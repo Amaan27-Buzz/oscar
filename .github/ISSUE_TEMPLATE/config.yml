@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security report
+    url: https://github.com/amaansyed27/oscar/security
+    about: Use the repository security area for vulnerability reporting where available.
+  - name: Roadmap
+    url: https://github.com/amaansyed27/oscar/blob/main/docs/ROADMAP.md
+    about: Check whether the capability is already planned before opening an issue.
