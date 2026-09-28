@@ -1,0 +1,11 @@
+# Default ownership
+* @amaansyed27
+
+# Architecture and product contract
+/README.md @amaansyed27
+/docs/ @amaansyed27
+/AGENTS.md @amaansyed27
+
+# Security-sensitive paths
+/SECURITY.md @amaansyed27
+/.github/ @amaansyed27
