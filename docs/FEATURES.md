@@ -5,7 +5,8 @@ This document is the comprehensive capability backlog for OSCAR. A feature being
 ## Interaction
 
 - Natural-language voice and text as equal first-class interfaces.
-- Shared context between voice, text, Sunday, ChatGPT and desk surfaces.
+- Shared context between voice, text, Sunday, desktop, ChatGPT and physical surfaces.
+- One continuous relationship/history rather than a mandatory chat-sidebar workflow.
 - Short contextual commands: “mute”, “cancel that”, “leave Codex running”, “what did it find?”.
 - Barge-in: interrupt speech instantly and resume listening.
 - Streaming recognition, reasoning and speech output where supported.
@@ -73,26 +74,50 @@ This document is the comprehensive capability backlog for OSCAR. A feature being
 - Stronger reasoning models only when needed.
 - Speech-provider routing may use the same abstraction where useful.
 
-## Intent and epistemic routing
+## Intent and epistemic routing — Jev
 
-- Fast intent recognition.
+- Fast typed intent recognition.
 - Detect when OSCAR already has enough context.
 - Decide when memory retrieval is necessary.
-- Decide when a source/tool should be inspected.
+- Decide when a live source/tool should be inspected.
 - Decide when to use ChatGPT, SwitchRoute or a specialist worker.
+- Decide when deterministic execution is enough.
 - Ask the user only when ambiguity materially blocks safe/correct execution.
-- Planned TypeSafe Jev integration for typed routing decisions.
+- Explicit `known / recall / verify / reason / delegate / ask` states.
+- Avoid guessing personal/project context that can be retrieved.
 
-## Memory and continuity
+## Memory and continuity — LRA + Supermemory
 
-- LRA long-term memory layer.
-- Supermemory retrieval backend.
+- LRA persistent single-conversation/history architecture.
+- Supermemory semantic/profile-style backend.
+- Active live context preserved separately from long-term recall.
+- Episodic conversation/task history.
 - Cross-device conversation/task continuity.
 - Project/context retrieval.
 - Device/environment context.
-- Remember important outcomes, not every raw event.
+- User profile/preferences.
+- Procedural memory.
+- Protocol state.
 - Source/provenance metadata where possible.
 - Confidence-aware use of recalled information.
+- Retrieval ranking using relevance, recency, importance, scope, source authority and staleness.
+- Searchable history/timeline instead of mandatory manual chat management.
+- User controls to inspect, correct and forget memory.
+
+## Learning and procedural memory
+
+- Capture successful novel execution paths.
+- Distill useful procedures from noisy exploratory runs.
+- Parameterize reusable steps.
+- Store required capabilities/preconditions.
+- Store verification strategy.
+- Reuse known procedures on similar tasks.
+- Skip unnecessary discovery on repeated work.
+- Convert stable paths toward deterministic execution where possible.
+- Measure improvements in latency, cost and reliability over time.
+- Version learned procedures.
+- Roll back worse versions.
+- Never let learned behavior self-grant permissions.
 
 ## Sunday — OSCAR on phone
 
@@ -104,9 +129,26 @@ This document is the comprehensive capability backlog for OSCAR. A feature being
 - Phone sensor/context access.
 - On-device speech recognition where appropriate.
 - Biometric/PIN confirmation for sensitive actions.
-- Handoff between phone, desk, ChatGPT and PC.
+- Handoff between phone, desk, ChatGPT and desktop.
 - Mobile Sentry participation.
 - Rich lock-screen/notification actions where platform permits.
+
+## OSCAR Desktop — Windows and macOS
+
+- Native/lightweight Windows app.
+- macOS app using the same surface/capability contracts with platform-specific adapters.
+- Voice + text interaction.
+- Push/hold-to-talk.
+- Avatar/presence state.
+- Screen context.
+- Cursor/focus context.
+- Selected-text context.
+- Active-window/app context.
+- Notifications and task progress.
+- Approval/permission surfaces.
+- Worker capability/health status.
+- Sunday handoff.
+- Searchable timeline/history rather than a giant chat sidebar.
 
 ## PC Worker
 
@@ -117,7 +159,7 @@ Planned worker capabilities include:
 - Codex
 - computer use
 - Antigravity
-- terminal / PowerShell
+- terminal / PowerShell / shell
 - browser
 - IDEs/editors
 - Git/GitHub workflows
@@ -133,11 +175,26 @@ The PC is never required for OSCAR's basic availability.
 ## Software-task orchestration
 
 - Delegate repository work to Codex rather than reproducing a coding agent poorly.
+- Preserve specialist project/workspace context where possible.
+- Route design tasks through relevant plugins such as Impeccable when available.
 - Use computer use for GUI operation and visual verification.
 - Run tests/commands through the worker.
 - Observe the result and feed failures back into the specialist agent.
 - Continue until an objective completion condition is met or the user is needed.
 - Prefer the best available software/tool for a task.
+- Re-route on worker/tool failure.
+- Verify independently where practical.
+
+## Capability registry
+
+- Dynamic node/app/plugin capability advertisement.
+- Availability state.
+- Task suitability metadata.
+- Latency/cost metadata where useful.
+- Permission requirements.
+- Reliability/history metadata.
+- Project/workspace context hints.
+- Ability for capabilities to disappear/reappear without killing OSCAR.
 
 ## Edge / physical world
 
@@ -155,14 +212,26 @@ The PC is never required for OSCAR's basic availability.
 - OTA/configuration management.
 - Future smart-home/environment integrations.
 
+## Kinetable integration
+
+- Treat Kinetable as OSCAR's specialist hardware workshop.
+- Route hardware design/visual wiring tasks into Kinetable.
+- Use actual user component inventory/context.
+- Simulation support.
+- Firmware generation/programming path.
+- Provision ESP32/Pico/new devices into OSCAR/Latch Edge.
+- Generate capability metadata during provisioning.
+- Avoid duplicating Kinetable inside OSCAR.
+
 ## Engineering/workbench capabilities
 
-Long-term target capabilities inspired by the useful parts of the JARVIS concept:
+Long-term target capabilities include:
 
 - identify connected components and sensors
 - inspect telemetry while the user works
 - correlate camera view with electronic state
 - explain wiring/problems using actual device data
+- route circuit/simulation work to Kinetable
 - drive visual-debugging or CAD/workbench tools
 - invoke specialist software rather than simulating it in chat
 - maintain personal component inventory/context
@@ -170,23 +239,45 @@ Long-term target capabilities inspired by the useful parts of the JARVIS concept
 
 ## Protocols and routines
 
-- Named protocols such as `leaving_home`.
+- Named protocols such as `leaving_home` or `release-watch`.
 - Recurring routines.
+- Time-triggered routines.
 - Event-triggered routines.
 - Multi-step stateful procedures.
+- Wait states.
+- Conditional branching.
+- Background observation.
+- Delegation to workers/tools.
 - Cancellation and pause/resume.
 - Preconditions and safety checks.
 - Idempotency where appropriate.
+- Recovery/retry policy.
+- Escalation rules.
+- Completion conditions.
 - Human approval gates for consequential steps.
+- Long-running responsibility over days/weeks/months when needed.
 
 ## Skills and plugins
 
-- Support globally portable `SKILL.md`-style capability descriptions/contracts.
+- Support portable `SKILL.md`-style capability descriptions/contracts.
 - Plugin/connector discovery.
 - Tool capability metadata.
 - OSCAR can identify when a specialist skill/plugin is better suited than its general path.
-- OSCAR may propose/create a reusable skill/protocol for repeated workflows.
-- Generated skills remain permission-scoped and reviewable.
+- OSCAR may create a reusable skill from a successful novel workflow.
+- OSCAR may propose/create/refine skills after repeated workflows.
+- Skills define required capabilities, inputs, preconditions, procedure, verification, risk and recovery.
+- Generated skills remain permission-scoped, inspectable and versioned.
+- Plugins/connectors become entries in the capability registry and can participate in skills/protocols.
+
+## Self-created automation
+
+- Create skill candidates from successful executions.
+- Create routine candidates from repeated recurring behavior.
+- Create protocol candidates from persistent objective patterns.
+- Validate generated definitions before activation.
+- Preserve provenance to the executions that taught the workflow.
+- Never grant new authority implicitly.
+- Require explicit approval when a generated workflow would broaden permissions or risk.
 
 ## Research and analysis
 
@@ -203,6 +294,7 @@ Long-term target capabilities inspired by the useful parts of the JARVIS concept
 - Continue delegated work after the user leaves.
 - Notify when a task reaches a meaningful result or blocker.
 - Avoid narrating routine background activity.
+- Learn preferred interruption patterns over time without overriding user controls.
 
 ## Device and environment awareness
 
@@ -235,8 +327,9 @@ Long-term target capabilities inspired by the useful parts of the JARVIS concept
 - Sentry configuration.
 - Environment/room/workbench setup.
 - Sunday pairing.
-- PC worker pairing.
+- Desktop/worker pairing.
 - Latch/ChatGPT/SwitchRoute setup.
+- Kinetable connection where desired.
 - Routines/protocol preferences.
 - End-to-end calibration and health check.
 
@@ -252,6 +345,7 @@ Long-term target capabilities inspired by the useful parts of the JARVIS concept
 - Outbound edge connections rather than exposed home endpoints.
 - Minimal cloud audio/video exposure.
 - Data retention controls.
+- Generated skills/protocols cannot self-elevate permissions.
 
 ## Reliability
 
@@ -265,3 +359,4 @@ Long-term target capabilities inspired by the useful parts of the JARVIS concept
 - Health/status reporting.
 - Recovery from partial task completion.
 - Explicit blocker reporting rather than silent failure.
+- Skill/protocol rollback when learned changes reduce reliability.
