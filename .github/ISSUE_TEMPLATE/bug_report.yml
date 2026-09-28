@@ -1,0 +1,61 @@
+name: Bug report
+description: Report reproducible incorrect OSCAR behavior
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not include secrets, personal memory exports, voice embeddings, private recordings or security exploit details here. Use SECURITY.md for vulnerabilities.
+  - type: input
+    id: slice
+    attributes:
+      label: Slice / component
+      description: Which slice or component is affected?
+      placeholder: "e.g. Slice 04 / voice core"
+    validations:
+      required: true
+  - type: textarea
+    id: summary
+    attributes:
+      label: What happened?
+      description: Describe the incorrect behavior clearly.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduction steps
+      placeholder: "1. ...\n2. ...\n3. ..."
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: OS/device, firmware/app version, node type and relevant provider/tool versions. Remove secrets.
+  - type: dropdown
+    id: safety
+    attributes:
+      label: Safety/security impact?
+      options:
+        - None known
+        - Possible safety impact
+        - Possible privacy/security impact
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks
+      options:
+        - label: I checked the current roadmap/docs for known limitations.
+          required: true
+        - label: I removed secrets and private user data from this report.
+          required: true
