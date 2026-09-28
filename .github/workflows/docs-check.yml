@@ -1,0 +1,54 @@
+name: Repository checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  repository-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check required repository files
+        shell: bash
+        run: |
+          set -euo pipefail
+          required=(
+            README.md
+            AGENTS.md
+            CONTRIBUTING.md
+            CHANGELOG.md
+            SECURITY.md
+            SUPPORT.md
+            docs/PRODUCT.md
+            docs/ARCHITECTURE.md
+            docs/FEATURES.md
+            docs/ROADMAP.md
+            docs/DECISIONS.md
+            docs/MEMORY.md
+            docs/ORCHESTRATION.md
+            docs/SURFACES.md
+            docs/VOICE-SENTRY.md
+            docs/ONBOARDING.md
+            docs/UI-AVATAR.md
+            docs/SECURITY.md
+            assets/brand/oscar-logo.png
+          )
+
+          for file in "${required[@]}"; do
+            test -e "$file" || { echo "Missing required file: $file"; exit 1; }
+          done
+
+      - name: Detect whitespace errors
+        run: git diff --check HEAD^
+        if: github.event_name == 'push'
+
+      - name: Detect whitespace errors in pull request
+        run: git diff --check origin/${{ github.base_ref }}...HEAD
+        if: github.event_name == 'pull_request'
