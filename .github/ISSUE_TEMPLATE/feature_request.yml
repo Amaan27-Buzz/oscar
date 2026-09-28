@@ -1,0 +1,43 @@
+name: Feature proposal
+description: Propose a capability that fits OSCAR's product architecture
+title: "[Feature] "
+labels: ["enhancement"]
+body:
+  - type: input
+    id: goal
+    attributes:
+      label: User goal
+      description: What should the user be able to accomplish?
+      placeholder: "e.g. Continue a task from Sunday on the desktop without restating context"
+    validations:
+      required: true
+  - type: textarea
+    id: fit
+    attributes:
+      label: Why this belongs in OSCAR
+      description: Explain how it fits the current product/architecture rather than being an isolated integration.
+    validations:
+      required: true
+  - type: textarea
+    id: capability
+    attributes:
+      label: Best execution capability
+      description: Which existing worker/tool/plugin/device should do the actual work? Avoid assuming OSCAR should reimplement a specialist.
+  - type: input
+    id: slice
+    attributes:
+      label: Suggested slice
+      placeholder: "e.g. Slice 08 / Desktop + workers"
+  - type: textarea
+    id: risks
+    attributes:
+      label: Permissions, privacy or safety considerations
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks
+      options:
+        - label: I checked `docs/FEATURES.md` and `docs/ROADMAP.md` first.
+          required: true
+        - label: This proposal does not rely on silently expanding OSCAR's permissions.
+          required: true
