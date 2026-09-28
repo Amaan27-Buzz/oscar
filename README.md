@@ -114,7 +114,7 @@ later       → improve/version the skill from better outcomes
 
 | Slice | Deliverable | Status |
 |---:|---|---|
-| 00 | Repository foundation, product definition, architecture docs, brand assets | ✅ Complete |
+| 00 | Repository foundation, product definition, architecture docs, brand assets and repository support | ✅ Complete |
 | 01 | Edge runtime skeleton: ESP32 gateway + Pico deterministic controller + event model | ⏭️ Next |
 | 02 | Reflex engine: local intents, command state, hardware-safe execution | Planned |
 | 03 | Latch Edge: secure bidirectional OSCAR ↔ Latch transport and capability registry | Planned |
@@ -148,6 +148,19 @@ later       → improve/version the skill from better outcomes
 - [Security + permissions](docs/SECURITY.md)
 - [Detailed roadmap](docs/ROADMAP.md)
 - [Architecture decisions](docs/DECISIONS.md)
+
+## Repository support
+
+- [Contributing](CONTRIBUTING.md)
+- [Coding-agent instructions](AGENTS.md)
+- [Changelog](CHANGELOG.md)
+- [Security policy](SECURITY.md)
+- [Support](SUPPORT.md)
+- [Code of Conduct](CODE_OF_CONDUCT.md)
+- `.github/` — issue forms, PR template, CODEOWNERS and repository checks
+- `.editorconfig`, `.gitattributes`, `.gitignore` — repository-wide development defaults
+
+A project license has intentionally **not** been chosen yet. The repository should not silently adopt an open-source license without an explicit licensing decision.
 
 ## Development rule
 
