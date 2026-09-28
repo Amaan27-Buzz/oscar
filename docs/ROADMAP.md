@@ -18,11 +18,14 @@ Deliverables:
 - canonical OSCAR product definition
 - architecture plan
 - comprehensive feature inventory
+- LRA/Supermemory/Jev memory plan
+- orchestration/learning/skills/protocol plan
+- Sunday/desktop/edge surface plan
 - voice/Sentry design
 - onboarding/Voice Match plan
 - avatar interaction language
 - security model
-- brand assets organized under `assets/brand/`
+- brand assets under `assets/brand/`
 - README status table and documentation links
 
 Exit condition: repository clearly defines what OSCAR is, what it is not, and the planned implementation order.
@@ -94,9 +97,9 @@ Deliverables:
 
 Exit condition: user can wake OSCAR, speak a request, receive a spoken reply and interrupt it naturally.
 
-## Slice 05 — OSCAR core router ◻️
+## Slice 05 — OSCAR core router / Jev ◻️
 
-**Goal:** create the decision layer that chooses the right execution path.
+**Goal:** create the decision layer that chooses the right execution and knowledge path.
 
 Deliverables:
 
@@ -105,10 +108,11 @@ Deliverables:
 - policy hooks
 - capability selection
 - deterministic vs tool vs model routing
-- Jev integration for intent/epistemic decisions
-- explicit “need context / inspect source / ask user” states
+- Jev integration for intent + epistemic decisions
+- explicit `known / recall / verify / reason / delegate / ask` states
+- latency instrumentation for routing
 
-Exit condition: representative requests route correctly without unnecessarily invoking heavy models.
+Exit condition: representative requests route correctly without unnecessarily invoking heavy models or guessing missing context.
 
 ## Slice 06 — Cloud brains ◻️
 
@@ -144,39 +148,44 @@ Deliverables:
 
 Exit condition: a task can move between Sunday and another OSCAR surface without becoming a separate assistant/session silo.
 
-## Slice 08 — PC Worker ◻️
+## Slice 08 — Desktop + worker nodes ◻️
 
-**Goal:** turn an online computer into an optional specialist execution node.
+**Goal:** create native desktop presence and turn online computers into specialist execution nodes.
 
 Deliverables:
 
-- worker pairing
-- dynamic capability discovery
+- Windows native/lightweight app shell
+- macOS-compatible surface plan and adapter boundary
+- voice/text interaction + OSCAR presence UI
+- screen/cursor/selection/active-window context
+- worker pairing and dynamic capability discovery
 - filesystem/terminal primitives
 - Codex integration
 - computer-use integration
 - browser/IDE/app launching
-- Antigravity/specialist software adapters where feasible
+- Antigravity/specialist adapters where feasible
 - progress/result callbacks
 - cancellation and disconnect recovery
 
-Exit condition: OSCAR can delegate a specialized software task, observe it, verify the result and survive the worker disappearing.
+Exit condition: OSCAR can interact naturally on desktop, delegate a specialist software task, observe it, verify the result and survive the worker disappearing.
 
 ## Slice 09 — Memory and context ◻️
 
-**Goal:** provide durable cross-device continuity without indiscriminate context stuffing.
+**Goal:** provide durable cross-device continuity without a conventional chat-sidebar dependency.
 
 Deliverables:
 
 - LRA integration boundary
+- active-context + episodic-history model
 - Supermemory backend
-- retrieval policy
-- task/project/device memory types
+- Jev retrieval/verification decisions
+- task/project/device/procedural memory types
 - provenance/confidence metadata
 - remember/forget/update flows
-- context handoff between Sunday, desk, ChatGPT and PC
+- context handoff between Sunday, desktop, ChatGPT, edge and workers
+- searchable history/timeline surface
 
-Exit condition: OSCAR can retrieve relevant prior context when needed and avoid retrieval when it already knows enough.
+Exit condition: OSCAR can retrieve relevant prior context when needed, preserve continuous interaction across devices, and avoid retrieval when it already knows enough.
 
 ## Slice 10 — Sentry Mode ◻️
 
@@ -208,7 +217,7 @@ Deliverables:
 - device/environment discovery
 - service connections
 - Sentry configuration
-- Sunday/PC pairing
+- Sunday/desktop pairing
 - permission matrix
 - end-to-end calibration
 
@@ -228,31 +237,39 @@ Deliverables:
 - reduced-motion accessibility
 - compact/icon variants
 
-Exit condition: avatar motion always maps to actual OSCAR state and works across phone and suitable desk displays.
+Exit condition: avatar motion always maps to actual OSCAR state and works across Sunday, desktop and suitable desk displays.
 
-## Slice 13 — Protocols, routines, skills and plugins ◻️
+## Slice 13 — Learning, skills, routines, protocols and plugins ◻️
 
-**Goal:** make OSCAR extensible and able to reuse learned workflows safely.
+**Goal:** make OSCAR learn reusable procedures and become faster with experience.
 
 Deliverables:
 
-- protocol schema
-- routine/event triggers
-- pause/resume/cancel
-- `SKILL.md`-style skill contract
+- procedural memory capture from successful executions
+- route/tool outcome history
+- reusable procedure distillation
+- `SKILL.md`-style portable skill contract
 - plugin/tool discovery
-- skill/protocol proposal/generation flow
+- protocol schema + durable state
+- routine/time/event triggers
+- pause/resume/cancel
+- self-created skill/routine/protocol candidate flow
 - permission review for generated automation
+- verification requirements
 - versioning and rollback
+- measurable repeated-task latency/cost improvement
 
-Exit condition: OSCAR can safely create/use a reusable workflow without self-granting authority.
+Exit condition: OSCAR can learn a novel successful workflow, reuse it later faster, refine it from a better outcome, and do so without self-granting authority.
 
-## Slice 14 — Environment / workbench integration ◻️
+## Slice 14 — Kinetable + environment/workbench ◻️
 
-**Goal:** connect richer physical and visual context.
+**Goal:** connect hardware engineering, richer physical context and provisioned OSCAR devices.
 
 Deliverables:
 
+- Kinetable integration contract
+- hardware project/inventory handoff
+- firmware/provisioning path into OSCAR/Latch Edge
 - camera-capable node path
 - component/workbench telemetry
 - device state correlation
@@ -260,7 +277,7 @@ Deliverables:
 - environment/device inventory
 - specialist visual/engineering tool hooks
 
-Exit condition: OSCAR can reason from actual workbench/environment data and execute safe approved actions.
+Exit condition: OSCAR can route hardware work to Kinetable, reason from actual workbench/environment data, and onboard an approved device as a capability-bearing OSCAR node.
 
 ## Slice 15 — Reliability and security pass ◻️
 
@@ -278,6 +295,7 @@ Deliverables:
 - rate limiting
 - permission regression tests
 - privacy/retention controls
+- generated-skill/protocol safety tests
 
 Exit condition: major failure modes are tested and documented, not merely assumed.
 
@@ -289,17 +307,19 @@ Reference scenario:
 
 ```text
 Sentry detects meaningful event
-→ OSCAR evaluates locally
-→ invokes cloud intelligence if needed
-→ uses Sunday/ChatGPT to involve user if required
-→ delegates specialist work to PC if available
+→ OSCAR/Jev evaluates locally
+→ retrieves context if needed
+→ invokes ChatGPT/SwitchRoute if reasoning is needed
+→ involves user through Sunday/desktop when required
+→ delegates specialist work to the best worker/tool
 → controls safe edge action
 → verifies outcome
-→ stores important result in memory
+→ stores important + procedural memory
+→ improves reusable skill/protocol if appropriate
 → reports succinctly
 ```
 
-Exit condition: edge + voice + ChatGPT + SwitchRoute + Sunday + PC worker + memory + Sentry operate as one coherent OSCAR system.
+Exit condition: edge + voice + ChatGPT + SwitchRoute + Sunday + desktop workers + LRA/Supermemory + learning + Sentry + Kinetable integration operate as one coherent OSCAR system.
 
 ## Slice definition of done
 
