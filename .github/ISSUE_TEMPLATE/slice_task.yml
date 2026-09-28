@@ -1,0 +1,56 @@
+name: Slice task
+description: Track an implementation task within an OSCAR slice
+title: "[Slice XX] "
+labels: ["slice"]
+body:
+  - type: input
+    id: slice
+    attributes:
+      label: Slice
+      placeholder: "e.g. 01 — Edge runtime skeleton"
+    validations:
+      required: true
+  - type: textarea
+    id: objective
+    attributes:
+      label: Objective
+      description: One coherent outcome for this task.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      placeholder: "- [ ] ...\n- [ ] ..."
+    validations:
+      required: true
+  - type: textarea
+    id: tests
+    attributes:
+      label: Test plan
+      description: Include failure/offline/safety cases where relevant.
+    validations:
+      required: true
+  - type: textarea
+    id: docs
+    attributes:
+      label: Documentation to update
+      placeholder: "README.md, docs/ROADMAP.md, docs/ARCHITECTURE.md..."
+    validations:
+      required: true
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies / specialist capabilities
+      description: Latch, Jev, Supermemory, SwitchRoute, Codex, Kinetable, hardware, etc.
+  - type: checkboxes
+    id: done
+    attributes:
+      label: Definition of done
+      options:
+        - label: No fake/demo state is presented as a finished capability.
+          required: true
+        - label: Limitations and follow-ups will be documented.
+          required: true
+        - label: README/docs status will be updated when the slice state changes.
+          required: true
