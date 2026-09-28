@@ -151,6 +151,7 @@ later       → improve/version the skill from better outcomes
 
 ## Repository support
 
+- [Development guide](DEVELOPMENT.md)
 - [Contributing](CONTRIBUTING.md)
 - [Coding-agent instructions](AGENTS.md)
 - [Changelog](CHANGELOG.md)
