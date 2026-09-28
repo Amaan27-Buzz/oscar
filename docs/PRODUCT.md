@@ -2,7 +2,7 @@
 
 ## North star
 
-OSCAR is a persistent personal agent designed to do justice to the *idea* of JARVIS: one intelligence that can understand natural language, perceive context, reason, operate software, control hardware, delegate to specialist systems, continue work autonomously, and appear through multiple devices without becoming a collection of disconnected assistants.
+OSCAR is a persistent personal agent designed to do justice to the *idea* of JARVIS: one intelligence that can understand natural language, perceive context, reason, operate software, control hardware, delegate to specialist systems, continue work autonomously, learn successful procedures, and appear through multiple devices without becoming a collection of disconnected assistants.
 
 The goal is explicitly **not** to build a chatbot with a wake word and a looping 3D animation.
 
@@ -16,6 +16,7 @@ OSCAR should feel:
 - **Capable** — it can act through tools, hardware, apps, services and specialist agents.
 - **Selective** — it uses the right execution path instead of invoking a frontier model for every action.
 - **Personal** — voice, permissions, routines, device context, memory and interaction style belong to the enrolled user.
+- **Learning** — novel successful work can become reusable procedural memory, skills, routines and protocols.
 - **Quietly proactive** — important events surface; routine noise stays silent.
 
 ## One intelligence, many embodiments
@@ -24,7 +25,11 @@ OSCAR is the identity and orchestration layer. Its surfaces are not separate ass
 
 ### Sunday
 
-**Sunday is OSCAR on the phone.** It exists to provide a more capable, contextual and characterful mobile assistant than a conventional phone voice assistant. Sunday should gain access, subject to permissions, to notifications, apps, calls/messages, camera, sensors, routines and mobile context while sharing OSCAR's memory and task state.
+**Sunday is OSCAR on the phone.** It provides a more capable, contextual and characterful mobile assistant than a conventional phone voice assistant. Sunday should gain access, subject to permissions, to notifications, apps, calls/messages, camera, sensors, routines and mobile context while sharing OSCAR's memory and task state.
+
+### Desktop
+
+OSCAR has native/lightweight Windows and macOS surfaces for voice/text interaction, approvals, screen/cursor context, progress and presence. The desktop app is an embodiment, not the permanent host.
 
 ### Desk / physical OSCAR
 
@@ -36,13 +41,21 @@ ChatGPT is a first-class intelligence surface through Latch. OSCAR should be abl
 
 ### PC worker
 
-When the user's PC/laptop is online, it becomes an optional high-capability execution node. OSCAR may delegate work to Codex, computer-use systems, Antigravity, terminals, browsers, IDEs, FFmpeg, Blender or other specialist software. The PC is an accelerator, not the host.
+When a PC/laptop is online, it becomes an optional high-capability execution node. OSCAR may delegate work to Codex, computer-use systems, Antigravity, terminals, browsers, IDEs, FFmpeg, Blender or other specialist software. The PC is an accelerator, not the host.
+
+### Kinetable
+
+Kinetable is OSCAR's hardware engineering/workbench environment. OSCAR should route hardware design, visual wiring, simulation, firmware generation and provisioning work to Kinetable rather than duplicating that product internally.
+
+Long term, a Kinetable-built device should be provisionable directly as an OSCAR/Latch Edge node with declared capabilities.
 
 ## Core product principles
 
 ### 1. Delegate objectives, not button presses
 
 A user should be able to state a goal such as “fix the ClearLane crash and make sure the UI still works.” OSCAR should decide that repository work belongs with Codex, visual verification belongs with computer use, and final validation may require another loop.
+
+For something like “build a landing page for SceneLab,” OSCAR should use the SceneLab project context, Codex, the Impeccable plugin and browser verification when those are the best available capabilities.
 
 ### 2. Language is a control surface
 
@@ -54,19 +67,37 @@ Emergency stop, mute, simple device controls and other deterministic commands mu
 
 ### 4. Use models only where useful
 
-OSCAR should route between deterministic code, Jev-style intent/context decisions, ChatGPT, SwitchRoute models, memory retrieval, tools and specialist workers. More orchestration is not automatically better.
+OSCAR routes between deterministic code, Jev intent/epistemic decisions, ChatGPT, SwitchRoute models, memory retrieval, tools and specialist workers. More orchestration is not automatically better.
 
-### 5. Proactivity requires restraint
+### 5. Know when context is missing
+
+If OSCAR does not reliably know a user/project-specific fact, Jev should route to LRA/Supermemory or an authoritative source before asking the user. Guessing from vague model memory is a failure mode.
+
+### 6. Get faster with experience
+
+The first time OSCAR completes a novel task may involve exploration. A successful verified path can then become procedural memory or a reusable skill so later executions skip unnecessary discovery.
+
+### 7. Protocols are delegated responsibility
+
+OSCAR's protocols should be able to wait, observe, branch, delegate, recover and notify over long periods. They are more capable than simple reminders or scheduled prompts.
+
+### 8. Proactivity requires restraint
 
 OSCAR should distinguish between something worth logging, notifying, speaking aloud, or interrupting the user for. Sentry Mode should make OSCAR present without making it noisy.
 
-### 6. Hardware safety is local
+### 9. Hardware safety is local
 
 Cloud reasoning can advise and coordinate, but emergency stop, over-current/temperature cutoffs, relay interlocks and other safety-critical behavior remain deterministic and local.
 
+## Continuous memory, not chat management
+
+LRA provides one continuous OSCAR relationship across voice, text, Sunday, desktop and other surfaces. Internal history may be segmented for engineering purposes, but the user should not be forced to manage a sidebar full of disconnected chats just to recover context.
+
+Supermemory sits underneath LRA as a semantic/profile-style memory backend. Jev decides when recall or live verification is needed.
+
 ## Practical JARVIS capability benchmark
 
-The inspiration is the *capability pattern* demonstrated by JARVIS across the Iron Man films and *Age of Ultron*: natural-language control, engineering assistance, environment control, suit/device telemetry, scientific analysis, proactive warnings, research, remote operation, autonomous routines, multi-agent coordination, cyber defense, persistence and delegated work.
+The inspiration is the *capability pattern* demonstrated by JARVIS across the Iron Man films and *Age of Ultron*: natural-language control, engineering assistance, environment control, device telemetry, scientific analysis, proactive warnings, research, remote operation, autonomous routines, multi-agent coordination, persistence and delegated work.
 
 OSCAR adapts that pattern to real systems the user actually owns:
 
@@ -76,8 +107,8 @@ OSCAR adapts that pattern to real systems the user actually owns:
 - memory and retrieval
 - cameras and sensors
 - ESP32/Pico hardware
-- workbench devices
-- software agents and plugins
+- Kinetable/workbench tooling
+- software agents, skills and plugins
 - future smart-home/environment integrations
 
 ## Non-goals
@@ -85,6 +116,7 @@ OSCAR adapts that pattern to real systems the user actually owns:
 - A decorative “AI orb” whose main feature is animation.
 - A laptop-only assistant.
 - A single enormous local model.
+- A conventional chat app with OSCAR branding.
 - Reimplementing specialist software that OSCAR can invoke directly.
 - Sending 24/7 ambient audio/video to cloud AI.
 - Giving voice biometrics more security authority than they deserve.
