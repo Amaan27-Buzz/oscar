@@ -2,7 +2,7 @@
 
 ## Overview
 
-OSCAR is a distributed personal-agent system. No single device is assumed to be permanently available except the low-power edge runtime and cloud rendezvous services.
+OSCAR is a distributed personal-agent system. No single user computer is assumed to be permanently available. The low-power edge runtime preserves local presence/safety while cloud services provide cognition and rendezvous.
 
 ```text
 User / Environment
@@ -11,103 +11,127 @@ User / Environment
        ▼
 ┌────────────────────────────────────────────────────────────┐
 │                       OSCAR CORE                           │
-│ intent • context • policy • task state • delegation       │
-└───────────────┬──────────────────┬─────────────────────────┘
-                │                  │
-          intelligence         memory/context
-                │                  │
-      ┌─────────┴─────────┐   LRA / Supermemory
-      ▼                   ▼
- ChatGPT via Latch   SwitchRoute models
-      │                   │
-      └─────────┬─────────┘
-                ▼
-              Latch
-                │
-   ┌────────────┼───────────────────────────────┐
-   ▼            ▼                               ▼
-OSCAR Edge    Sunday                        PC Worker
-ESP32/Pico    Android                  Codex / computer use /
-                                       terminal / apps / GPU
+│ identity • policy • task state • delegation • protocols   │
+└────────────────────────────┬───────────────────────────────┘
+                             │
+                            Jev
+                  intent + epistemic routing
+                             │
+          ┌──────────────────┼──────────────────┐
+          │                  │                  │
+      memory/context     intelligence       capabilities
+          │                  │                  │
+  LRA + Supermemory   ChatGPT / SwitchRoute   tools/plugins/
+                                             skills/workers
+          └──────────────────┼──────────────────┘
+                             │
+                           Latch
+                             │
+      ┌──────────────────────┼──────────────────────────┐
+      ▼                      ▼                          ▼
+  OSCAR Edge               Sunday               Desktop / Workers
+ ESP32 + Pico              Android               Windows / macOS
+      │                                                   │
+ physical world                                  Codex / Computer Use /
+      │                                          terminal / apps / IDE
+      └────────────── Kinetable hardware workshop ───────┘
 ```
 
 ## 1. OSCAR Core
 
-The core owns the high-level state of the assistant:
+The core owns:
 
-- active conversation/task context
-- intent and action planning
+- identity and shared assistant state
+- active task/protocol state
 - capability discovery
 - permission/policy checks
 - delegation decisions
 - event prioritization
-- protocol/routine execution
-- memory retrieval decisions
-- result verification and retry/recovery
+- recovery/retry decisions
+- verification strategy
+- memory/context requests
 
-The core must not assume that every request requires an LLM.
+The core must not assume every request requires an LLM.
 
-### Jev decision layer
+## 2. Jev decision layer
 
-The planned TypeSafe Jev integration acts as a fast intent/epistemic decision layer. It should decide whether OSCAR:
+TypeSafe Jev is the fast typed decision layer for both **intent** and **epistemic state**.
+
+It should decide whether OSCAR:
 
 - already has sufficient context
-- can execute a deterministic/local intent
+- can execute a deterministic/local action
 - should query LRA/Supermemory
-- should inspect another source/tool
-- should use ChatGPT or a SwitchRoute model
-- should delegate to a specialist worker
+- should inspect an authoritative source/tool
+- should invoke ChatGPT or a SwitchRoute model
+- should delegate to a specialist capability
 - should ask the user
 
-The purpose is to avoid unnecessary orchestration and model calls while keeping decisions explicit and testable.
+Conceptually:
 
-## 2. Memory: LRA + Supermemory
+```text
+known     → answer/act
+recall    → LRA/Supermemory
+verify    → live source/tool
+reason    → ChatGPT/SwitchRoute
+specialist→ Codex/Kinetable/computer-use/etc.
+unknown   → ask user
+```
 
-LRA is the planned long-term memory/retrieval layer. Supermemory is the retrieval backend under that layer.
+This is intended to reduce latency, unnecessary model calls and hallucinated user/project context.
 
-Responsibilities:
+## 3. Memory: LRA + Supermemory
 
-- durable user/project/device context
+LRA is the persistent single-conversation/history architecture. Supermemory is the semantic/profile-style backend underneath it.
+
+Responsibilities include:
+
+- active live context
+- episodic history
+- project/device/user context
+- procedural memory
+- profile/preferences
+- provenance/confidence
+- context assembly
+- remember/update/forget flows
 - cross-device continuity
-- task history and important outcomes
-- protocol/routine definitions
-- retrieval based on relevance, not indiscriminate context injection
-- provenance and confidence where possible
 
-OSCAR should never treat memory as automatically correct. Retrieval is one possible evidence source.
+The user-facing model is one continuous OSCAR relationship. Internal history may be segmented for context-window management, but that should not force manual chat management.
 
-## 3. Intelligence paths
+Memory is not universally authoritative. Live sources should override stale recalled state when current truth matters.
+
+See [MEMORY.md](MEMORY.md).
+
+## 4. Intelligence paths
 
 ### ChatGPT path
 
-ChatGPT is a first-class reasoning surface connected through Latch.
+ChatGPT is a first-class reasoning surface through Latch.
 
-Two directions are required:
+Both directions are required:
 
 ```text
 ChatGPT → Latch → OSCAR
 OSCAR → Latch → ChatGPT
 ```
 
-ChatGPT should be usable for complex personal reasoning, research, long-running Work-style tasks, and situations where the user's ChatGPT context is valuable.
-
-The inbound OSCAR → ChatGPT wake transport is deliberately abstracted behind Latch. If the current ChatGPT product requires an indirect event trigger, Latch owns that workaround. A future direct trigger can replace it without changing OSCAR.
+The wake/trigger transport for OSCAR → ChatGPT should remain abstracted behind Latch so implementation can evolve without changing OSCAR.
 
 ### SwitchRoute path
 
-SwitchRoute provides general cloud-model routing for autonomous OSCAR activity:
+SwitchRoute provides autonomous cloud-model routing:
 
-- fast/cheap model for classification and extraction
-- stronger models for reasoning when needed
+- fast/cheap classification and extraction
+- stronger reasoning when needed
 - provider/model fallback
 - task-specific routing
-- cost/latency policy
+- latency/cost policy
 
-Local models are not required for core OSCAR operation.
+Local PC models remain optional support capabilities, not core dependencies.
 
-## 4. Latch
+## 5. Latch
 
-Latch is OSCAR's secure bridge between ChatGPT/cloud services and devices/tools.
+Latch is OSCAR's secure bridge between ChatGPT/cloud coordination and devices/tools.
 
 Planned responsibilities:
 
@@ -118,19 +142,17 @@ Planned responsibilities:
 - event correlation IDs
 - task callbacks
 - audit metadata
-- secure rendezvous without exposing home devices directly to the public Internet
+- secure rendezvous without public home-network exposure
 
 ### Latch Edge
 
-Embedded nodes should use a tiny Latch Edge protocol rather than hosting the full Latch runtime.
+Embedded nodes should use a small Latch Edge protocol rather than the full Latch runtime.
 
-Preferred networking model:
+Preferred network model:
 
 ```text
 ESP32 ──persistent outbound secure connection──► Latch
 ```
-
-This avoids inbound port forwarding and public ESP32 endpoints.
 
 Example advertised capabilities:
 
@@ -144,22 +166,22 @@ voice.state
 sentry.state
 ```
 
-## 5. OSCAR Edge
+## 6. OSCAR Edge
 
-### ESP32: gateway / brainstem
+### ESP32 — gateway / brainstem
 
 Responsibilities:
 
 - Wi-Fi/network connectivity
 - Latch Edge connection
-- wake-word/VAD/audio front end where supported
+- wake/VAD/audio front end where supported
 - local event routing
 - short-lived state/cache
 - display/status coordination
 - OTA/configuration
 - communication with Pico/RP2040
 
-### RP2040/Pico: deterministic controller
+### RP2040/Pico — deterministic controller
 
 Responsibilities:
 
@@ -172,9 +194,9 @@ Responsibilities:
 - hardware interlocks
 - emergency behavior
 
-The Pico should remain able to enforce safety even if ESP32, Latch or the cloud fails.
+The Pico must enforce safety even if ESP32, Latch or cloud intelligence fails.
 
-## 6. Sunday
+## 7. Sunday
 
 Sunday is OSCAR's mobile embodiment.
 
@@ -183,60 +205,104 @@ Planned capabilities, subject to platform permissions:
 - voice/text interaction
 - notifications and proactive alerts
 - phone calls/messages/actions
-- camera and microphone
+- camera/microphone
 - device/location/sensor context
-- Android on-device speech capabilities where suitable
+- on-device speech path where suitable
 - biometric confirmation for high-risk actions
-- continuity with desk/ChatGPT/PC sessions
+- continuity with desktop/desk/ChatGPT sessions
 
 Sunday is not a separate identity or memory silo.
 
-## 7. PC Worker
+## 8. OSCAR Desktop + PC Worker
 
-The PC worker connects opportunistically through Latch and advertises capabilities dynamically.
+OSCAR Desktop provides native/lightweight Windows and macOS interaction surfaces.
 
-Example:
+Planned UI responsibilities:
+
+- voice/text interaction
+- avatar/presence
+- screen/cursor/selection/active-window context
+- task progress
+- approval surfaces
+- notifications
+- Sunday handoff
+
+The worker runtime advertises machine capabilities dynamically, for example:
 
 ```text
-node: PC-Amaan
-online: true
-capabilities:
-  - codex
-  - computer-use
-  - antigravity
-  - powershell
-  - terminal
-  - browser
-  - vscode
-  - git
-  - python
-  - ffmpeg
-  - blender
-  - local-models
-  - filesystem
-  - gpu: RTX-class
+codex
+computer-use
+terminal / powershell
+browser
+filesystem
+vscode / IDE
+python
+git
+ffmpeg
+blender
+local-models
+gpu
 ```
 
-OSCAR delegates to it only when useful. If the node disappears, core OSCAR remains available.
+The desktop app is an embodiment; the worker is an execution node. Neither is OSCAR's permanent host.
 
-## 8. Capability-based delegation
+## 9. Capability-based delegation
 
-A task should be decomposed by objective and capability, not by product branding.
+OSCAR should decompose tasks by objective and choose the most suitable capability.
 
 Example:
 
 ```text
-"Fix the app crash and verify the UI"
+"Build the SceneLab landing page"
      │
-     ├─ inspect repo / code change ─► Codex
-     ├─ run application ────────────► PC worker
-     ├─ visual verification ────────► computer use
-     └─ summarize / decide retry ───► OSCAR core
+     ├─ project context ─────────► SceneLab workspace
+     ├─ implementation ──────────► Codex
+     ├─ design expertise ────────► Impeccable plugin
+     └─ visual verification ─────► browser/computer use
 ```
 
-The same mechanism supports future devices or cloud workers without changing the orchestration model.
+Or:
 
-## 9. Latency tiers
+```text
+"Design an OLED presence detector"
+     │
+     ├─ component inventory ─────► Kinetable
+     ├─ circuit/simulation ──────► Kinetable
+     ├─ firmware/provisioning ───► Kinetable/edge toolchain
+     └─ runtime capability ──────► OSCAR/Latch Edge
+```
+
+See [ORCHESTRATION.md](ORCHESTRATION.md).
+
+## 10. Learning and procedural memory
+
+Successful execution can become reusable procedure:
+
+```text
+explore → execute → verify → distill → store
+```
+
+Later similar requests can retrieve the known path, adapt parameters and skip unnecessary discovery.
+
+Skills/protocols may improve over time, but cannot self-grant authority.
+
+## 11. Protocols, routines, skills and plugins
+
+- **tool:** primitive callable capability
+- **skill:** reusable learned procedure, preferably compatible with `SKILL.md` conventions
+- **routine:** recurring/simple event-driven behavior
+- **protocol:** stateful long-running responsibility with triggers, branching, waiting, recovery and escalation
+- **plugin/connector:** external capability provider
+
+OSCAR may create or refine these from successful/repeated workflows subject to policy and permission review.
+
+## 12. Kinetable
+
+Kinetable remains a separate specialist hardware product and is integrated through capability contracts rather than duplicated inside OSCAR.
+
+Long term, OSCAR should be able to route hardware engineering work to Kinetable and register provisioned hardware as new OSCAR-capable nodes.
+
+## 13. Latency tiers
 
 | Tier | Target | Examples |
 |---|---:|---|
@@ -247,42 +313,34 @@ The same mechanism supports future devices or cloud workers without changing the
 
 For deep tasks OSCAR should acknowledge immediately and continue asynchronously rather than remaining silent.
 
-## 10. Streaming pipeline
+## 14. Streaming voice pipeline
 
-Where available, voice should be fully streamed:
+Where available:
 
 ```text
-audio → VAD/wake → partial STT → intent → streamed model/tool result → chunked TTS → speaker
+audio → VAD/wake → partial STT → Jev → tool/model stream → chunked TTS → speaker
 ```
 
 Barge-in must stop current speech and return the system to listening immediately.
 
-## 11. Offline / degradation behavior
+## 15. Offline / degradation behavior
 
 - Internet unavailable: local reflexes, safety, sensors and preconfigured routines continue.
 - ChatGPT unavailable: SwitchRoute may handle suitable requests.
 - SwitchRoute/provider unavailable: ChatGPT or another configured route may handle suitable requests.
-- PC offline: PC-only capabilities disappear from the registry; OSCAR remains alive.
-- Sunday offline: phone capabilities disappear; desk/cloud state remains.
-- Edge gateway unavailable: physical-node capabilities disappear; cloud/mobile/PC surfaces may remain.
+- PC offline: desktop-worker capabilities disappear; OSCAR remains alive.
+- Sunday offline: phone capabilities disappear; other surfaces remain.
+- Edge unavailable: physical capabilities disappear; cloud/mobile/desktop may remain.
 
-## 12. Protocols, routines, skills and plugins
-
-OSCAR should support reusable high-level behaviors:
-
-- protocols: stateful named procedures such as `leaving_home`
-- routines: recurring or event-driven automations
-- skills: portable `SKILL.md`-style capability instructions/contracts
-- plugins/connectors: access to external services and tools
-
-OSCAR may propose or generate a new reusable protocol/skill after repeated or explicit user workflows, but activation must respect permissions and review requirements.
-
-## 13. Architectural invariants
+## 16. Architectural invariants
 
 1. The laptop is optional.
 2. Hardware safety does not depend on a cloud model.
-3. Every consequential action is attributable and permission-checked.
-4. Voice and text share task/conversation state.
-5. All nodes advertise capabilities rather than being hard-coded assumptions.
-6. Provider-specific APIs sit behind OSCAR/Latch abstractions where practical.
-7. Reflex commands do not traverse the full reasoning stack.
+3. Consequential actions are permission-checked and attributable.
+4. Voice/text/surfaces share task and memory state.
+5. Internal context segmentation does not become a chat-management burden.
+6. Nodes/apps/plugins advertise capabilities rather than being hard-coded assumptions.
+7. OSCAR uses specialists when they are better suited than generic reasoning.
+8. Jev retrieves/verifies before guessing missing personal/project context.
+9. Learned skills/protocols never self-grant permissions.
+10. Reflex commands do not traverse the full reasoning stack.
