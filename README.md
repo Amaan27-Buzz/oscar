@@ -114,6 +114,28 @@ No generic AI dashboard, card wall, permanent chat sidebar, glassmorphism, neon 
 
 See [`DESIGN.md`](DESIGN.md), [`TASTE.md`](TASTE.md) and [`docs/SUNDAY-DESIGN.md`](docs/SUNDAY-DESIGN.md).
 
+## Engineering philosophy
+
+OSCAR is meant to become a long-lived system across embedded hardware, mobile, desktop, cloud services and agent runtimes. The engineering rule is therefore:
+
+> **Simple boundaries, strong contracts, boring reliability.**
+
+In practice:
+
+- prefer the smallest coherent solution over speculative future-proofing;
+- build modules around clear responsibilities with high cohesion and low coupling;
+- reuse proven shared behavior, not accidental code similarity;
+- use typed/validated contracts and explicit state ownership across subsystem boundaries;
+- isolate provider/platform details behind narrow adapters when a stable OSCAR contract is needed;
+- design timeout, retry, reconnect, cancellation and failure states intentionally;
+- keep dependencies justified and replaceable;
+- test contracts and meaningful failure cases rather than implementation trivia;
+- measure critical-path latency before adding optimization complexity;
+- use least privilege and fail-safe defaults;
+- prefer small reviewable/reversible changes over broad rewrites.
+
+`ENGINEERING.md` is the canonical quality standard for both humans and coding agents.
+
 ## Architecture principles
 
 1. **One intelligence, many embodiments.** Desk hardware, Sunday, desktop apps, ChatGPT and workers are surfaces/nodes of OSCAR.
@@ -131,7 +153,7 @@ See [`DESIGN.md`](DESIGN.md), [`TASTE.md`](TASTE.md) and [`docs/SUNDAY-DESIGN.md
 
 | Slice | Deliverable | Status |
 |---:|---|---|
-| 00 | Repository foundation, product/design definition, architecture docs, brand assets and coding-agent support | ✅ Complete |
+| 00 | Repository foundation, product/design/engineering definition, architecture docs, brand assets and coding-agent support | ✅ Complete |
 | 01 | Edge runtime skeleton: ESP32 gateway + Pico deterministic controller + event model | ⏭️ Next |
 | 02 | Reflex engine: local intents, command state, hardware-safe execution | Planned |
 | 03 | Latch Edge: secure bidirectional OSCAR ↔ Latch transport and capability registry | Planned |
@@ -156,6 +178,7 @@ See [`DESIGN.md`](DESIGN.md), [`TASTE.md`](TASTE.md) and [`docs/SUNDAY-DESIGN.md
 - [Product vision](docs/PRODUCT.md)
 - [System architecture](docs/ARCHITECTURE.md)
 - [Feature inventory](docs/FEATURES.md)
+- [Engineering standard](ENGINEERING.md)
 - [Design system](DESIGN.md)
 - [Design taste / quality bar](TASTE.md)
 - [Sunday visual direction](docs/SUNDAY-DESIGN.md)
@@ -174,6 +197,7 @@ See [`DESIGN.md`](DESIGN.md), [`TASTE.md`](TASTE.md) and [`docs/SUNDAY-DESIGN.md
 
 - [Development guide](DEVELOPMENT.md)
 - [Contributing](CONTRIBUTING.md)
+- [Engineering standard](ENGINEERING.md)
 - [Canonical coding-agent instructions](AGENTS.md)
 - [Claude Code adapter](CLAUDE.md)
 - [Gemini CLI adapter](GEMINI.md)

@@ -177,3 +177,15 @@ A slice is not complete while the repository still describes an older system sta
 **Reason:** duplicating large instruction sets across agents creates stale/conflicting project truth and wastes context.
 
 **Implication:** reusable workflows belong in focused `SKILL.md` packages rather than continuously expanding `AGENTS.md`.
+
+## ADR-028 — Engineering favors simple, modular and evolvable code
+
+**Decision:** `ENGINEERING.md` is the canonical engineering/system-design quality bar for OSCAR.
+
+**Principles:** prefer the smallest coherent solution; high cohesion and low coupling; typed and validated boundaries; explicit state ownership; bounded failure/retry behavior; dependency discipline; contract-focused tests; least privilege; measurement before optimization; small reviewable changes.
+
+**Reason:** OSCAR spans firmware, mobile, desktop, cloud and agent runtimes. Durability comes from clear responsibilities and stable contracts, not speculative complexity.
+
+**Constraint:** abstraction, services, extension points and dependencies must solve a current concrete problem. “Future-proofing” that makes today's code harder to understand is not accepted by default.
+
+**Implication:** provider/platform details should be isolated when OSCAR requires a stable internal contract, while shared abstractions should represent proven shared behavior rather than accidental syntactic similarity.

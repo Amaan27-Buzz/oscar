@@ -7,6 +7,7 @@ OSCAR keeps one canonical project truth and uses thin agent-specific adapters. T
 | File | Purpose |
 |---|---|
 | `AGENTS.md` | repository-wide architecture, safety, workflow and documentation rules |
+| `ENGINEERING.md` | canonical system-design and code-quality standard |
 | `DESIGN.md` | normative visual tokens and durable design-system decisions |
 | `TASTE.md` | qualitative UI taste, composition rules and anti-slop quality bar |
 | `docs/PRODUCT.md` | product truth and north star |
@@ -22,13 +23,13 @@ Agent-specific files should point back to these rather than becoming independent
 
 ### Codex / AGENTS-aware agents
 
-`AGENTS.md` is canonical. Add nested `AGENTS.md` files only when a real sub-tree develops materially different rules, for example future `edge/`, `apps/sunday/` or `apps/desktop/` directories.
+`AGENTS.md` is canonical. Implementation work also loads `ENGINEERING.md`. Add nested `AGENTS.md` files only when a real sub-tree develops materially different rules, for example future `edge/`, `apps/sunday/` or `apps/desktop/` directories.
 
 Do not create nested files prematurely.
 
 ### Claude Code
 
-`CLAUDE.md` imports/references the canonical instructions and tells Claude to load design files only for relevant work.
+`CLAUDE.md` imports/references the canonical instructions and tells Claude to load design files only for relevant work. Repository implementation is still governed by `ENGINEERING.md` even when an adapter does not duplicate those rules.
 
 ### Gemini CLI
 
@@ -41,7 +42,7 @@ Do not create nested files prematurely.
 
 ### Cursor
 
-`.cursor/rules/oscar-design.mdc` applies the OSCAR design system to relevant UI files. `AGENTS.md` remains the broader cross-agent source.
+`.cursor/rules/oscar-design.mdc` applies the OSCAR design system to relevant UI files. `AGENTS.md` and `ENGINEERING.md` remain the broader cross-agent sources.
 
 ## Portable skills
 
@@ -56,7 +57,7 @@ skills/
 ```
 
 - `oscar-ui` handles design/implementation/review of OSCAR surfaces.
-- `oscar-slice` handles one roadmap slice end to end.
+- `oscar-slice` handles one roadmap slice end to end and applies `ENGINEERING.md`.
 
 Skills are workflow-specific; `AGENTS.md` should not grow into a giant prompt containing every workflow.
 
@@ -64,11 +65,11 @@ Skills are workflow-specific; `AGENTS.md` should not grow into a giant prompt co
 
 Load the least context that is sufficient:
 
-- architecture/backend task → core product/architecture/domain docs;
-- UI task → core docs + `DESIGN.md` + `TASTE.md` + relevant surface docs;
-- edge/hardware task → core docs + hardware/security docs;
-- memory task → core docs + `docs/MEMORY.md`;
-- orchestration/learning task → core docs + `docs/ORCHESTRATION.md`.
+- any implementation task → `ENGINEERING.md` + relevant product/architecture/domain context;
+- UI task → core docs + `ENGINEERING.md` + `DESIGN.md` + `TASTE.md` + relevant surface docs;
+- edge/hardware task → core docs + `ENGINEERING.md` + hardware/security docs;
+- memory task → core docs + `ENGINEERING.md` + `docs/MEMORY.md`;
+- orchestration/learning task → core docs + `ENGINEERING.md` + `docs/ORCHESTRATION.md`.
 
 Do not dump the entire documentation tree into every agent turn. More context is not automatically better.
 
@@ -81,4 +82,4 @@ When a durable project rule changes:
 3. avoid copying the entire new rule into every adapter;
 4. update README/documentation links if discoverability changes.
 
-When a UI direction changes system-wide, update both `DESIGN.md` and `TASTE.md`; when only one surface changes, keep the global system stable and document the surface-specific decision separately.
+When an engineering principle changes system-wide, update `ENGINEERING.md`. When a UI direction changes system-wide, update both `DESIGN.md` and `TASTE.md`; when only one surface changes, keep the global system stable and document the surface-specific decision separately.

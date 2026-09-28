@@ -7,13 +7,31 @@ OSCAR is being built slice-by-slice. Contributions should preserve the product a
 Read:
 
 1. `README.md`
-2. `docs/PRODUCT.md`
-3. `docs/ARCHITECTURE.md`
-4. `docs/ROADMAP.md`
-5. `docs/DECISIONS.md`
-6. the domain-specific document for the area being changed
+2. `ENGINEERING.md`
+3. `docs/PRODUCT.md`
+4. `docs/ARCHITECTURE.md`
+5. `docs/ROADMAP.md`
+6. `docs/DECISIONS.md`
+7. the domain-specific document for the area being changed
 
 For agent-driven work, also read `AGENTS.md`.
+
+## Engineering bar
+
+Every code change should preserve or improve overall code health.
+
+- Prefer the simplest design that fully solves the current requirement.
+- Keep responsibilities cohesive and subsystem coupling low.
+- Use typed, validated contracts across important boundaries.
+- Reuse actual shared behavior; do not build premature abstraction frameworks.
+- Keep external providers/platforms behind narrow adapters when OSCAR needs a stable internal contract.
+- Make mutable state ownership and authoritative sources obvious.
+- Define failure, timeout, retry, reconnect and cancellation behavior where relevant.
+- Add dependencies only when their value exceeds their maintenance/compatibility cost.
+- Test public behavior and meaningful failure modes rather than private implementation trivia.
+- Prefer small, reversible changes over broad rewrites.
+
+See `ENGINEERING.md` for the complete standard.
 
 ## Slice rule
 
@@ -23,6 +41,7 @@ Work on one coherent product slice at a time. A slice is complete only when:
 - important behavior has tests;
 - limitations and follow-ups are explicit;
 - security/safety implications have been reviewed;
+- engineering invariants and failure modes have been considered;
 - `README.md` status is updated;
 - affected files under `docs/` are updated;
 - the next slice or follow-up is clear.
@@ -49,13 +68,16 @@ Keep PRs focused. Include:
 
 - what changed;
 - why it belongs in the current slice;
+- why the chosen design is the simplest suitable option;
+- important boundaries/state ownership affected;
+- failure behavior considered;
 - how it was tested;
 - known limitations;
 - docs updated;
 - screenshots/video for UI changes where useful;
 - hardware test notes for embedded changes.
 
-Prefer small, reviewable changes over broad rewrites.
+Prefer small, reviewable changes over broad rewrites. Keep unrelated refactors separate when they would obscure the behavioral change.
 
 ## Commit style
 

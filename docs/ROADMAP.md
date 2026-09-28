@@ -2,6 +2,8 @@
 
 This roadmap is slice-based. Each slice should leave OSCAR in a coherent, testable state and update the README plus affected docs in the same change.
 
+All implementation slices are also governed by `ENGINEERING.md`: keep scope coherent, boundaries explicit, failure behavior intentional and code simple enough to evolve safely.
+
 ## Status legend
 
 - ✅ Complete
@@ -11,7 +13,7 @@ This roadmap is slice-based. Each slice should leave OSCAR in a coherent, testab
 
 ## Slice 00 — Repository foundation ✅
 
-**Goal:** establish the product, design and agent-development contract before implementation.
+**Goal:** establish the product, design, engineering and agent-development contract before implementation.
 
 Deliverables:
 
@@ -26,6 +28,7 @@ Deliverables:
 - avatar interaction language
 - **Quietly Alive** design system in `DESIGN.md`
 - qualitative design/taste rules in `TASTE.md`
+- canonical engineering/system-design quality bar in `ENGINEERING.md`
 - Sunday mobile visual direction
 - canonical `AGENTS.md` plus Claude, Gemini, Copilot and Cursor adapters
 - portable `SKILL.md` workflows for OSCAR UI and slice delivery
@@ -35,7 +38,7 @@ Deliverables:
 - repository support files and GitHub templates/checks
 - README status table and documentation links
 
-Exit condition: repository clearly defines what OSCAR is, what it is not, how it should look/feel, how coding agents should work in it, and the planned implementation order.
+Exit condition: repository clearly defines what OSCAR is, what it is not, how it should look/feel, how it should be engineered, how coding agents should work in it, and the planned implementation order.
 
 ## Slice 01 — Edge runtime skeleton ⏭️
 
@@ -333,9 +336,13 @@ Exit condition: edge + voice + ChatGPT + SwitchRoute + Sunday + desktop workers 
 Every slice must include:
 
 - implementation complete for the scoped deliverable
-- tests for important behavior
+- design remains no more complex than the current requirement justifies
+- responsibilities/boundaries and authoritative state ownership are clear
+- tests for important behavior and meaningful failure modes
+- timeout/retry/reconnect/cancellation/idempotency behavior addressed where relevant
 - explicit limitations/follow-ups
 - security/safety review where relevant
+- critical-path performance measured/budgeted where relevant
 - README status update
 - affected docs updated
 - next slice clearly identified

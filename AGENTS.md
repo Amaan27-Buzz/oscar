@@ -9,6 +9,7 @@ Keep this file short enough to be useful in every task. Detailed product/design/
 For any implementation task, read:
 
 - `README.md`
+- `ENGINEERING.md` — canonical engineering quality/system-design standard
 - `docs/PRODUCT.md`
 - `docs/ARCHITECTURE.md`
 - `docs/ROADMAP.md`
@@ -28,12 +29,31 @@ Treat these files as the current product contract. If implementation and docs di
 
 - Work on one product slice or narrowly scoped sub-slice at a time.
 - Do not brute-force around an architectural problem. Inspect current best practices, libraries/frameworks and existing OSCAR infrastructure first.
-- Prefer modular components over monolithic files or god objects.
+- Prefer the smallest coherent design that solves the current requirement.
+- Prefer modular components with high cohesion and low coupling over monolithic files, god objects or fragmented wrapper layers.
+- Do not add abstractions, services, extension points or dependencies for hypothetical future needs.
 - Do not create fake/demo states that make an unfinished capability appear functional.
 - Preserve explicit failure states and report blockers instead of fabricating success.
 - Reuse existing projects and specialist tools when they are the right execution environment.
 - Before adding a dependency, explain why the existing stack is insufficient.
 - Preserve native platform conventions unless the OSCAR design system intentionally overrides them.
+
+## Engineering quality
+
+`ENGINEERING.md` is normative for implementation quality. In particular:
+
+- keep critical paths lean and understandable;
+- make subsystem boundaries typed, explicit and evolvable;
+- centralize real shared invariants without premature abstraction;
+- keep provider/platform specifics behind narrow adapters when OSCAR needs a stable internal contract;
+- make mutable state ownership and authoritative sources obvious;
+- design timeout/retry/reconnect/cancellation/failure behavior intentionally;
+- validate at trust boundaries and fail safely;
+- measure critical-path performance before optimizing;
+- write tests around contracts and meaningful failure modes, not private implementation trivia;
+- prefer small reviewable changes and separate broad refactors from feature work when practical.
+
+Do not “future-proof” the code by making it harder to understand today.
 
 ## Core invariants
 
@@ -79,7 +99,7 @@ A representative rule: if the user asks for a SceneLab landing page and Codex ha
 
 ## Tests
 
-Every slice should define an explicit test checklist before being marked complete. Include failure cases, disconnects/timeouts and safety behavior where applicable.
+Every slice should define an explicit test checklist before being marked complete. Include failure cases, disconnects/timeouts, cancellation/retry/idempotency where relevant, and safety behavior where applicable.
 
 For hardware-facing changes, separate host/simulator tests from real-device verification and state clearly which has been run.
 
@@ -95,7 +115,7 @@ Every completed slice or architectural change must update:
 - `docs/DECISIONS.md` when an invariant changes;
 - `CHANGELOG.md` for user/developer-visible milestones.
 
-A system-wide visual change also updates `DESIGN.md` and, when it changes qualitative direction, `TASTE.md`.
+A system-wide engineering-rule change updates `ENGINEERING.md`. A system-wide visual change updates `DESIGN.md` and, when it changes qualitative direction, `TASTE.md`.
 
 Do not leave documentation updates for a later cleanup pass.
 

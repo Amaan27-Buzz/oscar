@@ -1,8 +1,9 @@
 # Gemini CLI context
 
 @./AGENTS.md
+@./ENGINEERING.md
 
-`AGENTS.md` is the canonical repository-wide instruction set.
+`AGENTS.md` is the canonical repository-wide instruction set. `ENGINEERING.md` is the canonical implementation/system-design quality standard.
 
 For UI/UX/frontend/mobile/desktop work, additionally read:
 

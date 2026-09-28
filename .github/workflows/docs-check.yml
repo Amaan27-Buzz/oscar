@@ -24,6 +24,7 @@ jobs:
           required=(
             README.md
             AGENTS.md
+            ENGINEERING.md
             DESIGN.md
             TASTE.md
             CONTRIBUTING.md

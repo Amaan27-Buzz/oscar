@@ -4,6 +4,11 @@ Significant OSCAR milestones are recorded here. Detailed implementation status r
 
 ## Unreleased
 
+### Added
+
+- `ENGINEERING.md` as the canonical system-design/code-quality standard: simplicity, modularity, reuse discipline, typed contracts, explicit state ownership, dependency control, reliability, security, tests, observability, performance and small reversible changes.
+- Engineering review gates wired into `AGENTS.md`, development/contribution guidance, slice skill, PR template and repository checks.
+
 ### Planned
 
 - Slice 01 — OSCAR Edge runtime skeleton: ESP32 gateway + RP2040/Pico controller + typed event model.
