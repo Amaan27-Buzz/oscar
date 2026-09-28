@@ -1,0 +1,13 @@
+---
+description: OSCAR UI/UX design language and anti-slop rules for frontend, Sunday and desktop surfaces
+globs: "**/*.{tsx,jsx,css,scss,html,kt,kts,swift}"
+alwaysApply: false
+---
+
+Read `DESIGN.md`, `TASTE.md`, `docs/UI-AVATAR.md` and the relevant surface documentation before editing UI.
+
+The OSCAR design direction is **Quietly Alive**: minimal, technical, tactile and expressive. Keep one dominant focal idea per screen. Use OSCAR blue/yellow identity sparingly, let the avatar carry character, prefer native controls and progressive disclosure, and drive motion from real state.
+
+Reject generic AI SaaS patterns: dashboard/card walls, permanent chat sidebars, glassmorphism, neon HUDs, purple gradients, fake telemetry, sparkle-as-AI iconography and random ambient animation.
+
+Visually verify the shipped device classes/viewport targets and respect reduced motion.

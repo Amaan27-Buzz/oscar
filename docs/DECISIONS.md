@@ -161,3 +161,19 @@ The yellow face uses weighted joystick/puck motion and a designed expression lan
 - next-slice marker
 
 A slice is not complete while the repository still describes an older system state.
+
+## ADR-026 — Quietly Alive is the OSCAR visual system
+
+**Decision:** OSCAR uses the **Quietly Alive** design direction documented in `DESIGN.md` and `TASTE.md`.
+
+**Principles:** restrained/native product clarity, tactile industrial character, friendly expressive feedback and functional honesty. OSCAR's blue-shell/yellow-face avatar is the visual anchor; personality comes from real state, motion and timing rather than generic AI decoration.
+
+**Constraint:** system-wide visual changes update the canonical design files rather than drifting independently across Sunday, desktop and physical surfaces.
+
+## ADR-027 — Agent adapters stay thin; canonical context stays shared
+
+**Decision:** `AGENTS.md` is the canonical repository-wide coding-agent instruction set. `DESIGN.md`, `TASTE.md` and domain docs hold detailed truth. `CLAUDE.md`, `GEMINI.md`, GitHub Copilot instructions and Cursor rules are thin adapters that point back to canonical context.
+
+**Reason:** duplicating large instruction sets across agents creates stale/conflicting project truth and wastes context.
+
+**Implication:** reusable workflows belong in focused `SKILL.md` packages rather than continuously expanding `AGENTS.md`.

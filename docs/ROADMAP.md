@@ -11,7 +11,7 @@ This roadmap is slice-based. Each slice should leave OSCAR in a coherent, testab
 
 ## Slice 00 — Repository foundation ✅
 
-**Goal:** establish the product definition before implementation.
+**Goal:** establish the product, design and agent-development contract before implementation.
 
 Deliverables:
 
@@ -24,11 +24,18 @@ Deliverables:
 - voice/Sentry design
 - onboarding/Voice Match plan
 - avatar interaction language
+- **Quietly Alive** design system in `DESIGN.md`
+- qualitative design/taste rules in `TASTE.md`
+- Sunday mobile visual direction
+- canonical `AGENTS.md` plus Claude, Gemini, Copilot and Cursor adapters
+- portable `SKILL.md` workflows for OSCAR UI and slice delivery
+- coding-agent context documentation
 - security model
 - brand assets under `assets/brand/`
+- repository support files and GitHub templates/checks
 - README status table and documentation links
 
-Exit condition: repository clearly defines what OSCAR is, what it is not, and the planned implementation order.
+Exit condition: repository clearly defines what OSCAR is, what it is not, how it should look/feel, how coding agents should work in it, and the planned implementation order.
 
 ## Slice 01 — Edge runtime skeleton ⏭️
 

@@ -19,6 +19,10 @@ Significant OSCAR milestones are recorded here. Detailed implementation status r
 - Learning layer: procedural memory, portable `SKILL.md`-style skills, routines and stateful protocols.
 - Capability-based orchestration and specialist delegation.
 - Avatar/presence UI specification and brand assets.
+- **Quietly Alive** design system in `DESIGN.md`, adapted from Kinetable's Playful Precision principles for OSCAR's blue/yellow ambient identity.
+- `TASTE.md` with composition, motion, copy and anti-slop quality rules for coding/design agents.
+- Sunday mobile surface direction and state-specific UI guidance.
+- Cross-agent context architecture: `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, GitHub Copilot instructions, Cursor rule and portable `SKILL.md` workflows.
 - Slice-based roadmap and architecture decision records.
 - Repository support files, contribution/agent guidance and GitHub templates.
 

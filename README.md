@@ -97,6 +97,23 @@ next time   → retrieve skill → adapt → execute faster
 later       → improve/version the skill from better outcomes
 ```
 
+## Design language — Quietly Alive
+
+OSCAR uses a minimal, technical and tactile design language with character coming from **state, motion, timing and the avatar**, not generic AI decoration.
+
+Directional blend:
+
+- **60% restrained/native product design** — whitespace, hierarchy, clarity, finish;
+- **20% tactile industrial character** — physical response, clear affordances, weighted motion;
+- **10% friendly character/feedback** — expressive but credible;
+- **10% functional honesty** — controls and state should explain themselves.
+
+The blue-shell/yellow-face OSCAR avatar is the visual anchor. The yellow face moves inside the blue shell like a weighted puck/joystick and communicates attention and state. Sunday uses bright neutral surfaces, deep navy copy, restrained OSCAR blue, presence yellow and minimal red expression marks.
+
+No generic AI dashboard, card wall, permanent chat sidebar, glassmorphism, neon HUD, purple AI gradient or fake telemetry.
+
+See [`DESIGN.md`](DESIGN.md), [`TASTE.md`](TASTE.md) and [`docs/SUNDAY-DESIGN.md`](docs/SUNDAY-DESIGN.md).
+
 ## Architecture principles
 
 1. **One intelligence, many embodiments.** Desk hardware, Sunday, desktop apps, ChatGPT and workers are surfaces/nodes of OSCAR.
@@ -114,7 +131,7 @@ later       → improve/version the skill from better outcomes
 
 | Slice | Deliverable | Status |
 |---:|---|---|
-| 00 | Repository foundation, product definition, architecture docs, brand assets and repository support | ✅ Complete |
+| 00 | Repository foundation, product/design definition, architecture docs, brand assets and coding-agent support | ✅ Complete |
 | 01 | Edge runtime skeleton: ESP32 gateway + Pico deterministic controller + event model | ⏭️ Next |
 | 02 | Reflex engine: local intents, command state, hardware-safe execution | Planned |
 | 03 | Latch Edge: secure bidirectional OSCAR ↔ Latch transport and capability registry | Planned |
@@ -139,12 +156,16 @@ later       → improve/version the skill from better outcomes
 - [Product vision](docs/PRODUCT.md)
 - [System architecture](docs/ARCHITECTURE.md)
 - [Feature inventory](docs/FEATURES.md)
+- [Design system](DESIGN.md)
+- [Design taste / quality bar](TASTE.md)
+- [Sunday visual direction](docs/SUNDAY-DESIGN.md)
 - [Memory: LRA + Supermemory + Jev](docs/MEMORY.md)
 - [Orchestration, learning, skills and protocols](docs/ORCHESTRATION.md)
 - [Surfaces: Sunday, desktop and edge](docs/SURFACES.md)
 - [Voice + Sentry](docs/VOICE-SENTRY.md)
 - [First-time setup](docs/ONBOARDING.md)
 - [Avatar + interaction language](docs/UI-AVATAR.md)
+- [Coding-agent context](docs/AGENT-CONTEXT.md)
 - [Security + permissions](docs/SECURITY.md)
 - [Detailed roadmap](docs/ROADMAP.md)
 - [Architecture decisions](docs/DECISIONS.md)
@@ -153,12 +174,16 @@ later       → improve/version the skill from better outcomes
 
 - [Development guide](DEVELOPMENT.md)
 - [Contributing](CONTRIBUTING.md)
-- [Coding-agent instructions](AGENTS.md)
+- [Canonical coding-agent instructions](AGENTS.md)
+- [Claude Code adapter](CLAUDE.md)
+- [Gemini CLI adapter](GEMINI.md)
+- [Portable agent skills](skills/)
 - [Changelog](CHANGELOG.md)
 - [Security policy](SECURITY.md)
 - [Support](SUPPORT.md)
 - [Code of Conduct](CODE_OF_CONDUCT.md)
-- `.github/` — issue forms, PR template, CODEOWNERS and repository checks
+- `.github/` — Copilot instructions, path-specific instructions, issue forms, PR template, CODEOWNERS and repository checks
+- `.cursor/rules/` — Cursor project rules
 - `.editorconfig`, `.gitattributes`, `.gitignore` — repository-wide development defaults
 
 A project license has intentionally **not** been chosen yet. The repository should not silently adopt an open-source license without an explicit licensing decision.
