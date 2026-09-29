@@ -14,7 +14,14 @@ For any implementation task, read:
 - `docs/ARCHITECTURE.md`
 - `docs/ROADMAP.md`
 - `docs/DECISIONS.md`
+- `docs/EPISTEMIC-INTEGRITY.md`
 - the relevant domain document(s)
+
+For any orchestration/Worker/Protocol/runtime task, additionally read:
+
+- `docs/RUNTIME-FOUNDATIONS.md`
+- `docs/ORCHESTRATION.md`
+- `docs/WORKERS.md` where relevant
 
 For any UI, UX, motion, frontend, mobile or desktop-surface task, additionally read:
 
@@ -37,6 +44,39 @@ Treat these files as the current product contract. If implementation and docs di
 - Reuse existing projects and specialist tools when they are the right execution environment.
 - Before adding a dependency, explain why the existing stack is insufficient.
 - Preserve native platform conventions unless the OSCAR design system intentionally overrides them.
+
+## Evidence and completion claims
+
+A tool call, commit, Worker response or model message is **not automatically proof that the user's objective is complete**.
+
+For every meaningful task:
+
+1. define the observable completion condition;
+2. execute;
+3. inspect the resulting authoritative state;
+4. run tests/visual/device verification where relevant;
+5. report the strongest claim the evidence supports.
+
+Use explicit distinctions such as:
+
+```text
+reported success
+verified
+partially verified
+failed
+blocked
+unknown
+```
+
+Do not say `done`, `fixed`, `all set`, `works` or equivalent when the result is only reported or partially verified.
+
+If a sub-agent says it completed work, verify the resulting files/tests/runtime state rather than trusting the report blindly.
+
+If verification is impossible, state that limitation explicitly.
+
+Do not agree with the user merely because they assert something is complete/correct. Check the repository/runtime evidence first.
+
+See `docs/EPISTEMIC-INTEGRITY.md`.
 
 ## Engineering quality
 
@@ -70,8 +110,13 @@ Do not violate these without an explicit architecture decision update:
 9. SwitchRoute supplies general model routing.
 10. Nodes advertise capabilities dynamically.
 11. OSCAR chooses the best specialist rather than doing everything itself.
-12. Generated skills/routines/protocols cannot self-grant permissions.
+12. Generated Skills/routines/Protocols cannot self-grant permissions.
 13. Consequential actions must be attributable, permission-aware and auditable.
+14. Completion claims cannot exceed available verification evidence.
+15. Workers/Protocols use the Durable Execution Runtime for long-running work where persistence/recovery is required.
+16. Capability discovery scales through a catalog/search path rather than a mega-prompt containing every tool.
+17. Learned automation is evaluated before trusted promotion.
+18. Finished outputs use typed artifact/result references where appropriate.
 
 ## Specialist delegation
 
@@ -93,7 +138,7 @@ A representative rule: if the user asks for a SceneLab landing page and Codex ha
 - Personality comes from OSCAR's avatar, state, motion, timing and physicality — not generic AI decoration.
 - Avoid dashboard gravity: no default wall of cards, permanent chat sidebar, glassmorphism, neon HUD, purple AI gradients or fake telemetry.
 - Use one dominant focal idea per surface and progressive disclosure for secondary detail.
-- UI state must reflect real runtime state. Never animate “thinking” when the system is actually blocked/disconnected.
+- UI state must reflect real runtime state. Never animate `thinking`, `working` or `done` when the system is actually blocked, failed or still verifying.
 - Desktop and mobile are different compositions sharing one identity; do not merely stretch one into the other.
 - For substantial UI work, use the Impeccable workflow when available and perform bounded visual verification before declaring completion.
 
@@ -104,6 +149,8 @@ Every slice should define an explicit test checklist before being marked complet
 For hardware-facing changes, separate host/simulator tests from real-device verification and state clearly which has been run.
 
 For UI work, include target viewport/device verification, reduced-motion behavior, keyboard/touch access where relevant, and screenshots/visual inspection when tooling allows.
+
+For learned Skills/routines/Protocols, include candidate evaluation/replay where practical before promoting a new version to trusted/default use.
 
 ## Documentation is part of the change
 
