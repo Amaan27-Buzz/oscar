@@ -55,7 +55,7 @@ OSCAR spans firmware, mobile, desktop, cloud services and external agents, so bo
 - Validate untrusted/external input at boundaries.
 - Define required/optional fields explicitly.
 - Use stable identifiers, versioned schemas and documented compatibility expectations for cross-process/device protocols.
-- Distinguish commands, events, state snapshots and errors rather than overloading one message type.
+- Distinguish commands, events, state snapshots, artifacts/results and errors rather than overloading one message type.
 - Preserve correlation/task IDs across distributed work.
 - Do not silently coerce malformed input into plausible values.
 
@@ -85,7 +85,9 @@ Assume networks fail, processes restart, devices disappear and providers time ou
 - Retry only transient failures and use bounded retry/backoff.
 - Avoid retry storms and duplicated retry layers.
 - Make repeatable remote commands idempotent where feasible.
-- Persist enough task/protocol state to recover long-running responsibilities safely.
+- Persist enough task/Protocol state to recover long-running responsibilities safely.
+- Use durable checkpoints/leases/heartbeats where work must survive executor loss.
+- Detect abandoned/stuck/zombie work and make reclaim behavior explicit.
 - Isolate failures so one provider/node does not collapse unrelated OSCAR capabilities.
 - Use health/status reporting where a component is long-lived.
 - Prefer graceful degradation to pretending a capability is available.
@@ -104,7 +106,27 @@ Hardware and security-critical behavior must fail safe, not merely fail quietly.
 
 A blocked task is a real state. Do not present it as `thinking`, `working` or success.
 
-## 8. State ownership must be obvious
+## 8. Epistemic integrity and verification
+
+OSCAR must never present an unverified result as fact merely because a tool, Worker or model reported success.
+
+- Distinguish execution success from objective verification.
+- Preserve task states such as `result_received`, `verifying`, `verified`, `partially_verified`, `failed`, `blocked` and `unknown` where they matter.
+- Preserve claim/evidence states such as direct/known, inferred, recalled, reported, verified and unknown.
+- A Worker/tool response is testimony/evidence, not automatically truth.
+- Define a verification strategy for consequential changes before declaring completion.
+- Prefer independent verification when practical: read-after-write, tests after code edits, browser/device checks after UI/hardware changes, API reads after mutations.
+- Report limitations explicitly when verification covers only part of the objective.
+- Never upgrade memory, inference or another agent's report to `verified` without evidence.
+- Unknown is preferable to guessing.
+- User confidence or preference does not alter factual state; disagree when evidence/constraints require it.
+- When new evidence contradicts an earlier claim, correct it explicitly and propagate the correction to affected state/docs/tasks.
+
+See `docs/EPISTEMIC-INTEGRITY.md` for the canonical product contract.
+
+**Completion rule:** only claim unqualified `Done`/`Fixed` when the completion condition has been verified wherever verification is technically possible.
+
+## 9. State ownership must be obvious
 
 For each mutable piece of state, an engineer should be able to answer: **who owns it, who may change it, and what is authoritative?**
 
@@ -112,21 +134,21 @@ For each mutable piece of state, an engineer should be able to answer: **who own
 - Derive/cache secondary state rather than allowing multiple components to mutate competing copies.
 - Avoid global mutable state.
 - Make persistence and retention explicit.
-- Separate durable task/protocol state from transient UI state and derived memory.
+- Separate durable task/Protocol state from transient UI state and derived memory.
 - External live systems remain authoritative for their current state; cached memory is not automatically truth.
 
-## 9. Concurrency requires a reason
+## 10. Concurrency requires a reason
 
 Concurrency can improve latency and responsiveness but rapidly increases failure modes.
 
 - Add parallelism only when it provides measurable or necessary value.
 - Make cancellation and ownership explicit.
 - Avoid shared mutable state where message passing/ownership works better.
-- Bound queues, buffers and worker counts.
+- Bound queues, buffers and Worker counts.
 - Define ordering guarantees when consumers rely on them.
 - Test races, cancellation, shutdown and reconnect paths for concurrent components.
 
-## 10. Performance: measure first, optimize the real path
+## 11. Performance: measure first, optimize the real path
 
 OSCAR must feel immediate, but maintainability should not be sacrificed for imagined micro-optimizations.
 
@@ -138,18 +160,18 @@ OSCAR must feel immediate, but maintainability should not be sacrificed for imag
 - Avoid unnecessary allocations/copies on embedded or audio hot paths where measurements justify the work.
 - Document non-obvious optimizations and preserve a correctness test around them.
 
-## 11. Security and permissions are architectural boundaries
+## 12. Security and permissions are architectural boundaries
 
 - Least privilege by default.
 - Deny/fail safely when authorization is uncertain.
 - Validate at trust boundaries even when upstream code “should” have validated.
 - Keep credentials and personal data out of logs and source control.
 - Permission checks belong in authoritative execution paths, not only UI controls.
-- Generated skills/protocols cannot expand their own authority.
+- Generated Skills/Protocols cannot expand their own authority.
 - Sensitive actions need attributable audit context.
 - Prefer established cryptographic/security primitives over custom implementations.
 
-## 12. Tests protect contracts, not implementation trivia
+## 13. Tests protect contracts, not implementation trivia
 
 Use the smallest level of test that proves the important behavior.
 
@@ -161,10 +183,11 @@ Use the smallest level of test that proves the important behavior.
 - Refactoring should preserve existing behavior under tests.
 - Tests should be deterministic, isolated and readable.
 - Avoid asserting private implementation details unless those details are themselves a required contract.
+- For learned automation, test candidate procedures before promotion when representative replay/evaluation is possible.
 
 For hardware changes, clearly distinguish simulator/host tests from verification on the actual device.
 
-## 13. Observability without telemetry clutter
+## 14. Observability without telemetry clutter
 
 Operationally important components should expose enough information to understand what happened.
 
@@ -174,12 +197,14 @@ Prefer structured signals such as:
 - component/node ID;
 - operation name;
 - outcome/error category;
+- execution status;
+- verification status/evidence reference;
 - duration/latency;
 - retry/reconnect count where relevant.
 
 Do not log secrets, full private conversations, voice biometrics or raw sensitive payloads by default. Observability exists to debug the system, not to collect everything.
 
-## 14. Code should explain itself
+## 15. Code should explain itself
 
 - Choose names based on domain meaning, not temporary implementation detail.
 - Keep functions focused and reasonably small; split when multiple responsibilities become apparent.
@@ -189,7 +214,7 @@ Do not log secrets, full private conversations, voice biometrics or raw sensitiv
 
 If a large comment is required to explain ordinary control flow, simplify the code first.
 
-## 15. Change discipline
+## 16. Change discipline
 
 OSCAR is slice-based; changes should also be reviewable and reversible.
 
@@ -201,7 +226,7 @@ OSCAR is slice-based; changes should also be reviewable and reversible.
 - Migrations must be staged so intermediate repository states remain valid.
 - Breaking protocol/schema changes require explicit migration and rollback thinking.
 
-## 16. Refactor when evidence says to
+## 17. Refactor when evidence says to
 
 Refactoring is warranted when there is evidence such as:
 
@@ -215,7 +240,7 @@ Refactoring is warranted when there is evidence such as:
 
 Do not perform broad “future-proofing” rewrites without such evidence.
 
-## 17. Architecture decisions need trade-offs
+## 18. Architecture decisions need trade-offs
 
 For a meaningful new subsystem or boundary, record:
 
@@ -239,6 +264,8 @@ Before declaring a code change complete, ask:
 - **Contracts:** Are external/cross-module inputs typed, validated and evolvable?
 - **Failure:** What happens on timeout, restart, disconnect, duplicate request or unavailable provider?
 - **State:** Is the authoritative owner obvious?
+- **Truth:** What evidence supports every completion/success claim?
+- **Verification:** Did we verify the objective independently where practical, and report unverified surfaces explicitly?
 - **Security:** Are privilege, permissions and sensitive data handled at the real execution boundary?
 - **Tests:** Do tests cover contracts and meaningful failure cases?
 - **Operations:** Can a failure be diagnosed without exposing private data?
@@ -261,12 +288,14 @@ Reject or redesign code that trends toward:
 - unbounded retries, queues or background tasks;
 - catch-all error handling that converts failures to success/defaults;
 - provider-specific types leaking through the entire core;
+- treating another agent/tool's success report as verified completion;
+- UI states that display success/working while the runtime is blocked or failed;
 - tests coupled primarily to private implementation details;
 - premature microservices simply to appear modular;
 - large rewrites when a small migration/refactor would solve the problem.
 
 ## Definition of durable code
 
-For OSCAR, “lasting code” does **not** mean code that never changes. It means code that can change safely because responsibilities are clear, contracts are explicit, tests protect behavior, dependencies are controlled and failures are understood.
+For OSCAR, “lasting code” does **not** mean code that never changes. It means code that can change safely because responsibilities are clear, contracts are explicit, tests protect behavior, dependencies are controlled, failures are understood and completion claims are evidence-backed.
 
 When simplicity and extensibility conflict, prefer the simpler implementation **unless an existing requirement proves the extension point is needed now**.
