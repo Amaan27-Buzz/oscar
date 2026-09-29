@@ -2,7 +2,12 @@
 
 @AGENTS.md
 
-Use `AGENTS.md` as the canonical repository-wide instruction set. For implementation/system-design work, also load `ENGINEERING.md`.
+Use `AGENTS.md` as the canonical repository-wide instruction set. For implementation/system-design work, also load:
+
+- `ENGINEERING.md`
+- `docs/EPISTEMIC-INTEGRITY.md`
+
+When the task touches orchestration, Workers, Protocols, channels or long-running execution, also load `docs/RUNTIME-FOUNDATIONS.md` plus the relevant domain docs.
 
 When the task touches UI, UX, motion, Sunday, desktop apps or frontend implementation, also load:
 
