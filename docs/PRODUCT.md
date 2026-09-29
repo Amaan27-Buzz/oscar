@@ -6,6 +6,12 @@ OSCAR is a persistent personal agent designed to do justice to the *idea* of JAR
 
 The goal is explicitly **not** to build a chatbot with a wake word and a looping 3D animation.
 
+A second north-star rule is equally important:
+
+> **OSCAR must prefer uncertainty, incompleteness, disagreement or failure over presenting an unverified statement as fact.**
+
+It should never claim `done`, `fixed`, `sent`, `deployed`, `scheduled`, `working` or equivalent merely because it intended the action, delegated it, or received a success response. Where verification is technically possible, OSCAR verifies before making an unqualified completion claim.
+
 ## What OSCAR should feel like
 
 OSCAR should feel:
@@ -16,9 +22,10 @@ OSCAR should feel:
 - **Capable** — it can act through tools, hardware, apps, services and specialist agents.
 - **Selective** — it uses the right execution path instead of invoking a frontier model for every action.
 - **Personal** — voice, Personal Policy, permissions, routines, device context, memory and interaction style belong to the enrolled user.
-- **Learning** — novel successful work can become reusable procedural memory, skills, routines and protocols.
+- **Learning** — verified novel work can become reusable procedural memory, Skills, routines and Protocols after evaluation.
 - **Delegating** — it can create Workers for temporary or persistent responsibilities rather than making the user manually coordinate every agent.
 - **Quietly proactive** — important events surface; routine noise stays silent.
+- **Truthful about state** — `reported`, `verifying`, `partially verified`, `blocked`, `failed` and `unknown` are valid outcomes and are not cosmetically converted into success.
 
 ## One intelligence, many embodiments
 
@@ -40,9 +47,9 @@ ESP32 and RP2040/Pico-class hardware provide an always-on edge presence for micr
 
 ChatGPT is a first-class intelligence surface through Latch. OSCAR should be able to reach ChatGPT as well as ChatGPT reaching OSCAR. Until a direct trigger path is available, Latch may abstract an indirect wake mechanism so the transport can be replaced later without changing OSCAR's higher-level contract.
 
-### Machine worker node
+### Machine Worker node
 
-When a PC/laptop is online, it becomes an optional high-capability execution node. OSCAR may delegate work to Codex, computer-use systems, Antigravity, terminals, browsers, IDEs, FFmpeg, Blender or other specialist software. The PC is an accelerator, not the host.
+When a PC/laptop is online, it becomes an optional high-capability execution node. OSCAR may delegate work to Codex, computer-use systems, terminals, browsers, IDEs, FFmpeg, Blender or other specialist software. The PC is an accelerator, not the host.
 
 ### Delegated Workers
 
@@ -66,13 +73,13 @@ For something like “build a landing page for SceneLab,” OSCAR should use the
 
 ### 2. Language is a control surface
 
-The user should not need rigid command syntax for ordinary interaction. Short contextual phrases such as “mute”, “cancel that”, “leave Codex running” or “what did it find?” should resolve against the active state.
+The user should not need rigid command syntax for ordinary interaction. Short contextual phrases such as “mute”, “cancel that”, “leave Codex running” or “what did it find?” should resolve against active state.
 
 The same rule applies to preferences and delegation:
 
 ```text
 "Don't answer family calls for me."
-"Let the SceneLab worker publish ordinary feature posts."
+"Let the SceneLab Worker publish ordinary feature posts."
 "Create someone to watch ClearLane releases tonight."
 ```
 
@@ -88,6 +95,8 @@ Calls, messaging, meetings, transcription, dictation and follow-up should use th
 
 OSCAR should prefer native/official integration paths and never pretend a platform/app exposes a capability that it does not.
 
+A Universal Channel Gateway should normalize supported inbound/outbound communication without pretending all channels provide the same actions.
+
 ### 5. Reflexes bypass intelligence
 
 Emergency stop, mute, simple device controls and other deterministic commands must not wait for ChatGPT or another cloud model.
@@ -98,27 +107,53 @@ OSCAR routes between deterministic code, Jev intent/epistemic decisions, ChatGPT
 
 ### 7. Know when context is missing
 
-If OSCAR does not reliably know a user/project-specific fact, Jev should route to LRA/Supermemory or an authoritative source before asking the user. Guessing from vague model memory is a failure mode.
+If OSCAR does not reliably know a user/project-specific fact, Jev should route to the World Model, LRA/Supermemory or an authoritative source before asking the user. Guessing from vague model memory is a failure mode.
 
-### 8. Get faster with experience
+### 8. Never claim more than the evidence supports
 
-The first time OSCAR completes a novel task may involve exploration. A successful verified path can then become procedural memory or a reusable skill so later executions skip unnecessary discovery.
+OSCAR keeps intention, execution, reported success, observation and verification separate.
 
-### 9. Workers should solve routine problems before escalating
+```text
+reported by tool/Worker ≠ verified objective completion
+```
+
+Unknown, partial, failed and blocked states are legitimate. OSCAR can disagree with the user when evidence or constraints require it.
+
+See `docs/EPISTEMIC-INTEGRITY.md`.
+
+### 9. Get faster with experience
+
+The first time OSCAR completes a novel task may involve exploration. A verified path can become procedural memory or a Skill candidate so later executions skip unnecessary discovery.
+
+A candidate is evaluated before becoming a trusted/default automation.
+
+### 10. Workers should solve routine problems before escalating
 
 A Worker that encounters a recoverable issue should use Jev to repair, retry or reroute safely before interrupting the user. Escalation is for ambiguity, blocked authentication, new authority or genuinely unresolved problems.
 
 Retries remain bounded and Workers never invent success.
 
-### 10. Protocols are delegated responsibility
+### 11. Protocols are delegated responsibility
 
-OSCAR's protocols should be able to wait, observe, branch, create/delegate Workers, recover and notify over long periods. They are more capable than simple reminders or scheduled prompts.
+OSCAR's Protocols should be able to wait, observe, branch, create/delegate Workers, recover and notify over long periods. They are more capable than simple reminders or scheduled prompts.
 
-### 11. Proactivity requires restraint
+Persistent responsibility uses a Durable Execution Runtime with checkpoints, recovery and explicit task state rather than depending on one process remaining alive.
+
+### 12. Capabilities are discovered progressively
+
+As the ecosystem grows, OSCAR should search a Capability Catalog and load only the relevant tool/Skill/plugin contracts for the current objective.
+
+The core must not become a mega-prompt containing every possible capability.
+
+### 13. Finished outputs are first-class
+
+Documents, reports, code changes, media, deployments, meeting notes, firmware builds and other durable outputs should be represented as Artifacts/Results with provenance, ownership/version/location and verification state.
+
+### 14. Proactivity requires restraint
 
 OSCAR should distinguish between something worth logging, notifying, speaking aloud, or interrupting the user for. Sentry Mode should make OSCAR present without making it noisy.
 
-### 12. Hardware safety is local
+### 15. Hardware safety is local
 
 Cloud reasoning can advise and coordinate, but emergency stop, over-current/temperature cutoffs, relay interlocks and other safety-critical behavior remain deterministic and local.
 
@@ -130,22 +165,34 @@ Supermemory sits underneath LRA as a semantic/profile-style memory backend. Jev 
 
 Personal Policy remains a separate authoritative behavior layer rather than being treated as merely another inferred memory.
 
-## Practical JARVIS capability benchmark
+Current truth belongs to the World Model/live authoritative sources; historical/semantic continuity belongs to memory.
 
-The inspiration is the *capability pattern* demonstrated by JARVIS across the Iron Man films and *Age of Ultron*: natural-language control, engineering assistance, environment control, device telemetry, scientific analysis, proactive warnings, research, communication, remote operation, autonomous routines, multi-agent coordination, persistence and delegated work.
+## Final practical benchmark
 
-OSCAR adapts that pattern to real systems the user actually owns:
+OSCAR's pre-implementation architecture has been compared against:
 
-- computers and development tools
-- phone and mobile context
-- calls, meetings, messages and dictation
-- cloud AI and ChatGPT
-- memory and Personal Policy
-- cameras and sensors
-- ESP32/Pico hardware
-- Kinetable/workbench tooling
-- software agents, Workers, skills and plugins
-- future smart-home/environment integrations
+- VoiceOS for low-friction voice/dictation/point-and-talk interaction;
+- MCU JARVIS for integrated perception, world state, executive control and physical/software reach;
+- ChatGPT/Claude for long-running work, plugins/connectors, artifacts and background execution;
+- Gemini for deep cross-source personal context and Android/Google integration;
+- Grok Bot for persistent delegated teammates;
+- OpenClaw for channel/gateway breadth and tool discovery;
+- Hermes for durable task recovery and self-improving Skills;
+- Pi for keeping the core small and extensible.
+
+See `docs/COMPETITIVE-BENCHMARK.md`.
+
+The resulting cross-cutting primitives are:
+
+- World Model + Perception Fabric;
+- Executive Planner;
+- Durable Execution Runtime;
+- Capability Catalog + Dynamic Tool Search;
+- Universal Channel Gateway;
+- Action Ledger + truthful Undo;
+- Artifact / Result Model;
+- Learned Automation Evaluation Pipeline;
+- Epistemic Integrity.
 
 ## Non-goals
 
@@ -155,7 +202,10 @@ OSCAR adapts that pattern to real systems the user actually owns:
 - A conventional chat app with OSCAR branding.
 - Reimplementing specialist software that OSCAR can invoke directly.
 - Creating a separate cloud desktop for every delegated Worker by default.
+- Turning the core into a giant framework or mega-prompt.
 - Pretending unsupported phone/app capabilities exist.
+- Pretending a tool/Worker report is verified success.
+- Acting like a yes-man when evidence/constraints disagree with the user.
 - Sending 24/7 ambient audio/video to cloud AI.
 - Giving voice biometrics more security authority than they deserve.
 - Letting inferred preferences silently become consequential authority.
