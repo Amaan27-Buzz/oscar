@@ -12,13 +12,13 @@ This file records decisions that should remain stable unless explicitly revisite
 
 **Decision:** Sunday is a mobile embodiment/surface of OSCAR, not a separate assistant.
 
-**Implication:** identity, memory, task state, permissions and protocols should be shared through OSCAR rather than duplicated into a separate mobile intelligence.
+**Implication:** identity, memory, task state, permissions and Protocols should be shared through OSCAR rather than duplicated into a separate mobile intelligence.
 
 ## ADR-003 — Laptop independence
 
 **Decision:** OSCAR must remain operational when the user's laptop/PC is off.
 
-**Implication:** primary availability cannot depend on a desktop daemon or local LLM. PCs join as optional worker nodes.
+**Implication:** primary availability cannot depend on a desktop daemon or local LLM. PCs join as optional Worker nodes.
 
 ## ADR-004 — Cloud-first intelligence, edge-first presence
 
@@ -40,7 +40,7 @@ Local PC models may exist only as optional support capabilities.
 
 ## ADR-006 — Latch is the bridge
 
-**Decision:** Latch is the secure integration layer between ChatGPT/cloud coordination and OSCAR devices/workers.
+**Decision:** Latch is the secure integration layer between ChatGPT/cloud coordination and OSCAR devices/Workers.
 
 Embedded hardware should use a minimal Latch Edge protocol with outbound connections rather than exposing home-network endpoints publicly.
 
@@ -49,8 +49,8 @@ Embedded hardware should use a minimal Latch Edge protocol with outbound connect
 **Decision:** both directions are required:
 
 ```text
-ChatGPT → OSCAR
-OSCAR → ChatGPT
+ChatGPT → Latch → OSCAR
+OSCAR → Latch → ChatGPT
 ```
 
 OSCAR → ChatGPT may initially require an indirect trigger/wake mechanism. The workaround must live behind a Latch abstraction so it can be replaced by a direct trigger later.
@@ -69,7 +69,7 @@ OSCAR → ChatGPT may initially require an indirect trigger/wake mechanism. The 
 
 ## ADR-010 — Capability advertisement
 
-**Decision:** nodes, apps, plugins and workers advertise capabilities dynamically.
+**Decision:** nodes, apps, plugins and Workers advertise capabilities dynamically.
 
 OSCAR should reason about `codex`, `computer-use`, `camera`, `relay`, `gpu`, `browser`, `kinetable`, plugins, etc. rather than assuming a specific machine or service is always present.
 
@@ -117,19 +117,19 @@ A user may speak a request, type a follow-up and continue verbally with the same
 
 ## ADR-019 — OSCAR learns procedures, not only facts
 
-**Decision:** successful novel executions can be distilled into procedural memory and reusable skills.
+**Decision:** successful novel executions can be distilled into procedural memory and reusable Skills.
 
 **Goal:** repeated tasks become faster, cheaper and more deterministic over time.
 
 ## ADR-020 — OSCAR can create reusable workflows safely
 
-**Decision:** OSCAR may create/propose/refine protocols, routines and ecosystem-compatible `SKILL.md`-style skills.
+**Decision:** OSCAR may create/propose/refine Protocols, routines and ecosystem-compatible `SKILL.md`-style Skills.
 
 **Constraint:** generated automation cannot grant itself new permissions. Expanded authority requires review/approval.
 
 ## ADR-021 — Protocols are stateful responsibilities, not just schedules
 
-**Decision:** OSCAR protocols may wait, observe, branch, delegate, retry, verify and escalate over long periods.
+**Decision:** OSCAR Protocols may wait, observe, branch, delegate, retry, verify and escalate over long periods.
 
 **Reason:** the target is persistent delegated responsibility, not a glorified cron/reminder system.
 
@@ -137,7 +137,7 @@ A user may speak a request, type a follow-up and continue verbally with the same
 
 **Decision:** OSCAR will have native/lightweight Windows and macOS surfaces for voice/text, context, approvals and presence.
 
-**Implication:** desktop UI is an embodiment; the machine worker is a capability node. Neither is the permanent host.
+**Implication:** desktop UI is an embodiment; the machine Worker is a capability node. Neither is the permanent host.
 
 ## ADR-023 — Kinetable is the hardware workshop
 
@@ -194,7 +194,7 @@ A slice is not complete while the repository still describes an older system sta
 
 **Decision:** explicit user preferences are stored/evaluated as Personal Policy, distinct from semantic memory and distinct from permissions.
 
-**Reason:** OSCAR must support arbitrary natural-language preferences such as call handling, interruption behavior, communication privacy, worker autonomy and app/project-specific rules without forcing everything into generic settings or unreliable prompt memory.
+**Reason:** OSCAR must support arbitrary natural-language preferences such as call handling, interruption behavior, communication privacy, Worker autonomy and app/project-specific rules without forcing everything into generic settings or unreliable prompt memory.
 
 **Precedence:** safety/legal/platform constraints and permissions remain authoritative; explicit policy is evaluated before inferred preferences/defaults.
 
@@ -295,3 +295,68 @@ A slice is not complete while the repository still describes an older system sta
 **Reason:** an always-present assistant cannot depend on the user manually noticing every infrastructure failure.
 
 **Constraint:** automatic repair/rollback occurs only when safe, bounded and authorized; otherwise OSCAR asks for the minimum intervention needed.
+
+## ADR-041 — Epistemic Integrity is a core invariant
+
+**Decision:** OSCAR distinguishes direct knowledge, inference, recalled memory, external reports, verified evidence and unknown state. Completion claims cannot exceed available verification evidence.
+
+**Reason:** intention, execution, tool success, Worker testimony, observation and verification are different states. Collapsing them causes false success claims and yes-man behavior.
+
+**Implications:**
+
+- `reported success` is not automatically `verified`;
+- unqualified `Done`/`Fixed` requires verification where technically possible;
+- partial verification is reported as partial;
+- unknown is a valid state;
+- OSCAR can disagree with the user when evidence/constraints require it;
+- corrections are explicit and propagated.
+
+See `docs/EPISTEMIC-INTEGRITY.md`.
+
+## ADR-042 — Communication adapters share a Universal Channel Gateway
+
+**Decision:** supported messaging/email/social channels map into one normalized inbound/outbound event/action abstraction while preserving channel-specific capabilities.
+
+**Reason:** OSCAR should not require bespoke orchestration logic for every new communication surface.
+
+**Constraint:** normalization must never imply unsupported parity. An adapter advertises exactly what that channel/account/surface can do.
+
+## ADR-043 — Long-running work uses a Durable Execution Runtime
+
+**Decision:** tasks that must survive process/device/executor loss use durable state with checkpoints, leases/ownership, heartbeats, bounded retry, cancellation, reclaim and restart/resume semantics.
+
+**Reason:** persistent Workers/Protocols cannot be reliable if `working` exists only in process memory.
+
+**Constraint:** the runtime owns execution mechanics; the Executive Planner owns priority/objective decisions and Workers own objective-specific reasoning.
+
+## ADR-044 — Capability discovery scales through a searchable catalog
+
+**Decision:** capabilities expose lightweight searchable manifests; detailed tool/Skill/plugin contracts are progressively loaded only for a relevant candidate set.
+
+**Reason:** OSCAR may eventually have hundreds/thousands of capabilities. Loading all definitions into every model context is wasteful and brittle.
+
+**Constraint:** search/ranking never bypasses permissions, Personal Policy or availability checks.
+
+## ADR-045 — Learned automation is evaluated before trusted promotion
+
+**Decision:** a successful exploratory execution can create a candidate Skill/routine/Protocol, but trusted/default promotion requires replay/evaluation where possible, safety/permission review, comparison with the current version and rollback support.
+
+**Reason:** one success does not prove a generalized workflow is reliable.
+
+**Constraint:** untestable candidates remain experimental/partially verified rather than silently becoming authoritative defaults.
+
+## ADR-046 — Finished outputs use a first-class Artifact / Result Model
+
+**Decision:** durable outputs such as documents, code changes, research, media, deployments, meeting notes and firmware builds can be represented as typed artifacts with provenance, version/location, ownership and verification state.
+
+**Reason:** Workers and Protocols need to hand off durable results without burying them in chat text or copying opaque blobs repeatedly.
+
+**Implication:** artifacts can be linked to projects/entities/tasks and reused by later Workers while preserving source and verification metadata.
+
+## ADR-047 — Device mesh is primary; cloud Worker computers are optional capabilities
+
+**Decision:** OSCAR's execution foundation remains the user's actual device/service mesh. A future cloud Worker node may be added as another advertised capability, not as a permanent architectural dependency.
+
+**Reason:** OSCAR's identity is persistent intelligence spanning the user's real phone, computers, edge hardware and services rather than one cloud desktop per agent.
+
+**Implication:** when a real device is offline, its capabilities disappear; OSCAR reroutes only through equivalent authorized capabilities and remains truthful about what is unavailable.
