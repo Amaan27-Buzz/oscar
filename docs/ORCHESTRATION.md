@@ -2,9 +2,9 @@
 
 OSCAR should not attempt to become a mediocre implementation of every specialist tool. Its job is to understand the objective, choose the best available capability, coordinate it, verify the result and learn from successful execution.
 
-## Capability registry
+## Capability Catalog + Dynamic Tool Search
 
-Every connected worker, app, plugin, device or service should advertise capabilities dynamically.
+Every connected Worker, app, plugin, device, channel or service advertises capabilities dynamically through lightweight manifests.
 
 Examples:
 
@@ -16,7 +16,7 @@ Codex
 - debugging
 - project-specific plugins
 
-Desktop worker node
+Desktop machine node
 - computer-use
 - terminal
 - browser
@@ -51,7 +51,34 @@ Kinetable
 - device provisioning
 ```
 
-Capability metadata should eventually include availability, latency, cost, permissions, reliability, supported input/output types and task suitability.
+Capability metadata should include, where useful:
+
+- ID/name/summary;
+- capability class;
+- inputs/outputs;
+- availability;
+- supported execution surfaces;
+- latency/cost hints;
+- permissions/risk;
+- reliability/history hints;
+- project/workspace affinity;
+- reversible/undo metadata;
+- provider/plugin/version.
+
+OSCAR should **search the catalog first** and load detailed contracts only for a small relevant candidate set. It should not dump every tool/plugin/Skill definition into every model context.
+
+Conceptually:
+
+```text
+objective
+→ required capability classes
+→ capability search
+→ rank by suitability + availability + policy + reliability + latency/cost
+→ load detailed contracts for finalists
+→ execute specialist
+```
+
+See [RUNTIME-FOUNDATIONS.md](RUNTIME-FOUNDATIONS.md).
 
 ## Routing by suitability
 
@@ -66,7 +93,7 @@ objective
   ↓
 Jev understands task + context
   ↓
-OSCAR discovers:
+Capability Catalog finds:
 - SceneLab project/repository
 - Codex subscription
 - Impeccable plugin
@@ -78,7 +105,7 @@ Codex builds with project + plugin context
   ↓
 OSCAR verifies visually/functionally
   ↓
-result + learned procedure
+Artifact/Result + learned procedure candidate
 ```
 
 OSCAR should not generate the page through a generic chat response merely because it technically can.
@@ -91,6 +118,7 @@ notes/knowledge      → connected Notion/Obsidian-like system when appropriate
 email/calendar       → structured service connector
 GUI-only workflow    → computer use
 phone/app workflow   → Sunday when it is the best execution surface
+communication        → Universal Channel Gateway + best native adapter
 hardware design      → Kinetable
 physical action      → OSCAR Edge
 research             → suitable research/model path
@@ -103,18 +131,57 @@ A robust delegated task follows:
 
 ```text
 understand objective
+→ define completion/verification condition
 → discover capabilities
 → choose route
 → provide relevant context
+→ persist task state if long-running
 → delegate
 → observe progress
+→ collect reported result
 → verify independently where practical
 → recover/re-route on failure
-→ report only what matters
-→ learn from successful execution
+→ record Action Ledger + Artifacts/Results
+→ report only what evidence supports
+→ learn from verified successful execution
 ```
 
-For long work, OSCAR should remain the owner of the objective even while specialists perform the steps.
+For long work, OSCAR remains the owner of the objective even while specialists perform steps.
+
+## Durable Execution Runtime
+
+Workers/Protocols/tasks that must survive process/device loss use the Durable Execution Runtime.
+
+It tracks, where relevant:
+
+- task/objective ID;
+- owner;
+- lifecycle state;
+- checkpoint/current step;
+- dependencies;
+- executor lease/ownership;
+- heartbeat/last progress;
+- retry budget/backoff state;
+- cancellation state;
+- deadline/expiry;
+- required capabilities;
+- current execution surface;
+- artifact/result references;
+- verification state;
+- blocker/escalation state.
+
+It provides:
+
+- durable checkpoints;
+- bounded retries;
+- heartbeats;
+- reclaim after lease expiry;
+- zombie/stuck-work detection;
+- restart/resume;
+- idempotency/deduplication where needed;
+- durable queues/event delivery when justified.
+
+The Executive Planner decides **what should run and priority**. The Durable Runtime makes the execution survive safely.
 
 ## Workers
 
@@ -122,20 +189,21 @@ A **Worker** is a delegated sub-agent OSCAR creates for an objective or responsi
 
 A Worker may coordinate:
 
-- Codex
-- Computer Use
-- browser/terminal/apps
-- Sunday/phone capabilities
-- plugins/connectors/APIs
-- ChatGPT/SwitchRoute
-- Kinetable
-- OSCAR Edge
+- Codex;
+- Computer Use;
+- browser/terminal/apps;
+- Sunday/phone capabilities;
+- plugins/connectors/APIs;
+- Universal Channel Gateway;
+- ChatGPT/SwitchRoute;
+- Kinetable;
+- OSCAR Edge.
 
 Workers can be temporary, task-scoped or persistent.
 
 ```text
 "Research these five laptops"
-→ temporary research Worker
+→ temporary Research Worker
 
 "Watch ClearLane CI tonight"
 → task Worker
@@ -144,7 +212,9 @@ Workers can be temporary, task-scoped or persistent.
 → persistent Worker
 ```
 
-Workers operate under OSCAR's Personal Policy and permission system. They can be created and edited through ordinary voice/chat and inspected through a lightweight management UI.
+Workers operate under OSCAR's Personal Policy and permission system. They can be created/edited through ordinary voice/chat and inspected through a lightweight management UI.
+
+Persistent Workers use the Durable Execution Runtime for recovery/checkpoints rather than relying on one process remaining alive.
 
 See [WORKERS.md](WORKERS.md).
 
@@ -160,11 +230,11 @@ Launch Kinetable
 └── Social Worker
 ```
 
-Workers may run in parallel, wait on dependencies, exchange artifacts/context and hand work off. OSCAR remains the top-level coordinator and resolves conflicts.
+Workers may run in parallel, wait on dependencies, exchange Artifact/Result references and hand work off. OSCAR remains the top-level coordinator and resolves conflicts.
 
-## Jev and worker recovery
+## Jev and Worker recovery
 
-Workers should not escalate routine recoverable failures to the user.
+Workers should not escalate routine recoverable failures unnecessarily.
 
 ```text
 Worker encounters issue
@@ -176,37 +246,37 @@ Worker encounters issue
 
 Retries must be bounded. Workers must never invent success or silently switch to a more privileged capability path.
 
-## Tools vs skills vs workers vs routines vs protocols
+A Worker saying `done` produces a **reported result**, not automatic verified completion.
+
+See [EPISTEMIC-INTEGRITY.md](EPISTEMIC-INTEGRITY.md).
+
+## Tool vs Skill vs Worker vs routine vs Protocol
 
 ### Tool
 
-A primitive capability OSCAR can invoke.
-
-Examples: `gmail.send`, `gpio.set`, browser click, terminal command, `codex.run`.
+Primitive callable capability, e.g. `gmail.send`, `gpio.set`, browser click, terminal command, `codex.run`.
 
 ### Skill
 
-A reusable learned procedure for achieving a goal, ideally portable and inspectable using the ecosystem's `SKILL.md`-style convention where suitable.
-
-A skill may combine multiple tools/workers.
+Reusable learned procedure for achieving a goal, ideally portable and inspectable using ecosystem `SKILL.md` conventions where suitable.
 
 ### Worker
 
-A delegated sub-agent that owns a scoped objective/job and may combine specialists, tools, devices and skills.
+Delegated sub-agent that owns a scoped objective/job and may combine specialists, tools, devices and Skills.
 
 ### Routine
 
-A recurring or simple event-driven behavior.
+Recurring or simple event-driven behavior.
 
 Examples:
 
-- every morning prepare a concise agenda
-- when the laptop comes online, advertise Codex availability
-- at bedtime switch Sentry behavior
+- every morning prepare a concise agenda;
+- when the laptop comes online, advertise Codex availability;
+- at bedtime switch Sentry behavior.
 
 ### Protocol
 
-A persistent, stateful autonomous responsibility that may wait, observe, branch, delegate, recover and escalate over time.
+Persistent, stateful autonomous responsibility that may wait, observe, branch, delegate, recover and escalate over time.
 
 Example:
 
@@ -220,20 +290,20 @@ watch CI
 → rerun tests
 → wait for deployment
 → verify live result
-→ notify user only if blocked or complete
+→ notify user only if blocked or verified complete
 ```
 
 This is intentionally more capable than a basic scheduled action.
 
-## Self-created skills, workers, routines and protocols
+## Self-created Skills, Workers, routines and Protocols
 
-OSCAR may create or propose reusable automation when:
+OSCAR may create/propose reusable automation when:
 
-- the user explicitly asks it to delegate or remember a workflow
-- a successful novel procedure is worth reusing
-- repeated behavior reveals a stable pattern
-- an existing skill can be improved from a better verified path
-- an objective is large enough to deserve a temporary or persistent Worker
+- the user explicitly asks it to delegate or remember a workflow;
+- a verified novel procedure is worth reusing;
+- repeated behavior reveals a stable pattern;
+- an existing Skill can be improved from a better verified path;
+- an objective is large enough to deserve a temporary/persistent Worker.
 
 Creation flow:
 
@@ -244,12 +314,42 @@ objective/history
 → define required capabilities
 → define Personal Policy + permissions/risk
 → define verification
-→ create Worker/skill/routine/protocol candidate
-→ validate
+→ create Worker/Skill/routine/Protocol candidate
+→ evaluate
+→ promote / reject / keep experimental
 → activate within existing authority
 ```
 
 Generated automation **cannot grant itself new permissions**.
+
+## Learned Automation Evaluation Pipeline
+
+One successful run can create a candidate. It does not automatically create a trusted/default automation.
+
+Promotion pipeline:
+
+```text
+candidate
+→ normalize / parameterize
+→ replay/evaluate representative cases where possible
+→ verify output + safety properties
+→ compare against current version
+→ permission/policy review
+→ promote / reject / keep experimental
+```
+
+Candidates should preserve:
+
+- source execution/provenance;
+- assumptions/preconditions;
+- required capabilities;
+- evaluation cases/results;
+- latency/cost/reliability metrics where meaningful;
+- permissions/risk;
+- limitations;
+- rollback target/version.
+
+Untestable candidates remain experimental/partially verified.
 
 ## Learning: first time vs next time
 
@@ -262,13 +362,14 @@ first time
 → recover from mistakes
 → verify success
 → capture path
+→ candidate
 ```
 
-Later:
+Later, after promotion:
 
 ```text
 same/similar task
-→ retrieve known procedure
+→ retrieve known Skill
 → fill parameters
 → skip unnecessary discovery
 → use deterministic steps where possible
@@ -276,33 +377,64 @@ same/similar task
 → verify
 ```
 
-The goal is for repeated tasks to become measurably faster, cheaper and more reliable.
+The goal is repeated tasks becoming measurably faster, cheaper and more reliable.
 
 ## Skill representation
 
-Portable skills should keep human-readable instructions and machine-readable metadata where practical.
+Portable Skills should keep human-readable instructions and machine-readable metadata where practical.
 
-A skill should be able to declare:
+A Skill should declare, where applicable:
 
-- purpose
-- triggers/applicability
-- required capabilities
-- input parameters
-- preconditions
-- procedure
-- verification
-- permissions/risk class
-- failure/recovery strategy
-- provenance
-- version
+- purpose;
+- triggers/applicability;
+- required capabilities;
+- input parameters;
+- preconditions;
+- procedure;
+- verification;
+- permissions/risk class;
+- failure/recovery strategy;
+- provenance;
+- version;
+- evaluation status.
 
-The exact schema should remain compatible with widely used `SKILL.md` conventions where possible rather than inventing an unnecessary closed format.
+The schema should remain compatible with widely used `SKILL.md` conventions where possible rather than inventing an unnecessary closed format.
+
+## Artifact / Result Model
+
+Durable outputs should be represented as typed Artifacts/Results rather than hidden inside Worker text.
+
+Examples:
+
+- document/report;
+- spreadsheet/slides;
+- image/video/audio;
+- code patch/commit/PR;
+- deployment;
+- meeting notes/transcript;
+- firmware/hardware build;
+- dataset/model/evaluation output.
+
+Artifact records include, where useful:
+
+- artifact ID/type/name;
+- owner task/Worker/Protocol;
+- producer capability;
+- location/reference;
+- version/hash;
+- source/provenance;
+- verification state;
+- access scope;
+- project/entity/task links;
+- derived-from/supersedes links.
+
+Workers hand off artifact references rather than repeatedly copying opaque payloads into prompts.
 
 ## Plugin/connector support
 
-OSCAR should discover and use plugins/connectors exposed by its host environments.
+OSCAR should discover/use plugins/connectors exposed by host environments.
 
-A plugin is not merely another menu item. It expands the capability registry and may become part of learned skills/protocols/Workers.
+A plugin is not merely another menu item. It expands the Capability Catalog and may participate in learned Skills/Protocols/Workers.
 
 Examples include mail, calendar, GitHub, cloud storage, knowledge tools, communication services and future third-party systems.
 
@@ -312,13 +444,13 @@ Workers often have useful context OSCAR should preserve rather than flattening i
 
 Examples:
 
-- Codex project/repository context
-- plugin configuration such as Impeccable
-- IDE workspace state
-- Kinetable project/inventory
-- Notion/Obsidian workspace
-- GitHub repository and issues
-- social/account context available through approved connectors
+- Codex project/repository context;
+- plugin configuration such as Impeccable;
+- IDE workspace state;
+- Kinetable project/inventory;
+- Notion/Obsidian workspace;
+- GitHub repository/issues;
+- social/account context through approved connectors.
 
 OSCAR should route the objective to the environment that already has the correct context whenever possible.
 
@@ -343,22 +475,24 @@ Delegation is not completion.
 
 OSCAR should verify outcomes using an independent signal when practical:
 
-- tests after code changes
-- browser/computer-use inspection after UI work
-- file/state checks after desktop actions
-- API/result checks after communication/social actions
-- sensor feedback after physical actions
-- deployment health checks after release
+- tests after code changes;
+- browser/computer-use inspection after UI work;
+- file/state checks after desktop actions;
+- API/result checks after communication/social actions;
+- sensor feedback after physical actions;
+- deployment health checks after release.
 
-If verification fails, OSCAR may retry, route to another capability or ask the user depending on policy.
+If verification fails, OSCAR may retry, reroute or ask depending on policy.
+
+If verification covers only part of the objective, the final state is `partially_verified`, not `verified`.
 
 ## Permissions and safety
 
 Learning never overrides authorization.
 
-A learned skill/protocol/Worker records what permissions it requires; it does not create them.
+A learned Skill/Protocol/Worker records required permissions; it does not create them.
 
-Critical or destructive steps still follow OSCAR's policy layer, Voice Match rules and stronger confirmation requirements.
+Critical/destructive steps still follow OSCAR's policy layer, Voice Match rules and stronger confirmation requirements.
 
 ## Design target
 
@@ -371,5 +505,5 @@ OSCAR should gradually evolve from:
 to:
 
 ```text
-"I know the best way to accomplish this for this user, with these tools, in this environment, and I can delegate the work to the right team."
+"I know the best verified way to accomplish this for this user, with these tools, in this environment, and I can delegate the work to the right team without claiming more than the evidence supports."
 ```
