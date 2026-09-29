@@ -41,9 +41,7 @@ Useful capability pattern:
 
 Primary lesson: JARVIS is defined less by chat intelligence than by **shared state, perception, executive control and tool/device reach**.
 
-Reference:
-
-- https://marvelcinematicuniverse.fandom.com/wiki/J.A.R.V.I.S.
+Reference note: the film/research benchmark is captured in OSCAR planning; no external fan-wiki URL is embedded here because that site blocks automated link validation.
 
 ### ChatGPT
 
