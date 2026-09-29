@@ -1,14 +1,16 @@
 # JARVIS / VoiceOS Gap Review
 
-This document is a product/architecture benchmark for OSCAR. It records the remaining system-level gaps between the current OSCAR plan, a practical real-world interpretation of MCU JARVIS, and the interaction baseline demonstrated by products such as VoiceOS.
+This document is a product/architecture benchmark for OSCAR. It records the system-level gaps between the OSCAR plan, a practical real-world interpretation of MCU JARVIS, and the interaction baseline demonstrated by products such as VoiceOS.
 
-It is not an implementation-status claim. Most of the capabilities below are planned, not built.
+It is not an implementation-status claim. Most capabilities below are planned, not built.
+
+This was the first major gap review. The later cross-product review is recorded in [COMPETITIVE-BENCHMARK.md](COMPETITIVE-BENCHMARK.md) and adds the runtime/integrity primitives in [RUNTIME-FOUNDATIONS.md](RUNTIME-FOUNDATIONS.md) and [EPISTEMIC-INTEGRITY.md](EPISTEMIC-INTEGRITY.md).
 
 ## Current position
 
-OSCAR already has a broad planned architecture: persistent memory, Personal Policy, communication, delegated Workers, protocols/routines/skills, physical hardware, Sentry, Sunday, desktop machine nodes, ChatGPT/SwitchRoute, Latch, Kinetable and cross-device continuity.
+OSCAR already has a broad planned architecture: persistent memory, Personal Policy, communication, delegated Workers, Protocols/routines/Skills, physical hardware, Sentry, Sunday, desktop machine nodes, ChatGPT/SwitchRoute, Latch, Kinetable and cross-device continuity.
 
-The remaining gap is less about adding more isolated integrations and more about making every capability behave like **one omnipresent intelligence**.
+The remaining gap is less about adding isolated integrations and more about making every capability behave like **one omnipresent intelligence**.
 
 VoiceOS is an important interaction benchmark because it demonstrates the practical baseline OSCAR must at least match on desktop: system-wide dictation/editing, selected-text/context interaction, cursor/screen awareness, agentic execution and confirmations. MCU JARVIS is the broader capability benchmark: one system that continuously integrates perception, memory, engineering, environment, communication, planning and action.
 
@@ -93,11 +95,7 @@ ESP32: desk unoccupied
 mother: calling
 ```
 
-The World Model should let OSCAR understand this as one situation:
-
-> The user is at university in class until 4. The home PC is running a build, nobody is at the desk, and the user's mother is calling.
-
-Personal Policy, permissions and Jev can then make the correct decision using one coherent context instead of disconnected facts.
+The World Model should let OSCAR understand this as one situation rather than disconnected facts.
 
 ## Perception Fabric
 
@@ -105,17 +103,17 @@ The Perception Fabric is the ingestion/normalization layer feeding the World Mod
 
 It should combine, where authorized:
 
-- screen + accessibility-tree state
-- cursor, focus and selected text
-- camera frames / scene observations
-- microphone/audio events
-- device and application events
-- phone location/activity context
-- calendar, communications and notifications
-- sensors / presence / environment telemetry
-- Worker/Protocol/task state
+- screen + accessibility-tree state;
+- cursor, focus and selected text;
+- camera frames / scene observations;
+- microphone/audio events;
+- device and application events;
+- phone location/activity context;
+- calendar, communications and notifications;
+- sensors / presence / environment telemetry;
+- Worker/Protocol/task state.
 
-Perception is not the same as memory. Perception is current evidence; LRA/Supermemory provides continuity and historical evidence.
+Perception is not memory. Perception is current evidence; LRA/Supermemory provides continuity and historical evidence.
 
 ## Universal live context/search fabric
 
@@ -125,7 +123,7 @@ Examples:
 
 ```text
 "Where is the latest SceneLab launch copy?"
-→ search project files + Notion/Obsidian + recent messages + GitHub
+→ search project files + knowledge systems + recent messages + GitHub
 
 "Did they ever send the internship form?"
 → search mail + messages + files
@@ -147,59 +145,33 @@ Ask      → answer about the current screen/selection/context
 Act      → operate the current app/device/task
 ```
 
-The runtime should understand:
+The runtime should understand focused application/window, focused text field, selected text, cursor target, accessibility tree, screenshot/visual context, clipboard when needed and active task/conversation.
 
-- focused application/window
-- focused text field
-- selected text
-- cursor target
-- accessibility tree
-- screenshot/visual context
-- clipboard when needed
-- active conversation/task
-
-This creates the VoiceOS-like “point and talk” baseline while preserving OSCAR's broader orchestration.
+This creates the VoiceOS-like point-and-talk baseline while preserving OSCAR's broader orchestration.
 
 ## Multi-device voice arbitration
 
 Wake/listen events from Sunday, desktop and physical OSCAR should participate in one arbitration protocol.
 
-Selection can consider:
+Selection can consider wake-word confidence, microphone signal quality, proximity, active device/surface, user interaction, room/presence state and explicit device preference.
 
-- wake-word confidence
-- microphone signal quality
-- proximity
-- currently active device/surface
-- user gaze/touch/activity where available
-- room/presence state
-- explicit device preference
-
-Only one surface should normally speak/own the turn. Other devices can remain synchronized and take over through explicit handoff or failure.
+Only one surface should normally speak/own the turn. Other devices remain synchronized and can take over through handoff/failure.
 
 ## Action Ledger and Undo
 
 Every consequential action should produce a structured ledger entry containing, where applicable:
 
-- initiating user/task/protocol/Worker
-- tool/device used
-- intent
-- permission/policy decision
-- target/resource
-- before state/reference
-- resulting state/reference
-- verification result
-- reversible/irreversible flag
-- compensating/undo action
-- timestamp/correlation ID
-
-This enables:
-
-```text
-"What did you change?"
-"Why did you do that?"
-"Undo the last thing."
-"Roll back the SceneLab social post."
-```
+- initiating user/task/Protocol/Worker;
+- tool/device used;
+- intent;
+- permission/policy decision;
+- target/resource;
+- before-state reference;
+- resulting-state reference;
+- execution + verification state/evidence;
+- reversible/irreversible flag;
+- compensating/undo action;
+- timestamp/correlation ID.
 
 Undo is best-effort and capability-aware; OSCAR must never pretend an irreversible operation can be reversed.
 
@@ -207,42 +179,15 @@ Undo is best-effort and capability-aware; OSCAR must never pretend an irreversib
 
 Workers remain below OSCAR. The Executive Planner coordinates the total objective set.
 
-Inputs include:
+Inputs include priority, deadline, dependencies, resource/device availability, user interruptibility, risk, cost, Worker/Protocol state and Personal Policy.
 
-```text
-priority
-deadline
-dependencies
-resource/device availability
-user interruptibility
-risk
-cost
-Worker/Protocol state
-Personal Policy
-```
-
-It can:
-
-- schedule and parallelize work
-- pause or pre-empt lower-priority work
-- resolve resource conflicts
-- route to another device/specialist
-- defer work until prerequisites become available
-- decide when the user actually needs to be interrupted
+It can schedule/parallelize work, pause/pre-empt lower-priority work, resolve resource conflicts, reroute, defer until prerequisites exist and decide when the user actually needs to be interrupted.
 
 This is the distinction between “many agents” and one JARVIS-like executive system.
 
 ## Predictive intelligence
 
-Sentry and the World Model should eventually support forecast-driven assistance.
-
-Examples:
-
-- detect likely calendar collision before it happens
-- notice a build trending toward failure and prepare diagnostics
-- notice unusual thermal/power behavior before a cutoff
-- identify that a deadline is at risk from current task progress
-- prefetch relevant project/contact/context when the user transitions into a likely task
+Sentry and the World Model should eventually support forecast-driven assistance such as calendar-collision risk, build/device anomaly trends, deadline risk and prefetching relevant context.
 
 Predictions do not become authority. Personal Policy and permission rules still govern actions.
 
@@ -256,47 +201,51 @@ OSCAR should support a deliberate teaching flow:
 → identify intent + stable steps
 → ask about ambiguous choices
 → build Skill candidate
-→ replay in a safe/test context when possible
+→ replay/evaluate in safe/test context when possible
 → verify
-→ save/version
+→ promote/version only when justified
 ```
-
-This extends OSCAR to applications that lack good APIs without requiring hand-authored automation for every workflow.
 
 ## Self-maintenance
 
-OSCAR should treat its own operation as a monitored system.
+OSCAR should treat its own operation as a monitored system and detect/repair, where safe, expired auth, broken connectors, stale capabilities, disconnected Edge nodes, degraded latency, state/storage health, update failures and repeated Worker failures.
 
-It should detect and surface/repair, where safe:
+## Final benchmark extension
 
-- expired authentication
-- missing/broken connectors
-- failing or stale device capabilities
-- disconnected Edge nodes
-- degraded speech latency
-- corrupted/stale local state
-- failed updates
-- storage pressure
-- repeated Worker failures
-- unhealthy cloud/provider routes
+The later comparison against ChatGPT/Claude, Gemini, Grok Bot, OpenClaw, Hermes and Pi identified five more cross-cutting primitives plus one behavioral invariant:
 
-Safe repair and rollback should happen automatically when confidence is high and permissions allow it; otherwise OSCAR asks for the minimum intervention needed.
+1. **Universal Channel Gateway** — normalize supported communication channels without erasing platform-specific limits.
+2. **Durable Execution Runtime** — checkpoints, leases, heartbeats, reclaim, bounded retry and restart/resume for long-running work.
+3. **Capability Catalog + Dynamic Tool Search** — progressive capability loading rather than a mega-prompt containing every tool.
+4. **Learned Automation Evaluation Pipeline** — candidate → replay/evaluate → compare → policy/safety review → promote/reject/rollback.
+5. **Artifact / Result Model** — typed durable outputs with provenance, ownership/version/location and verification state.
+6. **Epistemic Integrity** — never collapse intention, execution, reported success, observation and verified completion; never claim more than evidence supports.
+
+These are fully integrated into the canonical architecture/roadmap rather than living only in this review document.
+
+See:
+
+- [COMPETITIVE-BENCHMARK.md](COMPETITIVE-BENCHMARK.md)
+- [RUNTIME-FOUNDATIONS.md](RUNTIME-FOUNDATIONS.md)
+- [EPISTEMIC-INTEGRITY.md](EPISTEMIC-INTEGRITY.md)
+- [ARCHITECTURE.md](ARCHITECTURE.md)
+- [ROADMAP.md](ROADMAP.md)
 
 ## Post-alpha expansion
 
-Two major domains should remain later-stage rather than destabilizing the first unified alpha:
+Two major domains remain later-stage rather than destabilizing the first unified alpha:
 
 1. **Health/wearables** — highly permissioned personal physiological/activity context.
 2. **Home/robotics/vehicles** — standardized capability contracts for rooms, smart-home systems, robots, cameras, drones and vehicles.
 
 ## Direction
 
-Do not respond to this review by adding random integrations.
+Do not respond to competitor releases by continuously adding isolated features.
 
-The next system-level additions are:
+The pre-implementation architecture is now intentionally frozen around explicit primitives:
 
-> **World Model → Perception Fabric → Executive Planner → Action Ledger/Undo → VoiceOS-grade Interaction Runtime**
+> **Perception/World Model → Jev/Epistemic Integrity → Executive Planner → Durable Execution Runtime → Capability Search → Workers/Skills/Protocols → Channels/Devices/Specialists → Action Ledger + Artifact Model → Verification**
 
-Combined with the existing Jev, LRA/Supermemory, Personal Policy, Workers, Protocols, Sunday, Latch, SwitchRoute, Edge and Kinetable layers, these are what make OSCAR behave like one coherent ambient intelligence rather than a catalogue of features.
+The immediate implementation priority remains proving the fundamental loop.
 
-The immediate implementation priority remains proving the fundamental loop. Slice 01 is still next.
+**Slice 01 is still next.**
