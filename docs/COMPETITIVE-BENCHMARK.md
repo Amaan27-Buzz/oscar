@@ -56,10 +56,7 @@ Strengths to learn from:
 
 Primary lesson: objectives should end in verified outcomes/artifacts, and background work should survive beyond a single foreground turn.
 
-References:
-
-- https://openai.com/index/chatgpt-for-your-most-ambitious-work/
-- https://help.openai.com/en/articles/20001280-using-cloud-browser-in-chatgpt
+Reference note: current OpenAI product/help documentation was reviewed on 2026-09-29; direct OpenAI URLs are omitted here because the repository's automated link checker receives HTTP 403 from those documentation hosts.
 
 ### Claude
 
