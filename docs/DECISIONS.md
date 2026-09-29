@@ -189,3 +189,35 @@ A slice is not complete while the repository still describes an older system sta
 **Constraint:** abstraction, services, extension points and dependencies must solve a current concrete problem. “Future-proofing” that makes today's code harder to understand is not accepted by default.
 
 **Implication:** provider/platform details should be isolated when OSCAR requires a stable internal contract, while shared abstractions should represent proven shared behavior rather than accidental syntactic similarity.
+
+## ADR-029 — Personal Policy is a first-class authoritative behavior layer
+
+**Decision:** explicit user preferences are stored/evaluated as Personal Policy, distinct from semantic memory and distinct from permissions.
+
+**Reason:** OSCAR must support arbitrary natural-language preferences such as call handling, interruption behavior, communication privacy, worker autonomy and app/project-specific rules without forcing everything into generic settings or unreliable prompt memory.
+
+**Precedence:** safety/legal/platform constraints and permissions remain authoritative; explicit policy is evaluated before inferred preferences/defaults.
+
+**Implication:** LRA/Supermemory may suggest likely preferences from repeated behavior, but consequential inferred patterns do not silently become policy. The user can create, inspect, edit and remove Personal Policy by voice/chat or UI.
+
+## ADR-030 — Communication is one OSCAR subsystem
+
+**Decision:** calls, messaging, meetings, transcription, dictation and communication follow-up belong to a shared OSCAR communication layer.
+
+**Integration order:** native OS/official API → official plugin/connector → authorized device app automation → computer-use/accessibility fallback → unsupported/ask.
+
+**Reason:** the user should not need separate assistant identities for calls, meeting notes, dictation and follow-ups; all should use the same memory, schedule, Personal Policy and task context.
+
+**Constraint:** OSCAR must not claim or emulate capabilities that a phone/app/platform does not actually expose. Communication autonomy remains permission-scoped and attributable.
+
+## ADR-031 — Delegated Workers belong under OSCAR and use the real device mesh
+
+**Decision:** OSCAR may create temporary or persistent sub-agents called Workers for scoped objectives/responsibilities.
+
+**Reason:** persistent teammate-style delegation is useful, but each Worker should not require a separate cloud computer or become another assistant silo.
+
+**Execution model:** a Worker may use Sunday, desktop machine nodes, Codex, Computer Use, plugins/APIs, ChatGPT/SwitchRoute, Kinetable or OSCAR Edge according to capability, policy and availability.
+
+**Recovery:** Jev should allow safe self-repair/rerouting before unnecessary user escalation; retries remain bounded and authority never expands silently.
+
+**Implication:** Workers can collaborate, use Skills and participate in Protocols, while OSCAR remains the top-level coordinator and Personal Policy/permissions remain authoritative.

@@ -4,7 +4,7 @@ OSCAR should feel like one continuous relationship, not a collection of disconne
 
 ## Product rule
 
-The user-facing primitive is **one persistent OSCAR conversation/history** across voice, text, Sunday, desktop and physical surfaces.
+The user-facing primitive is **one persistent OSCAR conversation/history** across voice, text, Sunday, desktop, communications, Workers and physical surfaces.
 
 Internal context may be segmented, archived, summarized or retrieved differently for engineering reasons, but those implementation details must not force the user to manage hundreds of chats.
 
@@ -19,14 +19,46 @@ Planned responsibilities:
 - active live context
 - episodic conversation/task history
 - project/context boundaries
-- durable user profile/preferences
+- durable user profile/relationship memory
 - procedural memory and learned workflows
+- Worker/protocol history and state references
 - memory provenance/confidence
 - context assembly before reasoning
 - remember/update/forget flows
 - cross-device continuity
 
 LRA is the architecture. Supermemory is a backend used by that architecture rather than the product model itself.
+
+## Memory is not Personal Policy
+
+OSCAR must distinguish inferred/remembered information from explicit user instructions about behavior.
+
+```text
+Memory
+= what OSCAR knows or recalls
+
+Personal Policy
+= how the user explicitly wants OSCAR to behave
+
+Permission
+= what OSCAR is authorized to do
+
+Protocol
+= a durable autonomous responsibility/process
+```
+
+Example:
+
+```text
+Memory:      "Amaan usually silences calls while studying."
+Policy:      "Do not answer calls while I am studying."
+Permission:  "OSCAR may answer calls on my behalf."
+Protocol:    "Apply my call rules whenever a call arrives."
+```
+
+LRA/Supermemory can discover patterns and suggest policy changes, but consequential inferred patterns should not silently become authority.
+
+See [PERSONAL-POLICY.md](PERSONAL-POLICY.md).
 
 ## Active context vs long-term memory
 
@@ -62,8 +94,9 @@ Good uses include:
 - profile-like understanding
 - derived memory/reflection
 - retrieving related prior outcomes
+- identifying repeated preference patterns to suggest to the user
 
-Supermemory should **not** be treated as the sole source of truth for live system state.
+Supermemory should **not** be treated as the sole source of truth for live system state or explicit Personal Policy.
 
 ## Jev as epistemic router
 
@@ -78,6 +111,7 @@ Jev
   ├─ recall       → query LRA/Supermemory
   ├─ verify       → inspect authoritative source/tool
   ├─ reason       → ChatGPT/SwitchRoute/specialist
+  ├─ delegate     → Worker/specialist route
   └─ unknown      → ask user
 ```
 
@@ -106,9 +140,11 @@ Memory is evidence, not universal truth.
 A useful authority order is:
 
 ```text
+hard safety/permission/policy constraints
+        >
 live authoritative source/state
         >
-structured OSCAR state
+structured OSCAR task/Worker state
         >
 recent episodic history
         >
@@ -117,7 +153,7 @@ semantic/derived memory
 model prior knowledge
 ```
 
-For example, if memory says a repository uses one framework but the current repository says another, current repository state wins.
+For example, if memory says a repository uses one framework but the current repository says another, current repository state wins. If memory suggests a preferred call behavior but explicit Personal Policy says otherwise, policy wins.
 
 ## Memory classes
 
@@ -125,11 +161,15 @@ OSCAR should be able to distinguish at least:
 
 - **working context** — what is happening right now
 - **episodic history** — what happened and when
-- **semantic memory** — durable facts/preferences/relationships
+- **semantic memory** — durable facts/relationships/learned preferences
 - **project memory** — decisions, conventions, constraints and status
 - **device/environment memory** — stable configuration, names and normal state
+- **communication memory** — calls/meetings/messages outcomes and commitments, subject to retention policy
 - **procedural memory** — how OSCAR successfully completed a task
+- **Worker history/state references** — delegated objective outcomes, blockers and reusable artifacts
 - **protocol state** — state belonging to long-running autonomous responsibilities
+
+Explicit Personal Policy is intentionally not treated as just another semantic-memory category.
 
 ## Retrieval quality
 
@@ -154,7 +194,7 @@ When OSCAR completes something new successfully, it should preserve the useful p
 ```text
 first execution
 → explore
-→ select tools/workers
+→ select tools/Workers
 → execute
 → verify
 → capture successful path
@@ -174,6 +214,22 @@ Jev recognizes known/similar procedure
 
 This is how OSCAR becomes faster and more capable with use.
 
+## Communication retention
+
+Calls, meetings and messages can contain particularly sensitive data.
+
+OSCAR should separately control retention for:
+
+- raw audio
+- full transcript
+- concise summary
+- decisions/action items
+- relationship/context memory
+
+The system should prefer storing the minimum useful durable representation rather than retaining every raw recording indefinitely.
+
+See [COMMUNICATION.md](COMMUNICATION.md).
+
 ## Privacy and control
 
 The user must be able to inspect and control durable memory.
@@ -188,13 +244,15 @@ Planned controls:
 - export where practical
 - clear/reset memory independently from the current UI surface
 
-Memory should not silently grant permissions or bypass action policy.
+Memory should not silently grant permissions or bypass Personal Policy/action policy.
 
 ## Invariants
 
 1. User-facing continuity is more important than exposing internal session segmentation.
 2. Memory is not automatically authoritative.
-3. Jev retrieves before guessing.
-4. Live sources override stale memory when current truth matters.
-5. Procedural memory can improve execution, but never self-grant authority.
-6. Voice, text, Sunday, desktop and edge interactions contribute to the same OSCAR history where policy permits.
+3. Explicit Personal Policy is distinct from inferred memory.
+4. Jev retrieves before guessing.
+5. Live sources override stale memory when current truth matters.
+6. Procedural memory can improve execution, but never self-grant authority.
+7. Voice, text, Sunday, desktop, communications, Workers and edge interactions contribute to the same OSCAR history where policy permits.
+8. Sensitive communication data uses explicit retention controls rather than default permanent raw storage.

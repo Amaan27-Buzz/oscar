@@ -8,6 +8,10 @@ Significant OSCAR milestones are recorded here. Detailed implementation status r
 
 - `ENGINEERING.md` as the canonical system-design/code-quality standard: simplicity, modularity, reuse discipline, typed contracts, explicit state ownership, dependency control, reliability, security, tests, observability, performance and small reversible changes.
 - Engineering review gates wired into `AGENTS.md`, development/contribution guidance, slice skill, PR template and repository checks.
+- `docs/PERSONAL-POLICY.md` defining open-ended natural-language preferences, policy precedence, conflict handling and the distinction between memory, permission and protocol.
+- `docs/COMMUNICATION.md` defining OSCAR's unified communication layer for calls, messaging, meetings, transcription, system-wide dictation, AI call handling and follow-up work.
+- `docs/WORKERS.md` defining temporary/persistent delegated sub-agents, device-mesh execution, Worker collaboration, social-media management and Jev-based self-repair/rerouting.
+- Architecture, feature inventory, memory, onboarding, surface docs and roadmap updated to integrate Personal Policy, communication and delegated Workers.
 
 ### Planned
 

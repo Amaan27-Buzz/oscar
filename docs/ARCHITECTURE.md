@@ -7,33 +7,33 @@ OSCAR is a distributed personal-agent system. No single user computer is assumed
 ```text
 User / Environment
        │
-       ├─ voice / text / sensors / cameras / app events
+       ├─ voice / text / sensors / cameras / app events / communications
        ▼
 ┌────────────────────────────────────────────────────────────┐
 │                       OSCAR CORE                           │
-│ identity • policy • task state • delegation • protocols   │
+│ identity • task state • Personal Policy • protocols       │
 └────────────────────────────┬───────────────────────────────┘
                              │
                             Jev
                   intent + epistemic routing
                              │
-          ┌──────────────────┼──────────────────┐
-          │                  │                  │
-      memory/context     intelligence       capabilities
-          │                  │                  │
-  LRA + Supermemory   ChatGPT / SwitchRoute   tools/plugins/
-                                             skills/workers
-          └──────────────────┼──────────────────┘
+      ┌──────────────────────┼─────────────────────────┐
+      │                      │                         │
+ memory/context          intelligence             orchestration
+      │                      │                         │
+LRA + Supermemory   ChatGPT / SwitchRoute   tools / skills / Workers /
+                                            plugins / protocols
+      └──────────────────────┼─────────────────────────┘
                              │
                            Latch
                              │
       ┌──────────────────────┼──────────────────────────┐
       ▼                      ▼                          ▼
-  OSCAR Edge               Sunday               Desktop / Workers
+  OSCAR Edge               Sunday               Desktop / Worker nodes
  ESP32 + Pico              Android               Windows / macOS
-      │                                                   │
- physical world                                  Codex / Computer Use /
-      │                                          terminal / apps / IDE
+      │                      │                            │
+ physical world     calls / apps / meetings      Codex / Computer Use /
+                    messages / dictation         terminal / apps / IDE
       └────────────── Kinetable hardware workshop ───────┘
 ```
 
@@ -42,7 +42,8 @@ User / Environment
 The core owns:
 
 - identity and shared assistant state
-- active task/protocol state
+- active task/protocol/Worker state
+- Personal Policy evaluation
 - capability discovery
 - permission/policy checks
 - delegation decisions
@@ -64,21 +65,23 @@ It should decide whether OSCAR:
 - should query LRA/Supermemory
 - should inspect an authoritative source/tool
 - should invoke ChatGPT or a SwitchRoute model
-- should delegate to a specialist capability
+- should delegate to a specialist capability or Worker
+- can safely repair/retry/reroute a blocked Worker
 - should ask the user
 
 Conceptually:
 
 ```text
-known     → answer/act
-recall    → LRA/Supermemory
-verify    → live source/tool
-reason    → ChatGPT/SwitchRoute
-specialist→ Codex/Kinetable/computer-use/etc.
-unknown   → ask user
+known      → answer/act
+recall     → LRA/Supermemory
+verify     → live source/tool
+reason     → ChatGPT/SwitchRoute
+specialist → Codex/Kinetable/computer-use/etc.
+worker     → create/resume delegated Worker
+unknown    → ask user
 ```
 
-This is intended to reduce latency, unnecessary model calls and hallucinated user/project context.
+This is intended to reduce latency, unnecessary model calls, noisy escalation and hallucinated user/project context.
 
 ## 3. Memory: LRA + Supermemory
 
@@ -90,7 +93,7 @@ Responsibilities include:
 - episodic history
 - project/device/user context
 - procedural memory
-- profile/preferences
+- profile/relationship memory
 - provenance/confidence
 - context assembly
 - remember/update/forget flows
@@ -102,7 +105,40 @@ Memory is not universally authoritative. Live sources should override stale reca
 
 See [MEMORY.md](MEMORY.md).
 
-## 4. Intelligence paths
+## 4. Personal Policy
+
+Personal Policy is the durable behavior/preference layer.
+
+It is distinct from memory and permissions:
+
+```text
+memory      = what OSCAR knows
+policy      = how the user wants OSCAR to behave
+permission  = what OSCAR is authorized to do
+protocol    = persistent autonomous responsibility
+```
+
+Personal Policy can be created/edited through normal voice or text and may apply to arbitrary scopes: people, apps, projects, calls, meetings, workers, locations, Sentry modes, time windows and other user-defined contexts.
+
+Runtime precedence is conceptually:
+
+```text
+safety / legal / platform constraints
+        >
+permissions
+        >
+explicit Personal Policy
+        >
+protocol/routine defaults
+        >
+inferred preference suggestions
+        >
+product defaults
+```
+
+See [PERSONAL-POLICY.md](PERSONAL-POLICY.md).
+
+## 5. Intelligence paths
 
 ### ChatGPT path
 
@@ -129,7 +165,7 @@ SwitchRoute provides autonomous cloud-model routing:
 
 Local PC models remain optional support capabilities, not core dependencies.
 
-## 5. Latch
+## 6. Latch
 
 Latch is OSCAR's secure bridge between ChatGPT/cloud coordination and devices/tools.
 
@@ -166,7 +202,7 @@ voice.state
 sentry.state
 ```
 
-## 6. OSCAR Edge
+## 7. OSCAR Edge
 
 ### ESP32 — gateway / brainstem
 
@@ -196,7 +232,7 @@ Responsibilities:
 
 The Pico must enforce safety even if ESP32, Latch or cloud intelligence fails.
 
-## 7. Sunday
+## 8. Sunday
 
 Sunday is OSCAR's mobile embodiment.
 
@@ -205,6 +241,10 @@ Planned capabilities, subject to platform permissions:
 - voice/text interaction
 - notifications and proactive alerts
 - phone calls/messages/actions
+- app actions and app-specific automation where permitted
+- WhatsApp/Telegram/other communication surfaces where technically available
+- meetings, transcription and meeting notes
+- system-wide dictation/input assistance
 - camera/microphone
 - device/location/sensor context
 - on-device speech path where suitable
@@ -213,7 +253,9 @@ Planned capabilities, subject to platform permissions:
 
 Sunday is not a separate identity or memory silo.
 
-## 8. OSCAR Desktop + PC Worker
+See [COMMUNICATION.md](COMMUNICATION.md).
+
+## 9. OSCAR Desktop + machine Worker node
 
 OSCAR Desktop provides native/lightweight Windows and macOS interaction surfaces.
 
@@ -221,13 +263,15 @@ Planned UI responsibilities:
 
 - voice/text interaction
 - avatar/presence
+- system-wide dictation
+- meeting participation/transcription where supported
 - screen/cursor/selection/active-window context
 - task progress
 - approval surfaces
 - notifications
 - Sunday handoff
 
-The worker runtime advertises machine capabilities dynamically, for example:
+The machine Worker runtime advertises capabilities dynamically, for example:
 
 ```text
 codex
@@ -244,9 +288,38 @@ local-models
 gpu
 ```
 
-The desktop app is an embodiment; the worker is an execution node. Neither is OSCAR's permanent host.
+The desktop app is an embodiment; the machine Worker node is an execution surface. Neither is OSCAR's permanent host.
 
-## 9. Capability-based delegation
+## 10. Delegated Workers
+
+A delegated **Worker** is a sub-agent OSCAR creates for a specific objective/responsibility. It is different from a machine Worker node.
+
+Examples:
+
+```text
+SceneLab Social Worker
+ClearLane Release Worker
+Research Worker
+University Admin Worker
+```
+
+A delegated Worker may use the user's actual device mesh instead of owning a cloud desktop:
+
+```text
+Worker
+├── Sunday / phone apps
+├── Desktop / browser / terminal / Codex
+├── APIs / plugins
+├── ChatGPT / SwitchRoute
+├── Kinetable
+└── OSCAR Edge
+```
+
+Workers can be temporary or persistent, collaborate in parallel, use skills, participate in protocols and recover/reroute through Jev before escalating routine problems to the user.
+
+See [WORKERS.md](WORKERS.md).
+
+## 11. Capability-based delegation
 
 OSCAR should decompose tasks by objective and choose the most suitable capability.
 
@@ -264,17 +337,35 @@ Example:
 Or:
 
 ```text
-"Design an OLED presence detector"
+"Manage SceneLab social media"
      │
-     ├─ component inventory ─────► Kinetable
-     ├─ circuit/simulation ──────► Kinetable
-     ├─ firmware/provisioning ───► Kinetable/edge toolchain
-     └─ runtime capability ──────► OSCAR/Latch Edge
+     ├─ objective/policy ────────► Social Worker
+     ├─ project context ─────────► SceneLab workspace/GitHub
+     ├─ publishing ──────────────► API/plugin/browser/Sunday
+     └─ uncertainty/recovery ────► Jev → repair/reroute/ask
 ```
 
 See [ORCHESTRATION.md](ORCHESTRATION.md).
 
-## 10. Learning and procedural memory
+## 12. Communication runtime
+
+Calls, meetings, messaging and dictation should share one communication abstraction rather than become isolated mini-products.
+
+Integration order:
+
+```text
+native OS / official API
+→ official plugin/connector
+→ app automation on paired device
+→ computer-use/accessibility fallback
+→ unsupported/ask
+```
+
+Personal Policy determines user-specific behavior; platform capability determines what is technically possible; permissions determine what OSCAR may actually do.
+
+See [COMMUNICATION.md](COMMUNICATION.md).
+
+## 13. Learning and procedural memory
 
 Successful execution can become reusable procedure:
 
@@ -284,25 +375,26 @@ explore → execute → verify → distill → store
 
 Later similar requests can retrieve the known path, adapt parameters and skip unnecessary discovery.
 
-Skills/protocols may improve over time, but cannot self-grant authority.
+Skills/protocols/Workers may improve over time, but cannot self-grant authority.
 
-## 11. Protocols, routines, skills and plugins
+## 14. Protocols, routines, skills, Workers and plugins
 
 - **tool:** primitive callable capability
 - **skill:** reusable learned procedure, preferably compatible with `SKILL.md` conventions
+- **Worker:** delegated sub-agent responsible for an objective/job
 - **routine:** recurring/simple event-driven behavior
 - **protocol:** stateful long-running responsibility with triggers, branching, waiting, recovery and escalation
 - **plugin/connector:** external capability provider
 
-OSCAR may create or refine these from successful/repeated workflows subject to policy and permission review.
+A protocol can create Workers; a Worker can use skills; skills can invoke tools. OSCAR may create/refine these from successful/repeated workflows subject to policy and permission review.
 
-## 12. Kinetable
+## 15. Kinetable
 
 Kinetable remains a separate specialist hardware product and is integrated through capability contracts rather than duplicated inside OSCAR.
 
 Long term, OSCAR should be able to route hardware engineering work to Kinetable and register provisioned hardware as new OSCAR-capable nodes.
 
-## 13. Latency tiers
+## 16. Latency tiers
 
 | Tier | Target | Examples |
 |---|---:|---|
@@ -313,7 +405,7 @@ Long term, OSCAR should be able to route hardware engineering work to Kinetable 
 
 For deep tasks OSCAR should acknowledge immediately and continue asynchronously rather than remaining silent.
 
-## 14. Streaming voice pipeline
+## 17. Streaming voice pipeline
 
 Where available:
 
@@ -323,16 +415,17 @@ audio → VAD/wake → partial STT → Jev → tool/model stream → chunked TTS
 
 Barge-in must stop current speech and return the system to listening immediately.
 
-## 15. Offline / degradation behavior
+## 18. Offline / degradation behavior
 
 - Internet unavailable: local reflexes, safety, sensors and preconfigured routines continue.
 - ChatGPT unavailable: SwitchRoute may handle suitable requests.
 - SwitchRoute/provider unavailable: ChatGPT or another configured route may handle suitable requests.
-- PC offline: desktop-worker capabilities disappear; OSCAR remains alive.
-- Sunday offline: phone capabilities disappear; other surfaces remain.
+- PC offline: desktop-machine capabilities disappear; OSCAR remains alive.
+- Sunday offline: phone/app/communication capabilities owned by Sunday disappear; other surfaces remain.
 - Edge unavailable: physical capabilities disappear; cloud/mobile/desktop may remain.
+- Communication app unavailable: Worker waits/reroutes only to an equivalent authorized path; no silent privilege escalation.
 
-## 16. Architectural invariants
+## 19. Architectural invariants
 
 1. The laptop is optional.
 2. Hardware safety does not depend on a cloud model.
@@ -342,5 +435,8 @@ Barge-in must stop current speech and return the system to listening immediately
 6. Nodes/apps/plugins advertise capabilities rather than being hard-coded assumptions.
 7. OSCAR uses specialists when they are better suited than generic reasoning.
 8. Jev retrieves/verifies before guessing missing personal/project context.
-9. Learned skills/protocols never self-grant permissions.
+9. Learned skills/protocols/Workers never self-grant permissions.
 10. Reflex commands do not traverse the full reasoning stack.
+11. Personal Policy is distinct from memory and permission, and is editable through normal conversation.
+12. Communication autonomy is platform-capability-aware, permission-scoped and governed by Personal Policy.
+13. Delegated Workers belong to OSCAR and use the best available device/service mesh rather than requiring separate cloud computers.

@@ -13,6 +13,49 @@ This document is the comprehensive capability backlog for OSCAR. A feature being
 - Configurable response style, verbosity and proactivity.
 - Personality and expression without sacrificing clarity or speed.
 
+## Personal Policy and preferences
+
+- Open-ended preferences rather than a fixed list of generic settings.
+- Create/edit/remove preferences through ordinary voice or chat.
+- Seed a small number of useful preferences during first-run setup.
+- Scope policy to people, apps, projects, workers, devices, calls, meetings, locations, Sentry modes, times or arbitrary user-defined context.
+- Distinguish memory, preference/policy, permission, routine and protocol.
+- Explicit policy overrides inferred preference suggestions.
+- More-specific applicable policy normally overrides broader policy.
+- Safety/legal/platform constraints and permissions remain authoritative.
+- Explain which policy affected a decision and why.
+- Inspectable/versionable durable policy with provenance.
+- Inferred patterns can be proposed as preferences rather than silently gaining authority.
+- Natural-language edits update existing rules instead of accumulating contradictory prompt fragments.
+
+See [PERSONAL-POLICY.md](PERSONAL-POLICY.md).
+
+## Communication
+
+- OSCAR as the unified communication layer rather than separate call/meeting/dictation bots.
+- Ordinary phone calls subject to platform support and permissions.
+- WhatsApp calls/messages where technically available.
+- Telegram calls/messages where technically available.
+- Other phone communication apps through the strongest legitimate integration path.
+- Zoom/Google Meet/Teams/Discord-style meeting participation where supported.
+- In-person meeting capture through authorized microphones/devices.
+- AI call answering on the user's behalf under explicit Personal Policy.
+- Rules such as answer after N rings, exclude specific people, or adapt based on calendar/current context.
+- Context-aware call handling using contacts, schedule, agenda, current task, relationship and user rules.
+- Take messages, determine urgency, schedule callbacks and summarize calls.
+- Meeting transcription, speaker labels where reliable, notes, decisions, action items and follow-ups.
+- Meeting context linked back to people/projects/tasks through LRA.
+- System-wide dictation comparable to dedicated dictation products, not limited to OSCAR's own text box.
+- Literal/cleaned/rewrite/command dictation modes.
+- Voice-note handling.
+- App messaging: read/draft/send/reply subject to permissions.
+- Native OS/official API first, then official connector/plugin, then device automation/computer-use fallback.
+- Explicitly report unsupported capability instead of pretending an app exposes it.
+- Raw audio/transcript retention controls.
+- Permission/policy checks before speaking, publishing, sending or revealing private schedule context.
+
+See [COMMUNICATION.md](COMMUNICATION.md).
+
 ## Reflexes and local commands
 
 - Local wake-word detection.
@@ -82,9 +125,11 @@ This document is the comprehensive capability backlog for OSCAR. A feature being
 - Decide when a live source/tool should be inspected.
 - Decide when to use ChatGPT, SwitchRoute or a specialist worker.
 - Decide when deterministic execution is enough.
+- Decide whether a blocked Worker can be repaired/rerouted safely.
 - Ask the user only when ambiguity materially blocks safe/correct execution.
 - Explicit `known / recall / verify / reason / delegate / ask` states.
 - Avoid guessing personal/project context that can be retrieved.
+- Avoid escalating recoverable worker/tool errors unnecessarily.
 
 ## Memory and continuity — LRA + Supermemory
 
@@ -95,9 +140,10 @@ This document is the comprehensive capability backlog for OSCAR. A feature being
 - Cross-device conversation/task continuity.
 - Project/context retrieval.
 - Device/environment context.
-- User profile/preferences.
+- User profile/relationship memory.
+- Personal Policy stored as an authoritative behavior layer distinct from inferred memory.
 - Procedural memory.
-- Protocol state.
+- Protocol/Worker state.
 - Source/provenance metadata where possible.
 - Confidence-aware use of recalled information.
 - Retrieval ranking using relevance, recency, importance, scope, source authority and staleness.
@@ -124,7 +170,11 @@ This document is the comprehensive capability backlog for OSCAR. A feature being
 - OSCAR avatar and voice on Android/mobile.
 - Notifications and proactive alerts.
 - Calls/messages subject to permissions.
-- App actions/deep links where supported.
+- AI call answering when platform support and Personal Policy permit it.
+- WhatsApp/Telegram/other app actions where supported.
+- General phone-app actions/deep links where supported.
+- Mobile meeting transcription/notes.
+- System-wide dictation/input assistance.
 - Camera and microphone access when authorized.
 - Phone sensor/context access.
 - On-device speech recognition where appropriate.
@@ -139,6 +189,8 @@ This document is the comprehensive capability backlog for OSCAR. A feature being
 - macOS app using the same surface/capability contracts with platform-specific adapters.
 - Voice + text interaction.
 - Push/hold-to-talk.
+- System-wide dictation.
+- Meeting transcription/notes where supported.
 - Avatar/presence state.
 - Screen context.
 - Cursor/focus context.
@@ -146,15 +198,15 @@ This document is the comprehensive capability backlog for OSCAR. A feature being
 - Active-window/app context.
 - Notifications and task progress.
 - Approval/permission surfaces.
-- Worker capability/health status.
+- Machine-worker capability/health status.
 - Sunday handoff.
 - Searchable timeline/history rather than a giant chat sidebar.
 
-## PC Worker
+## Machine Worker node
 
 When online, a computer dynamically advertises capabilities to OSCAR.
 
-Planned worker capabilities include:
+Planned capabilities include:
 
 - Codex
 - computer use
@@ -172,13 +224,51 @@ Planned worker capabilities include:
 
 The PC is never required for OSCAR's basic availability.
 
+## Delegated Workers / sub-agents
+
+Workers are Grok-Bot-style delegated teammates owned by OSCAR, but they use the user's actual device/service mesh rather than requiring a separate cloud computer.
+
+- Create Workers naturally by voice or chat.
+- Temporary Workers for one-off research/tasks.
+- Task Workers that live until a completion condition is met.
+- Persistent Workers for continuing responsibilities.
+- Worker goal/context/permissions/capabilities/verification/escalation state.
+- Workers can use Sunday, desktop nodes, APIs/plugins, ChatGPT/SwitchRoute, Kinetable and OSCAR Edge.
+- Workers can use Codex or other specialist agents rather than acting as generic LLM clones.
+- Parallel Workers can collaborate, wait on dependencies and hand work off.
+- Workers can use shared learned Skills.
+- Protocols can create/stop/sleep Workers.
+- Jev handles safe self-repair/rerouting before user escalation.
+- Bounded retries and explicit blockers.
+- Worker state survives restart when a responsibility is long-running.
+- Create/pause/resume/edit/delete through UI or natural language.
+- Lightweight Worker UI rather than a dense agent dashboard.
+- Workers never self-grant permissions or bypass Personal Policy.
+
+See [WORKERS.md](WORKERS.md).
+
+## Social-media management
+
+- Persistent Social Worker when the user wants one.
+- Monitor mentions/replies.
+- Research relevant developments.
+- Draft posts.
+- Prepare media/assets.
+- Schedule content where supported.
+- Publish content within configured autonomy.
+- Answer permitted routine messages/comments.
+- Coordinate release announcements with project state.
+- Summarize community feedback/performance.
+- Use API/plugin first; browser/desktop/Sunday fallback where legitimate and available.
+- Personal Policy can differentiate ordinary posts, major announcements, controversial topics and account/security actions.
+
 ## Software-task orchestration
 
 - Delegate repository work to Codex rather than reproducing a coding agent poorly.
 - Preserve specialist project/workspace context where possible.
 - Route design tasks through relevant plugins such as Impeccable when available.
 - Use computer use for GUI operation and visual verification.
-- Run tests/commands through the worker.
+- Run tests/commands through the machine worker.
 - Observe the result and feed failures back into the specialist agent.
 - Continue until an objective completion condition is met or the user is needed.
 - Prefer the best available software/tool for a task.
@@ -194,6 +284,7 @@ The PC is never required for OSCAR's basic availability.
 - Permission requirements.
 - Reliability/history metadata.
 - Project/workspace context hints.
+- Communication/app capability metadata.
 - Ability for capabilities to disappear/reappear without killing OSCAR.
 
 ## Edge / physical world
@@ -247,7 +338,8 @@ Long-term target capabilities include:
 - Wait states.
 - Conditional branching.
 - Background observation.
-- Delegation to workers/tools.
+- Delegation to Workers/tools.
+- Worker creation/termination as protocol steps.
 - Cancellation and pause/resume.
 - Preconditions and safety checks.
 - Idempotency where appropriate.
@@ -267,23 +359,24 @@ Long-term target capabilities include:
 - OSCAR may propose/create/refine skills after repeated workflows.
 - Skills define required capabilities, inputs, preconditions, procedure, verification, risk and recovery.
 - Generated skills remain permission-scoped, inspectable and versioned.
-- Plugins/connectors become entries in the capability registry and can participate in skills/protocols.
+- Plugins/connectors become entries in the capability registry and can participate in Skills/Protocols/Workers.
 
 ## Self-created automation
 
 - Create skill candidates from successful executions.
+- Create Worker definitions from explicit delegation or persistent objectives.
 - Create routine candidates from repeated recurring behavior.
 - Create protocol candidates from persistent objective patterns.
 - Validate generated definitions before activation.
 - Preserve provenance to the executions that taught the workflow.
 - Never grant new authority implicitly.
-- Require explicit approval when a generated workflow would broaden permissions or risk.
+- Require explicit approval when generated automation would broaden permissions or risk.
 
 ## Research and analysis
 
 - Search/retrieve information through approved sources.
 - Compare multiple sources.
-- Continue research asynchronously.
+- Continue research asynchronously through Workers.
 - Notify only on meaningful findings.
 - Use structured tools/data rather than hallucinating unavailable state.
 
@@ -292,9 +385,10 @@ Long-term target capabilities include:
 - Report important changes without being prompted.
 - Suggest an action when confidence and value are high enough.
 - Continue delegated work after the user leaves.
-- Notify when a task reaches a meaningful result or blocker.
+- Notify when a task/Worker reaches a meaningful result or blocker.
 - Avoid narrating routine background activity.
 - Learn preferred interruption patterns over time without overriding user controls.
+- Apply explicit Personal Policy before inferred preferences.
 
 ## Device and environment awareness
 
@@ -319,6 +413,10 @@ Long-term target capabilities include:
 ## First-run commissioning
 
 - Identity and interaction preferences.
+- Small high-value Personal Policy setup with explanation that any preference can later be changed through normal conversation.
+- Calls/messaging autonomy defaults.
+- Meeting transcription/retention defaults.
+- Worker autonomy defaults.
 - Voice Match enrollment.
 - Wake/reflex command test.
 - Device discovery.
@@ -327,7 +425,7 @@ Long-term target capabilities include:
 - Sentry configuration.
 - Environment/room/workbench setup.
 - Sunday pairing.
-- Desktop/worker pairing.
+- Desktop/machine-worker pairing.
 - Latch/ChatGPT/SwitchRoute setup.
 - Kinetable connection where desired.
 - Routines/protocol preferences.
@@ -345,7 +443,9 @@ Long-term target capabilities include:
 - Outbound edge connections rather than exposed home endpoints.
 - Minimal cloud audio/video exposure.
 - Data retention controls.
-- Generated skills/protocols cannot self-elevate permissions.
+- Generated Skills/Workers/Protocols cannot self-elevate permissions.
+- Communication actions remain attributable.
+- Personal Policy may restrict authority but cannot create it.
 
 ## Reliability
 
@@ -360,3 +460,4 @@ Long-term target capabilities include:
 - Recovery from partial task completion.
 - Explicit blocker reporting rather than silent failure.
 - Skill/protocol rollback when learned changes reduce reliability.
+- Workers repair/reroute safe recoverable failures before escalating, without unbounded retry loops.

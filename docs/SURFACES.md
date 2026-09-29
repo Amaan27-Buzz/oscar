@@ -1,6 +1,6 @@
 # OSCAR Surfaces and Embodiments
 
-OSCAR is one intelligence expressed through multiple devices. These surfaces must share identity, task state, permissions and memory rather than becoming separate assistants.
+OSCAR is one intelligence expressed through multiple devices. These surfaces must share identity, task state, permissions, Personal Policy and memory rather than becoming separate assistants.
 
 ## Sunday — mobile
 
@@ -11,9 +11,13 @@ Primary goals:
 - voice and text access to the same OSCAR session/history
 - proactive notifications and alerts
 - phone calls/messages/actions subject to platform permissions
+- AI call answering under explicit Personal Policy where technically supported
+- WhatsApp/Telegram/other app communication where supported
+- mobile meetings/transcription/notes
+- system-wide dictation/input assistance
 - camera, microphone, location and sensor context
 - biometric/PIN confirmation for sensitive actions
-- remote access to OSCAR tasks and workers
+- remote access to OSCAR tasks and delegated Workers
 - continuity while moving away from the desk
 
 Example:
@@ -26,6 +30,8 @@ start task on desktop
 → continue by voice on phone
 ```
 
+Communication behavior is governed by `docs/COMMUNICATION.md` and `docs/PERSONAL-POLICY.md` rather than hard-coded app-specific assumptions.
+
 ## OSCAR Desktop — Windows and macOS
 
 The desktop app is OSCAR's native presence on a computer, not OSCAR's host.
@@ -37,20 +43,23 @@ Planned desktop capabilities:
 - native lightweight app / overlay
 - voice and text interaction
 - push/hold-to-talk and Sentry participation
+- system-wide dictation
+- meeting transcription/notes where supported
 - avatar/state presence
 - screen/cursor/selection/active-window context
 - notifications and task progress
 - permission/approval surfaces
-- worker health/capability status
+- machine-worker health/capability status
+- delegated Worker status/management
 - handoff to Sunday
 
 The desktop UI should avoid becoming another giant chat sidebar. The primary mental model is the current OSCAR interaction plus searchable history/timeline when needed.
 
-## Desktop worker
+## Machine Worker node
 
-The user-facing desktop app and high-capability worker can share infrastructure but are conceptually different.
+The user-facing desktop app and high-capability machine worker can share infrastructure but are conceptually different.
 
-The worker advertises machine capabilities such as:
+The machine worker advertises capabilities such as:
 
 ```text
 codex
@@ -69,6 +78,36 @@ specialist software
 ```
 
 When the computer is off, those capabilities disappear; OSCAR remains alive through edge/cloud/mobile paths.
+
+This machine-worker concept is distinct from delegated **Workers** such as `SceneLab Social` or `ClearLane Release`. A delegated Worker may use a machine worker node as one execution surface.
+
+## Delegated Worker surface
+
+Workers are created/managed by OSCAR and should have a minimal visibility/control UI rather than a dense agent dashboard.
+
+Example:
+
+```text
+Workers
+
+SceneLab Social      Active
+ClearLane Release    Waiting for CI
+University Admin     Idle
+Research             Working
+```
+
+Opening a Worker can show:
+
+- objective/responsibility
+- current state/blocker
+- capabilities it can use
+- autonomy/approval rules
+- recent consequential actions
+- pause/resume/edit/delete controls
+
+The primary Worker interface remains natural language: "OSCAR, pause the SceneLab worker" or "let it publish ordinary feature posts without asking."
+
+See [WORKERS.md](WORKERS.md).
 
 ## OSCAR Edge — embedded always-on presence
 
@@ -149,6 +188,24 @@ OSCAR → Latch → ChatGPT
 
 The user should be able to ask ChatGPT to inspect or operate OSCAR capabilities when permitted, while OSCAR can also invoke ChatGPT for suitable reasoning/workflows through the abstracted wake path.
 
+## Communication surfaces
+
+Calls, meetings, messaging and dictation may be executed by different devices/apps, but they are one logical OSCAR communication subsystem.
+
+Examples:
+
+```text
+cellular call          → Sunday / telephony capability
+WhatsApp message       → official integration or Sunday app capability
+Zoom meeting on laptop → desktop communication capability
+in-person meeting      → authorized phone/desk microphone
+system-wide dictation  → Sunday IME/accessibility or desktop input adapter
+```
+
+OSCAR should choose the strongest legitimate integration path and expose only capabilities that are actually available.
+
+See [COMMUNICATION.md](COMMUNICATION.md).
+
 ## Cross-surface continuity
 
 The same task should survive surface changes.
@@ -167,6 +224,15 @@ Desktop: "What did Codex find?"
 OSCAR resolves "Codex" and "that issue" from shared state
 ```
 
+Communication is continuous too:
+
+```text
+OSCAR takes a call on Sunday
+→ records approved summary/action item
+→ user asks on desktop "what did they need?"
+→ LRA resolves the call context
+```
+
 No manual chat transfer should be required.
 
 ## Capability presence
@@ -174,10 +240,11 @@ No manual chat transfer should be required.
 Every node joins/leaves dynamically.
 
 ```text
-Sunday online      → mobile capabilities available
+Sunday online      → mobile/communication capabilities available
 PC online          → Codex/desktop capabilities available
 ESP32 online       → physical capabilities available
 camera node online → visual context available
+app integration up → app-specific communication capability available
 ```
 
 OSCAR plans against what exists **now**, not assumptions about one permanent device.

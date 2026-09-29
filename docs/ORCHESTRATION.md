@@ -1,4 +1,4 @@
-# Orchestration, Learning, Skills and Protocols
+# Orchestration, Learning, Skills, Workers and Protocols
 
 OSCAR should not attempt to become a mediocre implementation of every specialist tool. Its job is to understand the objective, choose the best available capability, coordinate it, verify the result and learn from successful execution.
 
@@ -16,7 +16,7 @@ Codex
 - debugging
 - project-specific plugins
 
-Desktop worker
+Desktop worker node
 - computer-use
 - terminal
 - browser
@@ -28,6 +28,8 @@ Desktop worker
 Sunday
 - notifications
 - phone actions
+- calls/messages
+- phone apps
 - camera
 - microphone
 - location/context
@@ -84,14 +86,15 @@ OSCAR should not generate the page through a generic chat response merely becaus
 The same idea applies elsewhere:
 
 ```text
-coding              → Codex / coding specialist
-notes/knowledge     → connected Notion/Obsidian-like system when appropriate
-email/calendar      → structured service connector
-GUI-only workflow   → computer use
-hardware design     → Kinetable
-physical action     → OSCAR Edge
-research            → suitable research/model path
-cheap classification→ Jev / fast routed model
+coding               → Codex / coding specialist
+notes/knowledge      → connected Notion/Obsidian-like system when appropriate
+email/calendar       → structured service connector
+GUI-only workflow    → computer use
+phone/app workflow   → Sunday when it is the best execution surface
+hardware design      → Kinetable
+physical action      → OSCAR Edge
+research             → suitable research/model path
+cheap classification → Jev / fast routed model
 ```
 
 ## Execution loop
@@ -113,7 +116,67 @@ understand objective
 
 For long work, OSCAR should remain the owner of the objective even while specialists perform the steps.
 
-## Tools vs skills vs routines vs protocols
+## Workers
+
+A **Worker** is a delegated sub-agent OSCAR creates for an objective or responsibility. It is not necessarily another generic model and does not inherently own a cloud computer.
+
+A Worker may coordinate:
+
+- Codex
+- Computer Use
+- browser/terminal/apps
+- Sunday/phone capabilities
+- plugins/connectors/APIs
+- ChatGPT/SwitchRoute
+- Kinetable
+- OSCAR Edge
+
+Workers can be temporary, task-scoped or persistent.
+
+```text
+"Research these five laptops"
+→ temporary research Worker
+
+"Watch ClearLane CI tonight"
+→ task Worker
+
+"Manage SceneLab social media"
+→ persistent Worker
+```
+
+Workers operate under OSCAR's Personal Policy and permission system. They can be created and edited through ordinary voice/chat and inspected through a lightweight management UI.
+
+See [WORKERS.md](WORKERS.md).
+
+## Worker collaboration
+
+OSCAR may create several Workers for one objective:
+
+```text
+Launch Kinetable
+├── Research Worker
+├── Coding Worker
+├── Design Worker
+└── Social Worker
+```
+
+Workers may run in parallel, wait on dependencies, exchange artifacts/context and hand work off. OSCAR remains the top-level coordinator and resolves conflicts.
+
+## Jev and worker recovery
+
+Workers should not escalate routine recoverable failures to the user.
+
+```text
+Worker encounters issue
+→ Jev evaluates
+→ safe/confident self-fix? → repair/retry/verify
+→ better capability exists? → reroute/delegate
+→ otherwise ask OSCAR/user for minimum required intervention
+```
+
+Retries must be bounded. Workers must never invent success or silently switch to a more privileged capability path.
+
+## Tools vs skills vs workers vs routines vs protocols
 
 ### Tool
 
@@ -126,6 +189,10 @@ Examples: `gmail.send`, `gpio.set`, browser click, terminal command, `codex.run`
 A reusable learned procedure for achieving a goal, ideally portable and inspectable using the ecosystem's `SKILL.md`-style convention where suitable.
 
 A skill may combine multiple tools/workers.
+
+### Worker
+
+A delegated sub-agent that owns a scoped objective/job and may combine specialists, tools, devices and skills.
 
 ### Routine
 
@@ -149,7 +216,7 @@ Objective: get the release safely deployed
 
 watch CI
 → if failed, investigate
-→ delegate recoverable fix
+→ create/delegate Worker for recoverable fix
 → rerun tests
 → wait for deployment
 → verify live result
@@ -158,25 +225,26 @@ watch CI
 
 This is intentionally more capable than a basic scheduled action.
 
-## Self-created skills, routines and protocols
+## Self-created skills, workers, routines and protocols
 
-OSCAR may create or propose its own reusable automation when:
+OSCAR may create or propose reusable automation when:
 
-- the user explicitly asks it to remember a workflow
+- the user explicitly asks it to delegate or remember a workflow
 - a successful novel procedure is worth reusing
 - repeated behavior reveals a stable pattern
 - an existing skill can be improved from a better verified path
+- an objective is large enough to deserve a temporary or persistent Worker
 
 Creation flow:
 
 ```text
-successful task/history
-→ identify reusable procedure
+objective/history
+→ identify reusable responsibility/procedure
 → normalize parameters + preconditions
 → define required capabilities
-→ define permissions/risk
+→ define Personal Policy + permissions/risk
 → define verification
-→ create skill/routine/protocol candidate
+→ create Worker/skill/routine/protocol candidate
 → validate
 → activate within existing authority
 ```
@@ -234,9 +302,9 @@ The exact schema should remain compatible with widely used `SKILL.md` convention
 
 OSCAR should discover and use plugins/connectors exposed by its host environments.
 
-A plugin is not merely another menu item. It expands the capability registry and may become part of learned skills/protocols.
+A plugin is not merely another menu item. It expands the capability registry and may become part of learned skills/protocols/Workers.
 
-Examples include mail, calendar, GitHub, cloud storage, knowledge tools and future third-party systems.
+Examples include mail, calendar, GitHub, cloud storage, knowledge tools, communication services and future third-party systems.
 
 ## Projects and specialist context
 
@@ -250,8 +318,24 @@ Examples:
 - Kinetable project/inventory
 - Notion/Obsidian workspace
 - GitHub repository and issues
+- social/account context available through approved connectors
 
 OSCAR should route the objective to the environment that already has the correct context whenever possible.
+
+## Personal Policy
+
+Worker autonomy is constrained by [PERSONAL-POLICY.md](PERSONAL-POLICY.md).
+
+Examples:
+
+```text
+ordinary SceneLab feature post → Worker may publish
+major announcement              → ask
+controversial reply              → never auto-publish
+security/account change          → strong confirmation
+```
+
+Preferences may narrow behavior but cannot create permissions that do not already exist.
 
 ## Verification
 
@@ -262,6 +346,7 @@ OSCAR should verify outcomes using an independent signal when practical:
 - tests after code changes
 - browser/computer-use inspection after UI work
 - file/state checks after desktop actions
+- API/result checks after communication/social actions
 - sensor feedback after physical actions
 - deployment health checks after release
 
@@ -271,7 +356,7 @@ If verification fails, OSCAR may retry, route to another capability or ask the u
 
 Learning never overrides authorization.
 
-A learned skill/protocol records what permissions it requires; it does not create them.
+A learned skill/protocol/Worker records what permissions it requires; it does not create them.
 
 Critical or destructive steps still follow OSCAR's policy layer, Voice Match rules and stronger confirmation requirements.
 
@@ -286,5 +371,5 @@ OSCAR should gradually evolve from:
 to:
 
 ```text
-"I know the best way to accomplish this for this user, with these tools, in this environment."
+"I know the best way to accomplish this for this user, with these tools, in this environment, and I can delegate the work to the right team."
 ```

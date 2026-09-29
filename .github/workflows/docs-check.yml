@@ -37,6 +37,9 @@ jobs:
             docs/ROADMAP.md
             docs/DECISIONS.md
             docs/MEMORY.md
+            docs/PERSONAL-POLICY.md
+            docs/COMMUNICATION.md
+            docs/WORKERS.md
             docs/ORCHESTRATION.md
             docs/SURFACES.md
             docs/SUNDAY-DESIGN.md
