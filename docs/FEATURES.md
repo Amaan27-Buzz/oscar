@@ -78,8 +78,8 @@ This document is the comprehensive capability backlog for OSCAR. A feature being
 - Open-ended preferences rather than a fixed list of generic settings.
 - Create/edit/remove preferences through ordinary voice or chat.
 - Seed a small number of useful preferences during first-run setup.
-- Scope policy to people, apps, projects, workers, devices, calls, meetings, locations, Sentry modes, times or arbitrary user-defined context.
-- Distinguish memory, preference/policy, permission, routine and protocol.
+- Scope policy to people, apps, projects, Workers, devices, calls, meetings, locations, Sentry modes, times or arbitrary user-defined context.
+- Distinguish memory, preference/policy, permission, routine and Protocol.
 - Explicit policy overrides inferred preference suggestions.
 - More-specific applicable policy normally overrides broader policy.
 - Safety/legal/platform constraints and permissions remain authoritative.
@@ -117,6 +117,17 @@ See [PERSONAL-POLICY.md](PERSONAL-POLICY.md).
 
 See [COMMUNICATION.md](COMMUNICATION.md).
 
+## Universal Channel Gateway
+
+- Normalize supported inbound/outbound communication across cellular/SMS where possible, WhatsApp, Telegram, Signal, Discord, Slack/Teams-like channels, email, social DMs/replies and future adapters.
+- Common event envelope for channel/account/thread, canonical participant IDs, sender/recipients, direction, type, text/transcript/media refs, timestamps and source IDs.
+- Per-channel capability advertisement rather than assumed feature parity.
+- Native/official API path preferred over device/browser automation.
+- Channel events linked to canonical entities, World Model, LRA and Personal Policy where appropriate.
+- Unsupported actions remain explicitly unsupported rather than silently emulated.
+
+See [RUNTIME-FOUNDATIONS.md](RUNTIME-FOUNDATIONS.md).
+
 ## Action Ledger + universal Undo
 
 - Structured record for consequential actions.
@@ -126,11 +137,13 @@ See [COMMUNICATION.md](COMMUNICATION.md).
 - Permission + Personal Policy decision.
 - Before-state reference where available.
 - Resulting-state reference where available.
-- Verification result.
+- Execution status.
+- Verification status/method/evidence.
+- Limitations/untested surfaces.
 - Reversible/irreversible flag.
 - Compensating/undo action when the capability supports one.
 - Correlation ID + timestamp.
-- Natural queries: “what did you change?”, “why did you do that?”, “undo that”.
+- Natural queries: “what did you change?”, “why did you do that?”, “did you actually verify it?”, “undo that”.
 - Never claim reversibility for an irreversible action.
 
 ## Reflexes and local commands
@@ -193,6 +206,7 @@ See [COMMUNICATION.md](COMMUNICATION.md).
 - Long-running Work-style investigations can return results to OSCAR.
 - ChatGPT retains no special hardware-safety authority.
 - Wake/trigger transport is replaceable when product capabilities evolve.
+- ChatGPT/agent success reports enter as reported evidence until verified.
 
 ## SwitchRoute integration
 
@@ -202,6 +216,7 @@ See [COMMUNICATION.md](COMMUNICATION.md).
 - Small/fast model paths for classification and extraction.
 - Stronger reasoning models only when needed.
 - Speech-provider routing may use the same abstraction where useful.
+- Model inference is never silently relabeled as verified fact.
 
 ## Intent and epistemic routing — Jev
 
@@ -210,13 +225,28 @@ See [COMMUNICATION.md](COMMUNICATION.md).
 - Query the World Model for current state.
 - Decide when memory retrieval is necessary.
 - Decide when a live source/tool should be inspected.
-- Decide when to use ChatGPT, SwitchRoute or a specialist worker.
+- Decide when to use ChatGPT, SwitchRoute or a specialist Worker.
 - Decide when deterministic execution is enough.
 - Decide whether a blocked Worker can be repaired/rerouted safely.
 - Ask the user only when ambiguity materially blocks safe/correct execution.
-- Explicit `known / world / recall / verify / reason / delegate / ask` states.
+- Explicit `known / world / recall / verify / reason / reported / delegate / ask` states.
 - Avoid guessing personal/project context that can be retrieved.
 - Avoid escalating recoverable Worker/tool errors unnecessarily.
+
+## Epistemic Integrity
+
+- Distinguish intention, execution, reported success, observed result and verified objective completion.
+- Task states: planned, executing, result_received, verifying, verified, partially_verified, failed, blocked, cancelled, unknown.
+- Evidence states: KNOWN, INFERRED, RECALLED, REPORTED, VERIFIED, UNKNOWN.
+- Tool/Worker/model success is testimony/evidence, not automatically truth.
+- Unqualified `Done`/`Fixed` requires verification where technically possible.
+- Partial verification is reported as partial.
+- Unknown is preferable to guessing.
+- User confidence does not alter factual state; OSCAR can disagree when evidence/constraints require it.
+- Corrections are explicit and propagated to affected state/docs/tasks.
+- UI/avatar state reflects real execution/verification state rather than fake success.
+
+See [EPISTEMIC-INTEGRITY.md](EPISTEMIC-INTEGRITY.md).
 
 ## Memory and continuity — LRA + Supermemory
 
@@ -237,10 +267,11 @@ See [COMMUNICATION.md](COMMUNICATION.md).
 - Searchable history/timeline instead of mandatory manual chat management.
 - User controls to inspect, correct and forget memory.
 - Current World Model state remains distinct from historical/semantic memory.
+- Recalled memory remains explicitly recalled until verified against current authority where necessary.
 
 ## Learning and procedural memory
 
-- Capture successful novel execution paths.
+- Capture verified successful novel execution paths.
 - Distill useful procedures from noisy exploratory runs.
 - Parameterize reusable steps.
 - Store required capabilities/preconditions.
@@ -252,7 +283,7 @@ See [COMMUNICATION.md](COMMUNICATION.md).
 - Version learned procedures.
 - Roll back worse versions.
 - Never let learned behavior self-grant permissions.
-- Teach-by-demonstration: “watch me do this once” → observe authorized actions → infer intent/steps → clarify ambiguity → verify → save Skill candidate.
+- Teach-by-demonstration: “watch me do this once” → observe authorized actions → infer intent/steps → clarify ambiguity → verify → create Skill candidate.
 
 ## Sunday — OSCAR on phone
 
@@ -290,7 +321,7 @@ See [COMMUNICATION.md](COMMUNICATION.md).
 - Point-and-talk interaction.
 - Notifications and task progress.
 - Approval/permission surfaces.
-- Machine-worker capability/health status.
+- Machine-Worker capability/health status.
 - Sunday handoff.
 - Searchable timeline/history rather than a giant chat sidebar.
 
@@ -300,19 +331,18 @@ When online, a computer dynamically advertises capabilities to OSCAR.
 
 Planned capabilities include:
 
-- Codex
-- computer use
-- Antigravity
-- terminal / PowerShell / shell
-- browser
-- IDEs/editors
-- Git/GitHub workflows
-- Python/scripts
-- FFmpeg/media tooling
-- Blender or other specialist desktop apps
-- filesystem
-- optional local models
-- GPU-backed support jobs
+- Codex;
+- computer use;
+- terminal / PowerShell / shell;
+- browser;
+- IDEs/editors;
+- Git/GitHub workflows;
+- Python/scripts;
+- FFmpeg/media tooling;
+- Blender or other specialist desktop apps;
+- filesystem;
+- optional local models;
+- GPU-backed support jobs.
 
 The PC is never required for OSCAR's basic availability.
 
@@ -336,6 +366,7 @@ Workers are Grok-Bot-style delegated teammates owned by OSCAR, but they use the 
 - Create/pause/resume/edit/delete through UI or natural language.
 - Lightweight Worker UI rather than a dense agent dashboard.
 - Workers never self-grant permissions or bypass Personal Policy.
+- Worker success remains REPORTED until objective verification.
 
 See [WORKERS.md](WORKERS.md).
 
@@ -351,6 +382,28 @@ See [WORKERS.md](WORKERS.md).
 - Decide when the user actually needs to be interrupted.
 - Never bypass Jev, Personal Policy or permissions.
 
+## Durable Execution Runtime
+
+- Durable task/objective IDs and lifecycle state.
+- Persisted checkpoints/current step for long-running work.
+- Executor leases/ownership.
+- Heartbeats/last-progress tracking.
+- Retry budget and bounded backoff.
+- Cancellation state.
+- Deadline/expiry.
+- Required capabilities and current execution surface.
+- Artifact/result references.
+- Verification state.
+- Blocker/escalation state.
+- Lease expiry/reclaim of abandoned work.
+- Zombie/stuck-work detection.
+- Restart/resume after process/device loss.
+- Idempotency/deduplication where needed.
+- Durable queues/event delivery where justified.
+- Never leave a task indefinitely `Working` because its executor vanished.
+
+See [RUNTIME-FOUNDATIONS.md](RUNTIME-FOUNDATIONS.md).
+
 ## Social-media management
 
 - Persistent Social Worker when the user wants one.
@@ -363,7 +416,7 @@ See [WORKERS.md](WORKERS.md).
 - Answer permitted routine messages/comments.
 - Coordinate release announcements with project state.
 - Summarize community feedback/performance.
-- Use API/plugin first; browser/desktop/Sunday fallback where legitimate and available.
+- Use Channel/API/plugin first; browser/desktop/Sunday fallback where legitimate and available.
 - Personal Policy can differentiate ordinary posts, major announcements, controversial topics and account/security actions.
 
 ## Software-task orchestration
@@ -372,25 +425,46 @@ See [WORKERS.md](WORKERS.md).
 - Preserve specialist project/workspace context where possible.
 - Route design tasks through relevant plugins such as Impeccable when available.
 - Use computer use for GUI operation and visual verification.
-- Run tests/commands through the machine worker.
+- Run tests/commands through the machine Worker.
 - Observe the result and feed failures back into the specialist agent.
 - Continue until an objective completion condition is met or the user is needed.
 - Prefer the best available software/tool for a task.
-- Re-route on worker/tool failure.
+- Re-route on Worker/tool failure.
 - Verify independently where practical.
+- Preserve reported-vs-verified distinction throughout orchestration.
 
-## Capability registry
+## Capability Catalog + Dynamic Tool Search
 
-- Dynamic node/app/plugin capability advertisement.
+- Dynamic node/app/plugin/Skill/channel capability advertisement.
+- Lightweight searchable manifests.
 - Availability state.
 - Task suitability metadata.
 - Latency/cost metadata where useful.
-- Permission requirements.
+- Permission/risk requirements.
 - Reliability/history metadata.
 - Project/workspace context hints.
 - Communication/app capability metadata.
 - Reversal/undo capability metadata where applicable.
+- Provider/plugin/version metadata.
+- Search/rank by suitability + availability + policy + reliability + latency/cost.
+- Load detailed contracts only for relevant finalists.
 - Ability for capabilities to disappear/reappear without killing OSCAR.
+- Avoid a mega-prompt containing every tool definition.
+
+## Artifact / Result Model
+
+- First-class records for documents, spreadsheets, slides, images/video/audio, code patches/commits/PRs, research reports, meeting notes, deployments, firmware builds, datasets/models/evaluations and other durable outputs.
+- Artifact ID/kind/name.
+- Owner task/Worker/Protocol.
+- Producer capability.
+- Location/reference.
+- Version/hash where useful.
+- Source/provenance.
+- Verification status.
+- Permissions/access scope.
+- Project/entity/task relationships.
+- `supersedes` / `derived-from` links.
+- Workers pass artifact references rather than repeatedly copying opaque blobs through prompts.
 
 ## Edge / physical world
 
@@ -423,20 +497,20 @@ See [WORKERS.md](WORKERS.md).
 
 Long-term target capabilities include:
 
-- identify connected components and sensors
-- inspect telemetry while the user works
-- correlate camera view with electronic state
-- explain wiring/problems using actual device data
-- route circuit/simulation work to Kinetable
-- drive visual-debugging or CAD/workbench tools
-- invoke specialist software rather than simulating it in chat
-- route CAD, 3D, numerical simulation, diagnostics, reconstruction and optimization to appropriate external/specialist tools
-- maintain personal component inventory/context
-- run safe physical protocols after authorization
+- identify connected components and sensors;
+- inspect telemetry while the user works;
+- correlate camera view with electronic state;
+- explain wiring/problems using actual device data;
+- route circuit/simulation work to Kinetable;
+- drive visual-debugging or CAD/workbench tools;
+- invoke specialist software rather than simulating it in chat;
+- route CAD, 3D, numerical simulation, diagnostics, reconstruction and optimization to appropriate external/specialist tools;
+- maintain personal component inventory/context;
+- run safe physical Protocols after authorization.
 
 ## Protocols and routines
 
-- Named protocols such as `leaving_home` or `release-watch`.
+- Named Protocols such as `leaving_home` or `release-watch`.
 - Recurring routines.
 - Time-triggered routines.
 - Event-triggered routines.
@@ -445,7 +519,7 @@ Long-term target capabilities include:
 - Conditional branching.
 - Background observation.
 - Delegation to Workers/tools.
-- Worker creation/termination as protocol steps.
+- Worker creation/termination as Protocol steps.
 - Cancellation and pause/resume.
 - Preconditions and safety checks.
 - Idempotency where appropriate.
@@ -454,29 +528,44 @@ Long-term target capabilities include:
 - Completion conditions.
 - Human approval gates for consequential steps.
 - Long-running responsibility over days/weeks/months when needed.
+- Durable Execution Runtime used where restart/recovery matters.
 
 ## Skills and plugins
 
 - Support portable `SKILL.md`-style capability descriptions/contracts.
 - Plugin/connector discovery.
 - Tool capability metadata.
-- OSCAR can identify when a specialist skill/plugin is better suited than its general path.
-- OSCAR may create a reusable Skill from a successful novel workflow.
+- OSCAR can identify when a specialist Skill/plugin is better suited than its general path.
+- OSCAR may create a reusable Skill candidate from a verified novel workflow.
 - OSCAR may propose/create/refine Skills after repeated workflows.
 - Skills define required capabilities, inputs, preconditions, procedure, verification, risk and recovery.
 - Generated Skills remain permission-scoped, inspectable and versioned.
-- Plugins/connectors become entries in the capability registry and can participate in Skills/Protocols/Workers.
+- Plugins/connectors become entries in the Capability Catalog and can participate in Skills/Protocols/Workers.
 
 ## Self-created automation
 
-- Create Skill candidates from successful executions.
+- Create Skill candidates from verified successful executions.
 - Create Worker definitions from explicit delegation or persistent objectives.
 - Create routine candidates from repeated recurring behavior.
 - Create Protocol candidates from persistent objective patterns.
-- Validate generated definitions before activation.
 - Preserve provenance to the executions that taught the workflow.
 - Never grant new authority implicitly.
 - Require explicit approval when generated automation would broaden permissions or risk.
+
+## Learned Automation Evaluation Pipeline
+
+- One successful run creates a candidate, not automatically a trusted/default automation.
+- Normalize/parameterize candidate steps.
+- Replay/evaluate representative cases where possible.
+- Verify expected output and safety properties.
+- Compare new version with current trusted version.
+- Review permission/Personal Policy requirements.
+- Promote, reject or keep experimental.
+- Preserve evaluation cases/results, assumptions, provenance, limitations and rollback target.
+- Untestable candidates remain experimental/partially verified.
+- Roll back versions that regress reliability/safety.
+
+See [RUNTIME-FOUNDATIONS.md](RUNTIME-FOUNDATIONS.md).
 
 ## Research and analysis
 
@@ -485,15 +574,16 @@ Long-term target capabilities include:
 - Continue research asynchronously through Workers.
 - Notify only on meaningful findings.
 - Use structured tools/data rather than hallucinating unavailable state.
+- Preserve source/provenance and distinguish inference from verified fact.
 
 ## Proactivity
 
 - Report important changes without being prompted.
-- Suggest an action when confidence and value are high enough.
+- Suggest an action when confidence/value are high enough.
 - Continue delegated work after the user leaves.
-- Notify when a task/Worker reaches a meaningful result or blocker.
+- Notify when a task/Worker reaches a meaningful verified result or blocker.
 - Avoid narrating routine background activity.
-- Learn preferred interruption patterns over time without overriding user controls.
+- Learn preferred interruption patterns without overriding user controls.
 - Apply explicit Personal Policy before inferred preferences.
 - Use predictive signals to prepare quietly without turning uncertain forecasts into authority.
 
@@ -511,15 +601,16 @@ Long-term target capabilities include:
 ## Self-maintenance / diagnostics
 
 - Detect expired authentication.
-- Detect broken/missing connectors.
+- Detect broken/missing connectors/channels.
 - Detect stale/disappeared capabilities.
 - Detect Edge-node disconnects.
 - Detect provider/speech latency degradation.
 - Detect storage/local-state health problems.
 - Detect update failures.
 - Detect repeated Worker/Protocol failures.
-- Repair or roll back safe failures automatically when confidence and permissions allow.
-- Ask the user only for the minimum intervention when self-repair is not safe/possible.
+- Detect stuck/zombie durable tasks.
+- Repair or roll back safe failures automatically when confidence/permissions allow.
+- Ask the user only for minimum intervention when self-repair is not safe/possible.
 
 ## Avatar and presence
 
@@ -527,7 +618,9 @@ Long-term target capabilities include:
 - Yellow face behaves like a weighted joystick/puck inside the blue body.
 - Directionality indicates attention/focus.
 - Expression states for idle, listening, thinking, speaking, success, confusion, alert, sentry, sleeping, muted and error.
-- Small-size/icon variants preserve silhouette and readability.
+- Runtime states include Working, Verifying, Waiting, Blocked, Done and Failed.
+- Success animation/state only after verified completion where verification is applicable.
+- Small-size/icon variants preserve silhouette/readability.
 - “Serious” states become calmer/focused rather than cartoonishly expressive.
 - Motion grammar tied to actual system state.
 
@@ -541,16 +634,16 @@ Long-term target capabilities include:
 - Voice Match enrollment.
 - Wake/reflex command test.
 - Device discovery.
-- Accounts/services.
+- Accounts/services/channels.
 - Permission matrix.
 - Sentry configuration.
 - Environment/room/workbench setup.
 - Sunday pairing.
-- Desktop/machine-worker pairing.
+- Desktop/machine-Worker pairing.
 - Latch/ChatGPT/SwitchRoute setup.
 - Kinetable connection where desired.
-- Routines/protocol preferences.
-- End-to-end calibration and health check.
+- Routines/Protocol preferences.
+- End-to-end calibration and verified health check.
 
 ## Permissions and security
 
@@ -583,6 +676,9 @@ Long-term target capabilities include:
 - Skill/Protocol rollback when learned changes reduce reliability.
 - Workers repair/reroute safe recoverable failures before escalating, without unbounded retry loops.
 - World Model state carries freshness so stale evidence is not mistaken for current truth.
+- Durable tasks use checkpoint/lease/heartbeat/reclaim semantics where needed.
+- Reported success cannot silently become verified completion.
+- Partial/unknown/failed states are preserved and surfaced truthfully.
 
 ## Post-alpha expansion
 
@@ -590,6 +686,12 @@ Long-term target capabilities include:
 - Smart-home capability contracts.
 - Robotics/camera/room-infrastructure contracts.
 - Future vehicle/drone integration where safe and legally appropriate.
-- These domains plug into the existing capability registry, World Model, Personal Policy, permissions and Action Ledger rather than creating parallel architectures.
+- Optional cloud Worker node as an advertised capability rather than a foundational dependency.
+- These domains plug into existing Capability Catalog, World Model, Personal Policy, Durable Execution Runtime, Artifact Model, permissions and Action Ledger rather than creating parallel architectures.
 
-See [JARVIS-GAP-REVIEW.md](JARVIS-GAP-REVIEW.md) for the current system-level benchmark and priority rationale.
+See:
+
+- [JARVIS-GAP-REVIEW.md](JARVIS-GAP-REVIEW.md)
+- [COMPETITIVE-BENCHMARK.md](COMPETITIVE-BENCHMARK.md)
+- [RUNTIME-FOUNDATIONS.md](RUNTIME-FOUNDATIONS.md)
+- [EPISTEMIC-INTEGRITY.md](EPISTEMIC-INTEGRITY.md)
