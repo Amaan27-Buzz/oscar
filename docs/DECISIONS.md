@@ -221,3 +221,77 @@ A slice is not complete while the repository still describes an older system sta
 **Recovery:** Jev should allow safe self-repair/rerouting before unnecessary user escalation; retries remain bounded and authority never expands silently.
 
 **Implication:** Workers can collaborate, use Skills and participate in Protocols, while OSCAR remains the top-level coordinator and Personal Policy/permissions remain authoritative.
+
+## ADR-032 — The World Model is the live shared state layer
+
+**Decision:** OSCAR maintains a World Model representing current people, places, devices, apps, projects, tasks, objects and their relationships/state.
+
+**Reason:** JARVIS-like behavior requires one coherent situation model rather than independent facts scattered across memory, devices and connectors.
+
+**Constraint:** current state must carry freshness/provenance/confidence. Stale state is marked stale/unknown rather than presented as current truth.
+
+**Implication:** LRA/Supermemory remains historical/semantic continuity; the World Model is current state.
+
+## ADR-033 — Perception feeds the World Model through a normalized fabric
+
+**Decision:** screen/accessibility state, cursor/selection, camera observations, audio events, phone/app events, location, sensors and task/Worker state enter OSCAR through a Perception Fabric.
+
+**Reason:** each surface should not invent a separate perception model. Multimodal evidence needs one normalized path into current state.
+
+**Constraint:** perception/retention are separate decisions. Observing something does not automatically make it durable memory.
+
+## ADR-034 — OSCAR has an Executive Planner above Workers and Protocols
+
+**Decision:** a global Executive Planner coordinates concurrent objectives using priority, deadlines, dependencies, resources, risk, cost, interruptibility and device availability.
+
+**Reason:** the user should not become the human project manager for a collection of agents.
+
+**Implication:** the Executive Planner may schedule, parallelize, pause, pre-empt or reroute work, but cannot bypass Personal Policy, permissions or Jev.
+
+## ADR-035 — Consequential actions use an Action Ledger; undo is capability-aware
+
+**Decision:** consequential actions are recorded with intent, initiator, target, tool/device, policy/permission decision, verification and reversal metadata where available.
+
+**Reason:** OSCAR should be able to answer “what did you change?”, “why?” and “undo that” truthfully.
+
+**Constraint:** undo is best-effort. Irreversible operations are never represented as reversible. A compensating action is used only when the underlying capability actually supports a safe compensation.
+
+## ADR-036 — Interaction Runtime uses Dictate / Edit / Ask / Act
+
+**Decision:** desktop/mobile interaction converges on four user-facing modes: Dictate, Edit, Ask and Act, powered by focused app/window, selected text, cursor target, accessibility tree, screenshot/visual context and active task state.
+
+**Reason:** OSCAR must at least match the practical VoiceOS-style “point at something and talk about it” interaction baseline.
+
+**Implication:** system-wide dictation, selected-text editing and point-and-talk are core interaction architecture, not isolated features.
+
+## ADR-037 — Exactly one listening surface owns a voice turn
+
+**Decision:** when Sunday, desktop and physical OSCAR hear the same wake/utterance, a multi-device arbitration layer chooses one owning surface.
+
+**Inputs:** wake confidence, signal/proximity, active-device context, presence/user interaction and explicit priority.
+
+**Reason:** omnipresence should feel like one assistant, not several speakers responding at once.
+
+## ADR-038 — Live source retrieval is federated and authority-aware
+
+**Decision:** Jev can query a universal live context/search fabric across connected authoritative sources instead of hard-coding every connector into the reasoning path.
+
+**Reason:** memory alone cannot answer current-state questions reliably.
+
+**Implication:** current authoritative sources outrank stale memory; source provenance is preserved.
+
+## ADR-039 — OSCAR can be taught workflows by demonstration
+
+**Decision:** where device/platform capabilities allow it, the user can deliberately teach a workflow by demonstrating it once; OSCAR infers a Skill candidate, asks about ambiguity, verifies and versions the result.
+
+**Reason:** this extends OSCAR to apps and workflows that lack strong APIs without requiring the user to hand-author automation.
+
+**Constraint:** observed behavior never creates new authority. The resulting Skill remains permission-scoped and inspectable.
+
+## ADR-040 — OSCAR monitors and repairs its own operational health
+
+**Decision:** OSCAR treats expired auth, broken connectors, stale/disappeared capabilities, provider degradation, Edge disconnects, update failure, storage pressure and repeated Worker failures as first-class health state.
+
+**Reason:** an always-present assistant cannot depend on the user manually noticing every infrastructure failure.
+
+**Constraint:** automatic repair/rollback occurs only when safe, bounded and authorized; otherwise OSCAR asks for the minimum intervention needed.

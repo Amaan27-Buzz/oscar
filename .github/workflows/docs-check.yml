@@ -33,6 +33,7 @@ jobs:
             SUPPORT.md
             docs/PRODUCT.md
             docs/ARCHITECTURE.md
+            docs/JARVIS-GAP-REVIEW.md
             docs/FEATURES.md
             docs/ROADMAP.md
             docs/DECISIONS.md

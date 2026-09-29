@@ -13,6 +13,66 @@ This document is the comprehensive capability backlog for OSCAR. A feature being
 - Configurable response style, verbosity and proactivity.
 - Personality and expression without sacrificing clarity or speed.
 
+## Interaction Runtime — Dictate / Edit / Ask / Act
+
+- First-class system-wide interaction runtime rather than separate dictation, editing and agent modes.
+- `Dictate`: literal or cleaned speech inserted into the current target.
+- `Edit`: transform selected/recent text naturally.
+- `Ask`: answer about the current screen, selection, cursor target or app context.
+- `Act`: operate the current app/device/task through the best available capability.
+- Focused app/window awareness.
+- Focused control/text-field awareness.
+- Selected-text context.
+- Cursor target context.
+- Accessibility-tree context.
+- Screenshot/visual context when needed.
+- Clipboard/input-method fallback where native insertion is unavailable.
+- Point-and-talk requests such as “what is this?”, “reply to him” and “fix this button”.
+- Undo surface connected to the Action Ledger when a real compensating action exists.
+
+## Multi-device voice arbitration
+
+- Sunday, desktop and physical OSCAR can all listen without all responding at once.
+- Exactly one surface normally owns a voice turn.
+- Arbitration inputs can include wake confidence, microphone signal quality, proximity, current active device, room/presence, explicit device priority and available interaction context.
+- Explicit handoff between surfaces.
+- Failover if the selected surface becomes unavailable.
+- Shared turn/task state after arbitration so other surfaces remain synchronized.
+
+## World Model / digital twin
+
+- Live graph of people, places, devices, apps, projects, objects, tasks, Workers and Protocols.
+- Relationships between those entities.
+- Current state distinct from historical memory.
+- Freshness, confidence and provenance metadata.
+- Stale state becomes `stale/unknown` rather than being presented as current truth.
+- Current observations can be reconciled with structured OSCAR state and live authoritative sources.
+- World Model provides one coherent situation to Jev, Personal Policy and the Executive Planner.
+
+## Perception Fabric
+
+- Normalize current evidence from screens, accessibility trees, cursor/selection, cameras, microphones/audio events, apps, devices, phone context, location, sensors and Worker/Protocol state.
+- Current evidence is separate from durable memory/retention.
+- Fuse multiple signals where useful.
+- Camera + sensor + screen/device-state correlation for workbench/spatial reasoning.
+- Source/freshness/confidence metadata attached to observations.
+
+## Universal live context/search
+
+- Federated current-source retrieval rather than requiring Jev to know every connector directly.
+- Search connected files/drives, mail, messages, notes/knowledge systems, browser state, GitHub, calendar, social accounts, Sunday, desktop nodes, Edge telemetry and Worker/Protocol state.
+- Preserve source provenance.
+- Prefer authoritative current state over stale recalled memory.
+- Retrieve the smallest useful context rather than dumping all sources into every model call.
+
+## Canonical entity / relationship graph
+
+- Resolve one person across phone contact, email identity, messaging account and remembered relationship.
+- Resolve organizations/companies/projects/accounts consistently.
+- Track device/account ownership and relationship metadata where permitted.
+- Link communication history, calendar context and project context to canonical entities.
+- Avoid duplicate “John”/“same device” identities when evidence can resolve them.
+
 ## Personal Policy and preferences
 
 - Open-ended preferences rather than a fixed list of generic settings.
@@ -53,8 +113,25 @@ See [PERSONAL-POLICY.md](PERSONAL-POLICY.md).
 - Explicitly report unsupported capability instead of pretending an app exposes it.
 - Raw audio/transcript retention controls.
 - Permission/policy checks before speaking, publishing, sending or revealing private schedule context.
+- Concrete capability mapping for Android cellular calls, third-party app calls, media/audio capture and VoIP gateway fallbacks instead of assuming uniform call control.
 
 See [COMMUNICATION.md](COMMUNICATION.md).
+
+## Action Ledger + universal Undo
+
+- Structured record for consequential actions.
+- Initiating user/task/Protocol/Worker.
+- Intent and target/resource.
+- Tool/device/capability used.
+- Permission + Personal Policy decision.
+- Before-state reference where available.
+- Resulting-state reference where available.
+- Verification result.
+- Reversible/irreversible flag.
+- Compensating/undo action when the capability supports one.
+- Correlation ID + timestamp.
+- Natural queries: “what did you change?”, “why did you do that?”, “undo that”.
+- Never claim reversibility for an irreversible action.
 
 ## Reflexes and local commands
 
@@ -99,6 +176,15 @@ See [COMMUNICATION.md](COMMUNICATION.md).
 - Modes: Passive, Aware, Guard, Away and Sleep.
 - Natural transitions such as “I’m heading out” → Away behavior when configured.
 
+## Predictive intelligence
+
+- Forecast schedule conflicts before they occur.
+- Estimate deadline/task risk from current progress.
+- Detect abnormal device/sensor trends before obvious failure where evidence supports it.
+- Prepare diagnostics/context when a build or service appears likely to fail.
+- Prefetch relevant context for likely upcoming tasks/transitions.
+- Predictions remain evidence, not authority; Personal Policy and permissions still govern action.
+
 ## ChatGPT integration
 
 - ChatGPT can invoke OSCAR through Latch tools.
@@ -121,15 +207,16 @@ See [COMMUNICATION.md](COMMUNICATION.md).
 
 - Fast typed intent recognition.
 - Detect when OSCAR already has enough context.
+- Query the World Model for current state.
 - Decide when memory retrieval is necessary.
 - Decide when a live source/tool should be inspected.
 - Decide when to use ChatGPT, SwitchRoute or a specialist worker.
 - Decide when deterministic execution is enough.
 - Decide whether a blocked Worker can be repaired/rerouted safely.
 - Ask the user only when ambiguity materially blocks safe/correct execution.
-- Explicit `known / recall / verify / reason / delegate / ask` states.
+- Explicit `known / world / recall / verify / reason / delegate / ask` states.
 - Avoid guessing personal/project context that can be retrieved.
-- Avoid escalating recoverable worker/tool errors unnecessarily.
+- Avoid escalating recoverable Worker/tool errors unnecessarily.
 
 ## Memory and continuity — LRA + Supermemory
 
@@ -149,6 +236,7 @@ See [COMMUNICATION.md](COMMUNICATION.md).
 - Retrieval ranking using relevance, recency, importance, scope, source authority and staleness.
 - Searchable history/timeline instead of mandatory manual chat management.
 - User controls to inspect, correct and forget memory.
+- Current World Model state remains distinct from historical/semantic memory.
 
 ## Learning and procedural memory
 
@@ -164,6 +252,7 @@ See [COMMUNICATION.md](COMMUNICATION.md).
 - Version learned procedures.
 - Roll back worse versions.
 - Never let learned behavior self-grant permissions.
+- Teach-by-demonstration: “watch me do this once” → observe authorized actions → infer intent/steps → clarify ambiguity → verify → save Skill candidate.
 
 ## Sunday — OSCAR on phone
 
@@ -189,6 +278,7 @@ See [COMMUNICATION.md](COMMUNICATION.md).
 - macOS app using the same surface/capability contracts with platform-specific adapters.
 - Voice + text interaction.
 - Push/hold-to-talk.
+- Full `Dictate / Edit / Ask / Act` Interaction Runtime.
 - System-wide dictation.
 - Meeting transcription/notes where supported.
 - Avatar/presence state.
@@ -196,6 +286,8 @@ See [COMMUNICATION.md](COMMUNICATION.md).
 - Cursor/focus context.
 - Selected-text context.
 - Active-window/app context.
+- Accessibility-tree + screenshot context.
+- Point-and-talk interaction.
 - Notifications and task progress.
 - Approval/permission surfaces.
 - Machine-worker capability/health status.
@@ -247,6 +339,18 @@ Workers are Grok-Bot-style delegated teammates owned by OSCAR, but they use the 
 
 See [WORKERS.md](WORKERS.md).
 
+## Executive Planner
+
+- One global executive above Workers/Protocols rather than independent agent silos.
+- Consider priority, deadline, dependencies, resource/device availability, user interruptibility, risk and cost.
+- Schedule and parallelize work.
+- Pause/pre-empt lower-priority work when justified.
+- Resolve conflicts when multiple Workers need the same device/tool.
+- Reroute work when a device/specialist disappears.
+- Defer work until prerequisites become available.
+- Decide when the user actually needs to be interrupted.
+- Never bypass Jev, Personal Policy or permissions.
+
 ## Social-media management
 
 - Persistent Social Worker when the user wants one.
@@ -285,6 +389,7 @@ See [WORKERS.md](WORKERS.md).
 - Reliability/history metadata.
 - Project/workspace context hints.
 - Communication/app capability metadata.
+- Reversal/undo capability metadata where applicable.
 - Ability for capabilities to disappear/reappear without killing OSCAR.
 
 ## Edge / physical world
@@ -325,6 +430,7 @@ Long-term target capabilities include:
 - route circuit/simulation work to Kinetable
 - drive visual-debugging or CAD/workbench tools
 - invoke specialist software rather than simulating it in chat
+- route CAD, 3D, numerical simulation, diagnostics, reconstruction and optimization to appropriate external/specialist tools
 - maintain personal component inventory/context
 - run safe physical protocols after authorization
 
@@ -355,18 +461,18 @@ Long-term target capabilities include:
 - Plugin/connector discovery.
 - Tool capability metadata.
 - OSCAR can identify when a specialist skill/plugin is better suited than its general path.
-- OSCAR may create a reusable skill from a successful novel workflow.
-- OSCAR may propose/create/refine skills after repeated workflows.
+- OSCAR may create a reusable Skill from a successful novel workflow.
+- OSCAR may propose/create/refine Skills after repeated workflows.
 - Skills define required capabilities, inputs, preconditions, procedure, verification, risk and recovery.
-- Generated skills remain permission-scoped, inspectable and versioned.
+- Generated Skills remain permission-scoped, inspectable and versioned.
 - Plugins/connectors become entries in the capability registry and can participate in Skills/Protocols/Workers.
 
 ## Self-created automation
 
-- Create skill candidates from successful executions.
+- Create Skill candidates from successful executions.
 - Create Worker definitions from explicit delegation or persistent objectives.
 - Create routine candidates from repeated recurring behavior.
-- Create protocol candidates from persistent objective patterns.
+- Create Protocol candidates from persistent objective patterns.
 - Validate generated definitions before activation.
 - Preserve provenance to the executions that taught the workflow.
 - Never grant new authority implicitly.
@@ -389,6 +495,7 @@ Long-term target capabilities include:
 - Avoid narrating routine background activity.
 - Learn preferred interruption patterns over time without overriding user controls.
 - Apply explicit Personal Policy before inferred preferences.
+- Use predictive signals to prepare quietly without turning uncertain forecasts into authority.
 
 ## Device and environment awareness
 
@@ -399,6 +506,20 @@ Long-term target capabilities include:
 - Environmental state.
 - User-configurable normal baselines.
 - Anomaly detection from rules first; AI escalation when useful.
+- Feed current state into the World Model rather than leaving it as disconnected telemetry.
+
+## Self-maintenance / diagnostics
+
+- Detect expired authentication.
+- Detect broken/missing connectors.
+- Detect stale/disappeared capabilities.
+- Detect Edge-node disconnects.
+- Detect provider/speech latency degradation.
+- Detect storage/local-state health problems.
+- Detect update failures.
+- Detect repeated Worker/Protocol failures.
+- Repair or roll back safe failures automatically when confidence and permissions allow.
+- Ask the user only for the minimum intervention when self-repair is not safe/possible.
 
 ## Avatar and presence
 
@@ -438,7 +559,7 @@ Long-term target capabilities include:
 - Voice Match as one signal, not sole high-risk auth.
 - Strong confirmation through Sunday biometric/PIN or explicit approval for critical actions.
 - Universal local emergency-stop capability.
-- Audit log for consequential actions.
+- Audit log / Action Ledger for consequential actions.
 - Device-scoped/rotatable credentials.
 - Outbound edge connections rather than exposed home endpoints.
 - Minimal cloud audio/video exposure.
@@ -459,5 +580,16 @@ Long-term target capabilities include:
 - Health/status reporting.
 - Recovery from partial task completion.
 - Explicit blocker reporting rather than silent failure.
-- Skill/protocol rollback when learned changes reduce reliability.
+- Skill/Protocol rollback when learned changes reduce reliability.
 - Workers repair/reroute safe recoverable failures before escalating, without unbounded retry loops.
+- World Model state carries freshness so stale evidence is not mistaken for current truth.
+
+## Post-alpha expansion
+
+- Optional health/wearable context with strict permission/privacy boundaries.
+- Smart-home capability contracts.
+- Robotics/camera/room-infrastructure contracts.
+- Future vehicle/drone integration where safe and legally appropriate.
+- These domains plug into the existing capability registry, World Model, Personal Policy, permissions and Action Ledger rather than creating parallel architectures.
+
+See [JARVIS-GAP-REVIEW.md](JARVIS-GAP-REVIEW.md) for the current system-level benchmark and priority rationale.

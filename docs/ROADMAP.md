@@ -4,6 +4,8 @@ This roadmap is slice-based. Each slice should leave OSCAR in a coherent, testab
 
 All implementation slices are also governed by `ENGINEERING.md`: keep scope coherent, boundaries explicit, failure behavior intentional and code simple enough to evolve safely.
 
+The JARVIS/VoiceOS benchmark in `docs/JARVIS-GAP-REVIEW.md` is also part of roadmap planning. The immediate goal is not to add random integrations; it is to make existing capabilities behave like one coherent ambient intelligence.
+
 ## Status legend
 
 - ✅ Complete
@@ -25,6 +27,7 @@ Deliverables:
 - communication layer plan for calls, meetings, messaging and dictation
 - delegated Worker/sub-agent model
 - orchestration/learning/skills/protocol plan
+- JARVIS/VoiceOS gap benchmark covering World Model, Perception Fabric, Executive Planner, Action Ledger/Undo and Interaction Runtime
 - Sunday/desktop/edge surface plan
 - voice/Sentry design
 - onboarding/Voice Match plan
@@ -93,9 +96,9 @@ Deliverables:
 
 Exit condition: Latch can discover the edge node's capabilities and call safe test tools end to end.
 
-## Slice 04 — Voice core ◻️
+## Slice 04 — Voice core + multi-device arbitration ◻️
 
-**Goal:** establish low-latency natural voice interaction.
+**Goal:** establish low-latency natural voice interaction that behaves like one assistant across multiple listening surfaces.
 
 Deliverables:
 
@@ -107,12 +110,15 @@ Deliverables:
 - barge-in
 - echo cancellation strategy
 - first-audio/command latency metrics
+- wake/listen event identity across devices
+- multi-device voice arbitration using confidence, proximity, active-device context and explicit priority
+- one-owner-per-turn rule with handoff/failover
 
-Exit condition: user can wake OSCAR, speak a request, receive a spoken reply and interrupt it naturally.
+Exit condition: user can wake OSCAR, speak a request, receive a spoken reply, interrupt it naturally, and avoid multiple Sunday/desktop/Edge surfaces replying to the same utterance.
 
-## Slice 05 — OSCAR core router / Jev + policy hooks ◻️
+## Slice 05 — OSCAR core router / Jev + policy + Action Ledger foundation ◻️
 
-**Goal:** create the decision layer that chooses the right execution, knowledge and policy path.
+**Goal:** create the decision layer that chooses the right execution, knowledge and policy path while making consequential actions attributable and reversible where possible.
 
 Deliverables:
 
@@ -124,10 +130,13 @@ Deliverables:
 - deterministic vs tool vs model vs Worker routing
 - Jev integration for intent + epistemic decisions
 - explicit `known / recall / verify / reason / delegate / ask` states
-- safe worker-repair/reroute decision path
+- safe Worker repair/reroute decision path
+- Action Ledger event model for consequential actions
+- before/after/verification metadata where available
+- compensating/undo action contract where a capability can support one
 - latency instrumentation for routing
 
-Exit condition: representative requests route correctly without unnecessarily invoking heavy models, guessing missing context or bypassing explicit user policy.
+Exit condition: representative requests route correctly without unnecessarily invoking heavy models, guessing missing context or bypassing explicit user policy; consequential actions are attributable and can expose a real undo path when one exists.
 
 ## Slice 06 — Cloud brains ◻️
 
@@ -147,7 +156,7 @@ Exit condition: OSCAR can choose ChatGPT or SwitchRoute, receive results and con
 
 ## Slice 07 — Sunday + communication runtime ◻️
 
-**Goal:** ship OSCAR's mobile embodiment and the first real communication surface.
+**Goal:** ship OSCAR's mobile embodiment and prove the first real communication surface.
 
 Deliverables:
 
@@ -159,26 +168,34 @@ Deliverables:
 - task continuity
 - phone capability advertisement
 - initial safe phone/app actions
-- call/message integration boundary using native/official paths first
+- native/official call + message integration boundaries
+- concrete capability study for Android cellular calls, WhatsApp/Telegram-style app calls, audio access/loopback and VoIP gateway fallbacks
 - AI call-handling policy hooks where the platform permits
 - mobile meeting transcription/notes boundary
 - system-wide dictation/input path where practical
 - biometric confirmation surface
 
-Exit condition: a task can move between Sunday and another OSCAR surface without becoming a separate assistant/session silo, and Sunday can expose real phone/communication capabilities without fabricating unsupported app control.
+Exit condition: a task can move between Sunday and another OSCAR surface without becoming a separate assistant/session silo, and Sunday exposes only communication capabilities that are actually supported on the device/platform.
 
-## Slice 08 — Desktop + machine worker nodes ◻️
+## Slice 08 — Desktop + Interaction Runtime + machine Worker nodes ◻️
 
-**Goal:** create native desktop presence and turn online computers into specialist execution nodes.
+**Goal:** create native desktop presence, match the practical VoiceOS interaction baseline and turn online computers into specialist execution nodes.
 
 Deliverables:
 
 - Windows native/lightweight app shell
 - macOS-compatible surface plan and adapter boundary
 - voice/text interaction + OSCAR presence UI
+- first-class `Dictate / Edit / Ask / Act` interaction runtime
+- focused app/window/text-field context
+- selected-text operations
+- cursor target + accessibility-tree context
+- screenshot/visual context
+- point-and-talk flows such as “what is this?”, “reply to him”, “fix this button”
+- text insertion/rewrite with clipboard/accessibility fallbacks
+- user-visible undo when the Action Ledger exposes a compensating action
 - system-wide dictation path
 - desktop meeting transcription/notes boundary
-- screen/cursor/selection/active-window context
 - machine-worker pairing and dynamic capability discovery
 - filesystem/terminal primitives
 - Codex integration
@@ -188,11 +205,11 @@ Deliverables:
 - progress/result callbacks
 - cancellation and disconnect recovery
 
-Exit condition: OSCAR can interact naturally on desktop, delegate a specialist software task, observe it, verify the result and survive the machine worker disappearing.
+Exit condition: OSCAR can understand and act on the current desktop target with VoiceOS-grade interaction friction, delegate specialist software work, observe it, verify it and survive the machine node disappearing.
 
-## Slice 09 — Memory, context + Personal Policy ◻️
+## Slice 09 — Memory, live context, entity graph + Personal Policy ◻️
 
-**Goal:** provide durable cross-device continuity and authoritative user preferences without a conventional chat-sidebar dependency.
+**Goal:** provide durable cross-device continuity, authoritative preferences and a live-source-aware context layer without a conventional chat-sidebar dependency.
 
 Deliverables:
 
@@ -209,26 +226,32 @@ Deliverables:
 - context handoff between Sunday, desktop, ChatGPT, edge and Workers
 - searchable history/timeline surface
 - inspectable Personal Policy surface
+- universal live context/search abstraction over connected authoritative sources
+- source-authority and staleness rules
+- canonical entity/relationship graph for people, contacts, accounts, companies, devices, projects and identities
 
-Exit condition: OSCAR can retrieve relevant prior context when needed, preserve continuous interaction across devices, apply explicit preferences reliably and avoid confusing inferred memory with authority.
+Exit condition: OSCAR can recover historical context, query current authoritative sources, resolve identities consistently across systems and apply explicit preferences reliably without confusing inferred memory with authority.
 
-## Slice 10 — Sentry Mode ◻️
+## Slice 10 — World Model + Perception Fabric + Sentry intelligence ◻️
 
-**Goal:** make OSCAR continuously present without continuous cloud surveillance.
+**Goal:** give OSCAR a coherent live representation of what is happening across the user's digital and physical environment.
 
 Deliverables:
 
-- Passive/Aware/Guard/Away/Sleep modes
-- sensor/device event ingestion
+- World Model graph for people, places, devices, apps, projects, objects, tasks and relationships
+- separation of current evidence vs historical memory
+- Perception Fabric ingesting screen/accessibility state, app/device events, sensors, location, audio events and authorized camera observations
+- state freshness/confidence/provenance
+- fusion of phone, desktop, Edge, calendar, communication and Worker state
+- Passive/Aware/Guard/Away/Sleep Sentry modes
 - local rules/baselines
-- event fusion
 - importance/urgency/confidence/interruptibility scoring
 - Personal Policy-aware interruption decisions
+- predictive signals for obvious schedule/task/device risk where confidence can be measured
 - notification/speech escalation policy
 - Sunday alerts
-- example workbench/presence anomaly flows
 
-Exit condition: OSCAR can remain quietly aware for extended periods and surface only configured meaningful events.
+Exit condition: OSCAR can answer “what is true now?” from a coherent live model, react to meaningful events and surface only configured, high-value interruptions.
 
 ## Slice 11 — First-run commissioning + Voice Match ◻️
 
@@ -269,12 +292,15 @@ Deliverables:
 
 Exit condition: avatar motion always maps to actual OSCAR state and works across Sunday, desktop and suitable desk displays.
 
-## Slice 13 — Workers, learning, skills, routines, protocols and plugins ◻️
+## Slice 13 — Executive Planner + Workers + learning / protocols ◻️
 
-**Goal:** make OSCAR capable of creating/managing delegated teammates and learning reusable procedures so repeated work becomes faster and more autonomous.
+**Goal:** make OSCAR a single executive system that can create/manage delegated teammates, prioritize concurrent objectives and learn reusable procedures.
 
 Deliverables:
 
+- Executive Planner over Workers/Protocols/tasks
+- priority/deadline/dependency/resource/risk/interruptibility model
+- scheduling, parallelization, pause/pre-emption and rerouting
 - delegated Worker schema/lifecycle/state
 - voice/chat Worker creation/editing
 - temporary, task and persistent Worker types
@@ -287,6 +313,7 @@ Deliverables:
 - route/tool outcome history
 - reusable procedure distillation
 - `SKILL.md`-style portable skill contract
+- “watch me do this once” teach-by-demonstration flow for supported desktop/phone workflows
 - plugin/tool discovery
 - protocol schema + durable state
 - routine/time/event triggers
@@ -298,11 +325,11 @@ Deliverables:
 - versioning and rollback
 - measurable repeated-task latency/cost improvement
 
-Exit condition: OSCAR can create a Worker from natural language, let it use the best available device/service capabilities, recover from routine problems without unnecessary escalation, learn a successful workflow and reuse it later without self-granting authority.
+Exit condition: OSCAR can coordinate multiple objectives as one executive system, create a Worker from natural language, learn or be taught a workflow, reuse it later and recover from routine problems without self-granting authority.
 
-## Slice 14 — Kinetable + environment/workbench ◻️
+## Slice 14 — Kinetable + spatial/workbench + general engineering ◻️
 
-**Goal:** connect hardware engineering, richer physical context and provisioned OSCAR devices.
+**Goal:** connect hardware engineering, richer physical perception and specialist engineering/simulation tools.
 
 Deliverables:
 
@@ -314,18 +341,24 @@ Deliverables:
 - device state correlation
 - physical protocol execution
 - environment/device inventory
+- spatial perception experiments combining camera + sensor + World Model state
 - specialist visual/engineering tool hooks
+- general routing boundary for CAD, 3D, numerical simulation, diagnostics, reconstruction and optimization tools instead of trying to reimplement them inside OSCAR
 
-Exit condition: OSCAR can route hardware work to Kinetable, reason from actual workbench/environment data, and onboard an approved device as a capability-bearing OSCAR node.
+Exit condition: OSCAR can route engineering work to the appropriate specialist, reason from actual workbench/environment data, correlate perception with telemetry and onboard an approved device as a capability-bearing OSCAR node.
 
-## Slice 15 — Reliability and security pass ◻️
+## Slice 15 — Self-maintenance, reliability and security pass ◻️
 
-**Goal:** prove the system behaves correctly under failure and attack-relevant conditions.
+**Goal:** prove the system can diagnose itself and behaves correctly under failure and attack-relevant conditions.
 
 Deliverables:
 
+- self-health model for auth, connectors, providers, device capabilities, storage and latency
+- stale/broken capability detection
+- safe automatic repair/rollback where confidence and permission allow
 - credential rotation/revocation
 - replay/idempotency checks
+- Action Ledger integrity + undo/compensation tests
 - audit trail
 - provider/node outage tests
 - partial-task recovery
@@ -338,7 +371,7 @@ Deliverables:
 - privacy/retention controls
 - generated-skill/protocol/Worker safety tests
 
-Exit condition: major failure modes are tested and documented, not merely assumed.
+Exit condition: OSCAR can detect its own degraded state, repair safe failures when possible, ask for the minimum intervention otherwise, and has major failure/security modes tested rather than assumed.
 
 ## Slice 16 — Unified alpha ◻️
 
@@ -347,22 +380,36 @@ Exit condition: major failure modes are tested and documented, not merely assume
 Reference scenario:
 
 ```text
-Sentry/communication/device event occurs
-→ OSCAR/Jev evaluates locally
+Perception/Sentry/communication/device event occurs
+→ Perception Fabric updates World Model
+→ OSCAR/Jev evaluates current truth + memory
 → Personal Policy + permissions applied
-→ retrieves context if needed
+→ Executive Planner prioritizes objective/resources
+→ retrieves live or historical context if needed
 → invokes ChatGPT/SwitchRoute if reasoning is needed
 → creates/delegates Worker when the objective warrants it
 → involves user through Sunday/desktop only when required
 → delegates specialist work to the best tool/device
 → controls safe edge action if relevant
-→ verifies outcome
+→ Action Ledger records consequential changes
+→ verifies outcome / offers undo when real compensation exists
 → stores important + procedural memory
 → improves reusable skill/protocol if appropriate
 → reports succinctly
 ```
 
-Exit condition: edge + voice + communication + ChatGPT + SwitchRoute + Sunday + desktop machine nodes + delegated Workers + LRA/Supermemory + Personal Policy + learning + Sentry + Kinetable integration operate as one coherent OSCAR system.
+Exit condition: edge + voice + communication + Sunday + desktop Interaction Runtime + World Model + Perception Fabric + Executive Planner + Action Ledger + Workers + cloud + memory/policy + learning + Sentry + Kinetable integration operate as one coherent OSCAR system.
+
+## Post-alpha horizon — P2 domains
+
+These are intentionally deferred until the unified alpha is coherent:
+
+- health/wearable context with strict permission/privacy boundaries
+- smart-home capability contracts
+- robotics/camera/room-infrastructure contracts
+- future vehicle/drone integration where safe and legally appropriate
+
+These should plug into the same capability, World Model, policy, permission and Action Ledger abstractions rather than creating parallel architectures.
 
 ## Slice definition of done
 

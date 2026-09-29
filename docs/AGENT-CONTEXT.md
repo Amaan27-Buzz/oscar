@@ -12,13 +12,14 @@ OSCAR keeps one canonical project truth and uses thin agent-specific adapters. T
 | `TASTE.md` | qualitative UI taste, composition rules and anti-slop quality bar |
 | `docs/PRODUCT.md` | product truth and north star |
 | `docs/ARCHITECTURE.md` | system boundaries and responsibilities |
+| `docs/JARVIS-GAP-REVIEW.md` | system-level benchmark: World Model, Perception Fabric, Executive Planner, Action Ledger/Undo and VoiceOS-grade interaction gaps |
 | `docs/ROADMAP.md` | slice order/current implementation state |
 | `docs/DECISIONS.md` | stable architecture decisions |
 | `docs/MEMORY.md` | LRA/Supermemory/Jev memory and continuity model |
 | `docs/PERSONAL-POLICY.md` | explicit user preferences/policy, precedence and editing |
 | `docs/COMMUNICATION.md` | calls, meetings, messaging, dictation and communication autonomy |
 | `docs/WORKERS.md` | delegated sub-agents, lifecycle, recovery and collaboration |
-| `docs/ORCHESTRATION.md` | capability routing, skills, Workers, routines and protocols |
+| `docs/ORCHESTRATION.md` | capability routing, skills, Workers, routines and Protocols |
 | `docs/UI-AVATAR.md` | avatar, expression and state language |
 | `docs/SURFACES.md` | Sunday/desktop/edge/worker surface responsibilities |
 
@@ -77,7 +78,8 @@ Load the least context that is sufficient:
 - preference/policy task → core docs + `ENGINEERING.md` + `docs/PERSONAL-POLICY.md`;
 - calls/meetings/messaging/dictation task → core docs + `ENGINEERING.md` + `docs/COMMUNICATION.md` + relevant surface docs;
 - Worker/sub-agent task → core docs + `ENGINEERING.md` + `docs/WORKERS.md` + `docs/ORCHESTRATION.md`;
-- orchestration/learning task → core docs + `ENGINEERING.md` + `docs/ORCHESTRATION.md`.
+- orchestration/learning task → core docs + `ENGINEERING.md` + `docs/ORCHESTRATION.md`;
+- World Model / Perception Fabric / Executive Planner / Action Ledger / Interaction Runtime task → core docs + `ENGINEERING.md` + `docs/ARCHITECTURE.md` + `docs/JARVIS-GAP-REVIEW.md`.
 
 Do not dump the entire documentation tree into every agent turn. More context is not automatically better.
 
@@ -93,3 +95,5 @@ When a durable project rule changes:
 When an engineering principle changes system-wide, update `ENGINEERING.md`. When a UI direction changes system-wide, update both `DESIGN.md` and `TASTE.md`; when only one surface changes, keep the global system stable and document the surface-specific decision separately.
 
 When communication, Personal Policy or Worker behavior changes system-wide, update their dedicated domain document plus architecture/decision/roadmap references if the boundary changed.
+
+When the JARVIS/VoiceOS benchmark changes a system-level gap or priority, update `docs/JARVIS-GAP-REVIEW.md`, then reconcile `docs/ARCHITECTURE.md`, `docs/ROADMAP.md`, `docs/DECISIONS.md` and the root README where the change is durable.
