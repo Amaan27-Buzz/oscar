@@ -1,27 +1,28 @@
 # Workers
 
-Workers are delegated sub-agents OSCAR creates and manages for specific responsibilities. They provide the "persistent teammate" capability found in systems such as Grok Bot, but OSCAR should use the user's actual device/capability mesh rather than assume every worker owns a separate cloud computer.
+Workers are delegated sub-agents OSCAR creates and manages for specific responsibilities. They provide persistent-teammate capability similar to systems such as Grok Bot, but OSCAR uses the user's actual device/capability mesh rather than assuming every Worker owns a separate cloud computer.
 
 ## Product rule
 
 > The user talks to OSCAR. OSCAR creates, coordinates and manages the team underneath it.
 
-Workers are not separate assistant identities or chat silos. They operate under OSCAR's memory, policy, permissions and task ownership.
+Workers are not separate assistant identities or chat silos. They operate under OSCAR's memory, World Model, Personal Policy, permissions, Executive Planner and task ownership.
 
 ## What a Worker is
 
 A Worker is an objective envelope containing:
 
-- goal/responsibility
-- relevant context
-- allowed capabilities
-- permission boundaries
-- preferred specialists/models
-- execution surfaces
-- state/lifecycle
-- verification requirements
-- escalation rules
-- memory/provenance
+- goal/responsibility;
+- relevant context;
+- allowed capabilities;
+- permission boundaries;
+- preferred specialists/models;
+- execution surfaces;
+- durable state/lifecycle;
+- verification requirements;
+- escalation rules;
+- memory/provenance;
+- artifact/result references.
 
 A Worker may use one or many tools/agents/devices.
 
@@ -32,17 +33,17 @@ Worker: SceneLab Social
 Goal: manage SceneLab social presence
 
 Uses:
-- X / LinkedIn connectors or browser/app automation
+- X / LinkedIn adapters through Channel Gateway when available
 - SceneLab GitHub/project context
 - image generation
 - research tools
-- Sunday or desktop worker when app-only access is required
+- Sunday or desktop node when app-only access is required
 
 Allowed:
 - monitor mentions
 - draft posts
 - answer routine questions
-- publish ordinary feature posts (if Personal Policy permits)
+- publish ordinary feature posts if Personal Policy permits
 
 Ask first:
 - major announcements
@@ -60,7 +61,7 @@ Workers can be temporary or persistent.
 
 ```text
 "Research these laptops."
-→ temporary research Worker
+→ temporary Research Worker
 
 "Watch ClearLane CI tonight."
 → task Worker that expires when the objective completes
@@ -72,7 +73,7 @@ Workers can be temporary or persistent.
 → persistent responsibility Worker
 ```
 
-Workers can sleep when idle and resume when their trigger/objective requires them.
+Workers can sleep when idle and resume when triggers/objectives require them.
 
 ## Creation should be easy
 
@@ -80,13 +81,13 @@ The primary creation interface is ordinary voice or chat.
 
 Examples:
 
-- "OSCAR, make a worker that watches ClearLane releases and fixes recoverable CI failures."
+- "OSCAR, make a Worker that watches ClearLane releases and fixes recoverable CI failures."
 - "Create someone to manage SceneLab social media, but ask before major announcements."
-- "Have a worker keep track of internship applications and tell me what I need to do."
+- "Have a Worker keep track of internship applications and tell me what I need to do."
 
-OSCAR should infer the initial worker definition from the request, existing Personal Policy, available capabilities and relevant project context.
+OSCAR should infer the initial Worker definition from the request, existing Personal Policy, current World Model/context and available capabilities.
 
-For consequential autonomy, OSCAR should summarize the resulting scope/permissions before activation when necessary.
+For consequential autonomy, OSCAR summarizes resulting scope/permissions before activation when necessary.
 
 ## Device mesh, not mandatory cloud desktops
 
@@ -101,7 +102,7 @@ Sunday
 - notifications
 - camera/location
 
-Desktop worker
+Desktop machine node
 - browser
 - terminal
 - filesystem
@@ -121,17 +122,9 @@ Cloud/services
 
 The same Worker may move execution between these surfaces as availability changes.
 
-Example:
+No Worker should silently switch to a more privileged execution path merely because another path failed.
 
-```text
-Social Worker
-→ use official API when connected
-→ otherwise use browser worker
-→ otherwise use authorized phone app through Sunday
-→ if none are available, wait/escalate
-```
-
-No worker should silently switch to a more privileged execution path merely because another path failed.
+A future cloud Worker computer may exist as another advertised capability, but it is not foundational.
 
 ## Workers orchestrate specialists
 
@@ -145,22 +138,28 @@ Design Worker      → Codex + Impeccable + visual verification
 Research Worker    → ChatGPT/research path
 Phone Worker       → Sunday
 GUI Worker         → Computer Use
-Hardware Worker    → Kinetable + edge tools
-Social Worker      → APIs/plugins/browser/phone apps
+Hardware Worker    → Kinetable + Edge tools
+Social Worker      → Channel/API/plugin/browser/phone capabilities
 ```
 
 The Worker owns the objective; the specialist owns execution expertise.
 
+## Capability discovery
+
+Workers should not carry every tool/plugin/Skill definition in context.
+
+They query OSCAR's Capability Catalog, rank candidates by suitability/availability/policy/reliability/latency/cost, and load detailed contracts only for relevant finalists.
+
+See [RUNTIME-FOUNDATIONS.md](RUNTIME-FOUNDATIONS.md).
+
 ## Parallel collaboration
 
-OSCAR may create multiple Workers for one objective and let them collaborate.
-
-Example:
+OSCAR may create multiple Workers for one objective:
 
 ```text
 Objective: launch Kinetable
 
-OSCAR
+OSCAR Executive
 ├── Research Worker
 ├── Coding Worker
 ├── Design Worker
@@ -169,37 +168,48 @@ OSCAR
 
 Workers can:
 
-- exchange task artifacts/context through OSCAR
-- hand work off
-- wait on dependencies
-- run independently in parallel
-- report structured progress
+- exchange Artifact/Result references;
+- hand work off;
+- wait on dependencies;
+- run independently in parallel;
+- report structured progress/evidence.
 
-OSCAR remains the top-level coordinator and resolves conflicting priorities/policies.
+The Executive Planner remains the top-level coordinator and resolves conflicts/priorities.
 
-## Worker vs tool vs skill vs routine vs protocol
+## Durable Execution Runtime
 
-| Concept | Meaning |
-|---|---|
-| Tool | Primitive callable capability |
-| Skill | Reusable procedure for doing something |
-| Worker | Delegated sub-agent responsible for an objective/job |
-| Routine | Recurring/simple behavior |
-| Protocol | Stateful persistent responsibility/process |
+Persistent/task Workers use OSCAR's Durable Execution Runtime so responsibility does not disappear when a process/device/executor dies.
 
-A protocol may create Workers. A Worker may use Skills. A Skill may invoke Tools. A persistent Worker may itself be governed by one or more Protocols.
+Durable Worker state includes, where relevant:
 
-Example:
+- Worker ID/name;
+- objective;
+- lifecycle state;
+- current step/checkpoint;
+- owner Protocol/task;
+- dependency state;
+- executor lease/heartbeat;
+- context references;
+- capability requirements;
+- permission scope;
+- retry budget/backoff;
+- cancellation state;
+- completion condition;
+- verification state;
+- blocker/escalation state;
+- artifact/result references.
 
-```text
-Protocol: ClearLane release
-→ create Build Worker
-→ create QA Worker
-→ create Social Worker
-→ coordinate dependencies
-→ verify release
-→ stop/sleep Workers when done
-```
+The runtime provides:
+
+- persisted checkpoints;
+- heartbeats;
+- lease expiry and reclaim;
+- stuck/zombie detection;
+- restart/resume;
+- bounded retries;
+- idempotency/deduplication where needed.
+
+A Worker must not remain indefinitely `Working` because its executor vanished.
 
 ## Jev and autonomous recovery
 
@@ -214,27 +224,47 @@ Can fix safely/confidently?
   yes → repair/retry → verify → continue
   no  → is another capability better?
           yes → reroute/delegate
-          no  → ask OSCAR/user for the minimum intervention needed
+          no  → ask OSCAR/user for minimum intervention
 ```
 
-Examples:
+Retries are bounded. Workers never invent success.
+
+## Epistemic integrity
+
+A Worker's `success` response is **reported evidence**, not automatically verified completion.
 
 ```text
-image format rejected
-→ convert image
-→ bounded retry
-→ verify
-→ continue
+Worker reports done
+→ OSCAR inspects evidence/result
+→ independent verification where practical
+→ verified / partially_verified / failed / blocked / unknown
+→ report only that state
 ```
 
-```text
-account login expired and passkey required
-→ cannot safely recover
-→ ask user to authenticate
-→ resume after confirmation
-```
+Workers should return structured results including:
 
-A Worker must never invent success or remain stuck in an unbounded retry loop.
+- execution status;
+- evidence references;
+- artifact/result references;
+- limitations;
+- blockers;
+- suggested verification method.
+
+If verification is impossible, OSCAR reports the limitation rather than pretending certainty.
+
+See [EPISTEMIC-INTEGRITY.md](EPISTEMIC-INTEGRITY.md).
+
+## Worker vs Tool vs Skill vs Routine vs Protocol
+
+| Concept | Meaning |
+|---|---|
+| Tool | Primitive callable capability |
+| Skill | Reusable procedure for doing something |
+| Worker | Delegated sub-agent responsible for an objective/job |
+| Routine | Recurring/simple behavior |
+| Protocol | Stateful persistent responsibility/process |
+
+A Protocol may create Workers. A Worker may use Skills. A Skill may invoke Tools. A persistent Worker may itself be governed by one or more Protocols.
 
 ## Social-media management
 
@@ -242,15 +272,15 @@ Workers may manage social media when connected capabilities and permissions perm
 
 Potential responsibilities:
 
-- monitor mentions/replies
-- research relevant developments
-- draft posts
-- prepare media
-- schedule content
-- publish permitted content
-- answer permitted routine messages/comments
-- coordinate product-release announcements
-- summarize performance/community feedback
+- monitor mentions/replies;
+- research relevant developments;
+- draft posts;
+- prepare media;
+- schedule content;
+- publish permitted content;
+- answer permitted routine messages/comments;
+- coordinate release announcements;
+- summarize performance/community feedback.
 
 Personal Policy controls what may happen without confirmation.
 
@@ -265,39 +295,37 @@ security/account change         → strong confirmation
 
 ## Learning
 
-Workers should improve through OSCAR's procedural-memory/skill system.
+Workers improve through OSCAR's procedural-memory/Skill system.
 
 ```text
 novel Worker task
 → explore
-→ successful execution
+→ execute
 → verify
-→ distill reusable Skill
-→ future Workers reuse Skill
+→ distill candidate Skill
+→ evaluate/replay where possible
+→ promote / reject / keep experimental
+→ future Workers reuse promoted Skill
 ```
 
-A learned Skill may be shared by multiple Workers when its scope and permissions are compatible.
+A learned Skill may be shared by multiple Workers when scope/permissions are compatible.
 
-Workers can also propose better routines/protocols after repeated work, but generated automation cannot broaden authority on its own.
+Generated automation cannot broaden authority on its own.
 
-## State and persistence
+## Artifact / Result handoff
 
-Worker state should include at least:
+Workers should exchange typed Artifact/Result references for durable outputs instead of copying large opaque payloads through prompts.
 
-- identity/name
-- objective
-- lifecycle status
-- current step/blocker
-- owner protocol/task
-- context references
-- capability requirements
-- permission scope
-- last activity
-- completion condition
-- retry/escalation state
-- artifacts/results
+Example:
 
-Important state must survive process/device restarts when the Worker owns a long-running responsibility.
+```text
+Research Worker
+→ verified research artifact
+→ Launch Worker uses artifact
+→ Social Worker derives post drafts
+```
+
+Artifacts preserve producer, location/version, provenance, owner task/Worker and verification state.
 
 ## UI
 
@@ -311,10 +339,10 @@ Workers
 SceneLab Social      Active
 ClearLane Release    Waiting for CI
 University Admin     Idle
-Research             Working
+Research             Verifying
 ```
 
-Opening a Worker should show only the useful information:
+Opening a Worker should show useful information only:
 
 ```text
 SceneLab Social
@@ -322,6 +350,10 @@ Managing SceneLab's social accounts
 
 Now
 Watching launch replies
+
+Execution
+Running on Desktop node
+Checkpoint 4/7
 
 Can use
 X · LinkedIn · GitHub · Image generation
@@ -332,12 +364,12 @@ Draft posts            ✓
 Ordinary publishing    ✓
 Major announcements    Ask
 
-Recent
-Responded to 3 questions
-Prepared tomorrow's post
+Verification
+Last publish            Verified
+Next scheduled post     Draft only
 ```
 
-Users can create, pause, resume, edit or remove Workers using either UI or natural language.
+Users can create, pause, resume, edit or remove Workers using UI or natural language.
 
 ## Permissions and audit
 
@@ -345,26 +377,30 @@ Workers inherit only explicitly available OSCAR capabilities/permissions.
 
 They cannot:
 
-- self-grant new permissions
-- bypass Personal Policy
-- bypass approval gates
-- silently adopt a more privileged user/device identity
+- self-grant new permissions;
+- bypass Personal Policy;
+- bypass approval gates;
+- silently adopt a more privileged user/device identity.
 
-Consequential actions should remain attributable to:
+Consequential actions remain attributable to:
 
-- OSCAR task/protocol
-- Worker
-- capability/tool used
-- initiating user/policy
-- timestamp/result
+- OSCAR task/Protocol;
+- Worker;
+- capability/tool used;
+- initiating user/policy;
+- timestamp/result;
+- verification evidence where available.
 
 ## Invariants
 
 1. Workers belong to OSCAR; they are not separate assistant silos.
 2. Workers use the best available real device/service capability instead of requiring a cloud computer.
-3. Creation and editing should work through normal voice/chat.
-4. Jev enables self-repair/rerouting before unnecessary user escalation.
-5. Workers can collaborate and hand off work while OSCAR owns the top-level objective.
-6. Workers may use/create Skills and participate in Protocols, but cannot broaden their own permissions.
-7. Worker state and progress remain inspectable in a simple UI.
-8. Temporary Workers should disappear/retire when their objective is complete; persistent Workers remain only when they own a continuing responsibility.
+3. Creation/editing work through normal voice/chat.
+4. Jev enables self-repair/rerouting before unnecessary escalation.
+5. Workers can collaborate while the Executive Planner owns global coordination.
+6. Persistent Workers use durable execution state and recovery semantics.
+7. Workers search capabilities progressively rather than loading every tool definition.
+8. Worker `success` is reported evidence until verified.
+9. Workers may use/create Skills and participate in Protocols, but cannot broaden permissions.
+10. Worker state/progress/evidence remain inspectable in a simple UI.
+11. Temporary Workers retire when their objective is complete; persistent Workers remain only for continuing responsibility.
