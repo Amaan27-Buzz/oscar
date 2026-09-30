@@ -120,7 +120,7 @@ Design Worker      → Codex + Impeccable + visual verification
 Research Worker    → research capability + native model routing when useful
 Phone Worker       → Sunday
 GUI Worker         → Computer Use
-Hardware Worker    → Kinetable + Edge tools
+Hardware Worker    → OSCAR Edge + installed engineering/device tools
 Social Worker      → Channel/API/plugin/browser/phone capabilities
 ```
 
@@ -139,13 +139,13 @@ See [RUNTIME-FOUNDATIONS.md](RUNTIME-FOUNDATIONS.md).
 OSCAR may create multiple Workers for one objective:
 
 ```text
-Objective: launch Kinetable
+Objective: ship OSCAR Desktop
 
 OSCAR Executive
 ├── Research Worker
 ├── Coding Worker
 ├── Design Worker
-└── Social Worker
+└── Test Worker
 ```
 
 Workers can exchange Artifact/Result references, hand work off, wait on dependencies, run independently in parallel and report structured progress/evidence.
