@@ -31,6 +31,7 @@ jobs:
             CHANGELOG.md
             SECURITY.md
             SUPPORT.md
+            .env.example
             docs/PRODUCT.md
             docs/ARCHITECTURE.md
             docs/JARVIS-GAP-REVIEW.md
@@ -38,6 +39,8 @@ jobs:
             docs/EPISTEMIC-INTEGRITY.md
             docs/RUNTIME-FOUNDATIONS.md
             docs/NATIVE-INFRASTRUCTURE.md
+            docs/MODEL-ROUTING.md
+            docs/BUILD-GATES.md
             docs/FEATURES.md
             docs/ROADMAP.md
             docs/DECISIONS.md
