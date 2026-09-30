@@ -41,11 +41,10 @@ OSCAR Edge
 - motors
 - Sentry events
 
-Kinetable
-- hardware design
-- visual wiring
-- simulation
-- firmware generation
+Engineering applications
+- CAD / circuit / simulation when installed or connected
+- firmware toolchains
+- diagnostics
 - device provisioning
 ```
 
@@ -88,7 +87,7 @@ email/calendar       → structured service adapter
 GUI-only workflow    → computer use
 phone/app workflow   → Sunday
 communication        → Channel Gateway + best native adapter
-hardware design      → Kinetable
+hardware design      → installed/connected engineering capability
 physical action      → OSCAR Edge
 research             → research capability + model reasoning when needed
 cheap classification → Jev / fast model only when necessary
@@ -164,7 +163,7 @@ A Worker may coordinate:
 - plugins/connectors/APIs;
 - Universal Channel Gateway;
 - native OSCAR Model Router → ChatGPT/other providers;
-- Kinetable;
+- installed/connected specialist applications;
 - OSCAR Edge.
 
 Workers can be temporary, task-scoped or persistent and operate under Personal Policy/permissions.
@@ -176,11 +175,11 @@ See [WORKERS.md](WORKERS.md).
 OSCAR may create several Workers for one objective:
 
 ```text
-Launch Kinetable
+Ship ClearLane release
 ├── Research Worker
 ├── Coding Worker
 ├── Design Worker
-└── Social Worker
+└── Release Worker
 ```
 
 Workers may run in parallel, wait on dependencies, exchange Artifact/Result references and hand work off. Executive Planner remains the top-level coordinator.
