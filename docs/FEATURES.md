@@ -339,7 +339,7 @@ The PC is never required for basic OSCAR availability.
 - Natural-language Worker creation.
 - Temporary/task/persistent Workers.
 - Worker goal/context/permissions/capabilities/verification/escalation state.
-- Workers can use Sunday, desktop nodes, APIs/plugins, ChatGPT/native Model Router, Kinetable and Edge.
+- Workers can use Sunday, desktop nodes, APIs/plugins, ChatGPT/native Model Router, installed/connected specialist applications and Edge.
 - Parallel collaboration/handoffs/dependencies.
 - Shared learned Skills.
 - Protocol-driven Worker lifecycle.
@@ -406,21 +406,23 @@ See [RUNTIME-FOUNDATIONS.md](RUNTIME-FOUNDATIONS.md).
 - Workbench telemetry, health and OTA/configuration.
 - Future smart-home/environment integrations.
 
-## Kinetable integration
+## Physical/device capability expansion
 
-- Specialist hardware workshop.
-- Hardware design/visual wiring/inventory/simulation/firmware/provisioning.
-- Provision devices into native OSCAR Edge transport/capability catalog.
-- Avoid duplicating Kinetable inside OSCAR.
+- Onboard and provision additional embedded/device nodes into native OSCAR transport.
+- Advertise real sensors/actions/device health through the Capability Catalog.
+- Support custom ESP32/Pico devices without changing OSCAR Core contracts.
+- Integrate cameras, sensors, relays, displays, motors/actuators and environment controls through typed capabilities.
+- Correlate device state with World Model/Perception.
+- Run safe physical Protocols after authorization with local deterministic safety.
 
 ## Engineering/workbench capabilities
 
 - Identify components/sensors and inspect telemetry.
 - Correlate camera view with electronic state.
-- Route circuit/simulation work to Kinetable.
+- Route circuit design/simulation, firmware and provisioning to suitable installed or connected specialist tools.
 - Route CAD/3D/numerical simulation/diagnostics/reconstruction/optimization to specialist tools.
-- Maintain inventory/context.
-- Run safe physical Protocols after authorization.
+- Maintain inventory/context where useful.
+- Treat engineering applications as replaceable capabilities rather than an OSCAR architectural dependency.
 
 ## Protocols and routines
 
