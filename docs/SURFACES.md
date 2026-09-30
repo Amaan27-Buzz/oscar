@@ -157,21 +157,22 @@ OSCAR's own speaker output must be excluded from Voice Map learning/identity upd
 
 See [VOICE-SENTRY.md](VOICE-SENTRY.md).
 
-## Kinetable integration
+## Physical device and engineering capability expansion
 
-Kinetable is OSCAR's specialist hardware workshop rather than a duplicate editor inside OSCAR.
+Physical and engineering work stays inside the same capability model rather than depending on a dedicated hardware-workbench product.
 
-Long-term flow:
+Example:
 
 ```text
 "I want a desk presence detector with an OLED"
-→ OSCAR routes engineering work to Kinetable
-→ use actual inventory
-→ design + simulate + generate firmware
+→ OSCAR discovers installed/connected engineering capabilities
+→ routes CAD/circuit/simulation/firmware work to suitable specialist tools where available
 → user builds/provisions device
 → device joins native OSCAR transport
-→ device advertises capabilities
+→ device advertises sensors/actions/capabilities
 ```
+
+OSCAR can then control and observe the resulting device directly through Edge/device capability contracts.
 
 ## ChatGPT / model-provider surface
 
@@ -226,7 +227,7 @@ These become Perception/World Model events. Continuous local acoustic awareness 
 The same task should survive surface changes.
 
 ```text
-Sunday: "OSCAR, investigate the Kinetable issue."
+Sunday: "OSCAR, investigate the ClearLane issue."
 → OSCAR delegates to PC/Codex when available
 → user sits at desk
 → Desktop: "What did Codex find?"
