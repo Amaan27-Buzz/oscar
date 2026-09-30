@@ -25,16 +25,17 @@ Significant OSCAR milestones are recorded here. Detailed implementation status r
 ### Changed
 
 - Removed `.github/README.md` so GitHub does not surface repository-configuration copy in place of the intended root OSCAR README experience.
-- Roadmap slices now incorporate the system-level JARVIS gaps and the final competitor-derived runtime primitives without changing the immediate next implementation target.
-- `ENGINEERING.md` and `AGENTS.md` now require independent verification where practical and prohibit unqualified completion claims that exceed evidence.
-- Slice 05 now establishes Epistemic Integrity, Action Ledger evidence state, Artifact/Result foundations and the first durable task substrate.
-- Slice 07 now includes the Universal Channel Gateway.
-- Slice 13 now includes durable Worker recovery, dynamic capability search and learned-automation evaluation/promotion.
-- Slice 15 now explicitly tests truthfulness/verification-state integrity in addition to reliability/security.
+- Roadmap now starts with a **software-first OSCAR Core Loop** rather than ESP32/Pico hardware. The first implementation proves `objective → capability → execute → evidence → verify → ledger/artifact → report` before attaching embodiments.
+- ESP32/Pico Edge remains a fundamental architecture component but moves later, after Core Loop, Jev, Latch/capability discovery, cloud intelligence, a real machine Worker, and memory/Personal Policy have established stable contracts.
+- Early development may run on a development computer for convenience, but the contracts explicitly cannot make that computer OSCAR's permanent host.
+- `ENGINEERING.md` and `AGENTS.md` require independent verification where practical and prohibit unqualified completion claims that exceed evidence.
+- The new Slice 01 establishes task/capability/action/result/evidence contracts, minimal durable task state, Action Ledger/Artifact foundations and independent verification.
+- TypeSafe Jev follows as Slice 02; Latch + Capability Catalog as Slice 03; ChatGPT/SwitchRoute as Slice 04; the first real machine Worker as Slice 05; LRA/Personal Policy as Slice 06; and OSCAR Edge + reflexes as Slice 07.
+- Voice, Sunday/communication, Desktop Interaction Runtime, World Model/Perception, Executive Planner/Workers and later reliability slices follow the proven core rather than preceding it.
 
 ### Planned
 
-- Slice 01 — OSCAR Edge runtime skeleton: ESP32 gateway + RP2040/Pico controller + typed event model.
+- Slice 01 — **OSCAR Core Loop**: typed objective/task/capability/action/result/evidence contracts, minimal durable execution, Action Ledger/Artifact foundations, independent verification and evidence-backed reporting.
 
 ## 2026-09-29 — Repository foundation
 
@@ -57,4 +58,4 @@ Significant OSCAR milestones are recorded here. Detailed implementation status r
 ### Status
 
 - Slice 00: complete.
-- Slice 01: next.
+- Slice 01: next — OSCAR Core Loop.

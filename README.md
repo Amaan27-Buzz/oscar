@@ -302,29 +302,48 @@ See [`ENGINEERING.md`](ENGINEERING.md).
 19. **The PC is an accelerator, not a dependency.** Turning the laptop off must not turn OSCAR off.
 20. **No yes-man behavior.** User confidence does not override evidence, constraints or safety.
 
+## Implementation strategy
+
+OSCAR is built **core-loop first**, not hardware-first. The early implementation may run on a development computer, but the contracts cannot assume that computer permanently hosts OSCAR.
+
+The first thing to prove is:
+
+```text
+objective
+→ choose capability
+→ execute
+→ observe result
+→ verify independently where practical
+→ record action/artifact
+→ report only what the evidence supports
+```
+
+Once that nervous system works, cloud intelligence, machine Workers, memory, Edge hardware, voice, Sunday and perception attach to the same contracts.
+
 ## Planned slices
 
 | Slice | Deliverable | Status |
 |---:|---|---|
 | 00 | Repository foundation, final competitive architecture, Epistemic Integrity, runtime primitives and coding-agent support | ✅ Complete |
-| 01 | Edge runtime skeleton: ESP32 gateway + Pico deterministic controller + event model | ⏭️ Next |
-| 02 | Reflex engine: local intents, command state, hardware-safe execution | Planned |
-| 03 | Latch Edge + capability registry/search foundation | Planned |
-| 04 | Voice core + multi-device voice arbitration | Planned |
-| 05 | OSCAR core/Jev + Epistemic Integrity + Action Ledger + durable task/artifact foundations | Planned |
-| 06 | Cloud brains: ChatGPT path + SwitchRoute routing/fallbacks | Planned |
-| 07 | Sunday + communication + Universal Channel Gateway | Planned |
-| 08 | Desktop + VoiceOS-grade Interaction Runtime + machine nodes | Planned |
-| 09 | LRA/Supermemory + Personal Policy + live context/search + canonical entity graph | Planned |
-| 10 | World Model + Perception Fabric + Sentry/predictive intelligence | Planned |
-| 11 | First-run commissioning + Voice Match + autonomy preferences | Planned |
-| 12 | Avatar/presence UI with truthful Working/Verifying/Blocked/Done states | Planned |
-| 13 | Executive Planner + Durable Workers + capability search + learning/evaluation + Skills/Protocols | Planned |
-| 14 | Kinetable + spatial/workbench perception + general engineering/simulation routing | Planned |
-| 15 | Self-maintenance + reliability/security + truthfulness/verification pass | Planned |
-| 16 | Unified alpha: all layers operating as one coherent, evidence-backed OSCAR system | Planned |
+| 01 | OSCAR Core Loop: typed task/capability/action/result/evidence contracts + verification + ledger/artifact foundations | ⏭️ Next |
+| 02 | TypeSafe Jev: intent + epistemic routing over the proven Core Loop | Planned |
+| 03 | Latch + Capability Catalog: external nodes, capability advertisement/search and progressive contract loading | Planned |
+| 04 | Cloud intelligence: ChatGPT path + SwitchRoute routing/fallbacks | Planned |
+| 05 | First real machine Worker: Windows node + terminal/files/Git/Codex/browser + independent verification | Planned |
+| 06 | LRA/Supermemory + Personal Policy + live context/search + initial entity graph | Planned |
+| 07 | OSCAR Edge + reflexes: ESP32 gateway + Pico deterministic controller + Latch Edge + hardware safety | Planned |
+| 08 | Voice core + multi-device voice arbitration | Planned |
+| 09 | Sunday + communication + Universal Channel Gateway | Planned |
+| 10 | Desktop VoiceOS-grade `Dictate / Edit / Ask / Act` Interaction Runtime | Planned |
+| 11 | World Model + Perception Fabric + Sentry/predictive intelligence | Planned |
+| 12 | First-run commissioning + Voice Match + autonomy preferences | Planned |
+| 13 | Avatar/presence UI with truthful Working/Verifying/Blocked/Done states | Planned |
+| 14 | Executive Planner + durable Workers + capability search + learning/evaluation + Skills/Protocols | Planned |
+| 15 | Kinetable + spatial/workbench perception + general engineering/simulation routing | Planned |
+| 16 | Self-maintenance + reliability/security + truthfulness/verification pass | Planned |
+| 17 | Unified alpha: all layers operating as one coherent, evidence-backed OSCAR system | Planned |
 
-> **Current position:** Slice 00 is complete. Implementation begins with **Slice 01 — Edge runtime skeleton**.
+> **Current position:** Slice 00 is complete. Implementation begins with **Slice 01 — OSCAR Core Loop**.
 
 ## Documentation
 
