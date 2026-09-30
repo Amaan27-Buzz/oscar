@@ -179,20 +179,21 @@ OSCAR maintains a coherent current situation, can manage delegated responsibilit
 
 **Slices:** 15–17
 
-**Purpose:** integrate engineering/workbench reach, failure handling, security and the complete end-to-end developer alpha.
+**Purpose:** integrate broader physical/device reach, specialist engineering, failure handling, security and the complete end-to-end developer alpha.
 
 Includes:
 
-- Kinetable/general engineering integration;
-- spatial/workbench capabilities;
+- physical/device capability expansion;
+- installed/connected specialist engineering tools;
+- spatial/workbench perception where useful;
 - self-maintenance;
 - reliability/security/truthfulness pass;
 - unified alpha scenario.
 
 ### Manual scenarios
 
-1. Route an engineering objective to the appropriate specialist and return a typed artifact/result.
-2. Onboard at least one approved hardware capability into OSCAR.
+1. Route an engineering objective to the appropriate available specialist and return a typed artifact/result.
+2. Onboard at least one approved hardware capability into OSCAR and verify control/state through native capability contracts.
 3. Expire/break a provider or adapter credential and verify self-diagnosis plus bounded recovery/escalation.
 4. Simulate provider/node loss during a durable task and verify reclaim/restart behavior.
 5. Verify Action Ledger/Undo for reversible and irreversible actions.
