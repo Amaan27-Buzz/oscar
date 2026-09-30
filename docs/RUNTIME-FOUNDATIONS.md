@@ -131,7 +131,7 @@ The catalog includes:
 - `SKILL.md` Skills;
 - external specialist agents/apps;
 - Channel Gateway adapters;
-- Kinetable/engineering tools;
+- installed/connected engineering tools;
 - model-provider capabilities exposed through the native OSCAR Model Router where appropriate.
 
 ## 4. Learned Automation Evaluation Pipeline
@@ -233,3 +233,4 @@ Running through all of it:
 7. The core remains small: explicit contracts rather than one giant orchestration framework.
 8. Native OSCAR transport/capability contracts replace any requirement for a separately deployed Latch runtime.
 9. Native OSCAR Model Router replaces any requirement for a separately deployed SwitchRoute runtime.
+10. Engineering/design tools are ordinary replaceable specialist capabilities; no dedicated workbench product is required.
