@@ -80,8 +80,9 @@ LRA + Supermemory   ChatGPT / Model Router     authoritative sources
       │                      │                            │
  physical world      calls / apps / channels      Codex / Computer Use /
                      meetings / dictation         terminal / apps / IDE
-      └──────────── Kinetable + specialist engineering ────┘
 ```
+
+Physical hardware is controlled through native Edge/device capability contracts. Engineering/design/simulation software participates as ordinary installed or connected specialist capabilities, not as a mandatory workbench product.
 
 Cross-cutting layers:
 
@@ -186,7 +187,7 @@ recall     → LRA/Supermemory
 verify     → authoritative live source/test
 reason     → native Model Router → provider
 reported   → external agent/tool/device testimony
-specialist → Codex/Kinetable/computer-use/etc.
+specialist → Codex/computer-use/installed apps/etc.
 worker     → create/resume delegated Worker
 unknown    → retrieve/ask instead of fabricate
 ```
@@ -530,7 +531,7 @@ Speech presence, speaker identity and permission to transcribe/retain content ar
 
 ## 24. Delegated Workers
 
-Workers are objective/responsibility sub-agents owned by OSCAR. They can use Sunday, desktop/browser/terminal/Codex, APIs/plugins/channels, ChatGPT/native Model Router, Kinetable and OSCAR Edge.
+Workers are objective/responsibility sub-agents owned by OSCAR. They can use Sunday, desktop/browser/terminal/Codex, APIs/plugins/channels, ChatGPT/native Model Router, installed/connected specialist applications and OSCAR Edge.
 
 Persistent Workers use the Durable Execution Runtime for leases, checkpoints, retries, recovery and verification state.
 
@@ -571,11 +572,11 @@ OSCAR monitors expired auth, broken adapters/channels, stale capabilities, disco
 
 Safe repair/rollback can be automatic only when bounded, authorized and evidence-backed.
 
-## 32. Kinetable + general engineering
+## 32. Physical/device + general engineering
 
-Kinetable remains a specialist hardware/workbench environment. OSCAR routes hardware design/simulation/firmware/provisioning to it rather than duplicating it.
+OSCAR controls and observes physical systems through native Edge/device capability contracts. Additional sensors, relays, displays, actuators, cameras and custom embedded nodes join the same Transport + Capability Fabric and advertise what they can actually do.
 
-CAD, 3D, numerical simulation, diagnostics, reconstruction and optimization should similarly route to suitable specialist software.
+Hardware design, CAD, circuit work, firmware, 3D, numerical simulation, diagnostics, reconstruction and optimization route to suitable installed or connected specialist software discovered through the Capability Catalog. No dedicated engineering/workbench product is a required OSCAR dependency.
 
 ## 33. Latency tiers
 
@@ -648,3 +649,4 @@ Barge-in stops current speech and returns the owning surface to listening immedi
 29. Sentry's acoustic awareness is local-first; continuous raw room audio is not uploaded by default.
 30. OSCAR's own synthesized voice is excluded from external-speaker recognition/learning.
 31. OSCAR Voice Identity is a stable product contract independent of a particular TTS provider.
+32. Physical/device control is native OSCAR capability work; engineering applications are replaceable specialist capabilities rather than architectural dependencies.

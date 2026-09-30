@@ -73,11 +73,11 @@ Workers are sub-agents OSCAR creates for objectives such as research, release mo
 
 The user talks to OSCAR; OSCAR manages the team underneath it.
 
-### Kinetable
+### Hardware and engineering tools
 
-Kinetable is OSCAR's hardware engineering/workbench environment. OSCAR should route hardware design, visual wiring, simulation, firmware generation and provisioning work to Kinetable rather than duplicating that product internally.
+OSCAR controls and observes physical systems through native Edge/device capabilities rather than depending on a separate hardware-workbench product.
 
-Long term, a Kinetable-built device should be provisionable directly as a native OSCAR Edge node with declared capabilities.
+Hardware design, CAD, simulation, firmware, diagnostics and other engineering work can still be delegated to whichever installed or connected specialist software is actually available. Those tools advertise capabilities like any other machine-node application and are replaceable rather than architectural dependencies.
 
 ## Voice is part of OSCAR's identity
 

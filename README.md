@@ -74,7 +74,7 @@ See [`docs/NATIVE-INFRASTRUCTURE.md`](docs/NATIVE-INFRASTRUCTURE.md).
                                │
              Workers • Skills • Protocols • Channels
                                │
-       Actions / Devices / APIs / Specialists / Kinetable
+       Actions / Devices / APIs / Specialist software
                                │
               ┌────────────────┴────────────────┐
               │                                 │
@@ -168,7 +168,7 @@ See [`docs/VOICE-SENTRY.md`](docs/VOICE-SENTRY.md).
 "fix this crash"               → Codex → tests → independent verification → report
 "manage SceneLab socials"      → persistent Social Worker + Personal Policy
 "answer calls after 4 rings"   → Personal Policy + communication runtime
-"design this Pico device"      → Kinetable + hardware toolchain
+"design this Pico device"      → engineering tools + Edge/device capabilities
 ```
 
 Routing rule:
@@ -198,7 +198,7 @@ Workers are delegated sub-agents OSCAR creates for a job or ongoing responsibili
 "Handle university scheduling"   → persistent Admin Worker
 ```
 
-A Worker is not inherently another generic LLM and does not require its own cloud computer. It can use Sunday, machine nodes, Codex, Computer Use, APIs/plugins, native model routing, Kinetable or OSCAR Edge.
+A Worker is not inherently another generic LLM and does not require its own cloud computer. It can use Sunday, machine nodes, Codex, Computer Use, APIs/plugins, native model routing, specialist applications or OSCAR Edge.
 
 See [`docs/WORKERS.md`](docs/WORKERS.md).
 
@@ -275,6 +275,7 @@ See [`ENGINEERING.md`](ENGINEERING.md).
 22. **Voice Match ≠ Voice Map.** Recognition does not imply authorization.
 23. **OSCAR has a stable voice identity.** TTS provider choice must not define the character/product identity.
 24. **Sentry listens locally first.** Always-on acoustic awareness does not mean always-on cloud transcription.
+25. **Hardware and engineering stay capability-based.** Physical control uses OSCAR Edge/device contracts; specialist engineering software is replaceable rather than a product dependency.
 
 ## Implementation strategy
 
@@ -311,7 +312,7 @@ objective
 | 12 | First-run commissioning + Voice Match/Voice Map/Voice Identity calibration | Planned |
 | 13 | Avatar/presence UI | Planned |
 | 14 | Executive Planner + durable Workers + learning/evaluation + Skills/Protocols | Planned |
-| 15 | Kinetable + spatial/workbench + general engineering/simulation routing | Planned |
+| 15 | Physical/device capability expansion + specialist engineering | Planned |
 | 16 | Self-maintenance + reliability/security + truthfulness/voice robustness pass | Planned |
 | 17 | Unified alpha | Planned |
 
@@ -322,6 +323,8 @@ objective
 - [Product vision](docs/PRODUCT.md)
 - [System architecture](docs/ARCHITECTURE.md)
 - [Native OSCAR infrastructure](docs/NATIVE-INFRASTRUCTURE.md)
+- [Model routing](docs/MODEL-ROUTING.md)
+- [Build gates](docs/BUILD-GATES.md)
 - [Voice + Sentry](docs/VOICE-SENTRY.md)
 - [JARVIS / VoiceOS gap review](docs/JARVIS-GAP-REVIEW.md)
 - [Final competitive benchmark](docs/COMPETITIVE-BENCHMARK.md)

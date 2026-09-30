@@ -80,7 +80,7 @@ OSCAR should feel like a calm piece of advanced personal technology that happens
 
 The durable blend is **60% Apple-like restraint and native clarity, 20% Teenage Engineering-like tactile industrial character, 10% Duolingo-like friendliness and immediate feedback, and 10% Braun/Dieter Rams-like functional honesty**. These are principle references only; OSCAR must not copy another product’s UI.
 
-The current Sunday concept establishes the intended personality: bright neutral surfaces, deep navy typography, OSCAR blue as the interactive/presence color, yellow as the face/presence accent, minimal red expression marks, large negative space, soft natural depth and a single dominant animated avatar. Kinetable’s “Playful Precision” is the closest existing sibling language, but OSCAR replaces cream/lime hardware materiality with a cleaner blue/yellow ambient-computing identity.
+The current Sunday concept establishes the intended personality: bright neutral surfaces, deep navy typography, OSCAR blue as the interactive/presence color, yellow as the face/presence accent, minimal red expression marks, large negative space, soft natural depth and a single dominant animated avatar. OSCAR's tactile character comes from precise cause/effect, restrained physicality and responsive motion rather than visible complexity.
 
 **Key characteristics:**
 

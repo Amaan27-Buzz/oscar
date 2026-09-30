@@ -16,9 +16,8 @@ Use these only as principles, never as templates to copy:
 - **Teenage Engineering** — tactile controls, physical metaphor, playful industrial precision, delightful state changes.
 - **Duolingo** — character, readable emotional feedback, immediate acknowledgement, friendliness without requiring explanation.
 - **Braun / Dieter Rams** — useful hierarchy, honest function, legible controls, nothing decorative without a job.
-- **Kinetable** — sibling principle of **Playful Precision**: fun comes from response, movement and cause/effect rather than clutter.
 
-For OSCAR, the result is more ambient and personal than Kinetable: cleaner white/soft-neutral surfaces, OSCAR blue/yellow identity, the avatar as presence, and fewer visible technical controls until they are needed.
+For OSCAR, the result is ambient and personal: clean white/soft-neutral surfaces, OSCAR blue/yellow identity, the avatar as presence, and few visible technical controls until they are needed. Playfulness comes from response, movement and cause/effect rather than clutter.
 
 ## What should be memorable
 

@@ -7,7 +7,7 @@ body:
     id: slice
     attributes:
       label: Slice
-      placeholder: "e.g. 01 — Edge runtime skeleton"
+      placeholder: "e.g. 01 — OSCAR Core Loop"
     validations:
       required: true
   - type: textarea
@@ -42,7 +42,7 @@ body:
     id: dependencies
     attributes:
       label: Dependencies / specialist capabilities
-      description: Latch, Jev, Supermemory, SwitchRoute, Codex, Kinetable, hardware, etc.
+      description: Jev, LRA/Supermemory, Codex, computer use, Edge/device capabilities, provider adapters, installed specialist apps, etc.
   - type: checkboxes
     id: done
     attributes:

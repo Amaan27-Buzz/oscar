@@ -8,7 +8,7 @@ This was the first major gap review. The later cross-product review is recorded 
 
 ## Current position
 
-OSCAR already has a broad planned architecture: persistent memory, Personal Policy, communication, delegated Workers, Protocols/routines/Skills, physical hardware, Sentry, Sunday, desktop machine nodes, cloud-model providers, Kinetable and cross-device continuity.
+OSCAR already has a broad planned architecture: persistent memory, Personal Policy, communication, delegated Workers, Protocols/routines/Skills, physical hardware, Sentry, Sunday, desktop machine nodes, cloud-model providers, specialist engineering/software capabilities and cross-device continuity.
 
 Two implementation clarifications now apply:
 
@@ -46,7 +46,7 @@ External references used for this benchmark:
 | **Executive Planner** | Protocols + Workers are strong | A global executive must prioritize objectives, deadlines, dependencies, devices, cost, risk and user attention across all Workers/Protocols, including pause/pre-emption/reordering. | **P1** |
 | **Predictive intelligence** | Sentry mainly reacts to events | JARVIS-like behavior should anticipate deadline risk, schedule conflicts, likely build failures, abnormal sensor trends and likely next actions: **forecast → prepare**, not only event → reaction. | **P1** |
 | **Teach OSCAR by demonstration** | OSCAR learns from successful executions | “Watch me do this once” should let OSCAR observe a desktop/phone workflow, infer a reusable Skill, ask about ambiguity and save a verified procedure. | **P1** |
-| **General engineering/simulation runtime** | Kinetable + Codex cover electronics/software | A broader JARVIS-style engineering layer should route CAD, 3D, numerical simulation, diagnostics, reconstruction, optimization and scientific tools to appropriate specialists. | **P1** |
+| **General engineering/simulation runtime** | Edge + machine-node specialist tools cover electronics/software/physical control | A broader JARVIS-style engineering layer should route CAD, circuit simulation, 3D, numerical simulation, diagnostics, reconstruction, optimization and scientific tools to appropriate installed/connected specialists without making any one engineering product mandatory. | **P1** |
 | **Self-maintenance / self-diagnostics** | Recovery exists mostly per Worker | OSCAR itself should monitor expired auth, broken connectors/adapters, stale capabilities, edge-node failures, bad updates, latency/storage health and configuration drift, repairing or rolling back safely where possible. | **P1** |
 | **Authoritative entity / relationship graph** | LRA + Personal Policy know people/preferences | A person across contact/email/messaging/Voice Map identity, a company relationship, device/account ownership and communication history should resolve to canonical entities. | **P1** |
 | **Health / wearable integration** | Not yet a defined subsystem | Optional later capability: phone/watch/health data can support context and safety, but must be explicitly permissioned and privacy-sensitive. | **P2** |

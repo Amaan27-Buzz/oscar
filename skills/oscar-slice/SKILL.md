@@ -10,7 +10,7 @@ description: Implement one OSCAR roadmap slice or narrow sub-slice end to end, i
 3. Inspect existing code and connected infrastructure before designing replacements.
 4. Prefer the smallest coherent design; do not add speculative abstractions, services or dependencies.
 5. Identify module responsibilities, authoritative state ownership, trust boundaries and important failure modes before implementation.
-6. Prefer existing specialist systems: Latch, SwitchRoute, Jev, LRA/Supermemory, Kinetable, Codex/computer-use Workers, Sunday and Edge nodes.
+6. Prefer existing specialist capabilities: Jev, LRA/Supermemory, native OSCAR Transport/Model Router, Codex/computer-use Workers, Sunday, Edge nodes, and installed/connected specialist applications.
 7. Keep cross-subsystem contracts typed, validated and evolvable; isolate provider/platform details behind narrow adapters where appropriate.
 8. Define the slice's observable completion condition and verification plan before declaring it complete.
 9. Write an explicit test checklist.

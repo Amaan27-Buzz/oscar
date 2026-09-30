@@ -63,6 +63,16 @@ jobs:
             test -e "$file" || { echo "Missing required file: $file"; exit 1; }
           done
 
+      - name: Reject removed workbench-project references
+        shell: bash
+        run: |
+          set -euo pipefail
+          removed_name='kine''table'
+          if git grep -ni -I -e "$removed_name" -- .; then
+            echo "Removed hardware-workbench project is still referenced in the current repository."
+            exit 1
+          fi
+
       - name: Detect whitespace errors
         run: git diff --check HEAD^
         if: github.event_name == 'push'
