@@ -42,6 +42,8 @@ Significant OSCAR milestones are recorded here. Detailed implementation status r
 - Slice 08 now explicitly builds OSCAR Voice Identity, Voice Match, Voice Map, self-voice suppression and multi-device arbitration.
 - Slice 11 now explicitly builds Sentry's local acoustic plane and feeds speaker/audio events into Perception/World Model.
 - Slice 12 commissioning now validates Voice Identity, Voice Match, optional Voice Map, self-voice suppression and acoustic-Sentry privacy settings.
+- Hardware and engineering work now uses native OSCAR Edge/device capabilities plus whichever installed or connected specialist applications are actually available; OSCAR has no dedicated hardware-workbench project dependency.
+- Slice 15 is physical/device capability expansion and general specialist engineering rather than integration with a separate workbench product.
 - `ENGINEERING.md`/`AGENTS.md` completion rules continue to require independent verification where practical.
 
 ### Planned
@@ -54,7 +56,7 @@ Significant OSCAR milestones are recorded here. Detailed implementation status r
 ### Added
 
 - Canonical OSCAR product definition and JARVIS-inspired capability benchmark.
-- Architecture covering Jev, LRA + Supermemory, cloud/model routing, Sunday, desktop/Worker nodes, OSCAR Edge and Kinetable.
+- Architecture covering Jev, LRA + Supermemory, cloud/model routing, Sunday, desktop/Worker nodes, OSCAR Edge and general physical/device capabilities.
 - Continuous single-conversation memory direction rather than chat-sidebar organization.
 - Voice, Sentry, Voice Match and low-latency interaction plans.
 - Learning layer: procedural memory, portable `SKILL.md`-style Skills, routines and stateful Protocols.
