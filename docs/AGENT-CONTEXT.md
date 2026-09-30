@@ -13,9 +13,11 @@ OSCAR keeps one canonical project truth and uses thin agent-specific adapters. T
 | `docs/PRODUCT.md` | product truth and north star |
 | `docs/ARCHITECTURE.md` | system boundaries and responsibilities |
 | `docs/JARVIS-GAP-REVIEW.md` | JARVIS/VoiceOS system-level gap benchmark |
-| `docs/COMPETITIVE-BENCHMARK.md` | final comparison against VoiceOS, MCU JARVIS, ChatGPT/Claude, Gemini, Grok Bot, OpenClaw, Hermes and Pi |
+| `docs/COMPETITIVE-BENCHMARK.md` | comparison against VoiceOS, MCU JARVIS, ChatGPT/Claude, Gemini, Grok Bot, OpenClaw, Hermes and Pi |
 | `docs/EPISTEMIC-INTEGRITY.md` | evidence states, verification-before-completion, correction and non-yes-man behavior |
-| `docs/RUNTIME-FOUNDATIONS.md` | Universal Channel Gateway, Durable Execution Runtime, Capability Catalog/Search, learned-automation evaluation and Artifact/Result model |
+| `docs/RUNTIME-FOUNDATIONS.md` | Channel Gateway, Durable Runtime, Capability Catalog/Search, automation evaluation and Artifact/Result model |
+| `docs/NATIVE-INFRASTRUCTURE.md` | native OSCAR Transport + Capability Fabric and native Model Router; Latch/SwitchRoute are reference/prototype inputs, not required runtimes |
+| `docs/VOICE-SENTRY.md` | Voice Input, OSCAR Voice Identity, Voice Match, Voice Map, self-voice suppression and local acoustic Sentry |
 | `docs/ROADMAP.md` | slice order/current implementation state |
 | `docs/DECISIONS.md` | stable architecture decisions |
 | `docs/MEMORY.md` | LRA/Supermemory/Jev memory and continuity model |
@@ -25,6 +27,8 @@ OSCAR keeps one canonical project truth and uses thin agent-specific adapters. T
 | `docs/ORCHESTRATION.md` | capability routing, Skills, Workers, routines and Protocols |
 | `docs/UI-AVATAR.md` | avatar, expression and state language |
 | `docs/SURFACES.md` | Sunday/desktop/edge/Worker surface responsibilities |
+| `docs/SECURITY.md` | security, permissions, transport and voice/privacy boundaries |
+| `docs/ONBOARDING.md` | first-run commissioning including voice and Sentry calibration |
 
 Agent-specific files should point back to these rather than becoming independent sources of truth.
 
@@ -38,7 +42,7 @@ Do not create nested files prematurely.
 
 ### Claude Code
 
-`CLAUDE.md` imports/references the canonical instructions and tells Claude to load design files only for relevant work. Repository implementation is still governed by `ENGINEERING.md` and Epistemic Integrity even when an adapter does not duplicate those rules.
+`CLAUDE.md` imports/references canonical instructions and tells Claude to load design files only for relevant work. Repository implementation remains governed by `ENGINEERING.md` and Epistemic Integrity even when an adapter does not duplicate those rules.
 
 ### Gemini CLI
 
@@ -47,7 +51,7 @@ Do not create nested files prematurely.
 ### GitHub Copilot
 
 - `.github/copilot-instructions.md` provides concise repository-wide rules.
-- `.github/instructions/ui.instructions.md` adds path-specific UI guidance when Copilot works on frontend/native UI files.
+- `.github/instructions/ui.instructions.md` adds path-specific UI guidance for frontend/native UI files.
 
 ### Cursor
 
@@ -65,39 +69,70 @@ skills/
     └── SKILL.md
 ```
 
-- `oscar-ui` handles design/implementation/review of OSCAR surfaces.
-- `oscar-slice` handles one roadmap slice end to end and applies `ENGINEERING.md`.
-
 Skills are workflow-specific; `AGENTS.md` should not grow into a giant prompt containing every workflow.
 
 ## Context-loading rule
 
-Load the least context that is sufficient:
+Load the least context sufficient for the task:
 
 - any implementation task → `ENGINEERING.md` + `docs/EPISTEMIC-INTEGRITY.md` + relevant product/architecture/domain context;
-- UI task → core docs + `ENGINEERING.md` + `DESIGN.md` + `TASTE.md` + relevant surface docs;
-- edge/hardware task → core docs + `ENGINEERING.md` + hardware/security docs;
-- memory task → core docs + `ENGINEERING.md` + `docs/MEMORY.md`;
-- preference/policy task → core docs + `ENGINEERING.md` + `docs/PERSONAL-POLICY.md`;
-- calls/meetings/messaging/dictation task → core docs + `ENGINEERING.md` + `docs/COMMUNICATION.md` + `docs/RUNTIME-FOUNDATIONS.md` + relevant surface docs;
-- Worker/sub-agent task → core docs + `ENGINEERING.md` + `docs/EPISTEMIC-INTEGRITY.md` + `docs/WORKERS.md` + `docs/ORCHESTRATION.md` + `docs/RUNTIME-FOUNDATIONS.md`;
-- orchestration/learning task → core docs + `ENGINEERING.md` + `docs/ORCHESTRATION.md` + `docs/RUNTIME-FOUNDATIONS.md`;
-- World Model / Perception Fabric / Executive Planner / Action Ledger / Interaction Runtime task → core docs + `ENGINEERING.md` + `docs/ARCHITECTURE.md` + `docs/JARVIS-GAP-REVIEW.md` + `docs/EPISTEMIC-INTEGRITY.md`;
-- Durable Runtime / capability search / Channel Gateway / Artifact Model task → core docs + `ENGINEERING.md` + `docs/RUNTIME-FOUNDATIONS.md` + `docs/EPISTEMIC-INTEGRITY.md`.
+- UI task → core docs + `DESIGN.md` + `TASTE.md` + relevant surface docs;
+- edge/hardware task → core docs + `docs/NATIVE-INFRASTRUCTURE.md` + hardware/security docs;
+- transport/capability-node/pairing task → `docs/NATIVE-INFRASTRUCTURE.md` + `docs/RUNTIME-FOUNDATIONS.md` + `docs/SECURITY.md`;
+- model-provider/routing task → `docs/NATIVE-INFRASTRUCTURE.md` + `docs/ARCHITECTURE.md` + relevant provider context;
+- voice/STT/TTS/Voice Match/Voice Map/Sentry task → `docs/VOICE-SENTRY.md` + `docs/SECURITY.md` + relevant surface docs; include `docs/ONBOARDING.md` when enrollment/calibration is involved;
+- memory task → `docs/MEMORY.md`;
+- preference/policy task → `docs/PERSONAL-POLICY.md`;
+- calls/meetings/messaging/dictation task → `docs/COMMUNICATION.md` + `docs/VOICE-SENTRY.md` where audio/speaker identity is involved + relevant surface docs;
+- Worker/sub-agent task → `docs/WORKERS.md` + `docs/ORCHESTRATION.md` + `docs/RUNTIME-FOUNDATIONS.md`;
+- orchestration/learning task → `docs/ORCHESTRATION.md` + `docs/RUNTIME-FOUNDATIONS.md`;
+- World Model / Perception / Executive Planner / Action Ledger / Interaction Runtime task → `docs/ARCHITECTURE.md` + `docs/JARVIS-GAP-REVIEW.md` + `docs/EPISTEMIC-INTEGRITY.md`;
+- Durable Runtime / capability search / Channel Gateway / Artifact Model task → `docs/RUNTIME-FOUNDATIONS.md` + `docs/EPISTEMIC-INTEGRITY.md`.
 
 Do not dump the entire documentation tree into every agent turn. More context is not automatically better.
+
+## Native infrastructure rule
+
+Do not revive the old assumption that OSCAR directly depends on separate Latch/SwitchRoute deployments.
+
+Canonical mapping:
+
+```text
+Latch architecture/logic       → OSCAR Transport + Capability Fabric
+SwitchRoute architecture/logic → OSCAR Model Router
+```
+
+The earlier repositories may be inspected for useful code, tests or design lessons, but a new OSCAR implementation should adopt those ideas behind OSCAR-owned contracts rather than preserve a legacy service boundary by default.
+
+## Voice model rule
+
+Do not collapse all voice work into `STT/TTS`.
+
+The canonical distinction is:
+
+```text
+Voice Input          wake / VAD / STT / barge-in
+OSCAR Voice Identity stable synthesized identity / prosody / fallback
+Voice Match          authorization-oriented speaker verification
+Voice Map            perception-oriented speaker recognition/context
+Acoustic Sentry      local always-on wake/speech/speaker/sound events
+```
+
+Voice Map recognition never grants permission. Speaker embeddings/profiles are sensitive. OSCAR's own TTS must be excluded from speaker learning/recognition while real user barge-in remains possible.
+
+Always-on acoustic awareness is local-first and does not imply continuous cloud transcription or raw-audio retention.
 
 ## Verification rule for agents
 
 Before declaring a repository/runtime task complete:
 
-1. inspect the authoritative resulting state;
+1. inspect authoritative resulting state;
 2. run relevant tests/checks;
 3. distinguish reported success from verified completion;
 4. state any unverified surfaces explicitly;
 5. update docs only after confirming the architecture/status claim is actually true.
 
-An agent must not claim that it updated "the architecture and roadmap" if it only created one review document.
+An agent must not claim that it updated `the architecture and roadmap` if it only created one review document.
 
 ## Keeping files synchronized
 
@@ -107,10 +142,13 @@ When a durable project rule changes:
 2. update an adapter only if its routing text is now wrong;
 3. avoid copying the entire new rule into every adapter;
 4. update README/documentation links if discoverability changes;
-5. verify the affected canonical files before claiming the cross-doc update is complete.
+5. verify affected canonical files before claiming propagation is complete.
 
-When an engineering principle changes system-wide, update `ENGINEERING.md`. When a UI direction changes system-wide, update both `DESIGN.md` and `TASTE.md`; when only one surface changes, keep the global system stable and document the surface-specific decision separately.
+Specific propagation rules:
 
-When communication, Personal Policy or Worker behavior changes system-wide, update their dedicated domain document plus architecture/decision/roadmap references if the boundary changed.
-
-When the competitive benchmark changes a system-level primitive or priority, reconcile `docs/ARCHITECTURE.md`, `docs/ROADMAP.md`, `docs/DECISIONS.md`, `README.md` and the relevant domain docs in the same change.
+- native transport/model-routing boundary change → reconcile `NATIVE-INFRASTRUCTURE.md`, `ARCHITECTURE.md`, `ROADMAP.md`, `DECISIONS.md`, README and affected runtime/orchestration docs;
+- voice/Voice Match/Voice Map/Sentry boundary change → reconcile `VOICE-SENTRY.md`, `ARCHITECTURE.md`, `FEATURES.md`, `ROADMAP.md`, `SECURITY.md`, `ONBOARDING.md`, relevant surface/communication docs and README;
+- system-wide engineering rule → update `ENGINEERING.md`;
+- system-wide visual direction → update `DESIGN.md` and, when qualitative direction changes, `TASTE.md`;
+- communication/Personal Policy/Worker behavior → update dedicated domain doc plus architecture/decision/roadmap references if the boundary changed;
+- competitive benchmark changes a system-level primitive → reconcile architecture, roadmap, decisions, README and relevant domain docs in the same change.
