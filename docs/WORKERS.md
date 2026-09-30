@@ -57,20 +57,11 @@ recover locally → reroute specialist → ask OSCAR/user if still blocked
 
 ## Worker types
 
-Workers can be temporary or persistent.
-
 ```text
-"Research these laptops."
-→ temporary Research Worker
-
-"Watch ClearLane CI tonight."
-→ task Worker that expires when the objective completes
-
-"Manage SceneLab social media."
-→ persistent Worker
-
-"Handle university scheduling for me."
-→ persistent responsibility Worker
+"Research these laptops."            → temporary Research Worker
+"Watch ClearLane CI tonight."        → task Worker
+"Manage SceneLab social media."      → persistent Worker
+"Handle university scheduling."     → persistent responsibility Worker
 ```
 
 Workers can sleep when idle and resume when triggers/objectives require them.
@@ -78,12 +69,6 @@ Workers can sleep when idle and resume when triggers/objectives require them.
 ## Creation should be easy
 
 The primary creation interface is ordinary voice or chat.
-
-Examples:
-
-- "OSCAR, make a Worker that watches ClearLane releases and fixes recoverable CI failures."
-- "Create someone to manage SceneLab social media, but ask before major announcements."
-- "Have a Worker keep track of internship applications and tell me what I need to do."
 
 OSCAR should infer the initial Worker definition from the request, existing Personal Policy, current World Model/context and available capabilities.
 
@@ -115,8 +100,7 @@ OSCAR Edge
 - physical actions
 
 Cloud/services
-- ChatGPT
-- SwitchRoute models
+- native OSCAR Model Router → ChatGPT / other allowed providers
 - APIs/plugins/connectors
 ```
 
@@ -130,12 +114,10 @@ A future cloud Worker computer may exist as another advertised capability, but i
 
 A Worker is not necessarily another generic LLM.
 
-Examples:
-
 ```text
 Coding Worker      → Codex + repository + tests
 Design Worker      → Codex + Impeccable + visual verification
-Research Worker    → ChatGPT/research path
+Research Worker    → research capability + native model routing when useful
 Phone Worker       → Sunday
 GUI Worker         → Computer Use
 Hardware Worker    → Kinetable + Edge tools
@@ -166,13 +148,7 @@ OSCAR Executive
 └── Social Worker
 ```
 
-Workers can:
-
-- exchange Artifact/Result references;
-- hand work off;
-- wait on dependencies;
-- run independently in parallel;
-- report structured progress/evidence.
+Workers can exchange Artifact/Result references, hand work off, wait on dependencies, run independently in parallel and report structured progress/evidence.
 
 The Executive Planner remains the top-level coordinator and resolves conflicts/priorities.
 
@@ -199,15 +175,7 @@ Durable Worker state includes, where relevant:
 - blocker/escalation state;
 - artifact/result references.
 
-The runtime provides:
-
-- persisted checkpoints;
-- heartbeats;
-- lease expiry and reclaim;
-- stuck/zombie detection;
-- restart/resume;
-- bounded retries;
-- idempotency/deduplication where needed.
+The runtime provides persisted checkpoints, heartbeats, lease expiry/reclaim, stuck/zombie detection, restart/resume, bounded retries and idempotency/deduplication where needed.
 
 A Worker must not remain indefinitely `Working` because its executor vanished.
 
@@ -241,16 +209,7 @@ Worker reports done
 → report only that state
 ```
 
-Workers should return structured results including:
-
-- execution status;
-- evidence references;
-- artifact/result references;
-- limitations;
-- blockers;
-- suggested verification method.
-
-If verification is impossible, OSCAR reports the limitation rather than pretending certainty.
+Workers should return structured results including execution status, evidence refs, Artifact/Result refs, limitations, blockers and suggested verification method.
 
 See [EPISTEMIC-INTEGRITY.md](EPISTEMIC-INTEGRITY.md).
 
@@ -264,38 +223,17 @@ See [EPISTEMIC-INTEGRITY.md](EPISTEMIC-INTEGRITY.md).
 | Routine | Recurring/simple behavior |
 | Protocol | Stateful persistent responsibility/process |
 
-A Protocol may create Workers. A Worker may use Skills. A Skill may invoke Tools. A persistent Worker may itself be governed by one or more Protocols.
+A Protocol may create Workers. A Worker may use Skills. A Skill may invoke Tools.
 
 ## Social-media management
 
 Workers may manage social media when connected capabilities and permissions permit.
 
-Potential responsibilities:
-
-- monitor mentions/replies;
-- research relevant developments;
-- draft posts;
-- prepare media;
-- schedule content;
-- publish permitted content;
-- answer permitted routine messages/comments;
-- coordinate release announcements;
-- summarize performance/community feedback.
+Potential responsibilities include monitoring mentions/replies, research, drafting posts, preparing media, scheduling/publishing permitted content, routine replies, release coordination and summarizing feedback/performance.
 
 Personal Policy controls what may happen without confirmation.
 
-Example:
-
-```text
-ordinary SceneLab feature post → publish automatically
-major launch announcement       → ask
-controversial/political reply   → never publish automatically
-security/account change         → strong confirmation
-```
-
 ## Learning
-
-Workers improve through OSCAR's procedural-memory/Skill system.
 
 ```text
 novel Worker task
@@ -308,22 +246,11 @@ novel Worker task
 → future Workers reuse promoted Skill
 ```
 
-A learned Skill may be shared by multiple Workers when scope/permissions are compatible.
-
-Generated automation cannot broaden authority on its own.
+A learned Skill may be shared by multiple Workers when scope/permissions are compatible. Generated automation cannot broaden authority on its own.
 
 ## Artifact / Result handoff
 
-Workers should exchange typed Artifact/Result references for durable outputs instead of copying large opaque payloads through prompts.
-
-Example:
-
-```text
-Research Worker
-→ verified research artifact
-→ Launch Worker uses artifact
-→ Social Worker derives post drafts
-```
+Workers exchange typed Artifact/Result references for durable outputs instead of copying large opaque payloads through prompts.
 
 Artifacts preserve producer, location/version, provenance, owner task/Worker and verification state.
 
@@ -342,32 +269,7 @@ University Admin     Idle
 Research             Verifying
 ```
 
-Opening a Worker should show useful information only:
-
-```text
-SceneLab Social
-Managing SceneLab's social accounts
-
-Now
-Watching launch replies
-
-Execution
-Running on Desktop node
-Checkpoint 4/7
-
-Can use
-X · LinkedIn · GitHub · Image generation
-
-Autonomy
-Routine replies        ✓
-Draft posts            ✓
-Ordinary publishing    ✓
-Major announcements    Ask
-
-Verification
-Last publish            Verified
-Next scheduled post     Draft only
-```
+Opening a Worker should show current responsibility, execution surface, checkpoint, usable capabilities, autonomy boundaries and verification state.
 
 Users can create, pause, resume, edit or remove Workers using UI or natural language.
 
@@ -375,21 +277,9 @@ Users can create, pause, resume, edit or remove Workers using UI or natural lang
 
 Workers inherit only explicitly available OSCAR capabilities/permissions.
 
-They cannot:
+They cannot self-grant permissions, bypass Personal Policy/approval gates or silently adopt a more privileged identity.
 
-- self-grant new permissions;
-- bypass Personal Policy;
-- bypass approval gates;
-- silently adopt a more privileged user/device identity.
-
-Consequential actions remain attributable to:
-
-- OSCAR task/Protocol;
-- Worker;
-- capability/tool used;
-- initiating user/policy;
-- timestamp/result;
-- verification evidence where available.
+Consequential actions remain attributable to OSCAR task/Protocol, Worker, capability/tool, initiating user/policy, timestamp/result and verification evidence.
 
 ## Invariants
 
@@ -397,10 +287,12 @@ Consequential actions remain attributable to:
 2. Workers use the best available real device/service capability instead of requiring a cloud computer.
 3. Creation/editing work through normal voice/chat.
 4. Jev enables self-repair/rerouting before unnecessary escalation.
-5. Workers can collaborate while the Executive Planner owns global coordination.
-6. Persistent Workers use durable execution state and recovery semantics.
+5. Workers can collaborate while Executive Planner owns global coordination.
+6. Persistent Workers use durable execution state/recovery semantics.
 7. Workers search capabilities progressively rather than loading every tool definition.
 8. Worker `success` is reported evidence until verified.
 9. Workers may use/create Skills and participate in Protocols, but cannot broaden permissions.
-10. Worker state/progress/evidence remain inspectable in a simple UI.
-11. Temporary Workers retire when their objective is complete; persistent Workers remain only for continuing responsibility.
+10. Worker state/progress/evidence remain inspectable.
+11. Temporary Workers retire when complete; persistent Workers remain only for continuing responsibility.
+12. Model reasoning is accessed through OSCAR's native Model Router, not by depending on a separate SwitchRoute runtime.
+13. Cross-device execution is carried by OSCAR-owned transport/capability contracts, not a separately required Latch service.
