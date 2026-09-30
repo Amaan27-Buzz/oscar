@@ -79,7 +79,9 @@ Avoid creating microservices, plugin frameworks, generic managers, deep inherita
 
 ## Specialist-first rule
 
-OSCAR should orchestrate the best available capability instead of reproducing it poorly. The implementation should preserve this behavior from the beginning: coding agents for repository work, computer-use for GUI verification, Kinetable for hardware workflows, Latch for connected execution, SwitchRoute for general model routing, and LRA/Supermemory for long-term memory.
+OSCAR should orchestrate the best available capability instead of reproducing it poorly. The implementation should preserve this behavior from the beginning: coding agents for repository work, computer-use for GUI verification, installed/connected engineering tools for hardware/design/simulation, native OSCAR Transport for connected execution, native OSCAR Model Router for model selection, and LRA/Supermemory for long-term memory.
+
+Physical actions remain native OSCAR Edge/device capabilities. Engineering applications are replaceable capabilities, not architectural dependencies.
 
 ## Local data
 
