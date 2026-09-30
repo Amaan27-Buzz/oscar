@@ -8,7 +8,16 @@ This was the first major gap review. The later cross-product review is recorded 
 
 ## Current position
 
-OSCAR already has a broad planned architecture: persistent memory, Personal Policy, communication, delegated Workers, Protocols/routines/Skills, physical hardware, Sentry, Sunday, desktop machine nodes, ChatGPT/SwitchRoute, Latch, Kinetable and cross-device continuity.
+OSCAR already has a broad planned architecture: persistent memory, Personal Policy, communication, delegated Workers, Protocols/routines/Skills, physical hardware, Sentry, Sunday, desktop machine nodes, cloud-model providers, Kinetable and cross-device continuity.
+
+Two implementation clarifications now apply:
+
+- Latch is reference/prototype architecture; its useful transport/capability logic is folded into native OSCAR Transport + Capability Fabric.
+- SwitchRoute is reference/prototype architecture; its useful provider-routing logic is folded into the native OSCAR Model Router.
+
+See [NATIVE-INFRASTRUCTURE.md](NATIVE-INFRASTRUCTURE.md).
+
+Voice is also now modeled as more than STT/TTS: OSCAR has Voice Input, stable OSCAR Voice Identity, authorization-oriented Voice Match, perception-oriented Voice Map and a local-first acoustic Sentry plane. See [VOICE-SENTRY.md](VOICE-SENTRY.md).
 
 The remaining gap is less about adding isolated integrations and more about making every capability behave like **one omnipresent intelligence**.
 
@@ -27,6 +36,8 @@ External references used for this benchmark:
 | **Interaction Runtime** | Dictation, screen/cursor context and voice are planned, but separately | Needs a first-class `Dictate / Edit / Ask / Act` runtime: cursor target, selected text, focused field, app context, insertion, rewriting, undo and clipboard/accessibility fallback. This is the practical VoiceOS baseline. | **P0** |
 | **Point-and-talk context** | Screen/cursor/selection context exists conceptually | Requests such as “what is this?”, “reply to him” or “fix this button” should resolve from cursor + accessibility tree + screenshot + selection without requiring the user to explain the target. | **P0** |
 | **Multi-device voice arbitration** | Sunday, desktop and Edge can all become voice surfaces | If multiple OSCAR devices hear the wake word, exactly one should respond. Selection needs proximity, acoustic confidence, active-device context, user state and explicit device priority, with seamless handoff. | **P0** |
+| **Voice identity + ambient speaker context** | Earlier planning had STT/TTS, Voice Match and basic known/unknown speaker events | JARVIS-like presence needs a stable OSCAR speaking identity plus a distinct Voice Map for confidence-qualified speaker context. OSCAR must also suppress its own TTS from wake/speaker recognition. | **P0** |
+| **Local acoustic Sentry** | Earlier Sentry planning focused heavily on wake word and physical/environment sensors | Always-on local awareness should include speech presence, known/unknown speaker events, speaker changes and configured sound classes without implying continuous cloud transcription or recording. | **P0** |
 | **Universal live context/search fabric** | LRA memory + individual connectors | Memory is not enough. OSCAR needs federated live retrieval across files, mail, messages, notes, browser, GitHub, calendar, social accounts, devices and other connected systems, with live-source authority. | **P0** |
 | **Telephony / meeting media architecture** | Desired behavior is documented | The technical path still needs to be proven per platform: Android call control, app-call limitations, audio capture/loopback, Meet/Zoom/WhatsApp/Telegram boundaries, VoIP gateways and consent/platform restrictions. | **P0** |
 | **Action Ledger + universal Undo** | Audit, permissions and idempotency exist conceptually | “OSCAR, undo that” should work wherever technically possible. Consequential actions need before/after state, verification, attribution and a compensating/reversal operation when one exists. | **P0** |
@@ -36,14 +47,14 @@ External references used for this benchmark:
 | **Predictive intelligence** | Sentry mainly reacts to events | JARVIS-like behavior should anticipate deadline risk, schedule conflicts, likely build failures, abnormal sensor trends and likely next actions: **forecast → prepare**, not only event → reaction. | **P1** |
 | **Teach OSCAR by demonstration** | OSCAR learns from successful executions | “Watch me do this once” should let OSCAR observe a desktop/phone workflow, infer a reusable Skill, ask about ambiguity and save a verified procedure. | **P1** |
 | **General engineering/simulation runtime** | Kinetable + Codex cover electronics/software | A broader JARVIS-style engineering layer should route CAD, 3D, numerical simulation, diagnostics, reconstruction, optimization and scientific tools to appropriate specialists. | **P1** |
-| **Self-maintenance / self-diagnostics** | Recovery exists mostly per Worker | OSCAR itself should monitor expired auth, broken connectors, stale capabilities, edge-node failures, bad updates, latency/storage health and configuration drift, repairing or rolling back safely where possible. | **P1** |
-| **Authoritative entity / relationship graph** | LRA + Personal Policy know people/preferences | “John from university”, a phone contact, an email identity, a company relationship, device/account ownership and communication history should resolve to canonical entities. | **P1** |
+| **Self-maintenance / self-diagnostics** | Recovery exists mostly per Worker | OSCAR itself should monitor expired auth, broken connectors/adapters, stale capabilities, edge-node failures, bad updates, latency/storage health and configuration drift, repairing or rolling back safely where possible. | **P1** |
+| **Authoritative entity / relationship graph** | LRA + Personal Policy know people/preferences | A person across contact/email/messaging/Voice Map identity, a company relationship, device/account ownership and communication history should resolve to canonical entities. | **P1** |
 | **Health / wearable integration** | Not yet a defined subsystem | Optional later capability: phone/watch/health data can support context and safety, but must be explicitly permissioned and privacy-sensitive. | **P2** |
 | **Home / robotics / vehicle ecosystem** | Edge can control generic hardware | Later capability contracts should cover smart-home systems, robots, cameras, drones/vehicles and room infrastructure without making any one vendor mandatory. | **P2** |
 
 ## Core architectural addition: World Model
 
-OSCAR currently has many strong subsystems:
+OSCAR has many strong subsystems:
 
 ```text
 Memory
@@ -66,7 +77,7 @@ Those need a shared live representation of **what is true now**.
         Perception Fabric         Memory
               │                     │
  screens / cameras / audio      LRA / Supermemory
- sensors / apps / location
+ Voice Map / sensors / apps
               │
               ▼
        "What is true now?"
@@ -92,6 +103,7 @@ phone: user is on campus
 PC: online at home
 Codex: build running
 ESP32: desk unoccupied
+Voice Map: unknown speaker detected near desk
 mother: calling
 ```
 
@@ -106,7 +118,8 @@ It should combine, where authorized:
 - screen + accessibility-tree state;
 - cursor, focus and selected text;
 - camera frames / scene observations;
-- microphone/audio events;
+- microphone/acoustic events;
+- Voice Map speaker-presence/context events;
 - device and application events;
 - phone location/activity context;
 - calendar, communications and notifications;
@@ -114,6 +127,24 @@ It should combine, where authorized:
 - Worker/Protocol/task state.
 
 Perception is not memory. Perception is current evidence; LRA/Supermemory provides continuity and historical evidence.
+
+## Voice identity, Voice Map and Sentry
+
+Voice is part of OSCAR's product identity and perception system.
+
+```text
+Voice Input          = wake / VAD / STT / barge-in
+OSCAR Voice Identity = stable synthesized identity / prosody / fallback
+Voice Match          = authorization-oriented speaker verification
+Voice Map            = perception-oriented speaker recognition/context
+Acoustic Sentry      = local wake/speech/speaker/sound event plane
+```
+
+Recognition does not imply authorization. Voice Map unknowns remain unknown, confidence remains explicit, and sensitive voice profiles have dedicated retention/security controls.
+
+Sentry may listen locally for low-cost acoustic events while raw room audio and full transcription remain off-cloud/unretained by default unless explicitly activated by policy/mode.
+
+OSCAR's own TTS must be excluded from Voice Map learning and should not retrigger wake behavior, while real barge-in remains possible.
 
 ## Universal live context/search fabric
 
@@ -147,8 +178,6 @@ Act      → operate the current app/device/task
 
 The runtime should understand focused application/window, focused text field, selected text, cursor target, accessibility tree, screenshot/visual context, clipboard when needed and active task/conversation.
 
-This creates the VoiceOS-like point-and-talk baseline while preserving OSCAR's broader orchestration.
-
 ## Multi-device voice arbitration
 
 Wake/listen events from Sunday, desktop and physical OSCAR should participate in one arbitration protocol.
@@ -159,41 +188,23 @@ Only one surface should normally speak/own the turn. Other devices remain synchr
 
 ## Action Ledger and Undo
 
-Every consequential action should produce a structured ledger entry containing, where applicable:
-
-- initiating user/task/Protocol/Worker;
-- tool/device used;
-- intent;
-- permission/policy decision;
-- target/resource;
-- before-state reference;
-- resulting-state reference;
-- execution + verification state/evidence;
-- reversible/irreversible flag;
-- compensating/undo action;
-- timestamp/correlation ID.
+Every consequential action should produce a structured ledger entry containing, where applicable, initiating user/task/Protocol/Worker, capability/device, intent, policy/permission decision, target, before/result state refs, execution/verification evidence, reversibility/compensation and timestamp/correlation ID.
 
 Undo is best-effort and capability-aware; OSCAR must never pretend an irreversible operation can be reversed.
 
 ## Executive Planner
 
-Workers remain below OSCAR. The Executive Planner coordinates the total objective set.
+Workers remain below OSCAR. The Executive Planner coordinates the total objective set using priority, deadline, dependencies, resource/device availability, user interruptibility, risk, cost, Worker/Protocol state and Personal Policy.
 
-Inputs include priority, deadline, dependencies, resource/device availability, user interruptibility, risk, cost, Worker/Protocol state and Personal Policy.
-
-It can schedule/parallelize work, pause/pre-empt lower-priority work, resolve resource conflicts, reroute, defer until prerequisites exist and decide when the user actually needs to be interrupted.
-
-This is the distinction between “many agents” and one JARVIS-like executive system.
+It can schedule/parallelize, pause/pre-empt, resolve resource conflicts, reroute, defer and decide when the user actually needs interruption.
 
 ## Predictive intelligence
 
-Sentry and the World Model should eventually support forecast-driven assistance such as calendar-collision risk, build/device anomaly trends, deadline risk and prefetching relevant context.
+Sentry and World Model should eventually support forecast-driven assistance such as calendar-collision risk, build/device anomaly trends, deadline risk and prefetching relevant context.
 
-Predictions do not become authority. Personal Policy and permission rules still govern actions.
+Predictions do not become authority. Personal Policy and permissions still govern actions.
 
 ## Teach by demonstration
-
-OSCAR should support a deliberate teaching flow:
 
 ```text
 "OSCAR, watch how I do this."
@@ -208,7 +219,7 @@ OSCAR should support a deliberate teaching flow:
 
 ## Self-maintenance
 
-OSCAR should treat its own operation as a monitored system and detect/repair, where safe, expired auth, broken connectors, stale capabilities, disconnected Edge nodes, degraded latency, state/storage health, update failures and repeated Worker failures.
+OSCAR should monitor its own operation and detect/repair, where safe, expired auth, broken adapters, stale capabilities, disconnected Edge nodes, degraded model/speech latency, state/storage health, update failures and repeated Worker failures.
 
 ## Final benchmark extension
 
@@ -221,12 +232,14 @@ The later comparison against ChatGPT/Claude, Gemini, Grok Bot, OpenClaw, Hermes 
 5. **Artifact / Result Model** — typed durable outputs with provenance, ownership/version/location and verification state.
 6. **Epistemic Integrity** — never collapse intention, execution, reported success, observation and verified completion; never claim more than evidence supports.
 
-These are fully integrated into the canonical architecture/roadmap rather than living only in this review document.
+A later architecture correction also made the Latch/SwitchRoute-derived layers native to OSCAR and completed the voice model around Voice Identity, Voice Match, Voice Map and local acoustic Sentry.
 
 See:
 
 - [COMPETITIVE-BENCHMARK.md](COMPETITIVE-BENCHMARK.md)
 - [RUNTIME-FOUNDATIONS.md](RUNTIME-FOUNDATIONS.md)
+- [NATIVE-INFRASTRUCTURE.md](NATIVE-INFRASTRUCTURE.md)
+- [VOICE-SENTRY.md](VOICE-SENTRY.md)
 - [EPISTEMIC-INTEGRITY.md](EPISTEMIC-INTEGRITY.md)
 - [ARCHITECTURE.md](ARCHITECTURE.md)
 - [ROADMAP.md](ROADMAP.md)
@@ -242,9 +255,7 @@ Two major domains remain later-stage rather than destabilizing the first unified
 
 Do not respond to competitor releases by continuously adding isolated features.
 
-The pre-implementation architecture is now intentionally frozen around explicit primitives:
-
-> **Perception/World Model → Jev/Epistemic Integrity → Executive Planner → Durable Execution Runtime → Capability Search → Workers/Skills/Protocols → Channels/Devices/Specialists → Action Ledger + Artifact Model → Verification**
+The architecture is intentionally centered on explicit primitives and a coherent loop rather than a collection of branded dependencies.
 
 The immediate implementation priority remains proving the fundamental loop.
 

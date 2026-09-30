@@ -1,24 +1,16 @@
 # Runtime Foundations
 
-This document defines five cross-cutting primitives identified during the final competitive review of VoiceOS, ChatGPT/Claude, Gemini, Grok Bot, OpenClaw, Hermes and Pi.
+This document defines five cross-cutting primitives identified during the competitive review of VoiceOS, ChatGPT/Claude, Gemini, Grok Bot, OpenClaw, Hermes and Pi.
 
 These are not separate products or agent silos. They are infrastructure that lets OSCAR scale without turning the core into a giant prompt or a brittle collection of one-off integrations.
+
+Transport and model routing are also OSCAR-owned native infrastructure; see [NATIVE-INFRASTRUCTURE.md](NATIVE-INFRASTRUCTURE.md).
 
 ## 1. Universal Channel Gateway
 
 OSCAR should not hard-code every communication surface independently forever.
 
-The Channel Gateway provides one normalized inbound/outbound abstraction for channels such as:
-
-- phone/SMS where platform support exists;
-- WhatsApp;
-- Telegram;
-- Signal;
-- Discord;
-- Slack/Teams-style work channels;
-- email;
-- social DMs/replies;
-- future communication plugins/connectors.
+The Channel Gateway provides one normalized inbound/outbound abstraction for channels such as phone/SMS where supported, WhatsApp, Telegram, Signal, Discord, work channels, email, social DMs/replies and future adapters.
 
 Each adapter maps native platform capabilities into a common envelope:
 
@@ -28,8 +20,7 @@ ChannelEvent
 - account_id
 - conversation/thread ID
 - canonical participant/entity IDs
-- sender
-- recipients
+- sender / recipients
 - direction
 - message/call/event type
 - text/transcript/media references
@@ -41,16 +32,7 @@ ChannelEvent
 
 The gateway is not allowed to pretend all channels support the same operations. Capability discovery remains explicit.
 
-Example:
-
-```text
-telegram.message.send        available
-whatsapp.call.answer         unsupported on this surface
-email.thread.reply           available
-signal.message.read          unavailable
-```
-
-The integration order remains:
+Integration order:
 
 ```text
 native OS / official API
@@ -68,23 +50,7 @@ Workers, Protocols and long-running objectives need a runtime that survives proc
 
 The Durable Execution Runtime owns execution mechanics, not high-level intelligence.
 
-A durable task should carry:
-
-- task/objective ID;
-- owner (user / Protocol / Worker / Executive Planner);
-- lifecycle state;
-- current step/checkpoint;
-- dependencies;
-- leases/ownership where multiple executors can compete;
-- heartbeat/last progress;
-- retry budget;
-- cancellation state;
-- deadline/expiry;
-- required capabilities;
-- current execution surface;
-- artifact/result references;
-- verification state;
-- blocker/escalation state.
+A durable task can carry task/objective ID, owner, lifecycle state, checkpoint, dependencies, lease/ownership, heartbeat, retry budget, cancellation, deadline, required capabilities, current surface, artifact/result refs, verification state and blocker/escalation state.
 
 Core lifecycle states can include:
 
@@ -102,17 +68,7 @@ abandoned/reclaimable
 
 ### Recovery
 
-The runtime should support:
-
-- persisted checkpoints for long-running work;
-- bounded retries/backoff;
-- heartbeats for active Workers;
-- lease expiry and reclaim of abandoned jobs;
-- zombie/stuck-work detection;
-- restart/resume after process or device loss;
-- explicit compensation/rollback hooks where applicable;
-- deduplication/idempotency for repeated delivery;
-- durable queues/event delivery where the task warrants it.
+The runtime should support persisted checkpoints, bounded retries/backoff, heartbeats, lease expiry/reclaim, zombie detection, restart/resume, compensation hooks when real, idempotency/deduplication and durable queues/event delivery where warranted.
 
 A task must never remain forever in `working` because its executor disappeared.
 
@@ -120,8 +76,8 @@ A task must never remain forever in `working` because its executor disappeared.
 
 ```text
 Executive Planner → decides what should run and priority
-Durable Runtime   → makes the work survive and progress safely
-Worker            → owns/delegates objective-specific reasoning/execution
+Durable Runtime   → makes work survive and progress safely
+Worker            → owns/delegates objective-specific work
 Capability        → performs concrete operation
 Action Ledger     → records consequential changes + verification
 ```
@@ -146,11 +102,11 @@ reliability/history hints
 availability
 project/workspace affinity
 reversible/undo metadata
-provider/plugin owner
+adapter/provider owner
 version
 ```
 
-Jev/Workers should search the catalog first and load the detailed contract only for a small relevant candidate set.
+Jev/Workers search the catalog first and load the detailed contract only for a small relevant candidate set.
 
 Conceptual flow:
 
@@ -167,7 +123,7 @@ This is **progressive capability loading**, not a mega-prompt.
 
 The catalog includes:
 
-- Latch tools;
+- native OSCAR transport/node capabilities;
 - Sunday/device capabilities;
 - desktop machine capabilities;
 - Edge hardware actions;
@@ -175,41 +131,30 @@ The catalog includes:
 - `SKILL.md` Skills;
 - external specialist agents/apps;
 - Channel Gateway adapters;
-- Kinetable/engineering tools.
+- Kinetable/engineering tools;
+- model-provider capabilities exposed through the native OSCAR Model Router where appropriate.
 
 ## 4. Learned Automation Evaluation Pipeline
 
 OSCAR can create or improve Skills, routines and Protocols, but generated automation should not be promoted merely because one exploratory run succeeded.
 
-Use a promotion pipeline:
-
 ```text
 successful execution
 → candidate extraction
 → normalize/parameterize
-→ replay or evaluate on representative cases
+→ replay/evaluate representative cases
 → verify expected output + safety properties
 → compare against current version
 → permission/policy review
 → promote / reject / keep experimental
 ```
 
-A candidate should record:
-
-- source executions/provenance;
-- assumptions/preconditions;
-- required capabilities;
-- test/evaluation cases;
-- success/failure metrics;
-- latency/cost metrics where meaningful;
-- permissions required;
-- known limitations;
-- rollback target/version.
+A candidate should record source provenance, assumptions/preconditions, required capabilities, evaluation cases, success/failure metrics, latency/cost where meaningful, permissions, known limitations and rollback target/version.
 
 ### Promotion rules
 
-- One successful run can create a candidate, not automatically a trusted default.
-- New versions should not silently replace a more reliable existing Skill.
+- One success can create a candidate, not automatically a trusted default.
+- New versions should not silently replace a more reliable Skill.
 - Safety/permission requirements are never weakened by learning.
 - If evaluation is impossible, label the Skill experimental/partially verified.
 - Learned automation can be rolled back when reliability regresses.
@@ -218,19 +163,7 @@ A candidate should record:
 
 OSCAR should treat finished outputs as first-class objects rather than burying them in chat history.
 
-Examples:
-
-- document;
-- spreadsheet;
-- slide deck;
-- image/video/audio;
-- code patch/commit/PR;
-- research report;
-- meeting notes/transcript;
-- design asset;
-- deployment;
-- hardware/firmware build;
-- dataset/model/evaluation output.
+Examples include documents, spreadsheets, slides, media, code changes, research, meeting notes, design assets, deployments, firmware builds and datasets/models/evaluations.
 
 A standard artifact record should include:
 
@@ -252,25 +185,6 @@ supersedes / derived-from links
 ```
 
 Workers should pass artifact references rather than repeatedly copying opaque blobs through prompts.
-
-Example:
-
-```text
-Research Worker → verified research artifact
-        ↓
-Launch Worker → uses artifact as source
-        ↓
-Social Worker → derives post drafts
-```
-
-The Artifact Model also helps OSCAR answer:
-
-```text
-"Where is the final deck?"
-"Which version did you send?"
-"What changed from the previous report?"
-"Is this output verified?"
-```
 
 ## Relationship to the rest of OSCAR
 
@@ -294,6 +208,8 @@ Capabilities / Channels / Devices / Specialists
 Action Ledger + Artifact/Result Model
         ↓
 verify → memory/world model → report
+        ↓
+OSCAR Transport + Capability Fabric when cross-node work is needed
 ```
 
 Running through all of it:
@@ -303,14 +219,17 @@ Running through all of it:
 - permissions;
 - entity graph;
 - audit/provenance;
-- learning/evaluation.
+- learning/evaluation;
+- voice/privacy rules where acoustic data is involved.
 
 ## Invariants
 
-1. Channels are normalized without erasing platform-specific capability limits.
+1. Channels are normalized without erasing platform-specific limits.
 2. Long-running work has durable state, bounded retries and reclaim/recovery semantics.
-3. Capability definitions are discovered progressively rather than loaded globally into every model prompt.
+3. Capability definitions are discovered progressively rather than globally loaded.
 4. Learned automation is evaluated before trusted promotion.
-5. Artifacts/results are first-class typed objects with provenance and verification state.
+5. Artifacts/results are typed objects with provenance/verification state.
 6. None of these primitives can self-grant permissions.
-7. The core remains small: these layers provide explicit contracts rather than one giant orchestration framework.
+7. The core remains small: explicit contracts rather than one giant orchestration framework.
+8. Native OSCAR transport/capability contracts replace any requirement for a separately deployed Latch runtime.
+9. Native OSCAR Model Router replaces any requirement for a separately deployed SwitchRoute runtime.

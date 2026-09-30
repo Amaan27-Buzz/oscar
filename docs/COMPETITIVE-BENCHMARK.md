@@ -1,6 +1,6 @@
 # Competitive Benchmark — 2026-09-29
 
-This document records the final architecture comparison used to freeze OSCAR's pre-implementation design. It compares OSCAR against current public capability patterns in VoiceOS, MCU JARVIS, ChatGPT, Claude, Gemini, Grok Bot, OpenClaw, Hermes Agent and Pi.
+This document records the final architecture comparison used to shape OSCAR's pre-implementation design. It compares OSCAR against public capability patterns in VoiceOS, MCU JARVIS, ChatGPT, Claude, Gemini, Grok Bot, OpenClaw, Hermes Agent and Pi.
 
 This is a benchmark, not a claim that OSCAR currently implements these capabilities. OSCAR is still at Slice 00.
 
@@ -56,7 +56,7 @@ Strengths to learn from:
 
 Primary lesson: objectives should end in verified outcomes/artifacts, and background work should survive beyond a single foreground turn.
 
-Reference note: current OpenAI product/help documentation was reviewed on 2026-09-29; direct OpenAI URLs are omitted here because the repository's automated link checker receives HTTP 403 from those documentation hosts.
+Reference note: current OpenAI product/help documentation was reviewed on 2026-09-29; direct OpenAI URLs are omitted because repository link checking receives HTTP 403 from those documentation hosts.
 
 ### Claude
 
@@ -69,7 +69,7 @@ Strengths to learn from:
 - scheduled tasks;
 - increasingly deep Google Workspace operations.
 
-Primary lesson: users should state the objective; OSCAR/Jev should choose the execution depth and best available capability rather than forcing mode selection.
+Primary lesson: users should state the objective; OSCAR/Jev should choose execution depth and the best capability rather than forcing mode selection.
 
 References:
 
@@ -185,8 +185,6 @@ See [RUNTIME-FOUNDATIONS.md](RUNTIME-FOUNDATIONS.md).
 
 The benchmark also exposed a behavioral requirement more fundamental than feature breadth: OSCAR must never claim that work is complete merely because it intended to do it, delegated it, or received a success response.
 
-OSCAR must distinguish:
-
 ```text
 planned
 executing
@@ -197,19 +195,54 @@ partially verified
 failed / blocked / unknown
 ```
 
-A Worker/tool result is evidence, not automatically truth. User-facing claims cannot exceed available evidence.
+A Worker/tool/model result is evidence, not automatically truth. User-facing claims cannot exceed available evidence.
 
 See [EPISTEMIC-INTEGRITY.md](EPISTEMIC-INTEGRITY.md).
 
+## Subsequent architecture corrections
+
+Two important corrections were made after this comparison without changing the benchmark lessons.
+
+### Native transport and model routing
+
+OSCAR does not require Amaan's separate Latch or SwitchRoute projects to be independently complete/deployed.
+
+Their useful architecture/logic is folded into OSCAR:
+
+```text
+Latch-derived ideas       → OSCAR Transport + Capability Fabric
+SwitchRoute-derived ideas → OSCAR Model Router
+```
+
+This keeps the useful proven design while avoiding artificial service boundaries/dependencies.
+
+See [NATIVE-INFRASTRUCTURE.md](NATIVE-INFRASTRUCTURE.md).
+
+### Voice as identity + perception
+
+Voice is not just STT/TTS. The canonical model is:
+
+```text
+Voice Input          wake / VAD / STT / barge-in
+OSCAR Voice Identity stable synthesized voice / prosody / fallback
+Voice Match          authorization-oriented speaker verification
+Voice Map            perception-oriented speaker recognition/context
+Acoustic Sentry      local always-on wake/speech/speaker/sound events
+```
+
+Recognition does not imply authorization, and always-on acoustic awareness does not imply continuous cloud transcription or raw-audio retention.
+
+See [VOICE-SENTRY.md](VOICE-SENTRY.md).
+
 ## Final architecture position
 
-OSCAR's frozen pre-implementation architecture should therefore include:
+OSCAR's pre-implementation architecture therefore includes:
 
 ```text
 Perception Fabric
 → World Model
 → Jev + Epistemic Integrity
-→ Memory / Live Context / Intelligence
+→ Memory / Live Context / native Model Router
 → Executive Planner
 → Durable Execution Runtime
 → Workers / Protocols / Skills
@@ -218,7 +251,8 @@ Perception Fabric
 → Action Ledger + Artifact/Result Model
 → Verify
 → update World Model / Memory
-→ report only what evidence supports
+→ evidence-backed report
+→ native OSCAR Transport + Capability Fabric where cross-node execution is required
 ```
 
 Cross-cutting layers:
@@ -226,9 +260,10 @@ Cross-cutting layers:
 - Personal Policy;
 - permissions;
 - canonical entity graph;
+- OSCAR Voice Identity / Voice Match / Voice Map;
 - audit/provenance;
 - learning/evaluation;
-- safety.
+- safety/privacy.
 
 ## What OSCAR deliberately does differently
 
@@ -245,11 +280,11 @@ OSCAR
 
 If a device is offline, its capabilities disappear; OSCAR remains alive and reroutes only through equivalent authorized capabilities.
 
-An optional cloud Worker can be added later as another capability, not as the foundation of the product.
+A future cloud Worker may be another advertised capability, not the foundation.
 
 ## Architecture freeze rule
 
-After these additions, stop expanding the architecture because another assistant product ships a feature.
+Do not expand architecture merely because another assistant product ships a feature. Revisit it only when a concrete requirement exposes a missing primitive or invalid assumption.
 
 The next objective is implementation quality:
 

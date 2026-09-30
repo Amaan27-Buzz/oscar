@@ -2,48 +2,74 @@
 
 Canonical repository instructions for Codex and other coding agents working on OSCAR.
 
-Keep this file short enough to be useful in every task. Detailed product/design/domain truth lives in the linked docs and should be loaded only when relevant.
+Keep this file short enough to be useful in every task. Detailed product/design/domain truth lives in linked docs and should be loaded only when relevant.
 
 ## Read first
 
 For any implementation task, read:
 
 - `README.md`
-- `ENGINEERING.md` — canonical engineering quality/system-design standard
+- `ENGINEERING.md`
 - `docs/PRODUCT.md`
 - `docs/ARCHITECTURE.md`
 - `docs/ROADMAP.md`
 - `docs/DECISIONS.md`
 - `docs/EPISTEMIC-INTEGRITY.md`
-- the relevant domain document(s)
+- relevant domain documents.
 
-For any orchestration/Worker/Protocol/runtime task, additionally read:
+For transport/model-routing/capability work additionally read:
+
+- `docs/NATIVE-INFRASTRUCTURE.md`
+- `docs/RUNTIME-FOUNDATIONS.md`
+
+For voice/audio/Sentry work additionally read:
+
+- `docs/VOICE-SENTRY.md`
+- `docs/ONBOARDING.md` where commissioning/privacy matters.
+
+For orchestration/Worker/Protocol work additionally read:
 
 - `docs/RUNTIME-FOUNDATIONS.md`
 - `docs/ORCHESTRATION.md`
-- `docs/WORKERS.md` where relevant
+- `docs/WORKERS.md` where relevant.
 
-For any UI, UX, motion, frontend, mobile or desktop-surface task, additionally read:
+For UI/UX/motion/mobile/desktop work additionally read:
 
-- `DESIGN.md` — normative visual system and tokens
-- `TASTE.md` — qualitative quality bar and anti-slop rules
-- `docs/UI-AVATAR.md` — OSCAR avatar/state language
-- `docs/SURFACES.md` — embodiment/surface responsibilities
+- `DESIGN.md`
+- `TASTE.md`
+- `docs/UI-AVATAR.md`
+- `docs/SURFACES.md`.
 
 Treat these files as the current product contract. If implementation and docs disagree, investigate the mismatch rather than silently choosing one.
 
 ## Working style
 
 - Work on one product slice or narrowly scoped sub-slice at a time.
-- Do not brute-force around an architectural problem. Inspect current best practices, libraries/frameworks and existing OSCAR infrastructure first.
+- Do not brute-force around an architectural problem. Inspect existing OSCAR infrastructure and appropriate libraries/frameworks first.
 - Prefer the smallest coherent design that solves the current requirement.
-- Prefer modular components with high cohesion and low coupling over monolithic files, god objects or fragmented wrapper layers.
-- Do not add abstractions, services, extension points or dependencies for hypothetical future needs.
-- Do not create fake/demo states that make an unfinished capability appear functional.
+- Prefer modular components with high cohesion/low coupling over god objects or wrapper forests.
+- Do not add abstractions/services/dependencies for hypothetical future needs.
+- Do not create fake/demo states that make unfinished capability appear functional.
 - Preserve explicit failure states and report blockers instead of fabricating success.
-- Reuse existing projects and specialist tools when they are the right execution environment.
+- Reuse specialist tools when they are the right execution environment.
 - Before adding a dependency, explain why the existing stack is insufficient.
-- Preserve native platform conventions unless the OSCAR design system intentionally overrides them.
+
+## Native infrastructure rule
+
+Do **not** treat Amaan's separate `Latch` or `SwitchRoute` repositories as required runtime dependencies.
+
+Canonical OSCAR architecture is:
+
+```text
+Latch ideas/logic       → native OSCAR Transport + Capability Fabric
+SwitchRoute ideas/logic → native OSCAR Model Router
+```
+
+The separate repositories may be inspected for proven patterns/code/tests, but reuse must be folded into OSCAR behind OSCAR-owned contracts.
+
+Do not preserve an external service boundary solely because a prototype had one.
+
+See `docs/NATIVE-INFRASTRUCTURE.md` and ADR-006/008/048.
 
 ## Evidence and completion claims
 
@@ -51,118 +77,130 @@ A tool call, commit, Worker response or model message is **not automatically pro
 
 For every meaningful task:
 
-1. define the observable completion condition;
+1. define observable completion condition;
 2. execute;
-3. inspect the resulting authoritative state;
+3. inspect authoritative resulting state;
 4. run tests/visual/device verification where relevant;
-5. report the strongest claim the evidence supports.
+5. report the strongest claim evidence supports.
 
-Use explicit distinctions such as:
+Use explicit distinctions such as `reported success`, `verified`, `partially verified`, `failed`, `blocked`, `unknown`.
 
-```text
-reported success
-verified
-partially verified
-failed
-blocked
-unknown
-```
+Do not say `done`, `fixed`, `all set`, `works` or equivalent when only reported/partial.
 
-Do not say `done`, `fixed`, `all set`, `works` or equivalent when the result is only reported or partially verified.
+If a sub-agent says it completed work, verify resulting files/tests/runtime state rather than trusting the report blindly.
 
-If a sub-agent says it completed work, verify the resulting files/tests/runtime state rather than trusting the report blindly.
+If verification is impossible, state the limitation.
 
-If verification is impossible, state that limitation explicitly.
-
-Do not agree with the user merely because they assert something is complete/correct. Check the repository/runtime evidence first.
-
-See `docs/EPISTEMIC-INTEGRITY.md`.
+Do not agree with the user merely because they assert something is complete/correct. Check evidence first.
 
 ## Engineering quality
 
-`ENGINEERING.md` is normative for implementation quality. In particular:
+`ENGINEERING.md` is normative. In particular:
 
-- keep critical paths lean and understandable;
+- keep critical paths lean/understandable;
 - make subsystem boundaries typed, explicit and evolvable;
 - centralize real shared invariants without premature abstraction;
-- keep provider/platform specifics behind narrow adapters when OSCAR needs a stable internal contract;
-- make mutable state ownership and authoritative sources obvious;
-- design timeout/retry/reconnect/cancellation/failure behavior intentionally;
-- validate at trust boundaries and fail safely;
+- isolate provider/platform specifics behind narrow adapters when OSCAR needs stable contracts;
+- make state ownership/authoritative sources obvious;
+- design timeout/retry/reconnect/cancellation/failure intentionally;
+- validate trust boundaries and fail safely;
 - measure critical-path performance before optimizing;
-- write tests around contracts and meaningful failure modes, not private implementation trivia;
-- prefer small reviewable changes and separate broad refactors from feature work when practical.
-
-Do not “future-proof” the code by making it harder to understand today.
+- test contracts and meaningful failure modes;
+- prefer small reviewable changes.
 
 ## Core invariants
 
 Do not violate these without an explicit architecture decision update:
 
 1. Laptop/desktop workers are optional.
-2. Hardware safety is local and deterministic.
+2. Hardware safety is local/deterministic.
 3. Reflex actions do not wait for a frontier model.
-4. Voice and text share the same OSCAR task/context state.
+4. Voice and text share OSCAR task/context state.
 5. Sunday is OSCAR's mobile embodiment, not a separate assistant.
 6. LRA + Supermemory provide continuous memory/history.
-7. Jev decides whether OSCAR knows enough, should retrieve/verify, delegate, reason or ask.
-8. Latch is the bridge for ChatGPT/device/tool interaction.
-9. SwitchRoute supplies general model routing.
+7. Jev decides whether OSCAR should execute/retrieve/verify/reason/delegate/ask.
+8. OSCAR Transport + Capability Fabric is native infrastructure; Latch is reference/prototype material.
+9. OSCAR Model Router is native infrastructure; SwitchRoute is reference/prototype material.
 10. Nodes advertise capabilities dynamically.
 11. OSCAR chooses the best specialist rather than doing everything itself.
 12. Generated Skills/routines/Protocols cannot self-grant permissions.
-13. Consequential actions must be attributable, permission-aware and auditable.
-14. Completion claims cannot exceed available verification evidence.
-15. Workers/Protocols use the Durable Execution Runtime for long-running work where persistence/recovery is required.
-16. Capability discovery scales through a catalog/search path rather than a mega-prompt containing every tool.
+13. Consequential actions are attributable, permission-aware and auditable.
+14. Completion claims cannot exceed verification evidence.
+15. Long-running work uses Durable Execution Runtime where persistence/recovery is required.
+16. Capability discovery scales through catalog/search rather than a mega-prompt.
 17. Learned automation is evaluated before trusted promotion.
-18. Finished outputs use typed artifact/result references where appropriate.
+18. Durable outputs use typed artifact/result references where appropriate.
+19. Voice Match and Voice Map are distinct: recognition is not authorization.
+20. OSCAR owns a stable provider-independent Voice Identity.
+21. Always-on Sentry acoustic awareness is local-first and does not imply continuous cloud transcription/recording.
+22. OSCAR's own TTS is excluded from Voice Map learning/recognition while real barge-in remains functional.
+
+## Voice/audio implementation rules
+
+When working on voice:
+
+- treat `Voice Input`, `OSCAR Voice Identity`, `Voice Match` and `Voice Map` as separate contracts;
+- keep Voice Match authorization-oriented and Voice Map perception-oriented;
+- unknown speakers remain unknown instead of guessed;
+- voice embeddings/profiles are sensitive data;
+- do not equate speech presence with permission to transcribe or retain;
+- preserve self-voice suppression via playback reference/echo cancellation/TTS tagging where possible;
+- do not hard-code OSCAR's character to one provider's default TTS voice;
+- fallback voices/providers must expose degradation rather than silently changing identity;
+- test barge-in while OSCAR is speaking.
 
 ## Specialist delegation
 
 Do not use OSCAR's generic path when a better specialist is available.
 
 - Repository implementation/debugging → Codex or another coding agent.
-- UI/UX work → Impeccable/design tooling + coding agent; verify visually.
+- UI/UX → Impeccable/design tooling + coding agent; verify visually.
 - GUI-only operation → computer-use worker.
-- Notes/knowledge workflows → connected Notion/Obsidian-style capability when available.
+- Knowledge workflows → connected native tool/plugin when available.
 - Hardware design/provisioning → Kinetable.
-- General autonomous model work → SwitchRoute.
-- Personal/complex ChatGPT-context work → ChatGPT through Latch.
-
-A representative rule: if the user asks for a SceneLab landing page and Codex has the SceneLab project plus an appropriate design skill/plugin, delegate there rather than reproducing a weaker implementation through OSCAR itself.
+- General model work → Jev selects reasoning class → native OSCAR Model Router selects provider.
+- Personal/complex ChatGPT-context work → ChatGPT provider adapter where appropriate.
 
 ## UI and design quality
 
-- The durable direction is **Quietly Alive**: minimal, technical, tactile and expressive.
-- Personality comes from OSCAR's avatar, state, motion, timing and physicality — not generic AI decoration.
-- Avoid dashboard gravity: no default wall of cards, permanent chat sidebar, glassmorphism, neon HUD, purple AI gradients or fake telemetry.
-- Use one dominant focal idea per surface and progressive disclosure for secondary detail.
-- UI state must reflect real runtime state. Never animate `thinking`, `working` or `done` when the system is actually blocked, failed or still verifying.
-- Desktop and mobile are different compositions sharing one identity; do not merely stretch one into the other.
-- For substantial UI work, use the Impeccable workflow when available and perform bounded visual verification before declaring completion.
+- Durable direction is **Quietly Alive**: minimal, technical, tactile and expressive.
+- Personality comes from OSCAR's avatar, voice, state, motion, timing and physicality — not generic AI decoration.
+- Avoid dashboard gravity: no card walls, permanent chat sidebar, glassmorphism, neon HUD, purple gradients or fake telemetry.
+- One dominant focal idea per surface; progressive disclosure for secondary detail.
+- UI state must reflect real runtime state.
+- Desktop/mobile are different compositions sharing one identity.
+- For substantial UI work, use appropriate design workflow and perform bounded visual verification.
 
 ## Tests
 
-Every slice should define an explicit test checklist before being marked complete. Include failure cases, disconnects/timeouts, cancellation/retry/idempotency where relevant, and safety behavior where applicable.
+Every slice defines an explicit test checklist before being marked complete. Include failure cases, disconnects/timeouts, cancellation/retry/idempotency and safety behavior where applicable.
 
-For hardware-facing changes, separate host/simulator tests from real-device verification and state clearly which has been run.
+For hardware-facing changes, separate simulator tests from real-device verification.
 
-For UI work, include target viewport/device verification, reduced-motion behavior, keyboard/touch access where relevant, and screenshots/visual inspection when tooling allows.
+For voice/audio changes include, as relevant:
 
-For learned Skills/routines/Protocols, include candidate evaluation/replay where practical before promoting a new version to trusted/default use.
+- wake/VAD latency;
+- STT/TTS latency;
+- barge-in;
+- echo/self-voice suppression;
+- Voice Match false accept/reject behavior;
+- Voice Map unknown/known/multiple-speaker behavior;
+- no-continuous-cloud-audio default;
+- fallback Voice Identity behavior.
+
+For UI work include target viewport/device verification, reduced motion and visual inspection when tooling allows.
+
+For learned automation include evaluation/replay where practical before trusted promotion.
 
 ## Documentation is part of the change
 
-Every completed slice or architectural change must update:
+Every completed slice or architectural change updates:
 
-- `README.md` status/current-position section;
+- `README.md` status/current position;
 - `docs/ROADMAP.md`;
 - relevant feature/architecture/domain docs;
 - `docs/DECISIONS.md` when an invariant changes;
-- `CHANGELOG.md` for user/developer-visible milestones.
-
-A system-wide engineering-rule change updates `ENGINEERING.md`. A system-wide visual change updates `DESIGN.md` and, when it changes qualitative direction, `TASTE.md`.
+- `CHANGELOG.md` for visible milestones.
 
 Do not leave documentation updates for a later cleanup pass.
 
@@ -175,7 +213,7 @@ Never commit:
 - device credentials;
 - private memory exports;
 - raw personal conversation archives;
-- voice biometric embeddings;
+- voice biometric embeddings/Voice Map profiles;
 - private camera/microphone recordings;
 - `.env` files containing secrets.
 

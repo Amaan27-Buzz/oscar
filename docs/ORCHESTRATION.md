@@ -1,10 +1,10 @@
 # Orchestration, Learning, Skills, Workers and Protocols
 
-OSCAR should not attempt to become a mediocre implementation of every specialist tool. Its job is to understand the objective, choose the best available capability, coordinate it, verify the result and learn from successful execution.
+OSCAR should not become a mediocre implementation of every specialist tool. Its job is to understand the objective, choose the best available capability, coordinate it, verify the result and learn from successful execution.
 
 ## Capability Catalog + Dynamic Tool Search
 
-Every connected Worker, app, plugin, device, channel or service advertises capabilities dynamically through lightweight manifests.
+Every connected Worker, app, plugin, device, channel or service advertises capabilities through lightweight manifests.
 
 Examples:
 
@@ -14,7 +14,6 @@ Codex
 - repository editing
 - tests
 - debugging
-- project-specific plugins
 
 Desktop machine node
 - computer-use
@@ -30,8 +29,7 @@ Sunday
 - phone actions
 - calls/messages
 - phone apps
-- camera
-- microphone
+- camera/microphone
 - location/context
 - biometric approval
 
@@ -51,83 +49,78 @@ Kinetable
 - device provisioning
 ```
 
-Capability metadata should include, where useful:
+Capability metadata may include ID/name/summary, class, inputs/outputs, availability, surfaces, latency/cost, permissions/risk, reliability/history, project affinity, undo metadata and adapter/version.
 
-- ID/name/summary;
-- capability class;
-- inputs/outputs;
-- availability;
-- supported execution surfaces;
-- latency/cost hints;
-- permissions/risk;
-- reliability/history hints;
-- project/workspace affinity;
-- reversible/undo metadata;
-- provider/plugin/version.
-
-OSCAR should **search the catalog first** and load detailed contracts only for a small relevant candidate set. It should not dump every tool/plugin/Skill definition into every model context.
-
-Conceptually:
-
-```text
-objective
-→ required capability classes
-→ capability search
-→ rank by suitability + availability + policy + reliability + latency/cost
-→ load detailed contracts for finalists
-→ execute specialist
-```
-
-See [RUNTIME-FOUNDATIONS.md](RUNTIME-FOUNDATIONS.md).
+OSCAR searches the catalog first and loads detailed contracts only for a small relevant candidate set.
 
 ## Routing by suitability
 
-The central rule is:
-
 > Use the best available specialist for the objective, not the most general model.
 
-Example: build a SceneLab landing page.
+Example:
 
 ```text
-objective
+objective: build SceneLab landing page
   ↓
-Jev understands task + context
+Jev classifies objective/context needs
   ↓
-Capability Catalog finds:
+Capability Catalog finds
 - SceneLab project/repository
-- Codex subscription
-- Impeccable plugin
+- Codex
+- Impeccable
 - browser/computer-use verification
   ↓
-OSCAR selects that route
+OSCAR selects route
   ↓
-Codex builds with project + plugin context
+Codex + design specialist execute
   ↓
 OSCAR verifies visually/functionally
   ↓
-Artifact/Result + learned procedure candidate
+Artifact/Result + possible learned Skill candidate
 ```
 
-OSCAR should not generate the page through a generic chat response merely because it technically can.
-
-The same idea applies elsewhere:
+Other examples:
 
 ```text
 coding               → Codex / coding specialist
-notes/knowledge      → connected Notion/Obsidian-like system when appropriate
-email/calendar       → structured service connector
+notes/knowledge      → connected native knowledge tool
+email/calendar       → structured service adapter
 GUI-only workflow    → computer use
-phone/app workflow   → Sunday when it is the best execution surface
-communication        → Universal Channel Gateway + best native adapter
+phone/app workflow   → Sunday
+communication        → Channel Gateway + best native adapter
 hardware design      → Kinetable
 physical action      → OSCAR Edge
-research             → suitable research/model path
-cheap classification → Jev / fast routed model
+research             → research capability + model reasoning when needed
+cheap classification → Jev / fast model only when necessary
 ```
 
-## Execution loop
+## Native model routing
 
-A robust delegated task follows:
+Jev decides whether model reasoning is needed.
+
+Only then does OSCAR's native Model Router choose an allowed provider/model based on suitability, capability, latency, cost, quality, availability and policy.
+
+```text
+Jev: reason
+  ↓
+OSCAR Model Router
+  ↓
+ChatGPT / another configured provider
+```
+
+The separate SwitchRoute project is reference/prototype material, not a required deployed service.
+
+## Native transport
+
+Cross-device/worker execution uses OSCAR's native Transport + Capability Fabric.
+
+It carries typed task/event/action/result/progress messages to Sunday, desktop nodes, Edge, cloud/background executors and adapters.
+
+The separate Latch project is reference/prototype material, not a required deployed service.
+
+See [NATIVE-INFRASTRUCTURE.md](NATIVE-INFRASTRUCTURE.md).
+
+## Execution loop
 
 ```text
 understand objective
@@ -146,46 +139,21 @@ understand objective
 → learn from verified successful execution
 ```
 
-For long work, OSCAR remains the owner of the objective even while specialists perform steps.
+For long work, OSCAR remains owner of the objective even while specialists perform steps.
 
 ## Durable Execution Runtime
 
-Workers/Protocols/tasks that must survive process/device loss use the Durable Execution Runtime.
+Workers/Protocols/tasks that must survive process/device loss use Durable Execution Runtime.
 
-It tracks, where relevant:
+It tracks task/objective ID, owner, lifecycle, checkpoint/current step, dependencies, executor lease/ownership, heartbeat, retry budget, cancellation, deadline, required capabilities, current surface, artifact/result refs, verification state and blocker/escalation state.
 
-- task/objective ID;
-- owner;
-- lifecycle state;
-- checkpoint/current step;
-- dependencies;
-- executor lease/ownership;
-- heartbeat/last progress;
-- retry budget/backoff state;
-- cancellation state;
-- deadline/expiry;
-- required capabilities;
-- current execution surface;
-- artifact/result references;
-- verification state;
-- blocker/escalation state.
+It provides checkpoints, bounded retries, heartbeats, reclaim, zombie detection, restart/resume, idempotency/deduplication and durable queues when justified.
 
-It provides:
-
-- durable checkpoints;
-- bounded retries;
-- heartbeats;
-- reclaim after lease expiry;
-- zombie/stuck-work detection;
-- restart/resume;
-- idempotency/deduplication where needed;
-- durable queues/event delivery when justified.
-
-The Executive Planner decides **what should run and priority**. The Durable Runtime makes the execution survive safely.
+Executive Planner decides **what should run and priority**. Durable Runtime makes execution survive safely.
 
 ## Workers
 
-A **Worker** is a delegated sub-agent OSCAR creates for an objective or responsibility. It is not necessarily another generic model and does not inherently own a cloud computer.
+A Worker is a delegated sub-agent OSCAR creates for an objective or responsibility. It is not necessarily another generic model and does not inherently own a cloud computer.
 
 A Worker may coordinate:
 
@@ -195,26 +163,11 @@ A Worker may coordinate:
 - Sunday/phone capabilities;
 - plugins/connectors/APIs;
 - Universal Channel Gateway;
-- ChatGPT/SwitchRoute;
+- native OSCAR Model Router → ChatGPT/other providers;
 - Kinetable;
 - OSCAR Edge.
 
-Workers can be temporary, task-scoped or persistent.
-
-```text
-"Research these five laptops"
-→ temporary Research Worker
-
-"Watch ClearLane CI tonight"
-→ task Worker
-
-"Manage SceneLab social media"
-→ persistent Worker
-```
-
-Workers operate under OSCAR's Personal Policy and permission system. They can be created/edited through ordinary voice/chat and inspected through a lightweight management UI.
-
-Persistent Workers use the Durable Execution Runtime for recovery/checkpoints rather than relying on one process remaining alive.
+Workers can be temporary, task-scoped or persistent and operate under Personal Policy/permissions.
 
 See [WORKERS.md](WORKERS.md).
 
@@ -230,280 +183,122 @@ Launch Kinetable
 └── Social Worker
 ```
 
-Workers may run in parallel, wait on dependencies, exchange Artifact/Result references and hand work off. OSCAR remains the top-level coordinator and resolves conflicts.
+Workers may run in parallel, wait on dependencies, exchange Artifact/Result references and hand work off. Executive Planner remains the top-level coordinator.
 
 ## Jev and Worker recovery
-
-Workers should not escalate routine recoverable failures unnecessarily.
 
 ```text
 Worker encounters issue
 → Jev evaluates
 → safe/confident self-fix? → repair/retry/verify
-→ better capability exists? → reroute/delegate
-→ otherwise ask OSCAR/user for minimum required intervention
+→ better capability?       → reroute/delegate
+→ otherwise                → ask for minimum intervention
 ```
 
-Retries must be bounded. Workers must never invent success or silently switch to a more privileged capability path.
+Retries are bounded. Workers never invent success or silently escalate privilege.
 
 A Worker saying `done` produces a **reported result**, not automatic verified completion.
 
-See [EPISTEMIC-INTEGRITY.md](EPISTEMIC-INTEGRITY.md).
-
-## Tool vs Skill vs Worker vs routine vs Protocol
+## Tool vs Skill vs Worker vs Routine vs Protocol
 
 ### Tool
-
-Primitive callable capability, e.g. `gmail.send`, `gpio.set`, browser click, terminal command, `codex.run`.
+Primitive callable capability.
 
 ### Skill
-
-Reusable learned procedure for achieving a goal, ideally portable and inspectable using ecosystem `SKILL.md` conventions where suitable.
+Reusable learned procedure, preferably portable/inspectable using `SKILL.md` conventions where suitable.
 
 ### Worker
-
-Delegated sub-agent that owns a scoped objective/job and may combine specialists, tools, devices and Skills.
+Delegated sub-agent owning a scoped objective/job.
 
 ### Routine
-
 Recurring or simple event-driven behavior.
 
-Examples:
-
-- every morning prepare a concise agenda;
-- when the laptop comes online, advertise Codex availability;
-- at bedtime switch Sentry behavior.
-
 ### Protocol
+Persistent stateful responsibility that may wait, observe, branch, delegate, recover and escalate over time.
 
-Persistent, stateful autonomous responsibility that may wait, observe, branch, delegate, recover and escalate over time.
+A Protocol may create Workers; a Worker may use Skills; a Skill may invoke Tools.
 
-Example:
-
-```text
-Protocol: release-watch
-Objective: get the release safely deployed
-
-watch CI
-→ if failed, investigate
-→ create/delegate Worker for recoverable fix
-→ rerun tests
-→ wait for deployment
-→ verify live result
-→ notify user only if blocked or verified complete
-```
-
-This is intentionally more capable than a basic scheduled action.
-
-## Self-created Skills, Workers, routines and Protocols
+## Self-created automation
 
 OSCAR may create/propose reusable automation when:
 
-- the user explicitly asks it to delegate or remember a workflow;
+- user explicitly asks;
 - a verified novel procedure is worth reusing;
 - repeated behavior reveals a stable pattern;
 - an existing Skill can be improved from a better verified path;
-- an objective is large enough to deserve a temporary/persistent Worker.
+- an objective deserves a temporary/persistent Worker.
 
 Creation flow:
 
 ```text
 objective/history
 → identify reusable responsibility/procedure
-→ normalize parameters + preconditions
+→ normalize parameters/preconditions
 → define required capabilities
-→ define Personal Policy + permissions/risk
+→ define policy/permissions/risk
 → define verification
-→ create Worker/Skill/routine/Protocol candidate
+→ create candidate
 → evaluate
 → promote / reject / keep experimental
 → activate within existing authority
 ```
 
-Generated automation **cannot grant itself new permissions**.
+## Teach by demonstration
+
+Where authorized observation is technically available:
+
+```text
+"watch me do this once"
+→ capture actions/context
+→ infer stable intent/steps
+→ ask about ambiguity
+→ create Skill candidate
+→ replay/evaluate
+→ promote only after verification
+```
+
+Observed behavior never creates new authority.
 
 ## Learned Automation Evaluation Pipeline
 
-One successful run can create a candidate. It does not automatically create a trusted/default automation.
-
-Promotion pipeline:
+One successful run creates a candidate, not automatically a trusted default.
 
 ```text
 candidate
-→ normalize / parameterize
-→ replay/evaluate representative cases where possible
-→ verify output + safety properties
-→ compare against current version
-→ permission/policy review
-→ promote / reject / keep experimental
+→ normalize/parameterize
+→ representative replay/evaluation
+→ verify outputs/safety
+→ compare with current trusted version
+→ policy/permission review
+→ promote / reject / experimental
 ```
 
-Candidates should preserve:
+Preserve provenance, assumptions, limitations, metrics and rollback target.
 
-- source execution/provenance;
-- assumptions/preconditions;
-- required capabilities;
-- evaluation cases/results;
-- latency/cost/reliability metrics where meaningful;
-- permissions/risk;
-- limitations;
-- rollback target/version.
+## Artifacts as handoff
 
-Untestable candidates remain experimental/partially verified.
+Workers and Protocols should pass typed Artifact/Result references instead of copying opaque outputs repeatedly through prompts.
 
-## Learning: first time vs next time
+This preserves producer, version/location, provenance, verification and ownership.
 
-The first execution of a novel task may be exploratory and slow.
+## Voice-driven orchestration
 
-```text
-first time
-→ investigate environment
-→ try suitable capability
-→ recover from mistakes
-→ verify success
-→ capture path
-→ candidate
-```
+Voice commands enter the same task/orchestration contracts as text.
 
-Later, after promotion:
+Voice Match may influence authorization; Voice Map may provide environmental/person context; neither changes task truth semantics.
 
-```text
-same/similar task
-→ retrieve known Skill
-→ fill parameters
-→ skip unnecessary discovery
-→ use deterministic steps where possible
-→ invoke AI only for uncertainty
-→ verify
-```
+Always-on Sentry acoustic awareness can trigger Protocol/Worker evaluation from compact local events without continuously uploading room audio.
 
-The goal is repeated tasks becoming measurably faster, cheaper and more reliable.
+## Invariants
 
-## Skill representation
-
-Portable Skills should keep human-readable instructions and machine-readable metadata where practical.
-
-A Skill should declare, where applicable:
-
-- purpose;
-- triggers/applicability;
-- required capabilities;
-- input parameters;
-- preconditions;
-- procedure;
-- verification;
-- permissions/risk class;
-- failure/recovery strategy;
-- provenance;
-- version;
-- evaluation status.
-
-The schema should remain compatible with widely used `SKILL.md` conventions where possible rather than inventing an unnecessary closed format.
-
-## Artifact / Result Model
-
-Durable outputs should be represented as typed Artifacts/Results rather than hidden inside Worker text.
-
-Examples:
-
-- document/report;
-- spreadsheet/slides;
-- image/video/audio;
-- code patch/commit/PR;
-- deployment;
-- meeting notes/transcript;
-- firmware/hardware build;
-- dataset/model/evaluation output.
-
-Artifact records include, where useful:
-
-- artifact ID/type/name;
-- owner task/Worker/Protocol;
-- producer capability;
-- location/reference;
-- version/hash;
-- source/provenance;
-- verification state;
-- access scope;
-- project/entity/task links;
-- derived-from/supersedes links.
-
-Workers hand off artifact references rather than repeatedly copying opaque payloads into prompts.
-
-## Plugin/connector support
-
-OSCAR should discover/use plugins/connectors exposed by host environments.
-
-A plugin is not merely another menu item. It expands the Capability Catalog and may participate in learned Skills/Protocols/Workers.
-
-Examples include mail, calendar, GitHub, cloud storage, knowledge tools, communication services and future third-party systems.
-
-## Projects and specialist context
-
-Workers often have useful context OSCAR should preserve rather than flattening into a prompt.
-
-Examples:
-
-- Codex project/repository context;
-- plugin configuration such as Impeccable;
-- IDE workspace state;
-- Kinetable project/inventory;
-- Notion/Obsidian workspace;
-- GitHub repository/issues;
-- social/account context through approved connectors.
-
-OSCAR should route the objective to the environment that already has the correct context whenever possible.
-
-## Personal Policy
-
-Worker autonomy is constrained by [PERSONAL-POLICY.md](PERSONAL-POLICY.md).
-
-Examples:
-
-```text
-ordinary SceneLab feature post → Worker may publish
-major announcement              → ask
-controversial reply              → never auto-publish
-security/account change          → strong confirmation
-```
-
-Preferences may narrow behavior but cannot create permissions that do not already exist.
-
-## Verification
-
-Delegation is not completion.
-
-OSCAR should verify outcomes using an independent signal when practical:
-
-- tests after code changes;
-- browser/computer-use inspection after UI work;
-- file/state checks after desktop actions;
-- API/result checks after communication/social actions;
-- sensor feedback after physical actions;
-- deployment health checks after release.
-
-If verification fails, OSCAR may retry, reroute or ask depending on policy.
-
-If verification covers only part of the objective, the final state is `partially_verified`, not `verified`.
-
-## Permissions and safety
-
-Learning never overrides authorization.
-
-A learned Skill/Protocol/Worker records required permissions; it does not create them.
-
-Critical/destructive steps still follow OSCAR's policy layer, Voice Match rules and stronger confirmation requirements.
-
-## Design target
-
-OSCAR should gradually evolve from:
-
-```text
-"I can use these tools"
-```
-
-to:
-
-```text
-"I know the best verified way to accomplish this for this user, with these tools, in this environment, and I can delegate the work to the right team without claiming more than the evidence supports."
-```
+1. OSCAR remains the top-level objective owner.
+2. Specialist capability beats generic imitation.
+3. Jev decides whether reasoning/delegation/retrieval/verification is needed.
+4. Native Model Router selects concrete model/provider only after a model path is chosen.
+5. Native Transport + Capability Fabric carries cross-device execution.
+6. Latch/SwitchRoute are reference architectures, not required runtime services.
+7. Persistent work uses Durable Runtime.
+8. Worker/model/tool success remains reported until verified where verification matters.
+9. Capability discovery is progressive.
+10. Generated automation cannot self-grant authority.
+11. Learned automation is evaluated before trusted promotion.

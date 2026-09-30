@@ -37,6 +37,7 @@ jobs:
             docs/COMPETITIVE-BENCHMARK.md
             docs/EPISTEMIC-INTEGRITY.md
             docs/RUNTIME-FOUNDATIONS.md
+            docs/NATIVE-INFRASTRUCTURE.md
             docs/FEATURES.md
             docs/ROADMAP.md
             docs/DECISIONS.md
