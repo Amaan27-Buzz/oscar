@@ -15,6 +15,9 @@ Significant OSCAR milestones are recorded here. Detailed implementation status r
 - `docs/EPISTEMIC-INTEGRITY.md` defining evidence-backed reporting, explicit uncertainty and non-yes-man behavior.
 - `docs/RUNTIME-FOUNDATIONS.md` defining Universal Channel Gateway, Durable Execution Runtime, Capability Catalog, Learned Automation Evaluation and Artifact/Result Model.
 - `docs/NATIVE-INFRASTRUCTURE.md` defining native OSCAR Transport + Capability Fabric and native OSCAR Model Router, with Latch/SwitchRoute retained only as reference/prototype sources.
+- `docs/MODEL-ROUTING.md` defining provider classes, multi-key credential pools, automatic/manual routing modes, task/model affinity, fallback semantics, local runtimes, coding-agent executors and usage/history requirements.
+- `docs/BUILD-GATES.md` grouping the detailed slices into five manual verification milestones for the fast developer-alpha build.
+- `.env.example` with placeholder-only local development slots for GroqCloud, OpenRouter, NVIDIA NIM, Google AI Studio, Z.ai, Ollama Cloud and local Ollama/LM Studio/vLLM endpoints.
 - World Model, Perception Fabric, live-context search, entity graph, Executive Planner, Action Ledger/Undo, VoiceOS-grade `Dictate / Edit / Ask / Act`, teach-by-demonstration, predictive intelligence and self-maintenance added to the architecture.
 - Full voice architecture: Voice Input, stable OSCAR Voice Identity, Voice Match, Voice Map and self-voice suppression.
 - Always-on local acoustic Sentry plane for wake/VAD, speaker presence/classification, configured sound events and barge-in without default continuous cloud transcription.
@@ -27,8 +30,13 @@ Significant OSCAR milestones are recorded here. Detailed implementation status r
 - Roadmap starts software-first with the OSCAR Core Loop rather than ESP32/Pico hardware.
 - **Latch is no longer described as a required bridge/service.** Its useful architecture/logic is folded into native OSCAR Transport + Capability Fabric.
 - **SwitchRoute is no longer described as a required routing service.** Its useful architecture/logic is folded into the native OSCAR Model Router.
-- ChatGPT is now described as a provider/surface reached through OSCAR-owned adapters rather than through a mandatory Latch deployment.
+- Native model routing now explicitly separates Jev decision class, capability/executor selection and provider/model/credential selection.
+- Provider connections may use independent credential pools with per-slot health/quota/rate/usage state while raw secrets remain local and masked.
+- Routing profiles now include Auto, Fast, Balanced, Heavy Duty, Free First, Cheap, Local, Private, Manual and Specialist behavior.
+- Coding agents such as Codex, Claude Code and OpenCode are modeled as executable capabilities rather than flattened into ordinary model-provider keys.
+- ChatGPT is now described as a provider/surface reached through OSCAR-owned adapters rather than through a mandatory Latch deployment; ChatGPT-to-OSCAR uses an OSCAR-owned plugin/connector.
 - ESP32/Pico Edge uses a small native OSCAR transport/client rather than `Latch Edge` as a required external runtime.
+- Detailed slices remain the engineering unit while Gate A–E provide explicit cross-slice manual acceptance points.
 - Slice 03 is now Native OSCAR Transport + Capability Catalog.
 - Slice 04 is now Native OSCAR Model Router + cloud intelligence.
 - Slice 08 now explicitly builds OSCAR Voice Identity, Voice Match, Voice Map, self-voice suppression and multi-device arbitration.
@@ -39,6 +47,7 @@ Significant OSCAR milestones are recorded here. Detailed implementation status r
 ### Planned
 
 - Slice 01 — **OSCAR Core Loop**: typed objective/task/capability/action/result/evidence contracts, minimal durable execution, Action Ledger/Artifact foundations, independent verification and evidence-backed reporting.
+- Gate A manual verification after Slices 01–04, followed by Gate B–E as the larger developer-alpha milestones.
 
 ## 2026-09-29 — Repository foundation
 
