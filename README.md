@@ -380,4 +380,4 @@ A slice is not complete because an agent says it is complete. The exit condition
 
 ---
 
-<p align="center"><sub>OSCAR is an original project inspired by the goal of building a genuinely capable ambient agent. It is not affiliated with Marvel or the JARVIS trademark/character.</sub></p>
+<p align="center"><sub>OSCAR is an original project inspired by the goal of building a genuinely capable ambient agent.</sub></p>
