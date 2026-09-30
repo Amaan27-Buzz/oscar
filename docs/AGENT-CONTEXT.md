@@ -17,6 +17,8 @@ OSCAR keeps one canonical project truth and uses thin agent-specific adapters. T
 | `docs/EPISTEMIC-INTEGRITY.md` | evidence states, verification-before-completion, correction and non-yes-man behavior |
 | `docs/RUNTIME-FOUNDATIONS.md` | Channel Gateway, Durable Runtime, Capability Catalog/Search, automation evaluation and Artifact/Result model |
 | `docs/NATIVE-INFRASTRUCTURE.md` | native OSCAR Transport + Capability Fabric and native Model Router; Latch/SwitchRoute are reference/prototype inputs, not required runtimes |
+| `docs/MODEL-ROUTING.md` | provider classes, credential pools, automatic/manual modes, model/task affinity, fallback, usage/history and local development credential contract |
+| `docs/BUILD-GATES.md` | cross-slice manual verification milestones for the fast developer-alpha build |
 | `docs/VOICE-SENTRY.md` | Voice Input, OSCAR Voice Identity, Voice Match, Voice Map, self-voice suppression and local acoustic Sentry |
 | `docs/ROADMAP.md` | slice order/current implementation state |
 | `docs/DECISIONS.md` | stable architecture decisions |
@@ -79,7 +81,8 @@ Load the least context sufficient for the task:
 - UI task → core docs + `DESIGN.md` + `TASTE.md` + relevant surface docs;
 - edge/hardware task → core docs + `docs/NATIVE-INFRASTRUCTURE.md` + hardware/security docs;
 - transport/capability-node/pairing task → `docs/NATIVE-INFRASTRUCTURE.md` + `docs/RUNTIME-FOUNDATIONS.md` + `docs/SECURITY.md`;
-- model-provider/routing task → `docs/NATIVE-INFRASTRUCTURE.md` + `docs/ARCHITECTURE.md` + relevant provider context;
+- model-provider/routing/credential-pool task → `docs/MODEL-ROUTING.md` + `docs/NATIVE-INFRASTRUCTURE.md` + `docs/EPISTEMIC-INTEGRITY.md`;
+- coding-agent/executor selection task → `docs/MODEL-ROUTING.md` + `docs/ORCHESTRATION.md` + relevant machine-node context;
 - voice/STT/TTS/Voice Match/Voice Map/Sentry task → `docs/VOICE-SENTRY.md` + `docs/SECURITY.md` + relevant surface docs; include `docs/ONBOARDING.md` when enrollment/calibration is involved;
 - memory task → `docs/MEMORY.md`;
 - preference/policy task → `docs/PERSONAL-POLICY.md`;
@@ -87,7 +90,8 @@ Load the least context sufficient for the task:
 - Worker/sub-agent task → `docs/WORKERS.md` + `docs/ORCHESTRATION.md` + `docs/RUNTIME-FOUNDATIONS.md`;
 - orchestration/learning task → `docs/ORCHESTRATION.md` + `docs/RUNTIME-FOUNDATIONS.md`;
 - World Model / Perception / Executive Planner / Action Ledger / Interaction Runtime task → `docs/ARCHITECTURE.md` + `docs/JARVIS-GAP-REVIEW.md` + `docs/EPISTEMIC-INTEGRITY.md`;
-- Durable Runtime / capability search / Channel Gateway / Artifact Model task → `docs/RUNTIME-FOUNDATIONS.md` + `docs/EPISTEMIC-INTEGRITY.md`.
+- Durable Runtime / capability search / Channel Gateway / Artifact Model task → `docs/RUNTIME-FOUNDATIONS.md` + `docs/EPISTEMIC-INTEGRITY.md`;
+- cross-slice manual acceptance work → `docs/BUILD-GATES.md` + the detailed slices in `docs/ROADMAP.md`.
 
 Do not dump the entire documentation tree into every agent turn. More context is not automatically better.
 
@@ -103,6 +107,40 @@ SwitchRoute architecture/logic → OSCAR Model Router
 ```
 
 The earlier repositories may be inspected for useful code, tests or design lessons, but a new OSCAR implementation should adopt those ideas behind OSCAR-owned contracts rather than preserve a legacy service boundary by default.
+
+ChatGPT reaches OSCAR through an OSCAR-owned plugin/connector and transport boundary. The plugin is an interface into OSCAR, not OSCAR's intelligence or host.
+
+## Model-routing rule
+
+Do not collapse these decisions:
+
+```text
+Jev                  → what class of action is needed?
+Capability selection → which executor/tool/device should act?
+Model Router         → which provider/model/credential should reason?
+```
+
+Provider keys, local runtimes and coding agents are different capability classes.
+
+The developer may supply multiple local credential slots in `.env` for real integration testing. Never commit, print, snapshot or expose those values. Use `.env.example` only as the placeholder contract.
+
+Routing must support automatic and manual control, preserve provider/model/credential provenance, keep unknown quota/cost/latency unknown, and never treat a model/provider success response as verified task completion.
+
+See `docs/MODEL-ROUTING.md`.
+
+## Build-gate rule
+
+Detailed slices remain the implementation unit. `docs/BUILD-GATES.md` groups them into manual verification milestones:
+
+```text
+Gate A — Brain          Slices 01–04
+Gate B — Can Do Work    Slices 05–06
+Gate C — Embodied OSCAR Slices 07–10
+Gate D — JARVIS Layer   Slices 11–14
+Gate E — Unified Alpha  Slices 15–17
+```
+
+A fast 2–3 day developer-alpha sprint is a target for vertical proof, not permission to skip manual checks or relabel partial work as complete.
 
 ## Voice model rule
 
@@ -146,7 +184,9 @@ When a durable project rule changes:
 
 Specific propagation rules:
 
-- native transport/model-routing boundary change → reconcile `NATIVE-INFRASTRUCTURE.md`, `ARCHITECTURE.md`, `ROADMAP.md`, `DECISIONS.md`, README and affected runtime/orchestration docs;
+- native transport/model-routing boundary change → reconcile `NATIVE-INFRASTRUCTURE.md`, `MODEL-ROUTING.md`, `ARCHITECTURE.md`, `ROADMAP.md`, `DECISIONS.md`, README and affected runtime/orchestration docs;
+- provider/credential/routing-mode change → update `MODEL-ROUTING.md` first, then reconcile roadmap/features/UI data requirements where affected;
+- build-gate/manual acceptance change → update `BUILD-GATES.md` and affected slice exit conditions where needed;
 - voice/Voice Match/Voice Map/Sentry boundary change → reconcile `VOICE-SENTRY.md`, `ARCHITECTURE.md`, `FEATURES.md`, `ROADMAP.md`, `SECURITY.md`, `ONBOARDING.md`, relevant surface/communication docs and README;
 - system-wide engineering rule → update `ENGINEERING.md`;
 - system-wide visual direction → update `DESIGN.md` and, when qualitative direction changes, `TASTE.md`;

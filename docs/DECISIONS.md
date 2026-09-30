@@ -310,3 +310,52 @@ See `docs/NATIVE-INFRASTRUCTURE.md`.
 **Privacy rule:** always-on acoustic awareness does not imply continuous cloud transcription or raw-audio retention. Speech presence, speaker identity, transcription and retention are separate policy/permission decisions.
 
 **Self-voice rule:** OSCAR's own TTS must be tagged/suppressed so it does not trigger itself or pollute Voice Map. Self-voice suppression must still allow human barge-in.
+
+## ADR-052 — Model routing, capability selection and Jev are separate decisions
+
+**Decision:** OSCAR keeps three boundaries distinct:
+
+```text
+Jev                  → what class of action is needed?
+Capability selection → which executor/tool/device should act?
+Model Router         → which provider/model/credential should reason?
+```
+
+**Reason:** model-provider keys, local runtimes, coding agents, terminal/computer-use and installed applications have different execution semantics and should not be flattened into one generic provider list.
+
+**Implication:** coding agents such as Codex, Claude Code and OpenCode are discovered/selected as capabilities. The native Model Router is used only after a model-reasoning path is selected.
+
+See `docs/MODEL-ROUTING.md`.
+
+## ADR-053 — Providers may use independent credential pools
+
+**Decision:** a single provider may own multiple credential slots, each with independent validity, health, rate/quota/capacity, cooldown, usage and observed latency state where measurable.
+
+**Rules:**
+
+- raw credentials never appear in UI/telemetry/logs;
+- stable masked slot IDs are used for diagnostics;
+- one failing credential does not automatically disable the whole provider;
+- unknown quota is not unlimited;
+- unknown price is not free;
+- automatic routing and explicit manual provider/model selection both remain available.
+
+The initial local development pool is defined by `.env.example`; the real `.env` remains local-only.
+
+## ADR-054 — Build Gates are manual acceptance milestones above slices
+
+**Decision:** detailed roadmap slices remain the unit of implementation, while five Build Gates group them for explicit manual end-to-end verification:
+
+```text
+Gate A — Brain          Slices 01–04
+Gate B — Can Do Work    Slices 05–06
+Gate C — Embodied OSCAR Slices 07–10
+Gate D — JARVIS Layer   Slices 11–14
+Gate E — Unified Alpha  Slices 15–17
+```
+
+**Reason:** OSCAR is being built rapidly, but fast iteration must still stop at meaningful integration points where real combined behavior is tested manually.
+
+**Constraint:** a 2–3 day developer-alpha target does not weaken slice exit conditions, safety boundaries or epistemic-integrity rules. Partial work remains partial.
+
+See `docs/BUILD-GATES.md`.
