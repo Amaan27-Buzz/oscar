@@ -67,7 +67,7 @@ A provider-specific wake/trigger workaround stays behind the native transport/pr
 
 ## ADR-009 — Use specialist software rather than reimplementing it
 
-**Decision:** OSCAR delegates to the best execution environment: Codex for coding, computer use for GUIs/verification, Kinetable for hardware engineering, connected knowledge tools for their native workspaces, and other specialist software when suitable.
+**Decision:** OSCAR delegates to the best execution environment: Codex for coding, computer use for GUIs/verification, installed or connected engineering tools for hardware/design/simulation, connected knowledge tools for their native workspaces, and other specialist software when suitable.
 
 **Reason:** OSCAR should orchestrate expertise rather than become a mediocre clone of every tool.
 
@@ -75,7 +75,7 @@ A provider-specific wake/trigger workaround stays behind the native transport/pr
 
 **Decision:** nodes, apps, plugins and Workers advertise capabilities dynamically.
 
-OSCAR should reason about `codex`, `computer-use`, `camera`, `relay`, `gpu`, `browser`, `kinetable`, plugins, etc. rather than assuming a specific machine or service is always present.
+OSCAR should reason about capabilities such as `codex`, `computer-use`, `camera`, `relay`, `gpu`, `browser`, `cad`, `circuit-sim`, `device-provision`, plugins and other tools rather than assuming a specific machine or service is always present.
 
 ## ADR-011 — Voice and text share state
 
@@ -139,11 +139,13 @@ OSCAR should reason about `codex`, `computer-use`, `camera`, `relay`, `gpu`, `br
 
 **Implication:** desktop UI is an embodiment; the machine Worker is a capability node. Neither is the permanent host.
 
-## ADR-023 — Kinetable is the hardware workshop
+## ADR-023 — Hardware and engineering capabilities are tool-agnostic
 
-**Decision:** OSCAR should route hardware design/simulation/firmware/provisioning work to Kinetable instead of duplicating Kinetable internally.
+**Decision:** OSCAR controls physical systems through native Edge/device capability contracts and delegates hardware design, CAD, circuit work, simulation, firmware, diagnostics and provisioning to whichever installed or connected specialist tools are actually available.
 
-**Long-term implication:** Kinetable-built devices should be provisionable as native OSCAR Edge nodes with advertised capabilities.
+**Reason:** no dedicated hardware-workbench product should become an architectural dependency. Engineering tools are replaceable capabilities discovered through the same catalog as other software and devices.
+
+**Implication:** devices should be provisionable as native OSCAR nodes with advertised capabilities regardless of which engineering tool was used to design or program them.
 
 ## ADR-024 — Avatar is functional UI
 
@@ -187,7 +189,7 @@ A slice is not complete while the repository still describes an older system sta
 
 **Decision:** OSCAR may create temporary or persistent sub-agents called Workers for scoped objectives/responsibilities.
 
-**Execution model:** a Worker may use Sunday, desktop machine nodes, Codex, Computer Use, plugins/APIs, ChatGPT/native Model Router, Kinetable or OSCAR Edge according to capability, policy and availability.
+**Execution model:** a Worker may use Sunday, desktop machine nodes, Codex, Computer Use, plugins/APIs, ChatGPT/native Model Router, installed/connected specialist applications or OSCAR Edge according to capability, policy and availability.
 
 **Recovery:** Jev should allow safe self-repair/rerouting before unnecessary user escalation; retries remain bounded and authority never expands silently.
 
