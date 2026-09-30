@@ -7,691 +7,524 @@ This document is the comprehensive capability backlog for OSCAR. A feature being
 - Natural-language voice and text as equal first-class interfaces.
 - Shared context between voice, text, Sunday, desktop, ChatGPT and physical surfaces.
 - One continuous relationship/history rather than a mandatory chat-sidebar workflow.
-- Short contextual commands: “mute”, “cancel that”, “leave Codex running”, “what did it find?”.
+- Short contextual commands such as `mute`, `cancel that`, `leave Codex running`, `what did it find?`.
 - Barge-in: interrupt speech instantly and resume listening.
 - Streaming recognition, reasoning and speech output where supported.
 - Configurable response style, verbosity and proactivity.
-- Personality and expression without sacrificing clarity or speed.
+- Personality/expression without sacrificing clarity or speed.
 
 ## Interaction Runtime — Dictate / Edit / Ask / Act
 
-- First-class system-wide interaction runtime rather than separate dictation, editing and agent modes.
+- First-class system-wide interaction runtime rather than separate dictation/editing/agent silos.
 - `Dictate`: literal or cleaned speech inserted into the current target.
 - `Edit`: transform selected/recent text naturally.
-- `Ask`: answer about the current screen, selection, cursor target or app context.
-- `Act`: operate the current app/device/task through the best available capability.
-- Focused app/window awareness.
-- Focused control/text-field awareness.
-- Selected-text context.
-- Cursor target context.
-- Accessibility-tree context.
+- `Ask`: answer about current screen/selection/cursor/app context.
+- `Act`: operate current app/device/task through the best available capability.
+- Focused app/window/control/text-field awareness.
+- Selected-text/cursor/accessibility-tree context.
 - Screenshot/visual context when needed.
 - Clipboard/input-method fallback where native insertion is unavailable.
-- Point-and-talk requests such as “what is this?”, “reply to him” and “fix this button”.
-- Undo surface connected to the Action Ledger when a real compensating action exists.
+- Point-and-talk: `what is this?`, `reply to him`, `fix this button`.
+- Undo surface connected to Action Ledger when a real compensation exists.
 
 ## Multi-device voice arbitration
 
 - Sunday, desktop and physical OSCAR can all listen without all responding at once.
 - Exactly one surface normally owns a voice turn.
-- Arbitration inputs can include wake confidence, microphone signal quality, proximity, current active device, room/presence, explicit device priority and available interaction context.
-- Explicit handoff between surfaces.
-- Failover if the selected surface becomes unavailable.
-- Shared turn/task state after arbitration so other surfaces remain synchronized.
+- Arbitration may use wake confidence, microphone quality, proximity, active device, room/presence, explicit priority and available context.
+- Explicit handoff/failover.
+- Shared turn/task state after arbitration.
 
 ## World Model / digital twin
 
 - Live graph of people, places, devices, apps, projects, objects, tasks, Workers and Protocols.
-- Relationships between those entities.
-- Current state distinct from historical memory.
+- Relationships/current state distinct from historical memory.
 - Freshness, confidence and provenance metadata.
-- Stale state becomes `stale/unknown` rather than being presented as current truth.
-- Current observations can be reconciled with structured OSCAR state and live authoritative sources.
-- World Model provides one coherent situation to Jev, Personal Policy and the Executive Planner.
+- Stale state becomes `stale/unknown` rather than current truth.
+- Reconcile current observations with structured state and authoritative sources.
 
 ## Perception Fabric
 
-- Normalize current evidence from screens, accessibility trees, cursor/selection, cameras, microphones/audio events, apps, devices, phone context, location, sensors and Worker/Protocol state.
-- Current evidence is separate from durable memory/retention.
-- Fuse multiple signals where useful.
-- Camera + sensor + screen/device-state correlation for workbench/spatial reasoning.
-- Source/freshness/confidence metadata attached to observations.
+- Normalize current evidence from screens, accessibility trees, cursor/selection, cameras, microphones/audio events, Voice Map events, apps, devices, phone context, location, sensors and Worker/Protocol state.
+- Current evidence separate from durable retention.
+- Multimodal fusion where useful.
+- Source/freshness/confidence metadata.
 
 ## Universal live context/search
 
-- Federated current-source retrieval rather than requiring Jev to know every connector directly.
-- Search connected files/drives, mail, messages, notes/knowledge systems, browser state, GitHub, calendar, social accounts, Sunday, desktop nodes, Edge telemetry and Worker/Protocol state.
-- Preserve source provenance.
-- Prefer authoritative current state over stale recalled memory.
-- Retrieve the smallest useful context rather than dumping all sources into every model call.
+- Federated current-source retrieval rather than hard-coding every connector into Jev.
+- Search files/drives, mail, messages, knowledge systems, browser state, GitHub, calendar, social accounts, Sunday, desktop nodes, Edge telemetry and Worker/Protocol state.
+- Preserve provenance and source authority.
+- Prefer live authoritative state over stale recalled memory.
 
 ## Canonical entity / relationship graph
 
-- Resolve one person across phone contact, email identity, messaging account and remembered relationship.
-- Resolve organizations/companies/projects/accounts consistently.
-- Track device/account ownership and relationship metadata where permitted.
-- Link communication history, calendar context and project context to canonical entities.
-- Avoid duplicate “John”/“same device” identities when evidence can resolve them.
+- Resolve one person across contacts, email, messaging identities, Voice Map identity and remembered relationship.
+- Resolve organizations/projects/accounts/devices consistently.
+- Link communication/calendar/project context to canonical entities.
+- Avoid duplicate identities when evidence can resolve them.
 
 ## Personal Policy and preferences
 
-- Open-ended preferences rather than a fixed list of generic settings.
-- Create/edit/remove preferences through ordinary voice or chat.
-- Seed a small number of useful preferences during first-run setup.
-- Scope policy to people, apps, projects, Workers, devices, calls, meetings, locations, Sentry modes, times or arbitrary user-defined context.
-- Distinguish memory, preference/policy, permission, routine and Protocol.
-- Explicit policy overrides inferred preference suggestions.
-- More-specific applicable policy normally overrides broader policy.
+- Open-ended preferences rather than a fixed settings list.
+- Create/edit/remove through ordinary voice/chat.
+- Scope to people, apps, projects, Workers, devices, calls, meetings, locations, Sentry modes, time windows and arbitrary user-defined context.
+- Distinguish memory, policy, permission, routine and Protocol.
+- Explicit policy overrides inferred suggestions.
 - Safety/legal/platform constraints and permissions remain authoritative.
-- Explain which policy affected a decision and why.
 - Inspectable/versionable durable policy with provenance.
-- Inferred patterns can be proposed as preferences rather than silently gaining authority.
-- Natural-language edits update existing rules instead of accumulating contradictory prompt fragments.
+- Inferred patterns can be proposed rather than silently gaining authority.
 
 See [PERSONAL-POLICY.md](PERSONAL-POLICY.md).
 
 ## Communication
 
-- OSCAR as the unified communication layer rather than separate call/meeting/dictation bots.
-- Ordinary phone calls subject to platform support and permissions.
-- WhatsApp calls/messages where technically available.
-- Telegram calls/messages where technically available.
-- Other phone communication apps through the strongest legitimate integration path.
-- Zoom/Google Meet/Teams/Discord-style meeting participation where supported.
+- OSCAR as unified communication layer rather than separate call/meeting/dictation bots.
+- Phone calls/messages subject to platform support and permissions.
+- WhatsApp/Telegram/other app communication where technically available.
+- Zoom/Meet/Teams/Discord-style meeting participation where supported.
 - In-person meeting capture through authorized microphones/devices.
-- AI call answering on the user's behalf under explicit Personal Policy.
-- Rules such as answer after N rings, exclude specific people, or adapt based on calendar/current context.
-- Context-aware call handling using contacts, schedule, agenda, current task, relationship and user rules.
+- AI call answering under explicit Personal Policy.
+- Rules such as answer after N rings, caller exceptions and context-aware handling.
 - Take messages, determine urgency, schedule callbacks and summarize calls.
-- Meeting transcription, speaker labels where reliable, notes, decisions, action items and follow-ups.
-- Meeting context linked back to people/projects/tasks through LRA.
-- System-wide dictation comparable to dedicated dictation products, not limited to OSCAR's own text box.
-- Literal/cleaned/rewrite/command dictation modes.
-- Voice-note handling.
-- App messaging: read/draft/send/reply subject to permissions.
-- Native OS/official API first, then official connector/plugin, then device automation/computer-use fallback.
-- Explicitly report unsupported capability instead of pretending an app exposes it.
+- Meeting transcription, diarization/speaker labels where reliable, notes, decisions, action items and follow-ups.
+- System-wide dictation, voice notes and app messaging.
+- Native OS/official API first, then connector/plugin, device automation/computer use fallback.
 - Raw audio/transcript retention controls.
-- Permission/policy checks before speaking, publishing, sending or revealing private schedule context.
-- Concrete capability mapping for Android cellular calls, third-party app calls, media/audio capture and VoIP gateway fallbacks instead of assuming uniform call control.
+- Concrete capability mapping per platform/app instead of assumed call control.
 
 See [COMMUNICATION.md](COMMUNICATION.md).
 
 ## Universal Channel Gateway
 
-- Normalize supported inbound/outbound communication across cellular/SMS where possible, WhatsApp, Telegram, Signal, Discord, Slack/Teams-like channels, email, social DMs/replies and future adapters.
-- Common event envelope for channel/account/thread, canonical participant IDs, sender/recipients, direction, type, text/transcript/media refs, timestamps and source IDs.
-- Per-channel capability advertisement rather than assumed feature parity.
-- Native/official API path preferred over device/browser automation.
-- Channel events linked to canonical entities, World Model, LRA and Personal Policy where appropriate.
-- Unsupported actions remain explicitly unsupported rather than silently emulated.
-
-See [RUNTIME-FOUNDATIONS.md](RUNTIME-FOUNDATIONS.md).
+- Normalize supported inbound/outbound communication across cellular/SMS where possible, messaging apps, work channels, email, social DMs/replies and future adapters.
+- Common event envelope for channel/account/thread/participants/direction/type/text/transcript/media/timestamps/source IDs.
+- Per-channel capability advertisement rather than assumed parity.
+- Channel events linked to entities, World Model, LRA and Personal Policy where appropriate.
 
 ## Action Ledger + universal Undo
 
 - Structured record for consequential actions.
-- Initiating user/task/Protocol/Worker.
-- Intent and target/resource.
-- Tool/device/capability used.
-- Permission + Personal Policy decision.
-- Before-state reference where available.
-- Resulting-state reference where available.
-- Execution status.
-- Verification status/method/evidence.
+- Initiator/intent/target/capability/permission-policy decision.
+- Before/result state references when available.
+- Execution and verification state/evidence.
 - Limitations/untested surfaces.
-- Reversible/irreversible flag.
-- Compensating/undo action when the capability supports one.
+- Reversible/irreversible flag and real compensation when supported.
 - Correlation ID + timestamp.
-- Natural queries: “what did you change?”, “why did you do that?”, “did you actually verify it?”, “undo that”.
-- Never claim reversibility for an irreversible action.
+- Natural queries: `what did you change?`, `why?`, `did you verify it?`, `undo that`.
 
 ## Reflexes and local commands
 
 - Local wake-word detection.
 - Voice activity detection.
-- Immediate `mute`, `stop`, `cancel`, `listen`, `sentry`, `stand down`-style commands.
+- Immediate `mute`, `stop`, `cancel`, `listen`, `sentry`, `stand down` commands.
 - Simple local device controls without an LLM.
-- Hardware emergency stop path.
-- Active-task references such as “that”, “it”, and “stop this” resolved locally when unambiguous.
+- Hardware emergency-stop path.
+- Local resolution of active-task references when unambiguous.
+
+# Voice system
+
+## Voice Input
+
+- Local wake word + VAD.
+- Streaming STT abstraction.
+- Low first-token/first-action latency.
+- Barge-in while OSCAR is speaking.
+- Echo cancellation and playback reference.
+- Voice/text shared task state.
+
+## OSCAR Voice Identity
+
+- Natural low-latency TTS.
+- **Stable OSCAR voice identity** across Sunday, desktop and desk surfaces.
+- Provider-independent `VoiceProfile` rather than an arbitrary TTS-provider default.
+- Prosody/modulation/pace/rhythm policy.
+- Pronunciation lexicon/control.
+- Contextual speaking modes: normal, quiet/night, focused/serious, alert and representative/call mode.
+- Streaming/chunked speech.
+- Provider fallback mapping that preserves identity as closely as possible.
+- Report material degradation when a fallback cannot preserve voice quality/identity.
+- Voice identity/version can evolve intentionally rather than changing because a vendor default changed.
+
+## Self-voice suppression
+
+- TTS-origin tagging.
+- Known playback-reference audio.
+- Hardware/software acoustic echo cancellation.
+- Correlation between generated audio and microphone input.
+- Exclude OSCAR's own voice from Voice Map enrollment/identity updates.
+- Preserve real human barge-in while OSCAR speaks.
 
 ## Voice Match
 
-- Speaker-profile enrollment during setup.
-- Multiple enrollment phrases, distances, tones and noise conditions.
+- Owner/authorized-speaker enrollment during setup.
+- Samples across phrases, distances, volumes and noise conditions.
 - Confidence-based speaker verification.
 - Voice Match integrated with authorization policy.
-- Different policies for owner, recognized user, guest and unknown speaker.
-- Voice biometrics never treated as sufficient security for critical actions.
+- Different policy for owner, authorized user, guest and unknown speaker.
+- Voice biometrics never sufficient alone for critical actions.
 
-## Voice output
+## Voice Map
 
-- Natural low-latency TTS.
-- Stable OSCAR voice identity.
-- Chunked/streamed speech.
-- Immediate stop on barge-in.
-- Audio ducking and acknowledgement cues.
-- Phone-native speech path for Sunday where useful.
-- Provider abstraction so TTS/STT engines can be swapped without rewriting OSCAR.
+Voice Map is perception, not authorization.
+
+- Local speaker-profile/embedding abstraction where feasible.
+- States: `owner`, `known_person`, `recognized_but_unverified`, `unknown_speaker`, `multiple_speakers`, `uncertain`.
+- Optional linkage from voice profile to canonical person/entity with provenance and confidence.
+- Unknown voices remain unknown rather than guessed.
+- Do not silently assign a real identity from a weak acoustic match.
+- Speaker-change/presence events can exist without full transcription.
+- Meeting/call diarization may reuse Voice Map signals but remains confidence-qualified.
+- Voice Map recognition never grants permission by itself.
+- Voice profiles/embeddings treated as sensitive biometric-like data with explicit retention controls.
+- OSCAR's own synthesized voice excluded from learning/matching.
+
+See [VOICE-SENTRY.md](VOICE-SENTRY.md).
 
 ## Sentry Mode
 
 - Always-on low-power awareness.
-- Local wake-word/audio event processing rather than continuous cloud microphone streaming.
-- Presence/motion monitoring.
-- Environmental sensors: temperature, light, air/smoke/gas/water where hardware exists.
-- Device/power-state monitoring.
-- Workbench safety/anomaly events.
-- Known/unknown voice classification when enabled.
-- Event fusion across multiple signals.
+- Local wake/audio-event processing rather than continuous cloud microphone streaming.
+- **Always-on local acoustic Sentry plane when enabled**:
+  - wake word;
+  - speech/non-speech presence;
+  - Voice Map known/unknown classification;
+  - speaker-change/multiple-speaker events;
+  - configured unusual sound classes;
+  - barge-in while OSCAR speaks.
+- Speech presence, speaker identity, transcription and transcript retention are separate policy decisions.
+- Presence/motion/environment/device/workbench monitoring.
+- Known/unknown voice events when enabled.
+- Event fusion across signals.
 - Importance, urgency, confidence and interruptibility scoring.
-- Silent logging, notification, spoken alert or urgent interruption depending on policy.
+- Silent logging, notification, spoken alert or urgent interruption according to policy.
 - Modes: Passive, Aware, Guard, Away and Sleep.
-- Natural transitions such as “I’m heading out” → Away behavior when configured.
+- Self-voice suppression so Sentry does not react to OSCAR's own speaker output.
 
 ## Predictive intelligence
 
-- Forecast schedule conflicts before they occur.
-- Estimate deadline/task risk from current progress.
-- Detect abnormal device/sensor trends before obvious failure where evidence supports it.
-- Prepare diagnostics/context when a build or service appears likely to fail.
-- Prefetch relevant context for likely upcoming tasks/transitions.
-- Predictions remain evidence, not authority; Personal Policy and permissions still govern action.
+- Forecast schedule conflicts/deadline risk.
+- Detect abnormal device/sensor trends where evidence supports it.
+- Prepare diagnostics/context for likely failures.
+- Prefetch context for likely upcoming tasks/transitions.
+- Predictions remain evidence, not authority.
 
-## ChatGPT integration
+# Native OSCAR infrastructure
 
-- ChatGPT can invoke OSCAR through Latch tools.
-- OSCAR can wake/invoke ChatGPT through a Latch abstraction.
-- Complex personal reasoning can be delegated to ChatGPT.
-- Long-running Work-style investigations can return results to OSCAR.
-- ChatGPT retains no special hardware-safety authority.
-- Wake/trigger transport is replaceable when product capabilities evolve.
-- ChatGPT/agent success reports enter as reported evidence until verified.
+## Native Transport + Capability Fabric
 
-## SwitchRoute integration
+The useful architecture/logic from the separate Latch project is folded into OSCAR natively. Latch is not a required external runtime dependency.
 
-- Autonomous cloud-model access without the laptop.
-- Route by task, latency, capability and cost.
+- Typed bidirectional task/event/action/result transport.
+- Node/session identity.
+- Pairing/scoped credentials.
+- Capability advertisement.
+- Correlation IDs.
+- Reconnect/backoff.
+- Progress/stream callbacks.
+- Permission-aware dispatch.
+- Audit/provenance metadata.
+- Secure outbound rendezvous for private devices.
+- Small Edge transport client/protocol for embedded nodes.
+- ChatGPT/provider-specific transport details hidden behind OSCAR-owned adapters.
+
+## Native OSCAR Model Router
+
+The useful architecture/logic from the separate SwitchRoute project is folded into OSCAR natively. SwitchRoute is not a required external runtime dependency.
+
+- Provider/model registry.
+- Route by task/capability, quality, latency and cost.
 - Provider/model fallback.
-- Small/fast model paths for classification and extraction.
+- Health/availability state.
+- Context-limit/capability metadata.
+- Small/fast models for classification/extraction where useful.
 - Stronger reasoning models only when needed.
-- Speech-provider routing may use the same abstraction where useful.
-- Model inference is never silently relabeled as verified fact.
+- Routing telemetry/outcome history.
+- Model inference never silently relabeled as verified fact.
+
+## ChatGPT provider/surface
+
+- ChatGPT can reason for OSCAR through OSCAR-owned provider/transport adapters.
+- OSCAR can expose tools/capabilities to ChatGPT where supported.
+- A ChatGPT-specific wake/trigger mechanism is replaceable behind OSCAR-owned infrastructure.
+- ChatGPT has no special hardware-safety authority.
+- Agent/model success reports remain reported/inferred until verified where needed.
+
+See [NATIVE-INFRASTRUCTURE.md](NATIVE-INFRASTRUCTURE.md).
 
 ## Intent and epistemic routing — Jev
 
 - Fast typed intent recognition.
 - Detect when OSCAR already has enough context.
-- Query the World Model for current state.
-- Decide when memory retrieval is necessary.
-- Decide when a live source/tool should be inspected.
-- Decide when to use ChatGPT, SwitchRoute or a specialist Worker.
-- Decide when deterministic execution is enough.
-- Decide whether a blocked Worker can be repaired/rerouted safely.
-- Ask the user only when ambiguity materially blocks safe/correct execution.
-- Explicit `known / world / recall / verify / reason / reported / delegate / ask` states.
-- Avoid guessing personal/project context that can be retrieved.
-- Avoid escalating recoverable Worker/tool errors unnecessarily.
+- Query World Model for current state.
+- Decide when memory/live verification/model reasoning/specialist delegation is necessary.
+- Jev chooses the class of path; native Model Router chooses provider only after a model path is selected.
+- Repair/reroute recoverable Worker/tool failures.
+- Ask user only when ambiguity materially blocks safe/correct execution.
+- Explicit `known / world / recall / verify / reason / reported / specialist / worker / unknown` states.
 
 ## Epistemic Integrity
 
-- Distinguish intention, execution, reported success, observed result and verified objective completion.
-- Task states: planned, executing, result_received, verifying, verified, partially_verified, failed, blocked, cancelled, unknown.
+- Distinguish intention, execution, reported success, observed result and verified completion.
+- Task states include planned/executing/result_received/verifying/verified/partially_verified/failed/blocked/cancelled/unknown.
 - Evidence states: KNOWN, INFERRED, RECALLED, REPORTED, VERIFIED, UNKNOWN.
 - Tool/Worker/model success is testimony/evidence, not automatically truth.
-- Unqualified `Done`/`Fixed` requires verification where technically possible.
-- Partial verification is reported as partial.
 - Unknown is preferable to guessing.
-- User confidence does not alter factual state; OSCAR can disagree when evidence/constraints require it.
-- Corrections are explicit and propagated to affected state/docs/tasks.
-- UI/avatar state reflects real execution/verification state rather than fake success.
+- UI/avatar state reflects real execution/verification state.
 
 See [EPISTEMIC-INTEGRITY.md](EPISTEMIC-INTEGRITY.md).
 
 ## Memory and continuity — LRA + Supermemory
 
-- LRA persistent single-conversation/history architecture.
-- Supermemory semantic/profile-style backend.
-- Active live context preserved separately from long-term recall.
+- Persistent single-conversation/history architecture.
+- Active context separate from long-term recall.
 - Episodic conversation/task history.
-- Cross-device conversation/task continuity.
-- Project/context retrieval.
-- Device/environment context.
-- User profile/relationship memory.
-- Personal Policy stored as an authoritative behavior layer distinct from inferred memory.
-- Procedural memory.
-- Protocol/Worker state.
-- Source/provenance metadata where possible.
-- Confidence-aware use of recalled information.
-- Retrieval ranking using relevance, recency, importance, scope, source authority and staleness.
-- Searchable history/timeline instead of mandatory manual chat management.
-- User controls to inspect, correct and forget memory.
-- Current World Model state remains distinct from historical/semantic memory.
-- Recalled memory remains explicitly recalled until verified against current authority where necessary.
+- Cross-device continuity.
+- Project/device/user/procedural memory.
+- Profile/relationship memory.
+- Personal Policy separate from inferred memory.
+- Source/provenance/confidence metadata.
+- Searchable history/timeline.
+- User inspect/correct/forget controls.
+- Current World Model state distinct from historical memory.
 
 ## Learning and procedural memory
 
 - Capture verified successful novel execution paths.
-- Distill useful procedures from noisy exploratory runs.
-- Parameterize reusable steps.
-- Store required capabilities/preconditions.
-- Store verification strategy.
+- Distill/parameterize reusable procedures.
+- Store capabilities/preconditions/verification strategy.
 - Reuse known procedures on similar tasks.
-- Skip unnecessary discovery on repeated work.
-- Convert stable paths toward deterministic execution where possible.
-- Measure improvements in latency, cost and reliability over time.
-- Version learned procedures.
-- Roll back worse versions.
-- Never let learned behavior self-grant permissions.
-- Teach-by-demonstration: “watch me do this once” → observe authorized actions → infer intent/steps → clarify ambiguity → verify → create Skill candidate.
+- Measure latency/cost/reliability improvements.
+- Version/rollback learned procedures.
+- Teach-by-demonstration where authorized.
+- Learned behavior never self-grants permissions.
 
 ## Sunday — OSCAR on phone
 
-- OSCAR avatar and voice on Android/mobile.
-- Notifications and proactive alerts.
-- Calls/messages subject to permissions.
-- AI call answering when platform support and Personal Policy permit it.
-- WhatsApp/Telegram/other app actions where supported.
-- General phone-app actions/deep links where supported.
+- OSCAR avatar + stable VoiceProfile.
+- Voice/text interaction.
+- Notifications/proactive alerts.
+- Calls/messages/app actions subject to permissions/platform support.
+- AI call answering where supported and policy allows.
 - Mobile meeting transcription/notes.
 - System-wide dictation/input assistance.
-- Camera and microphone access when authorized.
-- Phone sensor/context access.
-- On-device speech recognition where appropriate.
+- Camera/microphone/sensors where authorized.
+- Voice Match and Voice Map participation where supported.
 - Biometric/PIN confirmation for sensitive actions.
 - Handoff between phone, desk, ChatGPT and desktop.
 - Mobile Sentry participation.
-- Rich lock-screen/notification actions where platform permits.
 
 ## OSCAR Desktop — Windows and macOS
 
-- Native/lightweight Windows app.
-- macOS app using the same surface/capability contracts with platform-specific adapters.
-- Voice + text interaction.
+- Native/lightweight app.
+- Voice + text with stable VoiceProfile.
 - Push/hold-to-talk.
-- Full `Dictate / Edit / Ask / Act` Interaction Runtime.
+- Full `Dictate / Edit / Ask / Act` runtime.
 - System-wide dictation.
-- Meeting transcription/notes where supported.
-- Avatar/presence state.
-- Screen context.
-- Cursor/focus context.
-- Selected-text context.
-- Active-window/app context.
-- Accessibility-tree + screenshot context.
-- Point-and-talk interaction.
-- Notifications and task progress.
-- Approval/permission surfaces.
-- Machine-Worker capability/health status.
-- Sunday handoff.
-- Searchable timeline/history rather than a giant chat sidebar.
+- Meeting transcription/notes.
+- Screen/cursor/selection/app/accessibility context.
+- Point-and-talk.
+- Notifications/progress/approvals.
+- Machine-node capability/health state.
+- Searchable timeline/history.
 
 ## Machine Worker node
 
-When online, a computer dynamically advertises capabilities to OSCAR.
+When online, a computer advertises capabilities such as Codex, computer use, terminal/PowerShell, browser, IDEs, Git/GitHub, Python, FFmpeg, Blender, filesystem, optional local models and GPU support.
 
-Planned capabilities include:
-
-- Codex;
-- computer use;
-- terminal / PowerShell / shell;
-- browser;
-- IDEs/editors;
-- Git/GitHub workflows;
-- Python/scripts;
-- FFmpeg/media tooling;
-- Blender or other specialist desktop apps;
-- filesystem;
-- optional local models;
-- GPU-backed support jobs.
-
-The PC is never required for OSCAR's basic availability.
+The PC is never required for basic OSCAR availability.
 
 ## Delegated Workers / sub-agents
 
-Workers are Grok-Bot-style delegated teammates owned by OSCAR, but they use the user's actual device/service mesh rather than requiring a separate cloud computer.
-
-- Create Workers naturally by voice or chat.
-- Temporary Workers for one-off research/tasks.
-- Task Workers that live until a completion condition is met.
-- Persistent Workers for continuing responsibilities.
+- Natural-language Worker creation.
+- Temporary/task/persistent Workers.
 - Worker goal/context/permissions/capabilities/verification/escalation state.
-- Workers can use Sunday, desktop nodes, APIs/plugins, ChatGPT/SwitchRoute, Kinetable and OSCAR Edge.
-- Workers can use Codex or other specialist agents rather than acting as generic LLM clones.
-- Parallel Workers can collaborate, wait on dependencies and hand work off.
-- Workers can use shared learned Skills.
-- Protocols can create/stop/sleep Workers.
-- Jev handles safe self-repair/rerouting before user escalation.
+- Workers can use Sunday, desktop nodes, APIs/plugins, ChatGPT/native Model Router, Kinetable and Edge.
+- Parallel collaboration/handoffs/dependencies.
+- Shared learned Skills.
+- Protocol-driven Worker lifecycle.
+- Jev repair/reroute before escalation.
 - Bounded retries and explicit blockers.
-- Worker state survives restart when a responsibility is long-running.
-- Create/pause/resume/edit/delete through UI or natural language.
-- Lightweight Worker UI rather than a dense agent dashboard.
-- Workers never self-grant permissions or bypass Personal Policy.
+- Durable state for long-running responsibilities.
 - Worker success remains REPORTED until objective verification.
 
 See [WORKERS.md](WORKERS.md).
 
 ## Executive Planner
 
-- One global executive above Workers/Protocols rather than independent agent silos.
-- Consider priority, deadline, dependencies, resource/device availability, user interruptibility, risk and cost.
-- Schedule and parallelize work.
-- Pause/pre-empt lower-priority work when justified.
-- Resolve conflicts when multiple Workers need the same device/tool.
-- Reroute work when a device/specialist disappears.
-- Defer work until prerequisites become available.
-- Decide when the user actually needs to be interrupted.
+- One global executive above Workers/Protocols.
+- Consider priority/deadline/dependencies/resources/interruptibility/risk/cost.
+- Schedule/parallelize/pause/pre-empt/reroute/defer.
 - Never bypass Jev, Personal Policy or permissions.
 
 ## Durable Execution Runtime
 
-- Durable task/objective IDs and lifecycle state.
-- Persisted checkpoints/current step for long-running work.
-- Executor leases/ownership.
-- Heartbeats/last-progress tracking.
-- Retry budget and bounded backoff.
-- Cancellation state.
-- Deadline/expiry.
-- Required capabilities and current execution surface.
-- Artifact/result references.
-- Verification state.
-- Blocker/escalation state.
-- Lease expiry/reclaim of abandoned work.
-- Zombie/stuck-work detection.
-- Restart/resume after process/device loss.
+- Durable task IDs/lifecycle/checkpoints.
+- Leases/heartbeats/retry budget/cancellation/deadlines.
+- Required capabilities/current execution surface.
+- Artifact/result and verification state.
+- Reclaim abandoned work, zombie detection, restart/resume.
 - Idempotency/deduplication where needed.
-- Durable queues/event delivery where justified.
-- Never leave a task indefinitely `Working` because its executor vanished.
 
 See [RUNTIME-FOUNDATIONS.md](RUNTIME-FOUNDATIONS.md).
 
 ## Social-media management
 
-- Persistent Social Worker when the user wants one.
-- Monitor mentions/replies.
-- Research relevant developments.
-- Draft posts.
-- Prepare media/assets.
-- Schedule content where supported.
-- Publish content within configured autonomy.
-- Answer permitted routine messages/comments.
+- Persistent Social Worker when desired.
+- Monitor/research/draft/prepare media/schedule/publish/reply within configured autonomy.
 - Coordinate release announcements with project state.
 - Summarize community feedback/performance.
-- Use Channel/API/plugin first; browser/desktop/Sunday fallback where legitimate and available.
-- Personal Policy can differentiate ordinary posts, major announcements, controversial topics and account/security actions.
+- Prefer native API/channel adapters, then browser/desktop/Sunday fallback where legitimate.
 
 ## Software-task orchestration
 
-- Delegate repository work to Codex rather than reproducing a coding agent poorly.
-- Preserve specialist project/workspace context where possible.
-- Route design tasks through relevant plugins such as Impeccable when available.
-- Use computer use for GUI operation and visual verification.
-- Run tests/commands through the machine Worker.
-- Observe the result and feed failures back into the specialist agent.
-- Continue until an objective completion condition is met or the user is needed.
-- Prefer the best available software/tool for a task.
-- Re-route on Worker/tool failure.
-- Verify independently where practical.
-- Preserve reported-vs-verified distinction throughout orchestration.
+- Delegate repository work to Codex or suitable coding specialist.
+- Preserve specialist project/workspace context.
+- Route design tasks through design specialists/plugins where available.
+- Use computer use for GUI operation/visual verification.
+- Run tests through machine nodes.
+- Observe results, feed failures back, verify independently where practical.
 
 ## Capability Catalog + Dynamic Tool Search
 
 - Dynamic node/app/plugin/Skill/channel capability advertisement.
 - Lightweight searchable manifests.
-- Availability state.
-- Task suitability metadata.
-- Latency/cost metadata where useful.
-- Permission/risk requirements.
-- Reliability/history metadata.
-- Project/workspace context hints.
-- Communication/app capability metadata.
-- Reversal/undo capability metadata where applicable.
-- Provider/plugin/version metadata.
-- Search/rank by suitability + availability + policy + reliability + latency/cost.
-- Load detailed contracts only for relevant finalists.
-- Ability for capabilities to disappear/reappear without killing OSCAR.
-- Avoid a mega-prompt containing every tool definition.
+- Availability, task suitability, latency/cost, permission/risk, reliability/history, project/workspace, undo and adapter/version metadata.
+- Search/rank then load detailed contracts only for finalists.
+- Capabilities can disappear/reappear without killing OSCAR.
 
 ## Artifact / Result Model
 
-- First-class records for documents, spreadsheets, slides, images/video/audio, code patches/commits/PRs, research reports, meeting notes, deployments, firmware builds, datasets/models/evaluations and other durable outputs.
-- Artifact ID/kind/name.
-- Owner task/Worker/Protocol.
-- Producer capability.
-- Location/reference.
-- Version/hash where useful.
-- Source/provenance.
-- Verification status.
-- Permissions/access scope.
-- Project/entity/task relationships.
-- `supersedes` / `derived-from` links.
-- Workers pass artifact references rather than repeatedly copying opaque blobs through prompts.
+- First-class records for docs, spreadsheets, slides, media, code changes, research, meeting notes, deployments, firmware builds, datasets/models/evaluations and other durable outputs.
+- Artifact ID/kind/name, owner, producer, location/reference, version/hash, provenance, verification, access scope and relationships.
 
 ## Edge / physical world
 
-- ESP32 network gateway.
+- ESP32 network gateway using native OSCAR Edge transport.
 - RP2040/Pico deterministic GPIO controller.
-- Buttons and physical controls.
-- Displays/status surfaces.
-- LEDs and expressive indicators.
-- Sensors.
-- Relays.
-- Servos/motors/actuators.
-- Cameras via suitable connected nodes.
-- Workbench telemetry.
-- Hardware-health monitoring.
-- OTA/configuration management.
+- Buttons/displays/LEDs/sensors/relays/actuators/cameras through suitable nodes.
+- Workbench telemetry, health and OTA/configuration.
 - Future smart-home/environment integrations.
 
 ## Kinetable integration
 
-- Treat Kinetable as OSCAR's specialist hardware workshop.
-- Route hardware design/visual wiring tasks into Kinetable.
-- Use actual user component inventory/context.
-- Simulation support.
-- Firmware generation/programming path.
-- Provision ESP32/Pico/new devices into OSCAR/Latch Edge.
-- Generate capability metadata during provisioning.
+- Specialist hardware workshop.
+- Hardware design/visual wiring/inventory/simulation/firmware/provisioning.
+- Provision devices into native OSCAR Edge transport/capability catalog.
 - Avoid duplicating Kinetable inside OSCAR.
 
 ## Engineering/workbench capabilities
 
-Long-term target capabilities include:
-
-- identify connected components and sensors;
-- inspect telemetry while the user works;
-- correlate camera view with electronic state;
-- explain wiring/problems using actual device data;
-- route circuit/simulation work to Kinetable;
-- drive visual-debugging or CAD/workbench tools;
-- invoke specialist software rather than simulating it in chat;
-- route CAD, 3D, numerical simulation, diagnostics, reconstruction and optimization to appropriate external/specialist tools;
-- maintain personal component inventory/context;
-- run safe physical Protocols after authorization.
+- Identify components/sensors and inspect telemetry.
+- Correlate camera view with electronic state.
+- Route circuit/simulation work to Kinetable.
+- Route CAD/3D/numerical simulation/diagnostics/reconstruction/optimization to specialist tools.
+- Maintain inventory/context.
+- Run safe physical Protocols after authorization.
 
 ## Protocols and routines
 
-- Named Protocols such as `leaving_home` or `release-watch`.
-- Recurring routines.
-- Time-triggered routines.
-- Event-triggered routines.
-- Multi-step stateful procedures.
-- Wait states.
-- Conditional branching.
-- Background observation.
-- Delegation to Workers/tools.
-- Worker creation/termination as Protocol steps.
-- Cancellation and pause/resume.
-- Preconditions and safety checks.
-- Idempotency where appropriate.
-- Recovery/retry policy.
-- Escalation rules.
-- Completion conditions.
+- Named Protocols and recurring/event/time-triggered routines.
+- Multi-step stateful procedures, wait states and branches.
+- Background observation/delegation/recovery/escalation/completion conditions.
 - Human approval gates for consequential steps.
-- Long-running responsibility over days/weeks/months when needed.
-- Durable Execution Runtime used where restart/recovery matters.
+- Durable Execution Runtime where restart/recovery matters.
 
 ## Skills and plugins
 
-- Support portable `SKILL.md`-style capability descriptions/contracts.
-- Plugin/connector discovery.
-- Tool capability metadata.
-- OSCAR can identify when a specialist Skill/plugin is better suited than its general path.
-- OSCAR may create a reusable Skill candidate from a verified novel workflow.
-- OSCAR may propose/create/refine Skills after repeated workflows.
-- Skills define required capabilities, inputs, preconditions, procedure, verification, risk and recovery.
+- Portable `SKILL.md`-style Skills.
+- Plugin/connector discovery and capability metadata.
+- OSCAR can identify when a specialist Skill/plugin is better than general reasoning.
 - Generated Skills remain permission-scoped, inspectable and versioned.
-- Plugins/connectors become entries in the Capability Catalog and can participate in Skills/Protocols/Workers.
 
 ## Self-created automation
 
-- Create Skill candidates from verified successful executions.
-- Create Worker definitions from explicit delegation or persistent objectives.
-- Create routine candidates from repeated recurring behavior.
-- Create Protocol candidates from persistent objective patterns.
-- Preserve provenance to the executions that taught the workflow.
+- Skill/Worker/routine/Protocol candidates from explicit delegation or verified patterns.
+- Preserve provenance.
 - Never grant new authority implicitly.
-- Require explicit approval when generated automation would broaden permissions or risk.
+- Explicit approval when automation broadens permissions/risk.
 
 ## Learned Automation Evaluation Pipeline
 
-- One successful run creates a candidate, not automatically a trusted/default automation.
-- Normalize/parameterize candidate steps.
-- Replay/evaluate representative cases where possible.
-- Verify expected output and safety properties.
-- Compare new version with current trusted version.
-- Review permission/Personal Policy requirements.
-- Promote, reject or keep experimental.
-- Preserve evaluation cases/results, assumptions, provenance, limitations and rollback target.
-- Untestable candidates remain experimental/partially verified.
-- Roll back versions that regress reliability/safety.
-
-See [RUNTIME-FOUNDATIONS.md](RUNTIME-FOUNDATIONS.md).
+- Candidate, normalize/parameterize, replay/evaluate, verify safety/output, compare, policy review, promote/reject/experimental.
+- Preserve evaluation cases/results/assumptions/limitations/rollback target.
 
 ## Research and analysis
 
-- Search/retrieve information through approved sources.
-- Compare multiple sources.
-- Continue research asynchronously through Workers.
-- Notify only on meaningful findings.
-- Use structured tools/data rather than hallucinating unavailable state.
+- Search/retrieve approved sources.
+- Compare sources.
+- Async research Workers.
+- Notify on meaningful findings.
 - Preserve source/provenance and distinguish inference from verified fact.
 
 ## Proactivity
 
-- Report important changes without being prompted.
-- Suggest an action when confidence/value are high enough.
-- Continue delegated work after the user leaves.
-- Notify when a task/Worker reaches a meaningful verified result or blocker.
-- Avoid narrating routine background activity.
-- Learn preferred interruption patterns without overriding user controls.
-- Apply explicit Personal Policy before inferred preferences.
-- Use predictive signals to prepare quietly without turning uncertain forecasts into authority.
+- Report meaningful changes without narration of routine background work.
+- Suggest action when confidence/value are high.
+- Continue delegated work after user leaves.
+- Apply Personal Policy before inferred preferences.
 
 ## Device and environment awareness
 
-- Node-online/node-offline events.
-- Capability discovery.
-- Presence state.
-- Device power/health state.
-- Environmental state.
-- User-configurable normal baselines.
-- Anomaly detection from rules first; AI escalation when useful.
-- Feed current state into the World Model rather than leaving it as disconnected telemetry.
+- Node/capability/presence/device/environment state.
+- User-configurable baselines and rule-first anomaly detection.
+- Feed current state into World Model.
 
 ## Self-maintenance / diagnostics
 
-- Detect expired authentication.
-- Detect broken/missing connectors/channels.
-- Detect stale/disappeared capabilities.
-- Detect Edge-node disconnects.
-- Detect provider/speech latency degradation.
-- Detect storage/local-state health problems.
-- Detect update failures.
-- Detect repeated Worker/Protocol failures.
-- Detect stuck/zombie durable tasks.
-- Repair or roll back safe failures automatically when confidence/permissions allow.
-- Ask the user only for minimum intervention when self-repair is not safe/possible.
+- Detect expired auth, broken adapters/channels, stale capabilities, Edge disconnects, model/speech latency degradation, storage/state problems, update failures and stuck tasks.
+- Repair/rollback safe failures where authorized.
+- Ask user only for minimum intervention when necessary.
 
 ## Avatar and presence
 
-- OSCAR's blue-shell / yellow-face avatar as a primary UI primitive.
-- Yellow face behaves like a weighted joystick/puck inside the blue body.
-- Directionality indicates attention/focus.
-- Expression states for idle, listening, thinking, speaking, success, confusion, alert, sentry, sleeping, muted and error.
-- Runtime states include Working, Verifying, Waiting, Blocked, Done and Failed.
-- Success animation/state only after verified completion where verification is applicable.
-- Small-size/icon variants preserve silhouette/readability.
-- “Serious” states become calmer/focused rather than cartoonishly expressive.
-- Motion grammar tied to actual system state.
+- Blue-shell/yellow-face avatar as primary UI primitive.
+- Weighted puck motion/directionality.
+- Idle/listening/thinking/speaking/success/confusion/alert/sentry/sleeping/muted/error.
+- Working/Verifying/Waiting/Blocked/Done/Failed runtime states.
+- Success only after verified completion where applicable.
 
 ## First-run commissioning
 
 - Identity and interaction preferences.
-- Small high-value Personal Policy setup with explanation that any preference can later be changed through normal conversation.
-- Calls/messaging autonomy defaults.
-- Meeting transcription/retention defaults.
-- Worker autonomy defaults.
-- Voice Match enrollment.
-- Wake/reflex command test.
+- Personal Policy starter rules.
+- Communication/meeting/Worker autonomy defaults.
+- Owner Voice Match enrollment.
+- Optional known-person Voice Map enrollment/linking with explicit consent/retention.
+- OSCAR Voice Identity listening/calibration/fallback test.
+- Wake/reflex and self-voice-suppression test.
 - Device discovery.
 - Accounts/services/channels.
+- Native transport/model-provider setup rather than separate Latch/SwitchRoute deployment.
 - Permission matrix.
-- Sentry configuration.
-- Environment/room/workbench setup.
-- Sunday pairing.
-- Desktop/machine-Worker pairing.
-- Latch/ChatGPT/SwitchRoute setup.
-- Kinetable connection where desired.
-- Routines/Protocol preferences.
-- End-to-end calibration and verified health check.
+- Sentry configuration including acoustic awareness/transcription-retention choices.
+- Environment setup.
+- Sunday/desktop/Edge pairing.
+- End-to-end verified health check.
 
 ## Permissions and security
 
-- Capability-scoped permissions.
-- Per-action authorization level.
+- Capability-scoped permissions and action authorization classes.
 - Voice Match as one signal, not sole high-risk auth.
-- Strong confirmation through Sunday biometric/PIN or explicit approval for critical actions.
-- Universal local emergency-stop capability.
-- Audit log / Action Ledger for consequential actions.
+- Voice Map never grants authority.
+- Strong confirmation for critical actions.
+- Universal local emergency stop.
+- Action Ledger/audit for consequential actions.
 - Device-scoped/rotatable credentials.
-- Outbound edge connections rather than exposed home endpoints.
-- Minimal cloud audio/video exposure.
-- Data retention controls.
-- Generated Skills/Workers/Protocols cannot self-elevate permissions.
-- Communication actions remain attributable.
-- Personal Policy may restrict authority but cannot create it.
+- Outbound Edge connections rather than exposed home endpoints.
+- Minimal cloud audio/video exposure and explicit retention controls.
+- Generated automation cannot self-elevate permissions.
 
 ## Reliability
 
 - PC-independent operation.
 - Local safety if cloud fails.
-- Graceful capability loss when a node disappears.
-- Retries with bounded backoff.
-- Idempotent commands where possible.
-- Action/result correlation IDs.
-- Watchdogs for edge components.
-- Health/status reporting.
+- Graceful capability loss.
+- Bounded retries/backoff and idempotency where possible.
+- Correlation IDs, watchdogs and health reporting.
 - Recovery from partial task completion.
-- Explicit blocker reporting rather than silent failure.
-- Skill/Protocol rollback when learned changes reduce reliability.
-- Workers repair/reroute safe recoverable failures before escalating, without unbounded retry loops.
-- World Model state carries freshness so stale evidence is not mistaken for current truth.
-- Durable tasks use checkpoint/lease/heartbeat/reclaim semantics where needed.
+- Explicit blocker reporting.
+- Durable tasks use checkpoints/leases/heartbeats/reclaim where needed.
 - Reported success cannot silently become verified completion.
-- Partial/unknown/failed states are preserved and surfaced truthfully.
-
-## Post-alpha expansion
-
-- Optional health/wearable context with strict permission/privacy boundaries.
-- Smart-home capability contracts.
-- Robotics/camera/room-infrastructure contracts.
-- Future vehicle/drone integration where safe and legally appropriate.
-- Optional cloud Worker node as an advertised capability rather than a foundational dependency.
-- These domains plug into existing Capability Catalog, World Model, Personal Policy, Durable Execution Runtime, Artifact Model, permissions and Action Ledger rather than creating parallel architectures.
-
-See:
-
-- [JARVIS-GAP-REVIEW.md](JARVIS-GAP-REVIEW.md)
-- [COMPETITIVE-BENCHMARK.md](COMPETITIVE-BENCHMARK.md)
-- [RUNTIME-FOUNDATIONS.md](RUNTIME-FOUNDATIONS.md)
-- [EPISTEMIC-INTEGRITY.md](EPISTEMIC-INTEGRITY.md)
+- Voice-provider fallback preserves OSCAR identity as closely as possible.
+- Voice Map/speaker identity confidence remains explicit and unknown speakers remain unknown.
