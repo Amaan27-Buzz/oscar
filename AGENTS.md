@@ -157,7 +157,7 @@ Do not use OSCAR's generic path when a better specialist is available.
 - UI/UX → Impeccable/design tooling + coding agent; verify visually.
 - GUI-only operation → computer-use worker.
 - Knowledge workflows → connected native tool/plugin when available.
-- Hardware design/provisioning → Kinetable.
+- Hardware design/provisioning → installed or connected engineering tools plus OSCAR Edge/device capabilities.
 - General model work → Jev selects reasoning class → native OSCAR Model Router selects provider.
 - Personal/complex ChatGPT-context work → ChatGPT provider adapter where appropriate.
 
