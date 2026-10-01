@@ -4,6 +4,20 @@ OSCAR is one intelligence expressed through multiple devices. These surfaces sha
 
 All cross-device coordination uses OSCAR-owned transport/capability contracts. The separate Latch project is reference/prototype material, not a required runtime.
 
+## Shared surface principles
+
+Across Sunday, desktop and physical surfaces:
+
+- OSCAR should feel **present**, not repeatedly launched;
+- voice and text are peers in one continuous context;
+- local acoustic awareness is distinct from active conversational listening;
+- UI state must reflect real runtime/verification state;
+- complexity is progressively disclosed;
+- motion preserves continuity where practical instead of replacing one page with another;
+- each platform gets a native composition rather than the same layout at different widths.
+
+The visual/interaction direction is defined by `DESIGN.md` and `TASTE.md`.
+
 ## Sunday — mobile
 
 Sunday is OSCAR on the phone.
@@ -24,14 +38,28 @@ Primary goals:
 - remote access to OSCAR tasks and delegated Workers;
 - continuity while moving away from the desk.
 
-Example:
+Sunday must not frame ordinary use as a permanent `Talk to OSCAR` / `Type instead` choice. If Sentry acoustic awareness is enabled, OSCAR may already be locally processing wake/VAD/hot-command/Voice Map/sound-event signals while not actively transcribing.
+
+Conceptually:
+
+```text
+Sentry aware         = local low-cost acoustic awareness may be active
+Listening            = active conversational turn / STT
+Muted                = ordinary conversational listening off; permitted local reflex/safety commands may remain
+Awareness disabled   = local acoustic plane actually disabled
+Typing               = another input modality in the same OSCAR context
+```
+
+See [SUNDAY-DESIGN.md](SUNDAY-DESIGN.md) and [VOICE-SENTRY.md](VOICE-SENTRY.md).
+
+Cross-device example:
 
 ```text
 start task on desktop
 → leave desk
 → Sunday keeps task state
-→ OSCAR notifies when blocked/verified complete
-→ continue by voice on phone
+→ OSCAR notifies when blocked or verified complete
+→ continue by voice or text on phone
 ```
 
 Communication behavior is governed by `docs/COMMUNICATION.md` and `docs/PERSONAL-POLICY.md`.
@@ -45,6 +73,8 @@ Windows is expected to be the deepest initial integration. macOS follows the sam
 Planned desktop capabilities:
 
 - native lightweight app/overlay;
+- compact ambient OSCAR presence;
+- contextual expansion rather than a permanent giant assistant window;
 - voice/text interaction using the same OSCAR VoiceProfile;
 - push/hold-to-talk and Sentry participation;
 - Voice Match/Voice Map participation when microphone access allows;
@@ -58,7 +88,17 @@ Planned desktop capabilities:
 - Worker status/management;
 - handoff to Sunday.
 
-The desktop UI should avoid becoming another giant chat sidebar.
+The desktop UI should avoid becoming another giant chat sidebar or dashboard.
+
+Where practical, a compact presence should physically/spatially transform into contextual detail rather than teleporting into an unrelated window:
+
+```text
+compact presence
+→ contextual overlay
+→ task/interaction state
+→ verification/result
+→ compact presence
+```
 
 ## Machine Worker node
 
@@ -86,9 +126,9 @@ When the computer is off, those capabilities disappear; OSCAR remains alive thro
 
 ## Delegated Worker surface
 
-Workers are created/managed by OSCAR and should have a minimal visibility/control UI rather than a dense dashboard.
+Workers are created/managed by OSCAR and should have minimal visibility/control UI rather than a dense dashboard.
 
-The primary interface remains natural language: `pause the SceneLab worker`, `let it publish ordinary feature posts without asking`.
+The primary interface remains natural language and contextual control. Worker surfaces should expose responsibility, current meaningful state, capability use, approvals, artifacts/evidence and blockers without turning OSCAR into an agent-management console.
 
 See [WORKERS.md](WORKERS.md).
 
@@ -151,7 +191,7 @@ Sunday / Desktop / Desk speaker
 
 Each surface may use a different local/cloud TTS implementation, but should preserve the same intended voice character/prosody as closely as possible.
 
-Voice Match and Voice Map also share profile semantics across surfaces while preserving source-device/confidence metadata.
+Voice Match and Voice Map share profile semantics across surfaces while preserving source-device/confidence metadata.
 
 OSCAR's own speaker output must be excluded from Voice Map learning/identity updates and should not retrigger wake logic. Real human barge-in must remain functional.
 
@@ -213,6 +253,7 @@ Sentry is distributed but coherent.
 A surface may contribute:
 
 - wake/VAD;
+- deterministic hot/reflex commands;
 - Voice Map speaker events;
 - configured sound events;
 - motion/presence;
@@ -222,15 +263,17 @@ A surface may contribute:
 
 These become Perception/World Model events. Continuous local acoustic awareness does not imply continuous cloud transcription or raw-audio retention.
 
+Sentry UI should expose meaningful state without becoming a surveillance dashboard. Normal mode should remain calm; evidence/source detail lives one layer deeper.
+
 ## Cross-surface continuity
 
 The same task should survive surface changes.
 
 ```text
-Sunday: "OSCAR, investigate the ClearLane issue."
-→ OSCAR delegates to PC/Codex when available
+Sunday: "OSCAR, investigate this issue."
+→ OSCAR delegates to an available PC/coding capability
 → user sits at desk
-→ Desktop: "What did Codex find?"
+→ Desktop: "What did the coding worker find?"
 → shared state resolves the reference
 ```
 
@@ -251,7 +294,7 @@ Every node joins/leaves dynamically.
 
 ```text
 Sunday online      → mobile/communication capabilities
-PC online          → Codex/desktop capabilities
+PC online          → coding/desktop capabilities
 ESP32 online       → physical capabilities
 camera node online → visual context
 app adapter up     → app/channel capability
@@ -261,8 +304,23 @@ OSCAR plans against what exists **now**, not assumptions about one permanent dev
 
 ## Avatar continuity
 
-The same OSCAR avatar/expression language should appear where useful across Sunday, desktop and physical displays.
+The same OSCAR presence/expression language should appear where useful across Sunday, desktop and physical displays.
 
-States include idle, listening, thinking, speaking, working, verifying, waiting, success, confused, alert, Sentry, sleeping, muted, blocked and error.
+States include present/idle, Sentry aware, listening, thinking/working, speaking, verifying, waiting, done/verified, partial, alert, sleeping, muted, acoustic-awareness-disabled, blocked, error and offline/degraded.
 
-The yellow face retains weighted joystick/puck movement inside the blue shell, with motion mapped to attention and real system state.
+The yellow face retains weighted magnetic-puck/joystick movement inside the blue shell, with motion mapped to attention and real system state.
+
+## Cross-surface motion continuity
+
+Motion should reinforce the idea that these are embodiments of one system.
+
+Shared rules:
+
+- state changes preserve geometry where practical;
+- controls expand from their cause/source;
+- motion is weighted and responsive, not decorative;
+- animation never blocks actions or hides failure;
+- reduced-motion mode preserves all meaning;
+- low-power/degraded surfaces may simplify motion without changing state semantics.
+
+Identity is shared; composition remains platform-native.
