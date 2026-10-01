@@ -144,7 +144,7 @@ If hierarchy requires five font styles in one compact screen, simplify the hiera
 ### Sunday / mobile
 
 - Feels like a native personal assistant, not a web app inside a phone frame.
-- Avatar/state dominates.
+- Presence/state leads; the avatar is a compact physical object, not most of the display.
 - Bottom navigation exists only if the actual information architecture warrants it.
 - Voice and text are peers.
 - Haptics and transitions should reinforce state.

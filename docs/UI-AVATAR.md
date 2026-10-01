@@ -17,6 +17,10 @@ The avatar should communicate system state through motion and expression without
 
 The yellow face moves inside the blue shell like a **weighted joystick head / magnetic puck**.
 
+The current Sunday experiment keeps the shell compact and treats it as a physical presence object. State, direction and constrained movement carry more meaning than facial expressions. The same object stays mounted across Home, Awareness and input changes. No permanent idle loop is required. See [the two-surface study](../prototypes/sunday/README.md); its state is scripted until connected to an authoritative runtime.
+
+The study includes small eye/mouth shapes drawn as SVG paths after manual reference feedback. Listening focuses, Speaking opens the mouth and curves the eyes, and Working/Verifying/Waiting/Blocked/Alert remain restrained. Facial interpolation respects reduced motion; labels and puck position remain the primary state signals. Ordinary Sentry awareness does not use an angry expression.
+
 Motion characteristics:
 
 - responsive but not twitchy
@@ -42,7 +46,7 @@ This should become one of OSCAR/Sunday's signature UI behaviors.
 | Alert | centered/focused posture; reduced playful motion |
 | Sentry | watchful, stable, directional awareness cues |
 | Sleep | lowered activity, reduced brightness/motion |
-| Muted | immediate stillness/clear muted state |
+| Muted | restrained motion and explicit conversation-mute label; acoustic policy remains separate |
 | Error | clear but calm failure state; avoid alarming animation for recoverable errors |
 
 ## Default expression

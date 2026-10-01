@@ -80,7 +80,7 @@ OSCAR should feel like a calm piece of advanced personal technology that happens
 
 The durable blend is **60% Apple-like restraint and native clarity, 20% Teenage Engineering-like tactile industrial character, 10% Duolingo-like friendliness and immediate feedback, and 10% Braun/Dieter Rams-like functional honesty**. These are principle references only; OSCAR must not copy another product’s UI.
 
-The current Sunday concept establishes the intended personality: bright neutral surfaces, deep navy typography, OSCAR blue as the interactive/presence color, yellow as the face/presence accent, minimal red expression marks, large negative space, soft natural depth and a single dominant animated avatar. OSCAR's tactile character comes from precise cause/effect, restrained physicality and responsive motion rather than visible complexity.
+The current Sunday code experiment uses **70% restraint/whitespace, 20% tactile industrial character and 10% approachable personality**. A compact physical blue-shell/yellow-puck object shares the composition with useful state; it does not occupy most of the display. This two-surface direction supersedes the earlier large-avatar concept without expanding into a full product design system. OSCAR's tactile character comes from precise cause/effect, restrained physicality and responsive motion rather than visible complexity. See `prototypes/sunday/README.md`.
 
 **Key characteristics:**
 
@@ -157,7 +157,7 @@ The default surface should usually contain:
 3. one obvious next action;
 4. secondary detail only when requested.
 
-On Sunday and voice surfaces, the avatar is usually the hero. On desktop, the current task/state may share the stage with the avatar, but the app must never collapse into a dense assistant dashboard.
+On Sunday, presence and current context form the focal idea; the avatar remains compact and functional. The app must never collapse into a dense assistant dashboard.
 
 Prefer contextual sheets, inspectors, transient rails and native disclosures over permanent sidebars. A sidebar is justified only when the task genuinely requires persistent navigation, not because desktop software “normally has one.”
 

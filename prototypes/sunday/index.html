@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="color-scheme" content="light dark"><title>OSCAR · Sunday study</title>
+  <link rel="stylesheet" href="styles.css"><script type="module" src="app.js"></script>
+</head>
+<body>
+  <aside class="study" aria-label="Prototype review controls">
+    <a class="wordmark" href="#home">OSCAR<span>Sunday / interaction study</span></a>
+    <p>Two surfaces.<br>One quiet presence.</p>
+    <label for="scenario">Scripted scenario</label><select id="scenario"></select>
+    <label for="theme">Appearance</label><select id="theme"><option value="light">Light</option><option value="system">System</option><option value="dark">Dark</option></select>
+    <label class="check"><input id="motion" type="checkbox"> Reduce motion</label>
+    <p class="study-note">Design prototype. No devices connected, no audio captured, no tasks executed. Controls change this study only.</p>
+    <a href="README.md">Review notes ↗</a>
+  </aside>
+  <main class="phone" id="phone">
+    <header><button id="back" class="bar-button" hidden aria-label="Back to Home"><span aria-hidden="true">←</span></button><span id="home-brand">Sunday</span><button id="privacy" class="bar-button" aria-label="Inspect privacy state"><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="6" y="10" width="12" height="10" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v2"/></svg></button></header>
+    <section class="presence-composition" aria-label="OSCAR presence">
+      <div class="avatar" aria-hidden="true"><div class="socket"><div class="puck"><svg class="face" viewBox="0 0 64 64"><path class="eye left-eye" d="M23 24 Q23 25 23 26"/><path class="eye right-eye" d="M41 24 Q41 25 41 26"/><path class="mouth" d="M26 39 Q32 43 38 39 Q32 43 26 39"/></svg></div></div></div>
+      <div class="presence-caption"><strong>OSCAR</strong><span id="presence-label" role="status" aria-live="polite">Ready</span></div>
+      <h1 id="headline" aria-live="polite"></h1><p id="description"></p>
+      <button class="awareness-row" id="awareness-link" aria-label="Open Awareness"><span class="awareness-symbol" aria-hidden="true"></span><span id="acoustic-label"></span><span aria-hidden="true">⌄</span></button>
+      <p class="attention-note" id="attention-note" hidden></p>
+    </section>
+    <section class="context" id="context" aria-label="Current context">
+      <button class="activity" id="activity" hidden><span class="activity-meta" id="activity-meta"></span><strong id="activity-title"></strong><span class="activity-detail" id="activity-detail"></span><span class="arrow" aria-hidden="true">↗</span></button>
+    </section>
+    <section class="sentry-controls" id="sentry-controls" hidden aria-label="Awareness controls">
+      <button class="setting-row" id="mode-button" aria-label="Change Sentry mode"><span><strong id="mode-label">Aware</strong> <span aria-hidden="true">⌄</span></span></button>
+      <button class="secondary" id="mute" aria-label="Mute conversation for 15 minutes">Mute 15m</button>
+      <button class="disclosure-row" id="sources" aria-label="Inspect awareness context and evidence"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 11v5M12 7v1"/></svg></button>
+    </section>
+    <footer class="input-dock">
+      <p id="input-hint"></p>
+      <div class="input-surface" id="input-surface">
+        <button id="type" class="type-button" aria-label="Write a thought"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 5h16v14H4zM7 9h1m3 0h1m3 0h2M7 12h1m3 0h1m3 0h2M8 16h8"/></svg></button>
+        <button id="voice" class="voice-button" aria-label="Preview conversational listening"><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M6 11v1a6 6 0 0 0 12 0v-1M12 18v3M9 21h6"/></svg></button>
+        <form id="composer" hidden><label class="sr-only" for="draft">Your thought</label><textarea id="draft" placeholder="A thought for OSCAR…" rows="2" maxlength="4000"></textarea><div class="composer-actions"><button type="button" id="close-compose" class="bar-button">Close</button><button type="submit" class="primary">Keep draft</button></div></form>
+        <div id="voice-preview" hidden><strong>Listening preview</strong><p>No audio is being captured.</p><button id="stop-voice" class="secondary">End turn</button><button id="voice-to-text" class="bar-button">Write a thought</button></div>
+      </div>
+      <p class="prototype-label">Scripted preview</p>
+      <p id="notice" role="status" aria-live="polite"></p>
+    </footer>
+  </main>
+  <dialog id="detail" aria-labelledby="detail-title"><div class="sheet-handle" aria-hidden="true"></div><div class="sheet-heading"><h2 id="detail-title"></h2><button id="close-detail" class="bar-button" aria-label="Close details">Close</button></div><div id="detail-body"></div></dialog>
+</body></html>

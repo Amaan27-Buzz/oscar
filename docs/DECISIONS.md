@@ -361,3 +361,11 @@ Gate E — Unified Alpha  Slices 15–17
 **Constraint:** a 2–3 day developer-alpha target does not weaken slice exit conditions, safety boundaries or epistemic-integrity rules. Partial work remains partial.
 
 See `docs/BUILD-GATES.md`.
+
+## ADR-055 — Sunday visual language is evaluated through two code surfaces
+
+**Decision:** establish Sunday Home and Sentry/Awareness through an isolated runnable code study and focused visual iterations. Use compact physical presence, not the previous large-avatar/image-first concept. No production mobile stack is selected by the browser prototype.
+
+**Presentation rule:** presence, acoustic state, attention and availability remain independent. Sentry awareness is not conversational STT; text does not disable voice; conversation mute is not physical microphone disconnection. Scripted fixture state cannot become live evidence.
+
+**Scope:** manual visual acceptance is pending. This experiment completes neither Slice 00.5 nor Sunday/voice/avatar runtime slices. No full product design system or other surfaces are included.

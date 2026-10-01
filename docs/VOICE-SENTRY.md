@@ -13,6 +13,12 @@ Voice is not just STT wrapped around commands. OSCAR needs four related but dist
 
 Sentry consumes the local acoustic layer continuously when enabled, but that does **not** mean continuous cloud transcription or recording.
 
+## Presentation boundaries
+
+Sunday presents **presence**, **acoustic state** and **attention** separately. `Sentry aware` is local acoustic perception, not an active conversational STT turn. `Listening` belongs to an activated conversational turn. Choosing text changes neither Sentry policy nor voice availability. Conversation mute pauses ordinary conversational turns; configured local perception/reflex/safety paths may remain available. Acoustic-awareness disabled is a separate software policy state, not proof that every microphone is physically disconnected. Missing Sentry/microphone/desktop evidence must become unavailable or unknown rather than an assurance that everything is quiet.
+
+The [current browser study](../prototypes/sunday/README.md) demonstrates these presentation distinctions with explicit scripted fixtures; it does not implement voice processing.
+
 ## Target interaction loop
 
 ```text

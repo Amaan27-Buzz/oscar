@@ -8,6 +8,8 @@ All cross-device coordination uses OSCAR-owned transport/capability contracts. T
 
 Sunday is OSCAR on the phone.
 
+Current visual evaluation is limited to [Sunday Home and Awareness](../prototypes/sunday/README.md). Home surfaces compact presence, acoustic state and at most one meaningful activity; Awareness reveals local perception, conversation mute, mode and privacy progressively. The browser study is scripted, not a native implementation or evidence that microphones/devices are connected.
+
 Primary goals:
 
 - voice and text access to the same OSCAR session/history;

@@ -72,3 +72,4 @@ build-*/
 recordings/
 captures/
 screenshots/
+/output/playwright/

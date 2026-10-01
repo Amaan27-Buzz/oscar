@@ -75,6 +75,8 @@ Exit condition: repository clearly defines OSCAR's product, architecture, engine
 
 ## Slice 01 — OSCAR Core Loop ⏭️
 
+**Parallel visual experiment, awaiting manual review:** `prototypes/sunday/` evaluates only Home and Sentry/Awareness with scripted, disconnected states. See its [research, model and verification notes](../prototypes/sunday/README.md). It establishes no production mobile stack and completes neither Slice 00.5 nor Slices 09/13. Core Loop remains next.
+
 **Goal:** prove the smallest end-to-end OSCAR execution loop before building embodiments or hardware.
 
 Deliverables:

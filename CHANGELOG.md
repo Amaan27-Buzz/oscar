@@ -6,6 +6,8 @@ Significant OSCAR milestones are recorded here. Detailed implementation status r
 
 ### Added
 
+- Isolated, dependency-free Sunday Home + Sentry/Awareness interaction study, with official shipping-product research using the Appllama skills, independent presence/acoustic/attention states, weighted puck settling, contextual disclosures, shared text/voice preview and robustness fixtures. Browser verification is separate from native/device acceptance; manual visual review remains pending and Slice 00.5 is not complete.
+
 - `ENGINEERING.md` as the canonical system-design/code-quality standard.
 - `docs/PERSONAL-POLICY.md` for open-ended natural-language preferences and policy precedence.
 - `docs/COMMUNICATION.md` for calls, messaging, meetings, transcription, dictation and AI call handling.
@@ -25,6 +27,12 @@ Significant OSCAR milestones are recorded here. Detailed implementation status r
 - Voice Identity fallback/degradation rules so TTS provider choice does not silently redefine OSCAR's voice.
 
 ### Changed
+
+- Added restrained state-specific eye/mouth shapes to the Sunday study avatar, with reduced-motion support.
+
+- Simplified the two Sunday study surfaces after manual feedback: centered physical presence, shorter state copy, compact input and Awareness controls, with explanations disclosed on demand.
+
+- Sunday visual evaluation now uses compact physical presence and a 70/20/10 restraint/tactile/personality blend. Local Sentry awareness, conversational Listening, conversation mute and software acoustic-awareness off remain distinct.
 
 - Removed `.github/README.md` so the intended root README is surfaced.
 - Roadmap starts software-first with the OSCAR Core Loop rather than ESP32/Pico hardware.

@@ -318,6 +318,8 @@ objective
 
 > **Current position:** Slice 00 is complete. Implementation begins with **Slice 01 — OSCAR Core Loop**.
 
+**Visual experiment:** [Sunday Home + Awareness](prototypes/sunday/README.md) is an isolated runnable browser study (`cd prototypes/sunday`, `npm start`, `npm test`). It uses explicit scripted states, captures no audio and connects no devices. Only two surfaces are implemented for manual review; native Sunday, runtime capabilities and Slice 00.5 are not complete. This study supersedes the earlier large-avatar Sunday concept; it does not advance the core roadmap.
+
 ## Documentation
 
 - [Product vision](docs/PRODUCT.md)

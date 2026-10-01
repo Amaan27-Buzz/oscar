@@ -416,6 +416,8 @@ The Pico enforces safety even if ESP32, OSCAR Core, transport or cloud intellige
 
 Sunday is OSCAR's mobile embodiment, not a separate assistant.
 
+The current [two-surface browser study](../prototypes/sunday/README.md) is isolated from runtime architecture. Its presentation model keeps presence, acoustic state, attention and subsystem availability independent. Scripted observations never become World Model evidence. No native stack or production state store is selected by this experiment.
+
 Planned capabilities include voice/text, notifications, phone calls/messages/actions, app automation where permitted, meetings/transcription, dictation, camera/microphone, phone context, Voice Match/Voice Map participation, biometric confirmation and continuity with other OSCAR surfaces.
 
 ## 19. Universal Channel Gateway
