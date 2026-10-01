@@ -1,19 +1,18 @@
 # Native OSCAR Infrastructure
 
-This document clarifies how the ideas proven in Amaan's separate Latch and SwitchRoute projects are used inside OSCAR.
+This document defines OSCAR-owned transport, capability, model-routing and availability infrastructure.
 
 ## Core decision
 
 OSCAR does **not** depend on Latch or SwitchRoute as completed external products.
 
-Those repositories are design/reference implementations whose useful architecture and logic are folded into OSCAR natively.
+Their useful architecture/logic is folded into OSCAR natively:
 
-The canonical OSCAR runtime therefore owns two internal subsystems:
+1. **OSCAR Transport + Capability Fabric** — informed by Latch.
+2. **OSCAR Model Router** — informed by SwitchRoute.
+3. **OSCAR Connection Grid** — the availability/control fabric connecting Sunday, cloud, desktop and Edge through those native contracts.
 
-1. **OSCAR Transport + Capability Fabric** — derived from the useful Latch architecture.
-2. **OSCAR Model Router** — derived from the useful SwitchRoute routing logic.
-
-The external repositories may remain useful as prototypes, experiments or sources of reusable ideas/code, but OSCAR must not require them to be separately deployed or complete in order to function.
+The separate repositories remain reference/prototype sources only.
 
 # 1. OSCAR Transport + Capability Fabric
 
@@ -24,12 +23,10 @@ Provide one secure typed transport between OSCAR Core and capability-bearing sur
 - desktop machine nodes;
 - Sunday;
 - Edge devices;
-- cloud/background workers;
+- cloud coordinators/background workers;
 - ChatGPT/tool surfaces;
-- external plugins/connectors;
+- plugins/connectors;
 - specialist applications.
-
-This subsystem absorbs the relevant architectural ideas from Latch directly into OSCAR.
 
 ## Responsibilities
 
@@ -39,114 +36,169 @@ This subsystem absorbs the relevant architectural ideas from Latch directly into
 - capability advertisement;
 - task/result correlation IDs;
 - reconnect/backoff;
-- streaming/progress callbacks;
+- progress/stream callbacks;
 - permission-aware dispatch;
 - audit/provenance metadata;
-- secure outbound rendezvous for private devices;
-- transport version negotiation;
-- cancellation and task-control messages;
-- health/heartbeat state where appropriate.
-
-## Native protocol boundary
+- outbound-first rendezvous for private devices;
+- protocol version negotiation;
+- cancellation/control messages;
+- health/heartbeat state;
+- replay protection/idempotency for consequential commands.
 
 Conceptually:
 
 ```text
 OSCAR Core
    │
-   ├── typed task/event/result protocol
-   │
 OSCAR Transport + Capability Fabric
-   │
-   ├── Sunday
-   ├── Desktop nodes
-   ├── Edge
-   ├── cloud/background executors
-   └── external capability adapters
+   ├─ Sunday
+   ├─ Desktop nodes
+   ├─ Edge
+   ├─ Cloud coordinator
+   └─ external capability adapters
 ```
 
-No transport implementation gets to own OSCAR's identity, memory, policy or task semantics.
+No transport implementation owns OSCAR's identity, memory, Personal Policy, Persona or task semantics.
 
 ## ChatGPT plugin / connector
 
-ChatGPT should reach OSCAR through an **OSCAR-owned plugin/connector**, not through a required Latch plugin/runtime.
+ChatGPT reaches OSCAR through an **OSCAR-owned plugin/connector**, not a required Latch plugin/runtime.
 
-The plugin is a thin doorway into OSCAR. It may expose scoped operations such as task submission/status/cancellation, capability discovery, Worker control, artifact retrieval and approved state queries, but it does not contain OSCAR's intelligence or become a second orchestration system.
-
-Conceptually:
-
-```text
-ChatGPT
-   ↓
-OSCAR plugin / connector
-   ↓
-OSCAR Transport + Capability Fabric
-   ↓
-OSCAR Core
-```
-
-Sunday, desktop, Edge and other nodes use the same native transport concepts directly rather than being routed through ChatGPT.
+The connector remains thin: authenticate, expose scoped OSCAR actions/state, translate typed calls and return task/evidence/artifact state. It does not become a second orchestration system.
 
 ## Edge
 
-ESP32-class devices use a small native OSCAR Edge transport/client rather than requiring the full desktop/runtime stack.
+ESP32-class devices use a small native OSCAR Edge client/protocol. Home devices prefer authenticated outbound sessions so users do not expose MCU services directly to the Internet.
 
-Preferred network behavior remains outbound-first so the home network does not need exposed inbound ports.
+# 2. OSCAR Connection Grid
 
-# 2. OSCAR Model Router
+The Connection Grid is the runtime topology built on native transport.
+
+```text
+                 Sunday
+        owner controls + approvals
+                    │
+      ┌─────────────┼─────────────┐
+      ▼             ▼             ▼
+   Cloud        Desktop(s)     Edge
+ rendezvous      execution   local reflex
+```
+
+Detailed behavior lives in [CONNECTION-GRID.md](CONNECTION-GRID.md).
+
+## Roles
+
+### Sunday
+
+- preferred everyday owner-control surface;
+- biometric/PIN confirmation;
+- inspect/pause/cancel/revoke work;
+- remote task continuation;
+- notifications and handoff.
+
+Sunday is not a substitute for local physical safety and is not assumed infallibly online.
+
+### Cloud coordinator
+
+- remote rendezvous;
+- durable task coordination/checkpoints;
+- notification/event fan-out;
+- remote routing when local nodes are behind NAT;
+- optional provider access/state services.
+
+Cloud remains portable and may be free-tier, paid or BYOC.
+
+### Desktop nodes
+
+- high-capability execution: Codex, terminal, filesystem, browser, computer use, installed apps, GPU/local models;
+- long-running work while the user is away;
+- remote progress/result/control through the Grid.
+
+### OSCAR Edge
+
+- local wake/VAD/Sentry signals;
+- sensors/GPIO/actuators;
+- deterministic safety/reflexes;
+- local LAN helper capabilities such as Wake-on-LAN when supported.
+
+## Remote continuation
+
+A desktop task may continue after the user leaves:
+
+```text
+start task on Desktop
+→ persist objective/checkpoint/lease
+→ user leaves with Sunday
+→ desktop continues
+→ progress/results flow through Grid
+→ Sunday can inspect / approve / cancel
+→ verify result
+→ optional sleep/shutdown machine if permitted
+```
+
+Remote power-on is exposed only when a real Wake-on-LAN/management/power capability is present.
+
+## Availability
+
+Do not model availability as one boolean.
+
+```text
+FULL        = coordinator + owner surface + available nodes
+CONNECTED   = core available, some nodes absent
+LOCAL       = cloud unavailable, permitted local paths continue
+REFLEX_ONLY = only deterministic Edge safety/reflex path remains
+OFFLINE     = no OSCAR compute path reachable from current surface
+```
+
+Durable tasks preserve state through executor loss and leases expire so dead nodes do not remain falsely `working`.
+
+# 3. OSCAR Model Router
 
 ## Purpose
 
-Provide native model/provider/credential selection without making SwitchRoute a runtime dependency.
+Provide native provider/model/credential selection without a SwitchRoute runtime dependency.
 
-The router absorbs the useful SwitchRoute logic directly into OSCAR, including the separation of provider identity, credential validity, transient health, quota/capacity, latency, cost policy, routing strategy and bounded fallback.
-
-Detailed routing behavior is canonical in [MODEL-ROUTING.md](MODEL-ROUTING.md).
+Detailed behavior is canonical in [MODEL-ROUTING.md](MODEL-ROUTING.md).
 
 ## Responsibilities
 
 - provider/model registry;
-- multi-credential pools per provider;
+- independent credential pools;
 - task/capability suitability;
-- automatic and manual routing modes;
+- automatic/manual routing modes;
 - latency/cost/quality policy;
-- provider/model/credential health and availability;
-- quota/rate/concurrency state where known;
-- fallback chains;
-- model-specific context limits/capabilities;
-- structured/vision/audio/tool-use capability metadata;
-- local/private runtime discovery boundaries;
+- provider/model/credential health;
+- known quota/rate/concurrency state;
+- fallback/circuit behavior;
+- context/tool/vision/audio capability metadata;
+- local/private runtime discovery;
 - user/project/provider policy;
-- routing telemetry and outcome history;
+- route/outcome/usage history;
 - graceful degradation.
 
-Conceptually:
-
 ```text
-Jev decides: what class of work is needed?
-        ↓
-model reasoning selected?
+Jev decides: reasoning needed?
         ↓
 OSCAR Model Router
         ↓
 provider → model → credential
         ↓
-reported/inferred result
+REPORTED / INFERRED result
         ↓
-OSCAR verification if the objective requires it
+verification if required
 ```
 
-Jev and the Model Router are different:
+Keep these boundaries separate:
 
-- **Jev** decides whether reasoning/retrieval/tool/delegation/ask-user is the right class of action.
-- **OSCAR Model Router** chooses the concrete model/provider/credential after a model path has been selected.
-- **Capability selection** chooses executable specialists such as Codex, Claude Code, OpenCode, terminal, computer use, installed applications, Sunday or Edge devices.
+```text
+Jev                  = which class of action?
+Capability selection = which executor/tool/device?
+Model Router         = which provider/model/credential?
+```
 
-Do not flatten model providers and coding/agent executors into one generic provider list.
+Coding agents, terminal, computer use and installed apps are capabilities, not ordinary model-provider entries.
 
 ## Routing modes
-
-The native router supports automatic behavior plus explicit user control. Planned profiles include:
 
 - Auto;
 - Fast;
@@ -159,95 +211,87 @@ The native router supports automatic behavior plus explicit user control. Planne
 - Manual;
 - Specialist.
 
-Auto may choose an effective mode based on task, Personal Policy and current provider/capability state. Manual selection cannot bypass permission/privacy/safety boundaries.
+Manual selection still obeys privacy, permission and safety policy.
 
 ## Provider breadth
 
-OSCAR should support an extensible adapter catalog rather than a frozen list embedded in core logic.
+The initial development set includes GroqCloud, OpenRouter, NVIDIA NIM, Google AI Studio, Z.ai, Ollama Cloud and local Ollama/LM Studio/vLLM endpoints.
 
-The initial development set includes the user's available GroqCloud, OpenRouter, NVIDIA NIM, Google AI Studio, Z.ai and Ollama Cloud credentials plus local Ollama/LM Studio/vLLM endpoints. The broader compatibility target includes the hosted/local provider families already explored in SwitchRoute and the long-tail adapter pattern demonstrated by OmniRoute-style catalogs.
+The broader provider catalog is adapter-driven. Provider breadth must not enlarge OSCAR Core.
 
-Provider breadth is a registry/adapter problem, not a reason to enlarge OSCAR Core.
+## Credential pools
 
-## Credential pools and usage
+Each credential slot tracks independent health/quota/rate/usage state where measurable. UI may show masked slot IDs, usage, models, latency, cost, quota, errors and route history, never raw key values.
 
-Providers may expose multiple credential slots. Each slot is independently health/quota/rate/usage tracked where the provider exposes enough data.
+Unknown quota is not infinite. Unknown price is not free. Unknown latency/quality gets no artificial routing advantage.
 
-The UI may show masked slot IDs, usage, models, latency, cost, quota, errors and routing history, but it must never reveal raw key values.
+# 4. Cloud deployment portability
 
-Unknown quota is not unlimited. Unknown price is not free. Unknown latency/quality must not receive an artificial routing advantage.
+OSCAR should not assume one cloud vendor.
 
-The local development credential layout is documented in the repository-root `.env.example`; real `.env` values remain local and ignored by Git.
+The coordinator/runtime should support:
 
-## ChatGPT
+- lightweight VM/container deployment;
+- event-driven/serverless rendezvous where appropriate;
+- free-tier deployment for developer/personal use;
+- paid BYOC for higher reliability.
 
-ChatGPT remains an important intelligence provider/surface, but it is reached through OSCAR-owned transport/provider adapters.
+Current deployment candidates and their limitations are maintained in `docs/CONNECTION-GRID.md` and should be re-verified before use because free tiers change.
 
-OSCAR should not require a separately deployed Latch service simply to communicate with ChatGPT.
+Avoid provider-specific types leaking into core task/transport contracts.
 
-If a ChatGPT-specific wake/trigger mechanism is needed, that implementation detail sits behind the native transport/provider boundary so it can change without changing OSCAR Core.
+# 5. Reuse policy
 
-# 3. Reuse policy
+Latch/SwitchRoute prototypes may be mined for:
 
-The separate Latch/SwitchRoute repositories can be mined for:
-
-- protocol ideas;
-- provider catalogs/adapters;
-- routing heuristics and strategies;
+- protocol/provider adapters;
+- routing heuristics;
 - quota/capacity handling;
-- circuit-breaker/health logic;
-- budget/cost logic;
-- model normalization;
+- health/circuit logic;
 - local runtime handling;
-- type definitions;
+- types;
 - failure handling;
 - tests;
 - security lessons.
 
-But integration follows this rule:
+Rule:
 
 > Reuse proven logic where useful; do not preserve a separate service boundary merely because an earlier prototype had one.
 
-Any code copied/adapted into OSCAR must still meet OSCAR's current contracts, engineering rules and tests.
+# 6. Development credentials
 
-# 4. Development credentials
-
-The developer may provide real provider credentials through a local repository-root `.env` for manual integration testing.
-
-Rules:
+The developer may provide real credentials through a local repository-root `.env` for integration testing.
 
 - real secrets never enter Git;
 - `.env.example` contains placeholders only;
-- secrets are never printed, snapshotted, sent to frontend code or copied into documentation;
-- telemetry records provider/model plus masked credential-slot IDs, not secret values;
-- automated CI uses mocks/test adapters unless scoped secrets are deliberately configured;
-- provider metadata/usage that cannot be measured remains explicitly unknown.
+- secrets are never printed/snapshotted/copied to frontend/docs;
+- telemetry stores provider/model + masked slot ID;
+- CI uses mocks/test adapters unless scoped secrets are deliberately configured;
+- unmeasured usage/quotas remain `unknown`.
 
-# 5. Ownership and availability
-
-Native ownership avoids a false dependency chain:
+# 7. Ownership
 
 ```text
 OSCAR
   ├─ owns task semantics
   ├─ owns transport semantics
   ├─ owns capability discovery
+  ├─ owns Connection Grid availability/control semantics
   ├─ owns model routing
-  ├─ owns routing/usage history
-  └─ treats providers/devices/tools as replaceable adapters
+  └─ treats cloud/providers/devices/tools as replaceable adapters
 ```
 
-This preserves the existing invariants:
+This preserves:
 
-- laptop independence;
+- desktop independence;
 - device-mesh execution;
-- provider replaceability;
-- capability loss without OSCAR identity loss;
+- replaceable cloud/provider infrastructure;
+- capability loss without identity loss;
 - evidence-backed reporting;
-- no single external prototype becoming the hidden host.
+- explicit graceful degradation.
 
-# 6. Verification milestones
+# 8. Verification milestones
 
-Detailed slices remain in `ROADMAP.md`. Cross-slice manual verification milestones are defined in [BUILD-GATES.md](BUILD-GATES.md).
+Roadmap slices remain canonical. Build Gates in [BUILD-GATES.md](BUILD-GATES.md) provide cross-slice manual checkpoints.
 
-The first routing implementation belongs to Gate A and must be manually exercised against real local developer credentials where appropriate before it is treated as a proven developer-alpha path.
+Gate A should prove native transport/model routing. Gate B should prove useful machine work and remote continuation. Later gates should prove Connection Grid failover/degradation, Sunday owner controls and Edge safety separation.
