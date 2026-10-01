@@ -2,352 +2,336 @@
 
 OSCAR's first-run experience should feel like commissioning a personal system, not clicking through generic app permissions.
 
-The setup establishes identity, OSCAR Voice Identity, Voice Match, optional Voice Map, devices, safety, services, permissions and behavior before proactive features are enabled.
+Setup establishes identity, Persona, Voice Identity, Voice Match, optional Voice Map, Connection Grid, devices, cloud coordination, permissions, Sentry/capture behavior and safety before proactive/autonomous behavior is trusted.
 
 ## Goals
 
-- make OSCAR useful immediately after setup;
+- become useful immediately;
 - collect only information that materially improves operation;
-- test critical integrations rather than assuming they work;
-- make permissions understandable;
-- make Voice Match, Voice Map and Sentry behavior explicit;
-- verify OSCAR's own voice path and self-voice suppression;
-- establish a few high-value Personal Policy rules without forcing dozens of settings;
-- finish with a complete system-health check.
+- verify integrations instead of assuming they work;
+- make privacy/permissions understandable;
+- distinguish Voice Match, Voice Map, Sentry awareness and recording/capture;
+- establish owner control through Sunday;
+- configure a recognizable OSCAR Persona without weakening truth/safety;
+- finish with evidence-backed system health.
 
 ## Setup flow
 
-### 1. Welcome and product model
+### 1. Welcome / one intelligence
 
 Explain briefly:
 
-- OSCAR is one intelligence across phone, desk, cloud providers and optional computers;
 - Sunday is OSCAR on the phone;
-- the laptop is optional;
-- local Edge hardware handles reflexes/safety;
-- cloud models handle heavy reasoning;
-- Workers can be created later by describing a responsibility;
-- OSCAR owns its transport/capability and model-routing infrastructure natively.
+- desktop machines are optional execution nodes;
+- Edge handles persistent local presence/reflex/safety;
+- cloud can provide replaceable rendezvous/durable coordination;
+- all of them form one Connection Grid;
+- Latch/SwitchRoute are not required external products.
 
-Do not present Latch or SwitchRoute as external products the user must install/configure. Their useful architecture has been folded into OSCAR.
+### 2. User identity
 
-### 2. Identity and interaction preferences
-
-Configure only high-value defaults:
+Configure:
 
 - preferred name/form of address;
-- concise vs conversational replies;
-- proactive behavior level;
-- spoken/visual acknowledgement preference;
-- quiet hours;
-- notification preferences.
+- basic notification/quiet-hour defaults;
+- concise vs conversational response preference;
+- broad proactivity preference.
 
-### 3. Personal Policy starter rules
+### 3. OSCAR Persona
+
+Let the user choose a starting character or describe it naturally.
+
+Possible starting profiles:
+
+- Wry;
+- Steady;
+- Spark;
+- Formal;
+- Custom.
+
+Expose only a few understandable traits initially:
+
+- humor;
+- candor;
+- warmth;
+- formality;
+- brevity;
+- initiative.
+
+Allow natural language such as:
+
+```text
+"Dry humor, concise, but serious on calls."
+"Less chatty and more blunt when reviewing code."
+```
+
+Make clear that truthfulness, safety and permission boundaries are fixed and cannot be turned down by Persona settings.
+
+See `docs/PERSONA.md`.
+
+### 4. Personal Policy starter rules
 
 Offer a small number of useful areas:
 
 - interruption/focus behavior;
-- call/message autonomy;
-- meeting transcription/note retention;
+- calls/messages;
+- meeting/capture retention;
 - schedule/privacy disclosure;
-- send/publish confirmation rules;
+- send/publish confirmation;
 - Worker autonomy;
-- Sentry behavior;
-- local acoustic-awareness/transcription rules.
+- Sentry/capture behavior.
 
-Make clear that the user can change these later by ordinary voice/chat.
+Keep Persona and Personal Policy distinct.
 
-### 4. OSCAR Voice Identity
+### 5. OSCAR Voice Identity
 
-Let the user hear and validate OSCAR's intended synthesized voice.
+Validate OSCAR's stable voice and relevant speaking modes:
 
-Test:
+- normal;
+- quiet/night;
+- focused/serious;
+- alert;
+- representative/professional.
 
-- normal speaking mode;
-- quiet/night mode;
-- focused/serious mode;
-- alert clarity;
-- representative/call mode where planned;
-- pronunciation of a few user/project names;
-- first-audio latency;
-- streaming/chunking behavior.
+Test pronunciation, first-audio latency, streaming/chunking and fallback degradation.
 
-The configured result becomes OSCAR's `VoiceProfile`, not merely a provider voice ID.
+### 6. Voice Match
 
-If multiple TTS providers/fallbacks are configured, test whether they preserve the intended identity well enough and record any known degradation.
+Collect realistic owner samples across volume, distance and noise. Show enrollment quality and explain Voice Match is an identity signal, not a password.
 
-### 5. Owner Voice Match enrollment
+### 7. Optional Voice Map
 
-Collect samples across realistic conditions:
-
-- normal/quiet/loud voice;
-- multiple phrases;
-- close/far microphone distance;
-- different room positions;
-- realistic background noise;
-- desk microphone and Sunday where applicable.
-
-Report enrollment quality and repeat weak samples.
-
-### 6. Voice Match policy
-
-Explain that Voice Match is an identity/authorization signal, not a password.
-
-Configure policies for harmless commands, personal information, messages/actions, call handling, Sentry controls, sensitive actions and critical actions requiring stronger confirmation.
-
-### 7. Optional Voice Map enrollment
-
-Explain the distinction:
+Explain:
 
 ```text
-Voice Match = is this an authorized speaker for this action?
-Voice Map   = who appears to be speaking in the environment?
+Voice Match = authorization evidence
+Voice Map   = who appears to be speaking
 ```
 
-Voice Map is optional and perception-oriented.
+Known-person enrollment requires appropriate consent. Unknown voices remain unknown.
 
-For owner and any deliberately enrolled known speakers:
+### 8. Self-voice suppression
 
-- collect representative samples only with appropriate consent;
-- label/link the voice profile to a canonical person only when confirmed;
-- show confidence/quality;
-- configure retention for embeddings/profiles;
-- explain that recognition never grants action permission;
-- allow leaving everyone except the owner as `unknown` by default.
+Verify OSCAR can speak without retriggering wake or mapping its own TTS as a person, while human barge-in still works.
 
-Do not silently infer identities from one ambient conversation.
+### 9. Wake / reflex commands
 
-### 8. Self-voice suppression test
+Calibrate/test deterministic commands such as:
 
-OSCAR must prove it can speak without recognizing its own output as another person or retriggering itself.
-
-Test while TTS is active:
-
-- acoustic echo cancellation/playback reference;
-- TTS-origin tagging;
-- Voice Map exclusion;
-- wake-loop prevention;
-- real human barge-in.
-
-The setup should fail this check visibly if OSCAR cannot distinguish its own playback from external speech on the current surface.
-
-### 9. Wake and reflex commands
-
-Calibrate/test:
-
-- wake word;
+- `Oscar`;
 - `Mute`;
 - `Stop`;
 - `Cancel`;
 - `Listen`;
 - `Sentry`;
-- `Stand down`.
+- `Stand down`;
+- `Pause capture`.
 
-Show measured latency and success/failure.
+### 10. Connection Grid commissioning
 
-### 10. Native transport + capability pairing
+Initialize native OSCAR Transport + Capability Fabric and pair available nodes.
 
-Initialize OSCAR's native Transport + Capability Fabric:
+Expected roles:
 
-- installation/device identity;
-- secure pairing keys/scoped credentials;
-- node discovery;
-- transport health;
-- reconnect behavior;
-- capability advertisement.
+```text
+Sunday      owner control / approvals / notifications
+Cloud       rendezvous / durable coordination (optional but recommended)
+Desktop     high-capability execution
+Edge        local presence / reflex / safety
+```
 
-The user should see devices/capabilities, not historical Latch terminology.
+Verify node identity, pairing, scoped credentials, transport health, reconnect and capability advertisement.
 
-### 11. Model providers
+Show capability/health state, not historical Latch terminology.
 
-Configure the providers the user wants OSCAR's native Model Router to use.
+See `docs/CONNECTION-GRID.md`.
 
-Possible setup includes:
+### 11. Cloud deployment choice
 
-- ChatGPT/OpenAI path where available;
-- other model providers;
-- optional local model capabilities;
-- provider priority/cost/privacy constraints.
+Offer a simple choice rather than forcing infrastructure expertise:
 
-Verify at least one reasoning path and one fallback/degradation case where practical.
+- `Free-first` — use a supported free-tier coordinator where practical;
+- `Bring my cloud` — deploy to user's AWS/GCP/Azure/Oracle/other supported target;
+- `Local only for now` — reduced remote availability, clearly explained;
+- future managed OSCAR hosting if/when offered.
 
-Do not present SwitchRoute as a separate required service.
+Provider free tiers change. Setup should discover/verify the selected deployment rather than hard-code marketing assumptions.
 
-### 12. Edge hardware discovery
+### 12. Model providers
 
-Discover/identify where available:
+Configure native Model Router providers/constraints and verify at least one real reasoning route plus one fallback/degradation case where practical.
 
-- ESP32 gateway;
-- Pico/RP2040 controller;
-- displays;
-- microphones/speakers;
-- sensors;
-- relays;
-- motors/servos;
-- cameras through suitable nodes.
+### 13. Edge discovery
 
-Show capabilities rather than raw ports unless advanced view is opened.
+Discover available ESP32/Pico, microphones/speakers, displays, sensors, relays, cameras and other capability-bearing devices.
 
-### 13. Environment model
+Show capabilities rather than raw GPIO unless Advanced is opened.
 
-Let the user define relevant places/zones such as room, desk, electronics workbench, entrance and future home zones.
+### 14. Environment model
 
-Associate sensors/devices with those zones.
+Let the user define only useful zones such as room, desk, entrance or workbench and associate relevant devices/sensors.
 
-### 14. Sunday pairing
+### 15. Sunday verification
 
-Pair the phone and verify:
+Verify actual phone capabilities:
 
 - notifications;
 - voice/text continuity;
-- OSCAR VoiceProfile behavior on phone;
-- camera/microphone permissions;
-- phone/app actions;
-- actual call/message capabilities;
-- dictation/input path;
-- meeting capture path;
 - biometric confirmation;
-- Voice Match/Voice Map participation where supported;
-- Sentry alerts.
+- microphone/camera permissions;
+- call/message capability actually exposed;
+- dictation/meeting path;
+- Connection Grid owner controls;
+- Sentry alerts;
+- Persona/Voice Identity behavior.
 
-Do not claim support for a call/app action that the platform does not expose.
+### 16. PC machine-node pairing
 
-### 15. PC machine-worker pairing
+Detect available capabilities such as Codex, terminal, filesystem, browser, computer use, IDE, Git, Python, FFmpeg, GPU/local models and installed applications.
 
-If a computer is available, connect the machine node through native OSCAR transport and detect capabilities such as Codex, Computer Use, PowerShell, browser, IDE, Git, Python, FFmpeg and GPU support.
+Test remote continuation:
 
-The user should not manually define safely detectable capabilities.
+```text
+start harmless long-running task
+→ leave task active
+→ observe from Sunday
+→ pause/cancel or let complete
+→ verify result
+```
 
-### 16. Permission matrix
+If supported, test machine sleep/shutdown after completion. Remote wake is tested only if a real Wake-on-LAN/management path exists.
 
-Use human-readable action classes rather than one broad `full access` switch.
+### 17. Permission matrix
 
-Examples:
+Use human-readable capability classes rather than `full access`.
 
 | Capability | Example default |
 |---|---|
-| Read harmless public info | Always |
-| Read calendar/personal context | Allow/deny during setup |
-| Run Codex on paired PC | Allow/ask |
-| Send a message | Confirm or Personal Policy |
-| Answer a call as user | Ask/allow by Personal Policy |
-| Publish social content | Ask by default |
-| Delete important files | Confirm |
-| Change Sentry security settings | Strong confirmation |
-| Critical financial/security action | Phone biometric/PIN + explicit approval |
+| public harmless read | allow |
+| private calendar/memory | user choice |
+| run Codex on paired PC | allow/ask |
+| send message | confirm or explicit Personal Policy |
+| answer call as user | ask/Personal Policy |
+| Context Capture / Daily Journal | off until explicitly configured |
+| delete important files | confirm |
+| change Sentry/capture security state | strong confirmation |
+| critical financial/security action | Sunday biometric/PIN + explicit approval |
 
-Voice Map cannot create permission. Personal Policy may restrict authority but cannot create ungranted permission.
+### 18. Communication defaults
 
-### 17. Communication defaults
+Configure actual supported calls/messages/email/meetings/dictation and retention behavior.
 
-Test/configure actual capabilities available on the user's devices:
+Do not claim unsupported app audio/control capability.
 
-- call handling;
-- caller exceptions;
-- messaging autonomy;
-- meeting transcription/notes;
-- raw audio/transcript retention;
-- callback/scheduling;
-- dictation mode defaults;
-- schedule/privacy disclosure.
+### 19. Sentry awareness
 
-### 18. Sentry setup
+Configure Passive/Aware/Guard/Away/Sleep plus sensors, quiet hours, alert channels, cameras, Voice Map behavior and acoustic-event classes.
 
-Configure:
-
-- enabled modes: Passive/Aware/Guard/Away/Sleep;
-- sensors used in each mode;
-- quiet hours;
-- alert channels;
-- camera use;
-- **local acoustic-awareness level**;
-- known/unknown speaker behavior from Voice Map;
-- sound-event classes;
-- workbench/device checks;
-- normal baseline period.
-
-Explicitly separate these toggles/policies:
+Explicitly separate:
 
 ```text
-listen locally for wake/VAD
-recognize known/unknown speakers
-classify configured sounds
-transcribe activated speech
-retain transcripts
-retain raw audio
+local wake/VAD
+Voice Map recognition
+sound classification
+activated conversational STT
+ambient/context STT
+raw audio retention
+transcript retention
+summary retention
+memory extraction
 ```
 
-They are not one permission.
+### 20. Optional Context Capture / Daily Journal
 
-Run at least one simulated Sentry event so the user sees exactly what OSCAR does.
+If the user wants OSCAR to keep comprehensive daily continuity, configure source-by-source capture:
 
-### 19. Personal protocols/routines
+- calls where legitimately accessible;
+- supported app calls;
+- messages/SMS;
+- email;
+- meetings;
+- voice notes;
+- in-person conversations;
+- other approved sources.
 
-Offer a few useful examples without forcing automation:
+For each source choose:
+
+- enabled/disabled;
+- consent/disclosure behavior where required;
+- raw media retention;
+- transcript retention;
+- summary/memory retention;
+- people/place/time exclusions.
+
+Offer quick privacy actions such as `Pause capture` and delete/forget controls.
+
+### 21. Personal protocols / routines
+
+Offer a few high-value examples:
 
 - leaving → Away mode + configured checks;
-- laptop online → expose machine capabilities;
+- machine online → advertise capabilities;
+- long-running desktop task → keep running + report to Sunday;
 - workbench left powered while away → verify + notify;
-- sleep routine → Sleep mode + suppress nonurgent speech;
+- sleep routine → quiet output + configured safety awareness;
 - incoming call while unavailable → apply communication policy.
 
-### 20. Worker autonomy
+### 22. Worker autonomy
 
-Explain Workers in one sentence: OSCAR can create temporary or persistent sub-agents for delegated responsibilities.
+Explain temporary/persistent Workers and configure bounded retry/reroute plus major-action confirmation defaults.
 
-Offer optional defaults for retry/reroute, routine messages, publishing and major-announcement confirmation.
+### 23. Avatar / motion / feedback
 
-### 21. Avatar and feedback calibration
+Choose motion intensity, acknowledgement sound/haptic behavior and reduced-motion preference. Verify avatar states map to actual runtime state.
 
-Choose/configure avatar motion intensity, acknowledgement sound level, spoken vs visual acknowledgements and serious/quiet mode behavior.
+### 24. End-to-end test
 
-Test listening, thinking, speaking, sentry, muted, verifying, blocked and done states.
-
-### 22. End-to-end test
-
-Before setup completes, test a chain such as:
+Test a chain such as:
 
 ```text
-voice command
-→ local wake / Voice Match
-→ OSCAR Core / Jev
-→ Personal Policy + permission
-→ native Model Router or capability path
-→ native Transport to executor if needed
+voice/text request
+→ Jev
+→ permission + Personal Policy
+→ capability/model route
+→ remote/local execution
 → result
 → verification
-→ spoken reply through OSCAR VoiceProfile
+→ response through current surface
 ```
 
-Also test:
+Also test where available:
 
-- reflex command while TTS is playing;
-- self-voice suppression while OSCAR speaks;
-- unknown speaker event if Voice Map is enabled;
-- provider unavailable fallback;
-- PC machine node offline behavior;
-- one configured communication action where available;
-- Personal Policy edit by voice/text;
-- Sentry event;
+- Sentry aware vs Listening vs Muted vs Awareness Off;
+- barge-in/self-voice suppression;
+- unknown speaker event;
+- provider fallback;
+- Connection Grid node disconnect/reconnect;
+- remote desktop task continuation;
+- Sunday owner pause/cancel;
+- capture pause/retention behavior if enabled;
+- Persona context trigger;
 - emergency stop path.
 
-## Setup completion screen
+## Completion screen
 
-Show a concise operational summary based on verified checks, for example:
+Show only verified status:
 
 ```text
 OSCAR READY
 
-Core loop             Verified
-Native transport      Healthy
-Model providers       2 available
-OSCAR voice           Verified
-Voice Match           Enrolled
-Voice Map             Owner only
-Acoustic Sentry       Local wake + speaker events
-Sunday                Connected
-Desktop worker        Optional / Connected
-Edge                   Optional / Connected
+Core loop              Verified
+Connection Grid         Healthy / Partial
+Cloud coordinator       Connected / Not configured
+Model providers         3 available
+OSCAR voice             Verified
+Persona                 Custom
+Voice Match             Enrolled
+Voice Map               Owner only
+Sentry                   Aware
+Daily Journal           Off / Configured
+Sunday                  Connected
+Desktop                 Optional / Connected
+Edge                    Optional / Connected
 ```
 
-Do not show `Ready` for a subsystem that was not actually tested. Use `Not configured`, `Unavailable`, `Partial` or `Failed` when that is the evidence-backed state.
+Never show `Ready` for something that was not actually tested.
