@@ -4,7 +4,7 @@ Sunday is OSCAR on the phone. This document captures the durable mobile interact
 
 ## Surface mode
 
-**Present, not launched.** Sunday should feel like the phone embodiment of an intelligence that is already there. It must help the user speak, type, understand OSCAR's current state, approve actions and receive meaningful proactive information without looking like a chatbot or productivity dashboard.
+**Present, not launched.** Sunday should feel like the phone embodiment of an intelligence that is already there. It must help the user speak, type, understand OSCAR's current state, approve actions, supervise remote work and receive meaningful proactive information without looking like a chatbot or productivity dashboard.
 
 ## Direction contract
 
@@ -14,7 +14,7 @@ Sunday is OSCAR on the phone. This document captures the durable mobile interact
 
 **MATERIAL.** Warm cream/off-white canvas, graphite/near-black typography, OSCAR blue/yellow identity, minimal red expression marks, restrained muted-orange warning cues, subtle natural depth and line iconography. Blue is presence, not the default color for every action.
 
-**STORY.** At a glance the user should understand whether OSCAR is present, acoustically aware, actively listening, working, verifying, waiting, blocked, muted or offline — without confusing these states.
+**STORY.** At a glance the user should understand whether OSCAR is present, acoustically aware, actively listening, working, verifying, waiting, blocked, muted, degraded or offline — without confusing those states.
 
 **FORM.** Native Android/mobile composition, not a responsive desktop/web layout placed in a phone frame. Use sheets, notifications, platform permission patterns and thumb-reachable controls when useful. Avoid permanent navigation unless real information architecture requires it.
 
@@ -29,40 +29,29 @@ The first viewport should answer only a few questions:
 
 Do not fill the viewport just because OSCAR has many capabilities.
 
-A calm state may legitimately be almost empty, but the composition must still feel intentional rather than unfinished.
-
 ## Presence and acoustic state model
 
 Sunday must not reduce voice to `Talk to OSCAR` versus `Type instead`.
 
 ### Sentry aware
 
-Local low-cost acoustic awareness may be active for:
-
-- wake word;
-- VAD / speech presence;
-- deterministic hot/reflex commands;
-- Voice Map events;
-- configured sound events;
-- barge-in while OSCAR is speaking.
-
-This is **not** the same as cloud STT or continuous transcription.
+Local low-cost acoustic awareness may be active for wake/VAD/hot commands/Voice Map/sound events while no active conversation transcript exists.
 
 ### Listening
 
-A conversational turn is active and speech recognition is running. This is an explicit active state.
+A conversational turn is active and speech recognition is running.
 
 ### Muted
 
-Normal conversational listening is disabled. Permitted safety/reflex/hot commands may remain locally available according to policy. The UI must not imply complete hardware microphone shutdown unless that is actually true.
+Normal conversational listening is disabled. Permitted safety/reflex/hot commands may remain locally available according to policy.
 
 ### Acoustic awareness disabled
 
-Local acoustic processing is genuinely disabled. This is a stronger privacy state than ordinary mute and must be presented distinctly.
+The local acoustic plane itself is disabled. This is stronger than ordinary mute.
 
 ### Typing
 
-Typing is another input modality into the same OSCAR context. Choosing text does not turn Sentry or the voice architecture off.
+Typing is another input modality in the same OSCAR context and does not automatically disable Sentry.
 
 ## Primary surfaces
 
@@ -70,182 +59,200 @@ Typing is another input modality into the same OSCAR context. Choosing text does
 
 Purpose: communicate presence and what matters now.
 
-- OSCAR presence should be visible but not dominate half the screen;
-- one concise state or greeting is enough;
-- surface at most one meaningful active/background item by default;
+- OSCAR presence visible but not half the screen;
+- one concise greeting/state;
+- at most one meaningful active/background item by default;
 - if nothing matters, say so simply;
-- voice/text interaction should be available without a giant `Talk to OSCAR` CTA;
-- a small acoustic/Sentry state can be available contextually;
-- secondary navigation should nearly disappear until needed.
-
-Do not use unrelated project names as placeholder content in design exploration.
+- voice/text interaction without a giant CTA;
+- small Sentry/acoustic state contextually available;
+- secondary navigation nearly disappears until needed.
 
 ### Listening
 
-- transition immediately from the existing home/presence geometry;
-- OSCAR should react before cloud reasoning begins;
+- transition from existing home geometry;
+- OSCAR reacts before cloud reasoning;
 - waveform/levels only while real audio is active;
-- stop/cancel/barge-in are obvious and thumb-friendly;
-- transcript may appear progressively but is not the hero;
-- do not replace the whole screen with a generic listening poster.
+- stop/cancel/barge-in obvious and thumb-friendly;
+- transcript may appear progressively but is not the hero.
 
-### Thinking / working
+### Thinking / Working / Verifying
 
-- show the real runtime state rather than a spinner;
-- use concise language such as `Looking into it`, `Running a task`, `Waiting for approval`, `Verifying`;
-- keep task detail one layer deeper;
-- the avatar/object becomes more deliberate and less playful;
-- never display `Working` if the task is actually blocked or disconnected.
-
-### Verifying
-
-Verification is a first-class visual state distinct from execution.
-
-- tighter/more deliberate motion;
-- evidence/result detail available on demand;
-- do not show celebratory completion until verification is actually satisfied where applicable.
+- show actual runtime state rather than spinner theatre;
+- task detail one layer deeper;
+- avatar motion becomes more deliberate;
+- never show `Working` when blocked/disconnected;
+- `Verifying` is distinct from executor completion;
+- completion styling only after evidence supports it.
 
 ### Speaking
 
-- subtle cadence response only;
-- no literal mouth animation unless it reaches the product quality bar;
-- human speech/barge-in interrupts immediately;
-- the listening state should grow naturally from the speaking state rather than resetting the whole layout.
+- subtle cadence response;
+- human barge-in interrupts immediately;
+- listening grows naturally from speaking rather than resetting the page.
 
 ### Sentry / awareness
 
-Purpose: explain what OSCAR is aware of without becoming surveillance software.
+Purpose: explain what OSCAR is aware of without surveillance aesthetics.
 
 - calm composition;
-- show active mode (`Passive`, `Aware`, `Guard`, `Away`, `Sleep`) only when useful;
-- distinguish local awareness from transcription/recording;
+- modes shown only when useful;
+- distinguish awareness from transcription/recording;
 - show only meaningful events by default;
-- allow the user to inspect what OSCAR is aware of and why;
-- expose privacy/retention controls one layer deeper;
-- use stronger confirmation for sensitive configuration changes where policy requires it.
+- evidence/source and privacy controls one layer deeper.
+
+### Continuity Capture / Daily Journal
+
+When explicitly enabled, Sunday should make selected capture sources and retention understandable without turning into a recorder app.
+
+Show:
+
+- current capture level: `Awareness only`, `Context capture` or `Daily journal`;
+- source availability for calls/messages/email/meetings/in-person conversation;
+- what is being retained: raw audio / transcript / summary / memory;
+- quick `Pause capture`;
+- delete/forget/source-exclusion controls;
+- clear unavailable/unsupported source states.
+
+The UI must never suggest covert recording or hide active capture state.
+
+### Connection Grid
+
+Sunday is the preferred owner control surface.
+
+The normal Grid view should stay compact:
+
+```text
+Sunday        Here
+Cloud         Healthy
+Desktop       Working · 1 task
+Desk Edge     Aware
+```
+
+Deeper node view may expose:
+
+- current task ownership;
+- actual advertised capabilities;
+- health;
+- pause/cancel/revoke;
+- remote sleep/shutdown if genuinely supported;
+- Wake-on-LAN only when a real wake path exists.
+
+Avoid network-admin UI.
+
+### Persona
+
+Persona should feel like shaping OSCAR's character, not configuring model parameters.
+
+Offer:
+
+- natural-language editing;
+- a few core controls such as Humor, Candor, Warmth, Formality, Brevity and Initiative;
+- context rules such as `university call → formal, no humor`;
+- live text/voice/motion preview;
+- fixed/non-configurable truthfulness and safety.
+
+See `PERSONA.md`.
 
 ### Muted / private
 
 - reduce motion immediately;
-- label the actual privacy/listening state clearly;
-- do not show fake waveform/listening animation;
-- distinguish ordinary mute from acoustic awareness fully disabled.
+- label actual privacy/listening state clearly;
+- distinguish mute from awareness fully disabled;
+- no fake listening waveform.
 
 ### Offline / degraded
 
-- preserve the calm visual identity;
-- say which capability disappeared rather than throwing a generic error page;
-- keep local/reflex functionality visible if it still works;
-- avoid stacking banners/modals.
+- preserve calm identity;
+- say which capability disappeared;
+- show what still works;
+- use Connection Grid availability semantics where useful (`Local`, `Connected`, etc.);
+- avoid stacked banners/modals.
+
+## Remote task continuation
+
+Sunday should make it ordinary to walk away from a computer while work continues.
+
+```text
+Desktop task running
+→ user leaves with Sunday
+→ Sunday shows current state/executor
+→ approve / pause / cancel / inspect remotely
+→ task finishes
+→ OSCAR verifies result where possible
+→ optional machine sleep/shutdown if policy/capability permits
+```
+
+Do not make this look like a separate remote-desktop product.
 
 ## Navigation
 
-Do not assume `Home / Work / History` or a four-tab assistant app.
+Do not assume a standard `Home / Work / History` assistant app.
 
-Navigation should emerge from real product use. Likely deeper destinations may include:
-
-- current work / tasks;
-- history/memory search;
-- Workers/Protocols;
-- Sentry/environment;
-- devices/capabilities;
-- settings/privacy.
-
-But normal Sunday use should remain presence-first and context-driven. OSCAR's continuous LRA history must not regress into a chat-list product.
+Likely deeper destinations may include current work, history/memory, Workers/Protocols, Sentry/Journal, Connection Grid/devices, Persona and settings/privacy, but normal use should remain presence-first and context-driven.
 
 ## Interaction surface
 
-Voice and text are peers in one continuous context.
+Voice and text are peers.
 
-Avoid a permanent giant microphone button or search-bar clone.
+Avoid a permanent giant microphone button or generic search-bar clone.
 
-A good interaction surface may:
-
-- remain compact while idle;
-- reveal text input when focused;
-- react to wake/listening without replacing the whole page;
-- morph into live audio/transcript only during an active turn;
-- collapse back into presence after the turn resolves.
-
-The exact component should be discovered through implementation and visual iteration, not frozen by a static mockup.
+A good interaction surface remains compact while idle, opens for text when focused, reacts to wake/listening in-place, morphs into live audio/transcript only during the turn, then resolves back into presence/task state.
 
 ## Fluid motion
 
 Sunday should feel alive through **continuous state transformation**, not decorative animation.
 
-Core rule:
-
 > State A should physically become State B where practical.
 
-Examples:
+Use shared elements, geometry morphing, weighted springs, gesture-linked motion, contextual expansion, content choreography and velocity continuity.
 
-```text
-present
-→ wake detected
-→ OSCAR shifts toward attention
-→ existing interaction region opens into Listening
-→ utterance becomes task state
-→ Working becomes Verifying
-→ result resolves into the same spatial system
-```
+Avoid generic page fades, particles, bouncing controls and animation that delays input.
 
-Use:
+Typical UI transitions begin within 120–220 ms. Avatar/physical motion may settle over 180–450 ms depending on meaning/distance.
 
-- shared elements;
-- geometry morphing;
-- weighted springs;
-- gesture-linked movement;
-- contextual expansion;
-- content choreography;
-- velocity continuity.
+Respect reduced motion and keep all semantics usable without animation.
 
-Avoid generic page fades, bouncing controls, particles and motion that delays input.
-
-Typical UI transitions should begin within 120–220 ms. Avatar/physical movement may settle over 180–450 ms depending on meaning and distance.
-
-Respect reduced motion and keep the UI completely usable when motion is disabled.
-
-## Avatar behavior on Sunday
+## Avatar behavior
 
 The avatar is a **presence object**, not the whole product.
 
-- small/medium in everyday home states;
-- larger only when a dedicated interaction moment earns it;
-- position/weight before facial expression;
+- small/medium in ordinary home states;
+- larger only when a dedicated interaction earns it;
+- puck position/weight before facial expression;
 - neutral face by default;
-- expression marks minimal;
-- serious states reduce animation amplitude;
-- notification/icon variants preserve recognizable identity without toy-like rendering.
+- minimal expression marks;
+- serious/Sentry states reduce playfulness;
+- Persona may subtly change acknowledgement style but not runtime truth.
 
 ## Native behavior
 
-- use Android-native navigation, sheets, text entry, permissions and biometric confirmation where appropriate;
-- respect safe areas, keyboard/inset behavior and one-handed reach;
-- use haptics to reinforce wake, confirmation and meaningful transitions;
-- do not build Sunday as a web view with mobile dimensions;
-- accessibility and reduced-motion support are part of the product, not polish.
+- Android-native navigation/sheets/text entry/permissions/biometric patterns;
+- safe areas/keyboard/insets/one-handed reach;
+- haptics for meaningful state changes;
+- never a web view pretending to be native;
+- accessibility and reduced motion are product requirements.
 
 ## Robustness cases
 
-Every Sunday surface should be checked against:
+Check Sunday against:
 
-- no current tasks;
-- many background tasks while only the most relevant is surfaced;
-- long task/title text;
+- no tasks;
+- many background tasks with only the relevant one surfaced;
+- long text;
 - microphone unavailable;
-- network/provider unavailable;
+- cloud coordinator unavailable;
 - desktop/Edge offline;
 - Sentry unavailable;
-- OSCAR working and an alert arriving simultaneously;
-- rapid switching between voice and text;
-- blocked, partial and unknown verification;
+- active capture source unavailable;
+- task running while an alert arrives;
+- rapid voice/text switching;
+- Persona context change mid-session;
+- blocked/partial/unknown verification;
 - reduced motion.
 
 The UI should degrade calmly instead of collapsing into error chrome.
 
 ## Design-development workflow
-
-Do not design the entire Sunday app in one pass.
 
 Use Kaizen:
 
@@ -253,29 +260,30 @@ Use Kaizen:
 study real shipping mobile patterns
 → build one real surface
 → inspect on target viewport/device
-→ identify the largest visual/interaction weakness
+→ identify largest weakness
 → improve it
 → verify again
-→ expand only after the pattern survives
+→ expand only when the pattern survives
 ```
 
-When available, use Appllama MCP/App Design Skill for research into real shipping mobile patterns and Impeccable for critique. Neither is a product/runtime dependency.
+Appllama/App Design research and Impeccable critique may support this workflow but are not runtime dependencies.
 
-Prefer coded UI once the direction is promising. Static image generation may support original assets, but should not become the source of truth for the whole interface.
+Prefer coded UI once the direction is promising. Static image generation is reference/asset support, not the product source of truth.
 
 ## Anti-patterns
 
-Reject Sunday designs that drift toward:
+Reject designs that drift toward:
 
 - chatbot landing pages;
-- giant `Talk to OSCAR` / `Type instead` choices;
-- giant greetings or mascot-centered poster layouts;
+- giant `Talk to OSCAR` / `Type instead` forks;
+- mascot posters;
 - generic bottom navigation without proven IA;
 - card walls;
 - blue CTA buttons everywhere;
 - glass/gradient AI styling;
-- low-information screens whose whitespace is accidental;
-- surveillance/security-dashboard Sentry;
-- static screens with motion added only at the end;
-- unrelated personal projects as sample content;
+- surveillance-dashboard Sentry;
+- hidden/ambiguous recording state;
+- network-admin Connection Grid;
+- LLM-parameter Persona UI;
+- static screens with motion sprinkled on later;
 - success styling before verification.
