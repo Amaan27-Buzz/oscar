@@ -2,205 +2,166 @@
 
 ## Overview
 
-OSCAR is a distributed personal-agent system. No single user computer is assumed to be permanently available. Low-power edge hardware preserves local presence/safety while cloud services provide heavy cognition and rendezvous.
+OSCAR is a distributed personal-intelligence system. No single ordinary user computer is assumed to be permanently available.
 
-The target is **one coherent ambient intelligence**, not a collection of disconnected assistants, bots or automations.
+The target is **one coherent ambient intelligence** spanning cloud coordination, phone, desktop machines, communications and physical Edge hardware.
 
 Two earlier projects inform the design without becoming runtime dependencies:
 
-- the useful architecture/logic from **Latch** is folded into OSCAR as the native **Transport + Capability Fabric**;
-- the useful architecture/logic from **SwitchRoute** is folded into OSCAR as the native **Model Router**.
+```text
+Latch ideas/logic       → native OSCAR Transport + Capability Fabric
+SwitchRoute ideas/logic → native OSCAR Model Router
+```
 
-OSCAR must not require either external repository to be complete or separately deployed.
+The final availability topology is the **Connection Grid**:
+
+```text
+                         User
+                          │
+                       Sunday
+              owner control / approvals
+                          │
+          ┌───────────────┼────────────────┐
+          ▼               ▼                ▼
+       Cloud           Desktop(s)        Edge
+ rendezvous/state     high compute    local reflex/safety
+          └───────────────┼────────────────┘
+                          ▼
+                OSCAR Connection Grid
+```
+
+No Grid member owns OSCAR's identity by itself.
+
+## Canonical control/data flow
 
 ```text
 User / Environment
        │
-       ├─ voice / text / screens / sensors / cameras / app events / communications
        ▼
-┌────────────────────────────────────────────────────────────┐
-│                      PERCEPTION FABRIC                     │
-│ screen • audio • Voice Map • devices • apps • sensors     │
-└────────────────────────────┬───────────────────────────────┘
-                             ▼
-┌────────────────────────────────────────────────────────────┐
-│                       WORLD MODEL                          │
-│ people • places • devices • apps • projects • tasks       │
-│ relationships • current state • freshness • provenance    │
-└────────────────────────────┬───────────────────────────────┘
-                             │
-                            Jev
-                intent + epistemic decisions
-                             │
-      ┌──────────────────────┼──────────────────────────┐
-      │                      │                          │
- memory/history          intelligence               live context
-      │                      │                          │
-LRA + Supermemory   ChatGPT / Model Router     authoritative sources
-      └──────────────────────┼──────────────────────────┘
-                             ▼
-┌────────────────────────────────────────────────────────────┐
-│                    OSCAR EXECUTIVE                         │
-│ identity • Personal Policy • Executive Planner            │
-│ permissions • Workers • Protocols • objectives            │
-└────────────────────────────┬───────────────────────────────┘
-                             ▼
-┌────────────────────────────────────────────────────────────┐
-│                 DURABLE EXECUTION RUNTIME                  │
-│ tasks • checkpoints • leases • retries • recovery         │
-└────────────────────────────┬───────────────────────────────┘
-                             ▼
-              Capability Catalog + Tool Search
-                             │
-      ┌──────────────────────┼──────────────────────────┐
-      │                      │                          │
-   Workers                Skills                   Protocols
-      └──────────────────────┼──────────────────────────┘
-                             ▼
-        Actions / Channels / Devices / Specialists
-                             │
-         ┌───────────────────┴───────────────────┐
-         ▼                                       ▼
-   Action Ledger                         Artifact / Result Model
-         │                                       │
-         └───────────────────┬───────────────────┘
-                             ▼
-                         verification
-                             │
-                  World Model / Memory update
-                             │
-                    evidence-backed report
-                             │
-             OSCAR Transport + Capability Fabric
-                             │
-      ┌──────────────────────┼──────────────────────────┐
-      ▼                      ▼                          ▼
-  OSCAR Edge               Sunday               Desktop / machine nodes
- ESP32 + Pico              Android               Windows / macOS
-      │                      │                            │
- physical world      calls / apps / channels      Codex / Computer Use /
-                     meetings / dictation         terminal / apps / IDE
+Perception Fabric
+       │
+       ▼
+World Model
+       │
+      Jev
+       │
+ ┌─────┼──────────────────────────────┐
+ │     │                              │
+Memory Live Context             Model Reasoning
+LRA    authoritative sources    native Model Router
+ │     │                              │
+ └─────┴─────────────┬────────────────┘
+                     ▼
+               OSCAR Executive
+     Personal Policy • Persona • permissions
+                     │
+                     ▼
+            Durable Execution Runtime
+                     │
+                     ▼
+        Capability Catalog + Tool Search
+                     │
+          Workers / Skills / Protocols
+                     │
+                     ▼
+              Connection Grid
+      Sunday • Cloud • Desktop • Edge
+                     │
+                     ▼
+     Apps / Channels / Devices / Specialists
+                     │
+         ┌───────────┴───────────┐
+         ▼                       ▼
+   Action Ledger          Artifact / Result
+         └───────────┬───────────┘
+                     ▼
+                 Verification
+                     │
+        World Model / Memory update
+                     │
+            evidence-backed report
 ```
-
-Physical hardware is controlled through native Edge/device capability contracts. Engineering/design/simulation software participates as ordinary installed or connected specialist capabilities, not as a mandatory workbench product.
 
 Cross-cutting layers:
 
 - Epistemic Integrity;
-- Personal Policy;
 - permissions/safety;
+- Personal Policy;
+- Persona;
 - canonical entity graph;
-- Voice Identity / Voice Match / Voice Map;
 - audit/provenance;
-- learning/evaluation.
-
-See:
-
-- [JARVIS-GAP-REVIEW.md](JARVIS-GAP-REVIEW.md)
-- [COMPETITIVE-BENCHMARK.md](COMPETITIVE-BENCHMARK.md)
-- [RUNTIME-FOUNDATIONS.md](RUNTIME-FOUNDATIONS.md)
-- [EPISTEMIC-INTEGRITY.md](EPISTEMIC-INTEGRITY.md)
-- [NATIVE-INFRASTRUCTURE.md](NATIVE-INFRASTRUCTURE.md)
-- [VOICE-SENTRY.md](VOICE-SENTRY.md)
+- learning/evaluation;
+- privacy/retention.
 
 ## 1. OSCAR Core
 
-The core owns the minimum responsibilities that must remain globally coherent:
+The core owns only responsibilities that must remain coherent across embodiments:
 
 - identity/shared assistant state;
-- active objectives/tasks/Protocols/Workers;
-- Personal Policy evaluation;
-- permission/policy checks;
+- active objectives/tasks/Workers/Protocols;
+- permissions and Personal Policy evaluation;
+- Persona selection/context triggers;
 - capability discovery requests;
-- delegation decisions;
+- delegation/reroute decisions;
 - event prioritization;
-- recovery/reroute decisions;
 - verification strategy;
-- memory/context requests;
+- memory/live-context requests;
 - World Model access;
 - Executive Planner decisions;
 - Action Ledger coordination;
-- epistemic/evidence state.
+- evidence/epistemic state.
 
-The core must not assume every request requires an LLM and must not grow into a giant framework. Breadth comes from explicit primitives, adapters and specialist capabilities.
+The core must not become a mega-framework or assume every request needs an LLM.
 
 ## 2. World Model
 
-The World Model is OSCAR's live representation of **what is true now**.
+The World Model represents **what is true now**.
 
-It is not memory. LRA/Supermemory records continuity/history; the World Model represents current entities, relationships and state with freshness/provenance.
+It is distinct from memory.
 
-Entity classes can include people, contacts, organizations, places, devices, sensors, apps, accounts, projects, repositories, tasks, Workers, Protocols and physical objects/components where perception supports them.
+Entities may include people, places, devices, sensors, apps, accounts, projects, repositories, tasks, Workers, Protocols and physical objects.
 
-State entries should carry, where useful:
+State should carry source, observed time, freshness/expiry, confidence and provenance.
 
-- source;
-- observed time;
-- freshness/expiry;
-- confidence;
-- authoritative/derived status;
-- relationship to canonical entities.
-
-Stale state becomes stale/unknown rather than current truth.
+Stale evidence becomes stale/unknown rather than current truth.
 
 ## 3. Perception Fabric
 
-The Perception Fabric normalizes current evidence before it reaches the World Model.
+Normalizes current evidence from:
 
-Inputs may include:
-
-- screen + accessibility-tree state;
-- cursor/focus/selected text;
+- screen/accessibility/cursor/selection;
 - screenshots/cameras;
 - microphone/acoustic events;
-- Voice Map speaker events;
-- application/device events;
-- phone location/activity context;
-- calendar/communications/notifications;
+- Voice Map;
+- communication events;
+- phone location/activity;
+- apps/devices;
 - Edge sensors/presence;
 - Worker/Protocol/task state.
 
-Perception is current evidence, not durable memory. Retention is a separate policy decision.
+Perception and retention are separate decisions.
 
-## 4. Jev decision layer
+## 4. Jev
 
-TypeSafe Jev is the fast typed decision layer for **intent** and **epistemic state**.
-
-It decides whether OSCAR:
-
-- already has enough evidence;
-- can execute a deterministic/local action;
-- should query the World Model;
-- should query LRA/Supermemory;
-- should inspect a live source/tool;
-- should invoke model reasoning;
-- should delegate to a specialist capability/Worker;
-- can safely repair/retry/reroute blocked work;
-- should ask the user.
-
-Conceptually:
+TypeSafe Jev decides the class of action.
 
 ```text
-known      → direct evidence is sufficient
-world      → current World Model state
+known      → direct evidence sufficient
+world      → current World Model
 recall     → LRA/Supermemory
-verify     → authoritative live source/test
-reason     → native Model Router → provider
-reported   → external agent/tool/device testimony
-specialist → Codex/computer-use/installed apps/etc.
-worker     → create/resume delegated Worker
+verify     → authoritative source/test
+reason     → native Model Router
+reported   → external testimony
+specialist → Codex/computer-use/installed app/etc.
+worker     → delegated Worker
 unknown    → retrieve/ask instead of fabricate
 ```
 
-Jev decides **whether** a model path is needed. The native Model Router decides **which** provider/model after that decision.
+Jev decides **whether** reasoning is needed. The Model Router decides **which** model/provider/credential. Capability selection decides **which executor**.
 
 ## 5. Epistemic Integrity
 
-Epistemic Integrity is a system invariant.
-
-OSCAR must distinguish intention, started execution, reported success, observed state and independently verified objective completion.
-
-Task states can include:
+Task/result states remain explicit:
 
 ```text
 planned
@@ -216,7 +177,7 @@ cancelled
 unknown
 ```
 
-Claim/evidence states can include:
+Evidence states remain distinct:
 
 ```text
 KNOWN
@@ -227,204 +188,198 @@ VERIFIED
 UNKNOWN
 ```
 
-Another agent/tool success result is testimony/evidence, not automatically truth.
+Another agent/tool/model saying `success` is evidence, not objective proof.
 
-See [EPISTEMIC-INTEGRITY.md](EPISTEMIC-INTEGRITY.md).
+## 6. Memory — LRA + Supermemory
 
-## 6. Memory: LRA + Supermemory
+LRA provides the persistent single-relationship/history architecture. Supermemory supplies semantic/profile-style memory underneath.
 
-LRA is the persistent single-conversation/history architecture. Supermemory is the semantic/profile-style backend underneath it.
+Memory includes episodic/project/device/procedural/profile/relationship context and provenance/confidence.
 
-Responsibilities include active context, episodic history, project/device/user context, procedural memory, profile/relationship memory, provenance/confidence, context assembly and cross-device continuity.
+Live authoritative state outranks stale memory when current truth matters.
 
-Memory is not universally authoritative. Live sources and current World Model evidence override stale recalled state when current truth matters.
+## 7. Live context/search
 
-## 7. Universal live context/search fabric
+OSCAR federates current-source retrieval across files, mail, messages, calendar, browser, GitHub, knowledge systems, social accounts, Sunday, desktops, Edge and Worker state.
 
-OSCAR needs one federated way to ask connected authoritative sources for current information rather than hard-coding every connector into Jev.
-
-Sources may include files/drives, mail/messages, calendar, browser state, GitHub, knowledge systems, social accounts, Sunday phone state, desktop machine state, Edge telemetry and Worker/Protocol state.
-
-Authority order is conceptually:
+Conceptual authority:
 
 ```text
 live authoritative state
-> World Model current observation
+> current World Model observation
 > structured OSCAR state
 > recent episodic memory
 > semantic/derived memory
-> model prior knowledge
+> model prior
 ```
 
-## 8. Canonical entity / relationship graph
+## 8. Entity graph
 
-One real-world entity should resolve consistently across systems.
-
-Examples:
-
-- a person across phone contact, email, messaging account, Voice Map identity and remembered relationship;
-- one company across email domain, calendar meetings, GitHub org and notes;
-- one device across OSCAR transport identity, Sunday pairing and World Model state;
-- one project across repository, files, tasks and Worker state.
+One real-world entity should resolve consistently across contacts, mail, messaging identities, Voice Map, calendar, projects, repositories, tasks and devices where evidence supports it.
 
 ## 9. Personal Policy
 
-Personal Policy is the durable behavior/preference layer, distinct from memory and permissions.
+Personal Policy is authoritative user behavior preference, distinct from memory, Persona and permissions.
 
 ```text
-memory      = what OSCAR knows
-policy      = how the user wants OSCAR to behave
-permission  = what OSCAR is authorized to do
-protocol    = persistent autonomous responsibility
+Memory          = what OSCAR remembers
+Persona         = how OSCAR expresses itself
+Personal Policy = how user wants OSCAR to behave
+Permission      = what OSCAR may do
+Protocol        = persistent autonomous responsibility
 ```
 
-Personal Policy can apply to people, apps, projects, calls, meetings, Workers, locations, Sentry modes, voice behavior, time windows and other contexts.
+## 10. Persona
 
-## 10. Executive Planner
+Persona is a configurable interaction layer.
 
-The Executive Planner coordinates the total objective set across Workers/Protocols/tasks using priority, deadlines, dependencies, resource/device availability, user interruptibility, cost, risk and Personal Policy.
+Possible traits include humor, candor, warmth, formality, brevity, playfulness, initiative and pushback, plus context triggers.
 
-It may schedule, parallelize, pause, pre-empt, reroute or defer work but never bypass policy/permissions/Jev.
+Persona may affect language, voice mode and motion amplitude. It never overrides truthfulness, safety, permission, consent or runtime state.
 
-## 11. Durable Execution Runtime
+See [PERSONA.md](PERSONA.md).
 
-The Durable Execution Runtime makes long-running work survive process restarts, executor loss and temporary provider/device failure.
+## 11. Executive Planner
 
-Durable task state includes lifecycle state, checkpoints, dependencies, executor ownership/leases, heartbeats, retry budget, cancellation, deadline, required capabilities, active surface, artifact/result refs, verification state and blocker/escalation state.
+Coordinates multiple objectives using priority, deadline, dependencies, resource/device availability, cost, risk and interruptibility.
 
-A task must never remain forever in `working` because its executor disappeared.
+It can schedule/parallelize/pause/pre-empt/reroute/defer but never bypass Jev, permissions or Personal Policy.
 
-## 12. Capability Catalog + Dynamic Tool Search
+## 12. Durable Execution Runtime
 
-Capabilities expose lightweight searchable manifests with ID/name/summary, capability class, inputs/outputs, permissions/risk, surfaces, availability, latency/cost/reliability hints, project affinity, undo metadata, provider/adapter and version.
+Long-running work carries durable task state, checkpoints, dependencies, leases/ownership, heartbeat, retry budget, cancellation, deadline, active execution surface, artifacts, verification and blockers.
 
-Detailed contracts are loaded only for a small candidate set.
+Dead executors must not remain `working` forever.
 
-## 13. Native OSCAR Model Router
+## 13. Capability Catalog + Dynamic Tool Search
 
-The Model Router is native OSCAR infrastructure based on the useful architecture/logic learned from SwitchRoute.
+Capabilities expose lightweight searchable manifests with class, inputs/outputs, permissions/risk, supported surfaces, availability, latency/cost/reliability hints, undo metadata and provider/version.
 
-It is **not** a dependency on a separate SwitchRoute deployment.
+Detailed contracts are loaded progressively only for relevant candidates.
+
+## 14. Native Model Router
+
+OSCAR owns provider/model/credential routing.
 
 Responsibilities:
 
 - provider/model registry;
-- task/capability suitability;
-- latency/cost/quality policy;
-- provider health/availability;
-- fallback chains;
-- context/capability metadata;
-- routing telemetry/history;
-- user/project/provider policy;
+- task affinity;
+- health/availability;
+- latency/cost/quality;
+- independent credential pools;
+- fallback/circuit behavior;
+- context/tool/vision/audio metadata;
+- route/outcome history;
+- manual + automatic modes;
 - graceful degradation.
 
-Flow:
+Models reason; they do not receive authority automatically.
 
-```text
-Jev: reasoning needed
-        ↓
-OSCAR Model Router
-        ↓
-provider adapter (ChatGPT / other configured model)
-        ↓
-REPORTED / INFERRED result
-        ↓
-verification when required
-```
+## 15. Native Transport + Capability Fabric
 
-ChatGPT is an important intelligence provider/surface, not OSCAR's sole brain and not the owner of OSCAR task state.
+OSCAR-owned secure typed transport provides:
 
-## 14. Native OSCAR Transport + Capability Fabric
-
-This subsystem is native OSCAR infrastructure based on the useful architecture/logic learned from Latch.
-
-It is **not** a dependency on a separate Latch deployment.
-
-Responsibilities:
-
-- bidirectional task/event/action/result transport;
 - node/session identity;
 - pairing/scoped credentials;
+- task/event/action/result transport;
 - capability advertisement;
 - correlation IDs;
-- progress/stream callbacks;
-- permission-aware dispatch;
-- audit/provenance metadata;
 - reconnect/backoff;
-- cancellation/control messages;
-- secure outbound rendezvous for private devices.
+- progress callbacks;
+- replay protection/idempotency;
+- version negotiation;
+- audit/provenance;
+- outbound-first private-device rendezvous.
 
-Conceptually:
+## 16. Connection Grid
+
+The Connection Grid uses native transport to keep OSCAR available across nodes.
+
+### Sunday
+
+Preferred owner control/approval surface. Can inspect/pause/cancel/revoke authorized work and approve sensitive actions. Cannot bypass local hardware safety.
+
+### Cloud coordinator
+
+Replaceable rendezvous/durable coordination. May be free-tier, paid or BYOC.
+
+### Desktop nodes
+
+High-capability execution: coding agents, terminal, filesystem, browser, computer use, installed apps, GPU/local models and long-running work.
+
+### Edge
+
+Persistent local wake/Sentry signals, sensors/GPIO/actuators and deterministic safety/reflexes.
+
+Availability can degrade through:
 
 ```text
-OSCAR Core
-  ↓
-native Transport + Capability Fabric
-  ├─ Sunday
-  ├─ Desktop nodes
-  ├─ Edge
-  ├─ cloud/background workers
-  └─ external adapters/providers
+FULL → CONNECTED → LOCAL → REFLEX_ONLY → OFFLINE
 ```
 
-A ChatGPT-specific wake/trigger implementation detail sits behind this boundary and can evolve without changing OSCAR Core.
+Remote continuation uses the same Durable Execution Runtime: the user can leave a desktop task running, supervise it from Sunday and optionally sleep/shut down the machine after verified completion if a real capability exists.
 
-See [NATIVE-INFRASTRUCTURE.md](NATIVE-INFRASTRUCTURE.md).
+Remote wake is exposed only when a real Wake-on-LAN/management path exists.
 
-## 15. Action Ledger + Undo
+See [CONNECTION-GRID.md](CONNECTION-GRID.md).
 
-Consequential actions produce structured ledger entries including initiator, intent, capability, permission/policy decision, target, before/result state refs, execution/verification state, evidence, limitations, reversibility/compensation metadata and correlation ID.
+## 17. Action Ledger + Undo
 
-Undo is best-effort and capability-aware.
+Consequential actions record initiator, intent, capability, permission/policy decision, target, execution state, verification state, evidence, reversibility/compensation and correlation ID.
 
-## 16. Artifact / Result Model
+Undo exists only when a real compensation is available.
 
-Finished outputs are first-class typed objects rather than being buried in chat/Worker text.
+## 18. Artifact / Result Model
 
-Examples include documents, spreadsheets/slides, media, code patches/commits/PRs, research, meeting notes, deployments, firmware builds and datasets/models/evaluations.
+Durable outputs are typed objects: docs, media, code changes, deployments, meeting notes, daily journals, firmware builds, datasets/models/evaluations and other results.
 
-Artifacts carry provenance, owner, producer capability, location/version, verification state, access scope and relationships.
+Artifacts carry provenance, ownership, location/version, access scope and verification state.
 
-## 17. OSCAR Edge
+## 19. OSCAR Edge
 
-### ESP32 — gateway / brainstem
+### ESP32
 
-Responsibilities:
-
-- Wi-Fi/network connectivity;
-- native OSCAR Edge transport client;
-- wake/VAD/audio front end where supported;
-- local event routing;
-- short-lived state/cache;
-- display/status coordination;
+- Wi-Fi/network;
+- Edge transport client;
+- wake/VAD/audio front end where practical;
+- local events;
+- display/status;
 - OTA/configuration;
-- communication with Pico/RP2040.
+- Pico communication;
+- optional LAN helper capability such as Wake-on-LAN.
 
-### RP2040/Pico — deterministic controller
-
-Responsibilities:
+### RP2040/Pico
 
 - GPIO/sensors/buttons;
 - relays/motors/actuators;
 - deterministic timing;
-- hardware interlocks;
-- emergency behavior.
+- interlocks/emergency behavior.
 
-The Pico enforces safety even if ESP32, OSCAR Core, transport or cloud intelligence fails.
+Pico/local safety remains functional if cloud/Core/transport fails.
 
-## 18. Sunday
+## 20. Sunday
 
-Sunday is OSCAR's mobile embodiment, not a separate assistant.
+Sunday is OSCAR on the phone, not another assistant.
 
-Planned capabilities include voice/text, notifications, phone calls/messages/actions, app automation where permitted, meetings/transcription, dictation, camera/microphone, phone context, Voice Match/Voice Map participation, biometric confirmation and continuity with other OSCAR surfaces.
+Responsibilities include interaction, notifications, owner approvals/control, Connection Grid supervision, supported communication, meeting/dictation/camera context, Voice Match/Map participation, Persona configuration and Sentry/capture controls.
 
-## 19. Universal Channel Gateway
+## 21. Desktop Interaction Runtime
 
-Communication adapters feed one normalized channel abstraction while preserving platform-specific limits.
+```text
+Dictate → insert/clean speech into focused target
+Edit    → transform selected/recent text
+Ask     → answer about current context
+Act     → operate current app/device/task
+```
 
-Potential channels include cellular/SMS, WhatsApp, Telegram, Signal, Discord, Slack/Teams-like channels, email, social DMs/replies and future adapters.
+Desktop context includes app/window, focused control, selection, cursor target, accessibility tree, screenshots, clipboard fallback and active task state.
 
-Integration order remains:
+## 22. Universal Channel Gateway
+
+Communication adapters normalize supported cellular/SMS, messaging, email, work channels, social DMs/replies and meetings while preserving each channel's real limits.
+
+Integration order:
 
 ```text
 native OS / official API
@@ -434,219 +389,74 @@ native OS / official API
 → unsupported / ask
 ```
 
-## 20. OSCAR Desktop + Interaction Runtime + machine Worker node
+## 23. Voice architecture
 
-The desktop Interaction Runtime exposes:
+### Voice Input
 
-```text
-Dictate → insert/clean speech into focused target
-Edit    → transform selected/recent text
-Ask     → answer about current screen/selection/context
-Act     → operate current app/device/task
-```
+Wake, VAD, streaming STT, barge-in, echo cancellation and multi-device arbitration.
 
-Context includes app/window, focused control, selected text, cursor target, accessibility tree, screenshots, clipboard fallback and active task state.
+### Voice Identity
 
-Machine nodes advertise capabilities such as Codex, computer use, terminal/PowerShell, browser, filesystem, IDEs, Python, Git, FFmpeg, Blender, local models and GPU support.
+Provider-independent VoiceProfile preserving recognizable OSCAR voice/prosody across surfaces.
 
-The desktop embodiment and machine execution node are not OSCAR's permanent host.
+### Voice Match
 
-## 21. Voice architecture
+Authorization-oriented speaker verification signal; not sufficient alone for critical actions.
 
-Voice has four distinct layers:
+### Voice Map
 
-### 21.1 Voice Input
+Perception-oriented speaker context. Unknown remains unknown. Recognition never grants permission.
 
-- wake word;
-- VAD;
-- streaming STT;
-- barge-in;
-- echo cancellation;
-- multi-device arbitration.
+### Self-voice suppression
 
-### 21.2 OSCAR Voice Identity
+OSCAR TTS is excluded from wake/Voice Map learning while preserving human barge-in.
 
-OSCAR owns a provider-independent `VoiceProfile` defining a stable synthesized voice identity, prosody/modulation policy, speaking rate/rhythm, pronunciation controls, contextual speaking modes and fallback mapping.
+## 24. Persistent Sentry
 
-The goal is one recognizably consistent OSCAR voice across Sunday, desktop and desk surfaces even if underlying TTS providers change.
+Sentry remains aware when enabled through local acoustic, device, sensor, communication and presence signals.
 
-OSCAR's voice should be natural and expressive through modulation/timing/pacing, not theatrically emotional by default.
-
-### 21.3 Voice Match
-
-Voice Match is an authorization-oriented speaker-verification signal for the owner/authorized speakers. It is not sufficient alone for critical actions.
-
-### 21.4 Voice Map
-
-Voice Map is a perception-oriented speaker layer answering `who appears to be speaking?`.
-
-Possible states include:
+Product states remain distinct:
 
 ```text
-owner
-known_person
-recognized_but_unverified
-unknown_speaker
-multiple_speakers
-uncertain
+Sentry Aware
+Listening
+Muted
+Acoustic Awareness Off
 ```
 
-Voice Map may link a speaker profile to the canonical entity graph only with sufficient evidence/confirmation. It never grants permissions by itself.
+Persistent awareness does not automatically mean full-time recording.
 
-Voice profiles/embeddings are sensitive and require retention/privacy controls.
+### Optional Context Capture / Daily Journal
 
-### 21.5 Self-voice suppression
+The user may explicitly enable selected calls/messages/mail/meetings/in-person conversations for transcription/indexing/summaries where technically and legally permitted.
 
-OSCAR must distinguish its own TTS from external speech using playback reference, echo cancellation, TTS-origin tagging and correlation where possible.
+Raw audio, transcript, summary and memory extraction are independent retention controls.
 
-OSCAR's own voice must never be learned as a person in Voice Map.
+See [VOICE-SENTRY.md](VOICE-SENTRY.md) and [COMMUNICATION.md](COMMUNICATION.md).
 
-Self-voice suppression must still allow real barge-in.
+## 25. Learning
 
-See [VOICE-SENTRY.md](VOICE-SENTRY.md).
+Verified successful paths may become candidate Skills/routines/Protocols.
 
-## 22. Multi-device voice arbitration
+Candidates are parameterized, evaluated, permission-reviewed and only then promoted. One success is not enough to create a trusted default.
 
-Sunday, desktop and physical OSCAR may hear the same wake word. Exactly one surface should normally own a voice turn.
+## 26. Self-maintenance
 
-Arbitration can consider wake confidence, signal/proximity, active device, user interaction, room/presence state and explicit device priority.
+OSCAR monitors provider/auth health, Grid node connectivity, capability staleness, task leases, Edge health, storage/state and repeated Worker failures.
 
-## 23. Sentry acoustic plane
+Safe bounded recovery may occur automatically. Otherwise OSCAR asks for the minimum needed user intervention.
 
-Sentry is not only physical sensor monitoring. When enabled, it also consumes **always-on local acoustic awareness**.
+## Architecture invariants
 
-Local low-cost signals may include:
-
-- wake word;
-- speech/non-speech presence;
-- Voice Map known/unknown speaker classification;
-- speaker changes/multiple speakers;
-- configured unusual sound classes;
-- acoustic activity useful for presence;
-- barge-in during OSCAR speech.
-
-These signals feed compact events to Perception/World Model. They do not imply continuous cloud transcription or raw-audio retention.
-
-Speech presence, speaker identity and permission to transcribe/retain content are separate decisions.
-
-## 24. Delegated Workers
-
-Workers are objective/responsibility sub-agents owned by OSCAR. They can use Sunday, desktop/browser/terminal/Codex, APIs/plugins/channels, ChatGPT/native Model Router, installed/connected specialist applications and OSCAR Edge.
-
-Persistent Workers use the Durable Execution Runtime for leases, checkpoints, retries, recovery and verification state.
-
-## 25. Capability-based delegation
-
-OSCAR decomposes objectives and chooses the most suitable specialist. Detailed capability contracts load only after catalog/search narrows candidates.
-
-## 26. Communication runtime
-
-Calls, meetings, messaging and dictation share one communication abstraction. Personal Policy determines desired behavior; platform capability determines what is technically possible; permissions determine what OSCAR may do.
-
-## 27. Learning and teach-by-demonstration
-
-Verified successful execution can become reusable procedural memory/Skill candidates. Deliberate `watch me do this once` teaching is supported where the platform can observe authorized actions.
-
-## 28. Learned Automation Evaluation Pipeline
-
-Generated/improved Skills/routines/Protocols move through candidate → normalize/parameterize → replay/evaluate → verify safety/output → compare → policy/permission review → promote/reject/experimental.
-
-## 29. Protocols, routines, Skills, Workers and plugins
-
-- **tool:** primitive callable capability;
-- **Skill:** reusable learned procedure;
-- **Worker:** delegated sub-agent;
-- **routine:** recurring/simple event-driven behavior;
-- **Protocol:** stateful long-running responsibility;
-- **plugin/connector:** external capability provider.
-
-## 30. Predictive intelligence
-
-World Model + Sentry + Executive Planner may support schedule conflict prediction, deadline risk, device/sensor anomaly trends, build-failure indicators and quiet context prefetching.
-
-Predictions remain evidence, not authority.
-
-## 31. Self-maintenance
-
-OSCAR monitors expired auth, broken adapters/channels, stale capabilities, disconnected nodes, degraded speech/model-provider latency, storage/state health, update failures and stuck tasks.
-
-Safe repair/rollback can be automatic only when bounded, authorized and evidence-backed.
-
-## 32. Physical/device + general engineering
-
-OSCAR controls and observes physical systems through native Edge/device capability contracts. Additional sensors, relays, displays, actuators, cameras and custom embedded nodes join the same Transport + Capability Fabric and advertise what they can actually do.
-
-Hardware design, CAD, circuit work, firmware, 3D, numerical simulation, diagnostics, reconstruction and optimization route to suitable installed or connected specialist software discovered through the Capability Catalog. No dedicated engineering/workbench product is a required OSCAR dependency.
-
-## 33. Latency tiers
-
-| Tier | Target | Examples |
-|---|---:|---|
-| Reflex | tens of ms to <100 ms perceived | mute, emergency stop, avatar acknowledgement |
-| Local command | ~100–400 ms target | simple device/volume/mode actions |
-| Fast intelligence | begin around sub-second where network allows | known tool lookup, short answer |
-| Deep task | seconds/minutes as required | coding, research, multi-tool execution |
-
-## 34. Streaming voice pipeline
-
-```text
-audio
-→ local wake/VAD + self-voice suppression + Voice Map event
-→ arbitration
-→ activated partial STT
-→ Jev
-→ capability/model stream
-→ OSCAR VoiceProfile / chunked TTS
-→ speaker
-```
-
-Barge-in stops current speech and returns the owning surface to listening immediately.
-
-## 35. Offline / degradation behavior
-
-- Internet unavailable: local reflexes, safety, sensors and configured acoustic/Sentry primitives continue.
-- ChatGPT unavailable: native Model Router may choose another configured provider.
-- model providers unavailable: deterministic/local/tool paths continue where possible.
-- PC offline: desktop-machine capabilities disappear; OSCAR remains alive.
-- Sunday offline: phone-owned capabilities disappear; other surfaces remain.
-- Edge unavailable: physical capabilities disappear; cloud/mobile/desktop may remain.
-- transport adapter fails: affected node capability disappears/reconnects without changing OSCAR identity.
-- World Model source stale: mark stale/unknown.
-- executor disappears: Durable Runtime reclaims/resumes or marks blocked/failed.
-- verification unavailable: report partial/unknown.
-- preferred TTS unavailable: use allowed fallback and report material Voice Identity degradation where relevant.
-
-## 36. Architectural invariants
-
-1. The laptop is optional.
-2. Hardware safety does not depend on a cloud model.
-3. Consequential actions are permission-checked, attributable, ledgered and evidence-aware.
-4. Voice/text/surfaces share task and memory state.
-5. Internal context segmentation does not become a chat-management burden.
-6. Nodes/apps/plugins advertise capabilities rather than being hard-coded assumptions.
-7. Capability definitions are discovered progressively.
-8. OSCAR uses specialists when better suited than generic reasoning.
-9. Jev retrieves/verifies before guessing missing personal/project context.
-10. A Worker/tool/model success report is not automatically verified completion.
-11. Learned Skills/Protocols/Workers never self-grant permissions.
-12. Reflex commands do not traverse the full reasoning stack.
-13. Personal Policy is distinct from memory and permission.
-14. Communication autonomy is platform-capability-aware and permission-scoped.
-15. Workers belong to OSCAR and use the best available device/service mesh.
-16. Current evidence belongs in World Model; historical continuity belongs in memory.
-17. Executive Planner coordinates Workers/Protocols.
-18. Long-running work has durable state and bounded recovery.
-19. Undo is truthful/best-effort.
-20. Finished outputs can be typed Artifacts/Results.
-21. Multiple listening surfaces arbitrate one voice turn.
-22. Point-and-talk is a first-class interaction target.
-23. Channel adapters share a gateway without erasing platform limits.
-24. The strongest user-facing claim cannot exceed evidence.
-25. Unknown/partial/blocked/failed are valid states.
-26. Native OSCAR transport replaces any requirement for a separately deployed Latch runtime.
-27. Native OSCAR Model Router replaces any requirement for a separately deployed SwitchRoute runtime.
-28. Voice Match and Voice Map are different: recognition does not imply authorization.
-29. Sentry's acoustic awareness is local-first; continuous raw room audio is not uploaded by default.
-30. OSCAR's own synthesized voice is excluded from external-speaker recognition/learning.
-31. OSCAR Voice Identity is a stable product contract independent of a particular TTS provider.
-32. Physical/device control is native OSCAR capability work; engineering applications are replaceable specialist capabilities rather than architectural dependencies.
+1. One intelligence, many embodiments.
+2. No ordinary desktop is the permanent host.
+3. Sunday is owner control, not hardware-safety override.
+4. Cloud is replaceable infrastructure.
+5. Edge safety is local/deterministic.
+6. Current World Model state is not the same as memory.
+7. Tool/model/Worker success is not verified completion.
+8. Capability availability is discovered, not assumed.
+9. Persona changes expression, never truth/authority.
+10. Sentry awareness and recording are different permissions/modes.
+11. Remote-control/power claims require real current capabilities.
+12. Latch/SwitchRoute remain reference sources, not runtime dependencies.
