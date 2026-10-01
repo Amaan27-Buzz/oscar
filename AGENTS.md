@@ -38,7 +38,8 @@ For UI/UX/motion/mobile/desktop work additionally read:
 - `DESIGN.md`
 - `TASTE.md`
 - `docs/UI-AVATAR.md`
-- `docs/SURFACES.md`.
+- `docs/SURFACES.md`
+- `docs/SUNDAY-DESIGN.md` for Sunday/mobile work.
 
 Treat these files as the current product contract. If implementation and docs disagree, investigate the mismatch rather than silently choosing one.
 
@@ -134,6 +135,8 @@ Do not violate these without an explicit architecture decision update:
 20. OSCAR owns a stable provider-independent Voice Identity.
 21. Always-on Sentry acoustic awareness is local-first and does not imply continuous cloud transcription/recording.
 22. OSCAR's own TTS is excluded from Voice Map learning/recognition while real barge-in remains functional.
+23. UI truth follows runtime truth: `Working`, `Verifying`, `Blocked`, `Partial` and `Done` must not be cosmetically collapsed.
+24. OSCAR may be acoustically aware without being in an active conversational `Listening` state.
 
 ## Voice/audio implementation rules
 
@@ -147,29 +150,85 @@ When working on voice:
 - preserve self-voice suppression via playback reference/echo cancellation/TTS tagging where possible;
 - do not hard-code OSCAR's character to one provider's default TTS voice;
 - fallback voices/providers must expose degradation rather than silently changing identity;
-- test barge-in while OSCAR is speaking.
+- test barge-in while OSCAR is speaking;
+- keep `Sentry aware`, `Listening`, `Muted` and `Acoustic awareness disabled` semantically distinct.
 
 ## Specialist delegation
 
 Do not use OSCAR's generic path when a better specialist is available.
 
 - Repository implementation/debugging → Codex or another coding agent.
-- UI/UX → Impeccable/design tooling + coding agent; verify visually.
+- UI/UX research → real shipping-product references first; use Appllama MCP/App Design Skill when available.
+- UI/UX critique → Impeccable or another suitable design-review capability when available.
+- UI implementation → coding agent; verify visually on target viewport/device.
 - GUI-only operation → computer-use worker.
 - Knowledge workflows → connected native tool/plugin when available.
 - Hardware design/provisioning → installed or connected engineering tools plus OSCAR Edge/device capabilities.
 - General model work → Jev selects reasoning class → native OSCAR Model Router selects provider.
 - Personal/complex ChatGPT-context work → ChatGPT provider adapter where appropriate.
 
+Design-research/critique tools are development aids, not runtime OSCAR dependencies.
+
 ## UI and design quality
 
-- Durable direction is **Quietly Alive**: minimal, technical, tactile and expressive.
-- Personality comes from OSCAR's avatar, voice, state, motion, timing and physicality — not generic AI decoration.
-- Avoid dashboard gravity: no card walls, permanent chat sidebar, glassmorphism, neon HUD, purple gradients or fake telemetry.
-- One dominant focal idea per surface; progressive disclosure for secondary detail.
-- UI state must reflect real runtime state.
-- Desktop/mobile are different compositions sharing one identity.
-- For substantial UI work, use appropriate design workflow and perform bounded visual verification.
+The durable direction is **Quietly Alive** with **Playful Precision**:
+
+- roughly 70% restraint/whitespace, 20% tactile industrial character, 10% approachable personality;
+- warm cream/off-white material world, graphite typography, OSCAR blue/yellow used sparingly;
+- personality from state, motion, timing, voice and the avatar/presence object — not generic AI decoration;
+- one dominant focal idea per surface;
+- progressive disclosure for secondary detail;
+- desktop/mobile are different compositions sharing one identity;
+- Sentry is calm ambient awareness, not surveillance/security-dashboard theatre;
+- the avatar is a weighted presence object, not a giant mascot;
+- avoid obvious neumorphism, glassmorphism, neon HUDs, purple gradients, card walls and fake telemetry.
+
+### Presence and input semantics
+
+Do not design ordinary mobile use around a permanent `Talk to OSCAR` / `Type instead` fork.
+
+- `Sentry aware` may keep local wake/VAD/hot-command/Voice Map/sound-event processing active without cloud transcription.
+- `Listening` means an active conversational turn/STT.
+- `Muted` disables ordinary conversational listening but may preserve allowed local reflex/safety commands.
+- `Acoustic awareness disabled` means the local acoustic plane is actually off.
+- Typing is another modality for the same OSCAR context, not a voice-off mode.
+
+### Fluid motion
+
+Motion is part of product structure, not a later polish pass.
+
+Prefer:
+
+- shared-element transitions;
+- geometry morphing;
+- contextual expansion;
+- weighted spring/inertia;
+- gesture-linked motion;
+- velocity continuity;
+- state A physically becoming state B where practical.
+
+Avoid generic fade-everything transitions, random bounce/springs, decorative particles and animation that delays input.
+
+Animation must never own runtime correctness and the UI must remain complete under reduced motion.
+
+### Kaizen design workflow
+
+Do not design dozens of screens up front.
+
+Use:
+
+```text
+research real shipping patterns
+→ build one or two real surfaces
+→ inspect visually
+→ fix the biggest weakness
+→ verify again
+→ repeat
+```
+
+Once a direction is promising, prefer real coded UI over mass-generated static mockups. Image generation is appropriate for original supporting assets/illustration/hero imagery, not as the canonical interface system.
+
+For substantial UI work, test robustness with long content, empty state, many background tasks, offline/degraded capabilities, reduced motion and conflicting simultaneous states.
 
 ## Tests
 
@@ -188,7 +247,14 @@ For voice/audio changes include, as relevant:
 - no-continuous-cloud-audio default;
 - fallback Voice Identity behavior.
 
-For UI work include target viewport/device verification, reduced motion and visual inspection when tooling allows.
+For UI work include:
+
+- target viewport/device visual verification;
+- reduced motion;
+- long/empty/degraded states;
+- real runtime-state mapping;
+- fluid transition behavior where implemented;
+- interaction responsiveness under ordinary load.
 
 For learned automation include evaluation/replay where practical before trusted promotion.
 
