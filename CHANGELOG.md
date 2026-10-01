@@ -23,6 +23,9 @@ Significant OSCAR milestones are recorded here. Detailed implementation status r
 - Always-on local acoustic Sentry plane for wake/VAD, speaker presence/classification, configured sound events and barge-in without default continuous cloud transcription.
 - Voice Map privacy/retention rules and explicit separation from authorization.
 - Voice Identity fallback/degradation rules so TTS provider choice does not silently redefine OSCAR's voice.
+- Continuous-interface motion language: shared geometry, contextual expansion, weighted springs, velocity continuity and state-driven motion rather than decorative animation.
+- Explicit UI distinction between `Sentry aware`, conversational `Listening`, `Muted`, `Acoustic awareness disabled` and text input.
+- Kaizen UI workflow: study real shipping patterns, build one or two real surfaces, visually inspect, make focused improvements and expand only after the pattern survives implementation.
 
 ### Changed
 
@@ -45,6 +48,13 @@ Significant OSCAR milestones are recorded here. Detailed implementation status r
 - Hardware and engineering work now uses native OSCAR Edge/device capabilities plus whichever installed or connected specialist applications are actually available; OSCAR has no dedicated hardware-workbench project dependency.
 - Slice 15 is physical/device capability expansion and general specialist engineering rather than integration with a separate workbench product.
 - `ENGINEERING.md`/`AGENTS.md` completion rules continue to require independent verification where practical.
+- `DESIGN.md`, `TASTE.md`, `docs/SUNDAY-DESIGN.md`, `docs/UI-AVATAR.md` and `docs/SURFACES.md` now define a warmer **Playful Precision / Quietly Alive** direction: roughly 70% restraint/whitespace, 20% tactile industrial character and 10% approachable personality.
+- OSCAR's material palette now favors warm cream/off-white surfaces and graphite typography, with blue/yellow reserved for identity and state rather than generic button chrome.
+- The avatar is explicitly a small/medium weighted presence object rather than a giant mascot; position, inertia and state should communicate more than cartoon expression.
+- Fluid motion is part of layout and state architecture, not a post-build polish pass; the UI should remain correct and usable with motion disabled.
+- Sunday is presence-first rather than a `Talk to OSCAR` launcher: Sentry may already be locally aware while an active conversational `Listening` turn remains a distinct state.
+- UI/product design now treats graceful degradation, long content, missing devices/network/microphone, simultaneous alerts/work and reduced motion as normal design cases rather than edge-case polish.
+- UI research may use Appllama MCP/App Design Skill and critique may use Impeccable when available, but these remain development aids rather than OSCAR dependencies; real coded surfaces become the source of truth once a direction is promising.
 
 ### Planned
 
