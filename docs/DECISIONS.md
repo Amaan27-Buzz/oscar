@@ -361,3 +361,58 @@ Gate E — Unified Alpha  Slices 15–17
 **Constraint:** a 2–3 day developer-alpha target does not weaken slice exit conditions, safety boundaries or epistemic-integrity rules. Partial work remains partial.
 
 See `docs/BUILD-GATES.md`.
+
+## ADR-055 — Connection Grid is OSCAR's availability and remote-control fabric
+
+**Decision:** Sunday, replaceable cloud coordination, desktop nodes and OSCAR Edge form one Connection Grid over OSCAR-owned transport/capability contracts.
+
+**Roles:** Sunday is the preferred everyday owner-control/approval surface; cloud provides portable rendezvous/durable coordination; desktops provide high-capability execution; Edge provides local perception/reflex/safety.
+
+**Constraint:** no Grid node is unrestricted merely because it is connected. Capability scope and permission are rechecked at the authoritative target.
+
+**Availability rule:** ordinary node loss degrades capabilities explicitly rather than making one hidden desktop/cloud process the permanent host.
+
+See `docs/CONNECTION-GRID.md`.
+
+## ADR-056 — Remote continuation and machine power actions require durable state and real capabilities
+
+**Decision:** long-running desktop work can continue while the user leaves and can be supervised from Sunday/cloud through the Durable Execution Runtime and Connection Grid.
+
+**Rules:**
+
+- progress/control uses durable task IDs, checkpoints and leases;
+- executor disappearance becomes waiting/blocked/reclaimable, never false completion;
+- sleep/shutdown is offered only when the online machine exposes a permitted capability;
+- remote wake is offered only when Wake-on-LAN or another approved real power-management path exists;
+- Sunday can pause/cancel/revoke user-authorized work but cannot override deterministic hardware safety.
+
+## ADR-057 — Sentry is persistent awareness; continuity capture is an explicit separate layer
+
+**Decision:** Sentry is persistently aware when enabled, but awareness, conversational Listening and durable recording/capture are separate states/capabilities.
+
+OSCAR may offer explicit `Context Capture` and `Daily Journal` modes for selected calls/messages/email/meetings/in-person conversations where technically and legally available.
+
+**Privacy rules:**
+
+- capture is source-specific and permission/consent-aware;
+- unsupported call/app capture remains unsupported;
+- raw audio, transcript, summary and memory extraction have independent retention controls;
+- capture can be paused/deleted/excluded by source/person/place/time;
+- the product is not designed around covert recording.
+
+## ADR-058 — Persona is configurable presentation, not truth or authority
+
+**Decision:** OSCAR exposes a user-configurable PersonaProfile for traits such as humor, candor, warmth, formality, brevity, playfulness, initiative and pushback, with context triggers.
+
+**Constraint:** Persona cannot reduce Epistemic Integrity, change permissions, bypass confirmation/consent or make failure/blocked state look successful.
+
+**Boundary:**
+
+```text
+Persona         = how OSCAR expresses itself
+Personal Policy = how user wants OSCAR to behave
+Permission      = what OSCAR is allowed to do
+Memory          = what OSCAR retains/recalls
+```
+
+See `docs/PERSONA.md`.
