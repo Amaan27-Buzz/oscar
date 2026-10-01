@@ -154,6 +154,8 @@ OSCAR's own generated voice must be tagged/suppressed so it does not trigger its
 
 Speech presence, speaker recognition, transcription and transcript retention are separate decisions.
 
+For product surfaces, `Sentry aware`, active conversational `Listening`, `Muted` and `Acoustic awareness disabled` are also distinct states. Typing is another modality for the same OSCAR context, not a voice-off mode.
+
 See [`docs/VOICE-SENTRY.md`](docs/VOICE-SENTRY.md).
 
 ## How OSCAR should work
@@ -166,7 +168,7 @@ See [`docs/VOICE-SENTRY.md`](docs/VOICE-SENTRY.md).
 "what is running at home?"     → Jev → live World Model/source state
 "undo that"                    → Action Ledger → real compensation if supported
 "fix this crash"               → Codex → tests → independent verification → report
-"manage SceneLab socials"      → persistent Social Worker + Personal Policy
+"manage my release updates"    → persistent Worker + Personal Policy
 "answer calls after 4 rings"   → Personal Policy + communication runtime
 "design this Pico device"      → engineering tools + Edge/device capabilities
 ```
@@ -193,9 +195,9 @@ Workers are delegated sub-agents OSCAR creates for a job or ongoing responsibili
 
 ```text
 "Research these laptops"          → temporary Research Worker
-"Watch ClearLane CI tonight"      → task Worker
-"Manage SceneLab social media"    → persistent Social Worker
-"Handle university scheduling"   → persistent Admin Worker
+"Watch this release CI tonight"   → task Worker
+"Manage my product social media"  → persistent Social Worker
+"Handle university scheduling"    → persistent Admin Worker
 ```
 
 A Worker is not inherently another generic LLM and does not require its own cloud computer. It can use Sunday, machine nodes, Codex, Computer Use, APIs/plugins, native model routing, specialist applications or OSCAR Edge.
@@ -211,7 +213,7 @@ Preferences should be as easy to change as talking to OSCAR:
 "If a recruiter calls while I'm in class, take a message."
 "For university meetings, keep detailed notes."
 "Never reveal calendar-event names, only free time."
-"Let the SceneLab worker publish ordinary feature posts without asking."
+"Let the social worker publish ordinary feature posts without asking."
 ```
 
 OSCAR keeps **memory**, **preferences/policy**, **permissions** and **Protocols** distinct.
@@ -220,18 +222,25 @@ See [`docs/PERSONAL-POLICY.md`](docs/PERSONAL-POLICY.md).
 
 ## Design language — Quietly Alive
 
-OSCAR uses a minimal, technical and tactile design language with character coming from **state, motion, timing, voice and the avatar**, not generic AI decoration.
+OSCAR's durable product language is **Quietly Alive** with **Playful Precision**.
 
 Directional blend:
 
-- **60% restrained/native product design**;
-- **20% tactile industrial character**;
-- **10% friendly character/feedback**;
-- **10% functional honesty**.
+- **70% restraint / whitespace** — calm hierarchy, editorial typography, minimal chrome;
+- **20% tactile industrial character** — physical cause/effect, precision, material honesty, satisfying state changes;
+- **10% approachable personality** — warmth and expression without becoming mascot-led.
 
-The blue-shell/yellow-face OSCAR avatar is the visual anchor. No generic AI dashboard, permanent chat sidebar, glassmorphism, neon HUD, purple AI gradient or fake telemetry.
+The material world is warm cream/off-white with graphite typography. OSCAR blue/yellow is reserved for identity, presence and meaningful state rather than generic button chrome.
 
-See [`DESIGN.md`](DESIGN.md), [`TASTE.md`](TASTE.md) and [`docs/SUNDAY-DESIGN.md`](docs/SUNDAY-DESIGN.md).
+The blue-shell/yellow-puck avatar is a weighted presence object, not a giant mascot. Fluid motion is part of the product structure: where practical, **State A physically becomes State B** through shared geometry, contextual expansion, weighted spring motion and continuous state transitions.
+
+OSCAR should feel already present. Sunday must not reduce everyday use to a giant `Talk to OSCAR` / `Type instead` fork, and Sentry awareness must not be visually confused with active transcription.
+
+The UI is designed through a Kaizen loop: study real shipping patterns, build one or two real surfaces, inspect visually, improve the biggest weakness, verify, then expand. Once a direction is promising, coded UI becomes the source of truth rather than mass-generated static mockups.
+
+No generic AI dashboard, permanent chat sidebar, card wall, glassmorphism, obvious neumorphism, neon HUD, purple AI gradient, fake telemetry or motion for motion's sake.
+
+See [`DESIGN.md`](DESIGN.md), [`TASTE.md`](TASTE.md), [`docs/SUNDAY-DESIGN.md`](docs/SUNDAY-DESIGN.md) and [`docs/UI-AVATAR.md`](docs/UI-AVATAR.md).
 
 ## Engineering philosophy
 
@@ -246,6 +255,8 @@ See [`DESIGN.md`](DESIGN.md), [`TASTE.md`](TASTE.md) and [`docs/SUNDAY-DESIGN.md
 - verify outcomes rather than trusting executor reports;
 - measure critical-path latency before optimizing;
 - prefer small reviewable/reversible changes.
+
+Product UI follows the same durability principle: **beautiful enough to feel premium, simple enough to reason about, robust enough to abuse, graceful when degraded.**
 
 See [`ENGINEERING.md`](ENGINEERING.md).
 
@@ -276,6 +287,8 @@ See [`ENGINEERING.md`](ENGINEERING.md).
 23. **OSCAR has a stable voice identity.** TTS provider choice must not define the character/product identity.
 24. **Sentry listens locally first.** Always-on acoustic awareness does not mean always-on cloud transcription.
 25. **Hardware and engineering stay capability-based.** Physical control uses OSCAR Edge/device contracts; specialist engineering software is replaceable rather than a product dependency.
+26. **Presence ≠ Listening.** Ambient/local awareness and active conversational STT are distinct product/runtime states.
+27. **Motion communicates causality.** Animation follows real state and never owns correctness.
 
 ## Implementation strategy
 
@@ -333,6 +346,8 @@ objective
 - [Feature inventory](docs/FEATURES.md)
 - [Engineering standard](ENGINEERING.md)
 - [Design system](DESIGN.md)
+- [Taste / visual quality bar](TASTE.md)
+- [Sunday design](docs/SUNDAY-DESIGN.md)
 - [Memory](docs/MEMORY.md)
 - [Personal Policy](docs/PERSONAL-POLICY.md)
 - [Communication](docs/COMMUNICATION.md)
