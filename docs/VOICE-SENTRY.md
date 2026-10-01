@@ -2,18 +2,18 @@
 
 ## Voice is a primary interface
 
-OSCAR should support voice natively across desk hardware, Sunday, desktop and other connected surfaces. Text remains equally valid and must share the same task/conversation state.
+OSCAR supports voice across Sunday, desktop, desk hardware and other connected surfaces. Text remains equally valid and shares the same task/context state.
 
-Voice is not just STT wrapped around commands. OSCAR needs four related but distinct voice layers:
+Voice has four distinct layers:
 
-1. **Voice Input** — wake, VAD, speech recognition, barge-in and dictation.
-2. **Voice Identity** — OSCAR's own stable synthesized voice and speaking behavior.
-3. **Voice Match** — authorization-oriented verification of the enrolled owner/authorized speakers.
-4. **Voice Map** — perception-oriented recognition of known/unknown speakers in the environment, linked to canonical people only when confidence and policy allow.
+1. **Voice Input** — wake, VAD, STT, barge-in and dictation.
+2. **Voice Identity** — OSCAR's stable synthesized voice and speaking behavior.
+3. **Voice Match** — authorization-oriented owner/authorized-speaker verification.
+4. **Voice Map** — perception-oriented recognition of who appears to be speaking.
 
-Sentry consumes the local acoustic layer continuously when enabled, but that does **not** mean continuous cloud transcription or recording.
+Sentry consumes local acoustic/device/environment signals persistently when enabled. This is broader than an ordinary wake-word feature.
 
-## Target interaction loop
+## Runtime audio model
 
 ```text
 microphone
@@ -21,254 +21,314 @@ microphone
 local audio front end
   ├─ echo/self-voice cancellation
   ├─ VAD
-  ├─ wake/reflex detection
-  ├─ sound-event detection
+  ├─ wake/hot/reflex detection
+  ├─ configured sound-event detection
   └─ Voice Map speaker signal
   ↓
-activation / policy gate
+Sentry / activation / policy gate
   ↓
-streaming speech recognition when needed
+streaming STT only when the selected capture/listening mode requires it
   ↓
-intent/context decision
-  ├─ reflex/local execution
-  ├─ tool/capability path
-  ├─ ChatGPT
-  └─ native OSCAR Model Router
+Jev / capability / model path
   ↓
-streamed result
+result
   ↓
-OSCAR Voice Identity / streaming TTS
-  ↓
-speaker
+OSCAR Voice Identity / TTS
 ```
 
-## Latency rules
+## Acoustic states — do not conflate them
 
-- Wake acknowledgement should be effectively immediate.
-- Reflex commands should stay local.
-- Begin speaking as soon as a useful first chunk exists; do not wait for a full paragraph.
-- Deep jobs may take time, but OSCAR should acknowledge immediately and work asynchronously.
-- Instrument end-to-end latency from audio onset to action/first audio.
-- Speaker recognition must not block harmless reflexes that do not require identity.
+### Sentry aware
+
+Persistent local acoustic/event awareness is active. OSCAR can detect wake/hot commands, speech presence, Voice Map events and configured sounds without necessarily producing a transcript.
+
+### Listening
+
+An active conversational turn is underway and speech recognition is running.
+
+### Muted
+
+Normal conversational listening/speaking behavior is suppressed according to policy. Permitted deterministic safety/reflex commands may remain locally available.
+
+`Muted` must not imply physical microphone shutdown unless that stronger state is actually active.
+
+### Acoustic awareness disabled
+
+Local acoustic processing itself is disabled. This is a stronger privacy state than ordinary mute.
+
+### Typing
+
+Typing is another input modality. Choosing text does not automatically turn Sentry or acoustic awareness off.
+
+## Sentry is persistent presence
+
+Sentry is OSCAR's always-present awareness system. It watches local acoustic, device, sensor, communication and presence events and selectively escalates meaningful situations.
+
+When enabled, Sentry should feel like OSCAR is **there**, not dormant until a button is pressed.
+
+```text
+microphones / sensors / devices / communications
+                         ↓
+                  Perception Fabric
+                         ↓
+                     Sentry
+       awareness • correlation • significance
+                  /                \
+               ordinary          meaningful
+                  ↓                  ↓
+          update context      policy / act / alert
+```
+
+Sentry can remain active while OSCAR is not in an explicit conversational turn.
+
+## Sentry modes
+
+### Passive
+
+- wake/hot/reflex commands;
+- essential health/safety signals;
+- minimal acoustic/presence awareness.
+
+### Aware
+
+- normal persistent environmental/device awareness;
+- Voice Map speaker events when enabled;
+- low-noise proactive context updates.
+
+### Guard
+
+- higher-priority security/environment awareness according to configured permissions;
+- unknown-speaker/door/camera/sensor evidence may matter more.
+
+### Away
+
+- assumes owner is away;
+- stronger anomaly significance;
+- prioritizes Sunday alerts and remote verification.
+
+### Sleep
+
+- quiet output;
+- nonurgent speech suppressed;
+- configured wake/reflex/safety/security awareness remains local.
+
+## Optional Sentry Capture / Daily Journal
+
+Persistent Sentry awareness and recording are different capabilities.
+
+The user may explicitly opt into richer continuity capture.
+
+### Awareness only — default
+
+```text
+local wake / VAD / Voice Map / sound / device events
+→ compact state
+→ no continuous transcript or raw-audio retention
+```
+
+### Context capture
+
+Authorized sources may be transcribed/indexed/summarized so OSCAR remembers what happened, while raw media is minimized or short-lived by default.
+
+Possible sources, only where legitimately accessible:
+
+- phone calls;
+- supported app calls;
+- SMS/messages;
+- email;
+- meetings;
+- voice notes;
+- in-person conversations through an authorized microphone;
+- ambient day-to-day context/events.
+
+### Daily journal
+
+Explicit durable life-log style capture across selected sources with per-source retention, consent and privacy rules.
+
+A Daily Journal can create a searchable timeline of conversations, commitments, decisions and events without requiring every raw recording to live forever.
+
+## Capture is source-specific
+
+A single `record everything` switch is not sufficient.
+
+OSCAR must know what the platform actually exposes.
+
+Examples:
+
+```text
+email/messages
+→ authorized channel/API/device access
+→ content/event ingestion
+
+phone call
+→ call metadata may be available while call-audio access is not
+→ audio capture only if OS/platform/law permits
+
+WhatsApp/Telegram/etc.
+→ official integration or legitimate device capability
+→ never assume call audio/control exists
+
+in-person conversation
+→ authorized microphone
+→ local VAD/diarization/STT according to capture policy
+```
+
+Unsupported capture remains unsupported rather than silently approximated.
+
+## Recording, transcription and retention are separate
+
+The following controls remain independent:
+
+```text
+local wake/VAD
+Voice Map speaker recognition
+sound-event classification
+activated conversation STT
+ambient/context STT
+raw audio retention
+transcript retention
+summary retention
+memory extraction
+```
+
+A user can, for example, allow local ambient transcription, discard raw audio immediately and retain only a daily summary.
+
+## Consent and legal boundary
+
+Recording laws differ by place, channel and participant.
+
+OSCAR must support:
+
+- clear recording/capture state;
+- jurisdiction/policy-aware consent requirements where known;
+- explicit per-source enablement;
+- participant/person exclusions;
+- privacy zones/times;
+- fast pause/stop commands;
+- delete/forget controls;
+- configurable retention;
+- disclosure when OSCAR acts/records where required.
+
+OSCAR must not be designed around covert recording.
+
+## Continuity processing
+
+When capture is enabled, the preferred pipeline is:
+
+```text
+source event/audio/text
+→ local/device processing where practical
+→ classify/diarize/transcribe if permitted
+→ extract people/projects/tasks/commitments
+→ create provenance-qualified context record
+→ update World Model if current
+→ update LRA/memory only according to retention policy
+→ raw material expires according to policy
+```
+
+Long transcripts are not automatically permanent memory. Summary/fact extraction and raw retention are separate.
+
+## Fast privacy controls
+
+Sunday and desktop/physical surfaces should make these easy:
+
+- `Pause capture`;
+- `Mute`;
+- `Sentry off`;
+- `Acoustic awareness off`;
+- `Forget the last 10 minutes` where technically possible;
+- delete a conversation/day/source;
+- exclude a person/place/source from durable capture.
+
+Deletion claims must match actual storage/backups/connected-source behavior.
+
+# OSCAR Voice Identity
+
+OSCAR's voice is a first-class product asset, not a provider default.
+
+A provider-independent `VoiceProfile` can include:
+
+```text
+voice/model reference
+speaking rate
+pitch/range policy
+prosody/expressiveness
+pronunciation lexicon
+pause/rhythm behavior
+volume/ducking policy
+speaking mode
+fallback mapping
+version
+```
+
+Persona affects tone/humor/formality/timing while Voice Identity stays recognizably OSCAR.
+
+See `docs/PERSONA.md`.
+
+## Speaking modes
+
+- normal;
+- quiet/night;
+- focused/serious;
+- alert;
+- representative/professional.
+
+Safety/security contexts suppress inappropriate humor/playfulness regardless of Persona.
 
 ## Barge-in
 
 Barge-in is mandatory.
 
-If OSCAR is speaking and the user says `mute`, `stop`, `no`, `not that`, or begins a new request, current TTS should stop immediately and the input should become authoritative.
+If a real person interrupts while OSCAR speaks, current TTS should stop promptly and input becomes authoritative according to policy.
 
-The voice stack therefore needs:
+Requires:
 
 - cancellable TTS;
 - active utterance/task IDs;
 - VAD while TTS is active;
-- acoustic echo cancellation;
-- an explicit playback reference so OSCAR can distinguish its own speech from external speech;
-- clear interruption semantics.
-
-# OSCAR Voice Identity
-
-OSCAR's own voice is a first-class product asset, not an arbitrary provider default.
-
-The voice identity should remain recognizably OSCAR across Sunday, desktop, desk hardware and provider fallbacks.
-
-A provider-independent `VoiceProfile` should capture, where supported:
-
-```text
-voice identity / model reference
-speaking rate
-pitch/range policy
-prosody/expressiveness policy
-pronunciation lexicon
-pause/rhythm behavior
-volume/ducking policy
-contextual speaking mode
-fallback voice mapping
-version
-```
-
-## Speaking modes
-
-The same identity can adapt without becoming a different character:
-
-- **normal** — understated conversational default;
-- **quiet/night** — softer, shorter and less interruptive;
-- **focused/serious** — restrained for failures, security or important work;
-- **alert** — concise, high-clarity warnings;
-- **meeting/call representative** — controlled and professional when speaking on the user's behalf.
-
-OSCAR should avoid exaggerated theatrical emotion by default. Expressiveness should come from intent, modulation, timing, pacing and emphasis rather than random emotional presets.
-
-## Voice-provider abstraction
-
-The speech stack may use native, local or cloud engines, but OSCAR owns the voice contract.
-
-A provider can be replaced without changing:
-
-- OSCAR's voice identity;
-- interruption behavior;
-- pronunciation rules;
-- speaking modes;
-- task/utterance state;
-- privacy policy.
-
-Fallbacks should preserve identity as closely as the available engine allows and should report material degradation when they cannot.
+- echo cancellation;
+- playback reference;
+- explicit interruption semantics.
 
 ## Self-voice suppression
 
-OSCAR must not treat its own speaker output as a person speaking to it.
+OSCAR must not hear itself as another person.
 
-Use, where available:
+Use where available:
 
-- hardware/software acoustic echo cancellation;
-- known playback-reference audio;
+- acoustic echo cancellation;
+- playback-reference audio;
 - TTS-origin tagging;
-- timing/correlation between generated frames and microphone input;
-- suppression of OSCAR's own synthesized voice from Voice Map enrollment/identity updates.
+- timing/correlation;
+- exclusion of OSCAR TTS from Voice Map learning.
 
-Self-audio suppression must not prevent real user barge-in while OSCAR is speaking.
-
-# Wake word and ambient audio
-
-The default privacy model is **local awareness first**.
-
-Ambient audio should remain on-device for wake/reflex detection, speech-presence detection, authorized Voice Map classification and configured sound events wherever practical.
-
-Raw room audio is not continuously uploaded to a cloud model.
-
-Cloud STT/transcription begins only after a valid trigger or explicitly enabled mode, such as:
-
-- wake/request activation;
-- deliberate meeting/call capture;
-- an approved Sentry event requiring transcription;
-- an explicit always-transcribe mode configured by the user.
-
-Speech presence is not equivalent to permission to retain a transcript.
-
-## Product-facing acoustic states
-
-The UI and runtime must not collapse local acoustic awareness, conversational listening and microphone/privacy controls into one boolean.
-
-### Sentry aware
-
-`Sentry aware` means the local acoustic plane may remain active for low-cost signals such as:
-
-- wake word;
-- VAD / speech presence;
-- deterministic hot/reflex commands;
-- Voice Map speaker events;
-- configured sound events;
-- barge-in while OSCAR is speaking.
-
-It does **not** mean OSCAR is actively transcribing the room or sending ambient speech to cloud STT.
-
-### Listening
-
-`Listening` means an active conversational turn is underway and speech recognition is currently processing the user's utterance.
-
-This should be an explicit transient state, not the default idle appearance of Sentry.
-
-### Muted
-
-`Muted` disables normal conversational listening/speech intake. Depending on configured policy, deterministic safety/reflex/hot commands may remain available locally.
-
-The product must not imply `Muted` means the microphone hardware is completely powered off unless that is actually true.
-
-### Acoustic awareness disabled
-
-`Acoustic awareness disabled` means the local acoustic plane itself is disabled. This is a stronger privacy state than ordinary mute and should be represented distinctly in Sunday/desktop/physical surfaces.
-
-### Text input
-
-Typing is another input modality into the same OSCAR context. Choosing text does not disable Sentry, Voice Match, Voice Map or local wake/reflex processing unless the user separately changes those settings.
-
-These distinctions should remain consistent across Sunday, desktop and physical OSCAR surfaces.
-
-# Recognition strategy
-
-The speech layer must be provider-abstracted and selected through OSCAR's native routing logic.
-
-Possible implementations may use:
-
-- native/on-device Android recognition for Sunday;
-- local wake-word/VAD/speaker processing on capable devices;
-- cloud Whisper-class transcription for activated speech;
-- alternate STT engines selected by latency, quality, availability and privacy policy.
-
-Exact providers can change; contracts and measured latency/quality matter more than vendor lock-in.
+Self-voice suppression must preserve human barge-in.
 
 # Voice Match
 
-## Purpose
-
 Voice Match answers primarily: **is this an authorized speaker for this action?**
 
-It provides fast owner/authorized-speaker verification for personal commands and Sentry behavior. It improves convenience and context but is **not cryptographic authentication**.
+It is convenient identity evidence, not cryptographic authentication.
 
-Voice Match is distinct from Voice Map. A speaker can be recognized perceptually without being authorized to perform personal actions.
-
-## Enrollment
-
-First-run setup should gather samples across:
-
-- multiple phrases;
-- normal/quiet/loud delivery;
-- close/far microphone distance;
-- different room positions;
-- realistic background noise;
-- desk microphone and Sunday where applicable.
-
-The resulting speaker profile should be tested before enrollment is accepted.
-
-## Runtime decision
-
-```text
-speech
-  ├─ what was said? ──────► intent / transcript
-  └─ who said it? ────────► speaker score
-                  \        /
-                   policy
-                     ↓
-               allow / confirm / deny
-```
-
-Speaker verification should expose confidence rather than only a boolean.
+High-risk actions require stronger factors such as Sunday biometric/PIN/explicit approval.
 
 ## Authorization levels
 
 | Level | Typical actions | Voice policy |
 |---|---|---|
-| 0 — Safety | emergency stop, stop motor, silence dangerous alarm path | should work for anyone nearby where safe |
-| 1 — Harmless | time, weather, simple lights/volume | Voice Match optional/configurable |
-| 2 — Personal | calendar, notifications, personal memory, PC context | owner/authorized speaker required |
-| 3 — Sensitive | messages, important file/app actions, Sentry configuration | strong Voice Match + contextual/explicit confirmation |
-| 4 — Critical | financial/security/destructive actions | voice alone insufficient; require biometric/PIN/explicit approval |
-
-The user can tighten these policies, but local emergency stop should fail safe.
+| 0 — Safety | stop dangerous hardware / silence | available broadly where safe |
+| 1 — Harmless | time, basic local state | configurable |
+| 2 — Personal | private calendar/memory/device context | authorized speaker normally required |
+| 3 — Sensitive | messages, important app/file actions, capture/Sentry settings | stronger identity + contextual/explicit confirmation |
+| 4 — Critical | financial/security/destructive actions | voice alone insufficient |
 
 # Voice Map
 
-## Purpose
+Voice Map answers: **who appears to be speaking?**
 
-Voice Map answers: **who appears to be speaking around OSCAR?**
+It is perception, not authorization.
 
-It is a perception layer, not an authorization database.
-
-A Voice Map entry may represent:
-
-```text
-speaker_profile_id
-canonical_person_id (optional)
-display label (optional)
-embedding/model metadata
-confidence history
-source devices / acoustic conditions
-last observed time
-consent / retention policy
-enrollment provenance
-```
-
-Possible runtime states include:
+Possible states:
 
 ```text
 owner
@@ -279,19 +339,16 @@ multiple_speakers
 uncertain
 ```
 
-## Identity rules
+Rules:
 
-- Unknown voices remain unknown rather than being guessed.
-- OSCAR should not silently assign a real-world identity from one weak acoustic match.
-- Linking a voice profile to a canonical person should require deliberate enrollment, strong corroborating evidence or user confirmation.
-- Speaker recognition confidence is evidence, not truth.
-- Voice Map does not grant permissions; Voice Match + permissions + Personal Policy still decide authority.
-- OSCAR's own synthesized voice is excluded from Voice Map learning.
-- Voice profiles and embeddings are sensitive biometric-like data and require explicit retention/privacy controls.
+- unknown remains unknown rather than guessed;
+- real-world identity linkage requires evidence/confirmation;
+- confidence remains explicit;
+- recognition grants no permission by itself;
+- profiles/embeddings are sensitive biometric-like data;
+- OSCAR's own TTS is excluded.
 
-## Speaker and conversation awareness
-
-Where enabled and technically feasible, Voice Map can provide local events such as:
+Where enabled, Voice Map can emit compact events without full transcription:
 
 ```text
 speech_started
@@ -300,16 +357,11 @@ speaker_changed
 known_speaker_present
 unknown_speaker_present
 multiple_speakers_detected
-speaker_confidence_changed
 ```
 
-Full transcription is not required for these events.
+# Reflex / hot commands
 
-Meeting/call diarization may reuse Voice Map signals, but communication-specific speaker labels should remain confidence-qualified.
-
-# Reflex command set
-
-Initial candidates:
+Initial deterministic candidates:
 
 - `Oscar`;
 - `Mute`;
@@ -318,109 +370,14 @@ Initial candidates:
 - `Enough`;
 - `Listen`;
 - `Sentry`;
-- `Stand down`.
+- `Stand down`;
+- `Pause capture`.
 
-These commands should have deterministic semantics and should not depend on a frontier model.
+These should not require frontier-model reasoning.
 
-# Sentry Mode
+# Event policy
 
-## Definition
-
-Sentry Mode is OSCAR's always-on low-power awareness system. It watches local acoustic, sensor, device and presence events, then escalates only meaningful situations.
-
-It is not `stream the room to AI all day`.
-
-```text
-microphone / sensors / devices / presence
-                  ↓
-          local perception plane
-     wake • VAD • Voice Map • sound events
-                  ↓
-            local event engine
-                  ↓
-        rules + baseline/anomaly check
-             /                \
-          normal             meaningful
-            ↓                    ↓
-         ignore/log       policy + escalation
-                               ↓
-                notify / speak / cloud reason
-```
-
-## Acoustic Sentry plane
-
-When Sentry voice awareness is enabled, the microphone front end can remain locally active for low-cost signals such as:
-
-- wake word;
-- speech/non-speech presence;
-- owner/known/unknown speaker classification;
-- speaker changes/multiple-speaker events;
-- unusual configured sound classes;
-- acoustic activity useful for room/presence state;
-- barge-in while OSCAR is speaking.
-
-This local acoustic plane should feed compact events into the Perception Fabric/World Model. It should not continuously retain raw audio or produce cloud transcripts unless policy explicitly permits it.
-
-Sentry must distinguish OSCAR's own playback from external speech.
-
-## Modes
-
-### Passive
-
-- wake word;
-- basic hardware health;
-- minimal speech/presence awareness;
-- self-voice suppression.
-
-### Aware
-
-- normal presence/device/environment monitoring;
-- local Voice Map events when enabled;
-- low-noise proactive events.
-
-### Guard
-
-- security-oriented sensors/cameras/audio-event classes according to configured permissions;
-- unknown-speaker events can carry higher priority;
-- higher alert priority.
-
-### Away
-
-- assumes the owner is not present;
-- stronger anomaly sensitivity;
-- checks configured devices/workbench conditions;
-- prioritizes Sunday alerts;
-- configured speech/unknown-speaker activity may be treated as relevant evidence.
-
-### Sleep
-
-- quiet interaction behavior;
-- wake/reflex/safety/security awareness continues;
-- suppress nonurgent speech;
-- acoustic processing remains local unless an event requires authorized escalation.
-
-## Events Sentry may monitor
-
-Subject to installed hardware and permissions:
-
-- room entry/motion;
-- door/window state;
-- device power state;
-- workbench power draw;
-- temperature/environment changes;
-- smoke/gas/water sensors;
-- OSCAR node health;
-- network/device failures;
-- phone/PC arrival or departure;
-- unusual sound classifications;
-- speech presence;
-- known/unknown speaker events from Voice Map;
-- multiple-speaker/speaker-change events;
-- scheduled conditions.
-
-## Event policy
-
-Every event should carry at least:
+Sentry events should carry:
 
 ```text
 importance
@@ -431,50 +388,18 @@ source
 correlation/task ID
 ```
 
-Voice/speaker events should additionally carry speaker-profile/canonical-person references only when supported by the evidence and retention policy.
-
 Typical outcomes:
 
-- low value → log compact state or discard;
-- useful but nonurgent → Sunday notification;
-- important while user nearby → speak;
-- urgent/safety → interrupt immediately.
-
-## Example
-
-```text
-no presence for 45 min
-+ workbench device drawing 58 W
-+ room light off
-+ Sunday indicates user away
-        ↓
-possible_device_left_on
-        ↓
-OSCAR may verify with another sensor/camera
-        ↓
-notify: “The soldering station appears to still be powered. Turn it off?”
-```
-
-No frontier model is needed to detect the initial condition.
-
-Another example:
-
-```text
-Away mode
-+ speech detected in room
-+ Voice Map: unknown speaker, high confidence
-+ phone confirms owner is away
-        ↓
-meaningful presence event
-        ↓
-verify with configured sensor/camera if allowed
-        ↓
-alert according to Personal Policy
-```
+- ignore/discard;
+- compact context update;
+- durable journal entry if enabled;
+- Sunday notification;
+- spoken alert;
+- urgent interruption/action within authority.
 
 ## Safety separation
 
-Sentry may decide that something deserves attention, but physical emergency protections remain deterministic:
+Physical emergency protections remain deterministic:
 
 - thermal cutoffs;
 - over-current protection;
@@ -482,4 +407,16 @@ Sentry may decide that something deserves attention, but physical emergency prot
 - emergency stop;
 - battery protection.
 
-Those paths must remain safe if OSCAR Core, native OSCAR transport, cloud intelligence or the Internet is unavailable.
+Sentry/cloud intelligence may coordinate or alert but never replaces those paths.
+
+## Invariants
+
+1. Sentry is persistent awareness when enabled, not merely a wake-word screen.
+2. Sentry awareness does not automatically mean cloud transcription or durable recording.
+3. Optional Context Capture/Daily Journal may retain authorized day-to-day communications/conversations under explicit policy.
+4. Every source is capability- and consent-aware; unsupported capture is never fabricated.
+5. Raw audio, transcripts, summaries and memory extraction have separate retention controls.
+6. Voice Match and Voice Map remain separate.
+7. Persona cannot weaken voice/privacy/security rules.
+8. OSCAR's own TTS never becomes an external speaker identity.
+9. Local safety/reflex paths continue if cloud/model layers fail.
