@@ -145,6 +145,45 @@ Cloud STT/transcription begins only after a valid trigger or explicitly enabled 
 
 Speech presence is not equivalent to permission to retain a transcript.
 
+## Product-facing acoustic states
+
+The UI and runtime must not collapse local acoustic awareness, conversational listening and microphone/privacy controls into one boolean.
+
+### Sentry aware
+
+`Sentry aware` means the local acoustic plane may remain active for low-cost signals such as:
+
+- wake word;
+- VAD / speech presence;
+- deterministic hot/reflex commands;
+- Voice Map speaker events;
+- configured sound events;
+- barge-in while OSCAR is speaking.
+
+It does **not** mean OSCAR is actively transcribing the room or sending ambient speech to cloud STT.
+
+### Listening
+
+`Listening` means an active conversational turn is underway and speech recognition is currently processing the user's utterance.
+
+This should be an explicit transient state, not the default idle appearance of Sentry.
+
+### Muted
+
+`Muted` disables normal conversational listening/speech intake. Depending on configured policy, deterministic safety/reflex/hot commands may remain available locally.
+
+The product must not imply `Muted` means the microphone hardware is completely powered off unless that is actually true.
+
+### Acoustic awareness disabled
+
+`Acoustic awareness disabled` means the local acoustic plane itself is disabled. This is a stronger privacy state than ordinary mute and should be represented distinctly in Sunday/desktop/physical surfaces.
+
+### Text input
+
+Typing is another input modality into the same OSCAR context. Choosing text does not disable Sentry, Voice Match, Voice Map or local wake/reflex processing unless the user separately changes those settings.
+
+These distinctions should remain consistent across Sunday, desktop and physical OSCAR surfaces.
+
 # Recognition strategy
 
 The speech layer must be provider-abstracted and selected through OSCAR's native routing logic.
