@@ -169,7 +169,7 @@ class Runtime:
                     TaskState.BLOCKED
                     if result.error
                     and (
-                        result.error.startswith("freshness_unavailable")
+                        result.error.startswith(("freshness_unavailable", "connector_blocked:"))
                         or result.error
                         in {"route_unavailable", "network_policy_blocked", "network_failure"}
                     )
