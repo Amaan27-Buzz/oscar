@@ -64,223 +64,218 @@
   "models": [
     {
       "provider_id": "groq",
-      "id": "llama-3.1-8b-instant",
-      "capabilities": [
-        "text"
-      ],
-      "quality": 1,
+      "id": "openai/gpt-oss-20b",
+      "capabilities": ["text"],
+      "quality": 2,
       "affinities": {
-        "reasoning": 0.5,
-        "extraction": 0.5
+        "reasoning": 0.65,
+        "extraction": 0.9
       },
-      "context_limit": 4096,
-      "output_limit": 1024,
+      "context_limit": 131072,
+      "output_limit": 65536,
       "funding": "free",
-      "provenance": "developer seed 2026-10-02; quality/limits are conservative configuration, not observed benchmarks; account quota UNKNOWN",
+      "provenance": "official Groq supported-model/deprecation docs checked 2026-10-02; replaces retired llama-3.1-8b-instant; free-account availability is user/account-specific and live capacity remains UNKNOWN",
       "last_verified": null
     },
     {
       "provider_id": "groq",
-      "id": "llama-3.3-70b-versatile",
-      "capabilities": [
-        "text"
-      ],
-      "quality": 3,
+      "id": "openai/gpt-oss-120b",
+      "capabilities": ["text"],
+      "quality": 4,
       "affinities": {
-        "reasoning": 0.5,
-        "extraction": 0.5
+        "reasoning": 0.9,
+        "extraction": 0.75
       },
-      "context_limit": 4096,
-      "output_limit": 1024,
+      "context_limit": 131072,
+      "output_limit": 65536,
       "funding": "free",
-      "provenance": "developer seed 2026-10-02; quality/limits are conservative configuration, not observed benchmarks; account quota UNKNOWN",
+      "provenance": "official Groq supported-model/deprecation docs checked 2026-10-02; recommended replacement for retired llama-3.3-70b-versatile; free-account availability is user/account-specific and live capacity remains UNKNOWN",
+      "last_verified": null
+    },
+    {
+      "provider_id": "groq",
+      "id": "qwen/qwen3.8-27b",
+      "capabilities": ["text"],
+      "quality": 4,
+      "affinities": {
+        "reasoning": 0.85,
+        "extraction": 0.7
+      },
+      "context_limit": 131072,
+      "output_limit": 16384,
+      "funding": "free",
+      "provenance": "official Groq current preview/deprecation docs checked 2026-10-02; replaces retired qwen/qwen3.6-27b; preview availability may change and must be live-checked",
       "last_verified": null
     },
     {
       "provider_id": "openrouter",
-      "id": "liquid/lfm-2.5-2.6b:free",
-      "capabilities": [
-        "text"
-      ],
-      "quality": 1,
+      "id": "openrouter/free",
+      "capabilities": ["text"],
+      "quality": 2,
       "affinities": {
-        "reasoning": 0.5,
-        "extraction": 0.5
+        "reasoning": 0.6,
+        "extraction": 0.65
       },
-      "context_limit": 4096,
-      "output_limit": 1024,
       "funding": "free",
-      "provenance": "live inventory and exact-response generation observed 2026-10-02; quality/limits remain conservative configuration, not benchmarks; account quota UNKNOWN",
+      "provenance": "official OpenRouter free-model collection checked 2026-10-02; dynamic free route intentionally replaces a stale fixed free-model seed; concrete backing model and limits must be retained from live route metadata",
+      "last_verified": null
+    },
+    {
+      "provider_id": "nvidia",
+      "id": "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "capabilities": ["text"],
+      "quality": 3,
+      "affinities": {
+        "reasoning": 0.75,
+        "extraction": 0.7
+      },
+      "funding": "free",
+      "provenance": "official NVIDIA API catalog checked 2026-10-02; current Free Endpoint candidate; exact account availability still requires live inventory/probe",
       "last_verified": null
     },
     {
       "provider_id": "nvidia",
       "id": "nvidia/nemotron-3-super-120b-a12b",
-      "capabilities": [
-        "text"
-      ],
+      "capabilities": ["text"],
       "quality": 4,
       "affinities": {
-        "reasoning": 0.5,
-        "extraction": 0.5
+        "reasoning": 0.9,
+        "extraction": 0.75
       },
-      "context_limit": 4096,
-      "output_limit": 1024,
-      "funding": "unknown",
-      "provenance": "live inventory and exact-response generation observed 2026-10-02; quality/limits remain conservative configuration, not benchmarks; account quota UNKNOWN",
+      "context_limit": 1000000,
+      "funding": "free",
+      "provenance": "official NVIDIA API catalog checked 2026-10-02; current Free Endpoint and previously observed live; account quota remains UNKNOWN",
+      "last_verified": null
+    },
+    {
+      "provider_id": "nvidia",
+      "id": "nvidia/nemotron-3-ultra-550b-a55b",
+      "capabilities": ["text"],
+      "quality": 5,
+      "affinities": {
+        "reasoning": 0.95,
+        "extraction": 0.75
+      },
+      "context_limit": 1000000,
+      "funding": "free",
+      "provenance": "official NVIDIA API catalog checked 2026-10-02; current Free Endpoint candidate; exact account availability still requires live inventory/probe",
       "last_verified": null
     },
     {
       "provider_id": "google",
-      "id": "gemini-3.1-flash-lite",
-      "capabilities": [
-        "text"
-      ],
+      "id": "gemini-3.5-flash-lite",
+      "capabilities": ["text"],
       "quality": 2,
       "affinities": {
-        "reasoning": 0.5,
-        "extraction": 0.5
+        "reasoning": 0.65,
+        "extraction": 0.9
       },
-      "context_limit": 4096,
-      "output_limit": 1024,
       "funding": "free",
-      "provenance": "live inventory and exact-response generation observed 2026-10-02; quality/limits remain conservative configuration, not benchmarks; account quota UNKNOWN",
+      "provenance": "official Gemini models guide checked 2026-10-02; current stable high-throughput Flash-Lite candidate; account free-tier limits remain live/account metadata",
       "last_verified": null
     },
     {
       "provider_id": "google",
-      "id": "gemini-2.5-flash",
-      "capabilities": [
-        "text"
-      ],
-      "quality": 3,
+      "id": "gemini-3.8-flash",
+      "capabilities": ["text"],
+      "quality": 4,
       "affinities": {
-        "reasoning": 0.5,
-        "extraction": 0.5
+        "reasoning": 0.9,
+        "extraction": 0.85
       },
-      "context_limit": 4096,
-      "output_limit": 1024,
       "funding": "free",
-      "provenance": "developer seed 2026-10-02; quality/limits are conservative configuration, not observed benchmarks; account quota UNKNOWN",
+      "provenance": "official Gemini models guide checked 2026-10-02; current stable flagship Flash candidate; account free-tier limits remain live/account metadata",
       "last_verified": null
     },
     {
       "provider_id": "zai",
-      "id": "glm-4.5-air",
-      "capabilities": [
-        "text"
-      ],
+      "id": "glm-5.3-flash",
+      "capabilities": ["text"],
       "quality": 3,
       "affinities": {
-        "reasoning": 0.5,
-        "extraction": 0.5
+        "reasoning": 0.75,
+        "extraction": 0.75
       },
-      "context_limit": 4096,
-      "output_limit": 1024,
       "funding": "unknown",
-      "provenance": "developer seed 2026-10-02; quality/limits are conservative configuration, not observed benchmarks; account quota UNKNOWN",
+      "provenance": "current Z.ai/Ollama model announcements checked 2026-10-02; Z.ai general API balance and Coding Plan quota are distinct and must be discovered separately",
       "last_verified": null
     },
     {
-      "provider_id": "ollama-cloud",
-      "id": "gemma4:31b",
-      "capabilities": [
-        "text"
-      ],
-      "quality": 2,
-      "affinities": {
-        "reasoning": 0.5,
-        "extraction": 0.5
-      },
-      "context_limit": 4096,
-      "output_limit": 1024,
-      "funding": "free",
-      "provenance": "live inventory and exact-response generation observed 2026-10-02; quality/limits remain conservative configuration, not benchmarks; account quota UNKNOWN",
-      "last_verified": null
-    },
-    {
-      "provider_id": "ollama-cloud",
-      "id": "gpt-oss:120b",
-      "capabilities": [
-        "text"
-      ],
-      "quality": 4,
-      "affinities": {
-        "reasoning": 0.5,
-        "extraction": 0.5
-      },
-      "context_limit": 4096,
-      "output_limit": 1024,
-      "funding": "free",
-      "provenance": "developer seed 2026-10-02; quality/limits are conservative configuration, not observed benchmarks; account quota UNKNOWN",
-      "last_verified": null
-    },
-    {
-      "provider_id": "ollama-cloud",
-      "id": "gpt-oss:20b",
-      "capabilities": [
-        "text"
-      ],
-      "quality": 2,
-      "affinities": {
-        "reasoning": 0.5,
-        "extraction": 0.5
-      },
-      "context_limit": 4096,
-      "output_limit": 1024,
-      "funding": "free",
-      "provenance": "developer seed 2026-10-02; quality/limits are conservative configuration, not observed benchmarks; account quota UNKNOWN",
-      "last_verified": null
-    },
-    {
-      "provider_id": "ollama-cloud",
-      "id": "nemotron-3-nano:30b",
-      "capabilities": [
-        "text"
-      ],
-      "quality": 2,
-      "affinities": {
-        "reasoning": 0.5,
-        "extraction": 0.5
-      },
-      "context_limit": 4096,
-      "output_limit": 1024,
-      "funding": "free",
-      "provenance": "developer seed 2026-10-02; quality/limits are conservative configuration, not observed benchmarks; account quota UNKNOWN",
-      "last_verified": null
-    },
-    {
-      "provider_id": "ollama-cloud",
-      "id": "nemotron-3-super",
-      "capabilities": [
-        "text"
-      ],
-      "quality": 4,
-      "affinities": {
-        "reasoning": 0.5,
-        "extraction": 0.5
-      },
-      "context_limit": 4096,
-      "output_limit": 1024,
-      "funding": "free",
-      "provenance": "developer seed 2026-10-02; quality/limits are conservative configuration, not observed benchmarks; account quota UNKNOWN",
-      "last_verified": null
-    },
-    {
-      "provider_id": "ollama-cloud",
-      "id": "nemotron-3-ultra",
-      "capabilities": [
-        "text"
-      ],
+      "provider_id": "zai",
+      "id": "glm-5.3",
+      "capabilities": ["text"],
       "quality": 5,
       "affinities": {
-        "reasoning": 0.5,
-        "extraction": 0.5
+        "reasoning": 0.95,
+        "extraction": 0.7
       },
-      "context_limit": 4096,
-      "output_limit": 1024,
-      "funding": "free",
-      "provenance": "developer seed 2026-10-02; quality/limits are conservative configuration, not observed benchmarks; account quota UNKNOWN",
+      "funding": "unknown",
+      "provenance": "official Z.ai GLM-5.3 announcement checked 2026-10-02; current flagship candidate; general API funding/quota is UNKNOWN and Coding Plan is a separate product/pool",
+      "last_verified": null
+    },
+    {
+      "provider_id": "ollama-cloud",
+      "id": "glm-5.3-flash",
+      "capabilities": ["text"],
+      "quality": 3,
+      "affinities": {
+        "reasoning": 0.75,
+        "extraction": 0.75
+      },
+      "funding": "unknown",
+      "provenance": "official Ollama Cloud catalog checked 2026-10-02; current cloud candidate; free-credit eligibility must be discovered from the user's current account, not assumed from historical screenshots",
+      "last_verified": null
+    },
+    {
+      "provider_id": "ollama-cloud",
+      "id": "glm-5.3",
+      "capabilities": ["text"],
+      "quality": 5,
+      "affinities": {
+        "reasoning": 0.95,
+        "extraction": 0.7
+      },
+      "funding": "unknown",
+      "provenance": "official Ollama Cloud catalog checked 2026-10-02; current cloud candidate; free-credit eligibility must be discovered from the user's current account",
+      "last_verified": null
+    },
+    {
+      "provider_id": "ollama-cloud",
+      "id": "deepseek-v4.1-flash",
+      "capabilities": ["text"],
+      "quality": 4,
+      "affinities": {
+        "reasoning": 0.85,
+        "extraction": 0.8
+      },
+      "funding": "unknown",
+      "provenance": "official Ollama Cloud catalog checked 2026-10-02; current cloud candidate; free-credit eligibility must be discovered from the user's current account",
+      "last_verified": null
+    },
+    {
+      "provider_id": "ollama-cloud",
+      "id": "deepseek-v4-pro",
+      "capabilities": ["text"],
+      "quality": 5,
+      "affinities": {
+        "reasoning": 0.95,
+        "extraction": 0.7
+      },
+      "funding": "unknown",
+      "provenance": "official Ollama Cloud catalog checked 2026-10-02; current cloud candidate; free-credit eligibility must be discovered from the user's current account",
+      "last_verified": null
+    },
+    {
+      "provider_id": "ollama-cloud",
+      "id": "minimax-m3",
+      "capabilities": ["text"],
+      "quality": 4,
+      "affinities": {
+        "reasoning": 0.85,
+        "extraction": 0.7
+      },
+      "funding": "unknown",
+      "provenance": "official Ollama Cloud catalog checked 2026-10-02; current cloud candidate; free-credit eligibility must be discovered from the user's current account",
       "last_verified": null
     }
   ]
