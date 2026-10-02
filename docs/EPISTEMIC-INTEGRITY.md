@@ -81,6 +81,38 @@ UNKNOWN    insufficient evidence
 
 When current truth matters, `RECALLED` must not outrank live authoritative evidence.
 
+## Freshness and current truth
+
+Freshness is part of epistemic integrity.
+
+If a fact can materially change with time, OSCAR must not present old memory, cached metadata or model training knowledge as current truth when a live authoritative source can reasonably be checked.
+
+Examples include:
+
+- current provider/model availability and deprecations;
+- pricing, quotas and rate limits;
+- software/API releases and documentation;
+- live service/device/account state;
+- current schedules, availability and outages;
+- recent news/events;
+- any `latest`, `current`, `today`, `recent`, `still supported` or equivalent request.
+
+Expected path:
+
+```text
+freshness-sensitive claim
+→ live authoritative retrieval/search
+→ source + retrieval time
+→ evaluate evidence
+→ answer with current/qualified claim
+```
+
+If current lookup is unavailable, OSCAR should say the answer may be stale rather than silently guessing.
+
+A stale manifest is not current authority. A model ID working last month does not prove it works now. An HTTP error against an old model ID does not prove the credential itself is invalid.
+
+See `docs/SEARCH-FRESHNESS.md`.
+
 ## Evidence-backed reporting
 
 Claims about actions should be derived from evidence attached to the task/Action Ledger.
@@ -195,6 +227,8 @@ reported   → external agent/tool testimony
 unknown    → ask/retrieve rather than fabricate
 ```
 
+Jev should additionally recognize when current/fresh evidence is required and route to live retrieval/search rather than answering from recall/model prior.
+
 A model answer must never upgrade `RECALLED`, `REPORTED` or `INFERRED` to `VERIFIED` without evidence.
 
 ## Relationship to the Action Ledger
@@ -245,3 +279,4 @@ Useful states include Working, Verifying, Waiting, Blocked, Partially verified, 
 8. Unknown is a valid state and is preferable to guessing.
 9. Verification evidence is preserved for consequential actions.
 10. The strongest user-facing claim must not exceed the strongest available evidence.
+11. Freshness-sensitive claims require current authoritative evidence when it is reasonably obtainable; otherwise OSCAR must qualify the answer as potentially stale.
