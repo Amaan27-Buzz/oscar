@@ -89,4 +89,23 @@ Runtime state, secrets, memory exports, recordings and device credentials must r
 
 ## Build commands
 
-There is no canonical build command yet because Slice 00 contains architecture/documentation only. Each implementation slice must add its exact setup/build/test commands here once the relevant runtime exists.
+Run from the repository root using Python 3.12+ on a POSIX host. The current file capability uses directory file descriptors and rejects symlink traversal; Windows machine execution is not yet verified.
+
+```sh
+python -m pip install '.[dev]'
+python -m ruff check oscar tests scripts
+python -m ruff format --check oscar tests scripts
+python -m mypy oscar
+python -m unittest discover -s tests -t . -v
+python -m scripts.check_repository
+python -m oscar proof
+python -m oscar grid-proof
+```
+
+The runtime itself has no third-party dependencies. `python -m oscar --help` lists developer commands. Use `--state`, `--workspace`, and `--manifest` before the subcommand to select durable state, an explicit filesystem scope and replaceable provider metadata. Defaults use ignored `.oscar/` and the checkout’s `config/development-models.json`. Installed CLI use outside this checkout requires an explicit manifest path.
+
+Export credentials through the execution environment; the CLI never reads or writes `.env`. `python -m oscar credentials` prints only variable names and present/missing. `python -m oscar live-providers` deliberately performs real network calls and records a safe report under `.oscar/`; it is excluded from ordinary tests/CI. No key material is logged or serialized. Network denials are reported with the required hostname; preserve proxy/TLS rather than bypassing controls.
+
+Use `inspect TASK_ID`, `cancel TASK_ID`, and `resume TASK_ID` for durable state. Resume is bounded and refuses replay of an action whose side effects are ambiguous. Cancellation is cooperative; blocking provider I/O may finish its bounded read before cancellation is observed, and cancellation cannot undo a side effect already committed. A target cancellation acknowledgement is REPORTED, not objective completion.
+
+See [docs/CLUB-A-CHECKPOINT.md](docs/CLUB-A-CHECKPOINT.md) for the manual Gate A matrix and current blockers.

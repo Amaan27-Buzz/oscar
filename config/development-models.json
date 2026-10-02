@@ -1,0 +1,287 @@
+{
+  "version": 1,
+  "providers": [
+    {
+      "id": "groq",
+      "adapter": "openai",
+      "base_url": "https://api.groq.com/openai/v1",
+      "credential_envs": {
+        "groq-1": "GROQ_API_KEY_1",
+        "groq-2": "GROQ_API_KEY_2",
+        "groq-3": "GROQ_API_KEY_3",
+        "groq-4": "GROQ_API_KEY_4"
+      }
+    },
+    {
+      "id": "openrouter",
+      "adapter": "openai",
+      "base_url": "https://openrouter.ai/api/v1",
+      "credential_envs": {
+        "openrouter-1": "OPENROUTER_API_KEY_1",
+        "openrouter-2": "OPENROUTER_API_KEY_2",
+        "openrouter-3": "OPENROUTER_API_KEY_3",
+        "openrouter-4": "OPENROUTER_API_KEY_4"
+      }
+    },
+    {
+      "id": "nvidia",
+      "adapter": "openai",
+      "base_url": "https://integrate.api.nvidia.com/v1",
+      "credential_envs": {
+        "nvidia-1": "NVIDIA_NIM_API_KEY_1",
+        "nvidia-2": "NVIDIA_NIM_API_KEY_2"
+      }
+    },
+    {
+      "id": "google",
+      "adapter": "google",
+      "base_url": "https://generativelanguage.googleapis.com/v1beta",
+      "credential_envs": {
+        "google-1": "GOOGLE_AI_STUDIO_API_KEY_1",
+        "google-2": "GOOGLE_AI_STUDIO_API_KEY_2",
+        "google-3": "GOOGLE_AI_STUDIO_API_KEY_3"
+      }
+    },
+    {
+      "id": "zai",
+      "adapter": "openai",
+      "base_url": "https://api.z.ai/api/paas/v4",
+      "credential_envs": {
+        "zai-1": "ZAI_API_KEY_1",
+        "zai-2": "ZAI_API_KEY_2"
+      }
+    },
+    {
+      "id": "ollama-cloud",
+      "adapter": "ollama",
+      "base_url": "https://ollama.com/api",
+      "credential_envs": {
+        "ollama-cloud-1": "OLLAMA_CLOUD_API_KEY_1",
+        "ollama-cloud-2": "OLLAMA_CLOUD_API_KEY_2"
+      }
+    }
+  ],
+  "models": [
+    {
+      "provider_id": "groq",
+      "id": "llama-3.1-8b-instant",
+      "capabilities": [
+        "text"
+      ],
+      "quality": 1,
+      "affinities": {
+        "reasoning": 0.5,
+        "extraction": 0.5
+      },
+      "context_limit": 4096,
+      "output_limit": 1024,
+      "funding": "free",
+      "provenance": "developer seed 2026-10-02; quality/limits are conservative configuration, not observed benchmarks; account quota UNKNOWN",
+      "last_verified": null
+    },
+    {
+      "provider_id": "groq",
+      "id": "llama-3.3-70b-versatile",
+      "capabilities": [
+        "text"
+      ],
+      "quality": 3,
+      "affinities": {
+        "reasoning": 0.5,
+        "extraction": 0.5
+      },
+      "context_limit": 4096,
+      "output_limit": 1024,
+      "funding": "free",
+      "provenance": "developer seed 2026-10-02; quality/limits are conservative configuration, not observed benchmarks; account quota UNKNOWN",
+      "last_verified": null
+    },
+    {
+      "provider_id": "openrouter",
+      "id": "meta-llama/llama-3.3-70b-instruct:free",
+      "capabilities": [
+        "text"
+      ],
+      "quality": 3,
+      "affinities": {
+        "reasoning": 0.5,
+        "extraction": 0.5
+      },
+      "context_limit": 4096,
+      "output_limit": 1024,
+      "funding": "free",
+      "provenance": "developer seed 2026-10-02; quality/limits are conservative configuration, not observed benchmarks; account quota UNKNOWN",
+      "last_verified": null
+    },
+    {
+      "provider_id": "nvidia",
+      "id": "meta/llama-3.1-8b-instruct",
+      "capabilities": [
+        "text"
+      ],
+      "quality": 1,
+      "affinities": {
+        "reasoning": 0.5,
+        "extraction": 0.5
+      },
+      "context_limit": 4096,
+      "output_limit": 1024,
+      "funding": "unknown",
+      "provenance": "developer seed 2026-10-02; quality/limits are conservative configuration, not observed benchmarks; account quota UNKNOWN",
+      "last_verified": null
+    },
+    {
+      "provider_id": "google",
+      "id": "gemini-2.5-flash-lite",
+      "capabilities": [
+        "text"
+      ],
+      "quality": 2,
+      "affinities": {
+        "reasoning": 0.5,
+        "extraction": 0.5
+      },
+      "context_limit": 4096,
+      "output_limit": 1024,
+      "funding": "free",
+      "provenance": "developer seed 2026-10-02; quality/limits are conservative configuration, not observed benchmarks; account quota UNKNOWN",
+      "last_verified": null
+    },
+    {
+      "provider_id": "google",
+      "id": "gemini-2.5-flash",
+      "capabilities": [
+        "text"
+      ],
+      "quality": 3,
+      "affinities": {
+        "reasoning": 0.5,
+        "extraction": 0.5
+      },
+      "context_limit": 4096,
+      "output_limit": 1024,
+      "funding": "free",
+      "provenance": "developer seed 2026-10-02; quality/limits are conservative configuration, not observed benchmarks; account quota UNKNOWN",
+      "last_verified": null
+    },
+    {
+      "provider_id": "zai",
+      "id": "glm-4.5-air",
+      "capabilities": [
+        "text"
+      ],
+      "quality": 3,
+      "affinities": {
+        "reasoning": 0.5,
+        "extraction": 0.5
+      },
+      "context_limit": 4096,
+      "output_limit": 1024,
+      "funding": "unknown",
+      "provenance": "developer seed 2026-10-02; quality/limits are conservative configuration, not observed benchmarks; account quota UNKNOWN",
+      "last_verified": null
+    },
+    {
+      "provider_id": "ollama-cloud",
+      "id": "gemma3:31b",
+      "capabilities": [
+        "text"
+      ],
+      "quality": 2,
+      "affinities": {
+        "reasoning": 0.5,
+        "extraction": 0.5
+      },
+      "context_limit": 4096,
+      "output_limit": 1024,
+      "funding": "free",
+      "provenance": "developer seed 2026-10-02; quality/limits are conservative configuration, not observed benchmarks; account quota UNKNOWN",
+      "last_verified": null
+    },
+    {
+      "provider_id": "ollama-cloud",
+      "id": "gpt-oss:120b",
+      "capabilities": [
+        "text"
+      ],
+      "quality": 4,
+      "affinities": {
+        "reasoning": 0.5,
+        "extraction": 0.5
+      },
+      "context_limit": 4096,
+      "output_limit": 1024,
+      "funding": "free",
+      "provenance": "developer seed 2026-10-02; quality/limits are conservative configuration, not observed benchmarks; account quota UNKNOWN",
+      "last_verified": null
+    },
+    {
+      "provider_id": "ollama-cloud",
+      "id": "gpt-oss:20b",
+      "capabilities": [
+        "text"
+      ],
+      "quality": 2,
+      "affinities": {
+        "reasoning": 0.5,
+        "extraction": 0.5
+      },
+      "context_limit": 4096,
+      "output_limit": 1024,
+      "funding": "free",
+      "provenance": "developer seed 2026-10-02; quality/limits are conservative configuration, not observed benchmarks; account quota UNKNOWN",
+      "last_verified": null
+    },
+    {
+      "provider_id": "ollama-cloud",
+      "id": "nemotron-3-nano:30b",
+      "capabilities": [
+        "text"
+      ],
+      "quality": 2,
+      "affinities": {
+        "reasoning": 0.5,
+        "extraction": 0.5
+      },
+      "context_limit": 4096,
+      "output_limit": 1024,
+      "funding": "free",
+      "provenance": "developer seed 2026-10-02; quality/limits are conservative configuration, not observed benchmarks; account quota UNKNOWN",
+      "last_verified": null
+    },
+    {
+      "provider_id": "ollama-cloud",
+      "id": "nemotron-3-super",
+      "capabilities": [
+        "text"
+      ],
+      "quality": 4,
+      "affinities": {
+        "reasoning": 0.5,
+        "extraction": 0.5
+      },
+      "context_limit": 4096,
+      "output_limit": 1024,
+      "funding": "free",
+      "provenance": "developer seed 2026-10-02; quality/limits are conservative configuration, not observed benchmarks; account quota UNKNOWN",
+      "last_verified": null
+    },
+    {
+      "provider_id": "ollama-cloud",
+      "id": "nemotron-3-ultra",
+      "capabilities": [
+        "text"
+      ],
+      "quality": 5,
+      "affinities": {
+        "reasoning": 0.5,
+        "extraction": 0.5
+      },
+      "context_limit": 4096,
+      "output_limit": 1024,
+      "funding": "free",
+      "provenance": "developer seed 2026-10-02; quality/limits are conservative configuration, not observed benchmarks; account quota UNKNOWN",
+      "last_verified": null
+    }
+  ]
+}

@@ -282,7 +282,9 @@ For the current fast developer-alpha build, adjacent slices are grouped into rev
 
 ### Current club
 
-**Club A — Brain (Slices 01–04) is next.**
+**Club A — Brain (Slices 01–04): PARTIAL. Gate A has not passed.**
+
+The native Python/SQLite core, typed Jev, authenticated loopback HTTP reference transport/Grid, and adaptive model-router foundations are implemented. Core file/read verification and fake-success rejection have been exercised. Hosted-provider requests were blocked by this environment’s egress policy; public coordinator deployment and physical nodes remain unverified. See [the Club A checkpoint](docs/CLUB-A-CHECKPOINT.md) for evidence, limitations and exact review commands. Slice 05 has not started.
 
 Target proof:
 
@@ -298,17 +300,32 @@ objective
 → truthful result
 ```
 
-Club A should use the real local `.env` credentials for explicit developer-run integration tests without printing/logging secrets. It must exercise multi-provider/multi-key routing, quota/credit-aware free-first behavior, model-strength/task-fit ranking, fallback and truthful verification.
+The CLI reads credentials from runtime environment variables and never reads or writes `.env`. Live tests are explicit (`python -m oscar live-providers`). Quota, price and quality evidence retain their provenance; unknown information stays unknown. Fault-injection tests cover multi-key/cross-provider fallback and scarcity; they do not establish hosted-provider success.
+
+## Run the Brain foundation
+
+Run from the repository root with Python 3.12 or newer:
+
+```sh
+python -m pip install '.[dev]'
+python -m unittest discover -s tests -t . -v
+python -m oscar proof
+python -m oscar grid-proof
+python -m oscar ask 'what is 2 + 2?'
+python -m oscar credentials
+```
+
+The runtime has no third-party dependencies. Durable state and proof files default to ignored `.oscar/`. Routing manifests live in `config/` and can be replaced using `--manifest`. See [DEVELOPMENT.md](DEVELOPMENT.md) and the [checkpoint](docs/CLUB-A-CHECKPOINT.md).
 
 ## Planned slices
 
 | Slice | Deliverable | Status |
 |---:|---|---|
 | 00 | Repository/architecture foundation | ✅ Complete |
-| 01 | OSCAR Core Loop | ⏭️ Next · Club A |
-| 02 | TypeSafe Jev | Planned · Club A |
-| 03 | Native Transport + Capability Catalog + Connection Grid foundation | Planned · Club A |
-| 04 | Native Model Router + cloud intelligence | Planned · Club A |
+| 01 | OSCAR Core Loop | Implemented; scoped proof verified · Club A |
+| 02 | TypeSafe Jev | Implemented; typed routing verified · Club A |
+| 03 | Native Transport + Capability Catalog + Connection Grid foundation | Partial; HTTP reference proof verified · Club A |
+| 04 | Native Model Router + cloud intelligence | Partial; hosted access blocked · Club A |
 | 05 | Real machine Worker + remote continuation | Planned · Club B |
 | 06 | LRA/Supermemory + Personal Policy + live context | Planned · Club B |
 | 07 | OSCAR Edge + reflexes | Planned · Club C |

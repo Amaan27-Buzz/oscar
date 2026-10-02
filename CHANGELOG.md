@@ -2,6 +2,15 @@
 
 Significant OSCAR milestones are recorded here. Detailed implementation status remains in `docs/ROADMAP.md`.
 
+## 2026-10-02 — Club A Brain foundation (partial)
+
+- Add native typed core/SQLite task, Action Ledger, artifact/evidence and independent verification contracts.
+- Add conservative fast Jev routing, scoped file/addition capabilities and developer CLI.
+- Add authenticated loopback HTTP reference transport, capability advertisements, replay/idempotency, cancellation, Grid availability and durable lease/disconnect/reclaim state.
+- Add data-driven adaptive model routing, all ten modes, independent masked credential pools, safe native provider adapters, bounded fallback, streaming integrity and content-free outcome history.
+- Add automated contract/failure/real loopback tests, pinned development checks, CI and value-silent repository secret scanning.
+- Record real hosted attempts blocked by network policy. Gate A remains partial; physical nodes and public coordinator deployment remain unverified. Slice 05 is not started.
+
 ## Unreleased
 
 ### Added

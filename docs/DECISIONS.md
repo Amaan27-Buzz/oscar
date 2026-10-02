@@ -416,3 +416,15 @@ Memory          = what OSCAR retains/recalls
 ```
 
 See `docs/PERSONA.md`.
+
+## ADR-059 — Club A uses a small native Python/SQLite foundation
+
+**Problem:** Slice 00 had product contracts but no runtime. Club A needs real durable execution, independent verification, authenticated reference transport and adaptable routing without a distributed stack.
+
+**Decision:** use Python 3.12 standard-library dataclasses/enums, SQLite transactions and bounded HTTP adapters. Keep Jev, capability discovery/dispatch, model routing, verification and durable state as distinct responsibilities. Use an explicit POSIX filesystem scope for the representative proof. Provider/model inventory is versioned JSON data; credentials remain opaque environment-backed runtime material.
+
+**Trade-offs:** no runtime dependency graph or external service is needed. The reference node shares the coordinator store and binds only to loopback; this proves protocol/state contracts but is not an Internet coordinator or physical-device integration. Pairing is a trusted coordinator API, not remote self-enrollment. SQLite is single-authority storage, not a replication scheme. Windows/mobile/Edge execution and a public TLS/outbound rendezvous adapter remain later or partial work.
+
+**Failure/recovery:** provider failure and credential failure have distinct bounded fallback semantics. Streaming never splices a second generation after meaningful output. Dead node leases produce blocked/reclaimable tasks, not completion. Started action records with unknown crash outcomes prevent automatic replay. File artifacts receive the hash from the same independent verification read; reported results remain reported even when independent evidence verifies the objective.
+
+**Evolution:** preserve version-1 wire contracts; a breaking protocol/storage change needs an explicit migration. The development manifest is replaceable and does not define OSCAR’s permanent provider/model boundary. Initial model quality/limits are configuration with provenance, not verified benchmarks. Gate A stays partial until relevant hosted and public-coordinator checks support acceptance. No Slice 05 work is included.

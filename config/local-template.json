@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "providers": [
+    {
+      "id": "local-ollama",
+      "adapter": "ollama",
+      "base_url": "http://127.0.0.1:11434/api",
+      "credential_envs": {},
+      "local": true,
+      "private": true,
+      "enabled": false
+    },
+    {
+      "id": "lm-studio",
+      "adapter": "openai",
+      "base_url": "http://127.0.0.1:1234/v1",
+      "credential_envs": {},
+      "local": true,
+      "private": true,
+      "enabled": false
+    },
+    {
+      "id": "vllm",
+      "adapter": "openai",
+      "base_url": "http://127.0.0.1:8000/v1",
+      "credential_envs": {},
+      "local": true,
+      "private": true,
+      "enabled": false
+    }
+  ],
+  "models": []
+}

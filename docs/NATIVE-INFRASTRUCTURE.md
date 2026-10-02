@@ -295,3 +295,11 @@ This preserves:
 Roadmap slices remain canonical. Build Gates in [BUILD-GATES.md](BUILD-GATES.md) provide cross-slice manual checkpoints.
 
 Gate A should prove native transport/model routing. Gate B should prove useful machine work and remote continuation. Later gates should prove Connection Grid failover/degradation, Sunday owner controls and Edge safety separation.
+
+## Club A implementation checkpoint
+
+The native foundation now lives in `oscar/contracts.py`, `storage.py`, `runtime.py`, `capabilities.py`, `grid.py` and `transport.py`. SQLite is the durable task/ledger/lease authority. Transport targets authenticate per-node sessions, recheck capability scope and bind commands to task/correlation/lease IDs. Replay nonces and action idempotency are durable. Started actions with uncertain outcomes block replay.
+
+`python -m oscar proof` uses a real loopback HTTP reference server. `python -m oscar grid-proof` disconnects a reference node and observes actual lease expiry while preserving the objective. These are reference-node proofs; Sunday/Desktop/Edge hardware, public TLS/outbound rendezvous, state replication and a vendor deployment have not been implemented or verified. The reference target shares the coordinator SQLite store and binds only to loopback. Session handles cannot be serialized; stored session token digests are distinct from provider credentials, which are never persisted.
+
+`Transport` is the adapter boundary for future network deployments. This does not establish a production secure Internet transport. See [the Club A checkpoint](CLUB-A-CHECKPOINT.md). No Latch/SwitchRoute service dependency was added.

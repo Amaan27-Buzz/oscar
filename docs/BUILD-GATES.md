@@ -46,6 +46,8 @@ Manual scenarios:
 
 **Pass:** native core/transport/model routing works without Latch/SwitchRoute deployment and remote node loss does not erase objective state.
 
+Current checkpoint: **PARTIAL**, not an acceptance pass. The exact file/write/read proof, fake-success rejection, deterministic routing, authenticated HTTP reference node and real-time lease-expiry scenario have been run. Automated fault injection proves routing policy/fallback contracts. Hosted-provider success and a configured public coordinator deployment remain unverified. See [CLUB-A-CHECKPOINT.md](CLUB-A-CHECKPOINT.md) for the commands and evidence. Stop here; Slice 05 has not started.
+
 ## Gate B — Can Do Work
 
 **Slices:** 05–06
@@ -154,7 +156,7 @@ This is intentionally aggressive. Anything not genuinely verified remains planne
 
 | Gate | Slices | Status |
 |---|---|---|
-| Gate A — Brain | 01–04 | Planned |
+| Gate A — Brain | 01–04 | PARTIAL — reference proofs pass; hosted access and public coordinator unresolved |
 | Gate B — Can Do Work | 05–06 | Planned |
 | Gate C — Embodied OSCAR | 07–10 | Planned |
 | Gate D — JARVIS Layer | 11–14 | Planned |

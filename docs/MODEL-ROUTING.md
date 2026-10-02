@@ -563,3 +563,17 @@ Before Gate A can pass, manually verify at least:
 13. model reports remain unverified until the surrounding objective verification succeeds.
 
 See also [NATIVE-INFRASTRUCTURE.md](NATIVE-INFRASTRUCTURE.md), [RUNTIME-FOUNDATIONS.md](RUNTIME-FOUNDATIONS.md), [EPISTEMIC-INTEGRITY.md](EPISTEMIC-INTEGRITY.md) and [BUILD-GATES.md](BUILD-GATES.md).
+
+## Club A implementation checkpoint
+
+`oscar/router.py` filters required capability/quality/context/output budgets, policy, credential availability and cooldown before ranking. Auto/Free First prefer eligible configured free/subscription/local routes; sufficient smaller models and known plentiful quota can preserve stronger scarce routes. Heavy Duty prioritizes eligible strength, Specialist task affinity, Fast latency, Balanced the combined evidence, and Cheap known monetary cost. Manual pins never expand privacy/cost/availability policy; Local never silently chooses cloud.
+
+`config/development-models.json` is replaceable developer metadata, including the six user-supplied Ollama Cloud models. Initial quality/context figures are conservative configuration, not observed benchmarks. Funding declarations for the initial free pools do not establish remaining quota or credential validity. NVIDIA/Z.ai funding remains unknown; the live harness performs read-only model discovery until cost policy is configured. `config/local-template.json` contains disabled Ollama/LM Studio/vLLM interfaces with no assumed model inventory.
+
+OpenAI-compatible, Google generateContent and Ollama chat adapters are in `oscar/providers.py`. Supported request paths currently cover text, JSON structured output and streaming; images/audio/tool execution are not implemented. Additional OpenAI-compatible providers can be configured by manifest; a genuinely different protocol requires a new adapter. ChatGPT product-surface connectors remain pending.
+
+Credential state is separate from secrets. The environment is the sole credential input for this harness; `.env` is neither read nor written. Error bodies, raw prompts, responses and keys are excluded from route history. Provider responses stay REPORTED. Independent objective evidence can link into history; response reliability and objective success are learned separately with priors and decaying observations. Explicit policies remain authoritative.
+
+Observed request/token headers can establish quota; absent/stale balances remain unknown, including after consumption without a fresh header. Scarcity currently uses confirmed remaining requests, with explicit pressure for unknown capacity; full credit/reset/consumption forecasting is future work. No quota percentages or current model benchmarks are invented. Paid routing is off by default; known-price fallback budgets are cumulative, while unknown-price routing requires a separate explicit allowance.
+
+The automated and real loopback contracts are verified; **hosted integrations remain BLOCKED by environment network policy**. See [CLUB-A-CHECKPOINT.md](CLUB-A-CHECKPOINT.md) for exact attempted operations, models and masked slots. Live credential failover, hosted quota adaptation and hosted objective quality remain unverified.

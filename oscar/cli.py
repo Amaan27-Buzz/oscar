@@ -1,0 +1,300 @@
+"""Explicit developer commands; live calls are opt-in and never load/write a .env file."""
+
+import argparse
+import json
+from dataclasses import asdict, replace
+from pathlib import Path
+from time import sleep
+from urllib.parse import urlparse
+
+from .capabilities import Cancellation
+from .contracts import Action, Result, TaskState, new_id, record
+from .harness import Harness
+from .jev import Intent
+from .models import Mode, ModelRequest, ProviderError, RoutingPolicy
+from .router import RouteUnavailable
+from .storage import StateConflict
+from .transport import HTTPTransport, ReferenceServer
+
+
+def print_json(value: object) -> None:
+    print(json.dumps(value, indent=2, allow_nan=False))
+
+
+def report_task(harness: Harness, task_id: str) -> dict[str, object]:
+    task = harness.store.task(task_id)
+    return {
+        "task": record(task),
+        "ledger": harness.store.ledger(task.id),
+        "evidence": [e for e in harness.store.all("evidence") if e["task_id"] == task.id],
+        "artifacts": [a for a in harness.store.all("artifact") if a["task_id"] == task.id],
+    }
+
+
+def fake_executor(action: Action, cancellation: Cancellation) -> Result:
+    cancellation.check()
+    return Result(
+        new_id(),
+        action.id,
+        action.task_id,
+        action.correlation_id,
+        "deliberately-fake-reference-executor",
+        True,
+    )
+
+
+def proof(harness: Harness) -> dict[str, object]:
+    with ReferenceServer(harness.dispatcher) as server:
+        transports = {harness.node_id: (HTTPTransport(server.url), harness.session)}
+        task = harness.runtime.create(
+            Intent(
+                "Gate A exact file",
+                "file_write",
+                "proof/" + new_id() + ".txt",
+                "OSCAR verified bytes\n",
+            )
+        )
+        actual = harness.runtime.run(task.id, transports)
+        arithmetic = harness.runtime.create(Intent("what is 2 + 2?"))
+        arithmetic = harness.runtime.run(arithmetic.id, transports)
+        original = harness.dispatcher.executors["files.write"]
+        harness.dispatcher.executors["files.write"] = fake_executor
+        try:
+            fake = harness.runtime.create(
+                Intent(
+                    "Deliberate fake-success test",
+                    "file_write",
+                    "proof/absent-" + new_id() + ".txt",
+                    "never written",
+                )
+            )
+            fake = harness.runtime.run(fake.id, transports)
+        finally:
+            harness.dispatcher.executors["files.write"] = original
+    passed = (
+        actual.state == TaskState.VERIFIED
+        and arithmetic.state == TaskState.VERIFIED
+        and fake.state == TaskState.FAILED
+    )
+    return {
+        "status": "VERIFIED" if passed else "FAILED",
+        "scope": "loopback HTTP, exact file verification, fake rejection and arithmetic",
+        "real_file": report_task(harness, actual.id),
+        "fake_executor": report_task(harness, fake.id),
+        "deterministic": report_task(harness, arithmetic.id),
+    }
+
+
+def grid_proof(harness: Harness) -> dict[str, object]:
+    task = harness.runtime.create(Intent("Lease loss proof", "file_write", "lease.txt", "test"))
+    harness.store.transition(task.id, TaskState.EXECUTING)
+    lease = harness.grid.lease(task.id, harness.node_id, ttl=0.05)
+    harness.grid.disconnect(harness.node_id)
+    before = harness.store.task(task.id).state
+    sleep(0.06)
+    expired = harness.grid.reap()
+    return {
+        "scope": "reference node; no physical device",
+        "task_id": task.id,
+        "state_after_disconnect": before,
+        "state_after_expiry": harness.store.task(task.id).state,
+        "lease_active": harness.store.get("lease", lease)["active"],
+        "expired_tasks": expired,
+        "objective_preserved": bool(harness.store.get("objective", task.objective_id)),
+        "availability": harness.grid.availability(),
+        "nodes": harness.grid.nodes(),
+    }
+
+
+def live_providers(harness: Harness, report_path: Path) -> list[dict[str, object]]:
+    for line in harness.pool.safe_presence_lines():
+        print(line)
+    results: list[dict[str, object]] = []
+    for provider in harness.registry.providers.values():
+        slots = [s for s in harness.pool.slots.values() if s.provider == provider.id and s.present]
+        hostname = urlparse(provider.base_url).hostname
+        result: dict[str, object] = {
+            "provider": provider.id,
+            "hostname": hostname,
+            "status": "UNAVAILABLE",
+            "slots_exercised": [],
+            "model": None,
+        }
+        if not slots:
+            result["reason"] = "no runtime credential slot present"
+            results.append(result)
+            continue
+        models = sorted(
+            (m for m in harness.registry.models.values() if m.provider_id == provider.id),
+            key=lambda m: (m.quality or 99, m.id),
+        )
+        if not models:
+            result["reason"] = "no configured model metadata"
+            results.append(result)
+            continue
+        request = ModelRequest(
+            new_id(),
+            new_id(),
+            "Reply exactly OSCAR_PROVIDER_OK",
+            mode=Mode.MANUAL,
+            pinned_provider=provider.id,
+            pinned_model=models[0].id,
+            max_output_tokens=32,
+        )
+        if not harness.router.rank(request):
+            # Read-only discovery can diagnose access without assuming unknown price is free.
+            result.update(operation="model inventory GET", slots_exercised=[slots[0].id])
+            try:
+                discovered = harness.adapters[provider.adapter].discover(
+                    provider, harness.pool.secret_for_adapter(slots[0].id)
+                )
+                result.update(
+                    status="PARTIALLY_VERIFIED",
+                    reason="inventory reachable; generation cost policy unresolved",
+                    discovered_model_count=len(discovered),
+                )
+            except ProviderError as error:
+                result.update(status="BLOCKED", reason=error.category.value)
+        else:
+            result.update(operation="generation POST", model=models[0].id)
+            try:
+                routed = harness.router.execute(
+                    request, RoutingPolicy(max_attempts=2, timeout_seconds=10)
+                )
+                matches = routed.response.text.strip() == "OSCAR_PROVIDER_OK"
+                result.update(
+                    status="VERIFIED" if matches else "PARTIALLY_VERIFIED",
+                    reason="independent sentinel comparison: "
+                    + ("matched" if matches else "did not match"),
+                    scope="provider generation contract only; general objective quality unverified",
+                )
+            except ProviderError as error:
+                result.update(
+                    status="BLOCKED"
+                    if error.category.value.startswith("network")
+                    else "UNAVAILABLE",
+                    reason=error.category.value,
+                )
+            except RouteUnavailable:
+                result.update(status="UNAVAILABLE", reason="no current route permitted")
+            result["slots_exercised"] = [
+                event["slot"]
+                for event in harness.store.all("route_history")
+                if event["task_id"] == request.task_id
+            ]
+        if result.get("reason") == "network_policy_blocked":
+            result["required_configuration"] = (
+                f"Allow HTTPS egress to {hostname} in the environment policy; preserve proxy/TLS."
+            )
+        results.append(result)
+    report_path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+    report_path.write_text(json.dumps(results, indent=2) + "\n")
+    report_path.chmod(0o600)
+    return results
+
+
+def parser() -> argparse.ArgumentParser:
+    result = argparse.ArgumentParser(description=__doc__)
+    result.add_argument("--state", type=Path, default=Path(".oscar/state.sqlite"))
+    result.add_argument("--workspace", type=Path, default=Path(".oscar/workspace"))
+    result.add_argument("--manifest", type=Path, default=Path("config/development-models.json"))
+    commands = result.add_subparsers(dest="command", required=True)
+    commands.add_parser("credentials")
+    commands.add_parser("proof")
+    commands.add_parser("grid-proof")
+    commands.add_parser("history")
+    write = commands.add_parser("write")
+    write.add_argument("--path", required=True)
+    write.add_argument("--content", required=True)
+    write.add_argument("--http-reference", action="store_true")
+    ask = commands.add_parser("ask")
+    ask.add_argument("text")
+    for command in ("reason", "routes"):
+        route = commands.add_parser(command)
+        if command == "reason":
+            route.add_argument("text")
+        route.add_argument("--mode", choices=list(Mode), default=Mode.AUTO)
+        route.add_argument("--provider")
+        route.add_argument("--model")
+        route.add_argument("--slot")
+        route.add_argument("--quality", type=int, default=1)
+        route.add_argument("--task-class", default="reasoning")
+    for command in ("inspect", "cancel", "resume"):
+        task = commands.add_parser(command)
+        task.add_argument("task_id")
+    live = commands.add_parser("live-providers")
+    live.add_argument("--report", type=Path, default=Path(".oscar/live-providers.json"))
+    return result
+
+
+def main() -> int:
+    args = parser().parse_args()
+    try:
+        template = None
+        if args.command in {"reason", "routes"}:
+            template = ModelRequest(
+                new_id(),
+                new_id(),
+                getattr(args, "text", ""),
+                task_class=args.task_class,
+                min_quality=args.quality,
+                mode=Mode(args.mode),
+                pinned_provider=args.provider,
+                pinned_model=args.model,
+                pinned_slot=args.slot,
+            )
+        with Harness(args.state, args.workspace, args.manifest, template) as harness:
+            transports = {harness.node_id: (harness.dispatcher, harness.session)}
+            if args.command == "credentials":
+                for line in harness.pool.safe_presence_lines():
+                    print(line)
+            elif args.command == "proof":
+                data = proof(harness)
+                print_json(data)
+                return 0 if data["status"] == "VERIFIED" else 1
+            elif args.command == "grid-proof":
+                print_json(grid_proof(harness))
+            elif args.command == "live-providers":
+                print_json(live_providers(harness, args.report))
+            elif args.command == "history":
+                print_json(harness.store.all("route_history"))
+            elif args.command == "routes" and template:
+                print_json([asdict(r) for r in harness.router.rank(template)])
+            elif args.command in {"inspect", "cancel", "resume"}:
+                if args.command == "cancel":
+                    harness.runtime.cancel(args.task_id)
+                elif args.command == "resume":
+                    harness.grid.reap()
+                    harness.runtime.reclaim(args.task_id)
+                    harness.runtime.run(args.task_id, transports)
+                print_json(report_task(harness, args.task_id))
+            else:
+                intent = (
+                    Intent(args.text)
+                    if args.command in {"ask", "reason"}
+                    else Intent("Write exact file", "file_write", args.path, args.content)
+                )
+                if args.command == "reason":
+                    intent = replace(intent, kind="reason")
+                task = harness.runtime.create(intent, mode=getattr(args, "mode", "auto"))
+                if getattr(args, "http_reference", False):
+                    with ReferenceServer(harness.dispatcher) as server:
+                        task = harness.runtime.run(
+                            task.id, {harness.node_id: (HTTPTransport(server.url), harness.session)}
+                        )
+                else:
+                    task = harness.runtime.run(task.id, transports)
+                print_json(report_task(harness, task.id))
+                return 0 if task.state == TaskState.VERIFIED else 2
+    except StateConflict as conflict:
+        print_json({"status": "BLOCKED", "reason": str(conflict)})
+        return 2
+    except (ValueError, TypeError, KeyError, PermissionError, OSError):
+        print_json(
+            {
+                "status": "BLOCKED",
+                "reason": "invalid configuration or unavailable state; inspect command inputs",
+            }
+        )
+        return 2
+    return 0

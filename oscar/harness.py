@@ -1,0 +1,133 @@
+"""Developer composition root; reference roles are not physical-device availability claims."""
+
+from dataclasses import replace
+from pathlib import Path
+from typing import Any
+
+from .capabilities import Cancellation, FileExecutor, ScopedFiles, Verifier, addition_executor
+from .contracts import Action, Capability, Result, new_id
+from .credentials import CredentialPool
+from .grid import Grid, Node, NodeRole
+from .models import ModelRequest, ProviderError, RoutingPolicy
+from .providers import HTTPAdapter
+from .registry import Registry
+from .router import Router, RouteUnavailable
+from .runtime import Runtime
+from .storage import Store
+from .transport import Dispatcher
+
+
+class ModelExecutor:
+    def __init__(self, router: Router, template: ModelRequest, policy: RoutingPolicy):
+        self.router, self.template, self.policy = router, template, policy
+
+    def __call__(self, action: Action, cancellation: Cancellation) -> Result:
+        request = replace(
+            self.template,
+            task_id=action.task_id,
+            correlation_id=action.correlation_id,
+            prompt=action.parameters["prompt"],
+        )
+        try:
+            routed = self.router.execute(request, self.policy, cancellation.check)
+            return Result(
+                new_id(),
+                action.id,
+                action.task_id,
+                action.correlation_id,
+                action.capability_id,
+                True,
+                value=routed.response.text,
+            )
+        except RouteUnavailable:
+            error = "route_unavailable"
+        except ProviderError as failure:
+            error = failure.category.value
+        return Result(
+            new_id(),
+            action.id,
+            action.task_id,
+            action.correlation_id,
+            action.capability_id,
+            False,
+            error=error,
+        )
+
+
+class Harness:
+    def __init__(
+        self,
+        state: Path,
+        workspace: Path,
+        manifest: Path,
+        model_request: ModelRequest | None = None,
+    ):
+        self.store = Store(state)
+        self.grid = Grid(self.store)
+        self.files = ScopedFiles(workspace)
+        self.runtime = Runtime(self.store, self.grid, Verifier(self.files))
+        self.registry = Registry.load(manifest)
+        self.pool = CredentialPool(list(self.registry.providers.values()), store=self.store)
+        self.adapters = {kind: HTTPAdapter(kind) for kind in {"openai", "google", "ollama"}}
+        self.router = Router(self.registry, self.pool, self.adapters, self.store)
+        self.runtime.on_verification = self.router.observe_verification
+        self.node_id = "reference-cloud"
+        scopes = ("heartbeat", "advertise", "execute", "files:write", "math", "models", "cancel")
+        try:
+            self.store.get("node", self.node_id)
+        except KeyError:
+            self.grid.register(Node(self.node_id, NodeRole.CLOUD, scopes))
+        self.session = self.grid.pair(self.node_id, scopes)
+        capabilities = [
+            Capability(
+                "files.write",
+                "Write exact file",
+                "Scoped exact-byte file creation",
+                "deterministic",
+                self.node_id,
+                ("files:write",),
+                "file_write",
+                "file",
+            ),
+            Capability(
+                "math.add",
+                "Integer addition",
+                "Bounded positive integer addition",
+                "deterministic",
+                self.node_id,
+                ("math",),
+                "addition",
+                "integer",
+            ),
+            Capability(
+                "models.reason",
+                "Reason",
+                "Native adaptive model route",
+                "model",
+                self.node_id,
+                ("models",),
+                "model_reasoning",
+                "text",
+            ),
+        ]
+        self.grid.advertise(self.session, capabilities)
+        template = model_request or ModelRequest(new_id(), new_id(), "")
+        self.dispatcher = Dispatcher(
+            self.store,
+            self.grid,
+            self.node_id,
+            {
+                "files.write": FileExecutor(self.files),
+                "math.add": addition_executor,
+                "models.reason": ModelExecutor(self.router, template, RoutingPolicy()),
+            },
+        )
+
+    def close(self) -> None:
+        self.store.close()
+
+    def __enter__(self) -> "Harness":
+        return self
+
+    def __exit__(self, *args: Any) -> None:
+        self.close()

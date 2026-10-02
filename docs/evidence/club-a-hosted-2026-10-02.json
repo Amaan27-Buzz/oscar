@@ -1,0 +1,79 @@
+{
+  "recorded_on": "2026-10-02",
+  "scope": "Real client operations using runtime slots; environment proxy denied access before any provider response. No hosted generation is verified.",
+  "provider_generation_verified": false,
+  "operations": [
+    {
+      "provider": "groq",
+      "hostname": "api.groq.com",
+      "status": "BLOCKED",
+      "slots_exercised": [
+        "groq-1"
+      ],
+      "model": "llama-3.1-8b-instant",
+      "operation": "generation POST",
+      "reason": "network_policy_blocked",
+      "required_configuration": "Allow HTTPS egress to api.groq.com in the environment policy; preserve proxy/TLS."
+    },
+    {
+      "provider": "openrouter",
+      "hostname": "openrouter.ai",
+      "status": "BLOCKED",
+      "slots_exercised": [
+        "openrouter-1"
+      ],
+      "model": "meta-llama/llama-3.3-70b-instruct:free",
+      "operation": "generation POST",
+      "reason": "network_policy_blocked",
+      "required_configuration": "Allow HTTPS egress to openrouter.ai in the environment policy; preserve proxy/TLS."
+    },
+    {
+      "provider": "nvidia",
+      "hostname": "integrate.api.nvidia.com",
+      "status": "BLOCKED",
+      "slots_exercised": [
+        "nvidia-1"
+      ],
+      "model": null,
+      "operation": "model inventory GET",
+      "reason": "network_policy_blocked",
+      "required_configuration": "Allow HTTPS egress to integrate.api.nvidia.com in the environment policy; preserve proxy/TLS."
+    },
+    {
+      "provider": "google",
+      "hostname": "generativelanguage.googleapis.com",
+      "status": "BLOCKED",
+      "slots_exercised": [
+        "google-1"
+      ],
+      "model": "gemini-2.5-flash-lite",
+      "operation": "generation POST",
+      "reason": "network_policy_blocked",
+      "required_configuration": "Allow HTTPS egress to generativelanguage.googleapis.com in the environment policy; preserve proxy/TLS."
+    },
+    {
+      "provider": "zai",
+      "hostname": "api.z.ai",
+      "status": "BLOCKED",
+      "slots_exercised": [
+        "zai-1"
+      ],
+      "model": null,
+      "operation": "model inventory GET",
+      "reason": "network_policy_blocked",
+      "required_configuration": "Allow HTTPS egress to api.z.ai in the environment policy; preserve proxy/TLS."
+    },
+    {
+      "provider": "ollama-cloud",
+      "hostname": "ollama.com",
+      "status": "BLOCKED",
+      "slots_exercised": [
+        "ollama-cloud-1"
+      ],
+      "model": "gemma3:31b",
+      "operation": "generation POST",
+      "reason": "network_policy_blocked",
+      "required_configuration": "Allow HTTPS egress to ollama.com in the environment policy; preserve proxy/TLS."
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+name: Brain contracts
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  brain:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned developer checks
+        run: python -m pip install '.[dev]'
+      - name: Lint, format and type contracts
+        run: |
+          python -m ruff check oscar tests scripts
+          python -m ruff format --check oscar tests scripts
+          python -m mypy oscar
+      - name: Offline contract and real loopback tests
+        run: python -m unittest discover -s tests -t . -v
+      - name: Offline repository and secret-safety checks
+        run: python -m scripts.check_repository
