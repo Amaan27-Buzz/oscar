@@ -1,129 +1,222 @@
 # Security + Permissions
 
-OSCAR is intended to act across computers, phones, cloud services and physical hardware. Security is therefore part of the architecture, not a later hardening pass.
+OSCAR acts across phones, computers, cloud services, communications and physical hardware. Security is architectural, not a later hardening pass.
 
 ## Core rules
 
-1. **Least privilege by capability.** Devices and tools receive only the permissions they need.
-2. **Voice is not a password.** Speaker verification is useful for convenience/context, but high-risk actions require stronger confirmation.
-3. **Voice Map is not authorization.** Recognizing who appears to be speaking never creates permission.
-4. **Safety-critical control stays local.** Emergency stop and hardware interlocks must not depend on cloud reasoning.
-5. **Consequential actions are attributable.** OSCAR records what requested an action, which policy allowed it, which node executed it and the result.
-6. **Edge nodes connect outward.** Avoid exposing ESP32/Pico/home-network services directly to the Internet.
-7. **Fail safe.** Loss of cloud, native transport or a worker must not create a dangerous hardware state.
+1. **Least privilege by capability.** Nodes/tools receive only required authority.
+2. **Voice is not a password.** Voice Match can contribute identity evidence; high-risk actions require stronger confirmation.
+3. **Voice Map is not authorization.** Recognition never grants permission.
+4. **Safety-critical control stays local.** Emergency stop/interlocks do not depend on cloud reasoning.
+5. **Consequential actions are attributable.** Record initiator, policy/permission, executor, result and verification.
+6. **Nodes connect outward where practical.** Avoid unnecessary inbound exposure on home/Edge devices.
+7. **Fail safe and degrade explicitly.** Loss of cloud/phone/desktop/Worker cannot create dangerous state or false success.
+8. **Capture is explicit.** Persistent awareness does not silently become persistent recording.
+9. **Persona never changes authority.** Character cannot weaken truth, safety, permissions, consent or required confirmation.
 
-## Authorization model
-
-Actions declare a risk/authorization class.
+## Authorization classes
 
 | Class | Examples | Typical requirement |
 |---|---|---|
-| Safety | emergency stop, halt actuator | local + universally reachable where safe |
-| Harmless | weather, volume, read public state | configured allow |
-| Personal | private calendar/memory/device context | authorized user / Voice Match where appropriate |
-| Sensitive | send message, important file change, Sentry config | explicit/contextual confirmation + strong identity evidence |
-| Critical | financial/security/destructive actions | phone biometric/PIN or equivalent strong approval; voice alone insufficient |
+| Safety | emergency stop / halt actuator | local and broadly reachable where safe |
+| Harmless | weather / simple local controls | configured allow |
+| Personal | private calendar/memory/device context | authorized user / Voice Match as appropriate |
+| Sensitive | send message / important file action / capture settings / Sentry config | strong identity + explicit/contextual approval |
+| Critical | financial/security/destructive actions | Sunday biometric/PIN or equivalent strong approval; voice alone insufficient |
 
-Policies should be configurable per capability/environment.
+## Owner authority and Connection Grid
+
+Sunday is the preferred everyday owner-control surface for the Connection Grid.
+
+Where supported it can:
+
+- pause autonomous work;
+- cancel tasks;
+- revoke a node/session/credential;
+- change Sentry/capture state;
+- approve sensitive actions;
+- request remote machine sleep/shutdown;
+- inspect what each node is doing.
+
+But Sunday does **not** outrank deterministic physical safety.
+
+Conceptual precedence:
+
+```text
+local emergency/safety interlocks
+> owner revocation / strong confirmation
+> granted permissions + explicit Personal Policy
+> OSCAR Executive / Workers / Persona
+```
+
+If Sunday is offline, existing authorized work may continue only within already granted scope. No other node may fabricate an owner-critical approval.
+
+See `docs/CONNECTION-GRID.md`.
+
+## Connection Grid transport security
+
+Each Grid node uses:
+
+- explicit pairing;
+- per-node identity;
+- scoped credentials;
+- encrypted transport;
+- short-lived session credentials where practical;
+- capability-scoped authorization at the target;
+- replay protection/idempotency;
+- correlation IDs;
+- credential rotation/revocation;
+- protocol/version negotiation;
+- health/lease expiry so dead nodes do not remain trusted as active executors.
+
+Do not use one blanket shared secret across phone, desktop, cloud and Edge.
+
+Cloud compromise must not bypass local safety interlocks.
+
+## Cloud coordinator security
+
+The cloud coordinator is replaceable infrastructure, not a root of unlimited authority.
+
+- provider admin credentials stay out of low-trust nodes;
+- cloud adapters expose only scoped OSCAR contracts;
+- persistent state is encrypted appropriately;
+- secrets/private memory are not replicated to every node by default;
+- free-tier deployment must not weaken security simply to avoid cost;
+- BYOC deployments use least-privilege cloud IAM/service credentials;
+- provider outage/deletion must leave local safety and permitted local capability intact.
 
 ## Voice Match threat model
 
-Speaker verification can be attacked with recordings, synthesized speech, replay near a microphone and environmental noise.
+Speaker verification can be attacked using recordings, synthetic speech, replay and noise.
 
-Therefore:
-
-- expose confidence scores;
+- expose confidence;
 - use liveness/context signals where feasible;
-- rate-limit repeated failed identity attempts;
+- rate-limit repeated failed attempts;
 - require stronger factors for critical actions;
-- never allow voice alone to disable fundamental safety protections.
+- voice alone cannot disable fundamental safety.
 
-## Voice Map privacy and threat model
+## Voice Map privacy
 
-Voice Map stores or derives speaker-recognition signals that should be treated as sensitive biometric-like data.
+Voice Map profiles/embeddings are sensitive biometric-like data.
 
-Rules:
+- prefer local processing/storage where practical;
+- encrypt retained profiles appropriately;
+- never commit/export to source control or ordinary logs;
+- do not silently name weak ambient matches;
+- support deletion/re-enrollment;
+- preserve confidence/source provenance;
+- never treat recognition as permission;
+- exclude OSCAR's own TTS from learning.
 
-- local processing/storage is preferred where practical;
-- encrypt retained speaker profiles/embeddings at rest where appropriate;
-- do not commit/export them into source control or ordinary logs;
-- do not silently create named identities from weak ambient matches;
-- canonical-person linkage requires deliberate enrollment, strong corroboration or user confirmation;
-- support profile deletion/re-enrollment;
-- preserve confidence/source-device metadata;
-- never use Voice Map recognition itself as authorization;
-- OSCAR's own TTS is excluded from Voice Map learning/identity updates.
+## Sentry and continuity-capture privacy
 
-Unknown voices remain unknown rather than being guessed.
+Sentry's persistent awareness and optional recording/capture modes are separate.
 
-## Native OSCAR transport / networking
+### Awareness-only baseline
 
-The final architecture uses OSCAR-owned Transport + Capability Fabric. The separate Latch project is not a required security boundary/runtime service.
+- local wake/VAD first;
+- local speaker/sound/event processing where practical;
+- no default continuous cloud microphone stream;
+- compact events preferred over raw-media retention.
 
-Preferred Edge model:
+### Optional Context Capture / Daily Journal
+
+If the user explicitly enables richer capture, OSCAR may process selected calls/messages/mail/meetings/in-person conversations where technically and legally permitted.
+
+Required controls:
+
+- per-source enablement;
+- visible current capture state;
+- consent/disclosure policy where required;
+- privacy zones/time windows;
+- participant/person exclusions;
+- fast pause/stop;
+- raw audio retention policy;
+- transcript retention policy;
+- summary/memory retention policy;
+- export/delete/forget controls;
+- encrypted storage/access control;
+- provenance for retained records.
+
+These are separate controls:
 
 ```text
-OSCAR Edge ──authenticated outbound secure session──► OSCAR transport rendezvous
+wake/VAD
+Voice Map recognition
+sound classification
+activated STT
+ambient/context STT
+raw audio retention
+transcript retention
+summary retention
+memory extraction
 ```
 
-Requirements:
+A generic microphone permission never silently grants all of the above.
 
-- device-scoped credentials;
-- credential rotation/revocation;
-- per-node identity;
-- encrypted transport;
-- short-lived session tokens where possible;
-- no blanket shared secret across all nodes;
-- replay protection for consequential commands;
-- correlation IDs and idempotency;
-- capability-scoped authorization at authoritative execution boundaries;
-- version negotiation and rejection of incompatible/unsafe protocol states.
+### Legal/consent boundary
 
-Useful networking/security lessons from Latch may be reused, but they must satisfy OSCAR's native contracts and tests.
+Recording consent requirements differ by jurisdiction/channel/participant.
+
+OSCAR must not be designed around covert recording. Where a source cannot be legitimately captured, the capability remains unavailable.
+
+Deletion claims must reflect actual local/cloud/backups/connected-source behavior; do not say `deleted everywhere` without evidence.
 
 ## Native Model Router security
 
-The native OSCAR Model Router may hold access to several providers.
-
-Requirements:
-
 - provider credentials are scoped/stored appropriately;
-- models never receive authority merely because they are selected;
-- routing/fallback cannot bypass user/provider/privacy policy;
-- fallback to a different provider must respect data-sharing constraints;
-- provider failure must not silently widen disclosure or permissions;
-- model outputs remain reported/inferred evidence until verified where required.
-
-The separate SwitchRoute project is reference/prototype material, not the authoritative policy boundary.
+- routing/fallback cannot bypass data-sharing/privacy policy;
+- provider failure must not silently widen disclosure;
+- models receive reasoning input, not authority;
+- model outputs remain reported/inferred until verified where required;
+- local/private mode cannot silently fall back to cloud.
 
 ## Secrets
 
-- Keep provider master keys off low-trust nodes where practical.
-- Prefer scoped tokens issued through OSCAR Core/native transport.
-- Do not commit secrets.
-- Redact credentials from logs.
-- Separate development and production credentials.
-- Support revoking one device without rebuilding the entire system.
+- keep provider master keys off low-trust nodes where practical;
+- prefer scoped OSCAR-issued tokens for nodes;
+- never commit secrets;
+- redact credentials from logs;
+- separate development/production credentials;
+- revoke one node without rebuilding the Grid;
+- never expose raw provider keys in UI, telemetry or prompt artifacts.
 
 ## PC worker
 
-A PC worker has broad power and must be treated accordingly.
+A machine node can be extremely powerful.
 
 Controls:
 
 - explicit pairing;
-- capability advertisement rather than assumed unrestricted access;
-- permission boundaries for filesystem, terminal, computer use and apps;
-- visible active-task state;
-- bounded autonomous execution;
-- approval gates for sensitive operations;
-- audit events for commands/file mutations.
+- advertised capabilities rather than assumed unrestricted control;
+- filesystem/terminal/computer-use/app scopes;
+- visible active task state;
+- bounded autonomy;
+- approval for sensitive operations;
+- audit events for mutations;
+- task lease expiry/reclaim;
+- remote shutdown only when a real allowed capability exists.
 
-Delegating to Codex or another specialist never bypasses OSCAR's permission policy.
+Delegating to Codex/another specialist never bypasses OSCAR permission policy.
 
-## ChatGPT and cloud models
+## Persona security boundary
 
-Models provide reasoning, not authority.
+Persona is presentation behavior.
+
+It may change humor, candor, warmth, formality, brevity, initiative, pushback and voice/motion style.
+
+It may **not**:
+
+- reduce factual integrity;
+- suppress required risk/consent disclosure;
+- bypass confirmation;
+- change permissions;
+- turn a blocked/failure state into success;
+- joke away security/safety-critical information.
+
+See `docs/PERSONA.md`.
+
+## Models and unstructured output
 
 ```text
 model recommendation
@@ -132,18 +225,18 @@ OSCAR typed action proposal
       ↓
 policy / permission check
       ↓
-optional user confirmation
+optional strong user approval
       ↓
 execution
       ↓
 verified result
 ```
 
-Unstructured model text must not directly become arbitrary shell/GPIO commands.
+Unstructured model text must not become arbitrary shell/GPIO commands directly.
 
 ## Physical safety
 
-Keep the following outside the cloud control loop:
+Keep outside the cloud/LLM control loop:
 
 - emergency stop;
 - over-current/thermal cutoffs;
@@ -152,78 +245,48 @@ Keep the following outside the cloud control loop:
 - relay safety conditions;
 - watchdog behavior.
 
-A model may request a safe high-level action, but the local controller validates whether it can execute.
-
-## Sentry privacy
-
-Default principles:
-
-- local wake-word/VAD first;
-- local speech-presence/Voice Map/sound-event classification where practical;
-- avoid continuous cloud microphone streaming;
-- distinguish local acoustic awareness from transcription;
-- transcription/retention requires explicit trigger/mode/policy;
-- cameras active only according to configured modes/permissions;
-- compact events preferred over permanent raw-media retention;
-- explicit retention controls for audio/transcripts/images/logs;
-- visible state when higher-observation Sentry modes are active.
-
-The following are separate controls, not one `microphone permission`:
-
-```text
-wake/VAD locally
-speaker recognition / Voice Map
-sound-event classification
-activated transcription
-raw audio retention
-transcript retention
-```
-
-## OSCAR self-voice safety
-
-OSCAR must not authenticate, map, or respond to its own synthesized voice as if it were an external person.
-
-Use playback reference, echo cancellation, TTS-origin tagging and timing/correlation where feasible.
-
-Self-voice suppression must still allow real human barge-in and emergency stop.
-
-## Protocols / generated skills
-
-Generated automation must declare capabilities, permissions, triggers, cancellation, failure behavior and review/approval when it expands authority.
-
-Generated automation cannot grant itself permissions.
+A model may request a safe high-level action; the local controller validates execution.
 
 ## Audit model
 
-Consequential events should record:
+Consequential events should record only what is necessary:
 
 ```text
 timestamp
-event/task ID
-requesting surface/user
-speaker/auth result if relevant
-Voice Map evidence if relevant (without unnecessary biometric material)
+correlation/task ID
+requesting user/surface
+identity evidence if relevant
 OSCAR decision/path
-model/tool/capability used
-permission decision
-worker/device
+capability/model/tool
+permission + Personal Policy decision
+target executor/node
 requested action
-result
-verification evidence/error/retry state
+execution state
+verification/evidence
+retry/error state
 ```
 
-Audit logs should avoid unnecessary raw private content.
+Capture/communication audit should reference content/artifacts rather than copy sensitive raw content into general logs.
 
 ## Recovery
 
-OSCAR should detect/expose partial completion rather than claiming success.
-
-Example:
+OSCAR exposes partial state rather than inventing completion.
 
 ```text
-1. Codex changed files          ✓
-2. tests passed                 ✓
-3. visual verification         ✗ worker disconnected
+Codex changed files       ✓
+tests passed              ✓
+visual verification       blocked — desktop disconnected
 ```
 
-Report partial state and resume safely later.
+The task remains partial/recoverable.
+
+## Invariants
+
+1. No node is trusted merely because it is connected.
+2. Sunday is owner control, not an override for hardware safety.
+3. Cloud is replaceable and least-privileged.
+4. Persistent Sentry awareness does not silently enable recording.
+5. Recording/capture is explicit, source-specific and retention-controlled.
+6. Persona cannot weaken truth/safety/authority.
+7. Remote-control claims require a real currently available capability.
+8. Completion claims remain evidence-backed.

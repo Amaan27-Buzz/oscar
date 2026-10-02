@@ -1,56 +1,23 @@
 # Build Gates
 
-This document groups OSCAR's detailed implementation slices into larger manual verification milestones.
+Build Gates group detailed roadmap slices into larger manual verification checkpoints. They do not replace slice exit conditions.
 
-The slice roadmap remains canonical for implementation scope. Build Gates do **not** replace individual slice exit conditions. They are deliberate stop points where the combined system is exercised manually before adding more surface area.
-
-The current development strategy is a fast developer-alpha sprint followed by continuous hardening. A 2–3 day sprint is an execution target, not a reason to claim unverified completeness or skip safety/reliability work.
-
-## Gate philosophy
+The fast developer-alpha target remains 2–3 days for a vertical proof, followed by continuous hardening.
 
 At each Gate:
 
-1. run the relevant automated tests;
-2. run the manual scenarios below;
-3. inspect real resulting state rather than relying only on executor/tool success;
-4. record blockers and limitations;
-5. do not call the Gate passed when a required scenario is only simulated unless the Gate explicitly allows simulation;
-6. continue to the next group only when the current foundation is coherent enough to support it.
-
-A Gate may be passed for **developer alpha** while still carrying clearly documented hardening follow-ups.
+1. run automated tests;
+2. run the manual scenarios;
+3. inspect authoritative resulting state;
+4. record blockers/limitations;
+5. do not upgrade simulated/reported behavior to verified real behavior;
+6. continue only when the foundation is coherent enough.
 
 ## Gate A — Brain
 
 **Slices:** 01–04
 
-**Purpose:** prove that OSCAR can understand a request, choose a path, execute through typed contracts, route intelligence automatically, verify results and report truthfully.
-
-Includes:
-
-- OSCAR Core Loop;
-- TypeSafe Jev;
-- native OSCAR Transport + Capability Catalog;
-- native OSCAR Model Router;
-- provider/model/credential pools;
-- automatic + manual routing;
-- evidence/verification boundary.
-
-### Manual scenarios
-
-1. Run the canonical test-workspace file objective and verify independent completion evidence.
-2. Force an executor to report success without making the expected change; verify OSCAR refuses to mark it complete.
-3. Route a deterministic request without invoking a heavy model.
-4. Route a reasoning request through Auto mode and inspect the provider/model/credential decision.
-5. Exercise Fast/Balanced/Heavy Duty routing on representative requests.
-6. Pin a provider/model manually and verify policy still applies.
-7. Put one credential into a failed/rate-limited state and verify eligible credential/provider fallback.
-8. Use Local mode and verify no silent cloud fallback occurs.
-9. Disconnect/reconnect a simulated capability node and verify capability state changes cleanly.
-10. Inspect route/usage history and confirm raw secrets/prompt contents are not exposed.
-
-### Gate A pass condition
-
-A request can travel through:
+Prove:
 
 ```text
 request
@@ -63,153 +30,112 @@ request
 → truthful report
 ```
 
-with explainable routing and no dependency on separate Latch or SwitchRoute deployments.
+Manual scenarios:
 
----
+- canonical file-write/read verification objective;
+- fake executor success must not become verified;
+- deterministic request avoids heavy model;
+- Auto/Fast/Balanced/Heavy routing;
+- manual provider/model selection;
+- failed credential/provider fallback;
+- Local mode with no silent cloud fallback;
+- simulated remote capability node connect/disconnect;
+- initial Connection Grid node/health state;
+- cloud rendezvous/coordinator path using one configured deployment target;
+- route/usage history contains no secrets.
+
+**Pass:** native core/transport/model routing works without Latch/SwitchRoute deployment and remote node loss does not erase objective state.
 
 ## Gate B — Can Do Work
 
 **Slices:** 05–06
 
-**Purpose:** make OSCAR useful on a real computer and persistent enough to remember context and obey explicit user policy.
+Prove a useful real machine objective plus memory/policy continuity.
 
-Includes:
+Manual scenarios:
 
-- first real machine Worker/node;
-- terminal/filesystem/Git;
-- Codex and other available coding executors;
-- browser/computer-use path;
-- installed-app capability discovery where technically available;
-- LRA + Supermemory;
-- Personal Policy;
-- live context/search;
-- source authority.
+- real repository bug delegated to coding specialist then independently tested;
+- terminal/filesystem/browser/computer-use capability;
+- installed app selected as capability, not host;
+- machine node disconnect mid-task → blocked/recoverable, not false success;
+- long-running task remains active while user leaves;
+- Sunday/cloud can observe and cancel/pause that task through Grid test harness/surface where available;
+- optional machine sleep/shutdown after verified completion if capability is real;
+- stale memory vs authoritative live source → live source wins;
+- natural-language Personal Policy change affects later behavior.
 
-### Manual scenarios
-
-1. Give OSCAR a real repository bug; delegate implementation to a coding specialist and independently rerun tests/inspect repository state.
-2. Use terminal/filesystem capabilities directly for a simple task.
-3. Exercise browser/computer-use fallback on an action without a stronger API/CLI path.
-4. Disconnect the machine node mid-task and verify the task becomes recoverable/blocked rather than falsely complete.
-5. Ask about an earlier project decision and verify memory retrieval.
-6. Ask a current-state question where stale memory conflicts with a live source; verify the live source wins.
-7. Create/edit a Personal Policy rule in natural language and verify it affects a later decision.
-8. Verify a coding executor or installed app is selected as a capability, not treated as the OSCAR host.
-
-### Gate B pass condition
-
-OSCAR can complete and verify a useful real-world software objective, recover historical context, respect explicit policy and remain conceptually independent of the computer providing the capabilities.
-
----
+**Pass:** OSCAR can do verified useful work while remaining conceptually independent of the computer executing it.
 
 ## Gate C — Embodied OSCAR
 
 **Slices:** 07–10
 
-**Purpose:** attach the physical, voice, phone and desktop embodiments to the already working OSCAR core.
+Prove physical, voice, mobile and desktop embodiments share one OSCAR.
 
-Includes:
+Manual scenarios:
 
-- ESP32/Pico Edge + reflexes;
-- Voice Input;
-- stable OSCAR Voice Identity;
-- Voice Match;
-- Voice Map;
+- ESP32/Pico advertises capabilities and executes a safe action with local safety independent of cloud;
+- wake OSCAR by voice and complete a real task;
+- barge-in/self-voice suppression;
+- Voice Match vs Voice Map distinction;
 - multi-device voice arbitration;
-- Sunday;
-- communication/Channel Gateway;
-- Desktop Interaction Runtime;
-- terminal/computer-use/installed-app control surfaced naturally.
+- Persona profile changes tone/voice/motion without changing truth/permission;
+- Sunday owner-control surface shows Connection Grid state;
+- start task on Desktop, leave, inspect/control from Sunday;
+- one supported communication path;
+- Dictate/Edit/Ask/Act against real desktop context;
+- degraded Grid state when one embodiment goes offline.
 
-### Manual scenarios
-
-1. ESP32/Pico node advertises capabilities and executes a safe test action while local safety remains independent of cloud intelligence.
-2. Wake OSCAR by voice, complete a real core task and receive spoken output.
-3. Interrupt OSCAR while it is speaking and verify barge-in/self-voice suppression.
-4. Verify Voice Match and Voice Map produce distinct authorization/perception outcomes.
-5. Trigger the same wake event near multiple surfaces and verify only one owns the turn.
-6. Start a task on desktop and continue/inspect it from Sunday.
-7. Exercise one real communication path supported by the device/platform.
-8. Use Dictate/Edit/Ask/Act against current desktop context.
-9. Ask OSCAR to use terminal, computer use or an installed application and verify the strongest available legitimate capability path is selected.
-
-### Gate C pass condition
-
-OSCAR feels like the same intelligence across desk hardware, voice, phone and desktop, with shared task state and no separate assistant silos.
-
----
+**Pass:** phone, desktop, voice and Edge feel like one intelligence with shared task state and owner control.
 
 ## Gate D — JARVIS Layer
 
 **Slices:** 11–14
 
-**Purpose:** move from a capable assistant to a persistent contextual executive system.
+Prove current-world awareness, persistent Sentry, commissioning and durable delegated work.
 
-Includes:
+Manual scenarios:
 
-- World Model;
-- Perception Fabric;
-- acoustic/physical Sentry;
-- first-run commissioning;
-- avatar/presence state;
-- Executive Planner;
-- durable Workers;
-- Skills/Protocols;
-- teach-by-demonstration;
-- learned automation evaluation.
+- combine at least three live sources into one World Model answer;
+- stale source becomes uncertain/unknown;
+- Sentry remains persistently aware without active conversation;
+- verify UI/runtime distinction: Sentry Aware vs Listening vs Muted vs Awareness Off;
+- trigger a physical/acoustic Sentry event and verify policy-aware escalation;
+- if Context Capture/Daily Journal enabled: capture one legitimately supported source, verify retention policy, pause and delete/forget path;
+- unsupported call/app capture must remain unsupported;
+- first-time commissioning includes Persona, Grid and capture privacy choices;
+- create a durable Worker and inspect progress/evidence;
+- competing objectives exercise Executive Planner;
+- teach one workflow and keep it experimental until evaluated;
+- avatar states match actual Working/Verifying/Blocked/Done state.
 
-### Manual scenarios
-
-1. Combine current state from at least three sources into one World Model answer.
-2. Let one source go stale and verify OSCAR exposes uncertainty instead of treating stale state as current.
-3. Trigger an acoustic/physical Sentry event and verify local-first processing plus policy-aware escalation.
-4. Run first-time commissioning end to end, including voice/privacy choices and verified health.
-5. Create a Worker in natural language, let it run in the background, then inspect its progress/evidence.
-6. Run two competing objectives and verify the Executive Planner resolves priority/resource conflict.
-7. Teach or capture one reusable workflow; keep it experimental until evaluation supports promotion.
-8. Confirm avatar/notification state reflects actual Working/Verifying/Blocked/Done state.
-
-### Gate D pass condition
-
-OSCAR maintains a coherent current situation, can manage delegated responsibilities over time and proactively surfaces only meaningful events under policy.
-
----
+**Pass:** OSCAR maintains coherent current awareness, durable responsibilities and optional continuity capture without collapsing privacy or evidence boundaries.
 
 ## Gate E — Unified Alpha
 
 **Slices:** 15–17
 
-**Purpose:** integrate broader physical/device reach, specialist engineering, failure handling, security and the complete end-to-end developer alpha.
+Deliberately break the integrated system.
 
-Includes:
+Manual scenarios:
 
-- physical/device capability expansion;
-- installed/connected specialist engineering tools;
-- spatial/workbench perception where useful;
-- self-maintenance;
-- reliability/security/truthfulness pass;
-- unified alpha scenario.
+- onboard/control at least one additional physical capability;
+- provider/auth failure → bounded recovery;
+- cloud coordinator loss while desktop task continues locally;
+- Sunday offline while existing permitted work continues without fabricated owner approval;
+- Desktop loss → lease expiry/reclaim;
+- Edge loss → physical capabilities disappear while software OSCAR remains available;
+- Grid reconnect/resync;
+- Action Ledger/Undo for reversible and irreversible actions;
+- unknown/partial/blocked/failed reporting;
+- Voice Match spoof / Voice Map false-positive checks;
+- capture-source failure, retention/deletion and privacy regression checks;
+- Persona cannot reduce truthfulness/safety/confirmation;
+- one complete scenario across perception/communication → World Model/Jev → policy → planning → capability/model routing → Grid node/Worker/device → ledger/artifact → verification → voice/text result.
 
-### Manual scenarios
+**Pass:** major subsystems operate as one evidence-backed developer alpha and remaining limitations are explicit.
 
-1. Route an engineering objective to the appropriate available specialist and return a typed artifact/result.
-2. Onboard at least one approved hardware capability into OSCAR and verify control/state through native capability contracts.
-3. Expire/break a provider or adapter credential and verify self-diagnosis plus bounded recovery/escalation.
-4. Simulate provider/node loss during a durable task and verify reclaim/restart behavior.
-5. Verify Action Ledger/Undo for reversible and irreversible actions.
-6. Exercise unknown/partial/blocked/failed reporting deliberately.
-7. Run Voice Match spoof/unknown-speaker and self-voice/echo checks.
-8. Run one complete scenario crossing perception/communication → World Model/Jev → policy/planning → capability/model routing → Worker/device → Action Ledger/artifact → verification → voice/text report.
-
-### Gate E pass condition
-
-The major OSCAR subsystems operate as one evidence-backed developer alpha. Remaining limitations are explicitly documented rather than hidden behind a `complete` label.
-
-## Suggested fast-build cadence
-
-The 2–3 day sprint should optimize for **vertical proof**, not superficial breadth.
-
-A practical target is:
+## Fast-build cadence
 
 ```text
 Day 1
@@ -219,12 +145,12 @@ Day 2
 Gate B completion + Gate C core paths
 
 Day 3
-Gate C completion + Gate D/E integration skeleton
+Gate C completion + Gate D/E integration shell
 ```
 
-This is intentionally aggressive. When a subsystem cannot be genuinely verified in that window, leave it planned/partial and continue iterating after the initial alpha.
+This is intentionally aggressive. Anything not genuinely verified remains planned/partial and is hardened afterward.
 
-## Gate status
+## Status
 
 | Gate | Slices | Status |
 |---|---|---|
@@ -234,4 +160,4 @@ This is intentionally aggressive. When a subsystem cannot be genuinely verified 
 | Gate D — JARVIS Layer | 11–14 | Planned |
 | Gate E — Unified Alpha | 15–17 | Planned |
 
-Gate status should only change after the manual checklist has actually been run against the relevant implementation.
+A Gate status changes only after its manual checklist has actually been run.

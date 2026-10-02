@@ -1,36 +1,34 @@
 # Communication Layer
 
-OSCAR should be able to act as the user's communication layer across calls, meetings, messaging, dictation and follow-up work. The goal is not a separate meeting/call bot product. Communication is another capability surface owned by the same OSCAR identity, memory, World Model, Personal Policy, Voice Identity and task state.
+OSCAR should act as the user's communication layer across calls, meetings, messaging, dictation, follow-up and optional continuity capture. Communication is one capability family owned by the same OSCAR identity, memory, World Model, Personal Policy, Persona, Voice Identity and task state.
 
 ## Product rule
 
-> Communication is a first-class OSCAR capability, not a collection of isolated integrations.
+> Communication is a first-class OSCAR capability, not a collection of isolated bots or integrations.
 
-OSCAR should eventually cover, where platform capabilities and permissions allow:
+Where platform capabilities and permissions allow, OSCAR may cover:
 
 - ordinary phone calls;
-- WhatsApp calls/messages;
-- Telegram calls/messages;
-- other phone communication apps;
-- Zoom, Google Meet, Teams, Discord and similar meetings;
-- in-person meeting capture through an authorized microphone/device;
+- WhatsApp/Telegram/other app calls and messages;
+- SMS/text;
+- email;
+- Zoom/Meet/Teams/Discord-style meetings;
+- in-person meeting/conversation capture through authorized microphones;
 - system-wide dictation;
 - voice notes;
 - live transcription;
-- structured meeting notes;
-- decisions/action-item extraction;
+- structured notes/decisions/action items;
 - scheduling/follow-up;
-- communication history linked to people, projects and tasks.
+- communication history linked to people/projects/tasks;
+- optional Sentry Context Capture / Daily Journal continuity.
 
-Sunday is the primary mobile execution surface. Desktop nodes can provide equivalent meeting/dictation capabilities.
+Sunday is the primary mobile execution/control surface. Desktop and other nodes can provide equivalent capabilities where technically supported.
 
 ## Universal Channel Gateway
 
-OSCAR should not hard-code orchestration separately for every messaging/social/email surface.
+Supported communication enters OSCAR through one normalized event/action envelope while preserving channel-specific limits.
 
-The Universal Channel Gateway normalizes supported inbound/outbound communication into one event/action envelope while preserving the real limits of each channel.
-
-Potential adapters include cellular/SMS where permitted, WhatsApp, Telegram, Signal, Discord, Slack/Teams-like channels, email, social DMs/replies and future plugins/connectors.
+Potential adapters include cellular/SMS where permitted, WhatsApp, Telegram, Signal, Discord, Slack/Teams-like channels, email, social DMs/replies and future connectors.
 
 A normalized event can include:
 
@@ -47,123 +45,92 @@ timestamps
 reply/action capabilities
 permission/risk metadata
 source-specific IDs
+capture/retention policy refs
 ```
 
-Normalization does not imply capability parity. Each adapter advertises only what is actually supported now.
+Normalization does not imply capability parity.
 
-## Capability-first integration order
+## Integration order
 
 ```text
 native OS / official API
 → official plugin / connector
-→ app automation on a paired device
+→ authorized device automation
 → computer-use / accessibility fallback
-→ explicitly unsupported / ask user
+→ explicitly unsupported / ask
 ```
 
-Do not pretend an app exposes call control, audio access or message actions when it does not.
+Do not pretend an app exposes call control/audio/message capability when it does not.
 
-The Capability Catalog should describe actual capabilities such as `phone.call.answer`, `whatsapp.message.send`, `meeting.transcribe`, `meeting.notes`, `dictation.insert_text`, including permission/risk metadata and execution surface.
+## Persona in communication
 
-## OSCAR Voice Identity in communication
+Persona affects tone and presentation but never permission or truth.
 
-When OSCAR speaks during calls, meetings, dictation feedback or other communication, it should use the same stable Voice Identity used elsewhere.
+Examples:
 
-The underlying TTS provider may differ by platform, but the product goal is one recognizably consistent OSCAR voice.
+- ordinary personal chat may use the user's configured humor/warmth;
+- university/professional calls can trigger high formality and low humor;
+- security/Sentry events suppress inappropriate playfulness;
+- representative/call mode stays concise and professional.
 
-Communication-specific speaking modes may include:
+See `docs/PERSONA.md`.
 
-- normal conversational;
-- concise representative/call mode;
-- focused professional mode;
-- alert/urgent clarification mode.
+## OSCAR Voice Identity
 
-The voice should not silently become a different personality because a phone/meeting surface uses another provider.
+When OSCAR speaks during calls/meetings/dictation it should preserve the same recognizable Voice Identity used elsewhere. Persona can select speaking style/mode without silently changing OSCAR into another voice.
 
-Where required by platform rules, law or user preference, OSCAR should identify itself as an AI assistant acting on the user's behalf.
+Where law/platform/policy requires it, OSCAR should identify itself as an AI assistant acting for the user.
 
 ## AI call answering
 
-OSCAR may answer calls on the user's behalf when explicitly allowed by Personal Policy and platform capabilities.
+OSCAR may answer calls on the user's behalf when Personal Policy and platform capability permit it.
 
-A typical policy may be:
+Example policy:
 
 ```text
 if unanswered for 4 rings
-  and caller is not excluded by policy
-  and current context permits delegation
+  and caller is not excluded
+  and context permits delegation
 then OSCAR may answer
 ```
 
-Context can include caller canonical identity/relationship, current calendar/task state, location/presence, urgency signals, user rules and disclosure/privacy requirements.
-
-Example:
+Typical flow:
 
 ```text
-Incoming call
-→ identify caller/context
-→ evaluate Personal Policy + permissions
+incoming call
+→ identify caller/context where possible
+→ evaluate permission + Personal Policy
 → continue ringing / silence / answer / escalate
-→ if OSCAR answers: converse within scope using OSCAR Voice Identity
-→ collect intent/message
-→ schedule callback when permitted
+→ if answering: speak within scope
+→ collect message/intent
+→ optional callback/schedule action
 → create communication result/artifact
+→ verify consequential follow-up where possible
 → summarize to user
-→ store appropriate context with provenance
 ```
 
-AI call handling remains attributable and permission-scoped.
-
-## Call policy examples
-
-Personal Policy should support rules such as:
-
-- `If I do not answer after four rings, answer for me.`
-- `Never answer family calls for me.`
-- `If a recruiter calls while I am in class, take a message and offer my next free callback slot.`
-- `Unknown callers should not be answered while I am asleep.`
-- `Delivery drivers can still reach me during Sleep Mode.`
-- `Do not reveal calendar-event titles; only say when I am free.`
-
-These belong in Personal Policy, not hard-coded call logic.
-
-## Meetings
-
-OSCAR should provide meeting intelligence as a native capability across phone/desktop surfaces.
+## Meetings and in-person conversations
 
 When authorized:
 
 ```text
-capture authorized audio / meeting stream
+capture allowed audio/meeting stream
 → transcribe
-→ diarize speakers
-→ use Voice Map signals where available
-→ maintain live meeting context
-→ extract decisions/actions
-→ associate notes with canonical people/projects
-→ prepare summary
-→ create follow-ups/tasks/events when permitted
-→ store relevant memory with provenance
+→ diarize
+→ use Voice Map evidence where available
+→ maintain live context
+→ extract decisions/tasks
+→ associate with people/projects
+→ create summary/artifact
+→ perform follow-ups when permitted
+→ retain according to policy
 ```
 
-### Voice Map and speaker labels
-
-Voice Map may improve speaker labeling when a known enrolled speaker is present, but:
-
-- Voice Map is evidence, not certainty;
-- unknown voices remain unknown;
-- acoustic recognition does not grant communication authority;
-- diarization and identity are separate steps;
-- speaker labels should remain confidence-qualified;
-- OSCAR's own TTS is excluded from speaker mapping;
-- linking a speaker to a canonical person requires sufficient evidence/confirmation;
-- participant consent/retention requirements still apply.
-
-Meeting notes/transcripts should become typed Artifacts/Results when durable handoff/search is useful.
+Voice Map improves context but remains confidence-qualified and never grants authority.
 
 ## System-wide dictation
 
-OSCAR should provide system-wide dictation across the device rather than only inside OSCAR's own UI.
+OSCAR should provide dictation outside its own UI.
 
 Examples:
 
@@ -175,139 +142,192 @@ Examples:
 "send it"
 ```
 
-Dictation uses the best available surface: native text insertion/API, accessibility/input method, desktop automation or app-specific integration.
+Modes may include literal dictation, cleaned dictation, rewrite/edit and command mode. Voice/keyboard remain one context.
 
-Modes can include literal dictation, cleaned dictation, rewrite/edit and command mode.
+## Messaging and email
 
-The user should be able to move between speech/keyboard without creating a separate context.
+When permitted, OSCAR may read, draft, send, search and manage communication through structured adapters or authorized device/browser/desktop capabilities.
 
-## Messaging and app communication
+Current platform state remains authoritative. A notification may expose less capability/content than the underlying app; OSCAR must not infer hidden access.
 
-OSCAR should be able to read, draft, send and manage messages across connected communication apps when permitted.
+## Optional daily continuity capture
 
-This includes Channel Gateway adapters/structured connectors, phone-app actions through Sunday, desktop/browser apps through Workers, notifications/reply actions and voice-note handling.
+Sentry may be configured to keep a cross-channel record of the user's day.
 
-OSCAR should use canonical relationships, communication preferences and active context when deciding tone, urgency and whether to interrupt.
+This can include, where legitimately available:
+
+- calls and call summaries/transcripts;
+- messages/SMS;
+- email;
+- meetings;
+- voice notes;
+- in-person conversations;
+- commitments/actions extracted from those sources.
+
+This is not one unconditional `record everything` feature.
+
+### Capture levels
+
+```text
+Awareness only
+→ communication events can inform current context; no continuous transcript retention
+
+Context capture
+→ selected sources are indexed/transcribed/summarized; raw media minimized
+
+Daily journal
+→ explicit durable continuity timeline across selected sources
+```
+
+### Source-specific capability
+
+- Phone call metadata and call audio are different capabilities.
+- WhatsApp/Telegram message access and call-audio access are different capabilities.
+- Email/text can often be represented directly as source records instead of audio.
+- In-person conversations require authorized microphones and consent/retention policy.
+- Unsupported capture remains unsupported.
+
+## Daily Journal artifact
+
+When enabled, OSCAR may create a daily continuity artifact such as:
+
+```text
+2026-10-01
+09:20  call — recruiter — callback requested
+11:05  meeting — project review — 3 actions
+14:40  in-person conversation — unknown/unenrolled speaker — summary retained
+17:10  email — university — deadline changed
+```
+
+The default journal should favor concise, searchable outcomes over permanent raw-media storage.
+
+Raw audio, transcript, summary and extracted memory each have independent retention controls.
+
+## Consent / privacy
+
+Recording/transcription rules vary by jurisdiction and channel.
+
+OSCAR should support:
+
+- explicit per-source capture settings;
+- clear capture state;
+- consent/disclosure rules where required;
+- person/place/time exclusions;
+- pause/stop controls;
+- delete/forget controls;
+- configurable raw/transcript/summary retention;
+- encryption/access controls;
+- transparent provenance.
+
+OSCAR must not be designed around covert recording.
 
 ## Follow-up and scheduling
 
-Communication does not end when a call/meeting/message ends.
+Communication may create, within permission:
 
-OSCAR may, within permissions:
+- callback tasks;
+- calendar availability checks;
+- meetings;
+- follow-up drafts/sends;
+- project/task updates;
+- commitments;
+- unresolved-item notifications.
 
-- create callback reminders;
-- find calendar availability;
-- schedule meetings;
-- draft/send follow-ups;
-- update project/task context;
-- record commitments;
-- notify the user of unresolved items.
+Each consequential mutation follows Action Ledger + verification rules.
 
 ## Context and memory
 
-Communication context participates in the same LRA/World Model architecture as the rest of OSCAR.
+Communication participates in LRA and World Model.
 
-Useful durable facts may include who contacted the user, purpose/outcome, commitments, action items, preferred communication style and callback/scheduling state.
+Useful durable information can include who contacted the user, purpose/outcome, commitments, action items, preferred communication style and pending follow-up.
 
-Raw audio/full transcripts have explicit retention controls. Sensitive recordings do not become durable memory merely because OSCAR can store them.
+A full transcript is not automatically durable memory. Retention policy decides what survives.
 
-Voice Map embeddings/profiles are separately sensitive and follow `docs/VOICE-SENTRY.md` retention/privacy rules.
-
-## Always-on acoustic awareness vs communication capture
-
-Sentry's local acoustic plane and deliberate communication recording are different modes.
+## Sentry awareness vs capture
 
 ```text
-Sentry acoustic awareness
-= local wake / VAD / speaker-event / sound-event signals
+Sentry awareness
+= persistent local events/presence/context
 
 Communication capture
-= authorized transcription/recording for a call, meeting, voice note or explicit request
+= authorized content/transcript/recording for specific sources
+
+Daily Journal
+= explicit durable cross-source continuity record
 ```
 
-The existence of Sentry voice awareness must never silently enable full-time meeting/room transcription.
+These remain separate modes even though they can cooperate.
 
-## Epistemic integrity and verification
-
-Communication actions follow `docs/EPISTEMIC-INTEGRITY.md`.
+## Epistemic integrity
 
 Examples:
 
 ```text
 send API reports success
 → REPORTED
-→ query message/thread state when possible
+→ inspect thread/message state where possible
 → VERIFIED / partially_verified / unknown
 ```
 
 ```text
 call Worker says "message taken"
 → preserve transcript/result evidence
-→ do not claim a callback was scheduled unless calendar/source state confirms it
+→ do not claim callback scheduled unless calendar/source confirms it
 ```
 
-OSCAR distinguishes drafted vs sent, send requested vs delivery confirmed, transcript produced vs speaker identity verified, callback suggested vs event created, and call attempt vs successful connection.
+OSCAR distinguishes drafted vs sent, attempt vs connection, transcript vs verified speaker identity, and suggestion vs actual follow-up mutation.
 
 ## Artifact / Result Model
 
-Communication outputs can be first-class artifacts:
+Possible communication artifacts:
 
 - call summary/transcript;
 - meeting notes/transcript;
+- Daily Journal/day summary;
 - follow-up draft;
 - sent-message reference;
 - scheduling result;
-- media/voice-note reference.
+- voice-note/media reference.
 
-Artifacts preserve source/channel IDs, canonical participants, producer, timestamps, provenance and verification state where useful.
+Artifacts preserve channel/source IDs, participants, producer, timestamps, provenance and verification state where useful.
 
-## Security and authorization
+## Security / authority
 
-Communication actions need clear authority.
-
-Examples:
-
-- reading a notification may be low risk;
-- sending routine messages may require configured permission;
-- answering a call as the user requires explicit delegation policy;
-- making commitments/sharing private schedule details may require stronger constraints;
-- account/security changes require stronger confirmation.
-
-Voice Match may be one identity signal. Voice Map alone is never authorization.
-
-OSCAR's permission layer is authoritative. Personal preferences may narrow authority but cannot grant permissions that do not already exist.
+- reading current communication requires granted access;
+- sending/answering requires explicit authority/Personal Policy;
+- making commitments or revealing private context may require stronger confirmation;
+- capture/retention changes are sensitive settings;
+- Voice Match may contribute identity evidence;
+- Voice Map alone never grants permission;
+- Persona never expands authority.
 
 ## Failure handling
 
-OSCAR resolves routine recoverable problems itself when safe:
-
 ```text
-app unavailable
-→ choose another equivalent authorized surface if available
+adapter unavailable
+→ try equivalent authorized path if one exists
 
-message format rejected
-→ repair payload
-→ bounded retry
+payload rejected
+→ repair + bounded retry
 
-login expired / passkey required
-→ ask user for minimum needed intervention
+auth expired / strong user confirmation required
+→ ask for minimum intervention
+
+source does not expose call audio
+→ do not fabricate transcript capture
 ```
 
-Do not repeatedly retry unavailable services or silently switch to a more privileged path.
-
-Long-running communication responsibilities use Durable Execution Runtime when persistence/recovery matters.
+Long-running communication responsibilities use Durable Execution Runtime where persistence matters.
 
 ## Invariants
 
-1. Communication belongs to one OSCAR identity/context, not separate bots.
-2. Personal Policy decides user-specific behavior; platform capability decides what is technically possible.
-3. Native/official integration is preferred over brittle UI automation.
-4. OSCAR never fabricates support for unavailable app/platform capabilities.
-5. Channel normalization does not erase per-channel limits.
-6. Call/meeting/message autonomy remains permission-scoped and attributable.
-7. Voice, dictation, meetings and messaging contribute to the same continuous context where policy allows.
-8. Communication success claims cannot exceed verification evidence.
-9. Durable communication outputs can be typed Artifacts/Results.
-10. Voice Map can assist speaker context but never creates authority.
-11. OSCAR's own synthesized voice is excluded from speaker identification/diarization learning.
-12. Sentry's always-on acoustic awareness does not silently enable continuous communication transcription/recording.
+1. Communication belongs to one OSCAR identity/context.
+2. Platform capability decides what is technically possible.
+3. Personal Policy decides user-specific behavior within permission.
+4. Persona affects tone, not authority/truth.
+5. Native/official integration is preferred over brittle automation.
+6. Channel normalization never erases channel limits.
+7. Capture is source-specific, explicit and retention-controlled.
+8. Sentry awareness does not silently enable recording.
+9. Voice Map supports context, never permission.
+10. Communication success claims cannot exceed verification evidence.

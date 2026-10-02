@@ -39,6 +39,7 @@ jobs:
             docs/EPISTEMIC-INTEGRITY.md
             docs/RUNTIME-FOUNDATIONS.md
             docs/NATIVE-INFRASTRUCTURE.md
+            docs/CONNECTION-GRID.md
             docs/MODEL-ROUTING.md
             docs/BUILD-GATES.md
             docs/FEATURES.md
@@ -46,6 +47,7 @@ jobs:
             docs/DECISIONS.md
             docs/MEMORY.md
             docs/PERSONAL-POLICY.md
+            docs/PERSONA.md
             docs/COMMUNICATION.md
             docs/WORKERS.md
             docs/ORCHESTRATION.md
@@ -56,6 +58,11 @@ jobs:
             docs/UI-AVATAR.md
             docs/AGENT-CONTEXT.md
             docs/SECURITY.md
+            image-prompts/README.md
+            image-prompts/web.md
+            image-prompts/sunday-mobile.md
+            image-prompts/desktop.md
+            image-prompts/system-surfaces.md
             assets/brand/oscar-logo.png
           )
 

@@ -2,20 +2,43 @@
 
 ## Identity
 
-OSCAR's avatar is a core interaction surface, not decorative branding.
+OSCAR's avatar is a core interaction surface, not decorative branding and not a mascot that should dominate every screen.
 
-The current visual identity consists of:
+The visual identity consists of:
 
-- a blue outer body/shell
-- a yellow circular face/puck inside it
-- minimal red facial features
-- simple, readable geometry that works from app-icon size to large voice surfaces
+- a blue outer body/shell;
+- a yellow circular face/puck inside it;
+- minimal red facial marks;
+- simple geometry that works from app-icon size to larger voice/presence surfaces.
 
-The avatar should communicate system state through motion and expression without becoming visually noisy.
+The avatar should communicate attention and runtime state primarily through **position, weighting, motion and restraint**, with expression as a secondary cue.
+
+## Presence object, not mascot
+
+The avatar should feel like a small precision physical/digital object.
+
+Good qualities:
+
+- satin/soft material impression;
+- precise circular geometry;
+- believable contact/depth relationship between shell and puck;
+- controlled highlights/shadows;
+- small-to-medium scale in ordinary UI;
+- very limited facial marks.
+
+Avoid:
+
+- giant centered mascot compositions;
+- toy-like glossy 3D rendering;
+- permanent smile/wink branding;
+- emoji-like expressions;
+- making the avatar the only source of hierarchy or meaning.
+
+The product must remain useful and composed even when the avatar is rendered very small.
 
 ## Primary motion concept
 
-The yellow face moves inside the blue shell like a **weighted joystick head / magnetic puck**.
+The yellow face moves inside the blue shell like a **weighted magnetic puck / joystick head**.
 
 The current Sunday experiment keeps the shell compact and treats it as a physical presence object. State, direction and constrained movement carry more meaning than facial expressions. The same object stays mounted across Home, Awareness and input changes. No permanent idle loop is required. See [the two-surface study](../prototypes/sunday/README.md); its state is scripted until connected to an authoritative runtime.
 
@@ -23,79 +46,141 @@ The study includes small eye/mouth shapes drawn as SVG paths after manual refere
 
 Motion characteristics:
 
-- responsive but not twitchy
-- soft spring/inertia
-- subtle overshoot
-- physically believable weighting
-- direction can indicate attention or focus
-- never random movement merely to look “AI-like”
+- responsive but not twitchy;
+- believable inertia;
+- soft spring;
+- slight overshoot;
+- controlled settling;
+- directional attention;
+- lower amplitude during serious/focused work;
+- no random motion merely to look alive.
 
-This should become one of OSCAR/Sunday's signature UI behaviors.
+The puck should feel as though it has mass and a preferred resting position.
+
+## Continuous-interface role
+
+The avatar should help preserve spatial/state continuity across interactions.
+
+Example:
+
+```text
+Present
+→ wake detected
+→ puck shifts toward attention
+→ nearby interaction surface opens
+→ Listening
+→ Working
+→ Verifying
+→ resolved result
+```
+
+Where practical, the same object should persist across these transformations rather than disappear and reappear in unrelated page layouts.
+
+On desktop, a compact OSCAR presence can expand into a contextual overlay from its actual origin. On Sunday, the presence object can recompose with the current interaction instead of requiring a full-screen mode switch.
 
 ## State language
 
 | State | Expression / motion direction |
 |---|---|
-| Idle | calm neutral face; slow minimal settling motion |
+| Idle / Present | calm neutral face; almost still; subtle settling only |
 | Wake acknowledgement | quick focused shift toward input/source |
-| Listening | attentive/open expression; subtle tracking/breathing |
-| Thinking | measured drift/orbit or small internal movement; no generic spinner dependency |
-| Speaking | expression synchronized lightly with cadence; avoid literal mouth flapping unless it looks excellent |
-| Success | brief positive acknowledgement; restrained bounce/settle |
-| Confused | small tilt/offset; clearly uncertain, not comedic |
-| Alert | centered/focused posture; reduced playful motion |
-| Sentry | watchful, stable, directional awareness cues |
-| Sleep | lowered activity, reduced brightness/motion |
-| Muted | restrained motion and explicit conversation-mute label; acoustic policy remains separate |
+| Sentry aware | stable, watchful orientation; low-amplitude motion |
+| Listening | focused orientation/tension toward active input; no fake waveform when audio is inactive |
+| Thinking / Working | deliberate measured movement; no generic spinner dependency |
+| Verifying | tighter, more precise movement; restrained expression |
+| Waiting | relaxed/suspended posture; no fake busy animation |
+| Speaking | light cadence response; preserve barge-in readiness |
+| Done / Verified | brief calm resolution only after verification where applicable |
+| Partially verified | unresolved/contained posture; no success flourish |
+| Blocked | visibly constrained/still; never presented as `Working` |
+| Confused / Unknown | small offset/tilt; uncertainty without comedy |
+| Alert | immediate focused posture; minimal playful movement |
+| Sleep | reduced brightness/activity while permitted reflex/safety awareness may remain |
+| Muted | immediate reduction of conversational-listening motion; clear state label/icon; local acoustic policy remains separate |
+| Acoustic awareness disabled | stronger privacy/off state distinct from ordinary mute |
 | Error | clear but calm failure state; avoid alarming animation for recoverable errors |
+| Offline | stable unavailable/degraded cue without implying complete OSCAR absence if other surfaces remain |
 
 ## Default expression
 
-The wink is a strong personality expression, but should not be the only default face. Use it as a playful acknowledgement or occasional idle beat.
+The standard idle face should be neutral.
 
-The standard idle state should be calmer and more neutral so OSCAR can also feel credible during work, safety and Sentry contexts.
+The wink/smile can appear as a brief acknowledgement or earned personality beat. It should not be the default face because OSCAR also needs credibility during serious work, safety, Sentry and verification.
 
 ## Serious mode
 
-OSCAR must be able to become more serious without changing identity.
+OSCAR becomes more serious by **reducing** expressive motion, not by changing identity.
 
-In alert, security, safety or focused-work contexts:
+In alert, security, safety, verification or focused-work contexts:
 
-- reduce playful motion
-- center/steady the yellow face
-- use cleaner, more focused expressions
-- reduce animation amplitude
-- prioritize information hierarchy over personality
+- reduce animation amplitude;
+- center/steady the yellow puck;
+- use cleaner expression marks;
+- suppress playful secondary movement;
+- prioritize information hierarchy and state truth.
 
 ## Voice choreography
 
 Avatar state must be driven by real system state:
 
 ```text
-wake detected   → acknowledge
-VAD active      → listening
-intent resolved → transition
-model/tool wait → thinking/working
-TTS active      → speaking
-barge-in        → speaking stops immediately → listening
-sentry event    → alert/sentry state
+wake/reflex detected         → acknowledge
+Sentry local awareness only  → aware, not Listening
+conversational STT active    → Listening
+intent resolved              → transition to task state
+model/tool execution         → Working
+objective/result check       → Verifying
+verification satisfied       → Done/Verified
+blocked dependency           → Blocked
+TTS active                   → Speaking
+barge-in                     → Speaking stops → Listening
+Sentry meaningful event      → Sentry/Alert
 ```
 
-The avatar must not claim “thinking” if OSCAR is actually blocked or disconnected. Failure/blocker states should be explicit.
+The avatar must never display `Thinking`, `Working` or `Done` when OSCAR is actually blocked, failed, partially verified or merely waiting.
+
+## Sentry / mute semantics
+
+The avatar must not conflate microphone/privacy states.
+
+- `Sentry aware` may mean local wake/VAD/hot-command/Voice Map/sound-event processing is active.
+- `Listening` means an active conversational turn/STT.
+- `Muted` means ordinary conversational listening is disabled, while permitted local safety/reflex commands may remain.
+- `Acoustic awareness disabled` means the local acoustic plane is actually off.
+
+Critical privacy states must always have a text/icon cue in addition to expression/motion.
 
 ## Sunday
 
-On Sunday, the avatar is expected to be one of the primary UI elements:
+On Sunday, the avatar is a recurring presence rather than a full-screen mascot.
 
-- home/assistant surface
-- voice session
-- listening indicator
-- proactive notification identity
-- Sentry status
-- onboarding/calibration
-- compact bubble/overlay where Android permits
+Expected uses:
 
-Motion should adapt to display size and power state.
+- home/presence;
+- voice session;
+- listening indicator;
+- proactive notification identity;
+- Sentry state;
+- onboarding/calibration;
+- compact system/notification variants where Android permits.
+
+Scale and motion should adapt to current task, display size, battery/power state and reduced-motion preference.
+
+## Desktop
+
+On desktop, OSCAR may begin as a compact presence and expand into contextual UI.
+
+The avatar/object should maintain spatial continuity when possible:
+
+```text
+compact presence
+→ contextual overlay
+→ task/progress state
+→ verified result
+→ compact presence
+```
+
+Do not make every desktop interaction open a separate unrelated assistant window.
 
 ## Desk / physical surfaces
 
@@ -103,10 +188,36 @@ On small OLED/TFT/LED hardware, preserve the same state language even if the ful
 
 Examples:
 
-- simplified eyes/face
-- directional puck/offset representation
-- status color/light patterns where a screen is unavailable
-- shared state names across hardware and software
+- simplified eyes/face;
+- directional puck/offset representation;
+- status light patterns where a screen is unavailable;
+- shared state names across hardware and software.
+
+Hardware safety state must not depend on decorative animation.
+
+## Motion timing and performance
+
+Typical guidance:
+
+- UI/shared-element response begins within ~120–220 ms;
+- avatar physical travel/settling may take ~180–450 ms depending on meaning;
+- urgent interruption/barge-in response should begin immediately;
+- no animation may delay a safety/reflex action or task cancellation;
+- runtime state changes must not depend on animation completion.
+
+Use compositor-friendly movement where practical. Avoid expensive blur/filter effects as a core part of avatar motion.
+
+## Reduced motion
+
+Reduced-motion mode must preserve meaning through:
+
+- static puck position;
+- text state;
+- iconography;
+- small opacity/position changes where permitted;
+- haptics/sound where appropriate and allowed.
+
+The interface should remain fully understandable with animation disabled.
 
 ## Accessibility
 
@@ -114,12 +225,12 @@ Do not rely on expression alone to convey critical state.
 
 Important states should also have at least one of:
 
-- text label
-- sound cue
-- haptic cue on Sunday
-- distinct iconography
+- text label;
+- sound cue;
+- haptic cue on Sunday;
+- distinct iconography.
 
-Animation intensity/reduced-motion preferences should be supported.
+Color alone is never sufficient for critical state.
 
 ## Asset locations
 
@@ -129,4 +240,4 @@ Brand/icon assets live under:
 assets/brand/
 ```
 
-The README and apps should reference the canonical assets from this directory rather than duplicating files at repository root.
+Apps and docs should reference canonical assets from this directory rather than duplicating them at repository root.

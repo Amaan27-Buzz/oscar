@@ -1,22 +1,22 @@
 # Roadmap
 
-This roadmap is slice-based. Each slice should leave OSCAR in a coherent, testable state and update the README plus affected docs in the same change.
+This roadmap is slice-based. Each slice must leave OSCAR coherent/testable and update affected docs in the same change.
 
-All implementation slices are governed by `ENGINEERING.md` and `docs/EPISTEMIC-INTEGRITY.md`: keep scope coherent, boundaries explicit, failure behavior intentional, code simple enough to evolve safely, and completion claims no stronger than the available evidence.
+All slices follow `ENGINEERING.md` and `docs/EPISTEMIC-INTEGRITY.md`.
 
-Related planning documents:
+Related planning docs:
 
-- `docs/JARVIS-GAP-REVIEW.md`
-- `docs/COMPETITIVE-BENCHMARK.md`
-- `docs/RUNTIME-FOUNDATIONS.md`
-- `docs/NATIVE-INFRASTRUCTURE.md`
-- `docs/MODEL-ROUTING.md`
 - `docs/BUILD-GATES.md`
+- `docs/NATIVE-INFRASTRUCTURE.md`
+- `docs/CONNECTION-GRID.md`
+- `docs/MODEL-ROUTING.md`
 - `docs/VOICE-SENTRY.md`
+- `docs/PERSONA.md`
+- `docs/RUNTIME-FOUNDATIONS.md`
 
-The implementation order is deliberately **software-core first, hardware later**. OSCAR's final architecture still requires always-on Edge hardware, but the first implementation milestone should prove OSCAR's own nervous system before attaching phone, voice and physical embodiments.
+## Implementation principle
 
-The first loop to prove is:
+Build OSCAR's nervous system first, then attach embodiments.
 
 ```text
 objective
@@ -26,19 +26,16 @@ objective
 → collect evidence
 → verify
 → record action/artifact
-→ report only what the evidence supports
+→ report only what evidence supports
 ```
 
-During early development this loop may run on a development computer for convenience. That does **not** make the computer OSCAR's permanent host.
+Early development may run on a development PC for convenience. The PC is never OSCAR's permanent host.
 
-Two earlier projects are architectural inputs rather than required external products:
+Availability ultimately spans the **Connection Grid**:
 
-- Latch architecture/logic → folded into **native OSCAR Transport + Capability Fabric**;
-- SwitchRoute architecture/logic → folded into **native OSCAR Model Router**.
-
-OSCAR must not depend on either separate repository being complete or separately deployed.
-
-Hardware/engineering follows the same rule: physical control is native OSCAR Edge/device capability work. CAD, circuit design, simulation, firmware and other engineering tasks route to whichever installed or connected specialist tools are actually available rather than to one mandatory workbench product.
+```text
+Sunday + Cloud coordinator + Desktop node(s) + OSCAR Edge
+```
 
 ## Status legend
 
@@ -47,533 +44,338 @@ Hardware/engineering follows the same rule: physical control is native OSCAR Edg
 - ⏭️ Next
 - ◻️ Planned
 
-## Slice 00 — Repository foundation ✅
+## Slice 00 — Repository / architecture foundation ✅
 
-**Goal:** establish the product, design, engineering and agent-development contract before implementation.
-
-Deliverables include:
-
-- canonical product/architecture definition;
-- feature inventory;
-- LRA/Supermemory/Jev memory plan;
-- Personal Policy;
-- communication/Workers/Protocols plans;
-- World Model + Perception Fabric;
-- Executive Planner;
-- Universal Channel Gateway;
-- Durable Execution Runtime;
-- Capability Catalog + Dynamic Tool Search;
-- Action Ledger + Artifact/Result Model;
-- Learned Automation Evaluation Pipeline;
-- Epistemic Integrity;
-- Voice/Sentry/Voice Match direction;
-- native OSCAR transport/model-routing decision;
-- design/engineering/agent guidance;
-- repository support and checks.
-
-Exit condition: repository clearly defines OSCAR's product, architecture, engineering rules, truth/verification model, implementation order and major system contracts.
+Established product, architecture, engineering/design rules, Epistemic Integrity, World Model, Perception Fabric, Personal Policy, Workers/Protocols, Durable Execution Runtime, Capability Catalog, Action Ledger, Artifact Model, Voice/Sentry architecture, native transport/model routing, Connection Grid direction, Persona direction and build-gate strategy.
 
 ## Slice 01 — OSCAR Core Loop ⏭️
 
 **Parallel visual experiment, awaiting manual review:** `prototypes/sunday/` evaluates only Home and Sentry/Awareness with scripted, disconnected states. See its [research, model and verification notes](../prototypes/sunday/README.md). It establishes no production mobile stack and completes neither Slice 00.5 nor Slices 09/13. Core Loop remains next.
 
-**Goal:** prove the smallest end-to-end OSCAR execution loop before building embodiments or hardware.
+**Goal:** prove the smallest evidence-backed execution loop.
 
 Deliverables:
 
-- minimal core package/service boundary with no desktop-host assumption;
-- typed `Objective`, `Task`, `Capability`, `Action`, `Result`, `Evidence` and `ArtifactRef` contracts;
-- explicit task states such as `planned`, `executing`, `result_received`, `verifying`, `verified`, `partially_verified`, `failed`, `blocked`, `cancelled` and `unknown`;
-- completion-condition and verification-strategy contracts;
-- minimal local capability registry;
-- minimal Durable Execution Runtime foundation with persisted task state, cancellation and retry budget;
-- Action Ledger foundation;
-- Artifact / Result Model foundation;
-- simple CLI/test harness rather than product UI;
-- one small reference capability such as scoped test-workspace file write/read;
+- typed `Objective`, `Task`, `Capability`, `Action`, `Result`, `Evidence`, `ArtifactRef`;
+- explicit task/verification states;
+- minimal capability registry;
+- durable task persistence/cancel/retry foundation;
+- Action Ledger + Artifact foundations;
+- CLI/test harness;
 - independent verifier;
-- evidence-backed final reporting;
-- tests proving `reported success` cannot become `verified` without evidence.
+- tests proving executor success cannot become verified without evidence.
 
-Reference demonstration:
-
-```text
-"Create hello.txt containing OSCAR online in the test workspace"
-→ select filesystem capability
-→ write file
-→ executor reports success
-→ OSCAR reads file independently
-→ compare expected vs actual
-→ mark VERIFIED
-→ report completion with evidence
-```
-
-Exit condition: a representative objective can travel through `objective → capability → action → result → evidence → verification → ledger/artifact → truthful report`, and a false executor-success report cannot produce a verified completion state.
+Exit: a representative objective completes through `objective → action → evidence → verification → truthful report`.
 
 ## Slice 02 — TypeSafe Jev ◻️
 
-**Goal:** add the fast intent + epistemic decision layer on top of the proven Core Loop.
+**Goal:** add fast intent + epistemic routing.
 
 Deliverables:
 
-- typed intent model;
-- typed epistemic routes: `known / world / recall / verify / reason / reported / specialist / worker / unknown`;
-- deterministic routing where sufficient;
+- typed intent;
+- `known / world / recall / verify / reason / reported / specialist / worker / unknown` routes;
+- deterministic paths when sufficient;
 - capability-selection hook;
-- current-evidence vs recall vs inference distinctions;
-- ask-user path only when retrieval/verification cannot safely resolve ambiguity;
-- repair/reroute decision contract;
-- Personal Policy/permission hooks;
+- repair/reroute/ask-user rules;
 - latency instrumentation;
-- tests for incorrect certainty, unsupported capability and unknown-state handling.
+- uncertainty/unsupported-capability tests.
 
-Exit condition: representative requests route through deterministic execution, verification or ask-user paths without unnecessary heavy-model calls, guessed personal context or false certainty.
+## Slice 03 — Native Transport + Capability Catalog + Connection Grid foundation ◻️
 
-## Slice 03 — Native OSCAR Transport + Capability Catalog ◻️
-
-**Goal:** connect OSCAR to external execution surfaces through OSCAR-owned transport/capability contracts.
-
-This slice folds the useful Latch architecture into OSCAR rather than integrating Latch as a required external service.
+**Goal:** connect OSCAR to remote capability nodes through OSCAR-owned contracts.
 
 Deliverables:
 
-- native typed task/event/action/result transport boundary;
+- typed task/event/result protocol;
 - node/session identity;
-- pairing and scoped credentials;
-- capability advertisement;
-- lightweight capability manifests;
-- Capability Catalog;
-- Dynamic Tool Search / progressive contract loading;
-- metadata for suitability, permissions, risk, availability, surface, latency/cost, reliability and undo;
-- event/task correlation IDs;
-- reconnect/backoff;
-- bounded remote command/result transport;
-- progress/streaming callbacks where useful;
-- audit/provenance metadata;
-- simulated/local reference node proving the protocol before Edge hardware exists;
-- clear documentation that the separate Latch repo is reference/prototype material, not a runtime dependency.
+- pairing/scoped credentials;
+- capability advertisement/search;
+- reconnect/backoff/correlation IDs;
+- audit/provenance;
+- simulated/local reference node;
+- cloud rendezvous/coordinator interface;
+- Connection Grid node-state model;
+- durable node leases/last-seen/health;
+- explicit availability levels such as Full / Connected / Local / Reflex-only / Offline;
+- portable coordinator deployment boundary supporting free-tier/paid/BYOC targets;
+- no runtime dependency on Latch.
 
-Exit condition: OSCAR can discover a capability on another node, load only its relevant contract, invoke it through native transport, receive a structured result and independently verify the objective without assuming that node hosts OSCAR.
+Exit: OSCAR discovers/invokes a capability on another node and survives node disconnect without losing objective state.
 
-## Slice 04 — Native OSCAR Model Router + cloud intelligence ◻️
+## Slice 04 — Native Model Router + cloud intelligence ◻️
 
-**Goal:** add cloud reasoning as a selectable capability using OSCAR-owned routing logic.
-
-This slice folds the useful SwitchRoute architecture/logic into OSCAR rather than requiring SwitchRoute as a separately deployed product.
+**Goal:** add provider/model/credential routing.
 
 Deliverables:
 
-- native provider/model registry;
-- independent credential pools per provider;
-- task/capability suitability metadata;
-- latency/cost/quality policy;
-- provider/model/credential health and availability;
-- fallback chains and circuit behavior;
-- model capability metadata: tool use, structured output, vision/audio/context limits where relevant;
-- automatic modes (`Auto`, `Fast`, `Balanced`, `Heavy Duty`, `Free First`, `Cheap`, `Local`, `Private`, `Specialist`) plus explicit manual selection;
-- ChatGPT provider/surface adapter through native OSCAR transport;
-- async callbacks into Durable Execution Runtime;
-- structured model/agent outputs recorded as `reported`/`inferred`, never automatically `verified`;
-- graceful provider degradation;
-- Jev decisions for when a model is unnecessary vs useful;
-- route/outcome/usage telemetry for later learning;
-- explicit documentation that the separate SwitchRoute repo is reference/prototype material, not a runtime dependency.
+- provider/model registry;
+- multi-key credential pools;
+- task/model affinity;
+- health/quota/rate/latency/cost state;
+- Auto / Fast / Balanced / Heavy Duty / Free First / Cheap / Local / Private / Manual / Specialist modes;
+- fallback/circuit behavior;
+- local runtimes;
+- provider usage/history UI data contract;
+- ChatGPT/other provider adapters;
+- no runtime dependency on SwitchRoute;
+- model output remains reported/inferred until verified where required.
 
-Exit condition: Jev can decide that reasoning is needed, the native router can choose/fallback among allowed providers/models/credentials, manual override works, and OSCAR preserves the evidence boundary between model claims and verified state.
+**Manual milestone:** Gate A — Brain.
 
-**Manual milestone:** complete **Gate A — Brain** from `docs/BUILD-GATES.md` after Slices 01–04.
+## Slice 05 — First real machine Worker + remote continuation ◻️
 
-## Slice 05 — First real machine Worker ◻️
-
-**Goal:** make OSCAR genuinely useful through an optional computer node while preserving laptop independence.
+**Goal:** make OSCAR useful through a real optional computer node.
 
 Deliverables:
 
-- lightweight Windows machine-node runtime;
-- pairing through native OSCAR transport;
-- dynamic capability advertisement;
-- scoped filesystem/terminal/Git primitives;
-- Codex integration;
-- other installed coding-agent capabilities when available;
-- browser/computer-use integration where practical;
-- installed-app capability discovery/automation through the strongest legitimate integration path;
-- task progress/result callbacks;
-- cancellation and disconnect handling;
-- restart/reconnect recovery;
-- independent test/state verification after specialist completion;
-- first meaningful Worker/objective flow.
+- Windows machine-node runtime;
+- filesystem/terminal/Git;
+- Codex and other installed coding agents where available;
+- browser/computer-use path;
+- installed-app capability discovery;
+- task progress/cancel/reconnect;
+- independent post-execution verification;
+- long-running task continues after user leaves;
+- Sunday/cloud-visible task state;
+- remote pause/cancel/approve;
+- optional machine sleep/shutdown after verified completion when policy/capability allow;
+- Wake-on-LAN only when a real wake path exists.
 
-Reference objective:
-
-```text
-"Check this repository, find why the tests fail, fix it and make sure they pass."
-→ discover repository/Codex/terminal capabilities
-→ delegate implementation
-→ receive specialist report
-→ independently run/inspect tests and repository state
-→ VERIFIED / PARTIAL / FAILED
-→ report evidence
-```
-
-Exit condition: OSCAR can delegate a useful software objective to a real machine/coding capability, survive ordinary executor failure/disconnect and verify completion independently where practical.
+Exit: useful repository/system objective can run remotely, survive ordinary disconnect and report verified/partial/blocked state truthfully.
 
 ## Slice 06 — LRA + Personal Policy + live context ◻️
 
-**Goal:** add persistent continuity and authoritative user preferences after the execution loop already works.
+**Goal:** add persistent continuity and explicit behavior rules.
 
 Deliverables:
 
-- LRA integration boundary;
-- active-context + episodic-history model;
-- Supermemory backend;
-- task/project/device/procedural memory types;
-- Jev recall vs live-verification decisions;
-- Personal Policy store distinct from inferred memory;
-- natural-language preference create/edit/remove;
-- policy scoping/precedence/conflict resolution;
-- provenance/confidence metadata;
-- remember/forget/update flows;
-- universal live context/search abstraction;
-- source-authority and staleness rules;
-- initial canonical entity/relationship graph;
-- explicit `recalled / inferred / reported / verified` distinctions.
+- LRA + Supermemory integration;
+- active context + episodic history;
+- procedural/project/device memory;
+- Personal Policy store distinct from memory/Persona;
+- natural-language policy editing;
+- authority/staleness rules;
+- live federated context/search;
+- canonical entity graph foundation.
 
-Exit condition: OSCAR can recover relevant historical context, query current authoritative context when needed and apply explicit user preferences without confusing memory or inference with current verified truth.
-
-**Manual milestone:** complete **Gate B — Can Do Work** after Slices 05–06.
+**Manual milestone:** Gate B — Can Do Work.
 
 ## Slice 07 — OSCAR Edge + reflexes ◻️
 
-**Goal:** attach the persistent physical embodiment after the core contracts are proven in software.
+**Goal:** attach persistent local physical presence.
 
 Deliverables:
 
-- ESP32 gateway project structure;
-- Pico/RP2040 deterministic controller project structure;
-- small native OSCAR Edge transport client/protocol;
-- typed event/message schema between ESP32 and Pico;
-- device identity/version reporting;
-- health heartbeat;
-- capability advertisement into the existing catalog;
+- ESP32 gateway/client;
+- Pico deterministic controller;
+- typed ESP32↔Pico events;
+- health/capability advertisement;
 - GPIO/sensor/display test capabilities;
-- local watchdog/safe-default behavior;
-- deterministic reflex state machine;
-- emergency-stop path;
-- simple local device commands;
-- hardware latency instrumentation;
+- local watchdog/safe defaults;
+- reflex/emergency-stop path;
 - reconnect/offline behavior;
-- simulator tests plus real-device verification;
-- explicit simulator-vs-hardware evidence reporting.
+- optional LAN helper capability such as Wake-on-LAN where hardware/network support it;
+- simulator + physical-device verification.
 
-Exit condition: ESP32 and Pico join OSCAR as capability-bearing nodes, preserve deterministic safety without cloud intelligence and use the same native task/result/evidence contracts as software nodes.
+## Slice 08 — Voice Core + Voice Identity + Voice Match/Map + Persona runtime ◻️
 
-## Slice 08 — Voice Core + OSCAR Voice Identity + Voice Map ◻️
-
-**Goal:** make the proven OSCAR loop naturally accessible by voice and establish the always-on local acoustic primitives Sentry will later consume.
+**Goal:** make the proven OSCAR loop natural by voice and establish character.
 
 Deliverables:
 
-### Voice input
-- microphone/audio pipeline;
-- local wake word + VAD;
-- streaming STT abstraction;
-- barge-in;
-- echo cancellation;
-- first-audio/command latency metrics;
-- voice/text task continuity.
+- wake/VAD/STT;
+- barge-in/echo cancellation;
+- stable provider-independent VoiceProfile;
+- speaking modes/fallback mapping;
+- Voice Match;
+- Voice Map;
+- self-voice suppression;
+- multi-device arbitration;
+- PersonaProfile with configurable humor/candor/warmth/formality/brevity/playfulness/initiative/pushback;
+- context trigger rules;
+- truth/safety/permission invariants that Persona cannot override.
 
-### OSCAR Voice Identity
-- provider-independent `VoiceProfile` contract;
-- stable OSCAR voice across desktop/Sunday/desk where possible;
-- natural prosody/modulation rather than a generic provider default;
-- pronunciation lexicon/control;
-- normal / quiet-night / focused-serious / alert / representative speaking modes;
-- streaming/chunked TTS;
-- provider fallback mapping that preserves identity as closely as possible;
-- self-voice tagging/playback reference so OSCAR never learns or reacts to its own TTS as an external speaker.
+Exit: user can wake/interact naturally, hear a stable OSCAR voice and observe Persona changes without compromising evidence/safety semantics.
 
-### Voice Match
-- owner/authorized-speaker verification interface;
-- confidence scores;
-- explicit separation from high-risk authentication.
+## Slice 09 — Sunday + communication + Connection Grid owner controls ◻️
 
-### Voice Map
-- local speaker-profile/embedding abstraction;
-- `owner / known / recognized-but-unverified / unknown / multiple / uncertain` states;
-- optional linkage to canonical people with provenance/confidence;
-- speaker-change/presence events without requiring full transcription;
-- privacy/retention controls for voice profiles;
-- explicit rule that Voice Map recognition does not grant permission;
-- OSCAR's own synthesized voice excluded from enrollment/identity updates.
-
-### Multi-device arbitration
-- wake/listen identity across devices;
-- confidence/proximity/active-device arbitration;
-- one-owner-per-turn rule;
-- handoff/failover.
-
-Exit condition: the user can wake OSCAR, invoke the Core Loop by voice, hear a stable OSCAR voice, interrupt naturally, avoid duplicate device responses, and generate local confidence-qualified speaker events without continuous cloud transcription.
-
-## Slice 09 — Sunday + communication + Universal Channel Gateway ◻️
-
-**Goal:** ship OSCAR's phone embodiment and prove communication as a first-class capability family.
+**Goal:** ship OSCAR's phone embodiment.
 
 Deliverables:
 
 - Android app shell;
-- OSCAR identity/avatar + stable voice profile;
-- voice + text session;
+- present-not-launched home interaction;
+- voice/text task continuity;
 - notifications;
-- native OSCAR transport connection;
-- task/context continuity;
-- phone capability advertisement;
-- initial safe phone/app actions;
-- Universal Channel Gateway event/action envelope;
-- first native/official adapters;
-- canonical participant/entity IDs;
-- explicit per-channel capability limits;
-- cellular/app-call capability studies;
-- audio access/loopback and VoIP fallback study;
-- AI call-handling policy hooks where supported;
-- mobile meeting transcription/notes;
-- system-wide dictation/input path where practical;
-- biometric confirmation;
-- Voice Map/Voice Match participation subject to platform support.
-
-Exit condition: a task can move between Sunday and another OSCAR surface without becoming a separate assistant/session, and communication adapters expose only capabilities actually supported by the device/platform.
+- biometric approval;
+- Connection Grid owner-control surface;
+- pause/cancel/revoke node/session controls;
+- active remote-task supervision;
+- Persona UI;
+- Universal Channel Gateway foundation;
+- initial supported call/message/email/meeting actions;
+- explicit per-platform capability limits.
 
 ## Slice 10 — Desktop Interaction Runtime ◻️
 
-**Goal:** turn the capable machine node into a polished native desktop embodiment and match the practical VoiceOS interaction baseline.
+**Goal:** polished native desktop embodiment.
 
 Deliverables:
 
-- native/lightweight Windows app shell;
-- macOS adapter boundary/plan;
-- OSCAR presence UI;
-- stable OSCAR voice output/input integration;
-- first-class `Dictate / Edit / Ask / Act` runtime;
-- focused app/window/text-field context;
-- selected-text operations;
-- cursor target + accessibility-tree context;
+- compact OSCAR presence/overlay;
+- expanded workspace only when needed;
+- Dictate / Edit / Ask / Act;
+- focused app/window/selection/cursor/accessibility context;
 - screenshot/visual context;
 - point-and-talk;
-- accessibility/clipboard insertion fallbacks;
-- system-wide dictation;
-- Action-Ledger-backed undo where real;
-- meeting transcription/notes;
-- task/progress/approval surfaces;
+- approvals/task progress;
+- Connection Grid state/control;
+- fluid shared-element state transitions;
 - verification state separate from executor completion.
 
-Exit condition: OSCAR can understand and act on the current desktop target with low-friction VoiceOS-grade interaction while preserving the same evidence, permission and task semantics as the headless machine Worker.
+**Manual milestone:** Gate C — Embodied OSCAR.
 
-**Manual milestone:** complete **Gate C — Embodied OSCAR** after Slices 07–10.
+## Slice 11 — World Model + Perception Fabric + persistent Sentry + optional Daily Journal ◻️
 
-## Slice 11 — World Model + Perception Fabric + Sentry ◻️
-
-**Goal:** give OSCAR one coherent live representation of what is happening across the user's digital, acoustic and physical environment.
+**Goal:** create a coherent live picture of the user's digital/physical/communication environment.
 
 Deliverables:
 
-- World Model graph for people, places, devices, apps, projects, objects, tasks and relationships;
-- current evidence separated from historical memory;
-- Perception Fabric ingesting screen/accessibility state, app/device events, sensors, location, authorized camera observations and local acoustic events;
-- state freshness/confidence/provenance;
-- fusion of Sunday, desktop, Edge, calendar, communication and Worker state;
-- entity resolution expansion across communication/context sources;
-- Passive/Aware/Guard/Away/Sleep Sentry modes;
-- **always-on local acoustic Sentry plane** when enabled: wake, VAD/speech presence, Voice Map classification, speaker-change/multiple-speaker events, configured sound-event classes and barge-in;
-- explicit no-continuous-cloud-audio default;
-- explicit distinction between speech presence, identity classification and permission to transcribe/retain content;
-- OSCAR self-voice suppression during Sentry listening;
-- importance/urgency/confidence/interruptibility scoring;
-- Personal Policy-aware interruption decisions;
-- predictive signals for obvious schedule/task/device risk;
-- notification/speech escalation policy.
+- World Model for people/places/devices/apps/projects/tasks;
+- Perception Fabric across screen/device/sensor/location/communication/acoustic inputs;
+- freshness/confidence/provenance;
+- Passive/Aware/Guard/Away/Sleep Sentry;
+- persistent local acoustic plane;
+- explicit Sentry Aware vs Listening vs Muted vs Awareness Off states;
+- optional Context Capture/Daily Journal;
+- selected calls/messages/mail/meetings/in-person conversations where legitimately available;
+- per-source capture capability checks;
+- raw/transcript/summary/memory retention controls;
+- consent/disclosure/privacy-zone controls;
+- pause/delete/forget controls;
+- no covert/default continuous recording;
+- importance/urgency/confidence/interruptibility scoring.
 
-Exit condition: OSCAR can answer `what is true now?` from a coherent live model, distinguish stale/unknown state and react to meaningful physical/acoustic/digital events without continuously uploading room audio or treating old memory as current truth.
+Exit: OSCAR can answer `what is true now?`, remain persistently aware and, when explicitly configured, build a provenance-qualified daily continuity record without confusing awareness with recording.
 
-## Slice 12 — First-run commissioning + Voice Match/Voice Map ◻️
+## Slice 12 — Commissioning / setup ◻️
 
-**Goal:** make setup safe and useful without forcing the user through an exhaustive settings product.
+**Goal:** safely commission the personal system.
 
 Deliverables:
 
-- identity/basic interaction preferences;
+- user identity;
+- Persona setup;
 - Personal Policy starter rules;
-- communication/meeting/Worker autonomy defaults;
-- owner Voice Match enrollment across varied conditions;
-- optional known-person Voice Map enrollment/labeling with consent and retention controls;
-- explicit explanation that Voice Map recognition is perception, not authorization;
-- OSCAR Voice Identity calibration/listening test and fallback behavior;
-- self-voice suppression test while OSCAR speaks;
-- wake/reflex tests;
-- authorization classes;
-- device/environment discovery;
-- service/channel connections;
-- Sentry configuration including local acoustic awareness/transcription-retention choices;
-- Sunday/desktop/Edge pairing;
+- Voice Identity calibration;
+- Voice Match / optional Voice Map;
+- Connection Grid pairing;
+- free-tier/paid/BYOC cloud-coordinator choice;
+- model providers;
+- Sunday/Desktop/Edge pairing;
+- Sentry setup;
+- optional capture/journal source + retention configuration;
 - permission matrix;
-- end-to-end calibration.
-
-Exit condition: a new installation ends with verified health/permission/voice status, understandable policy, working owner Voice Match, correctly configured Voice Map/Sentry privacy and a verified OSCAR voice path.
+- end-to-end health tests;
+- evidence-backed final readiness screen.
 
 ## Slice 13 — Avatar / presence UI ◻️
 
-**Goal:** turn OSCAR's character into a coherent state-driven interface across suitable surfaces.
+**Goal:** make OSCAR state physically legible.
 
 Deliverables:
 
-- reusable avatar component;
-- joystick/puck motion physics;
-- expression/state system;
-- listening/thinking/speaking choreography;
-- explicit Working / Verifying / Waiting / Blocked / Done / Failed states;
-- serious/Sentry states;
-- reduced-motion accessibility;
+- reusable blue-shell/yellow-puck component;
+- weighted spring/inertia;
+- Idle/Listening/Speaking/Working/Verifying/Waiting/Blocked/Done/Sentry/Muted/Offline states;
+- Persona-sensitive but truth-preserving expression amplitude;
+- reduced-motion support;
 - compact/icon variants.
-
-Exit condition: avatar motion always maps to actual OSCAR state and never displays success/working/thinking when the runtime is failed, blocked or still unverified.
 
 ## Slice 14 — Executive Planner + durable Workers + learning ◻️
 
-**Goal:** scale the proven single-objective loop into durable delegated teammates and concurrent objectives.
+**Goal:** scale from one objective to durable delegated responsibilities.
 
 Deliverables:
 
-- Executive Planner over tasks/Workers/Protocols;
-- priority/deadline/dependency/resource/risk/interruptibility model;
-- scheduling, parallelization, pause/pre-emption and rerouting;
-- delegated Worker schema/lifecycle/state;
-- voice/chat Worker creation/editing;
-- temporary/task/persistent Worker types;
-- Worker capability/permission/context envelope;
-- Worker collaboration/handoff/dependency model;
-- Durable Execution Runtime expansion: leases, heartbeats, checkpoints, reclaim, zombie detection and restart/resume;
-- Jev self-repair/reroute/escalation;
-- Worker management UI;
-- social-media Worker reference;
-- procedural-memory capture;
-- route/tool outcome history;
-- `SKILL.md` Skill contract;
+- Executive Planner;
+- Worker lifecycle/types;
+- priorities/dependencies/deadlines/resources/risk;
+- durable leases/heartbeats/checkpoints/reclaim;
+- self-repair/reroute/escalation;
+- Worker management visibility;
+- Skills/Protocols;
 - teach-by-demonstration;
-- Capability Catalog search for Workers/Protocols;
-- Protocol schema + durable state;
-- routine/time/event triggers;
-- pause/resume/cancel;
 - Learned Automation Evaluation Pipeline;
-- Artifact/Result handoff;
-- measurable repeated-task latency/cost/reliability improvement.
+- Artifact/Result handoff.
 
-Exit condition: OSCAR can coordinate multiple objectives, create a Worker naturally, survive executor loss, discover capabilities progressively, learn/be taught workflows, evaluate them before promotion and reuse them without self-granting authority.
+**Manual milestone:** Gate D — JARVIS Layer.
 
-**Manual milestone:** complete **Gate D — JARVIS Layer** after Slices 11–14.
+## Slice 15 — Physical / device capability expansion + specialist engineering ◻️
 
-## Slice 15 — Physical / Device Capability Expansion + specialist engineering ◻️
-
-**Goal:** broaden OSCAR's physical-world reach and engineering capability without introducing a dedicated hardware-workbench product dependency.
+**Goal:** broaden physical-world reach without a dedicated hardware-workbench product dependency.
 
 Deliverables:
 
-- onboarding/provisioning path for additional OSCAR Edge and capability-bearing devices;
-- sensors, buttons, relays, displays, motors/actuators and cameras through typed capability contracts;
-- custom ESP32/Pico projects joining native OSCAR transport;
-- smart-home/environment adapters where useful and legitimate;
-- device inventory, health, availability and capability discovery;
-- firmware/programming/provisioning through available specialist tools;
-- workbench/environment telemetry;
-- device-state correlation with World Model/Perception;
-- physical Protocol execution with local deterministic safety;
-- spatial perception experiments where useful;
-- CAD, circuit design/simulation, 3D, numerical simulation, diagnostics, reconstruction and optimization routed to installed/connected specialist applications;
-- Artifact/Result records for generated designs, firmware, simulations and diagnostics.
+- additional Edge/device onboarding;
+- sensors/relays/displays/motors/cameras;
+- smart-home/environment adapters where legitimate;
+- device inventory/health/capability discovery;
+- firmware/provisioning through available specialist tools;
+- CAD/circuit/simulation/3D/numerical/diagnostic tool routing;
+- physical Protocol execution with deterministic local safety;
+- typed engineering Artifacts/Results.
 
-Exit condition: OSCAR can onboard, discover, control, observe and verify representative physical devices through native capability contracts, while engineering work is routed to the best available specialist tool rather than a mandatory product.
+## Slice 16 — Self-maintenance + reliability/security/truthfulness pass ◻️
 
-## Slice 16 — Self-maintenance, reliability, security + truthfulness pass ◻️
+**Goal:** deliberately break OSCAR and prove graceful behavior.
 
-**Goal:** prove the system diagnoses itself and behaves correctly under failure, adversarial and verification-relevant conditions.
+Deliverables/tests include:
 
-Deliverables:
-
-- self-health model for auth, transport adapters, model providers, device capabilities, storage and latency;
-- stale/broken capability detection;
-- safe automatic repair/rollback;
-- credential rotation/revocation;
-- replay/idempotency checks;
-- Action Ledger integrity + undo tests;
-- evidence/verification-state integrity tests;
-- tests preventing `reported success` → `verified` without evidence;
-- partial/unknown/blocked reporting tests;
-- audit trail;
-- provider/node outage tests;
-- durable-task reclaim/restart/zombie tests;
-- Worker retry/reroute/escalation tests;
-- Personal Policy regressions;
-- Voice Match spoof-resistance evaluation;
-- Voice Map false-positive/unknown-speaker evaluation;
-- OSCAR self-voice suppression/echo tests;
-- local hardware-safety tests;
-- rate limiting/privacy/retention controls;
-- learned automation promotion/rollback tests.
-
-Exit condition: OSCAR can detect degraded state, repair safe failures when possible, ask for minimum intervention otherwise and never claim success beyond what it can verify.
+- provider/auth failures;
+- Connection Grid cloud/Sunday/Desktop/Edge node loss;
+- lease expiry/reclaim/restart;
+- remote-task continuation;
+- owner-control/revocation paths;
+- capture-source failure and retention/deletion verification;
+- consent/privacy regression tests;
+- Persona cannot reduce truth/safety/permission;
+- Voice Match spoof/Voice Map false positives;
+- self-voice/echo;
+- Action Ledger/Undo integrity;
+- local hardware safety;
+- learned-automation rollback.
 
 ## Slice 17 — Unified alpha ◻️
 
-**Goal:** demonstrate the complete product loop across software, cloud, voice, phone and physical embodiments.
+**Goal:** one evidence-backed developer alpha across core, Grid, models, machine work, memory, voice, Sunday, desktop, Edge, Sentry, Persona, Workers and physical capability.
 
-Reference scenario:
+Run one complete scenario crossing:
 
 ```text
-Perception/Sentry/communication/device event occurs
-→ local audio/sensor perception may update Voice Map / World Model
-→ OSCAR/Jev evaluates current truth + memory
-→ Personal Policy + permissions applied
-→ Executive Planner prioritizes objective/resources
-→ Durable Execution Runtime persists task/checkpoint state
-→ Capability Catalog finds the best available specialist/tool/channel
-→ native OSCAR Model Router selects a model only when needed
-→ native OSCAR Transport carries work to the chosen node/surface
-→ Worker/specialist executes
-→ Channel Gateway handles communication when relevant
-→ Action Ledger records consequential changes
-→ Artifact/Result Model records durable outputs
-→ verification checks objective completion
-→ World Model / memory update from evidence
-→ OSCAR replies through its stable Voice Identity or text
-→ report only what the evidence supports
+perception / communication
+→ World Model / Jev
+→ Personal Policy + Persona presentation
+→ Executive / task runtime
+→ capability/model routing
+→ Connection Grid node
+→ Worker/device/action
+→ ledger/artifact
+→ verification
+→ voice/text report
 ```
 
-Exit condition: Core Loop + Jev + native transport + native model routing + machine Worker + memory/policy + Edge + Voice Identity/Voice Match/Voice Map + Sunday/communication + desktop Interaction Runtime + World Model + Perception Fabric + Sentry + Executive Planner + Durable Runtime + Capability Catalog + Channel Gateway + Action Ledger + Artifact Model + Workers + learning + physical/device expansion operate as one coherent evidence-backed OSCAR system.
+**Manual milestone:** Gate E — Unified Alpha.
 
-**Manual milestone:** complete **Gate E — Unified Alpha** after Slices 15–17.
+## Build cadence
 
-## Post-alpha horizon — P2 domains
+The initial 2–3 day sprint optimizes for vertical proof, not superficial completeness.
 
-These are intentionally deferred until the unified alpha is coherent:
+```text
+Day 1  Gate A + basic Gate B
+Day 2  Gate B + Gate C core
+Day 3  Gate C + Gate D/E integration shell
+```
 
-- health/wearable context with strict permission/privacy boundaries;
-- broader smart-home capability contracts;
-- robotics/camera/room-infrastructure contracts;
-- future vehicle/drone integration where safe and legally appropriate;
-- optional cloud Worker node as an advertised capability rather than a foundational dependency.
-
-## Slice definition of done
-
-Every slice must include:
-
-- implementation complete for the scoped deliverable;
-- design no more complex than the current requirement justifies;
-- clear responsibilities/boundaries and authoritative state ownership;
-- tests for important behavior and meaningful failure modes;
-- timeout/retry/reconnect/cancellation/idempotency behavior where relevant;
-- explicit limitations/follow-ups;
-- explicit verification state and evidence for completion claims;
-- security/safety/privacy review where relevant;
-- critical-path performance measured/budgeted where relevant;
-- README status update;
-- affected docs updated;
-- next slice clearly identified.
-
-A slice is not `Complete` because an agent/tool said so. Its exit condition must be verified against repository/runtime/device evidence where verification is possible.
+Anything not genuinely verified remains planned/partial and is hardened after the first developer alpha.
