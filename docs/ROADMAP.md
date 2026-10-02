@@ -48,7 +48,7 @@ Sunday + Cloud coordinator + Desktop node(s) + OSCAR Edge
 
 Established product, architecture, engineering/design rules, Epistemic Integrity, World Model, Perception Fabric, Personal Policy, Workers/Protocols, Durable Execution Runtime, Capability Catalog, Action Ledger, Artifact Model, Voice/Sentry architecture, native transport/model routing, Connection Grid direction, Persona direction and build-gate strategy.
 
-## Slice 01 — OSCAR Core Loop 🚧
+## Slice 01 — OSCAR Core Loop ✅
 
 **Checkpoint:** implemented and verified for scoped file objectives and deterministic addition. The CLI proof independently reads exact file bytes and rejects a lying executor. See [Club A evidence](CLUB-A-CHECKPOINT.md).
 
@@ -67,7 +67,7 @@ Deliverables:
 
 Exit: a representative objective completes through `objective → action → evidence → verification → truthful report`.
 
-## Slice 02 — TypeSafe Jev 🚧
+## Slice 02 — TypeSafe Jev ✅
 
 **Checkpoint:** typed deterministic routing and all nine epistemic decision routes are implemented and tested. Calendar, memory, specialist and Worker paths block when no capability exists. This is a conservative grammar, not a general natural-language parser.
 
@@ -85,7 +85,7 @@ Deliverables:
 
 ## Slice 03 — Native Transport + Capability Catalog + Connection Grid foundation 🚧
 
-**Checkpoint: PARTIAL.** Authenticated loopback HTTP reference execution, scopes, replay protection, correlation, cancellation, progress, heartbeat state, durable leases, disconnect/expiry/reclaim and five availability levels are tested. A public TLS/outbound rendezvous deployment and real embodied nodes remain unverified.
+**Checkpoint: reference foundation VERIFIED; broader deployment PARTIAL.** Authenticated loopback HTTP execution, scopes, replay protection, correlation, cancellation, progress, heartbeat state, durable leases, disconnect/expiry/reclaim and five availability levels are verified. This foundation satisfies the current Gate A review scope. Public TLS/outbound rendezvous deployment, independent network-node stores and real embodiments require later acceptance scenarios.
 
 **Goal:** connect OSCAR to remote capability nodes through OSCAR-owned contracts.
 
@@ -109,7 +109,7 @@ Exit: OSCAR discovers/invokes a capability on another node and survives node dis
 
 ## Slice 04 — Native Model Router + cloud intelligence 🚧
 
-**Checkpoint: PARTIAL.** Versioned provider/model manifests, independent credential pools, all ten modes, quota/health observations, task-fit/scarcity ranking, bounded fallback, streaming integrity and content-free history are implemented. Adapter wire contracts pass real loopback HTTP tests. Hosted calls were denied by network policy; no hosted generation is verified. Gate A remains partial; Slice 05 is not started.
+**Checkpoint: hosted/routing foundation VERIFIED; broader integrations PARTIAL.** Four real hosted providers and 11 credential slots succeeded. Auto/Free First/Fast/Balanced/Heavy Duty and Manual pins have live evidence, as do real credential failover, bounded cross-provider recovery and reranking after an actual rate-limit observation. The live suite passed 162 checks; all 113 contract tests and quality checks pass. Groq HTTP 403 and Z.ai HTTP 429 are provider/account availability limits. Real quota remains unknown; scarcity counterfactuals use explicitly labeled fixtures. Local runtime instances, ChatGPT product surfaces and quality/quota calibration remain unverified. See [Club A evidence](CLUB-A-CHECKPOINT.md).
 
 **Goal:** add provider/model/credential routing.
 
@@ -127,7 +127,7 @@ Deliverables:
 - no runtime dependency on SwitchRoute;
 - model output remains reported/inferred until verified where required.
 
-**Manual milestone:** Gate A — Brain.
+**Manual milestone:** Gate A — Brain **PASS for the implemented foundation; manual review pending**. Public Grid deployment remains later integration work. **Stop here. Slice 05 has not started.**
 
 ## Slice 05 — First real machine Worker + remote continuation ◻️
 

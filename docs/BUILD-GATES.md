@@ -41,12 +41,14 @@ Manual scenarios:
 - Local mode with no silent cloud fallback;
 - simulated remote capability node connect/disconnect;
 - initial Connection Grid node/health state;
-- cloud rendezvous/coordinator path using one configured deployment target;
+- coherent reference coordinator/Transport/Grid path with durable objective preservation;
 - route/usage history contains no secrets.
 
 **Pass:** native core/transport/model routing works without Latch/SwitchRoute deployment and remote node loss does not erase objective state.
 
-Current checkpoint: **PARTIAL**, not an acceptance pass. The exact file/write/read proof, fake-success rejection, deterministic routing, authenticated HTTP reference node and real-time lease-expiry scenario have been run. Automated fault injection proves routing policy/fallback contracts. Hosted-provider success and a configured public coordinator deployment remain unverified. See [CLUB-A-CHECKPOINT.md](CLUB-A-CHECKPOINT.md) for the commands and evidence. Stop here; Slice 05 has not started.
+Current checkpoint: **PASS for the implemented developer foundation; manual review pending.** Core Loop/Jev and the authenticated reference Transport/Grid are verified. Four real hosted providers and 11 real credential slots succeeded; live credential failover, bounded cross-provider recovery, rate-limit reranking and requested routing modes passed. All 113 contract tests and 162 live checks pass. Groq HTTP 403, Z.ai HTTP 429 and unknown provider quota remain explicit limits. Scarcity numerical counterfactuals use labeled fixtures. See [CLUB-A-CHECKPOINT.md](CLUB-A-CHECKPOINT.md) for the evidence and exact scope. **Stop here; Slice 05 has not started.**
+
+The current foundation review accepts coherent reference Transport/Grid contracts. Public TLS/outbound rendezvous, independent network stores and a cloud coordinator path using a configured deployment target remain later Grid integration acceptance requirements; they are not claimed verified by Gate A. This refines the previous public-deployment gate expectation without changing the architecture or silently completing broader slice deliverables.
 
 ## Gate B — Can Do Work
 
@@ -156,7 +158,7 @@ This is intentionally aggressive. Anything not genuinely verified remains planne
 
 | Gate | Slices | Status |
 |---|---|---|
-| Gate A — Brain | 01–04 | PARTIAL — reference proofs pass; hosted access and public coordinator unresolved |
+| Gate A — Brain | 01–04 | PASS — implemented foundation verified; manual review pending |
 | Gate B — Can Do Work | 05–06 | Planned |
 | Gate C — Embodied OSCAR | 07–10 | Planned |
 | Gate D — JARVIS Layer | 11–14 | Planned |

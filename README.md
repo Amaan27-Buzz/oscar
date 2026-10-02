@@ -93,9 +93,9 @@ required capability
 
 This means OSCAR should not burn a scarce high-value free route on trivial work merely because that model is strongest. A fast/high-limit route such as Groq may be ideal for small structured tasks; more generous pools such as Google or Z.ai may handle broader work; OpenRouter may be valuable for models that are otherwise unavailable but its lower limits should be preserved when appropriate. The router re-evaluates current capacity and observed performance on every task rather than selecting one model forever.
 
-The current Ollama Cloud free-credit model set supplied for development is:
+The development manifest selects these six Ollama Cloud models from the inventory observed on **2026-10-02**:
 
-- `gemma3:31b`
+- `gemma4:31b`
 - `gpt-oss:120b`
 - `gpt-oss:20b`
 - `nemotron-3-nano:30b`
@@ -282,9 +282,9 @@ For the current fast developer-alpha build, adjacent slices are grouped into rev
 
 ### Current club
 
-**Club A — Brain (Slices 01–04): PARTIAL. Gate A has not passed.**
+**Club A — Brain (Slices 01–04): verification complete. Gate A PASS for the implemented foundation; manual review pending.**
 
-The native Python/SQLite core, typed Jev, authenticated loopback HTTP reference transport/Grid, and adaptive model-router foundations are implemented. Core file/read verification and fake-success rejection have been exercised. Hosted-provider requests were blocked by this environment’s egress policy; public coordinator deployment and physical nodes remain unverified. See [the Club A checkpoint](docs/CLUB-A-CHECKPOINT.md) for evidence, limitations and exact review commands. Slice 05 has not started.
+The existing native Python/SQLite core, typed Jev, authenticated HTTP reference Transport/Grid and adaptive router have passed foundation verification. Real generation succeeded through OpenRouter, Google AI Studio, Ollama Cloud and NVIDIA NIM across 11 credential slots. Live credential failover, bounded cross-provider recovery and routing modes passed. Groq returned HTTP 403 and Z.ai HTTP 429; real quota remains unknown. Public coordinator deployment and physical nodes remain later integration work. See [the Club A checkpoint](docs/CLUB-A-CHECKPOINT.md) for evidence, scope and review commands. **Stopped for manual review; Slice 05 has not started.**
 
 Target proof:
 
@@ -300,7 +300,7 @@ objective
 → truthful result
 ```
 
-The CLI reads credentials from runtime environment variables and never reads or writes `.env`. Live tests are explicit (`python -m oscar live-providers`). Quota, price and quality evidence retain their provenance; unknown information stays unknown. Fault-injection tests cover multi-key/cross-provider fallback and scarcity; they do not establish hosted-provider success.
+The CLI reads credentials from runtime environment variables and never reads or writes `.env`. The opt-in [live suite](scripts/verify_club_a_live.py) passed 162 checks, separately from the 113 passing contract tests. Provider responses remain REPORTED until independent verification; general reasoning without a verifier remains partial. Quota, cost and model-quality uncertainty retain their provenance. Scarcity counterfactuals use labeled test balances with actual HTTPS execution; no real provider balances are invented.
 
 ## Run the Brain foundation
 
@@ -322,10 +322,10 @@ The runtime has no third-party dependencies. Durable state and proof files defau
 | Slice | Deliverable | Status |
 |---:|---|---|
 | 00 | Repository/architecture foundation | ✅ Complete |
-| 01 | OSCAR Core Loop | Implemented; scoped proof verified · Club A |
-| 02 | TypeSafe Jev | Implemented; typed routing verified · Club A |
-| 03 | Native Transport + Capability Catalog + Connection Grid foundation | Partial; HTTP reference proof verified · Club A |
-| 04 | Native Model Router + cloud intelligence | Partial; hosted access blocked · Club A |
+| 01 | OSCAR Core Loop | Verified scoped foundation · Gate A passed |
+| 02 | TypeSafe Jev | Verified typed foundation · Gate A passed |
+| 03 | Native Transport + Capability Catalog + Connection Grid foundation | Reference foundation verified; broader deployment partial · Gate A passed |
+| 04 | Native Model Router + cloud intelligence | Hosted/routing foundation verified; broader integrations partial · Gate A passed |
 | 05 | Real machine Worker + remote continuation | Planned · Club B |
 | 06 | LRA/Supermemory + Personal Policy + live context | Planned · Club B |
 | 07 | OSCAR Edge + reflexes | Planned · Club C |

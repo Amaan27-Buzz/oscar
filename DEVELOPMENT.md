@@ -108,4 +108,12 @@ Export credentials through the execution environment; the CLI never reads or wri
 
 Use `inspect TASK_ID`, `cancel TASK_ID`, and `resume TASK_ID` for durable state. Resume is bounded and refuses replay of an action whose side effects are ambiguous. Cancellation is cooperative; blocking provider I/O may finish its bounded read before cancellation is observed, and cancellation cannot undo a side effect already committed. A target cancellation acknowledgement is REPORTED, not objective completion.
 
-See [docs/CLUB-A-CHECKPOINT.md](docs/CLUB-A-CHECKPOINT.md) for the manual Gate A matrix and current blockers.
+The full hosted verification suite is explicit and excluded from ordinary tests/CI:
+
+```sh
+python -m scripts.verify_club_a_live --run-live --allow-unknown-cost-diagnostics --report .oscar/live-review.json
+```
+
+The unknown-cost flag permits bounded NVIDIA/Z.ai diagnostics without declaring their funding free. Omit it for discovery-only verification of those providers. The script reuses the native runtime/router/adapters, creates fresh ignored diagnostic state, and records masked slot IDs, categorical failures and independent comparison evidence. Numerical scarcity tests use labeled synthetic balances; actual remaining provider quota stays unknown when headers are absent. Provider/account availability is reported separately from runtime assertions.
+
+See [docs/CLUB-A-CHECKPOINT.md](docs/CLUB-A-CHECKPOINT.md) for the passed foundation Gate A matrix, known limits and manual review stop.

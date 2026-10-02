@@ -98,24 +98,7 @@
     },
     {
       "provider_id": "openrouter",
-      "id": "meta-llama/llama-3.3-70b-instruct:free",
-      "capabilities": [
-        "text"
-      ],
-      "quality": 3,
-      "affinities": {
-        "reasoning": 0.5,
-        "extraction": 0.5
-      },
-      "context_limit": 4096,
-      "output_limit": 1024,
-      "funding": "free",
-      "provenance": "developer seed 2026-10-02; quality/limits are conservative configuration, not observed benchmarks; account quota UNKNOWN",
-      "last_verified": null
-    },
-    {
-      "provider_id": "nvidia",
-      "id": "meta/llama-3.1-8b-instruct",
+      "id": "liquid/lfm-2.5-2.6b:free",
       "capabilities": [
         "text"
       ],
@@ -126,13 +109,30 @@
       },
       "context_limit": 4096,
       "output_limit": 1024,
+      "funding": "free",
+      "provenance": "live inventory and exact-response generation observed 2026-10-02; quality/limits remain conservative configuration, not benchmarks; account quota UNKNOWN",
+      "last_verified": null
+    },
+    {
+      "provider_id": "nvidia",
+      "id": "nvidia/nemotron-3-super-120b-a12b",
+      "capabilities": [
+        "text"
+      ],
+      "quality": 4,
+      "affinities": {
+        "reasoning": 0.5,
+        "extraction": 0.5
+      },
+      "context_limit": 4096,
+      "output_limit": 1024,
       "funding": "unknown",
-      "provenance": "developer seed 2026-10-02; quality/limits are conservative configuration, not observed benchmarks; account quota UNKNOWN",
+      "provenance": "live inventory and exact-response generation observed 2026-10-02; quality/limits remain conservative configuration, not benchmarks; account quota UNKNOWN",
       "last_verified": null
     },
     {
       "provider_id": "google",
-      "id": "gemini-2.5-flash-lite",
+      "id": "gemini-3.1-flash-lite",
       "capabilities": [
         "text"
       ],
@@ -144,7 +144,7 @@
       "context_limit": 4096,
       "output_limit": 1024,
       "funding": "free",
-      "provenance": "developer seed 2026-10-02; quality/limits are conservative configuration, not observed benchmarks; account quota UNKNOWN",
+      "provenance": "live inventory and exact-response generation observed 2026-10-02; quality/limits remain conservative configuration, not benchmarks; account quota UNKNOWN",
       "last_verified": null
     },
     {
@@ -183,7 +183,7 @@
     },
     {
       "provider_id": "ollama-cloud",
-      "id": "gemma3:31b",
+      "id": "gemma4:31b",
       "capabilities": [
         "text"
       ],
@@ -195,7 +195,7 @@
       "context_limit": 4096,
       "output_limit": 1024,
       "funding": "free",
-      "provenance": "developer seed 2026-10-02; quality/limits are conservative configuration, not observed benchmarks; account quota UNKNOWN",
+      "provenance": "live inventory and exact-response generation observed 2026-10-02; quality/limits remain conservative configuration, not benchmarks; account quota UNKNOWN",
       "last_verified": null
     },
     {

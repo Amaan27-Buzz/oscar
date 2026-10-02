@@ -2,6 +2,15 @@
 
 Significant OSCAR milestones are recorded here. Detailed implementation status remains in `docs/ROADMAP.md`.
 
+## 2026-10-02 — Club A verification completed; Gate A foundation pass
+
+- Continue the previously pushed Club A runtime; no Core Loop, Jev, Transport/Grid or routing redesign.
+- Verify real generation through OpenRouter, Google AI Studio, Ollama Cloud and NVIDIA NIM across 11 working credential slots; accurately retain Groq HTTP 403 and Z.ai HTTP 429 availability limits.
+- Add opt-in live verification of real credential failover, bounded cross-provider recovery, rate-limit reranking, routing modes, Manual pins, reported/partial truth states and Local restrictions: 162 checks passed.
+- Refresh four stale model metadata entries using live inventory/generation evidence. Keep costs, quotas and model quality unknown where not measured; scarcity fixtures are explicitly labeled.
+- Rerun all 113 contract tests, Ruff/formatting, strict mypy, repository/secret checks and diff inspection; preserve safe live evidence and the original blocked record.
+- Record Gate A PASS for the authorized foundation scope. Public coordinator/embodied Grid acceptance remains later work. Stop for manual review; Slice 05 is not started.
+
 ## 2026-10-02 — Club A Brain foundation (partial)
 
 - Add native typed core/SQLite task, Action Ledger, artifact/evidence and independent verification contracts.

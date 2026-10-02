@@ -1,0 +1,2348 @@
+{
+  "version": 1,
+  "recorded_at": "2026-10-02T10:42:53.745352+00:00",
+  "continued_from": "93ad11a48891035373292fd6a16c39b4340d8684",
+  "scope": "Club A verification only; reference Grid; no Slice 05",
+  "unknown_cost_diagnostics": true,
+  "inventories": [
+    {
+      "provider": "groq",
+      "slot": "groq-1",
+      "scope": "returned inventory page; not credential validation",
+      "status": "UNAVAILABLE",
+      "reason": "credential_failure"
+    },
+    {
+      "provider": "groq",
+      "slot": "groq-2",
+      "scope": "returned inventory page; not credential validation",
+      "status": "UNAVAILABLE",
+      "reason": "credential_failure"
+    },
+    {
+      "provider": "groq",
+      "slot": "groq-3",
+      "scope": "returned inventory page; not credential validation",
+      "status": "UNAVAILABLE",
+      "reason": "credential_failure"
+    },
+    {
+      "provider": "groq",
+      "slot": "groq-4",
+      "scope": "returned inventory page; not credential validation",
+      "status": "UNAVAILABLE",
+      "reason": "credential_failure"
+    },
+    {
+      "provider": "openrouter",
+      "slot": "openrouter-1",
+      "scope": "returned inventory page; not credential validation",
+      "status": "REACHABLE",
+      "returned_model_count": 464,
+      "configured_models": {
+        "liquid/lfm-2.5-2.6b:free": true
+      }
+    },
+    {
+      "provider": "openrouter",
+      "slot": "openrouter-2",
+      "scope": "returned inventory page; not credential validation",
+      "status": "REACHABLE",
+      "returned_model_count": 464,
+      "configured_models": {
+        "liquid/lfm-2.5-2.6b:free": true
+      }
+    },
+    {
+      "provider": "openrouter",
+      "slot": "openrouter-3",
+      "scope": "returned inventory page; not credential validation",
+      "status": "REACHABLE",
+      "returned_model_count": 464,
+      "configured_models": {
+        "liquid/lfm-2.5-2.6b:free": true
+      }
+    },
+    {
+      "provider": "openrouter",
+      "slot": "openrouter-4",
+      "scope": "returned inventory page; not credential validation",
+      "status": "REACHABLE",
+      "returned_model_count": 464,
+      "configured_models": {
+        "liquid/lfm-2.5-2.6b:free": true
+      }
+    },
+    {
+      "provider": "nvidia",
+      "slot": "nvidia-1",
+      "scope": "returned inventory page; not credential validation",
+      "status": "REACHABLE",
+      "returned_model_count": 81,
+      "configured_models": {
+        "nvidia/nemotron-3-super-120b-a12b": true
+      }
+    },
+    {
+      "provider": "nvidia",
+      "slot": "nvidia-2",
+      "scope": "returned inventory page; not credential validation",
+      "status": "REACHABLE",
+      "returned_model_count": 81,
+      "configured_models": {
+        "nvidia/nemotron-3-super-120b-a12b": true
+      }
+    },
+    {
+      "provider": "google",
+      "slot": "google-1",
+      "scope": "returned inventory page; not credential validation",
+      "status": "REACHABLE",
+      "returned_model_count": 50,
+      "configured_models": {
+        "gemini-3.1-flash-lite": true,
+        "gemini-2.5-flash": true
+      }
+    },
+    {
+      "provider": "google",
+      "slot": "google-2",
+      "scope": "returned inventory page; not credential validation",
+      "status": "REACHABLE",
+      "returned_model_count": 50,
+      "configured_models": {
+        "gemini-3.1-flash-lite": true,
+        "gemini-2.5-flash": true
+      }
+    },
+    {
+      "provider": "google",
+      "slot": "google-3",
+      "scope": "returned inventory page; not credential validation",
+      "status": "REACHABLE",
+      "returned_model_count": 50,
+      "configured_models": {
+        "gemini-3.1-flash-lite": true,
+        "gemini-2.5-flash": true
+      }
+    },
+    {
+      "provider": "zai",
+      "slot": "zai-1",
+      "scope": "returned inventory page; not credential validation",
+      "status": "REACHABLE",
+      "returned_model_count": 11,
+      "configured_models": {
+        "glm-4.5-air": true
+      }
+    },
+    {
+      "provider": "zai",
+      "slot": "zai-2",
+      "scope": "returned inventory page; not credential validation",
+      "status": "REACHABLE",
+      "returned_model_count": 11,
+      "configured_models": {
+        "glm-4.5-air": true
+      }
+    },
+    {
+      "provider": "ollama-cloud",
+      "slot": "ollama-cloud-1",
+      "scope": "returned inventory page; not credential validation",
+      "status": "REACHABLE",
+      "returned_model_count": 17,
+      "configured_models": {
+        "gemma4:31b": true,
+        "gpt-oss:20b": true,
+        "nemotron-3-nano:30b": true,
+        "gpt-oss:120b": true,
+        "nemotron-3-super": true,
+        "nemotron-3-ultra": true
+      }
+    },
+    {
+      "provider": "ollama-cloud",
+      "slot": "ollama-cloud-2",
+      "scope": "returned inventory page; not credential validation",
+      "status": "REACHABLE",
+      "returned_model_count": 17,
+      "configured_models": {
+        "gemma4:31b": true,
+        "gpt-oss:20b": true,
+        "nemotron-3-nano:30b": true,
+        "gpt-oss:120b": true,
+        "nemotron-3-super": true,
+        "nemotron-3-ultra": true
+      }
+    }
+  ],
+  "operations": [
+    {
+      "scenario": "slot groq-1",
+      "source": "live provider",
+      "mode": "manual",
+      "quality_floor": 1,
+      "max_attempts": 1,
+      "max_output_tokens": 128,
+      "unknown_cost_allowed": false,
+      "initial_route": {
+        "provider": "groq",
+        "model": "llama-3.1-8b-instant",
+        "slot": "groq-1",
+        "quota_remaining": null,
+        "reasons": [
+          "required capabilities and context/output limits satisfied",
+          "quality tier 1 meets floor 1; source: developer seed 2026-10-02; quality/limits are conservative configuration, not observed benchmarks; account quota UNKNOWN",
+          "capacity class free; quota UNKNOWN",
+          "ranking considers task affinity, decaying reliability/latency, and scarcity",
+          "provider response health and verified objective outcomes remain separate",
+          "preserve stronger/scarcer routes when sufficient alternatives exist",
+          "mode manual; explicit policy enforced"
+        ]
+      },
+      "status": "UNAVAILABLE",
+      "reason": "credential_failure",
+      "provider_response_success": false,
+      "history": [
+        {
+          "provider": "groq",
+          "model": "llama-3.1-8b-instant",
+          "slot": "groq-1",
+          "attempt": 1,
+          "fallback": false,
+          "error": "credential_failure",
+          "provider_response_success": false,
+          "quota_remaining": null,
+          "verified_objective": null,
+          "latency_ms": 48.187497000071744
+        }
+      ],
+      "http_statuses": {
+        "openai": [
+          403
+        ]
+      }
+    },
+    {
+      "scenario": "slot groq-2",
+      "source": "live provider",
+      "mode": "manual",
+      "quality_floor": 1,
+      "max_attempts": 1,
+      "max_output_tokens": 128,
+      "unknown_cost_allowed": false,
+      "initial_route": {
+        "provider": "groq",
+        "model": "llama-3.1-8b-instant",
+        "slot": "groq-2",
+        "quota_remaining": null,
+        "reasons": [
+          "required capabilities and context/output limits satisfied",
+          "quality tier 1 meets floor 1; source: developer seed 2026-10-02; quality/limits are conservative configuration, not observed benchmarks; account quota UNKNOWN",
+          "capacity class free; quota UNKNOWN",
+          "ranking considers task affinity, decaying reliability/latency, and scarcity",
+          "provider response health and verified objective outcomes remain separate",
+          "preserve stronger/scarcer routes when sufficient alternatives exist",
+          "mode manual; explicit policy enforced"
+        ]
+      },
+      "status": "UNAVAILABLE",
+      "reason": "credential_failure",
+      "provider_response_success": false,
+      "history": [
+        {
+          "provider": "groq",
+          "model": "llama-3.1-8b-instant",
+          "slot": "groq-2",
+          "attempt": 1,
+          "fallback": false,
+          "error": "credential_failure",
+          "provider_response_success": false,
+          "quota_remaining": null,
+          "verified_objective": null,
+          "latency_ms": 49.615463000009186
+        }
+      ],
+      "http_statuses": {
+        "openai": [
+          403
+        ]
+      }
+    },
+    {
+      "scenario": "slot groq-3",
+      "source": "live provider",
+      "mode": "manual",
+      "quality_floor": 1,
+      "max_attempts": 1,
+      "max_output_tokens": 128,
+      "unknown_cost_allowed": false,
+      "initial_route": {
+        "provider": "groq",
+        "model": "llama-3.1-8b-instant",
+        "slot": "groq-3",
+        "quota_remaining": null,
+        "reasons": [
+          "required capabilities and context/output limits satisfied",
+          "quality tier 1 meets floor 1; source: developer seed 2026-10-02; quality/limits are conservative configuration, not observed benchmarks; account quota UNKNOWN",
+          "capacity class free; quota UNKNOWN",
+          "ranking considers task affinity, decaying reliability/latency, and scarcity",
+          "provider response health and verified objective outcomes remain separate",
+          "preserve stronger/scarcer routes when sufficient alternatives exist",
+          "mode manual; explicit policy enforced"
+        ]
+      },
+      "status": "UNAVAILABLE",
+      "reason": "credential_failure",
+      "provider_response_success": false,
+      "history": [
+        {
+          "provider": "groq",
+          "model": "llama-3.1-8b-instant",
+          "slot": "groq-3",
+          "attempt": 1,
+          "fallback": false,
+          "error": "credential_failure",
+          "provider_response_success": false,
+          "quota_remaining": null,
+          "verified_objective": null,
+          "latency_ms": 26.767547999952512
+        }
+      ],
+      "http_statuses": {
+        "openai": [
+          403
+        ]
+      }
+    },
+    {
+      "scenario": "slot groq-4",
+      "source": "live provider",
+      "mode": "manual",
+      "quality_floor": 1,
+      "max_attempts": 1,
+      "max_output_tokens": 128,
+      "unknown_cost_allowed": false,
+      "initial_route": {
+        "provider": "groq",
+        "model": "llama-3.1-8b-instant",
+        "slot": "groq-4",
+        "quota_remaining": null,
+        "reasons": [
+          "required capabilities and context/output limits satisfied",
+          "quality tier 1 meets floor 1; source: developer seed 2026-10-02; quality/limits are conservative configuration, not observed benchmarks; account quota UNKNOWN",
+          "capacity class free; quota UNKNOWN",
+          "ranking considers task affinity, decaying reliability/latency, and scarcity",
+          "provider response health and verified objective outcomes remain separate",
+          "preserve stronger/scarcer routes when sufficient alternatives exist",
+          "mode manual; explicit policy enforced"
+        ]
+      },
+      "status": "UNAVAILABLE",
+      "reason": "credential_failure",
+      "provider_response_success": false,
+      "history": [
+        {
+          "provider": "groq",
+          "model": "llama-3.1-8b-instant",
+          "slot": "groq-4",
+          "attempt": 1,
+          "fallback": false,
+          "error": "credential_failure",
+          "provider_response_success": false,
+          "quota_remaining": null,
+          "verified_objective": null,
+          "latency_ms": 53.2896830000027
+        }
+      ],
+      "http_statuses": {
+        "openai": [
+          403
+        ]
+      }
+    },
+    {
+      "scenario": "slot openrouter-1",
+      "source": "live provider",
+      "mode": "manual",
+      "quality_floor": 1,
+      "max_attempts": 1,
+      "max_output_tokens": 128,
+      "unknown_cost_allowed": false,
+      "initial_route": {
+        "provider": "openrouter",
+        "model": "liquid/lfm-2.5-2.6b:free",
+        "slot": "openrouter-1",
+        "quota_remaining": null,
+        "reasons": [
+          "required capabilities and context/output limits satisfied",
+          "quality tier 1 meets floor 1; source: live inventory and exact-response generation observed 2026-10-02; quality/limits remain conservative configuration, not benchmarks; account quota UNKNOWN",
+          "capacity class free; quota UNKNOWN",
+          "ranking considers task affinity, decaying reliability/latency, and scarcity",
+          "provider response health and verified objective outcomes remain separate",
+          "preserve stronger/scarcer routes when sufficient alternatives exist",
+          "mode manual; explicit policy enforced"
+        ]
+      },
+      "status": "VERIFIED",
+      "scope": "generation contract only; model quality is not benchmarked",
+      "provider_response_success": true,
+      "response_status": "REPORTED",
+      "sentinel_matches": true,
+      "provider": "openrouter",
+      "model": "liquid/lfm-2.5-2.6b:free",
+      "slot": "openrouter-1",
+      "attempts": 1,
+      "remaining_requests": null,
+      "remaining_tokens": null,
+      "input_tokens": 19,
+      "output_tokens": 109,
+      "history": [
+        {
+          "provider": "openrouter",
+          "model": "liquid/lfm-2.5-2.6b:free",
+          "slot": "openrouter-1",
+          "attempt": 1,
+          "fallback": false,
+          "error": null,
+          "provider_response_success": true,
+          "quota_remaining": null,
+          "verified_objective": true,
+          "latency_ms": 488.3800430000065
+        }
+      ],
+      "http_statuses": {
+        "openai": [
+          200
+        ]
+      }
+    },
+    {
+      "scenario": "slot openrouter-2",
+      "source": "live provider",
+      "mode": "manual",
+      "quality_floor": 1,
+      "max_attempts": 1,
+      "max_output_tokens": 128,
+      "unknown_cost_allowed": false,
+      "initial_route": {
+        "provider": "openrouter",
+        "model": "liquid/lfm-2.5-2.6b:free",
+        "slot": "openrouter-2",
+        "quota_remaining": null,
+        "reasons": [
+          "required capabilities and context/output limits satisfied",
+          "quality tier 1 meets floor 1; source: live inventory and exact-response generation observed 2026-10-02; quality/limits remain conservative configuration, not benchmarks; account quota UNKNOWN",
+          "capacity class free; quota UNKNOWN",
+          "ranking considers task affinity, decaying reliability/latency, and scarcity",
+          "provider response health and verified objective outcomes remain separate",
+          "preserve stronger/scarcer routes when sufficient alternatives exist",
+          "mode manual; explicit policy enforced"
+        ]
+      },
+      "status": "VERIFIED",
+      "scope": "generation contract only; model quality is not benchmarked",
+      "provider_response_success": true,
+      "response_status": "REPORTED",
+      "sentinel_matches": true,
+      "provider": "openrouter",
+      "model": "liquid/lfm-2.5-2.6b:free",
+      "slot": "openrouter-2",
+      "attempts": 1,
+      "remaining_requests": null,
+      "remaining_tokens": null,
+      "input_tokens": 19,
+      "output_tokens": 54,
+      "history": [
+        {
+          "provider": "openrouter",
+          "model": "liquid/lfm-2.5-2.6b:free",
+          "slot": "openrouter-2",
+          "attempt": 1,
+          "fallback": false,
+          "error": null,
+          "provider_response_success": true,
+          "quota_remaining": null,
+          "verified_objective": true,
+          "latency_ms": 997.0295949999581
+        }
+      ],
+      "http_statuses": {
+        "openai": [
+          200
+        ]
+      }
+    },
+    {
+      "scenario": "slot openrouter-3",
+      "source": "live provider",
+      "mode": "manual",
+      "quality_floor": 1,
+      "max_attempts": 1,
+      "max_output_tokens": 128,
+      "unknown_cost_allowed": false,
+      "initial_route": {
+        "provider": "openrouter",
+        "model": "liquid/lfm-2.5-2.6b:free",
+        "slot": "openrouter-3",
+        "quota_remaining": null,
+        "reasons": [
+          "required capabilities and context/output limits satisfied",
+          "quality tier 1 meets floor 1; source: live inventory and exact-response generation observed 2026-10-02; quality/limits remain conservative configuration, not benchmarks; account quota UNKNOWN",
+          "capacity class free; quota UNKNOWN",
+          "ranking considers task affinity, decaying reliability/latency, and scarcity",
+          "provider response health and verified objective outcomes remain separate",
+          "preserve stronger/scarcer routes when sufficient alternatives exist",
+          "mode manual; explicit policy enforced"
+        ]
+      },
+      "status": "VERIFIED",
+      "scope": "generation contract only; model quality is not benchmarked",
+      "provider_response_success": true,
+      "response_status": "REPORTED",
+      "sentinel_matches": true,
+      "provider": "openrouter",
+      "model": "liquid/lfm-2.5-2.6b:free",
+      "slot": "openrouter-3",
+      "attempts": 1,
+      "remaining_requests": null,
+      "remaining_tokens": null,
+      "input_tokens": 19,
+      "output_tokens": 96,
+      "history": [
+        {
+          "provider": "openrouter",
+          "model": "liquid/lfm-2.5-2.6b:free",
+          "slot": "openrouter-3",
+          "attempt": 1,
+          "fallback": false,
+          "error": null,
+          "provider_response_success": true,
+          "quota_remaining": null,
+          "verified_objective": true,
+          "latency_ms": 789.8282390001441
+        }
+      ],
+      "http_statuses": {
+        "openai": [
+          200
+        ]
+      }
+    },
+    {
+      "scenario": "slot openrouter-4",
+      "source": "live provider",
+      "mode": "manual",
+      "quality_floor": 1,
+      "max_attempts": 1,
+      "max_output_tokens": 128,
+      "unknown_cost_allowed": false,
+      "initial_route": {
+        "provider": "openrouter",
+        "model": "liquid/lfm-2.5-2.6b:free",
+        "slot": "openrouter-4",
+        "quota_remaining": null,
+        "reasons": [
+          "required capabilities and context/output limits satisfied",
+          "quality tier 1 meets floor 1; source: live inventory and exact-response generation observed 2026-10-02; quality/limits remain conservative configuration, not benchmarks; account quota UNKNOWN",
+          "capacity class free; quota UNKNOWN",
+          "ranking considers task affinity, decaying reliability/latency, and scarcity",
+          "provider response health and verified objective outcomes remain separate",
+          "preserve stronger/scarcer routes when sufficient alternatives exist",
+          "mode manual; explicit policy enforced"
+        ]
+      },
+      "status": "VERIFIED",
+      "scope": "generation contract only; model quality is not benchmarked",
+      "provider_response_success": true,
+      "response_status": "REPORTED",
+      "sentinel_matches": true,
+      "provider": "openrouter",
+      "model": "liquid/lfm-2.5-2.6b:free",
+      "slot": "openrouter-4",
+      "attempts": 1,
+      "remaining_requests": null,
+      "remaining_tokens": null,
+      "input_tokens": 19,
+      "output_tokens": 95,
+      "history": [
+        {
+          "provider": "openrouter",
+          "model": "liquid/lfm-2.5-2.6b:free",
+          "slot": "openrouter-4",
+          "attempt": 1,
+          "fallback": false,
+          "error": null,
+          "provider_response_success": true,
+          "quota_remaining": null,
+          "verified_objective": true,
+          "latency_ms": 418.37123000004794
+        }
+      ],
+      "http_statuses": {
+        "openai": [
+          200
+        ]
+      }
+    },
+    {
+      "scenario": "slot nvidia-1",
+      "source": "live provider",
+      "mode": "manual",
+      "quality_floor": 1,
+      "max_attempts": 1,
+      "max_output_tokens": 512,
+      "unknown_cost_allowed": true,
+      "initial_route": {
+        "provider": "nvidia",
+        "model": "nvidia/nemotron-3-super-120b-a12b",
+        "slot": "nvidia-1",
+        "quota_remaining": null,
+        "reasons": [
+          "required capabilities and context/output limits satisfied",
+          "quality tier 4 meets floor 1; source: live inventory and exact-response generation observed 2026-10-02; quality/limits remain conservative configuration, not benchmarks; account quota UNKNOWN",
+          "capacity class unknown; quota UNKNOWN",
+          "ranking considers task affinity, decaying reliability/latency, and scarcity",
+          "provider response health and verified objective outcomes remain separate",
+          "preserve stronger/scarcer routes when sufficient alternatives exist",
+          "mode manual; explicit policy enforced"
+        ]
+      },
+      "status": "VERIFIED",
+      "scope": "generation contract only; model quality is not benchmarked",
+      "provider_response_success": true,
+      "response_status": "REPORTED",
+      "sentinel_matches": true,
+      "provider": "nvidia",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "slot": "nvidia-1",
+      "attempts": 1,
+      "remaining_requests": null,
+      "remaining_tokens": null,
+      "input_tokens": 24,
+      "output_tokens": 30,
+      "history": [
+        {
+          "provider": "nvidia",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "slot": "nvidia-1",
+          "attempt": 1,
+          "fallback": false,
+          "error": null,
+          "provider_response_success": true,
+          "quota_remaining": null,
+          "verified_objective": true,
+          "latency_ms": 11971.003906000078
+        }
+      ],
+      "http_statuses": {
+        "openai": [
+          200
+        ]
+      }
+    },
+    {
+      "scenario": "slot nvidia-2",
+      "source": "live provider",
+      "mode": "manual",
+      "quality_floor": 1,
+      "max_attempts": 1,
+      "max_output_tokens": 512,
+      "unknown_cost_allowed": true,
+      "initial_route": {
+        "provider": "nvidia",
+        "model": "nvidia/nemotron-3-super-120b-a12b",
+        "slot": "nvidia-2",
+        "quota_remaining": null,
+        "reasons": [
+          "required capabilities and context/output limits satisfied",
+          "quality tier 4 meets floor 1; source: live inventory and exact-response generation observed 2026-10-02; quality/limits remain conservative configuration, not benchmarks; account quota UNKNOWN",
+          "capacity class unknown; quota UNKNOWN",
+          "ranking considers task affinity, decaying reliability/latency, and scarcity",
+          "provider response health and verified objective outcomes remain separate",
+          "preserve stronger/scarcer routes when sufficient alternatives exist",
+          "mode manual; explicit policy enforced"
+        ]
+      },
+      "status": "VERIFIED",
+      "scope": "generation contract only; model quality is not benchmarked",
+      "provider_response_success": true,
+      "response_status": "REPORTED",
+      "sentinel_matches": true,
+      "provider": "nvidia",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "slot": "nvidia-2",
+      "attempts": 1,
+      "remaining_requests": null,
+      "remaining_tokens": null,
+      "input_tokens": 24,
+      "output_tokens": 58,
+      "history": [
+        {
+          "provider": "nvidia",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "slot": "nvidia-2",
+          "attempt": 1,
+          "fallback": false,
+          "error": null,
+          "provider_response_success": true,
+          "quota_remaining": null,
+          "verified_objective": true,
+          "latency_ms": 597.9906620000293
+        }
+      ],
+      "http_statuses": {
+        "openai": [
+          200
+        ]
+      }
+    },
+    {
+      "scenario": "slot google-1",
+      "source": "live provider",
+      "mode": "manual",
+      "quality_floor": 1,
+      "max_attempts": 1,
+      "max_output_tokens": 128,
+      "unknown_cost_allowed": false,
+      "initial_route": {
+        "provider": "google",
+        "model": "gemini-3.1-flash-lite",
+        "slot": "google-1",
+        "quota_remaining": null,
+        "reasons": [
+          "required capabilities and context/output limits satisfied",
+          "quality tier 2 meets floor 1; source: live inventory and exact-response generation observed 2026-10-02; quality/limits remain conservative configuration, not benchmarks; account quota UNKNOWN",
+          "capacity class free; quota UNKNOWN",
+          "ranking considers task affinity, decaying reliability/latency, and scarcity",
+          "provider response health and verified objective outcomes remain separate",
+          "preserve stronger/scarcer routes when sufficient alternatives exist",
+          "mode manual; explicit policy enforced"
+        ]
+      },
+      "status": "VERIFIED",
+      "scope": "generation contract only; model quality is not benchmarked",
+      "provider_response_success": true,
+      "response_status": "REPORTED",
+      "sentinel_matches": true,
+      "provider": "google",
+      "model": "gemini-3.1-flash-lite",
+      "slot": "google-1",
+      "attempts": 1,
+      "remaining_requests": null,
+      "remaining_tokens": null,
+      "input_tokens": 9,
+      "output_tokens": 6,
+      "history": [
+        {
+          "provider": "google",
+          "model": "gemini-3.1-flash-lite",
+          "slot": "google-1",
+          "attempt": 1,
+          "fallback": false,
+          "error": null,
+          "provider_response_success": true,
+          "quota_remaining": null,
+          "verified_objective": true,
+          "latency_ms": 521.028804000025
+        }
+      ],
+      "http_statuses": {
+        "google": [
+          200
+        ]
+      }
+    },
+    {
+      "scenario": "slot google-2",
+      "source": "live provider",
+      "mode": "manual",
+      "quality_floor": 1,
+      "max_attempts": 1,
+      "max_output_tokens": 128,
+      "unknown_cost_allowed": false,
+      "initial_route": {
+        "provider": "google",
+        "model": "gemini-3.1-flash-lite",
+        "slot": "google-2",
+        "quota_remaining": null,
+        "reasons": [
+          "required capabilities and context/output limits satisfied",
+          "quality tier 2 meets floor 1; source: live inventory and exact-response generation observed 2026-10-02; quality/limits remain conservative configuration, not benchmarks; account quota UNKNOWN",
+          "capacity class free; quota UNKNOWN",
+          "ranking considers task affinity, decaying reliability/latency, and scarcity",
+          "provider response health and verified objective outcomes remain separate",
+          "preserve stronger/scarcer routes when sufficient alternatives exist",
+          "mode manual; explicit policy enforced"
+        ]
+      },
+      "status": "VERIFIED",
+      "scope": "generation contract only; model quality is not benchmarked",
+      "provider_response_success": true,
+      "response_status": "REPORTED",
+      "sentinel_matches": true,
+      "provider": "google",
+      "model": "gemini-3.1-flash-lite",
+      "slot": "google-2",
+      "attempts": 1,
+      "remaining_requests": null,
+      "remaining_tokens": null,
+      "input_tokens": 9,
+      "output_tokens": 6,
+      "history": [
+        {
+          "provider": "google",
+          "model": "gemini-3.1-flash-lite",
+          "slot": "google-2",
+          "attempt": 1,
+          "fallback": false,
+          "error": null,
+          "provider_response_success": true,
+          "quota_remaining": null,
+          "verified_objective": true,
+          "latency_ms": 1455.6067639998673
+        }
+      ],
+      "http_statuses": {
+        "google": [
+          200
+        ]
+      }
+    },
+    {
+      "scenario": "slot google-3",
+      "source": "live provider",
+      "mode": "manual",
+      "quality_floor": 1,
+      "max_attempts": 1,
+      "max_output_tokens": 128,
+      "unknown_cost_allowed": false,
+      "initial_route": {
+        "provider": "google",
+        "model": "gemini-3.1-flash-lite",
+        "slot": "google-3",
+        "quota_remaining": null,
+        "reasons": [
+          "required capabilities and context/output limits satisfied",
+          "quality tier 2 meets floor 1; source: live inventory and exact-response generation observed 2026-10-02; quality/limits remain conservative configuration, not benchmarks; account quota UNKNOWN",
+          "capacity class free; quota UNKNOWN",
+          "ranking considers task affinity, decaying reliability/latency, and scarcity",
+          "provider response health and verified objective outcomes remain separate",
+          "preserve stronger/scarcer routes when sufficient alternatives exist",
+          "mode manual; explicit policy enforced"
+        ]
+      },
+      "status": "VERIFIED",
+      "scope": "generation contract only; model quality is not benchmarked",
+      "provider_response_success": true,
+      "response_status": "REPORTED",
+      "sentinel_matches": true,
+      "provider": "google",
+      "model": "gemini-3.1-flash-lite",
+      "slot": "google-3",
+      "attempts": 1,
+      "remaining_requests": null,
+      "remaining_tokens": null,
+      "input_tokens": 9,
+      "output_tokens": 6,
+      "history": [
+        {
+          "provider": "google",
+          "model": "gemini-3.1-flash-lite",
+          "slot": "google-3",
+          "attempt": 1,
+          "fallback": false,
+          "error": null,
+          "provider_response_success": true,
+          "quota_remaining": null,
+          "verified_objective": true,
+          "latency_ms": 424.1301839999778
+        }
+      ],
+      "http_statuses": {
+        "google": [
+          200
+        ]
+      }
+    },
+    {
+      "scenario": "slot zai-1",
+      "source": "live provider",
+      "mode": "manual",
+      "quality_floor": 1,
+      "max_attempts": 1,
+      "max_output_tokens": 128,
+      "unknown_cost_allowed": true,
+      "initial_route": {
+        "provider": "zai",
+        "model": "glm-4.5-air",
+        "slot": "zai-1",
+        "quota_remaining": null,
+        "reasons": [
+          "required capabilities and context/output limits satisfied",
+          "quality tier 3 meets floor 1; source: developer seed 2026-10-02; quality/limits are conservative configuration, not observed benchmarks; account quota UNKNOWN",
+          "capacity class unknown; quota UNKNOWN",
+          "ranking considers task affinity, decaying reliability/latency, and scarcity",
+          "provider response health and verified objective outcomes remain separate",
+          "preserve stronger/scarcer routes when sufficient alternatives exist",
+          "mode manual; explicit policy enforced"
+        ]
+      },
+      "status": "UNAVAILABLE",
+      "reason": "rate_limit",
+      "provider_response_success": false,
+      "history": [
+        {
+          "provider": "zai",
+          "model": "glm-4.5-air",
+          "slot": "zai-1",
+          "attempt": 1,
+          "fallback": false,
+          "error": "rate_limit",
+          "provider_response_success": false,
+          "quota_remaining": null,
+          "verified_objective": null,
+          "latency_ms": 835.6606059999194
+        }
+      ],
+      "http_statuses": {
+        "openai": [
+          429
+        ]
+      }
+    },
+    {
+      "scenario": "slot zai-2",
+      "source": "live provider",
+      "mode": "manual",
+      "quality_floor": 1,
+      "max_attempts": 1,
+      "max_output_tokens": 128,
+      "unknown_cost_allowed": true,
+      "initial_route": {
+        "provider": "zai",
+        "model": "glm-4.5-air",
+        "slot": "zai-2",
+        "quota_remaining": null,
+        "reasons": [
+          "required capabilities and context/output limits satisfied",
+          "quality tier 3 meets floor 1; source: developer seed 2026-10-02; quality/limits are conservative configuration, not observed benchmarks; account quota UNKNOWN",
+          "capacity class unknown; quota UNKNOWN",
+          "ranking considers task affinity, decaying reliability/latency, and scarcity",
+          "provider response health and verified objective outcomes remain separate",
+          "preserve stronger/scarcer routes when sufficient alternatives exist",
+          "mode manual; explicit policy enforced"
+        ]
+      },
+      "status": "UNAVAILABLE",
+      "reason": "rate_limit",
+      "provider_response_success": false,
+      "history": [
+        {
+          "provider": "zai",
+          "model": "glm-4.5-air",
+          "slot": "zai-2",
+          "attempt": 1,
+          "fallback": false,
+          "error": "rate_limit",
+          "provider_response_success": false,
+          "quota_remaining": null,
+          "verified_objective": null,
+          "latency_ms": 896.5891689999808
+        }
+      ],
+      "http_statuses": {
+        "openai": [
+          429
+        ]
+      }
+    },
+    {
+      "scenario": "slot ollama-cloud-1",
+      "source": "live provider",
+      "mode": "manual",
+      "quality_floor": 1,
+      "max_attempts": 1,
+      "max_output_tokens": 128,
+      "unknown_cost_allowed": false,
+      "initial_route": {
+        "provider": "ollama-cloud",
+        "model": "gemma4:31b",
+        "slot": "ollama-cloud-1",
+        "quota_remaining": null,
+        "reasons": [
+          "required capabilities and context/output limits satisfied",
+          "quality tier 2 meets floor 1; source: live inventory and exact-response generation observed 2026-10-02; quality/limits remain conservative configuration, not benchmarks; account quota UNKNOWN",
+          "capacity class free; quota UNKNOWN",
+          "ranking considers task affinity, decaying reliability/latency, and scarcity",
+          "provider response health and verified objective outcomes remain separate",
+          "preserve stronger/scarcer routes when sufficient alternatives exist",
+          "mode manual; explicit policy enforced"
+        ]
+      },
+      "status": "VERIFIED",
+      "scope": "generation contract only; model quality is not benchmarked",
+      "provider_response_success": true,
+      "response_status": "REPORTED",
+      "sentinel_matches": true,
+      "provider": "ollama-cloud",
+      "model": "gemma4:31b",
+      "slot": "ollama-cloud-1",
+      "attempts": 1,
+      "remaining_requests": null,
+      "remaining_tokens": null,
+      "input_tokens": 21,
+      "output_tokens": 7,
+      "history": [
+        {
+          "provider": "ollama-cloud",
+          "model": "gemma4:31b",
+          "slot": "ollama-cloud-1",
+          "attempt": 1,
+          "fallback": false,
+          "error": null,
+          "provider_response_success": true,
+          "quota_remaining": null,
+          "verified_objective": true,
+          "latency_ms": 420.55087500011723
+        }
+      ],
+      "http_statuses": {
+        "ollama": [
+          200
+        ]
+      }
+    },
+    {
+      "scenario": "slot ollama-cloud-2",
+      "source": "live provider",
+      "mode": "manual",
+      "quality_floor": 1,
+      "max_attempts": 1,
+      "max_output_tokens": 128,
+      "unknown_cost_allowed": false,
+      "initial_route": {
+        "provider": "ollama-cloud",
+        "model": "gemma4:31b",
+        "slot": "ollama-cloud-2",
+        "quota_remaining": null,
+        "reasons": [
+          "required capabilities and context/output limits satisfied",
+          "quality tier 2 meets floor 1; source: live inventory and exact-response generation observed 2026-10-02; quality/limits remain conservative configuration, not benchmarks; account quota UNKNOWN",
+          "capacity class free; quota UNKNOWN",
+          "ranking considers task affinity, decaying reliability/latency, and scarcity",
+          "provider response health and verified objective outcomes remain separate",
+          "preserve stronger/scarcer routes when sufficient alternatives exist",
+          "mode manual; explicit policy enforced"
+        ]
+      },
+      "status": "VERIFIED",
+      "scope": "generation contract only; model quality is not benchmarked",
+      "provider_response_success": true,
+      "response_status": "REPORTED",
+      "sentinel_matches": true,
+      "provider": "ollama-cloud",
+      "model": "gemma4:31b",
+      "slot": "ollama-cloud-2",
+      "attempts": 1,
+      "remaining_requests": null,
+      "remaining_tokens": null,
+      "input_tokens": 21,
+      "output_tokens": 7,
+      "history": [
+        {
+          "provider": "ollama-cloud",
+          "model": "gemma4:31b",
+          "slot": "ollama-cloud-2",
+          "attempt": 1,
+          "fallback": false,
+          "error": null,
+          "provider_response_success": true,
+          "quota_remaining": null,
+          "verified_objective": true,
+          "latency_ms": 406.2330900001143
+        }
+      ],
+      "http_statuses": {
+        "ollama": [
+          200
+        ]
+      }
+    },
+    {
+      "scenario": "credential failover",
+      "source": "deliberately invalid test credential rejected by live endpoint; real alternate slot",
+      "mode": "manual",
+      "quality_floor": 1,
+      "max_attempts": 2,
+      "max_output_tokens": 128,
+      "unknown_cost_allowed": false,
+      "initial_route": {
+        "provider": "openrouter",
+        "model": "liquid/lfm-2.5-2.6b:free",
+        "slot": "openrouter-0-invalid-fixture",
+        "quota_remaining": null,
+        "reasons": [
+          "required capabilities and context/output limits satisfied",
+          "quality tier 1 meets floor 1; source: live inventory and exact-response generation observed 2026-10-02; quality/limits remain conservative configuration, not benchmarks; account quota UNKNOWN",
+          "capacity class free; quota UNKNOWN",
+          "ranking considers task affinity, decaying reliability/latency, and scarcity",
+          "provider response health and verified objective outcomes remain separate",
+          "preserve stronger/scarcer routes when sufficient alternatives exist",
+          "mode manual; explicit policy enforced"
+        ]
+      },
+      "status": "VERIFIED",
+      "scope": "generation contract only; model quality is not benchmarked",
+      "provider_response_success": true,
+      "response_status": "REPORTED",
+      "sentinel_matches": true,
+      "provider": "openrouter",
+      "model": "liquid/lfm-2.5-2.6b:free",
+      "slot": "openrouter-1",
+      "attempts": 2,
+      "remaining_requests": null,
+      "remaining_tokens": null,
+      "input_tokens": 19,
+      "output_tokens": 119,
+      "history": [
+        {
+          "provider": "openrouter",
+          "model": "liquid/lfm-2.5-2.6b:free",
+          "slot": "openrouter-0-invalid-fixture",
+          "attempt": 1,
+          "fallback": false,
+          "error": "credential_failure",
+          "provider_response_success": false,
+          "quota_remaining": null,
+          "verified_objective": null,
+          "latency_ms": 25.81888000008803
+        },
+        {
+          "provider": "openrouter",
+          "model": "liquid/lfm-2.5-2.6b:free",
+          "slot": "openrouter-1",
+          "attempt": 2,
+          "fallback": true,
+          "error": null,
+          "provider_response_success": true,
+          "quota_remaining": null,
+          "verified_objective": true,
+          "latency_ms": 403.31190799997785
+        }
+      ],
+      "http_statuses": {
+        "openai": [
+          401,
+          200
+        ]
+      }
+    },
+    {
+      "scenario": "cross-provider fallback",
+      "source": "live provider",
+      "mode": "auto",
+      "quality_floor": 1,
+      "max_attempts": 2,
+      "max_output_tokens": 128,
+      "unknown_cost_allowed": false,
+      "initial_route": {
+        "provider": "groq",
+        "model": "llama-3.1-8b-instant",
+        "slot": "groq-1",
+        "quota_remaining": null,
+        "reasons": [
+          "required capabilities and context/output limits satisfied",
+          "quality tier 1 meets floor 1; source: developer seed 2026-10-02; quality/limits are conservative configuration, not observed benchmarks; account quota UNKNOWN",
+          "capacity class free; quota UNKNOWN",
+          "ranking considers task affinity, decaying reliability/latency, and scarcity",
+          "provider response health and verified objective outcomes remain separate",
+          "preserve stronger/scarcer routes when sufficient alternatives exist",
+          "mode auto; explicit policy enforced"
+        ]
+      },
+      "status": "VERIFIED",
+      "scope": "generation contract only; model quality is not benchmarked",
+      "provider_response_success": true,
+      "response_status": "REPORTED",
+      "sentinel_matches": true,
+      "provider": "openrouter",
+      "model": "liquid/lfm-2.5-2.6b:free",
+      "slot": "openrouter-1",
+      "attempts": 2,
+      "remaining_requests": null,
+      "remaining_tokens": null,
+      "input_tokens": 19,
+      "output_tokens": 50,
+      "history": [
+        {
+          "provider": "groq",
+          "model": "llama-3.1-8b-instant",
+          "slot": "groq-1",
+          "attempt": 1,
+          "fallback": false,
+          "error": "credential_failure",
+          "provider_response_success": false,
+          "quota_remaining": null,
+          "verified_objective": null,
+          "latency_ms": 22.659832999806895
+        },
+        {
+          "provider": "openrouter",
+          "model": "liquid/lfm-2.5-2.6b:free",
+          "slot": "openrouter-1",
+          "attempt": 2,
+          "fallback": true,
+          "error": null,
+          "provider_response_success": true,
+          "quota_remaining": null,
+          "verified_objective": true,
+          "latency_ms": 682.2138479999467
+        }
+      ],
+      "http_statuses": {
+        "openai": [
+          403,
+          200
+        ]
+      }
+    },
+    {
+      "scenario": "one-attempt bound",
+      "source": "live provider",
+      "mode": "auto",
+      "quality_floor": 1,
+      "max_attempts": 1,
+      "max_output_tokens": 128,
+      "unknown_cost_allowed": false,
+      "initial_route": {
+        "provider": "groq",
+        "model": "llama-3.1-8b-instant",
+        "slot": "groq-1",
+        "quota_remaining": null,
+        "reasons": [
+          "required capabilities and context/output limits satisfied",
+          "quality tier 1 meets floor 1; source: developer seed 2026-10-02; quality/limits are conservative configuration, not observed benchmarks; account quota UNKNOWN",
+          "capacity class free; quota UNKNOWN",
+          "ranking considers task affinity, decaying reliability/latency, and scarcity",
+          "provider response health and verified objective outcomes remain separate",
+          "preserve stronger/scarcer routes when sufficient alternatives exist",
+          "mode auto; explicit policy enforced"
+        ]
+      },
+      "status": "UNAVAILABLE",
+      "reason": "credential_failure",
+      "provider_response_success": false,
+      "history": [
+        {
+          "provider": "groq",
+          "model": "llama-3.1-8b-instant",
+          "slot": "groq-1",
+          "attempt": 1,
+          "fallback": false,
+          "error": "credential_failure",
+          "provider_response_success": false,
+          "quota_remaining": null,
+          "verified_objective": null,
+          "latency_ms": 45.45033199997306
+        }
+      ],
+      "http_statuses": {
+        "openai": [
+          403
+        ]
+      }
+    },
+    {
+      "scenario": "rerank after actual rate limit",
+      "source": "actual HTTP 429 observation; subsequent alternative HTTPS call is real",
+      "mode": "heavy",
+      "quality_floor": 1,
+      "max_attempts": 1,
+      "max_output_tokens": 128,
+      "unknown_cost_allowed": true,
+      "initial_route": {
+        "provider": "openrouter",
+        "model": "liquid/lfm-2.5-2.6b:free",
+        "slot": "openrouter-1",
+        "quota_remaining": null,
+        "reasons": [
+          "required capabilities and context/output limits satisfied",
+          "quality tier 1 meets floor 1; source: live inventory and exact-response generation observed 2026-10-02; quality/limits remain conservative configuration, not benchmarks; account quota UNKNOWN",
+          "capacity class free; quota UNKNOWN",
+          "ranking considers task affinity, decaying reliability/latency, and scarcity",
+          "provider response health and verified objective outcomes remain separate",
+          "preserve stronger/scarcer routes when sufficient alternatives exist",
+          "mode heavy; explicit policy enforced"
+        ]
+      },
+      "status": "VERIFIED",
+      "scope": "generation contract only; model quality is not benchmarked",
+      "provider_response_success": true,
+      "response_status": "REPORTED",
+      "sentinel_matches": true,
+      "provider": "openrouter",
+      "model": "liquid/lfm-2.5-2.6b:free",
+      "slot": "openrouter-1",
+      "attempts": 1,
+      "remaining_requests": null,
+      "remaining_tokens": null,
+      "input_tokens": 19,
+      "output_tokens": 50,
+      "history": [
+        {
+          "provider": "openrouter",
+          "model": "liquid/lfm-2.5-2.6b:free",
+          "slot": "openrouter-1",
+          "attempt": 1,
+          "fallback": false,
+          "error": null,
+          "provider_response_success": true,
+          "quota_remaining": null,
+          "verified_objective": true,
+          "latency_ms": 575.3153569999085
+        }
+      ],
+      "http_statuses": {
+        "openai": [
+          200
+        ]
+      }
+    },
+    {
+      "scenario": "routing auto",
+      "source": "live provider",
+      "mode": "auto",
+      "quality_floor": 1,
+      "max_attempts": 4,
+      "max_output_tokens": 128,
+      "unknown_cost_allowed": false,
+      "initial_route": {
+        "provider": "openrouter",
+        "model": "liquid/lfm-2.5-2.6b:free",
+        "slot": "openrouter-1",
+        "quota_remaining": null,
+        "reasons": [
+          "required capabilities and context/output limits satisfied",
+          "quality tier 1 meets floor 1; source: live inventory and exact-response generation observed 2026-10-02; quality/limits remain conservative configuration, not benchmarks; account quota UNKNOWN",
+          "capacity class free; quota UNKNOWN",
+          "ranking considers task affinity, decaying reliability/latency, and scarcity",
+          "provider response health and verified objective outcomes remain separate",
+          "preserve stronger/scarcer routes when sufficient alternatives exist",
+          "mode auto; explicit policy enforced"
+        ]
+      },
+      "status": "VERIFIED",
+      "scope": "generation contract only; model quality is not benchmarked",
+      "provider_response_success": true,
+      "response_status": "REPORTED",
+      "sentinel_matches": true,
+      "provider": "openrouter",
+      "model": "liquid/lfm-2.5-2.6b:free",
+      "slot": "openrouter-1",
+      "attempts": 1,
+      "remaining_requests": null,
+      "remaining_tokens": null,
+      "input_tokens": 19,
+      "output_tokens": 109,
+      "history": [
+        {
+          "provider": "openrouter",
+          "model": "liquid/lfm-2.5-2.6b:free",
+          "slot": "openrouter-1",
+          "attempt": 1,
+          "fallback": false,
+          "error": null,
+          "provider_response_success": true,
+          "quota_remaining": null,
+          "verified_objective": true,
+          "latency_ms": 1133.0370939999739
+        }
+      ],
+      "http_statuses": {
+        "openai": [
+          200
+        ]
+      }
+    },
+    {
+      "scenario": "routing free_first",
+      "source": "live provider",
+      "mode": "free_first",
+      "quality_floor": 1,
+      "max_attempts": 4,
+      "max_output_tokens": 128,
+      "unknown_cost_allowed": false,
+      "initial_route": {
+        "provider": "openrouter",
+        "model": "liquid/lfm-2.5-2.6b:free",
+        "slot": "openrouter-1",
+        "quota_remaining": null,
+        "reasons": [
+          "required capabilities and context/output limits satisfied",
+          "quality tier 1 meets floor 1; source: live inventory and exact-response generation observed 2026-10-02; quality/limits remain conservative configuration, not benchmarks; account quota UNKNOWN",
+          "capacity class free; quota UNKNOWN",
+          "ranking considers task affinity, decaying reliability/latency, and scarcity",
+          "provider response health and verified objective outcomes remain separate",
+          "preserve stronger/scarcer routes when sufficient alternatives exist",
+          "mode free_first; explicit policy enforced"
+        ]
+      },
+      "status": "VERIFIED",
+      "scope": "generation contract only; model quality is not benchmarked",
+      "provider_response_success": true,
+      "response_status": "REPORTED",
+      "sentinel_matches": true,
+      "provider": "openrouter",
+      "model": "liquid/lfm-2.5-2.6b:free",
+      "slot": "openrouter-1",
+      "attempts": 1,
+      "remaining_requests": null,
+      "remaining_tokens": null,
+      "input_tokens": 19,
+      "output_tokens": 54,
+      "history": [
+        {
+          "provider": "openrouter",
+          "model": "liquid/lfm-2.5-2.6b:free",
+          "slot": "openrouter-1",
+          "attempt": 1,
+          "fallback": false,
+          "error": null,
+          "provider_response_success": true,
+          "quota_remaining": null,
+          "verified_objective": true,
+          "latency_ms": 848.8860700001624
+        }
+      ],
+      "http_statuses": {
+        "openai": [
+          200
+        ]
+      }
+    },
+    {
+      "scenario": "routing fast",
+      "source": "live provider",
+      "mode": "fast",
+      "quality_floor": 1,
+      "max_attempts": 4,
+      "max_output_tokens": 128,
+      "unknown_cost_allowed": false,
+      "initial_route": {
+        "provider": "openrouter",
+        "model": "liquid/lfm-2.5-2.6b:free",
+        "slot": "openrouter-1",
+        "quota_remaining": null,
+        "reasons": [
+          "required capabilities and context/output limits satisfied",
+          "quality tier 1 meets floor 1; source: live inventory and exact-response generation observed 2026-10-02; quality/limits remain conservative configuration, not benchmarks; account quota UNKNOWN",
+          "capacity class free; quota UNKNOWN",
+          "ranking considers task affinity, decaying reliability/latency, and scarcity",
+          "provider response health and verified objective outcomes remain separate",
+          "preserve stronger/scarcer routes when sufficient alternatives exist",
+          "mode fast; explicit policy enforced"
+        ]
+      },
+      "status": "VERIFIED",
+      "scope": "generation contract only; model quality is not benchmarked",
+      "provider_response_success": true,
+      "response_status": "REPORTED",
+      "sentinel_matches": true,
+      "provider": "openrouter",
+      "model": "liquid/lfm-2.5-2.6b:free",
+      "slot": "openrouter-1",
+      "attempts": 1,
+      "remaining_requests": null,
+      "remaining_tokens": null,
+      "input_tokens": 19,
+      "output_tokens": 50,
+      "history": [
+        {
+          "provider": "openrouter",
+          "model": "liquid/lfm-2.5-2.6b:free",
+          "slot": "openrouter-1",
+          "attempt": 1,
+          "fallback": false,
+          "error": null,
+          "provider_response_success": true,
+          "quota_remaining": null,
+          "verified_objective": true,
+          "latency_ms": 646.7797959999189
+        }
+      ],
+      "http_statuses": {
+        "openai": [
+          200
+        ]
+      }
+    },
+    {
+      "scenario": "routing balanced",
+      "source": "live provider",
+      "mode": "balanced",
+      "quality_floor": 1,
+      "max_attempts": 4,
+      "max_output_tokens": 128,
+      "unknown_cost_allowed": false,
+      "initial_route": {
+        "provider": "openrouter",
+        "model": "liquid/lfm-2.5-2.6b:free",
+        "slot": "openrouter-1",
+        "quota_remaining": null,
+        "reasons": [
+          "required capabilities and context/output limits satisfied",
+          "quality tier 1 meets floor 1; source: live inventory and exact-response generation observed 2026-10-02; quality/limits remain conservative configuration, not benchmarks; account quota UNKNOWN",
+          "capacity class free; quota UNKNOWN",
+          "ranking considers task affinity, decaying reliability/latency, and scarcity",
+          "provider response health and verified objective outcomes remain separate",
+          "preserve stronger/scarcer routes when sufficient alternatives exist",
+          "mode balanced; explicit policy enforced"
+        ]
+      },
+      "status": "VERIFIED",
+      "scope": "generation contract only; model quality is not benchmarked",
+      "provider_response_success": true,
+      "response_status": "REPORTED",
+      "sentinel_matches": true,
+      "provider": "openrouter",
+      "model": "liquid/lfm-2.5-2.6b:free",
+      "slot": "openrouter-1",
+      "attempts": 1,
+      "remaining_requests": null,
+      "remaining_tokens": null,
+      "input_tokens": 19,
+      "output_tokens": 96,
+      "history": [
+        {
+          "provider": "openrouter",
+          "model": "liquid/lfm-2.5-2.6b:free",
+          "slot": "openrouter-1",
+          "attempt": 1,
+          "fallback": false,
+          "error": null,
+          "provider_response_success": true,
+          "quota_remaining": null,
+          "verified_objective": true,
+          "latency_ms": 764.4235080001636
+        }
+      ],
+      "http_statuses": {
+        "openai": [
+          200
+        ]
+      }
+    },
+    {
+      "scenario": "routing heavy",
+      "source": "live provider",
+      "mode": "heavy",
+      "quality_floor": 4,
+      "max_attempts": 4,
+      "max_output_tokens": 512,
+      "unknown_cost_allowed": false,
+      "initial_route": {
+        "provider": "ollama-cloud",
+        "model": "nemotron-3-ultra",
+        "slot": "ollama-cloud-1",
+        "quota_remaining": null,
+        "reasons": [
+          "required capabilities and context/output limits satisfied",
+          "quality tier 5 meets floor 4; source: developer seed 2026-10-02; quality/limits are conservative configuration, not observed benchmarks; account quota UNKNOWN",
+          "capacity class free; quota UNKNOWN",
+          "ranking considers task affinity, decaying reliability/latency, and scarcity",
+          "provider response health and verified objective outcomes remain separate",
+          "preserve stronger/scarcer routes when sufficient alternatives exist",
+          "mode heavy; explicit policy enforced"
+        ]
+      },
+      "status": "VERIFIED",
+      "scope": "generation contract only; model quality is not benchmarked",
+      "provider_response_success": true,
+      "response_status": "REPORTED",
+      "sentinel_matches": true,
+      "provider": "ollama-cloud",
+      "model": "nemotron-3-ultra",
+      "slot": "ollama-cloud-1",
+      "attempts": 1,
+      "remaining_requests": null,
+      "remaining_tokens": null,
+      "input_tokens": 24,
+      "output_tokens": 24,
+      "history": [
+        {
+          "provider": "ollama-cloud",
+          "model": "nemotron-3-ultra",
+          "slot": "ollama-cloud-1",
+          "attempt": 1,
+          "fallback": false,
+          "error": null,
+          "provider_response_success": true,
+          "quota_remaining": null,
+          "verified_objective": true,
+          "latency_ms": 6426.286807999986
+        }
+      ],
+      "http_statuses": {
+        "ollama": [
+          200
+        ]
+      }
+    },
+    {
+      "scenario": "local refuses cloud",
+      "source": "live provider",
+      "mode": "local",
+      "quality_floor": 1,
+      "max_attempts": 4,
+      "max_output_tokens": 128,
+      "unknown_cost_allowed": false,
+      "initial_route": null,
+      "status": "UNAVAILABLE",
+      "reason": "route_unavailable",
+      "provider_response_success": false,
+      "history": [],
+      "http_statuses": {}
+    },
+    {
+      "scenario": "scarcity preserves constrained alternative",
+      "source": "synthetic quota fixture; selected provider request is real HTTPS",
+      "mode": "free_first",
+      "quality_floor": 2,
+      "max_attempts": 4,
+      "max_output_tokens": 128,
+      "unknown_cost_allowed": false,
+      "initial_route": {
+        "provider": "ollama-cloud",
+        "model": "gemma4:31b",
+        "slot": "fixture-ollama-cloud",
+        "quota_remaining": 500,
+        "reasons": [
+          "required capabilities and context/output limits satisfied",
+          "quality tier 2 meets floor 2; source: live inventory and exact-response generation observed 2026-10-02; quality/limits remain conservative configuration, not benchmarks; account quota UNKNOWN",
+          "capacity class free; quota 500 confirmed requests remaining",
+          "ranking considers task affinity, decaying reliability/latency, and scarcity",
+          "provider response health and verified objective outcomes remain separate",
+          "preserve stronger/scarcer routes when sufficient alternatives exist",
+          "mode free_first; explicit policy enforced"
+        ]
+      },
+      "status": "VERIFIED",
+      "scope": "generation contract only; model quality is not benchmarked",
+      "provider_response_success": true,
+      "response_status": "REPORTED",
+      "sentinel_matches": true,
+      "provider": "ollama-cloud",
+      "model": "gemma4:31b",
+      "slot": "fixture-ollama-cloud",
+      "attempts": 1,
+      "remaining_requests": null,
+      "remaining_tokens": null,
+      "input_tokens": 21,
+      "output_tokens": 7,
+      "history": [
+        {
+          "provider": "ollama-cloud",
+          "model": "gemma4:31b",
+          "slot": "fixture-ollama-cloud",
+          "attempt": 1,
+          "fallback": false,
+          "error": null,
+          "provider_response_success": true,
+          "quota_remaining": 500,
+          "verified_objective": true,
+          "latency_ms": 438.4014899999329
+        }
+      ],
+      "http_statuses": {
+        "ollama": [
+          200
+        ]
+      }
+    }
+  ],
+  "checks": [
+    {
+      "check": "slot groq-1 attempts bounded",
+      "status": "PASS"
+    },
+    {
+      "check": "slot groq-1 reservations released",
+      "status": "PASS"
+    },
+    {
+      "check": "slot groq-2 attempts bounded",
+      "status": "PASS"
+    },
+    {
+      "check": "slot groq-2 reservations released",
+      "status": "PASS"
+    },
+    {
+      "check": "slot groq-3 attempts bounded",
+      "status": "PASS"
+    },
+    {
+      "check": "slot groq-3 reservations released",
+      "status": "PASS"
+    },
+    {
+      "check": "slot groq-4 attempts bounded",
+      "status": "PASS"
+    },
+    {
+      "check": "slot groq-4 reservations released",
+      "status": "PASS"
+    },
+    {
+      "check": "slot openrouter-1 response stays REPORTED",
+      "status": "PASS"
+    },
+    {
+      "check": "slot openrouter-1 objective initially unknown",
+      "status": "PASS"
+    },
+    {
+      "check": "slot openrouter-1 verification linked",
+      "status": "PASS"
+    },
+    {
+      "check": "slot openrouter-1 absent quota stays unknown",
+      "status": "PASS"
+    },
+    {
+      "check": "slot openrouter-1 attempts bounded",
+      "status": "PASS"
+    },
+    {
+      "check": "slot openrouter-1 reservations released",
+      "status": "PASS"
+    },
+    {
+      "check": "slot openrouter-2 response stays REPORTED",
+      "status": "PASS"
+    },
+    {
+      "check": "slot openrouter-2 objective initially unknown",
+      "status": "PASS"
+    },
+    {
+      "check": "slot openrouter-2 verification linked",
+      "status": "PASS"
+    },
+    {
+      "check": "slot openrouter-2 absent quota stays unknown",
+      "status": "PASS"
+    },
+    {
+      "check": "slot openrouter-2 attempts bounded",
+      "status": "PASS"
+    },
+    {
+      "check": "slot openrouter-2 reservations released",
+      "status": "PASS"
+    },
+    {
+      "check": "slot openrouter-3 response stays REPORTED",
+      "status": "PASS"
+    },
+    {
+      "check": "slot openrouter-3 objective initially unknown",
+      "status": "PASS"
+    },
+    {
+      "check": "slot openrouter-3 verification linked",
+      "status": "PASS"
+    },
+    {
+      "check": "slot openrouter-3 absent quota stays unknown",
+      "status": "PASS"
+    },
+    {
+      "check": "slot openrouter-3 attempts bounded",
+      "status": "PASS"
+    },
+    {
+      "check": "slot openrouter-3 reservations released",
+      "status": "PASS"
+    },
+    {
+      "check": "slot openrouter-4 response stays REPORTED",
+      "status": "PASS"
+    },
+    {
+      "check": "slot openrouter-4 objective initially unknown",
+      "status": "PASS"
+    },
+    {
+      "check": "slot openrouter-4 verification linked",
+      "status": "PASS"
+    },
+    {
+      "check": "slot openrouter-4 absent quota stays unknown",
+      "status": "PASS"
+    },
+    {
+      "check": "slot openrouter-4 attempts bounded",
+      "status": "PASS"
+    },
+    {
+      "check": "slot openrouter-4 reservations released",
+      "status": "PASS"
+    },
+    {
+      "check": "slot nvidia-1 response stays REPORTED",
+      "status": "PASS"
+    },
+    {
+      "check": "slot nvidia-1 objective initially unknown",
+      "status": "PASS"
+    },
+    {
+      "check": "slot nvidia-1 verification linked",
+      "status": "PASS"
+    },
+    {
+      "check": "slot nvidia-1 absent quota stays unknown",
+      "status": "PASS"
+    },
+    {
+      "check": "slot nvidia-1 attempts bounded",
+      "status": "PASS"
+    },
+    {
+      "check": "slot nvidia-1 reservations released",
+      "status": "PASS"
+    },
+    {
+      "check": "slot nvidia-2 response stays REPORTED",
+      "status": "PASS"
+    },
+    {
+      "check": "slot nvidia-2 objective initially unknown",
+      "status": "PASS"
+    },
+    {
+      "check": "slot nvidia-2 verification linked",
+      "status": "PASS"
+    },
+    {
+      "check": "slot nvidia-2 absent quota stays unknown",
+      "status": "PASS"
+    },
+    {
+      "check": "slot nvidia-2 attempts bounded",
+      "status": "PASS"
+    },
+    {
+      "check": "slot nvidia-2 reservations released",
+      "status": "PASS"
+    },
+    {
+      "check": "slot google-1 response stays REPORTED",
+      "status": "PASS"
+    },
+    {
+      "check": "slot google-1 objective initially unknown",
+      "status": "PASS"
+    },
+    {
+      "check": "slot google-1 verification linked",
+      "status": "PASS"
+    },
+    {
+      "check": "slot google-1 absent quota stays unknown",
+      "status": "PASS"
+    },
+    {
+      "check": "slot google-1 attempts bounded",
+      "status": "PASS"
+    },
+    {
+      "check": "slot google-1 reservations released",
+      "status": "PASS"
+    },
+    {
+      "check": "slot google-2 response stays REPORTED",
+      "status": "PASS"
+    },
+    {
+      "check": "slot google-2 objective initially unknown",
+      "status": "PASS"
+    },
+    {
+      "check": "slot google-2 verification linked",
+      "status": "PASS"
+    },
+    {
+      "check": "slot google-2 absent quota stays unknown",
+      "status": "PASS"
+    },
+    {
+      "check": "slot google-2 attempts bounded",
+      "status": "PASS"
+    },
+    {
+      "check": "slot google-2 reservations released",
+      "status": "PASS"
+    },
+    {
+      "check": "slot google-3 response stays REPORTED",
+      "status": "PASS"
+    },
+    {
+      "check": "slot google-3 objective initially unknown",
+      "status": "PASS"
+    },
+    {
+      "check": "slot google-3 verification linked",
+      "status": "PASS"
+    },
+    {
+      "check": "slot google-3 absent quota stays unknown",
+      "status": "PASS"
+    },
+    {
+      "check": "slot google-3 attempts bounded",
+      "status": "PASS"
+    },
+    {
+      "check": "slot google-3 reservations released",
+      "status": "PASS"
+    },
+    {
+      "check": "slot zai-1 attempts bounded",
+      "status": "PASS"
+    },
+    {
+      "check": "slot zai-1 reservations released",
+      "status": "PASS"
+    },
+    {
+      "check": "slot zai-2 attempts bounded",
+      "status": "PASS"
+    },
+    {
+      "check": "slot zai-2 reservations released",
+      "status": "PASS"
+    },
+    {
+      "check": "slot ollama-cloud-1 response stays REPORTED",
+      "status": "PASS"
+    },
+    {
+      "check": "slot ollama-cloud-1 objective initially unknown",
+      "status": "PASS"
+    },
+    {
+      "check": "slot ollama-cloud-1 verification linked",
+      "status": "PASS"
+    },
+    {
+      "check": "slot ollama-cloud-1 absent quota stays unknown",
+      "status": "PASS"
+    },
+    {
+      "check": "slot ollama-cloud-1 attempts bounded",
+      "status": "PASS"
+    },
+    {
+      "check": "slot ollama-cloud-1 reservations released",
+      "status": "PASS"
+    },
+    {
+      "check": "slot ollama-cloud-2 response stays REPORTED",
+      "status": "PASS"
+    },
+    {
+      "check": "slot ollama-cloud-2 objective initially unknown",
+      "status": "PASS"
+    },
+    {
+      "check": "slot ollama-cloud-2 verification linked",
+      "status": "PASS"
+    },
+    {
+      "check": "slot ollama-cloud-2 absent quota stays unknown",
+      "status": "PASS"
+    },
+    {
+      "check": "slot ollama-cloud-2 attempts bounded",
+      "status": "PASS"
+    },
+    {
+      "check": "slot ollama-cloud-2 reservations released",
+      "status": "PASS"
+    },
+    {
+      "check": "credential failover response stays REPORTED",
+      "status": "PASS"
+    },
+    {
+      "check": "credential failover objective initially unknown",
+      "status": "PASS"
+    },
+    {
+      "check": "credential failover verification linked",
+      "status": "PASS"
+    },
+    {
+      "check": "credential failover absent quota stays unknown",
+      "status": "PASS"
+    },
+    {
+      "check": "credential failover attempts bounded",
+      "status": "PASS"
+    },
+    {
+      "check": "credential failover reservations released",
+      "status": "PASS"
+    },
+    {
+      "check": "live credential failover",
+      "status": "PASS"
+    },
+    {
+      "check": "cross-provider fallback response stays REPORTED",
+      "status": "PASS"
+    },
+    {
+      "check": "cross-provider fallback objective initially unknown",
+      "status": "PASS"
+    },
+    {
+      "check": "cross-provider fallback verification linked",
+      "status": "PASS"
+    },
+    {
+      "check": "cross-provider fallback absent quota stays unknown",
+      "status": "PASS"
+    },
+    {
+      "check": "cross-provider fallback attempts bounded",
+      "status": "PASS"
+    },
+    {
+      "check": "cross-provider fallback reservations released",
+      "status": "PASS"
+    },
+    {
+      "check": "live cross-provider fallback",
+      "status": "PASS"
+    },
+    {
+      "check": "one-attempt bound attempts bounded",
+      "status": "PASS"
+    },
+    {
+      "check": "one-attempt bound reservations released",
+      "status": "PASS"
+    },
+    {
+      "check": "live fallback stops at bound",
+      "status": "PASS"
+    },
+    {
+      "check": "actual rate limit changes next eligible route",
+      "status": "PASS",
+      "source": "copied actual HTTP 429 slot observation; no invented balance"
+    },
+    {
+      "check": "rerank after actual rate limit response stays REPORTED",
+      "status": "PASS"
+    },
+    {
+      "check": "rerank after actual rate limit objective initially unknown",
+      "status": "PASS"
+    },
+    {
+      "check": "rerank after actual rate limit verification linked",
+      "status": "PASS"
+    },
+    {
+      "check": "rerank after actual rate limit absent quota stays unknown",
+      "status": "PASS"
+    },
+    {
+      "check": "rerank after actual rate limit attempts bounded",
+      "status": "PASS"
+    },
+    {
+      "check": "rerank after actual rate limit reservations released",
+      "status": "PASS"
+    },
+    {
+      "check": "observed rate rerank reaches alternate provider",
+      "status": "PASS"
+    },
+    {
+      "check": "routing auto response stays REPORTED",
+      "status": "PASS"
+    },
+    {
+      "check": "routing auto objective initially unknown",
+      "status": "PASS"
+    },
+    {
+      "check": "routing auto verification linked",
+      "status": "PASS"
+    },
+    {
+      "check": "routing auto absent quota stays unknown",
+      "status": "PASS"
+    },
+    {
+      "check": "routing auto attempts bounded",
+      "status": "PASS"
+    },
+    {
+      "check": "routing auto reservations released",
+      "status": "PASS"
+    },
+    {
+      "check": "live auto routing",
+      "status": "PASS"
+    },
+    {
+      "check": "routing free_first response stays REPORTED",
+      "status": "PASS"
+    },
+    {
+      "check": "routing free_first objective initially unknown",
+      "status": "PASS"
+    },
+    {
+      "check": "routing free_first verification linked",
+      "status": "PASS"
+    },
+    {
+      "check": "routing free_first absent quota stays unknown",
+      "status": "PASS"
+    },
+    {
+      "check": "routing free_first attempts bounded",
+      "status": "PASS"
+    },
+    {
+      "check": "routing free_first reservations released",
+      "status": "PASS"
+    },
+    {
+      "check": "live free_first routing",
+      "status": "PASS"
+    },
+    {
+      "check": "routing fast response stays REPORTED",
+      "status": "PASS"
+    },
+    {
+      "check": "routing fast objective initially unknown",
+      "status": "PASS"
+    },
+    {
+      "check": "routing fast verification linked",
+      "status": "PASS"
+    },
+    {
+      "check": "routing fast absent quota stays unknown",
+      "status": "PASS"
+    },
+    {
+      "check": "routing fast attempts bounded",
+      "status": "PASS"
+    },
+    {
+      "check": "routing fast reservations released",
+      "status": "PASS"
+    },
+    {
+      "check": "live fast routing",
+      "status": "PASS"
+    },
+    {
+      "check": "routing balanced response stays REPORTED",
+      "status": "PASS"
+    },
+    {
+      "check": "routing balanced objective initially unknown",
+      "status": "PASS"
+    },
+    {
+      "check": "routing balanced verification linked",
+      "status": "PASS"
+    },
+    {
+      "check": "routing balanced absent quota stays unknown",
+      "status": "PASS"
+    },
+    {
+      "check": "routing balanced attempts bounded",
+      "status": "PASS"
+    },
+    {
+      "check": "routing balanced reservations released",
+      "status": "PASS"
+    },
+    {
+      "check": "live balanced routing",
+      "status": "PASS"
+    },
+    {
+      "check": "routing heavy response stays REPORTED",
+      "status": "PASS"
+    },
+    {
+      "check": "routing heavy objective initially unknown",
+      "status": "PASS"
+    },
+    {
+      "check": "routing heavy verification linked",
+      "status": "PASS"
+    },
+    {
+      "check": "routing heavy absent quota stays unknown",
+      "status": "PASS"
+    },
+    {
+      "check": "routing heavy attempts bounded",
+      "status": "PASS"
+    },
+    {
+      "check": "routing heavy reservations released",
+      "status": "PASS"
+    },
+    {
+      "check": "live heavy routing",
+      "status": "PASS"
+    },
+    {
+      "check": "local refuses cloud attempts bounded",
+      "status": "PASS"
+    },
+    {
+      "check": "local refuses cloud reservations released",
+      "status": "PASS"
+    },
+    {
+      "check": "Local never calls cloud",
+      "status": "PASS"
+    },
+    {
+      "check": "scarcity changes choice with other metadata unchanged",
+      "status": "PASS",
+      "source": "synthetic 2/500 request balances; NOT observed account quota"
+    },
+    {
+      "check": "scarcity preserves constrained alternative response stays REPORTED",
+      "status": "PASS"
+    },
+    {
+      "check": "scarcity preserves constrained alternative objective initially unknown",
+      "status": "PASS"
+    },
+    {
+      "check": "scarcity preserves constrained alternative verification linked",
+      "status": "PASS"
+    },
+    {
+      "check": "scarcity preserves constrained alternative absent quota stays unknown",
+      "status": "PASS"
+    },
+    {
+      "check": "scarcity preserves constrained alternative attempts bounded",
+      "status": "PASS"
+    },
+    {
+      "check": "scarcity preserves constrained alternative reservations released",
+      "status": "PASS"
+    },
+    {
+      "check": "scarcity choice reaches real provider",
+      "status": "PASS"
+    },
+    {
+      "check": "core exact file, fake rejection and deterministic Jev",
+      "status": "PASS"
+    },
+    {
+      "check": "authoritative exact file bytes",
+      "status": "PASS"
+    },
+    {
+      "check": "real model objective without verifier remains partial",
+      "status": "PASS",
+      "task_state": "partially_verified",
+      "result_status": "REPORTED",
+      "provider": "google",
+      "model": "gemini-3.1-flash-lite",
+      "slot": "google-1"
+    },
+    {
+      "check": "Grid loss preserves objective and expires lease",
+      "status": "PASS"
+    },
+    {
+      "check": "multiple real providers",
+      "status": "PASS",
+      "providers": [
+        "google",
+        "nvidia",
+        "ollama-cloud",
+        "openrouter"
+      ]
+    },
+    {
+      "check": "multiple real slots",
+      "status": "PASS",
+      "masked_slots": [
+        "google-1",
+        "google-2",
+        "google-3",
+        "nvidia-1",
+        "nvidia-2",
+        "ollama-cloud-1",
+        "ollama-cloud-2",
+        "openrouter-1",
+        "openrouter-2",
+        "openrouter-3",
+        "openrouter-4"
+      ]
+    },
+    {
+      "check": "route history excludes credentials and content",
+      "status": "PASS"
+    },
+    {
+      "check": "route history excludes credentials and content",
+      "status": "PASS"
+    },
+    {
+      "check": "route history excludes credentials and content",
+      "status": "PASS"
+    },
+    {
+      "check": "route history excludes credentials and content",
+      "status": "PASS"
+    },
+    {
+      "check": "route history excludes credentials and content",
+      "status": "PASS"
+    },
+    {
+      "check": "route history excludes credentials and content",
+      "status": "PASS"
+    },
+    {
+      "check": "runtime artifacts exclude provider secrets",
+      "status": "PASS"
+    }
+  ],
+  "status": "PASS",
+  "limitations": [
+    "Inventory reachability alone does not validate credentials or generation availability.",
+    "No quality benchmarks, quota estimates or funding guarantees are inferred.",
+    "Scarcity counterfactual uses synthetic metadata; HTTPS execution is real.",
+    "Public rendezvous, independent network stores and physical nodes remain unverified."
+  ]
+}

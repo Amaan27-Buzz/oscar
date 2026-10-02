@@ -1,149 +1,129 @@
 # Club A — Brain checkpoint
 
-Recorded **2026-10-02**. Overall status: **PARTIAL**. Gate A has not passed. **Slice 05 is not started.**
+Recorded **2026-10-02**. Overall status: **VERIFIED for the implemented Club A foundation. Gate A: PASS; manual review pending. Slice 05 is not started.**
+
+This verification continues the previously pushed `work` commit **`93ad11a48891035373292fd6a16c39b4340d8684`**. The checkout was fast-forwarded to that implementation before inspection or execution. No Core Loop, Jev, Transport, Grid, provider adapter or router was rebuilt. This continuation adds an opt-in verification script, refreshes four stale model entries using live inventory/generation evidence, and updates durable evidence/status.
+
+## Gate A decision and scope
+
+Gate A passes the foundation criteria authorized for this review:
+
+- Core Loop and Jev are verified by the real HTTP/file/read proof and the complete contract suite.
+- Native Transport/Catalog/Grid are coherent reference foundations: authenticated loopback execution, target scope checks, durable objective state, disconnect/reconnect, cancellation and lease expiry are verified.
+- **Four real hosted providers and 11 real credential slots** successfully generated independently checked responses.
+- Real credential rejection/failover, bounded cross-provider recovery, observed rate-limit reranking, automatic modes and Manual pins have live evidence.
+- Executor/provider testimony stays REPORTED; absent objective verification remains partial. Fake success, malformed/empty responses, exhausted retries and Local restrictions have no false-success path in the verified scenarios.
+
+This is acceptance of the implemented developer foundation, **not production Internet transport, physical embodiments, general model quality or complete quota forecasting**. The current review criteria accept the reference Transport/Grid stage; the earlier requirement for a public coordinator deployment is deferred to later Grid integration acceptance. Its implementation and acceptance scenario remain outstanding. Full slice/product capabilities are not silently marked shipped.
+
+**Stop for manual review. Do not start Slice 05.**
 
 ## Slice evidence
 
 | Slice | Status in this checkpoint | Evidence / limit |
 |---|---|---|
-| 01 — Core Loop | VERIFIED for implemented foundation | Real exact-file objective → HTTP execution → REPORTED result → independent read → VERIFIED evidence/task/artifact. Fake executor → missing file → FAILED. SQLite restart, cancellation, retry budgets, scope and deduplication tested. |
-| 02 — TypeSafe Jev | VERIFIED for implemented foundation | All nine routes are typed; arithmetic/file intents avoid a model. Live-source, memory, specialist and Worker intents block without advertised capabilities. Conservative routing grammar, not general language understanding. |
-| 03 — Transport / Catalog / Grid | PARTIAL | Real authenticated loopback HTTP, scope rechecks, replay rejection, correlated result/control/progress, node state, availability, disconnect/reconnect and durable lease expiry verified. Shared-store reference nodes; no public TLS/outbound rendezvous or physical embodiments verified. |
-| 04 — Adaptive Model Router | PARTIAL / hosted integration BLOCKED | Ten modes, capability/quality/context filters, credential pools, task fit, scarcity, bounded fallback, decaying observations, history and native HTTP adapter contracts tested. All real hosted attempts were denied by environment policy. |
-
-These statuses describe the implemented Club A scope. They are not acceptance of later architecture or a completed Gate A.
+| 01 — Core Loop | VERIFIED for implemented foundation | Real exact-file objective → HTTP execution → REPORTED result → independent read → VERIFIED evidence/task/artifact. Direct filesystem inspection confirmed exact bytes. Fake executor → missing file → FAILED. SQLite restart, cancellation, bounded retries, scope and deduplication tested. |
+| 02 — TypeSafe Jev | VERIFIED for implemented foundation | All nine routes are typed and tested; arithmetic/file intents avoid a model. Missing live-source, memory, specialist and Worker capabilities block. Conservative grammar, not general language understanding. |
+| 03 — Transport / Catalog / Grid | VERIFIED reference foundation; broader deployment PARTIAL | Authenticated loopback HTTP, scopes, replay rejection, correlated result/control/progress, five availability levels, disconnect/reconnect and durable lease expiry verified. Shared-store reference nodes; public TLS/outbound rendezvous and physical embodiments remain unverified. |
+| 04 — Adaptive Model Router | VERIFIED hosted/routing foundation; broader integrations PARTIAL | Four hosted providers, 11 working real slots, all requested live modes/pins, credential failover, cross-provider recovery and actual rate-limit reranking verified. Real quota counters were not exposed. Local runtime integrations, ChatGPT product surfaces and model benchmarks remain later work. |
 
 ## Architecture and changed modules
 
-There are no Latch/SwitchRoute runtime dependencies and no Kafka/Redis/Kubernetes stack. Python 3.12 and SQLite provide the native foundation without third-party runtime dependencies.
+The implementation remains the native Python 3.12/SQLite foundation, without Latch/SwitchRoute runtime dependencies or a new service stack.
 
-| Responsibility | Files |
+| Responsibility | Existing implementation |
 |---|---|
-| Typed domain / wire / epistemic states | [contracts.py](../oscar/contracts.py) |
+| Typed wire/domain/epistemic contracts | [contracts.py](../oscar/contracts.py) |
 | Durable task, ledger, replay and idempotency authority | [storage.py](../oscar/storage.py) |
-| Objective planning, execution lifecycle and verification handoff | [runtime.py](../oscar/runtime.py) |
-| Deterministic scoped executors and independent verifier | [capabilities.py](../oscar/capabilities.py) |
-| Fast typed path decisions | [jev.py](../oscar/jev.py) |
-| Node identity, pairing/scope, health, availability, leases and revocation | [grid.py](../oscar/grid.py) |
-| Target-side dispatch and real loopback HTTP reference transport/control | [transport.py](../oscar/transport.py) |
-| Model/task/policy contracts and replaceable metadata | [models.py](../oscar/models.py), [registry.py](../oscar/registry.py), [development-models.json](../config/development-models.json), [local-template.json](../config/local-template.json) |
-| Opaque credential material and independent slot metadata | [credentials.py](../oscar/credentials.py) |
-| Adaptive mode ranking, reservation, fallback and content-free history | [router.py](../oscar/router.py) |
-| Native OpenAI-compatible, Google and Ollama adapters / redirect security | [providers.py](../oscar/providers.py), [http_client.py](../oscar/http_client.py) |
-| Composition and manual developer commands | [harness.py](../oscar/harness.py), [cli.py](../oscar/cli.py), [pyproject.toml](../pyproject.toml) |
-| Contract/failure/real-loopback verification and CI | [tests](../tests/), [repository checker](../scripts/check_repository.py), [Brain checks](../.github/workflows/brain-checks.yml) |
+| Objective execution and independent verification | [runtime.py](../oscar/runtime.py), [capabilities.py](../oscar/capabilities.py) |
+| Typed execution-class decisions | [jev.py](../oscar/jev.py) |
+| Identity, scopes, capabilities, health, availability, leases and revocation | [grid.py](../oscar/grid.py), [transport.py](../oscar/transport.py) |
+| Replaceable model/provider metadata and opaque credential pools | [models.py](../oscar/models.py), [registry.py](../oscar/registry.py), [credentials.py](../oscar/credentials.py) |
+| Adaptive routing, fallback and content-free history | [router.py](../oscar/router.py) |
+| OpenAI-compatible, Google and Ollama HTTPS adapters | [providers.py](../oscar/providers.py), [http_client.py](../oscar/http_client.py) |
+| Composition and developer commands | [harness.py](../oscar/harness.py), [cli.py](../oscar/cli.py) |
 
-README, ROADMAP, BUILD-GATES, MODEL-ROUTING, NATIVE-INFRASTRUCTURE, ADR-059, DEVELOPMENT and CHANGELOG now describe this checkpoint.
+Verification additions: [live suite](../scripts/verify_club_a_live.py), [refreshed development manifest](../config/development-models.json), and [safe live evidence](evidence/club-a-live-2026-10-02.json). Existing runtime modules are unchanged.
 
 ## Automated results
 
-**113 tests passed**, covering all 28 requested matrix cases. Ruff lint/format checks and strict mypy checks pass. Offline repository required-file, local Markdown-link, removed-reference and secret-safety checks pass. External link checking and GitHub Actions were not run here.
+After live integrations, **all 113 tests passed**. Ruff lint passed; formatting passed for all 27 Python files. Strict mypy passed for all 18 checked source files, including the live verification script. Repository required-file, local Markdown-link, removed-reference, whitespace and secret-safety checks pass. GitHub Actions and external URL checks were not run here.
 
-| Matrix cases | Proof |
-|---|---|
-| 1–4 | Exact-file core flow; mandatory missing-file fake-success rejection; deterministic addition; all typed Jev classes/routes. |
-| 5–8 | Value-silent credential presence; 17 independent masked slots; invalid/rate-limited key failover; bounded cross-provider reranking. |
-| 9–17 | Explainable Auto; Free First capability/quality floor and scarcity preservation; hard-task escalation; Fast/Balanced/Heavy; Local/Private restrictions; Manual pins and Specialist affinity. |
-| 18–20 | Unknown/stale quota and unknown price retain uncertainty; replaceable six-model Ollama metadata; history contains route/timing/fallback but no prompt/response/key material. |
-| 21–24 | Reference advertisement, durable objective/task across disconnect/restart, dead lease expiry, blocked/reclaimable state instead of false Working/Done. |
-| 25–28 | Provider/executor success stays REPORTED; model objectives without a verifier are partial; independent outcome learning is separate; interrupted streaming never splices; cooperative cancellation and authenticated HTTP cancel; idempotency/replay/crash ambiguity guards; concurrent runners and stale leases cannot alter newer ownership. |
+The live suite separately passed **162 checks**. These are explicit live/runtime assertions, not an inflated unit-test count. All ordinary tests remain offline or explicitly synthetic loopback tests; hosted traffic requires the live flag.
 
-The provider contract tests execute actual HTTP requests against explicitly synthetic loopback servers for all three adapter protocols, structured output, SSE/NDJSON, 401/429/503, policy denial, redirects and malformed/empty 200 responses. End-to-end router HTTP tests prove credential failover and cross-provider fallback. These are **fault-injection/reference proofs, not hosted-provider integrations**.
+## Real hosted evidence
 
-## Real hosted operations
+The environment's readiness tool reports UNKNOWN variable/policy readiness, so readiness was not assumed from configuration. The actual HTTPS responses establish operation-level access. Inherited proxy, CA trust and TLS verification were preserved. All 17 configured slots were present; neither presence nor a public model listing proves credential validity.
 
-All **17 expected credential variables were present** in the safe presence check. Presence does not prove validity, account capacity or provider access. Credential values, lengths, prefixes, suffixes and hashes were never printed.
+The [original blocked evidence](evidence/club-a-hosted-2026-10-02.json) is retained as history. The [new live record](evidence/club-a-live-2026-10-02.json) supersedes its hosted-verification status.
 
-The [safe hosted evidence record](evidence/club-a-hosted-2026-10-02.json) records these actual attempts:
+| Provider | Returned inventory page | Real generation / masked slots | Outcome |
+|---|---:|---|---|
+| Groq | HTTP 403 for all four slots | `llama-3.1-8b-instant`; `groq-1` through `groq-4` | UNAVAILABLE: HTTP 403 access rejection. The adapter categorizes it as `credential_failure`; the evidence does not establish whether the cause is the key, account or service access policy. No Groq success claimed. |
+| OpenRouter | 464 models per tested slot | `liquid/lfm-2.5-2.6b:free`; `openrouter-1` through `openrouter-4` | VERIFIED generation contract: four HTTP 200 responses independently matched. The live model listing advertises zero prompt/completion pricing; no remaining account quota is inferred. |
+| Google AI Studio | 50 models on the returned page per slot | `gemini-3.1-flash-lite`; `google-1` through `google-3` | VERIFIED generation contract: three slots matched. Initial `google-3` HTTP 503 was transient; the subsequent bounded probe succeeded. Listing count is not a complete paginated inventory claim. |
+| Ollama Cloud | 17 models per tested slot | `gemma4:31b`; `ollama-cloud-1`, `ollama-cloud-2`; Heavy Duty additionally used `nemotron-3-ultra` | VERIFIED generation contracts and Heavy Duty routing. No remaining credit/request balance is inferred. |
+| NVIDIA NIM | 81 models per tested slot | `nvidia/nemotron-3-super-120b-a12b`; `nvidia-1`, `nvidia-2` | VERIFIED generation contract for both slots with bounded 512-token probes. Funding/price remain UNKNOWN; only this explicit diagnostic policy allowed unknown cost. |
+| Z.ai | 11 models per tested slot | `glm-4.5-air`; `zai-1`, `zai-2` | UNAVAILABLE: actual HTTP 429. Exact quota/balance and the distinction between temporary rate limiting and account capacity are not exposed by the retained categorical evidence. No Z.ai generation success claimed. |
 
-| Provider | Operation / configured model attempted | Masked slot | Required HTTPS hostname | Outcome |
-|---|---|---|---|---|
-| GroqCloud | Generation POST; `llama-3.1-8b-instant` | `groq-1` | `api.groq.com` | BLOCKED |
-| OpenRouter | Generation POST; `meta-llama/llama-3.3-70b-instruct:free` | `openrouter-1` | `openrouter.ai` | BLOCKED |
-| Google AI Studio | Generation POST; `gemini-2.5-flash-lite` | `google-1` | `generativelanguage.googleapis.com` | BLOCKED |
-| Ollama Cloud | Generation POST; `gemma3:31b` | `ollama-cloud-1` | `ollama.com` | BLOCKED |
-| NVIDIA NIM | Read-only model inventory GET; no generation/model called | `nvidia-1` | `integrate.api.nvidia.com` | BLOCKED |
-| Z.ai | Read-only model inventory GET; no generation/model called | `zai-1` | `api.z.ai` | BLOCKED |
+The refreshed manifest replaces unavailable seeded OpenRouter/NVIDIA models, the Google model that returned 404 for generation, and `gemma3:31b` with observed alternatives. Inventory inclusion alone was insufficient: an advertised NVIDIA Mistral model also returned 404. Quality tiers/context/output limits remain conservative configuration, not benchmarks. `last_verified` is not promoted into a model-quality claim.
 
-**No hosted model was successfully called. No provider HTTP success, live credential failover or live quota/quality adaptation is verified.** The proxy denied access before a provider response. NVIDIA/Z.ai generation was also excluded because its funding/price was unknown under the default no-paid policy. The relevant discovery denial was rechecked after correcting discovery error classification.
+An initial NVIDIA 128-token probe and a separate small-budget OpenRouter reasoning probe returned HTTP 200 without usable answer text. OSCAR correctly rejected both as `capability_mismatch` rather than claiming success. Suitable bounded diagnostics then succeeded. The failed reasoning task remained FAILED; its replacement used Google with a 256-token budget and remained PARTIALLY_VERIFIED without a verifier.
 
-Required environment change: allow HTTPS egress to the six listed hostnames through the supported environment configuration workflow, preserving inherited proxy/CA/TLS settings. Credential readiness should then be rechecked. No network controls were bypassed or changed.
+NVIDIA/Z.ai diagnostic allowances are opt-in, per-test, and bounded. They do not change default no-paid routing or classify unknown funding as free. No account was deliberately exhausted to manufacture a limit.
 
-## Routing and fallback observations
+## Requested verification matrix
 
-Observed in explicit synthetic contract fixtures:
+| # | Requirement | Actual evidence / scope |
+|---:|---|---|
+| 1 | Multiple real provider requests | OpenRouter, Google, Ollama Cloud and NVIDIA NIM returned usable HTTP 200 generations that independently matched the expected response. |
+| 2 | Provider/model inventory | All six providers were queried across their configured slots. Five returned model pages; Groq rejected access. Listings are not credential/capacity guarantees. |
+| 3 | Multiple credential slots | Four OpenRouter, three Google, two NVIDIA and two Ollama slots independently succeeded. Separate slot metadata does not prove separate billing/quota pools. |
+| 4 | Credential failover | A deliberately invalid **test** slot `openrouter-0-invalid-fixture` was rejected by the real endpoint with HTTP 401; `openrouter-1` then returned a matching HTTP 200 in attempt 2. No real credential was corrupted. |
+| 5 | Bounded cross-provider fallback | Actual Groq HTTP 403 → OpenRouter HTTP 200 in two attempts. A separate one-attempt policy stopped after Groq rejection and made no alternate call. |
+| 6 | Auto | After actual slot-health observations, Auto selected OpenRouter and matched the response. |
+| 7 | Free First | Selected the available configured free OpenRouter route and matched; unknown-cost NVIDIA/Z.ai remained outside the default policy. |
+| 8 | Scarcity-aware routing | Equal-tier Google/Ollama candidates changed order when explicitly synthetic 2/500 request balances were reversed. The selected Ollama HTTPS call succeeded. These numbers are **test fixtures, not provider quota**. Separately, copied actual Z.ai HTTP 429 cooldown evidence changed a Heavy diagnostic route to OpenRouter, whose real call succeeded. Real numerical quota calibration remains UNVERIFIED. |
+| 9 | Fast | Selected OpenRouter using the existing quality floor and observed latency/reliability ranking; real generation matched. This is not a claim that it is globally the fastest model. |
+| 10 | Heavy Duty | Quality floor 4 selected the strongest eligible configured tier, Ollama `nemotron-3-ultra`; real generation matched. Model power tiers remain declared metadata. |
+| 11 | Manual pins | All 11 successful slot probes used explicit provider/model/slot pins. The real invalid-slot failover retained the provider/model pin. Policy-bypass rejection remains covered by contract tests. |
+| 12 | Unknown quota | Successful hosted responses exposed no request/token quota headers. Remaining request/token counters stayed null in real slot state and history. Actual usage tokens are separate from remaining quota. |
+| 13 | Secret/content-free history | All live stores' serialized route history was checked against credential material, the sent prompts and response contents. No matches. Only masked IDs, route/usage/timing/failure/verification metadata persist. |
+| 14 | Reported until verified | Every usable routed response was REPORTED and objective verification was null before independent comparison. Comparison evidence verified only the generation contract. A real Google reasoning objective stayed PARTIALLY_VERIFIED with a REPORTED result and unknown objective match. |
+| 15 | Local refuses silent fallback | The live router produced `route_unavailable` with zero HTTP calls. The actual Local CLI returned exit 2, task BLOCKED and zero route-history entries. |
 
-- Auto / Free First extraction selected `plentiful / small / plentiful-1`: required capability and quality tier 2 satisfied, known remaining requests 1000, low fixture latency; the stronger route had only 2 remaining requests.
-- A difficult reasoning task requiring quality tier 4 selected `scarce / strong / scarce-1`; the small tier-2 model was ineligible. Heavy Duty selected the strongest eligible tier; Specialist prioritized task affinity.
-- An invalid or rate-limited `plentiful-1` failed over to `plentiful-2`. A provider failure reranked to `scarce / strong`; retries were bounded. The same provider/slot policy and actual HTTP adapters were also exercised against the reference servers.
-- Unknown quota remained null. Old balances became unknown after reset/staleness or successful consumption without a fresh header. Unknown monetary cost was not treated as free. Known paid fallback cost budgets were cumulative.
-- Manual pins, Local/Private restrictions and cancellation remained authoritative during fallback. Interrupted meaningful streaming failed with provenance instead of appending another provider.
+## Core / Grid proofs and secret safety
 
-No synthetic remaining balances or latency figures above describe the real hosted accounts.
+The live script re-executed the authenticated HTTP exact-file proof, directly inspected the written bytes, rejected a deliberately lying executor, verified deterministic addition without model use, and observed real-time Grid lease expiry after disconnect while preserving the objective. The full 113-test suite verifies restart/reconnect, correlated evidence, scoped permissions, cancellation, replay/idempotency, bounded fallback, streaming integrity and stale ownership.
 
-## Manual proofs actually run
+Provider secrets were checked value-silently against tracked/non-ignored source/docs, the final patch, and ignored report/log/proof/SQLite artifacts. Common secret-like patterns were also checked. No credential values, prefixes, suffixes, hashes or provider error bodies are included in the evidence. The runtime never reads/writes `.env`.
 
-1. `python -m oscar --state .oscar/final-proof.sqlite proof` passed. A real loopback node wrote exact bytes. The verifier read them independently; the resulting artifact was also inspected directly from the filesystem. Result status remained REPORTED while evidence/task/artifact became VERIFIED. Artifact promotion is bound to the exact inspected resource; unrelated reported artifacts cannot inherit objective verification.
-2. The same command invoked a deliberate fake executor for a unique absent path. Its success claim stayed REPORTED; independent evidence reported the missing file and task state became FAILED.
-3. Deterministic `2 + 2` became VERIFIED using a separate decimal-column calculation; no model route history was created for it.
-4. `python -m oscar --state .oscar/final-grid.sqlite grid-proof` observed real-time lease expiry after disconnect. The objective remained present, the lease became inactive, and the task stayed BLOCKED. Reconnect/readvertisement/reclaim are separately covered by contract tests.
-5. `python -m oscar --state .oscar/final-local.sqlite reason 'reason about this architecture' --mode local` returned expected exit code 2 and BLOCKED / `route_unavailable`; it made no hosted fallback.
-6. `live-providers` attempted the operations listed above using environment credentials and saved categorical blocked results. Runtime SQLite/report artifacts were also scanned against credential material without printing it.
+## Remaining limitations and later acceptance
 
-These traces are retained locally under ignored `.oscar/`. Reference Grid roles do not establish the presence of a real phone, laptop or Edge device.
+- Public TLS/outbound rendezvous, configured public coordinator deployment, independent network-node stores/replication and production pairing UX remain unimplemented/unverified. The reference target shares SQLite and is loopback-only. Later Grid integration must supply its own configured-target acceptance scenario.
+- Real quota/credit/reset/usage-velocity forecasting needs provider-exposed counters. The existing scarcity heuristic uses confirmed request balances; absent/stale balances remain unknown. No provider balance or model-quality benchmark was invented.
+- Groq access and Z.ai rate/account capacity need provider-side resolution. They do not invalidate verified behavior of available routes. UNKNOWN NVIDIA/Z.ai costs remain excluded by default.
+- Jev is a conservative grammar. The POSIX verifier proves exact bytes/addition, not arbitrary objectives or Windows behavior. Unsupported verification remains partial/unknown; no automatic file compensation is advertised.
+- Cancellation is cooperative; provider reads are bounded and cannot undo committed effects. Crash-ambiguous actions require inspection/reconciliation. Reference transport/control acknowledgements remain REPORTED.
+- Local Ollama/LM Studio/vLLM instances, the user's machines/LAN, actual Sunday/Edge hardware, remote wake, Workers, memory, communications and UI are unverified or later slices. No Slice 05 work is included.
 
-## Secret safety and repository state
+## Reproduce the review
 
-- No `.env` was read or written by the runtime; the existing ignored file was left alone.
-- Provider material is held only in the opaque environment-backed pool. Slot persistence/route history contain metadata and masked IDs. Session handles are non-serializable; authentication token digests are stored only for generated Grid sessions, not provider keys.
-- Provider error bodies and exception diagnostics are excluded from persistent errors. Redirects are rejected. Response/stream secret redaction includes keys spanning chunks.
-- Actual credential material and common secret-like patterns were checked in tracked/non-ignored source and documentation. Ignored proof/report/SQLite files were separately scanned. No credential material was found in those artifacts.
-- Work is local on branch `work`. No commit or push was made; GitHub/main was not changed.
-
-## Limits and technical debt
-
-- Public coordinator deployment, encrypted Internet transport, outbound private-node rendezvous, independent network-node state replication and a production pairing UX remain unverified/unimplemented. The HTTP reference target shares SQLite with the coordinator and is loopback-only.
-- The POSIX file verifier proves exact bytes, not every possible objective. Unsupported verifiers remain partial/unknown. No automatic compensation/undo is advertised for overwritten files.
-- Jev uses a conservative grammar; typed callers supply model task class and quality floor. Initial model quality/context/funding metadata needs live calibration and benchmarks. No hosted result establishes task quality yet.
-- Scarcity is a small confirmed-request-quota heuristic, not complete credit/reset/usage-velocity forecasting. Telemetry/session/nonce retention and large-history indexing require later work.
-- Cancellation is cooperative and cannot undo committed effects. Blocking provider I/O may complete a bounded read before noticing cancellation. Reference cancellation acknowledgements are REPORTED. Crash-ambiguous actions require explicit inspection/reconciliation before replay. Retry/reconnect scheduling is exposed as bounded foundations, not an autonomous distributed scheduler.
-- Local Ollama/LM Studio/vLLM interfaces are configured only by explicit manifests and disabled in the template. The user's laptop/LAN, Windows runtime, ESP32/Pico, Wake-on-LAN and actual Sunday mobile runtime are unavailable here and remain UNVERIFIED.
-- Coding Workers, memory, communication, hardware safety implementations, UI and ChatGPT product-surface connectors were not started in Club A.
-
-## Exact Gate A review commands
-
-Run from the repository root; provision credentials through the environment without displaying them:
+From the repository root, provision credentials through the environment without displaying them:
 
 ```sh
 python -m pip install '.[dev]'
+python -m scripts.verify_club_a_live --run-live --allow-unknown-cost-diagnostics --report .oscar/live-review.json
+python -m unittest discover -s tests -t . -v
 python -m ruff check oscar tests scripts
 python -m ruff format --check oscar tests scripts
-python -m mypy oscar
-python -m unittest discover -s tests -t . -v
+python -m mypy oscar scripts/verify_club_a_live.py
 python -m scripts.check_repository
 python -m oscar proof
 python -m oscar grid-proof
-python -m oscar ask 'what is 2 + 2?'
-python -m oscar write --path gate-a/review.txt --content 'Gate A exact bytes' --http-reference
-python -m oscar reason 'reason about this architecture' --mode local
-python -m oscar credentials
-python -m oscar routes --mode auto
-python -m oscar routes --mode fast
-python -m oscar routes --mode balanced
-python -m oscar routes --mode heavy --quality 4
-python -m oscar routes --mode free_first
-python -m oscar routes --mode manual --provider groq --model llama-3.1-8b-instant --slot groq-1
-python -m oscar history
+python -m oscar reason 'reason about a small architecture tradeoff' --mode local
 ```
 
-The Local reasoning command should exit **2** with BLOCKED, and never call cloud. Inspect the `proof`/`grid-proof` output and authoritative files/SQLite records, not just command exit codes. Use `python -m oscar inspect TASK_ID`, `cancel TASK_ID`, and `resume TASK_ID` with IDs returned by the commands; completed/ambiguous tasks must not replay consequential work.
+The explicit unknown-cost flag permits only bounded NVIDIA/Z.ai diagnostics; omit it to retain default no-paid discovery-only behavior for those providers. Live outcomes may change with provider/account capacity. The script distinguishes provider UNAVAILABLE operations from failed runtime assertions, retains fresh isolated diagnostic state under ignored `.oscar/`, and reports only safe metadata. Local reasoning should exit **2** and remain BLOCKED. Inspect authoritative task/evidence/files and the live report; API success alone is not objective completion.
 
-After the egress policy permits the hostnames and current model/funding metadata is reviewed:
-
-```sh
-python -m oscar --state .oscar/live-review.sqlite live-providers --report .oscar/live-review.json
-python -m oscar --state .oscar/live-review.sqlite history
-python -m oscar reason 'reason about a small architecture tradeoff' --mode free_first --quality 2
-```
-
-Use a fresh diagnostic state path for a new live review so a prior temporary circuit does not obscure the test. The live harness independently compares a sentinel response; even a match verifies only the generation contract. General reasoning objectives remain partially verified without an independent objective check. Real credential/provider failover must be exercised only through an explicitly authorized scenario; do not exhaust accounts to manufacture rate limits. A public coordinator deployment still needs its own configured-target acceptance scenario before Gate A can pass.
+**Repository delivery:** commit and push this verification continuation to `work`, then stop for manual review. The final pushed SHA is reported separately; no deployment or Slice 05 advancement is authorized by this checkpoint.

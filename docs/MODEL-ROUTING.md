@@ -211,16 +211,16 @@ Development rules:
 
 ## Current Ollama Cloud free-credit model metadata
 
-For the current developer account, free usage credits are available for these Ollama Cloud models:
+The developer manifest retains the user-declared free pool and selects these models from the inventory observed on 2026-10-02. Listing/generation evidence does not expose remaining credits or confirm billing terms:
 
-- `gemma3:31b`
+- `gemma4:31b`
 - `gpt-oss:120b`
 - `gpt-oss:20b`
 - `nemotron-3-nano:30b`
 - `nemotron-3-super`
 - `nemotron-3-ultra`
 
-Treat this list as current runtime/development metadata supplied by the user, **not** a permanent hard-coded allowlist. Provider discovery/configuration should be able to replace or extend it when Ollama Cloud changes the account's available models.
+Treat this list as replaceable runtime/development metadata, **not** a permanent hard-coded allowlist. `gemma4:31b` replaces the unavailable original `gemma3:31b` seed. Provider discovery/configuration can replace or extend it without redesigning OSCAR.
 
 ## Routing modes
 
@@ -568,7 +568,7 @@ See also [NATIVE-INFRASTRUCTURE.md](NATIVE-INFRASTRUCTURE.md), [RUNTIME-FOUNDATI
 
 `oscar/router.py` filters required capability/quality/context/output budgets, policy, credential availability and cooldown before ranking. Auto/Free First prefer eligible configured free/subscription/local routes; sufficient smaller models and known plentiful quota can preserve stronger scarce routes. Heavy Duty prioritizes eligible strength, Specialist task affinity, Fast latency, Balanced the combined evidence, and Cheap known monetary cost. Manual pins never expand privacy/cost/availability policy; Local never silently chooses cloud.
 
-`config/development-models.json` is replaceable developer metadata, including the six user-supplied Ollama Cloud models. Initial quality/context figures are conservative configuration, not observed benchmarks. Funding declarations for the initial free pools do not establish remaining quota or credential validity. NVIDIA/Z.ai funding remains unknown; the live harness performs read-only model discovery until cost policy is configured. `config/local-template.json` contains disabled Ollama/LM Studio/vLLM interfaces with no assumed model inventory.
+`config/development-models.json` is replaceable developer metadata. Four stale entries were refreshed from 2026-10-02 live inventory/generation evidence, including Ollama `gemma4:31b`; the original six-model seed is not a permanent provider boundary. Quality/context figures remain conservative configuration, not observed benchmarks. Funding declarations do not establish remaining quota or credential validity. NVIDIA/Z.ai funding remains unknown and default routing excludes it. The opt-in verification script can explicitly allow bounded unknown-cost diagnostics; the ordinary live CLI retains discovery-only behavior for those providers. `config/local-template.json` contains disabled Ollama/LM Studio/vLLM interfaces with no assumed model inventory.
 
 OpenAI-compatible, Google generateContent and Ollama chat adapters are in `oscar/providers.py`. Supported request paths currently cover text, JSON structured output and streaming; images/audio/tool execution are not implemented. Additional OpenAI-compatible providers can be configured by manifest; a genuinely different protocol requires a new adapter. ChatGPT product-surface connectors remain pending.
 
@@ -576,4 +576,4 @@ Credential state is separate from secrets. The environment is the sole credentia
 
 Observed request/token headers can establish quota; absent/stale balances remain unknown, including after consumption without a fresh header. Scarcity currently uses confirmed remaining requests, with explicit pressure for unknown capacity; full credit/reset/consumption forecasting is future work. No quota percentages or current model benchmarks are invented. Paid routing is off by default; known-price fallback budgets are cumulative, while unknown-price routing requires a separate explicit allowance.
 
-The automated and real loopback contracts are verified; **hosted integrations remain BLOCKED by environment network policy**. See [CLUB-A-CHECKPOINT.md](CLUB-A-CHECKPOINT.md) for exact attempted operations, models and masked slots. Live credential failover, hosted quota adaptation and hosted objective quality remain unverified.
+The automated/loopback contracts and implemented hosted foundation are verified. Real OpenRouter, Google AI Studio, Ollama Cloud and NVIDIA NIM generations succeeded across 11 slots. Credential failover, bounded cross-provider recovery, actual rate-limit reranking, Auto/Free First/Fast/Balanced/Heavy Duty and Manual pins have live evidence. Groq returned HTTP 403 and Z.ai HTTP 429; those operations remain unavailable. All successful response quota counters remained unknown. Numerical scarcity counterfactuals use labeled fixtures with real HTTPS execution, not invented provider balances. General model quality and real quota forecasting remain unverified. See [CLUB-A-CHECKPOINT.md](CLUB-A-CHECKPOINT.md).
