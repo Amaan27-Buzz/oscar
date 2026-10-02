@@ -111,9 +111,10 @@ Exit: OSCAR discovers/invokes a capability on another node and survives node dis
 ## Slice 04 — Native Model Router + cloud intelligence 🚧
 
 **Checkpoint: corrected architecture and focused routing verified; final search
-acceptance BLOCKED.** Current discovered routing resolves the previous automatic-mode
+acceptance PARTIAL.** Current discovered routing resolves the previous automatic-mode
 gap without paid/UNKNOWN funding fallback. The bounded Tavily adapter is implemented
-and tested, but all three live credentials remain absent in this execution environment.
+and tested; all three slots now authenticate and real failover passes. Title provenance
+and relevant official access-constraint coverage remain incomplete.
 Gate A remains PARTIAL for real combined-search acceptance. The canonical
 [checkpoint](CLUB-A-CHECKPOINT.md) preserves the earlier 69/72 result and all historical
 provider evidence.
@@ -135,7 +136,8 @@ Deliverables:
 - model output remains reported/inferred until verified where required.
 
 **Manual milestone:** Gate A — Brain **PARTIAL: real Tavily search
-acceptance blocked by missing credentials**. Core/reference Grid proofs remain
+acceptance incomplete for title provenance and relevant official constraints**.
+Core/reference Grid proofs remain
 verified; public deployment remains later integration work. **Stop here.
 Slice 05 has not started.**
 
@@ -148,15 +150,15 @@ freshness-aware Jev, sourced per-slot inventories, explicit retirement conflicts
 persistent observations and account-product/shared-quota pools. The manifest is a
 bootstrap/fallback seed, and missing current evidence blocks rather than guessing.
 Native inventory retrieval was exercised with zero generation calls; broader
-public-web acceptance remains blocked until real Tavily credentials are available.
+public-web acceptance remains PARTIAL for title provenance and relevant official constraints.
 See [SEARCH-FRESHNESS.md](SEARCH-FRESHNESS.md).
 
 Remaining search acceptance:
 
-- retain the three Tavily placeholders and the implemented, offline-tested adapter;
-  keys are absent and actual live Tavily remains UNVERIFIED;
-- combine native inventory with current official source retrieval, reconcile
-  contradictions and synthesize an evidence-qualified answer;
+- preserve the implemented adapter and 3/3 authenticated live slots;
+  complete title provenance and relevant official access-constraint coverage;
+- complete official constraints for the combined objective; the first real native +
+  Tavily run already preserved conflicts and returned an evidence-qualified partial answer;
 - retain source/time/scope and REPORTED/UNKNOWN limits through that full flow.
 
 First acceptance objective:

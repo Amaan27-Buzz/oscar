@@ -1,0 +1,1005 @@
+{
+  "recorded_at": "2026-10-02T21:32:26.810623+00:00",
+  "objective": "What are the currently supported models and relevant free/developer access constraints for OSCAR's configured intelligence providers right now?",
+  "scope": "Final Gate A freshness/search; no model-generation matrix or Slice 05",
+  "acceptance": "PARTIAL",
+  "decision": {
+    "route": "world",
+    "execution_class": "retrieval_live_source",
+    "capability_kind": "live_source",
+    "reason": "current-state claim requires authoritative live retrieval before reasoning",
+    "latency_ms": 0.2575529999973014,
+    "repair": "block if capability unavailable",
+    "freshness": "freshness_sensitive"
+  },
+  "task_state": "partially_verified",
+  "tavily_slots": [
+    {
+      "slot": "tavily-1",
+      "present": true,
+      "status": "OBSERVED",
+      "sources": [
+        {
+          "identity": "https://console.groq.com/docs/models",
+          "authority": "official_docs",
+          "scope": "provider",
+          "observed_at": 1790976724.0461893,
+          "ttl_seconds": 300,
+          "refreshable": true,
+          "published_at": null
+        }
+      ]
+    },
+    {
+      "slot": "tavily-2",
+      "present": true,
+      "status": "OBSERVED",
+      "sources": [
+        {
+          "identity": "https://console.groq.com/docs/models",
+          "authority": "official_docs",
+          "scope": "provider",
+          "observed_at": 1790976724.664859,
+          "ttl_seconds": 300,
+          "refreshable": true,
+          "published_at": null
+        }
+      ]
+    },
+    {
+      "slot": "tavily-3",
+      "present": true,
+      "status": "OBSERVED",
+      "sources": [
+        {
+          "identity": "https://console.groq.com/docs/models",
+          "authority": "official_docs",
+          "scope": "provider",
+          "observed_at": 1790976725.2683077,
+          "ttl_seconds": 300,
+          "refreshable": true,
+          "published_at": null
+        }
+      ]
+    }
+  ],
+  "search_observations": [
+    {
+      "slot": "tavily-1",
+      "quota_pool": "tavily/search-account-unknown",
+      "endpoint": "https://api.tavily.com/search",
+      "observed_at": 1790976721.3494422,
+      "search_depth": "basic",
+      "max_results": 1,
+      "credits": 1,
+      "status": "REPORTED",
+      "http_status": 200,
+      "rate_limits": {
+        "request_limit": null,
+        "token_limit": null,
+        "remaining_requests": null,
+        "remaining_tokens": null,
+        "requests_reset_at": null,
+        "tokens_reset_at": null,
+        "retry_after": null,
+        "request_window": "UNKNOWN",
+        "token_window": "UNKNOWN",
+        "source": "response headers",
+        "request_reset_hint": null
+      },
+      "retained_sources": 1,
+      "omitted_sources": 0,
+      "official_pages": 1,
+      "page_failures": 0
+    },
+    {
+      "slot": "tavily-2",
+      "quota_pool": "tavily/search-account-unknown",
+      "endpoint": "https://api.tavily.com/search",
+      "observed_at": 1790976724.0478172,
+      "search_depth": "basic",
+      "max_results": 1,
+      "credits": 1,
+      "status": "REPORTED",
+      "http_status": 200,
+      "rate_limits": {
+        "request_limit": null,
+        "token_limit": null,
+        "remaining_requests": null,
+        "remaining_tokens": null,
+        "requests_reset_at": null,
+        "tokens_reset_at": null,
+        "retry_after": null,
+        "request_window": "UNKNOWN",
+        "token_window": "UNKNOWN",
+        "source": "response headers",
+        "request_reset_hint": null
+      },
+      "retained_sources": 1,
+      "omitted_sources": 0,
+      "official_pages": 1,
+      "page_failures": 0
+    },
+    {
+      "slot": "tavily-3",
+      "quota_pool": "tavily/search-account-unknown",
+      "endpoint": "https://api.tavily.com/search",
+      "observed_at": 1790976724.6665254,
+      "search_depth": "basic",
+      "max_results": 1,
+      "credits": 1,
+      "status": "REPORTED",
+      "http_status": 200,
+      "rate_limits": {
+        "request_limit": null,
+        "token_limit": null,
+        "remaining_requests": null,
+        "remaining_tokens": null,
+        "requests_reset_at": null,
+        "tokens_reset_at": null,
+        "retry_after": null,
+        "request_window": "UNKNOWN",
+        "token_window": "UNKNOWN",
+        "source": "response headers",
+        "request_reset_hint": null
+      },
+      "retained_sources": 1,
+      "omitted_sources": 0,
+      "official_pages": 1,
+      "page_failures": 0
+    },
+    {
+      "slot": "tavily-1",
+      "quota_pool": "tavily/search-account-unknown",
+      "endpoint": "https://api.tavily.com/search",
+      "observed_at": 1790976727.5179377,
+      "search_depth": "basic",
+      "max_results": 1,
+      "credits": 1,
+      "status": "REPORTED",
+      "http_status": 200,
+      "rate_limits": {
+        "request_limit": null,
+        "token_limit": null,
+        "remaining_requests": null,
+        "remaining_tokens": null,
+        "requests_reset_at": null,
+        "tokens_reset_at": null,
+        "retry_after": null,
+        "request_window": "UNKNOWN",
+        "token_window": "UNKNOWN",
+        "source": "response headers",
+        "request_reset_hint": null
+      },
+      "retained_sources": 1,
+      "omitted_sources": 0,
+      "official_pages": 1,
+      "page_failures": 0
+    },
+    {
+      "slot": "tavily-2",
+      "quota_pool": "tavily/search-account-unknown",
+      "endpoint": "https://api.tavily.com/search",
+      "observed_at": 1790976730.4911592,
+      "search_depth": "basic",
+      "max_results": 1,
+      "credits": 1,
+      "status": "REPORTED",
+      "http_status": 200,
+      "rate_limits": {
+        "request_limit": null,
+        "token_limit": null,
+        "remaining_requests": null,
+        "remaining_tokens": null,
+        "requests_reset_at": null,
+        "tokens_reset_at": null,
+        "retry_after": null,
+        "request_window": "UNKNOWN",
+        "token_window": "UNKNOWN",
+        "source": "response headers",
+        "request_reset_hint": null
+      },
+      "retained_sources": 1,
+      "omitted_sources": 0,
+      "official_pages": 1,
+      "page_failures": 0
+    },
+    {
+      "slot": "tavily-3",
+      "quota_pool": "tavily/search-account-unknown",
+      "endpoint": "https://api.tavily.com/search",
+      "observed_at": 1790976735.267061,
+      "search_depth": "basic",
+      "max_results": 1,
+      "credits": 1,
+      "status": "REPORTED",
+      "http_status": 200,
+      "rate_limits": {
+        "request_limit": null,
+        "token_limit": null,
+        "remaining_requests": null,
+        "remaining_tokens": null,
+        "requests_reset_at": null,
+        "tokens_reset_at": null,
+        "retry_after": null,
+        "request_window": "UNKNOWN",
+        "token_window": "UNKNOWN",
+        "source": "response headers",
+        "request_reset_hint": null
+      },
+      "retained_sources": 0,
+      "omitted_sources": 1,
+      "official_pages": 0,
+      "page_failures": 0
+    },
+    {
+      "slot": "tavily-1",
+      "quota_pool": "tavily/search-account-unknown",
+      "endpoint": "https://api.tavily.com/search",
+      "observed_at": 1790976737.725297,
+      "search_depth": "basic",
+      "max_results": 1,
+      "credits": 1,
+      "status": "REPORTED",
+      "http_status": 200,
+      "rate_limits": {
+        "request_limit": null,
+        "token_limit": null,
+        "remaining_requests": null,
+        "remaining_tokens": null,
+        "requests_reset_at": null,
+        "tokens_reset_at": null,
+        "retry_after": null,
+        "request_window": "UNKNOWN",
+        "token_window": "UNKNOWN",
+        "source": "response headers",
+        "request_reset_hint": null
+      },
+      "retained_sources": 0,
+      "omitted_sources": 0,
+      "official_pages": 0,
+      "page_failures": 0
+    },
+    {
+      "slot": "tavily-2",
+      "quota_pool": "tavily/search-account-unknown",
+      "endpoint": "https://api.tavily.com/search",
+      "observed_at": 1790976742.008393,
+      "search_depth": "basic",
+      "max_results": 1,
+      "credits": 1,
+      "status": "REPORTED",
+      "http_status": 200,
+      "rate_limits": {
+        "request_limit": null,
+        "token_limit": null,
+        "remaining_requests": null,
+        "remaining_tokens": null,
+        "requests_reset_at": null,
+        "tokens_reset_at": null,
+        "retry_after": null,
+        "request_window": "UNKNOWN",
+        "token_window": "UNKNOWN",
+        "source": "response headers",
+        "request_reset_hint": null
+      },
+      "retained_sources": 0,
+      "omitted_sources": 1,
+      "official_pages": 0,
+      "page_failures": 0
+    },
+    {
+      "slot": "tavily-3",
+      "quota_pool": "tavily/search-account-unknown",
+      "endpoint": "https://api.tavily.com/search",
+      "observed_at": 1790976744.7253566,
+      "search_depth": "basic",
+      "max_results": 1,
+      "credits": 1,
+      "status": "REPORTED",
+      "http_status": 200,
+      "rate_limits": {
+        "request_limit": null,
+        "token_limit": null,
+        "remaining_requests": null,
+        "remaining_tokens": null,
+        "requests_reset_at": null,
+        "tokens_reset_at": null,
+        "retry_after": null,
+        "request_window": "UNKNOWN",
+        "token_window": "UNKNOWN",
+        "source": "response headers",
+        "request_reset_hint": null
+      },
+      "retained_sources": 0,
+      "omitted_sources": 1,
+      "official_pages": 0,
+      "page_failures": 0
+    }
+  ],
+  "slot_preflight_observations": [
+    {
+      "slot": "tavily-1",
+      "quota_pool": "tavily/search-account-unknown",
+      "endpoint": "https://api.tavily.com/search",
+      "observed_at": 1790976721.3494422,
+      "search_depth": "basic",
+      "max_results": 1,
+      "credits": 1,
+      "status": "REPORTED",
+      "http_status": 200,
+      "rate_limits": {
+        "request_limit": null,
+        "token_limit": null,
+        "remaining_requests": null,
+        "remaining_tokens": null,
+        "requests_reset_at": null,
+        "tokens_reset_at": null,
+        "retry_after": null,
+        "request_window": "UNKNOWN",
+        "token_window": "UNKNOWN",
+        "source": "response headers",
+        "request_reset_hint": null
+      },
+      "retained_sources": 1,
+      "omitted_sources": 0,
+      "official_pages": 1,
+      "page_failures": 0
+    },
+    {
+      "slot": "tavily-2",
+      "quota_pool": "tavily/search-account-unknown",
+      "endpoint": "https://api.tavily.com/search",
+      "observed_at": 1790976724.0478172,
+      "search_depth": "basic",
+      "max_results": 1,
+      "credits": 1,
+      "status": "REPORTED",
+      "http_status": 200,
+      "rate_limits": {
+        "request_limit": null,
+        "token_limit": null,
+        "remaining_requests": null,
+        "remaining_tokens": null,
+        "requests_reset_at": null,
+        "tokens_reset_at": null,
+        "retry_after": null,
+        "request_window": "UNKNOWN",
+        "token_window": "UNKNOWN",
+        "source": "response headers",
+        "request_reset_hint": null
+      },
+      "retained_sources": 1,
+      "omitted_sources": 0,
+      "official_pages": 1,
+      "page_failures": 0
+    },
+    {
+      "slot": "tavily-3",
+      "quota_pool": "tavily/search-account-unknown",
+      "endpoint": "https://api.tavily.com/search",
+      "observed_at": 1790976724.6665254,
+      "search_depth": "basic",
+      "max_results": 1,
+      "credits": 1,
+      "status": "REPORTED",
+      "http_status": 200,
+      "rate_limits": {
+        "request_limit": null,
+        "token_limit": null,
+        "remaining_requests": null,
+        "remaining_tokens": null,
+        "requests_reset_at": null,
+        "tokens_reset_at": null,
+        "retry_after": null,
+        "request_window": "UNKNOWN",
+        "token_window": "UNKNOWN",
+        "source": "response headers",
+        "request_reset_hint": null
+      },
+      "retained_sources": 1,
+      "omitted_sources": 0,
+      "official_pages": 1,
+      "page_failures": 0
+    }
+  ],
+  "objective_search_observations": [
+    {
+      "slot": "tavily-1",
+      "quota_pool": "tavily/search-account-unknown",
+      "endpoint": "https://api.tavily.com/search",
+      "observed_at": 1790976727.5179377,
+      "search_depth": "basic",
+      "max_results": 1,
+      "credits": 1,
+      "status": "REPORTED",
+      "http_status": 200,
+      "rate_limits": {
+        "request_limit": null,
+        "token_limit": null,
+        "remaining_requests": null,
+        "remaining_tokens": null,
+        "requests_reset_at": null,
+        "tokens_reset_at": null,
+        "retry_after": null,
+        "request_window": "UNKNOWN",
+        "token_window": "UNKNOWN",
+        "source": "response headers",
+        "request_reset_hint": null
+      },
+      "retained_sources": 1,
+      "omitted_sources": 0,
+      "official_pages": 1,
+      "page_failures": 0
+    },
+    {
+      "slot": "tavily-2",
+      "quota_pool": "tavily/search-account-unknown",
+      "endpoint": "https://api.tavily.com/search",
+      "observed_at": 1790976730.4911592,
+      "search_depth": "basic",
+      "max_results": 1,
+      "credits": 1,
+      "status": "REPORTED",
+      "http_status": 200,
+      "rate_limits": {
+        "request_limit": null,
+        "token_limit": null,
+        "remaining_requests": null,
+        "remaining_tokens": null,
+        "requests_reset_at": null,
+        "tokens_reset_at": null,
+        "retry_after": null,
+        "request_window": "UNKNOWN",
+        "token_window": "UNKNOWN",
+        "source": "response headers",
+        "request_reset_hint": null
+      },
+      "retained_sources": 1,
+      "omitted_sources": 0,
+      "official_pages": 1,
+      "page_failures": 0
+    },
+    {
+      "slot": "tavily-3",
+      "quota_pool": "tavily/search-account-unknown",
+      "endpoint": "https://api.tavily.com/search",
+      "observed_at": 1790976735.267061,
+      "search_depth": "basic",
+      "max_results": 1,
+      "credits": 1,
+      "status": "REPORTED",
+      "http_status": 200,
+      "rate_limits": {
+        "request_limit": null,
+        "token_limit": null,
+        "remaining_requests": null,
+        "remaining_tokens": null,
+        "requests_reset_at": null,
+        "tokens_reset_at": null,
+        "retry_after": null,
+        "request_window": "UNKNOWN",
+        "token_window": "UNKNOWN",
+        "source": "response headers",
+        "request_reset_hint": null
+      },
+      "retained_sources": 0,
+      "omitted_sources": 1,
+      "official_pages": 0,
+      "page_failures": 0
+    },
+    {
+      "slot": "tavily-1",
+      "quota_pool": "tavily/search-account-unknown",
+      "endpoint": "https://api.tavily.com/search",
+      "observed_at": 1790976737.725297,
+      "search_depth": "basic",
+      "max_results": 1,
+      "credits": 1,
+      "status": "REPORTED",
+      "http_status": 200,
+      "rate_limits": {
+        "request_limit": null,
+        "token_limit": null,
+        "remaining_requests": null,
+        "remaining_tokens": null,
+        "requests_reset_at": null,
+        "tokens_reset_at": null,
+        "retry_after": null,
+        "request_window": "UNKNOWN",
+        "token_window": "UNKNOWN",
+        "source": "response headers",
+        "request_reset_hint": null
+      },
+      "retained_sources": 0,
+      "omitted_sources": 0,
+      "official_pages": 0,
+      "page_failures": 0
+    },
+    {
+      "slot": "tavily-2",
+      "quota_pool": "tavily/search-account-unknown",
+      "endpoint": "https://api.tavily.com/search",
+      "observed_at": 1790976742.008393,
+      "search_depth": "basic",
+      "max_results": 1,
+      "credits": 1,
+      "status": "REPORTED",
+      "http_status": 200,
+      "rate_limits": {
+        "request_limit": null,
+        "token_limit": null,
+        "remaining_requests": null,
+        "remaining_tokens": null,
+        "requests_reset_at": null,
+        "tokens_reset_at": null,
+        "retry_after": null,
+        "request_window": "UNKNOWN",
+        "token_window": "UNKNOWN",
+        "source": "response headers",
+        "request_reset_hint": null
+      },
+      "retained_sources": 0,
+      "omitted_sources": 1,
+      "official_pages": 0,
+      "page_failures": 0
+    },
+    {
+      "slot": "tavily-3",
+      "quota_pool": "tavily/search-account-unknown",
+      "endpoint": "https://api.tavily.com/search",
+      "observed_at": 1790976744.7253566,
+      "search_depth": "basic",
+      "max_results": 1,
+      "credits": 1,
+      "status": "REPORTED",
+      "http_status": 200,
+      "rate_limits": {
+        "request_limit": null,
+        "token_limit": null,
+        "remaining_requests": null,
+        "remaining_tokens": null,
+        "requests_reset_at": null,
+        "tokens_reset_at": null,
+        "retry_after": null,
+        "request_window": "UNKNOWN",
+        "token_window": "UNKNOWN",
+        "source": "response headers",
+        "request_reset_hint": null
+      },
+      "retained_sources": 0,
+      "omitted_sources": 1,
+      "official_pages": 0,
+      "page_failures": 0
+    }
+  ],
+  "sources": [
+    {
+      "task_id": "beee8cdc8c1247a5bb625691c697b127",
+      "correlation_id": "307b1e7aa193410f8df441fe10da9ebb",
+      "source": {
+        "identity": "https://api.groq.com/openai/v1/models",
+        "authority": "live_api",
+        "scope": "account",
+        "observed_at": 1790976725.4641192,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null
+      },
+      "status": "REPORTED",
+      "conflicts": [
+        "llama-3.1-8b-instant: absent in complete live inventory; cached availability rejected",
+        "llama-3.3-70b-versatile: absent in complete live inventory; cached availability rejected",
+        "qwen/qwen3.6-27b: absent in complete live inventory; cached availability rejected",
+        "qwen/qwen3-32b: absent in complete live inventory; cached availability rejected",
+        "meta-llama/llama-4-scout-17b-16e-instruct: absent in complete live inventory; cached availability rejected",
+        "groq/compound: absent in complete live inventory; cached availability rejected",
+        "groq/compound-mini: absent in complete live inventory; cached availability rejected"
+      ],
+      "retrieval_method": "direct"
+    },
+    {
+      "task_id": "beee8cdc8c1247a5bb625691c697b127",
+      "correlation_id": "307b1e7aa193410f8df441fe10da9ebb",
+      "source": {
+        "identity": "https://openrouter.ai/api/v1/models/user",
+        "authority": "live_api",
+        "scope": "account",
+        "observed_at": 1790976725.830797,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null
+      },
+      "status": "REPORTED",
+      "conflicts": [],
+      "retrieval_method": "direct"
+    },
+    {
+      "task_id": "beee8cdc8c1247a5bb625691c697b127",
+      "correlation_id": "307b1e7aa193410f8df441fe10da9ebb",
+      "source": {
+        "identity": "https://integrate.api.nvidia.com/v1/models",
+        "authority": "live_api",
+        "scope": "account",
+        "observed_at": 1790976726.132388,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null
+      },
+      "status": "REPORTED",
+      "conflicts": [],
+      "retrieval_method": "direct"
+    },
+    {
+      "task_id": "beee8cdc8c1247a5bb625691c697b127",
+      "correlation_id": "307b1e7aa193410f8df441fe10da9ebb",
+      "source": {
+        "identity": "https://generativelanguage.googleapis.com/v1beta/models",
+        "authority": "live_api",
+        "scope": "account",
+        "observed_at": 1790976726.5676615,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null
+      },
+      "status": "REPORTED",
+      "conflicts": [
+        "gemini-3-pro-preview: absent in complete live inventory; cached availability rejected",
+        "gemini-2.0-flash: absent in complete live inventory; cached availability rejected",
+        "gemini-2.0-flash-lite: absent in complete live inventory; cached availability rejected",
+        "gemini-3.1-flash-lite-preview: official retirement overrides inventory listing; excluded from routing",
+        "gemini-3-pro-image-preview: official retirement overrides inventory listing; excluded from routing",
+        "gemini-3.1-flash-image-preview: official retirement overrides inventory listing; excluded from routing",
+        "gemini-2.5-computer-use-preview-10-2025: official retirement overrides inventory listing; excluded from routing"
+      ],
+      "retrieval_method": "direct"
+    },
+    {
+      "task_id": "beee8cdc8c1247a5bb625691c697b127",
+      "correlation_id": "307b1e7aa193410f8df441fe10da9ebb",
+      "source": {
+        "identity": "https://ai.google.dev/gemini-api/docs/deprecations",
+        "authority": "official_deprecation",
+        "scope": "provider",
+        "observed_at": 1790943196.6073742,
+        "ttl_seconds": 86400,
+        "refreshable": true,
+        "published_at": null
+      },
+      "status": "REPORTED",
+      "conflicts": [],
+      "retrieval_method": "direct"
+    },
+    {
+      "task_id": "beee8cdc8c1247a5bb625691c697b127",
+      "correlation_id": "307b1e7aa193410f8df441fe10da9ebb",
+      "source": {
+        "identity": "https://api.z.ai/api/paas/v4/models",
+        "authority": "live_api",
+        "scope": "account",
+        "observed_at": 1790976727.1643455,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null
+      },
+      "status": "REPORTED",
+      "conflicts": [],
+      "retrieval_method": "direct"
+    },
+    {
+      "task_id": "beee8cdc8c1247a5bb625691c697b127",
+      "correlation_id": "307b1e7aa193410f8df441fe10da9ebb",
+      "source": {
+        "identity": "https://ollama.com/api/tags",
+        "authority": "live_api",
+        "scope": "account",
+        "observed_at": 1790976727.5165477,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null
+      },
+      "status": "REPORTED",
+      "conflicts": [],
+      "retrieval_method": "direct"
+    },
+    {
+      "task_id": "beee8cdc8c1247a5bb625691c697b127",
+      "correlation_id": "307b1e7aa193410f8df441fe10da9ebb",
+      "source": {
+        "identity": "https://console.groq.com/docs/models",
+        "authority": "official_docs",
+        "scope": "provider",
+        "observed_at": 1790976730.489503,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null
+      },
+      "status": "REPORTED",
+      "conflicts": [],
+      "retrieval_method": "official_page"
+    },
+    {
+      "task_id": "beee8cdc8c1247a5bb625691c697b127",
+      "correlation_id": "307b1e7aa193410f8df441fe10da9ebb",
+      "source": {
+        "identity": "https://openrouter.ai/respan",
+        "authority": "official_docs",
+        "scope": "provider",
+        "observed_at": 1790976735.2654343,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null
+      },
+      "status": "REPORTED",
+      "conflicts": [],
+      "retrieval_method": "official_page"
+    }
+  ],
+  "official_web_coverage": [
+    "groq",
+    "openrouter"
+  ],
+  "native_provider_coverage": [
+    "google",
+    "groq",
+    "nvidia",
+    "ollama-cloud",
+    "openrouter",
+    "zai"
+  ],
+  "native_inventory_sources": 6,
+  "actual_live_tavily": true,
+  "objective_result_reported_success": true,
+  "generation_calls": 0,
+  "authority_resolution": "Account API outranks web for account listing; applicable official retirement evidence overrides residual catalog listing. Conflicts are explicit; web excerpts cannot change routing entitlement or funding.",
+  "limitations": [
+    "Retrieved official pages remain REPORTED evidence, not general factual verification. Index-only snippets do not satisfy official-page acceptance; account funding/credits remain UNKNOWN unless separately exposed."
+  ],
+  "continued_remote_head": "2054b5ad474e3d331a3844c354dcb68d40afd2ff",
+  "gate_a_status": "PARTIAL",
+  "credential_presence": {
+    "TAVILY_API_KEY_1": "present",
+    "TAVILY_API_KEY_2": "present",
+    "TAVILY_API_KEY_3": "present"
+  },
+  "tavily_working_slots": 3,
+  "credential_failover": {
+    "recorded_at": "2026-10-02T21:33:56.574813+00:00",
+    "status": "PASS",
+    "scope": "Real invalid synthetic credential -> one real valid slot; no real key altered",
+    "observations": [
+      {
+        "slot": "tavily-0-invalid-fixture",
+        "quota_pool": "tavily/search-account-unknown",
+        "endpoint": "https://api.tavily.com/search",
+        "observed_at": 1790976835.6255565,
+        "search_depth": "basic",
+        "max_results": 1,
+        "credits": null,
+        "status": "UNAVAILABLE",
+        "http_status": 401,
+        "category": "credential_failure",
+        "rate_limits": {
+          "request_limit": null,
+          "token_limit": null,
+          "remaining_requests": null,
+          "remaining_tokens": null,
+          "requests_reset_at": null,
+          "tokens_reset_at": null,
+          "retry_after": null,
+          "request_window": "UNKNOWN",
+          "token_window": "UNKNOWN",
+          "source": "response headers",
+          "request_reset_hint": null
+        }
+      },
+      {
+        "slot": "tavily-1",
+        "quota_pool": "tavily/search-account-unknown",
+        "endpoint": "https://api.tavily.com/search",
+        "observed_at": 1790976835.991817,
+        "search_depth": "basic",
+        "max_results": 1,
+        "credits": 1,
+        "status": "REPORTED",
+        "http_status": 200,
+        "rate_limits": {
+          "request_limit": null,
+          "token_limit": null,
+          "remaining_requests": null,
+          "remaining_tokens": null,
+          "requests_reset_at": null,
+          "tokens_reset_at": null,
+          "retry_after": null,
+          "request_window": "UNKNOWN",
+          "token_window": "UNKNOWN",
+          "source": "response headers",
+          "request_reset_hint": null
+        },
+        "retained_sources": 1,
+        "omitted_sources": 0,
+        "official_pages": 1,
+        "page_failures": 0
+      }
+    ],
+    "sources": [
+      {
+        "identity": "https://console.groq.com/docs/models",
+        "authority": "official_docs",
+        "scope": "provider",
+        "observed_at": 1790976836.5735204,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null
+      }
+    ]
+  },
+  "native_inventories": [
+    {
+      "provider": "groq",
+      "slot": "groq-1",
+      "source": {
+        "identity": "https://api.groq.com/openai/v1/models",
+        "authority": "live_api",
+        "scope": "account",
+        "observed_at": 1790976725.4641192,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null
+      },
+      "listed_models": 11,
+      "complete": true,
+      "pages": 1
+    },
+    {
+      "provider": "openrouter",
+      "slot": "openrouter-1",
+      "source": {
+        "identity": "https://openrouter.ai/api/v1/models/user",
+        "authority": "live_api",
+        "scope": "account",
+        "observed_at": 1790976725.830797,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null
+      },
+      "listed_models": 463,
+      "complete": true,
+      "pages": 1
+    },
+    {
+      "provider": "nvidia",
+      "slot": "nvidia-1",
+      "source": {
+        "identity": "https://integrate.api.nvidia.com/v1/models",
+        "authority": "live_api",
+        "scope": "account",
+        "observed_at": 1790976726.132388,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null
+      },
+      "listed_models": 81,
+      "complete": true,
+      "pages": 1
+    },
+    {
+      "provider": "google",
+      "slot": "google-1",
+      "source": {
+        "identity": "https://generativelanguage.googleapis.com/v1beta/models",
+        "authority": "live_api",
+        "scope": "account",
+        "observed_at": 1790976726.5676615,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null
+      },
+      "listed_models": 61,
+      "complete": true,
+      "pages": 2
+    },
+    {
+      "provider": "zai",
+      "slot": "zai-1",
+      "source": {
+        "identity": "https://api.z.ai/api/paas/v4/models",
+        "authority": "live_api",
+        "scope": "account",
+        "observed_at": 1790976727.1643455,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null
+      },
+      "listed_models": 11,
+      "complete": true,
+      "pages": 1
+    },
+    {
+      "provider": "ollama-cloud",
+      "slot": "ollama-cloud-1",
+      "source": {
+        "identity": "https://ollama.com/api/tags",
+        "authority": "live_api",
+        "scope": "account",
+        "observed_at": 1790976727.5165477,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null
+      },
+      "listed_models": 17,
+      "complete": true,
+      "pages": 1
+    }
+  ],
+  "reported_objective_result": [
+    {
+      "task_id": "beee8cdc8c1247a5bb625691c697b127",
+      "correlation_id": "307b1e7aa193410f8df441fe10da9ebb",
+      "status": "REPORTED",
+      "success": true,
+      "value": "Current evidence-qualified answer. Account listing, provider support, generation and funding are separate claims. Account APIs govern listing; applicable official retirement notices govern retirement. Web excerpts are REPORTED source material, not verified account entitlement.\nAccount-visible inventory:\ngroq: canopylabs/orpheus-arabic-saudi, openai/gpt-oss-120b, meta-llama/llama-prompt-guard-2-86m, openai/gpt-oss-safeguard-20b, meta-llama/llama-prompt-guard-2-22m, qwen/qwen3.8-27b, whisper-large-v3, allam-2-7b, canopylabs/orpheus-v1-english, whisper-large-v3-turbo, openai/gpt-oss-20b. Listed via groq-1; account generation/funding is not implied.\nSource: https://api.groq.com/openai/v1/models; authority: live_api; observed_at: 1790976725.4641192; scope: account\nConflicting evidence: llama-3.1-8b-instant: absent in complete live inventory; cached availability rejected; llama-3.3-70b-versatile: absent in complete live inventory; cached availability rejected; qwen/qwen3.6-27b: absent in complete live inventory; cached availability rejected; qwen/qwen3-32b: absent in complete live inventory; cached availability rejected; meta-llama/llama-4-scout-17b-16e-instruct: absent in complete live inventory; cached availability rejected; groq/compound: absent in complete live inventory; cached availability rejected; groq/compound-mini: absent in complete live inventory; cached availability rejected\nopenrouter: inclusionai/ling-3.1-flash, apodex/apodex-1.1-mini:free, unbiased/pareto-26.10-preview, openai/gpt-6.1-sol-pro, openai/gpt-6.1-sol, anthropic/claude-sonnet-5.5, anthropic/claude-sonnet-5.5:batch, typesafe/jev-router, perceptron/perceptron-mk1.5, fireworks/ember-1, z-ai/glm-5.3-prime, qwen/qwen3.8-max-prime, stealth/space-bunny-alpha, aion-labs/aion-3.5-mini, aion-labs/aion-3.5, upstage/solar-mini4, cohere/command-a-plus, openai/gpt-6-luna-pro, openai/gpt-6-luna-pro:batch, openai/gpt-6-luna, openai/gpt-6-luna:batch, openai/gpt-6-sol-pro, openai/gpt-6-sol-pro:batch, openai/gpt-6-sol, openai/gpt-6-sol:batch, anthropic/claude-opus-5.5, anthropic/claude-opus-5.5:batch, nvidia/switchyard, xiaomi/mimo-v2.6-pro-ultraspeed, xiaomi/mimo-v2.6-flash, xiaomi/mimo-v2.6-pro, x-ai/grok-4.7, qwen/qwen3.8-omni-flash, prism-ml/ternary-bonsai-2-27b, z-ai/glm-5.3-flashx, unbiased/pareto, ~deepseek/deepseek-pro-latest, ~deepseek/deepseek-flash-latest, inference-net/schematron-v2-turbo, inference-net/schematron-v2-small, ~openai/gpt-astra-latest, ~openai/gpt-sol-latest, ~openai/gpt-terra-latest, ~openai/gpt-luna-latest, sakana/fugu-ultra-v2, sakana/fugu-max, inclusionai/ling-3.0-flash-vl, deepseek/deepseek-v4.1-flash, deepseek/deepseek-v4.1-flash:batch, inception/mercury-2.5, nex-agi/nex-n2.5-mini, nex-agi/nex-n2.5-pro, openai/gpt-6-astra, openai/gpt-6-astra:batch, openai/gpt-6-astra-pro, openai/gpt-6-astra-pro:batch, inclusionai/ling-3.0-flash-sante:free, qwen/qwen3.8-max-0902, meta/muse-spark-1.3, google/gemini-3.8-flash, google/gemini-3.8-flash:batch, anthropic/claude-fable-5.1, anthropic/claude-fable-5.1:batch, ibm-granite/granite-4.2-8b, tencent/hy4-preview, inclusionai/ling-3.0-flash-fin, ~z-ai/glm-flash-latest, qwen/qwen3.8-flash, z-ai/glm-5.3-flash, z-ai/glm-5.3-flash:batch, deepseek/deepseek-v4-flash-vision-exp, tencent/hy-mt2-1.8b, tencent/hy-mt2-30b-a3b, ~z-ai/glm-latest, tencent/hy-mt2-7b, z-ai/glm-5.3, z-ai/glm-5.3:batch, qwen/qwen3.8-27b, qwen/qwen3.8-27b:free, dots-studio/dots-3-note-preview:free, google/gemini-3.7-flash, google/gemini-3.7-flash:batch, bytedance-seed/seed-2-1-turbo, qwen/qwen3.8-2.4t-a95b, bytedance-seed/seed-2.0-code, deepseek/deepseek-v4-pro-0813, x-ai/grok-4.6, liquid/lfm-2.5-2.6b:free, nvidia/nemotron-3.5-lightning, nvidia/nemotron-3.5-lightning:free, upstage/solar-pro4, meta/muse-glimmer-30b, meta/muse-spark-1.2, ~deepseek/deepseek-v4-flash-latest, deepseek/deepseek-v4-flash-0731, thinkingmachines/inkling-small, thinkingmachines/inkling-small:free, qwen/qwen3.7-flash, anthropic/claude-opus-5, anthropic/claude-opus-5:batch, inclusionai/ling-3.0-flash, poolside/laguna-s-2.1, poolside/laguna-s-2.1:free, google/gemini-3.6-flash, google/gemini-3.6-flash:batch, google/gemini-3.5-flash-lite, google/gemini-3.5-flash-lite:batch, meituan/longcat-2.0, thinkingmachines/inkling, thinkingmachines/inkling:free, openrouter/auto-beta, moonshotai/kimi-k3, moonshotai/kimi-k3:batch, meta/muse-spark-1.1, kwaipilot/kat-coder-pro-v2.5, openai/gpt-5.6-luna-pro, openai/gpt-5.6-luna-pro:batch, openai/gpt-5.6-luna, openai/gpt-5.6-luna:batch, openai/gpt-5.6-terra-pro, openai/gpt-5.6-terra-pro:batch, openai/gpt-5.6-terra, openai/gpt-5.6-terra:batch, openai/gpt-5.6-sol-pro, openai/gpt-5.6-sol-pro:batch, openai/gpt-5.6-sol, openai/gpt-5.6-sol:batch, x-ai/grok-4.5, ~x-ai/grok-latest, aion-labs/aion-3.0-mini, aion-labs/aion-3.0, tencent/hy3, poolside/laguna-xs-2.1, poolside/laguna-xs-2.1:free, anthropic/claude-sonnet-5, anthropic/claude-sonnet-5:batch, google/gemini-3.1-flash-lite-image, sakana/fugu-ultra, google/gemini-3.1-flash-image, google/gemini-3-pro-image, cohere/north-mini-code:free, z-ai/glm-5.2, openrouter/fusion, moonshotai/kimi-k2.7-code, ~anthropic/claude-fable-latest, anthropic/claude-fable-5, anthropic/claude-fable-5:batch, nvidia/nemotron-3.5-content-safety, nvidia/nemotron-3.5-content-safety:free, nvidia/nemotron-3-ultra-550b-a55b, nvidia/nemotron-3-ultra-550b-a55b:free, qwen/qwen3.7-plus, minimax/minimax-m3, stepfun/step-3.7-flash, anthropic/claude-opus-4.8, anthropic/claude-opus-4.8:batch, qwen/qwen3.7-max, x-ai/grok-build-0.1, google/gemini-3.5-flash, google/gemini-3.5-flash:batch, perceptron/perceptron-mk1, google/gemini-3.1-flash-lite, google/gemini-3.1-flash-lite:batch, openai/gpt-chat-latest, x-ai/grok-4.3, x-ai/grok-4.3:batch, mistralai/mistral-medium-3-5, mistralai/mistral-medium-3-5:batch, nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free, ~anthropic/claude-haiku-latest, ~openai/gpt-mini-latest, ~google/gemini-pro-latest, ~moonshotai/kimi-latest, ~google/gemini-flash-latest, ~anthropic/claude-sonnet-latest, qwen/qwen3.5-plus-20260420, qwen/qwen3.6-flash, qwen/qwen3.6-35b-a3b, qwen/qwen3.6-max-preview, qwen/qwen3.6-27b, openai/gpt-5.5-pro, openai/gpt-5.5-pro:batch, openai/gpt-5.5, openai/gpt-5.5:batch, deepseek/deepseek-v4-pro, deepseek/deepseek-v4-flash, tencent/hy3-preview, xiaomi/mimo-v2.5-pro, xiaomi/mimo-v2.5, openai/gpt-5.4-image-2, ~anthropic/claude-opus-latest, openrouter/pareto-code, moonshotai/kimi-k2.6, anthropic/claude-opus-4.7, anthropic/claude-opus-4.7:batch, z-ai/glm-5.1, google/gemma-4-26b-a4b-it, google/gemma-4-26b-a4b-it:free, google/gemma-4-31b-it, google/gemma-4-31b-it:free, qwen/qwen3.6-plus, z-ai/glm-5v-turbo, arcee-ai/trinity-large-thinking, x-ai/grok-4.20-multi-agent, x-ai/grok-4.20, google/lyria-3-pro-preview, google/lyria-3-clip-preview, rekaai/reka-edge, minimax/minimax-m2.7, openai/gpt-5.4-nano, openai/gpt-5.4-nano:batch, openai/gpt-5.4-mini, openai/gpt-5.4-mini:batch, mistralai/mistral-small-2603, mistralai/mistral-small-2603:batch, z-ai/glm-5-turbo, nvidia/nemotron-3-super-120b-a12b, nvidia/nemotron-3-super-120b-a12b:free, bytedance-seed/seed-2.0-lite, qwen/qwen3.5-9b, openai/gpt-5.4-pro, openai/gpt-5.4-pro:batch, openai/gpt-5.4, openai/gpt-5.4:batch, inception/mercury-2, google/gemini-3.1-flash-lite-preview, bytedance-seed/seed-2.0-mini, google/gemini-3.1-flash-image-preview, qwen/qwen3.5-35b-a3b, qwen/qwen3.5-27b, qwen/qwen3.5-122b-a10b, qwen/qwen3.5-flash-02-23, google/gemini-3.1-pro-preview-customtools, openai/gpt-5.3-codex, aion-labs/aion-2.0, google/gemini-3.1-pro-preview, google/gemini-3.1-pro-preview:batch, anthropic/claude-sonnet-4.6, anthropic/claude-sonnet-4.6:batch, qwen/qwen3.5-plus-02-15, qwen/qwen3.5-397b-a17b, minimax/minimax-m2.5, z-ai/glm-5, qwen/qwen3-max-thinking, anthropic/claude-opus-4.6, anthropic/claude-opus-4.6:batch, qwen/qwen3-coder-next, openrouter/free, stepfun/step-3.5-flash, moonshotai/kimi-k2.5, upstage/solar-pro-3, minimax/minimax-m2-her, writer/palmyra-x5, openai/gpt-audio, openai/gpt-audio-mini, z-ai/glm-4.7-flash, openai/gpt-5.2-codex, bytedance-seed/seed-1.6-flash, bytedance-seed/seed-1.6, minimax/minimax-m2.1, z-ai/glm-4.7, google/gemini-3-flash-preview, google/gemini-3-flash-preview:batch, nvidia/nemotron-3-nano-30b-a3b, openai/gpt-5.2-chat, openai/gpt-5.2-pro, openai/gpt-5.2-pro:batch, openai/gpt-5.2, openai/gpt-5.2:batch, mistralai/devstral-2512, relace/relace-search, z-ai/glm-4.6v, openrouter/bodybuilder, openai/gpt-5.1-codex-max, amazon/nova-2-lite-v1, mistralai/ministral-14b-2512, mistralai/ministral-8b-2512, mistralai/ministral-8b-2512:batch, mistralai/ministral-3b-2512, mistralai/mistral-large-2512, mistralai/mistral-large-2512:batch, deepseek/deepseek-v3.2, anthropic/claude-opus-4.5, anthropic/claude-opus-4.5:batch, google/gemini-3-pro-image-preview, openai/gpt-5.1, openai/gpt-5.1:batch, openai/gpt-5.1-codex, openai/gpt-5.1-codex-mini, moonshotai/kimi-k2-thinking, amazon/nova-premier-v1, perplexity/sonar-pro-search, mistralai/voxtral-small-24b-2507, openai/gpt-oss-safeguard-20b, minimax/minimax-m2, qwen/qwen3-vl-32b-instruct, ibm-granite/granite-4.0-h-micro, openai/gpt-5-image-mini, anthropic/claude-haiku-4.5, anthropic/claude-haiku-4.5:batch, qwen/qwen3-vl-8b-thinking, qwen/qwen3-vl-8b-instruct, openai/gpt-5-image, google/gemini-2.5-flash-image, qwen/qwen3-vl-30b-a3b-thinking, qwen/qwen3-vl-30b-a3b-instruct, openai/gpt-5-pro, openai/gpt-5-pro:batch, z-ai/glm-4.6, anthropic/claude-sonnet-4.5, anthropic/claude-sonnet-4.5:batch, deepseek/deepseek-v3.2-exp, thedrummer/cydonia-24b-v4.1, relace/relace-apply-3, qwen/qwen3-vl-235b-a22b-thinking, qwen/qwen3-vl-235b-a22b-instruct, qwen/qwen3-max, qwen/qwen3-coder-plus, deepseek/deepseek-v3.1-terminus, qwen/qwen3-coder-flash, qwen/qwen3-next-80b-a3b-thinking, qwen/qwen3-next-80b-a3b-instruct, qwen/qwen-plus-2025-07-28, moonshotai/kimi-k2-0905, qwen/qwen3-30b-a3b-thinking-2507, nousresearch/hermes-4-405b, deepseek/deepseek-chat-v3.1, mistralai/mistral-medium-3.1, mistralai/mistral-medium-3.1:batch, z-ai/glm-4.5v, openai/gpt-5, openai/gpt-5:batch, openai/gpt-5-mini, openai/gpt-5-mini:batch, openai/gpt-5-nano, openai/gpt-5-nano:batch, openai/gpt-oss-120b, openai/gpt-oss-120b:batch, openai/gpt-oss-20b, openai/gpt-oss-20b:batch, anthropic/claude-opus-4.1, anthropic/claude-opus-4.1:batch, mistralai/codestral-2508, mistralai/codestral-2508:batch, qwen/qwen3-coder-30b-a3b-instruct, qwen/qwen3-30b-a3b-instruct-2507, z-ai/glm-4.5, z-ai/glm-4.5-air, qwen/qwen3-235b-a22b-thinking-2507, qwen/qwen3-coder, bytedance/ui-tars-1.5-7b, google/gemini-2.5-flash-lite, google/gemini-2.5-flash-lite:batch, qwen/qwen3-235b-a22b-2507, moonshotai/kimi-k2, cognitivecomputations/dolphin-mistral-24b-venice-edition, tencent/hunyuan-a13b-instruct, morph/morph-v3-large, morph/morph-v3-fast, baidu/ernie-4.5-vl-424b-a47b, mistralai/mistral-small-3.2-24b-instruct, minimax/minimax-m1, google/gemini-2.5-flash, google/gemini-2.5-flash:batch, google/gemini-2.5-pro, google/gemini-2.5-pro:batch, openai/o3-pro, google/gemini-2.5-pro-preview, deepseek/deepseek-r1-0528, anthropic/claude-sonnet-4, mistralai/mistral-medium-3, meta-llama/llama-guard-4-12b, qwen/qwen3-30b-a3b, qwen/qwen3-8b, qwen/qwen3-14b, qwen/qwen3-32b, qwen/qwen3-235b-a22b, openai/o4-mini-high, openai/o3, openai/o3:batch, openai/o4-mini, openai/o4-mini:batch, openai/gpt-4.1, openai/gpt-4.1:batch, openai/gpt-4.1-mini, openai/gpt-4.1-mini:batch, openai/gpt-4.1-nano, openai/gpt-4.1-nano:batch, meta-llama/llama-4-maverick, meta-llama/llama-4-scout, deepseek/deepseek-chat-v3-0324, openai/o1-pro, mistralai/mistral-small-3.1-24b-instruct, google/gemma-3-4b-it, google/gemma-3-12b-it, cohere/command-a, rekaai/reka-flash-3, google/gemma-3-27b-it, thedrummer/skyfall-36b-v2, perplexity/sonar-reasoning-pro, perplexity/sonar-pro, perplexity/sonar-deep-research, mistralai/mistral-saba, openai/o3-mini-high, aion-labs/aion-rp-llama-3.1-8b, qwen/qwen2.5-vl-72b-instruct, qwen/qwen-plus, openai/o3-mini, openai/o3-mini:batch, mistralai/mistral-small-24b-instruct-2501, perplexity/sonar, deepseek/deepseek-r1, minimax/minimax-01, microsoft/phi-4, deepseek/deepseek-chat, sao10k/l3.3-euryale-70b, openai/o1, cohere/command-r7b-12-2024, meta-llama/llama-3.3-70b-instruct, amazon/nova-lite-v1, amazon/nova-micro-v1, amazon/nova-pro-v1, openai/gpt-4o-2024-11-20, mistralai/mistral-large-2407, qwen/qwen-2.5-coder-32b-instruct, thedrummer/unslopnemo-12b, anthracite-org/magnum-v4-72b, qwen/qwen-2.5-7b-instruct, meta-llama/llama-3.2-1b-instruct, meta-llama/llama-3.2-3b-instruct, qwen/qwen-2.5-72b-instruct, cohere/command-r-08-2024, cohere/command-r-plus-08-2024, sao10k/l3.1-euryale-70b, nousresearch/hermes-3-llama-3.1-70b, nousresearch/hermes-3-llama-3.1-405b, sao10k/l3-lunaris-8b, openai/gpt-4o-2024-08-06, meta-llama/llama-3.1-70b-instruct, meta-llama/llama-3.1-8b-instruct, mistralai/mistral-nemo, openai/gpt-4o-mini, openai/gpt-4o-mini-2024-07-18, openai/gpt-4o-mini:batch, google/gemma-2-27b-it, openai/gpt-4o, openai/gpt-4o-2024-05-13, openai/gpt-4o:batch, mistralai/mixtral-8x22b-instruct, microsoft/wizardlm-2-8x22b, openai/gpt-4-turbo, openai/gpt-4-turbo:batch, mistralai/mistral-large, openai/gpt-3.5-turbo-0613, openrouter/auto, openai/gpt-3.5-turbo-instruct, openai/gpt-3.5-turbo-16k, mancer/weaver, undi95/remm-slerp-l2-13b, gryphe/mythomax-l2-13b, openai/gpt-3.5-turbo, openai/gpt-3.5-turbo:batch, openai/gpt-4. Listed via openrouter-1; account generation/funding is not implied.\nSource: https://openrouter.ai/api/v1/models/user; authority: live_api; observed_at: 1790976725.830797; scope: account\nnvidia: 01-ai/yi-large, adept/fuyu-8b, ai21labs/jamba-1.5-large-instruct, aisingapore/sea-lion-7b-instruct, bigcode/starcoder2-15b, databricks/dbrx-instruct, deepseek-ai/deepseek-coder-6.7b-instruct, deepseek-ai/deepseek-v4.1-flash, google/codegemma-1.1-7b, google/codegemma-7b, google/deplot, google/diffusiongemma-26b-a4b-it, google/gemma-2b, google/gemma-3-12b-it, google/gemma-3-4b-it, google/gemma-4-31b-it, google/recurrentgemma-2b, ibm/granite-3.0-3b-a800m-instruct, ibm/granite-3.0-8b-instruct, ibm/granite-34b-code-instruct, ibm/granite-8b-code-instruct, meta/codellama-70b, meta/llama-3.2-11b-vision-instruct, meta/llama-3.2-90b-vision-instruct, meta/llama-guard-4-12b, meta/llama2-70b, meta/muse-glimmer-30b, microsoft/kosmos-2, microsoft/phi-3-vision-128k-instruct, microsoft/phi-3.5-moe-instruct, mistralai/codestral-22b-instruct-v0.1, mistralai/mistral-7b-instruct-v0.3, mistralai/mistral-large, mistralai/mistral-large-2-instruct, mistralai/mixtral-8x22b-v0.1, moonshotai/kimi-k2.6, moonshotai/kimi-k3, nv-mistralai/mistral-nemo-12b-instruct, nvidia/ai-synthetic-video-detector, nvidia/cosmos-reason2-8b, nvidia/embed-qa-4, nvidia/ising-calibration-1.5-31b, nvidia/llama-3.1-nemoguard-8b-content-safety, nvidia/llama-3.1-nemoguard-8b-topic-control, nvidia/llama-3.1-nemotron-51b-instruct, nvidia/llama-3.1-nemotron-70b-instruct, nvidia/llama-3.1-nemotron-safety-guard-8b-v3, nvidia/llama-3.1-nemotron-ultra-253b-v1, nvidia/llama-3.2-nemoretriever-1b-vlm-embed-v1, nvidia/llama-3.2-nv-embedqa-1b-v1, nvidia/llama-nemotron-embed-vl-1b-v2, nvidia/llama3-chatqa-1.5-70b, nvidia/mistral-nemo-minitron-8b-8k-instruct, nvidia/nemotron-3-embed-1b, nvidia/nemotron-3-nano-omni-30b-a3b-reasoning, nvidia/nemotron-3-super-120b-a12b, nvidia/nemotron-3-ultra-550b-a55b, nvidia/nemotron-3.5-content-safety, nvidia/nemotron-3.5-lightning-30b-a3b, nvidia/nemotron-4-340b-instruct, nvidia/nemotron-4-340b-reward, nvidia/nemotron-nano-3-30b-a3b, nvidia/nemotron-parse, nvidia/nemotron-parse-2.0, nvidia/neva-22b, nvidia/nv-embedqa-mistral-7b-v2, nvidia/nvclip, nvidia/riva-translate-4b-instruct, nvidia/riva-translate-4b-instruct-v1.1, nvidia/riva-translate-4b-instruct-v2, nvidia/vila, openai/gpt-oss-20b, poolside/laguna-xs-2.1, snowflake/arctic-embed-l, writer/palmyra-creative-122b, writer/palmyra-fin-70b-32k, writer/palmyra-med-70b, writer/palmyra-med-70b-32k, z-ai/glm-5.3, z-ai/glm-5.3-flash, zyphra/zamba2-7b-instruct. Listed via nvidia-1; account generation/funding is not implied.\nSource: https://integrate.api.nvidia.com/v1/models; authority: live_api; observed_at: 1790976726.132388; scope: account\ngoogle: gemini-2.5-flash, gemini-2.5-pro, gemini-2.5-flash-preview-tts, gemini-2.5-pro-preview-tts, gemma-4-26b-a4b-it, gemma-4-31b-it, gemini-flash-latest, gemini-flash-lite-latest, gemini-pro-latest, gemini-2.5-flash-lite, gemini-2.5-flash-image, gemini-3-flash-preview, gemini-3.1-pro-preview, gemini-3.1-pro-preview-customtools, gemini-3.1-flash-lite, gemini-3-pro-image, nano-banana-pro-preview, gemini-3.1-flash-image, gemini-3.1-flash-lite-image, gemini-3.5-flash, gemini-3.5-flash-lite, gemini-omni-flash-preview, gemini-omni-1.1-flash, gemini-3.5-transcribe, gemini-3.6-flash, gemini-3.7-flash, gemini-3.8-flash, lyria-3-clip-preview, lyria-3-pro-preview, lyria-3.5, gemini-3.1-flash-tts-preview, gemini-3.8-flash-tts, gemini-3.8-flash-lite-tts, gemini-robotics-er-2-preview, antigravity-preview-05-2026, antigravity-preview-09-2026, antigravity-preview-latest, deep-research-max-preview-04-2026, deep-research-preview-04-2026, deep-research-pro-preview-12-2025, gemini-embedding-001, gemini-embedding-2-preview, gemini-embedding-2, aqa, veo-3.1-generate-preview, veo-3.1-fast-generate-preview, veo-3.1-lite-generate-preview, gemini-3.5-transcribe-live, gemini-2.5-flash-native-audio-latest, gemini-2.5-flash-native-audio-preview-09-2025, gemini-2.5-flash-native-audio-preview-12-2025, gemini-3.1-flash-live-preview, gemini-3.8-live, gemini-3.8-live-extended-thinking, gemini-robotics-er-2-streaming-preview, gemini-3.5-live-translate-preview, lyria-realtime-exp. Listed via google-1; account generation/funding is not implied.\nSource: https://generativelanguage.googleapis.com/v1beta/models; authority: live_api; observed_at: 1790976726.5676615; scope: account\nConflicting evidence: gemini-3-pro-preview: absent in complete live inventory; cached availability rejected; gemini-2.0-flash: absent in complete live inventory; cached availability rejected; gemini-2.0-flash-lite: absent in complete live inventory; cached availability rejected; gemini-3.1-flash-lite-preview: official retirement overrides inventory listing; excluded from routing; gemini-3-pro-image-preview: official retirement overrides inventory listing; excluded from routing; gemini-3.1-flash-image-preview: official retirement overrides inventory listing; excluded from routing; gemini-2.5-computer-use-preview-10-2025: official retirement overrides inventory listing; excluded from routing\nzai: glm-4.5, glm-4.5-air, glm-4.6, glm-4.7, glm-5, glm-5-turbo, glm-5.1, glm-5.2, glm-5.3, glm-5.3-flash, glm-5.3-flashx. Listed via zai-1; account generation/funding is not implied.\nSource: https://api.z.ai/api/paas/v4/models; authority: live_api; observed_at: 1790976727.1643455; scope: account\nollama-cloud: glm-5.3-flash, kimi-k2.7-code, deepseek-v4.1-flash, gpt-oss:20b, gpt-oss:120b, minimax-m2.7, nemotron-3-super, kimi-k2.6, mistral-large-3:675b, gemma4:31b, nemotron-3-ultra, kimi-k3, glm-5.2, deepseek-v4-pro:0813, nemotron-3-nano:30b, glm-5.3, minimax-m3. Listed via ollama-cloud-1; account generation/funding is not implied.\nSource: https://ollama.com/api/tags; authority: live_api; observed_at: 1790976727.5165477; scope: account\nProvider-wide documentation/source evidence:\ngoogle: officially retired IDs remain listed: gemini-3.1-flash-lite-preview, gemini-3-pro-image-preview, gemini-3.1-flash-image-preview, gemini-2.5-computer-use-preview-10-2025; excluded from routing. Retirement is distinct from catalog visibility.\nSource: https://ai.google.dev/gemini-api/docs/deprecations; authority: official_deprecation; observed_at: 1790943196.6073742; scope: provider\nOfficial page excerpt (REPORTED, not account entitlement): Explore all available models on GroqCloud.\nGPT-OSS 120B is OpenAI's flagship open-weight language model with 120 billion parameters, built in browser search and code execution, and reasoning capabilities.\nNote: Production models are intended for use in your production environments. They meet or exceed our high standards for speed, quality, and reliability. Read more here .\nMODEL ID SPEED (T/SEC) PRICE PER 1M TOKENS RATE LIMITS (DEVELOPER PLAN) CONTEXT WINDOW (TOKENS) MAX COMPLETION TOKENS MAX FILE SIZE\nNote: Preview models are intended for evaluation purposes only and should not be used in production environments as they may be discontinued at short notice. Read more about deprecations here .\nMODEL ID SPEED (T/SEC) PRICE PER 1M TOKENS RATE LIMITS (DEVELOPER PLAN) CONTEXT WINDOW (TOKENS) MAX COMPLETION TOKENS MAX FILE SIZE\nDeprecated models are models that are no longer supported or will no longer be supported in the future. See our deprecation guidelines and deprecated models here .\nHosted models are directly accessible through the GroqCloud Models API endpoint using the model IDs mentioned above. You can use the https://api.groq.com/openai/v1/models endpoint to return a JSON list of all active models:\ncurl -X GET \"https://api.groq.com/openai/v1/models\" \\ -H \"Authorization: Bearer $GROQ_API_KEY\" \\ -H \"Content-Type: application/json\"\nimport Groq from \"groq-sdk\"; const groq = new Groq({ apiKey: process.env.GROQ_API_KEY }); const getModels = async () => { return await groq.model\nSource: https://console.groq.com/docs/models; authority: official_docs; observed_at: 1790976730.489503; scope: provider\nOfficial page excerpt (REPORTED, not account entitlement): Every Respan model below is served through the same OpenRouter API and API key. A guide, where listed, gives the confirmed APIs and request shapes for that model.\nAll models: https://openrouter.ai/models\nSource: https://openrouter.ai/respan; authority: official_docs; observed_at: 1790976735.2654343; scope: provider\n\nLimitations: This native source establishes inventory observations only; public access constraints require current official documentation/search.; Web excerpts describe provider-wide support/access, not account listing, generation or funding. Publication dates are search-provider estimates; current observation does not prove every excerpt was recently updated.; Unsafe/query-bearing or out-of-domain source references omitted.; google: public access constraints UNKNOWN.; nvidia: public access constraints UNKNOWN.; zai: public access constraints UNKNOWN.; ollama-cloud: public access constraints UNKNOWN."
+    }
+  ],
+  "current_access_constraint_coverage": {
+    "groq": "PARTIAL: direct model page has developer-limit headings, excerpt lacks numeric rows/free-plan constraints",
+    "openrouter": "UNKNOWN: directly read /respan is an official model landing page, not access-constraint evidence",
+    "google": "UNKNOWN: returned reference omitted by URL safety policy",
+    "nvidia": "UNKNOWN: no returned search result",
+    "zai": "UNKNOWN: returned reference omitted by URL safety policy",
+    "ollama-cloud": "UNKNOWN: returned reference omitted by URL safety policy"
+  },
+  "metadata_acceptance": {
+    "urls": "preserved for retained safe sources",
+    "retrieval_time": "preserved",
+    "publication_time": "preserved when supplied and parseable; absent in observed retained sources",
+    "title": "FAIL: adapter drops returned title; SourceRef has no title field"
+  },
+  "review_findings": [
+    {
+      "status": "OPEN",
+      "finding": "Search source titles are discarded instead of preserved where available.",
+      "locations": [
+        "oscar/search.py:TavilySource.search",
+        "oscar/freshness.py:SourceRef"
+      ]
+    },
+    {
+      "status": "OPEN",
+      "finding": "Existing verifier checks official-host page coverage but does not establish relevant free/developer access-constraint content. /respan is insufficient for the requested OpenRouter claim. It also does not require successful preflight of all three slots for its PASS predicate. This task applies the stricter requested criteria and remains PARTIAL.",
+      "locations": [
+        "scripts/verify_gate_a_search.py:search_acceptance"
+      ]
+    }
+  ],
+  "prior_routing_acceptance": "Preserved from remote head: Balanced, Heavy Duty, Free First PASS; not rerun.",
+  "search_budget": {
+    "search_http_attempts": 11,
+    "basic_successes": 10,
+    "observed_credits": 10,
+    "remaining_credits": "UNKNOWN",
+    "model_generation_calls": 0,
+    "objective_runs": 1
+  },
+  "freshness_acceptance": {
+    "stale_cache_cannot_override_current_evidence": "PASS: focused contracts plus actual native/cache conflicts",
+    "latest_current_triggers_retrieval": "PASS: exact live objective and focused contracts",
+    "static_avoids_search": "PASS: offline deterministic static/addition contract",
+    "conflict_provenance": "PASS: current correlated evidence preserves source, scope, observed_at and conflicts",
+    "unavailable_search_is_unknown": "PASS: offline absence/failure contracts; actual missing provider web evidence explicitly UNKNOWN",
+    "provider_agnostic_boundary": "PASS: RetrievalProvider protocol, Harness composition; Jev contains no Tavily dependency",
+    "complete_provenance": "PARTIAL: title field is not preserved",
+    "relevant_official_constraints": "PARTIAL: incomplete coverage and relevance"
+  },
+  "validation": {
+    "focused_search_tests": "74 PASS (9.723s)",
+    "offline_regression": "209 PASS in one full run (29.283s)",
+    "ruff": "PASS",
+    "format": "PASS: 39 Python files",
+    "mypy": "PASS: 25 source files",
+    "repository": "PASS: required files, local Markdown links, removed references",
+    "secret_scan": "PASS: value-silent scan of tracked/non-ignored files, ignored live reports/logs/SQLite state and patch; no material or locations emitted",
+    "diff_check": "PASS"
+  },
+  "record_finalized_at": "2026-10-02T21:35:24.943658+00:00"
+}

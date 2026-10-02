@@ -2,6 +2,19 @@
 
 Significant OSCAR milestones are recorded here. Detailed implementation status remains in `docs/ROADMAP.md`.
 
+## 2026-10-03 — New-cloud Tavily/search acceptance (PARTIAL)
+
+- Continue confirmed remote `work` at `2054b5a`; preserve previous routing/history.
+  Authenticate 3/3 Tavily slots and verify real invalid-fixture → valid-slot failover.
+- Run the exact Jev/native-inventory/Tavily objective once, with six complete native
+  inventories, six basic objective searches and zero hosted generations. Preserve
+  correlated evidence and synthesis; total observed search expenditure is 10 credits.
+- Keep Gate A PARTIAL: titles are dropped and relevant official constraint coverage
+  is incomplete; an official-host page alone is insufficient for claim acceptance.
+  Record the verifier's narrower coverage criteria without promoting missing facts.
+- Pass 74 focused tests and one 209-test regression suite, Ruff, formatting, mypy,
+  repository/link and value-silent secret/diff checks. Stop on `work`; no Slice 05.
+
 ## 2026-10-03 — Final Gate A focused acceptance (Tavily blocked)
 
 - Continue remote `work` at `d7caace`; implement bounded Tavily through the existing

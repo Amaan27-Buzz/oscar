@@ -107,7 +107,8 @@ is recorded in [PROVIDER-RESEARCH.md](docs/PROVIDER-RESEARCH.md).
 Freshness-sensitive questions route through a provider-agnostic live-source
 capability. Native provider inventory retrieval works; unsupported current sources
 return UNKNOWN/potentially stale. The bounded Tavily adapter is implemented behind
-this boundary, but its three credentials are absent here: actual live Tavily remains UNVERIFIED.
+this boundary. All three slots now authenticate and real credential failover passes;
+combined-search acceptance remains PARTIAL for source titles and relevant official constraints.
 
 ## System at a glance
 
@@ -288,15 +289,17 @@ For the current fast developer-alpha build, adjacent slices are grouped into rev
 ### Current club
 
 **Club A — Brain (Slices 01–04): final Gate A acceptance pass recorded.
-Gate A PARTIAL: actual Tavily search acceptance blocked by missing credentials.**
+Gate A PARTIAL: Tavily authenticates, but source provenance and official constraint
+coverage are incomplete.**
 
 Core Loop/Jev/reference Grid proofs remain verified. The earlier correction generated
 across 15 slots through Groq, OpenRouter, Google, NVIDIA and Ollama. The old Groq
 403 used retired models and did not diagnose credential health. Both Z.ai general
 slots exposed documented balance/resource-package error 1113 in that correction.
 Balanced, Heavy Duty and Free First now pass their focused current live probes;
-actual combined Tavily/native search acceptance remains blocked by absent Tavily
-credentials. Public coordinator deployment and physical nodes
+all three Tavily slots now pass bounded authentication and real failover. Combined
+search acceptance remains PARTIAL for title provenance and official constraint coverage.
+Public coordinator deployment and physical nodes
 remain later work. See [the checkpoint](docs/CLUB-A-CHECKPOINT.md) for all passing,
 failed and historical evidence. **Stopped for manual review; Slice 05 has not started.**
 

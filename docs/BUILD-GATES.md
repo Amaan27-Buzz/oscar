@@ -46,8 +46,9 @@ Manual scenarios:
 
 **Pass:** native core/transport/model routing works without Latch/SwitchRoute deployment and remote node loss does not erase objective state.
 
-Current checkpoint: **PARTIAL — final real Tavily acceptance blocked by absent
-credentials.** Core Loop/Jev/reference Grid proofs and the focused routing
+Current checkpoint: **PARTIAL — all three Tavily slots authenticate; source title
+provenance and relevant official access-constraint coverage remain incomplete.**
+Core Loop/Jev/reference Grid proofs and the focused routing
 acceptance remain verified; see [CLUB-A-CHECKPOINT.md](CLUB-A-CHECKPOINT.md).
 
 Acceptance does not require simultaneous availability of every provider. A genuine
@@ -169,7 +170,7 @@ This is intentionally aggressive. Anything not genuinely verified remains planne
 
 | Gate | Slices | Status |
 |---|---|---|
-| Gate A — Brain | 01–04 | PARTIAL — corrected architecture tested; latest live mode acceptance incomplete; manual review pending |
+| Gate A — Brain | 01–04 | PARTIAL — focused routing passed; search provenance/constraint acceptance incomplete; manual review pending |
 | Gate B — Can Do Work | 05–06 | Planned |
 | Gate C — Embodied OSCAR | 07–10 | Planned |
 | Gate D — JARVIS Layer | 11–14 | Planned |

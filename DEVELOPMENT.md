@@ -129,7 +129,8 @@ This flag never manufactures a new generation observation. Inspect all earlier
 refusals and the latest assertion outcome; an earlier passing run does not make a
 new failed run PASS. Native current-provider questions can use `oscar ask`; broad
 web/weather questions use Tavily when credentials are configured, otherwise block
-as UNKNOWN. Actual live Tavily is UNVERIFIED in the recorded environment.
+as UNKNOWN. The latest acceptance authenticates all three Tavily slots and real
+failover, but combined provenance/official-constraint acceptance remains PARTIAL.
 
 See [docs/CLUB-A-CHECKPOINT.md](docs/CLUB-A-CHECKPOINT.md) for Gate A's current
 PARTIAL status, preserved historical evidence and the manual review stop.

@@ -116,12 +116,17 @@ Source material stays REPORTED; unsupported factual verification remains PARTIAL
 Persisted retrieval/search telemetry stores references, retrieval method, timestamps,
 conflicts, masked slots, categorical status and numeric credits, not queries or webpage dumps.
 
-The final acceptance environment still exposes **none of the three Tavily slots**.
-The adapter and loopback contracts are implemented/tested, but **actual live Tavily
-UNVERIFIED; combined public-web acceptance BLOCKED**. The real Jev objective did
-retrieve six current native inventories, with zero generation calls. It does not
-claim current public access constraints from those listings alone. See the dated
-[checkpoint](CLUB-A-CHECKPOINT.md) for live observations and credential blockers.
+The new-cloud acceptance on **2026-10-03 IST** authenticated all three Tavily slots
+and verified real bounded invalid-fixture → valid-slot failover. The exact Jev
+objective read six native inventories and made six basic searches with zero model
+generations, returning an evidence-qualified partial answer. Complete acceptance
+remains **PARTIAL**: the adapter drops result titles; direct official-page coverage
+was only two provider groups, and the OpenRouter result did not establish relevant
+free/developer constraints. The verifier's page-coverage predicate also does not
+prove claim relevance or all-slot success. Missing public constraints remain UNKNOWN.
+See [the checkpoint](CLUB-A-CHECKPOINT.md) and
+[dated evidence](evidence/club-a-search-acceptance-2026-10-03.json). Earlier absent-key
+observations remain preserved in the checkpoint; they describe the earlier task.
 
 ## Search request contract
 
@@ -223,8 +228,8 @@ A historical successful model call does not prove that model is still available 
 
 ## First search objective
 
-The first combined-search acceptance objective, still pending real Tavily
-credentials, is OSCAR-related and deliberately freshness-sensitive:
+The first real combined-search objective ran on 2026-10-03 IST and remains PARTIAL
+for provenance and relevant official constraint coverage. It is deliberately freshness-sensitive:
 
 > `What are the currently supported models and relevant free/developer access constraints for OSCAR's configured intelligence providers right now?`
 

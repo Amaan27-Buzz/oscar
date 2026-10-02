@@ -1,5 +1,112 @@
 # Club A — Brain checkpoint
 
+## New-cloud final search acceptance — PARTIAL (2026-10-03 IST)
+
+Continued the **current remote `work` head
+`2054b5ad474e3d331a3844c354dcb68d40afd2ff`**, fetched and confirmed before
+inspection. The initially older, clean cloud checkout was fast-forwarded to that
+exact commit. Existing Jev, native inventories, provider-agnostic retrieval,
+Tavily adapter and final search verifier were reused. Previous routing acceptance
+(Balanced, Heavy Duty, Free First PASS) is retained without repeating hosted model
+probes. All previous checkpoints below remain unchanged historical observations.
+
+**Gate A remains PARTIAL. Credential publication is resolved, but complete search
+acceptance is not.** No runtime implementation, Club A redesign, main merge or
+Slice 05 work is included in this acceptance record.
+
+### Tavily authentication, failover and budget
+
+```text
+TAVILY_API_KEY_1 present
+TAVILY_API_KEY_2 present
+TAVILY_API_KEY_3 present
+```
+
+**3/3 slots working:** one basic, one-result, real authenticated search per slot
+returned HTTP 200 and a directly read Groq official model page. A separate bounded
+adapter failover used an explicitly synthetic invalid credential: real HTTP 401
+invalidated only that fixture, then the valid slot returned HTTP 200. No real key
+was changed. Shared-cooldown/no-quota-multiplication behavior remains covered by
+offline contracts; no real account was exhausted to force a rate limit.
+
+One objective run made six additional basic, one-result searches. Across preflight,
+objective and failover there were **11 search HTTP attempts, 10 successful basic
+responses and 10 observed credits**. Remaining credits/account allotment remain
+UNKNOWN. There were **zero model-generation calls** and no full provider matrix.
+
+### Exact real objective and evidence-qualified result
+
+> What are the currently supported models and relevant free/developer access
+> constraints for OSCAR's configured intelligence providers right now?
+
+The objective genuinely ran through **Jev freshness-sensitive classification →
+authenticated reference transport → six native account inventories + Tavily →
+source/scope authority separation → correlated evidence → deterministic synthesis**.
+The returned successful result is REPORTED and the task PARTIALLY_VERIFIED; API
+success is not promoted into verification of arbitrary factual claims.
+
+| Native provider | Complete current inventory | Scope / limitation |
+|---|---:|---|
+| Groq | 11 listed models, 1 page | Account listing, not generation/funding |
+| OpenRouter | 463 listed models, 1 page | Account-visible catalog, not quota entitlement |
+| NVIDIA | 81 listed models, 1 page | Account listing, funding UNKNOWN |
+| Google | 61 listed models, 2 pages | Residual retired preview listings remain excluded |
+| Z.ai | 11 listed models, 1 page | Listing does not resolve historical balance/product failure |
+| Ollama Cloud | 17 listed models, 1 page | Listing does not establish remaining account credits |
+
+Counts are returned inventory entries, not all eligible intelligence routes.
+The full returned model lists and evidence-qualified synthesis are preserved in
+[the new evidence record](evidence/club-a-search-acceptance-2026-10-03.json).
+Fresh native/cache conflicts are explicit: absent Groq seed entries cannot remain
+current, and applicable Google retirement guards still exclude listed previews.
+The Google deprecation reference in the synthesis is retained **prior evidence**
+with its original timestamp, not a new official-page read during this run.
+
+Only two provider groups produced direct official-page reads during the objective:
+Groq's `/docs/models` and OpenRouter's `/respan`. The Groq excerpt establishes model
+and developer-limit context but does not supply all numeric/free-plan constraints.
+OpenRouter's Respan landing page lacks the requested free/developer access
+constraints and is insufficient for that claim despite its official host.
+Google, Z.ai and Ollama references were omitted by the existing URL safety policy;
+NVIDIA returned no search result. Their public access constraints correctly remain
+UNKNOWN. No generic web claim was used to establish account availability or quota.
+
+### Open acceptance gaps
+
+- **Title provenance defect:** the existing adapter discards returned search
+  titles, and `SourceRef` has no title field. Retained URLs, retrieval time and
+  parseable publication metadata are supported; publication times were absent in
+  the observed retained sources. Complete URL/title/time acceptance therefore fails.
+- **Relevant official constraint coverage:** only 2/6 official-host groups were
+  directly read, and official-host coverage alone does not establish the requested
+  access constraints. No broader retry/search escalation was used to force PASS.
+- **Verifier coverage gap:** its PASS predicate checks six official page groups
+  but does not require relevant access-constraint content or all three successful
+  slot preflights. This run uses the user's stricter acceptance criteria and does
+  not confuse that predicate with completion. These gaps remain open for review.
+
+### Freshness, regression and secrecy
+
+**74 focused search/freshness/official-page tests PASS (9.723s).** They verify stale
+index/cache rejection, latest/current retrieval, static deterministic questions
+without search, conflict provenance, unavailable search as UNKNOWN/potentially
+stale, and credential failover/shared capacity. The live objective separately
+proves native freshness conflicts and UNKNOWN for missing official constraints.
+Tavily remains an implementation of `RetrievalProvider`; Jev has no Tavily dependency.
+
+The normal offline suite ran **once: 209 tests PASS (29.283s)**. Ruff, formatting
+(**39 Python files**) and strict mypy (**25 source files**) PASS. Repository/link,
+whitespace and value-silent credential scanning of tracked/non-ignored files,
+patch, live evidence, logs and ignored SQLite state PASS. Raw request headers and
+credential material are not serialized by the adapter/verifier. No secret values
+or identifying fragments are included in the new artifacts.
+
+Remaining UNKNOWN/PARTIAL: complete official free/developer constraints, title
+provenance, verifier completion criteria, account quotas/funding not exposed by
+this inventory/search objective, and general factual verification of source prose.
+Earlier routing and deployment limitations remain as recorded below.
+**Commit/push to `work` only, verify remote SHA, then stop. No main merge or Slice 05.**
+
 ## Final Gate A acceptance — PARTIAL (Tavily credentials absent)
 
 Recorded **2026-10-03 IST** (live observations on 2026-10-02 UTC), continuing remote `work`
