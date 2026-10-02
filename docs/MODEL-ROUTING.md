@@ -2,38 +2,38 @@
 
 This document is the canonical contract for OSCAR's model/provider routing layer.
 
-OSCAR does **not** depend on the separate SwitchRoute runtime. SwitchRoute remains a reference implementation whose proven provider, routing, quota, health, fallback and local-runtime ideas can be reused behind OSCAR-owned contracts.
+OSCAR does **not** depend on the separate SwitchRoute runtime. SwitchRoute remains reference/prototype material whose useful routing, quota, health and fallback lessons may be reused behind OSCAR-owned contracts.
 
-The goal is broader than choosing a model name. OSCAR must decide the correct execution class, then choose the best provider/model/credential only when a model path is actually needed.
+## Core principle
 
-## Core principle — the infrastructure evolves, the model does not define OSCAR
-
-OSCAR is **not one model** and is not permanently tied to the providers available during initial development.
-
-The durable system is:
+OSCAR is **not one model**.
 
 ```text
 Jev
-→ capability/model decision
-→ adaptive Model Router
-→ provider/model/credential pool
+→ decide whether model reasoning is needed
+→ OSCAR Model Router
+→ provider → account/quota pool → model → credential
 → observed outcome
-→ updated routing evidence
+→ evidence
+→ future routing adaptation
 ```
 
-Providers, models, quotas, free tiers, prices and model quality change. The router therefore treats them as replaceable runtime resources described by versioned metadata and observed evidence.
+Providers, models, account products, free tiers, prices, quotas and model quality change. They are replaceable runtime resources, not OSCAR's identity.
 
 Rules:
 
 - never hard-code one model as OSCAR's permanent brain;
 - never hard-code `task X = model Y forever`;
-- discover/reload provider/model metadata where practical;
-- re-rank on each task using current capability, capacity and observed performance;
-- preserve provenance for claims about model power, limits and reliability;
-- allow new provider adapters without redesigning OSCAR Core;
+- do not treat an old successful model ID as proof that it still exists;
+- refresh volatile provider/model metadata from live inventory/current official sources when freshness matters;
+- preserve provenance and observation time for provider/model claims;
+- re-rank on each task from current capability, availability, capacity and observed performance;
+- allow new adapters without redesigning OSCAR Core;
 - learned routing preferences remain reversible and cannot override privacy, permissions or explicit user policy.
 
-## Decision hierarchy
+See [SEARCH-FRESHNESS.md](SEARCH-FRESHNESS.md).
+
+## Decision boundaries
 
 Do not collapse all routing into one generic router.
 
@@ -42,64 +42,39 @@ request / objective
       ↓
      Jev
       ↓
-what class of work is required?
-├─ deterministic capability / tool
-├─ retrieval / live verification
+├─ deterministic capability
+├─ live retrieval / search / verification
 ├─ model reasoning
-├─ specialist agent / coding executor
+├─ specialist executor / Worker
 ├─ computer use / installed application
 └─ ask user
-      ↓
-if model reasoning
-→ OSCAR Model Router
-→ provider → model → credential
-
-if executable/specialist work
-→ Capability Catalog / execution selection
-→ Codex / Claude Code / OpenCode / terminal / computer use / app / device
 ```
 
-**Jev** decides whether reasoning, retrieval, execution, delegation or clarification is appropriate.
+- **Jev** chooses the class of action.
+- **Capability selection** chooses an executable tool/app/device/specialist.
+- **Model Router** chooses provider/account-pool/model/credential only after a model path is selected.
+- **Search/live retrieval** is a capability path, not just another model.
 
-**OSCAR Model Router** chooses the concrete model/provider/credential after a model path is selected.
-
-**Capability selection** chooses an executable specialist or device. Coding agents such as Codex, Claude Code and OpenCode are not treated as ordinary text-generation provider keys merely because they ultimately use models.
+Coding agents such as Codex, Claude Code and OpenCode are executable capabilities, not ordinary `/chat/completions` models.
 
 ## Provider classes
 
-OSCAR's catalog distinguishes provider classes rather than putting everything in one flat list.
+### Hosted model providers
 
-### 1. Hosted model providers
+The initial developer environment includes:
 
-Initial/high-priority adapters include providers already proven or planned through SwitchRoute-style architecture and the user's available credentials:
-
-- OpenAI;
-- Anthropic;
-- Google AI Studio / Gemini;
-- xAI;
-- Mistral AI;
-- DeepSeek;
-- Cohere;
 - GroqCloud;
-- Cerebras;
-- NVIDIA NIM;
-- SambaNova;
-- Together AI;
-- Fireworks AI;
-- DeepInfra;
 - OpenRouter;
-- Hugging Face Inference Providers;
+- NVIDIA NIM;
+- Google AI Studio;
 - Z.ai;
-- Ollama Cloud;
-- custom public OpenAI-compatible endpoints where safely supported.
+- Ollama Cloud.
 
-The provider registry must remain adapter/data driven. Provider support belongs in versioned adapters/manifests with capability and test metadata.
+The adapter boundary must also support future providers such as OpenAI, Anthropic, xAI, Mistral, Cerebras, Together, Fireworks, DeepInfra, SambaNova, Hugging Face, Bedrock, Vertex, Azure-hosted providers and compatible future endpoints without changing core task semantics.
 
-Do **not** freeze a large third-party provider list into core architecture.
+### Local/private runtimes
 
-### 2. Local/private model runtimes
-
-Planned local runtimes include:
+Planned runtime adapters include:
 
 - Ollama;
 - LM Studio;
@@ -107,42 +82,17 @@ Planned local runtimes include:
 - llama.cpp;
 - SGLang;
 - LocalAI;
-- other explicitly configured OpenAI-compatible local runtimes.
+- explicitly configured compatible local endpoints.
 
-Local runtimes are capabilities of a machine/node. They are not proof that OSCAR itself is hosted on that machine.
+A local runtime is a capability of a machine/Grid node. It does not make that machine OSCAR's permanent host.
 
-### 3. Coding / agent executors
+### Specialist providers
 
-Examples:
-
-- Codex;
-- Claude Code;
-- OpenCode;
-- Gemini CLI;
-- other installed coding/agent runtimes discovered through the Capability Catalog.
-
-These executors can have subscription/OAuth/provider behavior of their own. OSCAR selects them based on task suitability, availability, permissions and observed reliability rather than pretending every coding agent is just another `/chat/completions` model.
-
-### 4. Specialist AI providers
-
-The same architecture may later cover capability-specific providers such as:
-
-- STT;
-- TTS;
-- embeddings;
-- reranking;
-- search/research;
-- image generation;
-- video generation;
-- other specialist inference services.
-
-Specialist selection should use capability-specific metadata rather than one universal quality score.
+The same capability-oriented architecture may cover STT, TTS, embeddings, reranking, search/research, image/video generation and other specialist inference services. Specialist selection uses task-specific metadata rather than one universal model score.
 
 ## Credential pools
 
-A provider may have multiple independent credentials.
-
-Example:
+A provider may have multiple independent credential slots.
 
 ```text
 GroqCloud
@@ -152,40 +102,39 @@ GroqCloud
 └─ groq-4
 ```
 
-Each credential slot tracks its own operational state where available:
+Each slot may track, where actually observable:
 
 ```text
-credential_id
-provider_id
 health
 validity
+account/quota pool
 rate-limit state
-quota/capacity
+remaining quota/capacity
+reset horizon
 concurrency
 cooldown
-last-used time
+last use
 request/token usage
 estimated/confirmed cost
 recent errors
 latency observations
-reset/expiry information
 ```
 
 Rules:
 
-- credential values are never exposed to UI, logs, task prompts, artifacts or telemetry;
-- UI/logs use masked slot identifiers such as `groq-2`;
-- one failing/rate-limited credential does not mark the whole provider unavailable;
-- quota that is unknown is **unknown**, not unlimited;
-- price that is unknown is **unknown**, not free;
-- credential validity is distinct from transient provider/model health;
-- credentials may be rotated/revoked independently.
+- never expose raw credentials to UI/logs/prompts/artifacts/telemetry;
+- use stable masked IDs such as `groq-2`;
+- one bad/rate-limited key does not automatically kill the whole provider;
+- quota that is unknown remains **UNKNOWN**;
+- unknown price is not free;
+- credential validity is separate from model/provider health;
+- account product/quota pool matters: two APIs from one company may consume different entitlements.
 
-## Local development credential contract
+That last rule is important for providers such as Z.ai, where a general API balance and a Coding Plan/trial can be different resources.
 
-The repository-root `.env` is local-only and ignored by Git.
+## Development credentials
 
-The initial developer pool is expected to support:
+The current developer pool is expected to support:
 
 - 4 GroqCloud keys;
 - 4 OpenRouter keys;
@@ -193,73 +142,91 @@ The initial developer pool is expected to support:
 - 3 Google AI Studio keys;
 - 2 Z.ai keys;
 - 2 Ollama Cloud keys;
-- optional local runtime URLs for Ollama, LM Studio and vLLM.
+- later, 3 Tavily search keys;
+- optional local Ollama/LM Studio/vLLM endpoints.
 
-This pool is a **starting fleet, not the provider boundary**.
+This is a starting fleet, not the provider boundary.
 
-See the repository-root `.env.example` for placeholder variable names.
+See `.env.example`.
 
-Development rules:
+Never commit or echo real secrets. Integration evidence stores masked slot IDs only.
 
-- never commit the real `.env`;
-- never echo raw credentials;
-- never include secrets in snapshots, test fixtures, screenshots or CI output;
-- never forward provider credentials to frontend/browser code;
-- integration tests may use the real local credentials when explicitly run by the developer;
-- CI should use mocks/test adapters unless explicitly provisioned with scoped secrets;
-- results record credential slot IDs, not secret values.
+## Discovery-first model inventory
 
-## Current Ollama Cloud free-credit model metadata
+`config/development-models.json` contains **seed candidates**, not current truth.
 
-The developer manifest retains the user-declared free pool and selects these models from the inventory observed on 2026-10-02. Listing/generation evidence does not expose remaining credits or confirm billing terms:
+Before a provider/model claim is treated as current, OSCAR should prefer:
 
-- `gemma4:31b`
-- `gpt-oss:120b`
-- `gpt-oss:20b`
-- `nemotron-3-nano:30b`
-- `nemotron-3-super`
-- `nemotron-3-ultra`
+```text
+live provider models/inventory endpoint
+→ current official provider docs/deprecation notices
+→ bounded live probe where appropriate
+→ cached manifest only when still fresh enough
+```
 
-Treat this list as replaceable runtime/development metadata, **not** a permanent hard-coded allowlist. `gemma4:31b` replaces the unavailable original `gemma3:31b` seed. Provider discovery/configuration can replace or extend it without redesigning OSCAR.
+A stale manifest is a hint.
+
+A historical HTTP 200 is historical evidence.
+
+Neither proves current availability.
+
+### Current seed refresh — 2026-10-02
+
+The development seed was refreshed from current official sources after stale model IDs caused misleading provider failures.
+
+Current candidates include:
+
+- **Groq:** `openai/gpt-oss-20b`, `openai/gpt-oss-120b`, `qwen/qwen3.8-27b`;
+- **OpenRouter:** `openrouter/free` as a dynamic free route rather than pinning one aging free model;
+- **NVIDIA NIM:** current Nemotron 3.5 Lightning / Nemotron 3 Super / Nemotron 3 Ultra candidates;
+- **Google AI Studio:** `gemini-3.5-flash-lite`, `gemini-3.8-flash`;
+- **Z.ai:** `glm-5.3-flash`, `glm-5.3` with funding/account pool left unknown until live account evidence;
+- **Ollama Cloud:** current cloud-catalog candidates such as GLM-5.3, GLM-5.3-Flash, DeepSeek-V4.1-Flash, DeepSeek-V4-Pro and MiniMax M3, with free-credit eligibility left unknown until account evidence.
+
+These names are still replaceable metadata. The router must not assume they remain current next week.
+
+## Freshness rule
+
+Provider/model routing is inherently freshness-sensitive.
+
+Before attributing a 403/404/429 to a key, provider or quota, check whether the requested model/endpoint/account product is itself current and valid.
+
+For example:
+
+```text
+old model ID returns 403
+≠ credential is definitely bad
+
+current inventory says model retired
+→ classify stale model metadata
+→ refresh candidates
+→ retry bounded current route
+```
+
+Likewise, a provider's current pricing/free-tier/limits should come from live/official evidence rather than model training memory.
 
 ## Routing modes
 
-OSCAR supports automatic routing and explicit manual control.
-
 | Mode | Intent |
 |---|---|
-| `auto` | OSCAR chooses the execution/model profile from task, policy and current runtime state. |
-| `fast` | Prefer low first-token/response latency while preserving minimum capability requirements. |
-| `balanced` | Balance quality, latency, reliability, quota and cost. |
-| `heavy` / **Heavy Duty** | Prefer the strongest suitable reasoning/capability tier; cost/latency are secondary within policy. |
-| `free_first` | Prefer confirmed free/subscription/local capacity, using scarcity-aware allocation before paid fallback. |
-| `cheap` | Minimize expected monetary cost while meeting capability/quality requirements. |
-| `local` | Local/private runtimes only unless the user explicitly allows fallback. |
-| `private` | Use only providers/surfaces allowed by the active privacy policy. |
-| `manual` | User pins provider/model and optionally a credential slot. |
-| `specialist` | Task affinity/specialist capability dominates generic model ranking. |
+| `auto` | Choose the best eligible route from task + policy + current runtime evidence. |
+| `fast` | Prefer low latency while meeting capability/quality floor. |
+| `balanced` | Balance quality, reliability, latency, capacity and cost. |
+| `heavy` / Heavy Duty | Prefer strongest suitable route within policy. |
+| `free_first` | Prefer confirmed free/subscription/local capacity, scarcity-aware. |
+| `cheap` | Minimize expected monetary cost while meeting requirements. |
+| `local` | Local/private runtimes only; never silently fall back to cloud. |
+| `private` | Use only surfaces/providers allowed by privacy policy. |
+| `manual` | User pins provider/model and optionally credential slot. |
+| `specialist` | Task-specific capability dominates generic model ranking. |
 
-`auto` may itself choose an effective profile such as Fast, Balanced, Heavy Duty or Free First based on the request and Personal Policy.
+Manual overrides cannot bypass permission, privacy, safety or actual availability.
 
-Users can override routing per request, session/project or durable Personal Policy where appropriate.
+## Free-first + scarcity-aware allocation
 
-Examples:
+The current development environment is dominated by free accounts/free credits.
 
-```text
-"Use Heavy Duty for this research task."
-"Keep this project local only."
-"Prefer Groq for low-latency classification."
-"Always use Codex for repository implementation unless unavailable."
-"Use this OpenRouter model just for this request."
-```
-
-A manual override cannot bypass permission, privacy, safety or availability constraints.
-
-## Free-first and scarcity-aware allocation
-
-The current development environment is dominated by free accounts/free credits. OSCAR should therefore optimize for **available free capacity + sufficient model power**, rather than blindly using one favorite model or always selecting the largest model.
-
-The routing objective is:
+The router objective is:
 
 ```text
 1. satisfy required capability/context/tool constraints
@@ -267,313 +234,214 @@ The routing objective is:
 3. choose sufficient task-fit/model power
 4. prefer reliable healthy routes
 5. optimize latency for the task
-6. preserve scarce high-value quota when a cheaper/plentiful route is sufficient
-7. use paid fallback only when explicit policy permits
+6. preserve scarce high-value quota when a plentiful adequate route exists
+7. use paid fallback only if explicit policy permits
 ```
 
-This creates intentional behavior such as:
+Examples:
 
-- **GroqCloud** can absorb many small/fast tasks when its healthy limits and suitable models make it efficient;
-- **Google AI Studio** and **Z.ai** can carry broader or stronger work when their current free capacity and model fit are favorable;
-- **OpenRouter** can expose valuable models but lower free limits should be treated as scarce capacity and preserved for tasks where those models materially help;
-- **Ollama Cloud** should use the currently available free-credit model set according to task fit and remaining capacity rather than pinning one model;
-- local runtimes can win when privacy, availability or cost makes them preferable and the local model is sufficiently capable.
+- a healthy fast Groq route may absorb many small extraction/classification tasks;
+- Google or another generous pool may carry broader work when current capacity/model fit is better;
+- scarce OpenRouter free requests should be preserved when an adequate plentiful route exists;
+- stronger NVIDIA/Ollama/Z.ai routes may be justified for harder work when their current account product actually permits it;
+- local models can win for privacy/cost/availability when they are sufficiently capable.
 
-These are routing heuristics, not permanent provider rankings. Actual model inventory, quotas, quality and reliability can change.
+These are heuristics, not permanent provider rankings.
 
-### Scarcity score
+### Scarcity evidence
 
-Where enough data exists, a route can derive a scarcity signal from:
+Where available, derive scarcity from:
 
 ```text
 remaining confirmed quota/credits
 reset horizon
 recent consumption rate
-concurrency/rate limit pressure
-number of equivalent alternative routes
-quality uniqueness for the requested task
+rate-limit pressure
+concurrency
+number of equivalent alternatives
+quality uniqueness for the task
 ```
 
-A scarce route should not be consumed for trivial work when a plentiful route meets the same quality requirement.
+Unknown capacity remains unknown. Do not manufacture percentages from missing headers/account APIs.
 
-Unknown capacity stays unknown; do not invent numerical scarcity from missing provider data.
+## Model metadata
 
-## Model and task metadata
-
-Do not hard-code `task X = model Y forever`.
-
-Models/providers change. OSCAR should maintain explicit metadata plus observed runtime history.
-
-Relevant capability/affinity classes can include:
-
-- general conversation;
-- reasoning;
-- coding;
-- research;
-- vision;
-- audio;
-- long context;
-- tool use;
-- structured output;
-- extraction;
-- classification;
-- low-latency reflex support;
-- STT;
-- TTS;
-- embeddings;
-- reranking;
-- multimodal generation.
-
-A model record can include, where known:
+Model metadata can include, where known:
 
 ```text
 provider/model identity
+account/quota product
 capability flags
 context/output limits
-quality tier / task-affinity evidence
-latency observations
-reliability observations
+task-affinity evidence
+quality tier + provenance
+latency/reliability observations
 price metadata
-free/subscription capacity metadata
-scarcity/reset metadata
-privacy/location policy metadata
-tool/structured-output support
-vision/audio support
-last verified metadata time
+free/subscription metadata
+quota/reset/scarcity metadata
+privacy/location constraints
+tool/structured-output/vision/audio support
+last verified timestamp
 ```
 
-Provider claims, benchmark data and OSCAR's own observations must retain provenance. Unknown metadata stays unknown.
+Provider claims, external benchmarks and OSCAR's own verified outcomes are different evidence sources and retain provenance.
 
 ## Candidate filtering and ranking
 
-Routing should happen in stages:
-
 ```text
 required capability
+→ refresh stale/unknown volatile metadata when needed
 → remove unavailable/incompatible candidates
 → enforce permissions/privacy/provider policy
-→ enforce context/input/output requirements
-→ evaluate credential health + current capacity
-→ identify free/subscription/local eligible pool
-→ apply requested routing mode
+→ enforce context/input/output constraints
+→ evaluate credential/account-pool health + capacity
+→ identify eligible free/subscription/local pool
+→ apply routing mode
 → rank task suitability/model power
 → rank reliability + latency
-→ apply scarcity/quota-preservation pressure
-→ reserve credential/capacity where needed
+→ apply scarcity pressure
+→ reserve capacity where needed
 → execute
 → observe outcome
-→ update routing evidence
+→ update evidence
 ```
 
-No model wins merely because metadata is missing, because it is largest, or because it won the previous request.
+No model wins because metadata is missing, because it is largest, or because it won the previous request.
 
-A provider/model with unknown price, latency, quota or capability should not receive an artificial advantage.
-
-## Adaptive routing and learning
-
-OSCAR should change routing as infrastructure changes.
+## Adaptive routing
 
 Useful observations include:
 
-- verified task success/failure;
-- provider/model errors;
+- task class;
+- provider/model/slot;
+- account/quota pool;
+- verified task outcome where available;
+- provider/model error;
 - latency;
 - structured-output/tool-call reliability;
-- rate-limit pressure;
-- current/recent quota exhaustion;
+- rate-limit/quota events;
 - fallback frequency;
-- task-class quality evidence;
-- context-window/tool/vision compatibility.
+- context/tool/vision compatibility;
+- inventory/deprecation timestamp.
 
-Observed history may influence later ranking, but:
+Observations decay or become stale. A model/provider version change can invalidate old evidence. One success/failure never permanently defines a model.
 
-- one success/failure must not permanently define a model;
-- stale observations decay or become stale;
-- model/provider version changes can invalidate old evidence;
-- user manual choices and policy remain authoritative;
-- the router must remain explainable: `why this route now?` should have an evidence-backed answer.
+## Failure + fallback semantics
 
-## Fallback semantics
+Differentiate:
+
+```text
+credential failure
+stale/deprecated model
+model capability mismatch
+provider failure
+rate limit
+quota exhaustion
+account-product mismatch
+network failure
+network-policy block
+cancelled
+```
 
 Fallback is bounded and evidence-aware.
 
-- use explicit fallback chains or re-rank currently eligible candidates;
-- distinguish credential failure from provider/model failure;
-- apply bounded retry/backoff;
-- respect paid-fallback and privacy policy;
+- distinguish credential failure from provider/model metadata failure;
+- bounded retry/backoff only;
+- re-rank after fresh capacity/availability evidence;
+- respect paid/private policies;
 - preserve task correlation/provenance;
-- re-evaluate capacity and scarcity after a rate-limit/quota event;
-- once a streaming answer has emitted meaningful output, do not append a second provider's continuation as though it were one coherent response;
-- model/provider success remains `REPORTED`/`INFERRED` until the objective is independently verified where verification matters.
+- once meaningful streaming output has been emitted, never splice another provider's continuation as if it were one coherent response;
+- provider/model success remains `REPORTED`/`INFERRED` until the surrounding objective is independently verified where required.
 
-## Provider health and quota
+## Search relationship
 
-The native router should absorb the useful separation proven in SwitchRoute:
+Search is not model routing, but the router may need search/live retrieval to refresh volatile metadata.
 
-- credential validity;
-- transient provider/model health;
-- rolling latency;
-- circuit-breaker state;
-- quota/capacity;
-- concurrency;
-- free-credit/subscription capacity;
-- reset horizon where known;
-- price/cost policy;
-- routing strategy.
-
-A configured distributed state backend may be introduced when concurrency actually requires it. Early development should not add infrastructure merely to mimic a previous deployment architecture.
-
-## Manual assignment and learned preference
-
-Manual selection must coexist with automation.
-
-The user may:
-
-- choose a provider;
-- choose a model;
-- optionally choose a specific credential slot for diagnostics;
-- set a temporary routing mode;
-- create durable preferences such as project-local-only or preferred coding executor;
-- disable a provider/model;
-- control paid fallback;
-- cap paid usage where measurable.
-
-OSCAR may learn operational affinity from verified outcomes, latency and failure history, but learned routing cannot silently create new authority or override explicit policy.
-
-## Usage, history and UI contract
-
-The product should expose a calm **Intelligence / Providers** surface rather than a generic telemetry dashboard.
-
-At a glance it should be possible to see:
-
-- connected providers;
-- number of configured credential slots;
-- provider/key health;
-- local runtime online/offline state;
-- current default routing mode;
-- whether automatic routing is enabled;
-- material quota/rate-limit/free-credit warnings.
-
-Drill-down views may show, where available:
-
-- requests;
-- input/output tokens;
-- estimated/confirmed cost;
-- free/subscription usage;
-- rate limits/quota;
-- reset horizon;
-- latency;
-- error/success rate;
-- models used;
-- provider/model/credential history;
-- fallback/circuit events;
-- coding-agent/executor history;
-- route decisions and explanation;
-- manual overrides/policies.
-
-Routing history should be inspectable in a concise form, for example:
+Example:
 
 ```text
-Task: repository debugging
-Path: specialist executor
-Selected: Codex
-Reason: coding affinity + project access + healthy node
-Fallback: Claude Code
-Verification: tests + repository state
+need current provider route
+→ cached model metadata stale
+→ provider inventory + current official docs/search
+→ refresh candidate evidence
+→ route model
 ```
 
-or:
+Tavily is the first planned search adapter with three keys. Search remains a Capability Catalog capability and can later be replaced/augmented by other providers.
+
+See [SEARCH-FRESHNESS.md](SEARCH-FRESHNESS.md).
+
+## Usage / history / UI contract
+
+The product should eventually expose a calm **Intelligence / Providers** surface showing only useful operational state:
+
+- connected providers and account products;
+- masked credential-slot health;
+- local runtime state;
+- default routing mode;
+- meaningful quota/rate-limit warnings;
+- current selected routes and reasons.
+
+Drill-down may show requests, tokens, cost, capacity, reset horizon, latency, error/success rate, models used, fallback/circuit events and route explanations.
+
+Never expose raw keys or persist prompt/response contents merely for router analytics.
+
+Example history:
 
 ```text
 Task: short extraction
 Mode: Free First
-Selected: Groq / model-x / groq-3
-Reason: sufficient task power + healthy plentiful free capacity + low latency
-Preserved: scarce OpenRouter free route
-Fallback: Google / model-y / google-1
+Selected: Groq / openai/gpt-oss-20b / groq-3
+Reason: current model + sufficient task power + healthy free capacity + low latency
+Preserved: scarcer OpenRouter route
+Verification: objective-level verifier pending
 ```
-
-The UI must never reveal raw API keys. Unknown usage/quota should be shown as unavailable/unknown rather than fabricated.
-
-## Observability and privacy
-
-Routing telemetry should be content-minimal by default.
-
-Useful metadata includes:
-
-- task/request ID;
-- route mode;
-- capability class;
-- provider/model/credential slot;
-- timings;
-- token counts where available;
-- cost estimate/confirmed cost;
-- capacity/scarcity evidence where known;
-- fallback reason;
-- error category;
-- verification/result linkage.
-
-Do not persist prompt/response/tool/upload contents merely to support router analytics.
 
 ## Slice ownership
 
 ### Slice 03
 
-Provides the Capability Catalog/transport foundation that lets providers, machine nodes and executors advertise capabilities.
+Provides Capability Catalog + transport foundations for remote/provider capabilities.
 
 ### Slice 04
 
-Implements the first native Model Router:
+Provides the first native Model Router: provider/model registry, multi-key pools, real hosted adapters, routing modes, health/capacity state, bounded fallback, route history and manual control.
 
-- provider/model/credential registry;
-- multi-key pools;
-- initial real adapters using the developer `.env`;
-- dynamic provider/model inventory boundary;
-- routing modes;
-- capability/task filtering;
-- health/latency/quota/free-credit/cost state;
-- scarcity-aware Free First routing;
-- model-power/task-fit ranking;
-- bounded fallback;
-- route history/usage data;
-- manual override;
-- ChatGPT/provider adapter path;
-- local-runtime discovery boundary.
+Gate A verified this foundation, but provider/model metadata remains explicitly volatile and must be refreshed rather than treated as permanent truth.
+
+### Post-Gate-A freshness correction
+
+Before/with Club B:
+
+- add Tavily search credentials/capability;
+- implement freshness classification/live retrieval path;
+- make provider/model refresh search/inventory-first;
+- test the first freshness-sensitive OSCAR objective from [SEARCH-FRESHNESS.md](SEARCH-FRESHNESS.md).
 
 ### Slice 05
 
-Adds real coding/agent executors and machine capabilities such as Codex, Claude Code/OpenCode where available, terminal, browser/computer use and installed applications.
+Adds real machine/coding-agent executors and remote continuation.
 
-## Initial manual verification
+### Slice 06
 
-Before Gate A can pass, manually verify at least:
+Adds memory/Personal Policy/live context plus the full first-class search/freshness path.
 
-1. multiple credentials for one provider can be loaded without leaking values;
-2. an unhealthy/rate-limited credential can fail over to another eligible credential;
-3. Auto, Fast/Balanced, Heavy Duty and Free First produce explainable route choices;
-4. Free First considers current free capacity **and** sufficient task/model power rather than always choosing one provider;
-5. a plentiful suitable route can preserve a scarcer higher-value free route for harder work;
-6. a quota/rate-limit change causes the next request to re-rank rather than remain pinned;
-7. Ollama Cloud's current free-credit model inventory can be represented without hard-coding it into core architecture;
-8. Manual can pin a provider/model without bypassing policy;
-9. local-only routing does not silently use cloud fallback;
-10. provider/model failure uses bounded fallback;
-11. streaming does not splice two providers after meaningful output begins;
-12. usage/history records the selected provider/model/credential slot without prompt/response retention;
-13. model reports remain unverified until the surrounding objective verification succeeds.
+## Verification expectations
 
-See also [NATIVE-INFRASTRUCTURE.md](NATIVE-INFRASTRUCTURE.md), [RUNTIME-FOUNDATIONS.md](RUNTIME-FOUNDATIONS.md), [EPISTEMIC-INTEGRITY.md](EPISTEMIC-INTEGRITY.md) and [BUILD-GATES.md](BUILD-GATES.md).
+At minimum verify:
 
-## Club A implementation checkpoint
+1. multiple credentials load without leaking values;
+2. unhealthy/rate-limited slot can fail over;
+3. Auto/Fast/Balanced/Heavy/Free First produce explainable choices;
+4. plentiful suitable capacity can preserve scarcer higher-value capacity;
+5. current provider/model inventory is refreshed rather than trusted from stale seed data;
+6. deprecated/retired model errors are not misclassified as bad credentials without evidence;
+7. Manual pin obeys policy/availability;
+8. Local never silently falls back to cloud;
+9. provider/model fallback is bounded;
+10. streaming never silently splices providers;
+11. history stores masked route metadata without prompt/response/key content;
+12. model reports remain unverified until objective evidence supports completion;
+13. freshness-sensitive routing metadata can be backed by current authoritative sources.
 
-`oscar/router.py` filters required capability/quality/context/output budgets, policy, credential availability and cooldown before ranking. Auto/Free First prefer eligible configured free/subscription/local routes; sufficient smaller models and known plentiful quota can preserve stronger scarce routes. Heavy Duty prioritizes eligible strength, Specialist task affinity, Fast latency, Balanced the combined evidence, and Cheap known monetary cost. Manual pins never expand privacy/cost/availability policy; Local never silently chooses cloud.
-
-`config/development-models.json` is replaceable developer metadata. Four stale entries were refreshed from 2026-10-02 live inventory/generation evidence, including Ollama `gemma4:31b`; the original six-model seed is not a permanent provider boundary. Quality/context figures remain conservative configuration, not observed benchmarks. Funding declarations do not establish remaining quota or credential validity. NVIDIA/Z.ai funding remains unknown and default routing excludes it. The opt-in verification script can explicitly allow bounded unknown-cost diagnostics; the ordinary live CLI retains discovery-only behavior for those providers. `config/local-template.json` contains disabled Ollama/LM Studio/vLLM interfaces with no assumed model inventory.
-
-OpenAI-compatible, Google generateContent and Ollama chat adapters are in `oscar/providers.py`. Supported request paths currently cover text, JSON structured output and streaming; images/audio/tool execution are not implemented. Additional OpenAI-compatible providers can be configured by manifest; a genuinely different protocol requires a new adapter. ChatGPT product-surface connectors remain pending.
-
-Credential state is separate from secrets. The environment is the sole credential input for this harness; `.env` is neither read nor written. Error bodies, raw prompts, responses and keys are excluded from route history. Provider responses stay REPORTED. Independent objective evidence can link into history; response reliability and objective success are learned separately with priors and decaying observations. Explicit policies remain authoritative.
-
-Observed request/token headers can establish quota; absent/stale balances remain unknown, including after consumption without a fresh header. Scarcity currently uses confirmed remaining requests, with explicit pressure for unknown capacity; full credit/reset/consumption forecasting is future work. No quota percentages or current model benchmarks are invented. Paid routing is off by default; known-price fallback budgets are cumulative, while unknown-price routing requires a separate explicit allowance.
-
-The automated/loopback contracts and implemented hosted foundation are verified. Real OpenRouter, Google AI Studio, Ollama Cloud and NVIDIA NIM generations succeeded across 11 slots. Credential failover, bounded cross-provider recovery, actual rate-limit reranking, Auto/Free First/Fast/Balanced/Heavy Duty and Manual pins have live evidence. Groq returned HTTP 403 and Z.ai HTTP 429; those operations remain unavailable. All successful response quota counters remained unknown. Numerical scarcity counterfactuals use labeled fixtures with real HTTPS execution, not invented provider balances. General model quality and real quota forecasting remain unverified. See [CLUB-A-CHECKPOINT.md](CLUB-A-CHECKPOINT.md).
+See [NATIVE-INFRASTRUCTURE.md](NATIVE-INFRASTRUCTURE.md), [RUNTIME-FOUNDATIONS.md](RUNTIME-FOUNDATIONS.md), [EPISTEMIC-INTEGRITY.md](EPISTEMIC-INTEGRITY.md), [SEARCH-FRESHNESS.md](SEARCH-FRESHNESS.md) and [BUILD-GATES.md](BUILD-GATES.md).
