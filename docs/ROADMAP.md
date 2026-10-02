@@ -138,8 +138,7 @@ Deliverables:
 **Manual milestone:** Gate A — Brain **PASS for Club A foundation, including real
 source-qualified Tavily/native search acceptance**.
 Core/reference Grid proofs remain
-verified; public deployment remains later integration work. **Stop here.
-Slice 05 has not started.**
+verified; public deployment remains later integration work. **Club A acceptance is preserved; Club B now has an isolated PARTIAL reference foundation.**
 
 ## Post-Gate-A correction — live search + freshness 🚧
 
@@ -177,10 +176,16 @@ freshness-sensitive objective
 ```
 
 This corrects the source-of-truth architecture. Core/reference Grid verification
-is retained; focused routing acceptance is resolved, while real combined-search
-acceptance remains blocked. This does not advance Club B or Slice 05.
+is retained; focused routing and the final evidence-qualified combined-search
+acceptance are resolved. Club B reference progress is recorded separately below.
 
-## Slice 05 — First real machine Worker + remote continuation ◻️
+## Slice 05 — First real machine Worker + remote continuation 🚧
+
+**Reference foundation VERIFIED; full slice PARTIAL.** Real separate-process POSIX
+Worker/Git/file/terminal, lease/checkpoint/restart/reclaim, completed-result replay,
+HTTP pause/resume/cancel and independent verification pass. Windows, actual coding
+bug delegation, browser/computer-use and public transport remain unverified.
+See [CLUB-B-CHECKPOINT.md](CLUB-B-CHECKPOINT.md).
 
 **Goal:** make OSCAR useful through a real optional computer node.
 
@@ -201,7 +206,14 @@ Deliverables:
 
 Exit: useful repository/system objective can run remotely, survive ordinary disconnect and report verified/partial/blocked state truthfully.
 
-## Slice 06 — LRA + Personal Policy + live context ◻️
+## Slice 06 — LRA + Personal Policy + live context 🚧
+
+**Local/reference foundation VERIFIED; full slice PARTIAL.** Selected persistent
+memory, structured explicit policy, live federation boundaries and evidence-backed
+entity graph pass. Connector Fabric supplies 35 Google capabilities and thin
+Microsoft/GitHub/Slack/Notion/MCP foundations. OAuth/private account access,
+Supermemory semantic service and natural-language policy remain unverified.
+Gate B is PARTIAL, not PASS. Do not advance to physical/UI/voice slices.
 
 **Goal:** add persistent continuity, explicit behavior rules and freshness-aware live retrieval.
 

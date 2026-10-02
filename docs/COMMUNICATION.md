@@ -331,3 +331,13 @@ Long-running communication responsibilities use Durable Execution Runtime where 
 8. Sentry awareness does not silently enable recording.
 9. Voice Map supports context, never permission.
 10. Communication success claims cannot exceed verification evidence.
+
+## Club B connector foundation
+
+Structured Gmail/Graph mail, Calendar and Slack operations now have native
+connector manifests/adapters through the existing catalog and permission ledger.
+Sending is external communication; reads do not grant write authority. OAuth/
+service account authentication remains unverified in this cloud run. Bodies and
+results are active task context, not default durable communication capture.
+Gmail recipient/header read-back and deployed provider push subscriptions remain
+PARTIAL. See [CONNECTOR-FABRIC.md](CONNECTOR-FABRIC.md).

@@ -30,6 +30,7 @@ from .contracts import (
     Verification,
     new_id,
 )
+from .credentials import redact_runtime_secrets
 from .grid import Grid, SessionHandle
 from .policy import PersonalPolicy
 from .storage import StateConflict, Store
@@ -71,6 +72,16 @@ class MachineScope:
             fd = os.open(name, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=parent)
             os.close(fd)
         return self.root.resolve() / relative
+
+
+class WorkerCancellation(Cancellation):
+    def __init__(self, store: Store, task_id: str, guard: Any):
+        super().__init__(store, task_id)
+        self.guard = guard
+
+    def check(self) -> None:
+        super().check()
+        self.guard()
 
 
 class MachineWorker:
@@ -260,13 +271,7 @@ class MachineWorker:
                     break
                 sleep(0.02)
             # Kill remaining members even when the parent exited; do not orphan background jobs.
-            text = output.decode(errors="replace")
-            for key, value in os.environ.items():
-                if value and any(
-                    term in key.upper() for term in ("TOKEN", "KEY", "SECRET", "PASSWORD")
-                ):
-                    text = text.replace(value, "<redacted>")
-            return process.returncode, text
+            return process.returncode, redact_runtime_secrets(output.decode(errors="replace"))
         finally:
             try:
                 os.killpg(process.pid, signal.SIGKILL)
@@ -332,30 +337,34 @@ class MachineWorker:
         self.check(action, cancellation)
         self.checkpoint(action, "started", 0)
         p = action.parameters
+        guarded_cancel = WorkerCancellation(
+            self.store, action.task_id, lambda: self.check(action, cancellation)
+        )
         artifact: ArtifactRef | None = None
         metadata: dict[str, Any] = {}
         try:
             if cap.id == "machine.files.write":
-                return FileExecutor(self.files)(action, cancellation)
+                return FileExecutor(self.files)(action, guarded_cancel)
             if cap.id == "machine.files.read":
                 data = self.files.read(p["path"])
                 if len(data) > 1_000_000:
                     raise ValueError("read bound exceeded")
-                self.outputs[action.id] = data.decode(errors="replace")
+                self.outputs[action.id] = redact_runtime_secrets(data.decode(errors="replace"))
                 metadata = {"sha256": hashlib.sha256(data).hexdigest(), "bytes": len(data)}
             elif cap.id in {"machine.files.list", "machine.files.search"}:
-                directory = self.scope.directory(p.get("cwd", "."))
+                relative = p.get("cwd", ".")
                 pattern = p.get("pattern", "")
                 if not isinstance(pattern, str) or len(pattern) > 200:
                     raise ValueError("invalid filename search")
-                with os.scandir(directory) as entries:
-                    names: list[str] = []
-                    for entry in entries:
-                        if len(names) >= 500:
-                            raise ValueError("directory result bound exceeded")
-                        if not entry.is_symlink() and pattern in entry.name:
-                            names.append(entry.name)
-                self.outputs[action.id] = json.dumps(sorted(names))
+                with self.files.directory(relative) as descriptor:
+                    with os.scandir(descriptor) as entries:
+                        names: list[str] = []
+                        for scanned, entry in enumerate(entries):
+                            if scanned >= 10_000 or len(names) >= 500:
+                                raise ValueError("directory result bound exceeded")
+                            if not entry.is_symlink() and pattern in entry.name:
+                                names.append(entry.name)
+                self.outputs[action.id] = redact_runtime_secrets(json.dumps(sorted(names)))
                 metadata = {"entries": len(names)}
             elif cap.id == "machine.executables":
                 metadata = {
@@ -380,7 +389,7 @@ class MachineWorker:
                 )
                 if status or out.strip():
                     raise ValueError("repository must start clean")
-                self.files.write(p["path"], p["content"], cancellation)
+                self.files.write(p["path"], p["content"], guarded_cancel)
                 self.checkpoint(action, "file-written", 0.3)
                 assert self.git is not None
                 code, _ = self.run_command(

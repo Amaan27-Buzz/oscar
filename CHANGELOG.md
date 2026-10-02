@@ -2,6 +2,20 @@
 
 Significant OSCAR milestones are recorded here. Detailed implementation status remains in `docs/ROADMAP.md`.
 
+## 2026-10-03 — Club B reference foundation (PARTIAL)
+
+- Native Connector Fabric joins the existing Grid catalog, with 35 researched
+  Google API capabilities and thin Graph/GitHub/Slack/Notion/MCP adapters.
+- Separate-process POSIX machine Worker adds scoped files, opt-in trusted terminal/
+  Git/agent execution, checkpoints/leases, HTTP pause/resume/cancel and recovery.
+- Local selected memory, structured Personal Policy, live federation and
+  evidence-backed entity bindings remain separate from current truth/permissions.
+- Real loopback continuation and integrated Git/policy/memory acceptances pass;
+  Google tests are synthetic, public GitHub is a real unauthenticated read.
+- Gate B remains PARTIAL. Windows, browser/computer-use, private accounts, OAuth
+  enrollment, Supermemory and natural-language policy are unverified.
+
+
 ## 2026-10-03 — Last Gate A correction: Club A foundation PASS
 
 - Preserve optional source titles, retrieval/subject identity and evidence references

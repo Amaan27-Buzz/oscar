@@ -124,6 +124,25 @@ class ContinuityTests(unittest.TestCase):
             replace(active, live=(wrong_scope,)).resolve("repository.status", self.now).value,
         )
 
+    def test_current_api_response_outranks_stale_memory_without_status_upgrade(self):
+        self.memory.retain(self.item, retention_authorized=True)
+        live_source = SourceRef(
+            "https://api.example.com/current", Authority.LIVE_API, "account", self.now, 5
+        )
+        live = ContextObservation(
+            "repository.status",
+            "current provider observation",
+            "project",
+            live_source,
+            Epistemic.REPORTED,
+        )
+        active = ActiveContext(
+            "task", "project", (live,), self.memory.retrieve("repository", "project")
+        )
+        resolved = active.resolve("repository.status", self.now)
+        self.assertEqual("current provider observation", resolved.value)
+        self.assertEqual(Epistemic.REPORTED, resolved.state)
+
     def test_recalled_or_reported_never_becomes_authoritative(self):
         live_source = SourceRef("local://claims", Authority.LIVE_API, "local", self.now)
         reported = ContextObservation(

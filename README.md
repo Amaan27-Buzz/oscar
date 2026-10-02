@@ -289,7 +289,9 @@ For the current fast developer-alpha build, adjacent slices are grouped into rev
 
 ### Current club
 
-**Club A — Brain (Slices 01–04): final Gate A acceptance pass recorded.
+**Club B foundation (Slices 05–06): reference Worker, memory/policy and Connector Fabric implemented.
+Gate B remains PARTIAL; see [Club B checkpoint](docs/CLUB-B-CHECKPOINT.md).
+Club A — Brain (Slices 01–04): final Gate A acceptance pass preserved.
 Gate A PASS for the Club A foundation: source provenance, bounded official constraints
 and evidence-qualified UNKNOWN handling are verified.**
 
@@ -303,7 +305,7 @@ search acceptance now passes with retained titles, relevant official evidence an
 bounded evidenced UNKNOWN outcomes.
 Public coordinator deployment and physical nodes
 remain later work. See [the checkpoint](docs/CLUB-A-CHECKPOINT.md) for all passing,
-failed and historical evidence. **Stopped for manual review; Slice 05 has not started.**
+failed and historical evidence. **Club B progressed on an isolated review branch; no main/work merge.**
 
 Target proof:
 
@@ -320,7 +322,8 @@ objective
 ```
 
 The CLI reads runtime environment credentials and never reads/writes `.env`.
-All 209 automated tests pass; the opt-in [live suite](scripts/verify_club_a_live.py)
+The Club A checkpoint records its historical test count; current Club B verification
+is documented in [the checkpoint](docs/CLUB-B-CHECKPOINT.md). The opt-in [live suite](scripts/verify_club_a_live.py)
 records operation-level success, refusal and runtime assertions separately.
 Provider responses remain REPORTED until independently verified; unsupported
 objectives remain partial. Current authoritative sources outrank stale manifests
@@ -397,3 +400,18 @@ A slice is not complete because an agent says it is complete. Implementation, te
 ---
 
 <p align="center"><sub>OSCAR is an original project inspired by the goal of building a genuinely capable ambient intelligence.</sub></p>
+
+## Review the Club B reference foundation
+
+```sh
+python -m scripts.verify_worker_reference --report .oscar/worker-review.json
+python -m scripts.verify_club_b --report .oscar/club-b-review.json
+python -m unittest tests.test_connectors tests.test_connector_http -v
+python -m scripts.verify_connector_public --run-public --report .oscar/public-review.json
+```
+
+The first two use separate Worker/Core processes and real loopback HTTP/Git/SQLite.
+Google HTTP tests are synthetic; the public GitHub command is an explicit real
+network read. Windows/Sunday, authenticated coding tasks, private service accounts,
+OAuth enrollment, Supermemory and natural-language policy remain unverified.
+See [Connector Fabric](docs/CONNECTOR-FABRIC.md) for privacy/auth boundaries.

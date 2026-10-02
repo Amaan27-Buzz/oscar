@@ -75,6 +75,21 @@ class ScopedFiles:
         finally:
             os.close(descriptor)
 
+    @contextmanager
+    def directory(self, relative: str = ".") -> Iterator[int]:
+        """Scoped directory descriptor for race-resistant listing/search."""
+        if relative == ".":
+            descriptor = os.open(self.root, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+        else:
+            with self.parent(relative) as (parent, name):
+                descriptor = os.open(
+                    name, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=parent
+                )
+        try:
+            yield descriptor
+        finally:
+            os.close(descriptor)
+
     def write(self, relative: str, content: str, cancellation: Cancellation) -> None:
         if len(content.encode()) > 1_000_000:
             raise ValueError("file objective too large")

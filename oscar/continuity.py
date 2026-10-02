@@ -179,7 +179,7 @@ class ActiveContext:
             and o.scope == self.scope
             and o.source.current(now)
             and o.source.authority in {Authority.LIVE_API, Authority.OFFICIAL_DOCS}
-            and o.state in {Epistemic.KNOWN, Epistemic.VERIFIED}
+            and o.state in {Epistemic.KNOWN, Epistemic.VERIFIED, Epistemic.REPORTED}
         ]
         if authoritative:
             return min(

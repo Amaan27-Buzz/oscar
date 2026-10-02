@@ -234,3 +234,18 @@ Running through all of it:
 8. Native OSCAR transport/capability contracts replace any requirement for a separately deployed Latch runtime.
 9. Native OSCAR Model Router replaces any requirement for a separately deployed SwitchRoute runtime.
 10. Engineering/design tools are ordinary replaceable specialist capabilities; no dedicated workbench product is required.
+
+## Club B reference continuation and privacy
+
+The native runtime now accepts explicit structured capability objectives through
+Jev, preserving the existing durable task/plan/Action/Result/evidence path. Grid
+renewal fences the current unexpired lease; Worker progress stores metadata-only
+checkpoints. Authenticated pause/resume extends the existing version-1 envelope
+additively; older targets reject unsupported controls. No storage migration or
+second task engine was introduced. Completed response loss can reclaim the same
+Action and reuse durable dedup results. Started ambiguous mutations cannot replay.
+
+Connector private inputs are staged as transient references. Losing active input
+context blocks instead of recovering private content from durable history. Worker
+process logs and connector bodies never become generic router/ledger telemetry.
+Memory retention is selected separately. See [CLUB-B-CHECKPOINT.md](CLUB-B-CHECKPOINT.md).

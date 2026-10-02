@@ -315,7 +315,7 @@ def run_reference(root: Path) -> dict[str, Any]:
                 "shared SQLite reference authority",
                 "loopback-only transport",
                 "user Windows laptop unverified",
-                "coding-agent invocation unverified",
+                "authenticated coding-agent tasks unverified",
                 "public TLS/rendezvous and independent stores unverified",
             ],
             "state_path": str(state),

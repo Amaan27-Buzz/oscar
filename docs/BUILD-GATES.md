@@ -58,8 +58,8 @@ reranking finds an eligible alternative, or truthful blocking records that none
 exists. Shared cooldowns must not disable unrelated pools; UNKNOWN remains UNKNOWN.
 Live combined search is verified with current native inventories and official-source
 evidence/explicit UNKNOWN resolutions; native inventory or synthetic tests alone
-cannot establish this acceptance. **Stop here; Slice 05 has not
-started.**
+cannot establish this acceptance. **Club A acceptance remains preserved; the current Club B reference foundation
+is PARTIAL, as recorded in [CLUB-B-CHECKPOINT.md](CLUB-B-CHECKPOINT.md).**
 
 The current foundation review accepts coherent reference Transport/Grid contracts. Public TLS/outbound rendezvous, independent network stores and a cloud coordinator path using a configured deployment target remain later Grid integration acceptance requirements; they are not claimed verified by Gate A. This refines the previous public-deployment gate expectation without changing the architecture or silently completing broader slice deliverables.
 
@@ -172,7 +172,7 @@ This is intentionally aggressive. Anything not genuinely verified remains planne
 | Gate | Slices | Status |
 |---|---|---|
 | Gate A — Brain | 01–04 | PASS for Club A foundation — focused routing and final evidence-qualified search accepted; manual review stop |
-| Gate B — Can Do Work | 05–06 | Planned |
+| Gate B — Can Do Work | 05–06 | PARTIAL — reference foundation passes; full manual criteria pending |
 | Gate C — Embodied OSCAR | 07–10 | Planned |
 | Gate D — JARVIS Layer | 11–14 | Planned |
 | Gate E — Unified Alpha | 15–17 | Planned |
