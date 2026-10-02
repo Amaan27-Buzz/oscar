@@ -10,6 +10,7 @@ from .connectors import (
     ConnectorError,
     ConnectorManifest,
     RiskLevel,
+    endpoint,
 )
 
 
@@ -106,7 +107,7 @@ def github_manifest(*, public: bool = False) -> ConnectorManifest:
             ),
         ),
         AuthType.NONE if public else AuthType.SESSION,
-        headers=(("X-GitHub-Api-Version", "2022-11-28"), ("User-Agent", "OSCAR-reference")),
+        headers=(("X-GitHub-Api-Version", "2026-03-10"), ("User-Agent", "OSCAR-reference")),
         provenance="https://docs.github.com/en/rest; retrieved 2026-10-03 IST",
     )
 
@@ -289,3 +290,28 @@ class MCPBoundary:
         if response.get("isError"):
             raise ConnectorError("mcp_tool_failed")
         return response  # Still testimony; only ConnectorVerifier can upgrade an objective.
+
+
+class MCPConnectorHTTP:
+    """Session adapter invoked through Fabric/Dispatcher permission and policy boundaries."""
+
+    def __init__(self, boundary: MCPBoundary):
+        self.boundary = boundary
+
+    def request(
+        self,
+        manifest: ConnectorManifest,
+        spec: ConnectorCapability,
+        parameters: dict[str, Any],
+        secret: str | None,
+    ) -> tuple[dict[str, Any], str]:
+        if manifest.id != "mcp" or spec.name not in {
+            c.name for c in self.boundary.manifest().capabilities
+        }:
+            raise PermissionError("MCP capability was not owner reviewed")
+        endpoint(spec, parameters)
+        name = spec.name.removeprefix("mcp.")
+        if parameters["path"]["name"] != name:
+            raise PermissionError("MCP tool identity mismatch")
+        response = self.boundary.call(name, parameters["body"])
+        return response, "mcp://authenticated-session/" + name

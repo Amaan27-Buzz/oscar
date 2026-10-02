@@ -32,6 +32,7 @@ from .contracts import (
     Verification,
     new_id,
 )
+from .credentials import redact_runtime_secrets
 from .freshness import Authority, SourceRef
 from .grid import Grid, SessionHandle
 from .http_client import NoRedirects
@@ -91,7 +92,7 @@ class EnvironmentSecrets:
     def redact(self, value: str) -> str:
         for secret in self._values.values():
             value = value.replace(secret, "<redacted>")
-        return value
+        return redact_runtime_secrets(value)
 
     def __repr__(self) -> str:
         return "EnvironmentSecrets(<runtime-only>)"
@@ -185,6 +186,7 @@ class ConnectorInstance:
     credential: CredentialRef | None = None
     granted_scopes: frozenset[str] = frozenset()
     available: bool = True
+    session_ready: bool = False
 
 
 @dataclass(frozen=True)
@@ -193,6 +195,10 @@ class ConnectorOutcome:
     source: SourceRef | None
     payload: dict[str, Any] = field(default_factory=dict, repr=False)
     state: ConnectionState = ConnectionState.READY
+    instance_id: str = ""
+    granted: frozenset[str] = frozenset()
+    confirmed: bool = False
+    context: dict[str, str] = field(default_factory=dict, repr=False)
 
 
 @dataclass(frozen=True)
@@ -342,6 +348,8 @@ class ConnectorFabric:
     def state(self, instance: ConnectorInstance, spec: ConnectorCapability) -> ConnectionState:
         if not instance.available:
             return ConnectionState.UNAVAILABLE
+        if instance.manifest.auth == AuthType.MCP:
+            return ConnectionState.READY if instance.session_ready else ConnectionState.AUTH_MISSING
         if instance.manifest.auth != AuthType.NONE and (
             instance.credential is None or not self.secrets.resolve(instance.credential)
         ):
@@ -383,6 +391,8 @@ class ConnectorFabric:
         confirmed: bool = False,
         context: dict[str, str] | None = None,
     ) -> ConnectorOutcome:
+        if len(self.outcomes) >= 100:
+            raise ValueError("active connector outcome bound; release completed results")
         instance = self.instances[instance_id]
         spec = next(c for c in instance.manifest.capabilities if c.name == name)
         state = self.state(instance, spec)
@@ -423,7 +433,24 @@ class ConnectorFabric:
                     evidence_id=new_id(),
                 )
             except ConnectorError as failure:
-                error = str(failure)
+                category = str(failure)
+                error = (
+                    category
+                    if category
+                    in {
+                        "auth_missing",
+                        "access_denied",
+                        "rate_limited",
+                        "http_failure",
+                        "network_failure",
+                        "invalid_contract",
+                        "response_bound",
+                        "provider_rejected",
+                        "invalid_credential",
+                        "mcp_tool_failed",
+                    }
+                    else "connector_failure"
+                )
         result = Result(
             new_id(),
             action.id,
@@ -433,7 +460,9 @@ class ConnectorFabric:
             error is None,
             error=error,
         )
-        outcome = ConnectorOutcome(result, source, payload, state)
+        outcome = ConnectorOutcome(
+            result, source, payload, state, instance.id, granted, confirmed, context or {}
+        )
         self.outcomes[result.id] = outcome
         self.store.audit(
             action.task_id,
@@ -530,12 +559,23 @@ class ConnectorVerifier(Verifier):
         detail = "authoritative read-back unavailable"
         try:
             outcome = self.fabric.outcomes[result.id]
+            if outcome.instance_id != criterion["instance_id"]:
+                raise ConnectorError("readback_account_mismatch")
             instance = self.fabric.instances[criterion["instance_id"]]
             read = next(
                 c for c in instance.manifest.capabilities if c.name == criterion["read_capability"]
             )
             if read.method != "GET" or self.fabric.state(instance, read) != ConnectionState.READY:
                 raise ConnectorError("readback_unavailable")
+            policy = self.fabric.policy.evaluate(
+                read.name,
+                read.permissions,
+                outcome.granted,
+                outcome.context,
+                confirmed=outcome.confirmed,
+            )
+            if not policy.allowed:
+                raise ConnectorError("readback_permission_missing")
             if not criterion.get("expected") or not outcome.result.success:
                 raise ConnectorError("completion_fields_missing")
             params = criterion["read_parameters"]
@@ -547,7 +587,9 @@ class ConnectorVerifier(Verifier):
                 self.fabric.secrets.resolve(instance.credential) if instance.credential else None
             )
             payload, _ = self.fabric.http.request(instance.manifest, read, params, secret)
-            matches = all(payload.get(k) == v for k, v in criterion["expected"].items())
+            matches = payload.get("id") == response_id and all(
+                payload.get(k) == v for k, v in criterion["expected"].items()
+            )
             detail = "expected fields match" if matches else "read-back fields differ"
         except (KeyError, StopIteration, ConnectorError, ValueError):
             pass

@@ -105,7 +105,7 @@ class ConnectorTests(unittest.TestCase):
             "google.calendar.events.create",
             self.action,
             self.cancel,
-            frozenset({"connectors:write"}),
+            frozenset({"connectors:write", "connectors:read"}),
             **kwargs,
         )
 
@@ -249,6 +249,88 @@ class ConnectorTests(unittest.TestCase):
         self.assertTrue(self.fabric.ingest(event, authenticated=True))
         self.assertFalse(self.fabric.ingest(event, authenticated=True))
         self.assertNotIn("private-cursor", json.dumps(self.store.all("connector_event_receipt")))
+
+    def test_readback_cannot_borrow_ungranted_permission_or_another_account(self):
+        outcome = self.fabric.execute(
+            "calendar",
+            "google.calendar.events.create",
+            self.action,
+            self.cancel,
+            frozenset({"connectors:write"}),
+            confirmed=True,
+        )
+        objective = replace(
+            self.objective,
+            criterion={
+                "kind": "connector_fields",
+                "instance_id": "calendar",
+                "read_capability": "google.calendar.events.get",
+                "read_parameters": {"path": {"calendarId": "primary", "eventId": "event-1"}},
+                "expected": {"summary": "fixture"},
+            },
+        )
+        verifier = ConnectorVerifier(Verifier(ScopedFiles(self.root / "files")), self.fabric)
+        self.assertEqual(
+            TaskState.PARTIALLY_VERIFIED, verifier.verify(objective, outcome.result).state
+        )
+        self.assertEqual(1, len(self.http.calls))
+        self.fabric.outcomes[outcome.result.id] = replace(
+            outcome, instance_id="another-account", granted=frozenset({"connectors:read"})
+        )
+        self.assertEqual(
+            TaskState.PARTIALLY_VERIFIED, verifier.verify(objective, outcome.result).state
+        )
+
+    def test_provider_exception_cannot_leak_secret_into_ledger(self):
+        self.http.failure = self.secret
+        outcome = self.execute(confirmed=True)
+        self.assertEqual("connector_failure", outcome.result.error)
+        self.assertNotIn(self.secret, json.dumps(self.store.ledger(self.task.id)))
+
+    def test_mcp_fabric_scope_confirmation_and_reported_result(self):
+        from oscar.connector_providers import MCPConnectorHTTP
+
+        class Session:
+            def __init__(self):
+                self.calls = 0
+
+            def list_tools(self):
+                return [
+                    {
+                        "name": "delete",
+                        "inputSchema": {"type": "object"},
+                        "annotations": {"readOnlyHint": True},
+                    }
+                ]
+
+            def call_tool(self, name, arguments):
+                self.calls += 1
+                return {"content": [{"type": "text", "text": "synthetic success"}]}
+
+        session = Session()
+        boundary = MCPBoundary(session, {"delete": RiskLevel.DESTRUCTIVE})
+        fabric = ConnectorFabric(self.store, self.secrets, self.policy, MCPConnectorHTTP(boundary))
+        fabric.install(ConnectorInstance("mcp", boundary.manifest(), session_ready=True))
+        action = replace(
+            self.action,
+            capability_id="mcp:mcp.delete",
+            parameters={"path": {"name": "delete"}, "body": {}},
+        )
+        denied = fabric.execute(
+            "mcp", "mcp.delete", action, self.cancel, frozenset({"connectors:destructive"})
+        )
+        self.assertFalse(denied.result.success)
+        self.assertEqual(0, session.calls)
+        allowed = fabric.execute(
+            "mcp",
+            "mcp.delete",
+            action,
+            self.cancel,
+            frozenset({"connectors:destructive"}),
+            confirmed=True,
+        )
+        self.assertEqual(Epistemic.REPORTED, allowed.result.status)
+        self.assertEqual(1, session.calls)
 
     def test_pkce_s256(self):
         import base64

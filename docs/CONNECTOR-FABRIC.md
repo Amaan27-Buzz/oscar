@@ -86,3 +86,39 @@ Notion requires its version header; current documentation shows `2026-03-11`,
 selected explicitly. Device grants are not generally interchangeable with desktop
 OAuth and their supported scopes are provider-limited. The reference implements
 contracts only; it does not pretend to have completed either enrollment flow.
+
+## Additional current-source checks and acceptance
+
+Current method documentation was also retrieved with HTTP 200 for Graph
+[mail listing](https://learn.microsoft.com/en-us/graph/api/user-list-messages?view=graph-rest-1.0),
+[sendMail](https://learn.microsoft.com/en-us/graph/api/user-sendmail?view=graph-rest-1.0),
+[joined Teams](https://learn.microsoft.com/en-us/graph/api/user-list-joinedteams?view=graph-rest-1.0),
+[site search](https://learn.microsoft.com/en-us/graph/api/site-search?view=graph-rest-1.0),
+Slack [history](https://docs.slack.dev/reference/methods/conversations.history) and
+[search](https://docs.slack.dev/reference/methods/search.messages), Notion
+[data-source query](https://developers.notion.com/reference/query-a-data-source)
+and [page creation](https://developers.notion.com/reference/post-page), and
+[MCP 2025-11-25 tools](https://modelcontextprotocol.io/specification/2025-11-25/server/tools).
+Slack search requires a user token; public-channel history does not imply private
+channels/DM access. Graph `/me` requires delegated identity, not an App-only token.
+MCP `isError`/tool annotations remain testimony, never self-granted permission.
+
+The first guessed GitHub versioning-document URL returned an HTTP error. The
+successfully retrieved official repository reference explicitly supplies
+`latestApiVersion: 2026-03-10` and lists the older `2022-11-28` as another supported
+version. The adapter now explicitly selects **2026-03-10** based on that source.
+This corrects the initially selected older version, preserving the initial public
+read as a dated older-version observation rather than silently relabeling it.
+
+`tests.test_connector_http` routes the actual bounded adapter to an explicitly
+synthetic loopback HTTP service for all 35 Google methods, including media/export
+and redirect refusal. This verifies local HTTP/contract behavior, not Google
+account access. `scripts.verify_connector_public --run-public` performs only a
+real unauthenticated public GitHub response-contract check with source/time/ID.
+
+MCP has an SDK session HTTP-interface adapter through Fabric permission/policy
+checks. Session readiness must be supplied by trusted composition. Destructive
+MCP tool calls require both reviewed risk scope and confirmation even if the server
+claims a read-only annotation. No live MCP service has been authenticated/tested.
+Read-back also requires explicitly granted OSCAR read permission and the same
+connector instance/account; a write grant cannot borrow read access for verification.

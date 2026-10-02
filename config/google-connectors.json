@@ -76,7 +76,9 @@
           "risk": "write",
           "query_fields": [],
           "body_required": true,
-          "response_kind": "json"
+          "response_kind": "json",
+          "readback": "google.gmail.drafts.read",
+          "verification": "authoritative read-back; explicitly selected fields; provider-specific comparison may remain PARTIAL"
         },
         {
           "name": "google.gmail.drafts.read",
@@ -102,7 +104,9 @@
           "risk": "external-communication",
           "query_fields": [],
           "body_required": true,
-          "response_kind": "json"
+          "response_kind": "json",
+          "readback": "google.gmail.read",
+          "verification": "authoritative read-back; explicitly selected fields; provider-specific comparison may remain PARTIAL"
         },
         {
           "name": "google.gmail.labels.list",
@@ -182,7 +186,9 @@
             "sendUpdates"
           ],
           "body_required": true,
-          "response_kind": "json"
+          "response_kind": "json",
+          "readback": "google.calendar.events.get",
+          "verification": "authoritative read-back; explicitly selected fields; provider-specific comparison may remain PARTIAL"
         },
         {
           "name": "google.calendar.events.update",
@@ -196,7 +202,9 @@
             "sendUpdates"
           ],
           "body_required": true,
-          "response_kind": "json"
+          "response_kind": "json",
+          "readback": "google.calendar.events.get",
+          "verification": "authoritative read-back; explicitly selected fields; provider-specific comparison may remain PARTIAL"
         },
         {
           "name": "google.calendar.events.delete",
@@ -301,7 +309,9 @@
             "fields"
           ],
           "body_required": true,
-          "response_kind": "json"
+          "response_kind": "json",
+          "readback": "google.drive.read",
+          "verification": "authoritative read-back; explicitly selected fields; provider-specific comparison may remain PARTIAL"
         },
         {
           "name": "google.drive.update",
@@ -315,7 +325,9 @@
             "fields"
           ],
           "body_required": true,
-          "response_kind": "json"
+          "response_kind": "json",
+          "readback": "google.drive.read",
+          "verification": "authoritative read-back; explicitly selected fields; provider-specific comparison may remain PARTIAL"
         }
       ]
     },
@@ -415,7 +427,9 @@
           "risk": "write",
           "query_fields": [],
           "body_required": true,
-          "response_kind": "json"
+          "response_kind": "json",
+          "readback": "google.docs.read",
+          "verification": "authoritative read-back; explicitly selected fields; provider-specific comparison may remain PARTIAL"
         },
         {
           "name": "google.docs.update",
@@ -427,7 +441,9 @@
           "risk": "write",
           "query_fields": [],
           "body_required": true,
-          "response_kind": "json"
+          "response_kind": "json",
+          "readback": "google.docs.read",
+          "verification": "authoritative read-back; explicitly selected fields; provider-specific comparison may remain PARTIAL"
         }
       ]
     },
@@ -477,7 +493,9 @@
             "includeValuesInResponse"
           ],
           "body_required": true,
-          "response_kind": "json"
+          "response_kind": "json",
+          "readback": "google.sheets.ranges.read",
+          "verification": "authoritative read-back; explicitly selected fields; provider-specific comparison may remain PARTIAL"
         },
         {
           "name": "google.sheets.create",
@@ -518,7 +536,9 @@
           "risk": "write",
           "query_fields": [],
           "body_required": true,
-          "response_kind": "json"
+          "response_kind": "json",
+          "readback": "google.slides.read",
+          "verification": "authoritative read-back; explicitly selected fields; provider-specific comparison may remain PARTIAL"
         },
         {
           "name": "google.slides.update",
@@ -530,7 +550,9 @@
           "risk": "write",
           "query_fields": [],
           "body_required": true,
-          "response_kind": "json"
+          "response_kind": "json",
+          "readback": "google.slides.read",
+          "verification": "authoritative read-back; explicitly selected fields; provider-specific comparison may remain PARTIAL"
         }
       ]
     }
