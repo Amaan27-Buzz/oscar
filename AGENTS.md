@@ -26,6 +26,10 @@ Load additionally when relevant:
 - `docs/MODEL-ROUTING.md`
 - `docs/RUNTIME-FOUNDATIONS.md`
 
+### Search / live truth
+
+- `docs/SEARCH-FRESHNESS.md`
+
 ### Voice / Sentry / communication
 
 - `docs/VOICE-SENTRY.md`
@@ -61,6 +65,7 @@ Treat these as current product contract. If code/docs disagree, investigate rath
 - Use specialist tools when they are the right executor.
 - Do not add a dependency without a concrete reason.
 - Update durable docs in the same change when a real invariant changes.
+- When an objective is freshness-sensitive, retrieve current authoritative evidence before relying on memory/model priors.
 
 ## Native infrastructure
 
@@ -135,6 +140,22 @@ Do not say `done`, `fixed`, `works` or equivalent when evidence is only partial/
 18. OSCAR's own TTS is excluded from Voice Map/wake loops while human barge-in remains functional.
 19. Connection Grid degrades rather than treating one node as hidden host.
 20. Persona changes expression, never truth/safety/permission.
+21. Freshness-sensitive/current claims require live authoritative retrieval when available; recalled/model-prior data must not be presented as current truth.
+
+## Search / freshness rules
+
+Search is a first-class capability, not a fallback excuse for stale reasoning.
+
+- classify whether current/live truth materially matters;
+- prefer authoritative APIs/live sources over web summaries when available;
+- preserve source URL/identity, publication/update time and retrieval time;
+- stale cached/provider manifests are hints, not current authority;
+- model/provider availability, pricing, quota and deprecation checks are freshness-sensitive;
+- if live lookup is unavailable, report that the answer may be stale instead of guessing;
+- Tavily is the first planned search adapter with three credential slots, not an architectural dependency;
+- search results are evidence inputs, not automatically verified truth.
+
+See `docs/SEARCH-FRESHNESS.md`.
 
 ## Sentry / capture rules
 
@@ -209,6 +230,8 @@ Durable direction: **Quietly Alive + Playful Precision**.
 
 For design exploration, use real shipping-app research + coded UI + visual critique + Kaizen iteration. `image-prompts/` is reference material, not canonical implementation.
 
+Simplicity must preserve craftsmanship. Prototypes that establish a visual pattern must demonstrate real depth, expression, motion, finish and verification now rather than deferring those details to a later implementation.
+
 ## Testing expectations
 
 Every slice has an explicit checklist including relevant failure/reconnect/cancellation/idempotency/safety cases.
@@ -218,6 +241,8 @@ Where relevant test:
 - provider/node loss;
 - Connection Grid reconnect/lease expiry;
 - remote task continuation/cancel;
+- freshness-sensitive query vs stale cache/model prior;
+- search credential failover and source provenance;
 - wake/VAD/STT/TTS latency;
 - barge-in/self-voice suppression;
 - Voice Match/Voice Map behavior;
