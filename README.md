@@ -331,7 +331,7 @@ Manual integration checkpoints are in [`docs/BUILD-GATES.md`](docs/BUILD-GATES.m
 - [Architecture](docs/ARCHITECTURE.md)
 - [Roadmap](docs/ROADMAP.md)
 - [Connection Grid](docs/CONNECTION-GRID.md)
-- [Native infrastructure](docs/NATIVE-INFSTRUCTURE.md)
+- [Native infrastructure](docs/NATIVE-INFRASTRUCTURE.md)
 - [Model routing](docs/MODEL-ROUTING.md)
 - [Voice + Sentry](docs/VOICE-SENTRY.md)
 - [Persona](docs/PERSONA.md)
