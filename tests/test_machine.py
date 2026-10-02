@@ -214,6 +214,14 @@ class MachineTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 MachineScope(self.workspace, max_timeout=timeout)
 
+    def test_runtime_rejects_secret_before_durable_plan(self):
+        with patch.dict(os.environ, {"OSCAR_FIXTURE_API_KEY": "synthetic-runtime-secret"}):
+            with self.assertRaises(ValueError):
+                self.runtime.create(
+                    Intent("write", "file_write", "key.txt", "synthetic-runtime-secret")
+                )
+        self.assertEqual([], self.store.all("objective"))
+
     def test_machine_lie_does_not_verify_file(self):
         from oscar.contracts import Result, new_id
 

@@ -70,6 +70,11 @@ class Store:
                 (kind, identifier, json.dumps(data, allow_nan=False)),
             )
 
+    def delete(self, kind: str, identifier: str) -> None:
+        """Delete the live record; does not claim secure erasure of WAL/backups."""
+        with self.lock:
+            self.db.execute("DELETE FROM records WHERE kind=? AND id=?", (kind, identifier))
+
     def get(self, kind: str, identifier: str) -> dict[str, Any]:
         with self.lock:
             row = self.db.execute(

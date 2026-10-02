@@ -1,10 +1,14 @@
 """Deterministic user-authoritative rules, separate from permissions and inferred memory."""
 
+import json
+import math
+from collections.abc import Callable
 from dataclasses import dataclass
 from enum import StrEnum
 from time import time
 
 from .contracts import record
+from .credentials import redact_runtime_secrets
 from .storage import Store
 
 
@@ -35,6 +39,16 @@ class PolicyRule:
             raise ValueError("policy needs identity, scope and provenance")
         if "*" in self.capability[:-1]:
             raise ValueError("only trailing wildcard is supported")
+        if (
+            not all(math.isfinite(v) and v >= 0 for v in (self.created_at, self.updated_at))
+            or self.expires_at is not None
+            and not math.isfinite(self.expires_at)
+            or type(self.priority) is not int
+            or not all(
+                isinstance(k, str) and isinstance(v, str) for k, v in self.conditions.items()
+            )
+        ):
+            raise ValueError("invalid structured policy contract")
         if self.updated_at < self.created_at:
             raise ValueError("invalid policy timestamps")
 
@@ -48,12 +62,15 @@ class PolicyDecision:
 
 
 class PersonalPolicy:
-    def __init__(self, store: Store):
-        self.store = store
+    def __init__(self, store: Store, redact: Callable[[str], str] = redact_runtime_secrets):
+        self.store, self.redact = store, redact
 
     def save(self, rule: PolicyRule, *, owner_authorized: bool) -> None:
         if not owner_authorized or not rule.user_authoritative:
             raise PermissionError("candidates cannot become authoritative without owner authority")
+        data = json.dumps(record(rule))
+        if self.redact(data) != data:
+            raise ValueError("credential material cannot enter Personal Policy")
         self.store.put("personal_policy", rule.id, record(rule))
 
     def rules(self) -> list[PolicyRule]:

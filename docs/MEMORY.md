@@ -218,3 +218,33 @@ Memory does not grant permissions or bypass Personal Policy.
 8. Sensitive communication data uses explicit retention controls.
 9. Voice Match/Voice Map embeddings are dedicated sensitive system data, not generic LRA memories.
 10. Model reasoning is selected through OSCAR's native Model Router, not a required external SwitchRoute service.
+
+## Club B local continuity foundation
+
+`oscar.continuity.LocalMemory` uses existing SQLite records for selected episodic,
+project, device, procedural, profile, relationship, semantic, communication and
+Worker context. Every item carries source/time/evidence state, confidence when
+supplied, retention reason/expiry and entity references. Retention requires an
+explicit decision; retrieval alone never stores private connector content.
+
+Local retrieval is bounded lexical filtering by explicit scope and recency, not
+semantic/vector search. `MemoryBackend` is the replaceable semantic-engine
+contract; **Supermemory live integration is UNVERIFIED**. Verified historical
+content requires matching independently verified evidence, exact content hash and
+observation time; an unrelated verified task cannot promote arbitrary memory.
+Retrieved items are always RECALLED even if historically verified.
+
+Live federation adapters reuse scoped current files, Grid snapshots, native
+search/freshness and authorized Connector Fabric callbacks. Current known/verified
+live authoritative observations precede stale memory. API/search testimony remains
+REPORTED; a fresh retrieval timestamp cannot promote it. No prompt-history dump or
+full World Model runtime is implemented. Context sources carry evidence/source/
+time/scope and entity refs where supplied.
+
+`oscar.entities` supplies canonical entity records, exact provider/account/native
+identity bindings and a small relation vocabulary. Identity/relation evidence
+must explicitly name the matching claim fields; same labels and unrelated task
+proofs cannot merge identities. Unknown entities remain separate. Forget removes
+live entity bindings/relations or memory rows. Expiry excludes/purges live memory
+records. SQLite WAL, backups and connected-source deletion/secure erasure are
+**not verified**; deletion must never be reported as "deleted everywhere".

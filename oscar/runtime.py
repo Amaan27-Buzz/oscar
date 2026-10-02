@@ -1,5 +1,6 @@
 """Evidence-backed core loop; planning, dispatch and independent verification stay separate."""
 
+import json
 from collections.abc import Callable, Mapping
 from dataclasses import replace
 from time import time
@@ -17,6 +18,7 @@ from .contracts import (
     new_id,
     record,
 )
+from .credentials import redact_runtime_secrets
 from .grid import Grid, SessionHandle
 from .jev import ExecutionClass, Intent, decide
 from .storage import StateConflict, Store
@@ -57,6 +59,12 @@ class Runtime:
             parameters = {"prompt": intent.text, "mode": mode}
         elif kind == "live_source":
             parameters = {"query": intent.text, "freshness": decision.freshness.value}
+        material = json.dumps(
+            {"description": intent.text, "parameters": parameters, "criterion": criterion},
+            allow_nan=False,
+        )
+        if redact_runtime_secrets(material) != material:
+            raise ValueError("credential material cannot enter durable objectives/plans")
         objective = Objective(new_id(), intent.text, initiator, criterion, time())
         task = Task(
             new_id(),

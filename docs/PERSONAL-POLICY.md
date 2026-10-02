@@ -300,3 +300,20 @@ Sensitive policy is personal data and follows OSCAR privacy/retention controls.
 7. Capture policy cannot bypass consent/legal/platform limits.
 8. Conflicts are resolved deliberately, not by prompt order.
 9. The user can inspect/change durable policy.
+
+## Club B structured reference implementation
+
+`oscar.policy.PersonalPolicy` persists explicit owner-authorized structured rules
+separately from memory. Capability scope (exact or trailing wildcard), exact
+context conditions, priority, source, timestamps, enabled/expiry and preference
+are supported. Hard constraints and missing permission/required confirmation
+block before policy; specific explicit rules precede broad ones. Equal-ranking
+conflicts block with rule IDs. Model/inferred candidates cannot become authority.
+
+Connector mutations and machine executors recheck policy at execution. `ask` needs
+confirmation; `deny` remains denied even with confirmation. Preference values such
+as `free_first` can be evaluated, but are not automatically interpreted or applied
+to the Model Router. Natural-language interpretation/editing, quiet-hour parsing,
+Sunday approval identity and a policy UI remain **UNIMPLEMENTED/UNVERIFIED**.
+The reference editor is the typed `save(..., owner_authorized=True)` composition
+API; it is not a remotely exposed unauthenticated approval endpoint.
