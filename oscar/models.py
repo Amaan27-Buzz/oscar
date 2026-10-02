@@ -4,6 +4,8 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from enum import StrEnum
 
+from .freshness import SourceRef
+
 
 class Mode(StrEnum):
     AUTO = "auto"
@@ -28,6 +30,11 @@ class Funding(StrEnum):
 
 class Failure(StrEnum):
     CREDENTIAL = "credential_failure"
+    ACCESS = "access_denied"
+    PRODUCT = "account_product_mismatch"
+    CAPACITY = "temporary_capacity"
+    UNKNOWN_LIMIT = "limit_cause_unknown"
+    FUNDING = "funding_or_entitlement_unknown"
     MODEL = "model_failure"
     PROVIDER = "provider_failure"
     QUOTA = "quota_exhaustion"
@@ -40,8 +47,22 @@ class Failure(StrEnum):
 
 
 class ProviderError(Exception):
-    def __init__(self, category: Failure, *, retry_after: float = 30, emitted: bool = False):
+    def __init__(
+        self,
+        category: Failure,
+        *,
+        retry_after: float = 30,
+        emitted: bool = False,
+        http_status: int | None = None,
+        business_code: str | None = None,
+        rate_limits: "RateLimits | None" = None,
+    ):
         self.category, self.retry_after, self.emitted = category, retry_after, emitted
+        self.http_status, self.business_code, self.rate_limits = (
+            http_status,
+            business_code,
+            rate_limits,
+        )
         super().__init__(category.value)
 
 
@@ -55,6 +76,13 @@ class ProviderSpec:
     private: bool = False
     enabled: bool = True
     provenance: str = "user configuration"
+    discovery_required: bool = False
+    inventory_ttl_seconds: float = 300
+    account_product: str = "general-api"
+    quota_pool: str | None = None
+    credential_pools: dict[str, str] = field(default_factory=dict)
+    quota_pool_provenance: str = "conservative shared pool; account identity UNKNOWN"
+    allowed_tasks: tuple[str, ...] | None = None
 
 
 @dataclass(frozen=True)
@@ -72,6 +100,45 @@ class ModelSpec:
     reliability: float | None = None
     provenance: str = "unverified configuration"
     last_verified: float | None = None
+    metadata_source: SourceRef | None = None
+    funding_source: SourceRef | None = None
+    retired: bool = False
+    retirement_source: SourceRef | None = None
+
+
+@dataclass(frozen=True)
+class RateLimits:
+    request_limit: int | None = None
+    token_limit: int | None = None
+    remaining_requests: int | None = None
+    remaining_tokens: int | None = None
+    requests_reset_at: float | None = None
+    tokens_reset_at: float | None = None
+    retry_after: float | None = None
+    request_window: str = "UNKNOWN"
+    token_window: str = "UNKNOWN"
+    source: str = "response headers"
+    request_reset_hint: str | None = None
+
+
+@dataclass(frozen=True)
+class DiscoveredModel:
+    id: str
+    capabilities: frozenset[str] = frozenset()
+    context_limit: int | None = None
+    output_limit: int | None = None
+    funding: Funding = Funding.UNKNOWN
+    active: bool | None = None
+
+
+@dataclass(frozen=True)
+class Inventory:
+    provider: str
+    slot: str
+    source: SourceRef
+    models: tuple[DiscoveredModel, ...]
+    complete: bool = True
+    pages: int = 1
 
 
 @dataclass(frozen=True)
@@ -113,6 +180,7 @@ class RoutingPolicy:
     max_attempts: int = 4
     timeout_seconds: float = 15
     max_paid_cost: float = 0.01
+    allow_unknown_limits: bool = False
 
     def __post_init__(self) -> None:
         if not 1 <= self.max_attempts <= 10 or not 0 < self.timeout_seconds <= 120:
@@ -131,6 +199,9 @@ class ProviderResponse:
     reset_at: float | None = None
     structured_ok: bool | None = None
     tool_ok: bool | None = None
+    actual_model: str | None = None
+    actual_provider: str | None = None
+    rate_limits: RateLimits | None = None
 
 
 @dataclass(frozen=True)
@@ -142,6 +213,7 @@ class Route:
     score: float
     reasons: tuple[str, ...]
     quota_remaining: int | None
+    quota_pool: str | None = None
 
 
 @dataclass(frozen=True)

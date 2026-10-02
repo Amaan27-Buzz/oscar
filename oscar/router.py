@@ -8,6 +8,7 @@ from time import monotonic, time
 from .capabilities import Cancelled
 from .contracts import Evidence, new_id
 from .credentials import CredentialPool, Slot
+from .discovery import HTTPDiscovery
 from .models import (
     Failure,
     Funding,
@@ -41,6 +42,7 @@ class Router:
         adapters: Mapping[str, Adapter],
         store: Store,
         clock: Callable[[], float] = time,
+        discovery: HTTPDiscovery | None = None,
     ):
         self.registry, self.pool, self.adapters, self.store, self.clock = (
             registry,
@@ -49,6 +51,83 @@ class Router:
             store,
             clock,
         )
+        self.discovery = discovery
+
+    def refresh(
+        self,
+        request: ModelRequest,
+        policy: RoutingPolicy = DEFAULT_POLICY,
+        check_cancel: Callable[[], None] = lambda: None,
+    ) -> None:
+        """Explicit bounded I/O before execution; rank itself remains a pure cache read."""
+        if self.discovery is None:
+            return
+        for provider in self.registry.providers.values():
+            if not provider.enabled or not provider.discovery_required:
+                continue
+            if request.pinned_provider and request.pinned_provider != provider.id:
+                continue
+            if policy.allowed_providers is not None and provider.id not in policy.allowed_providers:
+                continue
+            if request.mode == Mode.LOCAL and not provider.local:
+                continue
+            if request.mode == Mode.PRIVATE and not (
+                provider.local or provider.private or provider.id in policy.private_providers
+            ):
+                continue
+            for slot in self.pool.slots.values():
+                if (
+                    slot.provider != provider.id
+                    or not slot.present
+                    or (request.pinned_slot and request.pinned_slot != slot.id)
+                ):
+                    continue
+                check_cancel()
+                inventory = self.registry.inventories.get((provider.id, slot.id))
+                if inventory and inventory.source.current(self.clock()):
+                    continue
+                try:
+                    fresh = self.discovery.inventory(
+                        provider,
+                        slot.id,
+                        self.pool.secret_for_adapter(slot.id),
+                        min(10, policy.timeout_seconds),
+                    )
+                    self.registry.apply_inventory(fresh)
+                    account = self.discovery.account(
+                        provider,
+                        self.pool.secret_for_adapter(slot.id),
+                        min(10, policy.timeout_seconds),
+                    )
+                    if account:
+                        self.store.put(
+                            "account_observation",
+                            slot.id,
+                            {
+                                "source": account.source.identity,
+                                "observed_at": account.source.observed_at,
+                                "scope": account.source.scope,
+                                "free_tier": account.free_tier,
+                                "credit_cap_remaining": account.credit_cap_remaining,
+                            },
+                        )
+                        if account.limits:
+                            self.pool.observe_limits(slot.id, "*", account.limits)
+                except ProviderError as error:
+                    self.store.put(
+                        "discovery_failure",
+                        slot.id,
+                        {
+                            "provider": provider.id,
+                            "slot": slot.id,
+                            "observed_at": self.clock(),
+                            "category": error.category.value,
+                            "http_status": error.http_status,
+                            "status": "UNKNOWN / potentially stale",
+                        },
+                    )
+                    if error.category == Failure.CREDENTIAL:
+                        self.pool.failed(slot.id, error.category, error.retry_after)
 
     def _health_blocked(self, provider: str, model: str) -> bool:
         for identifier in (provider, provider + "/" + model):
@@ -115,7 +194,13 @@ class Router:
         excluded: set[tuple[str, str, str]] | None = None,
     ) -> list[Route]:
         routes: list[Route] = []
-        for model in self.registry.models.values():
+        candidates = (
+            (self.registry.model_for_slot(m.provider_id, m.id, slot.id, self.clock()), slot)
+            for m in self.registry.models.values()
+            for slot in self.pool.slots.values()
+            if slot.provider == m.provider_id
+        )
+        for model, slot in candidates:
             provider = self.registry.providers[model.provider_id]
             if (
                 not provider.enabled
@@ -136,6 +221,12 @@ class Router:
             if request.pinned_model and model.id != request.pinned_model:
                 continue
             if (
+                model.retired
+                or provider.allowed_tasks is not None
+                and request.task_class not in provider.allowed_tasks
+            ):
+                continue
+            if (
                 not request.required <= model.capabilities
                 or model.quality is None
                 or model.quality < request.min_quality
@@ -143,10 +234,14 @@ class Router:
                 continue
             if (
                 model.context_limit is None
-                or model.context_limit < request.input_tokens + request.max_output_tokens
+                and not policy.allow_unknown_limits
+                or model.context_limit is not None
+                and model.context_limit < request.input_tokens + request.max_output_tokens
             ):
                 continue
-            if model.output_limit is None or model.output_limit < request.max_output_tokens:
+            if (model.output_limit is None and not policy.allow_unknown_limits) or (
+                model.output_limit is not None and model.output_limit < request.max_output_tokens
+            ):
                 continue
             free = model.funding in {Funding.FREE, Funding.SUBSCRIPTION, Funding.LOCAL}
             if not free and not policy.allow_paid:
@@ -164,70 +259,96 @@ class Router:
                 continue
             reliability, latency = self._observed(model, request.task_class)
             affinity = model.affinities.get(request.task_class, 0.0)
-            for slot in self.pool.slots.values():
-                identity = (provider.id, model.id, slot.id)
-                if (
-                    slot.provider != provider.id
-                    or excluded
-                    and identity in excluded
-                    or request.pinned_slot
-                    and slot.id != request.pinned_slot
-                    or not slot.eligible(
-                        self.clock(), request.input_tokens + request.max_output_tokens
-                    )
-                ):
-                    continue
-                scarcity = self.scarcity(slot)
-                # This is policy pressure, not a fabricated quota estimate/percentage.
-                scarcity_penalty = 3 if scarcity is None else 30 * scarcity
-                score = (
-                    40 * free
-                    + 10 * reliability
-                    + 5 * affinity
-                    + 10 * self._objective_fit(model, request.task_class)
+            identity = (provider.id, model.id, slot.id)
+            if (
+                slot.provider != provider.id
+                or excluded
+                and identity in excluded
+                or request.pinned_slot
+                and slot.id != request.pinned_slot
+                or not self.pool.eligible(
+                    slot.id, request.input_tokens + request.max_output_tokens, model.id
                 )
-                score -= 2 * math.log1p(latency / 100) + scarcity_penalty
-                score -= 5 * (model.quality - request.min_quality)
-                score -= slot.concurrent * 5
-                if request.mode == Mode.HEAVY:
-                    score += 20 * model.quality + 5 * affinity + scarcity_penalty
-                elif request.mode == Mode.FAST:
-                    score -= 15 * math.log1p(latency / 100)
-                elif request.mode == Mode.BALANCED:
-                    score += 6 * model.quality + 10 * reliability + 5 * affinity
-                elif request.mode == Mode.CHEAP:
-                    score -= 100 * (cost if cost is not None else 10)
-                elif request.mode == Mode.SPECIALIST:
-                    score += 60 * affinity
-                reasons = (
-                    "required capabilities and context/output limits satisfied",
-                    f"quality tier {model.quality} meets floor {request.min_quality}; "
-                    f"source: {model.provenance}",
-                    f"capacity class {model.funding.value}; quota "
-                    + (
-                        "UNKNOWN"
-                        if slot.remaining_requests is None
-                        else f"{slot.remaining_requests} confirmed requests remaining"
-                    ),
-                    "ranking considers task affinity, decaying reliability/latency, and scarcity",
-                    "provider response health and verified objective outcomes remain separate",
-                    "preserve stronger/scarcer routes when sufficient alternatives exist",
-                    f"mode {request.mode.value}; explicit policy enforced",
+            ):
+                continue
+            availability = self.registry.availability(provider.id, model.id, slot.id, self.clock())
+            if availability not in {
+                "configured fallback",
+                "listed via credential; generation entitlement not implied",
+            }:
+                continue
+            capacity = self.pool.capacity(slot.id, model.id)
+            remaining = capacity.remaining_requests if capacity else slot.remaining_requests
+            account_capacity = self.pool.capacity(slot.id, "*")
+            if account_capacity and account_capacity.remaining_requests is not None:
+                remaining = (
+                    min(remaining, account_capacity.remaining_requests)
+                    if remaining is not None
+                    else account_capacity.remaining_requests
                 )
-                routes.append(
-                    Route(
-                        provider.id,
-                        model.id,
-                        slot.id,
-                        request.mode,
-                        score,
-                        reasons,
-                        slot.remaining_requests,
-                    )
+            scarcity = None if remaining is None else 1 / max(1, remaining)
+            # This is policy pressure, not a fabricated quota estimate/percentage.
+            scarcity_penalty = 3 if scarcity is None else 30 * scarcity
+            score = (
+                40 * free
+                + 10 * reliability
+                + 5 * affinity
+                + 10 * self._objective_fit(model, request.task_class)
+            )
+            score -= 2 * math.log1p(latency / 100) + scarcity_penalty
+            score -= 5 * (model.quality - request.min_quality)
+            score -= slot.concurrent * 5
+            if request.mode == Mode.HEAVY:
+                score += 20 * model.quality + 5 * affinity + scarcity_penalty
+            elif request.mode == Mode.FAST:
+                score -= 15 * math.log1p(latency / 100)
+            elif request.mode == Mode.BALANCED:
+                score += 6 * model.quality + 10 * reliability + 5 * affinity
+            elif request.mode == Mode.CHEAP:
+                score -= 100 * (cost if cost is not None else 10)
+            elif request.mode == Mode.SPECIALIST:
+                score += 60 * affinity
+            reasons = (
+                "required capabilities satisfied; context/output limits checked"
+                if not policy.allow_unknown_limits
+                else "explicit bounded diagnostic allowance for UNKNOWN limits",
+                f"quality tier {model.quality} meets floor {request.min_quality}; "
+                f"source: {model.provenance}",
+                f"capacity class {model.funding.value}; quota "
+                + ("UNKNOWN" if remaining is None else f"{remaining} confirmed requests remaining"),
+                f"availability {availability}; inventory source "
+                + (
+                    f"{self.registry.inventories[(provider.id, slot.id)].source.identity}; "
+                    "observed_at "
+                    f"{self.registry.inventories[(provider.id, slot.id)].source.observed_at}; "
+                    f"TTL {provider.inventory_ttl_seconds}s"
+                    if (provider.id, slot.id) in self.registry.inventories
+                    else "explicit configured fallback; current inventory UNKNOWN"
+                ),
+                f"account product {slot.account_product}; shared quota pool {slot.quota_pool}; "
+                "credential count does not increase capacity",
+                "ranking considers task affinity, decaying reliability/latency, and scarcity",
+                "provider response health and verified objective outcomes remain separate",
+                "preserve stronger/scarcer routes when sufficient alternatives exist",
+                f"mode {request.mode.value}; explicit policy enforced",
+            )
+            routes.append(
+                Route(
+                    provider.id,
+                    model.id,
+                    slot.id,
+                    request.mode,
+                    score,
+                    reasons,
+                    remaining,
+                    slot.quota_pool or None,
                 )
+            )
 
         def ordering(route: Route) -> tuple[float, float, float, str, str, str]:
-            model = self.registry.models[(route.provider, route.model)]
+            model = self.registry.model_for_slot(
+                route.provider, route.model, route.slot, self.clock()
+            )
             primary = 0.0
             free = model.funding in {Funding.FREE, Funding.SUBSCRIPTION, Funding.LOCAL}
             if request.mode in {Mode.FREE_FIRST, Mode.AUTO}:
@@ -279,6 +400,10 @@ class Router:
                 "provider": route.provider,
                 "model": route.model,
                 "slot": route.slot,
+                "quota_pool": route.quota_pool,
+                "account_product": self.pool.slots[route.slot].account_product,
+                "actual_model": response.actual_model if response else None,
+                "actual_provider": response.actual_provider if response else None,
                 "mode": request.mode.value,
                 "reason": list(route.reasons),
                 "timestamp": self.clock(),
@@ -301,7 +426,7 @@ class Router:
         return identifier
 
     def _expected_cost(self, request: ModelRequest, route: Route) -> float | None:
-        model = self.registry.models[(route.provider, route.model)]
+        model = self.registry.model_for_slot(route.provider, route.model, route.slot, self.clock())
         if model.funding in {Funding.FREE, Funding.SUBSCRIPTION, Funding.LOCAL}:
             return 0.0
         if model.price_per_million is None:
@@ -338,6 +463,7 @@ class Router:
         prefer: tuple[str, str] | None = None
         last_error: ProviderError | None = None
         remaining_budget = policy.max_paid_cost
+        self.refresh(request, policy, check_cancel)
         for attempt in range(1, policy.max_attempts + 1):
             check_cancel()
             routes = self.rank(request, replace(policy, max_paid_cost=remaining_budget), excluded)
@@ -348,7 +474,7 @@ class Router:
                     route
                     for route in routes
                     if self.pool.reserve(
-                        route.slot, request.input_tokens + request.max_output_tokens
+                        route.slot, request.input_tokens + request.max_output_tokens, route.model
                     )
                 ),
                 None,
@@ -382,7 +508,16 @@ class Router:
                 check_cancel()
                 if not response.text.strip():
                     raise ProviderError(Failure.CAPABILITY, emitted=emitted)
-                response = replace(response, text=self.pool.redact(response.text))
+                response = replace(
+                    response,
+                    text=self.pool.redact(response.text),
+                    actual_model=self.pool.redact(response.actual_model)
+                    if response.actual_model
+                    else None,
+                    actual_provider=self.pool.redact(response.actual_provider)
+                    if response.actual_provider
+                    else None,
+                )
                 emitted = safe_stream.emitted
                 safe_stream.finish()
                 elapsed = (monotonic() - started) * 1000
@@ -390,6 +525,16 @@ class Router:
                 slot.latency_ms = elapsed
                 slot.input_tokens += response.input_tokens or 0
                 slot.output_tokens += response.output_tokens or 0
+                self.registry.observe_generation(
+                    route.provider, route.model, route.slot, self.clock(), True
+                )
+                if response.rate_limits and (
+                    response.rate_limits.remaining_requests is not None
+                    or response.rate_limits.remaining_tokens is not None
+                ):
+                    self.pool.observe_limits(route.slot, route.model, response.rate_limits)
+                else:
+                    self.pool.invalidate_capacity(route.slot, route.model)
                 if response.remaining_requests is not None or response.remaining_tokens is not None:
                     slot.remaining_requests, slot.remaining_tokens = (
                         response.remaining_requests,
@@ -422,9 +567,30 @@ class Router:
                     None,
                     output_emitted,
                 )
-                self.pool.failed(route.slot, error.category, error.retry_after)
+                if error.rate_limits:
+                    self.pool.observe_limits(route.slot, route.model, error.rate_limits)
+                self.pool.failed(route.slot, error.category, error.retry_after, route.model)
+                if error.category in {
+                    Failure.MODEL,
+                    Failure.ACCESS,
+                    Failure.PRODUCT,
+                    Failure.FUNDING,
+                }:
+                    self.registry.observe_generation(
+                        route.provider,
+                        route.model,
+                        route.slot,
+                        self.clock(),
+                        False,
+                        error.category.value,
+                    )
                 excluded.add((route.provider, route.model, route.slot))
-                if error.category in {Failure.CREDENTIAL, Failure.RATE_LIMIT, Failure.QUOTA}:
+                if error.category in {
+                    Failure.CREDENTIAL,
+                    Failure.RATE_LIMIT,
+                    Failure.QUOTA,
+                    Failure.UNKNOWN_LIMIT,
+                }:
                     prefer = (route.provider, route.model)
                 else:
                     prefer = None
@@ -436,6 +602,9 @@ class Router:
                             Failure.NETWORK,
                             Failure.NETWORK_POLICY,
                         }
+                        and not (
+                            route.provider == "openrouter" and error.category == Failure.PROVIDER
+                        )
                         else route.provider + "/" + route.model
                     )
                     self.store.put(

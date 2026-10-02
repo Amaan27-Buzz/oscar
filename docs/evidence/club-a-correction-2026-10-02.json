@@ -1,0 +1,3472 @@
+{
+  "recorded_at": "2026-10-02T13:24:41.113795+00:00",
+  "baseline_remote_work": "aa791dd",
+  "scope": "Post-Gate-A Club A correction only; no Slice 05 or main merge",
+  "gate_a": {
+    "status": "PARTIAL",
+    "previous_status": "PASS",
+    "reason": "Latest full current mode rerun failed/blocked Balanced, Heavy and Free First after unknown-cause OpenRouter 429. Structural defects found during the pass are corrected and regression-tested; earlier passing live modes remain dated evidence."
+  },
+  "official_sources": "provider-sources-2026-10-02.json",
+  "latest_inventory_observations": [
+    {
+      "provider": "groq",
+      "slot": "groq-1",
+      "status": "OBSERVED",
+      "source": {
+        "identity": "https://api.groq.com/openai/v1/models",
+        "authority": "live_api",
+        "scope": "account",
+        "observed_at": 1790946915.5202858,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null
+      },
+      "complete": true,
+      "pages": 1,
+      "returned_model_count": 11,
+      "retained_scope": "full inventory",
+      "account_visibility": "listed via credential; generation not implied",
+      "inventory_ref": "groq-11"
+    },
+    {
+      "provider": "groq",
+      "slot": "groq-2",
+      "status": "OBSERVED",
+      "source": {
+        "identity": "https://api.groq.com/openai/v1/models",
+        "authority": "live_api",
+        "scope": "account",
+        "observed_at": 1790946915.7541678,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null
+      },
+      "complete": true,
+      "pages": 1,
+      "returned_model_count": 11,
+      "retained_scope": "full inventory",
+      "account_visibility": "listed via credential; generation not implied",
+      "inventory_ref": "groq-11"
+    },
+    {
+      "provider": "groq",
+      "slot": "groq-3",
+      "status": "OBSERVED",
+      "source": {
+        "identity": "https://api.groq.com/openai/v1/models",
+        "authority": "live_api",
+        "scope": "account",
+        "observed_at": 1790946916.0035217,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null
+      },
+      "complete": true,
+      "pages": 1,
+      "returned_model_count": 11,
+      "retained_scope": "full inventory",
+      "account_visibility": "listed via credential; generation not implied",
+      "inventory_ref": "groq-11"
+    },
+    {
+      "provider": "groq",
+      "slot": "groq-4",
+      "status": "OBSERVED",
+      "source": {
+        "identity": "https://api.groq.com/openai/v1/models",
+        "authority": "live_api",
+        "scope": "account",
+        "observed_at": 1790946916.1549954,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null
+      },
+      "complete": true,
+      "pages": 1,
+      "returned_model_count": 11,
+      "retained_scope": "full inventory",
+      "account_visibility": "listed via credential; generation not implied",
+      "inventory_ref": "groq-11"
+    },
+    {
+      "provider": "openrouter",
+      "slot": "openrouter-1",
+      "status": "OBSERVED",
+      "source": {
+        "identity": "https://openrouter.ai/api/v1/models/user",
+        "authority": "live_api",
+        "scope": "account",
+        "observed_at": 1790946916.4148746,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null
+      },
+      "complete": true,
+      "pages": 1,
+      "returned_model_count": 461,
+      "retained_scope": "currently zero-priced subset of account-filtered inventory",
+      "account_visibility": "listed via credential; generation not implied",
+      "inventory_ref": "openrouter-461"
+    },
+    {
+      "provider": "openrouter",
+      "slot": "openrouter-2",
+      "status": "OBSERVED",
+      "source": {
+        "identity": "https://openrouter.ai/api/v1/models/user",
+        "authority": "live_api",
+        "scope": "account",
+        "observed_at": 1790946916.702246,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null
+      },
+      "complete": true,
+      "pages": 1,
+      "returned_model_count": 461,
+      "retained_scope": "currently zero-priced subset of account-filtered inventory",
+      "account_visibility": "listed via credential; generation not implied",
+      "inventory_ref": "openrouter-461"
+    },
+    {
+      "provider": "openrouter",
+      "slot": "openrouter-3",
+      "status": "OBSERVED",
+      "source": {
+        "identity": "https://openrouter.ai/api/v1/models/user",
+        "authority": "live_api",
+        "scope": "account",
+        "observed_at": 1790946917.0800693,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null
+      },
+      "complete": true,
+      "pages": 1,
+      "returned_model_count": 461,
+      "retained_scope": "currently zero-priced subset of account-filtered inventory",
+      "account_visibility": "listed via credential; generation not implied",
+      "inventory_ref": "openrouter-461"
+    },
+    {
+      "provider": "openrouter",
+      "slot": "openrouter-4",
+      "status": "OBSERVED",
+      "source": {
+        "identity": "https://openrouter.ai/api/v1/models/user",
+        "authority": "live_api",
+        "scope": "account",
+        "observed_at": 1790946917.3944,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null
+      },
+      "complete": true,
+      "pages": 1,
+      "returned_model_count": 461,
+      "retained_scope": "currently zero-priced subset of account-filtered inventory",
+      "account_visibility": "listed via credential; generation not implied",
+      "inventory_ref": "openrouter-461"
+    },
+    {
+      "provider": "nvidia",
+      "slot": "nvidia-1",
+      "status": "OBSERVED",
+      "source": {
+        "identity": "https://integrate.api.nvidia.com/v1/models",
+        "authority": "live_api",
+        "scope": "account",
+        "observed_at": 1790946917.6257567,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null
+      },
+      "complete": true,
+      "pages": 1,
+      "returned_model_count": 81,
+      "retained_scope": "full inventory",
+      "account_visibility": "listed via credential; generation not implied",
+      "inventory_ref": "nvidia-81"
+    },
+    {
+      "provider": "nvidia",
+      "slot": "nvidia-2",
+      "status": "OBSERVED",
+      "source": {
+        "identity": "https://integrate.api.nvidia.com/v1/models",
+        "authority": "live_api",
+        "scope": "account",
+        "observed_at": 1790946917.8255687,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null
+      },
+      "complete": true,
+      "pages": 1,
+      "returned_model_count": 81,
+      "retained_scope": "full inventory",
+      "account_visibility": "listed via credential; generation not implied",
+      "inventory_ref": "nvidia-81"
+    },
+    {
+      "provider": "google",
+      "slot": "google-1",
+      "status": "OBSERVED",
+      "source": {
+        "identity": "https://generativelanguage.googleapis.com/v1beta/models",
+        "authority": "live_api",
+        "scope": "account",
+        "observed_at": 1790946918.2000332,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null
+      },
+      "complete": true,
+      "pages": 2,
+      "returned_model_count": 61,
+      "retained_scope": "full inventory",
+      "account_visibility": "listed via credential; generation not implied",
+      "inventory_ref": "google-61"
+    },
+    {
+      "provider": "google",
+      "slot": "google-2",
+      "status": "OBSERVED",
+      "source": {
+        "identity": "https://generativelanguage.googleapis.com/v1beta/models",
+        "authority": "live_api",
+        "scope": "account",
+        "observed_at": 1790946918.5669906,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null
+      },
+      "complete": true,
+      "pages": 2,
+      "returned_model_count": 61,
+      "retained_scope": "full inventory",
+      "account_visibility": "listed via credential; generation not implied",
+      "inventory_ref": "google-61"
+    },
+    {
+      "provider": "google",
+      "slot": "google-3",
+      "status": "OBSERVED",
+      "source": {
+        "identity": "https://generativelanguage.googleapis.com/v1beta/models",
+        "authority": "live_api",
+        "scope": "account",
+        "observed_at": 1790946918.9575534,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null
+      },
+      "complete": true,
+      "pages": 2,
+      "returned_model_count": 61,
+      "retained_scope": "full inventory",
+      "account_visibility": "listed via credential; generation not implied",
+      "inventory_ref": "google-61"
+    },
+    {
+      "provider": "zai",
+      "slot": "zai-1",
+      "status": "OBSERVED",
+      "source": {
+        "identity": "https://api.z.ai/api/paas/v4/models",
+        "authority": "live_api",
+        "scope": "account",
+        "observed_at": 1790946919.974568,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null
+      },
+      "complete": true,
+      "pages": 1,
+      "returned_model_count": 11,
+      "retained_scope": "full inventory",
+      "account_visibility": "listed via credential; generation not implied",
+      "inventory_ref": "zai-11"
+    },
+    {
+      "provider": "zai",
+      "slot": "zai-2",
+      "status": "OBSERVED",
+      "source": {
+        "identity": "https://api.z.ai/api/paas/v4/models",
+        "authority": "live_api",
+        "scope": "account",
+        "observed_at": 1790946920.6248767,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null
+      },
+      "complete": true,
+      "pages": 1,
+      "returned_model_count": 11,
+      "retained_scope": "full inventory",
+      "account_visibility": "listed via credential; generation not implied",
+      "inventory_ref": "zai-11"
+    },
+    {
+      "provider": "ollama-cloud",
+      "slot": "ollama-cloud-1",
+      "status": "OBSERVED",
+      "source": {
+        "identity": "https://ollama.com/api/tags",
+        "authority": "live_api",
+        "scope": "account",
+        "observed_at": 1790946920.902757,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null
+      },
+      "complete": true,
+      "pages": 1,
+      "returned_model_count": 17,
+      "retained_scope": "full inventory",
+      "account_visibility": "listed via credential; generation not implied",
+      "inventory_ref": "ollama-cloud-17"
+    },
+    {
+      "provider": "ollama-cloud",
+      "slot": "ollama-cloud-2",
+      "status": "OBSERVED",
+      "source": {
+        "identity": "https://ollama.com/api/tags",
+        "authority": "live_api",
+        "scope": "account",
+        "observed_at": 1790946921.149407,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null
+      },
+      "complete": true,
+      "pages": 1,
+      "returned_model_count": 17,
+      "retained_scope": "full inventory",
+      "account_visibility": "listed via credential; generation not implied",
+      "inventory_ref": "ollama-cloud-17"
+    }
+  ],
+  "latest_account_observations": [
+    {
+      "provider": "openrouter",
+      "slot": "openrouter-1",
+      "source": {
+        "identity": "https://openrouter.ai/api/v1/key",
+        "authority": "live_api",
+        "scope": "account",
+        "observed_at": 1790946926.9860895,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null
+      },
+      "free_tier": true,
+      "limits": {
+        "request_limit": 50,
+        "token_limit": null,
+        "remaining_requests": 19,
+        "remaining_tokens": null,
+        "requests_reset_at": 1790985600,
+        "tokens_reset_at": null,
+        "retry_after": null,
+        "request_window": "day",
+        "token_window": "UNKNOWN",
+        "source": "https://openrouter.ai/api/v1/key"
+      },
+      "credit_cap_remaining": null
+    },
+    {
+      "provider": "openrouter",
+      "slot": "openrouter-2",
+      "source": {
+        "identity": "https://openrouter.ai/api/v1/key",
+        "authority": "live_api",
+        "scope": "account",
+        "observed_at": 1790946916.8266652,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null
+      },
+      "free_tier": true,
+      "limits": {
+        "request_limit": 50,
+        "token_limit": null,
+        "remaining_requests": 43,
+        "remaining_tokens": null,
+        "requests_reset_at": 1790985600,
+        "tokens_reset_at": null,
+        "retry_after": null,
+        "request_window": "day",
+        "token_window": "UNKNOWN",
+        "source": "https://openrouter.ai/api/v1/key"
+      },
+      "credit_cap_remaining": null
+    },
+    {
+      "provider": "openrouter",
+      "slot": "openrouter-3",
+      "source": {
+        "identity": "https://openrouter.ai/api/v1/key",
+        "authority": "live_api",
+        "scope": "account",
+        "observed_at": 1790946917.1623342,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null
+      },
+      "free_tier": true,
+      "limits": {
+        "request_limit": 50,
+        "token_limit": null,
+        "remaining_requests": 46,
+        "remaining_tokens": null,
+        "requests_reset_at": 1790985600,
+        "tokens_reset_at": null,
+        "retry_after": null,
+        "request_window": "day",
+        "token_window": "UNKNOWN",
+        "source": "https://openrouter.ai/api/v1/key"
+      },
+      "credit_cap_remaining": null
+    },
+    {
+      "provider": "openrouter",
+      "slot": "openrouter-4",
+      "source": {
+        "identity": "https://openrouter.ai/api/v1/key",
+        "authority": "live_api",
+        "scope": "account",
+        "observed_at": 1790946917.455543,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null
+      },
+      "free_tier": true,
+      "limits": {
+        "request_limit": 50,
+        "token_limit": null,
+        "remaining_requests": 46,
+        "remaining_tokens": null,
+        "requests_reset_at": 1790985600,
+        "tokens_reset_at": null,
+        "retry_after": null,
+        "request_window": "day",
+        "token_window": "UNKNOWN",
+        "source": "https://openrouter.ai/api/v1/key"
+      },
+      "credit_cap_remaining": null
+    }
+  ],
+  "quota_pools": [
+    {
+      "id": "groq/configured-account",
+      "provider": "groq",
+      "account_product": "developer-api",
+      "provenance": "Conservative shared-account grouping; same-account identity is UNKNOWN until configured/observed. Keys do not multiply capacity.",
+      "concurrent": 0,
+      "max_concurrent": 1
+    },
+    {
+      "id": "openrouter/configured-account",
+      "provider": "openrouter",
+      "account_product": "developer-api",
+      "provenance": "Conservative shared-account grouping; same-account identity is UNKNOWN until configured/observed. Keys do not multiply capacity.",
+      "concurrent": 0,
+      "max_concurrent": 1
+    },
+    {
+      "id": "nvidia/configured-account",
+      "provider": "nvidia",
+      "account_product": "developer-api",
+      "provenance": "Conservative shared-account grouping; same-account identity is UNKNOWN until configured/observed. Keys do not multiply capacity.",
+      "concurrent": 0,
+      "max_concurrent": 1
+    },
+    {
+      "id": "google/configured-account",
+      "provider": "google",
+      "account_product": "developer-api",
+      "provenance": "Conservative shared-account grouping; same-account identity is UNKNOWN until configured/observed. Keys do not multiply capacity.",
+      "concurrent": 0,
+      "max_concurrent": 1
+    },
+    {
+      "id": "zai/configured-account",
+      "provider": "zai",
+      "account_product": "general-api",
+      "provenance": "Conservative shared-account grouping; same-account identity is UNKNOWN until configured/observed. Keys do not multiply capacity.",
+      "concurrent": 0,
+      "max_concurrent": 1
+    },
+    {
+      "id": "ollama-cloud/configured-account",
+      "provider": "ollama-cloud",
+      "account_product": "developer-api",
+      "provenance": "Conservative shared-account grouping; same-account identity is UNKNOWN until configured/observed. Keys do not multiply capacity.",
+      "concurrent": 0,
+      "max_concurrent": 1
+    }
+  ],
+  "pool_membership": "Conservatively grouped per provider/product. Actual account/organization identities were not exposed; keys do not imply independent capacity.",
+  "successful_generation_operations": [
+    {
+      "scenario": "slot groq-1",
+      "observed_at": 1790944680.9536018,
+      "mode": "manual",
+      "max_output_tokens": 512,
+      "allow_unknown_cost": true,
+      "allow_unknown_limits": true,
+      "scope": "generation contract only; no model-quality/funding proof",
+      "status": "VERIFIED",
+      "sentinel_matches": true,
+      "provider": "groq",
+      "model": "openai/gpt-oss-20b",
+      "slot": "groq-1",
+      "quota_pool": "groq/configured-account",
+      "actual_model": "openai/gpt-oss-20b",
+      "actual_provider": null,
+      "input_tokens": 77,
+      "output_tokens": 64,
+      "attempts": 1,
+      "http_statuses": {
+        "openai": [
+          200
+        ]
+      },
+      "rate_limits": {
+        "request_limit": 1000,
+        "token_limit": 8000,
+        "remaining_requests": 999,
+        "remaining_tokens": 7596,
+        "requests_reset_at": 1790944767.651777,
+        "tokens_reset_at": 1790944684.281777,
+        "retry_after": null,
+        "request_window": "day",
+        "token_window": "minute",
+        "source": "response headers"
+      }
+    },
+    {
+      "scenario": "slot groq-2",
+      "observed_at": 1790944681.255348,
+      "mode": "manual",
+      "max_output_tokens": 512,
+      "allow_unknown_cost": true,
+      "allow_unknown_limits": true,
+      "scope": "generation contract only; no model-quality/funding proof",
+      "status": "VERIFIED",
+      "sentinel_matches": true,
+      "provider": "groq",
+      "model": "openai/gpt-oss-20b",
+      "slot": "groq-2",
+      "quota_pool": "groq/configured-account",
+      "actual_model": "openai/gpt-oss-20b",
+      "actual_provider": null,
+      "input_tokens": 77,
+      "output_tokens": 33,
+      "attempts": 1,
+      "http_statuses": {
+        "openai": [
+          200
+        ]
+      },
+      "rate_limits": {
+        "request_limit": 1000,
+        "token_limit": 8000,
+        "remaining_requests": 999,
+        "remaining_tokens": 7575,
+        "requests_reset_at": 1790944767.8346124,
+        "tokens_reset_at": 1790944684.6216123,
+        "retry_after": null,
+        "request_window": "day",
+        "token_window": "minute",
+        "source": "response headers"
+      }
+    },
+    {
+      "scenario": "slot groq-3",
+      "observed_at": 1790944681.438232,
+      "mode": "manual",
+      "max_output_tokens": 512,
+      "allow_unknown_cost": true,
+      "allow_unknown_limits": true,
+      "scope": "generation contract only; no model-quality/funding proof",
+      "status": "VERIFIED",
+      "sentinel_matches": true,
+      "provider": "groq",
+      "model": "openai/gpt-oss-20b",
+      "slot": "groq-3",
+      "quota_pool": "groq/configured-account",
+      "actual_model": "openai/gpt-oss-20b",
+      "actual_provider": null,
+      "input_tokens": 77,
+      "output_tokens": 47,
+      "attempts": 1,
+      "http_statuses": {
+        "openai": [
+          200
+        ]
+      },
+      "rate_limits": {
+        "request_limit": 1000,
+        "token_limit": 8000,
+        "remaining_requests": 999,
+        "remaining_tokens": 7541,
+        "requests_reset_at": 1790944768.124769,
+        "tokens_reset_at": 1790944685.1667688,
+        "retry_after": null,
+        "request_window": "day",
+        "token_window": "minute",
+        "source": "response headers"
+      }
+    },
+    {
+      "scenario": "slot groq-4",
+      "observed_at": 1790944681.7289925,
+      "mode": "manual",
+      "max_output_tokens": 512,
+      "allow_unknown_cost": true,
+      "allow_unknown_limits": true,
+      "scope": "generation contract only; no model-quality/funding proof",
+      "status": "VERIFIED",
+      "sentinel_matches": true,
+      "provider": "groq",
+      "model": "openai/gpt-oss-20b",
+      "slot": "groq-4",
+      "quota_pool": "groq/configured-account",
+      "actual_model": "openai/gpt-oss-20b",
+      "actual_provider": null,
+      "input_tokens": 77,
+      "output_tokens": 41,
+      "attempts": 1,
+      "http_statuses": {
+        "openai": [
+          200
+        ]
+      },
+      "rate_limits": {
+        "request_limit": 1000,
+        "token_limit": 8000,
+        "remaining_requests": 999,
+        "remaining_tokens": 7596,
+        "requests_reset_at": 1790944768.4391625,
+        "tokens_reset_at": 1790944685.0691624,
+        "retry_after": null,
+        "request_window": "day",
+        "token_window": "minute",
+        "source": "response headers"
+      }
+    },
+    {
+      "scenario": "candidate groq/openai/gpt-oss-120b",
+      "observed_at": 1790944682.0440402,
+      "mode": "manual",
+      "max_output_tokens": 512,
+      "allow_unknown_cost": true,
+      "allow_unknown_limits": true,
+      "scope": "generation contract only; no model-quality/funding proof",
+      "status": "VERIFIED",
+      "sentinel_matches": true,
+      "provider": "groq",
+      "model": "openai/gpt-oss-120b",
+      "slot": "groq-1",
+      "quota_pool": "groq/configured-account",
+      "actual_model": "openai/gpt-oss-120b",
+      "actual_provider": null,
+      "input_tokens": 77,
+      "output_tokens": 50,
+      "attempts": 1,
+      "http_statuses": {
+        "openai": [
+          200
+        ]
+      },
+      "rate_limits": {
+        "request_limit": 1000,
+        "token_limit": 8000,
+        "remaining_requests": 999,
+        "remaining_tokens": 7524,
+        "requests_reset_at": 1790944768.8867958,
+        "tokens_reset_at": 1790944686.0567956,
+        "retry_after": null,
+        "request_window": "day",
+        "token_window": "minute",
+        "source": "response headers"
+      }
+    },
+    {
+      "scenario": "candidate groq/qwen/qwen3.8-27b",
+      "observed_at": 1790944682.4906359,
+      "mode": "manual",
+      "max_output_tokens": 512,
+      "allow_unknown_cost": true,
+      "allow_unknown_limits": true,
+      "scope": "generation contract only; no model-quality/funding proof",
+      "status": "VERIFIED",
+      "sentinel_matches": true,
+      "provider": "groq",
+      "model": "qwen/qwen3.8-27b",
+      "slot": "groq-1",
+      "quota_pool": "groq/configured-account",
+      "actual_model": "qwen/qwen3.8-27b",
+      "actual_provider": null,
+      "input_tokens": 18,
+      "output_tokens": 5,
+      "attempts": 1,
+      "http_statuses": {
+        "openai": [
+          200
+        ]
+      },
+      "rate_limits": {
+        "request_limit": 1000,
+        "token_limit": 8000,
+        "remaining_requests": 999,
+        "remaining_tokens": 7679,
+        "requests_reset_at": 1790944769.114707,
+        "tokens_reset_at": 1790944685.121707,
+        "retry_after": null,
+        "request_window": "day",
+        "token_window": "minute",
+        "source": "response headers"
+      }
+    },
+    {
+      "scenario": "slot nvidia-1",
+      "observed_at": 1790944682.7191865,
+      "mode": "manual",
+      "max_output_tokens": 512,
+      "allow_unknown_cost": true,
+      "allow_unknown_limits": true,
+      "scope": "generation contract only; no model-quality/funding proof",
+      "status": "VERIFIED",
+      "sentinel_matches": true,
+      "provider": "nvidia",
+      "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "slot": "nvidia-1",
+      "quota_pool": "nvidia/configured-account",
+      "actual_model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "actual_provider": null,
+      "input_tokens": 24,
+      "output_tokens": 221,
+      "attempts": 1,
+      "http_statuses": {
+        "openai": [
+          200
+        ]
+      },
+      "rate_limits": {
+        "status": "UNKNOWN / not exposed",
+        "source": "response headers"
+      }
+    },
+    {
+      "scenario": "slot nvidia-2",
+      "observed_at": 1790944688.1482646,
+      "mode": "manual",
+      "max_output_tokens": 512,
+      "allow_unknown_cost": true,
+      "allow_unknown_limits": true,
+      "scope": "generation contract only; no model-quality/funding proof",
+      "status": "VERIFIED",
+      "sentinel_matches": true,
+      "provider": "nvidia",
+      "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "slot": "nvidia-2",
+      "quota_pool": "nvidia/configured-account",
+      "actual_model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "actual_provider": null,
+      "input_tokens": 24,
+      "output_tokens": 216,
+      "attempts": 1,
+      "http_statuses": {
+        "openai": [
+          200
+        ]
+      },
+      "rate_limits": {
+        "status": "UNKNOWN / not exposed",
+        "source": "response headers"
+      }
+    },
+    {
+      "scenario": "candidate nvidia/nvidia/nemotron-3-super-120b-a12b",
+      "observed_at": 1790944691.655826,
+      "mode": "manual",
+      "max_output_tokens": 512,
+      "allow_unknown_cost": true,
+      "allow_unknown_limits": true,
+      "scope": "generation contract only; no model-quality/funding proof",
+      "status": "VERIFIED",
+      "sentinel_matches": true,
+      "provider": "nvidia",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "slot": "nvidia-1",
+      "quota_pool": "nvidia/configured-account",
+      "actual_model": "nvidia/nemotron-3-super-120b-a12b",
+      "actual_provider": null,
+      "input_tokens": 24,
+      "output_tokens": 83,
+      "attempts": 1,
+      "http_statuses": {
+        "openai": [
+          200
+        ]
+      },
+      "rate_limits": {
+        "status": "UNKNOWN / not exposed",
+        "source": "response headers"
+      }
+    },
+    {
+      "scenario": "slot google-1",
+      "observed_at": 1790944694.1921747,
+      "mode": "manual",
+      "max_output_tokens": 512,
+      "allow_unknown_cost": true,
+      "allow_unknown_limits": true,
+      "scope": "generation contract only; no model-quality/funding proof",
+      "status": "VERIFIED",
+      "sentinel_matches": true,
+      "provider": "google",
+      "model": "gemini-3.5-flash-lite",
+      "slot": "google-1",
+      "quota_pool": "google/configured-account",
+      "actual_model": null,
+      "actual_provider": null,
+      "input_tokens": 9,
+      "output_tokens": 6,
+      "attempts": 1,
+      "http_statuses": {
+        "google": [
+          200
+        ]
+      },
+      "rate_limits": {
+        "status": "UNKNOWN / not exposed",
+        "source": "response headers"
+      }
+    },
+    {
+      "scenario": "slot google-2",
+      "observed_at": 1790944694.7768447,
+      "mode": "manual",
+      "max_output_tokens": 512,
+      "allow_unknown_cost": true,
+      "allow_unknown_limits": true,
+      "scope": "generation contract only; no model-quality/funding proof",
+      "status": "VERIFIED",
+      "sentinel_matches": true,
+      "provider": "google",
+      "model": "gemini-3.5-flash-lite",
+      "slot": "google-2",
+      "quota_pool": "google/configured-account",
+      "actual_model": null,
+      "actual_provider": null,
+      "input_tokens": 9,
+      "output_tokens": 6,
+      "attempts": 1,
+      "http_statuses": {
+        "google": [
+          200
+        ]
+      },
+      "rate_limits": {
+        "status": "UNKNOWN / not exposed",
+        "source": "response headers"
+      }
+    },
+    {
+      "scenario": "slot google-3",
+      "observed_at": 1790944695.3900218,
+      "mode": "manual",
+      "max_output_tokens": 512,
+      "allow_unknown_cost": true,
+      "allow_unknown_limits": true,
+      "scope": "generation contract only; no model-quality/funding proof",
+      "status": "VERIFIED",
+      "sentinel_matches": true,
+      "provider": "google",
+      "model": "gemini-3.5-flash-lite",
+      "slot": "google-3",
+      "quota_pool": "google/configured-account",
+      "actual_model": null,
+      "actual_provider": null,
+      "input_tokens": 9,
+      "output_tokens": 6,
+      "attempts": 1,
+      "http_statuses": {
+        "google": [
+          200
+        ]
+      },
+      "rate_limits": {
+        "status": "UNKNOWN / not exposed",
+        "source": "response headers"
+      }
+    },
+    {
+      "scenario": "slot openrouter-1",
+      "observed_at": 1790944940.0053124,
+      "mode": "manual",
+      "max_output_tokens": 512,
+      "allow_unknown_cost": false,
+      "allow_unknown_limits": true,
+      "scope": "generation contract only; no model-quality/funding proof",
+      "status": "VERIFIED",
+      "sentinel_matches": true,
+      "provider": "openrouter",
+      "model": "openrouter/free",
+      "slot": "openrouter-1",
+      "quota_pool": "openrouter/configured-account",
+      "actual_model": "dots-studio/dots-3-note-preview:free",
+      "actual_provider": "AtlasCloud",
+      "input_tokens": 19,
+      "output_tokens": 37,
+      "attempts": 1,
+      "http_statuses": {
+        "openai": [
+          200
+        ]
+      },
+      "rate_limits": {
+        "status": "UNKNOWN / not exposed",
+        "source": "response headers"
+      }
+    },
+    {
+      "scenario": "slot openrouter-2",
+      "observed_at": 1790944942.0300295,
+      "mode": "manual",
+      "max_output_tokens": 512,
+      "allow_unknown_cost": false,
+      "allow_unknown_limits": true,
+      "scope": "generation contract only; no model-quality/funding proof",
+      "status": "VERIFIED",
+      "sentinel_matches": true,
+      "provider": "openrouter",
+      "model": "openrouter/free",
+      "slot": "openrouter-2",
+      "quota_pool": "openrouter/configured-account",
+      "actual_model": "liquid/lfm-2.5-2.6b:free",
+      "actual_provider": "Liquid",
+      "input_tokens": 19,
+      "output_tokens": 54,
+      "attempts": 1,
+      "http_statuses": {
+        "openai": [
+          200
+        ]
+      },
+      "rate_limits": {
+        "status": "UNKNOWN / not exposed",
+        "source": "response headers"
+      }
+    },
+    {
+      "scenario": "slot openrouter-3",
+      "observed_at": 1790944942.7616324,
+      "mode": "manual",
+      "max_output_tokens": 512,
+      "allow_unknown_cost": false,
+      "allow_unknown_limits": true,
+      "scope": "generation contract only; no model-quality/funding proof",
+      "status": "VERIFIED",
+      "sentinel_matches": true,
+      "provider": "openrouter",
+      "model": "openrouter/free",
+      "slot": "openrouter-3",
+      "quota_pool": "openrouter/configured-account",
+      "actual_model": "nvidia/nemotron-3.5-lightning:free",
+      "actual_provider": "Nvidia",
+      "input_tokens": 24,
+      "output_tokens": 190,
+      "attempts": 1,
+      "http_statuses": {
+        "openai": [
+          200
+        ]
+      },
+      "rate_limits": {
+        "status": "UNKNOWN / not exposed",
+        "source": "response headers"
+      }
+    },
+    {
+      "scenario": "slot openrouter-4",
+      "observed_at": 1790944946.4544747,
+      "mode": "manual",
+      "max_output_tokens": 512,
+      "allow_unknown_cost": false,
+      "allow_unknown_limits": true,
+      "scope": "generation contract only; no model-quality/funding proof",
+      "status": "VERIFIED",
+      "sentinel_matches": true,
+      "provider": "openrouter",
+      "model": "openrouter/free",
+      "slot": "openrouter-4",
+      "quota_pool": "openrouter/configured-account",
+      "actual_model": "nvidia/nemotron-3.5-lightning:free",
+      "actual_provider": "Nvidia",
+      "input_tokens": 24,
+      "output_tokens": 332,
+      "attempts": 1,
+      "http_statuses": {
+        "openai": [
+          200
+        ]
+      },
+      "rate_limits": {
+        "status": "UNKNOWN / not exposed",
+        "source": "response headers"
+      }
+    },
+    {
+      "scenario": "candidate nvidia/nvidia/nemotron-3-ultra-550b-a55b",
+      "observed_at": 1790944956.5735095,
+      "mode": "manual",
+      "max_output_tokens": 512,
+      "allow_unknown_cost": true,
+      "allow_unknown_limits": true,
+      "scope": "generation contract only; no model-quality/funding proof",
+      "status": "VERIFIED",
+      "sentinel_matches": true,
+      "provider": "nvidia",
+      "model": "nvidia/nemotron-3-ultra-550b-a55b",
+      "slot": "nvidia-1",
+      "quota_pool": "nvidia/configured-account",
+      "actual_model": "nvidia/nemotron-3-ultra-550b-a55b",
+      "actual_provider": null,
+      "input_tokens": 24,
+      "output_tokens": 24,
+      "attempts": 1,
+      "http_statuses": {
+        "openai": [
+          200
+        ]
+      },
+      "rate_limits": {
+        "status": "UNKNOWN / not exposed",
+        "source": "response headers"
+      }
+    },
+    {
+      "scenario": "slot ollama-cloud-1",
+      "observed_at": 1790944962.7303886,
+      "mode": "manual",
+      "max_output_tokens": 512,
+      "allow_unknown_cost": true,
+      "allow_unknown_limits": true,
+      "scope": "generation contract only; no model-quality/funding proof",
+      "status": "VERIFIED",
+      "sentinel_matches": true,
+      "provider": "ollama-cloud",
+      "model": "gemma4:31b",
+      "slot": "ollama-cloud-1",
+      "quota_pool": "ollama-cloud/configured-account",
+      "actual_model": "gemma4:31b",
+      "actual_provider": null,
+      "input_tokens": 21,
+      "output_tokens": 7,
+      "attempts": 1,
+      "http_statuses": {
+        "ollama": [
+          200
+        ]
+      },
+      "rate_limits": {
+        "status": "UNKNOWN / not exposed",
+        "source": "response headers"
+      }
+    },
+    {
+      "scenario": "slot ollama-cloud-2",
+      "observed_at": 1790944963.225622,
+      "mode": "manual",
+      "max_output_tokens": 512,
+      "allow_unknown_cost": true,
+      "allow_unknown_limits": true,
+      "scope": "generation contract only; no model-quality/funding proof",
+      "status": "VERIFIED",
+      "sentinel_matches": true,
+      "provider": "ollama-cloud",
+      "model": "gemma4:31b",
+      "slot": "ollama-cloud-2",
+      "quota_pool": "ollama-cloud/configured-account",
+      "actual_model": "gemma4:31b",
+      "actual_provider": null,
+      "input_tokens": 21,
+      "output_tokens": 7,
+      "attempts": 1,
+      "http_statuses": {
+        "ollama": [
+          200
+        ]
+      },
+      "rate_limits": {
+        "status": "UNKNOWN / not exposed",
+        "source": "response headers"
+      }
+    },
+    {
+      "scenario": "routing fast",
+      "observed_at": 1790944966.4254189,
+      "mode": "fast",
+      "max_output_tokens": 512,
+      "allow_unknown_cost": false,
+      "allow_unknown_limits": false,
+      "scope": "generation contract only; no model-quality/funding proof",
+      "status": "VERIFIED",
+      "sentinel_matches": true,
+      "provider": "openrouter",
+      "model": "openrouter/free",
+      "slot": "openrouter-1",
+      "quota_pool": "openrouter/configured-account",
+      "actual_model": "dots-studio/dots-3-note-preview:free",
+      "actual_provider": "AtlasCloud",
+      "input_tokens": 19,
+      "output_tokens": 41,
+      "attempts": 1,
+      "http_statuses": {
+        "openai": [
+          200
+        ]
+      },
+      "rate_limits": {
+        "status": "UNKNOWN / not exposed",
+        "source": "response headers"
+      }
+    },
+    {
+      "scenario": "routing balanced",
+      "observed_at": 1790944968.2996268,
+      "mode": "balanced",
+      "max_output_tokens": 512,
+      "allow_unknown_cost": false,
+      "allow_unknown_limits": false,
+      "scope": "generation contract only; no model-quality/funding proof",
+      "status": "VERIFIED",
+      "sentinel_matches": true,
+      "provider": "openrouter",
+      "model": "openrouter/free",
+      "slot": "openrouter-1",
+      "quota_pool": "openrouter/configured-account",
+      "actual_model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "actual_provider": "Nvidia",
+      "input_tokens": 24,
+      "output_tokens": 24,
+      "attempts": 1,
+      "http_statuses": {
+        "openai": [
+          200
+        ]
+      },
+      "rate_limits": {
+        "status": "UNKNOWN / not exposed",
+        "source": "response headers"
+      }
+    },
+    {
+      "scenario": "routing heavy",
+      "observed_at": 1790944971.262853,
+      "mode": "heavy",
+      "max_output_tokens": 512,
+      "allow_unknown_cost": false,
+      "allow_unknown_limits": false,
+      "scope": "generation contract only; no model-quality/funding proof",
+      "status": "VERIFIED",
+      "sentinel_matches": true,
+      "provider": "openrouter",
+      "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "slot": "openrouter-2",
+      "quota_pool": "openrouter/configured-account",
+      "actual_model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "actual_provider": "Nvidia",
+      "input_tokens": 24,
+      "output_tokens": 47,
+      "attempts": 1,
+      "http_statuses": {
+        "openai": [
+          200
+        ]
+      },
+      "rate_limits": {
+        "status": "UNKNOWN / not exposed",
+        "source": "response headers"
+      }
+    },
+    {
+      "scenario": "candidate google/gemini-3.8-flash",
+      "observed_at": 1790945117.9878275,
+      "mode": "manual",
+      "max_output_tokens": 512,
+      "allow_unknown_cost": true,
+      "allow_unknown_limits": true,
+      "scope": "generation contract only; no model-quality/funding proof",
+      "status": "VERIFIED",
+      "sentinel_matches": true,
+      "provider": "google",
+      "model": "gemini-3.8-flash",
+      "slot": "google-1",
+      "quota_pool": "google/configured-account",
+      "actual_model": null,
+      "actual_provider": null,
+      "input_tokens": 9,
+      "output_tokens": 6,
+      "attempts": 1,
+      "http_statuses": {
+        "google": [
+          200
+        ]
+      },
+      "rate_limits": {
+        "status": "UNKNOWN / not exposed",
+        "source": "response headers"
+      }
+    },
+    {
+      "scenario": "routing auto",
+      "observed_at": 1790945122.1546695,
+      "mode": "auto",
+      "max_output_tokens": 512,
+      "allow_unknown_cost": false,
+      "allow_unknown_limits": false,
+      "scope": "generation contract only; no model-quality/funding proof",
+      "status": "VERIFIED",
+      "sentinel_matches": true,
+      "provider": "openrouter",
+      "model": "apodex/apodex-1.1-mini:free",
+      "slot": "openrouter-1",
+      "quota_pool": "openrouter/configured-account",
+      "actual_model": "apodex/apodex-1.1-mini:free",
+      "actual_provider": "Novita",
+      "input_tokens": 26,
+      "output_tokens": 435,
+      "attempts": 1,
+      "http_statuses": {
+        "openai": [
+          200
+        ]
+      },
+      "rate_limits": {
+        "status": "UNKNOWN / not exposed",
+        "source": "response headers"
+      }
+    },
+    {
+      "scenario": "routing fast",
+      "observed_at": 1790945125.3814158,
+      "mode": "fast",
+      "max_output_tokens": 512,
+      "allow_unknown_cost": false,
+      "allow_unknown_limits": false,
+      "scope": "generation contract only; no model-quality/funding proof",
+      "status": "VERIFIED",
+      "sentinel_matches": true,
+      "provider": "openrouter",
+      "model": "apodex/apodex-1.1-mini:free",
+      "slot": "openrouter-1",
+      "quota_pool": "openrouter/configured-account",
+      "actual_model": "apodex/apodex-1.1-mini:free",
+      "actual_provider": "Novita",
+      "input_tokens": 26,
+      "output_tokens": 346,
+      "attempts": 1,
+      "http_statuses": {
+        "openai": [
+          200
+        ]
+      },
+      "rate_limits": {
+        "status": "UNKNOWN / not exposed",
+        "source": "response headers"
+      }
+    },
+    {
+      "scenario": "routing balanced",
+      "observed_at": 1790945128.357235,
+      "mode": "balanced",
+      "max_output_tokens": 512,
+      "allow_unknown_cost": false,
+      "allow_unknown_limits": false,
+      "scope": "generation contract only; no model-quality/funding proof",
+      "status": "VERIFIED",
+      "sentinel_matches": true,
+      "provider": "openrouter",
+      "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "slot": "openrouter-2",
+      "quota_pool": "openrouter/configured-account",
+      "actual_model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "actual_provider": "Nvidia",
+      "input_tokens": 32,
+      "output_tokens": 54,
+      "attempts": 1,
+      "http_statuses": {
+        "openai": [
+          200
+        ]
+      },
+      "rate_limits": {
+        "status": "UNKNOWN / not exposed",
+        "source": "response headers"
+      }
+    },
+    {
+      "scenario": "routing heavy",
+      "observed_at": 1790945141.9071882,
+      "mode": "heavy",
+      "max_output_tokens": 512,
+      "allow_unknown_cost": false,
+      "allow_unknown_limits": false,
+      "scope": "generation contract only; no model-quality/funding proof",
+      "status": "VERIFIED",
+      "sentinel_matches": true,
+      "provider": "openrouter",
+      "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "slot": "openrouter-1",
+      "quota_pool": "openrouter/configured-account",
+      "actual_model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "actual_provider": "Nvidia",
+      "input_tokens": 32,
+      "output_tokens": 37,
+      "attempts": 1,
+      "http_statuses": {
+        "openai": [
+          200
+        ]
+      },
+      "rate_limits": {
+        "status": "UNKNOWN / not exposed",
+        "source": "response headers"
+      }
+    },
+    {
+      "scenario": "routing free_first",
+      "observed_at": 1790945143.9593334,
+      "mode": "free_first",
+      "max_output_tokens": 512,
+      "allow_unknown_cost": false,
+      "allow_unknown_limits": false,
+      "scope": "generation contract only; no model-quality/funding proof",
+      "status": "VERIFIED",
+      "sentinel_matches": true,
+      "provider": "openrouter",
+      "model": "apodex/apodex-1.1-mini:free",
+      "slot": "openrouter-1",
+      "quota_pool": "openrouter/configured-account",
+      "actual_model": "apodex/apodex-1.1-mini:free",
+      "actual_provider": "Novita",
+      "input_tokens": 26,
+      "output_tokens": 207,
+      "attempts": 1,
+      "http_statuses": {
+        "openai": [
+          200
+        ]
+      },
+      "rate_limits": {
+        "status": "UNKNOWN / not exposed",
+        "source": "response headers"
+      }
+    },
+    {
+      "scenario": "routing auto",
+      "observed_at": 1790946019.500657,
+      "mode": "auto",
+      "max_output_tokens": 512,
+      "allow_unknown_cost": false,
+      "allow_unknown_limits": false,
+      "scope": "generation contract only; no model-quality/funding proof",
+      "status": "VERIFIED",
+      "sentinel_matches": true,
+      "provider": "openrouter",
+      "model": "apodex/apodex-1.1-mini:free",
+      "slot": "openrouter-1",
+      "quota_pool": "openrouter/configured-account",
+      "actual_model": "apodex/apodex-1.1-mini:free",
+      "actual_provider": "Novita",
+      "input_tokens": 26,
+      "output_tokens": 239,
+      "attempts": 1,
+      "http_statuses": {
+        "openai": [
+          200
+        ]
+      },
+      "rate_limits": {
+        "status": "UNKNOWN / not exposed",
+        "source": "response headers"
+      }
+    },
+    {
+      "scenario": "routing fast",
+      "observed_at": 1790946021.9074454,
+      "mode": "fast",
+      "max_output_tokens": 512,
+      "allow_unknown_cost": false,
+      "allow_unknown_limits": false,
+      "scope": "generation contract only; no model-quality/funding proof",
+      "status": "VERIFIED",
+      "sentinel_matches": true,
+      "provider": "openrouter",
+      "model": "apodex/apodex-1.1-mini:free",
+      "slot": "openrouter-1",
+      "quota_pool": "openrouter/configured-account",
+      "actual_model": "apodex/apodex-1.1-mini:free",
+      "actual_provider": "Novita",
+      "input_tokens": 26,
+      "output_tokens": 173,
+      "attempts": 1,
+      "http_statuses": {
+        "openai": [
+          200
+        ]
+      },
+      "rate_limits": {
+        "status": "UNKNOWN / not exposed",
+        "source": "response headers"
+      }
+    },
+    {
+      "scenario": "routing auto",
+      "observed_at": 1790946267.3764775,
+      "mode": "auto",
+      "max_output_tokens": 512,
+      "allow_unknown_cost": false,
+      "allow_unknown_limits": false,
+      "scope": "generation contract only; no model-quality/funding proof",
+      "status": "VERIFIED",
+      "sentinel_matches": true,
+      "provider": "openrouter",
+      "model": "apodex/apodex-1.1-mini:free",
+      "slot": "openrouter-1",
+      "quota_pool": "openrouter/configured-account",
+      "actual_model": "apodex/apodex-1.1-mini:free",
+      "actual_provider": "Novita",
+      "input_tokens": 26,
+      "output_tokens": 320,
+      "attempts": 1,
+      "http_statuses": {
+        "openai": [
+          200
+        ]
+      },
+      "rate_limits": {
+        "status": "UNKNOWN / not exposed",
+        "source": "response headers"
+      }
+    },
+    {
+      "scenario": "routing fast",
+      "observed_at": 1790946270.032619,
+      "mode": "fast",
+      "max_output_tokens": 512,
+      "allow_unknown_cost": false,
+      "allow_unknown_limits": false,
+      "scope": "generation contract only; no model-quality/funding proof",
+      "status": "VERIFIED",
+      "sentinel_matches": true,
+      "provider": "openrouter",
+      "model": "apodex/apodex-1.1-mini:free",
+      "slot": "openrouter-1",
+      "quota_pool": "openrouter/configured-account",
+      "actual_model": "apodex/apodex-1.1-mini:free",
+      "actual_provider": "Novita",
+      "input_tokens": 26,
+      "output_tokens": 347,
+      "attempts": 1,
+      "http_statuses": {
+        "openai": [
+          200
+        ]
+      },
+      "rate_limits": {
+        "status": "UNKNOWN / not exposed",
+        "source": "response headers"
+      }
+    },
+    {
+      "scenario": "routing balanced",
+      "observed_at": 1790946272.5969498,
+      "mode": "balanced",
+      "max_output_tokens": 512,
+      "allow_unknown_cost": false,
+      "allow_unknown_limits": false,
+      "scope": "generation contract only; no model-quality/funding proof",
+      "status": "VERIFIED",
+      "sentinel_matches": true,
+      "provider": "openrouter",
+      "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "slot": "openrouter-2",
+      "quota_pool": "openrouter/configured-account",
+      "actual_model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "actual_provider": "Nvidia",
+      "input_tokens": 32,
+      "output_tokens": 54,
+      "attempts": 1,
+      "http_statuses": {
+        "openai": [
+          200
+        ]
+      },
+      "rate_limits": {
+        "status": "UNKNOWN / not exposed",
+        "source": "response headers"
+      }
+    },
+    {
+      "scenario": "routing auto",
+      "observed_at": 1790946921.150719,
+      "mode": "auto",
+      "max_output_tokens": 512,
+      "allow_unknown_cost": false,
+      "allow_unknown_limits": false,
+      "scope": "generation contract only; no model-quality/funding proof",
+      "status": "VERIFIED",
+      "sentinel_matches": true,
+      "provider": "openrouter",
+      "model": "apodex/apodex-1.1-mini:free",
+      "slot": "openrouter-1",
+      "quota_pool": "openrouter/configured-account",
+      "actual_model": "apodex/apodex-1.1-mini:free",
+      "actual_provider": "Novita",
+      "input_tokens": 26,
+      "output_tokens": 328,
+      "attempts": 1,
+      "http_statuses": {
+        "openai": [
+          200
+        ]
+      },
+      "attempt_trace": [
+        {
+          "provider": "openrouter",
+          "model": "apodex/apodex-1.1-mini:free",
+          "slot": "openrouter-1",
+          "quota_pool": "openrouter/configured-account",
+          "attempt": 1,
+          "provider_response_success": true,
+          "error": null,
+          "timestamp": 1790946923.9223568
+        }
+      ],
+      "rate_limits": {
+        "status": "UNKNOWN / not exposed",
+        "source": "response headers"
+      }
+    },
+    {
+      "scenario": "routing fast",
+      "observed_at": 1790946924.0174665,
+      "mode": "fast",
+      "max_output_tokens": 512,
+      "allow_unknown_cost": false,
+      "allow_unknown_limits": false,
+      "scope": "generation contract only; no model-quality/funding proof",
+      "status": "VERIFIED",
+      "sentinel_matches": true,
+      "provider": "openrouter",
+      "model": "apodex/apodex-1.1-mini:free",
+      "slot": "openrouter-1",
+      "quota_pool": "openrouter/configured-account",
+      "actual_model": "apodex/apodex-1.1-mini:free",
+      "actual_provider": "Novita",
+      "input_tokens": 26,
+      "output_tokens": 321,
+      "attempts": 1,
+      "http_statuses": {
+        "openai": [
+          200
+        ]
+      },
+      "attempt_trace": [
+        {
+          "provider": "openrouter",
+          "model": "apodex/apodex-1.1-mini:free",
+          "slot": "openrouter-1",
+          "quota_pool": "openrouter/configured-account",
+          "attempt": 1,
+          "provider_response_success": true,
+          "error": null,
+          "timestamp": 1790946926.9245791
+        }
+      ],
+      "rate_limits": {
+        "status": "UNKNOWN / not exposed",
+        "source": "response headers"
+      }
+    }
+  ],
+  "successful_credential_slots": [
+    "google-1",
+    "google-2",
+    "google-3",
+    "groq-1",
+    "groq-2",
+    "groq-3",
+    "groq-4",
+    "nvidia-1",
+    "nvidia-2",
+    "ollama-cloud-1",
+    "ollama-cloud-2",
+    "openrouter-1",
+    "openrouter-2",
+    "openrouter-3",
+    "openrouter-4"
+  ],
+  "successful_requested_models": {
+    "google": [
+      "gemini-3.5-flash-lite",
+      "gemini-3.8-flash"
+    ],
+    "groq": [
+      "openai/gpt-oss-120b",
+      "openai/gpt-oss-20b",
+      "qwen/qwen3.8-27b"
+    ],
+    "nvidia": [
+      "nvidia/nemotron-3-super-120b-a12b",
+      "nvidia/nemotron-3-ultra-550b-a55b",
+      "nvidia/nemotron-3.5-lightning-30b-a3b"
+    ],
+    "ollama-cloud": [
+      "gemma4:31b"
+    ],
+    "openrouter": [
+      "apodex/apodex-1.1-mini:free",
+      "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "openrouter/free"
+    ]
+  },
+  "observed_backing_model_provider_pairs": [
+    [
+      "apodex/apodex-1.1-mini:free",
+      "Novita"
+    ],
+    [
+      "dots-studio/dots-3-note-preview:free",
+      "AtlasCloud"
+    ],
+    [
+      "gemma4:31b",
+      null
+    ],
+    [
+      "liquid/lfm-2.5-2.6b:free",
+      "Liquid"
+    ],
+    [
+      "nvidia/nemotron-3-super-120b-a12b",
+      null
+    ],
+    [
+      "nvidia/nemotron-3-ultra-550b-a55b",
+      null
+    ],
+    [
+      "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "Nvidia"
+    ],
+    [
+      "nvidia/nemotron-3.5-lightning-30b-a3b",
+      null
+    ],
+    [
+      "nvidia/nemotron-3.5-lightning:free",
+      "Nvidia"
+    ],
+    [
+      "openai/gpt-oss-120b",
+      null
+    ],
+    [
+      "openai/gpt-oss-20b",
+      null
+    ],
+    [
+      "qwen/qwen3.8-27b",
+      null
+    ]
+  ],
+  "routing_and_probe_rounds": [
+    {
+      "name": "initial discovery/parser run",
+      "recorded_at": "2026-10-02T12:38:23.953506+00:00",
+      "assertions": 100,
+      "passed": 95,
+      "failed_assertions": [
+        {
+          "check": "current live auto",
+          "status": "FAIL"
+        },
+        {
+          "check": "current live fast",
+          "status": "FAIL"
+        },
+        {
+          "check": "current live balanced",
+          "status": "FAIL"
+        },
+        {
+          "check": "current live heavy",
+          "status": "FAIL"
+        },
+        {
+          "check": "current live free_first",
+          "status": "FAIL"
+        }
+      ],
+      "operations": [
+        {
+          "successful_generation_ref": 0
+        },
+        {
+          "successful_generation_ref": 1
+        },
+        {
+          "successful_generation_ref": 2
+        },
+        {
+          "successful_generation_ref": 3
+        },
+        {
+          "successful_generation_ref": 4
+        },
+        {
+          "successful_generation_ref": 5
+        },
+        {
+          "scenario": "slot openrouter-1",
+          "status": "BLOCKED",
+          "reason": "no current seed candidate in account inventory"
+        },
+        {
+          "scenario": "slot openrouter-2",
+          "status": "BLOCKED",
+          "reason": "no current seed candidate in account inventory"
+        },
+        {
+          "scenario": "slot openrouter-3",
+          "status": "BLOCKED",
+          "reason": "no current seed candidate in account inventory"
+        },
+        {
+          "scenario": "slot openrouter-4",
+          "status": "BLOCKED",
+          "reason": "no current seed candidate in account inventory"
+        },
+        {
+          "successful_generation_ref": 6
+        },
+        {
+          "successful_generation_ref": 7
+        },
+        {
+          "successful_generation_ref": 8
+        },
+        {
+          "scenario": "candidate nvidia/nvidia/nemotron-3-ultra-550b-a55b",
+          "observed_at": 1790944693.8875253,
+          "mode": "manual",
+          "max_output_tokens": 512,
+          "allow_unknown_cost": true,
+          "allow_unknown_limits": true,
+          "scope": "generation contract only; no model-quality/funding proof",
+          "status": "UNAVAILABLE",
+          "attempts": 1,
+          "http_statuses": {
+            "openai": [
+              503
+            ]
+          },
+          "category": "provider_failure",
+          "http_status": 503,
+          "business_code": null,
+          "rate_limits": {
+            "status": "UNKNOWN / not exposed",
+            "source": "response headers"
+          }
+        },
+        {
+          "successful_generation_ref": 9
+        },
+        {
+          "successful_generation_ref": 10
+        },
+        {
+          "successful_generation_ref": 11
+        },
+        {
+          "scenario": "candidate google/gemini-3.8-flash",
+          "observed_at": 1790944696.0051484,
+          "mode": "manual",
+          "max_output_tokens": 512,
+          "allow_unknown_cost": true,
+          "allow_unknown_limits": true,
+          "scope": "generation contract only; no model-quality/funding proof",
+          "status": "UNAVAILABLE",
+          "attempts": 1,
+          "http_statuses": {
+            "google": [
+              503
+            ]
+          },
+          "category": "provider_failure",
+          "http_status": 503,
+          "business_code": null,
+          "rate_limits": {
+            "status": "UNKNOWN / not exposed",
+            "source": "response headers"
+          }
+        },
+        {
+          "scenario": "slot zai-1",
+          "observed_at": 1790944698.3024948,
+          "mode": "manual",
+          "max_output_tokens": 512,
+          "allow_unknown_cost": true,
+          "allow_unknown_limits": true,
+          "scope": "generation contract only; no model-quality/funding proof",
+          "status": "UNAVAILABLE",
+          "attempts": 1,
+          "http_statuses": {
+            "openai": [
+              429
+            ]
+          },
+          "category": "quota_exhaustion",
+          "http_status": 429,
+          "business_code": "1113",
+          "rate_limits": {
+            "status": "UNKNOWN / not exposed",
+            "source": "response headers"
+          }
+        },
+        {
+          "scenario": "slot zai-2",
+          "observed_at": 1790944699.2242017,
+          "mode": "manual",
+          "max_output_tokens": 512,
+          "allow_unknown_cost": true,
+          "allow_unknown_limits": true,
+          "scope": "generation contract only; no model-quality/funding proof",
+          "status": "UNAVAILABLE",
+          "attempts": 1,
+          "http_statuses": {
+            "openai": [
+              429
+            ]
+          },
+          "category": "quota_exhaustion",
+          "http_status": 429,
+          "business_code": "1113",
+          "rate_limits": {
+            "status": "UNKNOWN / not exposed",
+            "source": "response headers"
+          }
+        },
+        {
+          "scenario": "slot ollama-cloud-1",
+          "observed_at": 1790944700.0969875,
+          "mode": "manual",
+          "max_output_tokens": 512,
+          "allow_unknown_cost": true,
+          "allow_unknown_limits": true,
+          "scope": "generation contract only; no model-quality/funding proof",
+          "status": "UNAVAILABLE",
+          "attempts": 1,
+          "http_statuses": {
+            "ollama": [
+              402
+            ]
+          },
+          "category": "limit_cause_unknown",
+          "http_status": 402,
+          "business_code": null,
+          "rate_limits": {
+            "status": "UNKNOWN / not exposed",
+            "source": "response headers"
+          }
+        },
+        {
+          "scenario": "slot ollama-cloud-2",
+          "observed_at": 1790944700.2949173,
+          "mode": "manual",
+          "max_output_tokens": 512,
+          "allow_unknown_cost": true,
+          "allow_unknown_limits": true,
+          "scope": "generation contract only; no model-quality/funding proof",
+          "status": "UNAVAILABLE",
+          "attempts": 1,
+          "http_statuses": {
+            "ollama": [
+              402
+            ]
+          },
+          "category": "limit_cause_unknown",
+          "http_status": 402,
+          "business_code": null,
+          "rate_limits": {
+            "status": "UNKNOWN / not exposed",
+            "source": "response headers"
+          }
+        },
+        {
+          "scenario": "candidate ollama-cloud/glm-5.3",
+          "observed_at": 1790944700.4820945,
+          "mode": "manual",
+          "max_output_tokens": 512,
+          "allow_unknown_cost": true,
+          "allow_unknown_limits": true,
+          "scope": "generation contract only; no model-quality/funding proof",
+          "status": "BLOCKED",
+          "attempts": 0,
+          "http_statuses": {},
+          "category": "route_unavailable"
+        },
+        {
+          "scenario": "routing auto",
+          "observed_at": 1790944700.4833245,
+          "mode": "auto",
+          "max_output_tokens": 512,
+          "allow_unknown_cost": false,
+          "allow_unknown_limits": false,
+          "scope": "generation contract only; no model-quality/funding proof",
+          "status": "BLOCKED",
+          "attempts": 0,
+          "http_statuses": {},
+          "category": "route_unavailable"
+        },
+        {
+          "scenario": "routing fast",
+          "observed_at": 1790944701.0879114,
+          "mode": "fast",
+          "max_output_tokens": 512,
+          "allow_unknown_cost": false,
+          "allow_unknown_limits": false,
+          "scope": "generation contract only; no model-quality/funding proof",
+          "status": "BLOCKED",
+          "attempts": 0,
+          "http_statuses": {},
+          "category": "route_unavailable"
+        },
+        {
+          "scenario": "routing balanced",
+          "observed_at": 1790944701.6786427,
+          "mode": "balanced",
+          "max_output_tokens": 512,
+          "allow_unknown_cost": false,
+          "allow_unknown_limits": false,
+          "scope": "generation contract only; no model-quality/funding proof",
+          "status": "BLOCKED",
+          "attempts": 0,
+          "http_statuses": {},
+          "category": "route_unavailable"
+        },
+        {
+          "scenario": "routing heavy",
+          "observed_at": 1790944702.3194947,
+          "mode": "heavy",
+          "max_output_tokens": 512,
+          "allow_unknown_cost": false,
+          "allow_unknown_limits": false,
+          "scope": "generation contract only; no model-quality/funding proof",
+          "status": "BLOCKED",
+          "attempts": 0,
+          "http_statuses": {},
+          "category": "route_unavailable"
+        },
+        {
+          "scenario": "routing free_first",
+          "observed_at": 1790944702.8494313,
+          "mode": "free_first",
+          "max_output_tokens": 512,
+          "allow_unknown_cost": false,
+          "allow_unknown_limits": false,
+          "scope": "generation contract only; no model-quality/funding proof",
+          "status": "BLOCKED",
+          "attempts": 0,
+          "http_statuses": {},
+          "category": "route_unavailable"
+        },
+        {
+          "scenario": "local refuses cloud",
+          "observed_at": 1790944703.301528,
+          "mode": "local",
+          "max_output_tokens": 128,
+          "allow_unknown_cost": false,
+          "allow_unknown_limits": false,
+          "scope": "generation contract only; no model-quality/funding proof",
+          "status": "BLOCKED",
+          "attempts": 0,
+          "http_statuses": {},
+          "category": "route_unavailable"
+        }
+      ],
+      "note": "Original observations retained. Corrected classifications/architecture do not rewrite earlier evidence."
+    },
+    {
+      "name": "second run; safe operations recovered after harness heartbeat expiry",
+      "recorded_at": "2026-10-02",
+      "assertions": null,
+      "passed": null,
+      "failed_assertions": [],
+      "operations": [
+        {
+          "successful_generation_ref": 12
+        },
+        {
+          "successful_generation_ref": 13
+        },
+        {
+          "successful_generation_ref": 14
+        },
+        {
+          "successful_generation_ref": 15
+        },
+        {
+          "successful_generation_ref": 16
+        },
+        {
+          "scenario": "candidate google/gemini-3.8-flash",
+          "observed_at": 1790944959.9612107,
+          "mode": "manual",
+          "max_output_tokens": 512,
+          "allow_unknown_cost": true,
+          "allow_unknown_limits": true,
+          "scope": "generation contract only; no model-quality/funding proof",
+          "status": "UNAVAILABLE",
+          "attempts": 1,
+          "http_statuses": {
+            "google": [
+              503
+            ]
+          },
+          "category": "provider_failure",
+          "http_status": 503,
+          "business_code": null,
+          "rate_limits": {
+            "status": "UNKNOWN / not exposed",
+            "source": "response headers"
+          }
+        },
+        {
+          "scenario": "slot zai-1",
+          "observed_at": 1790944961.3891428,
+          "mode": "manual",
+          "max_output_tokens": 512,
+          "allow_unknown_cost": true,
+          "allow_unknown_limits": true,
+          "scope": "generation contract only; no model-quality/funding proof",
+          "status": "UNAVAILABLE",
+          "attempts": 1,
+          "http_statuses": {
+            "openai": [
+              429
+            ]
+          },
+          "category": "quota_exhaustion",
+          "http_status": 429,
+          "business_code": "1113",
+          "rate_limits": {
+            "status": "UNKNOWN / not exposed",
+            "source": "response headers"
+          }
+        },
+        {
+          "scenario": "slot zai-2",
+          "observed_at": 1790944962.128795,
+          "mode": "manual",
+          "max_output_tokens": 512,
+          "allow_unknown_cost": true,
+          "allow_unknown_limits": true,
+          "scope": "generation contract only; no model-quality/funding proof",
+          "status": "UNAVAILABLE",
+          "attempts": 1,
+          "http_statuses": {
+            "openai": [
+              429
+            ]
+          },
+          "category": "quota_exhaustion",
+          "http_status": 429,
+          "business_code": "1113",
+          "rate_limits": {
+            "status": "UNKNOWN / not exposed",
+            "source": "response headers"
+          }
+        },
+        {
+          "successful_generation_ref": 17
+        },
+        {
+          "successful_generation_ref": 18
+        },
+        {
+          "scenario": "candidate ollama-cloud/glm-5.3",
+          "observed_at": 1790944963.713036,
+          "mode": "manual",
+          "max_output_tokens": 512,
+          "allow_unknown_cost": true,
+          "allow_unknown_limits": true,
+          "scope": "generation contract only; no model-quality/funding proof",
+          "status": "UNAVAILABLE",
+          "attempts": 1,
+          "http_statuses": {
+            "ollama": [
+              402
+            ]
+          },
+          "category": "funding_or_entitlement_unknown",
+          "http_status": 402,
+          "business_code": null,
+          "rate_limits": {
+            "status": "UNKNOWN / not exposed",
+            "source": "response headers"
+          }
+        },
+        {
+          "scenario": "routing auto",
+          "observed_at": 1790944963.8678083,
+          "mode": "auto",
+          "max_output_tokens": 512,
+          "allow_unknown_cost": false,
+          "allow_unknown_limits": false,
+          "scope": "generation contract only; no model-quality/funding proof",
+          "status": "PARTIAL",
+          "sentinel_matches": false,
+          "provider": "openrouter",
+          "model": "openrouter/free",
+          "slot": "openrouter-1",
+          "quota_pool": "openrouter/configured-account",
+          "actual_model": "nvidia/nemotron-3.5-content-safety:free",
+          "actual_provider": "Nvidia",
+          "input_tokens": 470,
+          "output_tokens": 179,
+          "attempts": 1,
+          "http_statuses": {
+            "openai": [
+              200
+            ]
+          },
+          "rate_limits": {
+            "status": "UNKNOWN / not exposed",
+            "source": "response headers"
+          }
+        },
+        {
+          "successful_generation_ref": 19
+        },
+        {
+          "successful_generation_ref": 20
+        },
+        {
+          "successful_generation_ref": 21
+        },
+        {
+          "scenario": "routing free_first",
+          "observed_at": 1790944983.2776837,
+          "mode": "free_first",
+          "max_output_tokens": 512,
+          "allow_unknown_cost": false,
+          "allow_unknown_limits": false,
+          "scope": "generation contract only; no model-quality/funding proof",
+          "status": "PARTIAL",
+          "sentinel_matches": false,
+          "provider": "openrouter",
+          "model": "openrouter/free",
+          "slot": "openrouter-1",
+          "quota_pool": "openrouter/configured-account",
+          "actual_model": "nvidia/nemotron-3.5-content-safety:free",
+          "actual_provider": "Nvidia",
+          "input_tokens": 470,
+          "output_tokens": 91,
+          "attempts": 1,
+          "http_statuses": {
+            "openai": [
+              200
+            ]
+          },
+          "rate_limits": {
+            "status": "UNKNOWN / not exposed",
+            "source": "response headers"
+          }
+        },
+        {
+          "scenario": "local refuses cloud",
+          "observed_at": 1790944985.1405082,
+          "mode": "local",
+          "max_output_tokens": 128,
+          "allow_unknown_cost": false,
+          "allow_unknown_limits": false,
+          "scope": "generation contract only; no model-quality/funding proof",
+          "status": "BLOCKED",
+          "attempts": 0,
+          "http_statuses": {},
+          "category": "route_unavailable"
+        }
+      ],
+      "note": "Original observations retained. Corrected classifications/architecture do not rewrite earlier evidence."
+    },
+    {
+      "name": "earlier all-mode passing run",
+      "recorded_at": "2026-10-02T12:45:46.665905+00:00",
+      "assertions": 94,
+      "passed": 94,
+      "failed_assertions": [],
+      "operations": [
+        {
+          "successful_generation_ref": 22
+        },
+        {
+          "scenario": "slot zai-1",
+          "observed_at": 1790945120.5338025,
+          "mode": "manual",
+          "max_output_tokens": 512,
+          "allow_unknown_cost": true,
+          "allow_unknown_limits": true,
+          "scope": "generation contract only; no model-quality/funding proof",
+          "status": "UNAVAILABLE",
+          "attempts": 1,
+          "http_statuses": {
+            "openai": [
+              429
+            ]
+          },
+          "category": "quota_exhaustion",
+          "http_status": 429,
+          "business_code": "1113",
+          "rate_limits": {
+            "status": "UNKNOWN / not exposed",
+            "source": "response headers"
+          }
+        },
+        {
+          "scenario": "slot zai-2",
+          "observed_at": 1790945121.3711019,
+          "mode": "manual",
+          "max_output_tokens": 512,
+          "allow_unknown_cost": true,
+          "allow_unknown_limits": true,
+          "scope": "generation contract only; no model-quality/funding proof",
+          "status": "UNAVAILABLE",
+          "attempts": 1,
+          "http_statuses": {
+            "openai": [
+              429
+            ]
+          },
+          "category": "quota_exhaustion",
+          "http_status": 429,
+          "business_code": "1113",
+          "rate_limits": {
+            "status": "UNKNOWN / not exposed",
+            "source": "response headers"
+          }
+        },
+        {
+          "scenario": "candidate ollama-cloud/glm-5.3",
+          "observed_at": 1790945121.9931843,
+          "mode": "manual",
+          "max_output_tokens": 512,
+          "allow_unknown_cost": true,
+          "allow_unknown_limits": true,
+          "scope": "generation contract only; no model-quality/funding proof",
+          "status": "UNAVAILABLE",
+          "attempts": 1,
+          "http_statuses": {
+            "ollama": [
+              402
+            ]
+          },
+          "category": "funding_or_entitlement_unknown",
+          "http_status": 402,
+          "business_code": null,
+          "rate_limits": {
+            "status": "UNKNOWN / not exposed",
+            "source": "response headers"
+          }
+        },
+        {
+          "successful_generation_ref": 23
+        },
+        {
+          "successful_generation_ref": 24
+        },
+        {
+          "successful_generation_ref": 25
+        },
+        {
+          "successful_generation_ref": 26
+        },
+        {
+          "successful_generation_ref": 27
+        },
+        {
+          "scenario": "local refuses cloud",
+          "observed_at": 1790945145.9711053,
+          "mode": "local",
+          "max_output_tokens": 128,
+          "allow_unknown_cost": false,
+          "allow_unknown_limits": false,
+          "scope": "generation contract only; no model-quality/funding proof",
+          "status": "BLOCKED",
+          "attempts": 0,
+          "http_statuses": {},
+          "category": "route_unavailable"
+        }
+      ],
+      "note": "Original observations retained. Corrected classifications/architecture do not rewrite earlier evidence."
+    },
+    {
+      "name": "aggregator failure-scope defect observed",
+      "recorded_at": "2026-10-02T13:00:25.163901+00:00",
+      "assertions": 72,
+      "passed": 69,
+      "failed_assertions": [
+        {
+          "check": "current live balanced",
+          "status": "FAIL"
+        },
+        {
+          "check": "current live heavy",
+          "status": "FAIL"
+        },
+        {
+          "check": "current live free_first",
+          "status": "FAIL"
+        }
+      ],
+      "operations": [
+        {
+          "scenario": "slot zai-1",
+          "observed_at": 1790946017.6523418,
+          "mode": "manual",
+          "max_output_tokens": 512,
+          "allow_unknown_cost": true,
+          "allow_unknown_limits": true,
+          "scope": "generation contract only; no model-quality/funding proof",
+          "status": "UNAVAILABLE",
+          "attempts": 1,
+          "http_statuses": {
+            "openai": [
+              429
+            ]
+          },
+          "category": "quota_exhaustion",
+          "http_status": 429,
+          "business_code": "1113",
+          "rate_limits": {
+            "status": "UNKNOWN / not exposed",
+            "source": "response headers"
+          }
+        },
+        {
+          "scenario": "slot zai-2",
+          "observed_at": 1790946018.5196908,
+          "mode": "manual",
+          "max_output_tokens": 512,
+          "allow_unknown_cost": true,
+          "allow_unknown_limits": true,
+          "scope": "generation contract only; no model-quality/funding proof",
+          "status": "UNAVAILABLE",
+          "attempts": 1,
+          "http_statuses": {
+            "openai": [
+              429
+            ]
+          },
+          "category": "quota_exhaustion",
+          "http_status": 429,
+          "business_code": "1113",
+          "rate_limits": {
+            "status": "UNKNOWN / not exposed",
+            "source": "response headers"
+          }
+        },
+        {
+          "scenario": "candidate ollama-cloud/glm-5.3",
+          "observed_at": 1790946019.1434588,
+          "mode": "manual",
+          "max_output_tokens": 512,
+          "allow_unknown_cost": true,
+          "allow_unknown_limits": true,
+          "scope": "generation contract only; no model-quality/funding proof",
+          "status": "UNAVAILABLE",
+          "attempts": 1,
+          "http_statuses": {
+            "ollama": [
+              402
+            ]
+          },
+          "category": "funding_or_entitlement_unknown",
+          "http_status": 402,
+          "business_code": null,
+          "rate_limits": {
+            "status": "UNKNOWN / not exposed",
+            "source": "response headers"
+          }
+        },
+        {
+          "successful_generation_ref": 28
+        },
+        {
+          "successful_generation_ref": 29
+        },
+        {
+          "scenario": "routing balanced",
+          "observed_at": 1790946024.0939023,
+          "mode": "balanced",
+          "max_output_tokens": 512,
+          "allow_unknown_cost": false,
+          "allow_unknown_limits": false,
+          "scope": "generation contract only; no model-quality/funding proof",
+          "status": "UNAVAILABLE",
+          "attempts": 1,
+          "http_statuses": {
+            "openai": [
+              200
+            ]
+          },
+          "category": "provider_failure",
+          "http_status": null,
+          "business_code": null,
+          "rate_limits": null
+        },
+        {
+          "scenario": "routing heavy",
+          "observed_at": 1790946024.475918,
+          "mode": "heavy",
+          "max_output_tokens": 512,
+          "allow_unknown_cost": false,
+          "allow_unknown_limits": false,
+          "scope": "generation contract only; no model-quality/funding proof",
+          "status": "BLOCKED",
+          "attempts": 0,
+          "http_statuses": {},
+          "category": "route_unavailable"
+        },
+        {
+          "scenario": "routing free_first",
+          "observed_at": 1790946024.4790957,
+          "mode": "free_first",
+          "max_output_tokens": 512,
+          "allow_unknown_cost": false,
+          "allow_unknown_limits": false,
+          "scope": "generation contract only; no model-quality/funding proof",
+          "status": "BLOCKED",
+          "attempts": 0,
+          "http_statuses": {},
+          "category": "route_unavailable"
+        },
+        {
+          "scenario": "local refuses cloud",
+          "observed_at": 1790946024.4818757,
+          "mode": "local",
+          "max_output_tokens": 128,
+          "allow_unknown_cost": false,
+          "allow_unknown_limits": false,
+          "scope": "generation contract only; no model-quality/funding proof",
+          "status": "BLOCKED",
+          "attempts": 0,
+          "http_statuses": {},
+          "category": "route_unavailable"
+        }
+      ],
+      "note": "Original observations retained. Corrected classifications/architecture do not rewrite earlier evidence."
+    },
+    {
+      "name": "account cooldown masking defect observed",
+      "recorded_at": "2026-10-02T13:04:38.939411+00:00",
+      "assertions": 74,
+      "passed": 72,
+      "failed_assertions": [
+        {
+          "check": "current live heavy",
+          "status": "FAIL"
+        },
+        {
+          "check": "current live free_first",
+          "status": "FAIL"
+        }
+      ],
+      "operations": [
+        {
+          "scenario": "slot zai-1",
+          "observed_at": 1790946265.3803542,
+          "mode": "manual",
+          "max_output_tokens": 512,
+          "allow_unknown_cost": true,
+          "allow_unknown_limits": true,
+          "scope": "generation contract only; no model-quality/funding proof",
+          "status": "UNAVAILABLE",
+          "attempts": 1,
+          "http_statuses": {
+            "openai": [
+              429
+            ]
+          },
+          "category": "quota_exhaustion",
+          "http_status": 429,
+          "business_code": "1113",
+          "rate_limits": {
+            "status": "UNKNOWN / not exposed",
+            "source": "response headers"
+          }
+        },
+        {
+          "scenario": "slot zai-2",
+          "observed_at": 1790946266.4238517,
+          "mode": "manual",
+          "max_output_tokens": 512,
+          "allow_unknown_cost": true,
+          "allow_unknown_limits": true,
+          "scope": "generation contract only; no model-quality/funding proof",
+          "status": "UNAVAILABLE",
+          "attempts": 1,
+          "http_statuses": {
+            "openai": [
+              429
+            ]
+          },
+          "category": "quota_exhaustion",
+          "http_status": 429,
+          "business_code": "1113",
+          "rate_limits": {
+            "status": "UNKNOWN / not exposed",
+            "source": "response headers"
+          }
+        },
+        {
+          "scenario": "candidate ollama-cloud/glm-5.3",
+          "observed_at": 1790946267.214296,
+          "mode": "manual",
+          "max_output_tokens": 512,
+          "allow_unknown_cost": true,
+          "allow_unknown_limits": true,
+          "scope": "generation contract only; no model-quality/funding proof",
+          "status": "UNAVAILABLE",
+          "attempts": 1,
+          "http_statuses": {
+            "ollama": [
+              402
+            ]
+          },
+          "category": "funding_or_entitlement_unknown",
+          "http_status": 402,
+          "business_code": null,
+          "rate_limits": {
+            "status": "UNKNOWN / not exposed",
+            "source": "response headers"
+          }
+        },
+        {
+          "successful_generation_ref": 30
+        },
+        {
+          "successful_generation_ref": 31
+        },
+        {
+          "successful_generation_ref": 32
+        },
+        {
+          "scenario": "routing heavy",
+          "observed_at": 1790946274.1478715,
+          "mode": "heavy",
+          "max_output_tokens": 512,
+          "allow_unknown_cost": false,
+          "allow_unknown_limits": false,
+          "scope": "generation contract only; no model-quality/funding proof",
+          "status": "UNAVAILABLE",
+          "attempts": 3,
+          "http_statuses": {
+            "openai": [
+              200,
+              429,
+              429
+            ]
+          },
+          "category": "limit_cause_unknown",
+          "http_status": 429,
+          "business_code": null,
+          "rate_limits": {
+            "status": "UNKNOWN / not exposed",
+            "source": "response headers"
+          }
+        },
+        {
+          "scenario": "routing free_first",
+          "observed_at": 1790946277.92728,
+          "mode": "free_first",
+          "max_output_tokens": 512,
+          "allow_unknown_cost": false,
+          "allow_unknown_limits": false,
+          "scope": "generation contract only; no model-quality/funding proof",
+          "status": "UNAVAILABLE",
+          "attempts": 2,
+          "http_statuses": {
+            "openai": [
+              429,
+              429
+            ]
+          },
+          "category": "limit_cause_unknown",
+          "http_status": 429,
+          "business_code": null,
+          "rate_limits": {
+            "status": "UNKNOWN / not exposed",
+            "source": "response headers"
+          }
+        },
+        {
+          "scenario": "local refuses cloud",
+          "observed_at": 1790946278.1928053,
+          "mode": "local",
+          "max_output_tokens": 128,
+          "allow_unknown_cost": false,
+          "allow_unknown_limits": false,
+          "scope": "generation contract only; no model-quality/funding proof",
+          "status": "BLOCKED",
+          "attempts": 0,
+          "http_statuses": {},
+          "category": "route_unavailable"
+        }
+      ],
+      "note": "Original observations retained. Corrected classifications/architecture do not rewrite earlier evidence."
+    },
+    {
+      "name": "latest acceptance after scope/cooldown corrections",
+      "recorded_at": "2026-10-02T13:15:28.595396+00:00",
+      "assertions": 72,
+      "passed": 69,
+      "failed_assertions": [
+        {
+          "check": "current live balanced",
+          "status": "FAIL"
+        },
+        {
+          "check": "current live heavy",
+          "status": "FAIL"
+        },
+        {
+          "check": "current live free_first",
+          "status": "FAIL"
+        }
+      ],
+      "operations": [
+        {
+          "successful_generation_ref": 33
+        },
+        {
+          "successful_generation_ref": 34
+        },
+        {
+          "scenario": "routing balanced",
+          "observed_at": 1790946926.9875004,
+          "mode": "balanced",
+          "max_output_tokens": 512,
+          "allow_unknown_cost": false,
+          "allow_unknown_limits": false,
+          "scope": "generation contract only; no model-quality/funding proof",
+          "status": "UNAVAILABLE",
+          "provider": "openrouter",
+          "model": "qwen/qwen3.8-27b:free",
+          "slot": "openrouter-3",
+          "quota_pool": "openrouter/configured-account",
+          "attempts": 2,
+          "http_statuses": {
+            "openai": [
+              200,
+              429
+            ]
+          },
+          "category": "limit_cause_unknown",
+          "http_status": 429,
+          "business_code": null,
+          "attempt_trace": [
+            {
+              "provider": "openrouter",
+              "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+              "slot": "openrouter-2",
+              "quota_pool": "openrouter/configured-account",
+              "attempt": 1,
+              "provider_response_success": false,
+              "error": "provider_failure",
+              "timestamp": 1790946927.4269018
+            },
+            {
+              "provider": "openrouter",
+              "model": "qwen/qwen3.8-27b:free",
+              "slot": "openrouter-3",
+              "quota_pool": "openrouter/configured-account",
+              "attempt": 2,
+              "provider_response_success": false,
+              "error": "limit_cause_unknown",
+              "timestamp": 1790946927.8056746
+            }
+          ],
+          "rate_limits": {
+            "status": "UNKNOWN / not exposed",
+            "source": "response headers"
+          }
+        },
+        {
+          "scenario": "routing heavy",
+          "observed_at": 1790946927.8144681,
+          "mode": "heavy",
+          "max_output_tokens": 512,
+          "allow_unknown_cost": false,
+          "allow_unknown_limits": false,
+          "scope": "generation contract only; no model-quality/funding proof",
+          "status": "BLOCKED",
+          "attempts": 0,
+          "http_statuses": {},
+          "category": "route_unavailable",
+          "attempt_trace": []
+        },
+        {
+          "scenario": "routing free_first",
+          "observed_at": 1790946927.8191385,
+          "mode": "free_first",
+          "max_output_tokens": 512,
+          "allow_unknown_cost": false,
+          "allow_unknown_limits": false,
+          "scope": "generation contract only; no model-quality/funding proof",
+          "status": "BLOCKED",
+          "attempts": 0,
+          "http_statuses": {},
+          "category": "route_unavailable",
+          "attempt_trace": []
+        },
+        {
+          "scenario": "local refuses cloud",
+          "observed_at": 1790946927.823653,
+          "mode": "local",
+          "max_output_tokens": 128,
+          "allow_unknown_cost": false,
+          "allow_unknown_limits": false,
+          "scope": "generation contract only; no model-quality/funding proof",
+          "status": "BLOCKED",
+          "attempts": 0,
+          "http_statuses": {},
+          "category": "route_unavailable",
+          "attempt_trace": []
+        }
+      ],
+      "note": "Original observations retained. Corrected classifications/architecture do not rewrite earlier evidence."
+    }
+  ],
+  "latest_live_assertions": {
+    "total": 72,
+    "passed": 69,
+    "failed": [
+      {
+        "check": "current live balanced",
+        "status": "FAIL"
+      },
+      {
+        "check": "current live heavy",
+        "status": "FAIL"
+      },
+      {
+        "check": "current live free_first",
+        "status": "FAIL"
+      }
+    ]
+  },
+  "inventory_conflicts": [
+    {
+      "provider": "groq",
+      "model": "llama-3.1-8b-instant",
+      "live_source": {
+        "identity": "https://api.groq.com/openai/v1/models",
+        "authority": "live_api",
+        "scope": "account",
+        "observed_at": 1790946915.5202858,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null
+      },
+      "resolution": "absent in complete live inventory; cached availability rejected",
+      "slots": [
+        "groq-1",
+        "groq-2",
+        "groq-3",
+        "groq-4"
+      ]
+    },
+    {
+      "provider": "groq",
+      "model": "llama-3.3-70b-versatile",
+      "live_source": {
+        "identity": "https://api.groq.com/openai/v1/models",
+        "authority": "live_api",
+        "scope": "account",
+        "observed_at": 1790946915.5202858,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null
+      },
+      "resolution": "absent in complete live inventory; cached availability rejected",
+      "slots": [
+        "groq-1",
+        "groq-2",
+        "groq-3",
+        "groq-4"
+      ]
+    },
+    {
+      "provider": "groq",
+      "model": "qwen/qwen3.6-27b",
+      "live_source": {
+        "identity": "https://api.groq.com/openai/v1/models",
+        "authority": "live_api",
+        "scope": "account",
+        "observed_at": 1790946915.5202858,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null
+      },
+      "resolution": "absent in complete live inventory; cached availability rejected",
+      "slots": [
+        "groq-1",
+        "groq-2",
+        "groq-3",
+        "groq-4"
+      ]
+    },
+    {
+      "provider": "groq",
+      "model": "qwen/qwen3-32b",
+      "live_source": {
+        "identity": "https://api.groq.com/openai/v1/models",
+        "authority": "live_api",
+        "scope": "account",
+        "observed_at": 1790946915.5202858,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null
+      },
+      "resolution": "absent in complete live inventory; cached availability rejected",
+      "slots": [
+        "groq-1",
+        "groq-2",
+        "groq-3",
+        "groq-4"
+      ]
+    },
+    {
+      "provider": "groq",
+      "model": "meta-llama/llama-4-scout-17b-16e-instruct",
+      "live_source": {
+        "identity": "https://api.groq.com/openai/v1/models",
+        "authority": "live_api",
+        "scope": "account",
+        "observed_at": 1790946915.5202858,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null
+      },
+      "resolution": "absent in complete live inventory; cached availability rejected",
+      "slots": [
+        "groq-1",
+        "groq-2",
+        "groq-3",
+        "groq-4"
+      ]
+    },
+    {
+      "provider": "groq",
+      "model": "groq/compound",
+      "live_source": {
+        "identity": "https://api.groq.com/openai/v1/models",
+        "authority": "live_api",
+        "scope": "account",
+        "observed_at": 1790946915.5202858,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null
+      },
+      "resolution": "absent in complete live inventory; cached availability rejected",
+      "slots": [
+        "groq-1",
+        "groq-2",
+        "groq-3",
+        "groq-4"
+      ]
+    },
+    {
+      "provider": "groq",
+      "model": "groq/compound-mini",
+      "live_source": {
+        "identity": "https://api.groq.com/openai/v1/models",
+        "authority": "live_api",
+        "scope": "account",
+        "observed_at": 1790946915.5202858,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null
+      },
+      "resolution": "absent in complete live inventory; cached availability rejected",
+      "slots": [
+        "groq-1",
+        "groq-2",
+        "groq-3",
+        "groq-4"
+      ]
+    },
+    {
+      "provider": "google",
+      "model": "gemini-3-pro-preview",
+      "live_source": {
+        "identity": "https://generativelanguage.googleapis.com/v1beta/models",
+        "authority": "live_api",
+        "scope": "account",
+        "observed_at": 1790946918.2000332,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null
+      },
+      "resolution": "absent in complete live inventory; cached availability rejected",
+      "slots": [
+        "google-1",
+        "google-2",
+        "google-3"
+      ]
+    },
+    {
+      "provider": "google",
+      "model": "gemini-2.0-flash",
+      "live_source": {
+        "identity": "https://generativelanguage.googleapis.com/v1beta/models",
+        "authority": "live_api",
+        "scope": "account",
+        "observed_at": 1790946918.2000332,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null
+      },
+      "resolution": "absent in complete live inventory; cached availability rejected",
+      "slots": [
+        "google-1",
+        "google-2",
+        "google-3"
+      ]
+    },
+    {
+      "provider": "google",
+      "model": "gemini-2.0-flash-lite",
+      "live_source": {
+        "identity": "https://generativelanguage.googleapis.com/v1beta/models",
+        "authority": "live_api",
+        "scope": "account",
+        "observed_at": 1790946918.2000332,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null
+      },
+      "resolution": "absent in complete live inventory; cached availability rejected",
+      "slots": [
+        "google-1",
+        "google-2",
+        "google-3"
+      ]
+    },
+    {
+      "provider": "google",
+      "model": "gemini-3.1-flash-lite-preview",
+      "live_source": {
+        "identity": "https://generativelanguage.googleapis.com/v1beta/models",
+        "authority": "live_api",
+        "scope": "account",
+        "observed_at": 1790946918.2000332,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null
+      },
+      "retirement_source": {
+        "identity": "https://ai.google.dev/gemini-api/docs/deprecations",
+        "authority": "official_deprecation",
+        "scope": "provider",
+        "observed_at": 1790943196.6073742,
+        "ttl_seconds": 86400,
+        "refreshable": true,
+        "published_at": null
+      },
+      "resolution": "official retirement overrides inventory listing; excluded from routing",
+      "slots": [
+        "google-1",
+        "google-2",
+        "google-3"
+      ]
+    },
+    {
+      "provider": "google",
+      "model": "gemini-3-pro-image-preview",
+      "live_source": {
+        "identity": "https://generativelanguage.googleapis.com/v1beta/models",
+        "authority": "live_api",
+        "scope": "account",
+        "observed_at": 1790946918.2000332,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null
+      },
+      "retirement_source": {
+        "identity": "https://ai.google.dev/gemini-api/docs/deprecations",
+        "authority": "official_deprecation",
+        "scope": "provider",
+        "observed_at": 1790943196.6073742,
+        "ttl_seconds": 86400,
+        "refreshable": true,
+        "published_at": null
+      },
+      "resolution": "official retirement overrides inventory listing; excluded from routing",
+      "slots": [
+        "google-1",
+        "google-2",
+        "google-3"
+      ]
+    },
+    {
+      "provider": "google",
+      "model": "gemini-3.1-flash-image-preview",
+      "live_source": {
+        "identity": "https://generativelanguage.googleapis.com/v1beta/models",
+        "authority": "live_api",
+        "scope": "account",
+        "observed_at": 1790946918.2000332,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null
+      },
+      "retirement_source": {
+        "identity": "https://ai.google.dev/gemini-api/docs/deprecations",
+        "authority": "official_deprecation",
+        "scope": "provider",
+        "observed_at": 1790943196.6073742,
+        "ttl_seconds": 86400,
+        "refreshable": true,
+        "published_at": null
+      },
+      "resolution": "official retirement overrides inventory listing; excluded from routing",
+      "slots": [
+        "google-1",
+        "google-2",
+        "google-3"
+      ]
+    },
+    {
+      "provider": "google",
+      "model": "gemini-2.5-computer-use-preview-10-2025",
+      "live_source": {
+        "identity": "https://generativelanguage.googleapis.com/v1beta/models",
+        "authority": "live_api",
+        "scope": "account",
+        "observed_at": 1790946918.2000332,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null
+      },
+      "retirement_source": {
+        "identity": "https://ai.google.dev/gemini-api/docs/deprecations",
+        "authority": "official_deprecation",
+        "scope": "provider",
+        "observed_at": 1790943196.6073742,
+        "ttl_seconds": 86400,
+        "refreshable": true,
+        "published_at": null
+      },
+      "resolution": "official retirement overrides inventory listing; excluded from routing",
+      "slots": [
+        "google-1",
+        "google-2",
+        "google-3"
+      ]
+    }
+  ],
+  "native_retrieval": {
+    "recorded_at": "2026-10-02T13:12:59.849656+00:00",
+    "native_objective": {
+      "state": "partially_verified",
+      "scope": "Native inventory component only; public-web constraints/synthesis UNVERIFIED",
+      "execution_class": "retrieval_live_source",
+      "sources": [
+        {
+          "identity": "https://api.groq.com/openai/v1/models",
+          "authority": "live_api",
+          "scope": "account",
+          "observed_at": 1790946778.3188615,
+          "ttl_seconds": 300,
+          "refreshable": true,
+          "published_at": null
+        },
+        {
+          "identity": "https://openrouter.ai/api/v1/models/user",
+          "authority": "live_api",
+          "scope": "account",
+          "observed_at": 1790946778.5020592,
+          "ttl_seconds": 300,
+          "refreshable": true,
+          "published_at": null
+        },
+        {
+          "identity": "https://integrate.api.nvidia.com/v1/models",
+          "authority": "live_api",
+          "scope": "account",
+          "observed_at": 1790946778.666781,
+          "ttl_seconds": 300,
+          "refreshable": true,
+          "published_at": null
+        },
+        {
+          "identity": "https://generativelanguage.googleapis.com/v1beta/models",
+          "authority": "live_api",
+          "scope": "account",
+          "observed_at": 1790946779.0202281,
+          "ttl_seconds": 300,
+          "refreshable": true,
+          "published_at": null
+        },
+        {
+          "identity": "https://ai.google.dev/gemini-api/docs/deprecations",
+          "authority": "official_deprecation",
+          "scope": "provider",
+          "observed_at": 1790943196.6073742,
+          "ttl_seconds": 86400,
+          "refreshable": true,
+          "published_at": null
+        },
+        {
+          "identity": "https://api.z.ai/api/paas/v4/models",
+          "authority": "live_api",
+          "scope": "account",
+          "observed_at": 1790946779.5780036,
+          "ttl_seconds": 300,
+          "refreshable": true,
+          "published_at": null
+        },
+        {
+          "identity": "https://ollama.com/api/tags",
+          "authority": "live_api",
+          "scope": "account",
+          "observed_at": 1790946779.8373706,
+          "ttl_seconds": 300,
+          "refreshable": true,
+          "published_at": null
+        }
+      ],
+      "conflicts": [
+        [
+          "llama-3.1-8b-instant: absent in complete live inventory; cached availability rejected",
+          "llama-3.3-70b-versatile: absent in complete live inventory; cached availability rejected",
+          "qwen/qwen3.6-27b: absent in complete live inventory; cached availability rejected",
+          "qwen/qwen3-32b: absent in complete live inventory; cached availability rejected",
+          "meta-llama/llama-4-scout-17b-16e-instruct: absent in complete live inventory; cached availability rejected",
+          "groq/compound: absent in complete live inventory; cached availability rejected",
+          "groq/compound-mini: absent in complete live inventory; cached availability rejected"
+        ],
+        [
+          "gemini-3-pro-preview: absent in complete live inventory; cached availability rejected",
+          "gemini-2.0-flash: absent in complete live inventory; cached availability rejected",
+          "gemini-2.0-flash-lite: absent in complete live inventory; cached availability rejected",
+          "gemini-3.1-flash-lite-preview: official retirement overrides inventory listing; excluded from routing",
+          "gemini-3-pro-image-preview: official retirement overrides inventory listing; excluded from routing",
+          "gemini-3.1-flash-image-preview: official retirement overrides inventory listing; excluded from routing",
+          "gemini-2.5-computer-use-preview-10-2025: official retirement overrides inventory listing; excluded from routing"
+        ]
+      ],
+      "generation_calls": 0
+    },
+    "weather_without_source": {
+      "state": "blocked",
+      "blocker": "freshness_unavailable: UNKNOWN / potentially stale"
+    },
+    "telemetry_content_free": true
+  },
+  "automated_quality": {
+    "unit_tests": 161,
+    "unit_status": "PASS",
+    "ruff": "PASS",
+    "format": "PASS",
+    "strict_mypy": "PASS",
+    "repository_checks": "PASS",
+    "secret_scan": "PASS",
+    "diff_check": "PASS",
+    "formatted_python_files": 31,
+    "mypy_source_files": 21,
+    "secret_scanned_files": 172,
+    "unit_duration_seconds": 19.623,
+    "verified_at": "2026-10-02T13:50:50.234397+00:00"
+  },
+  "tavily": "Integration boundary prepared / actual live Tavily UNVERIFIED; all three keys absent",
+  "zai_general": "Both general slots returned HTTP 429 business code 1113: insufficient balance or no resource package. Exact prepaid/trial/balance state UNKNOWN.",
+  "zai_coding": "Disabled, separate endpoint/product/pool and coding-task constraint; no coding credentials/legitimate supported-tool entitlement established. Live status/quotas UNVERIFIED.",
+  "uncertainties": [
+    "Live inventory is listing through a credential, not an entitlement guarantee.",
+    "Account funding remains UNKNOWN outside current zero-priced OpenRouter routes; successful generation does not establish Free/credit/subscription status.",
+    "OpenRouter 429 cause, retry/reset and exact quota pool identities remain UNKNOWN. Daily remaining counts alone do not diagnose upstream rate/capacity.",
+    "Cloud Ollama free-credit eligibility and remaining balance are not exposed; GLM model 402 does not prove account-wide exhaustion.",
+    "Most provider numeric quota/credit metadata and some context/output limits are not exposed.",
+    "Native inventory retrieval is verified as a component; public-web constraint synthesis/Tavily, model benchmarks, tool execution and public/physical Grid deployment remain UNVERIFIED."
+  ],
+  "historical_evidence_preserved": [
+    "club-a-hosted-2026-10-02.json",
+    "club-a-live-2026-10-02.json"
+  ],
+  "inventory_catalogs": {
+    "groq-11": {
+      "provider": "groq",
+      "returned_count": 11,
+      "retained_scope": "full inventory",
+      "model_ids": [
+        "allam-2-7b",
+        "canopylabs/orpheus-arabic-saudi",
+        "canopylabs/orpheus-v1-english",
+        "meta-llama/llama-prompt-guard-2-22m",
+        "meta-llama/llama-prompt-guard-2-86m",
+        "openai/gpt-oss-120b",
+        "openai/gpt-oss-20b",
+        "openai/gpt-oss-safeguard-20b",
+        "qwen/qwen3.8-27b",
+        "whisper-large-v3",
+        "whisper-large-v3-turbo"
+      ]
+    },
+    "openrouter-461": {
+      "provider": "openrouter",
+      "returned_count": 461,
+      "retained_scope": "currently zero-priced subset of account-filtered inventory",
+      "model_ids": [
+        "apodex/apodex-1.1-mini:free",
+        "cohere/north-mini-code:free",
+        "dots-studio/dots-3-note-preview:free",
+        "google/gemma-4-26b-a4b-it:free",
+        "google/gemma-4-31b-it:free",
+        "google/lyria-3-clip-preview",
+        "google/lyria-3-pro-preview",
+        "inclusionai/ling-3.0-flash-sante:free",
+        "liquid/lfm-2.5-2.6b:free",
+        "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+        "nvidia/nemotron-3-super-120b-a12b:free",
+        "nvidia/nemotron-3-ultra-550b-a55b:free",
+        "nvidia/nemotron-3.5-content-safety:free",
+        "nvidia/nemotron-3.5-lightning:free",
+        "openrouter/free",
+        "poolside/laguna-s-2.1:free",
+        "poolside/laguna-xs-2.1:free",
+        "qwen/qwen3.8-27b:free",
+        "stealth/space-bunny-alpha",
+        "thinkingmachines/inkling-small:free",
+        "thinkingmachines/inkling:free"
+      ]
+    },
+    "nvidia-81": {
+      "provider": "nvidia",
+      "returned_count": 81,
+      "retained_scope": "full inventory",
+      "model_ids": [
+        "01-ai/yi-large",
+        "adept/fuyu-8b",
+        "ai21labs/jamba-1.5-large-instruct",
+        "aisingapore/sea-lion-7b-instruct",
+        "bigcode/starcoder2-15b",
+        "databricks/dbrx-instruct",
+        "deepseek-ai/deepseek-coder-6.7b-instruct",
+        "deepseek-ai/deepseek-v4.1-flash",
+        "google/codegemma-1.1-7b",
+        "google/codegemma-7b",
+        "google/deplot",
+        "google/diffusiongemma-26b-a4b-it",
+        "google/gemma-2b",
+        "google/gemma-3-12b-it",
+        "google/gemma-3-4b-it",
+        "google/gemma-4-31b-it",
+        "google/recurrentgemma-2b",
+        "ibm/granite-3.0-3b-a800m-instruct",
+        "ibm/granite-3.0-8b-instruct",
+        "ibm/granite-34b-code-instruct",
+        "ibm/granite-8b-code-instruct",
+        "meta/codellama-70b",
+        "meta/llama-3.2-11b-vision-instruct",
+        "meta/llama-3.2-90b-vision-instruct",
+        "meta/llama-guard-4-12b",
+        "meta/llama2-70b",
+        "meta/muse-glimmer-30b",
+        "microsoft/kosmos-2",
+        "microsoft/phi-3-vision-128k-instruct",
+        "microsoft/phi-3.5-moe-instruct",
+        "mistralai/codestral-22b-instruct-v0.1",
+        "mistralai/mistral-7b-instruct-v0.3",
+        "mistralai/mistral-large",
+        "mistralai/mistral-large-2-instruct",
+        "mistralai/mixtral-8x22b-v0.1",
+        "moonshotai/kimi-k2.6",
+        "moonshotai/kimi-k3",
+        "nv-mistralai/mistral-nemo-12b-instruct",
+        "nvidia/ai-synthetic-video-detector",
+        "nvidia/cosmos-reason2-8b",
+        "nvidia/embed-qa-4",
+        "nvidia/ising-calibration-1.5-31b",
+        "nvidia/llama-3.1-nemoguard-8b-content-safety",
+        "nvidia/llama-3.1-nemoguard-8b-topic-control",
+        "nvidia/llama-3.1-nemotron-51b-instruct",
+        "nvidia/llama-3.1-nemotron-70b-instruct",
+        "nvidia/llama-3.1-nemotron-safety-guard-8b-v3",
+        "nvidia/llama-3.1-nemotron-ultra-253b-v1",
+        "nvidia/llama-3.2-nemoretriever-1b-vlm-embed-v1",
+        "nvidia/llama-3.2-nv-embedqa-1b-v1",
+        "nvidia/llama-nemotron-embed-vl-1b-v2",
+        "nvidia/llama3-chatqa-1.5-70b",
+        "nvidia/mistral-nemo-minitron-8b-8k-instruct",
+        "nvidia/nemotron-3-embed-1b",
+        "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+        "nvidia/nemotron-3-super-120b-a12b",
+        "nvidia/nemotron-3-ultra-550b-a55b",
+        "nvidia/nemotron-3.5-content-safety",
+        "nvidia/nemotron-3.5-lightning-30b-a3b",
+        "nvidia/nemotron-4-340b-instruct",
+        "nvidia/nemotron-4-340b-reward",
+        "nvidia/nemotron-nano-3-30b-a3b",
+        "nvidia/nemotron-parse",
+        "nvidia/nemotron-parse-2.0",
+        "nvidia/neva-22b",
+        "nvidia/nv-embedqa-mistral-7b-v2",
+        "nvidia/nvclip",
+        "nvidia/riva-translate-4b-instruct",
+        "nvidia/riva-translate-4b-instruct-v1.1",
+        "nvidia/riva-translate-4b-instruct-v2",
+        "nvidia/vila",
+        "openai/gpt-oss-20b",
+        "poolside/laguna-xs-2.1",
+        "snowflake/arctic-embed-l",
+        "writer/palmyra-creative-122b",
+        "writer/palmyra-fin-70b-32k",
+        "writer/palmyra-med-70b",
+        "writer/palmyra-med-70b-32k",
+        "z-ai/glm-5.3",
+        "z-ai/glm-5.3-flash",
+        "zyphra/zamba2-7b-instruct"
+      ]
+    },
+    "google-61": {
+      "provider": "google",
+      "returned_count": 61,
+      "retained_scope": "full inventory",
+      "model_ids": [
+        "antigravity-preview-05-2026",
+        "antigravity-preview-09-2026",
+        "antigravity-preview-latest",
+        "aqa",
+        "deep-research-max-preview-04-2026",
+        "deep-research-preview-04-2026",
+        "deep-research-pro-preview-12-2025",
+        "gemini-2.5-computer-use-preview-10-2025",
+        "gemini-2.5-flash",
+        "gemini-2.5-flash-image",
+        "gemini-2.5-flash-lite",
+        "gemini-2.5-flash-native-audio-latest",
+        "gemini-2.5-flash-native-audio-preview-09-2025",
+        "gemini-2.5-flash-native-audio-preview-12-2025",
+        "gemini-2.5-flash-preview-tts",
+        "gemini-2.5-pro",
+        "gemini-2.5-pro-preview-tts",
+        "gemini-3-flash-preview",
+        "gemini-3-pro-image",
+        "gemini-3-pro-image-preview",
+        "gemini-3.1-flash-image",
+        "gemini-3.1-flash-image-preview",
+        "gemini-3.1-flash-lite",
+        "gemini-3.1-flash-lite-image",
+        "gemini-3.1-flash-lite-preview",
+        "gemini-3.1-flash-live-preview",
+        "gemini-3.1-flash-tts-preview",
+        "gemini-3.1-pro-preview",
+        "gemini-3.1-pro-preview-customtools",
+        "gemini-3.5-flash",
+        "gemini-3.5-flash-lite",
+        "gemini-3.5-live-translate-preview",
+        "gemini-3.5-transcribe",
+        "gemini-3.5-transcribe-live",
+        "gemini-3.6-flash",
+        "gemini-3.7-flash",
+        "gemini-3.8-flash",
+        "gemini-3.8-flash-lite-tts",
+        "gemini-3.8-flash-tts",
+        "gemini-3.8-live",
+        "gemini-3.8-live-extended-thinking",
+        "gemini-embedding-001",
+        "gemini-embedding-2",
+        "gemini-embedding-2-preview",
+        "gemini-flash-latest",
+        "gemini-flash-lite-latest",
+        "gemini-omni-1.1-flash",
+        "gemini-omni-flash-preview",
+        "gemini-pro-latest",
+        "gemini-robotics-er-2-preview",
+        "gemini-robotics-er-2-streaming-preview",
+        "gemma-4-26b-a4b-it",
+        "gemma-4-31b-it",
+        "lyria-3-clip-preview",
+        "lyria-3-pro-preview",
+        "lyria-3.5",
+        "lyria-realtime-exp",
+        "nano-banana-pro-preview",
+        "veo-3.1-fast-generate-preview",
+        "veo-3.1-generate-preview",
+        "veo-3.1-lite-generate-preview"
+      ]
+    },
+    "zai-11": {
+      "provider": "zai",
+      "returned_count": 11,
+      "retained_scope": "full inventory",
+      "model_ids": [
+        "glm-4.5",
+        "glm-4.5-air",
+        "glm-4.6",
+        "glm-4.7",
+        "glm-5",
+        "glm-5-turbo",
+        "glm-5.1",
+        "glm-5.2",
+        "glm-5.3",
+        "glm-5.3-flash",
+        "glm-5.3-flashx"
+      ]
+    },
+    "ollama-cloud-17": {
+      "provider": "ollama-cloud",
+      "returned_count": 17,
+      "retained_scope": "full inventory",
+      "model_ids": [
+        "deepseek-v4-pro:0813",
+        "deepseek-v4.1-flash",
+        "gemma4:31b",
+        "glm-5.2",
+        "glm-5.3",
+        "glm-5.3-flash",
+        "gpt-oss:120b",
+        "gpt-oss:20b",
+        "kimi-k2.6",
+        "kimi-k2.7-code",
+        "kimi-k3",
+        "minimax-m2.7",
+        "minimax-m3",
+        "mistral-large-3:675b",
+        "nemotron-3-nano:30b",
+        "nemotron-3-super",
+        "nemotron-3-ultra"
+      ]
+    }
+  },
+  "final_review_regressions": [
+    "Account-visible pricing and limits are resolved per credential; one inventory cannot authorize another account.",
+    "Original seed sources/limits remain separate; a fresh inventory without limit fields does not refresh expired documentation.",
+    "Ambiguous numeric reset hints are preserved without guessing time units.",
+    "Balance/resource-package errors do not invent numerical remaining request counts."
+  ]
+}

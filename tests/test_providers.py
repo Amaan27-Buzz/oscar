@@ -6,8 +6,9 @@ from threading import Thread
 from unittest.mock import patch
 from urllib.error import URLError
 
-from oscar.models import Failure, ModelRequest, ProviderError, ProviderSpec
-from oscar.providers import HTTPAdapter
+from oscar.discovery import HTTPDiscovery
+from oscar.models import Failure, Funding, ModelRequest, ProviderError, ProviderSpec
+from oscar.providers import HTTPAdapter, rate_limits
 
 
 class ProviderContractTests(unittest.TestCase):
@@ -93,6 +94,35 @@ class ProviderContractTests(unittest.TestCase):
         self.assertTrue(self.requests[0]["bearer"])
         self.assertEqual(self.requests[0]["body"]["model"], "fixture-model")
 
+    def test_generic_request_limit_headers_keep_window_unknown(self):
+        limits = rate_limits(
+            {
+                "x-ratelimit-limit": "20",
+                "x-ratelimit-remaining": "0",
+                "x-ratelimit-reset": "2000",
+                "Retry-After": "2",
+            },
+            "openrouter",
+            1000,
+        )
+        self.assertEqual(limits.request_limit, 20)
+        self.assertEqual(limits.remaining_requests, 0)
+        self.assertIsNone(limits.requests_reset_at)
+        self.assertEqual(limits.request_reset_hint, "2000")
+        self.assertEqual(limits.request_window, "UNKNOWN")
+        self.assertEqual(limits.retry_after, 2)
+
+    def test_stream_keeps_backing_model_provider_from_earlier_chunk(self):
+        self.body = (
+            b'data: {"model":"backing/current","provider":"Fixture Provider",'
+            b'"choices":[{"delta":{"content":"OSCAR_PROVIDER_OK"}}]}\n\n'
+            b'data: {"choices":[{"delta":{},"finish_reason":"stop"}]}\n\n'
+            b"data: [DONE]\n\n"
+        )
+        response = self.generate(sink=lambda event: None)
+        self.assertEqual(response.actual_model, "backing/current")
+        self.assertEqual(response.actual_provider, "Fixture Provider")
+
     def test_google_native_wire_contract(self):
         self.body = {
             "candidates": [{"content": {"parts": [{"text": "OSCAR_PROVIDER_OK"}]}}],
@@ -137,10 +167,26 @@ class ProviderContractTests(unittest.TestCase):
             with self.assertRaises(ProviderError):
                 self.generate()
 
+    def test_inline_200_backing_errors_retain_http_status_and_categorical_cause(self):
+        for code, cause in [
+            (502, Failure.PROVIDER),
+            (401, Failure.ACCESS),
+            ("1113", Failure.QUOTA),
+            ("model_decommissioned", Failure.MODEL),
+        ]:
+            self.body = {"error": {"code": code, "message": "not retained"}}
+            with self.assertRaises(ProviderError) as caught:
+                self.generate()
+            self.assertEqual(caught.exception.http_status, 200)
+            self.assertEqual(caught.exception.category, cause)
+            self.assertNotIn("not retained", str(caught.exception))
+
     def test_credential_rate_quota_model_and_provider_are_distinct(self):
         examples = [
             (401, {}, Failure.CREDENTIAL),
-            (429, {}, Failure.RATE_LIMIT),
+            (403, {}, Failure.ACCESS),
+            (429, {}, Failure.UNKNOWN_LIMIT),
+            (429, {"error": {"code": "rate_limit_exceeded"}}, Failure.RATE_LIMIT),
             (429, {"error": {"code": "insufficient_quota"}}, Failure.QUOTA),
             (404, {}, Failure.MODEL),
             (503, {}, Failure.PROVIDER),
@@ -151,6 +197,160 @@ class ProviderContractTests(unittest.TestCase):
             with self.assertRaises(ProviderError) as caught:
                 self.generate()
             self.assertEqual(caught.exception.category, category)
+
+    def test_zai_documented_business_errors_distinguish_capacity_and_products(self):
+        for code, category in [
+            ("1113", Failure.QUOTA),
+            ("1302", Failure.RATE_LIMIT),
+            ("1305", Failure.CAPACITY),
+            ("1315", Failure.PRODUCT),
+            ("1311", Failure.PRODUCT),
+        ]:
+            self.status, self.body = 429, {"error": {"code": code}}
+            with self.assertRaises(ProviderError) as error:
+                self.generate()
+            self.assertEqual(error.exception.category, category)
+            self.assertEqual(error.exception.business_code, code)
+            self.assertEqual(error.exception.http_status, 429)
+
+    def test_retired_model_error_does_not_become_bad_credential(self):
+        self.status = 403
+        self.body = {"error": {"code": "model_decommissioned"}}
+        with self.assertRaises(ProviderError) as error:
+            self.generate()
+        self.assertEqual(error.exception.category, Failure.MODEL)
+
+    def test_402_does_not_invent_account_balance(self):
+        self.status, self.body = 402, {"error": "generic rejection"}
+        with self.assertRaises(ProviderError) as error:
+            self.generate()
+        self.assertEqual(error.exception.category, Failure.FUNDING)
+
+    def test_groq_headers_preserve_limits_and_independent_reset_windows(self):
+        headers = {
+            "x-ratelimit-limit-requests": "1000",
+            "x-ratelimit-limit-tokens": "8000",
+            "x-ratelimit-remaining-requests": "999",
+            "x-ratelimit-remaining-tokens": "7900",
+            "x-ratelimit-reset-requests": "1m30.5s",
+            "x-ratelimit-reset-tokens": "7.66s",
+            "Retry-After": "1.5",
+        }
+        limits = rate_limits(headers, "groq", 1000)
+        self.assertEqual(limits.request_limit, 1000)
+        self.assertEqual(limits.token_limit, 8000)
+        self.assertEqual(limits.requests_reset_at, 1090.5)
+        self.assertEqual(limits.tokens_reset_at, 1007.66)
+        self.assertEqual(limits.retry_after, 1.5)
+        self.assertEqual((limits.request_window, limits.token_window), ("day", "minute"))
+
+    def test_dynamic_backing_model_and_provider_are_preserved(self):
+        self.body.update(model="current/backing:free", provider="FixtureProvider")
+        response = self.generate()
+        self.assertEqual(response.actual_model, "current/backing:free")
+        self.assertEqual(response.actual_provider, "FixtureProvider")
+
+    def test_google_model_version_is_preserved(self):
+        self.body = {
+            "modelVersion": "current-gemini-version",
+            "candidates": [{"content": {"parts": [{"text": "answer"}]}}],
+        }
+        self.assertEqual(self.generate("google").actual_model, "current-gemini-version")
+
+    def test_discovery_paginates_google_before_marking_absence(self):
+        self.scheduled = [
+            (
+                200,
+                {
+                    "models": [
+                        {
+                            "name": "models/one",
+                            "inputTokenLimit": 1024,
+                            "outputTokenLimit": 128,
+                            "supportedGenerationMethods": ["generateContent"],
+                        }
+                    ],
+                    "nextPageToken": "next-page",
+                },
+            ),
+            (
+                200,
+                {
+                    "models": [
+                        {"name": "models/two", "supportedGenerationMethods": ["generateContent"]}
+                    ]
+                },
+            ),
+        ]
+        provider = replace(self.provider, adapter="google")
+        inventory = HTTPDiscovery().inventory(provider, "fixture", "synthetic-only", 2)
+        self.assertEqual({m.id for m in inventory.models}, {"one", "two"})
+        self.assertTrue(inventory.complete)
+        self.assertEqual(inventory.pages, 2)
+        self.assertIn("pageToken=next-page", self.requests[1]["path"])
+        self.assertTrue(all(r["google_key"] for r in self.requests))
+
+    def test_openrouter_aliases_and_live_zero_pricing_are_valid_inventory(self):
+        self.body = {
+            "data": [
+                {"id": "~vendor/model-latest", "pricing": {"prompt": "0", "completion": "0"}},
+                {
+                    "id": "vendor/request-fee",
+                    "pricing": {"prompt": "0", "completion": "0", "request": "0.1"},
+                },
+            ],
+            "links": {"next": None},
+        }
+        provider = replace(self.provider, id="openrouter")
+        inventory = HTTPDiscovery().inventory(provider, "fixture", "synthetic-only", 2)
+        self.assertEqual(inventory.models[0].id, "~vendor/model-latest")
+        self.assertEqual(inventory.models[0].funding, Funding.FREE)
+        self.assertEqual(inventory.models[1].funding, Funding.UNKNOWN)
+        self.assertEqual(self.requests[0]["path"], "/models/user")
+
+    def test_incomplete_or_malformed_discovery_does_not_claim_complete_inventory(self):
+        self.body = {"data": [{"id": "model"}], "links": {"next": "/unhandled-page"}}
+        self.assertFalse(
+            HTTPDiscovery().inventory(self.provider, "fixture", "synthetic", 2).complete
+        )
+        self.body = {"data": [{"id": "illegal model id"}]}
+        with self.assertRaises(ProviderError):
+            HTTPDiscovery().inventory(self.provider, "fixture", "synthetic", 2)
+
+    def test_discovery_rejects_credential_echo_without_persisting_or_logging_it(self):
+        self.body = {"data": [{"id": "synthetic-only"}]}
+        with self.assertRaises(ProviderError) as error:
+            HTTPDiscovery().inventory(self.provider, "fixture", "synthetic-only", 2)
+        self.assertNotIn("synthetic-only", str(error.exception))
+
+    def test_account_daily_limit_is_distinct_from_unknown_unlimited_credit_cap(self):
+        self.body = {
+            "data": {
+                "label": "do-not-retain-label",
+                "is_free_tier": True,
+                "limit_remaining": None,
+                "free_model_daily_requests": {"limit": 50, "remaining": 47},
+            }
+        }
+        provider = replace(self.provider, id="openrouter")
+        account = HTTPDiscovery().account(provider, "synthetic", 2)
+        self.assertTrue(account.free_tier)
+        self.assertEqual(account.limits.remaining_requests, 47)
+        self.assertIsNone(account.credit_cap_remaining)
+        self.assertNotIn("do-not-retain-label", repr(account))
+
+    def test_cloud_ollama_structured_feature_is_not_assumed_from_local_api(self):
+        provider = replace(self.provider, id="ollama-cloud", adapter="ollama")
+        with self.assertRaises(ProviderError):
+            HTTPAdapter("ollama").generate(
+                provider,
+                "model",
+                "synthetic",
+                replace(self.request, required=frozenset({"text", "structured"})),
+                2,
+                lambda: None,
+            )
+        self.assertEqual(self.requests, [])
 
     def test_error_body_and_material_are_never_exposed(self):
         self.status = 401

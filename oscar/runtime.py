@@ -52,6 +52,8 @@ class Runtime:
         elif decision.execution_class == ExecutionClass.MODEL:
             kind = "model_reasoning"
             parameters = {"prompt": intent.text, "mode": mode}
+        elif kind == "live_source":
+            parameters = {"query": intent.text, "freshness": decision.freshness.value}
         objective = Objective(new_id(), intent.text, initiator, criterion, time())
         task = Task(
             new_id(),
@@ -69,7 +71,13 @@ class Runtime:
             return self.store.transition(task.id, TaskState.UNKNOWN, blocker=decision.reason)
         if not kind or not self.grid.search(kind):
             return self.store.transition(
-                task.id, TaskState.BLOCKED, blocker="required capability is not advertised"
+                task.id,
+                TaskState.BLOCKED,
+                blocker=(
+                    "live retrieval unavailable: UNKNOWN / potentially stale"
+                    if kind == "live_source"
+                    else "required capability is not advertised"
+                ),
             )
         return task
 
@@ -160,7 +168,11 @@ class Runtime:
                     task.id,
                     TaskState.BLOCKED
                     if result.error
-                    in {"route_unavailable", "network_policy_blocked", "network_failure"}
+                    and (
+                        result.error.startswith("freshness_unavailable")
+                        or result.error
+                        in {"route_unavailable", "network_policy_blocked", "network_failure"}
+                    )
                     else TaskState.FAILED,
                     blocker=result.error or "executor reported failure",
                     expected_lease=lease_id,

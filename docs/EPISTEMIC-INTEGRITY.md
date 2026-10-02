@@ -111,6 +111,17 @@ If current lookup is unavailable, OSCAR should say the answer may be stale rathe
 
 A stale manifest is not current authority. A model ID working last month does not prove it works now. An HTTP error against an old model ID does not prove the credential itself is invalid.
 
+Provider support, account-visible listing, generation with this credential and
+funding/quota are separate observations. Current official retirement can contradict
+a still-listed API ID; a listing cannot override generation access denial. Preserve
+claim scope, source identity, observed time, refresh horizon and contradictions
+instead of one flattened confidence score. Unknown account/product state stays UNKNOWN.
+
+When newer evidence changes a provider-health interpretation, add an explicit
+correction and retain the original evidence. The post-Gate-A Groq correction in
+`docs/CLUB-A-CHECKPOINT.md` is the reference example. Source authority and freshness
+implementation are owned by `docs/SEARCH-FRESHNESS.md`.
+
 See `docs/SEARCH-FRESHNESS.md`.
 
 ## Evidence-backed reporting

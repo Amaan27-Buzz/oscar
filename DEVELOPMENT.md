@@ -95,7 +95,7 @@ Run from the repository root using Python 3.12+ on a POSIX host. The current fil
 python -m pip install '.[dev]'
 python -m ruff check oscar tests scripts
 python -m ruff format --check oscar tests scripts
-python -m mypy oscar
+python -m mypy oscar scripts/verify_club_a_live.py
 python -m unittest discover -s tests -t . -v
 python -m scripts.check_repository
 python -m oscar proof
@@ -114,6 +114,21 @@ The full hosted verification suite is explicit and excluded from ordinary tests/
 python -m scripts.verify_club_a_live --run-live --allow-unknown-cost-diagnostics --report .oscar/live-review.json
 ```
 
-The unknown-cost flag permits bounded NVIDIA/Z.ai diagnostics without declaring their funding free. Omit it for discovery-only verification of those providers. The script reuses the native runtime/router/adapters, creates fresh ignored diagnostic state, and records masked slot IDs, categorical failures and independent comparison evidence. Numerical scarcity tests use labeled synthetic balances; actual remaining provider quota stays unknown when headers are absent. Provider/account availability is reported separately from runtime assertions.
+The unknown-cost flag permits bounded diagnostics for any account whose funding
+or limits are UNKNOWN; it does not declare them free. Default routing excludes
+paid/UNKNOWN funding. The script uses fresh native inventories before selecting
+candidate IDs, follows pagination, captures actual backing routes and exposed
+quota metadata, and records masked slots and categorical failures.
+Visibility, generation and account funding remain separate. No provider quota is
+deliberately exhausted, and absent counters stay UNKNOWN.
 
-See [docs/CLUB-A-CHECKPOINT.md](docs/CLUB-A-CHECKPOINT.md) for the passed foundation Gate A matrix, known limits and manual review stop.
+To avoid repeating already successful probes within one correction pass, use
+`--previous-evidence .oscar/live-review.json`. Add `--routing-only` for a focused
+inventory/mode rerun that retains those probes and their original timestamps.
+This flag never manufactures a new generation observation. Inspect all earlier
+refusals and the latest assertion outcome; an earlier passing run does not make a
+new failed run PASS. Native current-provider questions can use `oscar ask`; broad
+web/weather questions block until a suitable source exists. Tavily is UNVERIFIED.
+
+See [docs/CLUB-A-CHECKPOINT.md](docs/CLUB-A-CHECKPOINT.md) for Gate A's current
+PARTIAL status, preserved historical evidence and the manual review stop.

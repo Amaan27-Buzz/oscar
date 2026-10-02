@@ -140,6 +140,8 @@ class RouterRig:
                 "test",
                 "https://plentiful.invalid",
                 {"plentiful-1": "FIXTURE_A", "plentiful-2": "FIXTURE_B"},
+                credential_pools={"plentiful-1": "plentiful/a", "plentiful-2": "plentiful/b"},
+                quota_pool_provenance="synthetic independently configured accounts",
             ),
             ProviderSpec("scarce", "test", "https://scarce.invalid", {"scarce-1": "FIXTURE_C"}),
         ]

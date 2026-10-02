@@ -91,18 +91,23 @@ required capability
 → paid fallback only if policy allows
 ```
 
-This means OSCAR should not burn a scarce high-value free route on trivial work merely because that model is strongest. A fast/high-limit route such as Groq may be ideal for small structured tasks; more generous pools such as Google or Z.ai may handle broader work; OpenRouter may be valuable for models that are otherwise unavailable but its lower limits should be preserved when appropriate. The router re-evaluates current capacity and observed performance on every task rather than selecting one model forever.
+OSCAR should use sufficient task-fit within currently evidenced account capacity
+and preserve scarce stronger routes when a suitable alternative exists. Quota
+comparisons use exposed counters; public Free offers and multiple keys do not
+establish independent capacity. The router re-evaluates current availability,
+funding and observed performance on each task.
 
-The development manifest selects these six Ollama Cloud models from the inventory observed on **2026-10-02**:
+The development manifest is a bootstrap/retirement seed. The hosted runtime
+refreshes current credential-visible inventory, preserves source/time/scope, and
+rejects retired, absent or stale-only routes. Listing, generation and funding are
+separate observations. Account products/quota pools prevent multiple keys from
+being counted as independent capacity without evidence. Current provider research
+is recorded in [PROVIDER-RESEARCH.md](docs/PROVIDER-RESEARCH.md).
 
-- `gemma4:31b`
-- `gpt-oss:120b`
-- `gpt-oss:20b`
-- `nemotron-3-nano:30b`
-- `nemotron-3-super`
-- `nemotron-3-ultra`
-
-This is development/runtime metadata, not a permanent hard-coded model boundary. Provider/model discovery and manifests should evolve without redesigning OSCAR Core.
+Freshness-sensitive questions route through a provider-agnostic live-source
+capability. Native provider inventory retrieval works; unsupported current sources
+return UNKNOWN/potentially stale. The Tavily boundary and three placeholders are
+prepared, but keys are absent and live Tavily integration is UNVERIFIED.
 
 ## System at a glance
 
@@ -282,9 +287,17 @@ For the current fast developer-alpha build, adjacent slices are grouped into rev
 
 ### Current club
 
-**Club A — Brain (Slices 01–04): verification complete. Gate A PASS for the implemented foundation; manual review pending.**
+**Club A — Brain (Slices 01–04): post-Gate-A correction complete.
+Gate A PARTIAL, downgraded; manual review pending.**
 
-The existing native Python/SQLite core, typed Jev, authenticated HTTP reference Transport/Grid and adaptive router have passed foundation verification. Real generation succeeded through OpenRouter, Google AI Studio, Ollama Cloud and NVIDIA NIM across 11 credential slots. Live credential failover, bounded cross-provider recovery and routing modes passed. Groq returned HTTP 403 and Z.ai HTTP 429; real quota remains unknown. Public coordinator deployment and physical nodes remain later integration work. See [the Club A checkpoint](docs/CLUB-A-CHECKPOINT.md) for evidence, scope and review commands. **Stopped for manual review; Slice 05 has not started.**
+Core Loop/Jev/reference Grid proofs remain verified. Current generation succeeded
+across 15 slots through Groq, OpenRouter, Google, NVIDIA and Ollama. The old Groq
+403 used retired models and did not diagnose credential health. Both Z.ai general
+slots now expose documented balance/resource-package error 1113. The latest full
+mode rerun hit an unknown-cause OpenRouter 429, so current Balanced/Heavy/Free First
+acceptance remains unresolved. Public coordinator deployment and physical nodes
+remain later work. See [the checkpoint](docs/CLUB-A-CHECKPOINT.md) for all passing,
+failed and historical evidence. **Stopped for manual review; Slice 05 has not started.**
 
 Target proof:
 
@@ -300,7 +313,13 @@ objective
 → truthful result
 ```
 
-The CLI reads credentials from runtime environment variables and never reads or writes `.env`. The opt-in [live suite](scripts/verify_club_a_live.py) passed 162 checks, separately from the 113 passing contract tests. Provider responses remain REPORTED until independent verification; general reasoning without a verifier remains partial. Quota, cost and model-quality uncertainty retain their provenance. Scarcity counterfactuals use labeled test balances with actual HTTPS execution; no real provider balances are invented.
+The CLI reads runtime environment credentials and never reads/writes `.env`.
+All 161 automated tests pass; the opt-in [live suite](scripts/verify_club_a_live.py)
+records operation-level success, refusal and runtime assertions separately.
+Provider responses remain REPORTED until independently verified; unsupported
+objectives remain partial. Current authoritative sources outrank stale manifests
+and model priors. Unknown funding/quota stays UNKNOWN; paid fallback requires
+explicit policy.
 
 ## Run the Brain foundation
 
@@ -322,10 +341,10 @@ The runtime has no third-party dependencies. Durable state and proof files defau
 | Slice | Deliverable | Status |
 |---:|---|---|
 | 00 | Repository/architecture foundation | ✅ Complete |
-| 01 | OSCAR Core Loop | Verified scoped foundation · Gate A passed |
-| 02 | TypeSafe Jev | Verified typed foundation · Gate A passed |
-| 03 | Native Transport + Capability Catalog + Connection Grid foundation | Reference foundation verified; broader deployment partial · Gate A passed |
-| 04 | Native Model Router + cloud intelligence | Hosted/routing foundation verified; broader integrations partial · Gate A passed |
+| 01 | OSCAR Core Loop | Verified scoped foundation |
+| 02 | TypeSafe Jev | Verified typed/freshness foundation |
+| 03 | Native Transport + Capability Catalog + Connection Grid foundation | Reference foundation verified; broader deployment partial |
+| 04 | Native Model Router + cloud intelligence | Corrected registry/pools verified; current live acceptance partial |
 | 05 | Real machine Worker + remote continuation | Planned · Club B |
 | 06 | LRA/Supermemory + Personal Policy + live context | Planned · Club B |
 | 07 | OSCAR Edge + reflexes | Planned · Club C |

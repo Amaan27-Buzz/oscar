@@ -92,7 +92,7 @@ The same capability-oriented architecture may cover STT, TTS, embeddings, rerank
 
 ## Credential pools
 
-A provider may have multiple independent credential slots.
+A provider may have multiple credential slots sharing one account product/quota pool.
 
 ```text
 GroqCloud
@@ -129,6 +129,8 @@ Rules:
 - unknown price is not free;
 - credential validity is separate from model/provider health;
 - account product/quota pool matters: two APIs from one company may consume different entitlements.
+- credential count never implies independent capacity; unknown topology is grouped
+  conservatively until distinct accounts/pools are explicitly established.
 
 That last rule is important for providers such as Z.ai, where a general API balance and a Coding Plan/trial can be different resources.
 
@@ -154,6 +156,77 @@ Never commit or echo real secrets. Integration evidence stores masked slot IDs o
 ## Discovery-first model inventory
 
 `config/development-models.json` contains **seed candidates**, not current truth.
+
+The post-Gate-A runtime implements this pipeline:
+
+```text
+bootstrap/fallback seed and dated retirement guards
+→ bounded provider-native discovery
+→ complete per-slot inventory + SourceRef
+→ separate generation/funding/quota observations
+→ current registry and route explanation
+```
+
+All configured hosted providers require inventory discovery. `Router.execute`
+refreshes expired/missing inventories; `rank` reads cached state without network
+I/O. Default inventory TTL is 300 seconds. Missing/expired discovery fails closed
+as UNKNOWN/potentially stale rather than activating the seed. Explicit offline/local
+configurations may opt out; the development hosted fleet does not.
+
+Absence rejects a model only in a complete inventory for that slot/product. Google
+pagination is followed before declaring absence; incomplete pages stay UNKNOWN.
+Fresh API limits and OpenRouter zero-price metadata override cached values.
+New text candidates receive a conservative, unbenchmarked tier 1; unknown limits
+remain unknown. Seed task-fit tiers are declared policy, not measured model power.
+
+Eligibility, ordering and cost history resolve pricing/context/output fields for
+the selected credential's own inventory. A zero-priced or larger-limit entry from
+another account cannot authorize this slot. Original seed sources remain separate
+from inventory updates; missing live limits can use only a still-fresh sourced
+seed, otherwise they are UNKNOWN. An inventory refresh does not refresh facts it
+did not return.
+
+Visibility, recent generation success, retirement and funding are independent.
+Fresh listings cannot lift a recent access/funding refusal; official retirement
+guards override API catalogs that still list shut-down models. Retirement sources
+are preserved separately from inventory sources. Absent entries and conflicting
+evidence remain inspectable rather than silently erasing history. Typed snapshots
+and probes persist across restart, without response bodies or credentials.
+
+`ProviderSpec` names an account product, a default quota pool and optional per-slot
+pool overrides. `CredentialPool` shares concurrency, cooldown and capacity within
+each pool. Unknown account topology defaults to one conservative provider/product
+pool; it is an operator assumption, not a claim that organization identities were
+verified. Groq model buckets and OpenRouter/Z.ai account buckets do not sum key
+counters. Conflicting cross-slot counters use a conservative minimum. Separate
+request/token reset horizons expire to UNKNOWN; they do not refill an invented
+balance. Pool reservation/release is atomic.
+
+HTTP 401 is distinct from 403 access denial. Documented retired-model, product,
+balance/resource-package, rate and capacity errors retain categorical cause.
+Unclassified 429 remains UNKNOWN. Ollama 402 without account metadata does not
+prove global balance exhaustion. An OpenRouter backing-model error, including an
+error inside HTTP 200, re-ranks other models without disabling the aggregator;
+network failures can still block the provider. Fallback stays bounded.
+
+OpenRouter uses `/models/user`, `/key` and the dynamic `openrouter/free` route.
+Pricing components, feature support and current limits are checked. Actual backing
+model/provider from JSON or stream chunks are retained in content-free history.
+A `:free` suffix alone is insufficient. The dynamic route's seed output budget is
+an operator diagnostic cap, not an invented provider maximum.
+
+Default policy excludes paid/UNKNOWN funding. Successful probes do not infer a
+free plan. The separate bounded `allow_unknown_limits`/unknown-cost diagnostic
+allowance cannot silently become default routing policy. Z.ai Coding Plan is
+disabled, coding-task restricted and separately pooled; subscription quota is not
+general API credit. Ollama Cloud structured output is excluded under current
+official documentation, regardless of local Ollama support.
+
+Implementation: [registry](../oscar/registry.py), [discovery](../oscar/discovery.py),
+[quota pools](../oscar/credentials.py), [router](../oscar/router.py).
+Current provider facts, source URLs and live account limits are owned by
+[PROVIDER-RESEARCH.md](PROVIDER-RESEARCH.md); Gate A evidence belongs to the
+[checkpoint](CLUB-A-CHECKPOINT.md).
 
 Before a provider/model claim is treated as current, OSCAR should prefer:
 
@@ -181,7 +254,10 @@ Current candidates include:
 - **NVIDIA NIM:** current Nemotron 3.5 Lightning / Nemotron 3 Super / Nemotron 3 Ultra candidates;
 - **Google AI Studio:** `gemini-3.5-flash-lite`, `gemini-3.8-flash`;
 - **Z.ai:** `glm-5.3-flash`, `glm-5.3` with funding/account pool left unknown until live account evidence;
-- **Ollama Cloud:** current cloud-catalog candidates such as GLM-5.3, GLM-5.3-Flash, DeepSeek-V4.1-Flash, DeepSeek-V4-Pro and MiniMax M3, with free-credit eligibility left unknown until account evidence.
+- **Ollama Cloud:** candidates include `gemma4:31b`, GPT OSS 20B, GLM-5.3,
+  GLM-5.3-Flash, DeepSeek-V4.1-Flash, `deepseek-v4-pro:0813` and MiniMax M3;
+  account free-credit eligibility remains UNKNOWN. Gemma generated; GLM probes
+  returned funding/access refusal. The historical account screenshot is not current entitlement.
 
 These names are still replaceable metadata. The router must not assume they remain current next week.
 
@@ -224,7 +300,8 @@ Manual overrides cannot bypass permission, privacy, safety or actual availabilit
 
 ## Free-first + scarcity-aware allocation
 
-The current development environment is dominated by free accounts/free credits.
+The developer setup intends to prefer free capacity; actual account funding must
+be established from current evidence. Public Free offers do not establish entitlement.
 
 The router objective is:
 
@@ -391,9 +468,9 @@ Example history:
 ```text
 Task: short extraction
 Mode: Free First
-Selected: Groq / openai/gpt-oss-20b / groq-3
-Reason: current model + sufficient task power + healthy free capacity + low latency
-Preserved: scarcer OpenRouter route
+Selected: OpenRouter / currently eligible free route / openrouter-1
+Reason: fresh account inventory + zero pricing + required features/task-fit + observed capacity
+Actual backing model/provider: captured from the response when exposed
 Verification: objective-level verifier pending
 ```
 
@@ -411,12 +488,11 @@ Gate A verified this foundation, but provider/model metadata remains explicitly 
 
 ### Post-Gate-A freshness correction
 
-Before/with Club B:
-
-- add Tavily search credentials/capability;
-- implement freshness classification/live retrieval path;
-- make provider/model refresh search/inventory-first;
-- test the first freshness-sensitive OSCAR objective from [SEARCH-FRESHNESS.md](SEARCH-FRESHNESS.md).
+Implemented within Club A: discovery-first current registry, quota pools,
+freshness classification and a provider-agnostic native live-retrieval capability.
+Three Tavily placeholders and the search boundary are prepared. Actual Tavily
+adapter/combined search acceptance remains UNVERIFIED pending keys; see
+[SEARCH-FRESHNESS.md](SEARCH-FRESHNESS.md). Slice 05 is not started.
 
 ### Slice 05
 

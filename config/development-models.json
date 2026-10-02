@@ -10,7 +10,12 @@
         "groq-2": "GROQ_API_KEY_2",
         "groq-3": "GROQ_API_KEY_3",
         "groq-4": "GROQ_API_KEY_4"
-      }
+      },
+      "discovery_required": true,
+      "inventory_ttl_seconds": 300,
+      "account_product": "developer-api",
+      "quota_pool": "groq/configured-account",
+      "quota_pool_provenance": "Conservative shared-account grouping; same-account identity is UNKNOWN until configured/observed. Keys do not multiply capacity."
     },
     {
       "id": "openrouter",
@@ -21,7 +26,12 @@
         "openrouter-2": "OPENROUTER_API_KEY_2",
         "openrouter-3": "OPENROUTER_API_KEY_3",
         "openrouter-4": "OPENROUTER_API_KEY_4"
-      }
+      },
+      "discovery_required": true,
+      "inventory_ttl_seconds": 300,
+      "account_product": "developer-api",
+      "quota_pool": "openrouter/configured-account",
+      "quota_pool_provenance": "Conservative shared-account grouping; same-account identity is UNKNOWN until configured/observed. Keys do not multiply capacity."
     },
     {
       "id": "nvidia",
@@ -30,7 +40,12 @@
       "credential_envs": {
         "nvidia-1": "NVIDIA_NIM_API_KEY_1",
         "nvidia-2": "NVIDIA_NIM_API_KEY_2"
-      }
+      },
+      "discovery_required": true,
+      "inventory_ttl_seconds": 300,
+      "account_product": "developer-api",
+      "quota_pool": "nvidia/configured-account",
+      "quota_pool_provenance": "Conservative shared-account grouping; same-account identity is UNKNOWN until configured/observed. Keys do not multiply capacity."
     },
     {
       "id": "google",
@@ -40,7 +55,12 @@
         "google-1": "GOOGLE_AI_STUDIO_API_KEY_1",
         "google-2": "GOOGLE_AI_STUDIO_API_KEY_2",
         "google-3": "GOOGLE_AI_STUDIO_API_KEY_3"
-      }
+      },
+      "discovery_required": true,
+      "inventory_ttl_seconds": 300,
+      "account_product": "developer-api",
+      "quota_pool": "google/configured-account",
+      "quota_pool_provenance": "Conservative shared-account grouping; same-account identity is UNKNOWN until configured/observed. Keys do not multiply capacity."
     },
     {
       "id": "zai",
@@ -49,7 +69,12 @@
       "credential_envs": {
         "zai-1": "ZAI_API_KEY_1",
         "zai-2": "ZAI_API_KEY_2"
-      }
+      },
+      "discovery_required": true,
+      "inventory_ttl_seconds": 300,
+      "account_product": "general-api",
+      "quota_pool": "zai/configured-account",
+      "quota_pool_provenance": "Conservative shared-account grouping; same-account identity is UNKNOWN until configured/observed. Keys do not multiply capacity."
     },
     {
       "id": "ollama-cloud",
@@ -58,14 +83,39 @@
       "credential_envs": {
         "ollama-cloud-1": "OLLAMA_CLOUD_API_KEY_1",
         "ollama-cloud-2": "OLLAMA_CLOUD_API_KEY_2"
-      }
+      },
+      "discovery_required": true,
+      "inventory_ttl_seconds": 300,
+      "account_product": "developer-api",
+      "quota_pool": "ollama-cloud/configured-account",
+      "quota_pool_provenance": "Conservative shared-account grouping; same-account identity is UNKNOWN until configured/observed. Keys do not multiply capacity."
+    },
+    {
+      "id": "zai-coding",
+      "adapter": "openai",
+      "base_url": "https://api.z.ai/api/coding/paas/v4",
+      "credential_envs": {
+        "zai-coding-1": "ZAI_CODING_API_KEY_1",
+        "zai-coding-2": "ZAI_CODING_API_KEY_2"
+      },
+      "enabled": false,
+      "discovery_required": true,
+      "account_product": "coding-plan",
+      "quota_pool": "zai-coding/configured-subscription",
+      "allowed_tasks": [
+        "coding"
+      ],
+      "provenance": "Official Coding Plan usage policy restricts to supported tools/products. Disabled: no coding credentials/legitimate OSCAR workload entitlement established.",
+      "quota_pool_provenance": "Separate subscription pool; never general/prepaid API balance."
     }
   ],
   "models": [
     {
       "provider_id": "groq",
       "id": "openai/gpt-oss-20b",
-      "capabilities": ["text"],
+      "capabilities": [
+        "text"
+      ],
       "quality": 2,
       "affinities": {
         "reasoning": 0.65,
@@ -73,14 +123,25 @@
       },
       "context_limit": 131072,
       "output_limit": 65536,
-      "funding": "free",
-      "provenance": "official Groq supported-model/deprecation docs checked 2026-10-02; replaces retired llama-3.1-8b-instant; free-account availability is user/account-specific and live capacity remains UNKNOWN",
-      "last_verified": null
+      "funding": "unknown",
+      "provenance": "Current official catalog candidate retrieved 2026-10-02; quality/affinity are declared routing tiers, not benchmarks. Account funding/entitlement UNKNOWN. Live inventory required.",
+      "last_verified": null,
+      "metadata_source": {
+        "identity": "https://console.groq.com/docs/models",
+        "authority": "official_docs",
+        "scope": "provider",
+        "observed_at": 1790944089.8160906,
+        "ttl_seconds": 86400,
+        "refreshable": true
+      },
+      "funding_source": null
     },
     {
       "provider_id": "groq",
       "id": "openai/gpt-oss-120b",
-      "capabilities": ["text"],
+      "capabilities": [
+        "text"
+      ],
       "quality": 4,
       "affinities": {
         "reasoning": 0.9,
@@ -88,14 +149,25 @@
       },
       "context_limit": 131072,
       "output_limit": 65536,
-      "funding": "free",
-      "provenance": "official Groq supported-model/deprecation docs checked 2026-10-02; recommended replacement for retired llama-3.3-70b-versatile; free-account availability is user/account-specific and live capacity remains UNKNOWN",
-      "last_verified": null
+      "funding": "unknown",
+      "provenance": "Current official catalog candidate retrieved 2026-10-02; quality/affinity are declared routing tiers, not benchmarks. Account funding/entitlement UNKNOWN. Live inventory required.",
+      "last_verified": null,
+      "metadata_source": {
+        "identity": "https://console.groq.com/docs/models",
+        "authority": "official_docs",
+        "scope": "provider",
+        "observed_at": 1790944089.8160906,
+        "ttl_seconds": 86400,
+        "refreshable": true
+      },
+      "funding_source": null
     },
     {
       "provider_id": "groq",
       "id": "qwen/qwen3.8-27b",
-      "capabilities": ["text"],
+      "capabilities": [
+        "text"
+      ],
       "quality": 4,
       "affinities": {
         "reasoning": 0.85,
@@ -103,180 +175,855 @@
       },
       "context_limit": 131072,
       "output_limit": 16384,
-      "funding": "free",
-      "provenance": "official Groq current preview/deprecation docs checked 2026-10-02; replaces retired qwen/qwen3.6-27b; preview availability may change and must be live-checked",
-      "last_verified": null
+      "funding": "unknown",
+      "provenance": "Current official catalog candidate retrieved 2026-10-02; quality/affinity are declared routing tiers, not benchmarks. Account funding/entitlement UNKNOWN. Live inventory required.",
+      "last_verified": null,
+      "metadata_source": {
+        "identity": "https://console.groq.com/docs/models",
+        "authority": "official_docs",
+        "scope": "provider",
+        "observed_at": 1790944089.8160906,
+        "ttl_seconds": 86400,
+        "refreshable": true
+      },
+      "funding_source": null
     },
     {
       "provider_id": "openrouter",
       "id": "openrouter/free",
-      "capabilities": ["text"],
+      "capabilities": [
+        "text"
+      ],
       "quality": 2,
       "affinities": {
         "reasoning": 0.6,
         "extraction": 0.65
       },
       "funding": "free",
-      "provenance": "official OpenRouter free-model collection checked 2026-10-02; dynamic free route intentionally replaces a stale fixed free-model seed; concrete backing model and limits must be retained from live route metadata",
-      "last_verified": null
+      "provenance": "Official dynamic free router; backing model varies and is recorded from response. Tier 2 is a conservative declared task floor. 512 output tokens is an operator budget cap, not a provider maximum.",
+      "last_verified": null,
+      "metadata_source": {
+        "identity": "https://openrouter.ai/docs/guides/routing/routers/free-router",
+        "authority": "official_docs",
+        "scope": "provider",
+        "observed_at": 1790944089.8160906,
+        "ttl_seconds": 86400,
+        "refreshable": true
+      },
+      "context_limit": 200000,
+      "output_limit": 512,
+      "funding_source": {
+        "identity": "https://openrouter.ai/docs/guides/routing/routers/free-router",
+        "authority": "official_docs",
+        "scope": "provider",
+        "observed_at": 1790944089.8160906,
+        "ttl_seconds": 86400,
+        "refreshable": true
+      }
     },
     {
       "provider_id": "nvidia",
       "id": "nvidia/nemotron-3.5-lightning-30b-a3b",
-      "capabilities": ["text"],
+      "capabilities": [
+        "text"
+      ],
       "quality": 3,
       "affinities": {
         "reasoning": 0.75,
         "extraction": 0.7
       },
-      "funding": "free",
-      "provenance": "official NVIDIA API catalog checked 2026-10-02; current Free Endpoint candidate; exact account availability still requires live inventory/probe",
-      "last_verified": null
+      "funding": "unknown",
+      "provenance": "Current official catalog candidate retrieved 2026-10-02; quality/affinity are declared routing tiers, not benchmarks. Account funding/entitlement UNKNOWN. Live inventory required.",
+      "last_verified": null,
+      "metadata_source": {
+        "identity": "https://build.nvidia.com/models",
+        "authority": "official_docs",
+        "scope": "provider",
+        "observed_at": 1790944089.8160906,
+        "ttl_seconds": 86400,
+        "refreshable": true
+      },
+      "funding_source": null
     },
     {
       "provider_id": "nvidia",
       "id": "nvidia/nemotron-3-super-120b-a12b",
-      "capabilities": ["text"],
+      "capabilities": [
+        "text"
+      ],
       "quality": 4,
       "affinities": {
         "reasoning": 0.9,
         "extraction": 0.75
       },
       "context_limit": 1000000,
-      "funding": "free",
-      "provenance": "official NVIDIA API catalog checked 2026-10-02; current Free Endpoint and previously observed live; account quota remains UNKNOWN",
-      "last_verified": null
+      "funding": "unknown",
+      "provenance": "Current official catalog candidate retrieved 2026-10-02; quality/affinity are declared routing tiers, not benchmarks. Account funding/entitlement UNKNOWN. Live inventory required.",
+      "last_verified": null,
+      "metadata_source": {
+        "identity": "https://build.nvidia.com/models",
+        "authority": "official_docs",
+        "scope": "provider",
+        "observed_at": 1790944089.8160906,
+        "ttl_seconds": 86400,
+        "refreshable": true
+      },
+      "funding_source": null
     },
     {
       "provider_id": "nvidia",
       "id": "nvidia/nemotron-3-ultra-550b-a55b",
-      "capabilities": ["text"],
+      "capabilities": [
+        "text"
+      ],
       "quality": 5,
       "affinities": {
         "reasoning": 0.95,
         "extraction": 0.75
       },
       "context_limit": 1000000,
-      "funding": "free",
-      "provenance": "official NVIDIA API catalog checked 2026-10-02; current Free Endpoint candidate; exact account availability still requires live inventory/probe",
-      "last_verified": null
+      "funding": "unknown",
+      "provenance": "Current official catalog candidate retrieved 2026-10-02; quality/affinity are declared routing tiers, not benchmarks. Account funding/entitlement UNKNOWN. Live inventory required.",
+      "last_verified": null,
+      "metadata_source": {
+        "identity": "https://build.nvidia.com/models",
+        "authority": "official_docs",
+        "scope": "provider",
+        "observed_at": 1790944089.8160906,
+        "ttl_seconds": 86400,
+        "refreshable": true
+      },
+      "funding_source": null
     },
     {
       "provider_id": "google",
       "id": "gemini-3.5-flash-lite",
-      "capabilities": ["text"],
+      "capabilities": [
+        "text"
+      ],
       "quality": 2,
       "affinities": {
         "reasoning": 0.65,
         "extraction": 0.9
       },
-      "funding": "free",
-      "provenance": "official Gemini models guide checked 2026-10-02; current stable high-throughput Flash-Lite candidate; account free-tier limits remain live/account metadata",
-      "last_verified": null
+      "funding": "unknown",
+      "provenance": "Current official catalog candidate retrieved 2026-10-02; quality/affinity are declared routing tiers, not benchmarks. Account funding/entitlement UNKNOWN. Live inventory required.",
+      "last_verified": null,
+      "metadata_source": {
+        "identity": "https://ai.google.dev/gemini-api/docs/models",
+        "authority": "official_docs",
+        "scope": "provider",
+        "observed_at": 1790944089.8160906,
+        "ttl_seconds": 86400,
+        "refreshable": true
+      },
+      "funding_source": null,
+      "context_limit": 1048576,
+      "output_limit": 65536
     },
     {
       "provider_id": "google",
       "id": "gemini-3.8-flash",
-      "capabilities": ["text"],
+      "capabilities": [
+        "text"
+      ],
       "quality": 4,
       "affinities": {
         "reasoning": 0.9,
         "extraction": 0.85
       },
-      "funding": "free",
-      "provenance": "official Gemini models guide checked 2026-10-02; current stable flagship Flash candidate; account free-tier limits remain live/account metadata",
-      "last_verified": null
+      "funding": "unknown",
+      "provenance": "Current official catalog candidate retrieved 2026-10-02; quality/affinity are declared routing tiers, not benchmarks. Account funding/entitlement UNKNOWN. Live inventory required.",
+      "last_verified": null,
+      "metadata_source": {
+        "identity": "https://ai.google.dev/gemini-api/docs/models",
+        "authority": "official_docs",
+        "scope": "provider",
+        "observed_at": 1790944089.8160906,
+        "ttl_seconds": 86400,
+        "refreshable": true
+      },
+      "funding_source": null,
+      "context_limit": 1048576,
+      "output_limit": 65536
     },
     {
       "provider_id": "zai",
       "id": "glm-5.3-flash",
-      "capabilities": ["text"],
+      "capabilities": [
+        "text"
+      ],
       "quality": 3,
       "affinities": {
         "reasoning": 0.75,
         "extraction": 0.75
       },
       "funding": "unknown",
-      "provenance": "current Z.ai/Ollama model announcements checked 2026-10-02; Z.ai general API balance and Coding Plan quota are distinct and must be discovered separately",
-      "last_verified": null
+      "provenance": "Current official catalog candidate retrieved 2026-10-02; quality/affinity are declared routing tiers, not benchmarks. Account funding/entitlement UNKNOWN. Live inventory required.",
+      "last_verified": null,
+      "metadata_source": {
+        "identity": "https://docs.z.ai/guides/vlm/glm-5.3-flash",
+        "authority": "official_docs",
+        "scope": "provider",
+        "observed_at": 1790944089.8160906,
+        "ttl_seconds": 86400,
+        "refreshable": true
+      },
+      "funding_source": null,
+      "context_limit": 1000000,
+      "output_limit": 128000
     },
     {
       "provider_id": "zai",
       "id": "glm-5.3",
-      "capabilities": ["text"],
+      "capabilities": [
+        "text"
+      ],
       "quality": 5,
       "affinities": {
         "reasoning": 0.95,
         "extraction": 0.7
       },
       "funding": "unknown",
-      "provenance": "official Z.ai GLM-5.3 announcement checked 2026-10-02; current flagship candidate; general API funding/quota is UNKNOWN and Coding Plan is a separate product/pool",
-      "last_verified": null
+      "provenance": "Current official catalog candidate retrieved 2026-10-02; quality/affinity are declared routing tiers, not benchmarks. Account funding/entitlement UNKNOWN. Live inventory required.",
+      "last_verified": null,
+      "metadata_source": {
+        "identity": "https://docs.z.ai/guides/llm/glm-5.3",
+        "authority": "official_docs",
+        "scope": "provider",
+        "observed_at": 1790944089.8160906,
+        "ttl_seconds": 86400,
+        "refreshable": true
+      },
+      "funding_source": null,
+      "context_limit": 1000000,
+      "output_limit": 128000
     },
     {
       "provider_id": "ollama-cloud",
       "id": "glm-5.3-flash",
-      "capabilities": ["text"],
+      "capabilities": [
+        "text"
+      ],
       "quality": 3,
       "affinities": {
         "reasoning": 0.75,
         "extraction": 0.75
       },
       "funding": "unknown",
-      "provenance": "official Ollama Cloud catalog checked 2026-10-02; current cloud candidate; free-credit eligibility must be discovered from the user's current account, not assumed from historical screenshots",
-      "last_verified": null
+      "provenance": "Current official catalog candidate retrieved 2026-10-02; quality/affinity are declared routing tiers, not benchmarks. Account funding/entitlement UNKNOWN. Live inventory required.",
+      "last_verified": null,
+      "metadata_source": {
+        "identity": "https://docs.ollama.com/cloud",
+        "authority": "official_docs",
+        "scope": "provider",
+        "observed_at": 1790944089.8160906,
+        "ttl_seconds": 86400,
+        "refreshable": true
+      },
+      "funding_source": null
     },
     {
       "provider_id": "ollama-cloud",
       "id": "glm-5.3",
-      "capabilities": ["text"],
+      "capabilities": [
+        "text"
+      ],
       "quality": 5,
       "affinities": {
         "reasoning": 0.95,
         "extraction": 0.7
       },
       "funding": "unknown",
-      "provenance": "official Ollama Cloud catalog checked 2026-10-02; current cloud candidate; free-credit eligibility must be discovered from the user's current account",
-      "last_verified": null
+      "provenance": "Current official catalog candidate retrieved 2026-10-02; quality/affinity are declared routing tiers, not benchmarks. Account funding/entitlement UNKNOWN. Live inventory required.",
+      "last_verified": null,
+      "metadata_source": {
+        "identity": "https://docs.ollama.com/cloud",
+        "authority": "official_docs",
+        "scope": "provider",
+        "observed_at": 1790944089.8160906,
+        "ttl_seconds": 86400,
+        "refreshable": true
+      },
+      "funding_source": null
     },
     {
       "provider_id": "ollama-cloud",
       "id": "deepseek-v4.1-flash",
-      "capabilities": ["text"],
+      "capabilities": [
+        "text"
+      ],
       "quality": 4,
       "affinities": {
         "reasoning": 0.85,
         "extraction": 0.8
       },
       "funding": "unknown",
-      "provenance": "official Ollama Cloud catalog checked 2026-10-02; current cloud candidate; free-credit eligibility must be discovered from the user's current account",
-      "last_verified": null
+      "provenance": "Current official catalog candidate retrieved 2026-10-02; quality/affinity are declared routing tiers, not benchmarks. Account funding/entitlement UNKNOWN. Live inventory required.",
+      "last_verified": null,
+      "metadata_source": {
+        "identity": "https://docs.ollama.com/cloud",
+        "authority": "official_docs",
+        "scope": "provider",
+        "observed_at": 1790944089.8160906,
+        "ttl_seconds": 86400,
+        "refreshable": true
+      },
+      "funding_source": null
     },
     {
       "provider_id": "ollama-cloud",
-      "id": "deepseek-v4-pro",
-      "capabilities": ["text"],
+      "id": "deepseek-v4-pro:0813",
+      "capabilities": [
+        "text"
+      ],
       "quality": 5,
       "affinities": {
         "reasoning": 0.95,
         "extraction": 0.7
       },
       "funding": "unknown",
-      "provenance": "official Ollama Cloud catalog checked 2026-10-02; current cloud candidate; free-credit eligibility must be discovered from the user's current account",
-      "last_verified": null
+      "provenance": "Current official catalog candidate retrieved 2026-10-02; quality/affinity are declared routing tiers, not benchmarks. Account funding/entitlement UNKNOWN. Live inventory required.",
+      "last_verified": null,
+      "metadata_source": {
+        "identity": "https://docs.ollama.com/cloud",
+        "authority": "official_docs",
+        "scope": "provider",
+        "observed_at": 1790944089.8160906,
+        "ttl_seconds": 86400,
+        "refreshable": true
+      },
+      "funding_source": null
     },
     {
       "provider_id": "ollama-cloud",
       "id": "minimax-m3",
-      "capabilities": ["text"],
+      "capabilities": [
+        "text"
+      ],
       "quality": 4,
       "affinities": {
         "reasoning": 0.85,
         "extraction": 0.7
       },
       "funding": "unknown",
-      "provenance": "official Ollama Cloud catalog checked 2026-10-02; current cloud candidate; free-credit eligibility must be discovered from the user's current account",
+      "provenance": "Current official catalog candidate retrieved 2026-10-02; quality/affinity are declared routing tiers, not benchmarks. Account funding/entitlement UNKNOWN. Live inventory required.",
+      "last_verified": null,
+      "metadata_source": {
+        "identity": "https://docs.ollama.com/cloud",
+        "authority": "official_docs",
+        "scope": "provider",
+        "observed_at": 1790944089.8160906,
+        "ttl_seconds": 86400,
+        "refreshable": true
+      },
+      "funding_source": null
+    },
+    {
+      "provider_id": "openrouter",
+      "id": "qwen/qwen3.8-27b:free",
+      "capabilities": [
+        "text",
+        "structured"
+      ],
+      "quality": 4,
+      "affinities": {
+        "reasoning": 0.85,
+        "extraction": 0.7
+      },
+      "context_limit": 262144,
+      "output_limit": 235929,
+      "funding": "free",
+      "provenance": "Bootstrap task-fit tier from official model description, not a benchmark. Discovery must confirm current zero pricing/account visibility; replaceable candidate, not the permanent free model.",
+      "last_verified": null,
+      "metadata_source": {
+        "identity": "https://openrouter.ai/api/v1/models",
+        "authority": "live_api",
+        "scope": "provider",
+        "observed_at": 1790944089.8160906,
+        "ttl_seconds": 300,
+        "refreshable": true
+      },
+      "funding_source": {
+        "identity": "https://openrouter.ai/api/v1/models",
+        "authority": "live_api",
+        "scope": "provider",
+        "observed_at": 1790944089.8160906,
+        "ttl_seconds": 300,
+        "refreshable": true
+      }
+    },
+    {
+      "provider_id": "openrouter",
+      "id": "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "capabilities": [
+        "text",
+        "structured"
+      ],
+      "quality": 5,
+      "affinities": {
+        "reasoning": 0.85,
+        "extraction": 0.7
+      },
+      "context_limit": 1000000,
+      "output_limit": 65536,
+      "funding": "free",
+      "provenance": "Bootstrap task-fit tier from official model description, not a benchmark. Discovery must confirm current zero pricing/account visibility; replaceable candidate, not the permanent free model.",
+      "last_verified": null,
+      "metadata_source": {
+        "identity": "https://openrouter.ai/api/v1/models",
+        "authority": "live_api",
+        "scope": "provider",
+        "observed_at": 1790944089.8160906,
+        "ttl_seconds": 300,
+        "refreshable": true
+      },
+      "funding_source": {
+        "identity": "https://openrouter.ai/api/v1/models",
+        "authority": "live_api",
+        "scope": "provider",
+        "observed_at": 1790944089.8160906,
+        "ttl_seconds": 300,
+        "refreshable": true
+      }
+    },
+    {
+      "provider_id": "ollama-cloud",
+      "id": "gemma4:31b",
+      "capabilities": [
+        "text"
+      ],
+      "quality": 2,
+      "affinities": {
+        "reasoning": 0.65,
+        "extraction": 0.8
+      },
+      "funding": "unknown",
+      "provenance": "Current authenticated tags inventory + official cloud documentation; conservative bootstrap tier, not a benchmark. Starter/free-credit eligibility UNKNOWN; actual generation must be probed.",
+      "metadata_source": {
+        "identity": "https://ollama.com/api/tags",
+        "authority": "live_api",
+        "scope": "account",
+        "observed_at": 1790943309.717934,
+        "ttl_seconds": 300,
+        "refreshable": true
+      },
       "last_verified": null
+    },
+    {
+      "provider_id": "ollama-cloud",
+      "id": "gpt-oss:20b",
+      "capabilities": [
+        "text"
+      ],
+      "quality": 2,
+      "affinities": {
+        "reasoning": 0.65,
+        "extraction": 0.8
+      },
+      "funding": "unknown",
+      "provenance": "Current authenticated tags inventory + official cloud documentation; conservative bootstrap tier, not a benchmark. Starter/free-credit eligibility UNKNOWN; actual generation must be probed.",
+      "metadata_source": {
+        "identity": "https://ollama.com/api/tags",
+        "authority": "live_api",
+        "scope": "account",
+        "observed_at": 1790943309.717934,
+        "ttl_seconds": 300,
+        "refreshable": true
+      },
+      "last_verified": null
+    },
+    {
+      "provider_id": "groq",
+      "id": "llama-3.1-8b-instant",
+      "capabilities": [
+        "text"
+      ],
+      "quality": null,
+      "affinities": {},
+      "funding": "unknown",
+      "retired": true,
+      "retirement_source": {
+        "identity": "https://console.groq.com/docs/deprecations",
+        "authority": "official_deprecation",
+        "scope": "provider",
+        "observed_at": 1790943195.9865122,
+        "ttl_seconds": 86400,
+        "refreshable": true
+      },
+      "metadata_source": {
+        "identity": "https://console.groq.com/docs/deprecations",
+        "authority": "official_deprecation",
+        "scope": "provider",
+        "observed_at": 1790943195.9865122,
+        "ttl_seconds": 86400,
+        "refreshable": true
+      },
+      "provenance": "Official retirement for the configured Free/Developer product; Enterprise committed-spend exception is preserved in provider research."
+    },
+    {
+      "provider_id": "groq",
+      "id": "llama-3.3-70b-versatile",
+      "capabilities": [
+        "text"
+      ],
+      "quality": null,
+      "affinities": {},
+      "funding": "unknown",
+      "retired": true,
+      "retirement_source": {
+        "identity": "https://console.groq.com/docs/deprecations",
+        "authority": "official_deprecation",
+        "scope": "provider",
+        "observed_at": 1790943195.9865122,
+        "ttl_seconds": 86400,
+        "refreshable": true
+      },
+      "metadata_source": {
+        "identity": "https://console.groq.com/docs/deprecations",
+        "authority": "official_deprecation",
+        "scope": "provider",
+        "observed_at": 1790943195.9865122,
+        "ttl_seconds": 86400,
+        "refreshable": true
+      },
+      "provenance": "Official retirement for the configured Free/Developer product; Enterprise committed-spend exception is preserved in provider research."
+    },
+    {
+      "provider_id": "groq",
+      "id": "qwen/qwen3.6-27b",
+      "capabilities": [
+        "text"
+      ],
+      "quality": null,
+      "affinities": {},
+      "funding": "unknown",
+      "retired": true,
+      "retirement_source": {
+        "identity": "https://console.groq.com/docs/deprecations",
+        "authority": "official_deprecation",
+        "scope": "provider",
+        "observed_at": 1790943195.9865122,
+        "ttl_seconds": 86400,
+        "refreshable": true
+      },
+      "metadata_source": {
+        "identity": "https://console.groq.com/docs/deprecations",
+        "authority": "official_deprecation",
+        "scope": "provider",
+        "observed_at": 1790943195.9865122,
+        "ttl_seconds": 86400,
+        "refreshable": true
+      },
+      "provenance": "Official retirement for the configured Free/Developer product; Enterprise committed-spend exception is preserved in provider research."
+    },
+    {
+      "provider_id": "groq",
+      "id": "qwen/qwen3-32b",
+      "capabilities": [
+        "text"
+      ],
+      "quality": null,
+      "affinities": {},
+      "funding": "unknown",
+      "retired": true,
+      "retirement_source": {
+        "identity": "https://console.groq.com/docs/deprecations",
+        "authority": "official_deprecation",
+        "scope": "provider",
+        "observed_at": 1790943195.9865122,
+        "ttl_seconds": 86400,
+        "refreshable": true
+      },
+      "metadata_source": {
+        "identity": "https://console.groq.com/docs/deprecations",
+        "authority": "official_deprecation",
+        "scope": "provider",
+        "observed_at": 1790943195.9865122,
+        "ttl_seconds": 86400,
+        "refreshable": true
+      },
+      "provenance": "Official retirement for the configured Free/Developer product; Enterprise committed-spend exception is preserved in provider research."
+    },
+    {
+      "provider_id": "groq",
+      "id": "meta-llama/llama-4-scout-17b-16e-instruct",
+      "capabilities": [
+        "text"
+      ],
+      "quality": null,
+      "affinities": {},
+      "funding": "unknown",
+      "retired": true,
+      "retirement_source": {
+        "identity": "https://console.groq.com/docs/deprecations",
+        "authority": "official_deprecation",
+        "scope": "provider",
+        "observed_at": 1790943195.9865122,
+        "ttl_seconds": 86400,
+        "refreshable": true
+      },
+      "metadata_source": {
+        "identity": "https://console.groq.com/docs/deprecations",
+        "authority": "official_deprecation",
+        "scope": "provider",
+        "observed_at": 1790943195.9865122,
+        "ttl_seconds": 86400,
+        "refreshable": true
+      },
+      "provenance": "Official retirement for the configured Free/Developer product; Enterprise committed-spend exception is preserved in provider research."
+    },
+    {
+      "provider_id": "groq",
+      "id": "groq/compound",
+      "capabilities": [
+        "text"
+      ],
+      "quality": null,
+      "affinities": {},
+      "funding": "unknown",
+      "retired": true,
+      "retirement_source": {
+        "identity": "https://console.groq.com/docs/deprecations",
+        "authority": "official_deprecation",
+        "scope": "provider",
+        "observed_at": 1790943195.9865122,
+        "ttl_seconds": 86400,
+        "refreshable": true
+      },
+      "metadata_source": {
+        "identity": "https://console.groq.com/docs/deprecations",
+        "authority": "official_deprecation",
+        "scope": "provider",
+        "observed_at": 1790943195.9865122,
+        "ttl_seconds": 86400,
+        "refreshable": true
+      },
+      "provenance": "Official retirement for the configured Free/Developer product; Enterprise committed-spend exception is preserved in provider research."
+    },
+    {
+      "provider_id": "groq",
+      "id": "groq/compound-mini",
+      "capabilities": [
+        "text"
+      ],
+      "quality": null,
+      "affinities": {},
+      "funding": "unknown",
+      "retired": true,
+      "retirement_source": {
+        "identity": "https://console.groq.com/docs/deprecations",
+        "authority": "official_deprecation",
+        "scope": "provider",
+        "observed_at": 1790943195.9865122,
+        "ttl_seconds": 86400,
+        "refreshable": true
+      },
+      "metadata_source": {
+        "identity": "https://console.groq.com/docs/deprecations",
+        "authority": "official_deprecation",
+        "scope": "provider",
+        "observed_at": 1790943195.9865122,
+        "ttl_seconds": 86400,
+        "refreshable": true
+      },
+      "provenance": "Official retirement for the configured Free/Developer product; Enterprise committed-spend exception is preserved in provider research."
+    },
+    {
+      "provider_id": "google",
+      "id": "gemini-3.1-flash-lite-preview",
+      "capabilities": [
+        "text"
+      ],
+      "quality": null,
+      "affinities": {},
+      "funding": "unknown",
+      "retired": true,
+      "retirement_source": {
+        "identity": "https://ai.google.dev/gemini-api/docs/deprecations",
+        "authority": "official_deprecation",
+        "scope": "provider",
+        "observed_at": 1790943196.6073742,
+        "ttl_seconds": 86400,
+        "refreshable": true
+      },
+      "metadata_source": {
+        "identity": "https://ai.google.dev/gemini-api/docs/deprecations",
+        "authority": "official_deprecation",
+        "scope": "provider",
+        "observed_at": 1790943196.6073742,
+        "ttl_seconds": 86400,
+        "refreshable": true
+      },
+      "provenance": "Official past shutdown; an API catalog listing does not override the retirement notice."
+    },
+    {
+      "provider_id": "google",
+      "id": "gemini-3.1-flash-image-preview",
+      "capabilities": [
+        "text"
+      ],
+      "quality": null,
+      "affinities": {},
+      "funding": "unknown",
+      "retired": true,
+      "retirement_source": {
+        "identity": "https://ai.google.dev/gemini-api/docs/deprecations",
+        "authority": "official_deprecation",
+        "scope": "provider",
+        "observed_at": 1790943196.6073742,
+        "ttl_seconds": 86400,
+        "refreshable": true
+      },
+      "metadata_source": {
+        "identity": "https://ai.google.dev/gemini-api/docs/deprecations",
+        "authority": "official_deprecation",
+        "scope": "provider",
+        "observed_at": 1790943196.6073742,
+        "ttl_seconds": 86400,
+        "refreshable": true
+      },
+      "provenance": "Official past shutdown; an API catalog listing does not override the retirement notice."
+    },
+    {
+      "provider_id": "google",
+      "id": "gemini-3-pro-image-preview",
+      "capabilities": [
+        "text"
+      ],
+      "quality": null,
+      "affinities": {},
+      "funding": "unknown",
+      "retired": true,
+      "retirement_source": {
+        "identity": "https://ai.google.dev/gemini-api/docs/deprecations",
+        "authority": "official_deprecation",
+        "scope": "provider",
+        "observed_at": 1790943196.6073742,
+        "ttl_seconds": 86400,
+        "refreshable": true
+      },
+      "metadata_source": {
+        "identity": "https://ai.google.dev/gemini-api/docs/deprecations",
+        "authority": "official_deprecation",
+        "scope": "provider",
+        "observed_at": 1790943196.6073742,
+        "ttl_seconds": 86400,
+        "refreshable": true
+      },
+      "provenance": "Official past shutdown; an API catalog listing does not override the retirement notice."
+    },
+    {
+      "provider_id": "google",
+      "id": "gemini-3-pro-preview",
+      "capabilities": [
+        "text"
+      ],
+      "quality": null,
+      "affinities": {},
+      "funding": "unknown",
+      "retired": true,
+      "retirement_source": {
+        "identity": "https://ai.google.dev/gemini-api/docs/deprecations",
+        "authority": "official_deprecation",
+        "scope": "provider",
+        "observed_at": 1790943196.6073742,
+        "ttl_seconds": 86400,
+        "refreshable": true
+      },
+      "metadata_source": {
+        "identity": "https://ai.google.dev/gemini-api/docs/deprecations",
+        "authority": "official_deprecation",
+        "scope": "provider",
+        "observed_at": 1790943196.6073742,
+        "ttl_seconds": 86400,
+        "refreshable": true
+      },
+      "provenance": "Official past shutdown; an API catalog listing does not override the retirement notice."
+    },
+    {
+      "provider_id": "google",
+      "id": "gemini-2.5-computer-use-preview-10-2025",
+      "capabilities": [
+        "text"
+      ],
+      "quality": null,
+      "affinities": {},
+      "funding": "unknown",
+      "retired": true,
+      "retirement_source": {
+        "identity": "https://ai.google.dev/gemini-api/docs/deprecations",
+        "authority": "official_deprecation",
+        "scope": "provider",
+        "observed_at": 1790943196.6073742,
+        "ttl_seconds": 86400,
+        "refreshable": true
+      },
+      "metadata_source": {
+        "identity": "https://ai.google.dev/gemini-api/docs/deprecations",
+        "authority": "official_deprecation",
+        "scope": "provider",
+        "observed_at": 1790943196.6073742,
+        "ttl_seconds": 86400,
+        "refreshable": true
+      },
+      "provenance": "Official past shutdown; an API catalog listing does not override the retirement notice."
+    },
+    {
+      "provider_id": "google",
+      "id": "gemini-2.0-flash",
+      "capabilities": [
+        "text"
+      ],
+      "quality": null,
+      "affinities": {},
+      "funding": "unknown",
+      "retired": true,
+      "retirement_source": {
+        "identity": "https://ai.google.dev/gemini-api/docs/deprecations",
+        "authority": "official_deprecation",
+        "scope": "provider",
+        "observed_at": 1790943196.6073742,
+        "ttl_seconds": 86400,
+        "refreshable": true
+      },
+      "metadata_source": {
+        "identity": "https://ai.google.dev/gemini-api/docs/deprecations",
+        "authority": "official_deprecation",
+        "scope": "provider",
+        "observed_at": 1790943196.6073742,
+        "ttl_seconds": 86400,
+        "refreshable": true
+      },
+      "provenance": "Official past shutdown; an API catalog listing does not override the retirement notice."
+    },
+    {
+      "provider_id": "google",
+      "id": "gemini-2.0-flash-lite",
+      "capabilities": [
+        "text"
+      ],
+      "quality": null,
+      "affinities": {},
+      "funding": "unknown",
+      "retired": true,
+      "retirement_source": {
+        "identity": "https://ai.google.dev/gemini-api/docs/deprecations",
+        "authority": "official_deprecation",
+        "scope": "provider",
+        "observed_at": 1790943196.6073742,
+        "ttl_seconds": 86400,
+        "refreshable": true
+      },
+      "metadata_source": {
+        "identity": "https://ai.google.dev/gemini-api/docs/deprecations",
+        "authority": "official_deprecation",
+        "scope": "provider",
+        "observed_at": 1790943196.6073742,
+        "ttl_seconds": 86400,
+        "refreshable": true
+      },
+      "provenance": "Official past shutdown; an API catalog listing does not override the retirement notice."
     }
   ]
 }

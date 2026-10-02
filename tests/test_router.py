@@ -343,7 +343,9 @@ class RouterTests(unittest.TestCase):
     def test_model_inventory_is_replaceable_including_ollama_account_data(self):
         manifest = Registry.load(Path("config/development-models.json"))
         ollama = [m for m in manifest.models.values() if m.provider_id == "ollama-cloud"]
-        self.assertEqual(len(ollama), 6)
+        self.assertTrue(ollama)
+        self.assertTrue(manifest.providers["ollama-cloud"].discovery_required)
+        self.assertTrue(all(m.funding == Funding.UNKNOWN for m in ollama))
         replacement = replace(ollama[0], id="future-model-v2")
         manifest.replace_models([replacement])
         self.assertEqual(list(manifest.models), [("ollama-cloud", "future-model-v2")])

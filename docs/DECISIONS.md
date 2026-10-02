@@ -427,4 +427,23 @@ See `docs/PERSONA.md`.
 
 **Failure/recovery:** provider failure and credential failure have distinct bounded fallback semantics. Streaming never splices a second generation after meaningful output. Dead node leases produce blocked/reclaimable tasks, not completion. Started action records with unknown crash outcomes prevent automatic replay. File artifacts receive the hash from the same independent verification read; reported results remain reported even when independent evidence verifies the objective.
 
-**Evolution:** preserve version-1 wire contracts; a breaking protocol/storage change needs an explicit migration. The development manifest is replaceable and does not define OSCAR’s permanent provider/model boundary. Initial model quality/limits are configuration with provenance, not verified benchmarks. Gate A now passes the implemented foundation review with real hosted routing/fallback evidence; manual review is pending. The 2026-10-02 review criteria accept the reference Transport/Grid stage and defer public-coordinator deployment acceptance to later Grid integration. Public TLS/outbound rendezvous and embodied nodes remain unverified; this does not change the architecture or complete broader product deliverables. No Slice 05 work is included.
+**Evolution:** preserve version-1 wire contracts; a breaking protocol/storage change needs an explicit migration. The development manifest is replaceable and does not define OSCAR’s permanent provider/model boundary. Initial model quality/limits are configuration with provenance, not verified benchmarks. The initial Gate A foundation review passed; the post-Gate-A correction explicitly downgrades current live acceptance to PARTIAL, as recorded in [CLUB-A-CHECKPOINT.md](CLUB-A-CHECKPOINT.md). The 2026-10-02 review criteria accept the reference Transport/Grid stage and defer public-coordinator deployment acceptance to later Grid integration. Public TLS/outbound rendezvous and embodied nodes remain unverified. No Slice 05 work is included.
+
+## ADR-060 — Current provider facts require scoped discovery and live evidence
+
+**Problem:** retired model IDs made earlier access failures insufficient to diagnose
+credential health. Multiple keys also do not establish independent quota capacity.
+
+**Decision:** treat manifests as sourced bootstrap/retirement seeds; require fresh
+hosted inventories, per-credential availability/pricing/limits and separate bounded
+generation observations. Group credentials by account product/quota pool with
+conservative unknown topology. Jev routes freshness-sensitive requests through a
+provider-agnostic live-source capability before reasoning; missing evidence remains
+UNKNOWN. Sources retain authority, time, scope, TTL and contradictions.
+
+**Limits:** public support/listing/generation/funding are separate claims. Search
+ranking is not verification. Native inventory retrieval is implemented; actual
+Tavily and combined public-web acceptance remain UNVERIFIED pending keys. Failed
+live runs and superseded provider-health interpretations are preserved explicitly.
+Detailed contracts are owned by [MODEL-ROUTING.md](MODEL-ROUTING.md) and
+[SEARCH-FRESHNESS.md](SEARCH-FRESHNESS.md).

@@ -5,9 +5,12 @@ TLS and inherited proxy/CA settings are preserved; redirects are rejected.
 """
 
 import json
+import re
 from collections.abc import Callable
+from datetime import UTC
+from email.utils import parsedate_to_datetime
 from http.client import HTTPException
-from time import monotonic
+from time import monotonic, time
 from typing import Any, Protocol
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote
@@ -20,6 +23,7 @@ from .models import (
     ProviderError,
     ProviderResponse,
     ProviderSpec,
+    RateLimits,
     StreamSink,
 )
 
@@ -51,16 +55,44 @@ def header_count(headers: Any, name: str) -> int | None:
 def error_category(status: int, headers: Any, body: bytes = b"") -> Failure:
     if headers.get("x-mitmproxy-blocked-reason") or headers.get("x-deny-reason"):
         return Failure.NETWORK_POLICY
-    if status == 429:
-        try:
-            data = json.loads(body)
-            if data.get("error", {}).get("code") in {"insufficient_quota", "quota_exceeded"}:
-                return Failure.QUOTA
-        except (ValueError, AttributeError, TypeError):
-            pass
-        return Failure.RATE_LIMIT
-    if status in {401, 403}:
+    code = business_code(body)
+    if code in {"model_decommissioned", "model_not_found", "model_not_active", "1211", "1221"}:
+        return Failure.MODEL
+    if code == "1315":
+        return Failure.PRODUCT
+    if code in {
+        "insufficient_quota",
+        "quota_exceeded",
+        "1113",
+        "1308",
+        "1310",
+        "1316",
+        "1317",
+        "1318",
+        "1319",
+        "1320",
+        "1321",
+    }:
+        return Failure.QUOTA
+    if code == "1305":
+        return Failure.CAPACITY
+    if code in {"1311", "1309", "1314"}:
+        return Failure.PRODUCT
+    if status in {402, 429}:
+        if (
+            code in {"1302", "rate_limit_exceeded"}
+            or headers.get("Retry-After")
+            or headers.get("x-ratelimit-remaining-requests") == "0"
+            or headers.get("x-ratelimit-remaining") == "0"
+        ):
+            return Failure.RATE_LIMIT
+        if status == 402:
+            return Failure.FUNDING
+        return Failure.UNKNOWN_LIMIT
+    if status == 401:
         return Failure.CREDENTIAL
+    if status == 403:
+        return Failure.ACCESS  # Access denial is not proof that a credential is invalid.
     if status == 404:
         return Failure.MODEL
     if status in {400, 422}:
@@ -68,6 +100,124 @@ def error_category(status: int, headers: Any, body: bytes = b"") -> Failure:
     if status >= 500:
         return Failure.PROVIDER
     return Failure.NETWORK
+
+
+def business_code(body: bytes) -> str | None:
+    try:
+        code = str(json.loads(body).get("error", {}).get("code"))
+        if code in {
+            "insufficient_quota",
+            "quota_exceeded",
+            "model_decommissioned",
+            "model_not_found",
+            "model_not_active",
+            "rate_limit_exceeded",
+        } or code in {
+            str(n)
+            for n in [
+                1113,
+                1211,
+                1220,
+                1221,
+                1302,
+                1305,
+                1308,
+                1309,
+                1310,
+                1311,
+                1313,
+                1314,
+                1315,
+                1316,
+                1317,
+                1318,
+                1319,
+                1320,
+                1321,
+            ]
+        }:
+            return code
+    except (ValueError, AttributeError, TypeError):
+        pass
+    return None
+
+
+def reset_time(raw: str | None, now: float) -> float | None:
+    if not raw:
+        return None
+    if re.fullmatch(r"(?:\d+(?:\.\d+)?(?:ms|[smhd]))+", raw):
+        units = {"ms": 0.001, "s": 1, "m": 60, "h": 3600, "d": 86400}
+        return now + sum(
+            float(n) * units[u] for n, u in re.findall(r"(\d+(?:\.\d+)?)(ms|[smhd])", raw)
+        )
+    try:
+        return parsedate_to_datetime(raw).replace(tzinfo=UTC).timestamp()
+    except (TypeError, ValueError, OverflowError):
+        return None
+
+
+def rate_limits(headers: Any, provider: str, now: float | None = None) -> RateLimits:
+    now = time() if now is None else now
+    retry = headers.get("Retry-After")
+    retry_seconds = float(retry) if retry and re.fullmatch(r"\d+(?:\.\d+)?", retry) else None
+    if retry_seconds is None and retry:
+        reset = reset_time(retry, now)
+        retry_seconds = max(0, reset - now) if reset is not None else None
+    generic_reset = headers.get("x-ratelimit-reset")
+    # Generic numeric reset headers do not establish seconds versus milliseconds.
+    # Preserve a bounded numeric hint; do not invent a reset horizon without units.
+    generic_reset_at = reset_time(generic_reset, now)
+    generic_reset_hint = (
+        generic_reset
+        if generic_reset and re.fullmatch(r"\d{1,20}(?:\.\d{1,6})?", generic_reset)
+        else None
+    )
+    request_limit = header_count(headers, "x-ratelimit-limit-requests")
+    remaining_requests = header_count(headers, "x-ratelimit-remaining-requests")
+    return RateLimits(
+        request_limit if request_limit is not None else header_count(headers, "x-ratelimit-limit"),
+        header_count(headers, "x-ratelimit-limit-tokens"),
+        remaining_requests
+        if remaining_requests is not None
+        else header_count(headers, "x-ratelimit-remaining"),
+        header_count(headers, "x-ratelimit-remaining-tokens"),
+        reset_time(headers.get("x-ratelimit-reset-requests"), now) or generic_reset_at,
+        reset_time(headers.get("x-ratelimit-reset-tokens"), now),
+        retry_seconds,
+        "day" if provider == "groq" else "UNKNOWN",
+        "minute" if provider == "groq" else "UNKNOWN",
+        request_reset_hint=generic_reset_hint,
+    )
+
+
+def safe_identity(value: Any) -> str | None:
+    return (
+        value
+        if isinstance(value, str) and re.fullmatch(r"[a-zA-Z0-9/_.:@~ -]{1,200}", value)
+        else None
+    )
+
+
+def inline_error(data: dict[str, Any], headers: Any, provider: str, emitted: bool) -> ProviderError:
+    """Some aggregators return a backing error inside HTTP 200; retain safe metadata only."""
+    body = json.dumps(data).encode()
+    code = data.get("error", {}).get("code") if isinstance(data.get("error"), dict) else None
+    status = (
+        int(str(code))
+        if str(code) in {"400", "401", "402", "403", "404", "429", "500", "502", "503"}
+        else 500
+    )
+    limits = rate_limits(headers, provider)
+    category = error_category(status, headers, body)
+    if category == Failure.CREDENTIAL:
+        category = Failure.ACCESS  # An inline/backing 401 does not prove our API key invalid.
+    return ProviderError(
+        category,
+        emitted=emitted,
+        http_status=200,
+        business_code=business_code(body),
+        rate_limits=limits,
+    )
 
 
 class HTTPAdapter:
@@ -81,7 +231,7 @@ class HTTPAdapter:
         self, provider: ProviderSpec, model: str, secret: str, request: ModelRequest, stream: bool
     ) -> Request:
         body: dict[str, Any]
-        headers = {"Content-Type": "application/json"}
+        headers = {"Content-Type": "application/json", "User-Agent": "OSCAR/0.1"}
         root = provider.base_url.rstrip("/")
         if self.kind == "google":
             if secret:
@@ -150,6 +300,8 @@ class HTTPAdapter:
     ) -> ProviderResponse:
         if request.required - {"text", "structured"}:
             raise ProviderError(Failure.CAPABILITY)
+        if provider.id == "ollama-cloud" and "structured" in request.required:
+            raise ProviderError(Failure.CAPABILITY)  # Official cloud docs exclude this feature.
         check_cancel()
         emitted = False
         deadline = monotonic() + timeout
@@ -159,6 +311,8 @@ class HTTPAdapter:
             ) as response:
                 raw, pending, texts = bytearray(), bytearray(), []
                 last: dict[str, Any] = {}
+                actual_model: str | None = None
+                actual_provider: str | None = None
                 complete_stream = False
                 while True:
                     check_cancel()
@@ -187,8 +341,15 @@ class HTTPAdapter:
                         if not line:
                             continue
                         last = json.loads(line)
-                        if not isinstance(last, dict) or "error" in last:
+                        if not isinstance(last, dict):
                             raise ProviderError(Failure.PROVIDER, emitted=emitted)
+                        if "error" in last:
+                            raise inline_error(last, response.headers, provider.id, emitted)
+                        actual_model = (
+                            safe_identity(last.get("modelVersion", last.get("model")))
+                            or actual_model
+                        )
+                        actual_provider = safe_identity(last.get("provider")) or actual_provider
                         text = self._text(last, streaming=True)
                         if text:
                             emitted = True
@@ -202,8 +363,12 @@ class HTTPAdapter:
                             complete_stream = True
                 if sink is None:
                     last = json.loads(raw)
-                    if not isinstance(last, dict) or "error" in last:
+                    if not isinstance(last, dict):
                         raise ProviderError(Failure.PROVIDER)
+                    if "error" in last:
+                        raise inline_error(last, response.headers, provider.id, False)
+                    actual_model = safe_identity(last.get("modelVersion", last.get("model")))
+                    actual_provider = safe_identity(last.get("provider"))
                     text = self._text(last)
                 else:
                     if not complete_stream:
@@ -236,6 +401,9 @@ class HTTPAdapter:
                     header_count(response.headers, "x-ratelimit-remaining-requests"),
                     header_count(response.headers, "x-ratelimit-remaining-tokens"),
                     structured_ok=structured,
+                    actual_model=actual_model,
+                    actual_provider=actual_provider,
+                    rate_limits=rate_limits(response.headers, provider.id),
                 )
         except HTTPError as error:
             try:
@@ -243,9 +411,15 @@ class HTTPAdapter:
             except (HTTPException, OSError):
                 body = b""
             category = error_category(error.code, error.headers, body)
-            raw_retry = error.headers.get("Retry-After", "30")
-            retry = float(raw_retry) if raw_retry.isdecimal() else 30.0
-            raise ProviderError(category, retry_after=min(3600, retry), emitted=emitted) from None
+            limits = rate_limits(error.headers, provider.id)
+            raise ProviderError(
+                category,
+                retry_after=min(3600, limits.retry_after or 30),
+                emitted=emitted,
+                http_status=error.code,
+                business_code=business_code(body),
+                rate_limits=limits,
+            ) from None
         except URLError as error:
             # CONNECT policy denial is raised by urllib before any provider HTTP response.
             policy = "Tunnel connection failed: 403" in str(error.reason)
@@ -258,23 +432,10 @@ class HTTPAdapter:
             raise ProviderError(Failure.CAPABILITY, emitted=emitted) from None
 
     def discover(self, provider: ProviderSpec, secret: str, timeout: float = 10) -> list[str]:
-        path = "/tags" if self.kind == "ollama" else "/models"
-        headers = (
-            {"x-goog-api-key": secret}
-            if self.kind == "google"
-            else {"Authorization": "Bearer " + secret}
-        )
-        request = Request(provider.base_url.rstrip("/") + path, headers=headers)
-        try:
-            with self.opener.open(request, timeout=timeout) as response:
-                data = json.loads(response.read(2_000_001))
-            entries = data.get("data", data.get("models", []))
-            models = [str(item.get("id", item.get("name", ""))) for item in entries]
-            return [m.removeprefix("models/") for m in models if m]
-        except HTTPError as error:
-            raise ProviderError(error_category(error.code, error.headers)) from None
-        except URLError as error:
-            policy = "Tunnel connection failed: 403" in str(error.reason)
-            raise ProviderError(Failure.NETWORK_POLICY if policy else Failure.NETWORK) from None
-        except (HTTPException, OSError, ValueError, TypeError, AttributeError):
-            raise ProviderError(Failure.NETWORK) from None
+        """Compatibility view of the canonical bounded/paginated native inventory read."""
+        from .discovery import HTTPDiscovery
+
+        discovery = HTTPDiscovery()
+        discovery.opener = self.opener
+        inventory = discovery.inventory(provider, "inventory-read", secret, timeout)
+        return [model.id for model in inventory.models]

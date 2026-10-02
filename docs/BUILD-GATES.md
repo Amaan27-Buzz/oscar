@@ -46,7 +46,16 @@ Manual scenarios:
 
 **Pass:** native core/transport/model routing works without Latch/SwitchRoute deployment and remote node loss does not erase objective state.
 
-Current checkpoint: **PASS for the implemented developer foundation; manual review pending.** Core Loop/Jev and the authenticated reference Transport/Grid are verified. Four real hosted providers and 11 real credential slots succeeded; live credential failover, bounded cross-provider recovery, rate-limit reranking and requested routing modes passed. All 113 contract tests and 162 live checks pass. Groq HTTP 403, Z.ai HTTP 429 and unknown provider quota remain explicit limits. Scarcity numerical counterfactuals use labeled fixtures. See [CLUB-A-CHECKPOINT.md](CLUB-A-CHECKPOINT.md) for the evidence and exact scope. **Stop here; Slice 05 has not started.**
+Current checkpoint: **PARTIAL, downgraded after the post-Gate-A correction; manual
+review pending.** Core Loop/Jev/reference Grid proofs remain verified. Fresh
+discovery, official retirement precedence, account-product/shared-quota pools and
+freshness routing are implemented and tested. Fifteen real slots across five
+providers generated with current candidates; Z.ai general balance/product state
+remains unavailable/unknown. The latest full mode rerun encountered an unexplained
+OpenRouter 429, leaving Balanced/Heavy/Free First current acceptance unresolved.
+Earlier passing evidence is retained with timestamps, not promoted over this
+newer result. See [CLUB-A-CHECKPOINT.md](CLUB-A-CHECKPOINT.md) for exact results and
+scope. **Stop here; Slice 05 has not started.**
 
 The current foundation review accepts coherent reference Transport/Grid contracts. Public TLS/outbound rendezvous, independent network stores and a cloud coordinator path using a configured deployment target remain later Grid integration acceptance requirements; they are not claimed verified by Gate A. This refines the previous public-deployment gate expectation without changing the architecture or silently completing broader slice deliverables.
 
@@ -158,7 +167,7 @@ This is intentionally aggressive. Anything not genuinely verified remains planne
 
 | Gate | Slices | Status |
 |---|---|---|
-| Gate A — Brain | 01–04 | PASS — implemented foundation verified; manual review pending |
+| Gate A — Brain | 01–04 | PARTIAL — corrected architecture tested; latest live mode acceptance incomplete; manual review pending |
 | Gate B — Can Do Work | 05–06 | Planned |
 | Gate C — Embodied OSCAR | 07–10 | Planned |
 | Gate D — JARVIS Layer | 11–14 | Planned |

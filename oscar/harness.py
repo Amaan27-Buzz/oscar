@@ -7,10 +7,12 @@ from typing import Any
 from .capabilities import Cancellation, FileExecutor, ScopedFiles, Verifier, addition_executor
 from .contracts import Action, Capability, Result, new_id
 from .credentials import CredentialPool
+from .discovery import HTTPDiscovery
 from .grid import Grid, Node, NodeRole
 from .models import ModelRequest, ProviderError, RoutingPolicy
 from .providers import HTTPAdapter
 from .registry import Registry
+from .retrieval import ProviderInventorySource, RetrievalExecutor
 from .router import Router, RouteUnavailable
 from .runtime import Runtime
 from .storage import Store
@@ -66,10 +68,12 @@ class Harness:
         self.grid = Grid(self.store)
         self.files = ScopedFiles(workspace)
         self.runtime = Runtime(self.store, self.grid, Verifier(self.files))
-        self.registry = Registry.load(manifest)
+        self.registry = Registry.load(manifest, self.store)
         self.pool = CredentialPool(list(self.registry.providers.values()), store=self.store)
         self.adapters = {kind: HTTPAdapter(kind) for kind in {"openai", "google", "ollama"}}
-        self.router = Router(self.registry, self.pool, self.adapters, self.store)
+        self.router = Router(
+            self.registry, self.pool, self.adapters, self.store, discovery=HTTPDiscovery()
+        )
         self.runtime.on_verification = self.router.observe_verification
         self.node_id = "reference-cloud"
         scopes = ("heartbeat", "advertise", "execute", "files:write", "math", "models", "cancel")
@@ -79,6 +83,16 @@ class Harness:
             self.grid.register(Node(self.node_id, NodeRole.CLOUD, scopes))
         self.session = self.grid.pair(self.node_id, scopes)
         capabilities = [
+            Capability(
+                "sources.retrieve",
+                "Live retrieval",
+                "Authoritative native inventory source",
+                "retrieval",
+                self.node_id,
+                ("models",),
+                "live_source",
+                "evidence",
+            ),
             Capability(
                 "files.write",
                 "Write exact file",
@@ -120,6 +134,9 @@ class Harness:
                 "files.write": FileExecutor(self.files),
                 "math.add": addition_executor,
                 "models.reason": ModelExecutor(self.router, template, RoutingPolicy()),
+                "sources.retrieve": RetrievalExecutor(
+                    self.router, (ProviderInventorySource(self.router),)
+                ),
             },
         )
 

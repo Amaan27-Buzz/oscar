@@ -151,6 +151,15 @@ Search is a first-class capability, not a fallback excuse for stale reasoning.
 - preserve source URL/identity, publication/update time and retrieval time;
 - stale cached/provider manifests are hints, not current authority;
 - model/provider availability, pricing, quota and deprecation checks are freshness-sensitive;
+- before changing provider metadata, retrieve current official catalogs/deprecations
+  and credential-visible inventory; preserve source/time/product scope;
+- distinguish provider support, account listing, generation and funding; a 403
+  against a retired model does not diagnose credential health;
+- preserve old evidence with an explicit correction; do not rewrite failed observations;
+- the manifest is a bootstrap/retirement seed; hosted inventory refresh must fail
+  closed when stale/unavailable;
+- keys can share capacity: configure account products/quota pools and never
+  multiply capacity by credential count; unknown cost/quota remains UNKNOWN;
 - if live lookup is unavailable, report that the answer may be stale instead of guessing;
 - Tavily is the first planned search adapter with three credential slots, not an architectural dependency;
 - search results are evidence inputs, not automatically verified truth.

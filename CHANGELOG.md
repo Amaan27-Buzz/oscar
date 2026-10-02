@@ -2,6 +2,30 @@
 
 Significant OSCAR milestones are recorded here. Detailed implementation status remains in `docs/ROADMAP.md`.
 
+## 2026-10-02 — Post-Gate-A current-evidence correction
+
+- Synchronize current remote `work`; research all six providers through current
+  official catalogs/product/deprecation/limit pages and all 17 live inventories
+  before changing metadata. Preserve URLs, timestamps and historical failures.
+- Make the manifest a bootstrap/retirement seed with fresh per-slot discovery,
+  persistent probes, source/scope/TTL and explicit catalog/retirement conflicts.
+  All four Groq slots generate with current GPT OSS; the old stale-model 403 does
+  not diagnose credential health. Fifteen real slots across five providers generate.
+- Add account products/shared quota pools; keys do not multiply capacity. Preserve
+  actual request/token/reset metadata and UNKNOWN billing/balance. Distinguish
+  Z.ai general code 1113 from rate limiting and its disabled separate Coding Plan.
+- Add freshness-aware Jev and a provider-agnostic native inventory retrieval
+  capability. Missing live evidence blocks as UNKNOWN; static addition skips search.
+  Prepare Tavily's boundary/placeholders without claiming absent-key live integration.
+- Fix OpenRouter dynamic alias parsing, preserve actual backing model/provider,
+  scope backing failures to routes, and prevent model records hiding shared cooldowns.
+  Resolve account pricing/limits per credential and retain seed-source freshness.
+  Keep Ollama Cloud structured-output and account entitlement limits explicit.
+- Pass 161 automated tests and record bounded live/quality/secret evidence.
+  Downgrade Gate A to PARTIAL: the latest mode run encountered unexplained OpenRouter
+  429s despite earlier passing modes. Retain failed runs and current limits;
+  stop on `work`, without main merge or Slice 05.
+
 ## 2026-10-02 — Club A verification completed; Gate A foundation pass
 
 - Continue the previously pushed Club A runtime; no Core Loop, Jev, Transport/Grid or routing redesign.

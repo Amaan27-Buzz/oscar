@@ -110,7 +110,15 @@ Exit: OSCAR discovers/invokes a capability on another node and survives node dis
 
 ## Slice 04 — Native Model Router + cloud intelligence 🚧
 
-**Checkpoint: hosted/routing foundation VERIFIED; broader integrations PARTIAL.** Four real hosted providers and 11 credential slots succeeded. Auto/Free First/Fast/Balanced/Heavy Duty and Manual pins have live evidence, as do real credential failover, bounded cross-provider recovery and reranking after an actual rate-limit observation. The live suite passed 162 checks; all 113 contract tests and quality checks pass. Groq HTTP 403 and Z.ai HTTP 429 are now treated as evidence that the seeded model/account metadata must be refreshed from live/current sources before attributing failure to credentials or provider capacity. Real quota remains unknown; scarcity counterfactuals use explicitly labeled fixtures. Local runtime instances, ChatGPT product surfaces and quality/quota calibration remain unverified. See [Club A evidence](CLUB-A-CHECKPOINT.md).
+**Checkpoint: corrected architecture verified; current live acceptance PARTIAL.**
+Fresh discovery, retirement guards, shared quota pools and bounded routing are
+implemented and regression-tested. Fifteen real slots across five providers
+generated with current candidates; both Z.ai general slots returned documented
+balance/resource-package error 1113. Groq's old stale-model 403 interpretation is
+explicitly superseded. Earlier correction modes passed, but the latest full mode
+rerun encountered an unknown-cause OpenRouter 429 and did not complete Balanced,
+Heavy Duty or Free First. Gate A is downgraded; see the canonical
+[checkpoint](CLUB-A-CHECKPOINT.md) for current evidence, quality results and limits.
 
 **Goal:** add provider/model/credential routing.
 
@@ -128,23 +136,31 @@ Deliverables:
 - no runtime dependency on SwitchRoute;
 - model output remains reported/inferred until verified where required.
 
-**Manual milestone:** Gate A — Brain **PASS for the implemented foundation; manual review pending**. Public Grid deployment remains later integration work. **Stop here. Slice 05 has not started.**
+**Manual milestone:** Gate A — Brain **PARTIAL, downgraded after the correction's
+latest live rerun; manual review pending**. Core/reference Grid proofs remain
+verified; public deployment remains later integration work. **Stop here.
+Slice 05 has not started.**
 
-## Post-Gate-A correction — live search + freshness ⏭️
+## Post-Gate-A correction — live search + freshness 🚧
 
 The provider-model review exposed a general OSCAR requirement: volatile information cannot be trusted from stale manifests or model priors.
 
-Before/with Club B, add the smallest first-class search/freshness path described in [SEARCH-FRESHNESS.md](SEARCH-FRESHNESS.md).
+Implemented in Club A: the smallest provider-agnostic native live-source path,
+freshness-aware Jev, sourced per-slot inventories, explicit retirement conflicts,
+persistent observations and account-product/shared-quota pools. The manifest is a
+bootstrap/fallback seed, and missing current evidence blocks rather than guessing.
+Native inventory retrieval was exercised with zero generation calls; broader
+constraints/synthesis remain PARTIAL. See [SEARCH-FRESHNESS.md](SEARCH-FRESHNESS.md).
 
-Deliverables:
+Remaining search acceptance:
 
-- three Tavily credential slots (`TAVILY_API_KEY_1..3`) with masked credential-pool health/failover semantics;
-- search as a Capability Catalog capability, not a hard-coded Jev special case;
-- freshness classification for stable vs freshness-sensitive/live-state objectives;
-- authoritative-source preference and source/retrieval timestamps;
-- stale-provider/model metadata refresh through live inventory/current official docs before treating seeded IDs as current truth;
-- bounded search retries/failover with 401/429/plan-limit handling;
-- search results remain evidence inputs rather than automatically verified truth.
+- retain the prepared three Tavily placeholders; keys are absent and actual live
+  Tavily integration is UNVERIFIED;
+- implement/test the real search adapter through the existing boundary when keys
+  are provided, preserving shared-pool health/failover and bounded costs;
+- combine native inventory with current official source retrieval, reconcile
+  contradictions and synthesize an evidence-qualified answer;
+- retain source/time/scope and REPORTED/UNKNOWN limits through that full flow.
 
 First acceptance objective:
 
@@ -161,7 +177,9 @@ freshness-sensitive objective
 → no stale model-prior claim presented as current
 ```
 
-This is a correction to the source-of-truth policy, not a rollback of Gate A's verified core/runtime contracts.
+This corrects the source-of-truth architecture. Core/reference Grid verification
+is retained, while current full live routing acceptance is PARTIAL. It does not
+advance Club B or Slice 05.
 
 ## Slice 05 — First real machine Worker + remote continuation ◻️
 

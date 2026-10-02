@@ -5,6 +5,8 @@ from dataclasses import dataclass
 from enum import StrEnum
 from time import perf_counter
 
+from .freshness import Freshness, classify
+
 
 class DecisionRoute(StrEnum):
     KNOWN = "known"
@@ -44,11 +46,13 @@ class Decision:
     reason: str
     latency_ms: float
     repair: str
+    freshness: Freshness = Freshness.UNKNOWN
 
 
 def decide(intent: Intent) -> Decision:
     start = perf_counter()
     text = intent.text.lower().strip()
+    freshness = classify(text)
     route, execution, kind, reason = (
         DecisionRoute.UNKNOWN,
         ExecutionClass.ASK,
@@ -56,6 +60,7 @@ def decide(intent: Intent) -> Decision:
         "request is unsupported or ambiguous",
     )
     if intent.kind == "file_write" and intent.path is not None and intent.content is not None:
+        freshness = Freshness.STATIC
         route, execution, kind, reason = (
             DecisionRoute.KNOWN,
             ExecutionClass.CAPABILITY,
@@ -63,11 +68,19 @@ def decide(intent: Intent) -> Decision:
             "explicit file objective",
         )
     elif re.fullmatch(r"(?:what is\s+)?\d{1,12}\s*\+\s*\d{1,12}\??", text):
+        freshness = Freshness.STATIC
         route, execution, kind, reason = (
             DecisionRoute.KNOWN,
             ExecutionClass.CAPABILITY,
             "addition",
             "bounded integer addition",
+        )
+    elif freshness in {Freshness.CURRENT, Freshness.LIVE}:
+        route, execution, kind, reason = (
+            DecisionRoute.WORLD,
+            ExecutionClass.RETRIEVAL,
+            "live_source",
+            "current-state claim requires authoritative live retrieval before reasoning",
         )
     elif text.startswith(("did ", "verify ", "check whether ")):
         route, execution, kind, reason = (
@@ -123,4 +136,6 @@ def decide(intent: Intent) -> Decision:
         if execution == ExecutionClass.ASK
         else "block if capability unavailable"
     )
-    return Decision(route, execution, kind, reason, (perf_counter() - start) * 1000, repair)
+    return Decision(
+        route, execution, kind, reason, (perf_counter() - start) * 1000, repair, freshness
+    )

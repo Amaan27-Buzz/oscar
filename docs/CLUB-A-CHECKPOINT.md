@@ -1,5 +1,110 @@
 # Club A — Brain checkpoint
 
+## Current post-Gate-A correction — 2026-10-02
+
+**Gate A: PARTIAL, downgraded from the previous PASS. Stop for manual review.
+Slice 05 is not started.** Core Loop/Jev/reference Transport/Grid proofs remain
+verified. The corrected architecture passes automated checks, but the latest
+complete live mode rerun did not pass: Auto/Fast generated verified responses;
+Balanced encountered a backing failure followed by an unexplained OpenRouter 429;
+Heavy Duty and Free First then blocked under the shared-pool cooldown.
+Paid/UNKNOWN-cost fallback was not silently used. Earlier successful mode checks
+remain historical evidence; they do not turn this latest rerun into PASS.
+
+### Explicit correction to the previous evidence
+
+The checkout was clean and synchronized from remote `work` to `aa791dd` before
+editing. Its newer documentation and candidate metadata were read and retained.
+Current official provider catalogs/deprecation/limit/product pages were retrieved
+before changing metadata, followed by all 17 credential-visible inventories and
+bounded current generation probes. Sources and observation times are retained in
+[provider research](PROVIDER-RESEARCH.md) and its linked evidence records.
+
+The previous Groq 403 used stale Llama model IDs retired for Free/Developer.
+That observation is preserved below and in the unchanged original JSON records.
+It was **insufficient to diagnose credential/account health**. All four current
+Groq inventories listed GPT OSS/Qwen candidates; all four keys generated with
+GPT OSS 20B, and slot 1 also generated with GPT OSS 120B and current Qwen.
+These observations supersede the old Groq-health interpretation. A 403 is now
+access denial unless more specific evidence identifies retirement or credential failure.
+
+Other corrections are explicit: Google 2.5 is restricted legacy access, not retired;
+3.1 Flash-Lite is still listed with a future shutdown. Several officially shut-down
+Google previews remain in the API catalog, so official retirement guards override
+those listings. Google inventory is now fully paginated. OpenRouter's old Liquid
+model still exists but is not a permanent free route. The Ollama versionless
+DeepSeek alias was absent, while `:0813` was listed; screenshot-era credit eligibility
+is historical. NVIDIA funding remains UNKNOWN despite public free-endpoint labels.
+Z.ai general 429 now retains code 1113 rather than guessing temporary rate limits.
+
+### Implemented correction and discovered defects
+
+The manifest is a bootstrap/retirement seed. Fresh, per-slot native inventory with
+TTL/source/scope feeds a persistent registry; visibility, generation, retirement,
+funding and quota remain separate. Account products and shared quota pools sit
+between provider and credentials; four keys do not create four quota budgets.
+Jev routes current/latest/live questions toward a replaceable live-source capability,
+and unavailable current sources block as UNKNOWN/potentially stale.
+
+The pass also found and fixed concrete runtime defects: rejecting valid
+OpenRouter `~...-latest` aliases; blocking the entire aggregator after one backing
+model failed; and allowing an empty model-level capacity record to hide an
+account-wide cooldown. Regression tests cover each. The latest actual 200-inline
+backing failure → alternate current model → 429 sequence shows bounded reranking,
+followed by zero attempts for later modes under the common cooldown. There is no
+claim that the unknown 429 was daily quota exhaustion or that multiple keys are
+confirmed to share one real account.
+
+Final review additionally prevented pricing/limits from one slot's inventory
+authorizing another account's route, and prevented a fieldless fresh inventory
+from refreshing expired seed limits. These account/fact-scope protections have
+focused regression coverage.
+
+### Current verification and limits
+
+- **161 automated tests pass**, including all previous contracts and freshness
+  A–E, retirement/catalog conflicts, denied generation versus listing, persistence,
+  pagination, shared counters/concurrency/reset/cooldown and backing metadata.
+- Ruff, format (31 Python files), strict mypy (21 source files), repository/link
+  checks, value-silent secret scans and diff checks **PASS**.
+- All **17 configured slots** returned current inventories. **15 slots across five
+  providers** independently generated matching bounded responses. Both general
+  Z.ai slots returned 429/code 1113: insufficient balance or no resource package;
+  exact balance/trial/product state remains UNKNOWN.
+- An earlier correction run passed **94 live assertions** and all five automatic
+  modes. The latest targeted inventory/mode run passed **69 of 72 assertions**;
+  three current-mode acceptance assertions failed/blocked as described above.
+  These are distinct runs, not cumulative unit tests. Failed intermediate runs and
+  the heartbeat-expiry harness error are retained with their causes.
+- Groq returned actual request/token limits, remaining counts and reset metadata.
+  OpenRouter `/key` returned Free-tier/daily quota information. Other account
+  funding/quota gaps remain UNKNOWN; public catalogs are not entitlements.
+- Native execution of the intended provider-search objective returned sourced
+  inventory and PARTIALLY_VERIFIED status with **zero generation calls**. Official
+  web access-constraint synthesis is still unverified. Today's-weather intent with
+  no source became BLOCKED/UNKNOWN rather than a fabricated current answer.
+- Tavily's provider boundary and three placeholders are prepared. All three keys
+  are absent: **actual live Tavily UNVERIFIED**. Z.ai Coding Plan is separately
+  modeled and disabled; no legitimate coding credentials/entitlement were established.
+
+Canonical ownership: registry/pool/runtime behavior in [MODEL-ROUTING.md](MODEL-ROUTING.md),
+freshness/search/source authority in [SEARCH-FRESHNESS.md](SEARCH-FRESHNESS.md),
+dated provider facts in [PROVIDER-RESEARCH.md](PROVIDER-RESEARCH.md), and observations
+in [the correction record](evidence/club-a-correction-2026-10-02.json).
+Public coordinator deployment, physical nodes, broad web search, model benchmarks
+and account-credit forecasting remain outside verified foundation scope.
+
+Gate A can be reconsidered after current eligible free capacity permits a complete
+passing mode run. UNKNOWN billing/limits must be resolved with account evidence or
+explicit policy; they cannot be reclassified free merely to force acceptance.
+**This correction is committed/pushed to `work` only. Do not start Slice 05.**
+
+## Historical pre-correction checkpoint — preserved
+
+The following checkpoint and its linked evidence describe the earlier run. Its
+provider-health interpretations and current status are superseded above; the
+original failures, assertions and limits are preserved rather than rewritten.
+
 Recorded **2026-10-02**. Overall status: **VERIFIED for the implemented Club A foundation. Gate A: PASS; manual review pending. Slice 05 is not started.**
 
 This verification continues the previously pushed `work` commit **`93ad11a48891035373292fd6a16c39b4340d8684`**. The checkout was fast-forwarded to that implementation before inspection or execution. No Core Loop, Jev, Transport, Grid, provider adapter or router was rebuilt. This continuation adds an opt-in verification script, refreshes four stale model entries using live inventory/generation evidence, and updates durable evidence/status.

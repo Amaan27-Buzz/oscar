@@ -23,7 +23,7 @@ Examples include:
 
 ## Freshness decision
 
-Jev should classify whether an objective is:
+Jev now classifies whether an objective is:
 
 ```text
 stable
@@ -44,7 +44,11 @@ specialist research capability
 
 Only after retrieval should reasoning/synthesis occur.
 
-If current lookup is unavailable, OSCAR should say that the answer may be stale rather than presenting old knowledge as current fact.
+If current lookup is unavailable, OSCAR returns **UNKNOWN / potentially stale**
+and blocks the current-fact objective. It does not fall through to model prior,
+including when the caller forces a reasoning path. Static deterministic file/addition
+paths run first; `what is 2+2?` makes no search/model call. Recognition remains a
+conservative grammar, not a claim of general intent understanding.
 
 ## Search capability
 
@@ -58,11 +62,40 @@ TAVILY_API_KEY_2
 TAVILY_API_KEY_3
 ```
 
-Keys are independent credential slots with the same health/rate/quota/cooldown/secrecy rules as model-provider credentials.
+Keys are separate credential slots; they may share an account quota pool.
+Three keys do not imply three times the credits. Provider identity, product/pool,
+slot health, rate/quota/cooldown and secrecy remain separate concerns.
 
 The search adapter must remain replaceable so OSCAR can later use other search/research providers or native provider search without redesigning Jev/Core.
 
 Tavily currently exposes Search, Extract, Crawl, Map and Research APIs. The first implementation only needs the smallest useful search/retrieval contract; do not overbuild the integration.
+
+## Implemented boundary and limits
+
+[freshness.py](../oscar/freshness.py) owns typed freshness and source authority.
+[retrieval.py](../oscar/retrieval.py) owns `RetrievalRequest`, `RetrievedFact`,
+`RetrievalResult`, the replaceable `RetrievalProvider` protocol and executor.
+Requests bound result count/depth and allow domain/time constraints. Query/source
+text is task data; retrieval telemetry retains references, timestamps, scope and
+conflicts without prompt/answer content. Domain restrictions match hostnames.
+
+The real `live_source` capability uses provider-native inventories for configured
+provider-model questions. Current-fact requests actively retrieve even when a
+short routing TTL would otherwise permit a cache. Complete inventories preserve
+URL/identity, observation time, scope and retirement/cache contradictions. Listed
+models do not imply generation or funding. Officially retired entries remain
+excluded even when the API lists them.
+
+This source establishes inventory observations. It explicitly reports that public
+free/developer constraints still need current official documentation/search.
+Broad weather/flight/price/web objectives have no configured source and block as
+UNKNOWN. Source material stays REPORTED; unsupported objective verification remains
+PARTIAL. The full public-web synthesis acceptance is not claimed from inventory alone.
+
+All three Tavily variables are absent in this correction environment.
+**Tavily integration boundary prepared / actual live Tavily UNVERIFIED.** No
+Tavily adapter traffic, credits or successful tests are invented. A future adapter
+implements the same protocol without changing Jev or task/evidence contracts.
 
 ## Search request contract
 
@@ -109,6 +142,23 @@ news/current event
 
 Search is not permission to replace an authoritative source with an easier secondary source.
 
+For provider/model facts, preserve ordered source authority rather than flattening
+it into one confidence number:
+
+1. live account/provider API;
+2. current official documentation;
+3. current official announcements/deprecations;
+4. reputable secondary source;
+5. cached OSCAR metadata;
+6. model prior.
+
+The ordering is claim-specific: account availability prefers account APIs over
+generic pages; provider/product retirement prefers the applicable official notice
+over an API catalog/cache that still lists the ID. Observation time, product scope
+and contradictions remain separate fields. `prefer_source` encodes this comparison;
+the registry enforces account absence and explicit retirement guards. General web
+claim reconciliation will use this boundary when a search adapter is configured.
+
 ## Freshness metadata
 
 Retrieved claims should retain, where available:
@@ -120,6 +170,8 @@ Retrieved claims should retain, where available:
 - requested freshness horizon;
 - whether the source actually satisfies that horizon;
 - conflicts between sources.
+- account-specific vs provider-global scope;
+- refreshability and TTL (hosted inventory defaults to 300 seconds).
 
 If freshness cannot be established, preserve `UNKNOWN` rather than inventing recency.
 
@@ -143,7 +195,8 @@ A historical successful model call does not prove that model is still available 
 
 ## First search objective
 
-The first end-to-end search objective should be OSCAR-related and deliberately freshness-sensitive:
+The first intended real combined-search acceptance objective after Tavily keys
+are provided is OSCAR-related and deliberately freshness-sensitive:
 
 > `What are the currently supported models and relevant free/developer access constraints for OSCAR's configured intelligence providers right now?`
 
@@ -153,6 +206,7 @@ Expected behavior:
 Jev detects freshness-sensitive objective
 → live search/provider inventory
 → authoritative current sources
+→ prefer official pages; reconcile conflicting evidence by claim scope
 → source-backed synthesis
 → no stale manifest/model-prior claim presented as current
 → evidence + retrieval timestamps recorded
@@ -190,6 +244,6 @@ When the user asks for current truth, live authoritative evidence outranks memor
 5. Current authoritative sources outrank recalled/model-prior information.
 6. If OSCAR cannot obtain current evidence, it says so.
 7. Tavily is the first adapter, not a permanent dependency.
-8. Search keys use independent credential-pool/failover semantics.
+8. Search keys retain slot health/failover and shared account quota-pool semantics.
 9. Search is invoked when freshness matters, not on every stable fact.
 10. The first search acceptance objective is explicitly about OSCAR's own current provider/model state.
