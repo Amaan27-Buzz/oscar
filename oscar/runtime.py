@@ -43,7 +43,10 @@ class Runtime:
         criterion: dict[str, Any] = {"kind": "unavailable"}
         parameters: dict[str, Any] = {}
         kind = decision.capability_kind
-        if kind == "file_write":
+        if intent.kind == "capability" and intent.parameters is not None:
+            parameters = intent.parameters
+            criterion = intent.criterion or {"kind": "unavailable"}
+        elif kind == "file_write":
             criterion = {"kind": "file_exact", "path": intent.path, "content": intent.content}
             parameters = {"path": intent.path, "content": intent.content}
         elif kind == "addition":
@@ -169,7 +172,9 @@ class Runtime:
                     TaskState.BLOCKED
                     if result.error
                     and (
-                        result.error.startswith(("freshness_unavailable", "connector_blocked:"))
+                        result.error.startswith(
+                            ("freshness_unavailable", "connector_blocked:", "machine_blocked:")
+                        )
                         or result.error
                         in {"route_unavailable", "network_policy_blocked", "network_failure"}
                     )

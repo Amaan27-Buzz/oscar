@@ -296,3 +296,39 @@ Consequential actions remain attributable to OSCAR task/Protocol, Worker, capabi
 11. Temporary Workers retire when complete; persistent Workers remain only for continuing responsibility.
 12. Model reasoning is accessed through OSCAR's native Model Router, not by depending on a separate SwitchRoute runtime.
 13. Cross-device execution is carried by OSCAR-owned transport/capability contracts, not a separately required Latch service.
+
+## Club B POSIX reference machine foundation
+
+`oscar.machine` composes real executors with the existing Dispatcher/Grid/Runtime.
+Allowed filesystem root uses the existing directory-FD ScopedFiles; traversal and
+symlinks are rejected. Capabilities include bounded file read/write/list/filename
+search, configured executable/agent discovery and, with explicit `machine:host`
+permission/configuration, terminal/Git/repository tasks and discovered CLI agents.
+No power capability is advertised. The repository reference task creates one new
+file in a clean Git repository and commits it; Core independently checks exact
+file bytes, HEAD tree, new commit identity and clean status.
+
+**Terminal/agent scope is trusted host execution, not an OS sandbox.** A configured
+executable such as Python can access host resources beyond cwd. It is disabled
+unless the owner opts into trusted execution; do not pair an untrusted principal
+with `machine:host`. Isolated OS/container/user execution remains future deployment
+work. Git hooks/signing/global config are disabled for reference work; this does
+not make arbitrary hostile repositories safe.
+
+Processes use explicit cwd, executable allowlist, timeout, bounded output,
+filtered environment and process-group cancellation. Progress carries native
+correlation/lease IDs, renews the current lease and stores content-free checkpoints.
+HTTP pause/resume/cancel uses existing authenticated transport; pause is cooperative
+between file/Git steps and SIGSTOP/SIGCONT for a running POSIX subprocess. Timeouts
+include paused wall time. Completed lost results are recovered through existing
+durable deduplication; started/crash-ambiguous actions require inspection, not
+blind replay. Scope, correlation, nonce and stale owner checks remain at the target.
+
+`python -m scripts.verify_worker_reference` runs Core plus a separate Worker
+process over real loopback HTTP with temporary Git/SQLite state. A lost result,
+Core/Worker restart, reconnect/reclaim, completed duplicate replay, authoritative
+Git/file verification, HTTP controls and mid-command disconnect are exercised.
+This is **reference network Worker verification**, with shared SQLite authority.
+Independent stores, public TLS/outbound rendezvous, Windows/user-machine runtime,
+GUI/browser work and real coding-agent task acceptance remain **UNVERIFIED**.
+Installed agent `--version` proves invocation only, not authenticated coding work.

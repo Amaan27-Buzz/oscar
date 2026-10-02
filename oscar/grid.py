@@ -276,6 +276,25 @@ class Grid:
         self.accept(envelope, token, "execute")
         self.store.audit(envelope.task_id, "progress_observed", {"fraction": fraction})
 
+    def renew(self, lease_id: str, session: SessionHandle, ttl: float = 30) -> None:
+        """Only the current authenticated task owner can renew a still-live lease."""
+        if not math.isfinite(ttl) or not 0 < ttl <= 300:
+            raise ValueError("invalid lease lifetime")
+        with self.store.transaction():
+            self.authenticate(session, "execute")
+            lease = self.store.get("lease", lease_id)
+            task = self.store.task(lease["task_id"])
+            if (
+                not lease["active"]
+                or lease["expires_at"] <= self.clock()
+                or lease["node_id"] != session.node_id
+                or task.lease_id != lease_id
+                or task.state not in {TaskState.EXECUTING, TaskState.AWAITING_RESULT}
+            ):
+                raise StateConflict("stale lease cannot be renewed")
+            lease["expires_at"] = self.clock() + ttl
+            self.store.put("lease", lease_id, lease)
+
     def release(self, lease_id: str) -> None:
         lease = self.store.get("lease", lease_id)
         lease["active"] = False
