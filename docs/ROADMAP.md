@@ -110,12 +110,12 @@ Exit: OSCAR discovers/invokes a capability on another node and survives node dis
 
 ## Slice 04 — Native Model Router + cloud intelligence 🚧
 
-**Checkpoint: corrected architecture and focused routing verified; final search
-acceptance PARTIAL.** Current discovered routing resolves the previous automatic-mode
+**Checkpoint: Club A foundation/routing and final search semantics verified; Gate A PASS.**
+Current discovered routing resolves the previous automatic-mode
 gap without paid/UNKNOWN funding fallback. The bounded Tavily adapter is implemented
-and tested; all three slots now authenticate and real failover passes. Title provenance
-and relevant official access-constraint coverage remain incomplete.
-Gate A remains PARTIAL for real combined-search acceptance. The canonical
+and tested; all three slots authenticate and real failover passes. Source titles,
+bounded official constraint refinement and qualified known/UNKNOWN synthesis are
+verified by the final real combined-search acceptance. The canonical
 [checkpoint](CLUB-A-CHECKPOINT.md) preserves the earlier 69/72 result and all historical
 provider evidence.
 
@@ -135,8 +135,8 @@ Deliverables:
 - no runtime dependency on SwitchRoute;
 - model output remains reported/inferred until verified where required.
 
-**Manual milestone:** Gate A — Brain **PARTIAL: real Tavily search
-acceptance incomplete for title provenance and relevant official constraints**.
+**Manual milestone:** Gate A — Brain **PASS for Club A foundation, including real
+source-qualified Tavily/native search acceptance**.
 Core/reference Grid proofs remain
 verified; public deployment remains later integration work. **Stop here.
 Slice 05 has not started.**
@@ -150,16 +150,16 @@ freshness-aware Jev, sourced per-slot inventories, explicit retirement conflicts
 persistent observations and account-product/shared-quota pools. The manifest is a
 bootstrap/fallback seed, and missing current evidence blocks rather than guessing.
 Native inventory retrieval was exercised with zero generation calls; broader
-public-web acceptance remains PARTIAL for title provenance and relevant official constraints.
+public-web foundation acceptance passes with retained titles, bounded relevant
+official acquisition and explicit evidenced UNKNOWN outcomes.
 See [SEARCH-FRESHNESS.md](SEARCH-FRESHNESS.md).
 
-Remaining search acceptance:
+Final search acceptance now verifies:
 
-- preserve the implemented adapter and 3/3 authenticated live slots;
-  complete title provenance and relevant official access-constraint coverage;
-- complete official constraints for the combined objective; the first real native +
-  Tavily run already preserved conflicts and returned an evidence-qualified partial answer;
-- retain source/time/scope and REPORTED/UNKNOWN limits through that full flow.
+- the existing replaceable adapter and current-run 3/3 authenticated slots;
+- title/source/time/scope/evidence provenance;
+- relevant official access evidence or UNKNOWN after bounded domain-scoped attempts;
+- native/account versus public/provider claims and REPORTED/UNKNOWN limits.
 
 First acceptance objective:
 

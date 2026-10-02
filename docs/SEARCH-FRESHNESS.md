@@ -90,15 +90,16 @@ excluded even when the API lists them.
 Harness composes native inventory and web retrieval without changing Jev. Search
 uses the current official Bearer-authenticated `POST /search` contract: explicit
 basic depth, automatic cost escalation/answers/raw pages disabled, usage enabled,
-15-second calls and a 30-second total search budget. Domain restrictions are checked
+15-second calls, a 30-second generic-search budget and a 90-second configured-provider
+constraint-acquisition budget. Domain restrictions are checked
 again against returned HTTPS URLs; query/credential-bearing references are omitted.
 Official results trigger a bounded, credential-free read of the actual trusted
 official page. Only those reads receive `official_page` evidence. Index excerpts
 whose pages cannot be read remain secondary discovery hints marked UNKNOWN /
 potentially stale; they cannot satisfy current official-page acceptance.
-The configured-provider objective searches each of the six official domain groups
-with one result per group, within the requested result budget. Other objectives
-use a bounded ordinary search when keys are present.
+Configured-model lookup searches each official domain group within the requested
+result budget. Access-constraint objectives use the bounded two-stage strategy
+below. Other objectives use a bounded ordinary search when keys are present.
 
 Tavily slots have their own conservatively shared account-product/quota pool,
 separate from model providers. A 401 invalidates only its slot; 429/432/433 preserve
@@ -113,20 +114,46 @@ cannot update routing availability/funding or override applicable retirement gua
 Search publication/update dates are estimates, distinct from retrieval time; the
 answer explicitly qualifies excerpt recency and unresolved account entitlements.
 Source material stays REPORTED; unsupported factual verification remains PARTIAL.
-Persisted retrieval/search telemetry stores references, retrieval method, timestamps,
-conflicts, masked slots, categorical status and numeric credits, not queries or webpage dumps.
+Persisted retrieval/search telemetry stores references, optional returned titles,
+retrieval method, timestamps, attempt/evidence IDs, conflicts, masked slots,
+categorical status and numeric credits, not queries or webpage dumps.
 
-The new-cloud acceptance on **2026-10-03 IST** authenticated all three Tavily slots
-and verified real bounded invalid-fixture → valid-slot failover. The exact Jev
-objective read six native inventories and made six basic searches with zero model
-generations, returning an evidence-qualified partial answer. Complete acceptance
-remains **PARTIAL**: the adapter drops result titles; direct official-page coverage
-was only two provider groups, and the OpenRouter result did not establish relevant
-free/developer constraints. The verifier's page-coverage predicate also does not
-prove claim relevance or all-slot success. Missing public constraints remain UNKNOWN.
-See [the checkpoint](CLUB-A-CHECKPOINT.md) and
-[dated evidence](evidence/club-a-search-acceptance-2026-10-03.json). Earlier absent-key
-observations remain preserved in the checkpoint; they describe the earlier task.
+The last Gate A correction on **2026-10-03 IST** passes foundation acceptance.
+`SourceRef` preserves optional title, retrieval-provider/subject identity and stable
+evidence reference in addition to URL/time/scope/authority. Missing title/publication
+is null; source text is not invented. Titles are redacted before bounding/persistence.
+
+For configured-provider access objectives, the adapter searches official domains
+for Free/Developer/API limits and refines once toward pricing/credit/usage policy
+if the first results are irrelevant or unavailable. Each stage has at most two
+hits and bounded credential attempts. Only directly read official prose with
+constraint topics is retained as substantive evidence; a generic model landing page
+or indexed excerpt cannot satisfy relevant official-page acceptance. Topics are a
+conservative relevance screen, not verification of arbitrary prose.
+
+Per-provider `ConstraintAssessment` retains REPORTED/UNKNOWN, observation time,
+attempt IDs, evidence IDs and reason. The executor correlates attempts/assessments
+with the objective and records separate public support, account listing,
+generation-probed, funding and quota claim states. Documentation for another
+product (for example Z.ai Coding Plan) is explicitly quoted as that product;
+it does not establish configured general-API entitlement. Unexposed account
+funding and remaining quota stay UNKNOWN.
+
+The verifier requires this run's 3/3 authenticated preflights, six complete current
+native inventories, actual objective search, retained metadata, visible provenance
+and conflicts, and all six relevant official/evidenced UNKNOWN resolutions.
+UNKNOWN requires both bounded official query stages and their correlated attempt
+references. Six touched hosts or a provider-wide web claim cannot replace account
+evidence. Historical sources are kept separate from current-fact requirements.
+Gate A may PASS while the returned source facts remain REPORTED and the task stays
+PARTIALLY_VERIFIED; no unsupported factual verification is implied.
+
+The single final live objective used 11 basic-search credits and no generations.
+Groq/OpenRouter/Google/Z.ai/Ollama retained relevant official excerpts; NVIDIA
+ended UNKNOWN after both official stages and failed direct reads. See
+[the checkpoint](CLUB-A-CHECKPOINT.md) and
+[final evidence](evidence/club-a-gate-a-pass-2026-10-03.json). Previous missing-key
+and incomplete-coverage observations remain preserved historical checkpoints.
 
 ## Search request contract
 
@@ -141,7 +168,9 @@ result limit
 search depth / cost class
 credential slot
 request timestamp
-source URLs
+source URLs / optional returned titles
+retrieval-provider / subject-provider identity
+evidence / acquisition-attempt references
 retrieval timestamp
 provider usage/credits when exposed
 ```
@@ -228,8 +257,8 @@ A historical successful model call does not prove that model is still available 
 
 ## First search objective
 
-The first real combined-search objective ran on 2026-10-03 IST and remains PARTIAL
-for provenance and relevant official constraint coverage. It is deliberately freshness-sensitive:
+The real combined-search objective passed foundation acceptance on 2026-10-03 IST
+with complete provenance and qualified known/UNKNOWN constraint states:
 
 > `What are the currently supported models and relevant free/developer access constraints for OSCAR's configured intelligence providers right now?`
 

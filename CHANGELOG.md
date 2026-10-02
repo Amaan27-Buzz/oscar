@@ -2,6 +2,20 @@
 
 Significant OSCAR milestones are recorded here. Detailed implementation status remains in `docs/ROADMAP.md`.
 
+## 2026-10-03 — Last Gate A correction: Club A foundation PASS
+
+- Preserve optional source titles, retrieval/subject identity and evidence references
+  through typed serialization, persisted retrieval evidence and synthesis.
+- Refine official-domain constraint queries once when necessary; retain directly
+  read relevant evidence or explicit UNKNOWN with bounded attempt provenance.
+- Require current-run 3/3 Tavily preflights, six complete native inventories,
+  provenance/conflicts and separate account/public/generation/funding/quota states.
+- Pass one real exact search objective with 11 observed credits and zero generations;
+  NVIDIA public constraints and unexposed account values remain UNKNOWN.
+- Pass 92 focused tests and one full 227-test offline regression, Ruff, formatting,
+  strict mypy, repository/links and secret/diff checks. Preserve all PARTIAL history.
+  Stop on `work` for manual review; no main merge or Slice 05.
+
 ## 2026-10-03 — New-cloud Tavily/search acceptance (PARTIAL)
 
 - Continue confirmed remote `work` at `2054b5a`; preserve previous routing/history.

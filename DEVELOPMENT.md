@@ -130,10 +130,11 @@ refusals and the latest assertion outcome; an earlier passing run does not make 
 new failed run PASS. Native current-provider questions can use `oscar ask`; broad
 web/weather questions use Tavily when credentials are configured, otherwise block
 as UNKNOWN. The latest acceptance authenticates all three Tavily slots and real
-failover, but combined provenance/official-constraint acceptance remains PARTIAL.
+failover; corrected provenance/official-constraint acceptance now passes with
+evidence-qualified UNKNOWN states.
 
 See [docs/CLUB-A-CHECKPOINT.md](docs/CLUB-A-CHECKPOINT.md) for Gate A's current
-PARTIAL status, preserved historical evidence and the manual review stop.
+PASS for the Club A foundation, preserved PARTIAL history and manual review stop.
 
 Final Gate A acceptance avoids the full provider-generation matrix:
 
@@ -148,5 +149,8 @@ JSON response. Every request uses fresh discovery and unchanged default funding
 policy. A genuine no-eligible-route block is truthful acceptance, not generation
 success. Search checks present Tavily slots and then executes the exact first
 freshness objective through Jev/reference transport/native inventories/Tavily.
-It returns PARTIAL when any required live coverage is missing; no keys or raw
-webpages are stored. Export keys into the execution environment before running.
+It requires all current preflights/native inventories, provenance and per-provider
+relevant official evidence or explicit UNKNOWN after bounded official attempts.
+Unproven completion stays PARTIAL; factual excerpts remain REPORTED and the task
+PARTIALLY_VERIFIED even when Gate A passes. No keys or raw webpages are stored.
+Export keys into the execution environment before running.

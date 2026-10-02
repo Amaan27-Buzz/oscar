@@ -4,15 +4,16 @@ No model prior is used as a fallback. Tavily can implement RetrievalProvider wit
 changing Jev, execution or evidence contracts. Source text is task data, never route telemetry.
 """
 
+import re
 from collections.abc import Callable
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass, field, replace
 from typing import Protocol
 from urllib.parse import urlparse
 
 from .capabilities import Cancellation
 from .contracts import Action, Result, new_id
 from .freshness import Freshness, SourceRef
-from .models import ProviderError
+from .models import Funding, ProviderError
 from .router import Router
 
 
@@ -38,11 +39,54 @@ class RetrievedFact:
     retrieval_method: str = "direct"
 
 
+def access_constraint_topics(text: str) -> tuple[str, ...]:
+    """Conservative relevance screen on directly read prose, not URL/host popularity.
+
+    This recognizes evidence topics, never verifies prose or extracts entitlement.
+    Navigation headings alone and generic model catalogs are insufficient.
+    """
+    topics: set[str] = set()
+    for line in text.splitlines():
+        if not re.search(
+            r"\b(?:free|developer|trial|subscription|paid|pricing|quota|credits?|rate limits?)\b",
+            line,
+            re.IGNORECASE,
+        ):
+            continue
+        if not re.search(
+            r"\d|\b(?:per|requests?|tokens?|requires?|included|available|pay|billed|charged|"
+            r"usage|costs?|purchase|billing|access)\b",
+            line,
+            re.IGNORECASE,
+        ):
+            continue
+        if re.search(r"\b(?:free|trial|credits?)\b", line, re.IGNORECASE):
+            topics.add("free_credit_policy")
+        if re.search(r"\b(?:limits?|quota|requests?|tokens?|rpm|rpd|tpm)\b", line, re.IGNORECASE):
+            topics.add("api_limits")
+        if re.search(r"\b(?:pricing|paid|subscription|billing|pay|costs?)\b", line, re.IGNORECASE):
+            topics.add("pricing_subscription")
+        if re.search(r"\bdeveloper\b", line, re.IGNORECASE):
+            topics.add("developer_access")
+    return tuple(sorted(topics))
+
+
+@dataclass(frozen=True)
+class ConstraintAssessment:
+    provider: str
+    status: str  # REPORTED relevant official excerpt, or explicit UNKNOWN
+    observed_at: float
+    attempt_ids: tuple[str, ...]
+    evidence_ids: tuple[str, ...] = ()
+    reason: str = ""
+
+
 @dataclass(frozen=True)
 class RetrievalResult:
     facts: tuple[RetrievedFact, ...]
     status: str = "REPORTED"
     limitations: tuple[str, ...] = ()
+    assessments: tuple[ConstraintAssessment, ...] = ()
 
 
 class RetrievalProvider(Protocol):
@@ -130,11 +174,27 @@ class ProviderInventorySource:
                     if m.active is not False
                     and not self.router.registry.models[(provider.id, m.id)].retired
                 )
+                free_ids = ", ".join(
+                    m.id
+                    for m in inventory.models
+                    if m.funding == Funding.FREE
+                    and m.active is not False
+                    and not self.router.registry.models[(provider.id, m.id)].retired
+                )
                 facts.append(
                     RetrievedFact(
                         f"{provider.id}: {ids}. Listed via {slot.id}; "
-                        "account generation/funding is not implied.",
-                        inventory.source,
+                        "account generation/funding is not implied. "
+                        + (
+                            "API-listed zero-price routes: "
+                            + free_ids
+                            + "; remaining quota/entitlement is not implied."
+                            if free_ids
+                            else ""
+                        ),
+                        replace(
+                            inventory.source, provider_id=provider.id, source_provider=provider.id
+                        ),
                         tuple(
                             c["model"] + ": " + c["resolution"]
                             for c in self.router.registry.conflicts
@@ -181,12 +241,26 @@ class RetrievalExecutor:
         )
         facts: list[RetrievedFact] = []
         limitations: list[str] = []
+        assessments: list[ConstraintAssessment] = []
         for provider in self.providers:
             cancellation.check()
             if provider.supports(request):
                 result = provider.retrieve(request, cancellation.check)
                 facts.extend(f for f in result.facts if f.source.current(self.router.clock()))
                 limitations.extend(result.limitations)
+                assessments.extend(result.assessments)
+        for assessment in assessments:
+            saved = asdict(assessment)
+            saved.update(task_id=action.task_id, correlation_id=action.correlation_id)
+            self.router.store.put("constraint_assessment", new_id(), saved)
+            for identifier in assessment.attempt_ids:
+                observation = self.router.store.get("search_observation", identifier)
+                observation.update(task_id=action.task_id, correlation_id=action.correlation_id)
+                self.router.store.put("search_observation", identifier, observation)
+        facts = [
+            replace(f, source=replace(f.source, evidence_id=f.source.evidence_id or new_id()))
+            for f in facts
+        ]
         if not facts:
             return Result(
                 new_id(),
@@ -200,7 +274,7 @@ class RetrievalExecutor:
         for fact in facts:
             self.router.store.put(
                 "retrieval_evidence",
-                new_id(),
+                fact.source.evidence_id or new_id(),
                 {
                     "task_id": action.task_id,
                     "correlation_id": action.correlation_id,
@@ -208,6 +282,9 @@ class RetrievalExecutor:
                     "status": "REPORTED",
                     "conflicts": fact.conflicts,
                     "retrieval_method": fact.retrieval_method,
+                    "access_topics": access_constraint_topics(fact.text)
+                    if fact.retrieval_method == "official_page"
+                    else (),
                 },
             )
         # Deterministic evidence synthesis keeps claim scopes separate. Web text
@@ -232,12 +309,56 @@ class RetrievalExecutor:
                 + ":\n"
                 + "\n".join(
                     f"{f.text}\nSource: {f.source.identity}; authority: {f.source.authority}; "
-                    f"observed_at: {f.source.observed_at}; scope: {f.source.scope}"
+                    f"observed_at: {f.source.observed_at}; scope: {f.source.scope}; "
+                    f"title: {f.source.title or 'UNKNOWN'}; "
+                    f"published_at: {f.source.published_at or 'UNKNOWN'}; "
+                    f"source_provider: {f.source.source_provider or 'UNKNOWN'}; "
+                    f"evidence_ref: {f.source.evidence_id}"
                     + ("\nConflicting evidence: " + "; ".join(f.conflicts) if f.conflicts else "")
                     for f in scoped
                 )
                 + "\n"
             )
+        claim_states: list[dict[str, str]] = []
+        for assessment in assessments:
+            claim = {
+                "provider": assessment.provider,
+                "provider_global_support": "REPORTED provider-wide documentation excerpts; "
+                "not entitlement"
+                if any(
+                    f.source.scope == "provider"
+                    and f.source.provider_id == assessment.provider
+                    and f.retrieval_method == "official_page"
+                    for f in facts
+                )
+                else "UNKNOWN: no relevant current provider-wide support documentation",
+                "account_visible_availability": "REPORTED live API listing"
+                if any(
+                    f.source.scope == "account" and f.source.provider_id == assessment.provider
+                    for f in facts
+                )
+                else "UNKNOWN",
+                "generation_probed_state": "UNKNOWN: not probed by this retrieval objective",
+                "account_funding": "UNKNOWN: free/subscription/paid entitlement not established",
+                "account_quota": "UNKNOWN: remaining quota not established by inventory/search",
+                "public_access_constraints": assessment.status,
+            }
+            claim_states.append(claim)
+            answer += "\n" + assessment.provider + " — evidence-qualified claim states:\n"
+            answer += "\n".join(k + ": " + v for k, v in claim.items() if k != "provider")
+            answer += "\nConstraint resolution: " + assessment.reason + "\n"
+        self.router.store.put(
+            "retrieval_synthesis",
+            new_id(),
+            {
+                "task_id": action.task_id,
+                "correlation_id": action.correlation_id,
+                "status": "REPORTED",
+                "claims": claim_states,
+                "evidence_ids": [f.source.evidence_id for f in facts],
+                "conflicts_preserved": True,
+            },
+        )
         if limitations:
             answer += "\nLimitations: " + "; ".join(limitations)
         return Result(

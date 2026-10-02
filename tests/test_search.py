@@ -7,13 +7,15 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from threading import Thread
+from types import SimpleNamespace
 from unittest.mock import patch
 
-from oscar.capabilities import Cancelled
+from oscar.capabilities import Cancellation, Cancelled
+from oscar.contracts import Action, Task, new_id, record
 from oscar.credentials import CredentialPool
-from oscar.freshness import Authority
+from oscar.freshness import Authority, Freshness, SourceRef
 from oscar.models import Failure, ProviderError, ProviderSpec
-from oscar.retrieval import RetrievalRequest
+from oscar.retrieval import RetrievalExecutor, RetrievalRequest
 from oscar.search import OFFICIAL_DOMAINS, TavilySource
 from oscar.storage import Store
 
@@ -489,3 +491,119 @@ class SearchContractTests(unittest.TestCase):
         self.assertFalse(self.requests)
         self.assertEqual(self.source.pool.slots["tavily-1"].concurrent, 0)
         self.assertFalse(self.store.all("search_observation"))
+
+    def execute_search(self):
+        task = Task(new_id(), "objective", new_id())
+        self.store.put("task", task.id, record(task))
+        action = Action(
+            new_id(),
+            task.id,
+            task.correlation_id,
+            "sources.retrieve",
+            {"query": "current Groq API", "freshness": Freshness.CURRENT},
+            "fixture",
+            "owner",
+        )
+        router = SimpleNamespace(store=self.store, clock=self.clock, pool=self.source.pool)
+        return RetrievalExecutor(router, (self.source,))(action, Cancellation(self.store, task.id))
+
+    def test_title_survives_adapter_typed_reference_persistence_and_synthesis(self):
+        self.body["results"][0].update(
+            title="Groq API model catalog", published_date="2026-10-01T00:00:00Z"
+        )
+        result = self.execute_search()
+        saved = self.store.all("retrieval_evidence")[0]
+        source = SourceRef(**saved["source"])
+        self.assertEqual(source.title, "Groq API model catalog")
+        self.assertEqual(source.published_at, "2026-10-01T00:00:00Z")
+        self.assertEqual(source.source_provider, "tavily")
+        self.assertEqual(source.provider_id, "groq")
+        self.assertTrue(source.evidence_id)
+        self.assertIn(source.title, result.value)
+        self.assertNotIn("Current provider catalog excerpt.", self.persisted())
+
+    def test_missing_title_and_publication_remain_null_without_invention(self):
+        result = self.execute_search()
+        source = self.store.all("retrieval_evidence")[0]["source"]
+        self.assertIsNone(source["title"])
+        self.assertIsNone(source["published_at"])
+        self.assertIn("title: UNKNOWN", result.value)
+
+    def test_secret_returned_in_title_is_redacted_before_persistence(self):
+        self.body["results"][0]["title"] = self.environ["TAVILY_API_KEY_1"]
+        self.execute_search()
+        self.assertNotIn(self.environ["TAVILY_API_KEY_1"], self.persisted())
+        self.assertEqual(self.store.all("retrieval_evidence")[0]["source"]["title"], "<redacted>")
+
+    def constraint_request(self):
+        return RetrievalRequest(
+            "Currently configured provider models and free access constraints",
+            domains=OFFICIAL_DOMAINS["groq"],
+            result_limit=1,
+        )
+
+    def test_irrelevant_first_page_refines_once_and_finds_official_constraint(self):
+        irrelevant = "https://console.groq.com/docs/models"
+        relevant = "https://console.groq.com/docs/rate-limits"
+        self.scheduled = [
+            (200, {"results": [{"url": url, "content": "Index hint", "title": "Fixture title"}]})
+            for url in (irrelevant, relevant)
+        ]
+        self.source.page_reader = lambda url, timeout, redact: (
+            "Available models are model-A and model-B."
+            if url == irrelevant
+            else "Free API tier has a rate limit of 100 requests per day."
+        )
+        result = self.source.retrieve(self.constraint_request(), lambda: None)
+        self.assertEqual(len(self.requests), 2)
+        self.assertNotEqual(self.requests[0]["body"]["query"], self.requests[1]["body"]["query"])
+        self.assertTrue(all(r["body"]["include_domains"] for r in self.requests))
+        self.assertEqual(result.assessments[0].status, "REPORTED")
+        self.assertEqual(result.facts[0].source.identity, relevant)
+        self.assertEqual(len(result.assessments[0].attempt_ids), 2)
+
+    def test_bounded_official_exhaustion_produces_evidenced_unknown(self):
+        self.source.page_reader = lambda url, timeout, redact: "Only models model-A and model-B."
+        result = self.source.retrieve(self.constraint_request(), lambda: None)
+        self.assertEqual(len(self.requests), 2)
+        self.assertEqual(result.facts, ())
+        assessment = result.assessments[0]
+        self.assertEqual(assessment.status, "UNKNOWN")
+        self.assertEqual(len(assessment.attempt_ids), 2)
+        self.assertEqual(assessment.evidence_ids, ())
+        self.assertIn("UNKNOWN", assessment.reason)
+
+    def test_synthesis_keeps_public_policy_separate_from_account_entitlement(self):
+        self.source.page_reader = lambda url, timeout, redact: (
+            "Free API tier allows 100 requests per day. Paid subscription pricing is per token."
+        )
+        # The loopback result only covers Groq; other domain-scoped searches become UNKNOWN.
+        task = Task(new_id(), "objective", new_id())
+        self.store.put("task", task.id, record(task))
+        action = Action(
+            new_id(),
+            task.id,
+            task.correlation_id,
+            "sources.retrieve",
+            {
+                "query": "configured current models free access constraints",
+                "freshness": Freshness.CURRENT,
+            },
+            "fixture",
+            "owner",
+        )
+        router = SimpleNamespace(store=self.store, clock=self.clock, pool=self.source.pool)
+        result = RetrievalExecutor(router, (self.source,))(
+            action, Cancellation(self.store, task.id)
+        )
+        self.assertTrue(result.success)
+        claims = self.store.all("retrieval_synthesis")[0]["claims"]
+        self.assertEqual(len(claims), 6)
+        self.assertTrue(all(c["account_visible_availability"] == "UNKNOWN" for c in claims))
+        self.assertTrue(all(c["account_funding"].startswith("UNKNOWN") for c in claims))
+        self.assertTrue(all(c["account_quota"].startswith("UNKNOWN") for c in claims))
+        saved = self.store.all("retrieval_evidence")
+        self.assertTrue(all(e["source"]["scope"] == "provider" for e in saved))
+        self.assertTrue(all(e["source"]["authority"] == "official_docs" for e in saved))
+        self.assertTrue(all(e["status"] == "REPORTED" for e in saved))
+        self.assertIn("not account entitlement", result.value)

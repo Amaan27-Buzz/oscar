@@ -24,7 +24,13 @@ from .http_client import NoRedirects
 from .models import Failure, ProviderError, ProviderSpec
 from .providers import error_category, rate_limits
 from .public_sources import read_official_page
-from .retrieval import RetrievalRequest, RetrievalResult, RetrievedFact
+from .retrieval import (
+    ConstraintAssessment,
+    RetrievalRequest,
+    RetrievalResult,
+    RetrievedFact,
+    access_constraint_topics,
+)
 from .storage import Store
 
 OFFICIAL_DOMAINS = {
@@ -76,7 +82,10 @@ class TavilySource:
         check_cancel()
         if not self.pool.reserve(slot, 0, "*"):
             raise ProviderError(Failure.CAPACITY)
+        observation_id = new_id()
         observation: dict[str, Any] = {
+            "id": observation_id,
+            "domains": request.domains,
             "slot": slot,
             "quota_pool": self.pool.slots[slot].quota_pool,
             "endpoint": self.provider.base_url + "/search",
@@ -207,10 +216,30 @@ class TavilySource:
                         datetime.fromisoformat(published.replace("Z", "+00:00"))
                     except ValueError:
                         published = None
+                if not isinstance(published, str):
+                    published = None
                 if isinstance(published, str) and (
                     self.pool.redact(published) != published or self.redact(published) != published
                 ):
                     published = None
+                title = item.get("title")
+                title = (
+                    self.redact(self.pool.redact(title))[:500] if isinstance(title, str) else None
+                )
+                evidence_id = new_id()
+                observation.setdefault("source_metadata", []).append(
+                    {
+                        "evidence_id": evidence_id,
+                        "identity": url,
+                        "title_returned": isinstance(item.get("title"), str),
+                        "title": title,
+                        "published_at": published,
+                        "retrieval_method": method,
+                        "access_topics": access_constraint_topics(text)
+                        if method == "official_page"
+                        else (),
+                    }
+                )
                 facts.append(
                     RetrievedFact(
                         (
@@ -227,6 +256,17 @@ class TavilySource:
                             "provider",
                             self.clock(),
                             published_at=published[:100] if isinstance(published, str) else None,
+                            title=title,
+                            source_provider="tavily",
+                            evidence_id=evidence_id,
+                            provider_id=next(
+                                (
+                                    p
+                                    for p, ds in OFFICIAL_DOMAINS.items()
+                                    if domain_matches(host, ds)
+                                ),
+                                None,
+                            ),
                         ),
                         retrieval_method=method,
                     )
@@ -299,7 +339,7 @@ class TavilySource:
             raise
         finally:
             try:
-                self.store.put("search_observation", new_id(), observation)
+                self.store.put("search_observation", observation_id, observation)
             finally:
                 self.pool.release(slot)
 
@@ -309,7 +349,14 @@ class TavilySource:
         # The configured-provider objective needs coverage, not a search ranking
         # dominated by one vendor. Bound total results and calls; each source keeps
         # the same replaceable retrieval contract and original observation time.
-        deadline = monotonic() + 30
+        constraint_objective = (
+            "model" in request.query.lower()
+            and "configured" in request.query.lower()
+            and any(word in request.query.lower() for word in ("access", "free", "constraint"))
+        )
+        deadline = monotonic() + (90 if constraint_objective else 30)
+        if constraint_objective:
+            return self._retrieve_constraints(request, check_cancel, deadline)
         if "model" in request.query.lower() and "configured" in request.query.lower():
             facts: list[RetrievedFact] = []
             limitations: list[str] = []
@@ -338,6 +385,84 @@ class TavilySource:
                     limitations.append(provider + ": public access constraints UNKNOWN.")
             return RetrievalResult(tuple(facts), limitations=tuple(dict.fromkeys(limitations)))
         return self._retrieve_one(request, check_cancel, deadline)
+
+    def _retrieve_constraints(
+        self, request: RetrievalRequest, check_cancel: Callable[[], None], deadline: float
+    ) -> RetrievalResult:
+        facts: list[RetrievedFact] = []
+        assessments: list[ConstraintAssessment] = []
+        labels = {
+            "google": "Google AI Studio Gemini",
+            "nvidia": "NVIDIA NIM API",
+            "zai": "Z.ai API",
+            "ollama-cloud": "Ollama Cloud",
+        }
+        for provider, domains in OFFICIAL_DOMAINS.items():
+            selected = tuple(
+                d for d in domains if not request.domains or domain_matches(d, request.domains)
+            )
+            if not selected or len(assessments) >= request.result_limit:
+                continue
+            label = labels.get(provider, provider)
+            relevant: list[RetrievedFact] = []
+            attempts: list[str] = []
+            # Exactly two query stages; each stage has at most three credential attempts.
+            # Successful but irrelevant results do not end the constraint lookup.
+            for stage, query in enumerate(
+                (
+                    f"{label} API free tier developer rate limits official",
+                    f"{label} API pricing free credits subscription usage limits "
+                    "official documentation",
+                )
+            ):
+                check_cancel()
+                start = len(self.store.all("search_observation"))
+                result = self._retrieve_one(
+                    RetrievalRequest(query, request.freshness, selected, 2, request.time_range),
+                    check_cancel,
+                    deadline,
+                )
+                observations = self.store.all("search_observation")[start:]
+                for observation in observations:
+                    observation.update(
+                        provider_id=provider,
+                        query_stage=stage,
+                        purpose="official_access_constraints",
+                    )
+                    self.store.put("search_observation", observation["id"], observation)
+                    attempts.append(observation["id"])
+                relevant = [
+                    f
+                    for f in result.facts
+                    if f.retrieval_method == "official_page"
+                    and f.source.current(self.clock())
+                    and access_constraint_topics(f.text)
+                ]
+                if relevant:
+                    break
+            facts.extend(relevant[:1])
+            assessments.append(
+                ConstraintAssessment(
+                    provider,
+                    "REPORTED" if relevant else "UNKNOWN",
+                    self.clock(),
+                    tuple(attempts),
+                    tuple(f.source.evidence_id or "" for f in relevant[:1]),
+                    "Relevant directly read official constraint excerpt; "
+                    "remaining account quota/funding UNKNOWN."
+                    if relevant
+                    else "No relevant directly readable official constraint page after bounded "
+                    "official-source attempts; public constraints UNKNOWN / potentially stale.",
+                )
+            )
+        return RetrievalResult(
+            tuple(facts),
+            limitations=(
+                "Public plan policies are not account entitlement; "
+                "missing account funding/quota remains UNKNOWN.",
+            ),
+            assessments=tuple(assessments),
+        )
 
     def _retrieve_one(
         self, request: RetrievalRequest, check_cancel: Callable[[], None], deadline: float

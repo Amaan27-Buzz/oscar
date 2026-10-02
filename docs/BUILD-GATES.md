@@ -46,8 +46,8 @@ Manual scenarios:
 
 **Pass:** native core/transport/model routing works without Latch/SwitchRoute deployment and remote node loss does not erase objective state.
 
-Current checkpoint: **PARTIAL — all three Tavily slots authenticate; source title
-provenance and relevant official access-constraint coverage remain incomplete.**
+Current checkpoint: **PASS for Club A foundation — all three Tavily slots authenticate;
+source provenance, bounded official constraints and qualified UNKNOWN semantics pass.**
 Core Loop/Jev/reference Grid proofs and the focused routing
 acceptance remain verified; see [CLUB-A-CHECKPOINT.md](CLUB-A-CHECKPOINT.md).
 
@@ -56,8 +56,9 @@ no-eligible-route BLOCKED result is correct under current capability/funding/cap
 policy. Temporary provider limits are not architectural defects when bounded
 reranking finds an eligible alternative, or truthful blocking records that none
 exists. Shared cooldowns must not disable unrelated pools; UNKNOWN remains UNKNOWN.
-Live combined search is required for this final acceptance and is not established
-by native inventory or synthetic search tests alone. **Stop here; Slice 05 has not
+Live combined search is verified with current native inventories and official-source
+evidence/explicit UNKNOWN resolutions; native inventory or synthetic tests alone
+cannot establish this acceptance. **Stop here; Slice 05 has not
 started.**
 
 The current foundation review accepts coherent reference Transport/Grid contracts. Public TLS/outbound rendezvous, independent network stores and a cloud coordinator path using a configured deployment target remain later Grid integration acceptance requirements; they are not claimed verified by Gate A. This refines the previous public-deployment gate expectation without changing the architecture or silently completing broader slice deliverables.
@@ -170,7 +171,7 @@ This is intentionally aggressive. Anything not genuinely verified remains planne
 
 | Gate | Slices | Status |
 |---|---|---|
-| Gate A — Brain | 01–04 | PARTIAL — focused routing passed; search provenance/constraint acceptance incomplete; manual review pending |
+| Gate A — Brain | 01–04 | PASS for Club A foundation — focused routing and final evidence-qualified search accepted; manual review stop |
 | Gate B — Can Do Work | 05–06 | Planned |
 | Gate C — Embodied OSCAR | 07–10 | Planned |
 | Gate D — JARVIS Layer | 11–14 | Planned |

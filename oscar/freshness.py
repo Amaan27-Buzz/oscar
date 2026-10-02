@@ -32,6 +32,10 @@ class SourceRef:
     ttl_seconds: float = 300
     refreshable: bool = True
     published_at: str | None = None
+    title: str | None = None
+    source_provider: str | None = None
+    provider_id: str | None = None
+    evidence_id: str | None = None
 
     def __post_init__(self) -> None:
         parsed = urlparse(self.identity)

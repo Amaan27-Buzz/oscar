@@ -1,0 +1,1935 @@
+{
+  "recorded_at": "2026-10-02T21:55:43.249958+00:00",
+  "run_started_at": 1790978112.8405068,
+  "objective_started_at": 1790978114.7010772,
+  "objective": "What are the currently supported models and relevant free/developer access constraints for OSCAR's configured intelligence providers right now?",
+  "scope": "Final Gate A freshness/search; no model-generation matrix or Slice 05",
+  "acceptance": "PASS",
+  "decision": {
+    "route": "world",
+    "execution_class": "retrieval_live_source",
+    "capability_kind": "live_source",
+    "reason": "current-state claim requires authoritative live retrieval before reasoning",
+    "latency_ms": 0.24274099996546283,
+    "repair": "block if capability unavailable",
+    "freshness": "freshness_sensitive"
+  },
+  "acceptance_checks": {
+    "current_run_three_authenticated_preflights": true,
+    "six_current_correlated_native_inventories": true,
+    "objective_search_executed": true,
+    "source_metadata_retained": true,
+    "visible_provenance_and_conflicts": true,
+    "six_evidenced_constraint_resolutions": true,
+    "qualified_synthesis_and_separate_claim_scopes": true,
+    "reported_successful_objective": true,
+    "freshness_routed_and_no_unsupported_verification": true,
+    "no_model_generations": true
+  },
+  "constraint_assessments": [
+    {
+      "provider": "groq",
+      "status": "REPORTED",
+      "observed_at": 1790978119.2618456,
+      "attempt_ids": [
+        "91596323f4d54dae8b695b0e5f0aa6ee"
+      ],
+      "evidence_ids": [
+        "d808ba82a42749d09dcfa811917eca9a"
+      ],
+      "reason": "Relevant directly read official constraint excerpt; remaining account quota/funding UNKNOWN.",
+      "task_id": "f599b48d89cc4a75bde5f1c70640a366",
+      "correlation_id": "bed5d12283084b158ccf6da52364015d"
+    },
+    {
+      "provider": "openrouter",
+      "status": "REPORTED",
+      "observed_at": 1790978122.41348,
+      "attempt_ids": [
+        "27e2e767b8e54cb4a52229cff61c20da"
+      ],
+      "evidence_ids": [
+        "57edfc11ecd346b9b03fc8802ad815c2"
+      ],
+      "reason": "Relevant directly read official constraint excerpt; remaining account quota/funding UNKNOWN.",
+      "task_id": "f599b48d89cc4a75bde5f1c70640a366",
+      "correlation_id": "bed5d12283084b158ccf6da52364015d"
+    },
+    {
+      "provider": "google",
+      "status": "REPORTED",
+      "observed_at": 1790978130.1388602,
+      "attempt_ids": [
+        "67824e4bd32f4b79a3f18784451c6050",
+        "29e47a7f66b249eeb8d3eea3376416d9"
+      ],
+      "evidence_ids": [
+        "9ad762a0ff9f49359efa990a205a5671"
+      ],
+      "reason": "Relevant directly read official constraint excerpt; remaining account quota/funding UNKNOWN.",
+      "task_id": "f599b48d89cc4a75bde5f1c70640a366",
+      "correlation_id": "bed5d12283084b158ccf6da52364015d"
+    },
+    {
+      "provider": "nvidia",
+      "status": "UNKNOWN",
+      "observed_at": 1790978138.6878014,
+      "attempt_ids": [
+        "0a6f90bc3e39472b900df93e71826e26",
+        "63a2146a447a499b8e2ecdaed8f3fbec"
+      ],
+      "evidence_ids": [],
+      "reason": "No relevant directly readable official constraint page after bounded official-source attempts; public constraints UNKNOWN / potentially stale.",
+      "task_id": "f599b48d89cc4a75bde5f1c70640a366",
+      "correlation_id": "bed5d12283084b158ccf6da52364015d"
+    },
+    {
+      "provider": "zai",
+      "status": "REPORTED",
+      "observed_at": 1790978141.0218375,
+      "attempt_ids": [
+        "89ee0d7f2e824a5bbcef5fef94e0c78a"
+      ],
+      "evidence_ids": [
+        "dfe3c78907144a8a90d65c3ed9e45242"
+      ],
+      "reason": "Relevant directly read official constraint excerpt; remaining account quota/funding UNKNOWN.",
+      "task_id": "f599b48d89cc4a75bde5f1c70640a366",
+      "correlation_id": "bed5d12283084b158ccf6da52364015d"
+    },
+    {
+      "provider": "ollama-cloud",
+      "status": "REPORTED",
+      "observed_at": 1790978142.8898602,
+      "attempt_ids": [
+        "8b9f1288ef454079a477f1dfc0523453"
+      ],
+      "evidence_ids": [
+        "580f8f0f7cb34f20bd3cd2d2de89a7ce"
+      ],
+      "reason": "Relevant directly read official constraint excerpt; remaining account quota/funding UNKNOWN.",
+      "task_id": "f599b48d89cc4a75bde5f1c70640a366",
+      "correlation_id": "bed5d12283084b158ccf6da52364015d"
+    }
+  ],
+  "constraint_coverage": {
+    "groq": "REPORTED",
+    "openrouter": "REPORTED",
+    "google": "REPORTED",
+    "nvidia": "UNKNOWN",
+    "zai": "REPORTED",
+    "ollama-cloud": "REPORTED"
+  },
+  "synthesis": [
+    {
+      "task_id": "f599b48d89cc4a75bde5f1c70640a366",
+      "correlation_id": "bed5d12283084b158ccf6da52364015d",
+      "status": "REPORTED",
+      "claims": [
+        {
+          "provider": "groq",
+          "provider_global_support": "REPORTED provider-wide documentation excerpts; not entitlement",
+          "account_visible_availability": "REPORTED live API listing",
+          "generation_probed_state": "UNKNOWN: not probed by this retrieval objective",
+          "account_funding": "UNKNOWN: free/subscription/paid entitlement not established",
+          "account_quota": "UNKNOWN: remaining quota not established by inventory/search",
+          "public_access_constraints": "REPORTED"
+        },
+        {
+          "provider": "openrouter",
+          "provider_global_support": "REPORTED provider-wide documentation excerpts; not entitlement",
+          "account_visible_availability": "REPORTED live API listing",
+          "generation_probed_state": "UNKNOWN: not probed by this retrieval objective",
+          "account_funding": "UNKNOWN: free/subscription/paid entitlement not established",
+          "account_quota": "UNKNOWN: remaining quota not established by inventory/search",
+          "public_access_constraints": "REPORTED"
+        },
+        {
+          "provider": "google",
+          "provider_global_support": "REPORTED provider-wide documentation excerpts; not entitlement",
+          "account_visible_availability": "REPORTED live API listing",
+          "generation_probed_state": "UNKNOWN: not probed by this retrieval objective",
+          "account_funding": "UNKNOWN: free/subscription/paid entitlement not established",
+          "account_quota": "UNKNOWN: remaining quota not established by inventory/search",
+          "public_access_constraints": "REPORTED"
+        },
+        {
+          "provider": "nvidia",
+          "provider_global_support": "UNKNOWN: no relevant current provider-wide support documentation",
+          "account_visible_availability": "REPORTED live API listing",
+          "generation_probed_state": "UNKNOWN: not probed by this retrieval objective",
+          "account_funding": "UNKNOWN: free/subscription/paid entitlement not established",
+          "account_quota": "UNKNOWN: remaining quota not established by inventory/search",
+          "public_access_constraints": "UNKNOWN"
+        },
+        {
+          "provider": "zai",
+          "provider_global_support": "REPORTED provider-wide documentation excerpts; not entitlement",
+          "account_visible_availability": "REPORTED live API listing",
+          "generation_probed_state": "UNKNOWN: not probed by this retrieval objective",
+          "account_funding": "UNKNOWN: free/subscription/paid entitlement not established",
+          "account_quota": "UNKNOWN: remaining quota not established by inventory/search",
+          "public_access_constraints": "REPORTED"
+        },
+        {
+          "provider": "ollama-cloud",
+          "provider_global_support": "REPORTED provider-wide documentation excerpts; not entitlement",
+          "account_visible_availability": "REPORTED live API listing",
+          "generation_probed_state": "UNKNOWN: not probed by this retrieval objective",
+          "account_funding": "UNKNOWN: free/subscription/paid entitlement not established",
+          "account_quota": "UNKNOWN: remaining quota not established by inventory/search",
+          "public_access_constraints": "REPORTED"
+        }
+      ],
+      "evidence_ids": [
+        "f4922781964c4685ad36bccdccbd4df9",
+        "94c024abbb1245689bff66db8eadfee0",
+        "cf44943b8264480d953bb7b679a39fc4",
+        "87562364bab14e54be1616b43d69c336",
+        "fa4a032df08b49529117c0626b8e0b42",
+        "5d8826b992b8499c8e679bab366a7634",
+        "c3d2c6a68a0b4db19610a507bb1dbaf9",
+        "d808ba82a42749d09dcfa811917eca9a",
+        "57edfc11ecd346b9b03fc8802ad815c2",
+        "9ad762a0ff9f49359efa990a205a5671",
+        "dfe3c78907144a8a90d65c3ed9e45242",
+        "580f8f0f7cb34f20bd3cd2d2de89a7ce"
+      ],
+      "conflicts_preserved": true
+    }
+  ],
+  "objective_result": [
+    {
+      "id": "1c891a1b2f7b40c580f343c438e32f49",
+      "action_id": "70507eae34ca47f1ad9c2fe992a13a33",
+      "task_id": "f599b48d89cc4a75bde5f1c70640a366",
+      "correlation_id": "bed5d12283084b158ccf6da52364015d",
+      "executor": "sources.retrieve",
+      "success": true,
+      "value": "Current evidence-qualified answer. Account listing, provider support, generation and funding are separate claims. Account APIs govern listing; applicable official retirement notices govern retirement. Web excerpts are REPORTED source material, not verified account entitlement.\nAccount-visible inventory:\ngroq: canopylabs/orpheus-arabic-saudi, canopylabs/orpheus-v1-english, allam-2-7b, qwen/qwen3.8-27b, meta-llama/llama-prompt-guard-2-86m, whisper-large-v3-turbo, whisper-large-v3, openai/gpt-oss-safeguard-20b, openai/gpt-oss-120b, meta-llama/llama-prompt-guard-2-22m, openai/gpt-oss-20b. Listed via groq-1; account generation/funding is not implied. \nSource: https://api.groq.com/openai/v1/models; authority: live_api; observed_at: 1790978114.9137256; scope: account; title: UNKNOWN; published_at: UNKNOWN; source_provider: groq; evidence_ref: f4922781964c4685ad36bccdccbd4df9\nConflicting evidence: llama-3.1-8b-instant: absent in complete live inventory; cached availability rejected; llama-3.3-70b-versatile: absent in complete live inventory; cached availability rejected; qwen/qwen3.6-27b: absent in complete live inventory; cached availability rejected; qwen/qwen3-32b: absent in complete live inventory; cached availability rejected; meta-llama/llama-4-scout-17b-16e-instruct: absent in complete live inventory; cached availability rejected; groq/compound: absent in complete live inventory; cached availability rejected; groq/compound-mini: absent in complete live inventory; cached availability rejected\nopenrouter: inclusionai/ling-3.1-flash, apodex/apodex-1.1-mini:free, unbiased/pareto-26.10-preview, openai/gpt-6.1-sol-pro, openai/gpt-6.1-sol, anthropic/claude-sonnet-5.5, anthropic/claude-sonnet-5.5:batch, typesafe/jev-router, perceptron/perceptron-mk1.5, fireworks/ember-1, z-ai/glm-5.3-prime, qwen/qwen3.8-max-prime, stealth/space-bunny-alpha, aion-labs/aion-3.5-mini, aion-labs/aion-3.5, upstage/solar-mini4, cohere/command-a-plus, openai/gpt-6-luna-pro, openai/gpt-6-luna-pro:batch, openai/gpt-6-luna, openai/gpt-6-luna:batch, openai/gpt-6-sol-pro, openai/gpt-6-sol-pro:batch, openai/gpt-6-sol, openai/gpt-6-sol:batch, anthropic/claude-opus-5.5, anthropic/claude-opus-5.5:batch, nvidia/switchyard, xiaomi/mimo-v2.6-pro-ultraspeed, xiaomi/mimo-v2.6-flash, xiaomi/mimo-v2.6-pro, x-ai/grok-4.7, qwen/qwen3.8-omni-flash, prism-ml/ternary-bonsai-2-27b, z-ai/glm-5.3-flashx, unbiased/pareto, ~deepseek/deepseek-pro-latest, ~deepseek/deepseek-flash-latest, inference-net/schematron-v2-turbo, inference-net/schematron-v2-small, ~openai/gpt-astra-latest, ~openai/gpt-sol-latest, ~openai/gpt-terra-latest, ~openai/gpt-luna-latest, sakana/fugu-ultra-v2, sakana/fugu-max, inclusionai/ling-3.0-flash-vl, deepseek/deepseek-v4.1-flash, deepseek/deepseek-v4.1-flash:batch, inception/mercury-2.5, nex-agi/nex-n2.5-mini, nex-agi/nex-n2.5-pro, openai/gpt-6-astra, openai/gpt-6-astra:batch, openai/gpt-6-astra-pro, openai/gpt-6-astra-pro:batch, inclusionai/ling-3.0-flash-sante:free, qwen/qwen3.8-max-0902, meta/muse-spark-1.3, google/gemini-3.8-flash, google/gemini-3.8-flash:batch, anthropic/claude-fable-5.1, anthropic/claude-fable-5.1:batch, ibm-granite/granite-4.2-8b, tencent/hy4-preview, inclusionai/ling-3.0-flash-fin, ~z-ai/glm-flash-latest, qwen/qwen3.8-flash, z-ai/glm-5.3-flash, z-ai/glm-5.3-flash:batch, deepseek/deepseek-v4-flash-vision-exp, tencent/hy-mt2-1.8b, tencent/hy-mt2-30b-a3b, ~z-ai/glm-latest, tencent/hy-mt2-7b, z-ai/glm-5.3, z-ai/glm-5.3:batch, qwen/qwen3.8-27b, qwen/qwen3.8-27b:free, dots-studio/dots-3-note-preview:free, google/gemini-3.7-flash, google/gemini-3.7-flash:batch, bytedance-seed/seed-2-1-turbo, qwen/qwen3.8-2.4t-a95b, bytedance-seed/seed-2.0-code, deepseek/deepseek-v4-pro-0813, x-ai/grok-4.6, liquid/lfm-2.5-2.6b:free, nvidia/nemotron-3.5-lightning, nvidia/nemotron-3.5-lightning:free, upstage/solar-pro4, meta/muse-glimmer-30b, meta/muse-spark-1.2, ~deepseek/deepseek-v4-flash-latest, deepseek/deepseek-v4-flash-0731, thinkingmachines/inkling-small, thinkingmachines/inkling-small:free, qwen/qwen3.7-flash, anthropic/claude-opus-5, anthropic/claude-opus-5:batch, inclusionai/ling-3.0-flash, poolside/laguna-s-2.1, poolside/laguna-s-2.1:free, google/gemini-3.6-flash, google/gemini-3.6-flash:batch, google/gemini-3.5-flash-lite, google/gemini-3.5-flash-lite:batch, meituan/longcat-2.0, thinkingmachines/inkling, thinkingmachines/inkling:free, openrouter/auto-beta, moonshotai/kimi-k3, moonshotai/kimi-k3:batch, meta/muse-spark-1.1, kwaipilot/kat-coder-pro-v2.5, openai/gpt-5.6-luna-pro, openai/gpt-5.6-luna-pro:batch, openai/gpt-5.6-luna, openai/gpt-5.6-luna:batch, openai/gpt-5.6-terra-pro, openai/gpt-5.6-terra-pro:batch, openai/gpt-5.6-terra, openai/gpt-5.6-terra:batch, openai/gpt-5.6-sol-pro, openai/gpt-5.6-sol-pro:batch, openai/gpt-5.6-sol, openai/gpt-5.6-sol:batch, x-ai/grok-4.5, ~x-ai/grok-latest, aion-labs/aion-3.0-mini, aion-labs/aion-3.0, tencent/hy3, poolside/laguna-xs-2.1, poolside/laguna-xs-2.1:free, anthropic/claude-sonnet-5, anthropic/claude-sonnet-5:batch, google/gemini-3.1-flash-lite-image, sakana/fugu-ultra, google/gemini-3.1-flash-image, google/gemini-3-pro-image, cohere/north-mini-code:free, z-ai/glm-5.2, openrouter/fusion, moonshotai/kimi-k2.7-code, ~anthropic/claude-fable-latest, anthropic/claude-fable-5, anthropic/claude-fable-5:batch, nvidia/nemotron-3.5-content-safety, nvidia/nemotron-3.5-content-safety:free, nvidia/nemotron-3-ultra-550b-a55b, nvidia/nemotron-3-ultra-550b-a55b:free, qwen/qwen3.7-plus, minimax/minimax-m3, stepfun/step-3.7-flash, anthropic/claude-opus-4.8, anthropic/claude-opus-4.8:batch, qwen/qwen3.7-max, x-ai/grok-build-0.1, google/gemini-3.5-flash, google/gemini-3.5-flash:batch, perceptron/perceptron-mk1, google/gemini-3.1-flash-lite, google/gemini-3.1-flash-lite:batch, openai/gpt-chat-latest, x-ai/grok-4.3, x-ai/grok-4.3:batch, mistralai/mistral-medium-3-5, mistralai/mistral-medium-3-5:batch, nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free, ~anthropic/claude-haiku-latest, ~openai/gpt-mini-latest, ~google/gemini-pro-latest, ~moonshotai/kimi-latest, ~google/gemini-flash-latest, ~anthropic/claude-sonnet-latest, qwen/qwen3.5-plus-20260420, qwen/qwen3.6-flash, qwen/qwen3.6-35b-a3b, qwen/qwen3.6-max-preview, qwen/qwen3.6-27b, openai/gpt-5.5-pro, openai/gpt-5.5-pro:batch, openai/gpt-5.5, openai/gpt-5.5:batch, deepseek/deepseek-v4-pro, deepseek/deepseek-v4-flash, tencent/hy3-preview, xiaomi/mimo-v2.5-pro, xiaomi/mimo-v2.5, openai/gpt-5.4-image-2, ~anthropic/claude-opus-latest, openrouter/pareto-code, moonshotai/kimi-k2.6, anthropic/claude-opus-4.7, anthropic/claude-opus-4.7:batch, z-ai/glm-5.1, google/gemma-4-26b-a4b-it, google/gemma-4-26b-a4b-it:free, google/gemma-4-31b-it, google/gemma-4-31b-it:free, qwen/qwen3.6-plus, z-ai/glm-5v-turbo, arcee-ai/trinity-large-thinking, x-ai/grok-4.20-multi-agent, x-ai/grok-4.20, google/lyria-3-pro-preview, google/lyria-3-clip-preview, rekaai/reka-edge, minimax/minimax-m2.7, openai/gpt-5.4-nano, openai/gpt-5.4-nano:batch, openai/gpt-5.4-mini, openai/gpt-5.4-mini:batch, mistralai/mistral-small-2603, mistralai/mistral-small-2603:batch, z-ai/glm-5-turbo, nvidia/nemotron-3-super-120b-a12b, nvidia/nemotron-3-super-120b-a12b:free, bytedance-seed/seed-2.0-lite, qwen/qwen3.5-9b, openai/gpt-5.4-pro, openai/gpt-5.4-pro:batch, openai/gpt-5.4, openai/gpt-5.4:batch, inception/mercury-2, google/gemini-3.1-flash-lite-preview, bytedance-seed/seed-2.0-mini, google/gemini-3.1-flash-image-preview, qwen/qwen3.5-35b-a3b, qwen/qwen3.5-27b, qwen/qwen3.5-122b-a10b, qwen/qwen3.5-flash-02-23, google/gemini-3.1-pro-preview-customtools, openai/gpt-5.3-codex, aion-labs/aion-2.0, google/gemini-3.1-pro-preview, google/gemini-3.1-pro-preview:batch, anthropic/claude-sonnet-4.6, anthropic/claude-sonnet-4.6:batch, qwen/qwen3.5-plus-02-15, qwen/qwen3.5-397b-a17b, minimax/minimax-m2.5, z-ai/glm-5, qwen/qwen3-max-thinking, anthropic/claude-opus-4.6, anthropic/claude-opus-4.6:batch, qwen/qwen3-coder-next, openrouter/free, stepfun/step-3.5-flash, moonshotai/kimi-k2.5, upstage/solar-pro-3, minimax/minimax-m2-her, writer/palmyra-x5, openai/gpt-audio, openai/gpt-audio-mini, z-ai/glm-4.7-flash, openai/gpt-5.2-codex, bytedance-seed/seed-1.6-flash, bytedance-seed/seed-1.6, minimax/minimax-m2.1, z-ai/glm-4.7, google/gemini-3-flash-preview, google/gemini-3-flash-preview:batch, nvidia/nemotron-3-nano-30b-a3b, openai/gpt-5.2-chat, openai/gpt-5.2-pro, openai/gpt-5.2-pro:batch, openai/gpt-5.2, openai/gpt-5.2:batch, mistralai/devstral-2512, relace/relace-search, z-ai/glm-4.6v, openrouter/bodybuilder, openai/gpt-5.1-codex-max, amazon/nova-2-lite-v1, mistralai/ministral-14b-2512, mistralai/ministral-8b-2512, mistralai/ministral-8b-2512:batch, mistralai/ministral-3b-2512, mistralai/mistral-large-2512, mistralai/mistral-large-2512:batch, deepseek/deepseek-v3.2, anthropic/claude-opus-4.5, anthropic/claude-opus-4.5:batch, google/gemini-3-pro-image-preview, openai/gpt-5.1, openai/gpt-5.1:batch, openai/gpt-5.1-codex, openai/gpt-5.1-codex-mini, moonshotai/kimi-k2-thinking, amazon/nova-premier-v1, perplexity/sonar-pro-search, mistralai/voxtral-small-24b-2507, openai/gpt-oss-safeguard-20b, minimax/minimax-m2, qwen/qwen3-vl-32b-instruct, ibm-granite/granite-4.0-h-micro, openai/gpt-5-image-mini, anthropic/claude-haiku-4.5, anthropic/claude-haiku-4.5:batch, qwen/qwen3-vl-8b-thinking, qwen/qwen3-vl-8b-instruct, openai/gpt-5-image, google/gemini-2.5-flash-image, qwen/qwen3-vl-30b-a3b-thinking, qwen/qwen3-vl-30b-a3b-instruct, openai/gpt-5-pro, openai/gpt-5-pro:batch, z-ai/glm-4.6, anthropic/claude-sonnet-4.5, anthropic/claude-sonnet-4.5:batch, deepseek/deepseek-v3.2-exp, thedrummer/cydonia-24b-v4.1, relace/relace-apply-3, qwen/qwen3-vl-235b-a22b-thinking, qwen/qwen3-vl-235b-a22b-instruct, qwen/qwen3-max, qwen/qwen3-coder-plus, deepseek/deepseek-v3.1-terminus, qwen/qwen3-coder-flash, qwen/qwen3-next-80b-a3b-thinking, qwen/qwen3-next-80b-a3b-instruct, qwen/qwen-plus-2025-07-28, moonshotai/kimi-k2-0905, qwen/qwen3-30b-a3b-thinking-2507, nousresearch/hermes-4-405b, deepseek/deepseek-chat-v3.1, mistralai/mistral-medium-3.1, mistralai/mistral-medium-3.1:batch, z-ai/glm-4.5v, openai/gpt-5, openai/gpt-5:batch, openai/gpt-5-mini, openai/gpt-5-mini:batch, openai/gpt-5-nano, openai/gpt-5-nano:batch, openai/gpt-oss-120b, openai/gpt-oss-120b:batch, openai/gpt-oss-20b, openai/gpt-oss-20b:batch, anthropic/claude-opus-4.1, anthropic/claude-opus-4.1:batch, mistralai/codestral-2508, mistralai/codestral-2508:batch, qwen/qwen3-coder-30b-a3b-instruct, qwen/qwen3-30b-a3b-instruct-2507, z-ai/glm-4.5, z-ai/glm-4.5-air, qwen/qwen3-235b-a22b-thinking-2507, qwen/qwen3-coder, bytedance/ui-tars-1.5-7b, google/gemini-2.5-flash-lite, google/gemini-2.5-flash-lite:batch, qwen/qwen3-235b-a22b-2507, moonshotai/kimi-k2, cognitivecomputations/dolphin-mistral-24b-venice-edition, tencent/hunyuan-a13b-instruct, morph/morph-v3-large, morph/morph-v3-fast, baidu/ernie-4.5-vl-424b-a47b, mistralai/mistral-small-3.2-24b-instruct, minimax/minimax-m1, google/gemini-2.5-flash, google/gemini-2.5-flash:batch, google/gemini-2.5-pro, google/gemini-2.5-pro:batch, openai/o3-pro, google/gemini-2.5-pro-preview, deepseek/deepseek-r1-0528, anthropic/claude-sonnet-4, mistralai/mistral-medium-3, meta-llama/llama-guard-4-12b, qwen/qwen3-30b-a3b, qwen/qwen3-8b, qwen/qwen3-14b, qwen/qwen3-32b, qwen/qwen3-235b-a22b, openai/o4-mini-high, openai/o3, openai/o3:batch, openai/o4-mini, openai/o4-mini:batch, openai/gpt-4.1, openai/gpt-4.1:batch, openai/gpt-4.1-mini, openai/gpt-4.1-mini:batch, openai/gpt-4.1-nano, openai/gpt-4.1-nano:batch, meta-llama/llama-4-maverick, meta-llama/llama-4-scout, deepseek/deepseek-chat-v3-0324, openai/o1-pro, mistralai/mistral-small-3.1-24b-instruct, google/gemma-3-4b-it, google/gemma-3-12b-it, cohere/command-a, rekaai/reka-flash-3, google/gemma-3-27b-it, thedrummer/skyfall-36b-v2, perplexity/sonar-reasoning-pro, perplexity/sonar-pro, perplexity/sonar-deep-research, mistralai/mistral-saba, openai/o3-mini-high, aion-labs/aion-rp-llama-3.1-8b, qwen/qwen2.5-vl-72b-instruct, qwen/qwen-plus, openai/o3-mini, openai/o3-mini:batch, mistralai/mistral-small-24b-instruct-2501, perplexity/sonar, deepseek/deepseek-r1, minimax/minimax-01, microsoft/phi-4, deepseek/deepseek-chat, sao10k/l3.3-euryale-70b, openai/o1, cohere/command-r7b-12-2024, meta-llama/llama-3.3-70b-instruct, amazon/nova-lite-v1, amazon/nova-micro-v1, amazon/nova-pro-v1, openai/gpt-4o-2024-11-20, mistralai/mistral-large-2407, qwen/qwen-2.5-coder-32b-instruct, thedrummer/unslopnemo-12b, anthracite-org/magnum-v4-72b, qwen/qwen-2.5-7b-instruct, meta-llama/llama-3.2-1b-instruct, meta-llama/llama-3.2-3b-instruct, qwen/qwen-2.5-72b-instruct, cohere/command-r-08-2024, cohere/command-r-plus-08-2024, sao10k/l3.1-euryale-70b, nousresearch/hermes-3-llama-3.1-70b, nousresearch/hermes-3-llama-3.1-405b, sao10k/l3-lunaris-8b, openai/gpt-4o-2024-08-06, meta-llama/llama-3.1-70b-instruct, meta-llama/llama-3.1-8b-instruct, mistralai/mistral-nemo, openai/gpt-4o-mini, openai/gpt-4o-mini-2024-07-18, openai/gpt-4o-mini:batch, google/gemma-2-27b-it, openai/gpt-4o, openai/gpt-4o-2024-05-13, openai/gpt-4o:batch, mistralai/mixtral-8x22b-instruct, microsoft/wizardlm-2-8x22b, openai/gpt-4-turbo, openai/gpt-4-turbo:batch, mistralai/mistral-large, openai/gpt-3.5-turbo-0613, openrouter/auto, openai/gpt-3.5-turbo-instruct, openai/gpt-3.5-turbo-16k, mancer/weaver, undi95/remm-slerp-l2-13b, gryphe/mythomax-l2-13b, openai/gpt-3.5-turbo, openai/gpt-3.5-turbo:batch, openai/gpt-4. Listed via openrouter-1; account generation/funding is not implied. API-listed zero-price routes: inclusionai/ling-3.1-flash, apodex/apodex-1.1-mini:free, stealth/space-bunny-alpha, inclusionai/ling-3.0-flash-sante:free, qwen/qwen3.8-27b:free, dots-studio/dots-3-note-preview:free, liquid/lfm-2.5-2.6b:free, nvidia/nemotron-3.5-lightning:free, thinkingmachines/inkling-small:free, poolside/laguna-s-2.1:free, thinkingmachines/inkling:free, poolside/laguna-xs-2.1:free, cohere/north-mini-code:free, nvidia/nemotron-3.5-content-safety:free, nvidia/nemotron-3-ultra-550b-a55b:free, nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free, google/gemma-4-26b-a4b-it:free, google/gemma-4-31b-it:free, google/lyria-3-pro-preview, google/lyria-3-clip-preview, nvidia/nemotron-3-super-120b-a12b:free, openrouter/free; remaining quota/entitlement is not implied.\nSource: https://openrouter.ai/api/v1/models/user; authority: live_api; observed_at: 1790978115.2387323; scope: account; title: UNKNOWN; published_at: UNKNOWN; source_provider: openrouter; evidence_ref: 94c024abbb1245689bff66db8eadfee0\nnvidia: 01-ai/yi-large, adept/fuyu-8b, ai21labs/jamba-1.5-large-instruct, aisingapore/sea-lion-7b-instruct, bigcode/starcoder2-15b, databricks/dbrx-instruct, deepseek-ai/deepseek-coder-6.7b-instruct, deepseek-ai/deepseek-v4.1-flash, google/codegemma-1.1-7b, google/codegemma-7b, google/deplot, google/diffusiongemma-26b-a4b-it, google/gemma-2b, google/gemma-3-12b-it, google/gemma-3-4b-it, google/gemma-4-31b-it, google/recurrentgemma-2b, ibm/granite-3.0-3b-a800m-instruct, ibm/granite-3.0-8b-instruct, ibm/granite-34b-code-instruct, ibm/granite-8b-code-instruct, meta/codellama-70b, meta/llama-3.2-11b-vision-instruct, meta/llama-3.2-90b-vision-instruct, meta/llama-guard-4-12b, meta/llama2-70b, meta/muse-glimmer-30b, microsoft/kosmos-2, microsoft/phi-3-vision-128k-instruct, microsoft/phi-3.5-moe-instruct, mistralai/codestral-22b-instruct-v0.1, mistralai/mistral-7b-instruct-v0.3, mistralai/mistral-large, mistralai/mistral-large-2-instruct, mistralai/mixtral-8x22b-v0.1, moonshotai/kimi-k2.6, moonshotai/kimi-k3, nv-mistralai/mistral-nemo-12b-instruct, nvidia/ai-synthetic-video-detector, nvidia/cosmos-reason2-8b, nvidia/embed-qa-4, nvidia/ising-calibration-1.5-31b, nvidia/llama-3.1-nemoguard-8b-content-safety, nvidia/llama-3.1-nemoguard-8b-topic-control, nvidia/llama-3.1-nemotron-51b-instruct, nvidia/llama-3.1-nemotron-70b-instruct, nvidia/llama-3.1-nemotron-safety-guard-8b-v3, nvidia/llama-3.1-nemotron-ultra-253b-v1, nvidia/llama-3.2-nemoretriever-1b-vlm-embed-v1, nvidia/llama-3.2-nv-embedqa-1b-v1, nvidia/llama-nemotron-embed-vl-1b-v2, nvidia/llama3-chatqa-1.5-70b, nvidia/mistral-nemo-minitron-8b-8k-instruct, nvidia/nemotron-3-embed-1b, nvidia/nemotron-3-nano-omni-30b-a3b-reasoning, nvidia/nemotron-3-super-120b-a12b, nvidia/nemotron-3-ultra-550b-a55b, nvidia/nemotron-3.5-content-safety, nvidia/nemotron-3.5-lightning-30b-a3b, nvidia/nemotron-4-340b-instruct, nvidia/nemotron-4-340b-reward, nvidia/nemotron-nano-3-30b-a3b, nvidia/nemotron-parse, nvidia/nemotron-parse-2.0, nvidia/neva-22b, nvidia/nv-embedqa-mistral-7b-v2, nvidia/nvclip, nvidia/riva-translate-4b-instruct, nvidia/riva-translate-4b-instruct-v1.1, nvidia/riva-translate-4b-instruct-v2, nvidia/vila, openai/gpt-oss-20b, poolside/laguna-xs-2.1, snowflake/arctic-embed-l, writer/palmyra-creative-122b, writer/palmyra-fin-70b-32k, writer/palmyra-med-70b, writer/palmyra-med-70b-32k, z-ai/glm-5.3, z-ai/glm-5.3-flash, zyphra/zamba2-7b-instruct. Listed via nvidia-1; account generation/funding is not implied. \nSource: https://integrate.api.nvidia.com/v1/models; authority: live_api; observed_at: 1790978115.4289093; scope: account; title: UNKNOWN; published_at: UNKNOWN; source_provider: nvidia; evidence_ref: cf44943b8264480d953bb7b679a39fc4\ngoogle: gemini-2.5-flash, gemini-2.5-pro, gemini-2.5-flash-preview-tts, gemini-2.5-pro-preview-tts, gemma-4-26b-a4b-it, gemma-4-31b-it, gemini-flash-latest, gemini-flash-lite-latest, gemini-pro-latest, gemini-2.5-flash-lite, gemini-2.5-flash-image, gemini-3-flash-preview, gemini-3.1-pro-preview, gemini-3.1-pro-preview-customtools, gemini-3.1-flash-lite, gemini-3-pro-image, nano-banana-pro-preview, gemini-3.1-flash-image, gemini-3.1-flash-lite-image, gemini-3.5-flash, gemini-3.5-flash-lite, gemini-omni-flash-preview, gemini-omni-1.1-flash, gemini-3.5-transcribe, gemini-3.6-flash, gemini-3.7-flash, gemini-3.8-flash, lyria-3-clip-preview, lyria-3-pro-preview, lyria-3.5, gemini-3.1-flash-tts-preview, gemini-3.8-flash-tts, gemini-3.8-flash-lite-tts, gemini-robotics-er-2-preview, antigravity-preview-05-2026, antigravity-preview-09-2026, antigravity-preview-latest, deep-research-max-preview-04-2026, deep-research-preview-04-2026, deep-research-pro-preview-12-2025, gemini-embedding-001, gemini-embedding-2-preview, gemini-embedding-2, aqa, veo-3.1-generate-preview, veo-3.1-fast-generate-preview, veo-3.1-lite-generate-preview, gemini-3.5-transcribe-live, gemini-2.5-flash-native-audio-latest, gemini-2.5-flash-native-audio-preview-09-2025, gemini-2.5-flash-native-audio-preview-12-2025, gemini-3.1-flash-live-preview, gemini-3.8-live, gemini-3.8-live-extended-thinking, gemini-robotics-er-2-streaming-preview, gemini-3.5-live-translate-preview, lyria-realtime-exp. Listed via google-1; account generation/funding is not implied. \nSource: https://generativelanguage.googleapis.com/v1beta/models; authority: live_api; observed_at: 1790978115.8620715; scope: account; title: UNKNOWN; published_at: UNKNOWN; source_provider: google; evidence_ref: 87562364bab14e54be1616b43d69c336\nConflicting evidence: gemini-3-pro-preview: absent in complete live inventory; cached availability rejected; gemini-2.0-flash: absent in complete live inventory; cached availability rejected; gemini-2.0-flash-lite: absent in complete live inventory; cached availability rejected; gemini-3.1-flash-lite-preview: official retirement overrides inventory listing; excluded from routing; gemini-3-pro-image-preview: official retirement overrides inventory listing; excluded from routing; gemini-3.1-flash-image-preview: official retirement overrides inventory listing; excluded from routing; gemini-2.5-computer-use-preview-10-2025: official retirement overrides inventory listing; excluded from routing\nzai: glm-4.5, glm-4.5-air, glm-4.6, glm-4.7, glm-5, glm-5-turbo, glm-5.1, glm-5.2, glm-5.3, glm-5.3-flash, glm-5.3-flashx. Listed via zai-1; account generation/funding is not implied. \nSource: https://api.z.ai/api/paas/v4/models; authority: live_api; observed_at: 1790978116.3875384; scope: account; title: UNKNOWN; published_at: UNKNOWN; source_provider: zai; evidence_ref: 5d8826b992b8499c8e679bab366a7634\nollama-cloud: nemotron-3-ultra, kimi-k2.6, gemma4:31b, kimi-k3, nemotron-3-nano:30b, glm-5.2, glm-5.3, nemotron-3-super, glm-5.3-flash, deepseek-v4-pro:0813, gpt-oss:20b, minimax-m2.7, minimax-m3, kimi-k2.7-code, deepseek-v4.1-flash, gpt-oss:120b, mistral-large-3:675b. Listed via ollama-cloud-1; account generation/funding is not implied. \nSource: https://ollama.com/api/tags; authority: live_api; observed_at: 1790978116.693488; scope: account; title: UNKNOWN; published_at: UNKNOWN; source_provider: ollama-cloud; evidence_ref: c3d2c6a68a0b4db19610a507bb1dbaf9\nProvider-wide documentation/source evidence:\ngoogle: officially retired IDs remain listed: gemini-3.1-flash-lite-preview, gemini-3-pro-image-preview, gemini-3.1-flash-image-preview, gemini-2.5-computer-use-preview-10-2025; excluded from routing. Retirement is distinct from catalog visibility.\nSource: https://ai.google.dev/gemini-api/docs/deprecations; authority: official_deprecation; observed_at: 1790943196.6073742; scope: provider; title: UNKNOWN; published_at: UNKNOWN; source_provider: UNKNOWN; evidence_ref: fa4a032df08b49529117c0626b8e0b42\nOfficial page excerpt (REPORTED, not account entitlement): Operational Excellence: Configure rate limits, monitor performance, and debug issues at the project level. This enables optimized resource allocation and simplified troubleshooting workflows.\nRate Limits: Customizable quotas for each available model\nOwner: Full access to creating, updating, and deleting projects, modifying limits for models within projects, managing API keys, viewing usage and spending data across all projects, and managing project access.\n3. Configure Settings : Once you create a project, you will be able to see it in the dropdown and under Manage Projects . Click Manage Projects and click View to customize project rate limits.\nNote: Start with conservative limits for new projects, increase limits based on actual usage patterns and needs, and monitor usage regularly to adjust as needed.\nRate limits control the maximum number of requests your project can make to models within a specific time window. Rate limits are applied per project, meaning each project has its own separate quota that doesn't interfere with other projects in your organization. Each project can be configured to have custom rate limits for every available model, which allows you to:\nAllocate higher limits to production projects\nSet conservative limits for experimental or development projects\nCustomize limits based on specific use case requirements\nCustom project rate limits can only be set to values equal to or lower than your organization's limits. Setting a custom rate limit for a project \nSource: https://console.groq.com/docs/projects; authority: official_docs; observed_at: 1790978119.0849848; scope: provider; title: Projects - GroqDocs; published_at: UNKNOWN; source_provider: tavily; evidence_ref: d808ba82a42749d09dcfa811917eca9a\nOfficial page excerpt (REPORTED, not account entitlement): Markdown twin of https://openrouter.ai/pricing, built from the same plan data the page renders. Inference is billed at each provider's list price on every plan; the plan table below states the platform fee, limits, and features that differ between plans. Per-model token prices are not repeated here: read them from the models API in the next section.\n| Feature | Free | Standard (Pay-as-you-go) | [Business (Pay-as-you-go)](https://openrouter.ai/business) | [Enterprise](https://openrouter.ai/enterprise) |\n| Platform fees | N/A | 5.5% | 8% | [Fee discounts available](https://openrouter.ai/enterprise/form?ref=pricing-table-platform-fees) |\n| Models [Explore all models \u2192](https://openrouter.ai/models) | 25+ free models | 500+ models | 500+ models | 500+ models |\n| Providers [Explore all models \u2192](https://openrouter.ai/models) | 4 free providers | 80+ providers | 80+ providers | 80+ providers |\n| Auto-routing, preferred vendor selections [Learn more \u2192](https://openrouter.ai/docs/features/model-routing) | No | Yes | Yes | Yes |\n| Data Policy-Based Routing [Model & provider policies](https://openrouter.ai/docs/guides/privacy/provider-logging) | No | Yes | Yes | Yes |\n| Workspace limit [Learn more \u2192](https://openrouter.ai/docs/guides/features/workspaces) | 5 | 5 | 1,000 | Custom |\n| BYOK Limits [Learn more \u2192](https://openrouter.ai/docs/use-cases/byok) | No | $25,000 of list price inference / month with no fees, 5% fee after | $25,000 of list price inference / month with no fees, 5% fee\nSource: https://openrouter.ai/pricing; authority: official_docs; observed_at: 1790978122.4109612; scope: provider; title: Pricing | OpenRouter; published_at: UNKNOWN; source_provider: tavily; evidence_ref: 57edfc11ecd346b9b03fc8802ad815c2\nOfficial page excerpt (REPORTED, not account entitlement): Gemini Developer API pricing | Gemini API | Google AI for Developers Skip to main content\nStart building free of charge with generous limits, then scale up with prepaid then pay-as-you-go pricing for your production ready applications.\nFor developers and small projects getting started with the Gemini API.\ncheck_circle Limited access to certain models\ncheck_circle Higher rate limits for production deployments\ncheck_circle Access to Google's most advanced models\ncheck_circle ML ops, model garden and more\nOur most intelligent Flash model, engineered for long-horizon software engineering, autonomous agents, and complex enterprise workflows.\nFree Tier Paid Tier, per 1M tokens in USD\nInput price Free of charge $0.75 through December 31, 2026.\nOutput price (including thinking tokens) Free of charge $3.75 through December 31, 2026.\nContext caching price Free of charge $0.075 through December 31, 2026.\n$0.50 / 1,000,000 tokens per hour (storage price) through December 31, 2026.\n$1.00 / 1,000,000 tokens per hour (storage price) starting January 1, 2027.\nGrounding with Google Search * Not available 5,000 free search requests per month (shared across all Gemini 3.x models), then $14 per 1,000 requests.\nGrounding with Google Maps Not available 5,000 prompts per month (free, shared across Gemini 3), then $14 / 1,000 search queries\nFree Tier Paid Tier, per 1M tokens in USD\nInput price Not available $0.375 through December 31, 2026.\nOutput price (including thinking tokens) Not available $1.8\nSource: https://ai.google.dev/gemini-api/docs/pricing; authority: official_docs; observed_at: 1790978129.5012224; scope: provider; title: Gemini Developer API pricing \u00a0|\u00a0 Gemini API \u00a0|\u00a0 Google AI for Developers; published_at: UNKNOWN; source_provider: tavily; evidence_ref: 9ad762a0ff9f49359efa990a205a5671\nOfficial page excerpt (REPORTED, not account entitlement): Usage Policy - Overview - Z.AI DEVELOPER DOCUMENT\nThe GLM Coding Plan is a subscription package designed specifically for AI-powered coding.\nRate (concurrency) limits are tied to your plan tier. The platform dynamically adjusts these limits based on resource availability, with the general principle being Max > Pro > Lite . For each project, you can use methods like Subagent to make concurrent model calls. Our recommended number of concurrent projects is as follows:\nPlan users will enjoy higher concurrency limits during off-peak hours (dynamically increased), enabling support for a greater number of concurrent projects.\nSubscription benefits are exclusive to the subscriber : Account sharing or multi-user access is prohibited. Violations may result in restrictions on subscription benefits and, in serious cases, may affect normal account usage.\nViolation handling : Violations of the Usage Rules may trigger risk control measures, including rate limiting, account freezing, or other restrictions. Accounts with more than three violations may be banned. If your account is flagged by the risk control system, you can view the risk notice on the Plan Overview page in the console and submit an appeal.\nYou can manage your subscription, view billing details, and cancel the subscription as follows:\nYour subscription will automatically renew at the end of each billing cycle , and the fee will be charged to your linked payment method.\nIf you need to cancel your subscription, you can do so on \nSource: https://docs.z.ai/devpack/usage-policy; authority: official_docs; observed_at: 1790978141.0173745; scope: provider; title: Usage Policy - Overview - Z.AI DEVELOPER DOCUMENT; published_at: UNKNOWN; source_provider: tavily; evidence_ref: dfe3c78907144a8a90d65c3ed9e45242\nOfficial page excerpt (REPORTED, not account entitlement): Ollama now supports Jev-style decision models\nOllama now supports decision models, based on TypeSafe's Jev API for fast, typed decisions. Decision models can now be run at no cost with low latency. Based on text, decision models answer yes-or-no questions, choices and scores about it, with a probability for every option.\nOllama's Pro, Max, and Team plans now use industry-standard per-token pricing with usage included on every plan.\nClaude Desktop can now be configured to work with Ollama as a third-party gateway provider, making it possible to use open models in Claude.\nNVIDIA Nemotron 3.5 Lightning is now available on Ollama. It's a 30 billion parameter (3B active) open model built for agents that stay running, gathering context, calling tools, and working through multi-step tasks on your own hardware.\nMeta's Muse Glimmer, the first open model released by Meta Superintelligence Labs, is now available. Muse Glimmer is a 30B multimodal model released under the Apache 2.0 license, designed for local coding agents, and accelerated by Ollama's MLX engine with new native DFlash and image input support.\nServing 8.9 million developers, Ollama has raised $88M from Benchmark, Theory Ventures, 8VC, Y Combinator, and many incredible angel investors.\nOllama's MLX engine has been updated to deliver its highest performance on Apple Silicon yet. Models output higher quality responses, respond faster, and use less memory.\nImproved performance and model support with GGUF\nOllama 0.30 is now av\nSource: https://ollama.com/blog; authority: official_docs; observed_at: 1790978142.7027895; scope: provider; title: Blog \u00b7 Ollama; published_at: UNKNOWN; source_provider: tavily; evidence_ref: 580f8f0f7cb34f20bd3cd2d2de89a7ce\n\ngroq \u2014 evidence-qualified claim states:\nprovider_global_support: REPORTED provider-wide documentation excerpts; not entitlement\naccount_visible_availability: REPORTED live API listing\ngeneration_probed_state: UNKNOWN: not probed by this retrieval objective\naccount_funding: UNKNOWN: free/subscription/paid entitlement not established\naccount_quota: UNKNOWN: remaining quota not established by inventory/search\npublic_access_constraints: REPORTED\nConstraint resolution: Relevant directly read official constraint excerpt; remaining account quota/funding UNKNOWN.\n\nopenrouter \u2014 evidence-qualified claim states:\nprovider_global_support: REPORTED provider-wide documentation excerpts; not entitlement\naccount_visible_availability: REPORTED live API listing\ngeneration_probed_state: UNKNOWN: not probed by this retrieval objective\naccount_funding: UNKNOWN: free/subscription/paid entitlement not established\naccount_quota: UNKNOWN: remaining quota not established by inventory/search\npublic_access_constraints: REPORTED\nConstraint resolution: Relevant directly read official constraint excerpt; remaining account quota/funding UNKNOWN.\n\ngoogle \u2014 evidence-qualified claim states:\nprovider_global_support: REPORTED provider-wide documentation excerpts; not entitlement\naccount_visible_availability: REPORTED live API listing\ngeneration_probed_state: UNKNOWN: not probed by this retrieval objective\naccount_funding: UNKNOWN: free/subscription/paid entitlement not established\naccount_quota: UNKNOWN: remaining quota not established by inventory/search\npublic_access_constraints: REPORTED\nConstraint resolution: Relevant directly read official constraint excerpt; remaining account quota/funding UNKNOWN.\n\nnvidia \u2014 evidence-qualified claim states:\nprovider_global_support: UNKNOWN: no relevant current provider-wide support documentation\naccount_visible_availability: REPORTED live API listing\ngeneration_probed_state: UNKNOWN: not probed by this retrieval objective\naccount_funding: UNKNOWN: free/subscription/paid entitlement not established\naccount_quota: UNKNOWN: remaining quota not established by inventory/search\npublic_access_constraints: UNKNOWN\nConstraint resolution: No relevant directly readable official constraint page after bounded official-source attempts; public constraints UNKNOWN / potentially stale.\n\nzai \u2014 evidence-qualified claim states:\nprovider_global_support: REPORTED provider-wide documentation excerpts; not entitlement\naccount_visible_availability: REPORTED live API listing\ngeneration_probed_state: UNKNOWN: not probed by this retrieval objective\naccount_funding: UNKNOWN: free/subscription/paid entitlement not established\naccount_quota: UNKNOWN: remaining quota not established by inventory/search\npublic_access_constraints: REPORTED\nConstraint resolution: Relevant directly read official constraint excerpt; remaining account quota/funding UNKNOWN.\n\nollama-cloud \u2014 evidence-qualified claim states:\nprovider_global_support: REPORTED provider-wide documentation excerpts; not entitlement\naccount_visible_availability: REPORTED live API listing\ngeneration_probed_state: UNKNOWN: not probed by this retrieval objective\naccount_funding: UNKNOWN: free/subscription/paid entitlement not established\naccount_quota: UNKNOWN: remaining quota not established by inventory/search\npublic_access_constraints: REPORTED\nConstraint resolution: Relevant directly read official constraint excerpt; remaining account quota/funding UNKNOWN.\n\nLimitations: This native source establishes inventory observations only; public access constraints require current official documentation/search.; Public plan policies are not account entitlement; missing account funding/quota remains UNKNOWN.",
+      "error": null,
+      "status": "REPORTED",
+      "artifact": null
+    }
+  ],
+  "task_state": "partially_verified",
+  "tavily_slots": [
+    {
+      "slot": "tavily-1",
+      "present": true,
+      "status": "OBSERVED",
+      "sources": [
+        {
+          "identity": "https://console.groq.com/docs/models",
+          "authority": "official_docs",
+          "scope": "provider",
+          "observed_at": 1790978113.474148,
+          "ttl_seconds": 300,
+          "refreshable": true,
+          "published_at": null,
+          "title": "Supported Models - GroqDocs",
+          "source_provider": "tavily",
+          "provider_id": "groq",
+          "evidence_id": "d6a75c4d7f294a37aaf2e2978e31fe04"
+        }
+      ]
+    },
+    {
+      "slot": "tavily-2",
+      "present": true,
+      "status": "OBSERVED",
+      "sources": [
+        {
+          "identity": "https://console.groq.com/docs/models",
+          "authority": "official_docs",
+          "scope": "provider",
+          "observed_at": 1790978114.1231625,
+          "ttl_seconds": 300,
+          "refreshable": true,
+          "published_at": null,
+          "title": "Supported Models - GroqDocs",
+          "source_provider": "tavily",
+          "provider_id": "groq",
+          "evidence_id": "fcbba386f5f44c8c81668b0a25c1090f"
+        }
+      ]
+    },
+    {
+      "slot": "tavily-3",
+      "present": true,
+      "status": "OBSERVED",
+      "sources": [
+        {
+          "identity": "https://console.groq.com/docs/models",
+          "authority": "official_docs",
+          "scope": "provider",
+          "observed_at": 1790978114.7010772,
+          "ttl_seconds": 300,
+          "refreshable": true,
+          "published_at": null,
+          "title": "Supported Models - GroqDocs",
+          "source_provider": "tavily",
+          "provider_id": "groq",
+          "evidence_id": "a64b94409db14ea69779ff8a7c2d3f54"
+        }
+      ]
+    }
+  ],
+  "search_observations": [
+    {
+      "id": "898f3125a483452da9fd3b6fe2de69f9",
+      "domains": [
+        "console.groq.com"
+      ],
+      "slot": "tavily-1",
+      "quota_pool": "tavily/search-account-unknown",
+      "endpoint": "https://api.tavily.com/search",
+      "observed_at": 1790978112.8405068,
+      "search_depth": "basic",
+      "max_results": 1,
+      "credits": 1,
+      "status": "REPORTED",
+      "http_status": 200,
+      "rate_limits": {
+        "request_limit": null,
+        "token_limit": null,
+        "remaining_requests": null,
+        "remaining_tokens": null,
+        "requests_reset_at": null,
+        "tokens_reset_at": null,
+        "retry_after": null,
+        "request_window": "UNKNOWN",
+        "token_window": "UNKNOWN",
+        "source": "response headers",
+        "request_reset_hint": null
+      },
+      "source_metadata": [
+        {
+          "evidence_id": "d6a75c4d7f294a37aaf2e2978e31fe04",
+          "identity": "https://console.groq.com/docs/models",
+          "title_returned": true,
+          "title": "Supported Models - GroqDocs",
+          "published_at": null,
+          "retrieval_method": "official_page",
+          "access_topics": [
+            "api_limits",
+            "developer_access"
+          ]
+        }
+      ],
+      "retained_sources": 1,
+      "omitted_sources": 0,
+      "official_pages": 1,
+      "page_failures": 0
+    },
+    {
+      "id": "a8652d2ab808419fa087ac867af3355a",
+      "domains": [
+        "console.groq.com"
+      ],
+      "slot": "tavily-2",
+      "quota_pool": "tavily/search-account-unknown",
+      "endpoint": "https://api.tavily.com/search",
+      "observed_at": 1790978113.4753008,
+      "search_depth": "basic",
+      "max_results": 1,
+      "credits": 1,
+      "status": "REPORTED",
+      "http_status": 200,
+      "rate_limits": {
+        "request_limit": null,
+        "token_limit": null,
+        "remaining_requests": null,
+        "remaining_tokens": null,
+        "requests_reset_at": null,
+        "tokens_reset_at": null,
+        "retry_after": null,
+        "request_window": "UNKNOWN",
+        "token_window": "UNKNOWN",
+        "source": "response headers",
+        "request_reset_hint": null
+      },
+      "source_metadata": [
+        {
+          "evidence_id": "fcbba386f5f44c8c81668b0a25c1090f",
+          "identity": "https://console.groq.com/docs/models",
+          "title_returned": true,
+          "title": "Supported Models - GroqDocs",
+          "published_at": null,
+          "retrieval_method": "official_page",
+          "access_topics": [
+            "api_limits",
+            "developer_access"
+          ]
+        }
+      ],
+      "retained_sources": 1,
+      "omitted_sources": 0,
+      "official_pages": 1,
+      "page_failures": 0
+    },
+    {
+      "id": "d0fb3e35d04247ee93de8c5d5eea43ca",
+      "domains": [
+        "console.groq.com"
+      ],
+      "slot": "tavily-3",
+      "quota_pool": "tavily/search-account-unknown",
+      "endpoint": "https://api.tavily.com/search",
+      "observed_at": 1790978114.1244001,
+      "search_depth": "basic",
+      "max_results": 1,
+      "credits": 1,
+      "status": "REPORTED",
+      "http_status": 200,
+      "rate_limits": {
+        "request_limit": null,
+        "token_limit": null,
+        "remaining_requests": null,
+        "remaining_tokens": null,
+        "requests_reset_at": null,
+        "tokens_reset_at": null,
+        "retry_after": null,
+        "request_window": "UNKNOWN",
+        "token_window": "UNKNOWN",
+        "source": "response headers",
+        "request_reset_hint": null
+      },
+      "source_metadata": [
+        {
+          "evidence_id": "a64b94409db14ea69779ff8a7c2d3f54",
+          "identity": "https://console.groq.com/docs/models",
+          "title_returned": true,
+          "title": "Supported Models - GroqDocs",
+          "published_at": null,
+          "retrieval_method": "official_page",
+          "access_topics": [
+            "api_limits",
+            "developer_access"
+          ]
+        }
+      ],
+      "retained_sources": 1,
+      "omitted_sources": 0,
+      "official_pages": 1,
+      "page_failures": 0
+    },
+    {
+      "id": "91596323f4d54dae8b695b0e5f0aa6ee",
+      "domains": [
+        "console.groq.com"
+      ],
+      "slot": "tavily-1",
+      "quota_pool": "tavily/search-account-unknown",
+      "endpoint": "https://api.tavily.com/search",
+      "observed_at": 1790978116.6954327,
+      "search_depth": "basic",
+      "max_results": 2,
+      "credits": 1,
+      "status": "REPORTED",
+      "http_status": 200,
+      "rate_limits": {
+        "request_limit": null,
+        "token_limit": null,
+        "remaining_requests": null,
+        "remaining_tokens": null,
+        "requests_reset_at": null,
+        "tokens_reset_at": null,
+        "retry_after": null,
+        "request_window": "UNKNOWN",
+        "token_window": "UNKNOWN",
+        "source": "response headers",
+        "request_reset_hint": null
+      },
+      "source_metadata": [
+        {
+          "evidence_id": "d808ba82a42749d09dcfa811917eca9a",
+          "identity": "https://console.groq.com/docs/projects",
+          "title_returned": true,
+          "title": "Projects - GroqDocs",
+          "published_at": null,
+          "retrieval_method": "official_page",
+          "access_topics": [
+            "api_limits"
+          ]
+        },
+        {
+          "evidence_id": "716a31cc03f1435c940905bf934a9236",
+          "identity": "https://console.groq.com/docs/billing-faqs",
+          "title_returned": true,
+          "title": "Billing FAQs - GroqDocs",
+          "published_at": null,
+          "retrieval_method": "official_page",
+          "access_topics": [
+            "api_limits",
+            "developer_access",
+            "free_credit_policy",
+            "pricing_subscription"
+          ]
+        }
+      ],
+      "retained_sources": 2,
+      "omitted_sources": 0,
+      "official_pages": 2,
+      "page_failures": 0,
+      "provider_id": "groq",
+      "query_stage": 0,
+      "purpose": "official_access_constraints",
+      "task_id": "f599b48d89cc4a75bde5f1c70640a366",
+      "correlation_id": "bed5d12283084b158ccf6da52364015d"
+    },
+    {
+      "id": "27e2e767b8e54cb4a52229cff61c20da",
+      "domains": [
+        "openrouter.ai"
+      ],
+      "slot": "tavily-2",
+      "quota_pool": "tavily/search-account-unknown",
+      "endpoint": "https://api.tavily.com/search",
+      "observed_at": 1790978119.2619624,
+      "search_depth": "basic",
+      "max_results": 2,
+      "credits": 1,
+      "status": "REPORTED",
+      "http_status": 200,
+      "rate_limits": {
+        "request_limit": null,
+        "token_limit": null,
+        "remaining_requests": null,
+        "remaining_tokens": null,
+        "requests_reset_at": null,
+        "tokens_reset_at": null,
+        "retry_after": null,
+        "request_window": "UNKNOWN",
+        "token_window": "UNKNOWN",
+        "source": "response headers",
+        "request_reset_hint": null
+      },
+      "source_metadata": [
+        {
+          "evidence_id": "ae5c99d49e854f64afcd487ef5da71c8",
+          "identity": "https://openrouter.ai/blog/insights/every-modality-one-api",
+          "title_returned": true,
+          "title": "One API for Image, Video, Audio, Embeddings & Transcription \u2014 OpenRouter Blog",
+          "published_at": null,
+          "retrieval_method": "search_excerpt",
+          "access_topics": []
+        },
+        {
+          "evidence_id": "57edfc11ecd346b9b03fc8802ad815c2",
+          "identity": "https://openrouter.ai/pricing",
+          "title_returned": true,
+          "title": "Pricing | OpenRouter",
+          "published_at": null,
+          "retrieval_method": "official_page",
+          "access_topics": [
+            "api_limits",
+            "free_credit_policy",
+            "pricing_subscription"
+          ]
+        }
+      ],
+      "retained_sources": 2,
+      "omitted_sources": 0,
+      "official_pages": 1,
+      "page_failures": 1,
+      "provider_id": "openrouter",
+      "query_stage": 0,
+      "purpose": "official_access_constraints",
+      "task_id": "f599b48d89cc4a75bde5f1c70640a366",
+      "correlation_id": "bed5d12283084b158ccf6da52364015d"
+    },
+    {
+      "id": "67824e4bd32f4b79a3f18784451c6050",
+      "domains": [
+        "ai.google.dev"
+      ],
+      "slot": "tavily-3",
+      "quota_pool": "tavily/search-account-unknown",
+      "endpoint": "https://api.tavily.com/search",
+      "observed_at": 1790978122.4136002,
+      "search_depth": "basic",
+      "max_results": 2,
+      "credits": 1,
+      "status": "REPORTED",
+      "http_status": 200,
+      "rate_limits": {
+        "request_limit": null,
+        "token_limit": null,
+        "remaining_requests": null,
+        "remaining_tokens": null,
+        "requests_reset_at": null,
+        "tokens_reset_at": null,
+        "retry_after": null,
+        "request_window": "UNKNOWN",
+        "token_window": "UNKNOWN",
+        "source": "response headers",
+        "request_reset_hint": null
+      },
+      "retained_sources": 0,
+      "omitted_sources": 2,
+      "official_pages": 0,
+      "page_failures": 0,
+      "provider_id": "google",
+      "query_stage": 0,
+      "purpose": "official_access_constraints",
+      "task_id": "f599b48d89cc4a75bde5f1c70640a366",
+      "correlation_id": "bed5d12283084b158ccf6da52364015d"
+    },
+    {
+      "id": "29e47a7f66b249eeb8d3eea3376416d9",
+      "domains": [
+        "ai.google.dev"
+      ],
+      "slot": "tavily-1",
+      "quota_pool": "tavily/search-account-unknown",
+      "endpoint": "https://api.tavily.com/search",
+      "observed_at": 1790978126.0464416,
+      "search_depth": "basic",
+      "max_results": 2,
+      "credits": 1,
+      "status": "REPORTED",
+      "http_status": 200,
+      "rate_limits": {
+        "request_limit": null,
+        "token_limit": null,
+        "remaining_requests": null,
+        "remaining_tokens": null,
+        "requests_reset_at": null,
+        "tokens_reset_at": null,
+        "retry_after": null,
+        "request_window": "UNKNOWN",
+        "token_window": "UNKNOWN",
+        "source": "response headers",
+        "request_reset_hint": null
+      },
+      "source_metadata": [
+        {
+          "evidence_id": "9ad762a0ff9f49359efa990a205a5671",
+          "identity": "https://ai.google.dev/gemini-api/docs/pricing",
+          "title_returned": true,
+          "title": "Gemini Developer API pricing \u00a0|\u00a0 Gemini API \u00a0|\u00a0 Google AI for Developers",
+          "published_at": null,
+          "retrieval_method": "official_page",
+          "access_topics": [
+            "api_limits",
+            "free_credit_policy",
+            "pricing_subscription"
+          ]
+        },
+        {
+          "evidence_id": "377f0eee71424093bd68b0cf63022dea",
+          "identity": "https://ai.google.dev/gemini-api/docs/billing",
+          "title_returned": true,
+          "title": "Billing \u00a0|\u00a0 Gemini API \u00a0|\u00a0 Google AI for Developers",
+          "published_at": null,
+          "retrieval_method": "official_page",
+          "access_topics": [
+            "api_limits",
+            "free_credit_policy",
+            "pricing_subscription"
+          ]
+        }
+      ],
+      "retained_sources": 2,
+      "omitted_sources": 0,
+      "official_pages": 2,
+      "page_failures": 0,
+      "provider_id": "google",
+      "query_stage": 1,
+      "purpose": "official_access_constraints",
+      "task_id": "f599b48d89cc4a75bde5f1c70640a366",
+      "correlation_id": "bed5d12283084b158ccf6da52364015d"
+    },
+    {
+      "id": "0a6f90bc3e39472b900df93e71826e26",
+      "domains": [
+        "build.nvidia.com",
+        "docs.api.nvidia.com"
+      ],
+      "slot": "tavily-2",
+      "quota_pool": "tavily/search-account-unknown",
+      "endpoint": "https://api.tavily.com/search",
+      "observed_at": 1790978130.1390233,
+      "search_depth": "basic",
+      "max_results": 2,
+      "credits": 1,
+      "status": "REPORTED",
+      "http_status": 200,
+      "rate_limits": {
+        "request_limit": null,
+        "token_limit": null,
+        "remaining_requests": null,
+        "remaining_tokens": null,
+        "requests_reset_at": null,
+        "tokens_reset_at": null,
+        "retry_after": null,
+        "request_window": "UNKNOWN",
+        "token_window": "UNKNOWN",
+        "source": "response headers",
+        "request_reset_hint": null
+      },
+      "source_metadata": [
+        {
+          "evidence_id": "abc43a3e85e342c39dd06fdc65c3172f",
+          "identity": "https://build.nvidia.com/nim/models",
+          "title_returned": true,
+          "title": "NVIDIA NIM | Try NVIDIA NIM APIs",
+          "published_at": null,
+          "retrieval_method": "search_excerpt",
+          "access_topics": []
+        }
+      ],
+      "retained_sources": 1,
+      "omitted_sources": 1,
+      "official_pages": 0,
+      "page_failures": 1,
+      "provider_id": "nvidia",
+      "query_stage": 0,
+      "purpose": "official_access_constraints",
+      "task_id": "f599b48d89cc4a75bde5f1c70640a366",
+      "correlation_id": "bed5d12283084b158ccf6da52364015d"
+    },
+    {
+      "id": "63a2146a447a499b8e2ecdaed8f3fbec",
+      "domains": [
+        "build.nvidia.com",
+        "docs.api.nvidia.com"
+      ],
+      "slot": "tavily-3",
+      "quota_pool": "tavily/search-account-unknown",
+      "endpoint": "https://api.tavily.com/search",
+      "observed_at": 1790978133.8736675,
+      "search_depth": "basic",
+      "max_results": 2,
+      "credits": 1,
+      "status": "REPORTED",
+      "http_status": 200,
+      "rate_limits": {
+        "request_limit": null,
+        "token_limit": null,
+        "remaining_requests": null,
+        "remaining_tokens": null,
+        "requests_reset_at": null,
+        "tokens_reset_at": null,
+        "retry_after": null,
+        "request_window": "UNKNOWN",
+        "token_window": "UNKNOWN",
+        "source": "response headers",
+        "request_reset_hint": null
+      },
+      "source_metadata": [
+        {
+          "evidence_id": "9b36616b2ed44825b25d627ef1871c0a",
+          "identity": "https://docs.api.nvidia.com/nim/docs/run-anywhere",
+          "title_returned": true,
+          "title": "Run NIM Anywhere",
+          "published_at": null,
+          "retrieval_method": "search_excerpt",
+          "access_topics": []
+        },
+        {
+          "evidence_id": "eff6fdd6fd194b35907a9df436c5dd11",
+          "identity": "https://docs.api.nvidia.com/nim/docs/product",
+          "title_returned": true,
+          "title": "General FAQ",
+          "published_at": null,
+          "retrieval_method": "search_excerpt",
+          "access_topics": []
+        }
+      ],
+      "retained_sources": 2,
+      "omitted_sources": 0,
+      "official_pages": 0,
+      "page_failures": 2,
+      "provider_id": "nvidia",
+      "query_stage": 1,
+      "purpose": "official_access_constraints",
+      "task_id": "f599b48d89cc4a75bde5f1c70640a366",
+      "correlation_id": "bed5d12283084b158ccf6da52364015d"
+    },
+    {
+      "id": "89ee0d7f2e824a5bbcef5fef94e0c78a",
+      "domains": [
+        "docs.z.ai"
+      ],
+      "slot": "tavily-1",
+      "quota_pool": "tavily/search-account-unknown",
+      "endpoint": "https://api.tavily.com/search",
+      "observed_at": 1790978138.6879578,
+      "search_depth": "basic",
+      "max_results": 2,
+      "credits": 1,
+      "status": "REPORTED",
+      "http_status": 200,
+      "rate_limits": {
+        "request_limit": null,
+        "token_limit": null,
+        "remaining_requests": null,
+        "remaining_tokens": null,
+        "requests_reset_at": null,
+        "tokens_reset_at": null,
+        "retry_after": null,
+        "request_window": "UNKNOWN",
+        "token_window": "UNKNOWN",
+        "source": "response headers",
+        "request_reset_hint": null
+      },
+      "source_metadata": [
+        {
+          "evidence_id": "91b6e5d89b2f4c42b41588d66db7e5de",
+          "identity": "https://docs.z.ai/guides/overview/pricing",
+          "title_returned": true,
+          "title": "Pricing - Overview - Z.AI DEVELOPER DOCUMENT",
+          "published_at": null,
+          "retrieval_method": "official_page",
+          "access_topics": []
+        },
+        {
+          "evidence_id": "dfe3c78907144a8a90d65c3ed9e45242",
+          "identity": "https://docs.z.ai/devpack/usage-policy",
+          "title_returned": true,
+          "title": "Usage Policy - Overview - Z.AI DEVELOPER DOCUMENT",
+          "published_at": null,
+          "retrieval_method": "official_page",
+          "access_topics": [
+            "developer_access",
+            "pricing_subscription"
+          ]
+        }
+      ],
+      "retained_sources": 2,
+      "omitted_sources": 0,
+      "official_pages": 2,
+      "page_failures": 0,
+      "provider_id": "zai",
+      "query_stage": 0,
+      "purpose": "official_access_constraints",
+      "task_id": "f599b48d89cc4a75bde5f1c70640a366",
+      "correlation_id": "bed5d12283084b158ccf6da52364015d"
+    },
+    {
+      "id": "8b9f1288ef454079a477f1dfc0523453",
+      "domains": [
+        "docs.ollama.com",
+        "ollama.com"
+      ],
+      "slot": "tavily-2",
+      "quota_pool": "tavily/search-account-unknown",
+      "endpoint": "https://api.tavily.com/search",
+      "observed_at": 1790978141.0220137,
+      "search_depth": "basic",
+      "max_results": 2,
+      "credits": 1,
+      "status": "REPORTED",
+      "http_status": 200,
+      "rate_limits": {
+        "request_limit": null,
+        "token_limit": null,
+        "remaining_requests": null,
+        "remaining_tokens": null,
+        "requests_reset_at": null,
+        "tokens_reset_at": null,
+        "retry_after": null,
+        "request_window": "UNKNOWN",
+        "token_window": "UNKNOWN",
+        "source": "response headers",
+        "request_reset_hint": null
+      },
+      "source_metadata": [
+        {
+          "evidence_id": "580f8f0f7cb34f20bd3cd2d2de89a7ce",
+          "identity": "https://ollama.com/blog",
+          "title_returned": true,
+          "title": "Blog \u00b7 Ollama",
+          "published_at": null,
+          "retrieval_method": "official_page",
+          "access_topics": [
+            "api_limits",
+            "pricing_subscription"
+          ]
+        },
+        {
+          "evidence_id": "9df32715715e434e8edaac8075a4f2eb",
+          "identity": "https://ollama.com",
+          "title_returned": true,
+          "title": "Ollama",
+          "published_at": null,
+          "retrieval_method": "official_page",
+          "access_topics": [
+            "api_limits",
+            "free_credit_policy",
+            "pricing_subscription"
+          ]
+        }
+      ],
+      "retained_sources": 2,
+      "omitted_sources": 0,
+      "official_pages": 2,
+      "page_failures": 0,
+      "provider_id": "ollama-cloud",
+      "query_stage": 0,
+      "purpose": "official_access_constraints",
+      "task_id": "f599b48d89cc4a75bde5f1c70640a366",
+      "correlation_id": "bed5d12283084b158ccf6da52364015d"
+    }
+  ],
+  "slot_preflight_observations": [
+    {
+      "id": "898f3125a483452da9fd3b6fe2de69f9",
+      "domains": [
+        "console.groq.com"
+      ],
+      "slot": "tavily-1",
+      "quota_pool": "tavily/search-account-unknown",
+      "endpoint": "https://api.tavily.com/search",
+      "observed_at": 1790978112.8405068,
+      "search_depth": "basic",
+      "max_results": 1,
+      "credits": 1,
+      "status": "REPORTED",
+      "http_status": 200,
+      "rate_limits": {
+        "request_limit": null,
+        "token_limit": null,
+        "remaining_requests": null,
+        "remaining_tokens": null,
+        "requests_reset_at": null,
+        "tokens_reset_at": null,
+        "retry_after": null,
+        "request_window": "UNKNOWN",
+        "token_window": "UNKNOWN",
+        "source": "response headers",
+        "request_reset_hint": null
+      },
+      "source_metadata": [
+        {
+          "evidence_id": "d6a75c4d7f294a37aaf2e2978e31fe04",
+          "identity": "https://console.groq.com/docs/models",
+          "title_returned": true,
+          "title": "Supported Models - GroqDocs",
+          "published_at": null,
+          "retrieval_method": "official_page",
+          "access_topics": [
+            "api_limits",
+            "developer_access"
+          ]
+        }
+      ],
+      "retained_sources": 1,
+      "omitted_sources": 0,
+      "official_pages": 1,
+      "page_failures": 0
+    },
+    {
+      "id": "a8652d2ab808419fa087ac867af3355a",
+      "domains": [
+        "console.groq.com"
+      ],
+      "slot": "tavily-2",
+      "quota_pool": "tavily/search-account-unknown",
+      "endpoint": "https://api.tavily.com/search",
+      "observed_at": 1790978113.4753008,
+      "search_depth": "basic",
+      "max_results": 1,
+      "credits": 1,
+      "status": "REPORTED",
+      "http_status": 200,
+      "rate_limits": {
+        "request_limit": null,
+        "token_limit": null,
+        "remaining_requests": null,
+        "remaining_tokens": null,
+        "requests_reset_at": null,
+        "tokens_reset_at": null,
+        "retry_after": null,
+        "request_window": "UNKNOWN",
+        "token_window": "UNKNOWN",
+        "source": "response headers",
+        "request_reset_hint": null
+      },
+      "source_metadata": [
+        {
+          "evidence_id": "fcbba386f5f44c8c81668b0a25c1090f",
+          "identity": "https://console.groq.com/docs/models",
+          "title_returned": true,
+          "title": "Supported Models - GroqDocs",
+          "published_at": null,
+          "retrieval_method": "official_page",
+          "access_topics": [
+            "api_limits",
+            "developer_access"
+          ]
+        }
+      ],
+      "retained_sources": 1,
+      "omitted_sources": 0,
+      "official_pages": 1,
+      "page_failures": 0
+    },
+    {
+      "id": "d0fb3e35d04247ee93de8c5d5eea43ca",
+      "domains": [
+        "console.groq.com"
+      ],
+      "slot": "tavily-3",
+      "quota_pool": "tavily/search-account-unknown",
+      "endpoint": "https://api.tavily.com/search",
+      "observed_at": 1790978114.1244001,
+      "search_depth": "basic",
+      "max_results": 1,
+      "credits": 1,
+      "status": "REPORTED",
+      "http_status": 200,
+      "rate_limits": {
+        "request_limit": null,
+        "token_limit": null,
+        "remaining_requests": null,
+        "remaining_tokens": null,
+        "requests_reset_at": null,
+        "tokens_reset_at": null,
+        "retry_after": null,
+        "request_window": "UNKNOWN",
+        "token_window": "UNKNOWN",
+        "source": "response headers",
+        "request_reset_hint": null
+      },
+      "source_metadata": [
+        {
+          "evidence_id": "a64b94409db14ea69779ff8a7c2d3f54",
+          "identity": "https://console.groq.com/docs/models",
+          "title_returned": true,
+          "title": "Supported Models - GroqDocs",
+          "published_at": null,
+          "retrieval_method": "official_page",
+          "access_topics": [
+            "api_limits",
+            "developer_access"
+          ]
+        }
+      ],
+      "retained_sources": 1,
+      "omitted_sources": 0,
+      "official_pages": 1,
+      "page_failures": 0
+    }
+  ],
+  "objective_search_observations": [
+    {
+      "id": "91596323f4d54dae8b695b0e5f0aa6ee",
+      "domains": [
+        "console.groq.com"
+      ],
+      "slot": "tavily-1",
+      "quota_pool": "tavily/search-account-unknown",
+      "endpoint": "https://api.tavily.com/search",
+      "observed_at": 1790978116.6954327,
+      "search_depth": "basic",
+      "max_results": 2,
+      "credits": 1,
+      "status": "REPORTED",
+      "http_status": 200,
+      "rate_limits": {
+        "request_limit": null,
+        "token_limit": null,
+        "remaining_requests": null,
+        "remaining_tokens": null,
+        "requests_reset_at": null,
+        "tokens_reset_at": null,
+        "retry_after": null,
+        "request_window": "UNKNOWN",
+        "token_window": "UNKNOWN",
+        "source": "response headers",
+        "request_reset_hint": null
+      },
+      "source_metadata": [
+        {
+          "evidence_id": "d808ba82a42749d09dcfa811917eca9a",
+          "identity": "https://console.groq.com/docs/projects",
+          "title_returned": true,
+          "title": "Projects - GroqDocs",
+          "published_at": null,
+          "retrieval_method": "official_page",
+          "access_topics": [
+            "api_limits"
+          ]
+        },
+        {
+          "evidence_id": "716a31cc03f1435c940905bf934a9236",
+          "identity": "https://console.groq.com/docs/billing-faqs",
+          "title_returned": true,
+          "title": "Billing FAQs - GroqDocs",
+          "published_at": null,
+          "retrieval_method": "official_page",
+          "access_topics": [
+            "api_limits",
+            "developer_access",
+            "free_credit_policy",
+            "pricing_subscription"
+          ]
+        }
+      ],
+      "retained_sources": 2,
+      "omitted_sources": 0,
+      "official_pages": 2,
+      "page_failures": 0,
+      "provider_id": "groq",
+      "query_stage": 0,
+      "purpose": "official_access_constraints",
+      "task_id": "f599b48d89cc4a75bde5f1c70640a366",
+      "correlation_id": "bed5d12283084b158ccf6da52364015d"
+    },
+    {
+      "id": "27e2e767b8e54cb4a52229cff61c20da",
+      "domains": [
+        "openrouter.ai"
+      ],
+      "slot": "tavily-2",
+      "quota_pool": "tavily/search-account-unknown",
+      "endpoint": "https://api.tavily.com/search",
+      "observed_at": 1790978119.2619624,
+      "search_depth": "basic",
+      "max_results": 2,
+      "credits": 1,
+      "status": "REPORTED",
+      "http_status": 200,
+      "rate_limits": {
+        "request_limit": null,
+        "token_limit": null,
+        "remaining_requests": null,
+        "remaining_tokens": null,
+        "requests_reset_at": null,
+        "tokens_reset_at": null,
+        "retry_after": null,
+        "request_window": "UNKNOWN",
+        "token_window": "UNKNOWN",
+        "source": "response headers",
+        "request_reset_hint": null
+      },
+      "source_metadata": [
+        {
+          "evidence_id": "ae5c99d49e854f64afcd487ef5da71c8",
+          "identity": "https://openrouter.ai/blog/insights/every-modality-one-api",
+          "title_returned": true,
+          "title": "One API for Image, Video, Audio, Embeddings & Transcription \u2014 OpenRouter Blog",
+          "published_at": null,
+          "retrieval_method": "search_excerpt",
+          "access_topics": []
+        },
+        {
+          "evidence_id": "57edfc11ecd346b9b03fc8802ad815c2",
+          "identity": "https://openrouter.ai/pricing",
+          "title_returned": true,
+          "title": "Pricing | OpenRouter",
+          "published_at": null,
+          "retrieval_method": "official_page",
+          "access_topics": [
+            "api_limits",
+            "free_credit_policy",
+            "pricing_subscription"
+          ]
+        }
+      ],
+      "retained_sources": 2,
+      "omitted_sources": 0,
+      "official_pages": 1,
+      "page_failures": 1,
+      "provider_id": "openrouter",
+      "query_stage": 0,
+      "purpose": "official_access_constraints",
+      "task_id": "f599b48d89cc4a75bde5f1c70640a366",
+      "correlation_id": "bed5d12283084b158ccf6da52364015d"
+    },
+    {
+      "id": "67824e4bd32f4b79a3f18784451c6050",
+      "domains": [
+        "ai.google.dev"
+      ],
+      "slot": "tavily-3",
+      "quota_pool": "tavily/search-account-unknown",
+      "endpoint": "https://api.tavily.com/search",
+      "observed_at": 1790978122.4136002,
+      "search_depth": "basic",
+      "max_results": 2,
+      "credits": 1,
+      "status": "REPORTED",
+      "http_status": 200,
+      "rate_limits": {
+        "request_limit": null,
+        "token_limit": null,
+        "remaining_requests": null,
+        "remaining_tokens": null,
+        "requests_reset_at": null,
+        "tokens_reset_at": null,
+        "retry_after": null,
+        "request_window": "UNKNOWN",
+        "token_window": "UNKNOWN",
+        "source": "response headers",
+        "request_reset_hint": null
+      },
+      "retained_sources": 0,
+      "omitted_sources": 2,
+      "official_pages": 0,
+      "page_failures": 0,
+      "provider_id": "google",
+      "query_stage": 0,
+      "purpose": "official_access_constraints",
+      "task_id": "f599b48d89cc4a75bde5f1c70640a366",
+      "correlation_id": "bed5d12283084b158ccf6da52364015d"
+    },
+    {
+      "id": "29e47a7f66b249eeb8d3eea3376416d9",
+      "domains": [
+        "ai.google.dev"
+      ],
+      "slot": "tavily-1",
+      "quota_pool": "tavily/search-account-unknown",
+      "endpoint": "https://api.tavily.com/search",
+      "observed_at": 1790978126.0464416,
+      "search_depth": "basic",
+      "max_results": 2,
+      "credits": 1,
+      "status": "REPORTED",
+      "http_status": 200,
+      "rate_limits": {
+        "request_limit": null,
+        "token_limit": null,
+        "remaining_requests": null,
+        "remaining_tokens": null,
+        "requests_reset_at": null,
+        "tokens_reset_at": null,
+        "retry_after": null,
+        "request_window": "UNKNOWN",
+        "token_window": "UNKNOWN",
+        "source": "response headers",
+        "request_reset_hint": null
+      },
+      "source_metadata": [
+        {
+          "evidence_id": "9ad762a0ff9f49359efa990a205a5671",
+          "identity": "https://ai.google.dev/gemini-api/docs/pricing",
+          "title_returned": true,
+          "title": "Gemini Developer API pricing \u00a0|\u00a0 Gemini API \u00a0|\u00a0 Google AI for Developers",
+          "published_at": null,
+          "retrieval_method": "official_page",
+          "access_topics": [
+            "api_limits",
+            "free_credit_policy",
+            "pricing_subscription"
+          ]
+        },
+        {
+          "evidence_id": "377f0eee71424093bd68b0cf63022dea",
+          "identity": "https://ai.google.dev/gemini-api/docs/billing",
+          "title_returned": true,
+          "title": "Billing \u00a0|\u00a0 Gemini API \u00a0|\u00a0 Google AI for Developers",
+          "published_at": null,
+          "retrieval_method": "official_page",
+          "access_topics": [
+            "api_limits",
+            "free_credit_policy",
+            "pricing_subscription"
+          ]
+        }
+      ],
+      "retained_sources": 2,
+      "omitted_sources": 0,
+      "official_pages": 2,
+      "page_failures": 0,
+      "provider_id": "google",
+      "query_stage": 1,
+      "purpose": "official_access_constraints",
+      "task_id": "f599b48d89cc4a75bde5f1c70640a366",
+      "correlation_id": "bed5d12283084b158ccf6da52364015d"
+    },
+    {
+      "id": "0a6f90bc3e39472b900df93e71826e26",
+      "domains": [
+        "build.nvidia.com",
+        "docs.api.nvidia.com"
+      ],
+      "slot": "tavily-2",
+      "quota_pool": "tavily/search-account-unknown",
+      "endpoint": "https://api.tavily.com/search",
+      "observed_at": 1790978130.1390233,
+      "search_depth": "basic",
+      "max_results": 2,
+      "credits": 1,
+      "status": "REPORTED",
+      "http_status": 200,
+      "rate_limits": {
+        "request_limit": null,
+        "token_limit": null,
+        "remaining_requests": null,
+        "remaining_tokens": null,
+        "requests_reset_at": null,
+        "tokens_reset_at": null,
+        "retry_after": null,
+        "request_window": "UNKNOWN",
+        "token_window": "UNKNOWN",
+        "source": "response headers",
+        "request_reset_hint": null
+      },
+      "source_metadata": [
+        {
+          "evidence_id": "abc43a3e85e342c39dd06fdc65c3172f",
+          "identity": "https://build.nvidia.com/nim/models",
+          "title_returned": true,
+          "title": "NVIDIA NIM | Try NVIDIA NIM APIs",
+          "published_at": null,
+          "retrieval_method": "search_excerpt",
+          "access_topics": []
+        }
+      ],
+      "retained_sources": 1,
+      "omitted_sources": 1,
+      "official_pages": 0,
+      "page_failures": 1,
+      "provider_id": "nvidia",
+      "query_stage": 0,
+      "purpose": "official_access_constraints",
+      "task_id": "f599b48d89cc4a75bde5f1c70640a366",
+      "correlation_id": "bed5d12283084b158ccf6da52364015d"
+    },
+    {
+      "id": "63a2146a447a499b8e2ecdaed8f3fbec",
+      "domains": [
+        "build.nvidia.com",
+        "docs.api.nvidia.com"
+      ],
+      "slot": "tavily-3",
+      "quota_pool": "tavily/search-account-unknown",
+      "endpoint": "https://api.tavily.com/search",
+      "observed_at": 1790978133.8736675,
+      "search_depth": "basic",
+      "max_results": 2,
+      "credits": 1,
+      "status": "REPORTED",
+      "http_status": 200,
+      "rate_limits": {
+        "request_limit": null,
+        "token_limit": null,
+        "remaining_requests": null,
+        "remaining_tokens": null,
+        "requests_reset_at": null,
+        "tokens_reset_at": null,
+        "retry_after": null,
+        "request_window": "UNKNOWN",
+        "token_window": "UNKNOWN",
+        "source": "response headers",
+        "request_reset_hint": null
+      },
+      "source_metadata": [
+        {
+          "evidence_id": "9b36616b2ed44825b25d627ef1871c0a",
+          "identity": "https://docs.api.nvidia.com/nim/docs/run-anywhere",
+          "title_returned": true,
+          "title": "Run NIM Anywhere",
+          "published_at": null,
+          "retrieval_method": "search_excerpt",
+          "access_topics": []
+        },
+        {
+          "evidence_id": "eff6fdd6fd194b35907a9df436c5dd11",
+          "identity": "https://docs.api.nvidia.com/nim/docs/product",
+          "title_returned": true,
+          "title": "General FAQ",
+          "published_at": null,
+          "retrieval_method": "search_excerpt",
+          "access_topics": []
+        }
+      ],
+      "retained_sources": 2,
+      "omitted_sources": 0,
+      "official_pages": 0,
+      "page_failures": 2,
+      "provider_id": "nvidia",
+      "query_stage": 1,
+      "purpose": "official_access_constraints",
+      "task_id": "f599b48d89cc4a75bde5f1c70640a366",
+      "correlation_id": "bed5d12283084b158ccf6da52364015d"
+    },
+    {
+      "id": "89ee0d7f2e824a5bbcef5fef94e0c78a",
+      "domains": [
+        "docs.z.ai"
+      ],
+      "slot": "tavily-1",
+      "quota_pool": "tavily/search-account-unknown",
+      "endpoint": "https://api.tavily.com/search",
+      "observed_at": 1790978138.6879578,
+      "search_depth": "basic",
+      "max_results": 2,
+      "credits": 1,
+      "status": "REPORTED",
+      "http_status": 200,
+      "rate_limits": {
+        "request_limit": null,
+        "token_limit": null,
+        "remaining_requests": null,
+        "remaining_tokens": null,
+        "requests_reset_at": null,
+        "tokens_reset_at": null,
+        "retry_after": null,
+        "request_window": "UNKNOWN",
+        "token_window": "UNKNOWN",
+        "source": "response headers",
+        "request_reset_hint": null
+      },
+      "source_metadata": [
+        {
+          "evidence_id": "91b6e5d89b2f4c42b41588d66db7e5de",
+          "identity": "https://docs.z.ai/guides/overview/pricing",
+          "title_returned": true,
+          "title": "Pricing - Overview - Z.AI DEVELOPER DOCUMENT",
+          "published_at": null,
+          "retrieval_method": "official_page",
+          "access_topics": []
+        },
+        {
+          "evidence_id": "dfe3c78907144a8a90d65c3ed9e45242",
+          "identity": "https://docs.z.ai/devpack/usage-policy",
+          "title_returned": true,
+          "title": "Usage Policy - Overview - Z.AI DEVELOPER DOCUMENT",
+          "published_at": null,
+          "retrieval_method": "official_page",
+          "access_topics": [
+            "developer_access",
+            "pricing_subscription"
+          ]
+        }
+      ],
+      "retained_sources": 2,
+      "omitted_sources": 0,
+      "official_pages": 2,
+      "page_failures": 0,
+      "provider_id": "zai",
+      "query_stage": 0,
+      "purpose": "official_access_constraints",
+      "task_id": "f599b48d89cc4a75bde5f1c70640a366",
+      "correlation_id": "bed5d12283084b158ccf6da52364015d"
+    },
+    {
+      "id": "8b9f1288ef454079a477f1dfc0523453",
+      "domains": [
+        "docs.ollama.com",
+        "ollama.com"
+      ],
+      "slot": "tavily-2",
+      "quota_pool": "tavily/search-account-unknown",
+      "endpoint": "https://api.tavily.com/search",
+      "observed_at": 1790978141.0220137,
+      "search_depth": "basic",
+      "max_results": 2,
+      "credits": 1,
+      "status": "REPORTED",
+      "http_status": 200,
+      "rate_limits": {
+        "request_limit": null,
+        "token_limit": null,
+        "remaining_requests": null,
+        "remaining_tokens": null,
+        "requests_reset_at": null,
+        "tokens_reset_at": null,
+        "retry_after": null,
+        "request_window": "UNKNOWN",
+        "token_window": "UNKNOWN",
+        "source": "response headers",
+        "request_reset_hint": null
+      },
+      "source_metadata": [
+        {
+          "evidence_id": "580f8f0f7cb34f20bd3cd2d2de89a7ce",
+          "identity": "https://ollama.com/blog",
+          "title_returned": true,
+          "title": "Blog \u00b7 Ollama",
+          "published_at": null,
+          "retrieval_method": "official_page",
+          "access_topics": [
+            "api_limits",
+            "pricing_subscription"
+          ]
+        },
+        {
+          "evidence_id": "9df32715715e434e8edaac8075a4f2eb",
+          "identity": "https://ollama.com",
+          "title_returned": true,
+          "title": "Ollama",
+          "published_at": null,
+          "retrieval_method": "official_page",
+          "access_topics": [
+            "api_limits",
+            "free_credit_policy",
+            "pricing_subscription"
+          ]
+        }
+      ],
+      "retained_sources": 2,
+      "omitted_sources": 0,
+      "official_pages": 2,
+      "page_failures": 0,
+      "provider_id": "ollama-cloud",
+      "query_stage": 0,
+      "purpose": "official_access_constraints",
+      "task_id": "f599b48d89cc4a75bde5f1c70640a366",
+      "correlation_id": "bed5d12283084b158ccf6da52364015d"
+    }
+  ],
+  "sources": [
+    {
+      "task_id": "f599b48d89cc4a75bde5f1c70640a366",
+      "correlation_id": "bed5d12283084b158ccf6da52364015d",
+      "source": {
+        "identity": "https://api.groq.com/openai/v1/models",
+        "authority": "live_api",
+        "scope": "account",
+        "observed_at": 1790978114.9137256,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null,
+        "title": null,
+        "source_provider": "groq",
+        "provider_id": "groq",
+        "evidence_id": "f4922781964c4685ad36bccdccbd4df9"
+      },
+      "status": "REPORTED",
+      "conflicts": [
+        "llama-3.1-8b-instant: absent in complete live inventory; cached availability rejected",
+        "llama-3.3-70b-versatile: absent in complete live inventory; cached availability rejected",
+        "qwen/qwen3.6-27b: absent in complete live inventory; cached availability rejected",
+        "qwen/qwen3-32b: absent in complete live inventory; cached availability rejected",
+        "meta-llama/llama-4-scout-17b-16e-instruct: absent in complete live inventory; cached availability rejected",
+        "groq/compound: absent in complete live inventory; cached availability rejected",
+        "groq/compound-mini: absent in complete live inventory; cached availability rejected"
+      ],
+      "retrieval_method": "direct",
+      "access_topics": []
+    },
+    {
+      "task_id": "f599b48d89cc4a75bde5f1c70640a366",
+      "correlation_id": "bed5d12283084b158ccf6da52364015d",
+      "source": {
+        "identity": "https://openrouter.ai/api/v1/models/user",
+        "authority": "live_api",
+        "scope": "account",
+        "observed_at": 1790978115.2387323,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null,
+        "title": null,
+        "source_provider": "openrouter",
+        "provider_id": "openrouter",
+        "evidence_id": "94c024abbb1245689bff66db8eadfee0"
+      },
+      "status": "REPORTED",
+      "conflicts": [],
+      "retrieval_method": "direct",
+      "access_topics": []
+    },
+    {
+      "task_id": "f599b48d89cc4a75bde5f1c70640a366",
+      "correlation_id": "bed5d12283084b158ccf6da52364015d",
+      "source": {
+        "identity": "https://integrate.api.nvidia.com/v1/models",
+        "authority": "live_api",
+        "scope": "account",
+        "observed_at": 1790978115.4289093,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null,
+        "title": null,
+        "source_provider": "nvidia",
+        "provider_id": "nvidia",
+        "evidence_id": "cf44943b8264480d953bb7b679a39fc4"
+      },
+      "status": "REPORTED",
+      "conflicts": [],
+      "retrieval_method": "direct",
+      "access_topics": []
+    },
+    {
+      "task_id": "f599b48d89cc4a75bde5f1c70640a366",
+      "correlation_id": "bed5d12283084b158ccf6da52364015d",
+      "source": {
+        "identity": "https://generativelanguage.googleapis.com/v1beta/models",
+        "authority": "live_api",
+        "scope": "account",
+        "observed_at": 1790978115.8620715,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null,
+        "title": null,
+        "source_provider": "google",
+        "provider_id": "google",
+        "evidence_id": "87562364bab14e54be1616b43d69c336"
+      },
+      "status": "REPORTED",
+      "conflicts": [
+        "gemini-3-pro-preview: absent in complete live inventory; cached availability rejected",
+        "gemini-2.0-flash: absent in complete live inventory; cached availability rejected",
+        "gemini-2.0-flash-lite: absent in complete live inventory; cached availability rejected",
+        "gemini-3.1-flash-lite-preview: official retirement overrides inventory listing; excluded from routing",
+        "gemini-3-pro-image-preview: official retirement overrides inventory listing; excluded from routing",
+        "gemini-3.1-flash-image-preview: official retirement overrides inventory listing; excluded from routing",
+        "gemini-2.5-computer-use-preview-10-2025: official retirement overrides inventory listing; excluded from routing"
+      ],
+      "retrieval_method": "direct",
+      "access_topics": []
+    },
+    {
+      "task_id": "f599b48d89cc4a75bde5f1c70640a366",
+      "correlation_id": "bed5d12283084b158ccf6da52364015d",
+      "source": {
+        "identity": "https://api.z.ai/api/paas/v4/models",
+        "authority": "live_api",
+        "scope": "account",
+        "observed_at": 1790978116.3875384,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null,
+        "title": null,
+        "source_provider": "zai",
+        "provider_id": "zai",
+        "evidence_id": "5d8826b992b8499c8e679bab366a7634"
+      },
+      "status": "REPORTED",
+      "conflicts": [],
+      "retrieval_method": "direct",
+      "access_topics": []
+    },
+    {
+      "task_id": "f599b48d89cc4a75bde5f1c70640a366",
+      "correlation_id": "bed5d12283084b158ccf6da52364015d",
+      "source": {
+        "identity": "https://ollama.com/api/tags",
+        "authority": "live_api",
+        "scope": "account",
+        "observed_at": 1790978116.693488,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null,
+        "title": null,
+        "source_provider": "ollama-cloud",
+        "provider_id": "ollama-cloud",
+        "evidence_id": "c3d2c6a68a0b4db19610a507bb1dbaf9"
+      },
+      "status": "REPORTED",
+      "conflicts": [],
+      "retrieval_method": "direct",
+      "access_topics": []
+    },
+    {
+      "task_id": "f599b48d89cc4a75bde5f1c70640a366",
+      "correlation_id": "bed5d12283084b158ccf6da52364015d",
+      "source": {
+        "identity": "https://console.groq.com/docs/projects",
+        "authority": "official_docs",
+        "scope": "provider",
+        "observed_at": 1790978119.0849848,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null,
+        "title": "Projects - GroqDocs",
+        "source_provider": "tavily",
+        "provider_id": "groq",
+        "evidence_id": "d808ba82a42749d09dcfa811917eca9a"
+      },
+      "status": "REPORTED",
+      "conflicts": [],
+      "retrieval_method": "official_page",
+      "access_topics": [
+        "api_limits"
+      ]
+    },
+    {
+      "task_id": "f599b48d89cc4a75bde5f1c70640a366",
+      "correlation_id": "bed5d12283084b158ccf6da52364015d",
+      "source": {
+        "identity": "https://openrouter.ai/pricing",
+        "authority": "official_docs",
+        "scope": "provider",
+        "observed_at": 1790978122.4109612,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null,
+        "title": "Pricing | OpenRouter",
+        "source_provider": "tavily",
+        "provider_id": "openrouter",
+        "evidence_id": "57edfc11ecd346b9b03fc8802ad815c2"
+      },
+      "status": "REPORTED",
+      "conflicts": [],
+      "retrieval_method": "official_page",
+      "access_topics": [
+        "api_limits",
+        "free_credit_policy",
+        "pricing_subscription"
+      ]
+    },
+    {
+      "task_id": "f599b48d89cc4a75bde5f1c70640a366",
+      "correlation_id": "bed5d12283084b158ccf6da52364015d",
+      "source": {
+        "identity": "https://ai.google.dev/gemini-api/docs/pricing",
+        "authority": "official_docs",
+        "scope": "provider",
+        "observed_at": 1790978129.5012224,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null,
+        "title": "Gemini Developer API pricing \u00a0|\u00a0 Gemini API \u00a0|\u00a0 Google AI for Developers",
+        "source_provider": "tavily",
+        "provider_id": "google",
+        "evidence_id": "9ad762a0ff9f49359efa990a205a5671"
+      },
+      "status": "REPORTED",
+      "conflicts": [],
+      "retrieval_method": "official_page",
+      "access_topics": [
+        "api_limits",
+        "free_credit_policy",
+        "pricing_subscription"
+      ]
+    },
+    {
+      "task_id": "f599b48d89cc4a75bde5f1c70640a366",
+      "correlation_id": "bed5d12283084b158ccf6da52364015d",
+      "source": {
+        "identity": "https://docs.z.ai/devpack/usage-policy",
+        "authority": "official_docs",
+        "scope": "provider",
+        "observed_at": 1790978141.0173745,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null,
+        "title": "Usage Policy - Overview - Z.AI DEVELOPER DOCUMENT",
+        "source_provider": "tavily",
+        "provider_id": "zai",
+        "evidence_id": "dfe3c78907144a8a90d65c3ed9e45242"
+      },
+      "status": "REPORTED",
+      "conflicts": [],
+      "retrieval_method": "official_page",
+      "access_topics": [
+        "developer_access",
+        "pricing_subscription"
+      ]
+    },
+    {
+      "task_id": "f599b48d89cc4a75bde5f1c70640a366",
+      "correlation_id": "bed5d12283084b158ccf6da52364015d",
+      "source": {
+        "identity": "https://ollama.com/blog",
+        "authority": "official_docs",
+        "scope": "provider",
+        "observed_at": 1790978142.7027895,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null,
+        "title": "Blog \u00b7 Ollama",
+        "source_provider": "tavily",
+        "provider_id": "ollama-cloud",
+        "evidence_id": "580f8f0f7cb34f20bd3cd2d2de89a7ce"
+      },
+      "status": "REPORTED",
+      "conflicts": [],
+      "retrieval_method": "official_page",
+      "access_topics": [
+        "api_limits",
+        "pricing_subscription"
+      ]
+    }
+  ],
+  "historical_sources": [
+    {
+      "task_id": "f599b48d89cc4a75bde5f1c70640a366",
+      "correlation_id": "bed5d12283084b158ccf6da52364015d",
+      "source": {
+        "identity": "https://ai.google.dev/gemini-api/docs/deprecations",
+        "authority": "official_deprecation",
+        "scope": "provider",
+        "observed_at": 1790943196.6073742,
+        "ttl_seconds": 86400,
+        "refreshable": true,
+        "published_at": null,
+        "title": null,
+        "source_provider": null,
+        "provider_id": null,
+        "evidence_id": "fa4a032df08b49529117c0626b8e0b42"
+      },
+      "status": "REPORTED",
+      "conflicts": [],
+      "retrieval_method": "direct",
+      "access_topics": []
+    }
+  ],
+  "official_web_coverage": [
+    "google",
+    "groq",
+    "ollama-cloud",
+    "openrouter",
+    "zai"
+  ],
+  "native_provider_coverage": [
+    "google",
+    "groq",
+    "nvidia",
+    "ollama-cloud",
+    "openrouter",
+    "zai"
+  ],
+  "native_inventory_sources": 6,
+  "actual_live_tavily": true,
+  "objective_result_reported_success": true,
+  "generation_calls": 0,
+  "authority_resolution": "Account API outranks web for account listing; applicable official retirement evidence overrides residual catalog listing. Conflicts are explicit; web excerpts cannot change routing entitlement or funding.",
+  "limitations": [
+    "Retrieved official pages remain REPORTED evidence, not general factual verification. Index-only snippets do not satisfy official-page acceptance; account funding/credits remain UNKNOWN unless separately exposed."
+  ],
+  "validation_note": "Final evidence-only predicate inspection uses the original acceptance completion time; no extra network calls or objective rerun. Run boundaries recovered from original preflight source/observation timestamps.",
+  "continued_remote_head": "3df56b8291f9fc4c36b2736f1aa1b85d11ffa74f",
+  "gate_a_status": "PASS for Club A foundation",
+  "native_inventory_summary": [
+    {
+      "provider": "groq",
+      "source": {
+        "identity": "https://api.groq.com/openai/v1/models",
+        "authority": "live_api",
+        "scope": "account",
+        "observed_at": 1790978114.9137256,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null,
+        "title": null,
+        "source_provider": null,
+        "provider_id": null,
+        "evidence_id": null
+      },
+      "listed_models": 11,
+      "complete": true,
+      "pages": 1
+    },
+    {
+      "provider": "openrouter",
+      "source": {
+        "identity": "https://openrouter.ai/api/v1/models/user",
+        "authority": "live_api",
+        "scope": "account",
+        "observed_at": 1790978115.2387323,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null,
+        "title": null,
+        "source_provider": null,
+        "provider_id": null,
+        "evidence_id": null
+      },
+      "listed_models": 463,
+      "complete": true,
+      "pages": 1
+    },
+    {
+      "provider": "nvidia",
+      "source": {
+        "identity": "https://integrate.api.nvidia.com/v1/models",
+        "authority": "live_api",
+        "scope": "account",
+        "observed_at": 1790978115.4289093,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null,
+        "title": null,
+        "source_provider": null,
+        "provider_id": null,
+        "evidence_id": null
+      },
+      "listed_models": 81,
+      "complete": true,
+      "pages": 1
+    },
+    {
+      "provider": "google",
+      "source": {
+        "identity": "https://generativelanguage.googleapis.com/v1beta/models",
+        "authority": "live_api",
+        "scope": "account",
+        "observed_at": 1790978115.8620715,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null,
+        "title": null,
+        "source_provider": null,
+        "provider_id": null,
+        "evidence_id": null
+      },
+      "listed_models": 61,
+      "complete": true,
+      "pages": 2
+    },
+    {
+      "provider": "zai",
+      "source": {
+        "identity": "https://api.z.ai/api/paas/v4/models",
+        "authority": "live_api",
+        "scope": "account",
+        "observed_at": 1790978116.3875384,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null,
+        "title": null,
+        "source_provider": null,
+        "provider_id": null,
+        "evidence_id": null
+      },
+      "listed_models": 11,
+      "complete": true,
+      "pages": 1
+    },
+    {
+      "provider": "ollama-cloud",
+      "source": {
+        "identity": "https://ollama.com/api/tags",
+        "authority": "live_api",
+        "scope": "account",
+        "observed_at": 1790978116.693488,
+        "ttl_seconds": 300,
+        "refreshable": true,
+        "published_at": null,
+        "title": null,
+        "source_provider": null,
+        "provider_id": null,
+        "evidence_id": null
+      },
+      "listed_models": 17,
+      "complete": true,
+      "pages": 1
+    }
+  ],
+  "search_budget": {
+    "objective_runs": 1,
+    "preflight_basic_searches": 3,
+    "objective_basic_searches": 8,
+    "total_observed_credits": 11,
+    "remaining_credits": "UNKNOWN",
+    "model_generation_calls": 0,
+    "limits": "two query stages/provider; two hits/stage; one retained relevant source/provider; 90-second constraint acquisition budget; bounded credential failover"
+  },
+  "public_evidence_limits": {
+    "groq": "Retained projects page establishes project/organization limit policy; exact numeric Free/Developer limits remain UNKNOWN in the excerpt.",
+    "openrouter": "Official pricing page distinguishes Free/Standard/Business plans. Native API zero-price listings do not imply remaining account capacity.",
+    "google": "Official Gemini pricing page was found after query refinement. Model-specific free availability and rates are quoted source evidence, not entitlement.",
+    "nvidia": "UNKNOWN after both official-domain query stages; indexed official references could not be directly read and were not promoted to current official authority.",
+    "zai": "Official usage excerpt is explicitly GLM Coding Plan product context, not proof of configured general-API subscription/funding/quota. General-API-specific policy values not shown remain UNKNOWN.",
+    "ollama-cloud": "Current official blog excerpt reports token-pricing/usage policy for Pro/Max/Team; remaining allowance for this account remains UNKNOWN."
+  },
+  "validation": {
+    "focused_tests": "92 PASS (16.058s)",
+    "full_offline_suite": "227 PASS in one full offline run (35.685s)",
+    "ruff": "PASS",
+    "format": "PASS: 39 Python files",
+    "mypy": "PASS: 25 source files",
+    "repository_links": "PASS: required files, local Markdown links, removed references",
+    "secret_scan": "PASS: value-silent tracked/non-ignored source, patch, live report/log/SQLite artifact scan",
+    "diff_inspection": "PASS: implementation, tests, docs and retained history reviewed; whitespace clean"
+  }
+}

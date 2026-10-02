@@ -1,5 +1,106 @@
 # Club A — Brain checkpoint
 
+## Last correction — Gate A PASS for Club A foundation (2026-10-03 IST)
+
+Fetched current remote `work` and confirmed
+**`3df56b8291f9fc4c36b2736f1aa1b85d11ffa74f`** before editing the clean, synchronized
+checkout. This correction fixes only source titles/provenance, bounded relevant
+public-constraint acquisition, and final-verifier semantics in the existing
+retrieval architecture. All earlier PARTIAL checkpoints below remain unchanged.
+
+**Gate A — PASS for Club A foundation.** This accepts complete evidence semantics,
+including legitimate evidenced UNKNOWN outcomes. It does not verify arbitrary
+source prose, unknown account entitlements, later deployment scope or Slice 05.
+The previous Balanced/Heavy Duty/Free First PASS and real Tavily 401 → 200 failover
+observations are preserved; no hosted generation/provider matrix was rerun.
+
+### Three corrections
+
+1. `SourceRef` now retains optional title, retrieval-provider identity, subject
+   provider and stable evidence reference alongside URL, observation time,
+   supplied publication time, authority and scope. Tavily redacts titles before
+   bounding/serialization. Missing title/publication stays null, never invented.
+   Typed round-trip and retrieval → persisted evidence → synthesis are tested.
+2. The configured-provider access objective now uses official-domain-scoped
+   Free/Developer/API-limit queries and, if necessary, one pricing/credit/usage
+   refinement. Each stage returns at most two hits; each provider retains at most
+   one relevant directly read official excerpt. Acquisition has a 90-second
+   overall budget, existing bounded HTTPS/page reads and credential failover.
+   Irrelevant hits/index-only pages cannot end the relevant-constraint search as
+   success. Exhaustion returns explicit UNKNOWN with attempt references and reason.
+   No provider fact/answer is hard-coded and no raw page dump is persisted.
+3. The verifier requires current-run 3/3 authenticated preflights, six complete
+   current native inventories correlated to the objective, actual objective
+   search, matching retained source metadata, every provider's relevant official
+   evidence **or** UNKNOWN supported by both bounded official query stages,
+   separate public/account/generation/funding/quota states, visible evidence and
+   conflicts, successful correlated synthesis and zero model generations. Prior
+   source material is separately dated; it cannot satisfy current requirements.
+   Host coverage alone, generic web claims or absent attempt provenance cannot PASS.
+
+The task remains PARTIALLY_VERIFIED and every factual source/result remains
+REPORTED. Gate acceptance verifies retrieval/provenance/uncertainty behavior; it
+never upgrades unsupported claims to VERIFIED. An evidence-only inspection helper
+checks the authoritative run state without performing network traffic.
+
+### One real final objective
+
+> What are the currently supported models and relevant free/developer access
+> constraints for OSCAR's configured intelligence providers right now?
+
+The genuine path was **Jev → authenticated reference transport → six native
+account inventories + Tavily → authority/scope separation → correlated evidence
+→ source-qualified synthesis**. All three Tavily slots passed bounded preflight
+in this run. There were **8 objective basic searches + 3 preflights = 11 observed
+credits**, **one objective run**, and **zero model-generation calls**. Neither
+remaining Tavily balance nor independent per-key quota is inferred.
+
+| Provider | Current account evidence | Public constraint outcome / evidence |
+|---|---|---|
+| Groq | Complete native model inventory | REPORTED: official project/organization rate-limit policy; exact numeric Free/Developer limits in this excerpt remain UNKNOWN |
+| OpenRouter | Complete account-visible catalog, including API-listed zero-price routes | REPORTED: official pricing/Free/Standard/Business policy; listing is not remaining quota or generation |
+| Google AI Studio | Complete paginated native inventory | REPORTED: official Gemini pricing page obtained by refined query |
+| NVIDIA NIM | Complete native model inventory | UNKNOWN: both official query stages returned references, but bounded direct page reads failed; indexed hints were not promoted |
+| Z.ai | Complete general-API model inventory | REPORTED: explicitly scoped GLM Coding Plan subscription/concurrency policy; configured general-API entitlement/policy values not established remain UNKNOWN |
+| Ollama Cloud | Complete native inventory | REPORTED: official blog excerpt on Pro/Max/Team token-pricing and included-usage policy; this account's allowance remains UNKNOWN |
+
+Source URLs, titles, observed times, scope/authority, attempt/evidence IDs, topics,
+conflicts, native model lists/zero-price routes, public excerpts and separate
+claim states are retained in [the final evidence](evidence/club-a-gate-a-pass-2026-10-03.json).
+Google's historical retirement reference retains its original timestamp and is
+separate from the newly read pricing source. No generic provider documentation
+changes account routing entitlement or labels UNKNOWN funding as free.
+
+The final evidence was inspected after strengthening the provenance/conflict and
+preflight-time assertions, using the original recorded completion time. Those
+checks also PASS on the same authoritative task/evidence; there was no additional
+objective/search run. The observation/source boundaries used for that final
+inspection are explicitly documented in the evidence record.
+
+### Regression, remaining unknowns and stop
+
+**92 focused search/verifier/freshness/official-page tests PASS (16.058s)**, including
+all eleven requested gap scenarios plus secrecy, optional title, incomplete native
+inventory, hidden conflict/provenance and stale-preflight rejection. The full normal
+offline suite ran **once: 227 tests PASS (35.685s)**, retaining all 209 existing tests
+and adding 18 focused cases. Ruff, formatting (**39 Python files**), strict mypy
+(**25 source files**), repository/local-link checks, value-silent secret scanning
+and final diff inspection PASS. No new architectural defect was exposed.
+
+Remaining external/factual UNKNOWN or later PARTIAL scope:
+
+- NVIDIA public constraints after evidenced bounded official-source attempts;
+- exact values not present in retained excerpts, including Z.ai general-API policy
+  versus separately labeled Coding Plan context;
+- all unexposed account funding/remaining quota and search credit balance;
+- per-source publication dates not supplied, general factual verification of prose,
+  and generation not probed by this retrieval objective;
+- prior documented public deployment/physical-node/local-integration limitations.
+
+These are explicit limits, not missing internal acceptance semantics.
+**Commit/push to `work`, verify the remote SHA, then stop. Do not merge main or
+start Slice 05.**
+
 ## New-cloud final search acceptance — PARTIAL (2026-10-03 IST)
 
 Continued the **current remote `work` head
