@@ -10,6 +10,7 @@ Related planning docs:
 - `docs/NATIVE-INFRASTRUCTURE.md`
 - `docs/CONNECTION-GRID.md`
 - `docs/MODEL-ROUTING.md`
+- `docs/SEARCH-FRESHNESS.md`
 - `docs/VOICE-SENTRY.md`
 - `docs/PERSONA.md`
 - `docs/RUNTIME-FOUNDATIONS.md`
@@ -109,7 +110,7 @@ Exit: OSCAR discovers/invokes a capability on another node and survives node dis
 
 ## Slice 04 — Native Model Router + cloud intelligence 🚧
 
-**Checkpoint: hosted/routing foundation VERIFIED; broader integrations PARTIAL.** Four real hosted providers and 11 credential slots succeeded. Auto/Free First/Fast/Balanced/Heavy Duty and Manual pins have live evidence, as do real credential failover, bounded cross-provider recovery and reranking after an actual rate-limit observation. The live suite passed 162 checks; all 113 contract tests and quality checks pass. Groq HTTP 403 and Z.ai HTTP 429 are provider/account availability limits. Real quota remains unknown; scarcity counterfactuals use explicitly labeled fixtures. Local runtime instances, ChatGPT product surfaces and quality/quota calibration remain unverified. See [Club A evidence](CLUB-A-CHECKPOINT.md).
+**Checkpoint: hosted/routing foundation VERIFIED; broader integrations PARTIAL.** Four real hosted providers and 11 credential slots succeeded. Auto/Free First/Fast/Balanced/Heavy Duty and Manual pins have live evidence, as do real credential failover, bounded cross-provider recovery and reranking after an actual rate-limit observation. The live suite passed 162 checks; all 113 contract tests and quality checks pass. Groq HTTP 403 and Z.ai HTTP 429 are now treated as evidence that the seeded model/account metadata must be refreshed from live/current sources before attributing failure to credentials or provider capacity. Real quota remains unknown; scarcity counterfactuals use explicitly labeled fixtures. Local runtime instances, ChatGPT product surfaces and quality/quota calibration remain unverified. See [Club A evidence](CLUB-A-CHECKPOINT.md).
 
 **Goal:** add provider/model/credential routing.
 
@@ -128,6 +129,39 @@ Deliverables:
 - model output remains reported/inferred until verified where required.
 
 **Manual milestone:** Gate A — Brain **PASS for the implemented foundation; manual review pending**. Public Grid deployment remains later integration work. **Stop here. Slice 05 has not started.**
+
+## Post-Gate-A correction — live search + freshness ⏭️
+
+The provider-model review exposed a general OSCAR requirement: volatile information cannot be trusted from stale manifests or model priors.
+
+Before/with Club B, add the smallest first-class search/freshness path described in [SEARCH-FRESHNESS.md](SEARCH-FRESHNESS.md).
+
+Deliverables:
+
+- three Tavily credential slots (`TAVILY_API_KEY_1..3`) with masked credential-pool health/failover semantics;
+- search as a Capability Catalog capability, not a hard-coded Jev special case;
+- freshness classification for stable vs freshness-sensitive/live-state objectives;
+- authoritative-source preference and source/retrieval timestamps;
+- stale-provider/model metadata refresh through live inventory/current official docs before treating seeded IDs as current truth;
+- bounded search retries/failover with 401/429/plan-limit handling;
+- search results remain evidence inputs rather than automatically verified truth.
+
+First acceptance objective:
+
+> `What are the currently supported models and relevant free/developer access constraints for OSCAR's configured intelligence providers right now?`
+
+Expected path:
+
+```text
+freshness-sensitive objective
+→ live search/provider inventory
+→ authoritative current sources
+→ source-backed synthesis
+→ evidence/retrieval timestamps
+→ no stale model-prior claim presented as current
+```
+
+This is a correction to the source-of-truth policy, not a rollback of Gate A's verified core/runtime contracts.
 
 ## Slice 05 — First real machine Worker + remote continuation ◻️
 
@@ -152,7 +186,7 @@ Exit: useful repository/system objective can run remotely, survive ordinary disc
 
 ## Slice 06 — LRA + Personal Policy + live context ◻️
 
-**Goal:** add persistent continuity and explicit behavior rules.
+**Goal:** add persistent continuity, explicit behavior rules and freshness-aware live retrieval.
 
 Deliverables:
 
@@ -163,6 +197,10 @@ Deliverables:
 - natural-language policy editing;
 - authority/staleness rules;
 - live federated context/search;
+- Tavily search adapter with three credential slots and replaceable search-provider boundary;
+- freshness-sensitive query detection and live-source routing;
+- source/provenance/retrieval-time metadata;
+- current authoritative evidence outranks recalled/model-prior information;
 - canonical entity graph foundation.
 
 **Manual milestone:** Gate B — Can Do Work.
