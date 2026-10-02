@@ -110,15 +110,13 @@ Exit: OSCAR discovers/invokes a capability on another node and survives node dis
 
 ## Slice 04 — Native Model Router + cloud intelligence 🚧
 
-**Checkpoint: corrected architecture verified; current live acceptance PARTIAL.**
-Fresh discovery, retirement guards, shared quota pools and bounded routing are
-implemented and regression-tested. Fifteen real slots across five providers
-generated with current candidates; both Z.ai general slots returned documented
-balance/resource-package error 1113. Groq's old stale-model 403 interpretation is
-explicitly superseded. Earlier correction modes passed, but the latest full mode
-rerun encountered an unknown-cause OpenRouter 429 and did not complete Balanced,
-Heavy Duty or Free First. Gate A is downgraded; see the canonical
-[checkpoint](CLUB-A-CHECKPOINT.md) for current evidence, quality results and limits.
+**Checkpoint: corrected architecture and focused routing verified; final search
+acceptance BLOCKED.** Current discovered routing resolves the previous automatic-mode
+gap without paid/UNKNOWN funding fallback. The bounded Tavily adapter is implemented
+and tested, but all three live credentials remain absent in this execution environment.
+Gate A remains PARTIAL for real combined-search acceptance. The canonical
+[checkpoint](CLUB-A-CHECKPOINT.md) preserves the earlier 69/72 result and all historical
+provider evidence.
 
 **Goal:** add provider/model/credential routing.
 
@@ -136,8 +134,8 @@ Deliverables:
 - no runtime dependency on SwitchRoute;
 - model output remains reported/inferred until verified where required.
 
-**Manual milestone:** Gate A — Brain **PARTIAL, downgraded after the correction's
-latest live rerun; manual review pending**. Core/reference Grid proofs remain
+**Manual milestone:** Gate A — Brain **PARTIAL: real Tavily search
+acceptance blocked by missing credentials**. Core/reference Grid proofs remain
 verified; public deployment remains later integration work. **Stop here.
 Slice 05 has not started.**
 
@@ -150,14 +148,13 @@ freshness-aware Jev, sourced per-slot inventories, explicit retirement conflicts
 persistent observations and account-product/shared-quota pools. The manifest is a
 bootstrap/fallback seed, and missing current evidence blocks rather than guessing.
 Native inventory retrieval was exercised with zero generation calls; broader
-constraints/synthesis remain PARTIAL. See [SEARCH-FRESHNESS.md](SEARCH-FRESHNESS.md).
+public-web acceptance remains blocked until real Tavily credentials are available.
+See [SEARCH-FRESHNESS.md](SEARCH-FRESHNESS.md).
 
 Remaining search acceptance:
 
-- retain the prepared three Tavily placeholders; keys are absent and actual live
-  Tavily integration is UNVERIFIED;
-- implement/test the real search adapter through the existing boundary when keys
-  are provided, preserving shared-pool health/failover and bounded costs;
+- retain the three Tavily placeholders and the implemented, offline-tested adapter;
+  keys are absent and actual live Tavily remains UNVERIFIED;
 - combine native inventory with current official source retrieval, reconcile
   contradictions and synthesize an evidence-qualified answer;
 - retain source/time/scope and REPORTED/UNKNOWN limits through that full flow.
@@ -178,8 +175,8 @@ freshness-sensitive objective
 ```
 
 This corrects the source-of-truth architecture. Core/reference Grid verification
-is retained, while current full live routing acceptance is PARTIAL. It does not
-advance Club B or Slice 05.
+is retained; focused routing acceptance is resolved, while real combined-search
+acceptance remains blocked. This does not advance Club B or Slice 05.
 
 ## Slice 05 — First real machine Worker + remote continuation ◻️
 

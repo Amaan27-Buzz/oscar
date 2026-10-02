@@ -1,0 +1,2618 @@
+{
+  "recorded_at": "2026-10-02T15:31:25.691386+00:00",
+  "base_work_sha": "d7caacec37c18d2f62382a9308e4af77967f02fc",
+  "scope": "Final Gate A acceptance only; no full generation matrix, main merge or Slice 05",
+  "gate_a": "PARTIAL",
+  "gate_reason": "Tavily slots absent; actual network-backed Tavily/public-web acceptance UNVERIFIED. Focused routing and regressions PASS; no architectural defect exposed.",
+  "tavily_contract_sources": [
+    {
+      "identity": "https://docs.tavily.com/documentation/api-reference/endpoint/search.md",
+      "authority": "official_docs",
+      "scope": "provider",
+      "observed_at": "2026-10-02T15:09:22Z",
+      "http_status": 200
+    },
+    {
+      "identity": "https://docs.tavily.com/documentation/api-credits.md",
+      "authority": "official_docs",
+      "scope": "provider",
+      "observed_at": "2026-10-02T15:09:22Z",
+      "http_status": 200
+    },
+    {
+      "identity": "https://docs.tavily.com/documentation/rate-limits.md",
+      "authority": "official_docs",
+      "scope": "provider",
+      "observed_at": "2026-10-02T15:09:22Z",
+      "http_status": 200
+    },
+    {
+      "identity": "https://docs.tavily.com/documentation/api-reference/endpoint/usage.md",
+      "authority": "official_docs",
+      "scope": "provider",
+      "observed_at": "2026-10-02T15:09:22Z",
+      "http_status": 200
+    }
+  ],
+  "focused_routing_rounds": [
+    {
+      "recorded_at": "2026-10-02T15:14:52.782624+00:00",
+      "scope": "Final Gate A focused routing; no provider generation matrix or Slice 05",
+      "funding_policy": "Default; paid and UNKNOWN funding excluded",
+      "checks": [
+        {
+          "check": "final routing balanced remains REPORTED before independent comparison",
+          "status": "PASS"
+        },
+        {
+          "check": "final routing balanced objective starts unknown",
+          "status": "PASS"
+        },
+        {
+          "check": "final routing balanced attempts bounded",
+          "status": "PASS"
+        },
+        {
+          "check": "final routing balanced pool/slot reservations released",
+          "status": "PASS"
+        },
+        {
+          "check": "final balanced truthful acceptance",
+          "status": "PASS"
+        },
+        {
+          "check": "final balanced eligible routes current and funding authorized",
+          "status": "PASS"
+        },
+        {
+          "check": "final routing heavy attempts bounded",
+          "status": "PASS"
+        },
+        {
+          "check": "final routing heavy pool/slot reservations released",
+          "status": "PASS"
+        },
+        {
+          "check": "final heavy truthful acceptance",
+          "status": "PASS"
+        },
+        {
+          "check": "final heavy eligible routes current and funding authorized",
+          "status": "PASS"
+        },
+        {
+          "check": "final routing free_first remains REPORTED before independent comparison",
+          "status": "PASS"
+        },
+        {
+          "check": "final routing free_first objective starts unknown",
+          "status": "PASS"
+        },
+        {
+          "check": "final routing free_first attempts bounded",
+          "status": "PASS"
+        },
+        {
+          "check": "final routing free_first pool/slot reservations released",
+          "status": "PASS"
+        },
+        {
+          "check": "final free_first truthful acceptance",
+          "status": "PASS"
+        },
+        {
+          "check": "final free_first eligible routes current and funding authorized",
+          "status": "PASS"
+        },
+        {
+          "check": "final routing history excludes credentials",
+          "status": "PASS"
+        },
+        {
+          "check": "final routing history excludes prompt and response",
+          "status": "PASS"
+        }
+      ],
+      "operations": [
+        {
+          "scenario": "final routing balanced",
+          "observed_at": 1790954082.2763863,
+          "mode": "balanced",
+          "max_output_tokens": 512,
+          "allow_unknown_cost": false,
+          "allow_unknown_limits": false,
+          "scope": "generation contract only; no model-quality/funding proof",
+          "status": "VERIFIED",
+          "sentinel_matches": true,
+          "provider": "openrouter",
+          "model": "openrouter/free",
+          "slot": "openrouter-1",
+          "quota_pool": "openrouter/configured-account",
+          "reasons": [
+            "required capabilities satisfied; context/output limits checked",
+            "quality tier 2 meets floor 1; source: Official dynamic free router; backing model varies and is recorded from response. Tier 2 is a conservative declared task floor. 512 output tokens is an operator budget cap, not a provider maximum.",
+            "capacity class free; quota 17 confirmed requests remaining",
+            "availability listed via credential; generation entitlement not implied; inventory source https://openrouter.ai/api/v1/models/user; observed_at 1790954077.3645887; TTL 300s",
+            "account product developer-api; shared quota pool openrouter/configured-account; credential count does not increase capacity",
+            "ranking considers task affinity, decaying reliability/latency, and scarcity",
+            "provider response health and verified objective outcomes remain separate",
+            "preserve stronger/scarcer routes when sufficient alternatives exist",
+            "mode balanced; explicit policy enforced"
+          ],
+          "actual_model": "nvidia/nemotron-3.5-lightning:free",
+          "actual_provider": "Nvidia",
+          "rate_limits": {
+            "request_limit": null,
+            "token_limit": null,
+            "remaining_requests": null,
+            "remaining_tokens": null,
+            "requests_reset_at": null,
+            "tokens_reset_at": null,
+            "retry_after": null,
+            "request_window": "UNKNOWN",
+            "token_window": "UNKNOWN",
+            "source": "response headers",
+            "request_reset_hint": null
+          },
+          "input_tokens": 32,
+          "output_tokens": 331,
+          "attempts": 1,
+          "attempt_trace": [
+            {
+              "provider": "openrouter",
+              "model": "openrouter/free",
+              "slot": "openrouter-1",
+              "quota_pool": "openrouter/configured-account",
+              "attempt": 1,
+              "provider_response_success": true,
+              "error": null,
+              "timestamp": 1790954090.2006116
+            }
+          ],
+          "http_statuses": {
+            "openai": [
+              200
+            ]
+          },
+          "acceptance": "PASS",
+          "disposition": "VERIFIED_GENERATION",
+          "eligible_before": 40,
+          "eligible_after": 40,
+          "eligible_providers_before": [
+            "openrouter"
+          ],
+          "eligible_providers_after": [
+            "openrouter"
+          ],
+          "block_semantics": null
+        },
+        {
+          "scenario": "final routing heavy",
+          "observed_at": 1790954090.3112612,
+          "mode": "heavy",
+          "max_output_tokens": 512,
+          "allow_unknown_cost": false,
+          "allow_unknown_limits": false,
+          "scope": "generation contract only; no model-quality/funding proof",
+          "status": "BLOCKED",
+          "category": "route_unavailable",
+          "attempts": 0,
+          "attempt_trace": [],
+          "http_statuses": {},
+          "acceptance": "PASS",
+          "disposition": "EXPECTED_BLOCKED",
+          "eligible_before": 0,
+          "eligible_after": 0,
+          "eligible_providers_before": [],
+          "eligible_providers_after": [],
+          "block_semantics": "No currently eligible route under unchanged default funding, capability and capacity policy; this does not diagnose invalid credentials.",
+          "block_diagnostics": {
+            "observed_at": 1790954090.3112612,
+            "scope": "Cached point-in-time diagnostics; no new network or generation calls",
+            "required_capabilities": [
+              "structured",
+              "text"
+            ],
+            "minimum_quality": 4,
+            "max_output_tokens": 512,
+            "candidate_model_count": 12,
+            "retained_model_limit": 20,
+            "truncated": false,
+            "reconstructed_at": 1790954414.0354474,
+            "snapshot_source": ".oscar/gate-a-routing-9ltlvxxi/live.sqlite",
+            "reconstruction_qualification": "Read-only final snapshot evaluated at original structured Heavy timestamp. Later successful Free First state does not alter high-tier capability/funding conclusions. No new provider calls.",
+            "grouped_candidate_observations": [
+              {
+                "provider": "openrouter",
+                "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+                "quota_pool": "openrouter/configured-account",
+                "quality": 5,
+                "capabilities": [
+                  "text"
+                ],
+                "missing_capabilities": [
+                  "structured"
+                ],
+                "funding": "free",
+                "context_limit": 1000000,
+                "output_limit": 65536,
+                "availability": "listed via credential; generation entitlement not implied",
+                "known_exclusions": [
+                  "required capability not currently established"
+                ],
+                "slots": [
+                  "openrouter-1",
+                  "openrouter-2",
+                  "openrouter-3",
+                  "openrouter-4"
+                ]
+              },
+              {
+                "provider": "openrouter",
+                "model": "qwen/qwen3.8-27b:free",
+                "quota_pool": "openrouter/configured-account",
+                "quality": 4,
+                "capabilities": [
+                  "text"
+                ],
+                "missing_capabilities": [
+                  "structured"
+                ],
+                "funding": "free",
+                "context_limit": 262144,
+                "output_limit": 235929,
+                "availability": "listed via credential; generation entitlement not implied",
+                "known_exclusions": [
+                  "required capability not currently established"
+                ],
+                "slots": [
+                  "openrouter-1",
+                  "openrouter-2",
+                  "openrouter-3",
+                  "openrouter-4"
+                ]
+              },
+              {
+                "provider": "google",
+                "model": "gemini-3.8-flash",
+                "quota_pool": "google/configured-account",
+                "quality": 4,
+                "capabilities": [
+                  "text"
+                ],
+                "missing_capabilities": [
+                  "structured"
+                ],
+                "funding": "unknown",
+                "context_limit": 1048576,
+                "output_limit": 65536,
+                "availability": "listed via credential; generation entitlement not implied",
+                "known_exclusions": [
+                  "required capability not currently established",
+                  "paid/UNKNOWN funding excluded by policy",
+                  "account funding UNKNOWN"
+                ],
+                "slots": [
+                  "google-1",
+                  "google-2",
+                  "google-3"
+                ]
+              },
+              {
+                "provider": "groq",
+                "model": "openai/gpt-oss-120b",
+                "quota_pool": "groq/configured-account",
+                "quality": 4,
+                "capabilities": [
+                  "text"
+                ],
+                "missing_capabilities": [
+                  "structured"
+                ],
+                "funding": "unknown",
+                "context_limit": 131072,
+                "output_limit": 65536,
+                "availability": "listed via credential; generation entitlement not implied",
+                "known_exclusions": [
+                  "required capability not currently established",
+                  "paid/UNKNOWN funding excluded by policy",
+                  "account funding UNKNOWN"
+                ],
+                "slots": [
+                  "groq-1",
+                  "groq-2",
+                  "groq-3",
+                  "groq-4"
+                ]
+              },
+              {
+                "provider": "groq",
+                "model": "qwen/qwen3.8-27b",
+                "quota_pool": "groq/configured-account",
+                "quality": 4,
+                "capabilities": [
+                  "text"
+                ],
+                "missing_capabilities": [
+                  "structured"
+                ],
+                "funding": "unknown",
+                "context_limit": 131072,
+                "output_limit": 16384,
+                "availability": "listed via credential; generation entitlement not implied",
+                "known_exclusions": [
+                  "required capability not currently established",
+                  "paid/UNKNOWN funding excluded by policy",
+                  "account funding UNKNOWN"
+                ],
+                "slots": [
+                  "groq-1",
+                  "groq-2",
+                  "groq-3",
+                  "groq-4"
+                ]
+              },
+              {
+                "provider": "nvidia",
+                "model": "nvidia/nemotron-3-super-120b-a12b",
+                "quota_pool": "nvidia/configured-account",
+                "quality": 4,
+                "capabilities": [
+                  "text"
+                ],
+                "missing_capabilities": [
+                  "structured"
+                ],
+                "funding": "unknown",
+                "context_limit": 1000000,
+                "output_limit": null,
+                "availability": "listed via credential; generation entitlement not implied",
+                "known_exclusions": [
+                  "required capability not currently established",
+                  "paid/UNKNOWN funding excluded by policy",
+                  "account funding UNKNOWN",
+                  "output limit UNKNOWN"
+                ],
+                "slots": [
+                  "nvidia-1",
+                  "nvidia-2"
+                ]
+              },
+              {
+                "provider": "nvidia",
+                "model": "nvidia/nemotron-3-ultra-550b-a55b",
+                "quota_pool": "nvidia/configured-account",
+                "quality": 5,
+                "capabilities": [
+                  "text"
+                ],
+                "missing_capabilities": [
+                  "structured"
+                ],
+                "funding": "unknown",
+                "context_limit": 1000000,
+                "output_limit": null,
+                "availability": "listed via credential; generation entitlement not implied",
+                "known_exclusions": [
+                  "required capability not currently established",
+                  "paid/UNKNOWN funding excluded by policy",
+                  "account funding UNKNOWN",
+                  "output limit UNKNOWN"
+                ],
+                "slots": [
+                  "nvidia-1",
+                  "nvidia-2"
+                ]
+              },
+              {
+                "provider": "ollama-cloud",
+                "model": "deepseek-v4-pro:0813",
+                "quota_pool": "ollama-cloud/configured-account",
+                "quality": 5,
+                "capabilities": [
+                  "text"
+                ],
+                "missing_capabilities": [
+                  "structured"
+                ],
+                "funding": "unknown",
+                "context_limit": null,
+                "output_limit": null,
+                "availability": "listed via credential; generation entitlement not implied",
+                "known_exclusions": [
+                  "required capability not currently established",
+                  "paid/UNKNOWN funding excluded by policy",
+                  "account funding UNKNOWN",
+                  "context limit UNKNOWN",
+                  "output limit UNKNOWN"
+                ],
+                "slots": [
+                  "ollama-cloud-1",
+                  "ollama-cloud-2"
+                ]
+              },
+              {
+                "provider": "ollama-cloud",
+                "model": "deepseek-v4.1-flash",
+                "quota_pool": "ollama-cloud/configured-account",
+                "quality": 4,
+                "capabilities": [
+                  "text"
+                ],
+                "missing_capabilities": [
+                  "structured"
+                ],
+                "funding": "unknown",
+                "context_limit": null,
+                "output_limit": null,
+                "availability": "listed via credential; generation entitlement not implied",
+                "known_exclusions": [
+                  "required capability not currently established",
+                  "paid/UNKNOWN funding excluded by policy",
+                  "account funding UNKNOWN",
+                  "context limit UNKNOWN",
+                  "output limit UNKNOWN"
+                ],
+                "slots": [
+                  "ollama-cloud-1",
+                  "ollama-cloud-2"
+                ]
+              },
+              {
+                "provider": "ollama-cloud",
+                "model": "glm-5.3",
+                "quota_pool": "ollama-cloud/configured-account",
+                "quality": 5,
+                "capabilities": [
+                  "text"
+                ],
+                "missing_capabilities": [
+                  "structured"
+                ],
+                "funding": "unknown",
+                "context_limit": null,
+                "output_limit": null,
+                "availability": "listed via credential; generation entitlement not implied",
+                "known_exclusions": [
+                  "required capability not currently established",
+                  "paid/UNKNOWN funding excluded by policy",
+                  "account funding UNKNOWN",
+                  "context limit UNKNOWN",
+                  "output limit UNKNOWN"
+                ],
+                "slots": [
+                  "ollama-cloud-1",
+                  "ollama-cloud-2"
+                ]
+              },
+              {
+                "provider": "ollama-cloud",
+                "model": "minimax-m3",
+                "quota_pool": "ollama-cloud/configured-account",
+                "quality": 4,
+                "capabilities": [
+                  "text"
+                ],
+                "missing_capabilities": [
+                  "structured"
+                ],
+                "funding": "unknown",
+                "context_limit": null,
+                "output_limit": null,
+                "availability": "listed via credential; generation entitlement not implied",
+                "known_exclusions": [
+                  "required capability not currently established",
+                  "paid/UNKNOWN funding excluded by policy",
+                  "account funding UNKNOWN",
+                  "context limit UNKNOWN",
+                  "output limit UNKNOWN"
+                ],
+                "slots": [
+                  "ollama-cloud-1",
+                  "ollama-cloud-2"
+                ]
+              },
+              {
+                "provider": "zai",
+                "model": "glm-5.3",
+                "quota_pool": "zai/configured-account",
+                "quality": 5,
+                "capabilities": [
+                  "text"
+                ],
+                "missing_capabilities": [
+                  "structured"
+                ],
+                "funding": "unknown",
+                "context_limit": 1000000,
+                "output_limit": 128000,
+                "availability": "listed via credential; generation entitlement not implied",
+                "known_exclusions": [
+                  "required capability not currently established",
+                  "paid/UNKNOWN funding excluded by policy",
+                  "account funding UNKNOWN"
+                ],
+                "slots": [
+                  "zai-1",
+                  "zai-2"
+                ]
+              }
+            ],
+            "source_lookup": "inventory_sources by masked slot in this same round; equivalent diagnostic fields grouped without changing observations"
+          }
+        },
+        {
+          "scenario": "final routing free_first",
+          "observed_at": 1790954090.4072227,
+          "mode": "free_first",
+          "max_output_tokens": 512,
+          "allow_unknown_cost": false,
+          "allow_unknown_limits": false,
+          "scope": "generation contract only; no model-quality/funding proof",
+          "status": "VERIFIED",
+          "sentinel_matches": true,
+          "provider": "openrouter",
+          "model": "apodex/apodex-1.1-mini:free",
+          "slot": "openrouter-2",
+          "quota_pool": "openrouter/configured-account",
+          "reasons": [
+            "required capabilities satisfied; context/output limits checked",
+            "quality tier 1 meets floor 1; source: discovered candidate; unbenchmarked conservative tier 1",
+            "capacity class free; quota 17 confirmed requests remaining",
+            "availability listed via credential; generation entitlement not implied; inventory source https://openrouter.ai/api/v1/models/user; observed_at 1790954077.7017434; TTL 300s",
+            "account product developer-api; shared quota pool openrouter/configured-account; credential count does not increase capacity",
+            "ranking considers task affinity, decaying reliability/latency, and scarcity",
+            "provider response health and verified objective outcomes remain separate",
+            "preserve stronger/scarcer routes when sufficient alternatives exist",
+            "mode free_first; explicit policy enforced"
+          ],
+          "actual_model": "apodex/apodex-1.1-mini:free",
+          "actual_provider": "Novita",
+          "rate_limits": {
+            "request_limit": null,
+            "token_limit": null,
+            "remaining_requests": null,
+            "remaining_tokens": null,
+            "requests_reset_at": null,
+            "tokens_reset_at": null,
+            "retry_after": null,
+            "request_window": "UNKNOWN",
+            "token_window": "UNKNOWN",
+            "source": "response headers",
+            "request_reset_hint": null
+          },
+          "input_tokens": 26,
+          "output_tokens": 263,
+          "attempts": 1,
+          "attempt_trace": [
+            {
+              "provider": "openrouter",
+              "model": "apodex/apodex-1.1-mini:free",
+              "slot": "openrouter-2",
+              "quota_pool": "openrouter/configured-account",
+              "attempt": 1,
+              "provider_response_success": true,
+              "error": null,
+              "timestamp": 1790954092.6795251
+            }
+          ],
+          "http_statuses": {
+            "openai": [
+              200
+            ]
+          },
+          "acceptance": "PASS",
+          "disposition": "VERIFIED_GENERATION",
+          "eligible_before": 40,
+          "eligible_after": 40,
+          "eligible_providers_before": [
+            "openrouter"
+          ],
+          "eligible_providers_after": [
+            "openrouter"
+          ],
+          "block_semantics": null
+        }
+      ],
+      "inventory_sources": [
+        {
+          "provider": "groq",
+          "slot": "groq-1",
+          "source": {
+            "identity": "https://api.groq.com/openai/v1/models",
+            "authority": "live_api",
+            "scope": "account",
+            "observed_at": 1790954076.306963,
+            "ttl_seconds": 300,
+            "refreshable": true,
+            "published_at": null
+          },
+          "complete": true,
+          "model_count": 11
+        },
+        {
+          "provider": "groq",
+          "slot": "groq-2",
+          "source": {
+            "identity": "https://api.groq.com/openai/v1/models",
+            "authority": "live_api",
+            "scope": "account",
+            "observed_at": 1790954076.574905,
+            "ttl_seconds": 300,
+            "refreshable": true,
+            "published_at": null
+          },
+          "complete": true,
+          "model_count": 11
+        },
+        {
+          "provider": "groq",
+          "slot": "groq-3",
+          "source": {
+            "identity": "https://api.groq.com/openai/v1/models",
+            "authority": "live_api",
+            "scope": "account",
+            "observed_at": 1790954076.74011,
+            "ttl_seconds": 300,
+            "refreshable": true,
+            "published_at": null
+          },
+          "complete": true,
+          "model_count": 11
+        },
+        {
+          "provider": "groq",
+          "slot": "groq-4",
+          "source": {
+            "identity": "https://api.groq.com/openai/v1/models",
+            "authority": "live_api",
+            "scope": "account",
+            "observed_at": 1790954077.126607,
+            "ttl_seconds": 300,
+            "refreshable": true,
+            "published_at": null
+          },
+          "complete": true,
+          "model_count": 11
+        },
+        {
+          "provider": "openrouter",
+          "slot": "openrouter-1",
+          "source": {
+            "identity": "https://openrouter.ai/api/v1/models/user",
+            "authority": "live_api",
+            "scope": "account",
+            "observed_at": 1790954077.3645887,
+            "ttl_seconds": 300,
+            "refreshable": true,
+            "published_at": null
+          },
+          "complete": true,
+          "model_count": 462
+        },
+        {
+          "provider": "openrouter",
+          "slot": "openrouter-2",
+          "source": {
+            "identity": "https://openrouter.ai/api/v1/models/user",
+            "authority": "live_api",
+            "scope": "account",
+            "observed_at": 1790954077.7017434,
+            "ttl_seconds": 300,
+            "refreshable": true,
+            "published_at": null
+          },
+          "complete": true,
+          "model_count": 462
+        },
+        {
+          "provider": "openrouter",
+          "slot": "openrouter-3",
+          "source": {
+            "identity": "https://openrouter.ai/api/v1/models/user",
+            "authority": "live_api",
+            "scope": "account",
+            "observed_at": 1790954077.9967594,
+            "ttl_seconds": 300,
+            "refreshable": true,
+            "published_at": null
+          },
+          "complete": true,
+          "model_count": 462
+        },
+        {
+          "provider": "openrouter",
+          "slot": "openrouter-4",
+          "source": {
+            "identity": "https://openrouter.ai/api/v1/models/user",
+            "authority": "live_api",
+            "scope": "account",
+            "observed_at": 1790954078.3073063,
+            "ttl_seconds": 300,
+            "refreshable": true,
+            "published_at": null
+          },
+          "complete": true,
+          "model_count": 462
+        },
+        {
+          "provider": "nvidia",
+          "slot": "nvidia-1",
+          "source": {
+            "identity": "https://integrate.api.nvidia.com/v1/models",
+            "authority": "live_api",
+            "scope": "account",
+            "observed_at": 1790954078.637635,
+            "ttl_seconds": 300,
+            "refreshable": true,
+            "published_at": null
+          },
+          "complete": true,
+          "model_count": 81
+        },
+        {
+          "provider": "nvidia",
+          "slot": "nvidia-2",
+          "source": {
+            "identity": "https://integrate.api.nvidia.com/v1/models",
+            "authority": "live_api",
+            "scope": "account",
+            "observed_at": 1790954078.8668578,
+            "ttl_seconds": 300,
+            "refreshable": true,
+            "published_at": null
+          },
+          "complete": true,
+          "model_count": 81
+        },
+        {
+          "provider": "google",
+          "slot": "google-1",
+          "source": {
+            "identity": "https://generativelanguage.googleapis.com/v1beta/models",
+            "authority": "live_api",
+            "scope": "account",
+            "observed_at": 1790954079.2986524,
+            "ttl_seconds": 300,
+            "refreshable": true,
+            "published_at": null
+          },
+          "complete": true,
+          "model_count": 61
+        },
+        {
+          "provider": "google",
+          "slot": "google-2",
+          "source": {
+            "identity": "https://generativelanguage.googleapis.com/v1beta/models",
+            "authority": "live_api",
+            "scope": "account",
+            "observed_at": 1790954079.712895,
+            "ttl_seconds": 300,
+            "refreshable": true,
+            "published_at": null
+          },
+          "complete": true,
+          "model_count": 61
+        },
+        {
+          "provider": "google",
+          "slot": "google-3",
+          "source": {
+            "identity": "https://generativelanguage.googleapis.com/v1beta/models",
+            "authority": "live_api",
+            "scope": "account",
+            "observed_at": 1790954080.0489154,
+            "ttl_seconds": 300,
+            "refreshable": true,
+            "published_at": null
+          },
+          "complete": true,
+          "model_count": 61
+        },
+        {
+          "provider": "zai",
+          "slot": "zai-1",
+          "source": {
+            "identity": "https://api.z.ai/api/paas/v4/models",
+            "authority": "live_api",
+            "scope": "account",
+            "observed_at": 1790954080.8733058,
+            "ttl_seconds": 300,
+            "refreshable": true,
+            "published_at": null
+          },
+          "complete": true,
+          "model_count": 11
+        },
+        {
+          "provider": "zai",
+          "slot": "zai-2",
+          "source": {
+            "identity": "https://api.z.ai/api/paas/v4/models",
+            "authority": "live_api",
+            "scope": "account",
+            "observed_at": 1790954081.6060698,
+            "ttl_seconds": 300,
+            "refreshable": true,
+            "published_at": null
+          },
+          "complete": true,
+          "model_count": 11
+        },
+        {
+          "provider": "ollama-cloud",
+          "slot": "ollama-cloud-1",
+          "source": {
+            "identity": "https://ollama.com/api/tags",
+            "authority": "live_api",
+            "scope": "account",
+            "observed_at": 1790954082.045957,
+            "ttl_seconds": 300,
+            "refreshable": true,
+            "published_at": null
+          },
+          "complete": true,
+          "model_count": 17
+        },
+        {
+          "provider": "ollama-cloud",
+          "slot": "ollama-cloud-2",
+          "source": {
+            "identity": "https://ollama.com/api/tags",
+            "authority": "live_api",
+            "scope": "account",
+            "observed_at": 1790954082.2395034,
+            "ttl_seconds": 300,
+            "refreshable": true,
+            "published_at": null
+          },
+          "complete": true,
+          "model_count": 17
+        }
+      ],
+      "account_observations": [
+        {
+          "source": "https://openrouter.ai/api/v1/key",
+          "observed_at": 1790954077.4578428,
+          "scope": "account",
+          "free_tier": true,
+          "credit_cap_remaining": null
+        },
+        {
+          "source": "https://openrouter.ai/api/v1/key",
+          "observed_at": 1790954077.7820206,
+          "scope": "account",
+          "free_tier": true,
+          "credit_cap_remaining": null
+        },
+        {
+          "source": "https://openrouter.ai/api/v1/key",
+          "observed_at": 1790954078.0833795,
+          "scope": "account",
+          "free_tier": true,
+          "credit_cap_remaining": null
+        },
+        {
+          "source": "https://openrouter.ai/api/v1/key",
+          "observed_at": 1790954078.3772802,
+          "scope": "account",
+          "free_tier": true,
+          "credit_cap_remaining": null
+        }
+      ],
+      "quota_pools": [
+        {
+          "id": "groq/configured-account",
+          "provider": "groq",
+          "account_product": "developer-api",
+          "provenance": "Conservative shared-account grouping; same-account identity is UNKNOWN until configured/observed. Keys do not multiply capacity.",
+          "concurrent": 0,
+          "max_concurrent": 1
+        },
+        {
+          "id": "openrouter/configured-account",
+          "provider": "openrouter",
+          "account_product": "developer-api",
+          "provenance": "Conservative shared-account grouping; same-account identity is UNKNOWN until configured/observed. Keys do not multiply capacity.",
+          "concurrent": 0,
+          "max_concurrent": 1
+        },
+        {
+          "id": "nvidia/configured-account",
+          "provider": "nvidia",
+          "account_product": "developer-api",
+          "provenance": "Conservative shared-account grouping; same-account identity is UNKNOWN until configured/observed. Keys do not multiply capacity.",
+          "concurrent": 0,
+          "max_concurrent": 1
+        },
+        {
+          "id": "google/configured-account",
+          "provider": "google",
+          "account_product": "developer-api",
+          "provenance": "Conservative shared-account grouping; same-account identity is UNKNOWN until configured/observed. Keys do not multiply capacity.",
+          "concurrent": 0,
+          "max_concurrent": 1
+        },
+        {
+          "id": "zai/configured-account",
+          "provider": "zai",
+          "account_product": "general-api",
+          "provenance": "Conservative shared-account grouping; same-account identity is UNKNOWN until configured/observed. Keys do not multiply capacity.",
+          "concurrent": 0,
+          "max_concurrent": 1
+        },
+        {
+          "id": "ollama-cloud/configured-account",
+          "provider": "ollama-cloud",
+          "account_product": "developer-api",
+          "provenance": "Conservative shared-account grouping; same-account identity is UNKNOWN until configured/observed. Keys do not multiply capacity.",
+          "concurrent": 0,
+          "max_concurrent": 1
+        }
+      ],
+      "current_cooldowns": [],
+      "current_route_health": [],
+      "conflicts": [
+        {
+          "provider": "groq",
+          "model": "llama-3.1-8b-instant",
+          "slot": "groq-1",
+          "cached_source": "Official retirement for the configured Free/Developer product; Enterprise committed-spend exception is preserved in provider research.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "groq-1"
+        },
+        {
+          "provider": "groq",
+          "model": "llama-3.3-70b-versatile",
+          "slot": "groq-1",
+          "cached_source": "Official retirement for the configured Free/Developer product; Enterprise committed-spend exception is preserved in provider research.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "groq-1"
+        },
+        {
+          "provider": "groq",
+          "model": "qwen/qwen3.6-27b",
+          "slot": "groq-1",
+          "cached_source": "Official retirement for the configured Free/Developer product; Enterprise committed-spend exception is preserved in provider research.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "groq-1"
+        },
+        {
+          "provider": "groq",
+          "model": "qwen/qwen3-32b",
+          "slot": "groq-1",
+          "cached_source": "Official retirement for the configured Free/Developer product; Enterprise committed-spend exception is preserved in provider research.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "groq-1"
+        },
+        {
+          "provider": "groq",
+          "model": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "slot": "groq-1",
+          "cached_source": "Official retirement for the configured Free/Developer product; Enterprise committed-spend exception is preserved in provider research.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "groq-1"
+        },
+        {
+          "provider": "groq",
+          "model": "groq/compound",
+          "slot": "groq-1",
+          "cached_source": "Official retirement for the configured Free/Developer product; Enterprise committed-spend exception is preserved in provider research.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "groq-1"
+        },
+        {
+          "provider": "groq",
+          "model": "groq/compound-mini",
+          "slot": "groq-1",
+          "cached_source": "Official retirement for the configured Free/Developer product; Enterprise committed-spend exception is preserved in provider research.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "groq-1"
+        },
+        {
+          "provider": "groq",
+          "model": "llama-3.1-8b-instant",
+          "slot": "groq-2",
+          "cached_source": "Official retirement for the configured Free/Developer product; Enterprise committed-spend exception is preserved in provider research.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "groq-2"
+        },
+        {
+          "provider": "groq",
+          "model": "llama-3.3-70b-versatile",
+          "slot": "groq-2",
+          "cached_source": "Official retirement for the configured Free/Developer product; Enterprise committed-spend exception is preserved in provider research.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "groq-2"
+        },
+        {
+          "provider": "groq",
+          "model": "qwen/qwen3.6-27b",
+          "slot": "groq-2",
+          "cached_source": "Official retirement for the configured Free/Developer product; Enterprise committed-spend exception is preserved in provider research.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "groq-2"
+        },
+        {
+          "provider": "groq",
+          "model": "qwen/qwen3-32b",
+          "slot": "groq-2",
+          "cached_source": "Official retirement for the configured Free/Developer product; Enterprise committed-spend exception is preserved in provider research.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "groq-2"
+        },
+        {
+          "provider": "groq",
+          "model": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "slot": "groq-2",
+          "cached_source": "Official retirement for the configured Free/Developer product; Enterprise committed-spend exception is preserved in provider research.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "groq-2"
+        },
+        {
+          "provider": "groq",
+          "model": "groq/compound",
+          "slot": "groq-2",
+          "cached_source": "Official retirement for the configured Free/Developer product; Enterprise committed-spend exception is preserved in provider research.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "groq-2"
+        },
+        {
+          "provider": "groq",
+          "model": "groq/compound-mini",
+          "slot": "groq-2",
+          "cached_source": "Official retirement for the configured Free/Developer product; Enterprise committed-spend exception is preserved in provider research.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "groq-2"
+        },
+        {
+          "provider": "groq",
+          "model": "llama-3.1-8b-instant",
+          "slot": "groq-3",
+          "cached_source": "Official retirement for the configured Free/Developer product; Enterprise committed-spend exception is preserved in provider research.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "groq-3"
+        },
+        {
+          "provider": "groq",
+          "model": "llama-3.3-70b-versatile",
+          "slot": "groq-3",
+          "cached_source": "Official retirement for the configured Free/Developer product; Enterprise committed-spend exception is preserved in provider research.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "groq-3"
+        },
+        {
+          "provider": "groq",
+          "model": "qwen/qwen3.6-27b",
+          "slot": "groq-3",
+          "cached_source": "Official retirement for the configured Free/Developer product; Enterprise committed-spend exception is preserved in provider research.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "groq-3"
+        },
+        {
+          "provider": "groq",
+          "model": "qwen/qwen3-32b",
+          "slot": "groq-3",
+          "cached_source": "Official retirement for the configured Free/Developer product; Enterprise committed-spend exception is preserved in provider research.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "groq-3"
+        },
+        {
+          "provider": "groq",
+          "model": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "slot": "groq-3",
+          "cached_source": "Official retirement for the configured Free/Developer product; Enterprise committed-spend exception is preserved in provider research.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "groq-3"
+        },
+        {
+          "provider": "groq",
+          "model": "groq/compound",
+          "slot": "groq-3",
+          "cached_source": "Official retirement for the configured Free/Developer product; Enterprise committed-spend exception is preserved in provider research.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "groq-3"
+        },
+        {
+          "provider": "groq",
+          "model": "groq/compound-mini",
+          "slot": "groq-3",
+          "cached_source": "Official retirement for the configured Free/Developer product; Enterprise committed-spend exception is preserved in provider research.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "groq-3"
+        },
+        {
+          "provider": "groq",
+          "model": "llama-3.1-8b-instant",
+          "slot": "groq-4",
+          "cached_source": "Official retirement for the configured Free/Developer product; Enterprise committed-spend exception is preserved in provider research.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "groq-4"
+        },
+        {
+          "provider": "groq",
+          "model": "llama-3.3-70b-versatile",
+          "slot": "groq-4",
+          "cached_source": "Official retirement for the configured Free/Developer product; Enterprise committed-spend exception is preserved in provider research.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "groq-4"
+        },
+        {
+          "provider": "groq",
+          "model": "qwen/qwen3.6-27b",
+          "slot": "groq-4",
+          "cached_source": "Official retirement for the configured Free/Developer product; Enterprise committed-spend exception is preserved in provider research.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "groq-4"
+        },
+        {
+          "provider": "groq",
+          "model": "qwen/qwen3-32b",
+          "slot": "groq-4",
+          "cached_source": "Official retirement for the configured Free/Developer product; Enterprise committed-spend exception is preserved in provider research.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "groq-4"
+        },
+        {
+          "provider": "groq",
+          "model": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "slot": "groq-4",
+          "cached_source": "Official retirement for the configured Free/Developer product; Enterprise committed-spend exception is preserved in provider research.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "groq-4"
+        },
+        {
+          "provider": "groq",
+          "model": "groq/compound",
+          "slot": "groq-4",
+          "cached_source": "Official retirement for the configured Free/Developer product; Enterprise committed-spend exception is preserved in provider research.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "groq-4"
+        },
+        {
+          "provider": "groq",
+          "model": "groq/compound-mini",
+          "slot": "groq-4",
+          "cached_source": "Official retirement for the configured Free/Developer product; Enterprise committed-spend exception is preserved in provider research.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "groq-4"
+        },
+        {
+          "provider": "google",
+          "model": "gemini-3-pro-preview",
+          "slot": "google-1",
+          "cached_source": "Official past shutdown; an API catalog listing does not override the retirement notice.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "google-1"
+        },
+        {
+          "provider": "google",
+          "model": "gemini-2.0-flash",
+          "slot": "google-1",
+          "cached_source": "Official past shutdown; an API catalog listing does not override the retirement notice.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "google-1"
+        },
+        {
+          "provider": "google",
+          "model": "gemini-2.0-flash-lite",
+          "slot": "google-1",
+          "cached_source": "Official past shutdown; an API catalog listing does not override the retirement notice.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "google-1"
+        },
+        {
+          "provider": "google",
+          "model": "gemini-3.1-flash-lite-preview",
+          "slot": "google-1",
+          "retirement_source": {
+            "identity": "https://ai.google.dev/gemini-api/docs/deprecations",
+            "authority": "official_deprecation",
+            "scope": "provider",
+            "observed_at": 1790943196.6073742,
+            "ttl_seconds": 86400,
+            "refreshable": true,
+            "published_at": null
+          },
+          "resolution": "official retirement overrides inventory listing; excluded from routing",
+          "live_inventory_source_ref": "google-1"
+        },
+        {
+          "provider": "google",
+          "model": "gemini-3-pro-image-preview",
+          "slot": "google-1",
+          "retirement_source": {
+            "identity": "https://ai.google.dev/gemini-api/docs/deprecations",
+            "authority": "official_deprecation",
+            "scope": "provider",
+            "observed_at": 1790943196.6073742,
+            "ttl_seconds": 86400,
+            "refreshable": true,
+            "published_at": null
+          },
+          "resolution": "official retirement overrides inventory listing; excluded from routing",
+          "live_inventory_source_ref": "google-1"
+        },
+        {
+          "provider": "google",
+          "model": "gemini-3.1-flash-image-preview",
+          "slot": "google-1",
+          "retirement_source": {
+            "identity": "https://ai.google.dev/gemini-api/docs/deprecations",
+            "authority": "official_deprecation",
+            "scope": "provider",
+            "observed_at": 1790943196.6073742,
+            "ttl_seconds": 86400,
+            "refreshable": true,
+            "published_at": null
+          },
+          "resolution": "official retirement overrides inventory listing; excluded from routing",
+          "live_inventory_source_ref": "google-1"
+        },
+        {
+          "provider": "google",
+          "model": "gemini-2.5-computer-use-preview-10-2025",
+          "slot": "google-1",
+          "retirement_source": {
+            "identity": "https://ai.google.dev/gemini-api/docs/deprecations",
+            "authority": "official_deprecation",
+            "scope": "provider",
+            "observed_at": 1790943196.6073742,
+            "ttl_seconds": 86400,
+            "refreshable": true,
+            "published_at": null
+          },
+          "resolution": "official retirement overrides inventory listing; excluded from routing",
+          "live_inventory_source_ref": "google-1"
+        },
+        {
+          "provider": "google",
+          "model": "gemini-3-pro-preview",
+          "slot": "google-2",
+          "cached_source": "Official past shutdown; an API catalog listing does not override the retirement notice.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "google-2"
+        },
+        {
+          "provider": "google",
+          "model": "gemini-2.0-flash",
+          "slot": "google-2",
+          "cached_source": "Official past shutdown; an API catalog listing does not override the retirement notice.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "google-2"
+        },
+        {
+          "provider": "google",
+          "model": "gemini-2.0-flash-lite",
+          "slot": "google-2",
+          "cached_source": "Official past shutdown; an API catalog listing does not override the retirement notice.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "google-2"
+        },
+        {
+          "provider": "google",
+          "model": "gemini-3.1-flash-lite-preview",
+          "slot": "google-2",
+          "retirement_source": {
+            "identity": "https://ai.google.dev/gemini-api/docs/deprecations",
+            "authority": "official_deprecation",
+            "scope": "provider",
+            "observed_at": 1790943196.6073742,
+            "ttl_seconds": 86400,
+            "refreshable": true,
+            "published_at": null
+          },
+          "resolution": "official retirement overrides inventory listing; excluded from routing",
+          "live_inventory_source_ref": "google-2"
+        },
+        {
+          "provider": "google",
+          "model": "gemini-3-pro-image-preview",
+          "slot": "google-2",
+          "retirement_source": {
+            "identity": "https://ai.google.dev/gemini-api/docs/deprecations",
+            "authority": "official_deprecation",
+            "scope": "provider",
+            "observed_at": 1790943196.6073742,
+            "ttl_seconds": 86400,
+            "refreshable": true,
+            "published_at": null
+          },
+          "resolution": "official retirement overrides inventory listing; excluded from routing",
+          "live_inventory_source_ref": "google-2"
+        },
+        {
+          "provider": "google",
+          "model": "gemini-3.1-flash-image-preview",
+          "slot": "google-2",
+          "retirement_source": {
+            "identity": "https://ai.google.dev/gemini-api/docs/deprecations",
+            "authority": "official_deprecation",
+            "scope": "provider",
+            "observed_at": 1790943196.6073742,
+            "ttl_seconds": 86400,
+            "refreshable": true,
+            "published_at": null
+          },
+          "resolution": "official retirement overrides inventory listing; excluded from routing",
+          "live_inventory_source_ref": "google-2"
+        },
+        {
+          "provider": "google",
+          "model": "gemini-2.5-computer-use-preview-10-2025",
+          "slot": "google-2",
+          "retirement_source": {
+            "identity": "https://ai.google.dev/gemini-api/docs/deprecations",
+            "authority": "official_deprecation",
+            "scope": "provider",
+            "observed_at": 1790943196.6073742,
+            "ttl_seconds": 86400,
+            "refreshable": true,
+            "published_at": null
+          },
+          "resolution": "official retirement overrides inventory listing; excluded from routing",
+          "live_inventory_source_ref": "google-2"
+        },
+        {
+          "provider": "google",
+          "model": "gemini-3-pro-preview",
+          "slot": "google-3",
+          "cached_source": "Official past shutdown; an API catalog listing does not override the retirement notice.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "google-3"
+        },
+        {
+          "provider": "google",
+          "model": "gemini-2.0-flash",
+          "slot": "google-3",
+          "cached_source": "Official past shutdown; an API catalog listing does not override the retirement notice.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "google-3"
+        },
+        {
+          "provider": "google",
+          "model": "gemini-2.0-flash-lite",
+          "slot": "google-3",
+          "cached_source": "Official past shutdown; an API catalog listing does not override the retirement notice.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "google-3"
+        },
+        {
+          "provider": "google",
+          "model": "gemini-3.1-flash-lite-preview",
+          "slot": "google-3",
+          "retirement_source": {
+            "identity": "https://ai.google.dev/gemini-api/docs/deprecations",
+            "authority": "official_deprecation",
+            "scope": "provider",
+            "observed_at": 1790943196.6073742,
+            "ttl_seconds": 86400,
+            "refreshable": true,
+            "published_at": null
+          },
+          "resolution": "official retirement overrides inventory listing; excluded from routing",
+          "live_inventory_source_ref": "google-3"
+        },
+        {
+          "provider": "google",
+          "model": "gemini-3-pro-image-preview",
+          "slot": "google-3",
+          "retirement_source": {
+            "identity": "https://ai.google.dev/gemini-api/docs/deprecations",
+            "authority": "official_deprecation",
+            "scope": "provider",
+            "observed_at": 1790943196.6073742,
+            "ttl_seconds": 86400,
+            "refreshable": true,
+            "published_at": null
+          },
+          "resolution": "official retirement overrides inventory listing; excluded from routing",
+          "live_inventory_source_ref": "google-3"
+        },
+        {
+          "provider": "google",
+          "model": "gemini-3.1-flash-image-preview",
+          "slot": "google-3",
+          "retirement_source": {
+            "identity": "https://ai.google.dev/gemini-api/docs/deprecations",
+            "authority": "official_deprecation",
+            "scope": "provider",
+            "observed_at": 1790943196.6073742,
+            "ttl_seconds": 86400,
+            "refreshable": true,
+            "published_at": null
+          },
+          "resolution": "official retirement overrides inventory listing; excluded from routing",
+          "live_inventory_source_ref": "google-3"
+        },
+        {
+          "provider": "google",
+          "model": "gemini-2.5-computer-use-preview-10-2025",
+          "slot": "google-3",
+          "retirement_source": {
+            "identity": "https://ai.google.dev/gemini-api/docs/deprecations",
+            "authority": "official_deprecation",
+            "scope": "provider",
+            "observed_at": 1790943196.6073742,
+            "ttl_seconds": 86400,
+            "refreshable": true,
+            "published_at": null
+          },
+          "resolution": "official retirement overrides inventory listing; excluded from routing",
+          "live_inventory_source_ref": "google-3"
+        }
+      ]
+    },
+    {
+      "recorded_at": "2026-10-02T15:19:40.104958+00:00",
+      "scope": "Final Gate A focused routing; no provider generation matrix or Slice 05",
+      "funding_policy": "Default; paid and UNKNOWN funding excluded",
+      "checks": [
+        {
+          "check": "final routing heavy remains REPORTED before independent comparison",
+          "status": "PASS"
+        },
+        {
+          "check": "final routing heavy objective starts unknown",
+          "status": "PASS"
+        },
+        {
+          "check": "final routing heavy attempts bounded",
+          "status": "PASS"
+        },
+        {
+          "check": "final routing heavy pool/slot reservations released",
+          "status": "PASS"
+        },
+        {
+          "check": "final heavy truthful acceptance",
+          "status": "PASS"
+        },
+        {
+          "check": "final heavy eligible routes current and funding authorized",
+          "status": "PASS"
+        },
+        {
+          "check": "final routing history excludes credentials",
+          "status": "PASS"
+        },
+        {
+          "check": "final routing history excludes prompt and response",
+          "status": "PASS"
+        }
+      ],
+      "operations": [
+        {
+          "scenario": "final routing heavy",
+          "observed_at": 1790954378.310994,
+          "mode": "heavy",
+          "max_output_tokens": 512,
+          "allow_unknown_cost": false,
+          "allow_unknown_limits": false,
+          "scope": "generation contract only; no model-quality/funding proof",
+          "status": "VERIFIED",
+          "sentinel_matches": true,
+          "provider": "openrouter",
+          "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+          "slot": "openrouter-1",
+          "quota_pool": "openrouter/configured-account",
+          "reasons": [
+            "required capabilities satisfied; context/output limits checked",
+            "quality tier 5 meets floor 4; source: Bootstrap task-fit tier from official model description, not a benchmark. Discovery must confirm current zero pricing/account visibility; replaceable candidate, not the permanent free model.",
+            "capacity class free; quota 16 confirmed requests remaining",
+            "availability listed via credential; generation entitlement not implied; inventory source https://openrouter.ai/api/v1/models/user; observed_at 1790954373.3649936; TTL 300s",
+            "account product developer-api; shared quota pool openrouter/configured-account; credential count does not increase capacity",
+            "ranking considers task affinity, decaying reliability/latency, and scarcity",
+            "provider response health and verified objective outcomes remain separate",
+            "preserve stronger/scarcer routes when sufficient alternatives exist",
+            "mode heavy; explicit policy enforced"
+          ],
+          "actual_model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+          "actual_provider": "Nvidia",
+          "rate_limits": {
+            "request_limit": null,
+            "token_limit": null,
+            "remaining_requests": null,
+            "remaining_tokens": null,
+            "requests_reset_at": null,
+            "tokens_reset_at": null,
+            "retry_after": null,
+            "request_window": "UNKNOWN",
+            "token_window": "UNKNOWN",
+            "source": "response headers",
+            "request_reset_hint": null
+          },
+          "input_tokens": 24,
+          "output_tokens": 24,
+          "attempts": 1,
+          "attempt_trace": [
+            {
+              "provider": "openrouter",
+              "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+              "slot": "openrouter-1",
+              "quota_pool": "openrouter/configured-account",
+              "attempt": 1,
+              "provider_response_success": true,
+              "error": null,
+              "timestamp": 1790954380.0080564
+            }
+          ],
+          "http_statuses": {
+            "openai": [
+              200
+            ]
+          },
+          "acceptance": "PASS",
+          "disposition": "VERIFIED_GENERATION",
+          "eligible_before": 8,
+          "eligible_after": 8,
+          "eligible_providers_before": [
+            "openrouter"
+          ],
+          "eligible_providers_after": [
+            "openrouter"
+          ],
+          "block_semantics": null
+        }
+      ],
+      "inventory_sources": [
+        {
+          "provider": "groq",
+          "slot": "groq-1",
+          "source": {
+            "identity": "https://api.groq.com/openai/v1/models",
+            "authority": "live_api",
+            "scope": "account",
+            "observed_at": 1790954372.6318414,
+            "ttl_seconds": 300,
+            "refreshable": true,
+            "published_at": null
+          },
+          "complete": true,
+          "model_count": 11
+        },
+        {
+          "provider": "groq",
+          "slot": "groq-2",
+          "source": {
+            "identity": "https://api.groq.com/openai/v1/models",
+            "authority": "live_api",
+            "scope": "account",
+            "observed_at": 1790954372.7963026,
+            "ttl_seconds": 300,
+            "refreshable": true,
+            "published_at": null
+          },
+          "complete": true,
+          "model_count": 11
+        },
+        {
+          "provider": "groq",
+          "slot": "groq-3",
+          "source": {
+            "identity": "https://api.groq.com/openai/v1/models",
+            "authority": "live_api",
+            "scope": "account",
+            "observed_at": 1790954372.9381943,
+            "ttl_seconds": 300,
+            "refreshable": true,
+            "published_at": null
+          },
+          "complete": true,
+          "model_count": 11
+        },
+        {
+          "provider": "groq",
+          "slot": "groq-4",
+          "source": {
+            "identity": "https://api.groq.com/openai/v1/models",
+            "authority": "live_api",
+            "scope": "account",
+            "observed_at": 1790954373.1122696,
+            "ttl_seconds": 300,
+            "refreshable": true,
+            "published_at": null
+          },
+          "complete": true,
+          "model_count": 11
+        },
+        {
+          "provider": "openrouter",
+          "slot": "openrouter-1",
+          "source": {
+            "identity": "https://openrouter.ai/api/v1/models/user",
+            "authority": "live_api",
+            "scope": "account",
+            "observed_at": 1790954373.3649936,
+            "ttl_seconds": 300,
+            "refreshable": true,
+            "published_at": null
+          },
+          "complete": true,
+          "model_count": 462
+        },
+        {
+          "provider": "openrouter",
+          "slot": "openrouter-2",
+          "source": {
+            "identity": "https://openrouter.ai/api/v1/models/user",
+            "authority": "live_api",
+            "scope": "account",
+            "observed_at": 1790954373.7039967,
+            "ttl_seconds": 300,
+            "refreshable": true,
+            "published_at": null
+          },
+          "complete": true,
+          "model_count": 462
+        },
+        {
+          "provider": "openrouter",
+          "slot": "openrouter-3",
+          "source": {
+            "identity": "https://openrouter.ai/api/v1/models/user",
+            "authority": "live_api",
+            "scope": "account",
+            "observed_at": 1790954374.1300812,
+            "ttl_seconds": 300,
+            "refreshable": true,
+            "published_at": null
+          },
+          "complete": true,
+          "model_count": 462
+        },
+        {
+          "provider": "openrouter",
+          "slot": "openrouter-4",
+          "source": {
+            "identity": "https://openrouter.ai/api/v1/models/user",
+            "authority": "live_api",
+            "scope": "account",
+            "observed_at": 1790954374.4271455,
+            "ttl_seconds": 300,
+            "refreshable": true,
+            "published_at": null
+          },
+          "complete": true,
+          "model_count": 462
+        },
+        {
+          "provider": "nvidia",
+          "slot": "nvidia-1",
+          "source": {
+            "identity": "https://integrate.api.nvidia.com/v1/models",
+            "authority": "live_api",
+            "scope": "account",
+            "observed_at": 1790954374.8259223,
+            "ttl_seconds": 300,
+            "refreshable": true,
+            "published_at": null
+          },
+          "complete": true,
+          "model_count": 81
+        },
+        {
+          "provider": "nvidia",
+          "slot": "nvidia-2",
+          "source": {
+            "identity": "https://integrate.api.nvidia.com/v1/models",
+            "authority": "live_api",
+            "scope": "account",
+            "observed_at": 1790954375.0158627,
+            "ttl_seconds": 300,
+            "refreshable": true,
+            "published_at": null
+          },
+          "complete": true,
+          "model_count": 81
+        },
+        {
+          "provider": "google",
+          "slot": "google-1",
+          "source": {
+            "identity": "https://generativelanguage.googleapis.com/v1beta/models",
+            "authority": "live_api",
+            "scope": "account",
+            "observed_at": 1790954375.437954,
+            "ttl_seconds": 300,
+            "refreshable": true,
+            "published_at": null
+          },
+          "complete": true,
+          "model_count": 61
+        },
+        {
+          "provider": "google",
+          "slot": "google-2",
+          "source": {
+            "identity": "https://generativelanguage.googleapis.com/v1beta/models",
+            "authority": "live_api",
+            "scope": "account",
+            "observed_at": 1790954375.7588701,
+            "ttl_seconds": 300,
+            "refreshable": true,
+            "published_at": null
+          },
+          "complete": true,
+          "model_count": 61
+        },
+        {
+          "provider": "google",
+          "slot": "google-3",
+          "source": {
+            "identity": "https://generativelanguage.googleapis.com/v1beta/models",
+            "authority": "live_api",
+            "scope": "account",
+            "observed_at": 1790954376.2991507,
+            "ttl_seconds": 300,
+            "refreshable": true,
+            "published_at": null
+          },
+          "complete": true,
+          "model_count": 61
+        },
+        {
+          "provider": "zai",
+          "slot": "zai-1",
+          "source": {
+            "identity": "https://api.z.ai/api/paas/v4/models",
+            "authority": "live_api",
+            "scope": "account",
+            "observed_at": 1790954377.090494,
+            "ttl_seconds": 300,
+            "refreshable": true,
+            "published_at": null
+          },
+          "complete": true,
+          "model_count": 11
+        },
+        {
+          "provider": "zai",
+          "slot": "zai-2",
+          "source": {
+            "identity": "https://api.z.ai/api/paas/v4/models",
+            "authority": "live_api",
+            "scope": "account",
+            "observed_at": 1790954377.7606702,
+            "ttl_seconds": 300,
+            "refreshable": true,
+            "published_at": null
+          },
+          "complete": true,
+          "model_count": 11
+        },
+        {
+          "provider": "ollama-cloud",
+          "slot": "ollama-cloud-1",
+          "source": {
+            "identity": "https://ollama.com/api/tags",
+            "authority": "live_api",
+            "scope": "account",
+            "observed_at": 1790954378.0061245,
+            "ttl_seconds": 300,
+            "refreshable": true,
+            "published_at": null
+          },
+          "complete": true,
+          "model_count": 17
+        },
+        {
+          "provider": "ollama-cloud",
+          "slot": "ollama-cloud-2",
+          "source": {
+            "identity": "https://ollama.com/api/tags",
+            "authority": "live_api",
+            "scope": "account",
+            "observed_at": 1790954378.2784572,
+            "ttl_seconds": 300,
+            "refreshable": true,
+            "published_at": null
+          },
+          "complete": true,
+          "model_count": 17
+        }
+      ],
+      "account_observations": [
+        {
+          "source": "https://openrouter.ai/api/v1/key",
+          "observed_at": 1790954373.4591758,
+          "scope": "account",
+          "free_tier": true,
+          "credit_cap_remaining": null
+        },
+        {
+          "source": "https://openrouter.ai/api/v1/key",
+          "observed_at": 1790954373.774818,
+          "scope": "account",
+          "free_tier": true,
+          "credit_cap_remaining": null
+        },
+        {
+          "source": "https://openrouter.ai/api/v1/key",
+          "observed_at": 1790954374.1994476,
+          "scope": "account",
+          "free_tier": true,
+          "credit_cap_remaining": null
+        },
+        {
+          "source": "https://openrouter.ai/api/v1/key",
+          "observed_at": 1790954374.6174908,
+          "scope": "account",
+          "free_tier": true,
+          "credit_cap_remaining": null
+        }
+      ],
+      "quota_pools": [
+        {
+          "id": "groq/configured-account",
+          "provider": "groq",
+          "account_product": "developer-api",
+          "provenance": "Conservative shared-account grouping; same-account identity is UNKNOWN until configured/observed. Keys do not multiply capacity.",
+          "concurrent": 0,
+          "max_concurrent": 1
+        },
+        {
+          "id": "openrouter/configured-account",
+          "provider": "openrouter",
+          "account_product": "developer-api",
+          "provenance": "Conservative shared-account grouping; same-account identity is UNKNOWN until configured/observed. Keys do not multiply capacity.",
+          "concurrent": 0,
+          "max_concurrent": 1
+        },
+        {
+          "id": "nvidia/configured-account",
+          "provider": "nvidia",
+          "account_product": "developer-api",
+          "provenance": "Conservative shared-account grouping; same-account identity is UNKNOWN until configured/observed. Keys do not multiply capacity.",
+          "concurrent": 0,
+          "max_concurrent": 1
+        },
+        {
+          "id": "google/configured-account",
+          "provider": "google",
+          "account_product": "developer-api",
+          "provenance": "Conservative shared-account grouping; same-account identity is UNKNOWN until configured/observed. Keys do not multiply capacity.",
+          "concurrent": 0,
+          "max_concurrent": 1
+        },
+        {
+          "id": "zai/configured-account",
+          "provider": "zai",
+          "account_product": "general-api",
+          "provenance": "Conservative shared-account grouping; same-account identity is UNKNOWN until configured/observed. Keys do not multiply capacity.",
+          "concurrent": 0,
+          "max_concurrent": 1
+        },
+        {
+          "id": "ollama-cloud/configured-account",
+          "provider": "ollama-cloud",
+          "account_product": "developer-api",
+          "provenance": "Conservative shared-account grouping; same-account identity is UNKNOWN until configured/observed. Keys do not multiply capacity.",
+          "concurrent": 0,
+          "max_concurrent": 1
+        }
+      ],
+      "current_cooldowns": [],
+      "current_route_health": [],
+      "conflicts": [
+        {
+          "provider": "groq",
+          "model": "llama-3.1-8b-instant",
+          "slot": "groq-1",
+          "cached_source": "Official retirement for the configured Free/Developer product; Enterprise committed-spend exception is preserved in provider research.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "groq-1"
+        },
+        {
+          "provider": "groq",
+          "model": "llama-3.3-70b-versatile",
+          "slot": "groq-1",
+          "cached_source": "Official retirement for the configured Free/Developer product; Enterprise committed-spend exception is preserved in provider research.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "groq-1"
+        },
+        {
+          "provider": "groq",
+          "model": "qwen/qwen3.6-27b",
+          "slot": "groq-1",
+          "cached_source": "Official retirement for the configured Free/Developer product; Enterprise committed-spend exception is preserved in provider research.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "groq-1"
+        },
+        {
+          "provider": "groq",
+          "model": "qwen/qwen3-32b",
+          "slot": "groq-1",
+          "cached_source": "Official retirement for the configured Free/Developer product; Enterprise committed-spend exception is preserved in provider research.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "groq-1"
+        },
+        {
+          "provider": "groq",
+          "model": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "slot": "groq-1",
+          "cached_source": "Official retirement for the configured Free/Developer product; Enterprise committed-spend exception is preserved in provider research.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "groq-1"
+        },
+        {
+          "provider": "groq",
+          "model": "groq/compound",
+          "slot": "groq-1",
+          "cached_source": "Official retirement for the configured Free/Developer product; Enterprise committed-spend exception is preserved in provider research.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "groq-1"
+        },
+        {
+          "provider": "groq",
+          "model": "groq/compound-mini",
+          "slot": "groq-1",
+          "cached_source": "Official retirement for the configured Free/Developer product; Enterprise committed-spend exception is preserved in provider research.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "groq-1"
+        },
+        {
+          "provider": "groq",
+          "model": "llama-3.1-8b-instant",
+          "slot": "groq-2",
+          "cached_source": "Official retirement for the configured Free/Developer product; Enterprise committed-spend exception is preserved in provider research.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "groq-2"
+        },
+        {
+          "provider": "groq",
+          "model": "llama-3.3-70b-versatile",
+          "slot": "groq-2",
+          "cached_source": "Official retirement for the configured Free/Developer product; Enterprise committed-spend exception is preserved in provider research.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "groq-2"
+        },
+        {
+          "provider": "groq",
+          "model": "qwen/qwen3.6-27b",
+          "slot": "groq-2",
+          "cached_source": "Official retirement for the configured Free/Developer product; Enterprise committed-spend exception is preserved in provider research.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "groq-2"
+        },
+        {
+          "provider": "groq",
+          "model": "qwen/qwen3-32b",
+          "slot": "groq-2",
+          "cached_source": "Official retirement for the configured Free/Developer product; Enterprise committed-spend exception is preserved in provider research.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "groq-2"
+        },
+        {
+          "provider": "groq",
+          "model": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "slot": "groq-2",
+          "cached_source": "Official retirement for the configured Free/Developer product; Enterprise committed-spend exception is preserved in provider research.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "groq-2"
+        },
+        {
+          "provider": "groq",
+          "model": "groq/compound",
+          "slot": "groq-2",
+          "cached_source": "Official retirement for the configured Free/Developer product; Enterprise committed-spend exception is preserved in provider research.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "groq-2"
+        },
+        {
+          "provider": "groq",
+          "model": "groq/compound-mini",
+          "slot": "groq-2",
+          "cached_source": "Official retirement for the configured Free/Developer product; Enterprise committed-spend exception is preserved in provider research.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "groq-2"
+        },
+        {
+          "provider": "groq",
+          "model": "llama-3.1-8b-instant",
+          "slot": "groq-3",
+          "cached_source": "Official retirement for the configured Free/Developer product; Enterprise committed-spend exception is preserved in provider research.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "groq-3"
+        },
+        {
+          "provider": "groq",
+          "model": "llama-3.3-70b-versatile",
+          "slot": "groq-3",
+          "cached_source": "Official retirement for the configured Free/Developer product; Enterprise committed-spend exception is preserved in provider research.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "groq-3"
+        },
+        {
+          "provider": "groq",
+          "model": "qwen/qwen3.6-27b",
+          "slot": "groq-3",
+          "cached_source": "Official retirement for the configured Free/Developer product; Enterprise committed-spend exception is preserved in provider research.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "groq-3"
+        },
+        {
+          "provider": "groq",
+          "model": "qwen/qwen3-32b",
+          "slot": "groq-3",
+          "cached_source": "Official retirement for the configured Free/Developer product; Enterprise committed-spend exception is preserved in provider research.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "groq-3"
+        },
+        {
+          "provider": "groq",
+          "model": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "slot": "groq-3",
+          "cached_source": "Official retirement for the configured Free/Developer product; Enterprise committed-spend exception is preserved in provider research.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "groq-3"
+        },
+        {
+          "provider": "groq",
+          "model": "groq/compound",
+          "slot": "groq-3",
+          "cached_source": "Official retirement for the configured Free/Developer product; Enterprise committed-spend exception is preserved in provider research.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "groq-3"
+        },
+        {
+          "provider": "groq",
+          "model": "groq/compound-mini",
+          "slot": "groq-3",
+          "cached_source": "Official retirement for the configured Free/Developer product; Enterprise committed-spend exception is preserved in provider research.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "groq-3"
+        },
+        {
+          "provider": "groq",
+          "model": "llama-3.1-8b-instant",
+          "slot": "groq-4",
+          "cached_source": "Official retirement for the configured Free/Developer product; Enterprise committed-spend exception is preserved in provider research.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "groq-4"
+        },
+        {
+          "provider": "groq",
+          "model": "llama-3.3-70b-versatile",
+          "slot": "groq-4",
+          "cached_source": "Official retirement for the configured Free/Developer product; Enterprise committed-spend exception is preserved in provider research.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "groq-4"
+        },
+        {
+          "provider": "groq",
+          "model": "qwen/qwen3.6-27b",
+          "slot": "groq-4",
+          "cached_source": "Official retirement for the configured Free/Developer product; Enterprise committed-spend exception is preserved in provider research.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "groq-4"
+        },
+        {
+          "provider": "groq",
+          "model": "qwen/qwen3-32b",
+          "slot": "groq-4",
+          "cached_source": "Official retirement for the configured Free/Developer product; Enterprise committed-spend exception is preserved in provider research.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "groq-4"
+        },
+        {
+          "provider": "groq",
+          "model": "meta-llama/llama-4-scout-17b-16e-instruct",
+          "slot": "groq-4",
+          "cached_source": "Official retirement for the configured Free/Developer product; Enterprise committed-spend exception is preserved in provider research.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "groq-4"
+        },
+        {
+          "provider": "groq",
+          "model": "groq/compound",
+          "slot": "groq-4",
+          "cached_source": "Official retirement for the configured Free/Developer product; Enterprise committed-spend exception is preserved in provider research.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "groq-4"
+        },
+        {
+          "provider": "groq",
+          "model": "groq/compound-mini",
+          "slot": "groq-4",
+          "cached_source": "Official retirement for the configured Free/Developer product; Enterprise committed-spend exception is preserved in provider research.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "groq-4"
+        },
+        {
+          "provider": "google",
+          "model": "gemini-3-pro-preview",
+          "slot": "google-1",
+          "cached_source": "Official past shutdown; an API catalog listing does not override the retirement notice.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "google-1"
+        },
+        {
+          "provider": "google",
+          "model": "gemini-2.0-flash",
+          "slot": "google-1",
+          "cached_source": "Official past shutdown; an API catalog listing does not override the retirement notice.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "google-1"
+        },
+        {
+          "provider": "google",
+          "model": "gemini-2.0-flash-lite",
+          "slot": "google-1",
+          "cached_source": "Official past shutdown; an API catalog listing does not override the retirement notice.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "google-1"
+        },
+        {
+          "provider": "google",
+          "model": "gemini-3.1-flash-lite-preview",
+          "slot": "google-1",
+          "retirement_source": {
+            "identity": "https://ai.google.dev/gemini-api/docs/deprecations",
+            "authority": "official_deprecation",
+            "scope": "provider",
+            "observed_at": 1790943196.6073742,
+            "ttl_seconds": 86400,
+            "refreshable": true,
+            "published_at": null
+          },
+          "resolution": "official retirement overrides inventory listing; excluded from routing",
+          "live_inventory_source_ref": "google-1"
+        },
+        {
+          "provider": "google",
+          "model": "gemini-3-pro-image-preview",
+          "slot": "google-1",
+          "retirement_source": {
+            "identity": "https://ai.google.dev/gemini-api/docs/deprecations",
+            "authority": "official_deprecation",
+            "scope": "provider",
+            "observed_at": 1790943196.6073742,
+            "ttl_seconds": 86400,
+            "refreshable": true,
+            "published_at": null
+          },
+          "resolution": "official retirement overrides inventory listing; excluded from routing",
+          "live_inventory_source_ref": "google-1"
+        },
+        {
+          "provider": "google",
+          "model": "gemini-3.1-flash-image-preview",
+          "slot": "google-1",
+          "retirement_source": {
+            "identity": "https://ai.google.dev/gemini-api/docs/deprecations",
+            "authority": "official_deprecation",
+            "scope": "provider",
+            "observed_at": 1790943196.6073742,
+            "ttl_seconds": 86400,
+            "refreshable": true,
+            "published_at": null
+          },
+          "resolution": "official retirement overrides inventory listing; excluded from routing",
+          "live_inventory_source_ref": "google-1"
+        },
+        {
+          "provider": "google",
+          "model": "gemini-2.5-computer-use-preview-10-2025",
+          "slot": "google-1",
+          "retirement_source": {
+            "identity": "https://ai.google.dev/gemini-api/docs/deprecations",
+            "authority": "official_deprecation",
+            "scope": "provider",
+            "observed_at": 1790943196.6073742,
+            "ttl_seconds": 86400,
+            "refreshable": true,
+            "published_at": null
+          },
+          "resolution": "official retirement overrides inventory listing; excluded from routing",
+          "live_inventory_source_ref": "google-1"
+        },
+        {
+          "provider": "google",
+          "model": "gemini-3-pro-preview",
+          "slot": "google-2",
+          "cached_source": "Official past shutdown; an API catalog listing does not override the retirement notice.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "google-2"
+        },
+        {
+          "provider": "google",
+          "model": "gemini-2.0-flash",
+          "slot": "google-2",
+          "cached_source": "Official past shutdown; an API catalog listing does not override the retirement notice.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "google-2"
+        },
+        {
+          "provider": "google",
+          "model": "gemini-2.0-flash-lite",
+          "slot": "google-2",
+          "cached_source": "Official past shutdown; an API catalog listing does not override the retirement notice.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "google-2"
+        },
+        {
+          "provider": "google",
+          "model": "gemini-3.1-flash-lite-preview",
+          "slot": "google-2",
+          "retirement_source": {
+            "identity": "https://ai.google.dev/gemini-api/docs/deprecations",
+            "authority": "official_deprecation",
+            "scope": "provider",
+            "observed_at": 1790943196.6073742,
+            "ttl_seconds": 86400,
+            "refreshable": true,
+            "published_at": null
+          },
+          "resolution": "official retirement overrides inventory listing; excluded from routing",
+          "live_inventory_source_ref": "google-2"
+        },
+        {
+          "provider": "google",
+          "model": "gemini-3-pro-image-preview",
+          "slot": "google-2",
+          "retirement_source": {
+            "identity": "https://ai.google.dev/gemini-api/docs/deprecations",
+            "authority": "official_deprecation",
+            "scope": "provider",
+            "observed_at": 1790943196.6073742,
+            "ttl_seconds": 86400,
+            "refreshable": true,
+            "published_at": null
+          },
+          "resolution": "official retirement overrides inventory listing; excluded from routing",
+          "live_inventory_source_ref": "google-2"
+        },
+        {
+          "provider": "google",
+          "model": "gemini-3.1-flash-image-preview",
+          "slot": "google-2",
+          "retirement_source": {
+            "identity": "https://ai.google.dev/gemini-api/docs/deprecations",
+            "authority": "official_deprecation",
+            "scope": "provider",
+            "observed_at": 1790943196.6073742,
+            "ttl_seconds": 86400,
+            "refreshable": true,
+            "published_at": null
+          },
+          "resolution": "official retirement overrides inventory listing; excluded from routing",
+          "live_inventory_source_ref": "google-2"
+        },
+        {
+          "provider": "google",
+          "model": "gemini-2.5-computer-use-preview-10-2025",
+          "slot": "google-2",
+          "retirement_source": {
+            "identity": "https://ai.google.dev/gemini-api/docs/deprecations",
+            "authority": "official_deprecation",
+            "scope": "provider",
+            "observed_at": 1790943196.6073742,
+            "ttl_seconds": 86400,
+            "refreshable": true,
+            "published_at": null
+          },
+          "resolution": "official retirement overrides inventory listing; excluded from routing",
+          "live_inventory_source_ref": "google-2"
+        },
+        {
+          "provider": "google",
+          "model": "gemini-3-pro-preview",
+          "slot": "google-3",
+          "cached_source": "Official past shutdown; an API catalog listing does not override the retirement notice.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "google-3"
+        },
+        {
+          "provider": "google",
+          "model": "gemini-2.0-flash",
+          "slot": "google-3",
+          "cached_source": "Official past shutdown; an API catalog listing does not override the retirement notice.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "google-3"
+        },
+        {
+          "provider": "google",
+          "model": "gemini-2.0-flash-lite",
+          "slot": "google-3",
+          "cached_source": "Official past shutdown; an API catalog listing does not override the retirement notice.",
+          "resolution": "absent in complete live inventory; cached availability rejected",
+          "live_inventory_source_ref": "google-3"
+        },
+        {
+          "provider": "google",
+          "model": "gemini-3.1-flash-lite-preview",
+          "slot": "google-3",
+          "retirement_source": {
+            "identity": "https://ai.google.dev/gemini-api/docs/deprecations",
+            "authority": "official_deprecation",
+            "scope": "provider",
+            "observed_at": 1790943196.6073742,
+            "ttl_seconds": 86400,
+            "refreshable": true,
+            "published_at": null
+          },
+          "resolution": "official retirement overrides inventory listing; excluded from routing",
+          "live_inventory_source_ref": "google-3"
+        },
+        {
+          "provider": "google",
+          "model": "gemini-3-pro-image-preview",
+          "slot": "google-3",
+          "retirement_source": {
+            "identity": "https://ai.google.dev/gemini-api/docs/deprecations",
+            "authority": "official_deprecation",
+            "scope": "provider",
+            "observed_at": 1790943196.6073742,
+            "ttl_seconds": 86400,
+            "refreshable": true,
+            "published_at": null
+          },
+          "resolution": "official retirement overrides inventory listing; excluded from routing",
+          "live_inventory_source_ref": "google-3"
+        },
+        {
+          "provider": "google",
+          "model": "gemini-3.1-flash-image-preview",
+          "slot": "google-3",
+          "retirement_source": {
+            "identity": "https://ai.google.dev/gemini-api/docs/deprecations",
+            "authority": "official_deprecation",
+            "scope": "provider",
+            "observed_at": 1790943196.6073742,
+            "ttl_seconds": 86400,
+            "refreshable": true,
+            "published_at": null
+          },
+          "resolution": "official retirement overrides inventory listing; excluded from routing",
+          "live_inventory_source_ref": "google-3"
+        },
+        {
+          "provider": "google",
+          "model": "gemini-2.5-computer-use-preview-10-2025",
+          "slot": "google-3",
+          "retirement_source": {
+            "identity": "https://ai.google.dev/gemini-api/docs/deprecations",
+            "authority": "official_deprecation",
+            "scope": "provider",
+            "observed_at": 1790943196.6073742,
+            "ttl_seconds": 86400,
+            "refreshable": true,
+            "published_at": null
+          },
+          "resolution": "official retirement overrides inventory listing; excluded from routing",
+          "live_inventory_source_ref": "google-3"
+        }
+      ]
+    }
+  ],
+  "first_freshness_objective": {
+    "recorded_at": "2026-10-02T15:29:00.403818+00:00",
+    "objective": "What are the currently supported models and relevant free/developer access constraints for OSCAR's configured intelligence providers right now?",
+    "scope": "Final Gate A freshness/search; no model-generation matrix or Slice 05",
+    "acceptance": "PARTIAL",
+    "decision": {
+      "route": "world",
+      "execution_class": "retrieval_live_source",
+      "capability_kind": "live_source",
+      "reason": "current-state claim requires authoritative live retrieval before reasoning",
+      "latency_ms": 0.27756600138673093,
+      "repair": "block if capability unavailable",
+      "freshness": "freshness_sensitive"
+    },
+    "task_state": "partially_verified",
+    "tavily_slots": [
+      {
+        "slot": "tavily-1",
+        "present": false,
+        "status": "BLOCKED",
+        "reason": "credential absent"
+      },
+      {
+        "slot": "tavily-2",
+        "present": false,
+        "status": "BLOCKED",
+        "reason": "credential absent"
+      },
+      {
+        "slot": "tavily-3",
+        "present": false,
+        "status": "BLOCKED",
+        "reason": "credential absent"
+      }
+    ],
+    "search_observations": [],
+    "slot_preflight_observations": [],
+    "objective_search_observations": [],
+    "sources": [
+      {
+        "task_id": "5250eec096b64822a9a2f1e86eb36136",
+        "correlation_id": "4b6126b8c87b42489ba428c9db48652a",
+        "source": {
+          "identity": "https://api.groq.com/openai/v1/models",
+          "authority": "live_api",
+          "scope": "account",
+          "observed_at": 1790954938.1080918,
+          "ttl_seconds": 300,
+          "refreshable": true,
+          "published_at": null
+        },
+        "status": "REPORTED",
+        "conflicts": [
+          "llama-3.1-8b-instant: absent in complete live inventory; cached availability rejected",
+          "llama-3.3-70b-versatile: absent in complete live inventory; cached availability rejected",
+          "qwen/qwen3.6-27b: absent in complete live inventory; cached availability rejected",
+          "qwen/qwen3-32b: absent in complete live inventory; cached availability rejected",
+          "meta-llama/llama-4-scout-17b-16e-instruct: absent in complete live inventory; cached availability rejected",
+          "groq/compound: absent in complete live inventory; cached availability rejected",
+          "groq/compound-mini: absent in complete live inventory; cached availability rejected"
+        ],
+        "retrieval_method": "direct"
+      },
+      {
+        "task_id": "5250eec096b64822a9a2f1e86eb36136",
+        "correlation_id": "4b6126b8c87b42489ba428c9db48652a",
+        "source": {
+          "identity": "https://openrouter.ai/api/v1/models/user",
+          "authority": "live_api",
+          "scope": "account",
+          "observed_at": 1790954938.6244059,
+          "ttl_seconds": 300,
+          "refreshable": true,
+          "published_at": null
+        },
+        "status": "REPORTED",
+        "conflicts": [],
+        "retrieval_method": "direct"
+      },
+      {
+        "task_id": "5250eec096b64822a9a2f1e86eb36136",
+        "correlation_id": "4b6126b8c87b42489ba428c9db48652a",
+        "source": {
+          "identity": "https://integrate.api.nvidia.com/v1/models",
+          "authority": "live_api",
+          "scope": "account",
+          "observed_at": 1790954938.8446784,
+          "ttl_seconds": 300,
+          "refreshable": true,
+          "published_at": null
+        },
+        "status": "REPORTED",
+        "conflicts": [],
+        "retrieval_method": "direct"
+      },
+      {
+        "task_id": "5250eec096b64822a9a2f1e86eb36136",
+        "correlation_id": "4b6126b8c87b42489ba428c9db48652a",
+        "source": {
+          "identity": "https://generativelanguage.googleapis.com/v1beta/models",
+          "authority": "live_api",
+          "scope": "account",
+          "observed_at": 1790954939.2144067,
+          "ttl_seconds": 300,
+          "refreshable": true,
+          "published_at": null
+        },
+        "status": "REPORTED",
+        "conflicts": [
+          "gemini-3-pro-preview: absent in complete live inventory; cached availability rejected",
+          "gemini-2.0-flash: absent in complete live inventory; cached availability rejected",
+          "gemini-2.0-flash-lite: absent in complete live inventory; cached availability rejected",
+          "gemini-3.1-flash-lite-preview: official retirement overrides inventory listing; excluded from routing",
+          "gemini-3-pro-image-preview: official retirement overrides inventory listing; excluded from routing",
+          "gemini-3.1-flash-image-preview: official retirement overrides inventory listing; excluded from routing",
+          "gemini-2.5-computer-use-preview-10-2025: official retirement overrides inventory listing; excluded from routing"
+        ],
+        "retrieval_method": "direct"
+      },
+      {
+        "task_id": "5250eec096b64822a9a2f1e86eb36136",
+        "correlation_id": "4b6126b8c87b42489ba428c9db48652a",
+        "source": {
+          "identity": "https://ai.google.dev/gemini-api/docs/deprecations",
+          "authority": "official_deprecation",
+          "scope": "provider",
+          "observed_at": 1790943196.6073742,
+          "ttl_seconds": 86400,
+          "refreshable": true,
+          "published_at": null
+        },
+        "status": "REPORTED",
+        "conflicts": [],
+        "retrieval_method": "direct"
+      },
+      {
+        "task_id": "5250eec096b64822a9a2f1e86eb36136",
+        "correlation_id": "4b6126b8c87b42489ba428c9db48652a",
+        "source": {
+          "identity": "https://api.z.ai/api/paas/v4/models",
+          "authority": "live_api",
+          "scope": "account",
+          "observed_at": 1790954940.0046575,
+          "ttl_seconds": 300,
+          "refreshable": true,
+          "published_at": null
+        },
+        "status": "REPORTED",
+        "conflicts": [],
+        "retrieval_method": "direct"
+      },
+      {
+        "task_id": "5250eec096b64822a9a2f1e86eb36136",
+        "correlation_id": "4b6126b8c87b42489ba428c9db48652a",
+        "source": {
+          "identity": "https://ollama.com/api/tags",
+          "authority": "live_api",
+          "scope": "account",
+          "observed_at": 1790954940.2259345,
+          "ttl_seconds": 300,
+          "refreshable": true,
+          "published_at": null
+        },
+        "status": "REPORTED",
+        "conflicts": [],
+        "retrieval_method": "direct"
+      }
+    ],
+    "official_web_coverage": [],
+    "native_provider_coverage": [
+      "google",
+      "groq",
+      "nvidia",
+      "ollama-cloud",
+      "openrouter",
+      "zai"
+    ],
+    "native_inventory_sources": 6,
+    "actual_live_tavily": false,
+    "objective_result_reported_success": true,
+    "generation_calls": 0,
+    "authority_resolution": "Account API outranks web for account listing; applicable official retirement evidence overrides residual catalog listing. Conflicts are explicit; web excerpts cannot change routing entitlement or funding.",
+    "limitations": [
+      "Retrieved official pages remain REPORTED evidence, not general factual verification. Index-only snippets do not satisfy official-page acceptance; account funding/credits remain UNKNOWN unless separately exposed.",
+      "No successful live Tavily search during this objective: actual live objective search UNVERIFIED; official access-constraint synthesis BLOCKED."
+    ]
+  },
+  "quality": {
+    "unit_tests": 209,
+    "unit_tests_status": "PASS",
+    "unit_tests_duration_seconds": 29.377,
+    "full_unit_runs": 1,
+    "ruff": "PASS",
+    "format": "PASS",
+    "formatted_python_files": 39,
+    "strict_mypy": "PASS",
+    "checked_source_files": 25,
+    "repository_checks": "PASS",
+    "secret_scan": "PASS",
+    "git_diff": "PASS",
+    "secret_scan_files": 142,
+    "secret_values_logged": false
+  },
+  "preserved_previous_evidence": "club-a-correction-2026-10-02.json",
+  "limits": [
+    "Tavily credentials absent in process environment; no Tavily credential-bearing request made.",
+    "Public free/developer access synthesis remains BLOCKED, not proved by native inventory.",
+    "Provider-wide pages, account listing, generation and funding remain separate.",
+    "General provider generation matrix was not rerun; previous 15/17 successful-slot observations retain their original timestamps.",
+    "No new provider 429/cooldown in focused mode probes; live cooldown reranking is historical evidence plus focused offline regression in this pass.",
+    "Original structured Heavy block was capability-specific, not account capacity; subsequent text-only Heavy generation independently matched.",
+    "Funding/quota for non-OpenRouter model accounts and Tavily account membership/credit balance remain UNKNOWN."
+  ],
+  "finalized_at": "2026-10-02T21:05:12.475689+00:00",
+  "finalized_local_date": "2026-10-03",
+  "local_timezone": "Asia/Calcutta",
+  "resume_checks": {
+    "remote_work_sha": "d7caacec37c18d2f62382a9308e4af77967f02fc",
+    "tavily_slots_present": {
+      "tavily-1": false,
+      "tavily-2": false,
+      "tavily-3": false
+    },
+    "local_env_tavily_slots_configured": false,
+    "full_unit_suite_repeated": false,
+    "provider_generation_matrix_repeated": false
+  },
+  "evidence_representation": "Compact metadata projection of safe live reports: repeated inventory sources are referenced by masked slot; equivalent structured-Heavy diagnostic fields are grouped. Original failed observations and source times are preserved."
+}

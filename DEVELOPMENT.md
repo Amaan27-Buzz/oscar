@@ -95,7 +95,7 @@ Run from the repository root using Python 3.12+ on a POSIX host. The current fil
 python -m pip install '.[dev]'
 python -m ruff check oscar tests scripts
 python -m ruff format --check oscar tests scripts
-python -m mypy oscar scripts/verify_club_a_live.py
+python -m mypy oscar scripts/verify_club_a_live.py scripts/verify_gate_a_routing.py scripts/verify_gate_a_search.py
 python -m unittest discover -s tests -t . -v
 python -m scripts.check_repository
 python -m oscar proof
@@ -128,7 +128,24 @@ inventory/mode rerun that retains those probes and their original timestamps.
 This flag never manufactures a new generation observation. Inspect all earlier
 refusals and the latest assertion outcome; an earlier passing run does not make a
 new failed run PASS. Native current-provider questions can use `oscar ask`; broad
-web/weather questions block until a suitable source exists. Tavily is UNVERIFIED.
+web/weather questions use Tavily when credentials are configured, otherwise block
+as UNKNOWN. Actual live Tavily is UNVERIFIED in the recorded environment.
 
 See [docs/CLUB-A-CHECKPOINT.md](docs/CLUB-A-CHECKPOINT.md) for Gate A's current
 PARTIAL status, preserved historical evidence and the manual review stop.
+
+Final Gate A acceptance avoids the full provider-generation matrix:
+
+```sh
+python -m scripts.verify_gate_a_search --run-live --report .oscar/final-gate-a-search.json
+python -m scripts.verify_gate_a_routing --run-live --report .oscar/final-gate-a-routing.json
+```
+
+The routing script runs only Balanced, Heavy Duty and Free First; `--mode heavy`
+runs just Heavy. Heavy uses a bounded text sentinel; the other two compare a small
+JSON response. Every request uses fresh discovery and unchanged default funding
+policy. A genuine no-eligible-route block is truthful acceptance, not generation
+success. Search checks present Tavily slots and then executes the exact first
+freshness objective through Jev/reference transport/native inventories/Tavily.
+It returns PARTIAL when any required live coverage is missing; no keys or raw
+webpages are stored. Export keys into the execution environment before running.

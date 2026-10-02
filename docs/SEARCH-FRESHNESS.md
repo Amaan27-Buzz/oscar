@@ -52,7 +52,7 @@ conservative grammar, not a claim of general intent understanding.
 
 ## Search capability
 
-Search is a first-class OSCAR capability exposed through the Capability Catalog. Tavily is the initial planned web-search provider, not the architectural boundary.
+Search is a first-class OSCAR capability exposed through the Capability Catalog. Tavily is the first implemented web-search adapter, not the architectural boundary.
 
 Initial development credential pool after Club A:
 
@@ -86,16 +86,42 @@ URL/identity, observation time, scope and retirement/cache contradictions. Liste
 models do not imply generation or funding. Officially retired entries remain
 excluded even when the API lists them.
 
-This source establishes inventory observations. It explicitly reports that public
-free/developer constraints still need current official documentation/search.
-Broad weather/flight/price/web objectives have no configured source and block as
-UNKNOWN. Source material stays REPORTED; unsupported objective verification remains
-PARTIAL. The full public-web synthesis acceptance is not claimed from inventory alone.
+[search.py](../oscar/search.py) now implements Tavily through that same protocol.
+Harness composes native inventory and web retrieval without changing Jev. Search
+uses the current official Bearer-authenticated `POST /search` contract: explicit
+basic depth, automatic cost escalation/answers/raw pages disabled, usage enabled,
+15-second calls and a 30-second total search budget. Domain restrictions are checked
+again against returned HTTPS URLs; query/credential-bearing references are omitted.
+Official results trigger a bounded, credential-free read of the actual trusted
+official page. Only those reads receive `official_page` evidence. Index excerpts
+whose pages cannot be read remain secondary discovery hints marked UNKNOWN /
+potentially stale; they cannot satisfy current official-page acceptance.
+The configured-provider objective searches each of the six official domain groups
+with one result per group, within the requested result budget. Other objectives
+use a bounded ordinary search when keys are present.
 
-All three Tavily variables are absent in this correction environment.
-**Tavily integration boundary prepared / actual live Tavily UNVERIFIED.** No
-Tavily adapter traffic, credits or successful tests are invented. A future adapter
-implements the same protocol without changing Jev or task/evidence contracts.
+Tavily slots have their own conservatively shared account-product/quota pool,
+separate from model providers. A 401 invalidates only its slot; 429/432/433 preserve
+rate/usage-limit semantics and shared cooldowns, including explicit Retry-After.
+Returned numeric `usage.credits` is observed expenditure, not an inferred remaining
+balance or three independent free allotments. No account product is inferred from
+a public Free offer. Missing/unusable keys produce UNKNOWN, never a fabricated result.
+
+Evidence synthesis separates account-visible inventories from provider-wide source
+excerpts and displays conflicts, source authority and observation times. Web excerpts
+cannot update routing availability/funding or override applicable retirement guards.
+Search publication/update dates are estimates, distinct from retrieval time; the
+answer explicitly qualifies excerpt recency and unresolved account entitlements.
+Source material stays REPORTED; unsupported factual verification remains PARTIAL.
+Persisted retrieval/search telemetry stores references, retrieval method, timestamps,
+conflicts, masked slots, categorical status and numeric credits, not queries or webpage dumps.
+
+The final acceptance environment still exposes **none of the three Tavily slots**.
+The adapter and loopback contracts are implemented/tested, but **actual live Tavily
+UNVERIFIED; combined public-web acceptance BLOCKED**. The real Jev objective did
+retrieve six current native inventories, with zero generation calls. It does not
+claim current public access constraints from those listings alone. See the dated
+[checkpoint](CLUB-A-CHECKPOINT.md) for live observations and credential blockers.
 
 ## Search request contract
 
@@ -156,8 +182,10 @@ The ordering is claim-specific: account availability prefers account APIs over
 generic pages; provider/product retirement prefers the applicable official notice
 over an API catalog/cache that still lists the ID. Observation time, product scope
 and contradictions remain separate fields. `prefer_source` encodes this comparison;
-the registry enforces account absence and explicit retirement guards. General web
-claim reconciliation will use this boundary when a search adapter is configured.
+the registry enforces account absence and explicit retirement guards. Evidence
+synthesis retains conflicting native/retirement observations and separates
+account claims from generic web claims. Arbitrary prose contradictions are not
+automatically verified or resolved; unresolved source statements stay explicit.
 
 ## Freshness metadata
 
@@ -195,8 +223,8 @@ A historical successful model call does not prove that model is still available 
 
 ## First search objective
 
-The first intended real combined-search acceptance objective after Tavily keys
-are provided is OSCAR-related and deliberately freshness-sensitive:
+The first combined-search acceptance objective, still pending real Tavily
+credentials, is OSCAR-related and deliberately freshness-sensitive:
 
 > `What are the currently supported models and relevant free/developer access constraints for OSCAR's configured intelligence providers right now?`
 

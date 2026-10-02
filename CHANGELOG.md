@@ -2,6 +2,20 @@
 
 Significant OSCAR milestones are recorded here. Detailed implementation status remains in `docs/ROADMAP.md`.
 
+## 2026-10-03 — Final Gate A focused acceptance (Tavily blocked)
+
+- Continue remote `work` at `d7caace`; implement bounded Tavily through the existing
+  retrieval protocol, conservatively shared search quota pool and official-page reads.
+  Preserve current source references, scope, conflicts and UNKNOWN/index-only evidence.
+- Verify Balanced, Heavy Duty text and Free First with three bounded current free
+  generations; preserve the earlier correct structured-Heavy block and 69/72 history.
+  Do not repeat the full generation matrix or use paid/UNKNOWN funding overrides.
+- Run the exact freshness objective through Jev and six real native inventories,
+  with zero generations. All three Tavily slots remain absent: actual live Tavily
+  and combined public-web acceptance remain UNVERIFIED/BLOCKED; Gate A stays PARTIAL.
+- Pass 209 offline tests in one full run, Ruff, formatting and strict mypy; record
+  repository/secret/diff verification. Stop on `work`, without main merge or Slice 05.
+
 ## 2026-10-02 — Post-Gate-A current-evidence correction
 
 - Synchronize current remote `work`; research all six providers through current

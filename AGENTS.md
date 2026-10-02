@@ -161,7 +161,7 @@ Search is a first-class capability, not a fallback excuse for stale reasoning.
 - keys can share capacity: configure account products/quota pools and never
   multiply capacity by credential count; unknown cost/quota remains UNKNOWN;
 - if live lookup is unavailable, report that the answer may be stale instead of guessing;
-- Tavily is the first planned search adapter with three credential slots, not an architectural dependency;
+- Tavily is the first implemented search adapter with three credential slots, not an architectural dependency;
 - search results are evidence inputs, not automatically verified truth.
 
 See `docs/SEARCH-FRESHNESS.md`.

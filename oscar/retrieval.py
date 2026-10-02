@@ -35,6 +35,7 @@ class RetrievedFact:
     text: str = field(repr=False)
     source: SourceRef
     conflicts: tuple[str, ...] = ()
+    retrieval_method: str = "direct"
 
 
 @dataclass(frozen=True)
@@ -206,13 +207,37 @@ class RetrievalExecutor:
                     "source": asdict(fact.source),
                     "status": "REPORTED",
                     "conflicts": fact.conflicts,
+                    "retrieval_method": fact.retrieval_method,
                 },
             )
-        answer = "\n".join(
-            f"{f.text}\nSource: {f.source.identity}; "
-            f"observed_at: {f.source.observed_at}; scope: {f.source.scope}"
-            for f in facts
+        # Deterministic evidence synthesis keeps claim scopes separate. Web text
+        # cannot authorize an account route or overturn native visibility; conflicts
+        # remain visible instead of being hidden behind a single confidence score.
+        answer = (
+            "Current evidence-qualified answer. Account listing, provider support, "
+            "generation and funding are separate claims. Account APIs govern listing; "
+            "applicable official retirement notices govern retirement. "
+            "Web excerpts are REPORTED source material, not verified account entitlement.\n"
         )
+        for scope, label in (
+            ("account", "Account-visible inventory"),
+            ("provider", "Provider-wide documentation/source evidence"),
+            ("local", "Current local evidence"),
+        ):
+            scoped = [f for f in facts if f.source.scope == scope]
+            if not scoped:
+                continue
+            answer += (
+                label
+                + ":\n"
+                + "\n".join(
+                    f"{f.text}\nSource: {f.source.identity}; authority: {f.source.authority}; "
+                    f"observed_at: {f.source.observed_at}; scope: {f.source.scope}"
+                    + ("\nConflicting evidence: " + "; ".join(f.conflicts) if f.conflicts else "")
+                    for f in scoped
+                )
+                + "\n"
+            )
         if limitations:
             answer += "\nLimitations: " + "; ".join(limitations)
         return Result(

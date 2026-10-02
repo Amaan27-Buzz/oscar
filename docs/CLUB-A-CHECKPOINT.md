@@ -1,6 +1,112 @@
 # Club A — Brain checkpoint
 
-## Current post-Gate-A correction — 2026-10-02
+## Final Gate A acceptance — PARTIAL (Tavily credentials absent)
+
+Recorded **2026-10-03 IST** (live observations on 2026-10-02 UTC), continuing remote `work`
+`d7caacec37c18d2f62382a9308e4af77967f02fc`. Fetch confirmed that exact head and a
+clean checkout. This final pass completes the adapter and closes the routing gap;
+it does not redesign Club A, repeat the expensive provider-generation matrix,
+merge main or start Slice 05. The earlier PARTIAL checkpoint below and its 69/72
+run are preserved as history, not quietly replaced.
+
+### Final decision
+
+**Gate A remains PARTIAL solely because real Tavily/search acceptance is BLOCKED
+by absent credentials.** `tavily-1`, `tavily-2` and `tavily-3` are absent from the
+execution environment; no key material was printed and no Tavily API traffic,
+credits or successful slot results are invented. The credential-location question
+was raised during the pass; no credentials became available. The implemented
+adapter's loopback/offline contracts do not substitute for actual live acceptance.
+No architectural defect was exposed by the focused routing review.
+
+Gate A does not require all providers to work simultaneously. Genuine BLOCKED is
+correct when no route satisfies current capability/funding/capacity policy;
+temporary rate limits are not defects when reranking/cooldowns are handled
+truthfully. Successful generation and a truthful block are distinct observations.
+
+### Focused live routing
+
+| Mode | Latest generation result | Current route / actual backing source | Attempts |
+|---|---|---|---:|
+| Balanced | VERIFIED bounded JSON contract | `openrouter/free` → `nvidia/nemotron-3.5-lightning:free`, NVIDIA; `openrouter-1` | 1 |
+| Heavy Duty | VERIFIED exact text contract | `nvidia/nemotron-3-ultra-550b-a55b:free`, NVIDIA; `openrouter-1` | 1 |
+| Free First | VERIFIED bounded JSON contract | `apodex/apodex-1.1-mini:free`, Novita; `openrouter-2` | 1 |
+
+All three use fresh credential-visible inventory and unchanged default funding
+policy: no paid or UNKNOWN funding/limits override. Each returned HTTP 200 and was
+independently compared against its bounded completion criterion. Model/provider
+responses remain REPORTED; this proves generation contracts, not model quality.
+Across two focused runs **26 runtime assertions passed**, separate from unit tests.
+No full provider generation matrix or Auto/Fast/Manual rerun was needed.
+
+The first Heavy diagnostic required structured output and correctly made **zero
+attempts**. Current high-tier free Qwen/Nemotron entries were listed with sufficient
+limits, but their current inventories established only text capability; expired
+seed metadata could not restore structured support. Offline diagnostics are retained
+in the original run. One subsequent text-only Heavy probe used the actually
+advertised capability and succeeded; Balanced/Free First were not repeated.
+
+There were **no new 429s or active provider/shared-pool cooldowns** in these focused
+runs. Exposed response counters/reset/Retry-After were absent and remain UNKNOWN.
+OpenRouter's account endpoint again reported Free tier; account identity/shared
+membership is not inferred from slot count. The common conservative pool remains
+one capacity pool. Focused offline cases prove a shared 429 blocks sibling keys,
+leaves unrelated capacity eligible, and reranks to that unrelated provider. Prior
+live rate-limit observations and their original timestamps remain in history.
+Z.ai/general balance/product failure 1113 is historical; it was not generation-retested.
+
+### Real freshness objective and search boundary
+
+The exact first objective ran through **Jev → authenticated reference transport →
+live inventory retrieval → evidence-qualified answer**. Jev selected live retrieval.
+Six real account inventory APIs were read; **zero model-generation calls** were
+made. The successful correlated retrieval result stays REPORTED and the task is
+PARTIALLY_VERIFIED. Current inventory versus cached/retired conflicts remain explicit.
+
+Sources observed during this pass: Groq `/openai/v1/models`, OpenRouter
+`/api/v1/models/user`, NVIDIA `/v1/models`, Google `/v1beta/models` (paginated),
+Z.ai general `/api/paas/v4/models`, and Ollama Cloud `/api/tags`. URLs, observation
+timestamps, scope and conflicts are preserved in the
+[final evidence](evidence/club-a-final-acceptance-2026-10-02.json). Google's applicable
+retirement notice remains separately sourced with its prior observation time.
+These APIs prove account listing, not successful generation or funding entitlement.
+
+Current official Tavily Search/credits/rate-limit/usage documentation was retrieved
+before implementation. Tavily now implements the existing replaceable retrieval
+protocol: Bearer HTTPS, explicit basic depth, automatic escalation/answers/raw pages
+disabled, bounded calls/results/deadlines, returned credit expenditure, slot health,
+shared quota/cooldowns and full Retry-After preservation. Official search results
+trigger bounded credential-free page reads. Indexed snippets whose pages cannot
+be retrieved remain secondary/UNKNOWN; they cannot count as current official-page
+acceptance. No giant page bodies or query text enter retrieval telemetry.
+
+The answer separates account inventories from provider-global evidence and displays
+conflicts. Web evidence cannot authorize account routes or override retirement
+facts. Factual excerpts remain REPORTED; unsupported or unavailable claims stay
+UNKNOWN. The final search verifier requires current-task/correlation evidence, a
+successful correlated result, six distinct native inventories, actual objective
+Tavily traffic, and six direct official-page sources. Preflights, stale evidence,
+index snippets and a failed transport cannot produce PASS.
+
+**Actual live Tavily UNVERIFIED / combined official access-constraint synthesis
+BLOCKED**: all three required slots remain absent. Provider-native inventory alone
+is not promoted into completion of the full combined-search objective. Canonical
+architecture and remaining live acceptance are owned by
+[SEARCH-FRESHNESS.md](SEARCH-FRESHNESS.md).
+
+### Regression and stop
+
+The full offline suite ran once after focused live acceptance: **209 tests PASS**
+in 29.377 seconds. This retains all 161 prior tests and adds 48 focused search,
+official-page, source/correlation, mode/capacity and failure contracts. Ruff,
+formatting (**39 Python files**) and strict mypy (**25 source files**) PASS.
+Repository/link checks, value-silent secret scanning and final diff inspection
+are recorded in the final evidence. Missing Tavily credentials are the remaining
+live acceptance blocker; account-credit and general factual-verification limits
+remain UNKNOWN. **Stop on `work`; no main merge or Slice 05.**
+
+
+## Historical post-Gate-A correction — 2026-10-02 (preserved)
 
 **Gate A: PARTIAL, downgraded from the previous PASS. Stop for manual review.
 Slice 05 is not started.** Core Loop/Jev/reference Transport/Grid proofs remain
@@ -60,7 +166,7 @@ authorizing another account's route, and prevented a fieldless fresh inventory
 from refreshing expired seed limits. These account/fact-scope protections have
 focused regression coverage.
 
-### Current verification and limits
+### Verification and limits at that historical checkpoint
 
 - **161 automated tests pass**, including all previous contracts and freshness
   A–E, retirement/catalog conflicts, denied generation versus listing, persistence,

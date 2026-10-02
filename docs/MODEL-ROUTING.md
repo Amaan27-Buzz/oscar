@@ -444,7 +444,7 @@ need current provider route
 → route model
 ```
 
-Tavily is the first planned search adapter with three keys. Search remains a Capability Catalog capability and can later be replaced/augmented by other providers.
+Tavily is the first implemented search adapter with three masked credential slots. Search remains a Capability Catalog capability and can later be replaced/augmented by other providers.
 
 See [SEARCH-FRESHNESS.md](SEARCH-FRESHNESS.md).
 
@@ -490,7 +490,7 @@ Gate A verified this foundation, but provider/model metadata remains explicitly 
 
 Implemented within Club A: discovery-first current registry, quota pools,
 freshness classification and a provider-agnostic native live-retrieval capability.
-Three Tavily placeholders and the search boundary are prepared. Actual Tavily
+The Tavily adapter is implemented through the existing search boundary. Actual Tavily
 adapter/combined search acceptance remains UNVERIFIED pending keys; see
 [SEARCH-FRESHNESS.md](SEARCH-FRESHNESS.md). Slice 05 is not started.
 

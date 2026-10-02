@@ -442,8 +442,9 @@ provider-agnostic live-source capability before reasoning; missing evidence rema
 UNKNOWN. Sources retain authority, time, scope, TTL and contradictions.
 
 **Limits:** public support/listing/generation/funding are separate claims. Search
-ranking is not verification. Native inventory retrieval is implemented; actual
-Tavily and combined public-web acceptance remain UNVERIFIED pending keys. Failed
+ranking is not verification. Native inventory retrieval and the bounded Tavily
+adapter are implemented; actual Tavily and combined public-web acceptance remain
+UNVERIFIED because keys are absent. Failed
 live runs and superseded provider-health interpretations are preserved explicitly.
 Detailed contracts are owned by [MODEL-ROUTING.md](MODEL-ROUTING.md) and
 [SEARCH-FRESHNESS.md](SEARCH-FRESHNESS.md).

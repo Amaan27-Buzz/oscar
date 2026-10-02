@@ -15,6 +15,7 @@ from .registry import Registry
 from .retrieval import ProviderInventorySource, RetrievalExecutor
 from .router import Router, RouteUnavailable
 from .runtime import Runtime
+from .search import TavilySource
 from .storage import Store
 from .transport import Dispatcher
 
@@ -74,6 +75,7 @@ class Harness:
         self.router = Router(
             self.registry, self.pool, self.adapters, self.store, discovery=HTTPDiscovery()
         )
+        self.search = TavilySource(self.store, redact=self.pool.redact)
         self.runtime.on_verification = self.router.observe_verification
         self.node_id = "reference-cloud"
         scopes = ("heartbeat", "advertise", "execute", "files:write", "math", "models", "cancel")
@@ -86,7 +88,7 @@ class Harness:
             Capability(
                 "sources.retrieve",
                 "Live retrieval",
-                "Authoritative native inventory source",
+                "Provider-native inventories and replaceable public-web retrieval",
                 "retrieval",
                 self.node_id,
                 ("models",),
@@ -135,7 +137,7 @@ class Harness:
                 "math.add": addition_executor,
                 "models.reason": ModelExecutor(self.router, template, RoutingPolicy()),
                 "sources.retrieve": RetrievalExecutor(
-                    self.router, (ProviderInventorySource(self.router),)
+                    self.router, (ProviderInventorySource(self.router), self.search)
                 ),
             },
         )

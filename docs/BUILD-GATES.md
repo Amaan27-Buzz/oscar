@@ -46,16 +46,18 @@ Manual scenarios:
 
 **Pass:** native core/transport/model routing works without Latch/SwitchRoute deployment and remote node loss does not erase objective state.
 
-Current checkpoint: **PARTIAL, downgraded after the post-Gate-A correction; manual
-review pending.** Core Loop/Jev/reference Grid proofs remain verified. Fresh
-discovery, official retirement precedence, account-product/shared-quota pools and
-freshness routing are implemented and tested. Fifteen real slots across five
-providers generated with current candidates; Z.ai general balance/product state
-remains unavailable/unknown. The latest full mode rerun encountered an unexplained
-OpenRouter 429, leaving Balanced/Heavy/Free First current acceptance unresolved.
-Earlier passing evidence is retained with timestamps, not promoted over this
-newer result. See [CLUB-A-CHECKPOINT.md](CLUB-A-CHECKPOINT.md) for exact results and
-scope. **Stop here; Slice 05 has not started.**
+Current checkpoint: **PARTIAL — final real Tavily acceptance blocked by absent
+credentials.** Core Loop/Jev/reference Grid proofs and the focused routing
+acceptance remain verified; see [CLUB-A-CHECKPOINT.md](CLUB-A-CHECKPOINT.md).
+
+Acceptance does not require simultaneous availability of every provider. A genuine
+no-eligible-route BLOCKED result is correct under current capability/funding/capacity
+policy. Temporary provider limits are not architectural defects when bounded
+reranking finds an eligible alternative, or truthful blocking records that none
+exists. Shared cooldowns must not disable unrelated pools; UNKNOWN remains UNKNOWN.
+Live combined search is required for this final acceptance and is not established
+by native inventory or synthetic search tests alone. **Stop here; Slice 05 has not
+started.**
 
 The current foundation review accepts coherent reference Transport/Grid contracts. Public TLS/outbound rendezvous, independent network stores and a cloud coordinator path using a configured deployment target remain later Grid integration acceptance requirements; they are not claimed verified by Gate A. This refines the previous public-deployment gate expectation without changing the architecture or silently completing broader slice deliverables.
 
