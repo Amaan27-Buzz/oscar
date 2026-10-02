@@ -6,6 +6,33 @@ OSCAR does **not** depend on the separate SwitchRoute runtime. SwitchRoute remai
 
 The goal is broader than choosing a model name. OSCAR must decide the correct execution class, then choose the best provider/model/credential only when a model path is actually needed.
 
+## Core principle — the infrastructure evolves, the model does not define OSCAR
+
+OSCAR is **not one model** and is not permanently tied to the providers available during initial development.
+
+The durable system is:
+
+```text
+Jev
+→ capability/model decision
+→ adaptive Model Router
+→ provider/model/credential pool
+→ observed outcome
+→ updated routing evidence
+```
+
+Providers, models, quotas, free tiers, prices and model quality change. The router therefore treats them as replaceable runtime resources described by versioned metadata and observed evidence.
+
+Rules:
+
+- never hard-code one model as OSCAR's permanent brain;
+- never hard-code `task X = model Y forever`;
+- discover/reload provider/model metadata where practical;
+- re-rank on each task using current capability, capacity and observed performance;
+- preserve provenance for claims about model power, limits and reliability;
+- allow new provider adapters without redesigning OSCAR Core;
+- learned routing preferences remain reversible and cannot override privacy, permissions or explicit user policy.
+
 ## Decision hierarchy
 
 Do not collapse all routing into one generic router.
@@ -44,7 +71,7 @@ OSCAR's catalog distinguishes provider classes rather than putting everything in
 
 ### 1. Hosted model providers
 
-Initial/high-priority adapters include the providers already proven or planned through SwitchRoute-style architecture and the user's available credentials:
+Initial/high-priority adapters include providers already proven or planned through SwitchRoute-style architecture and the user's available credentials:
 
 - OpenAI;
 - Anthropic;
@@ -66,9 +93,9 @@ Initial/high-priority adapters include the providers already proven or planned t
 - Ollama Cloud;
 - custom public OpenAI-compatible endpoints where safely supported.
 
-The provider registry must remain adapter/data driven. OSCAR should be able to add the wider provider set represented by projects such as OmniRoute without changing core architecture for each provider.
+The provider registry must remain adapter/data driven. Provider support belongs in versioned adapters/manifests with capability and test metadata.
 
-Do **not** freeze a large third-party provider list into the core. External catalogs change frequently. Provider support belongs in versioned adapters/manifests with capability and test metadata.
+Do **not** freeze a large third-party provider list into core architecture.
 
 ### 2. Local/private model runtimes
 
@@ -147,7 +174,7 @@ reset/expiry information
 Rules:
 
 - credential values are never exposed to UI, logs, task prompts, artifacts or telemetry;
-- UI and logs use stable masked slot identifiers such as `groq-2`;
+- UI/logs use masked slot identifiers such as `groq-2`;
 - one failing/rate-limited credential does not mark the whole provider unavailable;
 - quota that is unknown is **unknown**, not unlimited;
 - price that is unknown is **unknown**, not free;
@@ -168,6 +195,8 @@ The initial developer pool is expected to support:
 - 2 Ollama Cloud keys;
 - optional local runtime URLs for Ollama, LM Studio and vLLM.
 
+This pool is a **starting fleet, not the provider boundary**.
+
 See the repository-root `.env.example` for placeholder variable names.
 
 Development rules:
@@ -180,6 +209,19 @@ Development rules:
 - CI should use mocks/test adapters unless explicitly provisioned with scoped secrets;
 - results record credential slot IDs, not secret values.
 
+## Current Ollama Cloud free-credit model metadata
+
+For the current developer account, free usage credits are available for these Ollama Cloud models:
+
+- `gemma3:31b`
+- `gpt-oss:120b`
+- `gpt-oss:20b`
+- `nemotron-3-nano:30b`
+- `nemotron-3-super`
+- `nemotron-3-ultra`
+
+Treat this list as current runtime/development metadata supplied by the user, **not** a permanent hard-coded allowlist. Provider discovery/configuration should be able to replace or extend it when Ollama Cloud changes the account's available models.
+
 ## Routing modes
 
 OSCAR supports automatic routing and explicit manual control.
@@ -190,14 +232,14 @@ OSCAR supports automatic routing and explicit manual control.
 | `fast` | Prefer low first-token/response latency while preserving minimum capability requirements. |
 | `balanced` | Balance quality, latency, reliability, quota and cost. |
 | `heavy` / **Heavy Duty** | Prefer the strongest suitable reasoning/capability tier; cost/latency are secondary within policy. |
-| `free_first` | Prefer confirmed free/subscription/local capacity before paid fallback. |
+| `free_first` | Prefer confirmed free/subscription/local capacity, using scarcity-aware allocation before paid fallback. |
 | `cheap` | Minimize expected monetary cost while meeting capability/quality requirements. |
 | `local` | Local/private runtimes only unless the user explicitly allows fallback. |
 | `private` | Use only providers/surfaces allowed by the active privacy policy. |
 | `manual` | User pins provider/model and optionally a credential slot. |
 | `specialist` | Task affinity/specialist capability dominates generic model ranking. |
 
-`auto` may itself choose an effective profile such as Fast, Balanced or Heavy Duty based on the request and Personal Policy.
+`auto` may itself choose an effective profile such as Fast, Balanced, Heavy Duty or Free First based on the request and Personal Policy.
 
 Users can override routing per request, session/project or durable Personal Policy where appropriate.
 
@@ -212,6 +254,49 @@ Examples:
 ```
 
 A manual override cannot bypass permission, privacy, safety or availability constraints.
+
+## Free-first and scarcity-aware allocation
+
+The current development environment is dominated by free accounts/free credits. OSCAR should therefore optimize for **available free capacity + sufficient model power**, rather than blindly using one favorite model or always selecting the largest model.
+
+The routing objective is:
+
+```text
+1. satisfy required capability/context/tool constraints
+2. prefer currently usable free/subscription/local capacity
+3. choose sufficient task-fit/model power
+4. prefer reliable healthy routes
+5. optimize latency for the task
+6. preserve scarce high-value quota when a cheaper/plentiful route is sufficient
+7. use paid fallback only when explicit policy permits
+```
+
+This creates intentional behavior such as:
+
+- **GroqCloud** can absorb many small/fast tasks when its healthy limits and suitable models make it efficient;
+- **Google AI Studio** and **Z.ai** can carry broader or stronger work when their current free capacity and model fit are favorable;
+- **OpenRouter** can expose valuable models but lower free limits should be treated as scarce capacity and preserved for tasks where those models materially help;
+- **Ollama Cloud** should use the currently available free-credit model set according to task fit and remaining capacity rather than pinning one model;
+- local runtimes can win when privacy, availability or cost makes them preferable and the local model is sufficiently capable.
+
+These are routing heuristics, not permanent provider rankings. Actual model inventory, quotas, quality and reliability can change.
+
+### Scarcity score
+
+Where enough data exists, a route can derive a scarcity signal from:
+
+```text
+remaining confirmed quota/credits
+reset horizon
+recent consumption rate
+concurrency/rate limit pressure
+number of equivalent alternative routes
+quality uniqueness for the requested task
+```
+
+A scarce route should not be consumed for trivial work when a plentiful route meets the same quality requirement.
+
+Unknown capacity stays unknown; do not invent numerical scarcity from missing provider data.
 
 ## Model and task metadata
 
@@ -250,6 +335,7 @@ latency observations
 reliability observations
 price metadata
 free/subscription capacity metadata
+scarcity/reset metadata
 privacy/location policy metadata
 tool/structured-output support
 vision/audio support
@@ -267,17 +353,45 @@ required capability
 → remove unavailable/incompatible candidates
 → enforce permissions/privacy/provider policy
 → enforce context/input/output requirements
-→ evaluate credential capacity/health
+→ evaluate credential health + current capacity
+→ identify free/subscription/local eligible pool
 → apply requested routing mode
-→ rank task suitability + reliability + latency + cost/quota
+→ rank task suitability/model power
+→ rank reliability + latency
+→ apply scarcity/quota-preservation pressure
 → reserve credential/capacity where needed
 → execute
-→ update observations
+→ observe outcome
+→ update routing evidence
 ```
 
-No model wins merely because metadata is missing.
+No model wins merely because metadata is missing, because it is largest, or because it won the previous request.
 
 A provider/model with unknown price, latency, quota or capability should not receive an artificial advantage.
+
+## Adaptive routing and learning
+
+OSCAR should change routing as infrastructure changes.
+
+Useful observations include:
+
+- verified task success/failure;
+- provider/model errors;
+- latency;
+- structured-output/tool-call reliability;
+- rate-limit pressure;
+- current/recent quota exhaustion;
+- fallback frequency;
+- task-class quality evidence;
+- context-window/tool/vision compatibility.
+
+Observed history may influence later ranking, but:
+
+- one success/failure must not permanently define a model;
+- stale observations decay or become stale;
+- model/provider version changes can invalidate old evidence;
+- user manual choices and policy remain authoritative;
+- the router must remain explainable: `why this route now?` should have an evidence-backed answer.
 
 ## Fallback semantics
 
@@ -288,6 +402,7 @@ Fallback is bounded and evidence-aware.
 - apply bounded retry/backoff;
 - respect paid-fallback and privacy policy;
 - preserve task correlation/provenance;
+- re-evaluate capacity and scarcity after a rate-limit/quota event;
 - once a streaming answer has emitted meaningful output, do not append a second provider's continuation as though it were one coherent response;
 - model/provider success remains `REPORTED`/`INFERRED` until the objective is independently verified where verification matters.
 
@@ -301,6 +416,8 @@ The native router should absorb the useful separation proven in SwitchRoute:
 - circuit-breaker state;
 - quota/capacity;
 - concurrency;
+- free-credit/subscription capacity;
+- reset horizon where known;
 - price/cost policy;
 - routing strategy.
 
@@ -335,7 +452,7 @@ At a glance it should be possible to see:
 - local runtime online/offline state;
 - current default routing mode;
 - whether automatic routing is enabled;
-- material quota/rate-limit warnings.
+- material quota/rate-limit/free-credit warnings.
 
 Drill-down views may show, where available:
 
@@ -344,6 +461,7 @@ Drill-down views may show, where available:
 - estimated/confirmed cost;
 - free/subscription usage;
 - rate limits/quota;
+- reset horizon;
 - latency;
 - error/success rate;
 - models used;
@@ -368,15 +486,14 @@ or:
 
 ```text
 Task: short extraction
-Mode: Fast
+Mode: Free First
 Selected: Groq / model-x / groq-3
-Reason: required structured output + healthy free capacity + lowest observed latency
+Reason: sufficient task power + healthy plentiful free capacity + low latency
+Preserved: scarce OpenRouter free route
 Fallback: Google / model-y / google-1
 ```
 
 The UI must never reveal raw API keys. Unknown usage/quota should be shown as unavailable/unknown rather than fabricated.
-
-The detailed visual treatment belongs to the product-surface design slice; this document defines the data and behavior that UI must represent.
 
 ## Observability and privacy
 
@@ -391,6 +508,7 @@ Useful metadata includes:
 - timings;
 - token counts where available;
 - cost estimate/confirmed cost;
+- capacity/scarcity evidence where known;
 - fallback reason;
 - error category;
 - verification/result linkage.
@@ -410,9 +528,12 @@ Implements the first native Model Router:
 - provider/model/credential registry;
 - multi-key pools;
 - initial real adapters using the developer `.env`;
+- dynamic provider/model inventory boundary;
 - routing modes;
 - capability/task filtering;
-- health/latency/quota/cost state;
+- health/latency/quota/free-credit/cost state;
+- scarcity-aware Free First routing;
+- model-power/task-fit ranking;
 - bounded fallback;
 - route history/usage data;
 - manual override;
@@ -429,12 +550,16 @@ Before Gate A can pass, manually verify at least:
 
 1. multiple credentials for one provider can be loaded without leaking values;
 2. an unhealthy/rate-limited credential can fail over to another eligible credential;
-3. Auto, Fast/Balanced and Heavy Duty produce explainable route choices;
-4. Manual can pin a provider/model without bypassing policy;
-5. local-only routing does not silently use cloud fallback;
-6. provider/model failure uses bounded fallback;
-7. streaming does not splice two providers after meaningful output begins;
-8. usage/history records the selected provider/model/credential slot without prompt/response retention;
-9. model reports remain unverified until the surrounding objective verification succeeds.
+3. Auto, Fast/Balanced, Heavy Duty and Free First produce explainable route choices;
+4. Free First considers current free capacity **and** sufficient task/model power rather than always choosing one provider;
+5. a plentiful suitable route can preserve a scarcer higher-value free route for harder work;
+6. a quota/rate-limit change causes the next request to re-rank rather than remain pinned;
+7. Ollama Cloud's current free-credit model inventory can be represented without hard-coding it into core architecture;
+8. Manual can pin a provider/model without bypassing policy;
+9. local-only routing does not silently use cloud fallback;
+10. provider/model failure uses bounded fallback;
+11. streaming does not splice two providers after meaningful output begins;
+12. usage/history records the selected provider/model/credential slot without prompt/response retention;
+13. model reports remain unverified until the surrounding objective verification succeeds.
 
 See also [NATIVE-INFRASTRUCTURE.md](NATIVE-INFRASTRUCTURE.md), [RUNTIME-FOUNDATIONS.md](RUNTIME-FOUNDATIONS.md), [EPISTEMIC-INTEGRITY.md](EPISTEMIC-INTEGRITY.md) and [BUILD-GATES.md](BUILD-GATES.md).
