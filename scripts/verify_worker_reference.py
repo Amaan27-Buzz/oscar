@@ -107,13 +107,14 @@ class WorkerProcess:
         self.transport = HTTPTransport(self.ready["url"], timeout=5)
 
     def close(self) -> None:
-        self.process.terminate()
-        try:
-            self.process.wait(timeout=3)
-        except subprocess.TimeoutExpired:
-            self.process.kill()
-            self.process.wait(timeout=3)
-        if self.process.stdout:
+        if self.process.poll() is None:
+            self.process.terminate()
+            try:
+                self.process.wait(timeout=3)
+            except subprocess.TimeoutExpired:
+                self.process.kill()
+                self.process.wait(timeout=3)
+        if self.process.stdout and not self.process.stdout.closed:
             self.process.stdout.close()
 
 
@@ -280,7 +281,7 @@ def run_reference(root: Path) -> dict[str, Any]:
                 )
             runtime.cancel(long.id, transports)
             assert running.result(timeout=5).state == TaskState.CANCELLED
-        # Real mid-command process/node loss leaves ambiguous side effects BLOCKED.
+        # Kill the actual Worker after target-side admission to prove ambiguous execution is not replayed.
         lost = runtime.create(
             Intent(
                 "reference crash ambiguity",
@@ -303,14 +304,14 @@ def run_reference(root: Path) -> dict[str, Any]:
                         pass
                 sleep(0.02)
             else:
-                raise AssertionError("Worker never began the action before disconnect test")
-            # The checkpoint is written only after Dispatcher claimed the action, so
-            # disconnecting here tests a genuinely started/ambiguous execution rather
-            # than racing the request before target-side dedup admission.
+                raise AssertionError("Worker never began the action before crash test")
+            # A durable checkpoint is written after Dispatcher has claimed the action.
+            # Terminating the separate Worker process now prevents it from completing
+            # the dedup record and exercises a real lost-executor/ambiguous outcome.
+            worker.close()
             grid.disconnect(session.node_id)
-            assert running.result(timeout=5).state == TaskState.BLOCKED
+            assert running.result(timeout=10).state == TaskState.BLOCKED
         runtime.reclaim(lost.id)
-        # Started dedup entry remains ambiguous; replay is prohibited by the existing Dispatcher.
         dedup = store.db.execute(
             "SELECT state FROM dedup WHERE action_id=?",
             (store.get("planned_action", lost.id)["id"],),
@@ -340,7 +341,7 @@ def run_reference(root: Path) -> dict[str, Any]:
                 "reconnect/reclaim + idempotent completed replay",
                 "independent bytes/Git tree",
                 "HTTP pause/resume/cancel",
-                "mid-command node loss BLOCKED; replay ambiguous",
+                "real mid-command Worker death BLOCKED; replay ambiguous",
             ],
             "limitations": [
                 "shared SQLite reference authority",
