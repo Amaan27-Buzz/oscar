@@ -7,7 +7,7 @@ from collections.abc import Callable, Iterator
 from contextlib import contextmanager
 from pathlib import Path
 from time import time
-from typing import Protocol
+from typing import Any, Protocol
 
 from .contracts import (
     Action,
@@ -180,6 +180,12 @@ def addition_executor(action: Action, cancellation: Cancellation) -> Result:
 class Verifier:
     def __init__(self, files: ScopedFiles, clock: Callable[[], float] = time):
         self.files, self.clock = files, clock
+
+    def bind_task(self, task_id: str, parameters: dict[str, Any]) -> None:
+        """Bind transient verification resources to the durable task lifecycle."""
+
+    def release_task(self, task_id: str) -> None:
+        """Release private resources after completion, failure or cancellation."""
 
     def verify(self, objective: Objective, result: Result) -> Verification:
         criterion = objective.criterion

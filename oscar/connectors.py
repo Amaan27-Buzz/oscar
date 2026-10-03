@@ -28,6 +28,7 @@ from .contracts import (
     Evidence,
     Objective,
     Result,
+    Task,
     TaskState,
     Verification,
     new_id,
@@ -128,10 +129,32 @@ class ConnectorCapability:
     freshness_seconds: float = 60
     response_kind: str = "json"
     read_request: bool = False
+    consequences: tuple[RiskLevel, ...] = ()
+    communication_trigger: str | None = None
 
     @property
     def permissions(self) -> tuple[str, ...]:
-        return ("connectors:" + self.risk.value,)
+        return tuple(
+            dict.fromkeys("connectors:" + r.value for r in (self.risk, *self.consequences))
+        )
+
+    @property
+    def catalog_permissions(self) -> tuple[str, ...]:
+        # Grid authenticates before resolving the private parameter reference.
+        # Advertise the ceiling so a weaker session cannot borrow executor grants.
+        if self.communication_trigger:
+            return tuple(dict.fromkeys((*self.permissions, "connectors:external-communication")))
+        return self.permissions
+
+    def action_permissions(self, parameters: dict[str, Any]) -> tuple[str, ...]:
+        permissions = self.permissions
+        if self.communication_trigger == "calendar":
+            query = parameters.get("query", {})
+            body = parameters.get("body", {})
+            # Attendee changes can send mail even when notifications are suppressed.
+            if query.get("sendUpdates", "none") != "none" or body.get("attendees"):
+                permissions = (*permissions, "connectors:external-communication")
+        return tuple(dict.fromkeys(permissions))
 
     def __post_init__(self) -> None:
         if not re.fullmatch(r"[a-z0-9_.-]+", self.name):
@@ -144,6 +167,10 @@ class ConnectorCapability:
             # Read-only searches/freebusy use POST with an explicit exception at manifest authoring.
             if not self.name.endswith(("search", "query", "freebusy")):
                 raise ValueError("mutation cannot be classified as read")
+        if self.risk == RiskLevel.READ and (self.consequences or self.communication_trigger):
+            raise ValueError("read capability cannot declare mutation consequences")
+        if self.communication_trigger not in {None, "calendar"}:
+            raise ValueError("unknown communication trigger")
         if not math.isfinite(self.freshness_seconds) or self.freshness_seconds < 0:
             raise ValueError("invalid freshness")
 
@@ -199,6 +226,9 @@ class ConnectorOutcome:
     granted: frozenset[str] = frozenset()
     confirmed: bool = False
     context: dict[str, str] = field(default_factory=dict, repr=False)
+    capability_name: str = ""
+    executed_instance: ConnectorInstance | None = field(default=None, repr=False)
+    resource_path: dict[str, Any] = field(default_factory=dict, repr=False)
 
 
 @dataclass(frozen=True)
@@ -312,6 +342,17 @@ class HTTPSConnector:
             raise ConnectorError("invalid_contract") from None
 
 
+_ACTIVE_CONTEXT_STATES = frozenset(
+    {
+        TaskState.PLANNED,
+        TaskState.EXECUTING,
+        TaskState.AWAITING_RESULT,
+        TaskState.RESULT_RECEIVED,
+        TaskState.VERIFYING,
+    }
+)
+
+
 class ConnectorFabric:
     def __init__(
         self,
@@ -325,9 +366,24 @@ class ConnectorFabric:
         self.instances: dict[str, ConnectorInstance] = {}
         self.outcomes: dict[str, ConnectorOutcome] = {}
         self.requests: dict[str, dict[str, Any]] = {}
+        self.request_owners: dict[str, str] = {}
+        self.store.task_resources.add(self)
+
+    def task_transitioned(self, task: Task) -> None:
+        if task.state not in _ACTIVE_CONTEXT_STATES:
+            self.release_task(task.id)
+
+    def _reap_completed(self) -> None:
+        # Admission also covers transitions committed by another Store/process.
+        tasks = set(self.request_owners.values()) | {
+            outcome.result.task_id for outcome in self.outcomes.values()
+        }
+        for task_id in tasks:
+            self.task_transitioned(self.store.task(task_id))
 
     def stage(self, parameters: dict[str, Any]) -> str:
         """Return a transient input reference; private bodies never enter durable Action/plan."""
+        self._reap_completed()
         serialized = json.dumps(parameters, allow_nan=False)
         if self.secrets.redact(serialized) != serialized or len(serialized) > 1_000_000:
             raise ValueError("unsafe or oversized connector input")
@@ -337,8 +393,25 @@ class ConnectorFabric:
         self.requests[reference] = json.loads(serialized)
         return reference
 
+    def bind_task(self, task_id: str, parameters: dict[str, Any]) -> None:
+        reference = parameters.get("request_ref")
+        if reference not in self.requests:
+            return  # Restart/expired input remains unavailable, never recreated.
+        if reference in self.request_owners:
+            raise ValueError("connector request already belongs to a task")
+        self.request_owners[reference] = task_id
+
+    def release_task(self, task_id: str) -> None:
+        for reference, owner in list(self.request_owners.items()):
+            if owner == task_id:
+                self.release_request(reference)
+        for result_id, outcome in list(self.outcomes.items()):
+            if outcome.result.task_id == task_id:
+                self.forget_outcome(result_id)
+
     def release_request(self, reference: str) -> None:
         self.requests.pop(reference, None)
+        self.request_owners.pop(reference, None)
 
     def install(self, instance: ConnectorInstance) -> None:
         if instance.id in self.instances:
@@ -366,7 +439,7 @@ class ConnectorFabric:
                 "Structured " + instance.manifest.provider + " " + spec.risk.value,
                 "connector",
                 node_id,
-                spec.permissions,
+                spec.catalog_permissions,
                 spec.name,
                 "connector-reference",
                 "low" if spec.risk == RiskLevel.READ else "high",
@@ -391,26 +464,34 @@ class ConnectorFabric:
         confirmed: bool = False,
         context: dict[str, str] | None = None,
     ) -> ConnectorOutcome:
+        self._reap_completed()
         if len(self.outcomes) >= 100:
             raise ValueError("active connector outcome bound; release completed results")
         instance = self.instances[instance_id]
         spec = next(c for c in instance.manifest.capabilities if c.name == name)
+        if action.capability_id != instance_id + ":" + name:
+            raise ValueError("connector executor identity mismatch")
         state = self.state(instance, spec)
+        permissions = spec.action_permissions(action.parameters)
         decision = self.policy.evaluate(
             name,
-            spec.permissions,
+            permissions,
             granted,
             context,
             confirmed=confirmed,
             confirmation_required=spec.risk != RiskLevel.READ,
         )
+        consequences = [
+            self.policy.evaluate(permission, (permission,), granted, context, confirmed=confirmed)
+            for permission in permissions
+        ]
         cancellation.check()
         error: str | None = None
         payload: dict[str, Any] = {}
         source: SourceRef | None = None
         if state != ConnectionState.READY:
             error = "connector_blocked:" + state.value
-        elif not decision.allowed:
+        elif not decision.allowed or any(not d.allowed for d in consequences):
             error = "connector_blocked:policy"
         else:
             secret = self.secrets.resolve(instance.credential) if instance.credential else None
@@ -461,9 +542,21 @@ class ConnectorFabric:
             error=error,
         )
         outcome = ConnectorOutcome(
-            result, source, payload, state, instance.id, granted, confirmed, context or {}
+            result,
+            source,
+            payload,
+            state,
+            instance.id,
+            granted,
+            confirmed,
+            context or {},
+            name,
+            instance,
+            dict(action.parameters.get("path", {})),
         )
-        self.outcomes[result.id] = outcome
+        with self.store.lock:
+            if result.success and self.store.task(action.task_id).state in _ACTIVE_CONTEXT_STATES:
+                self.outcomes[result.id] = outcome
         self.store.audit(
             action.task_id,
             "connector_result",
@@ -475,7 +568,8 @@ class ConnectorFabric:
                 "success": result.success,
                 "error": error,
                 "risk": spec.risk.value,
-                "policy_rules": list(decision.rule_ids),
+                "permissions": list(permissions),
+                "policy_rules": sorted({r for d in [decision, *consequences] for r in d.rule_ids}),
                 "evidence_id": source.evidence_id if source else None,
                 "observed_at": source.observed_at if source else time(),
                 "correlation_id": action.correlation_id,
@@ -506,6 +600,11 @@ class ConnectorFabric:
                     False,
                     error="connector_blocked:input_expired",
                 )
+            reference = action.parameters["request_ref"]
+            if self.request_owners.get(reference, action.task_id) != action.task_id:
+                raise ValueError("connector input belongs to another task")
+            # Consume before dispatch: every success/error/cancel path releases input.
+            self.release_request(reference)
             transient = replace(action, parameters=parameters)
             return self.execute(
                 instance_id, name, transient, cancellation, granted, confirmed=confirmed(action)
@@ -551,7 +650,17 @@ class ConnectorVerifier(Verifier):
         super().__init__(base.files, base.clock)
         self.base, self.fabric = base, fabric
 
+    def bind_task(self, task_id: str, parameters: dict[str, Any]) -> None:
+        self.fabric.bind_task(task_id, parameters)
+        self.base.bind_task(task_id, parameters)
+
     def verify(self, objective: Objective, result: Result) -> Verification:
+        try:
+            return self._verify(objective, result)
+        finally:
+            self.fabric.forget_outcome(result.id)
+
+    def _verify(self, objective: Objective, result: Result) -> Verification:
         if objective.criterion.get("kind") != "connector_fields":
             return self.base.verify(objective, result)
         criterion = objective.criterion
@@ -561,11 +670,27 @@ class ConnectorVerifier(Verifier):
             outcome = self.fabric.outcomes[result.id]
             if outcome.instance_id != criterion["instance_id"]:
                 raise ConnectorError("readback_account_mismatch")
-            instance = self.fabric.instances[criterion["instance_id"]]
-            read = next(
-                c for c in instance.manifest.capabilities if c.name == criterion["read_capability"]
+            instance = self.fabric.instances[outcome.instance_id]
+            if (
+                result != outcome.result
+                or objective.correlation_id != result.correlation_id
+                or instance is not outcome.executed_instance
+                or result.executor != instance.id + ":" + outcome.capability_name
+            ):
+                raise ConnectorError("readback_executor_mismatch")
+            mutation = next(
+                c for c in instance.manifest.capabilities if c.name == outcome.capability_name
             )
-            if read.method != "GET" or self.fabric.state(instance, read) != ConnectionState.READY:
+            if not mutation.readback or mutation.risk == RiskLevel.READ:
+                raise ConnectorError("readback_undeclared")
+            if criterion.get("read_capability", mutation.readback) != mutation.readback:
+                raise ConnectorError("readback_capability_mismatch")
+            read = next(c for c in instance.manifest.capabilities if c.name == mutation.readback)
+            if (
+                read.method != "GET"
+                or read.risk != RiskLevel.READ
+                or self.fabric.state(instance, read) != ConnectionState.READY
+            ):
                 raise ConnectorError("readback_unavailable")
             policy = self.fabric.policy.evaluate(
                 read.name,
@@ -574,15 +699,35 @@ class ConnectorVerifier(Verifier):
                 outcome.context,
                 confirmed=outcome.confirmed,
             )
-            if not policy.allowed:
+            if not policy.allowed or any(
+                not self.fabric.policy.evaluate(
+                    permission,
+                    (permission,),
+                    outcome.granted,
+                    outcome.context,
+                    confirmed=outcome.confirmed,
+                ).allowed
+                for permission in read.permissions
+            ):
                 raise ConnectorError("readback_permission_missing")
             if not criterion.get("expected") or not outcome.result.success:
                 raise ConnectorError("completion_fields_missing")
             params = criterion["read_parameters"]
             # Correlate the requested resource with the actual mutation response.
             response_id = outcome.payload.get("id")
-            if not response_id or response_id not in params.get("path", {}).values():
+            expected_path = dict(outcome.resource_path)
+            read_keys = set(re.findall(r"\{(.*?)\}", read.path))
+            resource_keys = read_keys - expected_path.keys()
+            if len(resource_keys) == 1:
+                expected_path[next(iter(resource_keys))] = response_id
+            if (
+                not response_id
+                or len(resource_keys) > 1
+                or params.get("path") != expected_path
+                or response_id not in expected_path.values()
+            ):
                 raise ConnectorError("readback_resource_mismatch")
+            endpoint(read, params)
             secret = (
                 self.fabric.secrets.resolve(instance.credential) if instance.credential else None
             )

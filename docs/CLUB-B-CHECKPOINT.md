@@ -9,8 +9,11 @@ only main), confirming remote `work` at
 `c12fc0ec48e24b68a5fd59b58931170982c6067c`, clean status and the latest Gate A PASS.
 Created isolated **`overnight/club-b-foundation`** from that exact head. No main
 modification and no merge into main/work. Periodic checkpoint commits were pushed.
-Final remote SHA, PR into `work` and exact-SHA CI are reported at delivery; this
-source cannot embed the hash of its own final commit.
+Final remote head SHA and GitHub PR merge-ref SHA are reported separately at delivery;
+this source cannot embed the hash of its own final commit. GitHub `pull_request` CI
+uses the generated merge ref combining this branch head with the `work` base, via
+`actions/checkout@v4`; it does **not** check out the exact raw branch head. The prior
+delivery's raw-head CI wording was incorrect.
 
 [Machine-readable evidence](evidence/club-b-reference-2026-10-03.json) preserves
 task/correlation IDs, observation times, actual artifact commit, public URLs and
@@ -189,3 +192,18 @@ Natural-language policies need owner-confirmed interpretation before activation.
 **Next recommendation: finish Slice 05 Windows/isolated host execution and real
 coding/browser acceptance, then Slice 06 semantic/authenticated continuity.**
 Review the PR into `work`; do not merge automatically or advance to later slices.
+
+## PR #10 pre-merge review follow-up
+
+The lifecycle, trusted-manifest readback, and composite consequence corrections are
+specified in [CONNECTOR-FABRIC.md](CONNECTOR-FABRIC.md). They stay within the existing
+foundation: no new slice and no merge. Regression coverage includes 120 sequential
+Runtime connector tasks with no retained prior payloads; cancellation before/during
+execution, provider/permission/endpoint/routing failure, verifier errors, restart,
+unchanged active-context bounds, readback capability/resource/account/executor attacks,
+and additive permission/policy/confirmation checks across current communicating mutations.
+The historical 274-test checkpoint above is preserved. This follow-up passed **294/294
+tests in 38.891 seconds**, including 20 new regressions; 104 focused connector/Core/Grid/
+policy-continuity cases passed. Ruff lint/format (55 files), strict mypy (38 OSCAR/script
+files), repository/local-link checks and value-silent source/patch secret scans passed.
+Final head/base/merge SHAs and workflow conclusions are recorded in the PR delivery report.

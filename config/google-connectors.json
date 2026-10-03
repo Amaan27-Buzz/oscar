@@ -106,7 +106,10 @@
           "body_required": true,
           "response_kind": "json",
           "readback": "google.gmail.read",
-          "verification": "authoritative read-back; explicitly selected fields; provider-specific comparison may remain PARTIAL"
+          "verification": "authoritative read-back; explicitly selected fields; provider-specific comparison may remain PARTIAL",
+          "consequences": [
+            "write"
+          ]
         },
         {
           "name": "google.gmail.labels.list",
@@ -188,7 +191,8 @@
           "body_required": true,
           "response_kind": "json",
           "readback": "google.calendar.events.get",
-          "verification": "authoritative read-back; explicitly selected fields; provider-specific comparison may remain PARTIAL"
+          "verification": "authoritative read-back; explicitly selected fields; provider-specific comparison may remain PARTIAL",
+          "communication_trigger": "calendar"
         },
         {
           "name": "google.calendar.events.update",
@@ -204,7 +208,11 @@
           "body_required": true,
           "response_kind": "json",
           "readback": "google.calendar.events.get",
-          "verification": "authoritative read-back; explicitly selected fields; provider-specific comparison may remain PARTIAL"
+          "verification": "authoritative read-back; explicitly selected fields; provider-specific comparison may remain PARTIAL",
+          "communication_trigger": "calendar",
+          "consequences": [
+            "external-communication"
+          ]
         },
         {
           "name": "google.calendar.events.delete",
@@ -218,7 +226,11 @@
             "sendUpdates"
           ],
           "body_required": false,
-          "response_kind": "json"
+          "response_kind": "json",
+          "communication_trigger": "calendar",
+          "consequences": [
+            "external-communication"
+          ]
         },
         {
           "name": "google.calendar.freebusy",

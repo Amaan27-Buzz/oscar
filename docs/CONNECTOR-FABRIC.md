@@ -14,7 +14,10 @@ idempotency, Runtime and independent Evidence/Verification remain authoritative.
 - Bounded HTTPS JSON/media adapter, TLS verification and no redirects; no automatic
   mutation retry. Resource path segments are encoded; query keys are allowlisted.
 - Read, write, destructive, financial, security and external-communication scopes
-  remain distinct. Writes require explicit confirmation and Personal Policy.
+  remain distinct. Capabilities declare additive consequences; all required grants
+  and operation/consequence Personal Policy checks must pass. Writes still require
+  explicit confirmation. A deny on `connectors:external-communication` blocks any
+  action requiring that consequence, even with a write/destructive grant.
 - Environment secret resolver is a platform-supplied reference boundary, not a
   vault. OAuth refresh/revoke and authenticated MCP session are adapter protocols.
   PKCE S256 generation is implemented. Enrollment, token refresh, device flow and
@@ -26,7 +29,15 @@ idempotency, Runtime and independent Evidence/Verification remain authoritative.
 - Private bodies/results stay in bounded task-scoped transient context. `stage`
   returns an opaque input reference for durable Actions; process restart expires
   that input and BLOCKS execution. Metadata-only receipt/ledger records retain
-  evidence IDs/time and policy decision. Callers release completed inputs/results.
+  evidence IDs/time and policy decision. Runtime binds staged references to tasks;
+  dispatch consumes input before execution, including failure/cancellation. The
+  verifier releases outcomes in `finally`, after inspecting them. Committed local task
+  transitions notify weakly held transient owners: completion, failure, blocked
+  execution and cancellation immediately release remaining task context. Admission
+  also reaps context of tasks completed by another Store/process; the
+  100-active-item bound is unchanged. Unbound staging is not a task: clients that stage
+  without creating one must release that unused reference. Restart drops private
+  outcomes too; a durable REPORTED result cannot recreate independent readback proof.
 - Event authentication is supplied by the provider/platform boundary. Ingestion
   deduplicates authenticated IDs and keeps metadata only. Polling/incremental cursor
   and webhook interfaces do not claim deployed provider push subscriptions or
@@ -122,3 +133,40 @@ MCP tool calls require both reviewed risk scope and confirmation even if the ser
 claims a read-only annotation. No live MCP service has been authenticated/tested.
 Read-back also requires explicitly granted OSCAR read permission and the same
 connector instance/account; a write grant cannot borrow read access for verification.
+
+## PR #10 pre-merge corrections
+
+Readback is selected from the **executed mutation's installed manifest**, not the
+objective. Legacy `read_capability` may only agree with that declaration; omission
+is preferred. Verification checks the original Result identity/correlation/executor,
+the exact installed instance/account, granted read scope and read policy, original
+parent/resource path and mutation response ID, then an independent GET and expected
+fields. A manifest without declared GET readback remains PARTIAL. A verification
+attempt consumes its transient outcome; repeated attempts cannot reuse private data.
+
+Composite review of current mutations:
+
+| Mutation | Required consequences |
+| --- | --- |
+| Google Calendar create | write; communication if attendees or `sendUpdates` other than `none` |
+| Google Calendar update/delete | write/destructive + communication conservatively, including `none` |
+| Microsoft calendar create | write; communication when attendees are supplied |
+| Gmail send / Microsoft mail send / Slack post | write + communication |
+| GitHub issue creation | write + communication (publishing/notifications) |
+| Gmail draft; Drive metadata; Docs/Sheets/Slides; Notion pages | write; no explicit outbound notification option in the current admitted contract |
+| MCP | owner-reviewed primary risk plus optional additive consequences; server annotations confer no authority |
+
+Grid advertises the maximum permission set for conditional capabilities because it
+authenticates the caller before private input resolution. The Fabric then evaluates
+the parameter-specific consequences. This deliberately requires a communication-capable
+Grid session even for a calendar-create action that ends up having only a write effect.
+A capability-specific allow never overrides a consequence-specific deny.
+
+Official sources retrieved over TLS on 2026-10-03 UTC: Google Calendar
+[insert](https://developers.google.com/workspace/calendar/api/v3/reference/events/insert),
+[update](https://developers.google.com/workspace/calendar/api/v3/reference/events/update),
+[delete](https://developers.google.com/workspace/calendar/api/v3/reference/events/delete),
+and Microsoft [create event](https://learn.microsoft.com/en-us/graph/api/user-post-events?view=graph-rest-1.0).
+Google warns some emails may still be sent with notifications suppressed; update/delete
+can affect pre-existing attendees unknown to the request. Microsoft attendee invitations
+cannot be disabled. These are reference contract tests, not live private-account tests.

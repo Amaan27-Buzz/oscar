@@ -78,6 +78,7 @@ class Runtime:
             self.store.put("task", task.id, record(task))
             self.store.put("plan", task.id, {"kind": kind, "parameters": parameters})
             self.store.audit(task.id, "jev_decision", record(decision))
+        self.verifier.bind_task(task.id, parameters)
         if decision.execution_class == ExecutionClass.ASK:
             return self.store.transition(task.id, TaskState.UNKNOWN, blocker=decision.reason)
         if not kind or not self.grid.search(kind):

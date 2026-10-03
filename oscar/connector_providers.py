@@ -27,6 +27,7 @@ def load_google(path: Path) -> tuple[ConnectorManifest, ...]:
                     "scopes": tuple(c["scopes"]),
                     "risk": RiskLevel(c["risk"]),
                     "query_fields": tuple(c["query_fields"]),
+                    "consequences": tuple(RiskLevel(r) for r in c.get("consequences", [])),
                 }
             )
             for c in service["capabilities"]
@@ -58,9 +59,20 @@ def _cap(
     query: tuple[str, ...] = (),
     body: bool = False,
     read_request: bool = False,
+    consequences: tuple[RiskLevel, ...] = (),
+    communication_trigger: str | None = None,
 ) -> ConnectorCapability:
     return ConnectorCapability(
-        name, method, path, scopes, risk, query, body, read_request=read_request
+        name,
+        method,
+        path,
+        scopes,
+        risk,
+        query,
+        body,
+        read_request=read_request,
+        consequences=consequences,
+        communication_trigger=communication_trigger,
     )
 
 
@@ -103,6 +115,7 @@ def github_manifest(*, public: bool = False) -> ConnectorManifest:
                 "/repos/{owner}/{repo}/issues",
                 method="POST",
                 risk=RiskLevel.WRITE,
+                consequences=(RiskLevel.COMMUNICATION,),
                 body=True,
             ),
         ),
@@ -131,6 +144,7 @@ def microsoft_manifest() -> ConnectorManifest:
                 ("Mail.Send",),
                 method="POST",
                 risk=RiskLevel.COMMUNICATION,
+                consequences=(RiskLevel.WRITE,),
                 body=True,
             ),
             _cap(
@@ -145,6 +159,7 @@ def microsoft_manifest() -> ConnectorManifest:
                 ("Calendars.ReadWrite",),
                 method="POST",
                 risk=RiskLevel.WRITE,
+                communication_trigger="calendar",
                 body=True,
             ),
             _cap(
@@ -193,6 +208,7 @@ def slack_manifest() -> ConnectorManifest:
                 ("chat:write",),
                 method="POST",
                 risk=RiskLevel.COMMUNICATION,
+                consequences=(RiskLevel.WRITE,),
                 body=True,
             ),
         ),
@@ -250,7 +266,7 @@ class MCPSession(Protocol):
 class MCPBoundary:
     """Untrusted tool annotations cannot grant authority or assert successful verification."""
 
-    def __init__(self, session: MCPSession, reviewed: dict[str, RiskLevel]):
+    def __init__(self, session: MCPSession, reviewed: dict[str, RiskLevel | tuple[RiskLevel, ...]]):
         self.session, self.reviewed = session, reviewed
 
     def manifest(self) -> ConnectorManifest:
@@ -264,14 +280,19 @@ class MCPBoundary:
                 continue
             if not isinstance(tool.get("inputSchema"), dict):
                 raise ConnectorError("invalid_tool_schema")
+            risks = self.reviewed[name]
+            risks = (risks,) if isinstance(risks, RiskLevel) else risks
+            if not risks:
+                raise ConnectorError("reviewed_risks_missing")
             caps.append(
                 _cap(
                     "mcp." + name,
                     "/tools/{name}",
                     method="POST",
-                    risk=self.reviewed[name],
+                    risk=risks[0],
+                    consequences=risks[1:],
                     body=True,
-                    read_request=self.reviewed[name] == RiskLevel.READ,
+                    read_request=risks == (RiskLevel.READ,),
                 )
             )
         return ConnectorManifest(
