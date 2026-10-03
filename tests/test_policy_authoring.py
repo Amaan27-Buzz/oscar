@@ -68,3 +68,12 @@ class PolicyAuthoringTests(unittest.TestCase):
             self.author.confirm(c["id"], c["review_digest"], owner_authorized=True)
         self.assertEqual("candidate", self.store.get("policy_candidate", c["id"])["state"])
         self.assertEqual(1, len(self.policy.rules()))
+
+    def test_changed_stored_interpretation_cannot_activate(self):
+        c = self.author.propose("Never send messages")
+        digest = c["review_digest"]
+        c["rule"]["effect"] = "allow"
+        self.store.put("policy_candidate", c["id"], c)
+        with self.assertRaisesRegex(ValueError, "changed since review"):
+            self.author.confirm(c["id"], digest, owner_authorized=True)
+        self.assertEqual([], self.policy.rules())

@@ -54,7 +54,7 @@ class ScopedFiles:
         if os.name == "nt" and cls is ScopedFiles:
             from .windows_files import WindowsScopedFiles
 
-            return WindowsScopedFiles(root)
+            return super().__new__(WindowsScopedFiles)
         return super().__new__(cls)
 
     def exists(self, relative: str) -> bool:

@@ -125,6 +125,77 @@ class WindowsWorkerTests(unittest.TestCase):
         task = self.run_task("terminal_command", {"argv": ["cmd.exe", "/c", "echo bad"]})
         self.assertEqual(TaskState.FAILED, task.state)
 
+    def test_real_list_search_and_utf8_file(self):
+        task = self.run_task(
+            "file_write",
+            {"path": "notes.txt", "content": "caf\u00e9 \u03bb\n"},
+            {"kind": "file_exact", "path": "notes.txt", "content": "caf\u00e9 \u03bb\n"},
+        )
+        self.assertEqual(TaskState.VERIFIED, task.state)
+        self.assertEqual("caf\u00e9 \u03bb\n".encode(), self.worker.files.read("notes.txt"))
+        for kind, pattern in (("directory_list", ""), ("file_search", "notes")):
+            task = self.run_task(kind, {"pattern": pattern})
+            action = self.store.get("planned_action", task.id)
+            self.assertEqual('["notes.txt"]', self.worker.outputs[action["id"]])
+
+    def test_real_git_status_diff_log(self):
+        from scripts.verify_worker_reference import initialize_repository
+
+        initial = initialize_repository(self.workspace)
+        task = self.run_task(
+            "repository_task",
+            {"path": "tracked.txt", "content": "before\n", "message": "tracked artifact"},
+            {
+                "kind": "git_file_exact",
+                "path": "tracked.txt",
+                "content": "before\n",
+                "initial_head": initial,
+            },
+        )
+        self.assertEqual(TaskState.VERIFIED, task.state)
+        (self.workspace / "tracked.txt").write_bytes(b"after\n")
+        for operation, expected in (
+            ("status", " M tracked.txt"),
+            ("diff", "+after"),
+            ("log", initial),
+        ):
+            task = self.run_task("git_operation", {"operation": operation})
+            self.assertEqual(TaskState.PARTIALLY_VERIFIED, task.state)
+            action = self.store.get("planned_action", task.id)
+            self.assertIn(expected, self.worker.outputs[action["id"]])
+
+    def test_output_bound_kills_descendant(self):
+        task = self.run_task("terminal_command", {"argv": self.tree_command("print('x'*100000)")})
+        self.assertEqual(TaskState.FAILED, task.state)
+        self.assert_dead(int((self.workspace / "child.pid").read_text()))
+
+    def test_paused_before_launch_times_out_without_mutation(self):
+        task = self.task("terminal_command", {"argv": self.tree_command(), "timeout": 0.2})
+        self.worker.set_paused(task.id, True, owner_authorized=True)
+        self.assertEqual(TaskState.FAILED, self.runtime.run(task.id, self.transports).state)
+        self.assertEqual("command_timeout", self.result(task)["error"])
+        self.assertFalse((self.workspace / "child.pid").exists())
+
+    def test_job_assignment_failure_never_runs_child(self):
+        from oscar.windows_process import WindowsJob
+
+        job = WindowsJob()
+        job.kernel.AssignProcessToJobObject = lambda *_: False
+        marker = self.workspace / "should-not-exist"
+        try:
+            with self.assertRaises(OSError):
+                job.start(
+                    [
+                        sys.executable,
+                        "-c",
+                        f"from pathlib import Path; Path({str(marker)!r}).write_text('bad')",
+                    ],
+                    stdout=subprocess.PIPE,
+                )
+            self.assertFalse(marker.exists())
+        finally:
+            job.close()
+
     def test_running_pause_does_not_claim_process_suspension(self):
         task = self.task("terminal_command", {"argv": self.tree_command()})
         with ThreadPoolExecutor(max_workers=1) as pool:
@@ -136,3 +207,47 @@ class WindowsWorkerTests(unittest.TestCase):
             self.worker.set_paused(task.id, True, owner_authorized=True)
             self.runtime.cancel(task.id)
             self.assertEqual(TaskState.CANCELLED, running.result(timeout=5).state)
+
+    def test_abrupt_worker_death_after_mutation_blocks_replay(self):
+        from scripts.verify_worker_reference import WorkerProcess
+
+        worker = WorkerProcess(
+            self.root / "state.sqlite", self.workspace, self.session, discover_agents=False
+        )
+        command = self.tree_command()
+        command[-1] = command[-1].replace(
+            "import subprocess,sys;",
+            "import subprocess,sys; "
+            "from pathlib import Path; Path('ambiguous.txt').write_text('one mutation');",
+        )
+        task = self.task("terminal_command", {"argv": command})
+        try:
+            with ThreadPoolExecutor(max_workers=1) as pool:
+                running = pool.submit(
+                    self.runtime.run, task.id, {"machine": (worker.transport, self.session)}
+                )
+                for _ in range(300):
+                    if (self.workspace / "child.pid").exists():
+                        break
+                    sleep(0.01)
+                pid = int((self.workspace / "child.pid").read_text())
+                worker.close()  # Abrupt OS-process exit closes the Job handle.
+                self.assertEqual(TaskState.BLOCKED, running.result(timeout=8).state)
+            self.assert_dead(pid)
+            self.assertEqual("one mutation", (self.workspace / "ambiguous.txt").read_text())
+            self.grid.disconnect("machine")
+            session = self.grid.pair("machine", self.store.get("node", "machine")["scopes"])
+            worker = WorkerProcess(
+                self.root / "state.sqlite", self.workspace, session, discover_agents=False
+            )
+            self.runtime.reclaim(task.id)
+            state = self.runtime.run(task.id, {"machine": (worker.transport, session)})
+            self.assertEqual(TaskState.BLOCKED, state.state)
+            self.assertEqual("one mutation", (self.workspace / "ambiguous.txt").read_text())
+            action = self.store.get("planned_action", task.id)
+            row = self.store.db.execute(
+                "SELECT state FROM dedup WHERE action_id=?", (action["id"],)
+            ).fetchone()
+            self.assertEqual("started", row[0])
+        finally:
+            worker.close()

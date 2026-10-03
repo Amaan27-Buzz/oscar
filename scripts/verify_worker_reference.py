@@ -313,6 +313,7 @@ def run_reference(root: Path) -> dict[str, Any]:
         return {
             "status": "VERIFIED",
             "scope": "reference network Worker verification",
+            "platform": sys.platform,
             "observed_at": time(),
             "task_id": task.id,
             "correlation_id": task.correlation_id,
@@ -334,7 +335,9 @@ def run_reference(root: Path) -> dict[str, Any]:
             "limitations": [
                 "shared SQLite reference authority",
                 "loopback-only transport",
-                "user Windows laptop unverified",
+                "Windows verified on this host"
+                if os.name == "nt"
+                else "Windows unverified on POSIX host",
                 "authenticated coding-agent tasks unverified",
                 "public TLS/rendezvous and independent stores unverified",
             ],

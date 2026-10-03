@@ -5,6 +5,7 @@ Trusted composition supplies the short-lived session via a pipe, never argv/env/
 
 import argparse
 import json
+import os
 import sys
 from pathlib import Path
 from time import sleep
@@ -36,7 +37,13 @@ def main() -> int:
         ),
     )
     grid.advertise(session, worker.capabilities())
-    dispatcher = Dispatcher(store, grid, session.node_id, worker.executors())
+    dispatcher = Dispatcher(
+        store,
+        grid,
+        session.node_id,
+        worker.executors(),
+        pause_semantics="before-next-subprocess" if os.name == "nt" else "POSIX-process-group",
+    )
     try:
         with ReferenceServer(dispatcher) as server:
             print(

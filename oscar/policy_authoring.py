@@ -63,6 +63,12 @@ class PolicyAuthoring:
             candidate = self.policy.store.get("policy_candidate", candidate_id)
             if candidate["state"] != "candidate" or review_digest != candidate["review_digest"]:
                 raise ValueError("confirmation must name the exact pending interpretation")
+            reviewed = {k: v for k, v in candidate.items() if k != "review_digest"}
+            if (
+                hashlib.sha256(json.dumps(reviewed, sort_keys=True).encode()).hexdigest()
+                != review_digest
+            ):
+                raise ValueError("pending interpretation changed since review")
             data = candidate["rule"]
             rule = PolicyRule(**{**data, "effect": PolicyEffect(data["effect"])})
             # Do not silently replace existing contradictory owner policy.

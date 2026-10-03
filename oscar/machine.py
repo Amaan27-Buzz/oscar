@@ -402,6 +402,8 @@ class MachineWorker:
     def git_command(self, operation: str, parameters: dict[str, Any]) -> list[str]:
         if not self.git or self.git not in self.scope.allowed_executables:
             raise PermissionError("Git executor unavailable")
+        if (self.scope.root / ".git").exists():
+            self.scope.directory(".git")  # Reject redirected Git metadata roots.
         prefix = [
             self.git,
             "-c",

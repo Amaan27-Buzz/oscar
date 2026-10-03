@@ -6,8 +6,9 @@ import json
 import os
 import subprocess
 import sys
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
-from time import time
+from time import sleep, time
 from typing import Any
 
 from oscar.capabilities import ScopedFiles, Verifier
@@ -259,8 +260,78 @@ def main() -> int:
     parser.add_argument("--codex", required=True)
     parser.add_argument("--codex-home", type=Path, required=True)
     parser.add_argument("--report", type=Path, required=True)
+    parser.add_argument("--cancel-existing", action="store_true")
     args = parser.parse_args()
-    report = run(args.state_root, args.codex, args.codex_home)
+    if args.cancel_existing:
+        root = args.state_root.absolute()
+        store = Store(root / "state.sqlite")
+        grid = Grid(store)
+        session = grid.pair("codex-worker", SCOPES)
+        worker = WorkerProcess(
+            root / "state.sqlite",
+            root / "repository",
+            session,
+            executables=(args.codex,),
+            codex_home=args.codex_home,
+            discover_agents=False,
+        )
+        try:
+            runtime = Runtime(store, grid, CodingInspector(ScopedFiles(root / "repository")))
+            before = hashlib.sha256((root / "repository/intervals.py").read_bytes()).hexdigest()
+            task = runtime.create(
+                Intent(
+                    "bounded cancellable Codex review; no mutation authorized",
+                    "capability",
+                    capability_kind="coding",
+                    parameters={
+                        "arguments": [
+                            "exec",
+                            "--ignore-user-config",
+                            "--ephemeral",
+                            "--sandbox",
+                            "read-only",
+                            "Review intervals.py; do not change any files.",
+                        ],
+                        "timeout": 60,
+                    },
+                )
+            )
+            transports = {session.node_id: (worker.transport, session)}
+            with ThreadPoolExecutor(max_workers=1) as pool:
+                running = pool.submit(runtime.run, task.id, transports)
+                for _ in range(300):
+                    try:
+                        if store.get("worker_checkpoint", task.id)["step"] == "process-running":
+                            break
+                    except KeyError:
+                        pass
+                    sleep(0.01)
+                else:
+                    raise AssertionError("Codex subprocess did not reach running checkpoint")
+                assert not running.done()
+                runtime.cancel(task.id, transports)
+                assert running.result(timeout=8).state == TaskState.CANCELLED
+            assert (
+                before
+                == hashlib.sha256((root / "repository/intervals.py").read_bytes()).hexdigest()
+            )
+            report = {
+                "status": "VERIFIED",
+                "platform": sys.platform,
+                "observed_at": time(),
+                "task_id": task.id,
+                "checks": [
+                    "actual Codex subprocess started",
+                    "native HTTP cancel -> Job Object termination",
+                    "task CANCELLED",
+                    "artifact hash unchanged; terminal cancellation cannot replay",
+                ],
+            }
+        finally:
+            worker.close()
+            store.close()
+    else:
+        report = run(args.state_root, args.codex, args.codex_home)
     args.report.write_text(json.dumps(report, indent=2) + "\n")
     print(json.dumps(report, indent=2))
     return 0

@@ -2,6 +2,7 @@
 
 import argparse
 import json
+import sys
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from time import time
@@ -154,8 +155,8 @@ def run_integrated(root: Path) -> dict[str, Any]:
                 "forget live record",
             ],
             "limitations": [
-                "Windows/browser/computer-use unverified",
-                "natural-language policy absent",
+                "platform " + sys.platform + "; browser/computer-use unverified",
+                "this scenario uses structured policy; NL acceptance is separate",
                 "Supermemory live integration unverified",
                 "shared SQLite loopback reference",
             ],

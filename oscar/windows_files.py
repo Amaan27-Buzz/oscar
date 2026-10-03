@@ -6,13 +6,20 @@ This is a trusted local workspace boundary, not isolation from hostile host code
 import ctypes
 import os
 import re
-import stat
 from collections.abc import Iterator
 from contextlib import contextmanager
 from pathlib import Path
+from typing import Any
 
 from .capabilities import Cancellation, ScopedFiles
 from .contracts import new_id
+
+_win32: Any = ctypes
+
+
+def is_reparse(path: Path) -> bool:
+    metadata: Any = path.lstat()
+    return bool(metadata.st_file_attributes & 0x400)
 
 
 class WindowsScopedFiles(ScopedFiles):
@@ -44,7 +51,7 @@ class WindowsScopedFiles(ScopedFiles):
         """Open every ancestor without following a reparse, denying delete sharing."""
         from ctypes import wintypes
 
-        kernel = ctypes.WinDLL("kernel32", use_last_error=True)
+        kernel = _win32.WinDLL("kernel32", use_last_error=True)
         kernel.CreateFileW.argtypes = [
             wintypes.LPCWSTR,
             wintypes.DWORD,
@@ -66,9 +73,9 @@ class WindowsScopedFiles(ScopedFiles):
                     str(ancestor), 0x80000000, 3, None, 3, 0x02200000, None
                 )  # SHARE_READ|WRITE; OPEN_REPARSE_POINT|BACKUP_SEMANTICS
                 if handle == ctypes.c_void_p(-1).value:
-                    raise ctypes.WinError(ctypes.get_last_error())
+                    raise _win32.WinError(_win32.get_last_error())
                 handles.append(handle)
-                if ancestor.lstat().st_file_attributes & stat.FILE_ATTRIBUTE_REPARSE_POINT:
+                if is_reparse(ancestor):
                     raise PermissionError("reparse point denied")
             yield
         finally:
@@ -98,11 +105,7 @@ class WindowsScopedFiles(ScopedFiles):
             for scanned, entry in enumerate(entries):
                 if scanned >= 10_000 or len(names) >= 500:
                     raise ValueError("directory result bound exceeded")
-                if (
-                    not entry.stat(follow_symlinks=False).st_file_attributes
-                    & stat.FILE_ATTRIBUTE_REPARSE_POINT
-                    and pattern in entry.name
-                ):
+                if not is_reparse(Path(entry.path)) and pattern in entry.name:
                     names.append(entry.name)
             return sorted(names)
 
@@ -124,7 +127,7 @@ class WindowsScopedFiles(ScopedFiles):
         with self.checked_directory("/".join(parts[:-1]) or ".", True) as parent:
             target = parent / parts[-1]
             if target.exists() or target.is_symlink():
-                if target.lstat().st_file_attributes & stat.FILE_ATTRIBUTE_REPARSE_POINT:
+                if is_reparse(target):
                     raise PermissionError("reparse point denied")
                 if not target.is_file():
                     raise ValueError("regular file required")

@@ -5,6 +5,8 @@ import subprocess
 from ctypes import wintypes
 from typing import Any
 
+_win32: Any = ctypes
+
 
 class BasicLimits(ctypes.Structure):
     _fields_ = [
@@ -45,7 +47,7 @@ class ThreadEntry(ctypes.Structure):
 
 class WindowsJob:
     def __init__(self) -> None:
-        self.kernel: Any = ctypes.WinDLL("kernel32", use_last_error=True)
+        self.kernel: Any = _win32.WinDLL("kernel32", use_last_error=True)
         signatures = {
             "CreateJobObjectW": ([ctypes.c_void_p, wintypes.LPCWSTR], wintypes.HANDLE),
             "SetInformationJobObject": (
@@ -66,14 +68,14 @@ class WindowsJob:
             function.argtypes, function.restype = args, result
         self.handle = self.kernel.CreateJobObjectW(None, None)
         if not self.handle:
-            raise ctypes.WinError(ctypes.get_last_error())
+            raise _win32.WinError(_win32.get_last_error())
         limits = ExtendedLimits()
         limits.basic.flags = 0x2000  # JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE; no breakaway
         if not self.kernel.SetInformationJobObject(
             self.handle, 9, ctypes.byref(limits), ctypes.sizeof(limits)
         ):
             self.close()
-            raise ctypes.WinError(ctypes.get_last_error())
+            raise _win32.WinError(_win32.get_last_error())
 
     def start(self, argv: list[str], **kwargs: Any) -> subprocess.Popen[bytes]:
         # Popen closes the primary thread handle. Recover it via documented Toolhelp
@@ -82,15 +84,15 @@ class WindowsJob:
         try:
             handle = self.kernel.OpenProcess(0x100 | 0x1, False, process.pid)
             if not handle:
-                raise ctypes.WinError(ctypes.get_last_error())
+                raise _win32.WinError(_win32.get_last_error())
             try:
                 if not self.kernel.AssignProcessToJobObject(self.handle, handle):
-                    raise ctypes.WinError(ctypes.get_last_error())
+                    raise _win32.WinError(_win32.get_last_error())
             finally:
                 self.kernel.CloseHandle(handle)
             snapshot = self.kernel.CreateToolhelp32Snapshot(0x4, 0)
             if snapshot == ctypes.c_void_p(-1).value:
-                raise ctypes.WinError(ctypes.get_last_error())
+                raise _win32.WinError(_win32.get_last_error())
             try:
                 entry = ThreadEntry()
                 entry.size = ctypes.sizeof(entry)
@@ -99,7 +101,7 @@ class WindowsJob:
                     if entry.owner == process.pid:
                         thread = self.kernel.OpenThread(0x2, False, entry.id)
                         if not thread:
-                            raise ctypes.WinError(ctypes.get_last_error())
+                            raise _win32.WinError(_win32.get_last_error())
                         try:
                             if self.kernel.ResumeThread(thread) != 1:
                                 raise OSError("unexpected suspended thread state")
