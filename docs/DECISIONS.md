@@ -1,352 +1,289 @@
 # Architecture Decisions
 
-This file records decisions that should remain stable unless explicitly revisited. Update it when a future slice changes one of these assumptions.
+This file contains the **current active architecture decisions** for OSCAR. Retired/superseded decisions remain available in Git history and historical Gate/checkpoint evidence; they are not kept as active instructions merely for archival convenience.
 
-## ADR-001 — OSCAR is not hardware-only
+When a durable architecture assumption changes, update this file and the affected canonical domain docs in the same change.
 
-**Decision:** OSCAR is the full personal-agent system spanning cloud intelligence, phone, computers, edge hardware, memory, tools and environment.
+## ADR-001 — OSCAR is one distributed personal intelligence
 
-**Reason:** the target is a coherent JARVIS-like capability model, not a robot shell with a chatbot attached.
+**Decision:** OSCAR spans cloud coordination, phone, computers, communications, memory, tools, environment and Edge hardware as one system.
 
-## ADR-002 — Sunday is OSCAR on the phone
+**Implications:**
 
-**Decision:** Sunday is a mobile embodiment/surface of OSCAR, not a separate assistant.
+- Sunday is OSCAR on the phone, not a second assistant;
+- Desktop machines are optional capability nodes, not the permanent host;
+- cloud is replaceable infrastructure, not identity;
+- Edge provides local presence/reflex/safety where used.
 
-**Implication:** identity, memory, task state, permissions and Protocols are shared through OSCAR.
+## ADR-002 — User experience is one continuous relationship
 
-## ADR-003 — Laptop independence
+**Decision:** voice, text, Sunday, desktop, communications, Workers and physical surfaces share one continuing OSCAR relationship.
 
-**Decision:** OSCAR must remain operational when the user's laptop/PC is off.
+The user is not required to create/manage chat threads to preserve or retrieve memory.
 
-**Implication:** primary availability cannot depend on a desktop daemon or local LLM. PCs join as optional Worker nodes.
+Internal turns/episodes/projects/objectives/tasks/entities remain structured for scaling, retrieval and provenance.
 
-## ADR-004 — Cloud-first intelligence, edge-first presence
+## ADR-003 — OSCAR owns the canonical Memory Fabric
 
-**Decision:** heavy reasoning uses cloud intelligence; low-power edge hardware owns always-on presence, sensors, reflexes and safety.
+**Decision:** OSCAR owns canonical long-term history; no managed memory vendor is required.
 
-**Primary planned paths:**
-
-- ChatGPT and other configured providers through OSCAR-owned provider/transport adapters;
-- native OSCAR Model Router for provider/model selection;
-- local deterministic logic on Edge.
-
-Local PC models may exist only as optional support capabilities.
-
-## ADR-005 — ESP32 and Pico have different jobs
-
-**Decision:** ESP32 is the network/audio/event gateway; RP2040/Pico is the deterministic physical controller.
-
-**Reason:** networking/orchestration and deterministic GPIO/safety behavior have different constraints.
-
-## ADR-006 — Transport is native OSCAR infrastructure
-
-**Decision:** OSCAR owns its secure Transport + Capability Fabric. The separate Latch project is reference/prototype material whose useful architecture/logic may be folded into OSCAR; it is not a required runtime dependency.
-
-**Responsibilities:** bidirectional typed events/actions/results, node identity, pairing/scoped credentials, capability advertisement, correlation IDs, reconnect/backoff, progress callbacks, audit/provenance and secure outbound rendezvous for private devices.
-
-**Implication:** embedded hardware uses a small native OSCAR Edge transport/client rather than depending on a separately deployed Latch service.
-
-## ADR-007 — Bidirectional ChatGPT relationship
-
-**Decision:** OSCAR should support both directions where product APIs permit:
+Initial stack:
 
 ```text
-ChatGPT/provider surface → OSCAR-owned adapter → OSCAR
-OSCAR → OSCAR-owned adapter → ChatGPT/provider surface
+canonical OSCAR Event Archive
+SQLite + WAL + FTS5
+      │
+      ├─ Qdrant OSS semantic/hybrid derived index
+      └─ Graphiti OSS + Neo4j Community temporal/entity derived index
 ```
 
-A provider-specific wake/trigger workaround stays behind the native transport/provider boundary so it can be replaced later without changing OSCAR Core.
+Embedding/reranking are replaceable OSCAR capabilities.
 
-## ADR-008 — Model routing is native OSCAR infrastructure
+**Constraint:** vector/graph indexes are rebuildable derived state and never the sole source of memory truth.
 
-**Decision:** OSCAR owns model/provider routing. The separate SwitchRoute project is reference/prototype material whose useful architecture/logic may be folded into OSCAR; it is not a required runtime dependency.
+**Supersedes:** the earlier LRA + Supermemory backend formulation. Historical references to that formulation describe the old plan only.
 
-**Responsibilities:** provider/model registry, task suitability, latency/cost/quality policy, health/availability, fallback chains, capability/context metadata and route telemetry.
+See `docs/MEMORY.md`.
 
-**Implication:** ChatGPT is a first-class intelligence provider, not the only brain. Jev decides whether reasoning is needed; the native Model Router decides which allowed model/provider to use.
+## ADR-004 — Jev owns memory preflight and epistemic retrieval routing
 
-## ADR-009 — Use specialist software rather than reimplementing it
+**Decision:** TypeSafe Jev decides whether a request requires known/world/recall/verify/reason/reported/specialist/worker/unknown paths and whether memory retrieval is mandatory.
 
-**Decision:** OSCAR delegates to the best execution environment: Codex for coding, computer use for GUIs/verification, installed or connected engineering tools for hardware/design/simulation, connected knowledge tools for their native workspaces, and other specialist software when suitable.
+For personal/historical/project/entity/artifact/preference references, retrieval precedes historical factual claims.
 
-**Reason:** OSCAR should orchestrate expertise rather than become a mediocre clone of every tool.
+Bounded recall escalation:
 
-## ADR-010 — Capability advertisement
+```text
+active context
+→ structured OSCAR state/entities/tasks/policy
+→ canonical Event Archive exact/FTS5
+→ Qdrant hybrid
+→ Graphiti temporal/entity
+→ alias/entity/time-range expansion
+→ bounded deeper archive reconstruction
+→ UNKNOWN
+```
 
-**Decision:** nodes, apps, plugins and Workers advertise capabilities dynamically.
+A retrieval miss is not proof memory does not exist.
 
-OSCAR should reason about capabilities such as `codex`, `computer-use`, `camera`, `relay`, `gpu`, `browser`, `cad`, `circuit-sim`, `device-provision`, plugins and other tools rather than assuming a specific machine or service is always present.
+## ADR-005 — Recalled claims are evidence-bound
 
-## ADR-011 — Voice and text share state
+**Decision:** OSCAR must not say or imply `I remember X` unless X was actually retrieved or remains in Active Context with source provenance.
 
-**Decision:** changing modality does not start a new assistant/session conceptually.
+Personal/historical claims retain source event/memory IDs internally. Retrieved history remains `RECALLED` in the current reasoning path; similarity/reranking/model confidence never promotes it to current `VERIFIED` truth.
 
-## ADR-012 — Reflex commands bypass LLMs
+## ADR-006 — World Model and Memory are separate
 
-**Decision:** wake acknowledgement, mute, stop, cancel, emergency behavior and other deterministic reflexes must not wait on cloud-model reasoning.
+**Decision:** World Model represents current state; Memory Fabric represents historical continuity/evidence.
 
-**Reason:** latency, reliability and safety.
+**Constraint:** live authoritative state outranks stale memory when current truth matters. Historical questions may intentionally select older temporally valid facts.
 
-## ADR-013 — Voice Match is convenience/auth context, not strong authentication
+## ADR-007 — Corrections supersede; history is preserved
 
-**Decision:** speaker verification can gate personal commands and Sentry behavior, but critical actions require stronger confirmation such as phone biometric/PIN or explicit approval.
+**Decision:** corrections link to challenged facts/events, update current validity and derived indexes, and preserve the original source history for temporal questions.
 
-**Additional rule:** emergency stop should remain available even when the speaker is not recognized where doing so improves safety.
+Do not silently rewrite history.
 
-## ADR-014 — Sentry is local-first awareness
+## ADR-008 — Memory formation produces candidates, not truth
 
-**Decision:** Sentry Mode continuously observes low-power local events/state and selectively escalates. It must not require continuous raw microphone/camera streaming to cloud AI.
+**Decision:** model-assisted extraction creates scoped candidates with source provenance and epistemic state.
 
-## ADR-015 — Proactivity is scored
+Pipeline:
 
-**Decision:** events should carry importance, urgency, confidence and interruptibility so OSCAR can choose between silent logging, notification, speech and immediate interruption.
+```text
+source event
+→ extract candidate
+→ scope/classify
+→ entity resolution
+→ conflict/supersession check
+→ provenance + evidence state
+→ retention decision
+→ derived-index update
+```
 
-## ADR-016 — Hardware safety is deterministic
+Overgeneralization is a defect. Inference remains `INFERRED` unless stronger evidence exists.
 
-**Decision:** emergency stop, cutoffs, interlocks and watchdog behavior stay local and remain functional without Internet/cloud intelligence.
+## ADR-009 — Personal Policy, Permission, Persona and Memory are different authority layers
 
-## ADR-017 — LRA owns continuous memory; Supermemory is a backend
+```text
+Memory          = historical continuity/evidence
+World Model     = current state
+Personal Policy = explicit desired behavior
+Permission      = what OSCAR may do
+Persona         = how OSCAR expresses itself
+Protocol        = durable delegated responsibility
+```
 
-**Decision:** LRA is the persistent single-conversation/history architecture. Supermemory supplies semantic/profile-style memory underneath LRA.
+None silently grants/substitutes for another.
 
-**Implication:** internal context segmentation must not force the user into a sidebar of disconnected chats.
+## ADR-010 — Epistemic Integrity is a system invariant
 
-## ADR-018 — Jev is intent + epistemic routing
+**Decision:** OSCAR distinguishes KNOWN, INFERRED, RECALLED, REPORTED, VERIFIED and UNKNOWN, and preserves explicit task lifecycle states.
 
-**Decision:** TypeSafe Jev decides among execute, recall, verify, reason, delegate and ask-user paths.
+Tool/model/Worker/API success is testimony, not automatic objective completion.
 
-**Core rule:** if OSCAR lacks reliable user/project context, it retrieves or verifies it before guessing.
-
-## ADR-019 — OSCAR learns procedures, not only facts
-
-**Decision:** successful novel executions can be distilled into procedural memory and reusable Skills.
-
-**Goal:** repeated tasks become faster, cheaper and more deterministic over time.
-
-## ADR-020 — OSCAR can create reusable workflows safely
-
-**Decision:** OSCAR may create/propose/refine Protocols, routines and ecosystem-compatible `SKILL.md`-style Skills.
-
-**Constraint:** generated automation cannot grant itself new permissions. Expanded authority requires review/approval.
-
-## ADR-021 — Protocols are stateful responsibilities, not just schedules
-
-**Decision:** OSCAR Protocols may wait, observe, branch, delegate, retry, verify and escalate over long periods.
-
-## ADR-022 — Native desktop surfaces are part of OSCAR
-
-**Decision:** OSCAR will have native/lightweight Windows and macOS surfaces for voice/text, context, approvals and presence.
-
-**Implication:** desktop UI is an embodiment; the machine Worker is a capability node. Neither is the permanent host.
-
-## ADR-023 — Hardware and engineering capabilities are tool-agnostic
-
-**Decision:** OSCAR controls physical systems through native Edge/device capability contracts and delegates hardware design, CAD, circuit work, simulation, firmware, diagnostics and provisioning to whichever installed or connected specialist tools are actually available.
-
-**Reason:** no dedicated hardware-workbench product should become an architectural dependency. Engineering tools are replaceable capabilities discovered through the same catalog as other software and devices.
-
-**Implication:** devices should be provisionable as native OSCAR nodes with advertised capabilities regardless of which engineering tool was used to design or program them.
-
-## ADR-024 — Avatar is functional UI
-
-**Decision:** the blue-shell/yellow-face avatar is a major state/presence interface across Sunday and suitable OSCAR surfaces.
-
-The yellow face uses weighted joystick/puck motion and a designed expression language tied to real system state.
-
-## ADR-025 — Documentation is part of every slice
-
-**Decision:** each completed implementation slice updates README status, relevant architecture/feature docs, limitations/decisions and the next-slice marker.
-
-A slice is not complete while the repository still describes an older system state.
-
-## ADR-026 — Quietly Alive is the OSCAR visual system
-
-**Decision:** OSCAR uses the **Quietly Alive** design direction documented in `DESIGN.md` and `TASTE.md`.
-
-## ADR-027 — Agent adapters stay thin; canonical context stays shared
-
-**Decision:** `AGENTS.md` is the canonical repository-wide coding-agent instruction set. `DESIGN.md`, `TASTE.md` and domain docs hold detailed truth. Agent-specific files remain thin adapters.
-
-## ADR-028 — Engineering favors simple, modular and evolvable code
-
-**Decision:** `ENGINEERING.md` is the canonical engineering/system-design quality bar for OSCAR.
-
-**Principles:** smallest coherent solution; high cohesion/low coupling; typed validated boundaries; explicit state ownership; bounded failure/retry behavior; dependency discipline; contract-focused tests; least privilege; measurement before optimization; small reversible changes.
-
-## ADR-029 — Personal Policy is a first-class authoritative behavior layer
-
-**Decision:** explicit user preferences are stored/evaluated as Personal Policy, distinct from semantic memory and permissions.
-
-**Precedence:** safety/legal/platform constraints and permissions remain authoritative; explicit policy is evaluated before inferred preferences/defaults.
-
-## ADR-030 — Communication is one OSCAR subsystem
-
-**Decision:** calls, messaging, meetings, transcription, dictation and communication follow-up belong to a shared OSCAR communication layer.
-
-**Integration order:** native OS/official API → official plugin/connector → authorized device app automation → computer-use/accessibility fallback → unsupported/ask.
-
-## ADR-031 — Delegated Workers belong under OSCAR and use the real device mesh
-
-**Decision:** OSCAR may create temporary or persistent sub-agents called Workers for scoped objectives/responsibilities.
-
-**Execution model:** a Worker may use Sunday, desktop machine nodes, Codex, Computer Use, plugins/APIs, ChatGPT/native Model Router, installed/connected specialist applications or OSCAR Edge according to capability, policy and availability.
-
-**Recovery:** Jev should allow safe self-repair/rerouting before unnecessary user escalation; retries remain bounded and authority never expands silently.
-
-## ADR-032 — The World Model is the live shared state layer
-
-**Decision:** OSCAR maintains a World Model representing current people, places, devices, apps, projects, tasks, objects and their relationships/state.
-
-**Constraint:** current state carries freshness/provenance/confidence. Stale state becomes stale/unknown rather than current truth.
-
-## ADR-033 — Perception feeds the World Model through a normalized fabric
-
-**Decision:** screen/accessibility state, cursor/selection, camera observations, audio events, Voice Map events, phone/app events, location, sensors and task/Worker state enter OSCAR through a Perception Fabric.
-
-**Constraint:** perception and retention are separate decisions.
-
-## ADR-034 — OSCAR has an Executive Planner above Workers and Protocols
-
-**Decision:** a global Executive Planner coordinates concurrent objectives using priority, deadlines, dependencies, resources, risk, cost, interruptibility and device availability.
-
-## ADR-035 — Consequential actions use an Action Ledger; undo is capability-aware
-
-**Decision:** consequential actions are recorded with intent, initiator, target, capability/tool/device, policy/permission decision, verification and reversal metadata where available.
-
-**Constraint:** undo is best-effort. Irreversible operations are never represented as reversible.
-
-## ADR-036 — Interaction Runtime uses Dictate / Edit / Ask / Act
-
-**Decision:** desktop/mobile interaction converges on four user-facing modes: Dictate, Edit, Ask and Act, powered by focused app/window, selected text, cursor target, accessibility tree, screenshot/visual context and active task state.
-
-## ADR-037 — Exactly one listening surface owns a voice turn
-
-**Decision:** when Sunday, desktop and physical OSCAR hear the same wake/utterance, a multi-device arbitration layer chooses one owning surface.
-
-**Inputs:** wake confidence, signal/proximity, active-device context, presence/user interaction and explicit priority.
-
-## ADR-038 — Live source retrieval is federated and authority-aware
-
-**Decision:** Jev can query a universal live context/search fabric across connected authoritative sources instead of hard-coding every connector into the reasoning path.
-
-## ADR-039 — OSCAR can be taught workflows by demonstration
-
-**Decision:** where capabilities allow it, the user can deliberately teach a workflow by demonstrating it once; OSCAR infers a Skill candidate, asks about ambiguity, verifies and versions the result.
-
-**Constraint:** observed behavior never creates new authority.
-
-## ADR-040 — OSCAR monitors and repairs its own operational health
-
-**Decision:** OSCAR treats expired auth, broken adapters/connectors, stale/disappeared capabilities, provider degradation, Edge disconnects, update failure, storage pressure and repeated Worker failures as first-class health state.
-
-**Constraint:** automatic repair/rollback occurs only when safe, bounded and authorized.
-
-## ADR-041 — Epistemic Integrity is a core invariant
-
-**Decision:** OSCAR distinguishes direct knowledge, inference, recalled memory, external reports, verified evidence and unknown state. Completion claims cannot exceed available verification evidence.
-
-**Implications:** reported success is not automatically verified; partial verification is reported as partial; unknown is valid; OSCAR can disagree when evidence/constraints require it; corrections are explicit.
+Unknown/failure/disagreement is preferable to fabricated certainty.
 
 See `docs/EPISTEMIC-INTEGRITY.md`.
 
-## ADR-042 — Communication adapters share a Universal Channel Gateway
+## ADR-011 — Transport and capability fabric are native OSCAR infrastructure
 
-**Decision:** supported messaging/email/social channels map into one normalized inbound/outbound event/action abstraction while preserving channel-specific capabilities.
+**Decision:** OSCAR owns typed task/event/action/result transport, node/session identity, pairing/scoped credentials, capability advertisement, correlation, reconnect/backoff, progress, replay protection/idempotency and audit/provenance.
 
-## ADR-043 — Long-running work uses a Durable Execution Runtime
+Latch remains reference/prototype material, not a required runtime.
 
-**Decision:** tasks that must survive process/device/executor loss use durable state with checkpoints, leases/ownership, heartbeats, bounded retry, cancellation, reclaim and restart/resume semantics.
+## ADR-012 — Model routing is native and separate from capability routing
 
-## ADR-044 — Capability discovery scales through a searchable catalog
-
-**Decision:** capabilities expose lightweight searchable manifests; detailed tool/Skill/plugin contracts are progressively loaded only for a relevant candidate set.
-
-## ADR-045 — Learned automation is evaluated before trusted promotion
-
-**Decision:** a successful exploratory execution can create a candidate Skill/routine/Protocol, but trusted/default promotion requires evaluation where possible, safety/permission review, comparison and rollback support.
-
-## ADR-046 — Finished outputs use a first-class Artifact / Result Model
-
-**Decision:** durable outputs such as documents, code changes, research, media, deployments, meeting notes and firmware builds can be represented as typed artifacts with provenance, version/location, ownership and verification state.
-
-## ADR-047 — Device mesh is primary; cloud Worker computers are optional capabilities
-
-**Decision:** OSCAR's execution foundation remains the user's actual device/service mesh. A future cloud Worker node may be added as another advertised capability, not as a permanent architectural dependency.
-
-## ADR-048 — Latch and SwitchRoute are references, not required products
-
-**Decision:** OSCAR may reuse proven ideas/code from Amaan's Latch and SwitchRoute projects, but the final transport/capability and model-routing subsystems are native OSCAR modules.
-
-**Reason:** both projects are still evolving, and the useful architecture is already understood. Requiring separate deployed products would introduce artificial coupling and a false availability dependency.
-
-**Constraint:** do not preserve a service boundary merely because a prototype had one. Reuse only what still fits OSCAR's contracts and tests.
-
-See `docs/NATIVE-INFRASTRUCTURE.md`.
-
-## ADR-049 — Voice Map and Voice Match are different systems
-
-**Decision:** Voice Match is authorization-oriented speaker verification; Voice Map is perception-oriented speaker recognition/context.
-
-**Reason:** `I think this is person X` and `person X is authorized to perform action Y` are different claims.
-
-**Rules:**
-
-- Voice Map recognition never grants permission;
-- unknown speakers remain unknown instead of guessed;
-- canonical-person linkage requires sufficient evidence/confirmation;
-- voice profiles/embeddings are sensitive and retention-controlled;
-- speaker confidence remains explicit.
-
-## ADR-050 — OSCAR owns a stable Voice Identity
-
-**Decision:** OSCAR's synthesized voice is a provider-independent product identity represented by a `VoiceProfile`, not whatever default voice a TTS provider happens to expose.
-
-**VoiceProfile includes where supported:** voice/model reference, prosody/modulation, rate/rhythm, pronunciation controls, contextual speaking modes, fallback mapping and version.
-
-**Constraint:** provider fallbacks should preserve identity as closely as possible and report material degradation rather than silently becoming a different voice.
-
-## ADR-051 — Sentry includes local always-on acoustic awareness
-
-**Decision:** when enabled, Sentry's local perception plane continuously supports low-cost acoustic signals such as wake word, VAD/speech presence, Voice Map known/unknown speaker events, speaker changes/multiple speakers, configured sound-event classes and barge-in.
-
-**Privacy rule:** always-on acoustic awareness does not imply continuous cloud transcription or raw-audio retention. Speech presence, speaker identity, transcription and retention are separate policy/permission decisions.
-
-**Self-voice rule:** OSCAR's own TTS must be tagged/suppressed so it does not trigger itself or pollute Voice Map. Self-voice suppression must still allow human barge-in.
-
-## ADR-052 — Model routing, capability selection and Jev are separate decisions
-
-**Decision:** OSCAR keeps three boundaries distinct:
+**Decision:** keep three boundaries distinct:
 
 ```text
-Jev                  → what class of action is needed?
+Jev                  → what class of action/evidence is needed?
 Capability selection → which executor/tool/device should act?
 Model Router         → which provider/model/credential should reason?
 ```
 
-**Reason:** model-provider keys, local runtimes, coding agents, terminal/computer-use and installed applications have different execution semantics and should not be flattened into one generic provider list.
+SwitchRoute remains reference/prototype material, not a required runtime.
 
-**Implication:** coding agents such as Codex, Claude Code and OpenCode are discovered/selected as capabilities. The native Model Router is used only after a model-reasoning path is selected.
+Coding agents, terminal, computer-use and installed apps are executable capabilities, not model-provider entries.
 
-See `docs/MODEL-ROUTING.md`.
+## ADR-013 — Freshness-sensitive current facts require live evidence
 
-## ADR-053 — Providers may use independent credential pools
+**Decision:** when a fact can materially change, retrieve current authoritative evidence where reasonably available before answering from memory/cache/model prior.
 
-**Decision:** a single provider may own multiple credential slots, each with independent validity, health, rate/quota/capacity, cooldown, usage and observed latency state where measurable.
+Provider support, account-visible listing, generation access, funding/quota and current service state remain separate observations.
 
-**Rules:**
+Tavily is one replaceable search adapter, not an architectural dependency.
 
-- raw credentials never appear in UI/telemetry/logs;
-- stable masked slot IDs are used for diagnostics;
-- one failing credential does not automatically disable the whole provider;
-- unknown quota is not unlimited;
-- unknown price is not free;
-- automatic routing and explicit manual provider/model selection both remain available.
+See `docs/SEARCH-FRESHNESS.md`.
 
-The initial local development pool is defined by `.env.example`; the real `.env` remains local-only.
+## ADR-014 — Connection Grid is OSCAR's availability/control fabric
 
-## ADR-054 — Build Gates are manual acceptance milestones above slices
+**Decision:** Sunday, replaceable cloud coordination, Desktop nodes and Edge form one Connection Grid over OSCAR-owned transport/capability contracts.
 
-**Decision:** detailed roadmap slices remain the unit of implementation, while five Build Gates group them for explicit manual end-to-end verification:
+```text
+Sunday      = preferred owner control / approvals / notifications
+Cloud       = replaceable rendezvous + durable coordination
+Desktop     = high-capability execution
+Edge        = local awareness / reflex / safety
+```
+
+No connected node gains unrestricted authority. Capability scope and permission are rechecked at authoritative targets.
+
+Availability degrades explicitly rather than hiding a permanent host.
+
+See `docs/CONNECTION-GRID.md`.
+
+## ADR-015 — Long-running work uses a Durable Execution Runtime
+
+**Decision:** durable work carries task IDs, checkpoints, dependencies, leases/ownership, heartbeats, bounded retry, cancellation, reclaim/restart semantics, artifacts and verification state.
+
+Ambiguous consequential work is not blindly replayed. Dead executors do not remain falsely `working`.
+
+## ADR-016 — Use specialist software rather than reimplement it
+
+**Decision:** OSCAR delegates to the strongest legitimate environment: coding agents for code, computer-use for GUIs, installed/connected engineering tools, native connectors/APIs, browser runtime, model providers or Edge capabilities as appropriate.
+
+Capabilities advertise dynamically rather than being assumed always available.
+
+## ADR-017 — Machine execution is capability-scoped and truthful about isolation
+
+**Decision:** Desktop Workers expose scoped filesystem/Git/terminal/browser/computer-use/installed-app capabilities.
+
+Trusted-host execution is **not** a sandbox. Cwd restriction, allowlists, Job Objects, UI Automation and browser isolation improve boundaries but are not represented as OS-level hostile-code containment unless separately proven.
+
+## ADR-018 — Personal Policy interpretation requires owner confirmation
+
+**Decision:** open-ended natural-language policy is interpreted into a bounded structured candidate, shown to the owner and activated only after explicit confirmation.
+
+Policy cannot grant missing permission, bypass strong confirmation, weaken hard safety or be overridden by Persona/memory.
+
+## ADR-019 — Communication is one OSCAR subsystem
+
+**Decision:** calls, messages, email, meetings, dictation and communication follow-up share a Universal Channel Gateway while preserving real channel capabilities.
+
+Integration order:
+
+```text
+native OS / official API
+→ official connector/plugin
+→ authorized device automation
+→ computer-use/accessibility fallback
+→ unsupported / ask
+```
+
+Notification visibility never implies unrestricted access to the source app.
+
+## ADR-020 — Sentry awareness and durable capture are separate
+
+**Decision:** Sentry may provide persistent local awareness when enabled, while conversational Listening, raw recording, transcription, summaries and memory extraction remain separately controlled.
+
+The product is not designed around covert recording.
+
+## ADR-021 — Voice Identity, Voice Match and Voice Map are separate systems
+
+- Voice Identity is OSCAR's stable provider-independent speaking identity.
+- Voice Match is authorization-oriented speaker evidence.
+- Voice Map is perception-oriented speaker context.
+
+Recognition never grants permission. Unknown speakers remain unknown. Voice embeddings/profiles are sensitive dedicated data, not generic Memory Fabric records.
+
+## ADR-022 — Hardware safety is deterministic/local
+
+**Decision:** emergency stop, cutoffs, interlocks, watchdog behavior and other physical safety functions remain local and functional without cloud/model reasoning.
+
+No LLM sits in the mandatory emergency-control loop.
+
+## ADR-023 — Persona affects expression, not truth or authority
+
+**Decision:** Persona may change humor, candor, warmth, formality, brevity, playfulness, initiative and pushback, but cannot reduce Epistemic Integrity, permissions, consent or safety.
+
+## ADR-024 — Executive Planner coordinates objectives above Workers/Protocols
+
+**Decision:** Executive Planner coordinates concurrent objectives using priority, deadline, dependencies, resources, flexibility, cost, risk, interruptibility and device availability.
+
+It may replan flexible work only where Personal Policy and real capabilities allow it.
+
+## ADR-025 — Consequential actions use Action Ledger and truthful Undo
+
+**Decision:** consequential actions record initiator, intent, target, capability, permission/policy decision, execution, verification, evidence and reversibility/compensation metadata.
+
+Undo exists only where a real compensation exists.
+
+## ADR-026 — Finished outputs use first-class Artifact/Result records
+
+**Decision:** documents, code changes, research, media, deployments, notes, firmware, datasets/models/evaluations and other durable outputs may be typed artifacts with provenance, ownership, location/version and verification state.
+
+## ADR-027 — Learned automation is evaluated before trusted promotion
+
+**Decision:** successful exploratory work can create candidate Skills/routines/Protocols, but trusted/default promotion requires parameterization, evaluation, safety/permission review and rollback where practical.
+
+One success is not enough to create trusted automation.
+
+## ADR-028 — Sunday is OSCAR on Android, not a separate assistant
+
+**Decision:** Sunday is the primary everyday phone embodiment/owner-control surface.
+
+Where supported and explicitly granted it may use Android assistant/voice interaction, optional Orb overlay, widgets, notification context, legitimate notification replies, biometric/PIN approval and Grid supervision.
+
+OEM/device behavior is not claimed until exercised on target hardware.
+
+## ADR-029 — Perception, retention and action are independent
+
+```text
+CAN PERCEIVE ≠ CAN RETAIN ≠ CAN ACT
+```
+
+Reading a notification/calendar/screen/location does not itself grant retention or mutation authority.
+
+## ADR-030 — Documentation and evidence are part of slice completion
+
+**Decision:** each completed slice updates code, tests, authoritative evidence and affected canonical docs. A slice is not complete while the repository describes an older active architecture.
+
+Historical checkpoint/evidence files remain provenance. Retired architecture is removed from active canonical instructions or explicitly marked superseded.
+
+## ADR-031 — Gates are completed end-to-end before the next Club
+
+**Decision:** Build Gates remain manual acceptance milestones above slices.
 
 ```text
 Gate A — Brain          Slices 01–04
@@ -356,119 +293,30 @@ Gate D — JARVIS Layer   Slices 11–14
 Gate E — Unified Alpha  Slices 15–17
 ```
 
-**Reason:** OSCAR is being built rapidly, but fast iteration must still stop at meaningful integration points where real combined behavior is tested manually.
+A partial gate is not skipped because it is demoable or because a short-term alpha deadline is approaching. Mandatory planned work is completed/verified, genuinely blocked, or explicitly re-scoped by the owner before advancing.
 
-**Constraint:** a 2–3 day developer-alpha target does not weaken slice exit conditions, safety boundaries or epistemic-integrity rules. Partial work remains partial.
+## ADR-032 — Design direction is Quietly Alive + Playful Precision
 
-See `docs/BUILD-GATES.md`.
+**Decision:** `DESIGN.md` and `TASTE.md` own OSCAR's visual/motion quality bar: restrained warm materials, graphite typography, blue/yellow identity, weighted physical motion, progressive disclosure and no generic AI-dashboard/card-wall/neon slop.
 
-## ADR-055 — Connection Grid is OSCAR's availability and remote-control fabric
+## ADR-033 — Agent adapters remain thin
 
-**Decision:** Sunday, replaceable cloud coordination, desktop nodes and OSCAR Edge form one Connection Grid over OSCAR-owned transport/capability contracts.
+**Decision:** `AGENTS.md` is the repository-wide coding-agent instruction set. `CLAUDE.md`, `GEMINI.md`, Cursor/Copilot adapters and similar files point back to canonical docs instead of duplicating architecture.
 
-**Roles:** Sunday is the preferred everyday owner-control/approval surface; cloud provides portable rendezvous/durable coordination; desktops provide high-capability execution; Edge provides local perception/reflex/safety.
+## ADR-034 — Engineering favors modular, evolvable code
 
-**Constraint:** no Grid node is unrestricted merely because it is connected. Capability scope and permission are rechecked at the authoritative target.
+**Decision:** `ENGINEERING.md` owns code/system-design quality: smallest coherent solution, high cohesion/low coupling, typed validated boundaries, explicit state ownership, bounded failure/retry, dependency discipline, contract-focused tests, least privilege and small reversible changes.
 
-**Availability rule:** ordinary node loss degrades capabilities explicitly rather than making one hidden desktop/cloud process the permanent host.
+## Current accepted boundaries
 
-See `docs/CONNECTION-GRID.md`.
+### Gate A
 
-## ADR-056 — Remote continuation and machine power actions require durable state and real capabilities
+PASS for the documented Brain foundation.
 
-**Decision:** long-running desktop work can continue while the user leaves and can be supervised from Sunday/cloud through the Durable Execution Runtime and Connection Grid.
+### Gate B
 
-**Rules:**
+PARTIAL. Verified scoped foundations include native Windows machine execution, useful Codex delegation with independent verification, cancellation, restart/recovery, ambiguity blocking, local selected-memory continuity and bounded owner-reviewed policy interpretation.
 
-- progress/control uses durable task IDs, checkpoints and leases;
-- executor disappearance becomes waiting/blocked/reclaimable, never false completion;
-- sleep/shutdown is offered only when the online machine exposes a permitted capability;
-- remote wake is offered only when Wake-on-LAN or another approved real power-management path exists;
-- Sunday can pause/cancel/revoke user-authorized work but cannot override deterministic hardware safety.
+Mandatory Gate B completion now includes typed PowerShell, installed-app capability, Windows UI Automation/computer-use, browser runtime, owner-control continuation, production Memory Fabric, open-ended policy, real private OAuth/connector lifecycle, secure credential storage and live-authority-vs-memory federation.
 
-## ADR-057 — Sentry is persistent awareness; continuity capture is an explicit separate layer
-
-**Decision:** Sentry is persistently aware when enabled, but awareness, conversational Listening and durable recording/capture are separate states/capabilities.
-
-OSCAR may offer explicit `Context Capture` and `Daily Journal` modes for selected calls/messages/email/meetings/in-person conversations where technically and legally available.
-
-**Privacy rules:**
-
-- capture is source-specific and permission/consent-aware;
-- unsupported call/app capture remains unsupported;
-- raw audio, transcript, summary and memory extraction have independent retention controls;
-- capture can be paused/deleted/excluded by source/person/place/time;
-- the product is not designed around covert recording.
-
-## ADR-058 — Persona is configurable presentation, not truth or authority
-
-**Decision:** OSCAR exposes a user-configurable PersonaProfile for traits such as humor, candor, warmth, formality, brevity, playfulness, initiative and pushback, with context triggers.
-
-**Constraint:** Persona cannot reduce Epistemic Integrity, change permissions, bypass confirmation/consent or make failure/blocked state look successful.
-
-**Boundary:**
-
-```text
-Persona         = how OSCAR expresses itself
-Personal Policy = how user wants OSCAR to behave
-Permission      = what OSCAR is allowed to do
-Memory          = what OSCAR retains/recalls
-```
-
-See `docs/PERSONA.md`.
-
-## ADR-059 — Club A uses a small native Python/SQLite foundation
-
-**Problem:** Slice 00 had product contracts but no runtime. Club A needs real durable execution, independent verification, authenticated reference transport and adaptable routing without a distributed stack.
-
-**Decision:** use Python 3.12 standard-library dataclasses/enums, SQLite transactions and bounded HTTP adapters. Keep Jev, capability discovery/dispatch, model routing, verification and durable state as distinct responsibilities. Use an explicit POSIX filesystem scope for the representative proof. Provider/model inventory is versioned JSON data; credentials remain opaque environment-backed runtime material.
-
-**Trade-offs:** no runtime dependency graph or external service is needed. The reference node shares the coordinator store and binds only to loopback; this proves protocol/state contracts but is not an Internet coordinator or physical-device integration. Pairing is a trusted coordinator API, not remote self-enrollment. SQLite is single-authority storage, not a replication scheme. Windows/mobile/Edge execution and a public TLS/outbound rendezvous adapter remain later or partial work.
-
-**Failure/recovery:** provider failure and credential failure have distinct bounded fallback semantics. Streaming never splices a second generation after meaningful output. Dead node leases produce blocked/reclaimable tasks, not completion. Started action records with unknown crash outcomes prevent automatic replay. File artifacts receive the hash from the same independent verification read; reported results remain reported even when independent evidence verifies the objective.
-
-**Evolution:** preserve version-1 wire contracts; a breaking protocol/storage change needs an explicit migration. The development manifest is replaceable and does not define OSCAR’s permanent provider/model boundary. Initial model quality/limits are configuration with provenance, not verified benchmarks. The initial Gate A foundation review passed; the post-Gate-A correction explicitly downgrades current live acceptance to PARTIAL, as recorded in [CLUB-A-CHECKPOINT.md](CLUB-A-CHECKPOINT.md). The 2026-10-02 review criteria accept the reference Transport/Grid stage and defer public-coordinator deployment acceptance to later Grid integration. Public TLS/outbound rendezvous and embodied nodes remain unverified. No Slice 05 work is included.
-
-## ADR-060 — Current provider facts require scoped discovery and live evidence
-
-**Problem:** retired model IDs made earlier access failures insufficient to diagnose
-credential health. Multiple keys also do not establish independent quota capacity.
-
-**Decision:** treat manifests as sourced bootstrap/retirement seeds; require fresh
-hosted inventories, per-credential availability/pricing/limits and separate bounded
-generation observations. Group credentials by account product/quota pool with
-conservative unknown topology. Jev routes freshness-sensitive requests through a
-provider-agnostic live-source capability before reasoning; missing evidence remains
-UNKNOWN. Sources retain authority, time, scope, TTL and contradictions.
-
-**Limits:** public support/listing/generation/funding are separate claims. Search
-ranking is not verification. Native inventory retrieval and the bounded Tavily
-adapter are implemented; actual Tavily and combined public-web acceptance remain
-UNVERIFIED because keys are absent. Failed
-live runs and superseded provider-health interpretations are preserved explicitly.
-Detailed contracts are owned by [MODEL-ROUTING.md](MODEL-ROUTING.md) and
-[SEARCH-FRESHNESS.md](SEARCH-FRESHNESS.md).
-
-## ADR-061 — Connector, Worker and continuity foundations extend native contracts
-
-**Problem:** Club B needs useful machine/service work and persistent continuity
-without competing execution registries or promoting testimony into truth.
-
-**Decision:** connectors supply existing Grid capabilities; machine executors use
-existing Dispatcher/Actions/leases/dedup/Runtime/Verifier. Private connector bodies
-stay in transient referenced context. Local LRA, explicit Personal Policy and small
-evidence-bound entity records use existing SQLite. Structured Jev capability
-intents contain no hard-coded provider selection.
-
-**Trade-offs:** the reference uses separate processes and real loopback HTTP with
-shared SQLite, not independent network stores/public deployment. Subprocess scope
-is explicitly opted-in trusted host authority, not an OS sandbox. Local memory is
-bounded lexical retrieval behind a semantic-backend contract. Auth enrollment,
-Windows, natural-language policy and Supermemory service remain unverified.
-
-**Recovery/privacy:** completed lost results deduplicate; started uncertain effects
-block replay. Verification requires independent correlated state. Retrieved memory
-stays RECALLED; fresh API testimony can outrank stale memory without becoming
-VERIFIED. Retention/deletion applies to live records, not a claim of secure erasure.
-No destructive migration is needed; these are additive version-1 records and
-controls. Rollback removes new composition paths, leaving historical task evidence.
+Club C does not begin until Gate B mandatory acceptance passes.
