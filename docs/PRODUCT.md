@@ -2,11 +2,11 @@
 
 ## North star
 
-OSCAR is a persistent personal intelligence designed to do justice to the *idea* of JARVIS: one intelligence that understands natural language, perceives context, reasons, communicates, operates software, controls hardware, delegates to specialist systems, keeps working autonomously, learns successful procedures and appears through whichever trusted device is available.
+OSCAR is a persistent personal intelligence designed to do justice to the idea of JARVIS: one intelligence that understands natural language, perceives context, reasons, communicates, operates software, controls hardware, delegates to specialist systems, keeps working autonomously, learns successful procedures and appears through whichever trusted device is available.
 
-It is explicitly **not** a chatbot with a wake word, a laptop-only agent or a decorative animated orb.
+It is explicitly **not** a conventional chatbot, a laptop-only agent, a wrapper around one model provider or a decorative animated orb.
 
-A second north-star rule is non-negotiable:
+A non-negotiable rule:
 
 > **OSCAR must prefer uncertainty, incompleteness, disagreement or failure over presenting an unverified statement as fact.**
 
@@ -16,16 +16,66 @@ Where verification is technically possible, OSCAR verifies before making an unqu
 
 - **Immediate** — reflexes and simple interactions happen locally and quickly.
 - **Present** — OSCAR exists continuously rather than only while a chat window is open.
+- **Continuous** — one relationship and interaction point; the user does not manage memory by finding old chats.
 - **Contextual** — it understands active work, devices, communications, schedule and environment.
 - **Capable** — it acts through tools, apps, cloud services, Workers and physical devices.
-- **Selective** — it uses the best capability rather than invoking a frontier model for everything.
+- **Selective** — it uses the strongest suitable capability rather than invoking a frontier model for everything.
 - **Personal** — voice, Persona, Personal Policy, permissions, memory and interaction style belong to the user.
 - **Recognizably itself** — one voice/visual/character identity persists across surfaces.
 - **Learning** — verified procedures can become evaluated reusable Skills/routines/Protocols.
 - **Delegating** — Workers can own temporary or persistent responsibilities underneath OSCAR.
 - **Quietly proactive** — important events surface; routine noise stays quiet.
-- **Truthful about state** — `reported`, `verifying`, `partially verified`, `blocked`, `failed` and `unknown` remain real outcomes.
-- **Hard to kill** — ordinary loss of a phone, desktop, cloud node or Edge node degrades capability instead of silently erasing the system.
+- **Truthful about state** — reported/verifying/partial/blocked/failed/unknown remain real outcomes.
+- **Hard to kill** — ordinary loss of a phone, desktop, cloud node or Edge node degrades capability instead of erasing the system.
+
+## One continuous relationship
+
+The product-facing primitive is:
+
+```text
+You ↔ OSCAR
+```
+
+There is no requirement for the user to create a new chat to gain a new context window or find an old thread to recover history. Internal segmentation into turns, episodes, projects, objectives, entities and memories is an implementation detail.
+
+Active context is reconstructed from recent conversation, current objectives/projects/entities/commitments, relevant retrieved history and current World Model state.
+
+See `docs/MEMORY.md`.
+
+## OSCAR-owned Memory Fabric
+
+OSCAR owns its history rather than outsourcing identity/continuity to a managed memory vendor.
+
+Canonical architecture:
+
+```text
+OSCAR Event Archive
+SQLite + WAL + FTS5
+      │
+      ├─ Qdrant OSS semantic/hybrid index
+      └─ Graphiti OSS + Neo4j Community temporal/entity index
+                │
+        Retrieval Fusion + reranker
+                │
+        Jev Memory Preflight
+                │
+          Context Assembly
+```
+
+Qdrant and Graphiti/Neo4j are derived/rebuildable indexes. The Event Archive remains canonical source history and provenance.
+
+Product memory guarantees we design toward:
+
+- OSCAR does not say `I remember X` unless X was actually retrieved or remains in active context with provenance;
+- personal/historical claims bind to source events/memories;
+- an empty first retrieval is not treated as proof of absent memory;
+- Jev broadens retrieval before returning UNKNOWN when memory is expected;
+- live authoritative state beats stale recall for current-state questions;
+- corrections supersede old current facts without destroying history;
+- model-derived inference never silently becomes fact;
+- memory never grants permission or silently creates Personal Policy.
+
+The previous planned Supermemory dependency is retired.
 
 ## Ambient Chief of Staff
 
@@ -41,7 +91,7 @@ OSCAR should combine these into one freshness-qualified picture of the user's da
 - preparation/travel/weather buffers;
 - commitments extracted from communication;
 - morning/day briefs and `what did I miss?` summaries;
-- proactive warnings when plans are becoming unrealistic;
+- proactive warnings when plans become unrealistic;
 - bounded automatic calendar/task changes when explicitly authorized;
 - communication follow-up and schedule updates after verified changes.
 
@@ -55,15 +105,11 @@ observe silently
 → interrupt only when justified
 ```
 
-Attention matters. OSCAR should avoid unnecessary visual or spoken interruption while the user is watching video, reading, presenting, driving, sleeping or explicitly focusing when evidence supports that state.
-
 A core permission rule is:
 
 ```text
 CAN PERCEIVE ≠ CAN RETAIN ≠ CAN ACT
 ```
-
-Notification access does not imply permission to retain notification content or reply. Calendar read access does not imply permission to modify events. Microphone permission does not imply continuous transcription or raw-audio retention.
 
 See `docs/CHIEF-OF-STAFF.md`.
 
@@ -71,274 +117,114 @@ See `docs/CHIEF-OF-STAFF.md`.
 
 ### Sunday
 
-**Sunday is OSCAR on the phone.** It is the primary everyday owner-control surface because the phone usually remains with the user while laptops and desktops come and go.
+Sunday is OSCAR on the phone. It is the preferred everyday owner-control surface because the phone usually remains with the user while laptops/desktops come and go.
 
-Subject to platform support and permissions, Sunday provides voice/text, notifications, calls/messages, meetings, camera/sensors, biometric approval, remote task supervision, Connection Grid controls and the strongest everyday Chief-of-Staff presence.
+Subject to platform support and permissions, Sunday provides voice/text, notifications, communication context/actions, camera/sensors, biometric approval, remote task supervision, Connection Grid controls and everyday Chief-of-Staff presence.
 
-On Android, Sunday should use legitimate platform capabilities where supported: the assistant role/voice-interaction path, optional application overlay for the OSCAR Orb, home-screen widgets, notification-listener context and actionable notification replies when a real reply action exists. OEM/device behavior must be verified on target hardware rather than assumed.
+On Android, use legitimate platform capabilities where supported: assistant/voice-interaction role, optional application overlay for the OSCAR Orb, home-screen widgets, notification-listener context and legitimate notification replies when a real reply action exists.
 
-The Orb is persistent presence, not permanent obstruction. It may retreat to an edge anchor/hidden hotspot during video, reading, presentations or focus contexts and return immediately when invoked.
-
-Sunday can pause/cancel autonomous work, revoke nodes/sessions and issue owner-level remote controls. It does **not** override deterministic hardware safety.
+The Orb is persistent presence, not permanent obstruction. It may retreat during video, reading, presentations or focus and reappear when invoked.
 
 ### Desktop
 
-OSCAR has native/lightweight Windows and macOS surfaces for interaction, dictation, approvals, screen/cursor context, task progress and presence.
+Native/lightweight Windows/macOS surfaces provide interaction, dictation, approvals, context and presence. Desktop machines are optional high-capability nodes exposing coding agents, terminal, filesystem, browser/computer use, installed apps, GPU/local models and other capabilities.
 
-A desktop machine is an optional high-capability node exposing Codex, terminal, filesystem, browser, computer use, installed apps, GPU/local models and other capabilities. It is never the permanent OSCAR host.
+A desktop is never the permanent OSCAR host.
 
-### Desk / physical OSCAR
+### Edge
 
-ESP32 + RP2040/Pico-class hardware provide persistent local presence, sensors, wake/VAD, GPIO/actuators and deterministic safety/reflex behavior. The Edge layer does not run OSCAR's primary language model.
+ESP32/Pico-class hardware provides persistent local presence, sensors, wake/VAD, GPIO/actuators and deterministic safety/reflex behavior. Edge does not run OSCAR's primary language intelligence.
 
 ### Cloud
 
-A replaceable cloud coordinator can provide rendezvous, durable coordination, remote command routing and notification fan-out. OSCAR should support free-tier, paid and bring-your-own-cloud deployment rather than depending on one vendor.
+A replaceable cloud coordinator may provide rendezvous, durable coordination, remote command routing and notification fan-out. OSCAR should support free-tier, paid and BYOC paths rather than one required vendor.
 
-See `docs/CONNECTION-GRID.md`.
+## Connection Grid
 
-### ChatGPT and model providers
+Sunday, cloud coordination, Desktop nodes and Edge form the OSCAR Connection Grid. Nodes advertise capabilities dynamically and communicate through OSCAR-owned transport.
 
-ChatGPT is a first-class intelligence provider/surface, but OSCAR owns transport, routing, task state, permissions and verification semantics around it.
+The user should be able to start useful work on one machine, leave, inspect/approve/cancel remotely, receive a verified result and optionally permit power actions when a real capability exists.
 
-### Native infrastructure
+Remote wake/power exists only where a real mechanism exists.
 
-OSCAR does not depend on the separate Latch or SwitchRoute projects as runtime products.
+## Native infrastructure
 
-- Latch-derived ideas → **OSCAR Transport + Capability Fabric**.
-- SwitchRoute-derived ideas → **OSCAR Model Router**.
+OSCAR does not depend on separate Latch/SwitchRoute runtimes.
 
-The earlier repos remain reference/prototype sources only.
+- Latch-derived ideas → OSCAR Transport + Capability Fabric.
+- SwitchRoute-derived ideas → OSCAR Model Router.
 
-See `docs/NATIVE-INFRASTRUCTURE.md`.
+Jev decides action/evidence class; capability selection chooses executor; Model Router chooses a model/provider only after reasoning is required.
 
-## Connection Grid — OSCAR should not disappear with one node
+## Persona
 
-Sunday, cloud coordination, desktop nodes and Edge form the **OSCAR Connection Grid**.
+OSCAR may be dry, witty, solemn, warm, formal, playful, blunt or custom. Persona changes expression, not truth or authority.
 
-```text
-Sunday ─┬─ Cloud coordinator
-        ├─ Desktop / machine nodes
-        └─ OSCAR Edge
-```
+Epistemic Integrity, hard safety, permissions and Personal Policy outrank Persona.
 
-Nodes advertise capabilities dynamically and communicate through OSCAR-owned transport.
-
-The user should be able to leave a desktop task running, walk away with Sunday, inspect/approve/cancel remotely, receive the verified result and optionally let OSCAR sleep/shut down the machine when policy and real machine capabilities allow.
-
-Remote wake/power-on is available only when a real mechanism such as Wake-on-LAN, another always-on LAN node or approved remote-management capability exists.
-
-The product target is graceful availability, not an impossible claim of literal 100% uptime.
-
-## Persona — character is configurable
-
-OSCAR should be capable of character: dry, witty, solemn, warm, formal, playful, blunt or custom.
-
-The user can shape it conversationally or manually through traits such as humor, candor, warmth, formality, brevity, playfulness, initiative and pushback, with context-specific triggers.
-
-```text
-"Be drier and less chatty."
-"No jokes on university calls."
-"When Sentry alerts me, be direct and serious."
-```
-
-Persona changes **how OSCAR expresses itself**, not whether it tells the truth or what it is authorized to do.
-
-Epistemic Integrity, safety, permissions and Personal Policy outrank Persona.
-
-See `docs/PERSONA.md`.
-
-## Voice is part of OSCAR's identity
+## Voice identity
 
 Voice has four distinct layers:
 
-- **Voice Input** — wake/VAD/STT/barge-in/dictation.
-- **OSCAR Voice Identity** — stable provider-independent voice/prosody contract.
-- **Voice Match** — authorization-oriented owner/authorized-speaker verification.
-- **Voice Map** — perception-oriented confidence-qualified speaker recognition.
+- Voice Input — wake/VAD/STT/barge-in/dictation.
+- OSCAR Voice Identity — stable provider-independent voice/prosody contract.
+- Voice Match — authorization-oriented owner/authorized-speaker evidence.
+- Voice Map — perception-oriented confidence-qualified speaker recognition.
 
-Voice Match and Voice Map are intentionally different. Recognizing someone never grants authority by itself.
+Recognizing someone never grants authority by itself.
 
-Persona may change tone, humor, formality and speaking mode while preserving the same OSCAR Voice Identity.
+## Sentry and continuity capture
 
-See `docs/VOICE-SENTRY.md` and `docs/PERSONA.md`.
+Sentry means persistent local awareness when enabled, not permanent cloud transcription.
 
-## Sentry — persistent awareness, with optional continuity capture
+Possible low-cost signals include wake/reflex commands, VAD/speech presence, Voice Map events, configured sound classes, device/environment events and barge-in.
 
-Sentry means OSCAR is persistently aware when enabled, not merely waiting for a button press.
-
-Its local perception plane can continuously support low-cost signals such as:
-
-- wake/hot/reflex commands;
-- speech/non-speech presence;
-- Voice Map known/unknown speaker events;
-- configured sound classes;
-- motion/device/environment events;
-- barge-in while OSCAR speaks.
-
-This **awareness layer is not automatically a full-time cloud transcript**.
-
-OSCAR may additionally support explicit opt-in capture modes for the user who wants a comprehensive personal continuity record:
-
-- phone calls where audio access/recording is technically and legally permitted;
-- WhatsApp/other app calls where the platform exposes legitimate capture capability;
-- messages, text and email through authorized channel access;
-- meetings;
-- voice notes;
-- ordinary in-person conversations through authorized microphones;
-- day-to-day event summaries.
-
-Capture is policy-scoped and source-specific. Recording/transcription legality, participant consent, platform limits and retention settings remain explicit.
-
-Suggested modes:
-
-```text
-Awareness only
-→ local event awareness; no continuous transcript retention
-
-Context capture
-→ authorized transcription/summaries; raw media minimized/ephemeral
-
-Daily journal
-→ explicitly enabled durable cross-channel continuity capture with retention controls
-```
+Optional Context Capture / Daily Journal may retain selected communication or in-person context only where technically, legally and policy permitted.
 
 Raw audio, transcripts, summaries and derived memory are separate retention decisions.
 
-See `docs/VOICE-SENTRY.md`, `docs/COMMUNICATION.md` and `docs/SECURITY.md`.
-
 ## Core product principles
 
-### 1. Delegate objectives, not button presses
+1. **Delegate objectives, not button presses.** OSCAR chooses the strongest legitimate execution path and verifies results where practical.
+2. **Language is a control surface.** Short contextual phrases resolve against active state, memory and policy.
+3. **Memory is not authority.** Historical continuity never silently replaces current live truth.
+4. **Personal Policy is first-class.** Explicit desired behavior is distinct from memory, Persona and permissions.
+5. **Communication belongs to OSCAR.** Calls/messages/email/meetings/dictation/follow-up share one identity/context architecture.
+6. **Reflexes bypass intelligence.** Emergency stop/mute/cancel and deterministic controls do not wait on cloud reasoning.
+7. **Use models only where useful.** Jev decides whether reasoning is needed.
+8. **Know when context is missing.** Jev retrieves/expands/asks rather than guessing personal/current facts.
+9. **Never claim more than evidence supports.** External success testimony is not objective verification.
+10. **Get faster with experience.** Verified procedures may become evaluated reusable automation.
+11. **Workers recover before escalating.** Repair/reroute is bounded and never expands authority.
+12. **Capabilities are discovered progressively.** The core searches manifests rather than loading every tool into every prompt.
+13. **Artifacts/results are first-class.** Finished outputs carry provenance and verification state.
+14. **Proactivity requires restraint.** OSCAR distinguishes silent update, inform, suggest, act and interrupt.
+15. **Hardware safety is local.** Cloud intelligence never replaces deterministic interlocks/emergency behavior.
+16. **Perception, retention and action are separate.** Observing context does not imply storing or mutating it.
+17. **Availability is distributed.** Losing one ordinary node degrades capability instead of erasing OSCAR.
+18. **Finish gates end-to-end.** Planned mandatory work is completed and verified before moving to the next Club unless scope is explicitly changed.
 
-A user states the goal; OSCAR chooses the strongest legitimate execution path and verifies the result where practical.
+## Current build direction
 
-### 2. Language is a control surface
+Gate A is accepted. Gate B is the current work and must be completed before Club C.
 
-Short contextual phrases such as `mute`, `cancel that`, `leave it running`, `what did it find?`, `be more serious` or `forget the last conversation` should resolve against active state and policy.
+Gate B completion includes real machine/browser/computer-use/installed-app/remote-control paths plus the full OSCAR Memory Fabric, open-ended Personal Policy, real private OAuth/connector acceptance, secure credential storage and live-authority-vs-memory federation.
 
-### 3. Personal Policy is first-class
-
-Explicit behavioral rules are distinct from memory, Persona and permissions.
-
-```text
-Persona       = how OSCAR expresses itself
-Personal Policy = how the user wants OSCAR to behave
-Permission    = what OSCAR is authorized to do
-Memory        = what OSCAR retains/recalls
-```
-
-### 4. Communication belongs to OSCAR
-
-Calls, messaging, meetings, transcription, dictation, follow-up and optional daily continuity capture share one identity/context architecture.
-
-### 5. Reflexes bypass intelligence
-
-Emergency stop, wake acknowledgement, mute/stop/cancel and deterministic local controls do not wait for cloud reasoning.
-
-### 6. Use models only where useful
-
-Jev decides whether reasoning is needed. The Model Router chooses a provider/model only after that decision.
-
-### 7. Know when context is missing
-
-OSCAR queries World Model, memory or authoritative live sources instead of guessing personal/current facts.
-
-### 8. Never claim more than evidence supports
-
-```text
-reported by tool/Worker/model ≠ verified objective completion
-```
-
-### 9. Get faster with experience
-
-Verified procedures may become evaluated reusable automation.
-
-### 10. Workers recover before escalating
-
-Recoverable failures are repaired/rerouted with bounded retries before interrupting the user.
-
-### 11. Protocols are delegated responsibility
-
-Protocols may wait, observe, branch, delegate, verify and escalate over long periods using durable execution.
-
-### 12. Capabilities are discovered progressively
-
-The core searches a Capability Catalog rather than loading a mega-prompt of every tool.
-
-### 13. Finished outputs are first-class
-
-Durable outputs are typed Artifacts/Results with provenance and verification state.
-
-### 14. Proactivity requires restraint
-
-OSCAR distinguishes between silent context update, passive presence, notification, haptic, speech and urgent interruption.
-
-### 15. Hardware safety is local
-
-Cloud coordination never replaces deterministic local interlocks/emergency control.
-
-### 16. Capture is explicit and inspectable
-
-Awareness, transcription, raw-media retention, transcript retention and memory extraction are separate controls. Continuous capture is never silently enabled by a generic microphone permission.
-
-### 17. Availability is distributed
-
-No ordinary laptop/desktop is the permanent host. Sunday, cloud coordination and Edge provide complementary availability roles through the Connection Grid.
-
-### 18. Perception, retention and action are separate
-
-Being able to observe current context never silently creates durable memory or authority to mutate the underlying source.
-
-### 19. OSCAR coordinates the day, not just individual requests
-
-The Executive Planner should use authorized current commitments/context to help protect focus, detect conflicts, surface deadlines and replan within policy rather than waiting for every problem to become an explicit prompt.
-
-## Continuous memory, not chat management
-
-LRA provides one continuous OSCAR relationship across voice, text, Sunday, desktop, communications, Workers, Sentry capture and other surfaces.
-
-Supermemory sits underneath LRA for semantic/profile-style continuity. Current truth belongs to the World Model/live sources; historical continuity belongs to memory.
-
-## Practical benchmark
-
-OSCAR's architecture is informed by practical interaction/runtime patterns from VoiceOS, JARVIS-like integrated perception/executive behavior, modern long-running agent systems, device assistants and small extensible agent cores.
-
-The durable primitives are:
-
-- World Model + Perception Fabric;
-- Ambient Chief-of-Staff context/commitment model;
-- Executive Planner;
-- Durable Execution Runtime;
-- Capability Catalog + Dynamic Tool Search;
-- Universal Channel Gateway;
-- Action Ledger + truthful Undo;
-- Artifact / Result Model;
-- Learned Automation Evaluation Pipeline;
-- Epistemic Integrity;
-- native Transport + Capability Fabric;
-- native Model Router;
-- Connection Grid;
-- Voice Identity + Voice Match + Voice Map;
-- persistent Sentry awareness + explicit capture modes;
-- configurable Persona.
+See `docs/ROADMAP.md` and `docs/BUILD-GATES.md`.
 
 ## Non-goals
 
+- conventional chat-thread management as the memory model;
+- mandatory managed memory vendor;
 - decorative AI-orb software;
 - laptop-only availability;
-- a conventional chat app with OSCAR branding;
-- an intrusive always-on overlay that obstructs the user's content;
 - reimplementing specialist software OSCAR can invoke;
-- mandatory external Latch/SwitchRoute services;
-- one cloud computer per Worker;
-- one vendor-specific cloud host;
-- unsupported claims about phone/app/control capability;
-- treating notification visibility as unrestricted access to an app;
+- required external Latch/SwitchRoute runtimes;
+- unsupported phone/app/control claims;
+- treating notification visibility as unrestricted app access;
 - conflating perception permission with retention/action authority;
 - treating external success reports as verified facts;
 - yes-man behavior;
-- covert or silently enabled recording;
-- treating Voice Map identity as permission;
+- covert/silently enabled recording;
 - letting Persona reduce truthfulness/safety;
 - putting an LLM in a hardware emergency-control loop.
