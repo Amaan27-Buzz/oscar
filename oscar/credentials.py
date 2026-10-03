@@ -348,3 +348,11 @@ class SafeStream:
         if self.sink and self.pending:
             self.sink(self.redact(self.pending))
             self.pending = ""
+
+
+def redact_runtime_secrets(text: str) -> str:
+    """Value-silent filtering of known platform-supplied secret variables, without file reads."""
+    for name, value in os.environ.items():
+        if value and any(term in name.upper() for term in ("TOKEN", "KEY", "SECRET", "PASSWORD")):
+            text = text.replace(value, "<redacted>")
+    return text

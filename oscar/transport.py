@@ -100,8 +100,21 @@ class Dispatcher:
 
     def control(self, envelope: Envelope, session: SessionHandle) -> dict[str, Any]:
         envelope = Envelope.parse(record(envelope))
-        if envelope.node_id != self.node_id or envelope.kind != "cancel":
+        if envelope.node_id != self.node_id or envelope.kind not in {"cancel", "pause", "resume"}:
             raise ValueError("invalid control message")
+        if envelope.kind in {"pause", "resume"}:
+            self.grid.accept(envelope, session.token, "pause")
+            self.store.put("worker_control", envelope.task_id, {"paused": envelope.kind == "pause"})
+            self.store.audit(
+                envelope.task_id,
+                "worker_" + envelope.kind,
+                {"correlation_id": envelope.correlation_id},
+            )
+            return {
+                "kind": envelope.kind,
+                "task_id": envelope.task_id,
+                "correlation_id": envelope.correlation_id,
+            }
         self.grid.accept(envelope, session.token, "cancel")
         task = self.store.task(envelope.task_id)
         if not task.cancelled:
@@ -139,7 +152,7 @@ class HTTPTransport:
 
     def control(self, envelope: Envelope, session: SessionHandle) -> dict[str, Any]:
         request = Request(
-            self.url + "/cancel",
+            self.url + ("/cancel" if envelope.kind == "cancel" else "/control"),
             data=json.dumps(record(envelope)).encode(),
             headers={
                 "Content-Type": "application/json",
@@ -150,7 +163,7 @@ class HTTPTransport:
             with build_opener(NoRedirects()).open(request, timeout=self.timeout) as response:
                 data = json.loads(response.read(4096))
             if data != {
-                "kind": "cancelled",
+                "kind": "cancelled" if envelope.kind == "cancel" else envelope.kind,
                 "task_id": envelope.task_id,
                 "correlation_id": envelope.correlation_id,
             }:
@@ -166,7 +179,10 @@ class ReferenceServer:
             def do_POST(self) -> None:
                 try:
                     length = int(self.headers.get("Content-Length", "0"))
-                    if self.path not in {"/action", "/cancel"} or not 0 < length <= 2_000_000:
+                    if (
+                        self.path not in {"/action", "/cancel", "/control"}
+                        or not 0 < length <= 2_000_000
+                    ):
                         raise ValueError("invalid request")
                     envelope = Envelope.parse(json.loads(self.rfile.read(length)))
                     authorization = self.headers.get("Authorization", "")

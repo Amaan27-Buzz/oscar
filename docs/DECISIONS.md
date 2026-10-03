@@ -448,3 +448,27 @@ UNVERIFIED because keys are absent. Failed
 live runs and superseded provider-health interpretations are preserved explicitly.
 Detailed contracts are owned by [MODEL-ROUTING.md](MODEL-ROUTING.md) and
 [SEARCH-FRESHNESS.md](SEARCH-FRESHNESS.md).
+
+## ADR-061 — Connector, Worker and continuity foundations extend native contracts
+
+**Problem:** Club B needs useful machine/service work and persistent continuity
+without competing execution registries or promoting testimony into truth.
+
+**Decision:** connectors supply existing Grid capabilities; machine executors use
+existing Dispatcher/Actions/leases/dedup/Runtime/Verifier. Private connector bodies
+stay in transient referenced context. Local LRA, explicit Personal Policy and small
+evidence-bound entity records use existing SQLite. Structured Jev capability
+intents contain no hard-coded provider selection.
+
+**Trade-offs:** the reference uses separate processes and real loopback HTTP with
+shared SQLite, not independent network stores/public deployment. Subprocess scope
+is explicitly opted-in trusted host authority, not an OS sandbox. Local memory is
+bounded lexical retrieval behind a semantic-backend contract. Auth enrollment,
+Windows, natural-language policy and Supermemory service remain unverified.
+
+**Recovery/privacy:** completed lost results deduplicate; started uncertain effects
+block replay. Verification requires independent correlated state. Retrieved memory
+stays RECALLED; fresh API testimony can outrank stale memory without becoming
+VERIFIED. Retention/deletion applies to live records, not a claim of secure erasure.
+No destructive migration is needed; these are additive version-1 records and
+controls. Rollback removes new composition paths, leaving historical task evidence.

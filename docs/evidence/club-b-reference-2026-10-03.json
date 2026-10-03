@@ -1,0 +1,146 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-03 IST",
+  "baseline_work_sha": "c12fc0ec48e24b68a5fd59b58931170982c6067c",
+  "branch": "overnight/club-b-foundation",
+  "gate_a": "PASS preserved",
+  "gate_b": "PARTIAL",
+  "reports": {
+    "worker": {
+      "status": "VERIFIED",
+      "scope": "reference network Worker verification",
+      "observed_at": 1790981510.6565125,
+      "task_id": "88844005411b4397b18053807038c00c",
+      "correlation_id": "1d2f4ed863414baa884942d01ea335f4",
+      "artifact_commit": "eff5e60d725b7e8256295543d8ede02b45003aef",
+      "capabilities": [
+        "machine.files.write",
+        "machine.files.read",
+        "machine.files.list",
+        "machine.files.search",
+        "machine.executables",
+        "machine.git",
+        "machine.repository",
+        "machine.command",
+        "machine.agent.codex"
+      ],
+      "coding_agents_advertised": [
+        "codex"
+      ],
+      "coding_agent_tests": [
+        {
+          "capability": "machine.agent.codex",
+          "test": "--version subprocess only; no model task",
+          "success": true
+        }
+      ],
+      "checks": [
+        "separate Core/Worker processes",
+        "real loopback HTTP",
+        "file/Git work",
+        "durable progress/checkpoint",
+        "lost response + Core/Worker restart",
+        "reconnect/reclaim + idempotent completed replay",
+        "independent bytes/Git tree",
+        "HTTP pause/resume/cancel",
+        "mid-command node loss BLOCKED; replay ambiguous"
+      ],
+      "limitations": [
+        "shared SQLite reference authority",
+        "loopback-only transport",
+        "user Windows laptop unverified",
+        "authenticated coding-agent tasks unverified",
+        "public TLS/rendezvous and independent stores unverified"
+      ],
+      "state_path": "temporary reference state removed",
+      "workspace": "temporary reference workspace removed"
+    },
+    "integrated": {
+      "status": "VERIFIED",
+      "scope": "integrated local/reference Club B foundation",
+      "gate_b": "PARTIAL",
+      "observed_at": 1790981510.1858568,
+      "task_id": "df3dd0b36e924123912cddc425f65da1",
+      "correlation_id": "01a36da74092406a8a36e8bf8cff5e83",
+      "checks": [
+        "Jev structured objective",
+        "existing Capability Catalog/Dispatcher",
+        "target Personal Policy denial then explicit approval",
+        "separate HTTP Worker",
+        "real Git/file artifact",
+        "Core independent verification + ledger evidence",
+        "verified selected project retention",
+        "later recall remains RECALLED",
+        "actual changed file overrides historical memory",
+        "forget live record"
+      ],
+      "limitations": [
+        "Windows/browser/computer-use unverified",
+        "natural-language policy absent",
+        "Supermemory live integration unverified",
+        "shared SQLite loopback reference"
+      ]
+    },
+    "public_github_current_version": {
+      "status": "VERIFIED",
+      "scope": "public unauthenticated GitHub repository response contract only",
+      "source_url": "https://api.github.com/repos/python/cpython",
+      "observed_at": 1790981456.396447,
+      "evidence_id": "9e4686ec95e94cd5ac38dd071aaa9983",
+      "execution_status": "REPORTED",
+      "contract_matches": true,
+      "error": null,
+      "limitations": [
+        "private/authenticated GitHub unverified",
+        "provider data remains REPORTED",
+        "no writes or user-account actions performed"
+      ]
+    },
+    "public_github_initial_older_version": {
+      "status": "VERIFIED",
+      "scope": "public unauthenticated GitHub repository response contract only",
+      "source_url": "https://api.github.com/repos/python/cpython",
+      "observed_at": 1790981032.0476625,
+      "evidence_id": "3b2b6b185e65458f898a48e734bfb44b",
+      "execution_status": "REPORTED",
+      "contract_matches": true,
+      "error": null,
+      "limitations": [
+        "private/authenticated GitHub unverified",
+        "provider data remains REPORTED",
+        "no writes or user-account actions performed"
+      ]
+    }
+  },
+  "quality": {
+    "unittest_count": 274,
+    "unittest_result": "PASS",
+    "unittest_duration_seconds": 38.441,
+    "baseline_tests_preserved": 227,
+    "added_tests": 47,
+    "ruff_check": "PASS",
+    "ruff_format": "PASS, 55 Python files",
+    "mypy": "PASS, 30 source files",
+    "secret_scan": "value-silent repository scan; final result in checkpoint"
+  },
+  "synthetic": {
+    "google_http_methods": 35,
+    "scope": "local fixture only; no private Google account access"
+  },
+  "checkpoint_commits": [
+    "a518e78869d852f88e3c6cf51fc7f87707d25324 Add native Connector Fabric and official API provider foundations",
+    "d9ec03eac9910d8e0720b5a4e63bd6d44b76db1f Add scoped POSIX machine Worker and durable network continuation proof",
+    "ca0355b7edbc6014f11f0602d0d03b8473472a95 Add scoped memory, explicit Personal Policy and integrated live-context acceptance",
+    "fc65875a170bdc7cc519625c02d695f5b433e66d Verify synthetic HTTP providers and public GitHub with current API version"
+  ],
+  "limitations": [
+    "final remote SHA and CI state reported after delivery; no merge",
+    "Windows/Sunday/browser/computer-use unverified",
+    "authenticated coding-agent tasks unverified",
+    "private Google/Graph/GitHub/Slack/Notion/MCP accounts unverified",
+    "OAuth refresh/enrollment/device flow and platform secret storage unverified",
+    "Supermemory and natural-language policy unverified",
+    "public TLS/outbound rendezvous and independent Worker stores unverified",
+    "SQLite WAL/backups secure erasure unverified"
+  ]
+}

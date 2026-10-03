@@ -182,7 +182,15 @@ class Envelope:
                 raise ValueError("invalid envelope identifier")
         if data["version"] != PROTOCOL_VERSION or type(data["version"]) is not int:
             raise ValueError("unsupported protocol version")
-        if data["kind"] not in {"action", "progress", "result", "cancel", "heartbeat"}:
+        if data["kind"] not in {
+            "action",
+            "progress",
+            "result",
+            "cancel",
+            "pause",
+            "resume",
+            "heartbeat",
+        }:
             raise ValueError("unsupported message kind")
         if not isinstance(data["payload"], dict) or type(data["sent_at"]) not in {int, float}:
             raise ValueError("invalid envelope payload/time")

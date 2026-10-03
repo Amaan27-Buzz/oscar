@@ -1,5 +1,6 @@
 """Evidence-backed core loop; planning, dispatch and independent verification stay separate."""
 
+import json
 from collections.abc import Callable, Mapping
 from dataclasses import replace
 from time import time
@@ -17,6 +18,7 @@ from .contracts import (
     new_id,
     record,
 )
+from .credentials import redact_runtime_secrets
 from .grid import Grid, SessionHandle
 from .jev import ExecutionClass, Intent, decide
 from .storage import StateConflict, Store
@@ -43,7 +45,10 @@ class Runtime:
         criterion: dict[str, Any] = {"kind": "unavailable"}
         parameters: dict[str, Any] = {}
         kind = decision.capability_kind
-        if kind == "file_write":
+        if intent.kind == "capability" and intent.parameters is not None:
+            parameters = intent.parameters
+            criterion = intent.criterion or {"kind": "unavailable"}
+        elif kind == "file_write":
             criterion = {"kind": "file_exact", "path": intent.path, "content": intent.content}
             parameters = {"path": intent.path, "content": intent.content}
         elif kind == "addition":
@@ -54,6 +59,12 @@ class Runtime:
             parameters = {"prompt": intent.text, "mode": mode}
         elif kind == "live_source":
             parameters = {"query": intent.text, "freshness": decision.freshness.value}
+        material = json.dumps(
+            {"description": intent.text, "parameters": parameters, "criterion": criterion},
+            allow_nan=False,
+        )
+        if redact_runtime_secrets(material) != material:
+            raise ValueError("credential material cannot enter durable objectives/plans")
         objective = Objective(new_id(), intent.text, initiator, criterion, time())
         task = Task(
             new_id(),
@@ -67,6 +78,7 @@ class Runtime:
             self.store.put("task", task.id, record(task))
             self.store.put("plan", task.id, {"kind": kind, "parameters": parameters})
             self.store.audit(task.id, "jev_decision", record(decision))
+        self.verifier.bind_task(task.id, parameters)
         if decision.execution_class == ExecutionClass.ASK:
             return self.store.transition(task.id, TaskState.UNKNOWN, blocker=decision.reason)
         if not kind or not self.grid.search(kind):
@@ -169,7 +181,9 @@ class Runtime:
                     TaskState.BLOCKED
                     if result.error
                     and (
-                        result.error.startswith("freshness_unavailable")
+                        result.error.startswith(
+                            ("freshness_unavailable", "connector_blocked:", "machine_blocked:")
+                        )
                         or result.error
                         in {"route_unavailable", "network_policy_blocked", "network_failure"}
                     )
@@ -221,6 +235,9 @@ class Runtime:
             )
         finally:
             current = self.store.task(task.id)
+            # A different Store/process may have completed or cancelled the task.
+            for resources in list(self.store.task_resources):
+                resources.task_transitioned(current)
             if (
                 lease_id is not None
                 and current.lease_id == lease_id

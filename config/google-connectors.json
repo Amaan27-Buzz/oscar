@@ -1,0 +1,572 @@
+{
+  "version": 1,
+  "services": {
+    "gmail": {
+      "origin": "https://gmail.googleapis.com",
+      "capabilities": [
+        {
+          "name": "google.gmail.search",
+          "method": "GET",
+          "path": "/gmail/v1/users/{userId}/messages",
+          "scopes": [
+            "https://www.googleapis.com/auth/gmail.readonly"
+          ],
+          "risk": "read",
+          "query_fields": [
+            "q",
+            "maxResults",
+            "pageToken",
+            "labelIds"
+          ],
+          "body_required": false,
+          "response_kind": "json"
+        },
+        {
+          "name": "google.gmail.read",
+          "method": "GET",
+          "path": "/gmail/v1/users/{userId}/messages/{id}",
+          "scopes": [
+            "https://www.googleapis.com/auth/gmail.readonly"
+          ],
+          "risk": "read",
+          "query_fields": [
+            "format",
+            "metadataHeaders"
+          ],
+          "body_required": false,
+          "response_kind": "json"
+        },
+        {
+          "name": "google.gmail.threads.list",
+          "method": "GET",
+          "path": "/gmail/v1/users/{userId}/threads",
+          "scopes": [
+            "https://www.googleapis.com/auth/gmail.readonly"
+          ],
+          "risk": "read",
+          "query_fields": [
+            "q",
+            "maxResults",
+            "pageToken"
+          ],
+          "body_required": false,
+          "response_kind": "json"
+        },
+        {
+          "name": "google.gmail.threads.read",
+          "method": "GET",
+          "path": "/gmail/v1/users/{userId}/threads/{id}",
+          "scopes": [
+            "https://www.googleapis.com/auth/gmail.readonly"
+          ],
+          "risk": "read",
+          "query_fields": [
+            "format"
+          ],
+          "body_required": false,
+          "response_kind": "json"
+        },
+        {
+          "name": "google.gmail.draft",
+          "method": "POST",
+          "path": "/gmail/v1/users/{userId}/drafts",
+          "scopes": [
+            "https://www.googleapis.com/auth/gmail.compose"
+          ],
+          "risk": "write",
+          "query_fields": [],
+          "body_required": true,
+          "response_kind": "json",
+          "readback": "google.gmail.drafts.read",
+          "verification": "authoritative read-back; explicitly selected fields; provider-specific comparison may remain PARTIAL"
+        },
+        {
+          "name": "google.gmail.drafts.read",
+          "method": "GET",
+          "path": "/gmail/v1/users/{userId}/drafts/{id}",
+          "scopes": [
+            "https://www.googleapis.com/auth/gmail.compose"
+          ],
+          "risk": "read",
+          "query_fields": [
+            "format"
+          ],
+          "body_required": false,
+          "response_kind": "json"
+        },
+        {
+          "name": "google.gmail.send",
+          "method": "POST",
+          "path": "/gmail/v1/users/{userId}/messages/send",
+          "scopes": [
+            "https://www.googleapis.com/auth/gmail.send"
+          ],
+          "risk": "external-communication",
+          "query_fields": [],
+          "body_required": true,
+          "response_kind": "json",
+          "readback": "google.gmail.read",
+          "verification": "authoritative read-back; explicitly selected fields; provider-specific comparison may remain PARTIAL",
+          "consequences": [
+            "write"
+          ]
+        },
+        {
+          "name": "google.gmail.labels.list",
+          "method": "GET",
+          "path": "/gmail/v1/users/{userId}/labels",
+          "scopes": [
+            "https://www.googleapis.com/auth/gmail.readonly"
+          ],
+          "risk": "read",
+          "query_fields": [],
+          "body_required": false,
+          "response_kind": "json"
+        },
+        {
+          "name": "google.gmail.history.list",
+          "method": "GET",
+          "path": "/gmail/v1/users/{userId}/history",
+          "scopes": [
+            "https://www.googleapis.com/auth/gmail.readonly"
+          ],
+          "risk": "read",
+          "query_fields": [
+            "startHistoryId",
+            "pageToken",
+            "maxResults"
+          ],
+          "body_required": false,
+          "response_kind": "json"
+        }
+      ]
+    },
+    "calendar": {
+      "origin": "https://www.googleapis.com",
+      "capabilities": [
+        {
+          "name": "google.calendar.events.list",
+          "method": "GET",
+          "path": "/calendar/v3/calendars/{calendarId}/events",
+          "scopes": [
+            "https://www.googleapis.com/auth/calendar.events.readonly"
+          ],
+          "risk": "read",
+          "query_fields": [
+            "q",
+            "timeMin",
+            "timeMax",
+            "maxResults",
+            "pageToken",
+            "syncToken",
+            "singleEvents",
+            "orderBy"
+          ],
+          "body_required": false,
+          "response_kind": "json"
+        },
+        {
+          "name": "google.calendar.events.get",
+          "method": "GET",
+          "path": "/calendar/v3/calendars/{calendarId}/events/{eventId}",
+          "scopes": [
+            "https://www.googleapis.com/auth/calendar.events.readonly"
+          ],
+          "risk": "read",
+          "query_fields": [],
+          "body_required": false,
+          "response_kind": "json"
+        },
+        {
+          "name": "google.calendar.events.create",
+          "method": "POST",
+          "path": "/calendar/v3/calendars/{calendarId}/events",
+          "scopes": [
+            "https://www.googleapis.com/auth/calendar.events"
+          ],
+          "risk": "write",
+          "query_fields": [
+            "sendUpdates"
+          ],
+          "body_required": true,
+          "response_kind": "json",
+          "readback": "google.calendar.events.get",
+          "verification": "authoritative read-back; explicitly selected fields; provider-specific comparison may remain PARTIAL",
+          "communication_trigger": "calendar"
+        },
+        {
+          "name": "google.calendar.events.update",
+          "method": "PATCH",
+          "path": "/calendar/v3/calendars/{calendarId}/events/{eventId}",
+          "scopes": [
+            "https://www.googleapis.com/auth/calendar.events"
+          ],
+          "risk": "write",
+          "query_fields": [
+            "sendUpdates"
+          ],
+          "body_required": true,
+          "response_kind": "json",
+          "readback": "google.calendar.events.get",
+          "verification": "authoritative read-back; explicitly selected fields; provider-specific comparison may remain PARTIAL",
+          "communication_trigger": "calendar",
+          "consequences": [
+            "external-communication"
+          ]
+        },
+        {
+          "name": "google.calendar.events.delete",
+          "method": "DELETE",
+          "path": "/calendar/v3/calendars/{calendarId}/events/{eventId}",
+          "scopes": [
+            "https://www.googleapis.com/auth/calendar.events"
+          ],
+          "risk": "destructive",
+          "query_fields": [
+            "sendUpdates"
+          ],
+          "body_required": false,
+          "response_kind": "json",
+          "communication_trigger": "calendar",
+          "consequences": [
+            "external-communication"
+          ]
+        },
+        {
+          "name": "google.calendar.freebusy",
+          "method": "POST",
+          "path": "/calendar/v3/freeBusy",
+          "scopes": [
+            "https://www.googleapis.com/auth/calendar.freebusy"
+          ],
+          "risk": "read",
+          "query_fields": [],
+          "body_required": true,
+          "response_kind": "json"
+        }
+      ]
+    },
+    "drive": {
+      "origin": "https://www.googleapis.com",
+      "capabilities": [
+        {
+          "name": "google.drive.search",
+          "method": "GET",
+          "path": "/drive/v3/files",
+          "scopes": [
+            "https://www.googleapis.com/auth/drive.readonly"
+          ],
+          "risk": "read",
+          "query_fields": [
+            "q",
+            "pageSize",
+            "pageToken",
+            "fields",
+            "orderBy"
+          ],
+          "body_required": false,
+          "response_kind": "json"
+        },
+        {
+          "name": "google.drive.read",
+          "method": "GET",
+          "path": "/drive/v3/files/{fileId}",
+          "scopes": [
+            "https://www.googleapis.com/auth/drive.readonly"
+          ],
+          "risk": "read",
+          "query_fields": [
+            "fields"
+          ],
+          "body_required": false,
+          "response_kind": "json"
+        },
+        {
+          "name": "google.drive.download",
+          "method": "GET",
+          "path": "/drive/v3/files/{fileId}",
+          "scopes": [
+            "https://www.googleapis.com/auth/drive.readonly"
+          ],
+          "risk": "read",
+          "query_fields": [
+            "alt"
+          ],
+          "body_required": false,
+          "response_kind": "bytes"
+        },
+        {
+          "name": "google.drive.export",
+          "method": "GET",
+          "path": "/drive/v3/files/{fileId}/export",
+          "scopes": [
+            "https://www.googleapis.com/auth/drive.readonly"
+          ],
+          "risk": "read",
+          "query_fields": [
+            "mimeType"
+          ],
+          "body_required": false,
+          "response_kind": "bytes"
+        },
+        {
+          "name": "google.drive.create",
+          "method": "POST",
+          "path": "/drive/v3/files",
+          "scopes": [
+            "https://www.googleapis.com/auth/drive.file"
+          ],
+          "risk": "write",
+          "query_fields": [
+            "fields"
+          ],
+          "body_required": true,
+          "response_kind": "json",
+          "readback": "google.drive.read",
+          "verification": "authoritative read-back; explicitly selected fields; provider-specific comparison may remain PARTIAL"
+        },
+        {
+          "name": "google.drive.update",
+          "method": "PATCH",
+          "path": "/drive/v3/files/{fileId}",
+          "scopes": [
+            "https://www.googleapis.com/auth/drive.file"
+          ],
+          "risk": "write",
+          "query_fields": [
+            "fields"
+          ],
+          "body_required": true,
+          "response_kind": "json",
+          "readback": "google.drive.read",
+          "verification": "authoritative read-back; explicitly selected fields; provider-specific comparison may remain PARTIAL"
+        }
+      ]
+    },
+    "classroom": {
+      "origin": "https://classroom.googleapis.com",
+      "capabilities": [
+        {
+          "name": "google.classroom.courses.list",
+          "method": "GET",
+          "path": "/v1/courses",
+          "scopes": [
+            "https://www.googleapis.com/auth/classroom.courses.readonly"
+          ],
+          "risk": "read",
+          "query_fields": [
+            "pageSize",
+            "pageToken",
+            "teacherId",
+            "studentId"
+          ],
+          "body_required": false,
+          "response_kind": "json"
+        },
+        {
+          "name": "google.classroom.coursework.list",
+          "method": "GET",
+          "path": "/v1/courses/{courseId}/courseWork",
+          "scopes": [
+            "https://www.googleapis.com/auth/classroom.coursework.me.readonly"
+          ],
+          "risk": "read",
+          "query_fields": [
+            "pageSize",
+            "pageToken",
+            "orderBy"
+          ],
+          "body_required": false,
+          "response_kind": "json"
+        },
+        {
+          "name": "google.classroom.submissions.list",
+          "method": "GET",
+          "path": "/v1/courses/{courseId}/courseWork/{courseWorkId}/studentSubmissions",
+          "scopes": [
+            "https://www.googleapis.com/auth/classroom.coursework.me.readonly"
+          ],
+          "risk": "read",
+          "query_fields": [
+            "pageSize",
+            "pageToken",
+            "userId"
+          ],
+          "body_required": false,
+          "response_kind": "json"
+        },
+        {
+          "name": "google.classroom.announcements.list",
+          "method": "GET",
+          "path": "/v1/courses/{courseId}/announcements",
+          "scopes": [
+            "https://www.googleapis.com/auth/classroom.announcements.readonly"
+          ],
+          "risk": "read",
+          "query_fields": [
+            "pageSize",
+            "pageToken"
+          ],
+          "body_required": false,
+          "response_kind": "json"
+        }
+      ]
+    },
+    "docs": {
+      "origin": "https://docs.googleapis.com",
+      "capabilities": [
+        {
+          "name": "google.docs.read",
+          "method": "GET",
+          "path": "/v1/documents/{documentId}",
+          "scopes": [
+            "https://www.googleapis.com/auth/documents.readonly"
+          ],
+          "risk": "read",
+          "query_fields": [
+            "includeTabsContent"
+          ],
+          "body_required": false,
+          "response_kind": "json"
+        },
+        {
+          "name": "google.docs.create",
+          "method": "POST",
+          "path": "/v1/documents",
+          "scopes": [
+            "https://www.googleapis.com/auth/documents"
+          ],
+          "risk": "write",
+          "query_fields": [],
+          "body_required": true,
+          "response_kind": "json",
+          "readback": "google.docs.read",
+          "verification": "authoritative read-back; explicitly selected fields; provider-specific comparison may remain PARTIAL"
+        },
+        {
+          "name": "google.docs.update",
+          "method": "POST",
+          "path": "/v1/documents/{documentId}:batchUpdate",
+          "scopes": [
+            "https://www.googleapis.com/auth/documents"
+          ],
+          "risk": "write",
+          "query_fields": [],
+          "body_required": true,
+          "response_kind": "json",
+          "readback": "google.docs.read",
+          "verification": "authoritative read-back; explicitly selected fields; provider-specific comparison may remain PARTIAL"
+        }
+      ]
+    },
+    "sheets": {
+      "origin": "https://sheets.googleapis.com",
+      "capabilities": [
+        {
+          "name": "google.sheets.metadata",
+          "method": "GET",
+          "path": "/v4/spreadsheets/{spreadsheetId}",
+          "scopes": [
+            "https://www.googleapis.com/auth/spreadsheets.readonly"
+          ],
+          "risk": "read",
+          "query_fields": [
+            "fields",
+            "includeGridData"
+          ],
+          "body_required": false,
+          "response_kind": "json"
+        },
+        {
+          "name": "google.sheets.ranges.read",
+          "method": "GET",
+          "path": "/v4/spreadsheets/{spreadsheetId}/values/{range}",
+          "scopes": [
+            "https://www.googleapis.com/auth/spreadsheets.readonly"
+          ],
+          "risk": "read",
+          "query_fields": [
+            "valueRenderOption",
+            "dateTimeRenderOption"
+          ],
+          "body_required": false,
+          "response_kind": "json"
+        },
+        {
+          "name": "google.sheets.ranges.update",
+          "method": "PUT",
+          "path": "/v4/spreadsheets/{spreadsheetId}/values/{range}",
+          "scopes": [
+            "https://www.googleapis.com/auth/spreadsheets"
+          ],
+          "risk": "write",
+          "query_fields": [
+            "valueInputOption",
+            "includeValuesInResponse"
+          ],
+          "body_required": true,
+          "response_kind": "json",
+          "readback": "google.sheets.ranges.read",
+          "verification": "authoritative read-back; explicitly selected fields; provider-specific comparison may remain PARTIAL"
+        },
+        {
+          "name": "google.sheets.create",
+          "method": "POST",
+          "path": "/v4/spreadsheets",
+          "scopes": [
+            "https://www.googleapis.com/auth/spreadsheets"
+          ],
+          "risk": "write",
+          "query_fields": [],
+          "body_required": true,
+          "response_kind": "json"
+        }
+      ]
+    },
+    "slides": {
+      "origin": "https://slides.googleapis.com",
+      "capabilities": [
+        {
+          "name": "google.slides.read",
+          "method": "GET",
+          "path": "/v1/presentations/{presentationId}",
+          "scopes": [
+            "https://www.googleapis.com/auth/presentations.readonly"
+          ],
+          "risk": "read",
+          "query_fields": [],
+          "body_required": false,
+          "response_kind": "json"
+        },
+        {
+          "name": "google.slides.create",
+          "method": "POST",
+          "path": "/v1/presentations",
+          "scopes": [
+            "https://www.googleapis.com/auth/presentations"
+          ],
+          "risk": "write",
+          "query_fields": [],
+          "body_required": true,
+          "response_kind": "json",
+          "readback": "google.slides.read",
+          "verification": "authoritative read-back; explicitly selected fields; provider-specific comparison may remain PARTIAL"
+        },
+        {
+          "name": "google.slides.update",
+          "method": "POST",
+          "path": "/v1/presentations/{presentationId}:batchUpdate",
+          "scopes": [
+            "https://www.googleapis.com/auth/presentations"
+          ],
+          "risk": "write",
+          "query_fields": [],
+          "body_required": true,
+          "response_kind": "json",
+          "readback": "google.slides.read",
+          "verification": "authoritative read-back; explicitly selected fields; provider-specific comparison may remain PARTIAL"
+        }
+      ]
+    }
+  }
+}

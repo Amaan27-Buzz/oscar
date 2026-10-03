@@ -460,3 +460,19 @@ Safe bounded recovery may occur automatically. Otherwise OSCAR asks for the mini
 10. Sentry awareness and recording are different permissions/modes.
 11. Remote-control/power claims require real current capabilities.
 12. Latch/SwitchRoute remain reference sources, not runtime dependencies.
+
+## Club B reference implementation boundary
+
+The [Connector Fabric](CONNECTOR-FABRIC.md) supplies namespaced structured
+capabilities to existing Grid search/Dispatcher, with runtime-only credentials and
+transient private request/result references. No separate tool registry was added.
+Machine executors reuse native Actions/Results/leases/checkpoints and independent
+Evidence/Verification. Local LRA, explicit Personal Policy and entity identities
+reuse SQLite records. Live adapters reuse ScopedFiles, search/freshness, Grid and
+authorized connector callbacks. A structured Jev intent supports explicit new
+capability classes without provider facts in Jev.
+
+The separate-process network reference still shares coordinator SQLite and uses
+loopback-only transport. Terminal is configured trusted-host authority; OS sandbox,
+Windows/public deployment, semantic service and natural-language policy are not
+claimed. Gate B remains PARTIAL; [the checkpoint](CLUB-B-CHECKPOINT.md) is current.

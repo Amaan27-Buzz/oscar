@@ -46,6 +46,13 @@ Load additionally when relevant:
 - `docs/SUNDAY-DESIGN.md`
 - `docs/SURFACES.md`
 
+### Connectors / continuity
+
+- `docs/CONNECTOR-FABRIC.md`
+- `docs/CLUB-B-CHECKPOINT.md`
+- `docs/MEMORY.md`
+- `docs/PERSONAL-POLICY.md`
+
 ### Workers / orchestration
 
 - `docs/ORCHESTRATION.md`
@@ -273,3 +280,13 @@ Never commit or casually log:
 - local `.env` secrets.
 
 Use ignored local fixtures or synthetic test data.
+
+## Club B reference boundaries
+
+- Use Connector Fabric manifests as Grid catalog sources; do not add another registry.
+- Stage private connector inputs as transient references; expired inputs BLOCK, never replay blindly.
+- Read-back needs granted read scope and the same account; mutation reports remain REPORTED.
+- Machine terminal/agent execution is opt-in trusted host authority, not cwd sandboxing.
+- Selected retention requires authorization; recalled memory stays RECALLED.
+- Windows/user hardware, authenticated private accounts and Supermemory remain unverified.
+- Gate B remains PARTIAL until its actual manual criteria are met.

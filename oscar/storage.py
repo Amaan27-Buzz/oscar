@@ -6,13 +6,20 @@ from collections.abc import Iterator
 from contextlib import contextmanager
 from pathlib import Path
 from threading import RLock
-from typing import Any
+from typing import Any, Protocol
+from weakref import WeakSet
 
 from .contracts import TERMINAL, TRANSITIONS, Evidence, Task, TaskState, record
 
 
 class StateConflict(Exception):
     pass
+
+
+class TaskResources(Protocol):
+    """Transient owners observe committed task transitions, never persist their content."""
+
+    def task_transitioned(self, task: Task) -> None: ...
 
 
 class Store:
@@ -22,6 +29,7 @@ class Store:
         self.db = sqlite3.connect(path, check_same_thread=False, isolation_level=None, timeout=5)
         path.chmod(0o600)
         self.lock = RLock()
+        self.task_resources: WeakSet[TaskResources] = WeakSet()
         if self.db.execute("PRAGMA user_version").fetchone()[0] not in {0, 1}:
             self.db.close()
             raise StateConflict("unsupported storage schema; explicit migration required")
@@ -69,6 +77,11 @@ class Store:
                 "ON CONFLICT(kind,id) DO UPDATE SET data=excluded.data",
                 (kind, identifier, json.dumps(data, allow_nan=False)),
             )
+
+    def delete(self, kind: str, identifier: str) -> None:
+        """Delete the live record; does not claim secure erasure of WAL/backups."""
+        with self.lock:
+            self.db.execute("DELETE FROM records WHERE kind=? AND id=?", (kind, identifier))
 
     def get(self, kind: str, identifier: str) -> dict[str, Any]:
         with self.lock:
@@ -156,7 +169,10 @@ class Store:
                     "correlation_id": task.correlation_id,
                 },
             )
-            return task
+        # Notify only after commit; weak ownership cannot retain an abandoned Fabric.
+        for resources in list(self.task_resources):
+            resources.task_transitioned(task)
+        return task
 
     def claim_action(self, key: str, fingerprint: str, action_id: str) -> dict[str, Any] | None:
         """Crash ambiguity blocks replay. Completed duplicates reuse the original result."""

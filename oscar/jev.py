@@ -4,6 +4,7 @@ import re
 from dataclasses import dataclass
 from enum import StrEnum
 from time import perf_counter
+from typing import Any
 
 from .freshness import Freshness, classify
 
@@ -36,6 +37,9 @@ class Intent:
     kind: str | None = None
     path: str | None = None
     content: str | None = None
+    capability_kind: str | None = None
+    parameters: dict[str, Any] | None = None
+    criterion: dict[str, Any] | None = None
 
 
 @dataclass(frozen=True)
@@ -59,7 +63,14 @@ def decide(intent: Intent) -> Decision:
         None,
         "request is unsupported or ambiguous",
     )
-    if intent.kind == "file_write" and intent.path is not None and intent.content is not None:
+    if intent.kind == "capability" and intent.capability_kind and intent.parameters is not None:
+        route, execution, kind, reason = (
+            DecisionRoute.SPECIALIST,
+            ExecutionClass.SPECIALIST,
+            intent.capability_kind,
+            "explicit structured specialist objective",
+        )
+    elif intent.kind == "file_write" and intent.path is not None and intent.content is not None:
         freshness = Freshness.STATIC
         route, execution, kind, reason = (
             DecisionRoute.KNOWN,
