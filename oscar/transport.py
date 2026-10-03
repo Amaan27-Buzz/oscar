@@ -175,11 +175,24 @@ class HTTPTransport:
         try:
             with build_opener(NoRedirects()).open(request, timeout=self.timeout) as response:
                 data = json.loads(response.read(4096))
-            if data != {
+            expected = {
                 "kind": "cancelled" if envelope.kind == "cancel" else envelope.kind,
                 "task_id": envelope.task_id,
                 "correlation_id": envelope.correlation_id,
-            }:
+            }
+            # Version-1 targets may omit the additive pause qualifier. Identity and
+            # control state must still match exactly; unknown fields are rejected.
+            if isinstance(data, dict) and envelope.kind in {"pause", "resume"}:
+                semantics = data.get("pause_semantics")
+                if semantics is not None:
+                    if semantics not in {
+                        "executor-defined",
+                        "before-next-subprocess",
+                        "POSIX-process-group",
+                    }:
+                        raise ValueError("invalid pause semantics")
+                    expected["pause_semantics"] = semantics
+            if data != expected:
                 raise ValueError("invalid cancellation acknowledgement")
             return dict(data)
         except (HTTPException, HTTPError, URLError, TimeoutError, OSError):

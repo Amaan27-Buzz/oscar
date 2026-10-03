@@ -66,7 +66,11 @@ class MachineScope:
         if not 1024 <= self.max_output <= 1_000_000:
             raise ValueError("invalid output bound")
         if any(
-            not Path(p).is_absolute() or not os.access(p, os.X_OK) for p in self.allowed_executables
+            not Path(p).is_absolute()
+            or not os.access(p, os.X_OK)
+            or os.name == "nt"
+            and Path(p).suffix.lower() != ".exe"
+            for p in self.allowed_executables
         ):
             raise ValueError("allowed executables must be installed absolute executable paths")
 

@@ -273,6 +273,9 @@ def run_reference(root: Path) -> dict[str, Any]:
                 )
                 ack = worker.transport.control(envelope, session)
                 assert ack["kind"] == kind
+                assert ack["pause_semantics"] == (
+                    "before-next-subprocess" if os.name == "nt" else "POSIX-process-group"
+                )
             runtime.cancel(long.id, transports)
             assert running.result(timeout=5).state == TaskState.CANCELLED
         # Real mid-command process/node loss leaves ambiguous side effects BLOCKED.
