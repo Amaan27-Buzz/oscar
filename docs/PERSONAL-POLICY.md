@@ -18,6 +18,11 @@ Examples:
 - `When I leave home, keep approved desktop jobs running and tell me on Sunday when they finish.`
 - `After a verified overnight render, shut down the desktop.`
 - `Keep daily summaries of meetings and calls, but delete raw audio after transcription.`
+- `You may move study blocks automatically, but never move class or appointments.`
+- `Do not interrupt me while I am watching a match unless family calls twice.`
+- `Hide the Orb while I am reading, but keep the edge hotspot available.`
+- `Never retain banking notifications.`
+- `Always ask before replying to university faculty.`
 
 The user should not need to learn the internal schema.
 
@@ -44,8 +49,6 @@ Protocol:    "When a call arrives during study time, apply my call rules."
 
 A learned pattern does not automatically become authority.
 
-See `PERSONA.md` for expression/character configuration.
-
 ## Natural-language authoring
 
 Examples:
@@ -57,18 +60,24 @@ Examples:
 "Never shut my desktop down if another user session is active."
 "Pause Daily Journal at the university cafeteria."
 "Do not keep raw audio from casual conversations."
+"Move flexible study blocks if an urgent deadline appears, but never move class."
+"Keep the Orb hidden in YouTube and Kindle unless I invoke it."
 ```
 
-Conceptual flow:
+Safe conceptual flow for consequential durable rules:
 
 ```text
 user instruction
 → Jev recognizes durable policy change
-→ resolve scope/conflicts
-→ concise interpretation when needed
+→ interpret candidate structured rule
+→ resolve scope/conflicts/permission dependencies
+→ show concise interpretation when material
+→ owner confirms
 → persist rule
 → apply immediately where safe
 ```
+
+Model interpretation itself is not authority. Ambiguous consequential policy should remain a candidate until owner-confirmed.
 
 The user can later ask `Why did you do that?`, inspect/edit the rule or remove it.
 
@@ -79,13 +88,18 @@ Policies may apply to:
 - global behavior;
 - person/contact/relationship;
 - app/service/channel;
+- notification source/app/person;
 - project;
 - Worker/Protocol;
 - device/node;
 - Connection Grid role;
 - remote continuation/power behavior;
+- Android Orb/overlay presence;
+- home-screen/widget behavior;
 - location/environment;
 - calendar/context state;
+- schedule commitment type (`fixed`, `flexible`, deadline, follow-up);
+- attention/interruption state;
 - Sentry mode;
 - capture source/retention mode;
 - time window;
@@ -110,11 +124,87 @@ learned/inferred suggestions
 product defaults
 ```
 
-Persona does not sit in this authority chain because Persona changes presentation rather than action authority. It is applied only after the allowed behavior/path is resolved.
+Persona does not sit in this authority chain because Persona changes presentation rather than action authority.
 
-## Connection Grid policy examples
+## Perceive / retain / act
 
-Personal Policy can govern remote continuation without turning node connectivity into blanket authority.
+Policy can narrow behavior independently across three axes:
+
+```text
+CAN PERCEIVE ≠ CAN RETAIN ≠ CAN ACT
+```
+
+Examples:
+
+```text
+"You can read delivery notifications, but do not save them."
+"You can see my university calendar, but never move class."
+"You can summarize WhatsApp notifications, but ask before replying."
+"You can use location for travel buffers, but do not retain location history."
+```
+
+A read permission never silently becomes write/send authority. A perception source never automatically becomes durable memory.
+
+See [CHIEF-OF-STAFF.md](CHIEF-OF-STAFF.md).
+
+## Chief-of-Staff / schedule policy
+
+Personal Policy is the boundary between useful schedule autonomy and arbitrary calendar mutation.
+
+Examples:
+
+```text
+"Treat class, appointments and football matches as fixed."
+"Study blocks are flexible; move them if necessary."
+"Keep at least 30 minutes between university and anything across town."
+"Protect two hours before tomorrow's deadline."
+"Do not schedule deep work after midnight."
+"If a meeting is cancelled, you can fill the time with my highest-priority task."
+```
+
+The Executive may only act on a schedule source if the current capability and permission allow it. `flexible` is user policy, not a model guess.
+
+Changes remain Action-Ledger-backed and should be independently read back where practical before being reported as complete.
+
+## Attention / interruption policy
+
+Policies may map current evidence to output level:
+
+```text
+silent update
+notification
+haptic
+speech
+urgent escalation
+```
+
+Examples:
+
+```text
+"While I am watching a match, keep nonurgent work silent."
+"During class, only family or a security alert may interrupt."
+"If I am driving, speak urgent schedule changes instead of showing a long notification."
+"Do not wake me for routine Worker completion."
+```
+
+Weak activity evidence should result in conservative behavior rather than overconfident assumptions.
+
+## Sunday / Orb / notification policy
+
+Examples:
+
+```text
+"Hide the Orb in video and reading apps."
+"Keep the edge hotspot active even while the Orb is hidden."
+"Never retain notifications from banking apps."
+"Summarize university and family notifications, ignore promotional ones."
+"You may reply to routine delivery messages if a real notification reply action exists."
+"Always ask before sending a message to faculty."
+```
+
+Policy cannot make Android expose an unavailable `RemoteInput`, call-audio stream or app-private message store.
+
+## Connection Grid policy
 
 Examples:
 
@@ -131,11 +221,7 @@ These rules apply only if the target node currently advertises the required capa
 
 Sunday owner pause/cancel/revoke controls remain bounded by permissions and cannot override local hardware emergency safety.
 
-See `CONNECTION-GRID.md`.
-
 ## Sentry / Context Capture / Daily Journal policy
-
-Personal Policy can control capture behavior by source, place, person and time.
 
 Examples:
 
@@ -154,8 +240,6 @@ Important boundary:
 - Policy cannot override recording-consent/legal constraints.
 - Awareness, transcription, raw audio, transcript, summary and memory retention remain separate controls.
 
-See `VOICE-SENTRY.md` and `COMMUNICATION.md`.
-
 ## Persona boundary
 
 Requests such as:
@@ -167,8 +251,6 @@ Requests such as:
 ```
 
 belong primarily to Persona, not Personal Policy, unless they also encode a consequential behavioral constraint.
-
-A natural-language request can therefore update both layers when needed, but the stored meanings remain separate.
 
 Example:
 
@@ -194,8 +276,12 @@ Preserve provenance/history where useful for explanation/rollback.
 
 Commissioning should seed only high-value rules:
 
-- interruption/quiet hours;
+- interruption/quiet/focus behavior;
+- fixed vs flexible schedule classes;
+- schedule autonomy level (suggest-only vs bounded auto-replan);
 - calls/messages autonomy;
+- notification source/retention/reply boundaries;
+- Orb/overlay presence behavior;
 - meeting/capture retention;
 - schedule/privacy disclosure;
 - send/publish confirmation;
@@ -203,13 +289,11 @@ Commissioning should seed only high-value rules:
 - Sentry behavior;
 - Connection Grid remote-continuation/power preferences.
 
-Persona setup is separate but nearby in the onboarding flow.
+Persona setup is separate but nearby.
 
 ## Learned preferences
 
 Repeated observed behavior can become a **suggestion**, not hidden consequential policy.
-
-Example:
 
 ```text
 repeatedly pauses nonurgent alerts while studying
@@ -218,7 +302,7 @@ repeatedly pauses nonurgent alerts while studying
 → explicit policy is created
 ```
 
-Low-risk presentation tendencies belong in Persona and may also be suggested rather than silently rewritten when they materially change OSCAR's character.
+A repeated manually rescheduled calendar pattern does not silently grant future calendar mutation authority.
 
 ## Policy record
 
@@ -236,8 +320,6 @@ A durable policy record can include:
 - conflict/supersedes metadata;
 - optional expiry.
 
-The exact representation is implementation-specific.
-
 ## Runtime evaluation
 
 Before a consequential action:
@@ -245,37 +327,23 @@ Before a consequential action:
 ```text
 objective / event
 → current platform/capability
+→ current World Model / attention / commitment state
 → permission / owner revocation state
 → applicable Personal Policy
 → Protocol/Worker state
 → Jev / Executive decision
 → execute / ask / defer / block
+→ verify mutation where practical
 → Persona shapes presentation only
 ```
-
-Examples include incoming calls, Worker publishing, meeting/capture start, schedule disclosure, remote desktop shutdown and user interruption.
 
 ## UI
 
 The Personal Policy surface exists for visibility/control, not mandatory configuration.
 
-Useful presentation:
+Useful presentation can group real rules around Calls, Schedule, Notifications, Remote work, Orb/Presence and Capture, while preserving natural-language editing.
 
-```text
-Calls
-  Answer after 4 rings                  On
-  Never answer family                   On
-
-Remote work
-  Keep approved desktop tasks running  On
-  Shutdown after verified overnight job Ask
-
-Capture
-  Meetings: keep summary                Always
-  Casual conversation raw audio         Never
-```
-
-The user can still change any rule by ordinary voice/text.
+The user should be able to ask `why did you move this?`, `why did you interrupt me?`, `what rule let you reply?` and receive the relevant policy/evidence explanation.
 
 ## Privacy / transparency
 
@@ -300,20 +368,14 @@ Sensitive policy is personal data and follows OSCAR privacy/retention controls.
 7. Capture policy cannot bypass consent/legal/platform limits.
 8. Conflicts are resolved deliberately, not by prompt order.
 9. The user can inspect/change durable policy.
+10. Perception, retention and action can be independently narrowed.
+11. Schedule autonomy requires explicit policy; readability is not edit authority.
+12. Natural-language model interpretation does not become consequential authority until appropriately owner-confirmed.
 
 ## Club B structured reference implementation
 
-`oscar.policy.PersonalPolicy` persists explicit owner-authorized structured rules
-separately from memory. Capability scope (exact or trailing wildcard), exact
-context conditions, priority, source, timestamps, enabled/expiry and preference
-are supported. Hard constraints and missing permission/required confirmation
-block before policy; specific explicit rules precede broad ones. Equal-ranking
-conflicts block with rule IDs. Model/inferred candidates cannot become authority.
+`oscar.policy.PersonalPolicy` currently persists explicit owner-authorized structured rules separately from memory. Capability scope, exact context conditions, priority, source, timestamps, enabled/expiry and preference are supported. Hard constraints and missing permission/required confirmation block before policy; specific explicit rules precede broad ones. Equal-ranking conflicts block with rule IDs. Model/inferred candidates cannot become authority.
 
-Connector mutations and machine executors recheck policy at execution. `ask` needs
-confirmation; `deny` remains denied even with confirmation. Preference values such
-as `free_first` can be evaluated, but are not automatically interpreted or applied
-to the Model Router. Natural-language interpretation/editing, quiet-hour parsing,
-Sunday approval identity and a policy UI remain **UNIMPLEMENTED/UNVERIFIED**.
-The reference editor is the typed `save(..., owner_authorized=True)` composition
-API; it is not a remotely exposed unauthenticated approval endpoint.
+Connector mutations and machine executors recheck policy at execution. `ask` needs confirmation; `deny` remains denied even with confirmation. Preference values can be evaluated but are not automatically interpreted/applied to unrelated subsystems.
+
+Natural-language interpretation/editing, quiet-hour parsing, Sunday approval identity and a policy UI remain **UNIMPLEMENTED/UNVERIFIED** until the local/phone acceptance work proves them. The reference editor is the typed `save(..., owner_authorized=True)` composition API; it is not a remotely exposed unauthenticated approval endpoint.

@@ -27,13 +27,57 @@ Where verification is technically possible, OSCAR verifies before making an unqu
 - **Truthful about state** — `reported`, `verifying`, `partially verified`, `blocked`, `failed` and `unknown` remain real outcomes.
 - **Hard to kill** — ordinary loss of a phone, desktop, cloud node or Edge node degrades capability instead of silently erasing the system.
 
+## Ambient Chief of Staff
+
+OSCAR should behave like a continuously available personal Chief of Staff, not an app the user repeatedly opens to coordinate each part of life manually.
+
+Authorized current context may include time/date/timezone, weather, calendar, tasks/deadlines, location/mobility, notifications, calls/messages/email, current media/activity state, device/Connection Grid state, Workers/Protocols and Sentry/Edge observations.
+
+OSCAR should combine these into one freshness-qualified picture of the user's day and, within Personal Policy and real capability, help with:
+
+- schedule conflict detection and replanning;
+- task/deadline prioritization;
+- focus/study/build blocks;
+- preparation/travel/weather buffers;
+- commitments extracted from communication;
+- morning/day briefs and `what did I miss?` summaries;
+- proactive warnings when plans are becoming unrealistic;
+- bounded automatic calendar/task changes when explicitly authorized;
+- communication follow-up and schedule updates after verified changes.
+
+Proactivity is graduated:
+
+```text
+observe silently
+→ inform
+→ suggest
+→ act within policy
+→ interrupt only when justified
+```
+
+Attention matters. OSCAR should avoid unnecessary visual or spoken interruption while the user is watching video, reading, presenting, driving, sleeping or explicitly focusing when evidence supports that state.
+
+A core permission rule is:
+
+```text
+CAN PERCEIVE ≠ CAN RETAIN ≠ CAN ACT
+```
+
+Notification access does not imply permission to retain notification content or reply. Calendar read access does not imply permission to modify events. Microphone permission does not imply continuous transcription or raw-audio retention.
+
+See `docs/CHIEF-OF-STAFF.md`.
+
 ## One intelligence, many embodiments
 
 ### Sunday
 
 **Sunday is OSCAR on the phone.** It is the primary everyday owner-control surface because the phone usually remains with the user while laptops and desktops come and go.
 
-Subject to platform support and permissions, Sunday provides voice/text, notifications, calls/messages, meetings, camera/sensors, biometric approval, remote task supervision and Connection Grid controls.
+Subject to platform support and permissions, Sunday provides voice/text, notifications, calls/messages, meetings, camera/sensors, biometric approval, remote task supervision, Connection Grid controls and the strongest everyday Chief-of-Staff presence.
+
+On Android, Sunday should use legitimate platform capabilities where supported: the assistant role/voice-interaction path, optional application overlay for the OSCAR Orb, home-screen widgets, notification-listener context and actionable notification replies when a real reply action exists. OEM/device behavior must be verified on target hardware rather than assumed.
+
+The Orb is persistent presence, not permanent obstruction. It may retreat to an edge anchor/hidden hotspot during video, reading, presentations or focus contexts and return immediately when invoked.
 
 Sunday can pause/cancel autonomous work, revoke nodes/sessions and issue owner-level remote controls. It does **not** override deterministic hardware safety.
 
@@ -228,7 +272,7 @@ Durable outputs are typed Artifacts/Results with provenance and verification sta
 
 ### 14. Proactivity requires restraint
 
-OSCAR distinguishes between log, notification, speech and urgent interruption.
+OSCAR distinguishes between silent context update, passive presence, notification, haptic, speech and urgent interruption.
 
 ### 15. Hardware safety is local
 
@@ -241,6 +285,14 @@ Awareness, transcription, raw-media retention, transcript retention and memory e
 ### 17. Availability is distributed
 
 No ordinary laptop/desktop is the permanent host. Sunday, cloud coordination and Edge provide complementary availability roles through the Connection Grid.
+
+### 18. Perception, retention and action are separate
+
+Being able to observe current context never silently creates durable memory or authority to mutate the underlying source.
+
+### 19. OSCAR coordinates the day, not just individual requests
+
+The Executive Planner should use authorized current commitments/context to help protect focus, detect conflicts, surface deadlines and replan within policy rather than waiting for every problem to become an explicit prompt.
 
 ## Continuous memory, not chat management
 
@@ -255,6 +307,7 @@ OSCAR's architecture is informed by practical interaction/runtime patterns from 
 The durable primitives are:
 
 - World Model + Perception Fabric;
+- Ambient Chief-of-Staff context/commitment model;
 - Executive Planner;
 - Durable Execution Runtime;
 - Capability Catalog + Dynamic Tool Search;
@@ -275,11 +328,14 @@ The durable primitives are:
 - decorative AI-orb software;
 - laptop-only availability;
 - a conventional chat app with OSCAR branding;
+- an intrusive always-on overlay that obstructs the user's content;
 - reimplementing specialist software OSCAR can invoke;
 - mandatory external Latch/SwitchRoute services;
 - one cloud computer per Worker;
 - one vendor-specific cloud host;
 - unsupported claims about phone/app/control capability;
+- treating notification visibility as unrestricted access to an app;
+- conflating perception permission with retention/action authority;
 - treating external success reports as verified facts;
 - yes-man behavior;
 - covert or silently enabled recording;

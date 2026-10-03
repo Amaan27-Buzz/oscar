@@ -1,12 +1,15 @@
 # Roadmap
 
-This roadmap is slice-based. Each slice must leave OSCAR coherent/testable and update affected docs in the same change.
+This roadmap is slice-based. Each slice must leave OSCAR coherent/testable and update affected canonical docs in the same change.
 
-All slices follow `ENGINEERING.md` and `docs/EPISTEMIC-INTEGRITY.md`.
+All implementation follows `ENGINEERING.md` and `docs/EPISTEMIC-INTEGRITY.md`.
 
-Related planning docs:
+Related planning/contracts:
 
 - `docs/BUILD-GATES.md`
+- `docs/PRODUCT.md`
+- `docs/CHIEF-OF-STAFF.md`
+- `docs/ARCHITECTURE.md`
 - `docs/NATIVE-INFRASTRUCTURE.md`
 - `docs/CONNECTION-GRID.md`
 - `docs/MODEL-ROUTING.md`
@@ -20,19 +23,21 @@ Related planning docs:
 Build OSCAR's nervous system first, then attach embodiments.
 
 ```text
-objective
-→ choose capability
+objective / event
+→ current context + Jev
+→ capability / retrieval / model decision
+→ permission + Personal Policy
 → execute
 → receive result
 → collect evidence
 → verify
-→ record action/artifact
+→ update World Model / memory / commitments
 → report only what evidence supports
 ```
 
 Early development may run on a development PC for convenience. The PC is never OSCAR's permanent host.
 
-Availability ultimately spans the **Connection Grid**:
+Availability ultimately spans:
 
 ```text
 Sunday + Cloud coordinator + Desktop node(s) + OSCAR Edge
@@ -40,203 +45,90 @@ Sunday + Cloud coordinator + Desktop node(s) + OSCAR Edge
 
 ## Status legend
 
-- ✅ Complete
-- 🚧 In progress
-- ⏭️ Next
-- ◻️ Planned
+- ✅ accepted/verified for stated scope
+- 🚧 implemented foundation, broader slice still partial
+- ⏭️ next practical work
+- ◻️ planned
 
 ## Slice 00 — Repository / architecture foundation ✅
 
-Established product, architecture, engineering/design rules, Epistemic Integrity, World Model, Perception Fabric, Personal Policy, Workers/Protocols, Durable Execution Runtime, Capability Catalog, Action Ledger, Artifact Model, Voice/Sentry architecture, native transport/model routing, Connection Grid direction, Persona direction and build-gate strategy.
+Established product/architecture/engineering/design rules, Epistemic Integrity, World Model/Perception direction, Personal Policy, Workers/Protocols, Durable Execution Runtime, Capability Catalog, Action Ledger, Artifact Model, native transport/model-routing direction, Connection Grid, Persona and build gates.
 
 ## Slice 01 — OSCAR Core Loop ✅
 
-**Checkpoint:** implemented and verified for scoped file objectives and deterministic addition. The CLI proof independently reads exact file bytes and rejects a lying executor. See [Club A evidence](CLUB-A-CHECKPOINT.md).
+Verified evidence-backed objective → action → result → independent verification loop. Fake executor success cannot become verified completion.
 
-**Goal:** prove the smallest evidence-backed execution loop.
-
-Deliverables:
-
-- typed `Objective`, `Task`, `Capability`, `Action`, `Result`, `Evidence`, `ArtifactRef`;
-- explicit task/verification states;
-- minimal capability registry;
-- durable task persistence/cancel/retry foundation;
-- Action Ledger + Artifact foundations;
-- CLI/test harness;
-- independent verifier;
-- tests proving executor success cannot become verified without evidence.
-
-Exit: a representative objective completes through `objective → action → evidence → verification → truthful report`.
+See [Club A checkpoint](CLUB-A-CHECKPOINT.md).
 
 ## Slice 02 — TypeSafe Jev ✅
 
-**Checkpoint:** typed deterministic routing and all nine epistemic decision routes are implemented and tested. Calendar, memory, specialist and Worker paths block when no capability exists. This is a conservative grammar, not a general natural-language parser.
-
-**Goal:** add fast intent + epistemic routing.
-
-Deliverables:
-
-- typed intent;
-- `known / world / recall / verify / reason / reported / specialist / worker / unknown` routes;
-- deterministic paths when sufficient;
-- capability-selection hook;
-- repair/reroute/ask-user rules;
-- latency instrumentation;
-- uncertainty/unsupported-capability tests.
+Verified typed deterministic/epistemic routing for known/world/recall/verify/reason/reported/specialist/worker/unknown paths, with conservative handling of missing capability and freshness-sensitive retrieval.
 
 ## Slice 03 — Native Transport + Capability Catalog + Connection Grid foundation 🚧
 
-**Checkpoint: reference foundation VERIFIED; broader deployment PARTIAL.** Authenticated loopback HTTP execution, scopes, replay protection, correlation, cancellation, progress, heartbeat state, durable leases, disconnect/expiry/reclaim and five availability levels are verified. This foundation satisfies the current Gate A review scope. Public TLS/outbound rendezvous deployment, independent network-node stores and real embodiments require later acceptance scenarios.
+**Reference foundation verified; broader deployment partial.**
 
-**Goal:** connect OSCAR to remote capability nodes through OSCAR-owned contracts.
+Verified loopback/reference behavior includes scoped pairing/auth, capability advertisement/search, replay protection, correlation, cancellation, progress, heartbeats, durable leases, disconnect/expiry/reclaim and explicit availability states.
 
-Deliverables:
+Still later: public TLS/outbound rendezvous, independent network-node stores and real Sunday/Desktop/Edge deployment.
 
-- typed task/event/result protocol;
-- node/session identity;
-- pairing/scoped credentials;
-- capability advertisement/search;
-- reconnect/backoff/correlation IDs;
-- audit/provenance;
-- simulated/local reference node;
-- cloud rendezvous/coordinator interface;
-- Connection Grid node-state model;
-- durable node leases/last-seen/health;
-- explicit availability levels such as Full / Connected / Local / Reflex-only / Offline;
-- portable coordinator deployment boundary supporting free-tier/paid/BYOC targets;
-- no runtime dependency on Latch.
+## Slice 04 — Native Model Router + cloud intelligence ✅/🚧
 
-Exit: OSCAR discovers/invokes a capability on another node and survives node disconnect without losing objective state.
+**Gate A accepted for the current foundation.**
 
-## Slice 04 — Native Model Router + cloud intelligence 🚧
+Implemented/verified scope includes:
 
-**Checkpoint: Club A foundation/routing and final search semantics verified; Gate A PASS.**
-Current discovered routing resolves the previous automatic-mode
-gap without paid/UNKNOWN funding fallback. The bounded Tavily adapter is implemented
-and tested; all three slots authenticate and real failover passes. Source titles,
-bounded official constraint refinement and qualified known/UNKNOWN synthesis are
-verified by the final real combined-search acceptance. The canonical
-[checkpoint](CLUB-A-CHECKPOINT.md) preserves the earlier 69/72 result and all historical
-provider evidence.
+- provider/model/credential registry and multi-key pools;
+- account-product/shared-quota semantics;
+- Auto/Fast/Balanced/Heavy Duty/Free First/Cheap/Local/Private/Manual/Specialist modes;
+- bounded fallback and real provider evidence;
+- dynamic/fresh inventory instead of trusting stale model seeds;
+- Tavily behind a replaceable search-provider boundary;
+- source/time/provenance-qualified current search;
+- UNKNOWN rather than stale model-prior fabrication.
 
-**Goal:** add provider/model/credential routing.
+Public coordinator deployment and continually changing provider metadata remain operational work rather than a reason to treat Gate A as incomplete.
 
-Deliverables:
+**Gate A — PASS.** See [Club A checkpoint](CLUB-A-CHECKPOINT.md).
 
-- provider/model registry;
-- multi-key credential pools;
-- task/model affinity;
-- health/quota/rate/latency/cost state;
-- Auto / Fast / Balanced / Heavy Duty / Free First / Cheap / Local / Private / Manual / Specialist modes;
-- fallback/circuit behavior;
-- local runtimes;
-- provider usage/history UI data contract;
-- ChatGPT/other provider adapters;
-- no runtime dependency on SwitchRoute;
-- model output remains reported/inferred until verified where required.
+## Slice 05 — First real machine Worker + remote continuation ⏭️
 
-**Manual milestone:** Gate A — Brain **PASS for Club A foundation, including real
-source-qualified Tavily/native search acceptance**.
-Core/reference Grid proofs remain
-verified; public deployment remains later integration work. **Club A acceptance is preserved; Club B now has an isolated PARTIAL reference foundation.**
+**Reference foundation verified; full slice partial.**
 
-## Post-Gate-A correction — live search + freshness 🚧
+Merged Club B reference proves separate-process POSIX Worker/Git/file/terminal execution, lease/checkpoint/restart/reclaim, completed-result reuse, HTTP pause/resume/cancel and independent verification.
 
-The provider-model review exposed a general OSCAR requirement: volatile information cannot be trusted from stale manifests or model priors.
+Next acceptance on the real Windows development laptop:
 
-Implemented in Club A: the smallest provider-agnostic native live-source path,
-freshness-aware Jev, sourced per-slot inventories, explicit retirement conflicts,
-persistent observations and account-product/shared-quota pools. The manifest is a
-bootstrap/fallback seed, and missing current evidence blocks rather than guessing.
-Native inventory retrieval was exercised with zero generation calls; broader
-public-web foundation acceptance passes with retained titles, bounded relevant
-official acquisition and explicit evidenced UNKNOWN outcomes.
-See [SEARCH-FRESHNESS.md](SEARCH-FRESHNESS.md).
-
-Final search acceptance now verifies:
-
-- the existing replaceable adapter and current-run 3/3 authenticated slots;
-- title/source/time/scope/evidence provenance;
-- relevant official access evidence or UNKNOWN after bounded domain-scoped attempts;
-- native/account versus public/provider claims and REPORTED/UNKNOWN limits.
-
-First acceptance objective:
-
-> `What are the currently supported models and relevant free/developer access constraints for OSCAR's configured intelligence providers right now?`
-
-Expected path:
-
-```text
-freshness-sensitive objective
-→ live search/provider inventory
-→ authoritative current sources
-→ source-backed synthesis
-→ evidence/retrieval timestamps
-→ no stale model-prior claim presented as current
-```
-
-This corrects the source-of-truth architecture. Core/reference Grid verification
-is retained; focused routing and the final evidence-qualified combined-search
-acceptance are resolved. Club B reference progress is recorded separately below.
-
-## Slice 05 — First real machine Worker + remote continuation 🚧
-
-**Reference foundation VERIFIED; full slice PARTIAL.** Real separate-process POSIX
-Worker/Git/file/terminal, lease/checkpoint/restart/reclaim, completed-result replay,
-HTTP pause/resume/cancel and independent verification pass. Windows, actual coding
-bug delegation, browser/computer-use and public transport remain unverified.
-See [CLUB-B-CHECKPOINT.md](CLUB-B-CHECKPOINT.md).
-
-**Goal:** make OSCAR useful through a real optional computer node.
-
-Deliverables:
-
-- Windows machine-node runtime;
-- filesystem/terminal/Git;
-- Codex and other installed coding agents where available;
+- Windows-native filesystem/process safety semantics;
+- PowerShell/terminal/Git;
+- real useful Codex specialist objective, not merely `--version`;
+- cancellation/restart/recovery/no-duplicate execution;
 - browser/computer-use path;
 - installed-app capability discovery;
-- task progress/cancel/reconnect;
-- independent post-execution verification;
-- long-running task continues after user leaves;
-- Sunday/cloud-visible task state;
-- remote pause/cancel/approve;
-- optional machine sleep/shutdown after verified completion when policy/capability allow;
-- Wake-on-LAN only when a real wake path exists.
+- remote continuation/control semantics;
+- accurate trusted-host-vs-sandbox boundary.
 
-Exit: useful repository/system objective can run remotely, survive ordinary disconnect and report verified/partial/blocked state truthfully.
+See [Club B checkpoint](CLUB-B-CHECKPOINT.md).
 
-## Slice 06 — LRA + Personal Policy + live context 🚧
+## Slice 06 — LRA + Personal Policy + live context ⏭️
 
-**Local/reference foundation VERIFIED; full slice PARTIAL.** Selected persistent
-memory, structured explicit policy, live federation boundaries and evidence-backed
-entity graph pass. Connector Fabric supplies 35 Google capabilities and thin
-Microsoft/GitHub/Slack/Notion/MCP foundations. OAuth/private account access,
-Supermemory semantic service and natural-language policy remain unverified.
-Gate B is PARTIAL, not PASS. Do not advance to physical/UI/voice slices.
+**Local/reference foundation verified; full slice partial. Gate B remains PARTIAL.**
 
-**Goal:** add persistent continuity, explicit behavior rules and freshness-aware live retrieval.
+Merged reference scope includes selected persistent memory, explicit structured Personal Policy, live-context federation boundaries, evidence-backed entity mappings and Connector Fabric foundations for Google plus thin Microsoft/GitHub/Slack/Notion/MCP paths.
 
-Deliverables:
+Next acceptance:
 
-- LRA + Supermemory integration;
-- active context + episodic history;
-- procedural/project/device memory;
-- Personal Policy store distinct from memory/Persona;
-- natural-language policy editing;
-- authority/staleness rules;
-- live federated context/search;
-- Tavily search adapter with three credential slots and replaceable search-provider boundary;
-- freshness-sensitive query detection and live-source routing;
-- source/provenance/retrieval-time metadata;
-- current authoritative evidence outranks recalled/model-prior information;
-- canonical entity graph foundation.
+- natural-language policy interpretation → owner-confirmed structured rule;
+- actual Supermemory semantic backend when configured;
+- authenticated/private service accounts + OAuth lifecycle;
+- real local continuity on Windows;
+- broader live context into the future Chief-of-Staff/World Model path.
 
-**Manual milestone:** Gate B — Can Do Work.
+**Gate B — PARTIAL** until useful real-machine work and continuity are genuinely accepted.
 
 ## Slice 07 — OSCAR Edge + reflexes ◻️
 
-**Goal:** attach persistent local physical presence.
+Goal: persistent local physical presence.
 
 Deliverables:
 
@@ -245,210 +137,152 @@ Deliverables:
 - typed ESP32↔Pico events;
 - health/capability advertisement;
 - GPIO/sensor/display test capabilities;
-- local watchdog/safe defaults;
+- watchdog/safe defaults;
 - reflex/emergency-stop path;
 - reconnect/offline behavior;
-- optional LAN helper capability such as Wake-on-LAN where hardware/network support it;
+- optional LAN helper/Wake-on-LAN only when real;
 - simulator + physical-device verification.
 
 ## Slice 08 — Voice Core + Voice Identity + Voice Match/Map + Persona runtime ◻️
 
-**Goal:** make the proven OSCAR loop natural by voice and establish character.
+Goal: natural voice interaction and stable character without weakening truth/authority.
 
-Deliverables:
-
-- wake/VAD/STT;
-- barge-in/echo cancellation;
-- stable provider-independent VoiceProfile;
-- speaking modes/fallback mapping;
-- Voice Match;
-- Voice Map;
-- self-voice suppression;
-- multi-device arbitration;
-- PersonaProfile with configurable humor/candor/warmth/formality/brevity/playfulness/initiative/pushback;
-- context trigger rules;
-- truth/safety/permission invariants that Persona cannot override.
-
-Exit: user can wake/interact naturally, hear a stable OSCAR voice and observe Persona changes without compromising evidence/safety semantics.
+Deliverables include wake/VAD/STT, barge-in/echo cancellation, stable VoiceProfile, speaking modes/fallback, Voice Match, Voice Map, self-voice suppression, multi-device arbitration and Persona runtime/context triggers.
 
 ## Slice 09 — Sunday + communication + Connection Grid owner controls ◻️
 
-**Goal:** ship OSCAR's phone embodiment.
+Goal: ship OSCAR's phone embodiment and primary everyday Chief-of-Staff surface.
 
 Deliverables:
 
-- Android app shell;
-- present-not-launched home interaction;
-- voice/text task continuity;
-- notifications;
-- biometric approval;
+- native Android app shell;
+- `ROLE_ASSISTANT` / voice-interaction path where supported and user-selected;
+- persistent present-not-launched OSCAR behavior;
+- optional permissioned OSCAR Orb application overlay;
+- attention-aware Orb retreat/hide during video/reading/presentation/focus contexts;
+- edge/hotspot/assistant/voice invocation and natural reappearance;
+- configurable Android home-screen widgets;
+- notification-listener integration after explicit grant;
+- per-app/person/source notification exclusions;
+- notification summaries/triage;
+- legitimate notification `RemoteInput` replies when exposed;
+- voice/text continuity;
+- biometric/PIN approval;
 - Connection Grid owner-control surface;
-- pause/cancel/revoke node/session controls;
-- active remote-task supervision;
-- Persona UI;
-- Universal Channel Gateway foundation;
-- initial supported call/message/email/meeting actions;
-- explicit per-platform capability limits.
+- remote task supervision / pause / cancel / revoke;
+- initial Universal Channel Gateway actions;
+- explicit per-platform capability limits;
+- real-device/OEM acceptance on the target Samsung phone.
+
+Notification access must never be treated as unrestricted access to the source app.
+
+See [Sunday design](SUNDAY-DESIGN.md) and [Chief of Staff](CHIEF-OF-STAFF.md).
 
 ## Slice 10 — Desktop Interaction Runtime ◻️
 
-**Goal:** polished native desktop embodiment.
+Goal: polished native desktop embodiment.
 
-Deliverables:
-
-- compact OSCAR presence/overlay;
-- expanded workspace only when needed;
-- Dictate / Edit / Ask / Act;
-- focused app/window/selection/cursor/accessibility context;
-- screenshot/visual context;
-- point-and-talk;
-- approvals/task progress;
-- Connection Grid state/control;
-- fluid shared-element state transitions;
-- verification state separate from executor completion.
-
-**Manual milestone:** Gate C — Embodied OSCAR.
+Deliverables include compact ambient presence, Dictate/Edit/Ask/Act, focused app/window/selection/cursor/accessibility context, screenshot/visual context, approvals/task progress, Connection Grid control and fluid state transformations.
 
 ## Slice 11 — World Model + Perception Fabric + persistent Sentry + optional Daily Journal ◻️
 
-**Goal:** create a coherent live picture of the user's digital/physical/communication environment.
+Goal: coherent live truth about the user's digital/physical/communication environment.
 
 Deliverables:
 
-- World Model for people/places/devices/apps/projects/tasks;
-- Perception Fabric across screen/device/sensor/location/communication/acoustic inputs;
+- World Model for people/places/devices/apps/projects/tasks/commitments;
 - freshness/confidence/provenance;
+- Perception Fabric across screen/device/sensor/location/communication/acoustic inputs;
+- time/date/timezone context;
+- weather/forecast as live external context;
+- calendar/free-busy/current commitments;
+- tasks/deadlines/dependencies;
+- notification events/content where authorized;
+- media session/activity/focus evidence where legitimately available;
+- phone/device/Connection Grid state;
 - Passive/Aware/Guard/Away/Sleep Sentry;
-- persistent local acoustic plane;
-- explicit Sentry Aware vs Listening vs Muted vs Awareness Off states;
-- optional Context Capture/Daily Journal;
-- selected calls/messages/mail/meetings/in-person conversations where legitimately available;
-- per-source capture capability checks;
-- raw/transcript/summary/memory retention controls;
-- consent/disclosure/privacy-zone controls;
-- pause/delete/forget controls;
-- no covert/default continuous recording;
-- importance/urgency/confidence/interruptibility scoring.
+- optional Context Capture / Daily Journal;
+- independent perceive/retain/act boundaries;
+- importance/urgency/confidence/interruptibility scoring;
+- weak activity evidence remains uncertain rather than mind-reading.
 
-Exit: OSCAR can answer `what is true now?`, remain persistently aware and, when explicitly configured, build a provenance-qualified daily continuity record without confusing awareness with recording.
+Exit: OSCAR can answer `what is true now?` and provide a current, source-qualified basis for Chief-of-Staff decisions.
 
 ## Slice 12 — Commissioning / setup ◻️
 
-**Goal:** safely commission the personal system.
+Goal: safely commission the personal system.
 
-Deliverables:
-
-- user identity;
-- Persona setup;
-- Personal Policy starter rules;
-- Voice Identity calibration;
-- Voice Match / optional Voice Map;
-- Connection Grid pairing;
-- free-tier/paid/BYOC cloud-coordinator choice;
-- model providers;
-- Sunday/Desktop/Edge pairing;
-- Sentry setup;
-- optional capture/journal source + retention configuration;
-- permission matrix;
-- end-to-end health tests;
-- evidence-backed final readiness screen.
+Deliverables include identity, Persona, Personal Policy starter rules, Voice Identity/Match/Map, Connection Grid pairing, cloud/model setup, Sunday/Desktop/Edge pairing, Sentry/capture setup and a human-readable perceive/retain/act permission matrix with evidence-backed readiness tests.
 
 ## Slice 13 — Avatar / presence UI ◻️
 
-**Goal:** make OSCAR state physically legible.
+Goal: make real state physically legible.
 
-Deliverables:
-
-- reusable blue-shell/yellow-puck component;
-- weighted spring/inertia;
-- Idle/Listening/Speaking/Working/Verifying/Waiting/Blocked/Done/Sentry/Muted/Offline states;
-- Persona-sensitive but truth-preserving expression amplitude;
-- reduced-motion support;
-- compact/icon variants.
+Deliverables include reusable blue-shell/yellow-puck presence, weighted spring/inertia, runtime states, reduced motion and compact/overlay/widget variants. The avatar expresses real state; it never substitutes for it.
 
 ## Slice 14 — Executive Planner + durable Workers + learning ◻️
 
-**Goal:** scale from one objective to durable delegated responsibilities.
+Goal: scale from isolated requests to durable delegated responsibility and Chief-of-Staff coordination.
 
 Deliverables:
 
-- Executive Planner;
-- Worker lifecycle/types;
-- priorities/dependencies/deadlines/resources/risk;
-- durable leases/heartbeats/checkpoints/reclaim;
+- Executive Planner across priority/deadline/dependency/resources/risk;
+- explicit commitment model: fixed events, flexible blocks, deadlines/tasks, communication follow-ups, preparation/travel buffers, Worker dependencies;
+- schedule conflict detection;
+- focus/study/build block protection;
+- weather/location/travel-aware planning when current evidence exists;
+- bounded automatic replanning only under explicit Personal Policy;
+- proactive morning/day brief and `what needs me now?` synthesis;
+- interruption policy from attention/urgency evidence;
+- Worker lifecycle/leases/checkpoints/reclaim;
 - self-repair/reroute/escalation;
-- Worker management visibility;
-- Skills/Protocols;
-- teach-by-demonstration;
-- Learned Automation Evaluation Pipeline;
+- Skills/Protocols and evaluated learned automation;
 - Artifact/Result handoff.
 
-**Manual milestone:** Gate D — JARVIS Layer.
+See [Chief of Staff](CHIEF-OF-STAFF.md).
 
 ## Slice 15 — Physical / device capability expansion + specialist engineering ◻️
 
-**Goal:** broaden physical-world reach without a dedicated hardware-workbench product dependency.
+Broaden Edge/device onboarding, smart-home/environment adapters, cameras/sensors/actuators and specialist CAD/circuit/simulation/3D/numerical/diagnostic routing without creating a separate hardware-workbench runtime dependency.
 
-Deliverables:
+## Slice 16 — Reliability/security/truthfulness hardening ◻️
 
-- additional Edge/device onboarding;
-- sensors/relays/displays/motors/cameras;
-- smart-home/environment adapters where legitimate;
-- device inventory/health/capability discovery;
-- firmware/provisioning through available specialist tools;
-- CAD/circuit/simulation/3D/numerical/diagnostic tool routing;
-- physical Protocol execution with deterministic local safety;
-- typed engineering Artifacts/Results.
-
-## Slice 16 — Self-maintenance + reliability/security/truthfulness pass ◻️
-
-**Goal:** deliberately break OSCAR and prove graceful behavior.
-
-Deliverables/tests include:
-
-- provider/auth failures;
-- Connection Grid cloud/Sunday/Desktop/Edge node loss;
-- lease expiry/reclaim/restart;
-- remote-task continuation;
-- owner-control/revocation paths;
-- capture-source failure and retention/deletion verification;
-- consent/privacy regression tests;
-- Persona cannot reduce truth/safety/permission;
-- Voice Match spoof/Voice Map false positives;
-- self-voice/echo;
-- Action Ledger/Undo integrity;
-- local hardware safety;
-- learned-automation rollback.
+Deliberately break providers, auth, Grid nodes, leases, Workers, capture sources, persona/voice identity, privacy/retention, notification/assistant/overlay permissions and physical paths. Verify graceful degradation, revocation and no false-success behavior.
 
 ## Slice 17 — Unified alpha ◻️
 
-**Goal:** one evidence-backed developer alpha across core, Grid, models, machine work, memory, voice, Sunday, desktop, Edge, Sentry, Persona, Workers and physical capability.
-
-Run one complete scenario crossing:
+Run one end-to-end developer-alpha scenario across:
 
 ```text
 perception / communication
-→ World Model / Jev
-→ Personal Policy + Persona presentation
-→ Executive / task runtime
-→ capability/model routing
+→ World Model / Chief-of-Staff context / Jev
+→ Personal Policy + Persona
+→ Executive / Durable Runtime
+→ capability / search / model routing
 → Connection Grid node
-→ Worker/device/action
-→ ledger/artifact
+→ Worker / device / action
+→ ledger / artifact
 → verification
-→ voice/text report
+→ voice/text/Sunday report
 ```
 
-**Manual milestone:** Gate E — Unified Alpha.
+The alpha is accepted only for the surfaces genuinely exercised. Unavailable hardware/accounts/platform behavior stays partial/unknown.
 
-## Build cadence
+## Review clubs
 
-The initial 2–3 day sprint optimizes for vertical proof, not superficial completeness.
+| Club | Slices | Focus |
+|---|---:|---|
+| A — Brain | 01–04 | Core + Jev + Transport/Grid foundation + adaptive Model Router |
+| B — Can Do Work | 05–06 | Real machine Worker + continuation + memory/Personal Policy |
+| C — Embodied Core | 07–08 | Edge/reflexes + Voice/Identity/Persona |
+| D1 — Sunday | 09 | Android embodiment + communication + owner controls |
+| D2 — Desktop | 10 | Desktop interaction runtime |
+| E1 — Awareness | 11–13 | World Model/Sentry + commissioning + presence |
+| E2 — Executive | 14 | Chief-of-Staff planner + Workers + learning |
+| F — Unified Alpha | 15–17 | Physical expansion + hardening + integrated alpha |
 
-```text
-Day 1  Gate A + basic Gate B
-Day 2  Gate B + Gate C core
-Day 3  Gate C + Gate D/E integration shell
-```
+Manual integration checkpoints remain in [BUILD-GATES.md](BUILD-GATES.md).
 
-Anything not genuinely verified remains planned/partial and is hardened after the first developer alpha.
+## Current next step
+
+Finish the **local Windows Club B acceptance** before advancing to Slice 07. Gate B remains partial until the real laptop proves useful machine delegation and continuity. The Sunday/Chief-of-Staff direction is already canonical so later implementation does not need to rediscover product intent.

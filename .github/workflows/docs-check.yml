@@ -33,6 +33,7 @@ jobs:
             SUPPORT.md
             .env.example
             docs/PRODUCT.md
+            docs/CHIEF-OF-STAFF.md
             docs/ARCHITECTURE.md
             docs/JARVIS-GAP-REVIEW.md
             docs/COMPETITIVE-BENCHMARK.md
@@ -41,6 +42,7 @@ jobs:
             docs/NATIVE-INFRASTRUCTURE.md
             docs/CONNECTION-GRID.md
             docs/MODEL-ROUTING.md
+            docs/SEARCH-FRESHNESS.md
             docs/BUILD-GATES.md
             docs/FEATURES.md
             docs/ROADMAP.md
@@ -49,6 +51,7 @@ jobs:
             docs/PERSONAL-POLICY.md
             docs/PERSONA.md
             docs/COMMUNICATION.md
+            docs/CONNECTOR-FABRIC.md
             docs/WORKERS.md
             docs/ORCHESTRATION.md
             docs/SURFACES.md

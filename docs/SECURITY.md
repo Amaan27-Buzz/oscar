@@ -13,16 +13,55 @@ OSCAR acts across phones, computers, cloud services, communications and physical
 7. **Fail safe and degrade explicitly.** Loss of cloud/phone/desktop/Worker cannot create dangerous state or false success.
 8. **Capture is explicit.** Persistent awareness does not silently become persistent recording.
 9. **Persona never changes authority.** Character cannot weaken truth, safety, permissions, consent or required confirmation.
+10. **Perception, retention and action are separate.** Access to observe current context never silently grants durable storage or mutation authority.
 
 ## Authorization classes
 
 | Class | Examples | Typical requirement |
 |---|---|---|
 | Safety | emergency stop / halt actuator | local and broadly reachable where safe |
-| Harmless | weather / simple local controls | configured allow |
-| Personal | private calendar/memory/device context | authorized user / Voice Match as appropriate |
-| Sensitive | send message / important file action / capture settings / Sentry config | strong identity + explicit/contextual approval |
+| Harmless | weather / simple public read | configured allow |
+| Personal | private calendar/memory/device/notification context | authorized user + scoped permission |
+| Sensitive | send message / calendar mutation / capture settings / Sentry config | strong identity + explicit/contextual approval or explicit policy |
 | Critical | financial/security/destructive actions | Sunday biometric/PIN or equivalent strong approval; voice alone insufficient |
+
+## Permission lattice
+
+OSCAR should model at least three independent questions:
+
+```text
+CAN PERCEIVE?
+CAN RETAIN?
+CAN ACT?
+```
+
+Examples:
+
+```text
+notification listener access
+≠ permission to retain notification bodies
+≠ permission to reply
+
+calendar read
+≠ permission to edit/delete calendar
+
+location access
+≠ permission to retain location history
+
+microphone access
+≠ ambient STT
+≠ raw audio retention
+
+selected Android assistant role
+≠ notification access
+≠ overlay permission
+≠ microphone permission
+≠ unrestricted app access
+```
+
+Personal Policy may narrow any of these but cannot widen missing OS/provider permission.
+
+See [CHIEF-OF-STAFF.md](CHIEF-OF-STAFF.md).
 
 ## Owner authority and Connection Grid
 
@@ -40,8 +79,6 @@ Where supported it can:
 
 But Sunday does **not** outrank deterministic physical safety.
 
-Conceptual precedence:
-
 ```text
 local emergency/safety interlocks
 > owner revocation / strong confirmation
@@ -51,7 +88,39 @@ local emergency/safety interlocks
 
 If Sunday is offline, existing authorized work may continue only within already granted scope. No other node may fabricate an owner-critical approval.
 
-See `docs/CONNECTION-GRID.md`.
+## Android / Sunday security boundary
+
+Sunday should use legitimate platform APIs and explicit user-granted special access.
+
+### Assistant role
+
+If Sunday is selected as the Android assistant, treat that as one platform role—not root/system authority. Other permissions remain separate and inspectable.
+
+### Overlay Orb
+
+Application-overlay capability is sensitive UI authority.
+
+- require explicit overlay permission;
+- allow quick disable/hide;
+- do not use overlay to obscure security prompts or impersonate system UI;
+- do not treat overlay visibility as proof of runtime health;
+- account for Android/OEM behavior that can reposition or suppress overlays;
+- app-specific `hide Orb` rules should not silently disable unrelated OSCAR services.
+
+### Notification listener
+
+Notification-listener access can expose sensitive personal content.
+
+- require explicit user grant;
+- support per-app/person/source exclusions;
+- avoid durable retention by default unless policy says otherwise;
+- treat OTP/password/security-code/banking classes as non-retainable by default;
+- do not infer hidden app history/state;
+- do not treat notification visibility as permission to send/reply.
+
+### Notification actions / RemoteInput
+
+A reply/send capability exists only when Android exposes a legitimate action or another authorized connector/device capability exists. Sending follows communication permission/Personal Policy and verification semantics.
 
 ## Connection Grid transport security
 
@@ -121,7 +190,7 @@ Sentry's persistent awareness and optional recording/capture modes are separate.
 
 ### Optional Context Capture / Daily Journal
 
-If the user explicitly enables richer capture, OSCAR may process selected calls/messages/mail/meetings/in-person conversations where technically and legally permitted.
+If explicitly enabled, OSCAR may process selected calls/messages/mail/meetings/in-person conversations where technically and legally permitted.
 
 Required controls:
 
@@ -138,7 +207,7 @@ Required controls:
 - encrypted storage/access control;
 - provenance for retained records.
 
-These are separate controls:
+Keep separate:
 
 ```text
 wake/VAD
@@ -156,11 +225,20 @@ A generic microphone permission never silently grants all of the above.
 
 ### Legal/consent boundary
 
-Recording consent requirements differ by jurisdiction/channel/participant.
-
-OSCAR must not be designed around covert recording. Where a source cannot be legitimately captured, the capability remains unavailable.
+Recording consent requirements differ by jurisdiction/channel/participant. OSCAR must not be designed around covert recording. Where a source cannot be legitimately captured, the capability remains unavailable.
 
 Deletion claims must reflect actual local/cloud/backups/connected-source behavior; do not say `deleted everywhere` without evidence.
+
+## Chief-of-Staff schedule authority
+
+Calendar/task/schedule automation can become consequential even when individual mutations look harmless.
+
+- reading calendar/free-busy does not grant modification authority;
+- `fixed` vs `flexible` schedule classes come from explicit user policy/current source semantics, not model guesswork;
+- automatic replanning requires explicit Personal Policy and scoped write permission;
+- external communication triggered by a schedule change can require an additional communication permission;
+- changed calendar/task state should be independently read back where practical;
+- current weather/location/notification evidence may inform planning but never independently grant write/send authority.
 
 ## Native Model Router security
 
@@ -181,7 +259,7 @@ Deletion claims must reflect actual local/cloud/backups/connected-source behavio
 - revoke one node without rebuilding the Grid;
 - never expose raw provider keys in UI, telemetry or prompt artifacts.
 
-## PC worker
+## PC Worker
 
 A machine node can be extremely powerful.
 
@@ -199,22 +277,13 @@ Controls:
 
 Delegating to Codex/another specialist never bypasses OSCAR permission policy.
 
+Trusted-host execution is not a sandbox merely because cwd/path checks exist.
+
 ## Persona security boundary
 
-Persona is presentation behavior.
+Persona may change humor, candor, warmth, formality, brevity, initiative, pushback and voice/motion style.
 
-It may change humor, candor, warmth, formality, brevity, initiative, pushback and voice/motion style.
-
-It may **not**:
-
-- reduce factual integrity;
-- suppress required risk/consent disclosure;
-- bypass confirmation;
-- change permissions;
-- turn a blocked/failure state into success;
-- joke away security/safety-critical information.
-
-See `docs/PERSONA.md`.
+It may **not** reduce factual integrity, suppress required risk/consent disclosure, bypass confirmation, change permissions, turn blocked/failure into success or joke away safety-critical information.
 
 ## Models and unstructured output
 
@@ -232,11 +301,11 @@ execution
 verified result
 ```
 
-Unstructured model text must not become arbitrary shell/GPIO commands directly.
+Unstructured model text must not become arbitrary shell/GPIO/calendar/message commands directly.
 
 ## Physical safety
 
-Keep outside the cloud/LLM control loop:
+Keep outside cloud/LLM control loops:
 
 - emergency stop;
 - over-current/thermal cutoffs;
@@ -290,3 +359,7 @@ The task remains partial/recoverable.
 6. Persona cannot weaken truth/safety/authority.
 7. Remote-control claims require a real currently available capability.
 8. Completion claims remain evidence-backed.
+9. Android assistant/overlay/notification permissions are independent capabilities.
+10. Notification visibility is not unrestricted app access.
+11. Perception, retention and action are independently controlled.
+12. Chief-of-Staff schedule/communication mutations require explicit authority and verification.

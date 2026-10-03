@@ -15,7 +15,9 @@ Across Sunday, desktop and physical surfaces:
 - complexity is progressively disclosed;
 - fluid motion preserves continuity where practical;
 - each platform gets a native composition rather than the same layout at different widths;
-- Persona affects tone/expression but not truth, permissions or safety.
+- Persona affects tone/expression but not truth, permissions or safety;
+- current context is freshness-qualified;
+- perception, retention and action authority remain separate.
 
 The visual/interaction direction is defined by `DESIGN.md` and `TASTE.md`.
 
@@ -23,7 +25,7 @@ The visual/interaction direction is defined by `DESIGN.md` and `TASTE.md`.
 
 The Grid is the product-visible relationship between:
 
-- **Sunday** — owner control/approval/notifications;
+- **Sunday** — owner control/approval/notifications/Chief-of-Staff presence;
 - **Cloud coordinator** — rendezvous and durable coordination;
 - **Desktop nodes** — high-capability execution;
 - **OSCAR Edge** — persistent local perception/reflex/safety.
@@ -37,23 +39,27 @@ Desktop       Working · 1 task
 Desk Edge     Aware
 ```
 
-Expand only when the user needs capabilities, active task ownership, health, permissions or remote controls.
-
-See `CONNECTION-GRID.md`.
+Expand only when the user needs capabilities, task ownership, health, permissions or remote controls.
 
 ## Sunday — mobile
 
-Sunday is OSCAR on the phone and the preferred everyday owner-control surface.
+Sunday is OSCAR on the phone and the preferred everyday owner-control and Chief-of-Staff surface.
 
 Primary goals:
 
 - voice/text access to the same OSCAR relationship;
 - persistent presence rather than `launch assistant` behavior;
+- selected Android assistant integration where supported and chosen by the user;
+- optional attention-aware OSCAR Orb overlay;
+- configurable home-screen widgets;
+- current time/weather/calendar/tasks/notification/communication context;
 - clear Sentry Aware / Listening / Muted / Awareness Off states;
-- notifications/proactive alerts;
+- proactive alerts and `what needs me now?` synthesis;
 - task/Worker supervision;
 - Connection Grid controls;
 - calls/messages/email/meeting capability where platform support permits;
+- notification awareness after explicit grant;
+- legitimate notification replies only when a real reply action/integration exists;
 - optional Context Capture/Daily Journal controls;
 - camera/location/sensors where authorized;
 - biometric/PIN approval for sensitive actions;
@@ -62,17 +68,32 @@ Primary goals:
 
 Sunday must not frame normal use as `Talk to OSCAR` versus `Type instead`.
 
-Example:
+### Orb presence
+
+The Orb is available without permanently obstructing content.
 
 ```text
-start task on Desktop
-→ leave home
-→ Sunday retains task visibility/control
-→ OSCAR notifies when blocked or verified complete
-→ approve/cancel/redirect remotely
+normal context
+→ compact Orb
+
+video / reading / presentation / focus
+→ retreat to edge anchor / hidden hotspot
+
+assistant gesture / hotspot / voice / tap
+→ reappear immediately
 ```
 
-See `SUNDAY-DESIGN.md`.
+Overlay state is best-effort UI, not a correctness dependency. Hiding the Orb does not imply microphone/capture state.
+
+### Widgets
+
+Widgets may expose next commitment, focus task, Worker state, Grid health, privacy/Sentry state or one-tap OSCAR invocation. They should remain glanceable and native, not mini dashboards.
+
+### Notifications
+
+Notification-listener access is a current-context capability, not unrestricted access to the source app. Source/app/person exclusions and independent retention/reply authority are mandatory.
+
+See `SUNDAY-DESIGN.md` and `CHIEF-OF-STAFF.md`.
 
 ## OSCAR Desktop — Windows/macOS
 
@@ -120,13 +141,13 @@ When the computer disappears, those capabilities disappear but durable task stat
 
 A machine task may continue without the user being physically present.
 
-Sunday can inspect/pause/cancel/approve. After verified completion, OSCAR may sleep/shut down the PC when a real capability and policy permit.
+Sunday can inspect/pause/cancel/approve. After verified completion, OSCAR may sleep/shut down the PC when a real capability and policy permit it.
 
 Remote power-on is only presented if Wake-on-LAN/remote-management/approved power capability is available.
 
 ## Delegated Worker surface
 
-Workers remain underneath OSCAR. The user should see responsibility, current meaningful action, state, blocker/approval and result — not an agent-operations dashboard.
+Workers remain underneath OSCAR. Show responsibility, current meaningful action, state, blocker/approval and result—not an agent-operations dashboard.
 
 ## OSCAR Edge
 
@@ -168,86 +189,55 @@ Underlying TTS can differ while intended identity remains recognizable.
 
 Voice Match/Voice Map share semantics while preserving source/confidence metadata. OSCAR's own TTS is excluded from speaker learning and wake loops.
 
-## Sentry surface participation
+## Sentry participation
 
-Sentry is distributed and persistent when enabled.
-
-A surface can contribute:
-
-- wake/VAD/hot commands;
-- Voice Map speaker events;
-- sound events;
-- motion/presence;
-- device health;
-- camera/sensor observations;
-- current app/device context;
-- communication events.
+A surface can contribute wake/VAD/hot commands, Voice Map events, sound events, motion/presence, device health, camera/sensor observations, current app/device context and communication events.
 
 Persistent awareness is different from active Listening and different from durable recording.
 
-### Optional Context Capture / Daily Journal
+Authorized surfaces/channels may contribute selected calls/messages/mail/meetings/in-person conversations to Context Capture/Daily Journal according to source capability and retention policy.
 
-Sunday/desktop/authorized microphones and channel adapters can contribute selected calls/messages/mail/meetings/in-person conversations to continuity capture where technically and legally permitted.
+## Chief-of-Staff continuity
 
-The UI must expose capture state, source, retention and pause/delete controls clearly.
+Current schedule/task/communication state should survive surface changes.
 
-See `VOICE-SENTRY.md` and `COMMUNICATION.md`.
+```text
+Desktop task running
+→ Sunday sees task + next commitment
+→ user leaves
+→ notification changes schedule
+→ World Model updates
+→ OSCAR suggests/executes permitted replan
+→ user returns to Desktop
+→ same objective/commitment state continues
+```
+
+No manual chat transfer.
 
 ## Persona surfaces
 
-Persona should be editable conversationally and manually.
-
-Surface requirements:
-
-- starting profiles/custom description;
-- compact core trait controls;
-- context trigger rules;
-- preview of text/voice/motion behavior;
-- truthfulness/safety visibly non-configurable.
-
-See `PERSONA.md`.
-
-## Physical/device and engineering expansion
-
-Physical systems join OSCAR through native capability contracts. CAD, circuit design/simulation, firmware, diagnostics and other engineering work routes to whichever installed/connected specialist tools are available.
-
-## ChatGPT / model-provider surface
-
-ChatGPT and other providers are intelligence capabilities reached through native OSCAR routing. ChatGPT-to-OSCAR interaction uses an OSCAR-owned connector/path, not a required Latch service.
+Persona should be editable conversationally and manually with compact trait controls/context rules. Truthfulness/safety are visibly non-configurable.
 
 ## Communication surfaces
 
-Calls, messaging, email, meetings, dictation and continuity capture may execute through different devices/apps while remaining one logical communication subsystem.
+Calls, messaging, notifications, email, meetings, dictation and continuity capture may execute through different devices/apps while remaining one logical communication subsystem.
 
 Integration priority:
 
 ```text
 native OS / official API
 → official connector/plugin
-→ authorized device automation
+→ authorized device automation / notification action
 → computer-use/accessibility fallback
 → unsupported / ask
 ```
-
-## Cross-surface continuity
-
-The same task/context survives surface changes.
-
-```text
-Desktop task running
-→ Sunday shows state/control
-→ user returns to desk
-→ Desktop expands the same objective/result
-```
-
-No manual chat transfer.
 
 ## Capability presence
 
 Every node joins/leaves dynamically.
 
 ```text
-Sunday online      → mobile/owner controls
+Sunday online      → mobile/owner/context controls
 Cloud online       → rendezvous/durable coordination
 PC online          → machine capabilities
 Edge online        → physical/local capabilities
@@ -260,8 +250,16 @@ OSCAR plans against what exists now.
 
 The same blue-shell/yellow-puck interaction language appears where useful.
 
-Motion should express real state with shared geometry and continuity: compact presence can expand into Listening/task/detail rather than teleporting between unrelated screens.
-
-States include Idle, Sentry Aware, Listening, Speaking, Working, Verifying, Waiting, Blocked, Done, Muted, Awareness Off and Offline/Degraded.
+Motion should express real state with shared geometry and continuity. States include Idle, Sentry Aware, Listening, Speaking, Working, Verifying, Waiting, Blocked, Done, Muted, Awareness Off and Offline/Degraded.
 
 Identity is shared; composition remains platform-native.
+
+## Invariants
+
+1. Surfaces are embodiments of one OSCAR identity, not separate assistants.
+2. Surface disappearance must not erase durable task/context state.
+3. Sunday is the primary owner-control/Chief-of-Staff surface, not a hardware-safety override.
+4. Overlay/widget/avatar UI never substitutes for actual runtime state.
+5. Perception, retention and action authority stay independent.
+6. Platform-specific capabilities remain unverified until exercised on target hardware.
+7. Notification visibility never implies unrestricted source-app access.

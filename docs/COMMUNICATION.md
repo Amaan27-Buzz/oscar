@@ -1,17 +1,18 @@
 # Communication Layer
 
-OSCAR should act as the user's communication layer across calls, meetings, messaging, dictation, follow-up and optional continuity capture. Communication is one capability family owned by the same OSCAR identity, memory, World Model, Personal Policy, Persona, Voice Identity and task state.
+OSCAR should act as the user's communication layer across calls, meetings, messaging, notifications, dictation, follow-up and optional continuity capture. Communication is one capability family owned by the same OSCAR identity, World Model, Personal Policy, Persona, Voice Identity and task state.
 
 ## Product rule
 
 > Communication is a first-class OSCAR capability, not a collection of isolated bots or integrations.
 
-Where platform capabilities and permissions allow, OSCAR may cover:
+Where platform capability and permission allow, OSCAR may cover:
 
 - ordinary phone calls;
 - WhatsApp/Telegram/other app calls and messages;
 - SMS/text;
 - email;
+- Android notifications as a current event source;
 - Zoom/Meet/Teams/Discord-style meetings;
 - in-person meeting/conversation capture through authorized microphones;
 - system-wide dictation;
@@ -27,8 +28,6 @@ Sunday is the primary mobile execution/control surface. Desktop and other nodes 
 ## Universal Channel Gateway
 
 Supported communication enters OSCAR through one normalized event/action envelope while preserving channel-specific limits.
-
-Potential adapters include cellular/SMS where permitted, WhatsApp, Telegram, Signal, Discord, Slack/Teams-like channels, email, social DMs/replies and future connectors.
 
 A normalized event can include:
 
@@ -55,12 +54,55 @@ Normalization does not imply capability parity.
 ```text
 native OS / official API
 → official plugin / connector
-→ authorized device automation
+→ authorized device automation / notification action
 → computer-use / accessibility fallback
 → explicitly unsupported / ask
 ```
 
 Do not pretend an app exposes call control/audio/message capability when it does not.
+
+## Android notification awareness
+
+With explicit notification-listener access, Sunday may treat Android notification events/content as current communication evidence.
+
+This can support:
+
+- `what did I miss?` summaries;
+- urgency/importance triage;
+- grouping by person/project/source;
+- extracting commitments or changed deadlines;
+- detecting a changed meeting or delivery state;
+- deciding whether to interrupt during focus;
+- presenting a legitimate reply action where Android exposes one.
+
+Critical boundary:
+
+```text
+notification visibility
+≠ unrestricted app data access
+≠ durable retention permission
+≠ reply/send authority
+```
+
+A WhatsApp notification is evidence of what Android exposed in that notification, not proof OSCAR can browse arbitrary WhatsApp history or control WhatsApp calls.
+
+Source/app/person exclusions are first-class. Banking, OTP, password/security-code and similar sensitive content should not become durable memory by default.
+
+## Notification replies
+
+If an existing notification exposes a legitimate reply action/Android `RemoteInput`, OSCAR may draft or send through that action according to granted permission and Personal Policy.
+
+If no reply action exists:
+
+```text
+official connector/API available → use it
+otherwise authorized device/computer capability exists → use that
+otherwise → direct reply unavailable / ask
+```
+
+Do not invent a writable channel from notification read access.
+
+Drafted, send-attempted, accepted-by-API and independently observed sent/delivered are different evidence states.
 
 ## Persona in communication
 
@@ -68,38 +110,29 @@ Persona affects tone and presentation but never permission or truth.
 
 Examples:
 
-- ordinary personal chat may use the user's configured humor/warmth;
+- ordinary personal chat may use configured humor/warmth;
 - university/professional calls can trigger high formality and low humor;
 - security/Sentry events suppress inappropriate playfulness;
 - representative/call mode stays concise and professional.
 
-See `docs/PERSONA.md`.
+See `PERSONA.md`.
 
 ## OSCAR Voice Identity
 
-When OSCAR speaks during calls/meetings/dictation it should preserve the same recognizable Voice Identity used elsewhere. Persona can select speaking style/mode without silently changing OSCAR into another voice.
+When OSCAR speaks during calls/meetings/dictation it should preserve the same recognizable Voice Identity used elsewhere. Persona can select speaking style without silently changing OSCAR into another voice.
 
 Where law/platform/policy requires it, OSCAR should identify itself as an AI assistant acting for the user.
 
 ## AI call answering
 
-OSCAR may answer calls on the user's behalf when Personal Policy and platform capability permit it.
+OSCAR may answer calls on the user's behalf only when Personal Policy and platform capability genuinely permit it.
 
-Example policy:
-
-```text
-if unanswered for 4 rings
-  and caller is not excluded
-  and context permits delegation
-then OSCAR may answer
-```
-
-Typical flow:
+Conceptual flow:
 
 ```text
 incoming call
 → identify caller/context where possible
-→ evaluate permission + Personal Policy
+→ evaluate capability + permission + policy
 → continue ringing / silence / answer / escalate
 → if answering: speak within scope
 → collect message/intent
@@ -108,6 +141,8 @@ incoming call
 → verify consequential follow-up where possible
 → summarize to user
 ```
+
+Unsupported call audio/control remains unsupported.
 
 ## Meetings and in-person conversations
 
@@ -130,7 +165,7 @@ Voice Map improves context but remains confidence-qualified and never grants aut
 
 ## System-wide dictation
 
-OSCAR should provide dictation outside its own UI.
+OSCAR should provide dictation outside its own UI where platform capability exists.
 
 Examples:
 
@@ -142,19 +177,65 @@ Examples:
 "send it"
 ```
 
-Modes may include literal dictation, cleaned dictation, rewrite/edit and command mode. Voice/keyboard remain one context.
+Literal dictation, cleaned dictation, rewrite/edit and command mode remain distinct enough that `send it` triggers the required communication permission/policy boundary.
 
 ## Messaging and email
 
-When permitted, OSCAR may read, draft, send, search and manage communication through structured adapters or authorized device/browser/desktop capabilities.
+When permitted, OSCAR may read, search, draft, send and manage communication through structured adapters or authorized device/browser/desktop capabilities.
 
 Current platform state remains authoritative. A notification may expose less capability/content than the underlying app; OSCAR must not infer hidden access.
+
+## Communication → commitments → schedule
+
+Communication participates in the Chief-of-Staff commitment model.
+
+Potential extracted commitments:
+
+- meeting time changed;
+- callback requested;
+- assignment deadline moved;
+- recruiter expects response;
+- delivery requires presence;
+- task promised to another person;
+- travel/change affects later schedule.
+
+Flow:
+
+```text
+message/call/email/notification evidence
+→ extract candidate commitment
+→ preserve source/confidence
+→ verify current source when consequential
+→ update World Model / task state
+→ suggest or perform calendar/task mutation under Personal Policy
+→ read back mutation where practical
+```
+
+A model inference such as `they probably want a meeting tomorrow` does not become a verified calendar fact.
+
+See [CHIEF-OF-STAFF.md](CHIEF-OF-STAFF.md).
+
+## What did I miss?
+
+OSCAR should be able to synthesize authorized communication/notification context into a concise catch-up rather than replaying a chronological feed.
+
+Useful grouping can include:
+
+```text
+Needs action
+Changed plans
+Important FYI
+Routine / suppressed
+Unavailable sources
+```
+
+The summary must distinguish channels that were genuinely observed from channels unavailable due to permission/platform/offline state.
 
 ## Optional daily continuity capture
 
 Sentry may be configured to keep a cross-channel record of the user's day.
 
-This can include, where legitimately available:
+Potential sources where legitimately available:
 
 - calls and call summaries/transcripts;
 - messages/SMS;
@@ -162,6 +243,7 @@ This can include, where legitimately available:
 - meetings;
 - voice notes;
 - in-person conversations;
+- selected notification-derived events;
 - commitments/actions extracted from those sources.
 
 This is not one unconditional `record everything` feature.
@@ -179,29 +261,11 @@ Daily journal
 → explicit durable continuity timeline across selected sources
 ```
 
-### Source-specific capability
-
-- Phone call metadata and call audio are different capabilities.
-- WhatsApp/Telegram message access and call-audio access are different capabilities.
-- Email/text can often be represented directly as source records instead of audio.
-- In-person conversations require authorized microphones and consent/retention policy.
-- Unsupported capture remains unsupported.
+Raw audio, transcript, summary, notification content and extracted memory each have independent retention controls.
 
 ## Daily Journal artifact
 
-When enabled, OSCAR may create a daily continuity artifact such as:
-
-```text
-2026-10-01
-09:20  call — recruiter — callback requested
-11:05  meeting — project review — 3 actions
-14:40  in-person conversation — unknown/unenrolled speaker — summary retained
-17:10  email — university — deadline changed
-```
-
-The default journal should favor concise, searchable outcomes over permanent raw-media storage.
-
-Raw audio, transcript, summary and extracted memory each have independent retention controls.
+A daily continuity artifact should favor concise, searchable outcomes over permanent raw-media storage. It may include calls, meetings, communications and schedule changes with source/provenance where useful.
 
 ## Consent / privacy
 
@@ -211,11 +275,12 @@ OSCAR should support:
 
 - explicit per-source capture settings;
 - clear capture state;
+- notification/app/person source exclusions;
 - consent/disclosure rules where required;
 - person/place/time exclusions;
 - pause/stop controls;
-- delete/forget controls;
-- configurable raw/transcript/summary retention;
+- configurable raw/transcript/summary/notification retention;
+- export/delete/forget controls;
 - encryption/access controls;
 - transparent provenance.
 
@@ -231,17 +296,16 @@ Communication may create, within permission:
 - follow-up drafts/sends;
 - project/task updates;
 - commitments;
-- unresolved-item notifications.
+- unresolved-item notifications;
+- schedule changes caused by verified communication updates.
 
 Each consequential mutation follows Action Ledger + verification rules.
 
 ## Context and memory
 
-Communication participates in LRA and World Model.
-
 Useful durable information can include who contacted the user, purpose/outcome, commitments, action items, preferred communication style and pending follow-up.
 
-A full transcript is not automatically durable memory. Retention policy decides what survives.
+A full transcript or notification body is not automatically durable memory. Retention policy decides what survives.
 
 ## Sentry awareness vs capture
 
@@ -249,14 +313,17 @@ A full transcript is not automatically durable memory. Retention policy decides 
 Sentry awareness
 = persistent local events/presence/context
 
+Communication awareness
+= current authorized calls/messages/email/notification events
+
 Communication capture
-= authorized content/transcript/recording for specific sources
+= authorized content/transcript/recording for selected sources
 
 Daily Journal
 = explicit durable cross-source continuity record
 ```
 
-These remain separate modes even though they can cooperate.
+These remain separate even when they cooperate.
 
 ## Epistemic integrity
 
@@ -270,12 +337,13 @@ send API reports success
 ```
 
 ```text
-call Worker says "message taken"
-→ preserve transcript/result evidence
-→ do not claim callback scheduled unless calendar/source confirms it
+notification says meeting moved
+→ current notification evidence
+→ verify calendar/thread if mutation matters
+→ do not silently replace calendar truth from one ambiguous notification
 ```
 
-OSCAR distinguishes drafted vs sent, attempt vs connection, transcript vs verified speaker identity, and suggestion vs actual follow-up mutation.
+OSCAR distinguishes drafted vs sent, attempt vs connection, transcript vs verified speaker identity, suggestion vs actual follow-up mutation and notification evidence vs source-app truth.
 
 ## Artifact / Result Model
 
@@ -287,13 +355,15 @@ Possible communication artifacts:
 - follow-up draft;
 - sent-message reference;
 - scheduling result;
+- notification-derived commitment;
 - voice-note/media reference.
 
-Artifacts preserve channel/source IDs, participants, producer, timestamps, provenance and verification state where useful.
+Artifacts preserve source IDs, participants, producer, timestamps, provenance and verification state where useful.
 
 ## Security / authority
 
 - reading current communication requires granted access;
+- notification access is its own sensitive permission;
 - sending/answering requires explicit authority/Personal Policy;
 - making commitments or revealing private context may require stronger confirmation;
 - capture/retention changes are sensitive settings;
@@ -307,10 +377,13 @@ Artifacts preserve channel/source IDs, participants, producer, timestamps, prove
 adapter unavailable
 → try equivalent authorized path if one exists
 
+notification has no reply action
+→ use another legitimate integration or report unavailable
+
 payload rejected
 → repair + bounded retry
 
-auth expired / strong user confirmation required
+auth expired / strong confirmation required
 → ask for minimum intervention
 
 source does not expose call audio
@@ -331,13 +404,12 @@ Long-running communication responsibilities use Durable Execution Runtime where 
 8. Sentry awareness does not silently enable recording.
 9. Voice Map supports context, never permission.
 10. Communication success claims cannot exceed verification evidence.
+11. Notification visibility is not unrestricted source-app access.
+12. Notification observation, retention and reply authority are independent.
+13. Communication-derived schedule/task changes remain source-qualified and verified where consequential.
 
 ## Club B connector foundation
 
-Structured Gmail/Graph mail, Calendar and Slack operations now have native
-connector manifests/adapters through the existing catalog and permission ledger.
-Sending is external communication; reads do not grant write authority. OAuth/
-service account authentication remains unverified in this cloud run. Bodies and
-results are active task context, not default durable communication capture.
-Gmail recipient/header read-back and deployed provider push subscriptions remain
-PARTIAL. See [CONNECTOR-FABRIC.md](CONNECTOR-FABRIC.md).
+Structured Gmail/Graph mail, Calendar and Slack operations have native connector manifests/adapters through the existing catalog and permission ledger. Sending is external communication; reads do not grant write authority. OAuth/service-account authentication remains unverified in the current reference. Bodies/results are active task context, not default durable communication capture.
+
+Gmail recipient/header read-back, deployed provider push subscriptions and real private account acceptance remain PARTIAL. See [CONNECTOR-FABRIC.md](CONNECTOR-FABRIC.md).
