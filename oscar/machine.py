@@ -130,6 +130,16 @@ class MachineWorker:
                     if Path(executable).name.lower() == command + ".exe":
                         self.agents[name] = executable
         self.owners: dict[str, str] = {}
+        from .powershell import discover
+
+        candidate = discover()
+        self.powershell = (
+            candidate
+            if candidate
+            and candidate.executable in scope.allowed_executables
+            and scope.trusted_host_execution
+            else None
+        )
         self.outputs: dict[str, str] = {}  # Bounded active context; never task/ledger persistence.
 
     def capabilities(self) -> list[Capability]:
@@ -149,6 +159,8 @@ class MachineWorker:
             specs.append(
                 ("machine.command", "terminal_command", "machine:host", "metadata", "high")
             )
+        if self.powershell:
+            specs.append(("machine.powershell", "powershell", "machine:host", "metadata", "high"))
         specs += [
             ("machine.agent." + name, "coding", "machine:host", "metadata", "high")
             for name in self.agents
@@ -536,6 +548,11 @@ class MachineWorker:
             else:
                 if cap.id == "machine.git":
                     argv = self.git_command(p["operation"], p)
+                elif cap.id == "machine.powershell":
+                    from .powershell import command
+
+                    assert self.powershell is not None
+                    argv = command(self.powershell, p["request"], self.scope.root)
                 elif cap.id.startswith("machine.agent."):
                     name = cap.id.removeprefix("machine.agent.")
                     argv = [self.agents[name], *p["arguments"]]

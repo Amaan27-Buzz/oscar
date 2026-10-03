@@ -21,6 +21,7 @@ from .contracts import (
 from .credentials import redact_runtime_secrets
 from .grid import Grid, SessionHandle
 from .jev import ExecutionClass, Intent, decide
+from .memory_fabric import MemoryFabric
 from .storage import StateConflict, Store
 from .transport import Transport, action_envelope, parse_result
 
@@ -32,16 +33,36 @@ class Runtime:
         grid: Grid,
         verifier: Verifier,
         on_verification: Callable[[Evidence], None] | None = None,
+        memory: MemoryFabric | None = None,
+        relationship_id: str = "owner",
     ):
         self.store, self.grid, self.verifier = store, grid, verifier
         self.on_verification = on_verification
+        self.memory, self.relationship_id = memory, relationship_id
+        self.active_context: dict[str, dict[str, Any]] = {}
 
     def create(
         self, intent: Intent, initiator: str = "owner", retry_budget: int = 2, mode: str = "auto"
     ) -> Task:
         if not 0 <= retry_budget <= 5:
             raise ValueError("retry budget must be between zero and five")
-        decision = decide(intent)
+        names = (
+            tuple(
+                row[0]
+                for row in self.memory.archive.db.execute(
+                    "SELECT alias FROM archive_aliases WHERE relationship=? LIMIT 1000",
+                    (self.relationship_id,),
+                )
+            )
+            if self.memory
+            else ()
+        )
+        decision = decide(intent, names)
+        recall = (
+            self.memory.retrieve(self.relationship_id, intent.text)
+            if (self.memory and decision.memory_required)
+            else None
+        )
         criterion: dict[str, Any] = {"kind": "unavailable"}
         parameters: dict[str, Any] = {}
         kind = decision.capability_kind
@@ -78,6 +99,30 @@ class Runtime:
             self.store.put("task", task.id, record(task))
             self.store.put("plan", task.id, {"kind": kind, "parameters": parameters})
             self.store.audit(task.id, "jev_decision", record(decision))
+            self.store.audit(
+                task.id,
+                "memory_preflight",
+                {
+                    "required": decision.memory_required,
+                    "retrieved": recall is not None,
+                    "memory_ids": [hit.memory.id for hit in recall.hits] if recall else [],
+                    "event_ids": sorted(
+                        {event for hit in recall.hits for event in hit.memory.event_ids}
+                    )
+                    if recall
+                    else [],
+                    "attempts": list(recall.attempts) if recall else [],
+                    "status": Epistemic.RECALLED if recall and recall.hits else Epistemic.UNKNOWN,
+                },
+            )
+        if recall and self.memory:
+            self.active_context[task.id] = self.memory.context(
+                recall,
+                objective=intent.text,
+                project=None,
+                live={},
+                policy_ids=(),
+            )
         self.verifier.bind_task(task.id, parameters)
         if decision.execution_class == ExecutionClass.ASK:
             return self.store.transition(task.id, TaskState.UNKNOWN, blocker=decision.reason)

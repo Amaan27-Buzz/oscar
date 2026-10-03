@@ -11,7 +11,8 @@ from pathlib import Path
 from time import sleep
 
 from .grid import Grid, SessionHandle
-from .machine import MachineScope, MachineWorker
+from .interactive_worker import InteractiveWorker
+from .machine import MachineScope
 from .storage import Store
 from .transport import Dispatcher, ReferenceServer
 
@@ -23,18 +24,22 @@ def main() -> int:
     parser.add_argument("--trusted-host", action="store_true")
     parser.add_argument("--executable", action="append", default=[])
     parser.add_argument("--codex-home", type=Path)
+    parser.add_argument("--desktop", action="store_true")
+    parser.add_argument("--browser", action="store_true")
     args = parser.parse_args()
     bootstrap = json.loads(sys.stdin.readline(8192))
     session = SessionHandle(bootstrap["id"], bootstrap["node_id"], bootstrap["token"])
     store = Store(args.state)
     grid = Grid(store)
-    worker = MachineWorker(
+    worker = InteractiveWorker(
         store,
         grid,
         session,
         MachineScope(
             args.workspace, args.trusted_host, tuple(args.executable), codex_home=args.codex_home
         ),
+        desktop=args.desktop,
+        browser=args.browser,
     )
     grid.advertise(session, worker.capabilities())
     dispatcher = Dispatcher(
