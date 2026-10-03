@@ -66,7 +66,9 @@ class MemoryItem:
 
 class MemoryBackend(Protocol):
     def retain(self, item: MemoryItem, *, retention_authorized: bool) -> None: ...
+
     def retrieve(self, query: str, scope: str, limit: int = 8) -> tuple[MemoryItem, ...]: ...
+
     def forget(self, identifier: str, *, owner_authorized: bool) -> None: ...
 
 
