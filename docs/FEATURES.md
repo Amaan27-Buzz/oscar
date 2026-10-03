@@ -4,13 +4,14 @@ This is OSCAR's capability backlog. Listing a feature here does **not** mean it 
 
 ## Interaction
 
-- Natural-language voice and text as equal interfaces in one continuous context.
+- Natural-language voice and text as equal interfaces in one continuous relationship.
+- No required `new chat` workflow for memory/context continuity.
 - Short contextual commands such as `mute`, `cancel that`, `leave it running`, `what did it find?`.
 - Immediate local wake/reflex acknowledgement.
 - Barge-in while OSCAR is speaking.
 - Streaming STT/reasoning/TTS where useful.
 - Fluid state transitions rather than unrelated page swaps.
-- Configurable Persona without sacrificing clarity, truth or speed.
+- Configurable Persona without sacrificing truth or speed.
 
 ## Interaction Runtime — Dictate / Edit / Ask / Act
 
@@ -22,62 +23,159 @@ This is OSCAR's capability backlog. Listing a feature here does **not** mean it 
 - Point-and-talk.
 - Action-Ledger-backed Undo where real compensation exists.
 
+## OSCAR Memory Fabric
+
+### One persistent relationship
+
+- One user-facing OSCAR interaction point across text, voice, Sunday, desktop, communication, Workers and Edge.
+- Internal turns/episodes/projects/objectives/entities remain structured without forcing chat-thread management on the user.
+- Dynamic Active Context assembled from current objective/project/entities/commitments, recent conversation, retrieved history and World Model state.
+
+### Canonical Event Archive
+
+- SQLite + WAL initial canonical durable history.
+- FTS5 exact/full-text historical retrieval.
+- Stable event/turn/episode/entity/memory/source identifiers.
+- Provenance/evidence state/retention metadata.
+- Corrections and supersession links.
+- Canonical history survives replacement/rebuild of derived indexes.
+
+### Semantic retrieval
+
+- Qdrant OSS derived semantic index.
+- Dense retrieval.
+- Sparse/lexical retrieval where useful.
+- Hybrid retrieval.
+- Project/entity/time/type filters.
+- Local/replaceable embeddings.
+- Local/replaceable reranker.
+- Derived records always point to canonical archive IDs.
+
+### Temporal/entity retrieval
+
+- Graphiti OSS + Neo4j Community derived temporal/entity index.
+- Canonical entities and aliases.
+- Relationship graph.
+- Valid-from/valid-to history.
+- Current vs historical fact retrieval.
+- Preference/decision supersession.
+- Provenance to source events.
+- Same-name/ambiguous identities remain separate without evidence.
+
+### Jev Memory Preflight
+
+- Cheap memory-dependency classification on each interaction.
+- Mandatory retrieval for historical/personal/project/entity/artifact/preference references.
+- Skip unnecessary memory work for deterministic unrelated requests.
+- Retrieval ladder: Active Context → structured OSCAR state → FTS/archive → Qdrant hybrid → Graphiti temporal/entity → query expansion → bounded deep archive → UNKNOWN.
+- Empty first retrieval is not treated as proof that memory does not exist.
+- Expected-memory misses trigger bounded query broadening before UNKNOWN.
+
+### Evidence-bound recall
+
+- No `I remember X` without actual retrieved/active source evidence.
+- Personal/historical claims bind to source event/memory IDs internally.
+- Recalled history remains `RECALLED` in the current reasoning path.
+- Live authoritative current state outranks stale memory.
+- Reasoning models cannot promote inference into fact.
+- Retrieval/index scores never become epistemic authority by themselves.
+
+### Memory formation and consolidation
+
+- Episodic, semantic, preference, project, relationship, decision and procedural candidates.
+- Candidate extraction from source events, not free-floating model summaries.
+- Scope/overgeneralization checks.
+- Entity resolution.
+- Contradiction/supersession handling.
+- Background dedup/evidence merge/summary/index maintenance.
+- Original source events always retained according to policy.
+
+### Memory resilience/evaluation
+
+- Qdrant rebuild from canonical archive.
+- Graph/temporal rebuild from canonical events.
+- Index drift/lag health checks.
+- Fallback to archive/FTS/UNKNOWN when derived index unavailable.
+- Exact recall tests.
+- Paraphrase recall tests.
+- Temporal correctness tests.
+- Entity alias/disambiguation tests.
+- False-recall tests.
+- Expected-memory-miss escalation tests.
+- Correction/forget/rebuild tests.
+- Cross-process continuity tests.
+
+### Privacy/control
+
+- Inspect source/provenance.
+- Correct/supersede.
+- Forget/tombstone active OSCAR memory.
+- Remove derived semantic/graph entries where required.
+- Export where practical.
+- Retention controls by type/source/sensitivity.
+- No false claim of secure disk erasure or deletion from external source systems.
+- Voice Match/Voice Map embeddings remain dedicated sensitive data, not generic memory.
+
+Managed memory vendors are optional adapters only; none is a required OSCAR dependency.
+
+See [MEMORY.md](MEMORY.md).
+
 ## Persona
 
 - User-configurable OSCAR character.
 - Natural-language Persona editing.
-- Manual core traits such as Humor, Candor, Warmth, Formality, Brevity, Playfulness, Initiative and Pushback.
+- Manual traits such as Humor, Candor, Warmth, Formality, Brevity, Playfulness, Initiative and Pushback.
 - Context triggers for calls, Sentry/security, coding/deep work, quiet/night and specific relationships/projects.
-- Original starting profiles such as Wry, Steady, Spark, Formal and Custom.
 - Text/voice/avatar preview.
 - Truthfulness, safety, permissions and required confirmations remain fixed/non-configurable.
 - Persona distinct from Personal Policy and memory.
 
-See [PERSONA.md](PERSONA.md).
+## Personal Policy
+
+- Open-ended user behavior rules editable by voice/text.
+- Bounded structured interpretation shown before activation.
+- Exact owner confirmation before a newly interpreted rule becomes authoritative.
+- Scope to people, apps, projects, Workers, calls, meetings, locations, capture, Grid behavior, schedules and time windows.
+- Conflicts/ambiguity block rather than silently pick a rule.
+- Policy cannot grant missing permission.
+- Inferred preferences can be suggested but do not silently become policy.
 
 ## Connection Grid / availability
 
 - One availability/control fabric across Sunday, cloud coordinator, desktop nodes and Edge.
 - No ordinary laptop/desktop as permanent host.
 - Sunday as preferred everyday owner-control/kill-switch surface.
-- Phone biometric/PIN for owner-critical approval/revocation.
-- Remote inspect/pause/cancel/revoke of work and nodes.
+- Remote inspect/pause/cancel/revoke of authorized work.
 - Replaceable cloud rendezvous/durable coordination.
-- Free-tier, paid and bring-your-own-cloud deployment paths.
 - Desktop high-capability execution.
 - Edge local awareness/reflex/safety.
-- Explicit availability states such as Full, Connected, Local, Reflex-only and Offline.
+- Explicit Full / Connected / Local / Reflex-only / Offline states.
 - Per-node identity, capability advertisement, health and task leases.
-- Graceful degradation when a node/provider/network disappears.
-- Reconnect/resync without losing durable task state.
+- Graceful degradation/reconnect/resync without losing durable task state.
 
-See [CONNECTION-GRID.md](CONNECTION-GRID.md).
+## Real machine / remote continuation
 
-## Remote continuation
-
-- Start a Codex/build/render/other long-running machine task and leave the computer physically unattended.
-- Continue progress/event flow through the Connection Grid.
-- Inspect/approve/pause/cancel from Sunday.
-- Durable checkpoints/leases so executor loss is recoverable.
-- Independent result verification where practical.
-- Optional sleep/shutdown after verified completion when a real machine capability and Personal Policy permit it.
-- Remote wake only where a real Wake-on-LAN/management/power capability exists.
-- Never fabricate remote power/control for an offline node.
-
-## Multi-device voice arbitration
-
-- Sunday, desktop and physical OSCAR can hear the same wake/utterance without all responding.
-- One surface normally owns a voice turn.
-- Arbitration may use wake confidence, mic quality, proximity, active device, presence and explicit priority.
-- Handoff/failover while preserving the same task/context.
+- Scoped filesystem/Git.
+- Typed terminal/PowerShell.
+- Coding agents as discovered specialists.
+- Installed-app discovery as app capability rather than generic process guessing.
+- Windows UI Automation structured computer use.
+- Keyboard/mouse fallback only when structured automation unavailable.
+- Typed browser runtime with isolated profiles and deterministic verification.
+- Start long-running work and leave owner-control surface.
+- Separate owner-control client reconnects to same task.
+- Durable checkpoints/leases.
+- Independent result verification.
+- Ambiguous post-mutation crash blocks replay.
+- Optional power actions only when real and explicitly confirmed.
 
 ## World Model
 
-- Live graph of people, places, devices, apps, projects, objects, tasks, Workers and Protocols.
+- Live graph of people, places, devices, apps, projects, objects, tasks, commitments, Workers and Protocols.
 - Current state distinct from memory.
 - Freshness/confidence/provenance.
 - Stale state becomes stale/unknown.
-- Device/Connection Grid availability represented as current state.
+- Device/Grid availability represented as current state.
 
 ## Perception Fabric
 
@@ -92,106 +190,61 @@ See [CONNECTION-GRID.md](CONNECTION-GRID.md).
 
 ## Universal live context/search
 
-- Federated current-source retrieval across files/drives, mail, messages, knowledge systems, browser, GitHub, calendar, social accounts, Sunday, desktops, Edge and Workers.
+- Federated current-source retrieval across files/drives, mail, messages, knowledge systems, browser, GitHub, calendar, Sunday, desktops, Edge and Workers.
 - Live authoritative state preferred over stale memory.
-- Provenance and source authority preserved.
+- Provenance/source authority/freshness preserved.
+- Public search remains distinct from browser automation.
 
 ## Entity graph
 
-- Resolve people across contacts/email/messaging/Voice Map where evidence allows.
+- Resolve people across contacts/email/messaging/Voice Map only where evidence allows.
 - Resolve organizations/projects/accounts/devices consistently.
 - Link communication/calendar/project/task state to canonical entities.
-
-## Personal Policy
-
-- Open-ended user behavior rules editable by voice/text.
-- Scope to people, apps, projects, Workers, calls, meetings, locations, Sentry/capture modes, Connection Grid behavior and time windows.
-- Explicit policy distinct from Persona, memory and permission.
-- Inferred preferences can be suggested but do not silently become authority.
-
-See [PERSONAL-POLICY.md](PERSONAL-POLICY.md).
+- Memory Fabric temporal/entity index reuses canonical identity rather than inventing a second identity system.
 
 ## Communication
 
 - Unified calls/messages/email/meetings/dictation layer.
 - Cellular/SMS where platform permits.
 - WhatsApp/Telegram/other app communication where legitimately available.
-- Zoom/Meet/Teams/Discord-style meeting support where supported.
-- AI call answering under explicit Personal Policy.
-- Message taking, urgency, callback scheduling and call summaries.
+- Meeting support where integrations permit.
+- Message taking, urgency, callback scheduling and summaries.
 - Meeting transcription, diarization, decisions/actions/follow-up.
-- System-wide dictation and voice notes.
 - Native OS/official API first, then connector/plugin, device automation, computer-use/accessibility fallback.
-- Persona-aware professional/casual tone without changing authority.
 - Explicit capability limits per channel/app.
 
-See [COMMUNICATION.md](COMMUNICATION.md).
+## Connector / OAuth
 
-## Universal Channel Gateway
-
-- Normalize supported communication into channel/account/thread/participant/direction/type/text/transcript/media/timestamp/source-ID envelopes.
-- Preserve per-channel capabilities rather than pretending parity.
-- Link communication events to entities, World Model, LRA and Personal Policy where permitted.
+- Official authentication flows.
+- PKCE/device/system-browser flows where provider supports/requires them.
+- Minimal scopes.
+- Expiry/refresh/revoke lifecycle.
+- Secure OS credential-storage boundary where practical.
+- Tokens never enter memory, model prompts, Action Ledger or logs.
+- Mutation results remain REPORTED until independent readback/verification.
 
 ## Persistent Sentry
 
 - Always-present local-first awareness when enabled.
-- Wake/hot/reflex commands.
-- VAD / speech presence.
+- Wake/reflex commands.
+- VAD/speech presence.
 - Voice Map speaker events.
-- Configured sound-event classification.
+- Configured sound-event classes.
 - Motion/environment/device/health events.
 - Communication/context events.
-- Modes: Passive, Aware, Guard, Away, Sleep.
+- Passive/Aware/Guard/Away/Sleep modes.
 - Importance/urgency/confidence/interruptibility scoring.
-- Silent context update, notification, speech or urgent interruption according to policy.
 - Self-voice suppression.
-
-### Product-facing acoustic states
-
-- `Sentry Aware` — persistent local acoustic/event awareness may be active.
-- `Listening` — active conversational STT.
-- `Muted` — ordinary conversational listening suppressed; configured local reflex commands may remain.
-- `Awareness Off` — local acoustic plane disabled.
-- Typing remains another modality, not an automatic voice-off switch.
 
 ## Context Capture / Daily Journal
 
 Optional explicit continuity capture, not implied by Sentry awareness.
 
-Potential sources where technically/legally available:
+Potential sources where technically/legal/policy available include phone calls, supported app calls, messages, email, meetings, voice notes and in-person conversations.
 
-- phone calls;
-- supported app calls;
-- SMS/messages;
-- email;
-- meetings;
-- voice notes;
-- ordinary in-person conversations;
-- day-to-day environment/context events.
-
-Capture levels:
-
-```text
-Awareness only
-Context capture
-Daily journal
-```
-
-Independent controls for:
-
-- activated STT;
-- ambient/context STT;
-- raw audio retention;
-- transcript retention;
-- summary retention;
-- memory extraction;
-- person/place/time/source exclusions;
-- pause/delete/forget.
+Independent controls for raw audio, transcript, summary, derived memory, person/place/time/source exclusions and pause/delete/forget.
 
 Unsupported capture remains unsupported. Capture is never designed as covert recording.
-
-See [VOICE-SENTRY.md](VOICE-SENTRY.md) and [COMMUNICATION.md](COMMUNICATION.md).
 
 ## Voice system
 
@@ -208,25 +261,35 @@ See [VOICE-SENTRY.md](VOICE-SENTRY.md) and [COMMUNICATION.md](COMMUNICATION.md).
 
 - stable provider-independent `VoiceProfile`;
 - prosody/modulation/rate/rhythm/pronunciation policy;
-- normal, quiet/night, focused/serious, alert and representative modes;
+- contextual speaking modes;
 - streaming/chunked TTS;
 - fallback mapping with explicit degradation.
 
-### Voice Match
+### Voice Match / Voice Map
 
-- owner/authorized-speaker enrollment;
-- confidence scores;
-- authorization signal only;
-- voice alone insufficient for critical actions.
-
-### Voice Map
-
-- owner / known / recognized-but-unverified / unknown / multiple / uncertain states;
+- authorization-oriented Voice Match;
+- perception-oriented Voice Map;
+- owner / known / recognized-unverified / unknown / multiple / uncertain states;
 - confidence/provenance;
-- optional canonical-person linkage only with enough evidence/consent;
 - recognition never grants permission;
 - profiles/embeddings are sensitive;
 - OSCAR TTS excluded from learning/matching.
+
+## Jev
+
+- Typed `known / world / recall / verify / reason / reported / specialist / worker / unknown` routing.
+- Deterministic path where sufficient.
+- Memory Preflight and retrieval escalation where personal/history context is required.
+- Freshness-sensitive live-source routing.
+- Repair/reroute recoverable problems before asking the user.
+- Authority/evidence requirements established before final claims.
+
+## Epistemic Integrity
+
+- Intention, execution, result testimony, observation and verification remain distinct.
+- KNOWN/INFERRED/RECALLED/REPORTED/VERIFIED/UNKNOWN preserved.
+- Tool/Worker/model success is testimony, not objective proof.
+- UI/avatar state follows real runtime state.
 
 ## Native Transport + Capability Fabric
 
@@ -234,171 +297,92 @@ See [VOICE-SENTRY.md](VOICE-SENTRY.md) and [COMMUNICATION.md](COMMUNICATION.md).
 - Node/session identity and scoped pairing credentials.
 - Capability advertisement.
 - Correlation IDs, replay protection and idempotency.
-- Reconnect/backoff.
-- Progress/stream callbacks.
+- Reconnect/backoff/progress.
 - Permission-aware dispatch.
 - Outbound-first private-node rendezvous.
-- Small Edge client/protocol.
 - No required Latch runtime.
 
 ## Native Model Router
 
-- Provider/model registry.
-- Multiple credentials per provider.
+- Provider/model registry and multiple credentials.
 - Health/quota/rate/latency/cost state.
-- Task/model affinity and capabilities.
-- Auto, Fast, Balanced, Heavy Duty, Free First, Cheap, Local, Private, Manual and Specialist profiles.
+- Account-product/shared-pool semantics.
+- Auto/Fast/Balanced/Heavy Duty/Free First/Cheap/Local/Private/Manual/Specialist profiles.
 - Fallback/circuit behavior.
-- Local Ollama/LM Studio/vLLM-style runtimes.
-- Usage/model/key-slot/routing history.
+- Local runtimes as optional providers.
 - Models remain reasoning sources, not authority.
 - No required SwitchRoute runtime.
 
-## Coding / executable specialists
-
-- Codex, Claude Code, OpenCode and other installed coding agents as capabilities.
-- Terminal/PowerShell/shell.
-- Browser/computer-use.
-- Filesystem/Git/IDE.
-- Installed apps and specialist software.
-- Capability selection distinct from model-provider routing.
-
-## Jev
-
-- Fast typed intent + epistemic routing.
-- `known / world / recall / verify / reason / reported / specialist / worker / unknown`.
-- Deterministic path where sufficient.
-- Query current evidence/memory/live sources as needed.
-- Repair/reroute recoverable problems before asking the user.
-
-## Epistemic Integrity
-
-- Intention, execution, reported result, observation and verified completion remain distinct.
-- Explicit planned/executing/result_received/verifying/verified/partial/failed/blocked/cancelled/unknown states.
-- Tool/Worker/model success is testimony, not objective proof.
-- UI/avatar state follows real runtime state.
-
-## LRA + Supermemory
-
-- Persistent single relationship/history.
-- Active context separate from long-term recall.
-- Episodic/project/device/procedural/profile/relationship memory.
-- Cross-device continuity.
-- Searchable history/timeline.
-- Correct/forget controls.
-- Daily Journal artifacts/derived facts can feed memory only under retention policy.
-
-## Workers
+## Workers / Executive / durable runtime
 
 - Temporary/task/persistent Workers.
-- Natural-language creation/control.
 - Goal/context/permissions/capabilities/verification/escalation state.
-- Use Sunday, desktop, APIs/plugins, model routing, installed apps and Edge.
 - Bounded retry/recovery/reroute.
-- Durable state for long-running responsibilities.
-- Worker success remains `REPORTED` until objective verification.
-
-## Executive Planner
-
-- Coordinate priorities/deadlines/dependencies/resources/interruptibility/risk/cost.
-- Schedule/parallelize/pause/pre-empt/reroute/defer.
+- Durable task IDs/checkpoints/leases/heartbeats/cancellation/deadlines.
+- Executive coordination across priority/deadline/dependency/resource/interruptibility/risk/cost.
 - Never bypass Jev, Personal Policy or permissions.
 
-## Durable Execution Runtime
-
-- Durable task IDs/lifecycle/checkpoints.
-- Leases/heartbeats/retry budgets/cancellation/deadlines.
-- Executor/current surface.
-- Artifact/result/verification state.
-- Reclaim abandoned/zombie work.
-- Idempotency/dedup where needed.
-
-## Capability Catalog + Dynamic Tool Search
+## Capability Catalog
 
 - Search lightweight manifests rather than preload every tool.
-- Availability, suitability, latency/cost, permission/risk, reliability, project affinity, undo and adapter/version metadata.
+- Availability/suitability/latency/cost/permission/risk/reliability/project affinity/undo metadata.
 - Load detailed contracts only for finalists.
 - Capabilities can disappear/reappear without killing OSCAR.
 
-## Action Ledger + Undo
+## Action Ledger + Artifact Model
 
-- Consequential actions record intent/initiator/target/capability/permission-policy decision.
-- Execution + verification state/evidence.
-- Reversible/irreversible flag.
+- Consequential actions record intent/initiator/target/capability/permission-policy decision/execution/verification/evidence.
 - Real compensation only when supported.
-- Queries such as `what did you change?`, `why?`, `did you verify it?`, `undo that`.
-
-## Artifact / Result Model
-
-- First-class docs, media, code changes, reports, meeting/call notes, Daily Journals, deployments, firmware builds, datasets/models/evaluations.
-- Artifact ID/kind/name, owner, producer, location/version/hash, provenance, verification, access scope and relationships.
+- First-class docs, media, code changes, reports, meeting notes, deployments, firmware builds, datasets/models/evaluations with provenance/version/location/verification.
 
 ## Sunday
 
 - Native Android embodiment.
-- Present-not-launched home state.
-- Voice/text.
-- Notifications/proactive alerts.
-- Connection Grid owner controls.
-- Remote task continuation/supervision.
-- Calls/messages/email/meetings where supported.
-- Sentry + Context Capture/Daily Journal controls.
-- Persona configuration.
-- Camera/sensors/location where authorized.
+- Present-not-launched behavior.
+- Assistant/voice-interaction role where supported.
+- Optional OSCAR Orb overlay with attention-aware retreat.
+- Widgets.
+- Notification awareness and legitimate RemoteInput replies.
+- Grid owner controls and remote supervision.
 - Biometric/PIN sensitive approval.
 
 ## Desktop
 
 - Native/lightweight Windows/macOS presence.
-- Compact overlay + contextual expansion.
+- Compact ambient presence + contextual expansion.
 - Dictate/Edit/Ask/Act.
 - Screen/cursor/selection/accessibility context.
 - Machine capability/health state.
-- Remote continuation after user leaves.
-- Connection Grid visibility/control.
-- Fluid state-driven motion.
+- Remote continuation and Grid visibility/control.
 
 ## Edge / physical world
 
 - ESP32 networking/audio/event gateway.
-- Pico deterministic controller.
+- Pico deterministic controller where appropriate.
 - Sensors/buttons/displays/LEDs/relays/actuators/cameras via suitable nodes.
-- Workbench/environment telemetry.
 - Deterministic watchdog/interlock/emergency behavior.
-- Optional Wake-on-LAN LAN helper where supported.
-- Device capability discovery/health/provisioning.
+- Optional Wake-on-LAN helper where real.
 
 ## Learning / Skills / Protocols
 
-- Capture verified successful novel execution paths.
+- Capture verified successful novel paths.
 - Distill/parameterize procedures.
 - Evaluate before promotion.
 - Version/rollback.
 - Teach-by-demonstration where authorized.
-- Protocols can wait/observe/branch/delegate/retry/verify/escalate over time.
 - Learned behavior cannot self-grant permission.
-
-## Predictive intelligence
-
-- Forecast schedule/deadline/device risk.
-- Detect trends/anomalies when evidence supports them.
-- Prefetch/prepare context.
-- Predictions remain evidence, not authority.
 
 ## Self-maintenance
 
-- Detect expired auth, provider degradation, broken adapters, disappearing Grid nodes/capabilities, Edge disconnects, task leases, storage/state health and update failures.
-- Safe bounded repair/rollback where authorized.
-- Minimum user intervention when genuinely blocked.
+- Detect expired auth, provider degradation, broken adapters, disappearing Grid capabilities, Edge disconnects, task leases, storage/state health, Memory Fabric index drift and update failures.
+- Safe bounded repair/rebuild/rollback where authorized.
 
 ## Design / product behavior
 
 - Quietly Alive + Playful Precision.
-- 70% restraint/whitespace, 20% tactile industrial precision, 10% approachable personality.
+- Restraint, tactile industrial precision and approachable personality.
 - Warm cream/off-white materials + graphite typography.
 - Blue/yellow reserved for OSCAR identity/presence/state.
 - Weighted blue-shell/yellow-puck presence object.
-- Fluid shared-geometry state transitions.
-- Kaizen UI development: research real shipping patterns → build → inspect → improve → verify → expand.
-- Image reference prompt library under `image-prompts/`; coded UI is source of truth.
-- No generic AI dashboard, permanent chat sidebar, card walls, glass/neon/purple gradients or fake telemetry.
+- Fluid shared-geometry transitions.
+- No generic AI dashboard, permanent chat sidebar, card wall, glass/neon/purple-gradient slop or fake telemetry.
