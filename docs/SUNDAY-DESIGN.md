@@ -24,6 +24,33 @@ See `CHIEF-OF-STAFF.md`.
 
 ## Android system presence
 
+### Future direction reaffirmed — documentation only, 2026-10-04
+
+The local Club B pass does not implement Sunday/voice/UI or advance Slice 07.
+Future Sunday acceptance must distinguish four independent controls:
+
+| Control | Meaning | Does not grant |
+|---|---|---|
+| Presence | Selected `ROLE_ASSISTANT`/`VoiceInteractionService`, optional Orb and widgets | Context access, retention or action authority |
+| Context awareness | Permissioned time/date/weather/calendar/tasks/device/notification signals feeding World Model | Retention or mutation authority |
+| Retention | Explicit source/app/person-scoped storage and forget policy | Authority to send or edit |
+| Authority to act | Scoped owner-controlled calendar/task updates and legitimate notification `RemoteInput` replies | Missing OS/provider capability or unrelated permissions |
+
+The Orb is normally visible, retreats/hides for video/reading/presentation/focus,
+retains a supported hidden edge/hotspot invocation and reappears naturally after
+the attention context ends. Configurable home-screen widgets surface current
+time/date/weather/calendar/tasks/device context without fabricating unavailable
+sources. Notification-listener summaries require permission, with sensitive-content
+controls by source/app/person; reply requires a real exposed action. Prefer official
+connectors/APIs to UI automation. Chief-of-Staff schedule conflicts and replanning
+consume freshness-qualified World Model state; automatic calendar/task changes
+remain owner-controlled and independently verified.
+
+Quick controls must independently pause awareness, disable overlay, disable a
+notification source, exclude a person/app and forget retained context. No Android
+or OEM behavior is verified by this Windows pass. All assistant/overlay/hotspot/
+widget/notification/reply behavior remains untested on the actual Samsung phone.
+
 Sunday should integrate with Android through legitimate platform capabilities instead of visually pretending to be a system assistant.
 
 Target direction, subject to Android/OEM support and explicit user choice:

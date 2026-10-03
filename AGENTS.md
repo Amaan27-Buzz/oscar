@@ -330,5 +330,5 @@ Use ignored local fixtures or synthetic test data.
 - Read-back needs granted read scope and the same account; mutation reports remain REPORTED.
 - Machine terminal/agent execution is opt-in trusted host authority, not cwd sandboxing.
 - Selected retention requires authorization; recalled memory stays RECALLED.
-- Windows/user hardware, authenticated private accounts and Supermemory remain unverified.
+- Windows local Worker/Codex/continuity acceptance is scoped in CLUB-B-CHECKPOINT; physical hardware, private connector accounts and Supermemory remain unverified.
 - Gate B remains PARTIAL until its actual manual criteria are met.

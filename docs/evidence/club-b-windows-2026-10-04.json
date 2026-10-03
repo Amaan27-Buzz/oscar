@@ -1,0 +1,189 @@
+{
+  "worker": {
+    "status": "VERIFIED",
+    "scope": "reference network Worker verification",
+    "platform": "win32",
+    "observed_at": 1791061507.9260013,
+    "task_id": "b0dbaed602554754adaba351f73b9353",
+    "correlation_id": "fbc02d6b2a0d4d19b699edc9baeb2973",
+    "artifact_commit": "5b2c8049cd28879a9da58dd11a5171328b15ccc5",
+    "capabilities": [
+      "machine.files.write",
+      "machine.files.read",
+      "machine.files.list",
+      "machine.files.search",
+      "machine.executables",
+      "machine.git",
+      "machine.repository",
+      "machine.command",
+      "machine.agent.claude-code"
+    ],
+    "coding_agents_advertised": [
+      "claude-code"
+    ],
+    "coding_agent_tests": [
+      {
+        "capability": "machine.agent.claude-code",
+        "test": "--version subprocess only; no model task",
+        "success": true
+      }
+    ],
+    "checks": [
+      "separate Core/Worker processes",
+      "real loopback HTTP",
+      "file/Git work",
+      "durable progress/checkpoint",
+      "lost response + Core/Worker restart",
+      "reconnect/reclaim + idempotent completed replay",
+      "independent bytes/Git tree",
+      "HTTP pause/resume/cancel",
+      "mid-command node loss BLOCKED; replay ambiguous"
+    ],
+    "limitations": [
+      "shared SQLite reference authority",
+      "loopback-only transport",
+      "Windows verified on this host",
+      "authenticated coding-agent tasks unverified",
+      "public TLS/rendezvous and independent stores unverified"
+    ],
+    "state_path": "temporary reference state removed",
+    "workspace": "temporary reference workspace removed"
+  },
+  "codex": {
+    "status": "VERIFIED",
+    "platform": "win32",
+    "observed_at": 1791060729.93752,
+    "task_id": "5a298f2d08ab4e269aeaac8265e864c2",
+    "correlation_id": "c0226fba9790469ba65dd82dc2830eb1",
+    "objective": "repair nested interval merge while preserving contract",
+    "initial_head": "d74e6d50ff525d56ce9a36f8a2bf731d3f986179",
+    "artifact_sha256": "4af72063e693b32d64fd7549d902d5cc3acc8855a494ff0a037ce0261f808754",
+    "result_status": "REPORTED",
+    "verification_status": "verified",
+    "checks": [
+      "baseline independently fails",
+      "real authenticated Codex mutation",
+      "nine independent behavior cases pass",
+      "Git sole-file diff and baseline",
+      "lost-result restart/reconnect/recovery",
+      "one execution, identical hash",
+      "real invalid Codex task FAILED without mutation"
+    ],
+    "workspace": "D:\\TheDawnlightGroup\\DawnlightLabs\\oscar\\.oscar\\codex-acceptance-05\\repository",
+    "state_path": "D:\\TheDawnlightGroup\\DawnlightLabs\\oscar\\.oscar\\codex-acceptance-05\\state.sqlite"
+  },
+  "codex_cancellation": {
+    "status": "VERIFIED",
+    "platform": "win32",
+    "observed_at": 1791061016.4834704,
+    "task_id": "264a93bba1e14192b0c7b9de68a5f023",
+    "checks": [
+      "actual Codex subprocess started",
+      "native HTTP cancel -> Job Object termination",
+      "task CANCELLED",
+      "artifact hash unchanged; terminal cancellation cannot replay"
+    ]
+  },
+  "coordinator_memory_policy": {
+    "status": "VERIFIED",
+    "platform": "win32",
+    "observed_at": 1791060908.6583972,
+    "start_coordinator_pid": 36760,
+    "recovery_coordinator_pid": 8068,
+    "task_id": "cd414edbaa114eb68fb8b5263a4819eb",
+    "pid": 8068,
+    "checks": [
+      "completed result reused once after coordinator OS-process restart",
+      "Worker OS-process restart and reconnect",
+      "independent Git/file evidence",
+      "selected project memory persisted and stays RECALLED",
+      "live filesystem overrides stale memory",
+      "owner-confirmed policy persisted",
+      "policy cannot grant permissions",
+      "conflicting policies BLOCK",
+      "forget removes live OSCAR row; no secure-erasure claim"
+    ],
+    "limitations": [
+      "shared SQLite authority, loopback transport",
+      "Supermemory not configured/exercised",
+      "live-record forget is not secure disk erasure"
+    ]
+  },
+  "integrated": {
+    "status": "VERIFIED",
+    "scope": "integrated local/reference Club B foundation",
+    "gate_b": "PARTIAL",
+    "observed_at": 1791061509.5703707,
+    "task_id": "ed441bc1e0274b4c80fbb4ab71f147e9",
+    "correlation_id": "3a1edc0ab1ee48488828ef0bad8d2967",
+    "checks": [
+      "Jev structured objective",
+      "existing Capability Catalog/Dispatcher",
+      "target Personal Policy denial then explicit approval",
+      "separate HTTP Worker",
+      "real Git/file artifact",
+      "Core independent verification + ledger evidence",
+      "verified selected project retention",
+      "later recall remains RECALLED",
+      "actual changed file overrides historical memory",
+      "forget live record"
+    ],
+    "limitations": [
+      "platform win32; browser/computer-use unverified",
+      "this scenario uses structured policy; NL acceptance is separate",
+      "Supermemory live integration unverified",
+      "shared SQLite loopback reference"
+    ]
+  },
+  "starting_work_sha": "1d3778370495a05a84ca0badfea943cd5fb6d5be",
+  "platform": "real local Windows laptop; Python 3.14.2",
+  "gate_b": "PARTIAL",
+  "slice_05": "PARTIAL",
+  "slice_06": "PARTIAL",
+  "failed_attempts": [
+    {
+      "attempt": "01",
+      "outcome": "wrong discovered specialist selected; failed before mutation"
+    },
+    {
+      "attempt": "02",
+      "outcome": "requested timeout exceeded configured limit; rejected without mutation"
+    },
+    {
+      "attempt": "03",
+      "outcome": "Codex reported success with no mutation in read-only behavior; independent checks FAILED"
+    },
+    {
+      "attempt": "04",
+      "outcome": "real correct fix but generated untracked bytecode; strict scope verification FAILED"
+    },
+    {
+      "attempt": "05",
+      "outcome": "real fix independently VERIFIED and recovered once"
+    }
+  ],
+  "windows_regressions": [
+    "14 real Windows cases: junction/root/parent rejection and listing exclusion",
+    "namespace traversal/drive/UNC/ADS/device alias rejection",
+    "pinned directory cannot be renamed",
+    "UTF-8 exact file/read/list/search",
+    "Git status/diff/log/commit",
+    "cancel/timeout/output overflow/parent exit terminate descendants",
+    "paused pre-launch timeout without mutation",
+    "job assignment rejection before execution",
+    "abrupt Worker death after disposable mutation blocks replay"
+  ],
+  "quality": {
+    "status": "PASS",
+    "tests": 319,
+    "test_seconds": 73.878,
+    "windows_specific_tests": 14,
+    "ruff": "PASS",
+    "format": "PASS; 63 Python files",
+    "mypy": "PASS; 43 source/script files; Windows and Linux platform targets",
+    "repository_links_secret_scan": "PASS; value-silent tracked/non-ignored source scan",
+    "git_diff_check": "PASS",
+    "code_checkpoint_sha": "48fa2a22e0d1191f972b7426d2f335ac52589f51",
+    "notes": "Existing urllib HTTPError ResourceWarnings remain non-fatal on local Python 3.14."
+  }
+}

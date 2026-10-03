@@ -234,7 +234,7 @@ See [`DESIGN.md`](DESIGN.md), [`TASTE.md`](TASTE.md), [`docs/SUNDAY-DESIGN.md`](
 The repository foundation and Club A Brain are merged into `main`.
 
 - **Gate A — PASS** for the current Club A foundation: Core Loop, TypeSafe Jev, reference Transport/Grid, adaptive model routing, real multi-provider evidence and source-qualified Tavily/live-search acceptance.
-- **Gate B — PARTIAL**: the reviewed Club B reference foundation is merged. Separate-process POSIX Worker, Git/file/terminal reference execution, restart/reclaim, local memory/Personal Policy/entity continuity and Connector Fabric are verified for their scoped reference cases. Windows, a real useful authenticated Codex task, browser/computer use, private service accounts/OAuth, Supermemory and natural-language policy acceptance remain outstanding.
+- **Gate B — PARTIAL**: the reviewed Club B reference foundation is merged. Separate-process POSIX Worker, Git/file/terminal reference execution, restart/reclaim, local memory/Personal Policy/entity continuity and Connector Fabric are verified for their scoped reference cases. The local Windows pass verifies native file/process/Git work, a useful authenticated Codex fix with independent tests, process restart/recovery and a bounded owner-confirmed policy interpretation. Browser/computer use, private service accounts/OAuth and Supermemory remain outstanding.
 
 The detailed evidence and limitations live in [`docs/CLUB-A-CHECKPOINT.md`](docs/CLUB-A-CHECKPOINT.md) and [`docs/CLUB-B-CHECKPOINT.md`](docs/CLUB-B-CHECKPOINT.md).
 

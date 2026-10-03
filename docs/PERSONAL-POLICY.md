@@ -378,4 +378,29 @@ Sensitive policy is personal data and follows OSCAR privacy/retention controls.
 
 Connector mutations and machine executors recheck policy at execution. `ask` needs confirmation; `deny` remains denied even with confirmation. Preference values can be evaluated but are not automatically interpreted/applied to unrelated subsystems.
 
-Natural-language interpretation/editing, quiet-hour parsing, Sunday approval identity and a policy UI remain **UNIMPLEMENTED/UNVERIFIED** until the local/phone acceptance work proves them. The reference editor is the typed `save(..., owner_authorized=True)` composition API; it is not a remotely exposed unauthenticated approval endpoint.
+Broad natural-language interpretation/editing, quiet-hour parsing, Sunday approval identity and a policy UI remain partial/unverified. The bounded local message/send editor below supersedes the original unimplemented status for those exact phrases only. The reference editor is the typed `save(..., owner_authorized=True)` composition API; it is not a remotely exposed unauthenticated approval endpoint.
+
+## Bounded local owner-review authoring — 2026-10-04
+
+`oscar.policy_authoring.PolicyAuthoring` now recognizes a deliberately small set of
+exact message/send phrases, including `Never send messages without asking me.`
+It persists an inactive candidate and shows the structured interpretation:
+`connectors:external-communication` → ASK, covering current Connector Fabric
+mail/messages and communicating calendar mutations. The interpretation explicitly
+excludes arbitrary terminal/agent sending and grants no new permission.
+
+The trusted local editor is runnable with:
+
+```sh
+python -m oscar.policy_authoring --state .oscar/owner-policy.sqlite --text "Never send messages without asking me."
+```
+
+It prints the candidate and requires the owner to type `CONFIRM`. Only the exact
+pending review digest can activate; altered/stale/replayed confirmations and
+contradictory existing equal-scope rules reject activation. Ambiguous exceptions,
+compound instructions and unrecognized phrases request clarification rather than
+guessing. Confirmed rules persist across actual coordinator-process restart and
+affect later policy evaluation. Permissions remain an independent prerequisite;
+equal-ranking structured policy conflicts still BLOCK. This local owner editor
+is not a remote identity/approval service. Model parsing, arbitrary policy language,
+quiet hours, policy UI and Sunday biometric authorization remain partial/unverified.

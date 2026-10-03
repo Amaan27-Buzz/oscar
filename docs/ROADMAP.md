@@ -97,11 +97,13 @@ Public coordinator deployment and continually changing provider metadata remain 
 
 Merged Club B reference proves separate-process POSIX Worker/Git/file/terminal execution, lease/checkpoint/restart/reclaim, completed-result reuse, HTTP pause/resume/cancel and independent verification.
 
-Next acceptance on the real Windows development laptop:
+Verified in the 2026-10-04 local pass: Windows reparse-aware file operations, Job Object process-tree control, Git work, useful Codex bug repair independently tested, cancellation, actual coordinator/Worker process restart and ambiguous mutation blocking. Full Slice 05 remains PARTIAL.
 
-- Windows-native filesystem/process safety semantics;
+Remaining/broader acceptance on the real Windows development laptop:
+
+- hostile-host isolation beyond the documented trusted local-alpha boundary;
 - PowerShell/terminal/Git;
-- real useful Codex specialist objective, not merely `--version`;
+- broader specialist objectives beyond the accepted bounded bug fix;
 - cancellation/restart/recovery/no-duplicate execution;
 - browser/computer-use path;
 - installed-app capability discovery;
@@ -118,10 +120,10 @@ Merged reference scope includes selected persistent memory, explicit structured 
 
 Next acceptance:
 
-- natural-language policy interpretation → owner-confirmed structured rule;
+- open-ended policy interpretation beyond the locally verified message/send templates;
 - actual Supermemory semantic backend when configured;
 - authenticated/private service accounts + OAuth lifecycle;
-- real local continuity on Windows;
+- broader distributed continuity beyond verified Windows local process restart;
 - broader live context into the future Chief-of-Staff/World Model path.
 
 **Gate B — PARTIAL** until useful real-machine work and continuity are genuinely accepted.

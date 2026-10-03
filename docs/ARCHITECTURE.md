@@ -442,7 +442,7 @@ PARTIAL. The merged reference foundation includes:
 - POSIX reference machine Worker with files/Git/terminal and separate-process continuation;
 - local selected memory, explicit structured Personal Policy and entity continuity.
 
-Still unverified/partial: Windows machine acceptance, useful authenticated Codex task, browser/computer use, private account/OAuth flows, Supermemory service and natural-language policy acceptance.
+The local Windows pass verifies native Worker execution, useful Codex work, independent behavioral/Git verification, actual coordinator/Worker OS-process restart and bounded owner-reviewed policy authoring. Still partial: browser/computer use, private account/OAuth flows, Supermemory and open-ended policy interpretation. See the local checkpoint below the preserved reference evidence.
 
 See [CLUB-B-CHECKPOINT.md](CLUB-B-CHECKPOINT.md).
 

@@ -279,6 +279,38 @@ Delegating to Codex/another specialist never bypasses OSCAR permission policy.
 
 Trusted-host execution is not a sandbox merely because cwd/path checks exist.
 
+### Windows local-alpha boundary
+
+The local Worker requires explicit `machine:host` permission and trusted-host
+opt-in. It uses a scoped local workspace, native executable allowlist, filtered
+environment, timeout/output bounds, reparse-aware files and Win32 Job Object tree
+lifetime. Process creation is suspended until job assignment succeeds. No shell
+shim, fake POSIX process group or silent job-assignment fallback is used.
+
+These controls **are not a sandbox**. An approved interpreter/agent/Git process
+still runs as the laptop user, can access that user's other files/network and may
+execute code from the repository. Hostile repositories, concurrent hostile local
+writers, hard links, executable replacement, Git internal metadata/config/filter
+attacks and malicious specialists are not isolated. Path checks do not restrict
+subprocess file access. Git metadata root redirection is rejected; this does not
+certify every Git config/object/file as safe. Local SQLite/OS credentials are not
+claimed protected against the host account. Job Objects provide process lifetime,
+not permissions or containment. No restricted token/AppContainer/container boundary
+was installed or claimed. Use only explicitly trusted owner objectives/workspaces.
+
+The Codex acceptance used explicit trusted-host execution (`danger-full-access`)
+on a disposable fixture after the laptop's workspace-write invocation behaved as
+read-only and produced no mutation. That failure was independently rejected.
+Codex's own existing authentication home is supplied only for that capability;
+OSCAR provider environment credentials are excluded. Model testimony never verifies
+the mutation. Private specialist transcripts/auth/config stay outside Git evidence.
+
+Reference authority still shares coordinator SQLite and loopback HTTP. Completed
+results deduplicate; an abrupt mutation with missing result blocks replay even if
+the file appears changed. An owner must independently inspect/resolve uncertainty;
+clearing started dedup rows is not an automatic recovery strategy. Forget removes
+live OSCAR records; SQLite/WAL/backups and physical secure erasure remain unverified.
+
 ## Persona security boundary
 
 Persona may change humor, candor, warmth, formality, brevity, initiative, pushback and voice/motion style.
