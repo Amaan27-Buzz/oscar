@@ -2,11 +2,11 @@
 
 Canonical instructions for Codex and other coding agents working on OSCAR.
 
-Keep this file compact; detailed truth lives in the linked domain docs.
+Detailed truth lives in the linked domain docs. Do not duplicate the whole architecture into tool-specific prompts.
 
 ## Read first
 
-For any implementation task:
+For implementation work read:
 
 - `README.md`
 - `ENGINEERING.md`
@@ -19,25 +19,29 @@ For any implementation task:
 
 Load additionally when relevant:
 
+### Memory / continuity / entities
+
+- `docs/MEMORY.md`
+- `docs/PERSONAL-POLICY.md`
+- `docs/CLUB-B-CHECKPOINT.md`
+
 ### Transport / availability / routing
 
 - `docs/NATIVE-INFRASTRUCTURE.md`
 - `docs/CONNECTION-GRID.md`
 - `docs/MODEL-ROUTING.md`
 - `docs/RUNTIME-FOUNDATIONS.md`
-
-### Search / live truth
-
 - `docs/SEARCH-FRESHNESS.md`
 
-### Ambient context / schedule / proactive assistance
+### Ambient context / schedule / communication
 
 - `docs/CHIEF-OF-STAFF.md`
 - `docs/PERSONAL-POLICY.md`
 - `docs/COMMUNICATION.md`
+- `docs/CONNECTOR-FABRIC.md`
 - `docs/SURFACES.md`
 
-### Voice / Sentry / communication
+### Voice / Sentry
 
 - `docs/VOICE-SENTRY.md`
 - `docs/COMMUNICATION.md`
@@ -51,14 +55,6 @@ Load additionally when relevant:
 - `docs/PERSONA.md`
 - `docs/UI-AVATAR.md`
 - `docs/SUNDAY-DESIGN.md`
-- `docs/SURFACES.md`
-
-### Connectors / continuity
-
-- `docs/CONNECTOR-FABRIC.md`
-- `docs/CLUB-B-CHECKPOINT.md`
-- `docs/MEMORY.md`
-- `docs/PERSONAL-POLICY.md`
 
 ### Workers / orchestration
 
@@ -66,7 +62,22 @@ Load additionally when relevant:
 - `docs/WORKERS.md`
 - `docs/RUNTIME-FOUNDATIONS.md`
 
-Treat these as current product contract. If code/docs disagree, investigate rather than silently choosing one.
+Treat these as current product contract. If code/docs/evidence disagree, investigate rather than silently choosing the convenient version.
+
+## Development rule
+
+OSCAR is built gate-by-gate, end-to-end.
+
+```text
+finish planned slice/gate
+→ verify mandatory acceptance
+→ integrate
+→ update canonical docs/evidence
+→ advance
+→ later expand/harden
+```
+
+Do **not** advance to a later Club merely because the current partial implementation is demoable. Planned mandatory work remains current work until completed or explicitly re-scoped by the owner.
 
 ## Working style
 
@@ -79,18 +90,111 @@ Treat these as current product contract. If code/docs disagree, investigate rath
 - Use specialist tools when they are the right executor.
 - Do not add a dependency without a concrete reason.
 - Update durable docs in the same change when a real invariant changes.
-- When an objective is freshness-sensitive, retrieve current authoritative evidence before relying on memory/model priors.
+- Freshness-sensitive objectives retrieve current authoritative evidence before relying on memory/model priors.
 
 ## Native infrastructure
 
-Do **not** make Latch or SwitchRoute runtime dependencies.
+Do not make Latch, SwitchRoute, a managed memory vendor, LangGraph, Letta or another agent framework a required OSCAR runtime.
 
 ```text
 Latch ideas/logic       → native OSCAR Transport + Capability Fabric
 SwitchRoute ideas/logic → native OSCAR Model Router
+Memory services         → optional adapters behind OSCAR-owned Memory Fabric
 ```
 
-Reuse proven code/patterns only when they still fit OSCAR contracts/tests.
+OSCAR owns identity, task state, memory provenance, authority and verification.
+
+## Three routing decisions remain separate
+
+```text
+Jev                  → what class of action/evidence is needed?
+Capability selection → which executor/tool/device should act?
+Model Router         → which provider/model/credential should reason?
+```
+
+Coding agents, terminal, computer use and installed applications are executable capabilities, not provider keys.
+
+## OSCAR Memory Fabric
+
+Canonical memory architecture is defined in `docs/MEMORY.md`.
+
+### Ownership
+
+- OSCAR Event Archive is canonical history.
+- Initial canonical store: SQLite + WAL + FTS5.
+- Qdrant OSS is the first semantic/hybrid derived index.
+- Graphiti OSS + Neo4j Community are the first temporal/entity derived index.
+- Embeddings/rerankers are replaceable local/provider capabilities.
+- Derived indexes must be rebuildable from canonical events.
+- No managed memory service is required.
+
+### One interaction point
+
+The product exposes one continuous OSCAR relationship. Internal events/episodes/projects/tasks are structured for scaling and retrieval but do not force `new chat` management on the user.
+
+### Jev Memory Preflight
+
+Do not let the reasoning model casually decide whether it remembers something.
+
+If a request plausibly depends on prior user/project/entity/task/artifact/preference/history context, Jev routes through memory retrieval before answering.
+
+Examples requiring retrieval include:
+
+- `continue that`;
+- `same as before`;
+- `what did we decide?`;
+- references to an existing project/person/device/artifact;
+- personal preferences/history;
+- corrections or contradictions.
+
+### Retrieval ladder
+
+Use bounded escalation:
+
+```text
+active context
+→ structured OSCAR state/entities/tasks/policy
+→ Event Archive exact/FTS5
+→ Qdrant hybrid
+→ Graphiti temporal/entity
+→ alias/entity/time-range query expansion
+→ bounded deep archive reconstruction
+→ UNKNOWN
+```
+
+An empty search result is not proof that memory never existed.
+
+### Recall truth rules
+
+- Never say or imply `I remember X` unless X was actually retrieved or remains in active context with provenance.
+- Personal/historical factual claims require source event/memory evidence.
+- Retrieved historical material is `RECALLED`; retrieval does not make it current `VERIFIED` truth.
+- Live authoritative state outranks stale memory when current truth matters.
+- The reasoning model cannot promote inference into fact.
+- Derived memory/index records retain canonical source IDs.
+- Corrections supersede historical facts temporally rather than silently rewriting history.
+- Memory does not grant permission or create Personal Policy.
+
+### Memory formation
+
+Model extraction produces candidates, not automatic truth:
+
+```text
+source event
+→ extract
+→ scope/classify
+→ resolve entities
+→ compare/conflict check
+→ provenance + epistemic state
+→ retention decision
+→ update derived indexes
+```
+
+Overgeneralization is a defect. `I dislike this rounded UI` does not automatically become `user hates all rounded UI`.
+
+### Memory evaluation
+
+Gate B must include meaningful tests for exact recall, paraphrase recall, temporal supersession, entity alias/disambiguation, retrieval-miss escalation, stale-memory-vs-live, corrections, forget/delete, rebuild/drift and false-recall behavior.
 
 ## Connection Grid
 
@@ -107,36 +211,33 @@ Rules:
 
 - no ordinary desktop is the permanent host;
 - nodes advertise only real current capabilities;
-- any cross-node control is scoped and rechecked at the target;
-- Sunday may pause/cancel/revoke user-authorized work but never bypass local hardware safety;
-- cloud is replaceable/free-tier/paid/BYOC infrastructure, not identity;
-- executor loss expires leases and must not leave tasks falsely `working`;
+- cross-node control is scoped and rechecked at the target;
+- executor loss expires leases rather than leaving false `working` state;
 - remote sleep/shutdown/wake is offered only when a real capability exists;
-- availability is explicit: Full / Connected / Local / Reflex-only / Offline where useful.
-
-See `docs/CONNECTION-GRID.md`.
+- availability degrades explicitly rather than pretending a dead node is alive.
 
 ## Ambient Chief-of-Staff invariant
 
-OSCAR is not merely an on-demand assistant surface. It should continuously integrate authorized current context and help coordinate the user's day.
+OSCAR continuously integrates authorized current context and helps coordinate the user's day.
 
 Potential live inputs include time/date/timezone, weather, calendar, tasks/deadlines, location/mobility, device/app/media state, notifications, communications, Worker/Protocol state and Sentry/Edge observations.
 
 Rules:
 
 - volatile context is freshness-qualified and source-backed;
-- weak activity signals remain uncertain rather than becoming confident mind-reading;
+- weak activity signals remain uncertain rather than mind-reading;
 - perception, durable retention and authority to act are separate grants;
-- schedule/task/communication mutations require real capability + permission/Personal Policy + verification;
-- proactivity ranges from silent context update to inform/suggest/act/interrupt rather than one global `proactive` switch;
-- attention state should reduce unnecessary interruption and visual obstruction;
-- if OSCAR can safely and legitimately perform a user objective itself, do not force the user through unnecessary manual steps.
+- schedule/task/communication mutations require capability + permission/Personal Policy + verification;
+- proactivity ranges from silent context update to inform/suggest/act/interrupt rather than one global switch;
+- attention state should reduce unnecessary interruption and obstruction.
 
-See `docs/CHIEF-OF-STAFF.md`.
+```text
+CAN PERCEIVE ≠ CAN RETAIN ≠ CAN ACT
+```
 
 ## Evidence and completion claims
 
-A tool call, commit, Worker/model message or API `success` is not automatically proof of the objective.
+A tool call, commit, Worker/model message or API `success` is not proof of the objective.
 
 For meaningful work:
 
@@ -146,189 +247,101 @@ For meaningful work:
 4. run appropriate tests/device/visual/source verification;
 5. report only what evidence supports.
 
-Use distinctions such as `reported`, `verifying`, `verified`, `partially verified`, `failed`, `blocked`, `unknown`.
+Preserve `reported`, `verifying`, `verified`, `partially_verified`, `failed`, `blocked` and `unknown` distinctions.
 
-Do not say `done`, `fixed`, `works` or equivalent when evidence is only partial/reported.
+Do not say `done`, `fixed` or `works` when evidence is only partial/reported.
 
 ## Core invariants
 
-1. Laptop/desktop nodes are optional.
-2. Hardware safety is local/deterministic.
-3. Reflex actions do not wait for frontier models.
+1. One intelligence, many embodiments.
+2. Laptop/desktop nodes are optional.
+3. Hardware safety is local/deterministic.
 4. Voice and text share task/context state.
 5. Sunday is OSCAR on the phone, not a second assistant.
-6. LRA + Supermemory provide continuous history/memory.
-7. World Model owns current-state representation; memory is not automatically current truth.
-8. Jev chooses execute/retrieve/verify/reason/delegate/ask class.
+6. OSCAR owns the canonical Memory Fabric and one continuous relationship.
+7. World Model owns current-state representation; memory is historical evidence, not current truth by default.
+8. Jev chooses execute/retrieve/verify/reason/delegate/ask class and performs memory preflight when required.
 9. Model routing and executable capability selection are separate.
 10. Nodes advertise capabilities dynamically.
 11. Consequential actions are permission-aware, attributable and evidence-backed.
 12. Long-running work uses Durable Execution Runtime when persistence/recovery matters.
 13. Voice Match and Voice Map are distinct; recognition is not authorization.
 14. OSCAR owns stable Voice Identity independent of TTS vendor.
-15. Sentry is persistent local-first awareness when enabled.
-16. Sentry awareness, active Listening and durable recording/capture are separate states.
-17. Optional Context Capture/Daily Journal is source-specific, explicit and retention-controlled.
-18. OSCAR's own TTS is excluded from Voice Map/wake loops while human barge-in remains functional.
-19. Connection Grid degrades rather than treating one node as hidden host.
-20. Persona changes expression, never truth/safety/permission.
-21. Freshness-sensitive/current claims require live authoritative retrieval when available; recalled/model-prior data must not be presented as current truth.
-22. OSCAR is a context-aware Chief of Staff: current context can drive quiet assistance, schedule/task coordination and proactive suggestions/actions within explicit authority.
-23. `CAN PERCEIVE`, `CAN RETAIN` and `CAN ACT` are independent permission/retention boundaries.
+15. Sentry awareness, active Listening and durable capture are distinct.
+16. Persona changes expression, never truth/safety/permission.
+17. Freshness-sensitive claims require live authoritative retrieval when reasonably available.
+18. `CAN PERCEIVE`, `CAN RETAIN` and `CAN ACT` are independent.
+19. A failed memory retrieval is not proof of absence.
+20. Any historical/personal answer presented as recalled requires evidence provenance.
 
-## Search / freshness rules
+## Search / freshness
 
-Search is a first-class capability, not a fallback excuse for stale reasoning.
+Search is a first-class capability, not an excuse for stale reasoning.
 
-- classify whether current/live truth materially matters;
-- prefer authoritative APIs/live sources over web summaries when available;
-- preserve source URL/identity, publication/update time and retrieval time;
-- stale cached/provider manifests are hints, not current authority;
-- model/provider availability, pricing, quota and deprecation checks are freshness-sensitive;
-- before changing provider metadata, retrieve current official catalogs/deprecations and credential-visible inventory; preserve source/time/product scope;
-- distinguish provider support, account listing, generation and funding; a 403 against a retired model does not diagnose credential health;
-- preserve old evidence with an explicit correction; do not rewrite failed observations;
-- the manifest is a bootstrap/retirement seed; hosted inventory refresh must fail closed when stale/unavailable;
-- keys can share capacity: configure account products/quota pools and never multiply capacity by credential count; unknown cost/quota remains UNKNOWN;
-- if live lookup is unavailable, report that the answer may be stale instead of guessing;
-- Tavily is the first implemented search adapter with three credential slots, not an architectural dependency;
-- search results are evidence inputs, not automatically verified truth.
+- classify whether current/live truth matters;
+- prefer authoritative APIs/live sources over summaries when available;
+- preserve source identity, relevant timestamps and observation time;
+- cached manifests/memory/model priors are not current authority;
+- if live lookup is unavailable, report stale/UNKNOWN rather than guess;
+- Tavily is an implemented replaceable search adapter, not an architectural dependency.
 
 See `docs/SEARCH-FRESHNESS.md`.
 
-## Sentry / capture rules
+## Sunday / Android
 
-Persistent Sentry may consume local wake/VAD/Voice Map/sound/device/presence events continuously when enabled.
+Sunday uses legitimate Android platform capabilities rather than pretending to have system privilege. Assistant role, overlay, widgets, notification access, replies, microphone/camera and retention/action authority remain separate permissions/capabilities. OEM-specific behavior is unverified until exercised on the target device.
 
-Do not equate that with continuous cloud STT.
+## Persona / voice / Sentry
 
-Optional capture may include selected calls/messages/mail/meetings/in-person conversations **only** where platform capability, permission and consent/legal requirements allow.
+Persona may affect humor, candor, warmth, formality, brevity, playfulness, initiative and pushback, but never truth/safety/permission.
 
-Keep separate:
+Voice Input, Voice Identity, Voice Match and Voice Map remain separate contracts. Unknown speakers remain unknown. Voice profiles/embeddings are sensitive. OSCAR's own TTS is excluded from wake/Voice Map loops while human barge-in remains functional.
 
-```text
-local awareness
-active conversational STT
-ambient/context STT
-raw audio retention
-transcript retention
-summary retention
-memory extraction
-```
-
-Unsupported app/call capture remains unsupported.
-
-Never design covert recording as the default.
-
-## Sunday / Android rules
-
-Sunday should use legitimate Android platform capabilities rather than pretending to have system privilege.
-
-- target the Android assistant role / voice-interaction contracts where supported and explicitly selected by the user;
-- a persistent Orb overlay is optional, permissioned and attention-aware; it may retreat during video/reading/presentation/focus rather than obstruct content;
-- home-screen widgets should be glanceable state/action surfaces, not dashboards;
-- notification-listener access may feed current context only after explicit user grant;
-- notification visibility does not imply full app access;
-- a notification reply is actionable only when a legitimate reply action/`RemoteInput` or another authorized integration exists;
-- Android/OEM-specific behavior remains unverified until exercised on the target device;
-- overlay/notification/assistant permissions never imply retention or action authority.
-
-See `docs/SUNDAY-DESIGN.md`, `docs/CHIEF-OF-STAFF.md` and `docs/SECURITY.md`.
-
-## Persona rules
-
-Persona may configure humor, candor, warmth, formality, brevity, playfulness, initiative, pushback and context triggers.
-
-- factual integrity cannot be lowered;
-- serious/security/safety context may suppress humor;
-- Persona cannot grant permissions;
-- Persona cannot hide uncertainty/failure;
-- user can edit Persona manually or by natural language;
-- Persona and Personal Policy are different layers.
-
-See `docs/PERSONA.md`.
-
-## Voice/audio rules
-
-- Voice Input, Voice Identity, Voice Match and Voice Map remain separate contracts.
-- Unknown speakers remain unknown rather than guessed.
-- Voice profiles/embeddings are sensitive.
-- Self-voice suppression uses playback reference/echo cancellation/TTS tagging where feasible.
-- Test barge-in while OSCAR speaks.
+Persistent Sentry awareness does not imply continuous cloud transcription or raw-audio retention.
 
 ## Specialist delegation
 
 Examples:
 
-- repository implementation/debugging → Codex or another coding capability;
+- repository implementation/debugging → Codex/coding capability;
 - GUI-only operation → computer-use capability;
 - knowledge workspace → native connector/plugin;
-- engineering/design/simulation → installed specialist tools + Edge/device capabilities;
 - model reasoning → Jev then native Model Router;
-- physical device action → advertised Edge/device capability.
+- physical action → advertised Edge/device capability.
 
 ## UI / design quality
 
 Durable direction: **Quietly Alive + Playful Precision**.
 
-- warm restrained material system;
-- one dominant idea per surface;
-- progressive disclosure;
-- fluid state continuity: State A should physically become State B where practical;
-- avatar is a weighted presence object, not a giant mascot;
-- desktop/mobile are native distinct compositions;
-- no generic AI dashboard, card wall, glass/neon/purple-gradient slop or fake telemetry;
-- Sentry must not look like surveillance software;
-- Connection Grid must not look like a network-admin console;
-- Persona must not look like raw LLM parameter tuning.
-
-For design exploration, use real shipping-app research + coded UI + visual critique + Kaizen iteration. `image-prompts/` is reference material, not canonical implementation.
-
-Simplicity must preserve craftsmanship. Prototypes that establish a visual pattern must demonstrate real depth, expression, motion, finish and verification now rather than deferring those details to a later implementation.
+Avoid generic AI dashboards, card walls, glass/neon/purple-gradient slop and fake telemetry. Simplicity must preserve craftsmanship. UI/avatar state reflects real runtime state.
 
 ## Testing expectations
 
-Every slice has an explicit checklist including relevant failure/reconnect/cancellation/idempotency/safety cases.
+Every slice has explicit acceptance including relevant failure/reconnect/cancellation/idempotency/safety cases.
 
 Where relevant test:
 
 - provider/node loss;
-- Connection Grid reconnect/lease expiry;
+- Grid reconnect/lease expiry;
 - remote task continuation/cancel;
-- freshness-sensitive query vs stale cache/model prior;
-- search credential failover and source provenance;
-- wake/VAD/STT/TTS latency;
-- barge-in/self-voice suppression;
-- Voice Match/Voice Map behavior;
-- capture pause/retention/source-unavailable behavior;
-- Persona context trigger without safety/truth regression;
-- Android assistant/overlay/widget/notification behavior on a real target phone separately from emulator tests;
-- attention-aware Orb retreat/reappearance without making overlay state a correctness dependency;
-- notification source exclusions and perceive/retain/act separation;
-- schedule mutation readback and fixed-vs-flexible commitment rules;
-- reduced motion / target viewport visual inspection;
+- freshness vs stale cache/model prior;
+- memory exact/semantic/temporal/entity retrieval;
+- expected-memory miss escalation;
+- correction/supersession/forget/rebuild;
+- browser/computer-use verification;
+- wake/VAD/STT/TTS/barge-in;
+- Android assistant/overlay/widget/notification behavior on real hardware;
+- schedule mutation readback;
 - simulator vs real hardware separately.
 
 ## Secrets / personal data
 
-Never commit or casually log:
-
-- API/provider keys;
-- OAuth/device credentials;
-- private memory exports;
-- raw conversation archives;
-- Voice Map embeddings/profiles;
-- private camera/mic recordings;
-- local `.env` secrets.
+Never commit or casually log API/provider keys, OAuth/device credentials, private memory exports, raw conversation archives, Voice Map embeddings/profiles, private recordings or local `.env` secrets.
 
 Use ignored local fixtures or synthetic test data.
 
-## Club B reference boundaries
+## Current Gate B boundary
 
-- Use Connector Fabric manifests as Grid catalog sources; do not add another registry.
-- Stage private connector inputs as transient references; expired inputs BLOCK, never replay blindly.
-- Read-back needs granted read scope and the same account; mutation reports remain REPORTED.
-- Machine terminal/agent execution is opt-in trusted host authority, not cwd sandboxing.
-- Selected retention requires authorization; recalled memory stays RECALLED.
-- Windows local Worker/Codex/continuity acceptance is scoped in CLUB-B-CHECKPOINT; physical hardware, private connector accounts and Supermemory remain unverified.
-- Gate B remains PARTIAL until its actual manual criteria are met.
+Verified scoped foundations include native Windows file/process/Git work, useful Codex delegation with independent verification, cancellation, coordinator/Worker restart/recovery, ambiguous mutation blocking, local selected memory continuity and bounded owner-reviewed policy authoring.
+
+Gate B remains PARTIAL. Complete the planned Slice 05/06 work before starting Slice 07, including browser/computer use, installed-app capability, owner-control continuation, the production Memory Fabric, open-ended Personal Policy, real private OAuth/connector acceptance, secure credential-storage boundary and live-authority-vs-memory federation.
