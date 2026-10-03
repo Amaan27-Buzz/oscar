@@ -281,7 +281,8 @@ def run_reference(root: Path) -> dict[str, Any]:
                 )
             runtime.cancel(long.id, transports)
             assert running.result(timeout=5).state == TaskState.CANCELLED
-        # Kill the actual Worker after target-side admission to prove ambiguous execution is not replayed.
+        # Kill the actual Worker after target-side admission to prove ambiguous execution
+        # is not replayed.
         lost = runtime.create(
             Intent(
                 "reference crash ambiguity",
