@@ -235,6 +235,9 @@ class Runtime:
             )
         finally:
             current = self.store.task(task.id)
+            # A different Store/process may have completed or cancelled the task.
+            for resources in list(self.store.task_resources):
+                resources.task_transitioned(current)
             if (
                 lease_id is not None
                 and current.lease_id == lease_id

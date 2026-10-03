@@ -34,7 +34,9 @@ idempotency, Runtime and independent Evidence/Verification remain authoritative.
   verifier releases outcomes in `finally`, after inspecting them. Committed local task
   transitions notify weakly held transient owners: completion, failure, blocked
   execution and cancellation immediately release remaining task context. Admission
-  also reaps context of tasks completed by another Store/process; the
+  also reaps context of tasks completed by another Store/process, and the active
+  Runtime runner rechecks resource ownership on exit to cover cross-process
+  cancellation racing with result creation; the
   100-active-item bound is unchanged. Unbound staging is not a task: clients that stage
   without creating one must release that unused reference. Restart drops private
   outcomes too; a durable REPORTED result cannot recreate independent readback proof.

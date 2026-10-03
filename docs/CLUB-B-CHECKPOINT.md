@@ -200,10 +200,10 @@ specified in [CONNECTOR-FABRIC.md](CONNECTOR-FABRIC.md). They stay within the ex
 foundation: no new slice and no merge. Regression coverage includes 120 sequential
 Runtime connector tasks with no retained prior payloads; cancellation before/during
 execution, provider/permission/endpoint/routing failure, verifier errors, restart,
-unchanged active-context bounds, readback capability/resource/account/executor attacks,
+unchanged active-context bounds, cancellation races across Store instances, readback capability/resource/account/executor attacks,
 and additive permission/policy/confirmation checks across current communicating mutations.
-The historical 274-test checkpoint above is preserved. This follow-up passed **294/294
-tests in 38.891 seconds**, including 20 new regressions; 104 focused connector/Core/Grid/
+The historical 274-test checkpoint above is preserved. This follow-up passed **295/295
+tests in 38.910 seconds**, including 21 new regressions; 105 focused connector/Core/Grid/
 policy-continuity cases passed. Ruff lint/format (55 files), strict mypy (38 OSCAR/script
 files), repository/local-link checks and value-silent source/patch secret scans passed.
 Final head/base/merge SHAs and workflow conclusions are recorded in the PR delivery report.

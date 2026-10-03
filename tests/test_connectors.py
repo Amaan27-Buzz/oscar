@@ -1000,3 +1000,23 @@ class ConnectorTests(unittest.TestCase):
         self.assertEqual(TaskState.BLOCKED, runtime.run(task.id, transports).state)
         self.assertEqual({}, self.fabric.outcomes)
         self.assertEqual({}, self.fabric.requests)
+
+    def test_cross_store_cancel_after_outcome_creation_is_cleaned_by_runner(self):
+        runtime, transports = self.runtime_fixture()
+        task, _ = self.staged_task(runtime)
+        original = self.store.audit
+
+        def remote_cancel(task_id, event, data):
+            if event == "connector_result":
+                self.assertEqual(1, len(self.fabric.outcomes))
+                other = Store(self.root / "state.sqlite")
+                try:
+                    other.transition(task_id, TaskState.CANCELLED)
+                finally:
+                    other.close()
+            original(task_id, event, data)
+
+        with patch.object(self.store, "audit", side_effect=remote_cancel):
+            self.assertEqual(TaskState.CANCELLED, runtime.run(task.id, transports).state)
+        self.assertEqual({}, self.fabric.outcomes)
+        self.assertEqual({}, self.fabric.requests)
