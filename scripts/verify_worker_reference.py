@@ -253,12 +253,14 @@ def run_reference(root: Path) -> dict[str, Any]:
         transports = {session.node_id: (worker.transport, session)}
         with ThreadPoolExecutor(max_workers=1) as pool:
             running = pool.submit(runtime.run, long.id, transports)
-            for _ in range(100):
+            for _ in range(500):
                 try:
                     store.get("worker_checkpoint", long.id)
                     break
                 except KeyError:
                     sleep(0.02)
+            else:
+                raise AssertionError("long-running Worker never reached a durable checkpoint")
             for kind in ("pause", "resume"):
                 current = store.task(long.id)
                 envelope = Envelope(
@@ -292,7 +294,7 @@ def run_reference(root: Path) -> dict[str, Any]:
         )
         with ThreadPoolExecutor(max_workers=1) as pool:
             running = pool.submit(runtime.run, lost.id, transports)
-            for _ in range(100):
+            for _ in range(500):
                 if store.task(lost.id).state == TaskState.AWAITING_RESULT:
                     try:
                         store.get("worker_checkpoint", lost.id)
@@ -300,6 +302,11 @@ def run_reference(root: Path) -> dict[str, Any]:
                     except KeyError:
                         pass
                 sleep(0.02)
+            else:
+                raise AssertionError("Worker never began the action before disconnect test")
+            # The checkpoint is written only after Dispatcher claimed the action, so
+            # disconnecting here tests a genuinely started/ambiguous execution rather
+            # than racing the request before target-side dedup admission.
             grid.disconnect(session.node_id)
             assert running.result(timeout=5).state == TaskState.BLOCKED
         runtime.reclaim(lost.id)
