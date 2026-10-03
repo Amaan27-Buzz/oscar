@@ -1,7 +1,8 @@
-"""Local LRA reference: selected retention, bounded retrieval and live-source precedence.
+"""Local Memory Fabric foundation: selected retention, bounded retrieval and live-source precedence.
 
-Personal Policy and World Model remain distinct. External semantic engines implement
-MemoryBackend; no Supermemory service access is fabricated by this local adapter.
+Personal Policy and World Model remain distinct. MemoryBackend is a replaceable
+OSCAR-owned retrieval boundary; production semantic/temporal indexes are added by
+Gate B without changing the authority rules in this local adapter.
 """
 
 import hashlib
