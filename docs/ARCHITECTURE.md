@@ -4,14 +4,15 @@
 
 OSCAR is a distributed personal-intelligence system: one coherent intelligence spanning cloud coordination, phone, desktop machines, communications and physical Edge hardware. No ordinary user computer is assumed to be permanently available.
 
-Two earlier projects inform the design without becoming runtime dependencies:
+OSCAR owns its core infrastructure. Earlier projects or external frameworks may provide ideas/adapters but do not own OSCAR's identity, task state, memory, authority or verification semantics.
 
 ```text
 Latch ideas/logic       → native OSCAR Transport + Capability Fabric
 SwitchRoute ideas/logic → native OSCAR Model Router
+managed memory systems  → optional adapters only
 ```
 
-The availability topology is the **Connection Grid**:
+## Connection topology
 
 ```text
                          User
@@ -43,41 +44,41 @@ World Model + current commitments / attention
        │
       Jev
        │
- ┌─────┼────────────────────────────────────┐
- │     │                                    │
-Memory Live Context / Search          Model Reasoning
-LRA    authoritative current sources   native Model Router
- │     │                                    │
- └─────┴──────────────┬─────────────────────┘
-                      ▼
-                OSCAR Executive
-      Personal Policy • Persona • permissions
-                      │
-                      ▼
-             Durable Execution Runtime
-                      │
-                      ▼
-         Capability Catalog + Tool Search
-                      │
-           Workers / Skills / Protocols
-                      │
-                      ▼
-               Connection Grid
-       Sunday • Cloud • Desktop • Edge
-                      │
-                      ▼
-      Apps / Channels / Devices / Specialists
-                      │
-          ┌───────────┴───────────┐
-          ▼                       ▼
-    Action Ledger          Artifact / Result
-          └───────────┬───────────┘
-                      ▼
-                  Verification
-                      │
-      World Model / commitments / memory update
-                      │
-             evidence-backed report
+ ┌─────┼──────────────────────────────────────────┐
+ │     │                    │                     │
+ │     │                    │                     │
+Memory Fabric          Live Context/Search   Model Reasoning
+historical evidence    current authority     native Model Router
+ │     │                    │                     │
+ └─────┴────────────────────┴──────────┬──────────┘
+                                      ▼
+                                OSCAR Executive
+                    Personal Policy • Persona • permissions
+                                      │
+                                      ▼
+                             Durable Execution Runtime
+                                      │
+                                      ▼
+                         Capability Catalog + Tool Search
+                              Workers / Skills / Protocols
+                                      │
+                                      ▼
+                               Connection Grid
+                         Sunday • Cloud • Desktop • Edge
+                                      │
+                                      ▼
+                    Apps / Channels / Devices / Specialists
+                                      │
+                          ┌───────────┴───────────┐
+                          ▼                       ▼
+                    Action Ledger          Artifact / Result
+                          └───────────┬───────────┘
+                                      ▼
+                                  Verification
+                                      │
+               World Model / commitments / Memory Fabric update
+                                      │
+                             evidence-backed report
 ```
 
 Cross-cutting layers:
@@ -86,24 +87,25 @@ Cross-cutting layers:
 - permissions/safety;
 - Personal Policy;
 - Persona;
-- canonical entity graph;
+- canonical entity identity;
 - audit/provenance;
 - learning/evaluation;
 - privacy/retention.
 
 ## 1. OSCAR Core
 
-Core owns only responsibilities that must remain coherent across embodiments:
+Core owns responsibilities that must remain coherent across embodiments:
 
 - identity/shared assistant state;
+- one continuous user relationship/interaction point;
 - active objectives/tasks/Workers/Protocols;
 - permission and Personal Policy evaluation;
 - Persona selection/context triggers;
-- capability discovery requests;
-- delegation/reroute decisions;
+- Jev routing and evidence requirements;
+- capability discovery/delegation/reroute decisions;
 - event prioritization;
 - verification strategy;
-- memory/live-context requests;
+- Memory Fabric/live-context requests;
 - World Model access;
 - Executive decisions;
 - Action Ledger coordination;
@@ -115,83 +117,163 @@ Core must not become a mega-framework or assume every request requires an LLM.
 
 The World Model represents current state and is distinct from memory.
 
-Entities/state may include:
-
-- people/contacts/organizations;
-- places/rooms/location;
-- devices/nodes/sensors;
-- apps/services/accounts;
-- projects/repositories;
-- tasks/Workers/Protocols;
-- calendar events and commitments;
-- flexible schedule blocks and deadlines;
-- communication threads/events;
-- media/activity/focus state where evidence supports it;
-- physical objects where supported.
+Entities/state may include people, places, devices, apps/services/accounts, projects/repositories, tasks/Workers/Protocols, calendar events, commitments, communication threads, activity/focus state and physical objects where supported.
 
 Every current-state claim should carry source, observed time, freshness/expiry, confidence/authority and provenance as appropriate. Stale evidence becomes stale/unknown rather than current truth.
 
 ## 3. Perception Fabric
 
-Normalizes current evidence from:
+Normalizes current evidence from screen/accessibility/cursor/selection, screenshots/cameras, microphone/acoustic events, Voice Map, time/date/timezone, weather, calendar/tasks, authorized notifications, phone location/activity/media state, calls/messages/email/meetings, apps/devices, Edge sensors and Worker/task state.
 
-- screen/accessibility/cursor/selection;
-- screenshots/cameras;
-- microphone/acoustic events;
-- Voice Map;
-- time/date/timezone;
-- weather/current external context;
-- calendar/free-busy/tasks/deadlines;
-- notification events/content where authorized;
-- phone location/activity/media state;
-- calls/messages/email/meeting events;
-- apps/devices;
-- Edge sensors/presence;
-- Worker/Protocol/task state.
+Perception and retention are separate decisions. Observation does not itself create durable memory or authority to act.
 
-Perception and retention are separate decisions. Observation of a notification/location/audio event does not itself create durable memory or authority to act.
+## 4. OSCAR Memory Fabric — historical continuity
 
-## 4. Ambient Chief-of-Staff context
+OSCAR exposes one continuing relationship while maintaining structured internal history.
 
-OSCAR should use current World Model evidence to coordinate the user's day, not just answer isolated prompts.
+### Canonical store
 
-A commitment can represent a fixed event, flexible block, task/deadline, communication follow-up, Worker dependency or preparation/travel buffer.
+The **OSCAR Event Archive** is canonical historical memory. Initial implementation uses SQLite + WAL + FTS5.
 
-Conceptual loop:
+Canonical events include retained user turns, corrections, objectives/actions/results, artifacts/evidence, project/entity references, decisions/preferences and other retained history under policy.
+
+### Derived semantic index
+
+Qdrant OSS is the first semantic/hybrid retrieval index. It is rebuildable derived state and stores references back to canonical archive IDs.
+
+### Derived temporal/entity index
+
+Graphiti OSS + Neo4j Community are the first temporal/entity memory index. They model entities, aliases, relationships, temporal validity and supersession while retaining source-event provenance.
+
+### Replaceable ML components
+
+Embedding and reranking models are replaceable OSCAR capabilities. They may be local/self-hosted or selected through the native Model Router under policy.
+
+### Memory ownership invariant
 
 ```text
-current context + commitments
-→ detect conflict / opportunity / risk
-→ grade urgency + interruptibility
-→ Personal Policy / permission
-→ stay quiet / inform / suggest / act / interrupt
-→ verify any mutation
-→ update current state
+OSCAR Event Archive = canonical history
+Qdrant              = derived retrieval index
+Graphiti/Neo4j      = derived temporal/entity index
 ```
 
-The Executive may rearrange flexible work only when real capability and explicit policy allow it. It may never infer calendar-write or message-send authority merely because those sources are readable.
+Losing either derived index must not erase OSCAR's history. Derived indexes are rebuildable.
 
-See [CHIEF-OF-STAFF.md](CHIEF-OF-STAFF.md).
+See [MEMORY.md](MEMORY.md).
 
-## 5. Jev
+## 5. Jev — intent + epistemic + retrieval routing
 
-TypeSafe Jev decides the class of action:
+TypeSafe Jev decides what kind of evidence/action path is required:
 
 ```text
 known      → direct evidence sufficient
 world      → current World Model
-recall     → LRA/Supermemory
+recall     → OSCAR Memory Fabric
 verify     → authoritative source/test
 reason     → native Model Router
 reported   → external testimony
-specialist → Codex/computer-use/installed app/etc.
+specialist → coding/computer-use/installed app/etc.
 worker     → delegated Worker
 unknown    → retrieve/ask instead of fabricate
 ```
 
-Jev decides **whether** reasoning/retrieval/execution is needed. The Model Router decides **which** model/provider/credential only after a model path is chosen. Capability selection decides **which executor**.
+Jev also performs a **Memory Preflight**. If the request plausibly depends on previous user/project/entity/task/artifact/preference/history context, retrieval is mandatory before a historical/personal claim is generated.
 
-## 6. Epistemic Integrity
+The reasoning model does not decide whether memory exists.
+
+Retrieval escalation is bounded:
+
+```text
+active context
+→ structured OSCAR state/entities/tasks/policy
+→ Event Archive exact/FTS5
+→ Qdrant hybrid
+→ Graphiti temporal/entity
+→ alias/entity/time-range expansion
+→ bounded deep archive reconstruction
+→ UNKNOWN
+```
+
+An empty retrieval result is not proof that memory never existed.
+
+Jev, capability selection and Model Router remain separate decisions.
+
+## 6. Evidence-bound recall
+
+Historical/personal claims require evidence provenance.
+
+Conceptually a generated historical claim carries:
+
+```text
+claim
+supporting_event_ids[]
+supporting_memory_ids[]
+evidence_state
+confidence
+```
+
+OSCAR must not say or imply `I remember X` unless X was retrieved during the current reasoning path or remains in active context with source provenance.
+
+Retrieved historical information remains `RECALLED`; retrieval does not promote it to current `VERIFIED` truth.
+
+## 7. Memory formation, correction and consolidation
+
+Memory extraction is candidate formation, not automatic truth:
+
+```text
+source event
+→ extract candidate
+→ scope/classify
+→ resolve entities
+→ compare/conflict check
+→ provenance + epistemic state
+→ retention decision
+→ update derived indexes
+```
+
+Corrections preserve history:
+
+```text
+new correction
+→ link challenged fact
+→ preserve old source event
+→ supersede old current fact
+→ update temporal validity
+→ update semantic/graph indexes
+```
+
+Background consolidation may deduplicate derived memories, merge supporting evidence, resolve safe aliases, detect contradictions, maintain temporal windows, generate provenance-backed summaries and rebuild indexes. It never replaces source events.
+
+## 8. Authority and freshness
+
+Memory is evidence, not universal current truth.
+
+Default authority pattern:
+
+```text
+hard safety / permission / Personal Policy
+> current explicit owner statement for personal claims
+> live authoritative state
+> current World Model observation
+> structured OSCAR state
+> recent directly sourced episode
+> temporal graph fact with provenance
+> semantic memory
+> inferred memory
+> model prior
+```
+
+Authority is claim-specific. Live filesystem, calendar, device, weather or account state outranks memory of that state.
+
+## 9. Entity identity
+
+One real-world entity should resolve consistently across contacts, messaging identities, Voice Map, calendar, projects, repositories, tasks and devices only where evidence supports the mapping.
+
+Canonical entity records carry stable IDs, names/aliases, type, evidence, relationships and confidence. Same labels do not prove identity. Ambiguous entities remain distinct.
+
+Entity resolution improves both World Model and Memory Fabric retrieval but never fabricates identity.
+
+## 10. Epistemic Integrity
 
 Task/result states remain explicit:
 
@@ -220,94 +302,76 @@ VERIFIED
 UNKNOWN
 ```
 
-Another agent/tool/model saying `success` is evidence, not objective proof.
+Tool/model/Worker/API success is testimony, not objective proof. Model reasoning cannot promote `RECALLED`, `INFERRED` or `REPORTED` into `VERIFIED` without evidence.
 
-## 7. Memory — LRA + Supermemory
+## 11. Ambient Chief-of-Staff context
 
-LRA provides persistent single-relationship/history architecture. Supermemory is the intended semantic/profile-style backend underneath it.
-
-Memory may include episodic/project/device/procedural/profile/relationship context and provenance/confidence. Current authoritative state always outranks stale memory when current truth matters.
-
-The current Club B reference implements a local backend boundary; a real Supermemory service remains partial until actually integrated and verified.
-
-## 8. Live context and search
-
-OSCAR federates current retrieval across files, mail, messages, calendar, browser, GitHub, knowledge systems, public web/search, Sunday, desktops, Edge and Worker state.
-
-Authority is claim-specific, but a useful default is:
+OSCAR uses current World Model evidence to coordinate the user's day rather than only answer isolated prompts.
 
 ```text
-live authoritative state
-> current World Model observation
-> structured OSCAR state
-> recent episodic memory
-> semantic/derived memory
-> model prior
+current context + commitments
+→ detect conflict / opportunity / risk
+→ grade urgency + interruptibility
+→ Personal Policy / permission
+→ stay quiet / inform / suggest / act / interrupt
+→ verify mutation
+→ update current state
 ```
 
-Freshness-sensitive information is retrieved rather than guessed from stale manifests/model priors. Tavily is one replaceable search adapter, not an architectural dependency.
+The Executive may rearrange flexible work only when real capability and explicit policy allow it.
 
-## 9. Entity graph
+See [CHIEF-OF-STAFF.md](CHIEF-OF-STAFF.md).
 
-One real-world entity should resolve consistently across contacts, mail, messaging identities, Voice Map, calendar, projects, repositories, tasks and devices only where evidence supports the mapping.
-
-Same labels alone do not prove identity.
-
-## 10. Personal Policy
+## 12. Personal Policy
 
 ```text
-Memory          = what OSCAR remembers
-Persona         = how OSCAR expresses itself
-Personal Policy = how user wants OSCAR to behave
+Memory          = historical continuity/evidence
+World Model     = current truth model
+Persona         = expression
+Personal Policy = how the user wants OSCAR to behave
 Permission      = what OSCAR may do
-Protocol        = persistent autonomous responsibility
+Protocol        = durable autonomous responsibility
 ```
 
-Personal Policy can govern interruption, schedule flexibility, communications, capture/retention, Worker autonomy and remote continuation within granted capability. Policy cannot grant a missing permission.
+Personal Policy can constrain behavior but cannot grant a missing permission. Memory can suggest policy candidates but cannot silently create authority.
 
-## 11. Persona
+## 13. Executive Planner
 
-Persona may affect language, voice mode and motion amplitude. It never overrides truthfulness, safety, permission, consent or runtime state.
+Coordinates multiple objectives/commitments using priority, deadline, dependencies, flexibility, resource/device availability, cost, risk and interruptibility.
 
-See [PERSONA.md](PERSONA.md).
+It may schedule, parallelize, pause, pre-empt, reroute, defer and—where policy permits—replan flexible work. It never bypasses Jev, permissions or Personal Policy.
 
-## 12. Executive Planner
+## 14. Durable Execution Runtime
 
-Coordinates multiple objectives and commitments using priority, deadline, dependencies, flexibility, resource/device availability, cost, risk and interruptibility.
+Long-running work carries durable task state, checkpoints, dependencies, leases/ownership, heartbeat, retry budget, cancellation, deadline, execution surface, artifacts, verification and blockers.
 
-It may schedule, parallelize, pause, pre-empt, reroute, defer and—where policy permits—replan flexible schedule/task blocks. It never bypasses Jev, permissions or Personal Policy.
+Dead executors do not remain `working` forever. Ambiguous consequential work is not blindly replayed.
 
-## 13. Durable Execution Runtime
+## 15. Capability Catalog + Dynamic Tool Search
 
-Long-running work carries durable task state, checkpoints, dependencies, leases/ownership, heartbeat, retry budget, cancellation, deadline, active execution surface, artifacts, verification and blockers.
-
-Dead executors must not remain `working` forever. Ambiguous consequential work must not be blindly replayed.
-
-## 14. Capability Catalog + Dynamic Tool Search
-
-Capabilities expose lightweight searchable manifests with class, inputs/outputs, permissions/risk, surfaces, availability, latency/cost/reliability hints, undo metadata and provider/version.
+Capabilities expose searchable lightweight manifests with class, inputs/outputs, permissions/risk, surfaces, availability, latency/cost/reliability hints, undo metadata and provider/version.
 
 Detailed contracts are loaded only for relevant finalists.
 
-## 15. Native Model Router
+## 16. Native Model Router
 
-Owns provider/model/credential routing with dynamic inventory, health/availability, latency/cost/quality, account-product/quota-pool state, fallback/circuit behavior, context/tool/vision/audio metadata and route history.
+Owns provider/model/credential routing with dynamic inventory, health/availability, latency/cost/quality, account-product/quota-pool state, fallback/circuit behavior and route history.
 
 Models reason; they do not receive authority automatically.
 
-## 16. Native Transport + Capability Fabric
+## 17. Native Transport + Capability Fabric
 
-OSCAR-owned secure typed transport provides node/session identity, pairing/scoped credentials, task/event/action/result transport, capability advertisement, correlation IDs, reconnect/backoff, progress, replay protection/idempotency, version negotiation, audit/provenance and outbound-first private-device rendezvous.
+OSCAR-owned typed transport provides node/session identity, pairing/scoped credentials, task/event/action/result transport, capability advertisement, correlation IDs, reconnect/backoff, progress, replay protection/idempotency, version negotiation, audit/provenance and outbound-first private-device rendezvous.
 
-## 17. Connection Grid
+## 18. Connection Grid
 
 ### Sunday
 
-Preferred owner-control/approval surface and strongest everyday Chief-of-Staff embodiment. Can inspect/pause/cancel/revoke authorized work and approve sensitive actions. Cannot bypass local hardware safety.
+Preferred owner-control/approval surface and strongest everyday Chief-of-Staff embodiment. It can inspect/pause/cancel/revoke authorized work but cannot bypass local hardware safety.
 
 ### Cloud coordinator
 
-Replaceable rendezvous/durable coordination. May be free-tier, paid or BYOC.
+Replaceable rendezvous/durable coordination. Free-tier, paid or BYOC infrastructure is possible; cloud is not identity.
 
 ### Desktop nodes
 
@@ -317,73 +381,23 @@ High-capability execution: coding agents, terminal, filesystem, browser, compute
 
 Persistent local wake/Sentry signals, sensors/GPIO/actuators and deterministic safety/reflexes.
 
-Availability can degrade through:
+Availability can degrade:
 
 ```text
 FULL → CONNECTED → LOCAL → REFLEX_ONLY → OFFLINE
 ```
 
-Remote continuation uses the same Durable Execution Runtime. Remote wake/power is exposed only when a real mechanism exists.
-
 See [CONNECTION-GRID.md](CONNECTION-GRID.md).
 
-## 18. Action Ledger + Undo
+## 19. Action Ledger + Artifact/Result Model
 
 Consequential actions record initiator, intent, capability, permission/policy decision, target, execution state, verification state, evidence, reversibility/compensation and correlation ID.
 
-Undo exists only when a real compensation is available.
+Durable outputs are typed artifacts with provenance, ownership, location/version and verification state. Undo exists only when real compensation exists.
 
-## 19. Artifact / Result Model
+## 20. Communication
 
-Durable outputs include docs, media, code changes, deployments, meeting/call notes, Daily Journals, firmware builds, datasets/models/evaluations and other results. Artifacts carry provenance, ownership, location/version and verification state.
-
-## 20. OSCAR Edge
-
-### ESP32
-
-Network/Edge transport, wake/VAD/audio front end where practical, local events, display/status, OTA/configuration, Pico communication and optional LAN helper capability such as Wake-on-LAN.
-
-### RP2040/Pico
-
-GPIO/sensors/buttons, relays/motors/actuators, deterministic timing and local interlocks/emergency behavior.
-
-Local safety remains functional if cloud/Core/transport fails.
-
-## 21. Sunday / Android
-
-Sunday is OSCAR on the phone, not another assistant.
-
-Target platform integration, where supported and explicitly granted:
-
-- Android assistant role / voice-interaction contracts;
-- optional OSCAR Orb application overlay;
-- attention-aware overlay retreat/hide/reappearance;
-- configurable home-screen widgets;
-- notification-listener current context;
-- legitimate notification `RemoteInput` replies;
-- biometric/PIN owner approvals;
-- Connection Grid supervision;
-- calls/messages/email/meeting capability where legitimately available;
-- Sentry/capture/privacy controls.
-
-Android assistant, overlay, notification and microphone permissions remain separate. Notification visibility never implies unrestricted source-app access.
-
-See [SUNDAY-DESIGN.md](SUNDAY-DESIGN.md) and [CHIEF-OF-STAFF.md](CHIEF-OF-STAFF.md).
-
-## 22. Desktop Interaction Runtime
-
-```text
-Dictate → insert/clean speech into focused target
-Edit    → transform selected/recent text
-Ask     → answer about current context
-Act     → operate current app/device/task
-```
-
-Desktop context may include app/window, focused control, selection, cursor target, accessibility tree, screenshots, clipboard fallback and active task state.
-
-## 23. Universal Channel Gateway
-
-Communication adapters normalize supported cellular/SMS, messaging, email, work channels, social DMs/replies and meetings while preserving each channel's real limits.
+Supported communication adapters normalize calls/messages/email/meetings while preserving channel limits.
 
 Integration order:
 
@@ -395,72 +409,77 @@ native OS / official API
 → unsupported / ask
 ```
 
-## 24. Voice architecture
+Notification visibility never implies unrestricted app access.
+
+## 21. Voice / Sentry
 
 - **Voice Input** — wake, VAD, STT, barge-in, echo cancellation.
 - **Voice Identity** — stable provider-independent VoiceProfile.
 - **Voice Match** — authorization-oriented speaker evidence.
 - **Voice Map** — perception-oriented speaker context; recognition never grants permission.
-- **Self-voice suppression** — OSCAR TTS excluded from wake/Voice Map loops while preserving human barge-in.
+- **Sentry** — persistent local-first awareness when enabled.
 
-## 25. Persistent Sentry + optional capture
+Awareness, transcription, raw audio retention, transcript retention, summaries and memory extraction are separate controls.
 
-Sentry remains aware when enabled through local acoustic, device, sensor, communication and presence signals.
+## 22. Sunday / Android
+
+Sunday is OSCAR on the phone, not another assistant.
+
+Target platform integrations where legitimate and explicitly granted include assistant-role/voice interaction, optional Orb overlay, attention-aware retreat/reappearance, widgets, notification-listener context, legitimate notification replies, biometric/PIN approval and Connection Grid supervision.
+
+## 23. Desktop Interaction Runtime
 
 ```text
-Sentry Aware
-Listening
-Muted
-Acoustic Awareness Off
+Dictate → insert/clean speech into focused target
+Edit    → transform selected/recent text
+Ask     → answer about current context
+Act     → operate current app/device/task
 ```
 
-Persistent awareness does not automatically mean recording. Optional Context Capture / Daily Journal may retain selected calls/messages/mail/meetings/in-person conversations only where technically/legal/policy permitted.
+Desktop context may include app/window, focused control, selection, accessibility tree, screenshots, clipboard fallback and active task state.
 
-Raw audio, transcript, summary and memory extraction are independent controls.
+## 24. Edge
 
-## 26. Learning
+ESP32-class nodes own network/audio/event gateway responsibilities; RP2040/Pico-class controllers own deterministic physical timing, GPIO and local safety where used. Local safety remains functional if cloud/Core/transport fails.
 
-Verified successful paths may become candidate Skills/routines/Protocols only after parameterization, evaluation and permission review. One success is not enough to create a trusted default.
+## 25. Learning
 
-## 27. Self-maintenance
+Verified successful paths may become candidate Skills/routines/Protocols only after parameterization, evaluation and permission review. One successful run is not enough for trusted promotion.
 
-OSCAR monitors provider/auth health, Grid connectivity, capability staleness, task leases, Edge health, storage/state and repeated Worker failures. Safe bounded recovery may occur automatically; otherwise ask for minimum user intervention.
+## 26. Self-maintenance
+
+OSCAR monitors provider/auth health, Grid connectivity, capability staleness, task leases, Edge health, storage state, Memory Fabric index health/drift and repeated Worker failures. Safe bounded repair/rebuild may occur automatically where authorized.
 
 ## Current implementation boundary
 
 ### Gate A
 
-PASS for the current Brain foundation: Core Loop/Jev/reference Grid, adaptive model routing and real source-qualified search/freshness acceptance are verified for their documented scope.
+**PASS.** Core Loop/Jev/reference Grid, adaptive model routing and source-qualified search/freshness acceptance are verified for their documented scope.
 
 ### Gate B
 
-PARTIAL. The merged reference foundation includes:
+**PARTIAL.** Verified scoped work includes native Windows file/process/Git execution, useful Codex delegation with independent verification, cancellation, coordinator/Worker restart/recovery, ambiguous mutation blocking, local selected memory continuity and bounded owner-reviewed policy authoring.
 
-- Connector Fabric namespaced capabilities through existing Grid/Dispatcher contracts;
-- transient task-owned private connector input;
-- manifest/account/resource/executor-bound readback verification;
-- POSIX reference machine Worker with files/Git/terminal and separate-process continuation;
-- local selected memory, explicit structured Personal Policy and entity continuity.
+Gate B completion still requires the planned Slice 05/06 work: typed PowerShell, installed-app discovery, Windows UI Automation/computer use, browser capability, owner-control continuation, production Memory Fabric, open-ended policy, real private OAuth/connector acceptance, secure credential-storage boundary and live-authority-vs-memory federation.
 
-The local Windows pass verifies native Worker execution, useful Codex work, independent behavioral/Git verification, actual coordinator/Worker OS-process restart and bounded owner-reviewed policy authoring. Still partial: browser/computer use, private account/OAuth flows, Supermemory and open-ended policy interpretation. See the local checkpoint below the preserved reference evidence.
-
-See [CLUB-B-CHECKPOINT.md](CLUB-B-CHECKPOINT.md).
+No Slice 07 work begins until Gate B mandatory acceptance passes.
 
 ## Architecture invariants
 
 1. One intelligence, many embodiments.
-2. No ordinary desktop is the permanent host.
-3. Sunday is owner control, not hardware-safety override.
+2. One continuing user relationship/interaction point.
+3. No ordinary desktop is the permanent host.
 4. Cloud is replaceable infrastructure.
 5. Edge safety is local/deterministic.
-6. Current World Model state is not memory.
-7. Tool/model/Worker success is not verified completion.
-8. Capability availability is discovered, not assumed.
-9. Persona changes expression, never truth/authority.
-10. Sentry awareness and recording are different permissions/modes.
-11. Remote-control/power claims require real current capabilities.
-12. Latch/SwitchRoute remain reference sources, not runtime dependencies.
-13. Freshness-sensitive current facts use current authoritative evidence when reasonably available.
-14. `CAN PERCEIVE`, `CAN RETAIN` and `CAN ACT` are independent boundaries.
-15. Chief-of-Staff proactivity is attention-aware and policy-bounded.
-16. Notification access never implies unrestricted access to the source app.
+6. World Model current state is distinct from historical memory.
+7. OSCAR Event Archive is canonical memory history; vector/graph indexes are derived/rebuildable.
+8. Personal/historical recall claims require retrieved evidence provenance.
+9. Failed memory retrieval is not proof of absence.
+10. Tool/model/Worker success is not verified completion.
+11. Capability availability is discovered, not assumed.
+12. Persona changes expression, never truth/authority.
+13. Sentry awareness and recording are different permissions/modes.
+14. Freshness-sensitive current facts use live authoritative evidence when reasonably available.
+15. `CAN PERCEIVE`, `CAN RETAIN` and `CAN ACT` are independent boundaries.
+16. Notification access never implies unrestricted source-app access.
+17. A gate is completed end-to-end before development advances to the next Club unless the owner explicitly changes the plan.
