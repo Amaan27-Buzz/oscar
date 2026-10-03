@@ -8,24 +8,24 @@ OSCAR keeps one canonical project truth and uses thin agent-specific adapters. D
 |---|---|
 | `AGENTS.md` | repository-wide workflow, truth, safety and coding-agent rules |
 | `ENGINEERING.md` | system-design/code-quality standard |
-| `DESIGN.md` | normative visual tokens and durable design rules |
-| `TASTE.md` | qualitative quality / motion / anti-slop bar |
+| `DESIGN.md` | visual tokens and durable design rules |
+| `TASTE.md` | qualitative quality/motion/anti-slop bar |
 | `docs/PRODUCT.md` | product north star |
-| `docs/CHIEF-OF-STAFF.md` | ambient context, commitments, schedule/proactivity and Sunday system-presence contract |
+| `docs/CHIEF-OF-STAFF.md` | ambient context, commitments, schedule/proactivity and Sunday presence |
 | `docs/ARCHITECTURE.md` | system boundaries and ownership |
+| `docs/MEMORY.md` | OSCAR-owned one-relationship Memory Fabric |
 | `docs/ROADMAP.md` | implementation order/current slice |
 | `docs/BUILD-GATES.md` | cross-slice manual verification checkpoints |
 | `docs/DECISIONS.md` | durable architecture decisions |
 | `docs/EPISTEMIC-INTEGRITY.md` | evidence/verification/non-yes-man contract |
 | `docs/RUNTIME-FOUNDATIONS.md` | durable tasks, capabilities, channels, artifacts and automation evaluation |
-| `docs/NATIVE-INFRASTRUCTURE.md` | native transport and model-routing infrastructure |
-| `docs/CONNECTION-GRID.md` | Sunday/cloud/desktop/Edge availability and remote-control fabric |
+| `docs/NATIVE-INFRASTRUCTURE.md` | native transport/model-routing infrastructure |
+| `docs/CONNECTION-GRID.md` | Sunday/cloud/desktop/Edge availability/control fabric |
 | `docs/MODEL-ROUTING.md` | provider/model/credential routing |
 | `docs/SEARCH-FRESHNESS.md` | current-source/freshness authority contract |
-| `docs/MEMORY.md` | LRA/Supermemory continuity |
 | `docs/PERSONAL-POLICY.md` | explicit user behavioral rules |
 | `docs/PERSONA.md` | configurable OSCAR character/presentation |
-| `docs/VOICE-SENTRY.md` | voice layers, persistent Sentry and optional continuity capture |
+| `docs/VOICE-SENTRY.md` | voice layers, persistent Sentry and optional capture |
 | `docs/COMMUNICATION.md` | calls/messages/email/meetings/dictation/capture |
 | `docs/CONNECTOR-FABRIC.md` | structured service/API connector boundary |
 | `docs/WORKERS.md` | delegated Worker lifecycle/recovery |
@@ -36,17 +36,24 @@ OSCAR keeps one canonical project truth and uses thin agent-specific adapters. D
 | `docs/ONBOARDING.md` | commissioning |
 | `docs/SECURITY.md` | permissions, transport, capture/Grid security |
 | `docs/FEATURES.md` | comprehensive capability backlog |
-| `docs/CLUB-A-CHECKPOINT.md` | historical Gate A evidence and corrections |
-| `docs/CLUB-B-CHECKPOINT.md` | historical/current Club B evidence and limits |
+| `docs/CLUB-A-CHECKPOINT.md` | historical Gate A evidence/corrections |
+| `docs/CLUB-B-CHECKPOINT.md` | historical/current Gate B evidence and limits |
 | `image-prompts/` | optional visual-reference prompt library, not implementation truth |
 
-Agent-specific files should point back to these rather than becoming independent product definitions.
+Agent-specific files point back to these rather than becoming independent definitions.
 
 ## Context loading
 
-More context is not automatically better. Load `AGENTS.md`, `ENGINEERING.md`, `docs/EPISTEMIC-INTEGRITY.md` and the relevant domain docs.
+More context is not automatically better. Load `AGENTS.md`, `ENGINEERING.md`, `docs/EPISTEMIC-INTEGRITY.md` and relevant domain docs.
 
-### Ambient / schedule / proactive assistance / Sunday context
+### Memory / continuity / entities
+
+- `docs/MEMORY.md`
+- `docs/PERSONAL-POLICY.md`
+- `docs/ARCHITECTURE.md`
+- `docs/CLUB-B-CHECKPOINT.md` for current acceptance evidence.
+
+### Ambient / schedule / Sunday
 
 - `docs/CHIEF-OF-STAFF.md`
 - `docs/SUNDAY-DESIGN.md`
@@ -55,27 +62,26 @@ More context is not automatically better. Load `AGENTS.md`, `ENGINEERING.md`, `d
 - `docs/SURFACES.md`
 - `docs/SECURITY.md`
 
-### Transport / remote nodes / availability
+### Transport / remote nodes
 
 - `docs/NATIVE-INFRASTRUCTURE.md`
 - `docs/CONNECTION-GRID.md`
 - `docs/RUNTIME-FOUNDATIONS.md`
 - `docs/SECURITY.md`
 
-### Model providers / current facts / credentials
+### Model providers / current facts
 
 - `docs/MODEL-ROUTING.md`
 - `docs/SEARCH-FRESHNESS.md`
 - `docs/NATIVE-INFRASTRUCTURE.md`
 - `docs/EPISTEMIC-INTEGRITY.md`
 
-### Voice / Sentry / capture / communication
+### Voice / Sentry / capture
 
 - `docs/VOICE-SENTRY.md`
 - `docs/COMMUNICATION.md`
 - `docs/SECURITY.md`
-- relevant surface docs;
-- `docs/ONBOARDING.md` for commissioning.
+- relevant surface docs.
 
 ### Persona / UI / motion
 
@@ -84,13 +90,6 @@ More context is not automatically better. Load `AGENTS.md`, `ENGINEERING.md`, `d
 - `TASTE.md`
 - `docs/SUNDAY-DESIGN.md`
 - `docs/UI-AVATAR.md`
-- relevant surfaces.
-
-### Memory / policy / entities
-
-- `docs/MEMORY.md`
-- `docs/PERSONAL-POLICY.md`
-- `docs/PERSONA.md` when presentation and behavior risk being conflated.
 
 ### Workers / orchestration
 
@@ -98,34 +97,68 @@ More context is not automatically better. Load `AGENTS.md`, `ENGINEERING.md`, `d
 - `docs/ORCHESTRATION.md`
 - `docs/RUNTIME-FOUNDATIONS.md`
 
-### Current Gate B work
+## Durable development rule
 
-- `docs/CLUB-B-CHECKPOINT.md`
-- `docs/CONNECTOR-FABRIC.md`
-- `docs/ROADMAP.md`
-
-## Durable architectural rules
-
-### Native infrastructure
-
-Do not revive separate Latch/SwitchRoute runtime dependencies.
+Finish the current planned gate end-to-end before advancing to the next Club.
 
 ```text
-Latch architecture/logic       → OSCAR Transport + Capability Fabric
-SwitchRoute architecture/logic → OSCAR Model Router
+implement
+→ verify required scenarios
+→ integrate
+→ update evidence/docs
+→ PASS
+→ next Club
 ```
 
-### Three routing decisions remain separate
+Do not use an alpha/demo deadline as justification for silently turning mandatory work into future hardening.
+
+## Memory architecture
+
+OSCAR owns memory continuity.
 
 ```text
-Jev                  → what class of action is needed?
+one interaction point
+→ Active Context
+→ canonical OSCAR Event Archive (SQLite/WAL/FTS5 initially)
+→ derived Qdrant semantic/hybrid index
+→ derived Graphiti + Neo4j temporal/entity index
+→ Retrieval Fusion / local reranker
+→ Jev Memory Preflight + authority checks
+→ Context Assembly
+→ reasoning/action
+→ Claim Verification
+```
+
+Rules:
+
+- canonical Event Archive survives derived-index replacement/loss;
+- Qdrant/Graphiti/Neo4j are rebuildable indexes, not truth owners;
+- no managed memory service is mandatory;
+- personal/history references trigger Jev retrieval before reasoning;
+- failed first retrieval is not proof of absent memory;
+- retrieval broadens through structured state → FTS/archive → Qdrant → Graphiti → aliases/time expansion → bounded deep archive → UNKNOWN;
+- no `I remember X` without actually retrieved/active evidence;
+- personal/historical claims retain source IDs;
+- live authoritative current state outranks stale recall;
+- memory extraction creates candidates with provenance, never unsupported truth;
+- corrections supersede prior current facts while preserving historical source events;
+- memory cannot grant permission or create Personal Policy.
+
+See `docs/MEMORY.md`.
+
+## Routing boundaries
+
+```text
+Jev                  → what class of action/evidence is needed?
 Capability selection → which executor/tool/device should act?
 Model Router         → which provider/model/credential should reason?
 ```
 
 Coding agents, terminal, computer use and installed applications are executable capabilities, not provider keys.
 
-### Connection Grid
+Memory retrieval is also not model routing: Jev can require recall before any reasoning model is selected.
+
+## Connection Grid
 
 ```text
 Sunday      = preferred owner control / approvals / notifications
@@ -134,19 +167,55 @@ Desktop     = high-capability execution
 Edge        = local awareness / reflex / safety
 ```
 
-No desktop is a hidden permanent host. Nodes advertise only real capabilities. Executor loss expires leases rather than leaving false `working` state. Power/wake claims require a real current capability.
+No desktop is a hidden permanent host. Executor loss expires leases rather than leaving false `working` state. Power/wake claims require real current capability.
 
-### Chief of Staff
+## Chief of Staff
 
-OSCAR should coordinate authorized current context across time/weather/calendar/tasks/notifications/communication/device/activity/Workers rather than behave only as a prompt-response app.
+OSCAR coordinates authorized current context across time/weather/calendar/tasks/notifications/communication/device/activity/Workers rather than behaving only as prompt-response software.
 
 ```text
 CAN PERCEIVE ≠ CAN RETAIN ≠ CAN ACT
 ```
 
-Current decisions are freshness-qualified. Proactivity is graded from silent observation through inform/suggest/act/interrupt. Schedule/message mutations require explicit authority and verification.
+Current decisions are freshness-qualified. Proactivity is graded from silent observation through inform/suggest/act/interrupt. Mutations require authority and verification.
 
-### Sentry / capture
+## World Model vs Memory
+
+```text
+World Model = what is true now from current evidence
+Memory      = historical continuity/evidence
+```
+
+Do not answer current-state questions from stale memory when a live source is reasonably available.
+
+## Persona / Policy / Permission
+
+```text
+Persona         = how OSCAR expresses itself
+Personal Policy = how user wants OSCAR to behave
+Permission      = what OSCAR may do
+Memory          = what OSCAR retains/recalls
+```
+
+None silently substitutes for another.
+
+## Freshness
+
+When current truth matters, use current authoritative sources where reasonably obtainable. Cached manifests, memory and model priors do not become current truth merely because they are convenient.
+
+## Evidence / completion
+
+For meaningful work:
+
+1. define observable completion;
+2. execute;
+3. inspect authoritative resulting state;
+4. run relevant tests/device/visual/source checks;
+5. report the strongest claim evidence supports.
+
+Worker/model/tool success is testimony until independently verified where practical.
+
+## Sentry / capture
 
 Keep separate:
 
@@ -161,67 +230,31 @@ Daily Journal
 
 Awareness does not automatically mean recording. Raw audio, transcript, summary and memory extraction are separate retention decisions.
 
-### Persona
-
-```text
-Persona         = how OSCAR expresses itself
-Personal Policy = how user wants OSCAR to behave
-Permission      = what OSCAR may do
-Memory          = what OSCAR retains/recalls
-```
-
-Persona never lowers truth, safety, consent or authority requirements.
-
-### Freshness
-
-When current truth matters, use current authoritative sources where reasonably obtainable. Cached manifests, memory and model priors do not become current truth merely because they are convenient.
-
-### Evidence / completion
-
-For meaningful work:
-
-1. define observable completion;
-2. execute;
-3. inspect authoritative resulting state;
-4. run relevant tests/device/visual/source checks;
-5. report the strongest claim evidence supports.
-
-Worker/model/tool success is testimony until the objective is independently verified where practical.
-
 ## Design direction
 
 Canonical direction is **Quietly Alive + Playful Precision**.
 
-- 70% restraint/whitespace;
-- 20% tactile industrial precision;
-- 10% approachable personality;
-- warm cream/off-white materials;
-- graphite typography;
-- OSCAR blue/yellow reserved for identity/presence/state;
-- fluid shared-geometry motion;
-- weighted avatar/puck;
-- progressive disclosure.
-
-Simplicity must preserve craftsmanship. Avoid generic AI dashboards, permanent chat sidebars, card walls, glass/neon/purple gradients, obvious neumorphism, fake telemetry and mascot-led layouts.
+Avoid generic AI dashboards, permanent chat sidebars, card walls, glass/neon/purple gradients, fake telemetry and mascot-led layouts. Simplicity must preserve craftsmanship.
 
 ## Adapter files are intentional
 
 - `AGENTS.md` is canonical for AGENTS-aware coding agents.
-- `CLAUDE.md`, `GEMINI.md`, Copilot instructions and Cursor rules are deliberately thin adapters.
-- Do **not** delete them as redundant merely because they point to the same canonical rules.
-- Historical Gate/checkpoint/evidence docs are provenance and should not be deleted as `old docs` unless their evidence has been explicitly archived elsewhere.
+- `CLAUDE.md`, `GEMINI.md`, Copilot instructions and Cursor rules are thin adapters.
+- Do not delete them merely because they point to shared canonical rules.
+- Historical Gate/checkpoint/evidence docs are provenance and should not be deleted as `old docs`; supersede stale plans explicitly.
 
 ## Propagation rules
 
-When a durable rule changes, update the canonical owner first and reconcile only affected docs/adapters.
+When a durable rule changes, update the canonical owner first and reconcile affected docs/adapters.
 
-- ambient Chief-of-Staff/context/schedule → `CHIEF-OF-STAFF.md`, then Product/Architecture/Roadmap/Sunday/Surfaces/Policy/Communication/Security as affected;
-- Connection Grid/availability → `CONNECTION-GRID.md` + affected architecture/security/surface docs;
-- Sentry/capture → `VOICE-SENTRY.md` + Communication/Security/Onboarding/relevant surfaces;
+- memory/continuity/retrieval → `MEMORY.md`, then Product/Architecture/Epistemic/Roadmap/Build Gates/Features/Agents as affected;
+- Chief-of-Staff/context/schedule → `CHIEF-OF-STAFF.md` plus affected product/surface/policy docs;
+- Grid/availability → `CONNECTION-GRID.md` + affected architecture/security/surface docs;
+- Sentry/capture → `VOICE-SENTRY.md` + Communication/Security/Onboarding;
 - Persona → `PERSONA.md` + affected product/policy/surface docs;
-- model routing/freshness → `MODEL-ROUTING.md` + `SEARCH-FRESHNESS.md` + affected infrastructure/roadmap docs;
-- system-wide design → `DESIGN.md` + `TASTE.md` + affected surface docs;
+- model routing/freshness → `MODEL-ROUTING.md` + `SEARCH-FRESHNESS.md`;
+- system design → `DESIGN.md` + `TASTE.md`;
 - engineering invariant → `ENGINEERING.md`;
-- architecture invariant → `DECISIONS.md` plus affected architecture/domain docs.
+- architecture decision → `DECISIONS.md` plus affected domain docs.
 
-After propagation, re-read the resulting canonical files before claiming completion.
+After propagation, re-read canonical files before claiming completion.
