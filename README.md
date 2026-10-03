@@ -4,7 +4,7 @@
 
 <h1 align="center">OSCAR</h1>
 
-<p align="center"><strong>A persistent, multimodal, agentic intelligence spanning phone, computers, communications, environment and physical hardware.</strong></p>
+<p align="center"><strong>A persistent, multimodal, agentic personal intelligence spanning phone, computers, communications, environment and physical hardware.</strong></p>
 
 <p align="center"><code>Persistent</code> · <code>Context-aware</code> · <code>Agentic</code> · <code>Immediate</code> · <code>Learning</code> · <code>Evidence-backed</code></p>
 
@@ -12,15 +12,74 @@
 
 ## What OSCAR is
 
-OSCAR is a practical interpretation of the *idea* behind JARVIS: one intelligence that can perceive current context, reason, communicate, use tools, delegate work, operate software/hardware, keep working in the background, coordinate the user's day and appear through whichever trusted device is available.
+OSCAR is a practical interpretation of the idea behind JARVIS: one intelligence that can perceive current context, reason, communicate, use tools, delegate work, operate software/hardware, keep working in the background, coordinate the user's day and appear through whichever trusted device is available.
 
-It is **not** a chatbot with a wake word, a laptop-only agent or a decorative orb.
+It is **not** a conventional chat app, a laptop-only agent, a wrapper around one model provider or a decorative orb.
 
 OSCAR's truth rule:
 
 > **Know what you know, know why you know it, verify what can be verified, and never claim more than the evidence supports.**
 
-A tool, Worker or model saying `success` is not automatically proof that the objective is complete.
+Tool, Worker, model or API success is evidence, not automatic proof that the objective is complete.
+
+## One relationship, one interaction point
+
+OSCAR is designed as one continuous relationship rather than a collection of disconnected chats.
+
+```text
+You ↔ OSCAR
+```
+
+Text, voice, Sunday, desktop, communications, Workers and Edge all contribute to the same continuity where policy permits. Internally OSCAR segments events, episodes, objectives, entities and memories for retrieval and scaling, but the user should not have to find an old chat to recover context.
+
+The canonical history belongs to OSCAR. Managed memory vendors are optional, never required infrastructure.
+
+See [`docs/MEMORY.md`](docs/MEMORY.md).
+
+## OSCAR Memory Fabric
+
+The long-term memory architecture is self-hostable and vendor-independent:
+
+```text
+Active Context
+      ↓
+OSCAR Event Archive
+SQLite + WAL + FTS5
+canonical history/provenance
+      ↓
+Memory Formation
+  ┌───┴──────────────┐
+  ↓                  ↓
+Qdrant OSS       Graphiti OSS
+hybrid semantic  temporal/entity
+retrieval        relationships
+                     ↓
+               Neo4j Community
+  └──────┬───────────┘
+         ↓
+Retrieval Fusion + reranker
+         ↓
+Jev Memory Preflight
+         ↓
+Context Assembly
+         ↓
+Reason / Act
+         ↓
+Claim Verification
+```
+
+Key rules:
+
+- the Event Archive is canonical; Qdrant/Graphiti are rebuildable indexes;
+- Jev decides when recall is mandatory before reasoning;
+- personal/historical claims require source event/memory evidence;
+- an empty retrieval is not proof that the memory never existed;
+- live authoritative state outranks stale recall;
+- corrections supersede previous facts temporally instead of silently rewriting history;
+- inference never silently becomes fact;
+- OSCAR never says `I remember X` unless X was actually retrieved or remains in active context with provenance.
+
+The previous planned Supermemory dependency has been retired.
 
 ## Ambient Chief of Staff
 
@@ -39,7 +98,7 @@ Workers / Protocols
 Sentry / Edge observations
 ```
 
-The goal is not to dump this information back to the user. OSCAR should combine it into useful decisions: protect focus time, detect schedule conflicts, manage flexible blocks, surface changed commitments, account for travel/weather, summarize what was missed and update tasks/calendar when policy allows.
+The goal is not to dump context back to the user. OSCAR should combine it into useful decisions: protect focus time, detect schedule conflicts, manage flexible blocks, surface changed commitments, account for travel/weather, summarize what was missed and update tasks/calendar when policy allows.
 
 Proactivity is graduated:
 
@@ -56,8 +115,6 @@ A core privacy/authority rule is:
 ```text
 CAN PERCEIVE ≠ CAN RETAIN ≠ CAN ACT
 ```
-
-Notification access does not imply permission to store or reply. Calendar read access does not imply permission to modify. Microphone permission does not imply continuous transcription or raw-audio retention.
 
 See [`docs/CHIEF-OF-STAFF.md`](docs/CHIEF-OF-STAFF.md).
 
@@ -78,11 +135,11 @@ See [`docs/CHIEF-OF-STAFF.md`](docs/CHIEF-OF-STAFF.md).
 ```
 
 - **Sunday** — OSCAR on the phone; preferred owner-control, approval, notification and Chief-of-Staff surface.
-- **Cloud** — replaceable free-tier/paid/BYOC rendezvous and durable coordination.
-- **Desktop** — optional high-capability execution: Codex, terminal, filesystem, browser/computer use, apps, GPU/local models.
-- **Edge** — ESP32/Pico local wake, sensors, GPIO, reflexes and deterministic safety.
+- **Cloud** — replaceable rendezvous/durable coordination.
+- **Desktop** — optional high-capability execution: coding agents, terminal, filesystem, browser/computer use, installed apps, GPU/local models.
+- **Edge** — persistent local wake, sensors, GPIO, reflexes and deterministic safety.
 
-No ordinary laptop/desktop is OSCAR's permanent host. Losing one node should reduce capability, not silently erase OSCAR.
+No ordinary laptop/desktop is OSCAR's permanent host. Losing one node should reduce capability rather than erase OSCAR.
 
 See [`docs/CONNECTION-GRID.md`](docs/CONNECTION-GRID.md).
 
@@ -92,31 +149,31 @@ Sunday should feel **present, not launched**.
 
 On Android, the product direction is to use legitimate platform capabilities where supported and explicitly granted:
 
-- selected assistant role / voice-interaction architecture;
-- an optional OSCAR Orb application overlay;
+- selected assistant/voice-interaction role;
+- optional OSCAR Orb overlay;
 - attention-aware Orb retreat during video, reading, presentation or focus contexts;
-- hidden edge/hotspot/assistant/voice invocation and natural reappearance;
+- edge/hotspot/assistant/voice invocation and natural reappearance;
 - configurable home-screen widgets;
 - notification-listener context;
-- real notification reply actions when exposed;
+- legitimate notification reply actions when exposed;
 - biometric/PIN confirmation for sensitive owner actions.
 
-Notification visibility is not unrestricted WhatsApp/app access. OEM/device behavior remains unverified until tested on target hardware.
+Notification visibility is not unrestricted source-app access. OEM/device behavior remains unverified until tested on target hardware.
 
 See [`docs/SUNDAY-DESIGN.md`](docs/SUNDAY-DESIGN.md), [`docs/SURFACES.md`](docs/SURFACES.md) and [`docs/CHIEF-OF-STAFF.md`](docs/CHIEF-OF-STAFF.md).
 
 ## Native infrastructure
 
-OSCAR does **not** require the separate Latch or SwitchRoute projects as runtime products.
+OSCAR does not require the separate Latch or SwitchRoute projects as runtime products.
 
 ```text
 Latch ideas/logic       → native OSCAR Transport + Capability Fabric
 SwitchRoute ideas/logic → native OSCAR Model Router
 ```
 
-Providers, models and credentials are replaceable runtime resources. Jev decides whether reasoning/retrieval/execution is needed; the Model Router only chooses a provider/model after a model path is selected.
+Jev decides whether OSCAR should execute, retrieve, verify, reason, delegate or ask. Capability selection chooses the executor. The Model Router chooses a provider/model only after a model path is selected.
 
-Freshness-sensitive questions must use current authoritative evidence when reasonably available. Provider manifests are bootstrap metadata, not permanent truth.
+Freshness-sensitive questions use current authoritative evidence when reasonably available. Provider manifests and memory are not permanent truth.
 
 See [`docs/NATIVE-INFRASTRUCTURE.md`](docs/NATIVE-INFRASTRUCTURE.md), [`docs/MODEL-ROUTING.md`](docs/MODEL-ROUTING.md) and [`docs/SEARCH-FRESHNESS.md`](docs/SEARCH-FRESHNESS.md).
 
@@ -127,9 +184,11 @@ User / Environment
       ↓
 Perception Fabric → World Model
       ↓
-     Jev
-      ↓
-Memory / Live Context / Search / Model Router
+Jev
+      ├─ current/live retrieval
+      ├─ OSCAR Memory Fabric
+      ├─ capability selection
+      └─ Model Router when reasoning is needed
       ↓
 OSCAR Executive + Personal Policy
       ↓
@@ -150,106 +209,91 @@ World Model / Memory update
 evidence-backed result
 ```
 
-## Voice, Sentry and continuity
-
-```text
-Voice Input     = wake / VAD / STT / barge-in
-OSCAR Voice     = stable provider-independent voice identity
-Voice Match     = authorization-oriented speaker evidence
-Voice Map       = perception-oriented speaker context
-Sentry          = persistent local-first awareness
-```
-
-Keep these product states distinct:
-
-```text
-Sentry Aware
-Listening
-Muted
-Acoustic Awareness Off
-Context Capture
-Daily Journal
-```
-
-Persistent awareness does not automatically mean persistent recording. Raw audio, transcript, summary and memory extraction each have separate controls.
-
-See [`docs/VOICE-SENTRY.md`](docs/VOICE-SENTRY.md), [`docs/COMMUNICATION.md`](docs/COMMUNICATION.md) and [`docs/SECURITY.md`](docs/SECURITY.md).
-
-## Persona and Personal Policy
+## Persona, policy and voice
 
 ```text
 Persona         = how OSCAR expresses itself
 Personal Policy = how the user wants OSCAR to behave
 Permission      = what OSCAR may do
 Memory          = what OSCAR retains/recalls
+World Model     = what OSCAR currently believes is true from live evidence
 ```
 
-Persona may be witty, solemn, warm, formal, blunt or custom. **Truthfulness is not a slider.** Persona never changes factual integrity, permissions, required confirmation or safety.
+Truthfulness is not a Persona slider. Persona never changes factual integrity, permissions, required confirmation or safety.
 
-Personal Policy can govern interruption, schedule flexibility, communications, capture, Worker autonomy, remote continuation and other behavior within granted capability.
+Voice remains split into Voice Input, stable OSCAR Voice Identity, Voice Match for authorization evidence and Voice Map for perception/context. Recognition never grants authority by itself.
 
-See [`docs/PERSONA.md`](docs/PERSONA.md) and [`docs/PERSONAL-POLICY.md`](docs/PERSONAL-POLICY.md).
+See [`docs/PERSONA.md`](docs/PERSONA.md), [`docs/PERSONAL-POLICY.md`](docs/PERSONAL-POLICY.md) and [`docs/VOICE-SENTRY.md`](docs/VOICE-SENTRY.md).
 
 ## Core capability map
 
 | Area | Direction |
 |---|---|
-| Chief of Staff | Time/weather/calendar/tasks/notifications/context → schedule/task/communication coordination within policy |
+| Chief of Staff | Current context → schedule/task/communication coordination within policy |
+| Memory Fabric | OSCAR Event Archive + FTS5 + Qdrant + Graphiti/Neo4j + Jev evidence-bound recall |
 | Connection Grid | Sunday + replaceable cloud + Desktop + Edge availability/control fabric |
-| Epistemic Integrity | Known/inferred/recalled/reported/verified/unknown remain distinct |
-| Jev | Decide execute/retrieve/verify/reason/delegate/ask path |
-| Search / freshness | Current authoritative evidence outranks stale manifests/model priors |
-| Model Router | Adaptive provider/model/credential routing with real health/quota/funding evidence |
+| Epistemic Integrity | KNOWN/INFERRED/RECALLED/REPORTED/VERIFIED/UNKNOWN remain distinct |
+| Jev | Decide execute/retrieve/verify/reason/delegate/ask; mandatory memory preflight when needed |
+| Search/freshness | Current authoritative evidence outranks stale manifests/model priors/memory |
+| Model Router | Adaptive provider/model/credential routing with health/quota/funding evidence |
 | Machine Workers | Filesystem/Git/terminal/Codex/browser/apps as discovered capabilities |
 | Sunday | Android embodiment, assistant presence, Orb/widgets, notifications, owner control |
 | Desktop | Dictate / Edit / Ask / Act + machine capability surface |
 | World Model | Live current-state graph with freshness/provenance |
-| LRA + Supermemory | Historical/personal continuity; never current authority by itself |
 | Communication | Calls/messages/email/meetings/dictation/follow-up where supported |
 | Voice/Sentry | Persistent local awareness, stable voice identity, barge-in, capture controls |
 | Workers/Executive | Durable delegated responsibilities + priority/dependency coordination |
 | Edge | Sensors/GPIO/actuators with deterministic local safety |
 | Learning | Verified procedures become evaluated reusable Skills/Protocols |
 
-## Design language
+## Development rule
 
-OSCAR uses **Quietly Alive + Playful Precision**:
+A gate is not skipped because a partial foundation is good enough for a demo.
 
-- 70% restraint / whitespace;
-- 20% tactile industrial precision;
-- 10% approachable personality;
-- warm cream/off-white materials + graphite typography;
-- OSCAR blue/yellow reserved for identity/presence/state;
-- shared geometry and weighted physical motion;
-- no generic AI dashboard, card wall, glass/neon/purple-gradient slop or fake telemetry.
+```text
+implement planned slice/gate end-to-end
+→ verify it
+→ integrate it
+→ update canonical docs/evidence
+→ advance
+→ later harden/expand the completed system
+```
 
-> **State A should physically become State B where practical.**
-
-Simplicity must never become lack of craftsmanship.
-
-See [`DESIGN.md`](DESIGN.md), [`TASTE.md`](TASTE.md), [`docs/SUNDAY-DESIGN.md`](docs/SUNDAY-DESIGN.md) and [`docs/UI-AVATAR.md`](docs/UI-AVATAR.md).
+Anything unavailable or genuinely blocked remains explicit, but planned mandatory work is not silently deferred to make the roadmap look faster.
 
 ## Current build status
 
-The repository foundation and Club A Brain are merged into `main`.
+- **Gate A — PASS.** Core Loop, TypeSafe Jev, reference Transport/Grid, adaptive model routing, real multi-provider evidence and source-qualified live search/freshness acceptance are accepted for their documented scope.
+- **Gate B — PARTIAL.** Native Windows Worker, useful Codex delegation with independent verification, cancellation, process restart/recovery, ambiguity blocking, local memory continuity and bounded owner-confirmed policy interpretation are verified for their documented scope.
 
-- **Gate A — PASS** for the current Club A foundation: Core Loop, TypeSafe Jev, reference Transport/Grid, adaptive model routing, real multi-provider evidence and source-qualified Tavily/live-search acceptance.
-- **Gate B — PARTIAL**: the reviewed Club B reference foundation is merged. Separate-process POSIX Worker, Git/file/terminal reference execution, restart/reclaim, local memory/Personal Policy/entity continuity and Connector Fabric are verified for their scoped reference cases. The local Windows pass verifies native file/process/Git work, a useful authenticated Codex fix with independent tests, process restart/recovery and a bounded owner-confirmed policy interpretation. Browser/computer use, private service accounts/OAuth and Supermemory remain outstanding.
+Gate B is not complete yet. Remaining planned work includes:
 
-The detailed evidence and limitations live in [`docs/CLUB-A-CHECKPOINT.md`](docs/CLUB-A-CHECKPOINT.md) and [`docs/CLUB-B-CHECKPOINT.md`](docs/CLUB-B-CHECKPOINT.md).
+- typed PowerShell/terminal acceptance;
+- installed-application catalog;
+- Windows UI Automation/computer-use;
+- typed browser runtime and independent verification;
+- owner-control long-running continuation/reconnect;
+- production OSCAR Memory Fabric (Event Archive/FTS5 + Qdrant + Graphiti/Neo4j + Jev recall/claim controls + evaluation);
+- open-ended Personal Policy interpretation/confirmation;
+- real private connector/OAuth lifecycle and secure credential-storage boundary;
+- live-context federation proving current authoritative state beats stale recall.
+
+Club C does not start until Gate B's required acceptance is complete.
+
+See [`docs/CLUB-A-CHECKPOINT.md`](docs/CLUB-A-CHECKPOINT.md), [`docs/CLUB-B-CHECKPOINT.md`](docs/CLUB-B-CHECKPOINT.md), [`docs/ROADMAP.md`](docs/ROADMAP.md) and [`docs/BUILD-GATES.md`](docs/BUILD-GATES.md).
 
 ## Roadmap
 
 | Slice | Deliverable | Status |
 |---:|---|---|
 | 00 | Repository/architecture foundation | ✅ Complete |
-| 01 | OSCAR Core Loop | ✅ Verified scoped foundation |
-| 02 | TypeSafe Jev | ✅ Verified typed/freshness foundation |
-| 03 | Native Transport + Catalog + Grid foundation | Reference verified; public deployment partial |
-| 04 | Native Model Router + cloud intelligence | ✅ Gate A accepted; broader deployment/metadata evolves |
-| 05 | Real machine Worker + remote continuation | Reference verified; Windows/real specialist/browser partial |
-| 06 | LRA/Supermemory + Personal Policy + live context | Local/reference verified; Supermemory/OAuth/NL policy partial |
-| 07 | OSCAR Edge + reflexes | Planned |
+| 01 | OSCAR Core Loop | ✅ Verified foundation |
+| 02 | TypeSafe Jev | ✅ Verified foundation |
+| 03 | Native Transport + Catalog + Grid foundation | 🚧 Reference verified; deployment evolves |
+| 04 | Native Model Router + cloud intelligence | ✅ Gate A accepted |
+| 05 | Real machine Worker + remote continuation | 🚧 Gate B completion in progress |
+| 06 | Memory Fabric + Personal Policy + live context | 🚧 Gate B completion in progress |
+| 07 | OSCAR Edge + reflexes | Planned after Gate B PASS |
 | 08 | Voice Core + Identity + Match/Map + Persona runtime | Planned |
 | 09 | Sunday + communication + Grid owner controls | Planned |
 | 10 | Desktop Interaction Runtime | Planned |
@@ -261,7 +305,13 @@ The detailed evidence and limitations live in [`docs/CLUB-A-CHECKPOINT.md`](docs
 | 16 | Reliability/security/truthfulness hardening | Planned |
 | 17 | Unified alpha | Planned |
 
-See [`docs/ROADMAP.md`](docs/ROADMAP.md) and [`docs/BUILD-GATES.md`](docs/BUILD-GATES.md).
+## Design language
+
+OSCAR uses **Quietly Alive + Playful Precision**: restrained warm materials, graphite typography, blue/yellow identity accents, weighted physical motion, progressive disclosure and no generic AI-dashboard/card-wall/neon slop.
+
+Simplicity must never become lack of craftsmanship.
+
+See [`DESIGN.md`](DESIGN.md), [`TASTE.md`](TASTE.md) and [`docs/UI-AVATAR.md`](docs/UI-AVATAR.md).
 
 ## Review / development
 
@@ -276,21 +326,14 @@ python -m unittest discover -s tests -t . -v
 python -m scripts.check_repository
 ```
 
-Reference Club B checks:
-
-```sh
-python -m scripts.verify_worker_reference --report .oscar/worker-review.json
-python -m scripts.verify_club_b --report .oscar/club-b-review.json
-python -m unittest tests.test_connectors tests.test_connector_http -v
-```
-
-A slice is not complete because an agent says it is complete. Implementation, tests, limitations, documentation and authoritative resulting state must agree.
+A slice is not complete because an agent says it is complete. Implementation, tests, manual acceptance, evidence, documentation and authoritative resulting state must agree.
 
 ## Canonical documentation
 
 - [Product](docs/PRODUCT.md)
 - [Ambient Chief of Staff](docs/CHIEF-OF-STAFF.md)
 - [Architecture](docs/ARCHITECTURE.md)
+- [Memory Fabric](docs/MEMORY.md)
 - [Roadmap](docs/ROADMAP.md)
 - [Build gates](docs/BUILD-GATES.md)
 - [Epistemic Integrity](docs/EPISTEMIC-INTEGRITY.md)
@@ -298,19 +341,12 @@ A slice is not complete because an agent says it is complete. Implementation, te
 - [Connection Grid](docs/CONNECTION-GRID.md)
 - [Model routing](docs/MODEL-ROUTING.md)
 - [Sunday design](docs/SUNDAY-DESIGN.md)
-- [Surfaces](docs/SURFACES.md)
 - [Communication](docs/COMMUNICATION.md)
-- [Memory](docs/MEMORY.md)
 - [Personal Policy](docs/PERSONAL-POLICY.md)
 - [Persona](docs/PERSONA.md)
 - [Voice + Sentry](docs/VOICE-SENTRY.md)
 - [Workers](docs/WORKERS.md)
 - [Orchestration](docs/ORCHESTRATION.md)
-- [Onboarding](docs/ONBOARDING.md)
 - [Security](docs/SECURITY.md)
 - [Design system](DESIGN.md)
 - [Taste / quality bar](TASTE.md)
-
----
-
-<p align="center"><sub>OSCAR is an original project inspired by the goal of building a genuinely capable ambient intelligence.</sub></p>
