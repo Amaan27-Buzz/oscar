@@ -30,7 +30,10 @@ idempotency, Runtime and independent Evidence/Verification remain authoritative.
   returns an opaque input reference for durable Actions; process restart expires
   that input and BLOCKS execution. Metadata-only receipt/ledger records retain
   evidence IDs/time and policy decision. Runtime binds staged references to tasks;
-  dispatch consumes input before execution, including failure/cancellation. The
+  execution requires an explicit `request_owners` binding to the current task.
+  Unbound or other-task references are rejected without consumption; direct executor
+  clients must call `bind_task` first. Dispatch consumes owned input before execution,
+  including failure/cancellation. The
   verifier releases outcomes in `finally`, after inspecting them. Committed local task
   transitions notify weakly held transient owners: completion, failure, blocked
   execution and cancellation immediately release remaining task context. Admission

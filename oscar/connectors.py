@@ -601,8 +601,9 @@ class ConnectorFabric:
                     error="connector_blocked:input_expired",
                 )
             reference = action.parameters["request_ref"]
-            if self.request_owners.get(reference, action.task_id) != action.task_id:
-                raise ValueError("connector input belongs to another task")
+            owner = self.request_owners.get(reference)
+            if owner != action.task_id:
+                raise ValueError("connector input is not bound to this task")
             # Consume before dispatch: every success/error/cancel path releases input.
             self.release_request(reference)
             transient = replace(action, parameters=parameters)

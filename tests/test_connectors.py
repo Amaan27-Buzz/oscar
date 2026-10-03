@@ -222,6 +222,7 @@ class ConnectorTests(unittest.TestCase):
         self.assertNotIn(self.secret, json.dumps(self.store.ledger(self.task.id)))
         reference = self.fabric.stage(self.action.parameters)
         durable = replace(self.action, parameters={"request_ref": reference})
+        self.fabric.bind_task(self.task.id, durable.parameters)
         executor = self.fabric.executor(
             "calendar",
             "google.calendar.events.create",
@@ -843,7 +844,12 @@ class ConnectorTests(unittest.TestCase):
         from oscar.capabilities import Cancelled
 
         reference = self.fabric.stage(self.action.parameters)
-        self.store.transition(self.task.id, TaskState.CANCELLED)
+        self.fabric.bind_task(self.task.id, {"request_ref": reference})
+        other_store = Store(self.root / "state.sqlite")
+        try:
+            other_store.transition(self.task.id, TaskState.CANCELLED)
+        finally:
+            other_store.close()
         executor = self.fabric.executor(
             "calendar",
             "google.calendar.events.create",
@@ -1020,3 +1026,69 @@ class ConnectorTests(unittest.TestCase):
             self.assertEqual(TaskState.CANCELLED, runtime.run(task.id, transports).state)
         self.assertEqual({}, self.fabric.outcomes)
         self.assertEqual({}, self.fabric.requests)
+
+    def ownership_fixture(self):
+        reference = self.fabric.stage(
+            {"path": {"calendarId": "primary"}, "body": {"summary": "ownership-private-input"}}
+        )
+        self.http.payload["private"] = "ownership-private-outcome"
+        action = replace(self.action, parameters={"request_ref": reference})
+        self.store.put("action", action.id, record(action))
+        executor = self.fabric.executor(
+            "calendar",
+            "google.calendar.events.create",
+            frozenset({"connectors:write", "connectors:read"}),
+            confirmed=lambda _: True,
+        )
+        return reference, action, executor
+
+    def assert_ownership_payloads_not_persisted(self):
+        durable = json.dumps(self.store.db.execute("SELECT data FROM records").fetchall())
+        durable += json.dumps(self.store.db.execute("SELECT data FROM audit").fetchall())
+        self.assertNotIn("ownership-private-input", durable)
+        self.assertNotIn("ownership-private-outcome", durable)
+
+    def test_executor_rejects_unbound_staged_reference(self):
+        reference, action, executor = self.ownership_fixture()
+        with self.assertRaisesRegex(ValueError, "not bound to this task"):
+            executor(action, self.cancel)
+        self.assertIn(reference, self.fabric.requests)
+        self.assertNotIn(reference, self.fabric.request_owners)
+        self.assertEqual([], self.http.calls)
+        self.assertEqual({}, self.fabric.outcomes)
+        self.assert_ownership_payloads_not_persisted()
+        self.fabric.release_request(reference)
+        self.assertEqual({}, self.fabric.requests)
+
+    def test_executor_accepts_reference_explicitly_bound_to_current_task(self):
+        reference, action, executor = self.ownership_fixture()
+        self.fabric.bind_task(self.task.id, action.parameters)
+        result = executor(action, self.cancel)
+        self.assertTrue(result.success)
+        self.assertEqual(1, len(self.http.calls))
+        self.assertNotIn(reference, self.fabric.requests)
+        self.assertNotIn(reference, self.fabric.request_owners)
+        self.assertIn(result.id, self.fabric.outcomes)
+        verifier = ConnectorVerifier(Verifier(ScopedFiles(self.root / "files")), self.fabric)
+        self.assertEqual(
+            TaskState.VERIFIED,
+            verifier.verify(replace(self.objective, criterion=self.criterion()), result).state,
+        )
+        self.assertEqual({}, self.fabric.outcomes)
+        self.assert_ownership_payloads_not_persisted()
+
+    def test_executor_rejects_reference_explicitly_bound_to_another_task(self):
+        reference, action, executor = self.ownership_fixture()
+        other = replace(self.task, id=new_id())
+        self.store.put("task", other.id, record(other))
+        self.fabric.bind_task(other.id, action.parameters)
+        with self.assertRaisesRegex(ValueError, "not bound to this task"):
+            executor(action, self.cancel)
+        self.assertIn(reference, self.fabric.requests)
+        self.assertEqual(other.id, self.fabric.request_owners[reference])
+        self.assertEqual([], self.http.calls)
+        self.assertEqual({}, self.fabric.outcomes)
+        self.assert_ownership_payloads_not_persisted()
+        self.store.transition(other.id, TaskState.CANCELLED)
+        self.assertEqual({}, self.fabric.requests)
+        self.assertEqual({}, self.fabric.request_owners)
