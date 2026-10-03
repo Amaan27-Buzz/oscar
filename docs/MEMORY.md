@@ -1,257 +1,469 @@
-# Memory: LRA + Supermemory + Jev
+# OSCAR Memory Fabric
 
-OSCAR should feel like one continuous relationship, not a collection of disconnected chat threads.
+OSCAR should feel like one continuous relationship, not a collection of disconnected chat threads. The user-facing primitive is one persistent interaction point across text, voice, Sunday, desktop, communications, Workers and physical surfaces.
 
-## Product rule
+Internal segmentation exists only for engineering quality, retrieval, retention and scaling. The user should not have to remember which old chat contains a fact.
 
-The user-facing primitive is **one persistent OSCAR conversation/history** across voice, text, Sunday, desktop, communications, Workers and physical surfaces.
-
-Internal context may be segmented, archived, summarized or retrieved differently for engineering reasons, but those implementation details must not force the user to manage hundreds of chats.
-
-`New chat`-style behavior, if ever exposed, should reset the immediate working surface without silently deleting durable OSCAR memory.
-
-## LRA role
-
-LRA is the memory/history architecture that owns continuity and context assembly.
-
-Planned responsibilities:
-
-- active live context;
-- episodic conversation/task history;
-- project/context boundaries;
-- durable user profile/relationship memory;
-- procedural memory and learned workflows;
-- Worker/Protocol history and state refs;
-- memory provenance/confidence;
-- context assembly before reasoning;
-- remember/update/forget flows;
-- cross-device continuity.
-
-LRA is the architecture. Supermemory is a backend used by that architecture rather than the product model itself.
-
-## Memory is not Personal Policy
+## Product invariant
 
 ```text
-Memory
-= what OSCAR knows or recalls
-
-Personal Policy
-= how the user explicitly wants OSCAR to behave
-
-Permission
-= what OSCAR is authorized to do
-
-Protocol
-= a durable autonomous responsibility/process
+You ↔ OSCAR
 ```
 
-LRA/Supermemory can discover patterns and suggest policy changes, but consequential inferred patterns should not silently become authority.
+There is one continuing relationship. Internally OSCAR may create `event_id`, `turn_id`, `episode_id`, `objective_id`, `task_id`, `artifact_id`, `entity_id` and `memory_id` records, but those are implementation details rather than separate assistant identities.
 
-## Active context vs long-term memory
+A future UI may expose temporary workspaces or views, but changing views must not silently reset identity or durable memory.
 
-Recent conversation should remain true active context while useful. It should not be prematurely flattened into isolated RAG snippets.
+## Ownership rule
+
+OSCAR owns canonical memory. No managed memory vendor, vector database, graph database or model provider owns OSCAR's history.
+
+The canonical source is the **OSCAR Event Archive**. Semantic/vector and temporal/graph systems are derived, replaceable and rebuildable indexes.
 
 ```text
-continuous OSCAR surface
-        │
-        ▼
-active live context
-        │
-        ├─ enough room / still active → keep live
-        └─ idle / context pressure    → archive segment
-                                      ↓
-                             episodic history + memory
+                     OSCAR MEMORY FABRIC
+
+one continuous interaction point
+             │
+             ▼
+       Active Context
+             │
+             ▼
+     OSCAR Event Archive
+   SQLite + WAL + FTS5 initially
+      canonical provenance
+             │
+      Memory Formation
+             │
+   ┌─────────┴─────────┐
+   ▼                   ▼
+Qdrant OSS          Graphiti OSS
+hybrid semantic     temporal/entity
+retrieval           relationships
+                        │
+                    Neo4j Community
+   └─────────┬─────────┘
+             ▼
+      Retrieval Fusion
+      + local reranker
+             │
+             ▼
+   Jev Memory Preflight
+   authority/conflict logic
+             │
+             ▼
+      Context Assembly
+             │
+             ▼
+ reasoning / Executive / action
+             │
+             ▼
+       Claim Verifier
 ```
 
-Exact rollover thresholds remain configurable/benchmark-driven rather than protocol guarantees.
+## Canonical stack
 
-## Supermemory role
+### OSCAR Event Archive
 
-Supermemory supplies semantic/profile-style memory capabilities underneath LRA.
+Initial implementation: SQLite with WAL and FTS5.
 
-Good uses include semantic recall, durable user/project facts, connected memories, profile-like understanding, reflection, prior-outcome retrieval and identifying repeated preference patterns to suggest.
+The archive stores durable source events and provenance, including where appropriate:
 
-Supermemory is not the sole source of truth for live system state or explicit Personal Policy.
+- user turns and explicit corrections;
+- OSCAR replies and their evidence references;
+- objectives/tasks/actions/results;
+- Worker and Protocol events;
+- artifacts and verification evidence;
+- project/entity references;
+- decisions and explicit preferences;
+- retained communication/context events permitted by retention policy;
+- memory derivations and supersession links.
 
-## Jev as epistemic router
+The archive is the recovery source for derived indexes. Losing Qdrant or the graph store must not erase OSCAR's history.
 
-Jev is not only an intent classifier. It reasons about whether OSCAR has enough reliable context.
+### Qdrant OSS
+
+Qdrant is the first semantic retrieval index.
+
+Use it for:
+
+- dense semantic retrieval;
+- sparse/lexical retrieval where useful;
+- hybrid retrieval;
+- metadata/project/entity/time filtering;
+- candidate generation for reranking.
+
+Qdrant is not authoritative memory. Its records point back to canonical archive IDs.
+
+### Graphiti OSS + Neo4j Community
+
+Graphiti is the first temporal/entity memory index. Neo4j Community is the initial graph store.
+
+Use it for:
+
+- canonical entities and aliases;
+- relationships;
+- time-varying facts;
+- validity windows;
+- historical states;
+- supersession/correction relationships;
+- provenance back to source episodes/events.
+
+The graph is derived state and can be rebuilt from the Event Archive.
+
+### Embeddings and reranking
+
+Embeddings and reranking are replaceable OSCAR capabilities. Prefer local/self-hosted models where practical; cloud models may be selected through the native Model Router under policy.
+
+No embedding or reranking provider becomes an architectural dependency.
+
+## Active Context
+
+One continuous conversation does not mean one infinitely growing prompt.
+
+Active Context is reconstructed dynamically from:
 
 ```text
-request
-  │
-  ▼
-Jev
-  ├─ known        → answer/act
-  ├─ world        → current World Model
-  ├─ recall       → query LRA/Supermemory
-  ├─ verify       → inspect authoritative source/tool
-  ├─ reason       → native OSCAR Model Router → configured provider
-  ├─ specialist   → specialist capability
-  ├─ worker       → delegated Worker
-  └─ unknown      → retrieve/ask rather than guess
+recent conversation
++ current objective/task
++ current project
++ active entities
++ open commitments
++ relevant retrieved episodes/memories
++ Personal Policy required for this objective
++ current World Model/live context
 ```
 
-The separate SwitchRoute project is not a runtime dependency; its useful routing concepts are folded into OSCAR's native Model Router.
-
-Core rule:
-
-> Never guess user/project context when it can be retrieved or verified.
-
-## Source authority
-
-Memory is evidence, not universal truth.
-
-A useful authority order is:
-
-```text
-hard safety/permission/policy constraints
-        >
-live authoritative source/state
-        >
-World Model current evidence
-        >
-structured OSCAR task/Worker state
-        >
-recent episodic history
-        >
-semantic/derived memory
-        >
-model prior knowledge
-```
+Recent useful context remains live. Older context can be archived and later retrieved without becoming a separate user-visible chat.
 
 ## Memory classes
 
-OSCAR should distinguish at least:
+OSCAR distinguishes at least:
 
-- **working context** — what is happening now;
-- **episodic history** — what happened and when;
-- **semantic memory** — durable facts/relationships/learned preferences;
-- **project memory** — decisions/conventions/constraints/status;
-- **device/environment memory** — stable configuration/names/normal state;
-- **communication memory** — calls/meetings/messages outcomes/commitments subject to retention;
-- **procedural memory** — how OSCAR successfully completed a task;
-- **Worker history/state refs** — delegated outcomes/blockers/artifacts;
-- **Protocol state** — long-running autonomous responsibility state.
+- **working context** — immediate interaction state;
+- **episodic history** — what happened, when and with whom;
+- **semantic memory** — durable facts and relationships;
+- **preference memory** — explicit or carefully scoped preferences;
+- **project memory** — decisions, conventions, constraints and status history;
+- **device/environment memory** — durable configuration, not current telemetry;
+- **communication memory** — retained decisions/outcomes/commitments under policy;
+- **procedural memory** — verified reusable ways of doing work;
+- **Worker/Protocol history** — delegated work and durable responsibility history;
+- **entity memory** — canonical entities, aliases and evidence-backed relationships.
 
-Explicit Personal Policy is not merely another semantic-memory category.
+Personal Policy is not a memory class. Permission is not a memory class. Voice Match/Voice Map embeddings remain dedicated sensitive system data.
 
-## Voice identity / Voice Map are not ordinary memory
+## Jev Memory Preflight
 
-Speaker-recognition profiles/embeddings used by Voice Match or Voice Map are sensitive biometric-like system data and should not be flattened into generic semantic memory.
+Memory retrieval is not left to the language model's intuition.
 
-LRA may store safe relationship/context facts such as `person X spoke during meeting Y` when retention policy permits, but the underlying speaker embedding/profile stays under the dedicated voice/security retention controls defined in `VOICE-SENTRY.md` and `SECURITY.md`.
+Every interaction receives a cheap Jev preflight that asks whether the objective depends on personal/history/project/entity context.
 
-Unknown speaker observations should remain confidence-qualified observations rather than invented identity memories.
+Retrieval is mandatory when the request plausibly references:
 
-OSCAR's own TTS output is excluded from speaker identity learning.
+- something said or decided earlier;
+- a known person, project, device, repository or artifact;
+- a preference or habit;
+- a previous task/result;
+- `continue that`, `same as before`, `what did we decide`, `that project`, `my usual`, or equivalent deictic language;
+- a correction or prior contradiction.
 
-## Retrieval quality
+A deterministic question such as `2 + 2` does not need memory retrieval.
 
-Retrieval should not be raw nearest-neighbor similarity only. Ranking can combine semantic relevance, recency, importance, memory type, project/task scope, repetition/confirmation, source authority, confidence and staleness penalty.
+Core rule:
 
-The goal is the **smallest useful context**, not history dumping.
+> The reasoning model does not decide whether memory exists. Jev decides whether memory retrieval is required.
+
+## Retrieval ladder
+
+For a memory-dependent request, use bounded escalation:
+
+```text
+0. Active Context
+1. Structured OSCAR state / entities / tasks / Personal Policy
+2. Event Archive exact + SQLite FTS5
+3. Qdrant hybrid semantic retrieval
+4. Graphiti temporal/entity retrieval
+5. Query expansion: aliases, related entities, project names, time ranges
+6. Bounded deeper archive reconstruction
+7. UNKNOWN
+```
+
+Do not jump directly from one empty vector query to `I don't remember`.
+
+### Expected-memory misses
+
+If Jev classifies a request as clearly historical/personal and retrieval returns no useful result:
+
+```text
+expected_memory = true
+retrieval_hits = insufficient
+→ broaden retrieval
+→ inspect aliases/entities/time ranges
+→ bounded deeper archive search
+→ UNKNOWN only after those attempts
+```
+
+A retrieval miss is evidence of a retrieval miss, not proof that the memory never existed.
+
+## Retrieval fusion and ranking
+
+Do not rely on raw nearest-neighbor similarity alone.
+
+Candidate ranking may combine:
+
+- exact/lexical match;
+- dense semantic similarity;
+- graph/entity relation;
+- temporal validity;
+- project/entity scope;
+- recency;
+- source authority;
+- explicitness/repetition;
+- confidence;
+- staleness penalty;
+- current objective relevance.
+
+Use a replaceable local reranker after broad candidate retrieval when it materially improves precision.
+
+The output should be the smallest useful evidence set, not a transcript dump.
+
+## Evidence-bound recall
+
+A personal/historical factual answer must be traceable to source memory/event evidence.
+
+Conceptually, generated claims carry:
+
+```text
+claim
+supporting_event_ids[]
+supporting_memory_ids[]
+evidence_state
+confidence
+```
+
+If the answer has no supporting retrieved evidence, OSCAR must not present it as remembered fact.
+
+### Recall language invariant
+
+OSCAR must not say or imply `I remember X` unless X was actually retrieved from the Memory Fabric during the current reasoning path or remains in active context with provenance.
+
+Historical data remains `RECALLED` when used in a new answer even if the original source event had stronger evidence. Retrieval does not promote it to current `VERIFIED` truth.
+
+## Authority and freshness
+
+Memory is historical evidence, not universal current truth.
+
+A useful default order is:
+
+```text
+hard safety / permission / Personal Policy
+> current explicit owner statement for a personal claim
+> live authoritative source/state
+> current World Model observation
+> structured OSCAR task/entity state
+> recent directly sourced episode
+> temporal graph fact with provenance
+> semantic memory
+> derived/inferred memory
+> model prior
+```
+
+Authority is claim-specific. A live filesystem read outranks memory of a file. Current weather outranks an old weather memory. A current explicit preference can supersede an older preference.
+
+Jev chooses the authority policy and whether verification/live retrieval is required.
+
+## Memory formation
+
+After eligible interactions, OSCAR may create memory candidates rather than blindly storing model summaries as truth.
+
+Pipeline:
+
+```text
+source event
+→ extract candidate
+→ classify type/scope
+→ resolve entities
+→ compare existing memories
+→ detect conflict/supersession
+→ assign provenance + epistemic state
+→ retain under policy
+→ update derived indexes
+```
+
+Examples:
+
+- `I switched from VS Code to Zed` can create a directly sourced preference update.
+- `That UI is too rounded` should not silently become a universal `user hates rounded UI` rule. Keep the narrower scoped observation unless later evidence justifies broader generalization.
+
+Model-derived interpretations remain `INFERRED` unless a stronger source/evidence exists.
+
+## Corrections and supersession
+
+Corrections are first-class.
+
+```text
+new owner correction
+→ identify challenged fact/memory
+→ preserve original source event
+→ mark old fact superseded/invalid for current use
+→ record correction relation
+→ update semantic index
+→ update temporal graph
+→ future current retrieval favors corrected fact
+```
+
+OSCAR does not silently erase history to make the present look consistent.
+
+Temporal questions should still be able to retrieve earlier valid states.
+
+## Entity resolution
+
+A canonical Entity Registry links aliases only when evidence supports the match.
+
+Minimum entity metadata:
+
+```text
+entity_id
+canonical_name
+aliases[]
+type
+relationships[]
+source_event_ids[]
+confidence
+```
+
+Same names do not prove identity. Unknown or ambiguous entities remain separate until evidence supports a merge.
+
+Jev resolves likely entity IDs before broad historical retrieval when doing so improves precision.
+
+## Background consolidation
+
+Idle/background consolidation may:
+
+- deduplicate equivalent derived memories;
+- merge repeated supporting evidence;
+- resolve safe entity aliases;
+- detect contradictions;
+- maintain temporal validity windows;
+- generate bounded summaries;
+- compact/rebuild derived indexes;
+- identify procedure/Skill candidates.
+
+Summaries never replace source events. They retain provenance to originals.
 
 ## Procedural memory
 
 ```text
 first execution
 → explore
-→ select capabilities/Workers
 → execute
-→ verify
+→ independently verify
 → capture successful path
-→ distill reusable procedure
+→ parameterize
+→ evaluate
+→ candidate Skill/procedure
 ```
 
-Later:
+Procedural memory may improve future execution. It never grants new permission or authority.
+
+## Privacy, retention and forget
+
+`CAN PERCEIVE`, `CAN RETAIN` and `CAN ACT` remain independent.
+
+Memory records carry retention metadata where appropriate, including source, scope, reason, expiry and sensitivity class.
+
+Forget/delete behavior must be truthful:
+
+- remove/tombstone the live OSCAR memory record as defined by retention policy;
+- remove relevant semantic/graph index entries;
+- prevent normal future retrieval;
+- preserve only audit/tombstone information required by policy/security;
+- do not claim secure disk erasure or deletion from external source systems unless independently verified.
+
+Raw audio, transcripts, summaries, communication memory and Voice Map/Match data remain separately controlled.
+
+## Resilience and rebuild
+
+Derived indexes are disposable from an authority perspective.
+
+Acceptance must include:
+
+- rebuild Qdrant from canonical archive records;
+- rebuild Graphiti/Neo4j derived state from canonical events where supported;
+- detect index lag/drift;
+- preserve archive/event IDs across rebuilds;
+- fail closed to archive/FTS/UNKNOWN rather than inventing memory when an index is unavailable.
+
+## Memory evaluation
+
+Memory quality is a tested subsystem, not a vibe.
+
+Maintain synthetic and non-sensitive evaluation sets covering:
+
+- exact long-history recall;
+- paraphrased semantic recall;
+- temporal current-vs-historical questions;
+- preference supersession;
+- entity aliases and same-name disambiguation;
+- project context switching;
+- false-recall rate;
+- retrieval-miss escalation;
+- stale memory vs authoritative live state;
+- corrections;
+- forget/delete;
+- index rebuild and drift;
+- cross-process/device continuity;
+- procedural recall without authority expansion.
+
+Track metrics such as recall@k/precision where meaningful, temporal correctness, false-memory claims and UNKNOWN correctness.
+
+## Memory vs other OSCAR systems
 
 ```text
-Jev recognizes known/similar procedure
-→ retrieve procedural memory / Skill
-→ adapt parameters
-→ execute faster
-→ verify
-→ improve/version if a better path was found
+Memory          = historical continuity/evidence
+World Model     = what is true now
+Personal Policy = explicit desired behavior
+Permission      = what OSCAR may do
+Persona         = how OSCAR expresses itself
+Protocol        = durable delegated responsibility
 ```
 
-Procedural memory improves execution without expanding authority.
+None silently substitutes for another.
 
-## Communication retention
+## Current Club B boundary
 
-Calls, meetings and messages can contain particularly sensitive data.
+The existing `oscar.continuity.LocalMemory` and SQLite-backed records verify selected local retention, restart continuity, evidence state, entity references, live-source precedence and forget of the live OSCAR record for the documented Windows/reference cases.
 
-OSCAR separately controls retention for:
+The production Memory Fabric described above is **not yet fully implemented**. Gate B completion must add and verify:
 
-- raw audio;
-- full transcript;
-- concise summary;
-- decisions/action items;
-- relationship/context memory;
-- Voice Map/speaker-identity data under dedicated voice controls.
+- canonical Event Archive/WAL/FTS5 behavior;
+- Qdrant OSS derived semantic index;
+- Graphiti + Neo4j Community temporal/entity index;
+- replaceable local embedding and reranking path;
+- Jev Memory Preflight and retrieval planner;
+- expected-memory miss escalation;
+- evidence-bound recalled claims;
+- correction/supersession propagation;
+- rebuild/drift behavior;
+- evaluation suite.
 
-The system should prefer the minimum useful durable representation rather than retaining every raw recording indefinitely.
+The prior planned Supermemory integration has been retired. Historical checkpoint references to it describe the earlier plan, not a current dependency.
 
-## Privacy and control
+## Non-negotiable invariants
 
-Planned controls:
-
-- search memory/history;
-- inspect source/provenance;
-- correct/edit;
-- forget/delete;
-- disable categories/providers;
-- export where practical;
-- clear/reset memory independently from current UI surface.
-
-Memory does not grant permissions or bypass Personal Policy.
-
-## Invariants
-
-1. User-facing continuity is more important than exposing internal session segmentation.
-2. Memory is not automatically authoritative.
-3. Explicit Personal Policy is distinct from inferred memory.
-4. Jev retrieves before guessing.
-5. Live/current sources override stale memory when current truth matters.
-6. Procedural memory can improve execution but never self-grant authority.
-7. Voice, text, Sunday, desktop, communications, Workers and Edge interactions contribute to the same history where policy permits.
-8. Sensitive communication data uses explicit retention controls.
-9. Voice Match/Voice Map embeddings are dedicated sensitive system data, not generic LRA memories.
-10. Model reasoning is selected through OSCAR's native Model Router, not a required external SwitchRoute service.
-
-## Club B local continuity foundation
-
-`oscar.continuity.LocalMemory` uses existing SQLite records for selected episodic,
-project, device, procedural, profile, relationship, semantic, communication and
-Worker context. Every item carries source/time/evidence state, confidence when
-supplied, retention reason/expiry and entity references. Retention requires an
-explicit decision; retrieval alone never stores private connector content.
-
-Local retrieval is bounded lexical filtering by explicit scope and recency, not
-semantic/vector search. `MemoryBackend` is the replaceable semantic-engine
-contract; **Supermemory live integration is UNVERIFIED**. Verified historical
-content requires matching independently verified evidence, exact content hash and
-observation time; an unrelated verified task cannot promote arbitrary memory.
-Retrieved items are always RECALLED even if historically verified.
-
-Live federation adapters reuse scoped current files, Grid snapshots, native
-search/freshness and authorized Connector Fabric callbacks. Current known/verified
-live authoritative observations precede stale memory. API/search testimony remains
-REPORTED; a fresh retrieval timestamp cannot promote it. No prompt-history dump or
-full World Model runtime is implemented. Context sources carry evidence/source/
-time/scope and entity refs where supplied.
-
-`oscar.entities` supplies canonical entity records, exact provider/account/native
-identity bindings and a small relation vocabulary. Identity/relation evidence
-must explicitly name the matching claim fields; same labels and unrelated task
-proofs cannot merge identities. Unknown entities remain separate. Forget removes
-live entity bindings/relations or memory rows. Expiry excludes/purges live memory
-records. SQLite WAL, backups and connected-source deletion/secure erasure are
-**not verified**; deletion must never be reported as "deleted everywhere".
-
-The 2026-10-04 Windows local pass separately verifies selected project retention
-across two actual coordinator OS-processes and Worker reconnect. Recall stays
-RECALLED; a real changed filesystem artifact overrides stale retained text. Forget
-removes the live OSCAR row. This verifies local continuity, not a Supermemory
-service, secure disk erasure or private-account synchronization. See
-[local evidence](evidence/club-b-windows-2026-10-04.json).
+1. One user-facing relationship/interaction point; internal segmentation is invisible unless explicitly surfaced for organization.
+2. OSCAR owns the canonical Event Archive.
+3. Qdrant, Graphiti and graph/vector stores are derived rebuildable indexes, never canonical truth.
+4. OSCAR never says `I remember X` without retrieved/active-context evidence for X.
+5. Personal/historical factual claims require source event/memory provenance.
+6. A failed retrieval is not proof the memory does not exist.
+7. Jev escalates retrieval before returning UNKNOWN when historical memory is expected.
+8. Live/current authoritative evidence outranks stale memory.
+9. History is superseded temporally, not silently overwritten.
+10. No single retrieval mechanism is trusted as complete.
+11. Derived facts retain provenance and epistemic state.
+12. The reasoning model cannot promote inference or recall into current verified fact.
+13. Memory does not grant permission, modify Personal Policy or weaken safety.
+14. Sensitive voice/communication retention remains separately controlled.
+15. Any managed memory service is optional; OSCAR must remain operable with the free/self-hosted stack.
