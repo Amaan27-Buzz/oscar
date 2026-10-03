@@ -3,13 +3,14 @@
 import argparse
 import json
 import os
-import selectors
 import shutil
 import subprocess
 import sys
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
+from queue import Queue
 from tempfile import TemporaryDirectory
+from threading import Thread
 from time import sleep, time
 from typing import Any
 
@@ -35,15 +36,31 @@ SCOPES = (
 
 
 class WorkerProcess:
-    def __init__(self, state: Path, workspace: Path, session: SessionHandle):
+    def __init__(
+        self,
+        state: Path,
+        workspace: Path,
+        session: SessionHandle,
+        *,
+        executables: tuple[str, ...] = (),
+        codex_home: Path | None = None,
+        discover_agents: bool = True,
+    ):
         git = shutil.which("git")
         assert git is not None
         # Bootstrap over inherited pipe; child inherits no provider/GitHub credentials.
         env = {k: os.environ[k] for k in ("PATH", "LANG") if k in os.environ}
+        env.update({k: os.environ[k] for k in ("SystemRoot", "TEMP", "TMP") if k in os.environ})
         agent_args = []
-        for executable in AGENT_EXECUTABLES.values():
-            if installed := shutil.which(executable):
+        for executable in AGENT_EXECUTABLES.values() if discover_agents else ():
+            if (installed := shutil.which(executable)) and (
+                os.name != "nt" or Path(installed).suffix.lower() == ".exe"
+            ):
                 agent_args.extend(["--executable", installed])
+        for executable in executables:
+            agent_args.extend(["--executable", executable])
+        if codex_home is not None:
+            agent_args.extend(["--codex-home", str(codex_home)])
         self.process = subprocess.Popen(
             [
                 sys.executable,
@@ -74,12 +91,15 @@ class WorkerProcess:
         )
         self.process.stdin.flush()
         self.process.stdin.close()
-        with selectors.DefaultSelector() as selector:
-            selector.register(self.process.stdout, selectors.EVENT_READ)
-            if not selector.select(timeout=10):
-                self.close()
-                raise RuntimeError("reference worker startup timeout")
-        line = self.process.stdout.readline(8192)
+        lines: Queue[str] = Queue(maxsize=1)
+        stream = self.process.stdout
+        reader = Thread(target=lambda: lines.put(stream.readline(8192)), daemon=True)
+        reader.start()
+        try:
+            line = lines.get(timeout=10)
+        except Exception:
+            self.close()
+            raise RuntimeError("reference worker startup timeout") from None
         if not line:
             self.close()
             raise RuntimeError("reference worker startup failed")

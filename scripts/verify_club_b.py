@@ -126,7 +126,7 @@ def run_integrated(root: Path) -> dict[str, Any]:
         context = federation.assemble(task.id, "project", "reference-project")
         assert context.memories[0].evidence_state == Epistemic.RECALLED
         # A genuine subsequent external file change must outrank that verified historical memory.
-        (workspace / "verified.txt").write_text("current changed artifact\n")
+        (workspace / "verified.txt").write_bytes(b"current changed artifact\n")
         changed = federation.assemble(task.id, "project", "reference-project")
         resolved = changed.resolve("project.artifact", time())
         assert resolved and resolved.value == "current changed artifact\n"
