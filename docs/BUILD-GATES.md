@@ -2,16 +2,16 @@
 
 Build Gates group detailed roadmap slices into larger manual verification checkpoints. They do not replace slice exit conditions.
 
-The fast developer-alpha target remains 2–3 days for a vertical proof, followed by continuous hardening.
-
 At each Gate:
 
 1. run automated tests;
-2. run the manual scenarios;
+2. run required manual scenarios;
 3. inspect authoritative resulting state;
 4. record blockers/limitations;
 5. do not upgrade simulated/reported behavior to verified real behavior;
-6. continue only when the foundation is coherent enough.
+6. complete the planned mandatory scope before advancing to the next Club unless the owner explicitly re-scopes the plan.
+
+A gate is not `PASS` because the implementation is demoable.
 
 ## Gate A — Brain
 
@@ -22,7 +22,7 @@ Prove:
 ```text
 request
 → Jev
-→ capability/model decision
+→ capability/model/retrieval decision
 → native transport/router
 → execution
 → evidence
@@ -30,80 +30,207 @@ request
 → truthful report
 ```
 
-Manual scenarios:
+Required acceptance includes canonical file verification, fake-success rejection, deterministic requests avoiding unnecessary models, automatic/manual model routing, provider/credential fallback, Local mode without silent cloud fallback, reference Grid connect/disconnect, durable objective preservation, secret-safe route history and freshness-sensitive live search.
 
-- canonical file-write/read verification objective;
-- fake executor success must not become verified;
-- deterministic request avoids heavy model;
-- Auto/Fast/Balanced/Heavy routing;
-- manual provider/model selection;
-- failed credential/provider fallback;
-- Local mode with no silent cloud fallback;
-- simulated remote capability node connect/disconnect;
-- initial Connection Grid node/health state;
-- coherent reference coordinator/Transport/Grid path with durable objective preservation;
-- route/usage history contains no secrets.
+**Pass:** native core/transport/model/search foundation works without required Latch/SwitchRoute deployment, current information is refreshed when needed and remote/reference node loss does not erase objective state.
 
-**Pass:** native core/transport/model routing works without Latch/SwitchRoute deployment and remote node loss does not erase objective state.
+**Current:** **PASS.** See [CLUB-A-CHECKPOINT.md](CLUB-A-CHECKPOINT.md).
 
-Current checkpoint: **PASS for Club A foundation — all three Tavily slots authenticate;
-source provenance, bounded official constraints and qualified UNKNOWN semantics pass.**
-Core Loop/Jev/reference Grid proofs and the focused routing
-acceptance remain verified; see [CLUB-A-CHECKPOINT.md](CLUB-A-CHECKPOINT.md).
-
-Acceptance does not require simultaneous availability of every provider. A genuine
-no-eligible-route BLOCKED result is correct under current capability/funding/capacity
-policy. Temporary provider limits are not architectural defects when bounded
-reranking finds an eligible alternative, or truthful blocking records that none
-exists. Shared cooldowns must not disable unrelated pools; UNKNOWN remains UNKNOWN.
-Live combined search is verified with current native inventories and official-source
-evidence/explicit UNKNOWN resolutions; native inventory or synthetic tests alone
-cannot establish this acceptance. **Club A acceptance remains preserved; the current Club B reference foundation
-is PARTIAL, as recorded in [CLUB-B-CHECKPOINT.md](CLUB-B-CHECKPOINT.md).**
-
-The current foundation review accepts coherent reference Transport/Grid contracts. Public TLS/outbound rendezvous, independent network stores and a cloud coordinator path using a configured deployment target remain later Grid integration acceptance requirements; they are not claimed verified by Gate A. This refines the previous public-deployment gate expectation without changing the architecture or silently completing broader slice deliverables.
+Public TLS/rendezvous, independent remote stores and physical deployment remain later integration acceptance rather than retroactively making Gate A partial.
 
 ## Gate B — Can Do Work
 
 **Slices:** 05–06
 
-Prove a useful real machine objective plus memory/policy continuity.
+Gate B proves that OSCAR can do useful verified work through a replaceable machine node while preserving continuous memory, policy and live-context authority.
 
-Manual scenarios:
+Gate B must be completed end-to-end before Club C starts.
 
-- real repository bug delegated to coding specialist then independently tested;
-- terminal/filesystem/browser/computer-use capability;
-- installed app selected as capability, not host;
-- machine node disconnect mid-task → blocked/recoverable, not false success;
-- long-running task remains active while user leaves;
-- Sunday/cloud can observe and cancel/pause that task through Grid test harness/surface where available;
-- optional machine sleep/shutdown after verified completion if capability is real;
-- stale memory vs authoritative live source → live source wins;
-- natural-language Personal Policy change affects later behavior.
+### B1 — Real machine work
 
-**Pass:** OSCAR can do verified useful work while remaining conceptually independent of the computer executing it.
+Required manual acceptance:
+
+- real repository bug delegated to a coding specialist and independently tested;
+- scoped filesystem/Git work;
+- typed terminal/PowerShell capability;
+- installed application discovered/selected as an app capability rather than generic host command;
+- structured Windows computer-use/UI Automation on a harmless real application;
+- typed browser capability against a deterministic local fixture plus bounded public page;
+- independent readback/observation after browser/desktop mutation;
+- machine node disconnect mid-task → BLOCKED/recoverable, not false success;
+- ambiguous consequential mutation is not blindly replayed;
+- cancellation stops the actual process tree;
+- no duplicate mutation after restart/lost-result recovery.
+
+### B2 — Long-running continuation and owner control
+
+Using existing Connection Grid contracts and a separate control process:
+
+```text
+start bounded long-running task
+→ owner-control observes task/progress/node
+→ owner-control disconnects
+→ Worker continues within existing authorization
+→ coordinator/control reconnects
+→ same task state recovered
+→ pause/resume where genuinely supported or cancel
+→ no duplicate execution
+→ independently verified final state
+```
+
+This is a control-path proof, not Sunday UI.
+
+Optional physical sleep/shutdown acceptance may remain manual-pending; do not shut down the development machine merely to make Gate B green. The typed power capability, if present, must remain high risk and owner-confirmed.
+
+### B3 — Canonical Memory Fabric
+
+Required architecture:
+
+```text
+OSCAR Event Archive
+SQLite + WAL + FTS5
+      │
+      ├── Qdrant OSS semantic/hybrid derived index
+      └── Graphiti OSS + Neo4j Community temporal/entity derived index
+```
+
+The Event Archive is canonical. Vector/graph indexes are rebuildable derived state.
+
+Required acceptance:
+
+- durable source event with stable provenance IDs;
+- exact/FTS retrieval;
+- paraphrased/hybrid Qdrant retrieval;
+- temporal/entity Graphiti retrieval;
+- current fact vs historical fact correctly distinguished;
+- preference correction/supersession preserves old history but changes current answer;
+- same-name/alias entity tests do not merge identities without evidence;
+- restart preserves canonical continuity;
+- Qdrant/graph index rebuild from canonical archive;
+- stale/failed derived index falls back truthfully rather than inventing memory;
+- forget removes/tombstones active OSCAR memory/index state according to policy without false secure-erasure claims.
+
+### B4 — Jev memory reliability
+
+Jev must perform memory dependency preflight rather than let the reasoning model guess whether memory exists.
+
+Required behavior:
+
+```text
+historical/personal reference
+→ retrieval mandatory
+→ active context
+→ structured state/entities/tasks/policy
+→ FTS/exact archive
+→ Qdrant hybrid
+→ Graphiti temporal/entity
+→ bounded query expansion/deep archive
+→ UNKNOWN
+```
+
+Required tests:
+
+- `continue that`/`same as before`/existing project references trigger retrieval;
+- deterministic unrelated questions avoid unnecessary memory work;
+- empty first retrieval triggers bounded expansion rather than `not remembered`;
+- no `I remember X` without retrieved/active source evidence;
+- personal/historical claims expose source event/memory provenance internally;
+- recalled historical material remains `RECALLED` in the current reasoning path;
+- live authoritative current state outranks stale memory;
+- reasoning/model output cannot promote inference into fact.
+
+### B5 — Memory Writer and evaluation
+
+Required acceptance:
+
+- memory extraction creates provenance-bound candidates, not model-authored truth;
+- scoped preference inference does not overgeneralize;
+- corrections propagate to semantic/temporal indexes;
+- background consolidation preserves source events;
+- synthetic/non-sensitive evaluation covers exact recall, paraphrase recall, temporal correctness, alias/disambiguation, project switching, expected-memory miss escalation, false recall, correction, forget, rebuild/drift and live-vs-memory authority.
+
+### B6 — Personal Policy
+
+Required acceptance:
+
+```text
+natural-language policy
+→ bounded structured candidate
+→ show interpretation
+→ exact owner confirmation
+→ active policy
+```
+
+Test representative open-ended rules, scope/conditions, ambiguity, conflicting equal-authority rules, expiry and later real behavior.
+
+Policy cannot grant missing permission, bypass strong confirmation, weaken hard safety or be overridden by Persona/memory.
+
+### B7 — Real private connector / OAuth
+
+Complete at least one useful private service end-to-end using a current official auth flow.
+
+Required acceptance:
+
+- minimal scopes;
+- PKCE/device/system-browser flow as appropriate;
+- state/nonce validation;
+- token expiry/refresh/revoke where supported;
+- platform secure-credential boundary;
+- raw tokens never enter Git, model prompts, memory, Action Ledger or logs;
+- harmless private read;
+- one reversible write/readback/cleanup only after owner approval.
+
+If owner authorization is required, STOP only at that interactive authorization point; do not fake account acceptance.
+
+### B8 — Live context vs memory
+
+Demonstrate a real conflict:
+
+```text
+memory says X
+current authoritative source says Y
+→ OSCAR answers Y for current-state question
+→ memory stays historical/RECALLED
+→ provenance explains the conflict
+```
+
+At minimum federate current local project/file/task state, one authenticated private source when available and public/search evidence when relevant.
+
+### Gate B pass condition
+
+**PASS** only when mandatory Slice 05 and Slice 06 scenarios above are genuinely accepted and recorded.
+
+Automated tests are necessary but insufficient.
+
+A genuinely unavailable external/private step remains BLOCKED/PARTIAL until completed; it is not silently deferred to Club C.
+
+**Current:** **PARTIAL — current work.** Native Windows Worker/Codex/restart/cancellation/local continuity foundations are verified; browser/computer-use, installed app, owner-control continuation, production Memory Fabric, open-ended policy, private OAuth/secure storage and live-context federation remain to be completed.
+
+See [CLUB-B-CHECKPOINT.md](CLUB-B-CHECKPOINT.md), [ROADMAP.md](ROADMAP.md) and [MEMORY.md](MEMORY.md).
 
 ## Gate C — Embodied OSCAR
 
 **Slices:** 07–10
 
+Starts only after Gate B PASS.
+
 Prove physical, voice, mobile and desktop embodiments share one OSCAR.
 
-Manual scenarios:
+Required scenarios include:
 
-- ESP32/Pico advertises capabilities and executes a safe action with local safety independent of cloud;
+- ESP32/Pico capability advertisement and safe physical action with local safety;
 - wake OSCAR by voice and complete a real task;
 - barge-in/self-voice suppression;
 - Voice Match vs Voice Map distinction;
 - multi-device voice arbitration;
-- Persona profile changes tone/voice/motion without changing truth/permission;
+- Persona changes expression without changing truth/permission;
 - Sunday owner-control surface shows Connection Grid state;
 - start task on Desktop, leave, inspect/control from Sunday;
 - one supported communication path;
 - Dictate/Edit/Ask/Act against real desktop context;
 - degraded Grid state when one embodiment goes offline.
 
-**Pass:** phone, desktop, voice and Edge feel like one intelligence with shared task state and owner control.
+**Pass:** phone, desktop, voice and Edge feel like one intelligence with shared task/memory state and owner control.
 
 ## Gate D — JARVIS Layer
 
@@ -111,22 +238,9 @@ Manual scenarios:
 
 Prove current-world awareness, persistent Sentry, commissioning and durable delegated work.
 
-Manual scenarios:
+Required scenarios include combining multiple live sources into the World Model, stale-state uncertainty, persistent Sentry without active conversation, capture/privacy boundaries, commissioning, durable Worker inspection, competing objectives, evaluated learned workflow and UI/avatar correspondence to real runtime state.
 
-- combine at least three live sources into one World Model answer;
-- stale source becomes uncertain/unknown;
-- Sentry remains persistently aware without active conversation;
-- verify UI/runtime distinction: Sentry Aware vs Listening vs Muted vs Awareness Off;
-- trigger a physical/acoustic Sentry event and verify policy-aware escalation;
-- if Context Capture/Daily Journal enabled: capture one legitimately supported source, verify retention policy, pause and delete/forget path;
-- unsupported call/app capture must remain unsupported;
-- first-time commissioning includes Persona, Grid and capture privacy choices;
-- create a durable Worker and inspect progress/evidence;
-- competing objectives exercise Executive Planner;
-- teach one workflow and keep it experimental until evaluated;
-- avatar states match actual Working/Verifying/Blocked/Done state.
-
-**Pass:** OSCAR maintains coherent current awareness, durable responsibilities and optional continuity capture without collapsing privacy or evidence boundaries.
+**Pass:** OSCAR maintains coherent current awareness, durable responsibilities and optional continuity capture without collapsing privacy/evidence boundaries.
 
 ## Gate E — Unified Alpha
 
@@ -134,47 +248,16 @@ Manual scenarios:
 
 Deliberately break the integrated system.
 
-Manual scenarios:
-
-- onboard/control at least one additional physical capability;
-- provider/auth failure → bounded recovery;
-- cloud coordinator loss while desktop task continues locally;
-- Sunday offline while existing permitted work continues without fabricated owner approval;
-- Desktop loss → lease expiry/reclaim;
-- Edge loss → physical capabilities disappear while software OSCAR remains available;
-- Grid reconnect/resync;
-- Action Ledger/Undo for reversible and irreversible actions;
-- unknown/partial/blocked/failed reporting;
-- Voice Match spoof / Voice Map false-positive checks;
-- capture-source failure, retention/deletion and privacy regression checks;
-- Persona cannot reduce truthfulness/safety/confirmation;
-- one complete scenario across perception/communication → World Model/Jev → policy → planning → capability/model routing → Grid node/Worker/device → ledger/artifact → verification → voice/text result.
+Required scenarios include provider/auth failure, coordinator/node/Edge loss, Grid resync, Action Ledger/Undo, memory-index failure/rebuild, unknown/partial/blocked reporting, voice spoof/false-positive checks, capture retention/deletion, Persona truthfulness regression and one complete end-to-end scenario across perception/communication → World Model/Jev/Memory Fabric → policy/planning → capability/model routing → Grid/Worker/device → ledger/artifact → verification → Sunday/voice/text result.
 
 **Pass:** major subsystems operate as one evidence-backed developer alpha and remaining limitations are explicit.
-
-## Fast-build cadence
-
-```text
-Day 1
-Gate A + core Gate B path
-
-Day 2
-Gate B completion + Gate C core paths
-
-Day 3
-Gate C completion + Gate D/E integration shell
-```
-
-This is intentionally aggressive. Anything not genuinely verified remains planned/partial and is hardened afterward.
 
 ## Status
 
 | Gate | Slices | Status |
 |---|---|---|
-| Gate A — Brain | 01–04 | PASS for Club A foundation — focused routing and final evidence-qualified search accepted; manual review stop |
-| Gate B — Can Do Work | 05–06 | PARTIAL — Windows Worker/useful Codex/local continuity accepted; browser, private services and broader criteria pending |
+| Gate A — Brain | 01–04 | **PASS** |
+| Gate B — Can Do Work | 05–06 | **PARTIAL — current work; finish end-to-end before Club C** |
 | Gate C — Embodied OSCAR | 07–10 | Planned |
 | Gate D — JARVIS Layer | 11–14 | Planned |
 | Gate E — Unified Alpha | 15–17 | Planned |
-
-A Gate status changes only after its manual checklist has actually been run.
