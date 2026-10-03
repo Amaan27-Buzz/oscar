@@ -71,6 +71,10 @@ class Dispatcher:
         candidates = [c for c in node["capabilities"] if c["id"] == action.capability_id]
         if len(candidates) != 1 or action.capability_id not in self.executors:
             raise PermissionError("target capability unavailable")
+        # A successfully advertised node necessarily has heartbeat scope. Authenticated
+        # target-side activity is fresh liveness evidence, so continuous real work must
+        # not expire solely because a separate timer heartbeat was not scheduled.
+        self.grid.heartbeat(session)
         self.grid.accept(envelope, session.token, "execute")
         for permission in candidates[0]["permissions"]:
             self.grid.authenticate(session, permission)
