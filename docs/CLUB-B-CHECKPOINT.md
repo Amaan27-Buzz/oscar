@@ -1,5 +1,117 @@
 # Club B foundation checkpoint — 2026-10-03 IST
 
+## Local Windows completion pass — 2026-10-04 IST
+
+**Slice 05: PARTIAL. Slice 06: PARTIAL. Gate B: PARTIAL.**
+The useful Windows machine/Codex/local-continuity scope below is VERIFIED; it does
+not complete every slice or Gate B criterion. Gate A remains unchanged. No Slice
+07, Sunday, voice or UI implementation was started.
+
+Started from exact fetched remote `work` SHA
+`1d3778370495a05a84ca0badfea943cd5fb6d5be`, after confirming PR #10 was MERGED into
+`work` and its `cfa8c2fdeb2de0b4dbb2d912102be476f718ef4e` merge commit was an ancestor.
+Branch: `overnight/club-b-windows`; checkpoint commits are pushed. The final branch
+SHA/PR/CI conclusion are reported at delivery; this document cannot contain its
+own final commit hash. Earlier reference evidence below remains historical.
+
+[Machine-readable local evidence](evidence/club-b-windows-2026-10-04.json) records
+Windows platform, real task/correlation IDs, independent file hash and Git baseline,
+coordinator process IDs, failed attempts and limitations. Disposable repositories
+and SQLite state remain under ignored `.oscar/` for local inspection. No provider
+keys, authentication file or specialist transcript is committed.
+
+### Observable acceptance and evidence
+
+- **Windows Worker:** real file read/write/list/filename search and UTF-8 content;
+  traversal/drive/UNC/ADS/device aliases, junctions and symlink parents reject;
+  reparse entries are excluded from listings. `CreateFileW` ancestor handles with
+  read access/no delete sharing pin paths; rename regression passes. Git
+  status/diff/log/new-file commit is real, with independent bytes/HEAD-tree checks.
+- **Native processes:** explicit absolute `.exe` allowlist, no shell shims,
+  filtered environment, bounded timeout/output and `machine:host` permission.
+  Suspended creation → Job assignment → resume prevents execution before tree
+  control. Real descendants terminate on cancel, timeout, output overflow, parent
+  exit and abrupt Worker process death. Job-assignment rejection never starts the
+  child. Initial pause/resume is verified; Windows pause means before the next
+  subprocess, **not suspension of a running arbitrary process**. HTTP acknowledgments
+  qualify that behavior; paused wall time counts toward timeout.
+- **Useful Codex specialist:** Jev structured coding objective → advertised Codex
+  capability → separate Machine Worker → native authenticated Codex CLI → actual
+  `intervals.py` repair in a disposable Git repo. Nested intervals formerly shrank
+  the merged endpoint; the fix preserves the maximum. Core's separate inspector
+  runs nine behavioral cases, input-immutability/invalid-input checks, sole-file
+  Git diff and unchanged baseline HEAD. Baseline fails independently; corrected
+  behavior passes. Result remains REPORTED; only independent evidence is VERIFIED.
+- **Codex failure/cancel/recovery:** no-mutation success testimony was correctly
+  FAILED by independent checks. An invalid real invocation FAILED without changing
+  the verified file. A separate real Codex subprocess reached running state, then
+  HTTP cancellation killed its job and task became CANCELLED with the same artifact
+  hash. Lost-result recovery after Worker restart reused one completed execution.
+  Initial wrong-specialist/timeout/read-only/extra-bytecode failures are preserved
+  in the evidence rather than recast as successful acceptance.
+- **Actual coordinator restart:** first coordinator PID `36760` exits, Worker exits,
+  reconnect starts another Worker and coordinator PID `8068` recovers the same
+  completed result. File/Git checks verify once; checkpoint stays identical and
+  execution count stays one. This strengthens the earlier same-process composition
+  restart proof without pretending to implement independent distributed stores.
+- **Ambiguous mutation:** a disposable command actually writes a marker and starts
+  a child; the Worker OS-process is terminated abruptly. The child dies, task
+  BLOCKS, reconnect/reclaim cannot replay the started dedup action, and the existing
+  marker remains one mutation. No repository or OS damage was induced.
+- **Memory/Policy:** selected synthetic project memory and owner-confirmed policy
+  survive actual coordinator process restart. Recall stays RECALLED; current file
+  state outranks stale memory. Missing permission and equal-ranked conflicts block.
+  Forget removes the live OSCAR memory row, with no disk/WAL/backup erasure claim.
+- **Natural-language Policy:** exact message/send phrases produce a shown inactive
+  structured candidate. Owner confirmation binds its review digest; wrong/stale/
+  altered/duplicate confirmation and conflicting interpretations reject activation.
+  Ambiguous/compound instructions remain unsupported. Later external-communication
+  evaluation requires per-action confirmation while missing grants still block.
+  This is a trusted local editor, not open-ended model authority or remote identity.
+- **Future Sunday:** canonical design reaffirmed assistant role/voice-interaction,
+  optional attention-aware Orb/hotspot/reappearance, configurable context widgets,
+  permissioned notification summaries/RemoteInput, official API preference,
+  Chief-of-Staff replanning and independent presence/awareness/retention/action
+  controls. **Documentation only; target Samsung behavior is entirely unverified.**
+
+### Final local quality checks
+
+**319/319 tests PASS in 73.878 seconds**, including 14 actual Windows-specific
+regressions and all existing baseline cases. Ruff PASS; format PASS (63 Python
+files); strict mypy PASS (43 source/script files, Windows and Linux platform
+targets). Repository required-file/local-link/value-silent secret scan and Git
+diff checks PASS. Existing urllib HTTPError ResourceWarnings are non-fatal on local
+Python 3.14. Windows and Ubuntu Python 3.12 CI are now separate jobs; CI conclusions
+are reported independently from local evidence, using GitHub PR merge-ref checkout.
+
+### Boundary and remaining acceptance
+
+Trusted-host execution is not an OS sandbox. Approved interpreters/agents can
+access host files/network as the laptop user; hostile repositories/local writers,
+hard links, Git internal config/filter attacks, credential isolation and restricted
+user/AppContainer/container execution remain unsafe/unverified. Codex's useful
+acceptance explicitly used trusted `danger-full-access` in the disposable fixture
+after workspace-write behaved as read-only. Its own auth home is supplied explicitly;
+OSCAR provider environment keys are not inherited. See [SECURITY.md](SECURITY.md).
+
+Gate B cannot PASS from unit-test volume. Browser/computer-use and broader installed
+app execution, authenticated private connector accounts/OAuth, actual Supermemory
+service, public remote TLS/rendezvous, independent node stores, secure platform
+storage, remote power, Sunday/Android/phone supervision, voice and physical hardware
+remain partial/unverified. Supermemory remains the existing `MemoryBackend`
+boundary; no service was fabricated. Broad natural-language policy, calendar/task
+automation and future World Model/Chief-of-Staff behavior are not implemented here.
+
+### Morning physical/manual review
+
+Inspect the retained Codex fixture `.oscar/codex-acceptance-05/repository`, its
+single-file diff and `.oscar/windows-codex.json`; inspect local task/evidence/dedup
+state before changing any ambiguous record. Re-run the documented local scripts
+with a new empty state-root. Review the PR into `work`, particularly trusted-host
+scope and cooperative pause semantics. Any browser/private account/Supermemory or
+Samsung acceptance is separate work requiring real access/device evidence. Do not
+merge automatically or start Slice 07 from this checkpoint.
+
 **Slice 05: VERIFIED reference Worker foundation; full slice PARTIAL.**
 **Slice 06: VERIFIED local/reference memory and policy foundation; full slice PARTIAL.**
 **Gate B: PARTIAL, not PASS. Gate A PASS is preserved.**

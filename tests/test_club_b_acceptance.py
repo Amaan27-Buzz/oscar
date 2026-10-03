@@ -9,6 +9,14 @@ from scripts.verify_worker_reference import run_reference
 
 
 class ClubBAcceptanceTests(unittest.TestCase):
+    def test_coordinator_os_process_restart_memory_policy_continuation(self):
+        from scripts.verify_local_continuation import run
+
+        with TemporaryDirectory() as temporary:
+            report = run(Path(temporary) / "acceptance")
+        self.assertEqual("VERIFIED", report["status"])
+        self.assertNotEqual(report["start_coordinator_pid"], report["recovery_coordinator_pid"])
+
     def test_separate_process_network_worker_continuation(self):
         with TemporaryDirectory() as temporary:
             report = run_reference(Path(temporary))

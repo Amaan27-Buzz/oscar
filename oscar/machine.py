@@ -12,9 +12,12 @@ import shutil
 import signal
 import subprocess
 from dataclasses import dataclass
+from io import BufferedReader
 from pathlib import Path
+from queue import Empty, Full, Queue
+from threading import Event, Thread
 from time import monotonic, sleep, time
-from typing import Any
+from typing import Any, cast
 
 from .capabilities import Cancellation, FileExecutor, ScopedFiles, Verifier
 from .contracts import (
@@ -35,6 +38,9 @@ from .grid import Grid, SessionHandle
 from .policy import PersonalPolicy
 from .storage import StateConflict, Store
 
+_posix_os: Any = os
+_posix_signal: Any = signal
+
 AGENT_EXECUTABLES = {
     "codex": "codex",
     "claude-code": "claude",
@@ -50,6 +56,7 @@ class MachineScope:
     allowed_executables: tuple[str, ...] = ()
     max_timeout: float = 120
     max_output: int = 64_000
+    codex_home: Path | None = None
 
     def __post_init__(self) -> None:
         if not self.root.is_dir() or self.root.is_symlink():
@@ -59,17 +66,28 @@ class MachineScope:
         if not 1024 <= self.max_output <= 1_000_000:
             raise ValueError("invalid output bound")
         if any(
-            not Path(p).is_absolute() or not os.access(p, os.X_OK) for p in self.allowed_executables
+            not Path(p).is_absolute()
+            or not os.access(p, os.X_OK)
+            or os.name == "nt"
+            and Path(p).suffix.lower() != ".exe"
+            for p in self.allowed_executables
         ):
             raise ValueError("allowed executables must be installed absolute executable paths")
 
     def directory(self, relative: str) -> Path:
+        if os.name == "nt":
+            from .windows_files import WindowsScopedFiles
+
+            with WindowsScopedFiles(self.root).checked_directory(relative) as directory:
+                return directory
         if relative == ".":
             return self.root.resolve()
         # Directory-FD traversal rejects symlinks. Returned paths are for trusted host commands.
         files = ScopedFiles(self.root)
         with files.parent(relative) as (parent, name):
-            fd = os.open(name, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=parent)
+            fd = os.open(
+                name, os.O_RDONLY | _posix_os.O_DIRECTORY | _posix_os.O_NOFOLLOW, dir_fd=parent
+            )
             os.close(fd)
         return self.root.resolve() / relative
 
@@ -106,6 +124,11 @@ class MachineWorker:
             and path in scope.allowed_executables
             and scope.trusted_host_execution
         }
+        if os.name == "nt" and scope.trusted_host_execution:
+            for name, command in AGENT_EXECUTABLES.items():
+                for executable in scope.allowed_executables:
+                    if Path(executable).name.lower() == command + ".exe":
+                        self.agents[name] = executable
         self.owners: dict[str, str] = {}
         self.outputs: dict[str, str] = {}  # Bounded active context; never task/ledger persistence.
 
@@ -225,14 +248,23 @@ class MachineWorker:
             raise ValueError("invalid or unauthorized command")
         directory = self.scope.directory(cwd)
         env = {k: os.environ[k] for k in ("PATH", "LANG", "LC_ALL") if k in os.environ}
+        if os.name == "nt":
+            # Windows system components require these; provider tokens are never inherited.
+            env.update({k: os.environ[k] for k in ("SystemRoot", "TEMP", "TMP") if k in os.environ})
         env.update(
             {
                 "GIT_CONFIG_NOSYSTEM": "1",
                 "GIT_CONFIG_GLOBAL": os.devnull,
                 "GIT_TERMINAL_PROMPT": "0",
+                "PYTHONDONTWRITEBYTECODE": "1",
             }
         )
+        if self.scope.codex_home is not None and argv[0] == self.agents.get("codex"):
+            # Explicit specialist auth/config boundary; never OSCAR provider environment.
+            env["CODEX_HOME"] = str(self.scope.codex_home)
         self.check(action, cancellation)
+        if os.name == "nt":
+            return self.run_windows_command(action, cancellation, argv, directory, timeout, env)
         process = subprocess.Popen(
             argv,
             cwd=directory,
@@ -252,7 +284,9 @@ class MachineWorker:
                 self.check(action, cancellation)
                 want_pause = self.controls(action.task_id)["paused"] is True
                 if want_pause != paused:
-                    os.killpg(process.pid, signal.SIGSTOP if want_pause else signal.SIGCONT)
+                    _posix_os.killpg(
+                        process.pid, _posix_signal.SIGSTOP if want_pause else _posix_signal.SIGCONT
+                    )
                     paused = want_pause
                 chunk = process.stdout.read(8192) or b""
                 output.extend(chunk)
@@ -274,15 +308,106 @@ class MachineWorker:
             return process.returncode, redact_runtime_secrets(output.decode(errors="replace"))
         finally:
             try:
-                os.killpg(process.pid, signal.SIGKILL)
+                _posix_os.killpg(process.pid, _posix_signal.SIGKILL)
             except ProcessLookupError:
                 pass
             process.wait(timeout=3)
             process.stdout.close()
 
+    def run_windows_command(
+        self,
+        action: Action,
+        cancellation: Cancellation,
+        argv: list[str],
+        directory: Path,
+        timeout: float,
+        env: dict[str, str],
+    ) -> tuple[int, str]:
+        from .windows_files import WindowsScopedFiles
+        from .windows_process import WindowsJob
+
+        started = monotonic()
+        # Windows pause is cooperative before a subprocess starts, never fake SIGSTOP.
+        while self.controls(action.task_id)["paused"] is True:
+            self.check(action, cancellation)
+            if monotonic() - started >= timeout:
+                raise TimeoutError("machine command timeout while paused")
+            self.checkpoint(action, "paused-before-process", 0.4)
+            sleep(0.05)
+        if Path(argv[0]).suffix.lower() != ".exe":
+            raise ValueError("Windows requires a native executable; shell shims are not executed")
+        job = WindowsJob()
+        chunks: Queue[bytes | None] = Queue(maxsize=8)
+        stopping = Event()
+        process: subprocess.Popen[bytes] | None = None
+        reader: Thread | None = None
+        try:
+            with WindowsScopedFiles(self.scope.root).pinned(directory):
+                process = job.start(
+                    argv,
+                    cwd=directory,
+                    env=env,
+                    stdin=subprocess.DEVNULL,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                )
+                assert process.stdout is not None
+                stream = cast(BufferedReader, process.stdout)
+
+                def collect() -> None:
+                    try:
+                        while not stopping.is_set():
+                            chunk = stream.read1(8192)
+                            while not stopping.is_set():
+                                try:
+                                    chunks.put(chunk or None, timeout=0.05)
+                                    break
+                                except Full:
+                                    continue
+                            if not chunk:
+                                break
+                    except OSError:
+                        pass
+
+                reader = Thread(target=collect, daemon=True)
+                reader.start()
+                output = bytearray()
+                last_progress = 0.0
+                while True:
+                    self.check(action, cancellation)
+                    if monotonic() - started >= timeout:
+                        raise TimeoutError("machine command timeout")
+                    if monotonic() - last_progress >= 1:
+                        self.checkpoint(action, "process-running", 0.5)
+                        last_progress = monotonic()
+                    if process.poll() is not None:
+                        job.close()  # Terminate descendants even if parent already exited.
+                    try:
+                        chunk = chunks.get(timeout=0.02)
+                    except Empty:
+                        continue
+                    if chunk is None:
+                        break
+                    output.extend(chunk)
+                    if len(output) > self.scope.max_output:
+                        raise ValueError("command output bound exceeded")
+                code = process.wait(timeout=max(0.1, timeout - (monotonic() - started)))
+                return code, redact_runtime_secrets(output.decode(errors="replace"))
+        finally:
+            stopping.set()
+            job.close()
+            if process:
+                process.wait(timeout=3)
+                if reader:
+                    reader.join(timeout=3)
+                if process.stdout:
+                    process.stdout.close()
+
     def git_command(self, operation: str, parameters: dict[str, Any]) -> list[str]:
         if not self.git or self.git not in self.scope.allowed_executables:
             raise PermissionError("Git executor unavailable")
+        if (self.scope.root / ".git").exists():
+            self.scope.directory(".git")  # Reject redirected Git metadata roots.
         prefix = [
             self.git,
             "-c",
@@ -356,14 +481,7 @@ class MachineWorker:
                 pattern = p.get("pattern", "")
                 if not isinstance(pattern, str) or len(pattern) > 200:
                     raise ValueError("invalid filename search")
-                with self.files.directory(relative) as descriptor:
-                    with os.scandir(descriptor) as entries:
-                        names: list[str] = []
-                        for scanned, entry in enumerate(entries):
-                            if scanned >= 10_000 or len(names) >= 500:
-                                raise ValueError("directory result bound exceeded")
-                            if not entry.is_symlink() and pattern in entry.name:
-                                names.append(entry.name)
+                names = self.files.names(relative, pattern)
                 self.outputs[action.id] = redact_runtime_secrets(json.dumps(sorted(names)))
                 metadata = {"entries": len(names)}
             elif cap.id == "machine.executables":
@@ -377,13 +495,8 @@ class MachineWorker:
                 # A single new file plus commit: exact bounded reference objective, no LLM.
                 if (self.scope.root / ".git").is_symlink():
                     raise PermissionError("symlink Git directory denied")
-                with self.files.parent(p["path"]) as (parent, name):
-                    try:
-                        os.stat(name, dir_fd=parent, follow_symlinks=False)
-                    except FileNotFoundError:
-                        pass
-                    else:
-                        raise ValueError("repository reference task only creates a new file")
+                if self.files.exists(p["path"]):
+                    raise ValueError("repository reference task only creates a new file")
                 status, out = self.run_command(
                     action, cancellation, self.git_command("status", {}), ".", 10
                 )
@@ -492,7 +605,13 @@ class MachineVerifier(Verifier):
             actual = self.files.read(c["path"])
             digest = hashlib.sha256(actual).hexdigest()
             prefix = ["git", "-c", "core.hooksPath=" + os.devnull, "-c", "core.fsmonitor=false"]
-            env = {"PATH": os.defpath, "GIT_CONFIG_NOSYSTEM": "1", "GIT_CONFIG_GLOBAL": os.devnull}
+            env = {
+                "PATH": os.environ.get("PATH", os.defpath),
+                "GIT_CONFIG_NOSYSTEM": "1",
+                "GIT_CONFIG_GLOBAL": os.devnull,
+            }
+            if os.name == "nt":
+                env["SystemRoot"] = os.environ["SystemRoot"]
 
             def read(args: list[str]) -> bytes:
                 return subprocess.check_output(

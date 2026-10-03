@@ -40,12 +40,40 @@ class Executor(Protocol):
     def __call__(self, action: Action, cancellation: Cancellation) -> Result: ...
 
 
+_posix_os: Any = os
+
+
 class ScopedFiles:
     """Directory-FD operations reject symlinks and traversal, including parent symlinks."""
 
     def __init__(self, root: Path):
         self.root = root.resolve()
         self.root.mkdir(parents=True, exist_ok=True, mode=0o700)
+
+    def __new__(cls, root: Path) -> "ScopedFiles":
+        if os.name == "nt" and cls is ScopedFiles:
+            from .windows_files import WindowsScopedFiles
+
+            return super().__new__(WindowsScopedFiles)
+        return super().__new__(cls)
+
+    def exists(self, relative: str) -> bool:
+        with self.parent(relative) as (parent, name):
+            try:
+                os.stat(name, dir_fd=parent, follow_symlinks=False)
+                return True
+            except FileNotFoundError:
+                return False
+
+    def names(self, relative: str, pattern: str) -> list[str]:
+        with self.directory(relative) as descriptor, os.scandir(descriptor) as entries:
+            names: list[str] = []
+            for scanned, entry in enumerate(entries):
+                if scanned >= 10_000 or len(names) >= 500:
+                    raise ValueError("directory result bound exceeded")
+                if not entry.is_symlink() and pattern in entry.name:
+                    names.append(entry.name)
+            return sorted(names)
 
     @contextmanager
     def parent(self, relative: str, create: bool = False) -> Iterator[tuple[int, str]]:
@@ -58,7 +86,7 @@ class ScopedFiles:
             or "\\" in relative
         ):
             raise ValueError("path outside authorized workspace")
-        descriptor = os.open(self.root, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+        descriptor = os.open(self.root, os.O_RDONLY | _posix_os.O_DIRECTORY | _posix_os.O_NOFOLLOW)
         try:
             for part in parts[:-1]:
                 if create:
@@ -67,7 +95,9 @@ class ScopedFiles:
                     except FileExistsError:
                         pass
                 next_fd = os.open(
-                    part, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=descriptor
+                    part,
+                    os.O_RDONLY | _posix_os.O_DIRECTORY | _posix_os.O_NOFOLLOW,
+                    dir_fd=descriptor,
                 )
                 os.close(descriptor)
                 descriptor = next_fd
@@ -79,11 +109,13 @@ class ScopedFiles:
     def directory(self, relative: str = ".") -> Iterator[int]:
         """Scoped directory descriptor for race-resistant listing/search."""
         if relative == ".":
-            descriptor = os.open(self.root, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+            descriptor = os.open(
+                self.root, os.O_RDONLY | _posix_os.O_DIRECTORY | _posix_os.O_NOFOLLOW
+            )
         else:
             with self.parent(relative) as (parent, name):
                 descriptor = os.open(
-                    name, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=parent
+                    name, os.O_RDONLY | _posix_os.O_DIRECTORY | _posix_os.O_NOFOLLOW, dir_fd=parent
                 )
         try:
             yield descriptor
@@ -97,7 +129,7 @@ class ScopedFiles:
             temp_name = f".oscar-{new_id()}"
             descriptor = os.open(
                 temp_name,
-                os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW,
+                os.O_WRONLY | os.O_CREAT | os.O_EXCL | _posix_os.O_NOFOLLOW,
                 0o600,
                 dir_fd=parent,
             )
@@ -117,7 +149,9 @@ class ScopedFiles:
 
     def read(self, relative: str) -> bytes:
         with self.parent(relative) as (parent, name):
-            descriptor = os.open(name, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK, dir_fd=parent)
+            descriptor = os.open(
+                name, os.O_RDONLY | _posix_os.O_NOFOLLOW | _posix_os.O_NONBLOCK, dir_fd=parent
+            )
             with os.fdopen(descriptor, "rb") as file:
                 import stat
 

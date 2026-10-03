@@ -172,7 +172,7 @@ This is intentionally aggressive. Anything not genuinely verified remains planne
 | Gate | Slices | Status |
 |---|---|---|
 | Gate A — Brain | 01–04 | PASS for Club A foundation — focused routing and final evidence-qualified search accepted; manual review stop |
-| Gate B — Can Do Work | 05–06 | PARTIAL — reference foundation passes; full manual criteria pending |
+| Gate B — Can Do Work | 05–06 | PARTIAL — Windows Worker/useful Codex/local continuity accepted; browser, private services and broader criteria pending |
 | Gate C — Embodied OSCAR | 07–10 | Planned |
 | Gate D — JARVIS Layer | 11–14 | Planned |
 | Gate E — Unified Alpha | 15–17 | Planned |

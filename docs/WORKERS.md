@@ -332,3 +332,42 @@ This is **reference network Worker verification**, with shared SQLite authority.
 Independent stores, public TLS/outbound rendezvous, Windows/user-machine runtime,
 GUI/browser work and real coding-agent task acceptance remain **UNVERIFIED**.
 Installed agent `--version` proves invocation only, not authenticated coding work.
+
+## Windows local-alpha Worker — 2026-10-04
+
+Windows uses `WindowsScopedFiles`, not POSIX directory-FD emulation. It rejects
+traversal, drive/UNC/device/alternate-stream aliases and all encountered reparse
+points, including junctions and parent/leaf symlinks. Ancestors are opened with
+`CreateFileW`, `OPEN_REPARSE_POINT`, read access and no delete sharing for the
+operation; real tests prove pinned directories cannot be renamed. File writes
+use a flushed temporary file and entry replacement. This assumes a trusted local
+workspace, not a hostile filesystem or OS sandbox.
+
+Only configured absolute native `.exe` paths run, without a shell. Windows jobs
+start suspended, are assigned to a non-inheritable Job Object with
+`JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE`, then resume through documented thread APIs.
+Assignment failure rejects execution. Descendants cannot opt into breakaway.
+Cancellation, timeout, output failure, parent exit and abrupt Worker OS-process
+death close the job and terminate its process tree. Output drains through a
+bounded pipe-reader queue; environment inheritance uses an explicit allowlist.
+Codex gets its own explicitly configured `CODEX_HOME`, not OSCAR provider keys.
+Native Codex binaries can be configured directly; `.cmd`/`.ps1` shims do not run.
+
+Windows pause means **before the next subprocess**, including an initially paused
+task. A currently running arbitrary Windows process is not suspended. Control
+acknowledgments expose `pause_semantics`; file atomic operations are not pausable.
+Timeout includes pre-start paused wall time. Cancellation remains available while
+paused. POSIX process-group pause behavior is preserved independently.
+
+The useful Codex objective repaired a nested interval merge in a disposable repo.
+Its report stayed REPORTED. Core independently checked nine behavioral cases,
+input immutability, invalid-input rejection, sole-file Git diff and baseline HEAD
+before VERIFIED. Lost result/restart recovery kept the same artifact hash and one
+execution. Real Codex cancellation and invalid invocation were exercised separately.
+See [local acceptance evidence](evidence/club-b-windows-2026-10-04.json) and
+[checkpoint](CLUB-B-CHECKPOINT.md). Browser/computer-use, independent node stores,
+public remote transport, power and phone supervision remain unverified.
+
+Windows API research uses Microsoft's [Job Objects](https://learn.microsoft.com/en-us/windows/win32/procthread/job-objects)
+and [reparse/file operations](https://learn.microsoft.com/en-us/windows/win32/fileio/reparse-points-and-file-operations)
+contracts; platform claims above additionally require the recorded actual laptop tests.

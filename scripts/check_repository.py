@@ -13,7 +13,7 @@ def main() -> int:
     ).splitlines()
     files = sorted(set(files))
     failures = []
-    workflow = (root / ".github/workflows/docs-check.yml").read_text()
+    workflow = (root / ".github/workflows/docs-check.yml").read_text(encoding="utf-8")
     required = re.search(r"required=\((.*?)\)", workflow, re.DOTALL)
     if required is None:
         failures.append("required file contract unavailable")
@@ -22,7 +22,9 @@ def main() -> int:
             if not (root / name).is_file():
                 failures.append("required file absent: " + name)
     names = re.findall(
-        r"^([A-Z][A-Z0-9_]*API_KEY[A-Z0-9_]*)=", (root / ".env.example").read_text(), re.MULTILINE
+        r"^([A-Z][A-Z0-9_]*API_KEY[A-Z0-9_]*)=",
+        (root / ".env.example").read_text(encoding="utf-8"),
+        re.MULTILINE,
     )
     material = [os.environ[name].encode() for name in names if os.environ.get(name)]
     secret_pattern = re.compile(

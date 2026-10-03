@@ -5,6 +5,7 @@ Trusted composition supplies the short-lived session via a pipe, never argv/env/
 
 import argparse
 import json
+import os
 import sys
 from pathlib import Path
 from time import sleep
@@ -21,6 +22,7 @@ def main() -> int:
     parser.add_argument("--workspace", type=Path, required=True)
     parser.add_argument("--trusted-host", action="store_true")
     parser.add_argument("--executable", action="append", default=[])
+    parser.add_argument("--codex-home", type=Path)
     args = parser.parse_args()
     bootstrap = json.loads(sys.stdin.readline(8192))
     session = SessionHandle(bootstrap["id"], bootstrap["node_id"], bootstrap["token"])
@@ -30,10 +32,18 @@ def main() -> int:
         store,
         grid,
         session,
-        MachineScope(args.workspace, args.trusted_host, tuple(args.executable)),
+        MachineScope(
+            args.workspace, args.trusted_host, tuple(args.executable), codex_home=args.codex_home
+        ),
     )
     grid.advertise(session, worker.capabilities())
-    dispatcher = Dispatcher(store, grid, session.node_id, worker.executors())
+    dispatcher = Dispatcher(
+        store,
+        grid,
+        session.node_id,
+        worker.executors(),
+        pause_semantics="before-next-subprocess" if os.name == "nt" else "POSIX-process-group",
+    )
     try:
         with ReferenceServer(dispatcher) as server:
             print(

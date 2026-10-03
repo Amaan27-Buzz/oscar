@@ -43,8 +43,17 @@ class Transport(Protocol):
 class Dispatcher:
     """Target-side authorization/deduplication. Both local and HTTP paths use this boundary."""
 
-    def __init__(self, store: Store, grid: Grid, node_id: str, executors: dict[str, Executor]):
+    def __init__(
+        self,
+        store: Store,
+        grid: Grid,
+        node_id: str,
+        executors: dict[str, Executor],
+        *,
+        pause_semantics: str = "executor-defined",
+    ):
         self.store, self.grid, self.node_id, self.executors = store, grid, node_id, executors
+        self.pause_semantics = pause_semantics
 
     def invoke(self, envelope: Envelope, session: SessionHandle) -> Result:
         envelope = Envelope.parse(record(envelope))
@@ -108,12 +117,16 @@ class Dispatcher:
             self.store.audit(
                 envelope.task_id,
                 "worker_" + envelope.kind,
-                {"correlation_id": envelope.correlation_id},
+                {
+                    "correlation_id": envelope.correlation_id,
+                    "pause_semantics": self.pause_semantics,
+                },
             )
             return {
                 "kind": envelope.kind,
                 "task_id": envelope.task_id,
                 "correlation_id": envelope.correlation_id,
+                "pause_semantics": self.pause_semantics,
             }
         self.grid.accept(envelope, session.token, "cancel")
         task = self.store.task(envelope.task_id)
@@ -162,11 +175,24 @@ class HTTPTransport:
         try:
             with build_opener(NoRedirects()).open(request, timeout=self.timeout) as response:
                 data = json.loads(response.read(4096))
-            if data != {
+            expected = {
                 "kind": "cancelled" if envelope.kind == "cancel" else envelope.kind,
                 "task_id": envelope.task_id,
                 "correlation_id": envelope.correlation_id,
-            }:
+            }
+            # Version-1 targets may omit the additive pause qualifier. Identity and
+            # control state must still match exactly; unknown fields are rejected.
+            if isinstance(data, dict) and envelope.kind in {"pause", "resume"}:
+                semantics = data.get("pause_semantics")
+                if semantics is not None:
+                    if semantics not in {
+                        "executor-defined",
+                        "before-next-subprocess",
+                        "POSIX-process-group",
+                    }:
+                        raise ValueError("invalid pause semantics")
+                    expected["pause_semantics"] = semantics
+            if data != expected:
                 raise ValueError("invalid cancellation acknowledgement")
             return dict(data)
         except (HTTPException, HTTPError, URLError, TimeoutError, OSError):

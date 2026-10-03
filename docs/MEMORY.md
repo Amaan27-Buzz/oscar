@@ -248,3 +248,10 @@ proofs cannot merge identities. Unknown entities remain separate. Forget removes
 live entity bindings/relations or memory rows. Expiry excludes/purges live memory
 records. SQLite WAL, backups and connected-source deletion/secure erasure are
 **not verified**; deletion must never be reported as "deleted everywhere".
+
+The 2026-10-04 Windows local pass separately verifies selected project retention
+across two actual coordinator OS-processes and Worker reconnect. Recall stays
+RECALLED; a real changed filesystem artifact overrides stale retained text. Forget
+removes the live OSCAR row. This verifies local continuity, not a Supermemory
+service, secure disk erasure or private-account synchronization. See
+[local evidence](evidence/club-b-windows-2026-10-04.json).
