@@ -16,11 +16,11 @@ Accepted baseline:
 
 Historical Gate B evidence remains in `docs/GATE-B-COMPLETION.md` and `docs/evidence/`.
 
-## Current scope — Slice 07
+## Accepted Slice 07 scope
 
 Slice 07 is **OSCAR Edge + reflexes**.
 
-Planned acceptance scope:
+Original Slice 07 scope (physical verification is rescheduled by owner below):
 
 - ESP32 gateway/client;
 - Pico deterministic controller where used;
@@ -32,7 +32,7 @@ Planned acceptance scope:
 - reconnect/offline behavior;
 - optional LAN helper/Wake-on-LAN only when a real capability exists;
 - simulator coverage;
-- physical-device verification.
+- physical-device verification, owner-deferred to Slice 15/16.
 
 Out of scope for this slice:
 
@@ -88,3 +88,16 @@ watchdog and safety/reflex verification remain mandatory before Slice 17
 Unified Alpha can PASS. The hardware acceptance guide is preserved.
 The owner authorizes Slice 08 after Slice 07 integration; Slice 09/10, deployment
 and Galaxy Tab Home Node remain outside this work.
+
+## Current Slice 08 — 2026-10-05
+
+Slice 07 PR #13 merged; accepted synchronized main/work baseline
+`9e443cac61281d7d890724b9ef593c0d58d145f3`. Slice 08 is on
+`club-c/slice-08-voice`, draft PR #14 into `work`, **PARTIAL /
+OWNER_MICROPHONE_ACCEPTANCE_REQUIRED**. Local voice software and deterministic
+reference contracts are implemented; owner microphone, room echo/barge-in and
+speaker calibration remain NOT RUN. Gate C remains PARTIAL.
+See [Voice Core](VOICE-CORE.md) for adapters, tests, reference latency and owner steps.
+Slice 09/10, Oracle deployment and Galaxy Tab Home Node are NOT STARTED.
+Physical Edge remains DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED, mandatory
+before Slice 17 Unified Alpha PASS.

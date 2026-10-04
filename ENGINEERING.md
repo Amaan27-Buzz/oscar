@@ -315,3 +315,12 @@ watchdog and safety/reflex verification remain mandatory before Slice 17
 Unified Alpha can PASS. The hardware acceptance guide is preserved.
 The owner authorizes Slice 08 after Slice 07 integration; Slice 09/10, deployment
 and Galaxy Tab Home Node remain outside this work.
+
+## Slice 08 verification boundary
+
+Slice 08 is PARTIAL / OWNER_MICROPHONE_ACCEPTANCE_REQUIRED. Run the full offline
+suite and the voice contracts; numeric playback-reference tests require the
+optional voice NumPy dependency. `OSCAR_VOICE_MODELS=1` opts into the prepared
+Windows local-model tests with synthetic audio, never microphone acceptance.
+See [Voice Core](docs/VOICE-CORE.md) for exact owner interaction and evidence classes.
+No raw room audio or speaker enrollment is obtained autonomously.

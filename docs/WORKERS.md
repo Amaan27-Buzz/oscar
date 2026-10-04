@@ -374,3 +374,16 @@ contracts; platform claims above additionally require the recorded actual laptop
 ## Gate B local completion candidate — 2026-10-04
 
 InteractiveWorker composes typed PowerShell, application IDs, UIA and browser operations with existing Worker leases/dedup/Job Objects. Discovery is not launch authority: app IDs and selected executables require explicit allowlists. Browser capability is advertised only after the selected interpreter loads the actual source-anchored OSCAR package entrypoint and launches/closes Chromium. The artifact cwd remains scoped; no editable install or global PYTHONPATH is required. Bounded failures retain allowlisted diagnostic metadata only. See [the browser launch repair](GATE-B-HARDENING.md). Browser artifact creation uses pinned directories and native CREATE_NEW; anonymous anchor downloads enforce streaming bounds. App activation can broker into an existing user process and is not contained by a new Job. Verified acceptance includes native Windows/Codex work, typed PowerShell, registered Notepad/UIA, isolated browser, separate owner control, native credentials, canonical WAL/FTS5, real Qdrant/Graphiti/Neo4j, local embedding/reranking, memory evaluation and owner-reviewed policy candidates. The owner completed physical machine acceptance and registered GitHub device OAuth with exactly `user:email`, real private reads, new-process restart, controlled private/public federation and local credential deletion/absence checks. Slice 05 and Slice 06 are COMPLETE for the documented local-alpha scope; Gate B is PASS. Remote provider revocation remains `UNKNOWN_OWNER_ACTION_REQUIRED`; private writes were not authorized and are optional. General conversational recall integration remains a composition boundary, not a proven autonomous product. See [Gate B completion ledger](GATE-B-COMPLETION.md).
+
+## Current Slice 08 — 2026-10-05
+
+Slice 07 PR #13 merged; accepted synchronized main/work baseline
+`9e443cac61281d7d890724b9ef593c0d58d145f3`. Slice 08 is on
+`club-c/slice-08-voice`, draft PR #14 into `work`, **PARTIAL /
+OWNER_MICROPHONE_ACCEPTANCE_REQUIRED**. Local voice software and deterministic
+reference contracts are implemented; owner microphone, room echo/barge-in and
+speaker calibration remain NOT RUN. Gate C remains PARTIAL.
+See [Voice Core](VOICE-CORE.md) for adapters, tests, reference latency and owner steps.
+Slice 09/10, Oracle deployment and Galaxy Tab Home Node are NOT STARTED.
+Physical Edge remains DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED, mandatory
+before Slice 17 Unified Alpha PASS.

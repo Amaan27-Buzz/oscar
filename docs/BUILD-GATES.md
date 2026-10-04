@@ -258,7 +258,7 @@ Required scenarios include provider/auth failure, coordinator/node/Edge loss, Gr
 |---|---|---|
 | Gate A — Brain | 01–04 | **PASS** |
 | Gate B — Can Do Work | 05–06 | **PASS for documented local-alpha acceptance** |
-| Gate C — Embodied OSCAR | 07–10 | PARTIAL; Slice 07 software accepted, physical deferred; 08 next, 09–10 unbuilt |
+| Gate C — Embodied OSCAR | 07–10 | PARTIAL; Slice 07 software accepted, physical deferred; 08 PARTIAL / owner microphone required, 09–10 unbuilt |
 | Gate D — JARVIS Layer | 11–14 | Planned |
 | Gate E — Unified Alpha | 15–17 | Planned |
 
@@ -294,7 +294,7 @@ The reported prior stale OSCAR fixture was not mutated; it does not invalidate t
 Gate C PARTIAL; Slice 07 closure/integration and Slice 08 authorized after frozen Gate B PASS. Edge host
 simulation and firmware compilation are separate evidence classes; neither
 grants physical PASS. Owner ESP32/Pico acceptance is mandatory: [exact hardware
-sequence](EDGE-HARDWARE-ACCEPTANCE.md). Slices 08–10 not started. See [checkpoint](CLUB-C-CHECKPOINT.md).
+sequence](EDGE-HARDWARE-ACCEPTANCE.md). Slice 08 now PARTIAL; Slices 09–10 not started. See [checkpoint](CLUB-C-CHECKPOINT.md).
 
 ## Owner scope decision — 2026-10-05
 
@@ -311,3 +311,16 @@ watchdog and safety/reflex verification remain mandatory before Slice 17
 Unified Alpha can PASS. The hardware acceptance guide is preserved.
 The owner authorizes Slice 08 after Slice 07 integration; Slice 09/10, deployment
 and Galaxy Tab Home Node remain outside this work.
+
+## Current Slice 08 — 2026-10-05
+
+Slice 07 PR #13 merged; accepted synchronized main/work baseline
+`9e443cac61281d7d890724b9ef593c0d58d145f3`. Slice 08 is on
+`club-c/slice-08-voice`, draft PR #14 into `work`, **PARTIAL /
+OWNER_MICROPHONE_ACCEPTANCE_REQUIRED**. Local voice software and deterministic
+reference contracts are implemented; owner microphone, room echo/barge-in and
+speaker calibration remain NOT RUN. Gate C remains PARTIAL.
+See [Voice Core](VOICE-CORE.md) for adapters, tests, reference latency and owner steps.
+Slice 09/10, Oracle deployment and Galaxy Tab Home Node are NOT STARTED.
+Physical Edge remains DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED, mandatory
+before Slice 17 Unified Alpha PASS.

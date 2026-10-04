@@ -1,6 +1,6 @@
 # Slice 08 Voice Core
 
-Status: IMPLEMENTING / OWNER_MICROPHONE_ACCEPTANCE_REQUIRED.
+Status: PARTIAL / OWNER_MICROPHONE_ACCEPTANCE_REQUIRED. Draft PR #14 into work.
 Accepted baseline: `9e443cac61281d7d890724b9ef593c0d58d145f3` (PR 13 merged).
 Slice 07 is COMPLETE FOR SOFTWARE / SIMULATED EDGE FOUNDATION; physical Edge
 remains DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED and mandatory before Unified Alpha.
@@ -41,3 +41,182 @@ Oracle deployment or Home Node. Voice acceptance is never inferred from fixtures
   scores are not identity proof or calibrated biometric-security probabilities.
 
 No paid-only provider is required. Model/provider absence stays BLOCKED.
+
+## Runtime and boundaries
+
+```text
+explicit microphone grant → WASAPI/PortAudio mono 16k frames
+→ local keyword spotting / Silero VAD / bounded pre-roll
+→ activated STT only (provisional partials cannot execute)
+→ final transcript → Controller / PersonalPolicy / existing Runtime
+→ independent existing verification → immutable VoiceResponse
+→ Persona expression → Voice Identity / synthesis fallback
+→ cancellable speaker playback + own playback reference
+```
+
+Contracts live in `oscar/voice_contracts.py`; lifecycle/fallback/arbitration in
+`voice_runtime.py`; optional model/audio adapters in `voice_adapters.py`.
+`voice_core.py` composes existing Core contracts rather than a second task engine.
+The owner harness is intentionally restricted to integer addition, with explicit
+`math` grant. General conversational/action integration is not claimed.
+
+Local wake is sherpa English GigaSpeech Zipformer int8 (configurable OSCAR BPE
+keyword); VAD is Silero ONNX. The bilingual 2025 model is an alternative, not a
+reason to replace the measured English baseline. STT is local faster-whisper
+base.en/CPU/int8; no implicit download or cloud fallback at inference. Partial
+transcripts use bounded rolling snapshots and are provisional. Interfaces permit
+replacement; hosted STT through an audio-capable Router adapter is future optional
+work because the current Router provider boundary is text-oriented.
+
+VoiceProfile owns identity ID/version, preferred voice/provider/model, rate, style,
+latency/quality mode, privacy, interruption and per-provider fallback bindings.
+Fallback preserves this logical identity/configuration; identical timbre across
+vendors is not promised. Windows System.Speech is the exercised local adapter;
+it prepares bounded original speech as temporary PCM16 WAV, deletes it and streams
+PCM chunks to interruptible playback. It does not provide native incremental
+neural synthesis. Piper's optional adapter yields audio chunks; its runtime/model
+execution remains unverified here. Unsupported prosody controls are not fabricated.
+
+Fallback retries only before audible output; a partial failure never repeats the
+utterance through another provider. Cancellation propagates at chunk/segment
+boundaries and aborts playback. Native local STT inference cannot be forcibly
+preempted mid-kernel; cancelled/obsolete generations cannot reach Core/output.
+
+## Mandatory self-output / barge-in contract
+
+TTS-origin frames never activate wake/STT/Match/Map. During output the front end
+uses bounded timestamped playback PCM, a delay search and scalar echo subtraction.
+Matched own output is suppressed. Independent residual speech for three frames
+interrupts output and preserves the human prefix. Missing/ambiguous references
+fail conservatively; manual activation remains available. The reference guard
+continues across a short output tail. Audio queues and turns are bounded;
+overflow/disconnect invalidates the turn rather than silently dropping context.
+
+This reference suppressor is **not full calibrated room AEC**. Nonlinear echo,
+reverberation, driver latency, quiet double-talk and endpoint processing can defeat
+it. It may decline automatic barge-in when evidence is uncertain. WASAPI AEC
+capability is researched, not enabled/verified by PortAudio alone. Full physical
+self-wake suppression and human barge-in remain acceptance requirements; an owner
+failure keeps Slice 08 PARTIAL and requires repair, not a scope waiver.
+
+## Match, Map, arbitration and Persona
+
+Match uses explicit confirmed enrollment and model-hash-bound CAM++ embeddings.
+Similarity ≥0.8 is accepted evidence; <0.55 rejected; intermediate, ambiguous,
+missing/invalid/model-mismatched evidence is uncertain. These are **uncalibrated
+reference thresholds**, not identity certainty or biometric-security probabilities.
+Replay/synthetic voice/spoofing is not prevented. Voice alone never authorizes
+high-risk actions. Grants and PersonalPolicy are always independent. The harness
+can require Match for the harmless task; it has no private/high-risk action route.
+
+Map has separately confirmed known-person links and bounded transient anonymous
+speaker clusters; it emits known-probable, unknown, changed and multiple source
+segments with confidence/provenance. It has no authorization path. Multiple
+segments may be supplied by an independent diarizer; real overlapping-speaker
+diarization is not implemented/proven. Own TTS cannot enroll or update Map.
+Biometric-like embeddings stay in ignored owner-only local enrollment, not Git or
+OSCAR's Event Archive. Enrollment/linkage/retention grants remain separate.
+
+The reference arbiter chooses one eligible fresh claim using priority, proximity,
+quality, timestamp and stable node tie-break, then holds a renewable 10-second
+conversation lease with generation fencing. Loss/expiry reselects; handoff must
+come from the current generation. Grid authentication/availability must determine
+eligibility upstream. It is one coordinator's reference contract, not distributed
+consensus or phone/Edge-microphone acceptance.
+
+Persona currently applies bounded acknowledgement and speaking style to an
+immutable response while preserving its entire claim, epistemic/task state,
+evidence, permission and limitations. Serious/failed/blocked contexts suppress
+casual expression. Full natural-language Persona authoring/context learning is
+future work; expression never changes PersonalPolicy or verification.
+
+Sentry receives only bounded transient local speech/wake/change events. No Slice
+11 persistent World Model, journal, ambient cloud STT or raw room retention is
+implemented. Activated speech is transient; only the normalized harmless Core
+task/result/evidence enters the normal local ledger.
+
+## Reference evidence and performance
+
+See [reference record](evidence/voice-reference-2026-10-05.json). On Intel Core
+Ultra 7 255H, Windows/Python 3.12, actual local models processing System.Speech
+**synthetic audio** produced OSCAR wake, speech detection, real STT and a VERIFIED
+Core arithmetic result. Microphone and speaker playback were NOT RUN.
+
+These are reference model execution timings, not real-device conversational latency:
+
+| Stage | Reference measurement |
+| --- | ---: |
+| wake + VAD total inference over fixture | 55.02 ms |
+| speech/wake location in synthetic clip | 0.224 s / 1.088 s |
+| provisional partial STT | 388.65 ms |
+| final STT | 382.09 ms |
+| Core setup/handoff/verification | 260.06 ms |
+| first generated TTS audio | 337.05 ms |
+| speaker embedding | 29.60 ms |
+| physical barge-in stop / microphone latency | UNKNOWN / NOT RUN |
+
+No synthetic timing is presented as physical performance. Cold startup differs.
+The deterministic suite covers wake/no-wake, VAD start/end/timeouts, provisional
+STT/final execution, cancellation, feedback suppression/double-talk, Match
+accepted/rejected/uncertain, Map identity/change/multiple, Persona integrity,
+competing reference nodes, stale/lost claims, fallback and offline policy.
+Opt-in tests exercise real local models and System.Speech on synthetic speech.
+
+## Exact Windows owner acceptance
+
+Prepared ignored local environment/models are at `.tmp/voice-env` and
+`.oscar/voice/models`. For a fresh setup:
+
+```powershell
+py -3.12 -m venv .tmp/voice-env
+.tmp/voice-env/Scripts/python.exe -m pip install '.[voice]'
+.tmp/voice-env/Scripts/python.exe -m scripts.voice_setup
+.tmp/voice-env/Scripts/python.exe -m scripts.voice_owner preflight
+```
+
+Preflight enumerates devices and loads models; it never opens microphone/playback.
+The observed HyperX WASAPI input/output IDs were **28 / 22** on this machine.
+Run preflight again and replace IDs if inventory changed. Owner interaction starts here:
+
+```powershell
+.tmp/voice-env/Scripts/python.exe -m scripts.voice_owner enroll --input 28
+# Type ENROLL; speak for five seconds. Type LINK only for separate Map linkage.
+.tmp/voice-env/Scripts/python.exe -m scripts.voice_owner run --input 28 --output 22 --seconds 120 --allow-harmless-math --require-voice-match
+```
+
+1. Observe explicit real microphone use; say OSCAR, then “what is two plus three”.
+2. Observe wake/speech, provisional transcription and independently verified task.
+3. Hear OSCAR speak the result; Map is contextual and Match score remains evidence.
+4. Enter **b** for a longer original barge-in test including OSCAR's own name.
+5. Interrupt verbally while playback runs; observe output stop and new listening.
+   Enter **p** for manual activation, **c** cancel or **q** close microphone/output.
+6. Leave output uninterrupted and observe no self-wake/transcript/speaker feedback.
+7. With Match required, try a non-enrolled/reference speaker; it must not execute
+   the task. No private/high-risk routes are enabled even if similarity is high.
+8. Run `reference` after enrollment to inspect the synthetic reference Match outcome
+   without microphone/playback. This is a negative reference, not a spoof guarantee.
+9. Record each step as VERIFIED / FAILED / UNKNOWN with observed endpoint/model,
+   timestamps and measured physical onset/stop timings. Do not infer overall PASS.
+
+```powershell
+.tmp/voice-env/Scripts/python.exe -m scripts.voice_owner reference
+.tmp/voice-env/Scripts/python.exe -m scripts.voice_owner forget
+# Removes live enrollment file only; no secure-erasure/backups claim.
+$env:OSCAR_VOICE_MODELS='1'
+.tmp/voice-env/Scripts/python.exe -m unittest tests.test_voice tests.test_voice_models -v
+Remove-Item Env:OSCAR_VOICE_MODELS
+```
+
+Raw microphone speech is never written by enrollment/run. Enrollment retains only
+an explicitly approved local model-bound embedding; the owner applies the local
+ACL before persistence. Stop for the owner; never fake microphone acceptance.
+
+## Candidate verification
+
+Full Gate A/B/Edge/Voice regression: 474 tests, PASS, four optional local-model
+checks skipped in the base environment. Prepared Windows voice environment:
+27 focused tests PASS including four real local-model/synthesis tests on synthetic
+audio. Ruff lint/format, strict mypy (56 Core files plus voice setup/owner scripts),
+repository contracts, local links, secret scan and diff checks PASS. Firmware
+cross-build and Linux/Windows exact-head CI results are attached to draft PR #14.
+No microphone, playback or owner biometric acceptance is inferred.

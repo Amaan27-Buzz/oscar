@@ -1,0 +1,74 @@
+{
+  "evidence_class": "REFERENCE_MODEL_EXECUTION_SYNTHETIC_AUDIO",
+  "microphone": "NOT_RUN",
+  "speaker_playback": "NOT_RUN",
+  "owner_voice": "NOT_RUN",
+  "source_audio": "Windows System.Speech synthetic original acceptance phrase",
+  "python": "3.12.10",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "models": [
+    {
+      "source": "https://github.com/k2-fsa/sherpa-onnx/releases/download/kws-models/sherpa-onnx-kws-zipformer-gigaspeech-3.3M-2024-01-01.tar.bz2",
+      "file": "kws.tar.bz2",
+      "sha256": "f170013b4716e41b62b9bfd809687c207cef798ef9bc6534d524e17af9b6561a"
+    },
+    {
+      "source": "https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/silero_vad.onnx",
+      "file": "silero_vad.onnx",
+      "sha256": "9e2449e1087496d8d4caba907f23e0bd3f78d91fa552479bb9c23ac09cbb1fd6"
+    },
+    {
+      "source": "https://github.com/k2-fsa/sherpa-onnx/releases/download/speaker-recongition-models/3dspeaker_speech_campplus_sv_en_voxceleb_16k.onnx",
+      "file": "speaker.onnx",
+      "sha256": "357a834f702b80161e5b981182c038e18553c1f2ca752ed6cec2052365d4129b"
+    },
+    {
+      "source": "Systran/faster-whisper-base.en",
+      "revision": "3d3d5dee26484f91867d81cb899cfcf72b96be6c"
+    }
+  ],
+  "latency": {
+    "tts_total_ms": 337.72390001104213,
+    "first_tts_audio_ms": 337.04820000275504,
+    "wake_vad_inference_total_ms": 55.01729999377858,
+    "partial_stt_ms": 388.6518000072101,
+    "final_stt_ms": 382.0863000000827,
+    "speaker_embedding_ms": 29.604999988805503,
+    "core_handoff_ms": 260.057899999083
+  },
+  "wake_at_audio_seconds": 1.088,
+  "speech_at_audio_seconds": 0.224,
+  "partial_observed": true,
+  "final_transcript": "Oscar. What is 2 plus 3?",
+  "embedding_dimensions": 512,
+  "synthetic_reference_match": "NOT_ENROLLED",
+  "task_state": "verified",
+  "epistemic": "VERIFIED",
+  "task_id": "81f9f714efd64873b14b3339a61d75b3",
+  "barge_in_stop_ms": null,
+  "real_device_performance": "UNKNOWN",
+  "hardware": {
+    "cpu": "Intel Core Ultra 7 255H",
+    "cores": 16,
+    "execution": "CPU / int8 Whisper; 2 threads sherpa, 4 threads Whisper"
+  },
+  "evidence_status": "REFERENCE EXECUTION VERIFIED; input audio SIMULATED; model transcripts REPORTED",
+  "limits": [
+    "No microphone opened",
+    "No speaker playback performed",
+    "No owner enrollment performed",
+    "No calibrated room AEC or physical barge-in measurement",
+    "No phone acceptance",
+    "No biometric spoof resistance claimed"
+  ],
+  "source_sha256": {
+    "oscar\\voice_adapters.py": "c37a754718f011e6ab4bd214a299237a64eadf3ba1372c6fe883c7cfb9a7fec4",
+    "oscar\\voice_contracts.py": "1537ff2d51e38ccac20d53a4c6491e314f7c96c32392cb2276d7ae8d3a9d2f49",
+    "oscar\\voice_core.py": "5b491602f7798293f1d008b10ca3e2847091f74a9dbf18ab31036687e98da40e",
+    "oscar\\voice_identity.py": "e53157c026795599007f25fc9989d49e2a1018068b3e50efe04959e1eb5fd39a",
+    "oscar\\voice_runtime.py": "8bcc2f6bcddf25beb42e7040828bb182791dc4ca477b5e35a8c63556244ba777",
+    "scripts\\voice_owner.py": "1ebed204e194bf59b7c967e2cf3bfc01d16fbb1bee055e7cd5eaa3d105035321",
+    "scripts\\voice_sapi.ps1": "b720f18c5c64bc71ef19bbbac6d950ad95891cc909254c63ba71805948e4583b",
+    "scripts\\voice_setup.py": "d560911e71a689b22b160d6a6a8e98f218b72e755627708ccd1197d40f655f33"
+  }
+}

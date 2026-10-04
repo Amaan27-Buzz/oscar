@@ -290,7 +290,7 @@ See [`docs/CLUB-A-CHECKPOINT.md`](docs/CLUB-A-CHECKPOINT.md), [`docs/CLUB-B-CHEC
 | 05 | Real machine Worker + remote continuation | ✅ COMPLETE, accepted local-alpha scope |
 | 06 | Memory Fabric + Personal Policy + live context | ✅ COMPLETE, accepted local-alpha scope |
 | 07 | OSCAR Edge + reflexes | COMPLETE FOR SOFTWARE / SIMULATED EDGE FOUNDATION; physical DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED |
-| 08 | Voice Core + Identity + Match/Map + Persona runtime | Planned |
+| 08 | Voice Core + Identity + Match/Map + Persona runtime | PARTIAL; local/reference software, owner microphone acceptance required |
 | 09 | Sunday + communication + Grid owner controls | Planned |
 | 10 | Desktop Interaction Runtime | Planned |
 | 11 | World Model + Perception + Sentry + Daily Journal | Planned |
@@ -362,3 +362,16 @@ watchdog and safety/reflex verification remain mandatory before Slice 17
 Unified Alpha can PASS. The hardware acceptance guide is preserved.
 The owner authorizes Slice 08 after Slice 07 integration; Slice 09/10, deployment
 and Galaxy Tab Home Node remain outside this work.
+
+## Current Slice 08 — 2026-10-05
+
+Slice 07 PR #13 merged; accepted synchronized main/work baseline
+`9e443cac61281d7d890724b9ef593c0d58d145f3`. Slice 08 is on
+`club-c/slice-08-voice`, draft PR #14 into `work`, **PARTIAL /
+OWNER_MICROPHONE_ACCEPTANCE_REQUIRED**. Local voice software and deterministic
+reference contracts are implemented; owner microphone, room echo/barge-in and
+speaker calibration remain NOT RUN. Gate C remains PARTIAL.
+See [Voice Core](docs/VOICE-CORE.md) for adapters, tests, reference latency and owner steps.
+Slice 09/10, Oracle deployment and Galaxy Tab Home Node are NOT STARTED.
+Physical Edge remains DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED, mandatory
+before Slice 17 Unified Alpha PASS.

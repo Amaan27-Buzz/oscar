@@ -335,7 +335,7 @@ Deliverables:
 - optional LAN helper/Wake-on-LAN only when real;
 - simulator verification accepted; physical-device verification owner-deferred to Slice 15/16.
 
-## Slice 08 — Voice Core + Voice Identity + Voice Match/Map + Persona runtime ◻️
+## Slice 08 — Voice Core + Voice Identity + Voice Match/Map + Persona runtime — PARTIAL
 
 Deliverables include wake/VAD/STT, barge-in/echo cancellation, stable VoiceProfile, speaking modes/fallback, Voice Match, Voice Map, self-voice suppression, multi-device arbitration and Persona runtime/context triggers.
 
@@ -478,12 +478,12 @@ The reported prior stale OSCAR fixture was not mutated; it does not invalidate t
 
 ## Current Club C / Slice 07 — 2026-10-05
 
-Branch `club-c/slice-07-edge`, draft PR #13, starts at
+Historical Slice 07 branch `club-c/slice-07-edge`, PR #13 (now merged), started at
 `9fde9385af6b34c4f76991e2d871ab0909296af5`. PR #12 merged; main/work baseline
 `97c0622507df3f724ecf0c8b74aa7f4ae7784b08`; Gate A/B PASS; 05/06 COMPLETE.
 The software/simulator foundation is accepted for continuation. Mandatory owner
 wiring, flash and real acceptance return during Slice 15/16. See [checkpoint](CLUB-C-CHECKPOINT.md).
-Slice 07 is COMPLETE FOR SOFTWARE / SIMULATED EDGE FOUNDATION. Gate C PARTIAL; Slice 08 is authorized next; 09–10 remain unbuilt.
+Slice 07 is COMPLETE FOR SOFTWARE / SIMULATED EDGE FOUNDATION. Gate C PARTIAL; Slice 08 is current PARTIAL work; 09–10 remain unbuilt.
 Capability Evolution is deferred, as recorded in [architecture](ARCHITECTURE.md).
 
 ## Owner scope decision — 2026-10-05
@@ -514,3 +514,16 @@ contracts. Slice 17 cannot PASS without genuine deferred physical Edge acceptanc
 
 Capability Evolution is future backlog; see the authorization and lifecycle
 contract in [architecture](ARCHITECTURE.md). No self-modification is implemented.
+
+## Current Slice 08 — 2026-10-05
+
+Slice 07 PR #13 merged; accepted synchronized main/work baseline
+`9e443cac61281d7d890724b9ef593c0d58d145f3`. Slice 08 is on
+`club-c/slice-08-voice`, draft PR #14 into `work`, **PARTIAL /
+OWNER_MICROPHONE_ACCEPTANCE_REQUIRED**. Local voice software and deterministic
+reference contracts are implemented; owner microphone, room echo/barge-in and
+speaker calibration remain NOT RUN. Gate C remains PARTIAL.
+See [Voice Core](VOICE-CORE.md) for adapters, tests, reference latency and owner steps.
+Slice 09/10, Oracle deployment and Galaxy Tab Home Node are NOT STARTED.
+Physical Edge remains DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED, mandatory
+before Slice 17 Unified Alpha PASS.
