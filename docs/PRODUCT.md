@@ -206,7 +206,11 @@ Raw audio, transcripts, summaries and derived memory are separate retention deci
 
 ## Current build direction
 
-Gate A is accepted. Gate B is the current work and must be completed before Club C.
+Gate A/B are PASS for their documented scope. Slice 07 is COMPLETE FOR SOFTWARE /
+SIMULATED EDGE FOUNDATION; physical Edge acceptance is DEFERRED_BY_OWNER /
+NOT_PHYSICALLY_VERIFIED. Gate C remains PARTIAL. Slice 08 is authorized after
+Slice 07 integration; physical verification returns during Slice 15/16 and is
+mandatory before Slice 17 Unified Alpha PASS.
 
 Gate B completion includes real machine/browser/computer-use/installed-app/remote-control paths plus the full OSCAR Memory Fabric, open-ended Personal Policy, real private OAuth/connector acceptance, secure credential storage and live-authority-vs-memory federation.
 

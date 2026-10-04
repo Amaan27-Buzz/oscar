@@ -318,7 +318,7 @@ A green unit suite alone is insufficient.
 
 Once Gate B passes, merge/review/freeze its accepted baseline before Slice 07 begins.
 
-## Slice 07 — OSCAR Edge + reflexes 🚧
+## Slice 07 — OSCAR Edge + reflexes — software foundation accepted
 
 Starts only after Gate B PASS.
 
@@ -333,7 +333,7 @@ Deliverables:
 - reflex/emergency-stop path;
 - reconnect/offline behavior;
 - optional LAN helper/Wake-on-LAN only when real;
-- simulator + physical-device verification.
+- simulator verification accepted; physical-device verification owner-deferred to Slice 15/16.
 
 ## Slice 08 — Voice Core + Voice Identity + Voice Match/Map + Persona runtime ◻️
 
