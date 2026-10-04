@@ -305,6 +305,12 @@ class PlaybackReference:
         return AcousticDecision(cleaned, "human", "playback_reference_residual")
 
 
+def audio_settings(sd: Any, device: int) -> Any:
+    info = sd.query_devices(device)
+    host = sd.query_hostapis(info["hostapi"])["name"]
+    return sd.WasapiSettings(auto_convert=True) if "WASAPI" in host else None
+
+
 class SoundDeviceCapture:
     def __init__(self, device: int, node_id: str = "windows-voice"):
         self.device, self.node_id = device, node_id
@@ -314,7 +320,12 @@ class SoundDeviceCapture:
         sd = optional("sounddevice")
         try:
             with sd.InputStream(
-                device=self.device, channels=1, samplerate=16000, dtype="float32", blocksize=512
+                device=self.device,
+                channels=1,
+                samplerate=16000,
+                dtype="float32",
+                blocksize=512,
+                extra_settings=audio_settings(sd, self.device),
             ) as stream:
                 self.stream = stream
                 while not stop.event.is_set():
@@ -354,7 +365,12 @@ class SoundDevicePlayback:
         audio = np.frombuffer(chunk.pcm, dtype="<i2")
         try:
             with sd.RawOutputStream(
-                device=self.device, samplerate=chunk.rate, channels=1, dtype="int16", blocksize=0
+                device=self.device,
+                samplerate=chunk.rate,
+                channels=1,
+                dtype="int16",
+                blocksize=0,
+                extra_settings=audio_settings(sd, self.device),
             ) as stream:
                 self.stream = stream
                 for offset in range(0, len(audio), chunk.rate // 32):

@@ -23,6 +23,7 @@ from oscar.voice_adapters import (
     SoundDeviceCapture,
     SoundDevicePlayback,
     WindowsSpeech,
+    audio_settings,
     optional,
     read_wave,
 )
@@ -69,6 +70,27 @@ def preflight() -> int:
                 device["max_output_channels"],
                 "WASAPI",
             )
+            settings = audio_settings(sd, index)
+            try:
+                if device["max_input_channels"]:
+                    sd.check_input_settings(
+                        device=index,
+                        channels=1,
+                        dtype="float32",
+                        samplerate=16000,
+                        extra_settings=settings,
+                    )
+                if device["max_output_channels"]:
+                    sd.check_output_settings(
+                        device=index,
+                        channels=1,
+                        dtype="int16",
+                        samplerate=16000,
+                        extra_settings=settings,
+                    )
+                print("  shared-mode 16k mono format: supported (no stream opened)")
+            except Exception:
+                print("  shared-mode 16k mono format: unavailable; choose another endpoint")
     models()
     print("Local models load. Device inventory only; microphone/playback NOT RUN.")
     return 0

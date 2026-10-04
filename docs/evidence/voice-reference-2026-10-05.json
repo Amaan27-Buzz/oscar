@@ -28,13 +28,13 @@
     }
   ],
   "latency": {
-    "tts_total_ms": 337.72390001104213,
-    "first_tts_audio_ms": 337.04820000275504,
-    "wake_vad_inference_total_ms": 55.01729999377858,
-    "partial_stt_ms": 388.6518000072101,
-    "final_stt_ms": 382.0863000000827,
-    "speaker_embedding_ms": 29.604999988805503,
-    "core_handoff_ms": 260.057899999083
+    "tts_total_ms": 356.91039999073837,
+    "first_tts_audio_ms": 356.26679999404587,
+    "wake_vad_inference_total_ms": 57.569800002966076,
+    "partial_stt_ms": 398.5010000033071,
+    "final_stt_ms": 382.58809999388177,
+    "speaker_embedding_ms": 29.658900006324984,
+    "core_handoff_ms": 259.3788000085624
   },
   "wake_at_audio_seconds": 1.088,
   "speech_at_audio_seconds": 0.224,
@@ -44,7 +44,7 @@
   "synthetic_reference_match": "NOT_ENROLLED",
   "task_state": "verified",
   "epistemic": "VERIFIED",
-  "task_id": "81f9f714efd64873b14b3339a61d75b3",
+  "task_id": "114ce7f03ca84b0c9d031d4bbc00f60e",
   "barge_in_stop_ms": null,
   "real_device_performance": "UNKNOWN",
   "hardware": {
@@ -62,12 +62,12 @@
     "No biometric spoof resistance claimed"
   ],
   "source_sha256": {
-    "oscar\\voice_adapters.py": "c37a754718f011e6ab4bd214a299237a64eadf3ba1372c6fe883c7cfb9a7fec4",
+    "oscar\\voice_adapters.py": "91717e6a2609e32b823d4f0889545de64f07495f3c19eaf0890479fa374bdb21",
     "oscar\\voice_contracts.py": "1537ff2d51e38ccac20d53a4c6491e314f7c96c32392cb2276d7ae8d3a9d2f49",
     "oscar\\voice_core.py": "5b491602f7798293f1d008b10ca3e2847091f74a9dbf18ab31036687e98da40e",
     "oscar\\voice_identity.py": "e53157c026795599007f25fc9989d49e2a1018068b3e50efe04959e1eb5fd39a",
     "oscar\\voice_runtime.py": "8bcc2f6bcddf25beb42e7040828bb182791dc4ca477b5e35a8c63556244ba777",
-    "scripts\\voice_owner.py": "1ebed204e194bf59b7c967e2cf3bfc01d16fbb1bee055e7cd5eaa3d105035321",
+    "scripts\\voice_owner.py": "9cc8945fd5b16a54dfd16b9de103ce0732120b319b31fb04c474e8047b45266a",
     "scripts\\voice_sapi.ps1": "b720f18c5c64bc71ef19bbbac6d950ad95891cc909254c63ba71805948e4583b",
     "scripts\\voice_setup.py": "d560911e71a689b22b160d6a6a8e98f218b72e755627708ccd1197d40f655f33"
   }

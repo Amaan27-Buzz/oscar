@@ -5,7 +5,7 @@ import os
 import unittest
 import wave
 
-from oscar.voice_adapters import WindowsSpeech, read_wave
+from oscar.voice_adapters import WindowsSpeech, audio_settings, optional, read_wave
 from oscar.voice_contracts import (
     AudioFrame,
     Origin,
@@ -22,6 +22,34 @@ from scripts.voice_owner import models
     "optional Windows/local-model reference executor not requested",
 )
 class LocalVoiceModelTests(unittest.TestCase):
+    def test_wasapi_shared_format_without_opening_audio(self) -> None:
+        sd = optional("sounddevice")
+        checked = 0
+        for index, device in enumerate(sd.query_devices()):
+            settings = audio_settings(sd, index)
+            if settings is None:
+                continue
+            if device["max_input_channels"]:
+                sd.check_input_settings(
+                    device=index,
+                    channels=1,
+                    dtype="float32",
+                    samplerate=16000,
+                    extra_settings=settings,
+                )
+                checked += 1
+            if device["max_output_channels"]:
+                sd.check_output_settings(
+                    device=index,
+                    channels=1,
+                    dtype="int16",
+                    samplerate=16000,
+                    extra_settings=settings,
+                )
+                checked += 1
+        if not checked:
+            self.skipTest("no WASAPI endpoint available; no hardware format evidence")
+
     @classmethod
     def setUpClass(cls) -> None:
         cls.wake, cls.vad, cls.stt, cls.embedding = models()

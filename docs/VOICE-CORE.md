@@ -146,13 +146,13 @@ These are reference model execution timings, not real-device conversational late
 
 | Stage | Reference measurement |
 | --- | ---: |
-| wake + VAD total inference over fixture | 55.02 ms |
+| wake + VAD total inference over fixture | 57.57 ms |
 | speech/wake location in synthetic clip | 0.224 s / 1.088 s |
-| provisional partial STT | 388.65 ms |
-| final STT | 382.09 ms |
-| Core setup/handoff/verification | 260.06 ms |
-| first generated TTS audio | 337.05 ms |
-| speaker embedding | 29.60 ms |
+| provisional partial STT | 398.50 ms |
+| final STT | 382.59 ms |
+| Core setup/handoff/verification | 259.38 ms |
+| first generated TTS audio | 356.27 ms |
+| speaker embedding | 29.66 ms |
 | physical barge-in stop / microphone latency | UNKNOWN / NOT RUN |
 
 No synthetic timing is presented as physical performance. Cold startup differs.
@@ -174,7 +174,11 @@ py -3.12 -m venv .tmp/voice-env
 .tmp/voice-env/Scripts/python.exe -m scripts.voice_owner preflight
 ```
 
-Preflight enumerates devices and loads models; it never opens microphone/playback.
+Preflight enumerates devices, checks shared WASAPI 16k mono formats and loads models;
+it never opens microphone/playback. The selected HyperX endpoints use a 48k
+system mixer; explicit WASAPI shared-mode auto conversion supports our 16k frames.
+Format support is verified without opening streams; this is not AEC evidence.
+See [sounddevice shared conversion](https://python-sounddevice.readthedocs.io/en/latest/api/platform-specific-settings.html).
 The observed HyperX WASAPI input/output IDs were **28 / 22** on this machine.
 Run preflight again and replace IDs if inventory changed. Owner interaction starts here:
 
@@ -213,9 +217,9 @@ ACL before persistence. Stop for the owner; never fake microphone acceptance.
 
 ## Candidate verification
 
-Full Gate A/B/Edge/Voice regression: 474 tests, PASS, four optional local-model
+Full Gate A/B/Edge/Voice regression: 475 tests, PASS, five optional local-model/backend
 checks skipped in the base environment. Prepared Windows voice environment:
-27 focused tests PASS including four real local-model/synthesis tests on synthetic
+28 focused tests PASS including four real local-model/synthesis tests and a WASAPI format check on synthetic
 audio. Ruff lint/format, strict mypy (56 Core files plus voice setup/owner scripts),
 repository contracts, local links, secret scan and diff checks PASS. Firmware
 cross-build and Linux/Windows exact-head CI results are attached to draft PR #14.
