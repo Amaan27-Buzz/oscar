@@ -14,7 +14,7 @@ behavior. Stop before owner wiring, BOOTSEL, reset, flashing and observations.
   [DevKitC guide](https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32/esp32-devkitc/user_guide.html).
 - **Raspberry Pi Pico, original RP2040, non-W**, headered variant or soldered
   headers; `PICO_BOARD=pico`. See official
-  [Pico board documentation](https://www.raspberrypi.com/documentation/microcontrollers/pico-series.html).
+  [Pico board documentation](https://github.com/raspberrypi/documentation/blob/develop/documentation/asciidoc/microcontrollers/pico-series.adoc).
 - Two USB data cables matching those boards, two USB ports, breadboard and
   jumper wires; one LED, one 1 kΩ LED resistor, one 10 kΩ pulldown resistor,
   two momentary switches, optional 10 kΩ potentiometer for ADC demonstration.

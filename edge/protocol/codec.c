@@ -25,7 +25,7 @@ bool edge_decode(const uint8_t *p, size_t n, edge_message *m) {
     m->channel = (uint16_t)get(p + 12, 2); m->value = get(p + 14, 4);
     return m->session != 0 && m->sequence != 0;
 }
-void edge_encode(const edge_message *m, uint8_t *p) {
+void edge_encode(const edge_message *m, uint8_t p[EDGE_FRAME_SIZE]) {
     p[0] = 'O'; p[1] = 'E'; p[2] = EDGE_VERSION; p[3] = m->kind;
     put(p + 4, m->session, 4); put(p + 8, m->sequence, 4);
     put(p + 12, m->channel, 2); put(p + 14, m->value, 4);

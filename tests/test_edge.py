@@ -234,6 +234,32 @@ class EdgeIntegrationTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             server(self.bridge, ("0.0.0.0", 0))
 
+    def test_core_restart_fences_pending_and_preserves_sequence(self) -> None:
+        action = self.queue()
+        prior = self.bridge.pending
+        assert prior
+        replacement = EdgeBridge(self.grid, self.policy, "desk-edge")
+        self.assertIsNone(replacement.pending)
+        self.assertIsNone(replacement.exchange(self.session, 100, True))
+        receipt = Frame(Kind.ACK, 100, prior.frame.sequence, 1, 1).encode()
+        replacement.exchange(self.session, 100, True, receipt)
+        replacement.queue(
+            "edge.gpio.write", 1, 0, granted=frozenset({"edge.gpio.write"}), confirmed=True
+        )
+        assert replacement.pending
+        self.assertGreater(replacement.pending.frame.sequence, prior.frame.sequence)
+        evidence = [e for e in self.store.ledger("") if e.get("action_id") == action]
+        self.assertEqual(evidence[-1]["status"], "unknown")
+
+    def test_delivery_rechecks_scoped_session_and_expiry(self) -> None:
+        self.queue()
+        read_session = self.grid.pair("desk-edge", ("heartbeat", "advertise", "edge.gpio.read"))
+        with self.assertRaises(PermissionError):
+            self.bridge.exchange(read_session, 100, True)
+        self.now += 86401
+        with self.assertRaises(PermissionError):
+            self.bridge.exchange(self.session, 100, True)
+
 
 if __name__ == "__main__":
     unittest.main()

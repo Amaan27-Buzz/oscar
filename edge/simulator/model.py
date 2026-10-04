@@ -20,9 +20,7 @@ def reference_binary() -> Path:
         check=True,
         capture_output=True,
     )
-    subprocess.run(
-        ["cmake", "--build", str(build), "--config", "Release"], check=True, capture_output=True
-    )
+    subprocess.run(["cmake", "--build", str(build), "--config", "Release"], check=True)
     return build / ("Release/edge_reference.exe" if os.name == "nt" else "edge_reference")
 
 

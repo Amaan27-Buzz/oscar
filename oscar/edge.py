@@ -5,6 +5,7 @@ rechecks node scope, expiry, boot identity and policy; no offline command backlo
 """
 
 from dataclasses import dataclass
+from threading import RLock
 from typing import Any
 
 from .contracts import Capability, new_id
@@ -43,6 +44,35 @@ class EdgeBridge:
         self.pending: Pending | None = None
         self.healthy = False
         self.last_receipt: bytes | None = None
+        self.lock = RLock()
+        try:
+            state = grid.store.get("edge_state", node_id)
+        except KeyError:
+            pass
+        else:
+            self.boot, self.sequence = state["boot"], state["sequence"]
+            if state.get("pending"):
+                grid.store.audit(
+                    "",
+                    "edge_unknown",
+                    {
+                        "action_id": state["pending"],
+                        "status": "unknown",
+                        "reason": "Core restarted; no physical command replay",
+                    },
+                )
+                self._save_state()
+
+    def _save_state(self) -> None:
+        self.grid.store.put(
+            "edge_state",
+            self.node_id,
+            {
+                "boot": self.boot,
+                "sequence": self.sequence,
+                "pending": self.pending.id if self.pending else None,
+            },
+        )
 
     def capabilities(self) -> list[Capability]:
         return [
@@ -82,6 +112,18 @@ class EdgeBridge:
         granted: frozenset[str],
         confirmed: bool = False,
     ) -> str:
+        with self.lock:
+            return self._queue(capability, channel, value, granted=granted, confirmed=confirmed)
+
+    def _queue(
+        self,
+        capability: str,
+        channel: int,
+        value: int,
+        *,
+        granted: frozenset[str],
+        confirmed: bool,
+    ) -> str:
         if (
             not self.healthy
             or self.boot is None
@@ -105,6 +147,7 @@ class EdgeBridge:
         if not self._allowed(pending):
             raise PermissionError("Edge permission/policy denied")
         self.pending = pending
+        self._save_state()
         self.grid.store.audit(
             "",
             "edge_queued",
@@ -127,6 +170,18 @@ class EdgeBridge:
         *,
         simulated: bool = False,
     ) -> bytes | None:
+        with self.lock:
+            return self._exchange(session, boot, healthy, receipt, simulated=simulated)
+
+    def _exchange(
+        self,
+        session: SessionHandle,
+        boot: int,
+        healthy: bool,
+        receipt: bytes | None,
+        *,
+        simulated: bool,
+    ) -> bytes | None:
         if session.node_id != self.node_id or type(boot) is not int or not 0 < boot <= 0xFFFFFFFF:
             raise PermissionError("Edge identity denied")
         self.grid.authenticate(session, "heartbeat")
@@ -135,6 +190,7 @@ class EdgeBridge:
             self._discard("gateway reboot; prior result unknown")
             self.boot, self.sequence = boot, 1
             self.last_receipt = None
+            self._save_state()
         self.healthy = healthy
         self.grid.advertise(session, self.capabilities() if healthy else [])
         self.grid.heartbeat(session, health="healthy" if healthy else "degraded")
@@ -142,6 +198,19 @@ class EdgeBridge:
         if receipt is not None:
             frame = Frame.decode(receipt)
             if self.last_receipt == receipt:
+                return None
+            if pending is None and frame.session == boot and frame.kind in {Kind.ACK, Kind.ERROR}:
+                self.grid.store.audit(
+                    "",
+                    "edge_late_receipt",
+                    {
+                        "node_id": self.node_id,
+                        "sequence": frame.sequence,
+                        "status": "unknown",
+                        "reason": "no live pending action; no replay",
+                    },
+                )
+                self.last_receipt = receipt
                 return None
             if (
                 pending is None
@@ -165,6 +234,7 @@ class EdgeBridge:
                 },
             )
             self.pending = None
+            self._save_state()
             self.last_receipt = receipt
             return None
         if pending is None:
@@ -187,8 +257,13 @@ class EdgeBridge:
                 },
             )
         self.pending = None
+        self._save_state()
 
     def event(self, session: SessionHandle, raw: bytes, *, simulated: bool = False) -> None:
+        with self.lock:
+            self._event(session, raw, simulated=simulated)
+
+    def _event(self, session: SessionHandle, raw: bytes, *, simulated: bool) -> None:
         self.grid.authenticate(session, "heartbeat")
         if session.node_id != self.node_id:
             raise PermissionError("event identity denied")
@@ -212,6 +287,8 @@ class EdgeBridge:
                 "node_id": self.node_id,
                 "channel": frame.channel,
                 "value": frame.value,
+                "observed_at": self.grid.clock(),
+                "source_time": "unknown",
                 "evidence": "SIMULATED" if simulated else "REPORTED",
             },
         )

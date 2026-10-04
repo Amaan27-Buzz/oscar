@@ -2,6 +2,8 @@
 #include "stream.h"
 #include "driver/uart.h"
 #include "esp_task_wdt.h"
+#include "esp_system.h"
+static uint32_t event_sequence;
 #ifdef CONFIG_OSCAR_EDGE_WATCHDOG_TEST
 #include "driver/gpio.h"
 #endif
@@ -21,6 +23,7 @@ static bool transact(edge_message request, edge_message *reply) {
             if (uart_read_bytes(UART_NUM_1, &byte, 1, pdMS_TO_TICKS(5)) == 1 &&
                 edge_stream_byte(&stream, byte, gateway_now(), reply)) {
                 if (reply->kind == EDGE_EVENT && reply->session == boot_id) {
+                    reply->sequence = ++event_sequence;
                     xQueueSend(events, reply, 0); continue;
                 }
                 if (reply->session == request.session && reply->sequence == request.sequence &&
@@ -52,6 +55,7 @@ void link_task(void *unused) {
     edge_message previous = {0}, cached = {0};
     bool cached_valid = false;
     while (true) {
+        if (sequence > UINT32_MAX - 4 || event_sequence > UINT32_MAX - 4) esp_restart();
 #ifdef CONFIG_OSCAR_EDGE_WATCHDOG_TEST
         if (!gpio_get_level(27)) {
             edge_message safe = {.kind=EDGE_SAFE_STATE, .session=boot_id, .sequence=sequence};

@@ -1,5 +1,8 @@
 name: Edge reference and firmware
-on: [push, pull_request]
+on:
+  pull_request:
+  push:
+    branches: [main, work]
 permissions:
   contents: read
 jobs:
@@ -14,6 +17,8 @@ jobs:
           export PICO_SDK_PATH="$RUNNER_TEMP/pico-sdk"
           cmake -S edge/pico -B .tmp/pico -DPICO_BOARD=pico
           cmake --build .tmp/pico --parallel 2
+          cmake -S edge/pico -B .tmp/pico-watchdog -DPICO_BOARD=pico -DEDGE_WATCHDOG_TEST=ON
+          cmake --build .tmp/pico-watchdog --parallel 2
       - uses: actions/upload-artifact@v4
         with:
           name: pico-reference-firmware

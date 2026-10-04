@@ -18,7 +18,7 @@ Official sources retrieved 2026-10-05:
 - [UART driver](https://docs.espressif.com/projects/esp-idf/en/v6.1/esp32/api-reference/peripherals/uart.html),
   [I2C driver](https://docs.espressif.com/projects/esp-idf/en/v6.1/esp32/api-reference/peripherals/i2c.html),
   [SPI driver](https://docs.espressif.com/projects/esp-idf/en/v6.1/esp32/api-reference/peripherals/spi_master.html)
-  and [Pico hardware APIs](https://www.raspberrypi.com/documentation/pico-sdk/hardware.html)
+  and [Pico hardware APIs](https://github.com/raspberrypi/pico-sdk/tree/2.3.1/src/rp2_common)
   informed the comparison below. This is an engineering choice for a short desk
   link, not a universal transport preference.
 
@@ -131,7 +131,7 @@ communication lease expiry is a separate 1500 ms software deadline. ESP32
 subscribes both tasks to its five-second panic/reset task watchdog. Idle/interrupt
 watchdog defaults remain enabled. See official
 [ESP watchdog guidance](https://docs.espressif.com/projects/esp-idf/en/v6.1/esp32/api-reference/system/wdts.html)
-and [Pico watchdog APIs](https://www.raspberrypi.com/documentation/pico-sdk/hardware.html#hardware_watchdog).
+and [Pico watchdog APIs](https://github.com/raspberrypi/pico-sdk/blob/2.3.1/src/rp2_common/hardware_watchdog/include/hardware/watchdog.h).
 Register-level watchdog expiry, electrical timing and boot transients require
 physical acceptance; the host simulator verifies safety state logic and reset
 semantics, not silicon watchdog behavior.
@@ -145,7 +145,7 @@ writes ignored local NVS-generation material; never commit that CSV/bin/database
 or TLS keys. The initial provisioning route is explicit local USB flashing.
 
 ESP-IDF offers secure BLE/SoftAP provisioning; current
-[network provisioning](https://github.com/espressif/esp-protocols/tree/master/components/network_provisioning)
+[network provisioning](https://github.com/espressif/idf-extra-components/tree/master/network_provisioning)
 supports security schemes. This slice avoids a new wireless enrollment service:
 OSCAR Grid remains pairing authority. NVS encryption, secure boot/flash encryption
 and manufacturing eFuse operations need an explicit board/security commissioning
