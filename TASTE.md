@@ -84,7 +84,7 @@ Use the task, object, timeline, conversation state or current environment itself
 
 OSCAR is expressive, not mascot-led.
 
-- Neutral is the default.
+- Calm motion and the canonical Orb appearance are the default.
 - The [canonical Orb](assets/brand/oscar-orb.svg) includes a curved wink. Any
   animated wink should acknowledge a real interaction and derive from that source.
 - Happy is brief and earned.

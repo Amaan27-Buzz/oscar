@@ -99,9 +99,12 @@ On desktop, a compact OSCAR presence can expand into a contextual overlay from i
 
 ## Default expression
 
-The standard idle face should be neutral.
+The standard idle appearance uses the canonical Orb source, including its curved wink.
 
-The wink/smile can appear as a brief acknowledgement or earned personality beat. It should not be the default face because OSCAR also needs credibility during serious work, safety, Sentry and verification.
+Additional animated expressions can appear as a brief acknowledgement or earned
+personality beat, derived from the canonical source. Credibility during serious
+work, safety, Sentry and verification comes from truthful state and restrained
+motion; the source artwork must not be silently replaced or redrawn.
 
 ## Serious mode
 
