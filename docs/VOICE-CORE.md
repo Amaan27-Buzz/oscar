@@ -219,8 +219,9 @@ ACL before persistence. Stop for the owner; never fake microphone acceptance.
 
 Full Gate A/B/Edge/Voice regression: 475 tests, PASS, five optional local-model/backend
 checks skipped in the base environment. Prepared Windows voice environment:
-28 focused tests PASS including four real local-model/synthesis tests and a WASAPI format check on synthetic
-audio. Ruff lint/format, strict mypy (56 Core files plus voice setup/owner scripts),
+28 focused tests PASS including four real local-model/synthesis tests on synthetic
+audio and a WASAPI format-support query without opening streams.
+Ruff lint/format, strict mypy (56 Core files plus voice setup/owner scripts),
 repository contracts, local links, secret scan and diff checks PASS. Firmware
 cross-build and Linux/Windows exact-head CI results are attached to draft PR #14.
 No microphone, playback or owner biometric acceptance is inferred.

@@ -408,7 +408,9 @@ Manual integration checkpoints remain in [BUILD-GATES.md](BUILD-GATES.md).
 
 Mandatory acceptance is complete: owner physical machine and GitHub OAuth/private
 federation runs passed. PR 12 merged at `97c0622507df3f724ecf0c8b74aa7f4ae7784b08`; Gate B frozen PASS.
-Owner authorized Club C / Slice 07 on branch `club-c/slice-07-edge`, draft PR 13.
+PR #13 is merged; main/work share `9e443cac61281d7d890724b9ef593c0d58d145f3`.
+Current authorized work is Slice 08 on `club-c/slice-08-voice`, draft PR #14,
+PARTIAL / OWNER_MICROPHONE_ACCEPTANCE_REQUIRED. Slices 09/10 remain unbuilt.
 
 The original ordered acceptance sequence below remains a contract, not a list of unimplemented items:
 
@@ -476,7 +478,7 @@ See [owner OAuth acceptance preparation](GATE-B-OAUTH-ACCEPTANCE.md) and
 [physical machine PASS evidence](evidence/gate-b-owner-machine-pass-2026-10-04.json).
 The reported prior stale OSCAR fixture was not mutated; it does not invalidate the PASS.
 
-## Current Club C / Slice 07 — 2026-10-05
+## Accepted Club C / Slice 07 — 2026-10-05
 
 Historical Slice 07 branch `club-c/slice-07-edge`, PR #13 (now merged), started at
 `9fde9385af6b34c4f76991e2d871ab0909296af5`. PR #12 merged; main/work baseline
