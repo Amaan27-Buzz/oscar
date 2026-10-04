@@ -44,6 +44,26 @@ class CoreTests(unittest.TestCase):
         self.assertFalse(r.store.all("evidence")[0]["matches"])
         self.assertFalse((r.files.root / "proof.txt").exists())
 
+    def test_owner_cancel_rechecks_executor_inside_transaction(self):
+        r = self.rig
+        task, _, _ = r.leased_action()
+        with self.assertRaises(PermissionError):
+            r.runtime.cancel(task.id, r.transports, expected_node="another-node")
+        self.assertEqual(TaskState.AWAITING_RESULT, r.store.task(task.id).state)
+        self.assertTrue(r.store.get("lease", r.store.task(task.id).lease_id)["active"])
+        self.assertEqual(
+            TaskState.CANCELLED,
+            r.runtime.cancel(task.id, r.transports, expected_node="test-node").state,
+        )
+        self.assertFalse((r.files.root / "proof.txt").exists())
+
+    def test_terminal_transition_releases_transient_memory_context(self):
+        r = self.rig
+        task = r.file_task()
+        r.runtime.active_context[task.id] = {"synthetic": "retained only while active"}
+        self.assertEqual(TaskState.VERIFIED, r.runtime.run(task.id, r.transports).state)
+        self.assertNotIn(task.id, r.runtime.active_context)
+
     def test_wrong_file_contents_are_not_verified(self):
         r = self.rig
         original = r.dispatcher.executors["file"]

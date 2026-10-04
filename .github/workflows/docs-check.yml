@@ -65,6 +65,8 @@ jobs:
             image-prompts/desktop.md
             image-prompts/system-surfaces.md
             assets/brand/oscar-logo.png
+            assets/brand/oscar-orb.svg
+            assets/brand/README.md
           )
 
           for file in "${required[@]}"; do

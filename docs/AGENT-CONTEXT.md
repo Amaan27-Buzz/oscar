@@ -9,10 +9,12 @@ OSCAR keeps one canonical project truth and uses thin agent-specific adapters. D
 | `AGENTS.md` | repository-wide workflow, truth, safety and coding-agent rules |
 | `ENGINEERING.md` | system-design/code-quality standard |
 | `DESIGN.md` | visual tokens and durable design rules |
+| [brand assets](../assets/brand/README.md) | canonical OSCAR Orb SVG and compatibility asset rules |
 | `TASTE.md` | qualitative quality/motion/anti-slop bar |
 | `docs/PRODUCT.md` | product north star |
 | `docs/CHIEF-OF-STAFF.md` | ambient context, commitments, schedule/proactivity and Sunday presence |
-| `docs/ARCHITECTURE.md` | system boundaries and ownership |
+| `docs/ARCHITECTURE.md` | system boundaries and OSCAR-owned Decision / Epistemic Controller |
+| [deployment](DEPLOYMENT.md) | free-first replaceable Core/API hosts and deferred Home Node |
 | `docs/MEMORY.md` | OSCAR-owned one-relationship Memory Fabric |
 | `docs/ROADMAP.md` | implementation order/current slice |
 | `docs/BUILD-GATES.md` | cross-slice manual verification checkpoints |
@@ -41,6 +43,22 @@ OSCAR keeps one canonical project truth and uses thin agent-specific adapters. D
 | `image-prompts/` | optional visual-reference prompt library, not implementation truth |
 
 Agent-specific files point back to these rather than becoming independent definitions.
+
+## Reconciled ownership and current boundary
+
+Controller means OSCAR's Decision / Epistemic Controller. `oscar/jev.py` is an
+unchanged historical/internal filename; no TypeSafe Jev runtime/API is required.
+Laya/Jev decision providers remain replaceable beneath OSCAR's hard deterministic
+authority rules, with evaluation only after Gate B PASS. Auth Broker/provider/vault
+expansion is a target design, not implemented universal authentication.
+
+Oracle is the preferred free-first persistent Core candidate; Vercel supports
+Python/Fluid bounded web/API/relay workloads. The Galaxy Tab S6 Lite (2021) is a
+future Home Node only after full deployment and operational Core architecture.
+None of deployment, Tab implementation, decision-model evaluation or full broker
+expansion is a Gate B requirement. Owner OAuth and final manual
+machine acceptance PASSED; Slice 05/06 COMPLETE, Gate B PASS, Slice 07 NOT
+STARTED, PR 12 DRAFT/UNMERGED. Historical evidence retains its original vocabulary.
 
 ## Context loading
 
@@ -123,7 +141,7 @@ one interaction point
 → derived Qdrant semantic/hybrid index
 → derived Graphiti + Neo4j temporal/entity index
 → Retrieval Fusion / local reranker
-→ Jev Memory Preflight + authority checks
+→ Controller Memory Preflight + authority checks
 → Context Assembly
 → reasoning/action
 → Claim Verification
@@ -134,7 +152,7 @@ Rules:
 - canonical Event Archive survives derived-index replacement/loss;
 - Qdrant/Graphiti/Neo4j are rebuildable indexes, not truth owners;
 - no managed memory service is mandatory;
-- personal/history references trigger Jev retrieval before reasoning;
+- personal/history references trigger Controller retrieval before reasoning;
 - failed first retrieval is not proof of absent memory;
 - retrieval broadens through structured state → FTS/archive → Qdrant → Graphiti → aliases/time expansion → bounded deep archive → UNKNOWN;
 - no `I remember X` without actually retrieved/active evidence;
@@ -149,14 +167,14 @@ See `docs/MEMORY.md`.
 ## Routing boundaries
 
 ```text
-Jev                  → what class of action/evidence is needed?
+Controller           → what class of action/evidence is needed?
 Capability selection → which executor/tool/device should act?
 Model Router         → which provider/model/credential should reason?
 ```
 
 Coding agents, terminal, computer use and installed applications are executable capabilities, not provider keys.
 
-Memory retrieval is also not model routing: Jev can require recall before any reasoning model is selected.
+Memory retrieval is also not model routing: Controller can require recall before any reasoning model is selected.
 
 ## Connection Grid
 
@@ -258,3 +276,18 @@ When a durable rule changes, update the canonical owner first and reconcile affe
 - architecture decision → `DECISIONS.md` plus affected domain docs.
 
 After propagation, re-read canonical files before claiming completion.
+
+## Gate B local completion candidate — 2026-10-04
+
+Verified acceptance includes native Windows/Codex work, typed PowerShell, registered Notepad/UIA, isolated browser, separate owner control, native credentials, canonical WAL/FTS5, real Qdrant/Graphiti/Neo4j, local embedding/reranking, memory evaluation and owner-reviewed policy candidates. The owner completed physical machine acceptance and registered GitHub device OAuth with exactly `user:email`, real private reads, new-process restart, controlled private/public federation and local credential deletion/absence checks. Slice 05 and Slice 06 are COMPLETE for the documented local-alpha scope; Gate B is PASS. Remote provider revocation remains `UNKNOWN_OWNER_ACTION_REQUIRED`; private writes were not authorized and are optional. General conversational recall integration remains a composition boundary, not a proven autonomous product. See [Gate B completion ledger](GATE-B-COMPLETION.md).
+
+
+The owner's final physical/manual machine acceptance PASSED in run
+`manual-gate-b-20261004-200734`; desktop/local/public browser phases are VERIFIED.
+The [accepted GitHub OAuth/federation path](GATE-B-OAUTH-ACCEPTANCE.md) uses
+the existing native vault, opaque references and Connector Fabric; private email
+addresses remain transient. The controlled synthetic past count remains RECALLED;
+current provider count facts remain REPORTED, with separate source/temporal provenance.
+Owner run `oauth-gate-b-20261004-234817` passed real private OAuth and controlled
+federation. Slice 06 COMPLETE; Gate B PASS. Remote revocation remains
+`UNKNOWN_OWNER_ACTION_REQUIRED`. See [final acceptance](GATE-B-COMPLETION.md).

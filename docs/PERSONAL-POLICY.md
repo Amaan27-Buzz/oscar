@@ -68,7 +68,7 @@ Safe conceptual flow for consequential durable rules:
 
 ```text
 user instruction
-→ Jev recognizes durable policy change
+→ Controller recognizes durable policy change
 → interpret candidate structured rule
 → resolve scope/conflicts/permission dependencies
 → show concise interpretation when material
@@ -331,7 +331,7 @@ objective / event
 → permission / owner revocation state
 → applicable Personal Policy
 → Protocol/Worker state
-→ Jev / Executive decision
+→ Controller / Executive decision
 → execute / ask / defer / block
 → verify mutation where practical
 → Persona shapes presentation only
@@ -378,7 +378,7 @@ Sensitive policy is personal data and follows OSCAR privacy/retention controls.
 
 Connector mutations and machine executors recheck policy at execution. `ask` needs confirmation; `deny` remains denied even with confirmation. Preference values can be evaluated but are not automatically interpreted/applied to unrelated subsystems.
 
-Broad natural-language interpretation/editing, quiet-hour parsing, Sunday approval identity and a policy UI remain partial/unverified. The bounded local message/send editor below supersedes the original unimplemented status for those exact phrases only. The reference editor is the typed `save(..., owner_authorized=True)` composition API; it is not a remotely exposed unauthenticated approval endpoint.
+Open-ended bounded model interpretation now produces inactive candidates through the native Model Router. Exact trusted-owner confirmation is required; ambiguity/conflict/expiry block. Numeric constraints never grant capabilities. General quiet-hour parsing, Sunday approval identity and a policy UI remain unverified. The bounded local message/send editor below supersedes the original unimplemented status for those exact phrases only. The reference editor is the typed `save(..., owner_authorized=True)` composition API; it is not a remotely exposed unauthenticated approval endpoint.
 
 ## Bounded local owner-review authoring — 2026-10-04
 
@@ -402,5 +402,8 @@ compound instructions and unrecognized phrases request clarification rather than
 guessing. Confirmed rules persist across actual coordinator-process restart and
 affect later policy evaluation. Permissions remain an independent prerequisite;
 equal-ranking structured policy conflicts still BLOCK. This local owner editor
-is not a remote identity/approval service. Model parsing, arbitrary policy language,
-quiet hours, policy UI and Sunday biometric authorization remain partial/unverified.
+is not a remote identity/approval service. The model-backed candidate path below supersedes the model-parsing limitation. General arbitrary language semantics, quiet hours, policy UI and Sunday biometric authorization remain partial/unverified.
+
+## Gate B local completion candidate — 2026-10-04
+
+`python -m oscar.policy_cli --state <isolated.sqlite> --provider <provider> --propose <rule>` shows an inactive interpretation. Separate `--confirm <candidate-id> --digest <exact-digest>` activates only that unexpired candidate. The live native Model Router acceptance used a synthetic ASK-before-file-write rule; reopening and an independently absent artifact proved actual Worker enforcement. Model parsing does not grant authority. Owner identity here is a trusted local composition/CLI boundary, not remote biometrics. Broad initial wording was rejected for clarification. Verified acceptance includes native Windows/Codex work, typed PowerShell, registered Notepad/UIA, isolated browser, separate owner control, native credentials, canonical WAL/FTS5, real Qdrant/Graphiti/Neo4j, local embedding/reranking, memory evaluation and owner-reviewed policy candidates. The owner completed physical machine acceptance and registered GitHub device OAuth with exactly `user:email`, real private reads, new-process restart, controlled private/public federation and local credential deletion/absence checks. Slice 05 and Slice 06 are COMPLETE for the documented local-alpha scope; Gate B is PASS. Remote provider revocation remains `UNKNOWN_OWNER_ACTION_REQUIRED`; private writes were not authorized and are optional. General conversational recall integration remains a composition boundary, not a proven autonomous product. See [Gate B completion ledger](GATE-B-COMPLETION.md).

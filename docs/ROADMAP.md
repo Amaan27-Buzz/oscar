@@ -25,7 +25,7 @@ Build OSCAR's nervous system first, finish each planned gate end-to-end, then at
 
 ```text
 objective / event
-→ current context + Jev
+→ current context + Controller
 → memory/live retrieval/capability/model decision
 → permission + Personal Policy
 → execute
@@ -57,15 +57,15 @@ Verified evidence-backed objective → action → result → independent verific
 
 See [Club A checkpoint](CLUB-A-CHECKPOINT.md).
 
-## Slice 02 — TypeSafe Jev ✅
+## Slice 02 — OSCAR Decision / Epistemic Controller ✅
 
 Verified typed deterministic/epistemic routing for known/world/recall/verify/reason/reported/specialist/worker/unknown paths, with conservative handling of missing capability and freshness-sensitive retrieval.
 
-Jev is now also the architectural owner of Memory Preflight/retrieval escalation requirements defined in [MEMORY.md](MEMORY.md); the production Memory Fabric implementation is Slice 06 work.
+Controller is now also the architectural owner of Memory Preflight/retrieval escalation requirements defined in [MEMORY.md](MEMORY.md); the production Memory Fabric implementation is Slice 06 work.
 
-## Slice 03 — Native Transport + Capability Catalog + Connection Grid foundation 🚧
+## Slice 03 — Native Transport + Capability Catalog + Connection Grid foundation ✅
 
-Reference foundation verified. Broader deployment remains evolutionary work.
+Slice 03 is accepted and complete for its planned reference foundation. Public deployment remains later deployment scope.
 
 Verified behavior includes scoped pairing/auth, capability advertisement/search, replay protection, correlation, cancellation, progress, heartbeats, durable leases, disconnect/expiry/reclaim and explicit availability states.
 
@@ -88,9 +88,9 @@ Implemented/verified scope includes:
 
 **Gate A — PASS.**
 
-## Slice 05 — Real machine Worker + remote continuation ⏭️
+## Slice 05 — Real machine Worker + remote continuation ✅
 
-**Scoped native Windows foundation verified; full slice still incomplete.**
+**COMPLETE for Windows local-alpha acceptance in this candidate.** Typed PowerShell, registered Notepad/UIA, browser fixture/public-page work and separate owner-control continuation have now been exercised. See [completion ledger](GATE-B-COMPLETION.md). Trusted-host execution is not a sandbox; independent network stores, phone/power and hostile-host isolation remain unverified.
 
 Already verified in the local Windows pass:
 
@@ -104,7 +104,7 @@ Already verified in the local Windows pass:
 - ambiguous post-mutation Worker loss blocks replay;
 - explicit trusted-host boundary rather than fake sandbox claims.
 
-### Remaining mandatory Slice 05 completion
+### Slice 05 acceptance contract — exercised for stated local scope
 
 #### 05A — Typed terminal / PowerShell
 
@@ -164,11 +164,11 @@ This proves OSCAR is conceptually independent of the computer executing the task
 
 Sleep/shutdown/restart may be modeled only if real OS capability exists. These are high-risk and require explicit owner confirmation. Do not shut down the development machine merely to satisfy automated Gate B acceptance.
 
-## Slice 06 — OSCAR Memory Fabric + Personal Policy + live context ⏭️
+## Slice 06 — OSCAR Memory Fabric + Personal Policy + live context ✅
 
 The previous planned managed-memory backend has been retired. OSCAR now owns a free/self-hosted Memory Fabric.
 
-Existing verified foundation includes selected local memory, restart continuity, entity references, explicit structured Personal Policy, live-source precedence and bounded owner-confirmed message/send policy interpretation.
+Verified acceptance includes native Windows/Codex work, typed PowerShell, registered Notepad/UIA, isolated browser, separate owner control, native credentials, canonical WAL/FTS5, real Qdrant/Graphiti/Neo4j, local embedding/reranking, memory evaluation and owner-reviewed policy candidates. The owner completed physical machine acceptance and registered GitHub device OAuth with exactly `user:email`, real private reads, new-process restart, controlled private/public federation and local credential deletion/absence checks. Slice 05 and Slice 06 are COMPLETE for the documented local-alpha scope; Gate B is PASS. Remote provider revocation remains `UNKNOWN_OWNER_ACTION_REQUIRED`; private writes were not authorized and are optional. General conversational recall integration remains a composition boundary, not a proven autonomous product. See [Gate B completion ledger](GATE-B-COMPLETION.md).
 
 ### 06A — Canonical Event Archive
 
@@ -213,7 +213,7 @@ Implement as derived/rebuildable state:
 - optional Model Router/provider paths without architectural dependence;
 - no provider-specific memory truth.
 
-### 06E — Jev Memory Preflight + Retrieval Planner
+### 06E — Controller Memory Preflight + Retrieval Planner
 
 Every interaction gets a cheap memory-dependency classification.
 
@@ -377,7 +377,7 @@ Run one end-to-end scenario across:
 
 ```text
 perception / communication
-→ World Model / Chief-of-Staff context / Jev
+→ World Model / Chief-of-Staff context / Controller
 → Memory Fabric / live evidence
 → Personal Policy + Persona
 → Executive / Durable Runtime
@@ -393,8 +393,8 @@ perception / communication
 
 | Club | Slices | Focus | Status |
 |---|---:|---|---|
-| A — Brain | 01–04 | Core + Jev + Transport/Grid foundation + adaptive Model Router | **PASS** |
-| B — Can Do Work | 05–06 | Real machine/continuation + Memory Fabric + policy/live context | **PARTIAL — current work** |
+| A — Brain | 01–04 | Core + Controller + Transport/Grid foundation + adaptive Model Router | **PASS** |
+| B — Can Do Work | 05–06 | Real machine/continuation + Memory Fabric + policy/live context | **PASS for documented local-alpha scope** |
 | C — Embodied Core | 07–08 | Edge/reflexes + Voice/Identity/Persona | Planned after Gate B PASS |
 | D1 — Sunday | 09 | Android embodiment + communication + owner controls | Planned |
 | D2 — Desktop | 10 | Desktop interaction runtime | Planned |
@@ -406,9 +406,11 @@ Manual integration checkpoints remain in [BUILD-GATES.md](BUILD-GATES.md).
 
 ## Current next step
 
-**Finish Gate B completely. Do not start Slice 07.**
+Mandatory acceptance is complete: owner physical machine and GitHub OAuth/private
+federation runs passed. Review PR 12 for merge after exact-head CI. Gate B PASS;
+Slice 07 remains NOT STARTED and requires a separate instruction.
 
-Immediate order:
+The original ordered acceptance sequence below remains a contract, not a list of unimplemented items:
 
 ```text
 05 machine gaps
@@ -423,7 +425,7 @@ Immediate order:
 → Qdrant
 → Graphiti + Neo4j
 → local embeddings/reranker
-→ Jev Memory Preflight/retrieval escalation
+→ Controller Memory Preflight/retrieval escalation
 → evidence-bound claims
 → Memory Writer/consolidation
 → correction/forget/rebuild/evals
@@ -439,3 +441,37 @@ Immediate order:
 → Gate B PASS
 → only then Club C / Slice 07
 ```
+
+The [pre-manual Gate B hardening pass](GATE-B-HARDENING.md) improves BM25/ONNX retrieval,
+generation integrity, scoped graph rebuilds, credential recovery and evidence-bound claims.
+It adds no later-slice capability. Slice 05 remains COMPLETE for its documented local scope;
+Slice 06 is COMPLETE and Gate B PASS after the owner OAuth/federation run.
+The later physical/manual machine PASS is recorded below.
+
+
+## Reconciliation boundary — 2026-10-04
+
+The OSCAR-owned Decision / Epistemic Controller applies hard deterministic authority
+rules; `oscar/jev.py` is a historical/internal module name, not a TypeSafe Jev
+dependency. Separate deterministic/Laya/hybrid evaluation starts only after Gate B
+PASS. GitHub is the first intended private authentication proof; the shared Auth
+Broker/provider architecture does not require independent OAuth per plugin.
+
+[Deployment architecture](DEPLOYMENT.md) selects free-first Oracle persistent Core
+and Vercel bounded Python/web/API/relay candidates. Deployment, the future Galaxy
+Tab S6 Lite Home Node, decision-model evaluation and full Auth Broker expansion are
+not additional Gate B requirements. Build the Tab node only after OSCAR is fully
+deployed and its main Core architecture is operational.
+
+Slice 05 and Slice 06 are COMPLETE for the documented local-alpha scope; Gate B
+is PASS. Owner physical/manual machine acceptance passed in run
+`manual-gate-b-20261004-200734`; OAuth/private federation passed in run
+`oauth-gate-b-20261004-234817`. Remote revocation remains unknown; no private write
+was authorized. Slice 07 NOT STARTED and PR 12 DRAFT/UNMERGED. The harness repair at
+`c9cb7d2d20fb444cce98e2749eeea5425d4a0ee1` is independently reviewed with 25 focused
+regressions passing and exact-head CI green; it is not a physical acceptance PASS.
+The prior owner focus failure and its evidence remain unchanged.
+
+See [owner OAuth acceptance preparation](GATE-B-OAUTH-ACCEPTANCE.md) and
+[physical machine PASS evidence](evidence/gate-b-owner-machine-pass-2026-10-04.json).
+The reported prior stale OSCAR fixture was not mutated; it does not invalidate the PASS.

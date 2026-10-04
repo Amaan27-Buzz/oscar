@@ -1,0 +1,100 @@
+{
+  "schema": 1,
+  "review_date": "2026-10-05",
+  "starting_sha": "68305308105f3b9424451010d546e118fd5e2506",
+  "branch": "gate-b/completion",
+  "pr": 12,
+  "base": "work",
+  "status": {
+    "slice05": "COMPLETE for documented Windows local-alpha scope",
+    "slice06": "COMPLETE for documented local-alpha scope",
+    "gate_b": "PASS",
+    "slice07": "NOT STARTED"
+  },
+  "owner_oauth": {
+    "root": ".oscar/oauth-gate-b-20261004-234817",
+    "fixture_id": "20e24c2a9c4643c8bd92c64c2d2c8fc8",
+    "result": "PRIVATE_READ_LIFECYCLE_AND_FEDERATION_CHECKS_PASSED",
+    "owner_manual_authorization": true,
+    "scopes": [
+      "user:email"
+    ],
+    "read_contracts": {
+      "/user": "VERIFIED",
+      "/user/emails?page=1&per_page=100": "VERIFIED"
+    },
+    "provider_facts": "REPORTED",
+    "payload": "TRANSIENT; no addresses or bodies copied",
+    "credentials": "native Windows Credential Manager only; opaque SQLite metadata",
+    "restart": "new process reopened native vault/connection, repeated reads, salted identity matched",
+    "disconnect": "DELETED_AND_ABSENCE_CHECKED",
+    "independent_vault_recheck": "owned token and device references absent",
+    "state": "locally_disconnected_provider_revocation_pending",
+    "remote_revocation": "UNKNOWN_OWNER_ACTION_REQUIRED",
+    "private_write": "OPTIONAL_NOT_AUTHORIZED; no gist scope",
+    "source_sha256": {
+      "archive.sqlite": "6be60dd2b081a17b533208911396429d93512573b1adf03ee2c39177d675f3cd",
+      "checkpoint.json": "eecb105dfe6a2aa12cccfc3125981741971570cce6e8f02c6812ce2a8ad0be97",
+      "fixture.json": "955db8ec722f0e4aa27fab4bcee1057e6a0c933f1552c918135132e0873c5ebe",
+      "initial.json": "822b82773d92042174480ce0d57cd478d5c794ccc54cc829313faff8d1b1a720",
+      "oauth.sqlite": "ebea3ab764dbdc0bc74c2858a9406c236008e9d0faba9e2cac813aacbfa0c6af",
+      "progress.json": "80306c07dcc8ab4cca5fcbe110cfa91d9870ca3246a050dcc6bf8173b9e44dd6",
+      "report.json": "a0c07953e79a051887e28d73003dd4e25781ca11dffbee8bce609c7370667a68",
+      "restart.json": "c3532d3d7ddc9d072889802d6bf713b39a69c4e3ed91d924a9dc9efc399d40be"
+    },
+    "preserved_unchanged": true,
+    "inspection": "immutable database copies; integrity checks OK; named scope/state and synthetic-history checks; no original database open",
+    "original_report_gate_b": "PARTIAL retained; separate full review establishes PASS"
+  },
+  "federation": {
+    "composition_checks": "VERIFIED",
+    "now": "current authenticated GitHub page-one count; REPORTED",
+    "history": "synthetic -1 event; RECALLED",
+    "event_id": "e78c8b7c8f104f50a125af61a81dafac",
+    "memory_id": "8b68ee1fcece418abd68a1f071e89c26",
+    "history_unchanged": true,
+    "public": "https://api.github.com/repos/python/cpython; REPORTED",
+    "local_file_project_task": "previously accepted in implementation record"
+  },
+  "mandatory_checklist": {
+    "B1_real_machine": "ACCEPTED",
+    "B2_continuation_owner_control": "ACCEPTED",
+    "B3_canonical_memory": "ACCEPTED",
+    "B4_controller_recall": "ACCEPTED",
+    "B5_writer_evaluation": "ACCEPTED",
+    "B6_personal_policy": "ACCEPTED",
+    "B7_private_oauth": "ACCEPTED",
+    "B8_live_context": "ACCEPTED"
+  },
+  "evidence_records": [
+    "gate-b-completion-2026-10-04.json",
+    "gate-b-hardening-2026-10-04.json",
+    "gate-b-owner-machine-pass-2026-10-04.json"
+  ],
+  "non_blocking_limitations": [
+    "remote provider revocation unknown; owner action",
+    "refresh not implemented; acceptance non-expiring grant",
+    "conditional private writes not authorized",
+    "trusted host is not a sandbox",
+    "cooperative pause",
+    "shared SQLite and loopback control; remote deployment unverified",
+    "synthetic unauthenticated Neo4j fixture",
+    "structural claim verifier does not prove arbitrary entailment",
+    "general conversational recall remains composition boundary",
+    "secure disk erasure unverified",
+    "Android/OEM, Sunday, voice, Edge/hardware, managed-memory services and broader private connectors unverified"
+  ],
+  "quality": {
+    "windows_tests": 427,
+    "windows_skips": 0,
+    "windows_seconds": 107.321,
+    "windows_result": "PASS",
+    "focused": "PASS: 85 Gate B/OAuth/federation/memory/policy tests, 4.450 seconds",
+    "ruff": "PASS",
+    "format": "PASS: 94 files",
+    "strict_mypy": "PASS: 48 source files",
+    "repository_local_links_secret_scan": "PASS: required files/local Markdown links/value-silent secret scan",
+    "diff_review": "PASS: docs/evidence only; historical evidence unchanged",
+    "exact_head_ci": "Required at final PR head; recorded in PR description after observation"
+  }
+}

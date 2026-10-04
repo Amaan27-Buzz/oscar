@@ -83,7 +83,7 @@ Semantic similarity, graph proximity, reranking score and model confidence do no
 
 ### Retrieval miss is not proof of absence
 
-If Jev expects historical/personal memory and a first retrieval returns nothing useful:
+If Controller expects historical/personal memory and a first retrieval returns nothing useful:
 
 ```text
 expected memory
@@ -173,7 +173,8 @@ Examples:
 - current owner preference can supersede older preference history;
 - a historical question may deliberately select an older temporally valid memory.
 
-Jev decides which authority policy fits the claim.
+The Controller applies hard deterministic, claim-specific source-authority rules;
+a replaceable decision model cannot redefine them.
 
 ## Evidence-backed action reporting
 
@@ -265,7 +266,7 @@ When new evidence contradicts an earlier claim:
 
 Avoid ambiguous success language when meaningful parts remain unverified.
 
-## Relationship to Jev
+## Relationship to Controller
 
 ```text
 known      → direct evidence sufficient
@@ -279,12 +280,12 @@ worker     → delegated responsibility
 unknown    → retrieve/ask rather than fabricate
 ```
 
-Jev also owns:
+Controller also owns:
 
 - freshness classification;
 - Memory Preflight;
 - retrieval escalation when historical context is expected;
-- claim-specific authority selection;
+- application of hard deterministic claim-specific authority rules;
 - requirement for source-backed recall before historical/personal assertions.
 
 ## Action Ledger
@@ -325,3 +326,7 @@ Do not show `Done` while verifying, `Thinking` while blocked on auth, `Working` 
 13. Strongest user-facing claim cannot exceed strongest evidence.
 14. Freshness-sensitive claims require current authoritative evidence when reasonably obtainable; otherwise qualify/UNKNOWN.
 15. Persona, Personal Policy, memory and permission remain separate authority layers.
+
+## Gate B local completion candidate — 2026-10-04
+
+Historical claim checking proves exact source-bound assertions; arbitrary paraphrase entailment remains UNKNOWN. Context rechecks forget/expiry and preserves INFERRED. The A–R local benchmark measures five positive queries and six unsupported claims, not a universal zero-hallucination guarantee. Verified acceptance includes native Windows/Codex work, typed PowerShell, registered Notepad/UIA, isolated browser, separate owner control, native credentials, canonical WAL/FTS5, real Qdrant/Graphiti/Neo4j, local embedding/reranking, memory evaluation and owner-reviewed policy candidates. The owner completed physical machine acceptance and registered GitHub device OAuth with exactly `user:email`, real private reads, new-process restart, controlled private/public federation and local credential deletion/absence checks. Slice 05 and Slice 06 are COMPLETE for the documented local-alpha scope; Gate B is PASS. Remote provider revocation remains `UNKNOWN_OWNER_ACTION_REQUIRED`; private writes were not authorized and are optional. General conversational recall integration remains a composition boundary, not a proven autonomous product. See [Gate B completion ledger](GATE-B-COMPLETION.md).

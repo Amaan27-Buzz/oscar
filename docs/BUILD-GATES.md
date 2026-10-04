@@ -21,7 +21,7 @@ Prove:
 
 ```text
 request
-→ Jev
+→ Controller
 → capability/model/retrieval decision
 → native transport/router
 → execution
@@ -110,9 +110,9 @@ Required acceptance:
 - stale/failed derived index falls back truthfully rather than inventing memory;
 - forget removes/tombstones active OSCAR memory/index state according to policy without false secure-erasure claims.
 
-### B4 — Jev memory reliability
+### B4 — Controller memory reliability
 
-Jev must perform memory dependency preflight rather than let the reasoning model guess whether memory exists.
+Controller must perform memory dependency preflight rather than let the reasoning model guess whether memory exists.
 
 Required behavior:
 
@@ -204,7 +204,7 @@ Automated tests are necessary but insufficient.
 
 A genuinely unavailable external/private step remains BLOCKED/PARTIAL until completed; it is not silently deferred to Club C.
 
-**Current:** **PARTIAL — current work.** Native Windows Worker/Codex/restart/cancellation/local continuity foundations are verified; browser/computer-use, installed app, owner-control continuation, production Memory Fabric, open-ended policy, private OAuth/secure storage and live-context federation remain to be completed.
+**Current: PASS for documented local-alpha acceptance.** Verified acceptance includes native Windows/Codex work, typed PowerShell, registered Notepad/UIA, isolated browser, separate owner control, native credentials, canonical WAL/FTS5, real Qdrant/Graphiti/Neo4j, local embedding/reranking, memory evaluation and owner-reviewed policy candidates. The owner completed physical machine acceptance and registered GitHub device OAuth with exactly `user:email`, real private reads, new-process restart, controlled private/public federation and local credential deletion/absence checks. Slice 05 and Slice 06 are COMPLETE for the documented local-alpha scope; Gate B is PASS. Remote provider revocation remains `UNKNOWN_OWNER_ACTION_REQUIRED`; private writes were not authorized and are optional. General conversational recall integration remains a composition boundary, not a proven autonomous product. See [Gate B completion ledger](GATE-B-COMPLETION.md).
 
 See [CLUB-B-CHECKPOINT.md](CLUB-B-CHECKPOINT.md), [ROADMAP.md](ROADMAP.md) and [MEMORY.md](MEMORY.md).
 
@@ -248,7 +248,7 @@ Required scenarios include combining multiple live sources into the World Model,
 
 Deliberately break the integrated system.
 
-Required scenarios include provider/auth failure, coordinator/node/Edge loss, Grid resync, Action Ledger/Undo, memory-index failure/rebuild, unknown/partial/blocked reporting, voice spoof/false-positive checks, capture retention/deletion, Persona truthfulness regression and one complete end-to-end scenario across perception/communication → World Model/Jev/Memory Fabric → policy/planning → capability/model routing → Grid/Worker/device → ledger/artifact → verification → Sunday/voice/text result.
+Required scenarios include provider/auth failure, coordinator/node/Edge loss, Grid resync, Action Ledger/Undo, memory-index failure/rebuild, unknown/partial/blocked reporting, voice spoof/false-positive checks, capture retention/deletion, Persona truthfulness regression and one complete end-to-end scenario across perception/communication → World Model/Controller/Memory Fabric → policy/planning → capability/model routing → Grid/Worker/device → ledger/artifact → verification → Sunday/voice/text result.
 
 **Pass:** major subsystems operate as one evidence-backed developer alpha and remaining limitations are explicit.
 
@@ -257,7 +257,34 @@ Required scenarios include provider/auth failure, coordinator/node/Edge loss, Gr
 | Gate | Slices | Status |
 |---|---|---|
 | Gate A — Brain | 01–04 | **PASS** |
-| Gate B — Can Do Work | 05–06 | **PARTIAL — current work; finish end-to-end before Club C** |
+| Gate B — Can Do Work | 05–06 | **PASS for documented local-alpha acceptance** |
 | Gate C — Embodied OSCAR | 07–10 | Planned |
 | Gate D — JARVIS Layer | 11–14 | Planned |
 | Gate E — Unified Alpha | 15–17 | Planned |
+
+
+## Reconciliation boundary — 2026-10-04
+
+The OSCAR-owned Decision / Epistemic Controller applies hard deterministic authority
+rules; `oscar/jev.py` is a historical/internal module name, not a TypeSafe Jev
+dependency. Separate deterministic/Laya/hybrid evaluation starts only after Gate B
+PASS. GitHub is the first intended private authentication proof; the shared Auth
+Broker/provider architecture does not require independent OAuth per plugin.
+
+[Deployment architecture](DEPLOYMENT.md) selects free-first Oracle persistent Core
+and Vercel bounded Python/web/API/relay candidates. Deployment, the future Galaxy
+Tab S6 Lite Home Node, decision-model evaluation and full Auth Broker expansion are
+not additional Gate B requirements. Build the Tab node only after OSCAR is fully
+deployed and its main Core architecture is operational.
+
+Slice 05/06 COMPLETE; Gate B PASS for the documented local-alpha scope. Owner
+physical machine run `manual-gate-b-20261004-200734` and OAuth/federation run
+`oauth-gate-b-20261004-234817` passed. Remote revocation remains unknown, optional
+private writes were not authorized, Slice 07 NOT STARTED and PR 12 DRAFT/UNMERGED. The harness repair at
+`c9cb7d2d20fb444cce98e2749eeea5425d4a0ee1` is independently reviewed with 25 focused
+regressions passing and exact-head CI green; it is not a physical acceptance PASS.
+The prior owner focus failure and its evidence remain unchanged.
+
+See [owner OAuth acceptance](GATE-B-OAUTH-ACCEPTANCE.md) and
+[physical machine PASS evidence](evidence/gate-b-owner-machine-pass-2026-10-04.json).
+The reported prior stale OSCAR fixture was not mutated; it does not invalidate the PASS.

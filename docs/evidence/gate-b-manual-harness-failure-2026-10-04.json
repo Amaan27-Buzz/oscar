@@ -1,0 +1,55 @@
+{
+  "status": "FAILED_MANUAL_ACCEPTANCE_ATTEMPT",
+  "owner_evidence_root": ".oscar/manual-gate-b-20261004-175011",
+  "fixture_id": "24b069e0f11546c688a227ac4684f0e0",
+  "successful_reported_actions": 5,
+  "action_sequence": [
+    "installed-app catalog",
+    "installed-app launch",
+    "desktop bind",
+    "UIA tree",
+    "desktop mouse_click"
+  ],
+  "last_task_id": "8b15e6ce58b74ba7958483932d7a4339",
+  "last_capability": "machine.desktop",
+  "last_result_status": "REPORTED",
+  "fixture_size_bytes": 0,
+  "failure": {
+    "type": "AssertionError",
+    "message": "",
+    "located_check": "desktop.focus_readback",
+    "actual_focused_pid": "NOT_RECORDED",
+    "interpretation": "one-shot post-click check failed; exact focus state/timing was not retained"
+  },
+  "source_sha256": {
+    "failure.json": "7010b8194a5554e145ce180508515c0a4e0d87f30f989383460dab7109c0a644",
+    "actions.json": "4b60a0b01fddc6ee5aecc4e3dc966a1f9eeb0fc96e2fdddc57219055ecf7669f",
+    "fixture.json": "419860b26cb89003e476f2db86c80de579535dfd823cbf49e73fd3613dffa074"
+  },
+  "preserved_owner_root": true,
+  "capability_acceptance": "NOT_PASSED",
+  "manual_rerun": "OWNER_REQUIRED",
+  "slice_05": "COMPLETE",
+  "slice_06": "PARTIAL",
+  "gate_b": "PARTIAL",
+  "repair_automated_verification": {
+    "windows_full_suite": {
+      "tests": 397,
+      "seconds": 87.992,
+      "status": "PASS"
+    },
+    "focused_harness_and_hardening": {
+      "tests": 25,
+      "status": "PASS"
+    },
+    "added_harness_tests": 13,
+    "ruff": "PASS",
+    "format": "PASS",
+    "strict_mypy_source_files": 48,
+    "repository_local_links_secret_scan": "PASS",
+    "git_diff_check": "PASS",
+    "physical_manual_rerun": "NOT_PERFORMED",
+    "oauth": "NOT_STARTED",
+    "cross_platform_ci": "CHECK_EXACT_PR_HEAD"
+  }
+}

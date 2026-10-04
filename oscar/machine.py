@@ -11,7 +11,7 @@ import os
 import shutil
 import signal
 import subprocess
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass, replace
 from io import BufferedReader
 from pathlib import Path
 from queue import Empty, Full, Queue
@@ -130,6 +130,22 @@ class MachineWorker:
                     if Path(executable).name.lower() == command + ".exe":
                         self.agents[name] = executable
         self.owners: dict[str, str] = {}
+        from .powershell import discover
+
+        candidate = discover() if scope.trusted_host_execution else None
+        self.powershell = (
+            replace(
+                candidate,
+                node_id=session.node_id,
+                workspace=str(scope.root.resolve()),
+                max_timeout=scope.max_timeout,
+                max_output=scope.max_output,
+            )
+            if candidate
+            and candidate.executable in scope.allowed_executables
+            and scope.trusted_host_execution
+            else None
+        )
         self.outputs: dict[str, str] = {}  # Bounded active context; never task/ledger persistence.
 
     def capabilities(self) -> list[Capability]:
@@ -149,6 +165,8 @@ class MachineWorker:
             specs.append(
                 ("machine.command", "terminal_command", "machine:host", "metadata", "high")
             )
+        if self.powershell:
+            specs.append(("machine.powershell", "powershell", "machine:host", "metadata", "high"))
         specs += [
             ("machine.agent." + name, "coding", "machine:host", "metadata", "high")
             for name in self.agents
@@ -488,6 +506,7 @@ class MachineWorker:
                 metadata = {
                     "agents": sorted(self.agents),
                     "executables": [Path(p).name for p in self.scope.allowed_executables],
+                    "powershell": asdict(self.powershell) if self.powershell else None,
                 }
             elif cap.id == "machine.repository":
                 if set(p) != {"path", "content", "message"}:
@@ -536,6 +555,11 @@ class MachineWorker:
             else:
                 if cap.id == "machine.git":
                     argv = self.git_command(p["operation"], p)
+                elif cap.id == "machine.powershell":
+                    from .powershell import command
+
+                    assert self.powershell is not None
+                    argv = command(self.powershell, p["request"], self.scope.root)
                 elif cap.id.startswith("machine.agent."):
                     name = cap.id.removeprefix("machine.agent.")
                     argv = [self.agents[name], *p["arguments"]]

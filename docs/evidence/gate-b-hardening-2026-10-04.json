@@ -1,0 +1,596 @@
+{
+  "observed_at": 1791113674.9707453,
+  "starting_sha": "447ad2eef86deeab2cc924bc88c4f5afb123b687",
+  "branch": "gate-b/completion",
+  "pr": 12,
+  "base": "work",
+  "scope": "synthetic automated pre-manual hardening; no owner OAuth or physical acceptance",
+  "statuses": {
+    "slice05": "COMPLETE",
+    "slice06": "PARTIAL",
+    "gate_b": "PARTIAL"
+  },
+  "versions": {
+    "playwright": "1.63.0",
+    "qdrant-client": "1.19.1",
+    "graphiti-core": "0.30.2",
+    "sentence-transformers": "6.1.0",
+    "fastembed": "0.8.1",
+    "neo4j": "2026.09.0",
+    "neo4j-driver": "6.3.1",
+    "onnxruntime": "1.30.0"
+  },
+  "models": {
+    "default_dense": "BAAI/bge-small-en-v1.5",
+    "default_sparse": "Qdrant/bm25 with Qdrant IDF and query_embed",
+    "default_reranker": "Xenova/ms-marco-MiniLM-L-6-v2",
+    "onnx_bytes": {
+      "bge": 66465124,
+      "minilm": 90387630,
+      "reranker": 90992115
+    },
+    "revisions": {
+      "bge": "aa8f8b060edb00e03bfdd08813a2949946c8ba55",
+      "minilm_onnx": "d13954661f83248295ba75c1ed411eef3b7b936e",
+      "reranker_onnx": "a09144355adeed5f58c8ed011d209bf8ee5a1fec"
+    },
+    "isolated_cached_startup": {
+      "fast": {
+        "isolated_process_cached_startup_seconds": 1.9018413000012515
+      },
+      "torch": {
+        "isolated_process_cached_startup_seconds": 30.52782780000416
+      },
+      "limitation": "one observation before fingerprinting, includes SDK import, background load"
+    }
+  },
+  "benchmark": [
+    {
+      "candidate": "torch-minilm",
+      "embedding": "sentence-transformers:sentence-transformers/all-MiniLM-L6-v2:1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
+      "reranker": "cross-encoder:cross-encoder/ms-marco-MiniLM-L6-v2:233902d25c440f23af6f7d6e94d2946bac0bee0a",
+      "startup_seconds_including_download": 10.604559500003234,
+      "evaluation_seconds": 15.423984199995175,
+      "measurements": {
+        "dense_median_seconds": 0.01161129999672994,
+        "reranker_median_seconds": 0.010277399996994063
+      },
+      "evaluation": {
+        "status": "VERIFIED",
+        "observed_at": 1791113278.1261911,
+        "cases": [
+          {
+            "case": "A",
+            "name": "exact",
+            "status": "PASS"
+          },
+          {
+            "case": "B",
+            "name": "semantic paraphrase",
+            "status": "PASS",
+            "paths": [
+              "3-qdrant-hybrid",
+              "4-graphiti-temporal"
+            ]
+          },
+          {
+            "case": "C",
+            "name": "three-year gap",
+            "status": "PASS"
+          },
+          {
+            "case": "D",
+            "name": "temporal current",
+            "status": "PASS"
+          },
+          {
+            "case": "E",
+            "name": "historical",
+            "status": "PASS"
+          },
+          {
+            "case": "F",
+            "name": "correction provenance",
+            "status": "PASS"
+          },
+          {
+            "case": "G",
+            "name": "live source outranks recalled archive",
+            "status": "PASS"
+          },
+          {
+            "case": "H",
+            "name": "ambiguous alias",
+            "status": "PASS"
+          },
+          {
+            "case": "I",
+            "name": "similar names distinct",
+            "status": "PASS"
+          },
+          {
+            "case": "J",
+            "name": "project scope",
+            "status": "PASS"
+          },
+          {
+            "case": "K",
+            "name": "negative retrieval",
+            "status": "PASS"
+          },
+          {
+            "case": "L",
+            "name": "empty active/structured triggers escalation",
+            "status": "PASS"
+          },
+          {
+            "case": "M",
+            "name": "inference remains INFERRED",
+            "status": "PASS"
+          },
+          {
+            "case": "N",
+            "name": "plausible unsupported claims",
+            "status": "PASS",
+            "rejected": 6
+          },
+          {
+            "case": "O",
+            "name": "forget",
+            "status": "PASS"
+          },
+          {
+            "case": "P",
+            "name": "both native indexes rebuild",
+            "status": "PASS"
+          },
+          {
+            "case": "Q",
+            "name": "restart reopen",
+            "status": "PASS"
+          },
+          {
+            "case": "R",
+            "name": "one relationship across episodes",
+            "status": "PASS",
+            "episodes": 167
+          }
+        ],
+        "metrics": {
+          "component_retrieval": {
+            "dense": {
+              "top5_hit_rate": 1.0,
+              "queries": 5,
+              "query_seconds": [
+                0.0016346999909728765,
+                0.0009375000081490725,
+                0.001156700003775768,
+                0.0009581999911461025,
+                0.0008852000028127804
+              ]
+            },
+            "lexical": {
+              "top5_hit_rate": 0.8,
+              "queries": 5,
+              "query_seconds": [
+                0.0008382999949390069,
+                0.0007830000104149804,
+                0.0008231999963754788,
+                0.0007777999999234453,
+                0.0005871000030310825
+              ]
+            }
+          },
+          "positive_top5_hit_rate": 1.0,
+          "positive_queries": 5,
+          "unsupported_claim_acceptance_rate": 0.0,
+          "unsupported_claim_queries": 6,
+          "temporal_cases_passed": 3,
+          "entity_error_cases": 0
+        },
+        "limitations": [
+          "small synthetic dataset; no universal hallucination claim",
+          "exact sourced assertion verifier; arbitrary model paraphrases remain UNKNOWN",
+          "reopen evidence here; separate process continuity evaluated independently",
+          "Neo4j loopback synthetic fixture without auth; no private records"
+        ]
+      },
+      "cumulative_onnx_cache_bytes": 500038236
+    },
+    {
+      "candidate": "onnx-bge",
+      "embedding": "fastembed:0.8.1:BAAI/bge-small-en-v1.5:5dc9fe36c81e64b98d40c803c759fd1d3fa98d3435c783bf9150c092959a235a",
+      "reranker": "fastembed:0.8.1:Xenova/ms-marco-MiniLM-L-6-v2:e94b6cbe772c7ef98fa80cb99827942fa20d6e0ebf149b696d56d642e8de5e32",
+      "startup_seconds_including_download": 0.5731687000079546,
+      "evaluation_seconds": 9.147613699999056,
+      "measurements": {
+        "dense_median_seconds": 0.00994239999272395,
+        "reranker_median_seconds": 0.006764699995983392
+      },
+      "evaluation": {
+        "status": "VERIFIED",
+        "observed_at": 1791113287.967943,
+        "cases": [
+          {
+            "case": "A",
+            "name": "exact",
+            "status": "PASS"
+          },
+          {
+            "case": "B",
+            "name": "semantic paraphrase",
+            "status": "PASS",
+            "paths": [
+              "3-qdrant-hybrid",
+              "4-graphiti-temporal"
+            ]
+          },
+          {
+            "case": "C",
+            "name": "three-year gap",
+            "status": "PASS"
+          },
+          {
+            "case": "D",
+            "name": "temporal current",
+            "status": "PASS"
+          },
+          {
+            "case": "E",
+            "name": "historical",
+            "status": "PASS"
+          },
+          {
+            "case": "F",
+            "name": "correction provenance",
+            "status": "PASS"
+          },
+          {
+            "case": "G",
+            "name": "live source outranks recalled archive",
+            "status": "PASS"
+          },
+          {
+            "case": "H",
+            "name": "ambiguous alias",
+            "status": "PASS"
+          },
+          {
+            "case": "I",
+            "name": "similar names distinct",
+            "status": "PASS"
+          },
+          {
+            "case": "J",
+            "name": "project scope",
+            "status": "PASS"
+          },
+          {
+            "case": "K",
+            "name": "negative retrieval",
+            "status": "PASS"
+          },
+          {
+            "case": "L",
+            "name": "empty active/structured triggers escalation",
+            "status": "PASS"
+          },
+          {
+            "case": "M",
+            "name": "inference remains INFERRED",
+            "status": "PASS"
+          },
+          {
+            "case": "N",
+            "name": "plausible unsupported claims",
+            "status": "PASS",
+            "rejected": 6
+          },
+          {
+            "case": "O",
+            "name": "forget",
+            "status": "PASS"
+          },
+          {
+            "case": "P",
+            "name": "both native indexes rebuild",
+            "status": "PASS"
+          },
+          {
+            "case": "Q",
+            "name": "restart reopen",
+            "status": "PASS"
+          },
+          {
+            "case": "R",
+            "name": "one relationship across episodes",
+            "status": "PASS",
+            "episodes": 167
+          }
+        ],
+        "metrics": {
+          "component_retrieval": {
+            "dense": {
+              "top5_hit_rate": 1.0,
+              "queries": 5,
+              "query_seconds": [
+                0.0007644999859621748,
+                0.0007518000056734309,
+                0.0007419000030495226,
+                0.0006565000076079741,
+                0.0007540999940829352
+              ]
+            },
+            "lexical": {
+              "top5_hit_rate": 0.8,
+              "queries": 5,
+              "query_seconds": [
+                0.00045419999514706433,
+                0.00044290001096669585,
+                0.00043400000140536577,
+                0.000415000002249144,
+                0.000443600001744926
+              ]
+            }
+          },
+          "positive_top5_hit_rate": 1.0,
+          "positive_queries": 5,
+          "unsupported_claim_acceptance_rate": 0.0,
+          "unsupported_claim_queries": 6,
+          "temporal_cases_passed": 3,
+          "entity_error_cases": 0
+        },
+        "limitations": [
+          "small synthetic dataset; no universal hallucination claim",
+          "exact sourced assertion verifier; arbitrary model paraphrases remain UNKNOWN",
+          "reopen evidence here; separate process continuity evaluated independently",
+          "Neo4j loopback synthetic fixture without auth; no private records"
+        ]
+      },
+      "cumulative_onnx_cache_bytes": 500038236
+    },
+    {
+      "candidate": "onnx-minilm",
+      "embedding": "fastembed:0.8.1:sentence-transformers/all-MiniLM-L6-v2:7db4d811c066c6ef0e6e6a8adb2b7d8eaf6ac182f38689f9173f9e2cc4b18ec0",
+      "reranker": "fastembed:0.8.1:Xenova/ms-marco-MiniLM-L-6-v2:e94b6cbe772c7ef98fa80cb99827942fa20d6e0ebf149b696d56d642e8de5e32",
+      "startup_seconds_including_download": 0.5620778000011342,
+      "evaluation_seconds": 9.009234600001946,
+      "measurements": {
+        "dense_median_seconds": 0.005623500008368865,
+        "reranker_median_seconds": 0.008113400006550364
+      },
+      "evaluation": {
+        "status": "VERIFIED",
+        "observed_at": 1791113297.6385295,
+        "cases": [
+          {
+            "case": "A",
+            "name": "exact",
+            "status": "PASS"
+          },
+          {
+            "case": "B",
+            "name": "semantic paraphrase",
+            "status": "PASS",
+            "paths": [
+              "3-qdrant-hybrid",
+              "4-graphiti-temporal"
+            ]
+          },
+          {
+            "case": "C",
+            "name": "three-year gap",
+            "status": "PASS"
+          },
+          {
+            "case": "D",
+            "name": "temporal current",
+            "status": "PASS"
+          },
+          {
+            "case": "E",
+            "name": "historical",
+            "status": "PASS"
+          },
+          {
+            "case": "F",
+            "name": "correction provenance",
+            "status": "PASS"
+          },
+          {
+            "case": "G",
+            "name": "live source outranks recalled archive",
+            "status": "PASS"
+          },
+          {
+            "case": "H",
+            "name": "ambiguous alias",
+            "status": "PASS"
+          },
+          {
+            "case": "I",
+            "name": "similar names distinct",
+            "status": "PASS"
+          },
+          {
+            "case": "J",
+            "name": "project scope",
+            "status": "PASS"
+          },
+          {
+            "case": "K",
+            "name": "negative retrieval",
+            "status": "PASS"
+          },
+          {
+            "case": "L",
+            "name": "empty active/structured triggers escalation",
+            "status": "PASS"
+          },
+          {
+            "case": "M",
+            "name": "inference remains INFERRED",
+            "status": "PASS"
+          },
+          {
+            "case": "N",
+            "name": "plausible unsupported claims",
+            "status": "PASS",
+            "rejected": 6
+          },
+          {
+            "case": "O",
+            "name": "forget",
+            "status": "PASS"
+          },
+          {
+            "case": "P",
+            "name": "both native indexes rebuild",
+            "status": "PASS"
+          },
+          {
+            "case": "Q",
+            "name": "restart reopen",
+            "status": "PASS"
+          },
+          {
+            "case": "R",
+            "name": "one relationship across episodes",
+            "status": "PASS",
+            "episodes": 167
+          }
+        ],
+        "metrics": {
+          "component_retrieval": {
+            "dense": {
+              "top5_hit_rate": 1.0,
+              "queries": 5,
+              "query_seconds": [
+                0.000910000002477318,
+                0.001167800000985153,
+                0.0009175000013783574,
+                0.0006733000045642257,
+                0.000930900001549162
+              ]
+            },
+            "lexical": {
+              "top5_hit_rate": 0.8,
+              "queries": 5,
+              "query_seconds": [
+                0.0007621000113431364,
+                0.00085120000585448,
+                0.0005710999976145104,
+                0.0005806999979540706,
+                0.0006800999981351197
+              ]
+            }
+          },
+          "positive_top5_hit_rate": 1.0,
+          "positive_queries": 5,
+          "unsupported_claim_acceptance_rate": 0.0,
+          "unsupported_claim_queries": 6,
+          "temporal_cases_passed": 3,
+          "entity_error_cases": 0
+        },
+        "limitations": [
+          "small synthetic dataset; no universal hallucination claim",
+          "exact sourced assertion verifier; arbitrary model paraphrases remain UNKNOWN",
+          "reopen evidence here; separate process continuity evaluated independently",
+          "Neo4j loopback synthetic fixture without auth; no private records"
+        ]
+      },
+      "cumulative_onnx_cache_bytes": 500038236
+    }
+  ],
+  "native_index_acceptance": {
+    "status": "VERIFIED",
+    "observed_at": 1791113401.6307003,
+    "relationship": "synthetic-owner",
+    "source_event_ids": [
+      "ffbeb532f277468782a28f0f80e13fe6",
+      "fde6a1fafc874f99b2107f6a83ea7f97",
+      "3ebc060392a94844a5967447063723ff",
+      "af007ee1cf3d4fce821cc7beed0ca61a"
+    ],
+    "memory_ids": [
+      "9dbab1d95c42497aa6c450819e86d9ed",
+      "60fc0098335f4d46ad3387ab3427611f",
+      "719d2bda1a5843d4ae090b7fca9cddbc",
+      "77dc84a166574dcca54c6d9b5dbaaa21"
+    ],
+    "graph_group": "oscar_38f55d018936668ab87f",
+    "embedding": "fastembed:0.8.1:BAAI/bge-small-en-v1.5:5dc9fe36c81e64b98d40c803c759fd1d3fa98d3435c783bf9150c092959a235a",
+    "reranker": "fastembed:0.8.1:Xenova/ms-marco-MiniLM-L-6-v2:e94b6cbe772c7ef98fa80cb99827942fa20d6e0ebf149b696d56d642e8de5e32",
+    "checks": [
+      "exact rare build identifier uses native BM25 plus configured Qdrant IDF",
+      "rebuild preserves second group and unrelated same-group node",
+      "real Qdrant dense+sparse RRF paraphrase and relationship filter",
+      "real Graphiti native hybrid search against Neo4j",
+      "canonical time filters distinguish current Zed and historical VS Code",
+      "real local embedding/reranker paraphrase candidates with source IDs",
+      "unsupported personal claim UNKNOWN; retrieved claim remains RECALLED",
+      "independent injected reranker and embedding failures preserve archive recall",
+      "independent Neo4j query confirms source episode IDs and validity interval",
+      "canonical archive and Qdrant reopen preserve one relationship",
+      "deleted derived collection gives explicit fallback and canonical rebuild",
+      "forget fences cached evidence, deletes native index entries, survives rebuild"
+    ],
+    "limitations": [
+      "synthetic local fixture only",
+      "Neo4j fixture has loopback ports and no authentication; never load private data",
+      "exact claim validation; arbitrary paraphrased entailment remains UNKNOWN",
+      "forget is not secure disk erasure"
+    ]
+  },
+  "warning_reproduction": {
+    "baseline_reference_time_notifications": 22,
+    "final_native_notifications": 0,
+    "root_cause": "adapter reference_time None omitted by Neo4j; native Graphiti projection reads property",
+    "suppression": false
+  },
+  "automated_suite": {
+    "count": 384,
+    "seconds": 94.341,
+    "status": "PASS"
+  },
+  "credential_fault_boundaries": [
+    "device_intent",
+    "device_written",
+    "device_active",
+    "exchange_intent",
+    "exchange_returned",
+    "token_intent",
+    "token_written",
+    "token_active",
+    "device_deleted",
+    "disconnect_intent",
+    "credential_deleted",
+    "disconnect_recorded"
+  ],
+  "native_credential_process_crash": "child exit 73 after native vault write; reconciled ready without exchange replay; refs deleted",
+  "quality": {
+    "ruff": "PASS",
+    "format": "PASS",
+    "strict_mypy": "PASS: 48 source files",
+    "repository_links_secrets": "PASS",
+    "git_diff": "PASS"
+  },
+  "artifact_sha256": {
+    ".oscar\\hardening-quality-final.log": "3b30b3d0c509cd8c582208d05d159a089fe46c4a0425e92535187e94f9ae8639",
+    ".oscar\\hardening-benchmark-accepted\\report.json": "7a26ff9a78363f3c2837204cb25d5a50f39c6812b3ef6d983270449774ce9ee0",
+    ".oscar\\hardening-native-acceptance\\report.json": "4284ef768674cd229b2bd4dc194719c4dfd5d06340a37adebfe49f46dccf135c",
+    ".oscar\\hardening-warning-baseline.log": "6dc0e32619da05c2498e969d5a2052620a205c1a09789aaec36c71d8ec9e6f8e"
+  },
+  "unverified": [
+    "owner physical/manual acceptance",
+    "registered-client owner OAuth",
+    "remote provider revocation",
+    "private connector/live federation",
+    "general conversational entailment",
+    "Sunday",
+    "Android/OEM",
+    "voice",
+    "hardware",
+    "private cloud accounts"
+  ]
+}

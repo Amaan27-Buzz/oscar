@@ -3,9 +3,62 @@
 OSCAR prefers official structured authenticated APIs, then official connectors,
 reviewed MCP sessions, authorized app automation and computer-use fallback.
 `ConnectorFabric` is a capability source for the existing Grid catalog, not another
-registry competing with it. Jev selects a capability class; provider manifests
+registry competing with it. Controller selects a capability class; provider manifests
 contain service facts. Existing Dispatcher target authorization, action correlation,
 idempotency, Runtime and independent Evidence/Verification remain authoritative.
+
+## Shared authentication target architecture
+
+GitHub OAuth is only the **first accepted real Gate B authentication proof**.
+Owner run `oauth-gate-b-20261004-234817` passed authorization, private reads, restart,
+controlled federation and local disconnect; remote revocation remains unknown.
+It is not a design for independent OAuth implementations in every plugin.
+
+```text
+OSCAR Auth Broker
+├── OAuth2 / PKCE
+├── Device Flow
+├── API Key
+├── MCP/session auth
+├── refresh / expiry
+├── incremental scope upgrades
+├── disconnect / revocation state
+├── native/server vault abstraction
+└── opaque CredentialRef
+
+Reusable provider adapters
+├── Google Auth    -> Gmail / Calendar / Drive / Contacts
+├── Microsoft Auth -> Outlook / Calendar / OneDrive / Teams
+└── GitHub Auth    -> GitHub capabilities
+```
+
+Plugins/connectors primarily declare provider, auth type/profile, required scopes,
+capabilities, risk and verification/readback. The broker and reusable provider
+adapters own enrollment/lifecycle and scope upgrades. Start with the minimum
+scopes for the current objective; do not request every future permission during
+first authorization. A later upgrade needs owner consent, explicit scope tracking
+and permission rechecks; provider consent is not an OSCAR permission grant.
+
+Connectors carry opaque CredentialRef values. Plugins must not receive raw tokens
+when an opaque reference suffices. Only trusted broker/provider transport code may
+resolve a secret transiently for authenticated protocol I/O. Never place raw tokens
+in manifests, task state, logs or SQLite. Reuse provider code across capabilities
+while retaining explicit provider/account/tenant/audience/scope identity; one
+credential cannot silently authorize another account or provider service.
+Native Windows and future server vaults sit behind a replaceable store boundary.
+
+Local credential deletion and remote revocation confirmation remain separate.
+Refresh/expiry/revoke support is provider-specific; unsupported remote revocation
+stays UNKNOWN/PENDING owner action. The current GitHub registered-client flow
+cannot confirm provider revocation without the required provider credentials.
+
+This is target architecture, not a new broker implementation. Existing CredentialRef,
+SecretResolver, AuthSession/PKCE, GitHub device enrollment, native vault and durable
+recovery are implemented foundations. Broad Google/Microsoft provider enrollment,
+server vault deployment, generalized incremental upgrades and every auth profile
+are not accepted. Full Auth Broker expansion is later work, not an added Gate B
+requirement. Existing trusted HTTP transport resolves raw bytes for requests; this
+does not mean an arbitrary plugin is allowed to inspect the native vault.
 
 ## Implemented boundary
 
@@ -20,8 +73,11 @@ idempotency, Runtime and independent Evidence/Verification remain authoritative.
   action requiring that consequence, even with a write/destructive grant.
 - Environment secret resolver is a platform-supplied reference boundary, not a
   vault. OAuth refresh/revoke and authenticated MCP session are adapter protocols.
-  PKCE S256 generation is implemented. Enrollment, token refresh, device flow and
-  OS secure storage are **not implemented or live verified**.
+  PKCE S256 generation is implemented. GitHub registered-client device enrollment
+  and Windows Credential Manager are implemented; native credential lifecycle is exercised.
+  Real owner GitHub authorization/private reads/restart/disconnect are accepted.
+  This adapter does not implement refresh; acceptance used non-expiring grants.
+  Local disconnect does not revoke remotely: UNKNOWN_OWNER_ACTION_REQUIRED.
 - Provider results remain REPORTED. `ConnectorVerifier` independently fetches a
   correlated resource and compares explicit expected fields before verification.
   Gmail sent-recipient/header verification and arbitrary nested/batch-update
@@ -175,3 +231,18 @@ and Microsoft [create event](https://learn.microsoft.com/en-us/graph/api/user-po
 Google warns some emails may still be sent with notifications suppressed; update/delete
 can affect pre-existing attendees unknown to the request. Microsoft attendee invitations
 cannot be disabled. These are reference contract tests, not live private-account tests.
+
+## Gate B local completion candidate — 2026-10-04
+
+`python -m oscar.oauth_cli --state <local.sqlite> --owner-authorized --begin <registered-client-id>` starts only the official GitHub device flow. One `--poll <transaction-id>` reads its nonce from stdin; no polling loop or token output. Tokens/device credentials live in OSCAR-owned native Credential Manager references. Interrupted exchange is ambiguous and blocked rather than replayed. A registered client was used in the owner acceptance run; no client secret was needed. Provider revocation needs the legitimate provider settings/app boundary; local disconnect is explicitly pending remote revocation. No CLI/browser tokens are borrowed. Verified acceptance includes native Windows/Codex work, typed PowerShell, registered Notepad/UIA, isolated browser, separate owner control, native credentials, canonical WAL/FTS5, real Qdrant/Graphiti/Neo4j, local embedding/reranking, memory evaluation and owner-reviewed policy candidates. The owner completed physical machine acceptance and registered GitHub device OAuth with exactly `user:email`, real private reads, new-process restart, controlled private/public federation and local credential deletion/absence checks. Slice 05 and Slice 06 are COMPLETE for the documented local-alpha scope; Gate B is PASS. Remote provider revocation remains `UNKNOWN_OWNER_ACTION_REQUIRED`; private writes were not authorized and are optional. General conversational recall integration remains a composition boundary, not a proven autonomous product. See [Gate B completion ledger](GATE-B-COMPLETION.md).
+
+
+The owner's final physical/manual machine acceptance PASSED in run
+`manual-gate-b-20261004-200734`; desktop/local/public browser phases are VERIFIED.
+The [accepted GitHub OAuth/federation path](GATE-B-OAUTH-ACCEPTANCE.md) uses
+the existing native vault, opaque references and Connector Fabric; private email
+addresses remain transient. The controlled synthetic past count remains RECALLED;
+current provider count facts remain REPORTED, with separate source/temporal provenance.
+Owner run `oauth-gate-b-20261004-234817` passed real private OAuth and controlled
+federation. Slice 06 COMPLETE; Gate B PASS. Remote revocation remains
+`UNKNOWN_OWNER_ACTION_REQUIRED`. See [final acceptance](GATE-B-COMPLETION.md).

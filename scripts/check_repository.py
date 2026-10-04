@@ -28,7 +28,8 @@ def main() -> int:
     )
     material = [os.environ[name].encode() for name in names if os.environ.get(name)]
     secret_pattern = re.compile(
-        rb"(?:gsk_[A-Za-z0-9]{20,}|AIza[A-Za-z0-9_-]{20,}|sk-(?:proj-)?[A-Za-z0-9_-]{20,})"
+        rb"(?:gsk_[A-Za-z0-9]{20,}|AIza[A-Za-z0-9_-]{20,}|sk-(?:proj-)?[A-Za-z0-9_-]{20,}"
+        rb"|gh[pousr]_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,})"
     )
     removed = ("kine" + "table").encode()
     sensitive_found = False

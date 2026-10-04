@@ -30,7 +30,7 @@ Avoid:
 
 - giant centered mascot compositions;
 - toy-like glossy 3D rendering;
-- permanent smile/wink branding;
+- independently invented facial geometry that changes the canonical Orb identity;
 - emoji-like expressions;
 - making the avatar the only source of hierarchy or meaning.
 
@@ -78,7 +78,7 @@ On desktop, a compact OSCAR presence can expand into a contextual overlay from i
 
 | State | Expression / motion direction |
 |---|---|
-| Idle / Present | calm neutral face; almost still; subtle settling only |
+| Idle / Present | canonical Orb appearance; almost still; subtle settling only |
 | Wake acknowledgement | quick focused shift toward input/source |
 | Sentry aware | stable, watchful orientation; low-amplitude motion |
 | Listening | focused orientation/tension toward active input; no fake waveform when audio is inactive |
@@ -99,9 +99,12 @@ On desktop, a compact OSCAR presence can expand into a contextual overlay from i
 
 ## Default expression
 
-The standard idle face should be neutral.
+The standard idle appearance uses the canonical Orb source, including its curved wink.
 
-The wink/smile can appear as a brief acknowledgement or earned personality beat. It should not be the default face because OSCAR also needs credibility during serious work, safety, Sentry and verification.
+Additional animated expressions can appear as a brief acknowledgement or earned
+personality beat, derived from the canonical source. Credibility during serious
+work, safety, Sentry and verification comes from truthful state and restrained
+motion; the source artwork must not be silently replaced or redrawn.
 
 ## Serious mode
 
@@ -237,3 +240,9 @@ assets/brand/
 ```
 
 Apps and docs should reference canonical assets from this directory rather than duplicating them at repository root.
+
+[oscar-orb.svg](../assets/brand/oscar-orb.svg) is the canonical source and actual
+intended OSCAR appearance, including its curved wink. Prefer it on scalable
+surfaces. Future runtime variants derive from this artwork and must preserve its
+core identity; motion guidance is not permission to independently redraw it.
+See [brand assets](../assets/brand/README.md) for retained raster compatibility files.

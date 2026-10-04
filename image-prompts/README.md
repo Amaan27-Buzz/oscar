@@ -59,6 +59,11 @@ Do not use:
 
 The avatar is a blue shell with a yellow weighted puck/face and restrained red expression marks.
 
+Use the [canonical Orb SVG](../assets/brand/oscar-orb.svg) as the authoritative
+identity artwork. Visual exploration must not regenerate or approximate the Orb;
+future interface variants derive from this source. See
+[brand assets](../assets/brand/README.md) for the compatibility rules.
+
 It should feel like a precision physical/digital object rather than a children's mascot. The yellow puck moves with believable spring/inertia and communicates attention/state.
 
 Do not make the avatar occupy most of every screen.

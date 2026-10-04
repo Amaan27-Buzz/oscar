@@ -4,6 +4,7 @@ This is a trusted local workspace boundary, not isolation from hostile host code
 """
 
 import ctypes
+import importlib
 import os
 import re
 from collections.abc import Iterator
@@ -98,6 +99,46 @@ class WindowsScopedFiles(ScopedFiles):
                 return True
             except FileNotFoundError:
                 return False
+
+    def create_bytes(self, relative: str, data: bytes) -> None:
+        """Native CREATE_NEW rejects even dangling reparse leaves on Windows."""
+        from ctypes import wintypes
+
+        if len(data) > 4_000_000:
+            raise ValueError("file objective too large")
+        parts = self.parts(relative)
+        msvcrt = importlib.import_module("msvcrt")
+        windows_os: Any = os
+        kernel = _win32.WinDLL("kernel32", use_last_error=True)
+        kernel.CreateFileW.argtypes = [
+            wintypes.LPCWSTR,
+            wintypes.DWORD,
+            wintypes.DWORD,
+            ctypes.c_void_p,
+            wintypes.DWORD,
+            wintypes.DWORD,
+            wintypes.HANDLE,
+        ]
+        kernel.CreateFileW.restype = wintypes.HANDLE
+        kernel.CloseHandle.argtypes = [wintypes.HANDLE]
+        with self.checked_directory("/".join(parts[:-1]) or ".") as parent:
+            handle = kernel.CreateFileW(
+                str(parent / parts[-1]), 0x40000000, 0, None, 1, 0x00200080, None
+            )
+            if handle == ctypes.c_void_p(-1).value:
+                error = _win32.get_last_error()
+                if error in {80, 183}:
+                    raise FileExistsError("artifact overwrite rejected")
+                raise _win32.WinError(error)
+            try:
+                descriptor = msvcrt.open_osfhandle(handle, os.O_WRONLY | windows_os.O_BINARY)
+            except Exception:
+                kernel.CloseHandle(handle)
+                raise
+            with os.fdopen(descriptor, "wb") as stream:
+                stream.write(data)
+                stream.flush()
+                os.fsync(stream.fileno())
 
     def names(self, relative: str, pattern: str) -> list[str]:
         with self.checked_directory(relative) as directory, os.scandir(directory) as entries:

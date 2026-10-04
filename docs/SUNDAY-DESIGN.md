@@ -381,7 +381,7 @@ The avatar is a **presence object**, not the whole product.
 - small/medium in ordinary home states;
 - larger only when a dedicated interaction earns it;
 - puck position/weight before facial expression;
-- neutral face by default;
+- [canonical Orb appearance](../assets/brand/oscar-orb.svg) by default;
 - minimal expression marks;
 - serious/Sentry states reduce playfulness;
 - Persona may subtly change acknowledgement style but not runtime truth.

@@ -68,6 +68,10 @@ components:
 
 # Design System: OSCAR
 
+The [canonical OSCAR Orb](assets/brand/oscar-orb.svg) defines the actual intended
+Orb appearance. Use or derive variants from that source; interface tokens above
+must not recolor it. See the [brand asset contract](assets/brand/README.md).
+
 ## North star
 
 **Quietly Alive.**
@@ -200,7 +204,7 @@ OSCAR's blue shell + yellow puck is a functional presence object, not a mascot i
 - scale it up only when a dedicated interaction moment justifies it;
 - use position, weighting and motion before facial expression;
 - keep facial marks minimal;
-- avoid permanent winks/smiles;
+- preserve the canonical Orb's curved wink; avoid unrelated added expressions;
 - serious work should reduce playful movement, not change the identity.
 
 The puck behaves like a **weighted magnetic/joystick object** with inertia, slight overshoot and controlled settling.

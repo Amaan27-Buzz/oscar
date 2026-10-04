@@ -104,10 +104,24 @@ Memory services         → optional adapters behind OSCAR-owned Memory Fabric
 
 OSCAR owns identity, task state, memory provenance, authority and verification.
 
+## OSCAR-owned controller
+
+Controller means OSCAR's Decision / Epistemic Controller, implemented today by
+OSCAR-owned deterministic logic in `oscar/jev.py` (temporary historical/internal
+name). No TypeSafe Jev runtime/API is required. Hard safety, permission, Personal
+Policy, live-vs-memory, confirmation and consequential-action rules are authoritative.
+Laya/Jev decision providers are replaceable implementations beneath this boundary;
+System-1 evaluation starts only after Gate B PASS.
+
+See [deployment](docs/DEPLOYMENT.md) and [shared auth](docs/CONNECTOR-FABRIC.md).
+Oracle/Vercel deployment, the Galaxy Tab Home Node and full Auth Broker expansion
+are later work, not added Gate B requirements. Do not implement the Tab node before
+OSCAR is fully deployed and its main Core architecture is operational.
+
 ## Three routing decisions remain separate
 
 ```text
-Jev                  → what class of action/evidence is needed?
+Controller           → what class of action/evidence is needed?
 Capability selection → which executor/tool/device should act?
 Model Router         → which provider/model/credential should reason?
 ```
@@ -132,11 +146,11 @@ Canonical memory architecture is defined in `docs/MEMORY.md`.
 
 The product exposes one continuous OSCAR relationship. Internal events/episodes/projects/tasks are structured for scaling and retrieval but do not force `new chat` management on the user.
 
-### Jev Memory Preflight
+### Controller Memory Preflight
 
 Do not let the reasoning model casually decide whether it remembers something.
 
-If a request plausibly depends on prior user/project/entity/task/artifact/preference/history context, Jev routes through memory retrieval before answering.
+If a request plausibly depends on prior user/project/entity/task/artifact/preference/history context, Controller routes through memory retrieval before answering.
 
 Examples requiring retrieval include:
 
@@ -260,7 +274,7 @@ Do not say `done`, `fixed` or `works` when evidence is only partial/reported.
 5. Sunday is OSCAR on the phone, not a second assistant.
 6. OSCAR owns the canonical Memory Fabric and one continuous relationship.
 7. World Model owns current-state representation; memory is historical evidence, not current truth by default.
-8. Jev chooses execute/retrieve/verify/reason/delegate/ask class and performs memory preflight when required.
+8. Controller chooses execute/retrieve/verify/reason/delegate/ask class and performs memory preflight when required.
 9. Model routing and executable capability selection are separate.
 10. Nodes advertise capabilities dynamically.
 11. Consequential actions are permission-aware, attributable and evidence-backed.
@@ -306,12 +320,16 @@ Examples:
 - repository implementation/debugging → Codex/coding capability;
 - GUI-only operation → computer-use capability;
 - knowledge workspace → native connector/plugin;
-- model reasoning → Jev then native Model Router;
+- model reasoning → Controller then native Model Router;
 - physical action → advertised Edge/device capability.
 
 ## UI / design quality
 
 Durable direction: **Quietly Alive + Playful Precision**.
+
+Use [the canonical OSCAR Orb](assets/brand/oscar-orb.svg) for scalable identity
+artwork. Derive future variants from it rather than recreating the Orb; preserve
+its core visual identity. See [brand assets](assets/brand/README.md).
 
 Avoid generic AI dashboards, card walls, glass/neon/purple-gradient slop and fake telemetry. Simplicity must preserve craftsmanship. UI/avatar state reflects real runtime state.
 
@@ -344,4 +362,14 @@ Use ignored local fixtures or synthetic test data.
 
 Verified scoped foundations include native Windows file/process/Git work, useful Codex delegation with independent verification, cancellation, coordinator/Worker restart/recovery, ambiguous mutation blocking, local selected memory continuity and bounded owner-reviewed policy authoring.
 
-Gate B remains PARTIAL. Complete the planned Slice 05/06 work before starting Slice 07, including browser/computer use, installed-app capability, owner-control continuation, the production Memory Fabric, open-ended Personal Policy, real private OAuth/connector acceptance, secure credential-storage boundary and live-authority-vs-memory federation.
+Verified acceptance includes native Windows/Codex work, typed PowerShell, registered Notepad/UIA, isolated browser, separate owner control, native credentials, canonical WAL/FTS5, real Qdrant/Graphiti/Neo4j, local embedding/reranking, memory evaluation and owner-reviewed policy candidates. The owner completed physical machine acceptance and registered GitHub device OAuth with exactly `user:email`, real private reads, new-process restart, controlled private/public federation and local credential deletion/absence checks. Slice 05 and Slice 06 are COMPLETE for the documented local-alpha scope; Gate B is PASS. Remote provider revocation remains `UNKNOWN_OWNER_ACTION_REQUIRED`; private writes were not authorized and are optional. General conversational recall integration remains a composition boundary, not a proven autonomous product. See [Gate B completion ledger](docs/GATE-B-COMPLETION.md). No Slice 07.
+
+
+Final physical/manual machine acceptance PASSED in owner run
+`manual-gate-b-20261004-200734` (desktop/local/public browser VERIFIED; prior stale
+fixture untouched). Slice 05 is COMPLETE for its documented local-alpha scope;
+Slice 06 is COMPLETE and Gate B PASS after owner OAuth run `oauth-gate-b-20261004-234817`.
+The dedicated [owner OAuth harness](docs/GATE-B-OAUTH-ACCEPTANCE.md) has passed real owner acceptance with
+exactly `user:email`, restart, federation and local disconnect. Never borrow credentials or authorize autonomously: the owner
+must supply a registered Client ID and interact with GitHub. No Slice 07, deployment,
+Sunday/Android implementation or merge is authorized by this acceptance recording.

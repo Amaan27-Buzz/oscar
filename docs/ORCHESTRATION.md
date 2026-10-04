@@ -61,7 +61,7 @@ Example:
 ```text
 objective: build SceneLab landing page
   ↓
-Jev classifies objective/context needs
+Controller classifies objective/context needs
   ↓
 Capability Catalog finds
 - SceneLab project/repository
@@ -90,17 +90,17 @@ communication        → Channel Gateway + best native adapter
 hardware design      → installed/connected engineering capability
 physical action      → OSCAR Edge
 research             → research capability + model reasoning when needed
-cheap classification → Jev / fast model only when necessary
+cheap classification → Controller / fast model only when necessary
 ```
 
 ## Native model routing
 
-Jev decides whether model reasoning is needed.
+Controller decides whether model reasoning is needed.
 
 Only then does OSCAR's native Model Router choose an allowed provider/model based on suitability, capability, latency, cost, quality, availability and policy.
 
 ```text
-Jev: reason
+Controller: reason
   ↓
 OSCAR Model Router
   ↓
@@ -184,11 +184,11 @@ Ship ClearLane release
 
 Workers may run in parallel, wait on dependencies, exchange Artifact/Result references and hand work off. Executive Planner remains the top-level coordinator.
 
-## Jev and Worker recovery
+## Controller and Worker recovery
 
 ```text
 Worker encounters issue
-→ Jev evaluates
+→ Controller evaluates
 → safe/confident self-fix? → repair/retry/verify
 → better capability?       → reroute/delegate
 → otherwise                → ask for minimum intervention
@@ -292,7 +292,7 @@ Always-on Sentry acoustic awareness can trigger Protocol/Worker evaluation from 
 
 1. OSCAR remains the top-level objective owner.
 2. Specialist capability beats generic imitation.
-3. Jev decides whether reasoning/delegation/retrieval/verification is needed.
+3. Controller decides whether reasoning/delegation/retrieval/verification is needed.
 4. Native Model Router selects concrete model/provider only after a model path is chosen.
 5. Native Transport + Capability Fabric carries cross-device execution.
 6. Latch/SwitchRoute are reference architectures, not required runtime services.

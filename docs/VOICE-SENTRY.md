@@ -29,7 +29,7 @@ Sentry / activation / policy gate
   ↓
 streaming STT only when the selected capture/listening mode requires it
   ↓
-Jev / capability / model path
+Controller / capability / model path
   ↓
 result
   ↓

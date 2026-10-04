@@ -51,9 +51,12 @@ class Decision:
     latency_ms: float
     repair: str
     freshness: Freshness = Freshness.UNKNOWN
+    memory_required: bool = False
 
 
-def decide(intent: Intent) -> Decision:
+def decide(intent: Intent, known_names: tuple[str, ...] = ()) -> Decision:
+    from .memory_fabric import memory_preflight
+
     start = perf_counter()
     text = intent.text.lower().strip()
     freshness = classify(text)
@@ -135,6 +138,13 @@ def decide(intent: Intent) -> Decision:
             "worker",
             "durable responsibility needs worker",
         )
+    elif memory_preflight(text, known_names):
+        route, execution, kind, reason = (
+            DecisionRoute.RECALL,
+            ExecutionClass.RETRIEVAL,
+            "memory",
+            "personal/historical dependency requires sourced recall before reasoning",
+        )
     elif intent.kind == "reason" or text.startswith(("reason ", "analyze ", "explain ")):
         route, execution, kind, reason = (
             DecisionRoute.REASON,
@@ -148,5 +158,12 @@ def decide(intent: Intent) -> Decision:
         else "block if capability unavailable"
     )
     return Decision(
-        route, execution, kind, reason, (perf_counter() - start) * 1000, repair, freshness
+        route,
+        execution,
+        kind,
+        reason,
+        (perf_counter() - start) * 1000,
+        repair,
+        freshness,
+        memory_preflight(text, known_names),
     )

@@ -48,7 +48,7 @@ retrieval           relationships
       + local reranker
              │
              ▼
-   Jev Memory Preflight
+   Controller Memory Preflight
    authority/conflict logic
              │
              ▼
@@ -153,11 +153,15 @@ OSCAR distinguishes at least:
 
 Personal Policy is not a memory class. Permission is not a memory class. Voice Match/Voice Map embeddings remain dedicated sensitive system data.
 
-## Jev Memory Preflight
+## Controller Memory Preflight
+
+The Controller is OSCAR's own Decision / Epistemic Controller. Its current Python
+module `oscar/jev.py` has a temporary historical/internal name; TypeSafe Jev is not
+a required runtime/API. Replaceable decision models cannot grant memory authority.
 
 Memory retrieval is not left to the language model's intuition.
 
-Every interaction receives a cheap Jev preflight that asks whether the objective depends on personal/history/project/entity context.
+Every interaction receives a cheap Controller preflight that asks whether the objective depends on personal/history/project/entity context.
 
 Retrieval is mandatory when the request plausibly references:
 
@@ -172,7 +176,7 @@ A deterministic question such as `2 + 2` does not need memory retrieval.
 
 Core rule:
 
-> The reasoning model does not decide whether memory exists. Jev decides whether memory retrieval is required.
+> The reasoning model does not decide whether memory exists. Controller decides whether memory retrieval is required.
 
 ## Retrieval ladder
 
@@ -193,7 +197,7 @@ Do not jump directly from one empty vector query to `I don't remember`.
 
 ### Expected-memory misses
 
-If Jev classifies a request as clearly historical/personal and retrieval returns no useful result:
+If Controller classifies a request as clearly historical/personal and retrieval returns no useful result:
 
 ```text
 expected_memory = true
@@ -271,7 +275,9 @@ hard safety / permission / Personal Policy
 
 Authority is claim-specific. A live filesystem read outranks memory of a file. Current weather outranks an old weather memory. A current explicit preference can supersede an older preference.
 
-Jev chooses the authority policy and whether verification/live retrieval is required.
+The Controller applies OSCAR's hard deterministic, claim-specific authority rules
+and determines whether verification/live retrieval is required. A decision model
+cannot change live-vs-memory precedence or turn recalled history into current truth.
 
 ## Memory formation
 
@@ -335,7 +341,7 @@ confidence
 
 Same names do not prove identity. Unknown or ambiguous entities remain separate until evidence supports a merge.
 
-Jev resolves likely entity IDs before broad historical retrieval when doing so improves precision.
+Controller resolves likely entity IDs before broad historical retrieval when doing so improves precision.
 
 ## Background consolidation
 
@@ -435,18 +441,15 @@ None silently substitutes for another.
 
 The existing `oscar.continuity.LocalMemory` and SQLite-backed records verify selected local retention, restart continuity, evidence state, entity references, live-source precedence and forget of the live OSCAR record for the documented Windows/reference cases.
 
-The production Memory Fabric described above is **not yet fully implemented**. Gate B completion must add and verify:
+The archive/index/retrieval implementation is now exercised on this Windows laptop with synthetic retained sources. Verified acceptance includes native Windows/Codex work, typed PowerShell, registered Notepad/UIA, isolated browser, separate owner control, native credentials, canonical WAL/FTS5, real Qdrant/Graphiti/Neo4j, local embedding/reranking, memory evaluation and owner-reviewed policy candidates. The owner completed physical machine acceptance and registered GitHub device OAuth with exactly `user:email`, real private reads, new-process restart, controlled private/public federation and local credential deletion/absence checks. Slice 05 and Slice 06 are COMPLETE for the documented local-alpha scope; Gate B is PASS. Remote provider revocation remains `UNKNOWN_OWNER_ACTION_REQUIRED`; private writes were not authorized and are optional. General conversational recall integration remains a composition boundary, not a proven autonomous product. See [Gate B completion ledger](GATE-B-COMPLETION.md).
 
-- canonical Event Archive/WAL/FTS5 behavior;
-- Qdrant OSS derived semantic index;
-- Graphiti + Neo4j Community temporal/entity index;
-- replaceable local embedding and reranking path;
-- Jev Memory Preflight and retrieval planner;
-- expected-memory miss escalation;
-- evidence-bound recalled claims;
-- correction/supersession propagation;
-- rebuild/drift behavior;
-- evaluation suite.
+Canonical admission rechecks forgotten/expired/inferred and temporally superseded sources even when a recalled object was cached. Context has a total serialized bound and terminal tasks release transient context. Consolidation runs in bounded batches with a durable atomic cursor; it preserves source events and merges only matching evidence inside a batch. Run one consolidation runner per relationship. A completed consolidation pass requires explicit restart. No automatic unbounded daemon, model-extracted global summaries, or private unauthenticated Neo4j deployment is claimed.
+
+Archive writes transactionally advance a per-relationship generation. Retrieval excludes a derived index unless durable CURRENT state, generation, physical projection digest and model identity match. Rebuilds are bounded, idempotent and stamped only after completion; failure preserves canonical history. Outdated/lost/unavailable services fall back through valid archive/context/remaining-index paths, eventually UNKNOWN. A concurrent archive write fences the in-flight recall. See [pre-manual hardening evidence and design](GATE-B-HARDENING.md).
+
+The local default is FastEmbed BGE small v1.5 plus Qdrant BM25 with the IDF modifier, RRF and an ONNX MiniLM cross-encoder. FTS5 remains the canonical lexical path. Sparse embeddings use FastEmbed's document/query APIs, not OSCAR token hashing. Sentence-transformers remains an optional benchmark reference, outside the default memory dependency extra. Offline dense/reranker loaders fingerprint actual model/tokenizer artifacts.
+
+Bounded response context carries claim ID/type, supporting canonical event/memory IDs, retrieval path, confidence, epistemic state and temporal interpretation. Required retrieval failure, empty evidence, unresolved identity and inadmissible cached support produce UNKNOWN. The verifier supports exact sourced assertions, not arbitrary natural-language entailment; RECALLED is never automatically VERIFIED.
 
 The prior planned Supermemory integration has been retired. Historical checkpoint references to it describe the earlier plan, not a current dependency.
 
@@ -458,7 +461,7 @@ The prior planned Supermemory integration has been retired. Historical checkpoin
 4. OSCAR never says `I remember X` without retrieved/active-context evidence for X.
 5. Personal/historical factual claims require source event/memory provenance.
 6. A failed retrieval is not proof the memory does not exist.
-7. Jev escalates retrieval before returning UNKNOWN when historical memory is expected.
+7. Controller escalates retrieval before returning UNKNOWN when historical memory is expected.
 8. Live/current authoritative evidence outranks stale memory.
 9. History is superseded temporally, not silently overwritten.
 10. No single retrieval mechanism is trusted as complete.
@@ -467,3 +470,14 @@ The prior planned Supermemory integration has been retired. Historical checkpoin
 13. Memory does not grant permission, modify Personal Policy or weaken safety.
 14. Sensitive voice/communication retention remains separately controlled.
 15. Any managed memory service is optional; OSCAR must remain operable with the free/self-hosted stack.
+
+
+The owner's final physical/manual machine acceptance PASSED in run
+`manual-gate-b-20261004-200734`; desktop/local/public browser phases are VERIFIED.
+The [accepted GitHub OAuth/federation path](GATE-B-OAUTH-ACCEPTANCE.md) uses
+the existing native vault, opaque references and Connector Fabric; private email
+addresses remain transient. The controlled synthetic past count remains RECALLED;
+current provider count facts remain REPORTED, with separate source/temporal provenance.
+Owner run `oauth-gate-b-20261004-234817` passed real private OAuth and controlled
+federation. Slice 06 COMPLETE; Gate B PASS. Remote revocation remains
+`UNKNOWN_OWNER_ACTION_REQUIRED`. See [final acceptance](GATE-B-COMPLETION.md).

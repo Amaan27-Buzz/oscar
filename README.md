@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/brand/oscar-logo.png" width="180" alt="OSCAR logo" />
+  <img src="assets/brand/oscar-orb.svg" width="180" alt="OSCAR Orb" />
 </p>
 
 <h1 align="center">OSCAR</h1>
@@ -9,6 +9,10 @@
 <p align="center"><code>Persistent</code> · <code>Context-aware</code> · <code>Agentic</code> · <code>Immediate</code> · <code>Learning</code> · <code>Evidence-backed</code></p>
 
 ---
+
+See [deployment architecture](docs/DEPLOYMENT.md) for the free-first persistent Core
+and separate web/API host candidates and the deferred Home Node. These are future
+deployment choices, not Gate B completion claims.
 
 ## What OSCAR is
 
@@ -59,7 +63,7 @@ retrieval        relationships
          ↓
 Retrieval Fusion + reranker
          ↓
-Jev Memory Preflight
+Controller Memory Preflight
          ↓
 Context Assembly
          ↓
@@ -71,7 +75,7 @@ Claim Verification
 Key rules:
 
 - the Event Archive is canonical; Qdrant/Graphiti are rebuildable indexes;
-- Jev decides when recall is mandatory before reasoning;
+- Controller decides when recall is mandatory before reasoning;
 - personal/historical claims require source event/memory evidence;
 - an empty retrieval is not proof that the memory never existed;
 - live authoritative state outranks stale recall;
@@ -171,7 +175,9 @@ Latch ideas/logic       → native OSCAR Transport + Capability Fabric
 SwitchRoute ideas/logic → native OSCAR Model Router
 ```
 
-Jev decides whether OSCAR should execute, retrieve, verify, reason, delegate or ask. Capability selection chooses the executor. The Model Router chooses a provider/model only after a model path is selected.
+OSCAR owns the Decision / Epistemic Controller (Controller in these docs). Its
+current `oscar/jev.py` name is historical/internal; no TypeSafe Jev runtime/API is
+required. The Controller decides whether OSCAR should execute, retrieve, verify, reason, delegate or ask. Capability selection chooses the executor. The Model Router chooses a provider/model only after a model path is selected.
 
 Freshness-sensitive questions use current authoritative evidence when reasonably available. Provider manifests and memory are not permanent truth.
 
@@ -184,7 +190,7 @@ User / Environment
       ↓
 Perception Fabric → World Model
       ↓
-Jev
+Controller
       ├─ current/live retrieval
       ├─ OSCAR Memory Fabric
       ├─ capability selection
@@ -230,10 +236,10 @@ See [`docs/PERSONA.md`](docs/PERSONA.md), [`docs/PERSONAL-POLICY.md`](docs/PERSO
 | Area | Direction |
 |---|---|
 | Chief of Staff | Current context → schedule/task/communication coordination within policy |
-| Memory Fabric | OSCAR Event Archive + FTS5 + Qdrant + Graphiti/Neo4j + Jev evidence-bound recall |
+| Memory Fabric | OSCAR Event Archive + FTS5 + Qdrant + Graphiti/Neo4j + Controller evidence-bound recall |
 | Connection Grid | Sunday + replaceable cloud + Desktop + Edge availability/control fabric |
 | Epistemic Integrity | KNOWN/INFERRED/RECALLED/REPORTED/VERIFIED/UNKNOWN remain distinct |
-| Jev | Decide execute/retrieve/verify/reason/delegate/ask; mandatory memory preflight when needed |
+| Controller | Decide execute/retrieve/verify/reason/delegate/ask; mandatory memory preflight when needed |
 | Search/freshness | Current authoritative evidence outranks stale manifests/model priors/memory |
 | Model Router | Adaptive provider/model/credential routing with health/quota/funding evidence |
 | Machine Workers | Filesystem/Git/terminal/Codex/browser/apps as discovered capabilities |
@@ -263,20 +269,10 @@ Anything unavailable or genuinely blocked remains explicit, but planned mandator
 
 ## Current build status
 
-- **Gate A — PASS.** Core Loop, TypeSafe Jev, reference Transport/Grid, adaptive model routing, real multi-provider evidence and source-qualified live search/freshness acceptance are accepted for their documented scope.
-- **Gate B — PARTIAL.** Native Windows Worker, useful Codex delegation with independent verification, cancellation, process restart/recovery, ambiguity blocking, local memory continuity and bounded owner-confirmed policy interpretation are verified for their documented scope.
+- **Gate A — PASS.** Core Loop, OSCAR Decision / Epistemic Controller, reference Transport/Grid, adaptive model routing, real multi-provider evidence and source-qualified live search/freshness acceptance are accepted for their documented scope.
+- **Gate B — PASS for documented local-alpha acceptance.** Native Windows Worker, useful Codex delegation with independent verification, cancellation, process restart/recovery, ambiguity blocking, local memory continuity and bounded owner-confirmed policy interpretation are verified for their documented scope.
 
-Gate B is not complete yet. Remaining planned work includes:
-
-- typed PowerShell/terminal acceptance;
-- installed-application catalog;
-- Windows UI Automation/computer-use;
-- typed browser runtime and independent verification;
-- owner-control long-running continuation/reconnect;
-- production OSCAR Memory Fabric (Event Archive/FTS5 + Qdrant + Graphiti/Neo4j + Jev recall/claim controls + evaluation);
-- open-ended Personal Policy interpretation/confirmation;
-- real private connector/OAuth lifecycle and secure credential-storage boundary;
-- live-context federation proving current authoritative state beats stale recall.
+Verified acceptance includes native Windows/Codex work, typed PowerShell, registered Notepad/UIA, isolated browser, separate owner control, native credentials, canonical WAL/FTS5, real Qdrant/Graphiti/Neo4j, local embedding/reranking, memory evaluation and owner-reviewed policy candidates. The owner completed physical machine acceptance and registered GitHub device OAuth with exactly `user:email`, real private reads, new-process restart, controlled private/public federation and local credential deletion/absence checks. Slice 05 and Slice 06 are COMPLETE for the documented local-alpha scope; Gate B is PASS. Remote provider revocation remains `UNKNOWN_OWNER_ACTION_REQUIRED`; private writes were not authorized and are optional. General conversational recall integration remains a composition boundary, not a proven autonomous product. See [Gate B completion ledger](docs/GATE-B-COMPLETION.md).
 
 Club C does not start until Gate B's required acceptance is complete.
 
@@ -288,10 +284,10 @@ See [`docs/CLUB-A-CHECKPOINT.md`](docs/CLUB-A-CHECKPOINT.md), [`docs/CLUB-B-CHEC
 |---:|---|---|
 | 00 | Repository/architecture foundation | ✅ Complete |
 | 01 | OSCAR Core Loop | ✅ Verified foundation |
-| 02 | TypeSafe Jev | ✅ Verified foundation |
-| 03 | Native Transport + Catalog + Grid foundation | 🚧 Reference verified; deployment evolves |
+| 02 | OSCAR Decision / Epistemic Controller | ✅ Verified foundation |
+| 03 | Native Transport + Catalog + Grid foundation | ✅ Accepted reference foundation; deployment evolves |
 | 04 | Native Model Router + cloud intelligence | ✅ Gate A accepted |
-| 05 | Real machine Worker + remote continuation | 🚧 Gate B completion in progress |
+| 05 | Real machine Worker + remote continuation | ✅ Windows local-alpha acceptance candidate |
 | 06 | Memory Fabric + Personal Policy + live context | 🚧 Gate B completion in progress |
 | 07 | OSCAR Edge + reflexes | Planned after Gate B PASS |
 | 08 | Voice Core + Identity + Match/Map + Persona runtime | Planned |

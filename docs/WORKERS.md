@@ -179,14 +179,14 @@ The runtime provides persisted checkpoints, heartbeats, lease expiry/reclaim, st
 
 A Worker must not remain indefinitely `Working` because its executor vanished.
 
-## Jev and autonomous recovery
+## Controller and autonomous recovery
 
 Workers should not bother the user for routine recoverable problems.
 
 ```text
 Worker encounters issue
         ↓
-Jev evaluates
+Controller evaluates
         ↓
 Can fix safely/confidently?
   yes → repair/retry → verify → continue
@@ -286,7 +286,7 @@ Consequential actions remain attributable to OSCAR task/Protocol, Worker, capabi
 1. Workers belong to OSCAR; they are not separate assistant silos.
 2. Workers use the best available real device/service capability instead of requiring a cloud computer.
 3. Creation/editing work through normal voice/chat.
-4. Jev enables self-repair/rerouting before unnecessary escalation.
+4. Controller enables self-repair/rerouting before unnecessary escalation.
 5. Workers can collaborate while Executive Planner owns global coordination.
 6. Persistent Workers use durable execution state/recovery semantics.
 7. Workers search capabilities progressively rather than loading every tool definition.
@@ -365,9 +365,12 @@ input immutability, invalid-input rejection, sole-file Git diff and baseline HEA
 before VERIFIED. Lost result/restart recovery kept the same artifact hash and one
 execution. Real Codex cancellation and invalid invocation were exercised separately.
 See [local acceptance evidence](evidence/club-b-windows-2026-10-04.json) and
-[checkpoint](CLUB-B-CHECKPOINT.md). Browser/computer-use, independent node stores,
-public remote transport, power and phone supervision remain unverified.
+[checkpoint](CLUB-B-CHECKPOINT.md). Browser and Notepad/UIA now have current laptop evidence in the [completion ledger](GATE-B-COMPLETION.md). Independent node stores, public remote transport, power and phone supervision remain unverified.
 
 Windows API research uses Microsoft's [Job Objects](https://learn.microsoft.com/en-us/windows/win32/procthread/job-objects)
 and [reparse/file operations](https://learn.microsoft.com/en-us/windows/win32/fileio/reparse-points-and-file-operations)
 contracts; platform claims above additionally require the recorded actual laptop tests.
+
+## Gate B local completion candidate — 2026-10-04
+
+InteractiveWorker composes typed PowerShell, application IDs, UIA and browser operations with existing Worker leases/dedup/Job Objects. Discovery is not launch authority: app IDs and selected executables require explicit allowlists. Browser capability is advertised only after the selected interpreter loads the actual source-anchored OSCAR package entrypoint and launches/closes Chromium. The artifact cwd remains scoped; no editable install or global PYTHONPATH is required. Bounded failures retain allowlisted diagnostic metadata only. See [the browser launch repair](GATE-B-HARDENING.md). Browser artifact creation uses pinned directories and native CREATE_NEW; anonymous anchor downloads enforce streaming bounds. App activation can broker into an existing user process and is not contained by a new Job. Verified acceptance includes native Windows/Codex work, typed PowerShell, registered Notepad/UIA, isolated browser, separate owner control, native credentials, canonical WAL/FTS5, real Qdrant/Graphiti/Neo4j, local embedding/reranking, memory evaluation and owner-reviewed policy candidates. The owner completed physical machine acceptance and registered GitHub device OAuth with exactly `user:email`, real private reads, new-process restart, controlled private/public federation and local credential deletion/absence checks. Slice 05 and Slice 06 are COMPLETE for the documented local-alpha scope; Gate B is PASS. Remote provider revocation remains `UNKNOWN_OWNER_ACTION_REQUIRED`; private writes were not authorized and are optional. General conversational recall integration remains a composition boundary, not a proven autonomous product. See [Gate B completion ledger](GATE-B-COMPLETION.md).

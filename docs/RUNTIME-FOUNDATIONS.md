@@ -42,7 +42,7 @@ native OS / official API
 → unsupported / ask
 ```
 
-Channel events feed the entity graph, World Model, LRA and Personal Policy as appropriate.
+Channel events feed the entity graph, World Model, OSCAR Memory Fabric and Personal Policy as appropriate.
 
 ## 2. Durable Execution Runtime
 
@@ -106,7 +106,7 @@ adapter/provider owner
 version
 ```
 
-Jev/Workers search the catalog first and load the detailed contract only for a small relevant candidate set.
+Controller/Workers search the catalog first and load the detailed contract only for a small relevant candidate set.
 
 Conceptual flow:
 
@@ -193,7 +193,7 @@ User / Environment
         ↓
 Perception Fabric → World Model
         ↓
-       Jev
+       Controller
         ↓
 Executive Planner
         ↓
@@ -238,7 +238,7 @@ Running through all of it:
 ## Club B reference continuation and privacy
 
 The native runtime now accepts explicit structured capability objectives through
-Jev, preserving the existing durable task/plan/Action/Result/evidence path. Grid
+Controller, preserving the existing durable task/plan/Action/Result/evidence path. Grid
 renewal fences the current unexpired lease; Worker progress stores metadata-only
 checkpoints. Authenticated pause/resume extends the existing version-1 envelope
 additively; older targets reject unsupported controls. No storage migration or
@@ -249,3 +249,7 @@ Connector private inputs are staged as transient references. Losing active input
 context blocks instead of recovering private content from durable history. Worker
 process logs and connector bodies never become generic router/ledger telemetry.
 Memory retention is selected separately. See [CLUB-B-CHECKPOINT.md](CLUB-B-CHECKPOINT.md).
+
+## Gate B local completion candidate — 2026-10-04
+
+OwnerControl uses existing Grid/Runtime leases, target-scoped owner grants and separate processes. Cancellation atomically rechecks executor identity in the task transition. Windows pause is cooperative before the next subprocess, not arbitrary process suspension. Canonical consolidation has bounded durable checkpoints; failure rolls back the checkpoint and evidence merge together. Derived generations are invalidated after consolidation and rebuilt explicitly. Verified acceptance includes native Windows/Codex work, typed PowerShell, registered Notepad/UIA, isolated browser, separate owner control, native credentials, canonical WAL/FTS5, real Qdrant/Graphiti/Neo4j, local embedding/reranking, memory evaluation and owner-reviewed policy candidates. The owner completed physical machine acceptance and registered GitHub device OAuth with exactly `user:email`, real private reads, new-process restart, controlled private/public federation and local credential deletion/absence checks. Slice 05 and Slice 06 are COMPLETE for the documented local-alpha scope; Gate B is PASS. Remote provider revocation remains `UNKNOWN_OWNER_ACTION_REQUIRED`; private writes were not authorized and are optional. General conversational recall integration remains a composition boundary, not a proven autonomous product. See [Gate B completion ledger](GATE-B-COMPLETION.md).

@@ -51,10 +51,10 @@ Do not mark a slice complete while the repository documentation still describes 
 ## Architecture rules
 
 - OSCAR orchestrates specialist tools; it should not reimplement them poorly.
-- Jev owns fast intent/epistemic routing decisions.
-- LRA + Supermemory own long-term continuity and recall.
-- Latch is the bridge between OSCAR, ChatGPT and execution nodes.
-- SwitchRoute handles general model routing/fallbacks.
+- Controller owns fast intent/epistemic routing decisions.
+- OSCAR Event Archive owns canonical memory; semantic/graph indexes are derived.
+- OSCAR owns native Transport/Grid; Latch is reference material, not a dependency.
+- OSCAR owns native Model Router/fallbacks; SwitchRoute is reference material.
 - Sunday is OSCAR on the phone, not a separate assistant.
 - PCs are optional worker nodes, not OSCAR's host.
 - ESP32/Pico own edge presence and deterministic hardware behavior.

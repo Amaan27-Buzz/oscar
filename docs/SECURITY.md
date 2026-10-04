@@ -142,9 +142,34 @@ Do not use one blanket shared secret across phone, desktop, cloud and Edge.
 
 Cloud compromise must not bypass local safety interlocks.
 
+## Auth Broker and decision-controller authority
+
+OSCAR owns the shared Auth Broker target, with reusable provider adapters and
+opaque CredentialRef values. Plugins declare auth profile/scopes/risk/readback;
+only trusted broker/transport code resolves raw secrets for required protocol I/O.
+Native/server vaults contain secrets; durable state contains references and lifecycle
+metadata. Provider/account/tenant/audience boundaries are not erased by reuse.
+Ask for minimum initial scopes; subsequent upgrades require appropriate owner
+consent and OSCAR permission checks. OAuth consent never overrides Personal Policy,
+consequential-action confirmation or local deterministic safety.
+
+The Decision / Epistemic Controller applies these hard deterministic rules.
+Laya/Jev or another replaceable classification provider cannot grant permission,
+change source authority or waive confirmation. `oscar/jev.py` is historical naming
+for OSCAR-owned logic, not an external authority dependency.
+
+GitHub is the first real authentication proof, accepted by the owner in run
+`oauth-gate-b-20261004-234817`. Registered device flow, exactly `user:email`, private
+reads, restart and local disconnect passed. This is not a fully generalized Auth Broker. Local disconnect deletes a local secret;
+provider revocation remains UNKNOWN/PENDING owner action until independent provider
+evidence confirms it. See [connector/auth design](CONNECTOR-FABRIC.md).
+
 ## Cloud coordinator security
 
 The cloud coordinator is replaceable infrastructure, not a root of unlimited authority.
+[DEPLOYMENT.md](DEPLOYMENT.md) separates the Oracle stateful Core candidate from
+Vercel bounded Python API/web/relay functions. Neither is deployed in this pass;
+the future Home Node cannot bypass Core permissions or local Edge safety.
 
 - provider admin credentials stay out of low-trust nodes;
 - cloud adapters expose only scoped OSCAR contracts;
@@ -395,3 +420,36 @@ The task remains partial/recoverable.
 10. Notification visibility is not unrestricted app access.
 11. Perception, retention and action are independently controlled.
 12. Chief-of-Staff schedule/communication mutations require explicit authority and verification.
+
+## Gate B local completion candidate — 2026-10-04
+
+Native Windows Credential Manager is exercised for synthetic write/read/rotation/expiry/process-reopen/delete. Known runtime secret material is rejected from durable objectives/policy/archive and remains filtered from child environment. Credential Manager does not isolate secrets from the same Windows account or malicious host code. Browser contexts are nonpersistent and origin-scoped; screenshots/downloads are bounded exclusive artifacts, not sandbox claims. UIA uses observed IDs/PID/executable, fixed patterns and bounded input; UIPI/elevation is not bypassed. Notepad broker activation may reuse an existing user process. Neo4j acceptance is an unauthenticated loopback synthetic fixture: NEVER load private history into it. Native vault and SQLite commits cannot be one atomic transaction. Durable enrollment/disconnect intents now precede native mutations, and restart reconciles known references. Ambiguous external exchanges never replay; missing/expired credentials require reauthorization. Local disconnect exposes remote revocation UNKNOWN/owner-action-required. Raw device/access tokens remain exclusively in the native vault. See [crash boundaries and scoped cleanup](GATE-B-HARDENING.md).
+
+Verified local acceptance includes the previously documented typed PowerShell, Notepad/UIA, browser, owner-control, credentials and memory cases. The later owner physical and OAuth runs are accepted in the completion ledger. Slice 05/06 are COMPLETE; Gate B PASS. Remote revocation remains UNKNOWN_OWNER_ACTION_REQUIRED; no private write was authorized. General conversational recall integration remains a composition boundary, not a proven autonomous product. See [Gate B completion ledger](GATE-B-COMPLETION.md).
+
+
+Browser source loading is anchored to the trusted OSCAR package with isolated Python
+imports; the artifact cwd remains under MachineScope. Preflight exercises that same
+worker and closes an owned headless Chromium process tree. Neither package anchoring
+nor cwd scope is a sandbox. Failed browser operations retain only bounded allowlisted
+categories, exception classes, exit codes and byte counts, never arbitrary page, URL,
+cookie, credential or exception text. See [the focused repair](GATE-B-HARDENING.md).
+
+
+The owner's final physical/manual machine acceptance PASSED in run
+`manual-gate-b-20261004-200734`; desktop/local/public browser phases are VERIFIED.
+The [accepted GitHub OAuth/federation path](GATE-B-OAUTH-ACCEPTANCE.md) uses
+the existing native vault, opaque references and Connector Fabric; private email
+addresses remain transient. The controlled synthetic past count remains RECALLED;
+current provider count facts remain REPORTED, with separate source/temporal provenance.
+Owner run `oauth-gate-b-20261004-234817` passed real private OAuth and controlled
+federation. Slice 06 COMPLETE; Gate B PASS. Remote revocation remains
+`UNKNOWN_OWNER_ACTION_REQUIRED`. See [final acceptance](GATE-B-COMPLETION.md).
+
+Full-suite verification exposed asynchronous `KILL_ON_JOB_CLOSE` teardown: the
+browser timeout returned before an owned descendant released its artifact cwd.
+Job shutdown now explicitly terminates only that job, queries its bounded process
+list, rechecks job membership to reject PID reuse and waits on owned process handles
+for at most three seconds. Handles close even on drain failure; unrelated owner
+processes are never terminated by PID. See Microsoft's
+[Job Objects contract](https://learn.microsoft.com/en-us/windows/win32/procthread/job-objects).

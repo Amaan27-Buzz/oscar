@@ -1,0 +1,76 @@
+{
+  "status": "FAILED_OVERALL_MANUAL_ACCEPTANCE_ATTEMPT",
+  "starting_sha": "8a9bdd75b86554046fb87e38a296d342ae39af51",
+  "owner_evidence_root": ".oscar/manual-gate-b-20261004-190338",
+  "owner_evidence_preserved_unchanged": true,
+  "source_sha256": {
+    "actions.json": "75813ee6e276010ba5d44964b033f070381265c1dbf51584eaa6fa0648289fd2",
+    "failure.json": "485a49175775ff119c780c2b39225d06c6892c442747bce889977ec83d792739",
+    "fixture.json": "edf9a56d6213427b9070162fef0de66f57f65cfd0581a7c34899c7d503782d36",
+    "runtime.sqlite": "4a5c6c12fb83d5b619d435de5b8decbe913bca89a193ce58a13f5c0fea72affc"
+  },
+  "inspection_note": "Read-only SQLite inspection created empty WAL/read-lock sidecars; only these newly created files were removed after verifying all original hashes. Original file set and bytes restored.",
+  "fixture_id": "f66dcaca09464551a5fb8b0080d18d19",
+  "desktop_sub_phase": {
+    "status": "PASS",
+    "independent_methods": [
+      "separate UIA focused-process readback",
+      "separate UIA text readback",
+      "separate UIA empty text readback",
+      "separate UIA test-tab absence"
+    ],
+    "fixture_cleanup": "owned fixture closed; empty file removed",
+    "stale_fixture_windows": [],
+    "provenance": "owner execution; actions/failure/SQLite evidence inspection"
+  },
+  "browser_phase": {
+    "status": "FAILED",
+    "check": "runtime.operation",
+    "task_id": "a9a6767727ec4209b934e82e4b8f6767",
+    "original_subprocess_stderr": "NOT_RETAINED"
+  },
+  "independent_reproduction": {
+    "old_direct_file_default_python": "ModuleNotFoundError: No module named oscar",
+    "old_direct_file_fresh_no_pip_venv": "ModuleNotFoundError: No module named oscar",
+    "acceptance_venv": "source resolution masked old import defect",
+    "new_source_package_launch_fresh_no_pip_venv": "PASS: --help imports real worker without editable install",
+    "new_fresh_venv_preflight": "browser.playwright_unavailable",
+    "new_acceptance_venv_preflight": "browser.ready: actual Chromium launched and closed"
+  },
+  "automated_verification": {
+    "windows_full_suite": {
+      "tests": 408,
+      "seconds": 97.392,
+      "status": "PASS",
+      "command": "python -m unittest discover -s tests -t . -v"
+    },
+    "focused_browser_interactive_hardening": {
+      "tests": 50,
+      "status": "PASS"
+    },
+    "new_regressions": 11,
+    "real_synthetic_browser": [
+      "scoped download bytes independently checked",
+      "scoped screenshot PNG signature independently checked",
+      "existing artifact overwrite rejected through real failed worker path",
+      "cancellation after actual navigation",
+      "timeout after actual navigation"
+    ],
+    "ruff": "PASS",
+    "format": "PASS",
+    "strict_mypy": {
+      "files": 48,
+      "status": "PASS"
+    },
+    "repository_local_links_secret_scan": "PASS",
+    "git_diff_check": "PASS",
+    "exact_head_ci": "SEE_CURRENT_PR_12_CHECKS"
+  },
+  "owner_final_manual_acceptance": "OUTSTANDING",
+  "physical_desktop_acceptance_by_agent": "NOT_PERFORMED",
+  "oauth": "NOT_STARTED",
+  "slice_05": "COMPLETE",
+  "slice_06": "PARTIAL",
+  "gate_b": "PARTIAL",
+  "slice_07": "NOT_STARTED"
+}
