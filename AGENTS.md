@@ -313,6 +313,10 @@ Examples:
 
 Durable direction: **Quietly Alive + Playful Precision**.
 
+Use [the canonical OSCAR Orb](assets/brand/oscar-orb.svg) for scalable identity
+artwork. Derive future variants from it rather than recreating the Orb; preserve
+its core visual identity. See [brand assets](assets/brand/README.md).
+
 Avoid generic AI dashboards, card walls, glass/neon/purple-gradient slop and fake telemetry. Simplicity must preserve craftsmanship. UI/avatar state reflects real runtime state.
 
 ## Testing expectations

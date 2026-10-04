@@ -9,6 +9,7 @@ OSCAR keeps one canonical project truth and uses thin agent-specific adapters. D
 | `AGENTS.md` | repository-wide workflow, truth, safety and coding-agent rules |
 | `ENGINEERING.md` | system-design/code-quality standard |
 | `DESIGN.md` | visual tokens and durable design rules |
+| [brand assets](../assets/brand/README.md) | canonical OSCAR Orb SVG and compatibility asset rules |
 | `TASTE.md` | qualitative quality/motion/anti-slop bar |
 | `docs/PRODUCT.md` | product north star |
 | `docs/CHIEF-OF-STAFF.md` | ambient context, commitments, schedule/proactivity and Sunday presence |

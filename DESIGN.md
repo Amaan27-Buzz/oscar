@@ -68,6 +68,10 @@ components:
 
 # Design System: OSCAR
 
+The [canonical OSCAR Orb](assets/brand/oscar-orb.svg) defines the actual intended
+Orb appearance. Use or derive variants from that source; interface tokens above
+must not recolor it. See the [brand asset contract](assets/brand/README.md).
+
 ## North star
 
 **Quietly Alive.**

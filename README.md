@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/brand/oscar-logo.png" width="180" alt="OSCAR logo" />
+  <img src="assets/brand/oscar-orb.svg" width="180" alt="OSCAR Orb" />
 </p>
 
 <h1 align="center">OSCAR</h1>
