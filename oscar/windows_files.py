@@ -4,6 +4,7 @@ This is a trusted local workspace boundary, not isolation from hostile host code
 """
 
 import ctypes
+import importlib
 import os
 import re
 from collections.abc import Iterator
@@ -101,12 +102,13 @@ class WindowsScopedFiles(ScopedFiles):
 
     def create_bytes(self, relative: str, data: bytes) -> None:
         """Native CREATE_NEW rejects even dangling reparse leaves on Windows."""
-        import msvcrt
         from ctypes import wintypes
 
         if len(data) > 4_000_000:
             raise ValueError("file objective too large")
         parts = self.parts(relative)
+        msvcrt = importlib.import_module("msvcrt")
+        windows_os: Any = os
         kernel = _win32.WinDLL("kernel32", use_last_error=True)
         kernel.CreateFileW.argtypes = [
             wintypes.LPCWSTR,
@@ -129,7 +131,7 @@ class WindowsScopedFiles(ScopedFiles):
                     raise FileExistsError("artifact overwrite rejected")
                 raise _win32.WinError(error)
             try:
-                descriptor = msvcrt.open_osfhandle(handle, os.O_WRONLY | os.O_BINARY)
+                descriptor = msvcrt.open_osfhandle(handle, os.O_WRONLY | windows_os.O_BINARY)
             except Exception:
                 kernel.CloseHandle(handle)
                 raise

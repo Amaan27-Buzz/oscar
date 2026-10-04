@@ -113,3 +113,14 @@ and Chief-of-Staff/privacy direction already lives in canonical design docs. No
 Samsung/OEM, Sunday, voice, hardware or managed-memory acceptance is claimed.
 Older failed Notepad acceptance attempts may leave empty synthetic OSCAR tabs for
 manual review; never close the owner window or unrelated document to clean them up.
+
+## Quality observation
+
+The real laptop full suite passed **372 tests in 86.558 seconds**. Ruff and formatting
+pass; mypy passes for 48 source files. Required repository files, local Markdown
+links, value-silent secret scan and Git diff checks pass. Cross-platform CI and
+external links are authoritative at [draft PR 12](https://github.com/amaansyed27/oscar/pull/12).
+Its checks must match the latest branch SHA; local Windows results do not prove Ubuntu.
+The initial Ubuntu job caught platform-specific native handle stubs; the adapter now
+loads its Windows-only module at the native boundary and keeps the public API typed.
+Private OAuth remains unverified regardless of green quality checks.
