@@ -11,7 +11,7 @@ import os
 import shutil
 import signal
 import subprocess
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass, replace
 from io import BufferedReader
 from pathlib import Path
 from queue import Empty, Full, Queue
@@ -132,9 +132,15 @@ class MachineWorker:
         self.owners: dict[str, str] = {}
         from .powershell import discover
 
-        candidate = discover()
+        candidate = discover() if scope.trusted_host_execution else None
         self.powershell = (
-            candidate
+            replace(
+                candidate,
+                node_id=session.node_id,
+                workspace=str(scope.root.resolve()),
+                max_timeout=scope.max_timeout,
+                max_output=scope.max_output,
+            )
             if candidate
             and candidate.executable in scope.allowed_executables
             and scope.trusted_host_execution
@@ -500,6 +506,7 @@ class MachineWorker:
                 metadata = {
                     "agents": sorted(self.agents),
                     "executables": [Path(p).name for p in self.scope.allowed_executables],
+                    "powershell": asdict(self.powershell) if self.powershell else None,
                 }
             elif cap.id == "machine.repository":
                 if set(p) != {"path", "content", "message"}:

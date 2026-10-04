@@ -62,6 +62,20 @@ class FabricTests(unittest.TestCase):
         self.assertEqual(event, self.archive.event(event.id))
         self.assertIn(memory.id, self.archive.fts("owner", "VS Code"))
 
+    def test_pre_forget_evidence_cannot_resurrect_claim(self):
+        event, memory = self.memory("Unique forgotten historical fact")
+        recalled = self.fabric.retrieve("owner", memory.content)
+        self.fabric.forget(memory.id, owner_authorized=True)
+        claim = HistoricalClaim(memory.content, (event.id,), (memory.id,), Epistemic.RECALLED, 0.9)
+        self.assertEqual(Epistemic.UNKNOWN, self.fabric.check_claim(claim, recalled))
+
+    def test_long_gap_older_than_thousand_derived_records(self):
+        _, old = self.memory("Pine Lantern archived objective", project="old-project")
+        for index in range(1001):
+            self.memory(f"New unrelated entry {index}", project="new-project")
+        recalled = self.fabric.retrieve("owner", "Pine Lantern", project="old-project")
+        self.assertEqual(old.id, recalled.hits[0].memory.id)
+
     def test_temporal_correction_preserves_original(self):
         old_event, old = self.memory("My editor is VS Code")
         new_event, new = self.memory(

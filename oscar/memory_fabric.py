@@ -113,7 +113,7 @@ class MemoryFabric:
             project=project,
             entity=entities[0] if entities else None,
             at=at,
-            limit=1000,
+            limit=10_000,
         )
         allowed = {memory.id: memory for memory in records}
         paths: dict[str, list[str]] = {}
@@ -214,6 +214,18 @@ class MemoryFabric:
         support = [hit.memory for hit in evidence.hits if hit.memory.id in claim.memory_ids]
         if not support or set(claim.memory_ids) != {memory.id for memory in support}:
             return Epistemic.UNKNOWN
+        # Evidence captured before forget/expiry is no longer admissible.
+        for memory in support:
+            row = self.archive.db.execute(
+                "SELECT forgotten FROM archive_memories WHERE id=?", (memory.id,)
+            ).fetchone()
+            if not row or row[0] or memory.expires_at is not None and memory.expires_at <= time():
+                return Epistemic.UNKNOWN
+            try:
+                for identifier in memory.event_ids:
+                    self.archive.event(identifier)
+            except KeyError:
+                return Epistemic.UNKNOWN
         events = {identifier for memory in support for identifier in memory.event_ids}
         if not claim.event_ids or not set(claim.event_ids) <= events:
             return Epistemic.UNKNOWN

@@ -13,7 +13,14 @@ from .machine import MachineWorker
 
 
 class InteractiveWorker(MachineWorker):
-    def __init__(self, *args: Any, desktop: bool = False, browser: bool = False, **kwargs: Any):
+    def __init__(
+        self,
+        *args: Any,
+        desktop: bool = False,
+        browser: bool = False,
+        desktop_app_ids: tuple[str, ...] = (),
+        **kwargs: Any,
+    ):
         super().__init__(*args, **kwargs)
         self.desktop: Any = None
         self.browser_python = (
@@ -31,9 +38,12 @@ class InteractiveWorker(MachineWorker):
         if desktop and os.name == "nt" and self.scope.trusted_host_execution:
             from .windows_desktop import WindowsDesktop, discover_apps
 
+            catalog = tuple(discover_apps())
             adapter = WindowsDesktop(
                 permissions=frozenset({"machine:host", "desktop:control"}),
-                allowed_apps=tuple(discover_apps()),
+                allowed_apps=tuple(app for app in catalog if app.id in desktop_app_ids),
+                catalog_apps=catalog,
+                workspace=self.scope.root,
             )
             if adapter.shell in self.scope.allowed_executables:
                 self.desktop = adapter
@@ -103,8 +113,13 @@ class InteractiveWorker(MachineWorker):
             if cap.id == "machine.apps":
                 if request == {"operation": "catalog"}:
                     output = json.dumps(self.desktop.catalog())
-                elif set(request) == {"operation", "app_id"} and request["operation"] == "launch":
-                    process = self.desktop.launch(request["app_id"])
+                elif (
+                    set(request) in ({"operation", "app_id"}, {"operation", "app_id", "artifact"})
+                    and request["operation"] == "launch"
+                ):
+                    process = self.desktop.launch(
+                        request["app_id"], artifact=request.get("artifact")
+                    )
                     output = json.dumps(
                         {"pid": process.pid, "app_id": request["app_id"], "observed_at": time()}
                     )
@@ -120,6 +135,7 @@ class InteractiveWorker(MachineWorker):
                     code, output = self.run_command(
                         action, cancellation, self.desktop.command(request), ".", 15
                     )
+                    self.outputs[action.id] = output
                     if code:
                         raise ValueError("UI Automation operation failed")
             else:

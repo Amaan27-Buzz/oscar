@@ -3,7 +3,7 @@
 import json
 import math
 from collections.abc import Callable
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import StrEnum
 from time import time
 
@@ -33,6 +33,7 @@ class PolicyRule:
     user_authoritative: bool = True
     preference: str | None = None
     expires_at: float | None = None
+    numeric_limits: dict[str, float] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         if not self.id or not self.source or not self.capability:
@@ -51,6 +52,20 @@ class PolicyRule:
             raise ValueError("invalid structured policy contract")
         if self.updated_at < self.created_at:
             raise ValueError("invalid policy timestamps")
+        if (
+            not isinstance(self.numeric_limits, dict)
+            or len(self.numeric_limits) > 8
+            or any(
+                not isinstance(k, str)
+                or not k
+                or len(k) > 100
+                or type(v) not in {int, float}
+                or not math.isfinite(v)
+                or not 0 <= v <= 1_000_000
+                for k, v in self.numeric_limits.items()
+            )
+        ):
+            raise ValueError("invalid bounded numeric action constraints")
 
 
 @dataclass(frozen=True)
@@ -132,4 +147,12 @@ class PersonalPolicy:
             return PolicyDecision(False, "explicit policy denies action", ids)
         if effect == PolicyEffect.ASK and not confirmed:
             return PolicyDecision(False, "personal policy requires confirmation", ids)
+        for rule in selected:
+            for key, maximum in rule.numeric_limits.items():
+                try:
+                    actual = float(context[key])
+                except (KeyError, ValueError):
+                    return PolicyDecision(False, "action constraint evidence missing", ids)
+                if not math.isfinite(actual) or abs(actual) > maximum:
+                    return PolicyDecision(False, "action exceeds owner numeric constraint", ids)
         return PolicyDecision(True, "explicit policy applied", ids, selected[0].preference)

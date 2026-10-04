@@ -235,6 +235,9 @@ class GraphitiIndex:
             raise ValueError("OSCAR-owned graph group required")
         os.environ["GRAPHITI_TELEMETRY_ENABLED"] = "false"
         graphiti = importlib.import_module("graphiti_core")
+        llm = importlib.import_module("graphiti_core.llm_client.client")
+        embedding = importlib.import_module("graphiti_core.embedder.client")
+        ranking = importlib.import_module("graphiti_core.cross_encoder.client")
         self.nodes = importlib.import_module("graphiti_core.nodes")
         self.edges = importlib.import_module("graphiti_core.edges")
 
@@ -265,9 +268,19 @@ class GraphitiIndex:
             uri,
             user,
             password,
-            llm_client=SourceOnlyLLM(),
-            embedder=Embeddings(),
-            cross_encoder=Ranking(),
+            llm_client=type(
+                "SourceOnlyLLM",
+                (llm.LLMClient,),
+                {"_generate_response": SourceOnlyLLM._generate_response},
+            )(None),
+            embedder=type(
+                "LocalGraphitiEmbeddings",
+                (embedding.EmbedderClient,),
+                {"create": Embeddings.create, "create_batch": Embeddings.create_batch},
+            )(),
+            cross_encoder=type(
+                "LocalGraphitiRanking", (ranking.CrossEncoderClient,), {"rank": Ranking.rank}
+            )(),
             store_raw_episode_content=False,
             max_coroutines=2,
         )

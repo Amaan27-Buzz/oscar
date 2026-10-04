@@ -9,6 +9,8 @@ from time import time
 from typing import Any
 from uuid import uuid4
 
+from .credentials import SecretMaterial
+
 
 class _Credential(ctypes.Structure):
     _fields_ = [
@@ -45,6 +47,7 @@ class WindowsCredentialStore:
         if os.name != "nt":
             raise OSError("native Windows secure credential store unavailable")
         win32: Any = ctypes
+        self.material = SecretMaterial()
         self.api = win32.WinDLL("advapi32", use_last_error=True)
         pointer = ctypes.POINTER(_Credential)
         self.api.CredWriteW.argtypes = [pointer, wintypes.DWORD]
@@ -73,6 +76,7 @@ class WindowsCredentialStore:
         payload = json.dumps({"secret": secret, "expires_at": expires_at}).encode()
         if not secret or "\x00" in secret or len(payload) > 2500:
             raise ValueError("bounded credential payload required")
+        self.material.remember(secret)
         blob = (ctypes.c_ubyte * len(payload)).from_buffer_copy(payload)
         credential = _Credential()
         credential.Type, credential.TargetName = 1, target
@@ -99,7 +103,9 @@ class WindowsCredentialStore:
                 and data["expires_at"] <= time()
             ):
                 raise PermissionError("credential expired")
-            return SecretValue(str(data["secret"]))
+            value = str(data["secret"])
+            self.material.remember(value)
+            return SecretValue(value)
         finally:
             self.api.CredFree(pointer)
 

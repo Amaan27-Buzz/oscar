@@ -8,6 +8,32 @@ from pathlib import Path
 from time import monotonic
 from typing import Any
 from urllib.parse import urlsplit
+from urllib.request import HTTPRedirectHandler, Request, build_opener
+
+
+class NoDownloadRedirects(HTTPRedirectHandler):
+    def redirect_request(self, *args: Any, **kwargs: Any) -> None:
+        raise PermissionError("download redirects require a new explicit plan")
+
+
+def bounded_download(
+    url: str, artifact: Path, allowed: list[str], maximum: int, timeout: float
+) -> None:
+    """Anonymous HTTP anchor download, with a streaming byte admission limit.
+
+    Browser cookies never leave the context. Blob/JS/authenticated downloads are unsupported.
+    """
+    if origin(url) not in allowed:
+        raise PermissionError("download origin outside grant")
+    with build_opener(NoDownloadRedirects()).open(
+        Request(url), timeout=min(timeout, 15)
+    ) as response:
+        data = response.read(maximum + 1)
+    if len(data) > maximum:
+        raise ValueError("download bound exceeded")
+    # Exclusive creation rejects preexisting files, including links/reparse targets.
+    with artifact.open("xb") as stream:
+        stream.write(data)
 
 
 def origin(url: str) -> str:
@@ -84,9 +110,7 @@ def run(request: dict[str, Any], root: Path) -> dict[str, Any]:
     observations = []
     with sync_playwright() as playwright:
         browser = playwright.chromium.launch(headless=True, env=env)
-        context = browser.new_context(
-            accept_downloads=any(s["operation"] == "download" for s in request["steps"])
-        )
+        context = browser.new_context(accept_downloads=False)
         # Recheck redirects, subresources and navigation at the network boundary.
         context.route(
             "**/*",
@@ -142,14 +166,10 @@ def run(request: dict[str, Any], root: Path) -> dict[str, Any]:
                     artifact = root / step["path"]
                     if artifact.exists():
                         raise ValueError("artifact overwrite rejected")
-                    with page.expect_download() as download_info:
-                        page.locator(step["selector"]).click()
-                    download = download_info.value
-                    path = download.path()
-                    if path is None or path.stat().st_size > step["max_bytes"]:
-                        download.cancel()
-                        raise ValueError("download bound exceeded")
-                    download.save_as(str(artifact))
+                    url = page.locator(step["selector"]).evaluate("e => e.href || ''")
+                    bounded_download(
+                        url, artifact, request["origins"], step["max_bytes"], remaining
+                    )
             return {"observations": observations, "isolated": True, "status": "REPORTED"}
         finally:
             context.close()

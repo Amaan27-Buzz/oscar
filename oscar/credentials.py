@@ -1,11 +1,13 @@
 """Credential material stays in an opaque runtime pool, never in metadata or persistence."""
 
 import os
+import re
 from collections.abc import Callable, Mapping
 from dataclasses import asdict, dataclass, replace
 from threading import RLock
 from time import time
 from typing import Any
+from weakref import WeakSet
 
 from .models import Failure, ProviderSpec, RateLimits, StreamSink
 from .storage import Store
@@ -350,9 +352,33 @@ class SafeStream:
             self.pending = ""
 
 
+class SecretMaterial:
+    """Runtime-owned secret filter; weak registration does not extend credential lifetime."""
+
+    def __init__(self) -> None:
+        self.values: set[str] = set()
+        _secret_material.add(self)
+
+    def remember(self, value: str) -> None:
+        if value not in self.values and len(self.values) >= 100:
+            raise ValueError("runtime secret material bound exceeded")
+        self.values.add(value)
+
+    def clear(self) -> None:
+        self.values.clear()
+
+
+_secret_material: WeakSet[SecretMaterial] = WeakSet()
+
+
 def redact_runtime_secrets(text: str) -> str:
     """Value-silent filtering of known platform-supplied secret variables, without file reads."""
     for name, value in os.environ.items():
         if value and any(term in name.upper() for term in ("TOKEN", "KEY", "SECRET", "PASSWORD")):
             text = text.replace(value, "<redacted>")
-    return text
+    for material in list(_secret_material):
+        for value in material.values:
+            text = text.replace(value, "<redacted>")
+    return re.sub(
+        r"(?:gh[pousr]_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,})", "<redacted>", text
+    )

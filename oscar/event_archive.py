@@ -32,6 +32,7 @@ class SourceEvent:
     artifact_id: str | None = None
     corrects: str | None = None
     expires_at: float | None = None
+    context_key: str | None = None
 
 
 @dataclass(frozen=True)
@@ -49,6 +50,7 @@ class MemoryRecord:
     supersedes: str | None = None
     sensitivity: str = "synthetic"
     expires_at: float | None = None
+    context_key: str | None = None
 
 
 class EventArchive:
@@ -112,6 +114,8 @@ class EventArchive:
             if prior.relationship_id != event.relationship_id:
                 raise ValueError("correction cannot cross relationships")
         payload = json.dumps(asdict(event), sort_keys=True)
+        if redact_runtime_secrets(payload) != payload:
+            raise ValueError("credential material cannot enter event metadata")
         with self.db:
             existing = self.db.execute(
                 "SELECT payload,forgotten FROM archive_events WHERE id=?", (event.id,)
@@ -323,6 +327,8 @@ class MemoryWriter:
         relationship = events[0].relationship_id
         if any(e.relationship_id != relationship or e.project_id != project for e in events):
             raise ValueError("memory cannot broaden source relationship/project scope")
+        if any(e.context_key != events[0].context_key for e in events):
+            raise ValueError("memory cannot combine different structured context keys")
         if not inferred and any(content != e.content for e in events):
             raise ValueError("non-inferred extraction must preserve exact source statement")
         if any(entity not in e.entity_ids for e in events for entity in entities):
@@ -343,6 +349,7 @@ class MemoryWriter:
             expires_at=min(
                 (e.expires_at for e in events if e.expires_at is not None), default=None
             ),
+            context_key=events[0].context_key,
         )
         with self.archive.db:
             if supersedes:
@@ -385,7 +392,13 @@ class MemoryWriter:
             for memory in reversed(records):
                 key = (memory.content, memory.project_id, memory.kind, memory.status)
                 previous = seen.get(key)
-                if previous and previous.entity_ids == memory.entity_ids:
+                if (
+                    previous
+                    and previous.entity_ids == memory.entity_ids
+                    and previous.context_key == memory.context_key
+                    and previous.sensitivity == memory.sensitivity
+                    and previous.expires_at == memory.expires_at
+                ):
                     data = asdict(previous)
                     data["event_ids"] = sorted(set(previous.event_ids + memory.event_ids))
                     if len(data["event_ids"]) > 32:

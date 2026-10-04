@@ -4,6 +4,7 @@ import base64
 import json
 import os
 import shutil
+import subprocess
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -15,6 +16,11 @@ class PowerShellManifest:
     executable: str
     edition: str
     available: bool
+    version: str = "UNKNOWN"
+    node_id: str | None = None
+    workspace: str | None = None
+    max_timeout: float = 120
+    max_output: int = 64_000
     permissions: tuple[str, ...] = ("machine:host",)
     operations: tuple[str, ...] = ("write_utf8", "file_hash", "environment", "wait")
 
@@ -25,8 +31,27 @@ def discover() -> PowerShellManifest | None:
     for command, edition in (("pwsh.exe", "PowerShell"), ("powershell.exe", "WindowsPowerShell")):
         executable = shutil.which(command)
         if executable and Path(executable).is_file():
+            env = {k: os.environ[k] for k in ("SystemRoot", "TEMP", "TMP") if k in os.environ}
+            try:
+                result = subprocess.run(
+                    [
+                        executable,
+                        "-NoProfile",
+                        "-NonInteractive",
+                        "-Command",
+                        "$PSVersionTable.PSVersion.ToString()",
+                    ],
+                    env=env,
+                    capture_output=True,
+                    timeout=5,
+                )
+                version = result.stdout.decode("utf-8-sig").strip()
+                if result.returncode or len(version) > 100:
+                    version = "UNKNOWN"
+            except (OSError, subprocess.SubprocessError):
+                version = "UNKNOWN"
             return PowerShellManifest(
-                "machine.powershell", str(Path(executable).resolve()), edition, True
+                "machine.powershell", str(Path(executable).resolve()), edition, True, version
             )
     return None
 

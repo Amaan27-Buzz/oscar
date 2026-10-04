@@ -25,6 +25,7 @@ def main() -> int:
     parser.add_argument("--executable", action="append", default=[])
     parser.add_argument("--codex-home", type=Path)
     parser.add_argument("--desktop", action="store_true")
+    parser.add_argument("--application-id", action="append", default=[])
     parser.add_argument("--browser", action="store_true")
     args = parser.parse_args()
     bootstrap = json.loads(sys.stdin.readline(8192))
@@ -39,6 +40,7 @@ def main() -> int:
             args.workspace, args.trusted_host, tuple(args.executable), codex_home=args.codex_home
         ),
         desktop=args.desktop,
+        desktop_app_ids=tuple(args.application_id),
         browser=args.browser,
     )
     grid.advertise(session, worker.capabilities())

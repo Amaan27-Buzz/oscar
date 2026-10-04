@@ -196,7 +196,9 @@ class ActiveContext:
                 recalled.content,
                 self.scope,
                 recalled.source,
-                Epistemic.RECALLED,
+                Epistemic.INFERRED
+                if recalled.evidence_state == Epistemic.INFERRED
+                else Epistemic.RECALLED,
                 recalled.entity_refs,
             )
         # Unverified live testimony can be shown with its explicit state, not called truth.

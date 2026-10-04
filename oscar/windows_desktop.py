@@ -13,25 +13,32 @@ from typing import Any
 
 BRIDGE = r"""
 $ErrorActionPreference='Stop'
+$ProgressPreference='SilentlyContinue'
 [Console]::OutputEncoding=[Text.UTF8Encoding]::new($false)
 Add-Type -AssemblyName UIAutomationClient,UIAutomationTypes
 $p=[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('__PAYLOAD__'))|ConvertFrom-Json
 $root=[Windows.Automation.AutomationElement]::RootElement
 function Describe($e) {
+ $parent=[Windows.Automation.TreeWalker]::ControlViewWalker.GetParent($e)
+ $parentId=$null
+ if ($null -ne $parent) {$parentId=(@($parent.GetRuntimeId()) -join '.')}
  $text=$null; $v=$null
- if ($e.TryGetCurrentPattern([Windows.Automation.ValuePattern]::Pattern,[ref]$v)) {
+ if (-not $e.Current.IsPassword -and
+     $e.TryGetCurrentPattern([Windows.Automation.ValuePattern]::Pattern,[ref]$v)) {
   $text=$v.Current.Value
  }
  else {
   $t=$null
-  if ($e.TryGetCurrentPattern([Windows.Automation.TextPattern]::Pattern,[ref]$t)) {
+  if (-not $e.Current.IsPassword -and
+      $e.TryGetCurrentPattern([Windows.Automation.TextPattern]::Pattern,[ref]$t)) {
    $text=$t.DocumentRange.GetText(8192)
   }
  }
- @{runtime_id=(@($e.GetRuntimeId()) -join '.');name=$e.Current.Name
+ @{runtime_id=(@($e.GetRuntimeId()) -join '.');parent_runtime_id=$parentId;name=$e.Current.Name
    type=$e.Current.ControlType.ProgrammaticName; automation_id=$e.Current.AutomationId
    pid=$e.Current.ProcessId;handle=$e.Current.NativeWindowHandle
    enabled=$e.Current.IsEnabled;password=$e.Current.IsPassword;text=$text;
+   offscreen=$e.Current.IsOffscreen;
    patterns=@($e.GetSupportedPatterns()|ForEach-Object {$_.ProgrammaticName})}
 }
 if ($p.operation -eq 'windows') {
@@ -39,12 +46,16 @@ if ($p.operation -eq 'windows') {
  $result=@(); for ($i=0;$i -lt [Math]::Min($all.Count,100);$i++) { $result+=Describe $all[$i] }
  ConvertTo-Json -InputObject @($result) -Compress -Depth 6; exit
 }
+if ($p.operation -eq 'focused') {
+ Describe ([Windows.Automation.AutomationElement]::FocusedElement) |
+  ConvertTo-Json -Compress -Depth 6;exit
+}
 $window=[Windows.Automation.AutomationElement]::FromHandle([IntPtr]$p.handle)
 if ($null -eq $window -or $window.Current.ProcessId -ne $p.pid) { throw 'target identity changed' }
 if ($p.operation -eq 'tree') {
  $queue=[Collections.Generic.Queue[object]]::new();$queue.Enqueue(@{e=$window;depth=0});$result=@()
  $walker=[Windows.Automation.TreeWalker]::ControlViewWalker
- while ($queue.Count -gt 0 -and $result.Count -lt 100) {
+ while ($queue.Count -gt 0 -and $result.Count -lt 200) {
   $item=$queue.Dequeue();$result+=Describe $item.e
   if ($item.depth -lt 8) {
    $child=$walker.GetFirstChild($item.e);$count=0
@@ -61,11 +72,18 @@ if ($p.operation -eq 'close') {
   [Windows.Automation.WindowPattern]::Pattern,[ref]$pattern)) { throw 'no window pattern' }
  $pattern.Close(); @{operation='close';status='REPORTED'}|ConvertTo-Json -Compress;exit
 }
-$elements=$window.FindAll([Windows.Automation.TreeScope]::Descendants,
-                         [Windows.Automation.Condition]::TrueCondition)
 $element=$null
-for ($i=0;$i -lt [Math]::Min($elements.Count,500);$i++) {
- if ((@($elements[$i].GetRuntimeId()) -join '.') -eq $p.runtime_id) {$element=$elements[$i];break}
+$queue=[Collections.Generic.Queue[object]]::new();$queue.Enqueue(@{e=$window;depth=0})
+$walker=[Windows.Automation.TreeWalker]::ControlViewWalker;$visited=0
+while ($queue.Count -gt 0 -and $visited++ -lt 500) {
+ $item=$queue.Dequeue()
+ if ((@($item.e.GetRuntimeId()) -join '.') -eq $p.runtime_id) {$element=$item.e;break}
+ if ($item.depth -lt 8) {
+  $child=$walker.GetFirstChild($item.e);$count=0
+  while ($null -ne $child -and $count++ -lt 100 -and $queue.Count -lt 500) {
+   $queue.Enqueue(@{e=$child;depth=$item.depth+1});$child=$walker.GetNextSibling($child)
+  }
+ }
 }
 if ($null -eq $element -or $element.Current.ProcessId -ne $p.pid -or $element.Current.IsPassword) {
  throw 'target unavailable/unsafe'
@@ -83,6 +101,65 @@ switch ($p.operation) {
    [Windows.Automation.InvokePattern]::Pattern,[ref]$pattern)) {throw 'invoke unsupported'}
   $pattern.Invoke();@{status='REPORTED'}|ConvertTo-Json -Compress
  }
+ 'select' {
+  $pattern=$null
+  if (-not $element.TryGetCurrentPattern(
+    [Windows.Automation.SelectionItemPattern]::Pattern,[ref]$pattern)) {throw 'select unsupported'}
+  $pattern.Select();@{status='REPORTED';operation='select'}|ConvertTo-Json -Compress
+ }
+ 'key' {
+  Add-Type -AssemblyName System.Windows.Forms
+  $element.SetFocus()
+  $focused=[Windows.Automation.AutomationElement]::FocusedElement
+  if ($focused.Current.ProcessId -ne $p.pid -or
+      (@($focused.GetRuntimeId()) -join '.') -ne $p.runtime_id) {throw 'focus changed'}
+  $keys=@{select_all='^a';backspace='{BACKSPACE}';enter='{ENTER}';escape='{ESC}';tab='{TAB}'}
+  [Windows.Forms.SendKeys]::SendWait($keys[$p.key])
+  @{status='REPORTED';operation='key'}|ConvertTo-Json -Compress
+ }
+ 'close_tab' {
+  if ($window.Current.Name -ne $p.expected_title) {throw 'active tab title changed'}
+  $element.SetFocus()
+  $focused=[Windows.Automation.AutomationElement]::FocusedElement
+  if ($focused.Current.ProcessId -ne $p.pid -or
+      (@($focused.GetRuntimeId()) -join '.') -ne $p.runtime_id) {throw 'focus changed'}
+  Add-Type -AssemblyName System.Windows.Forms
+  [Windows.Forms.SendKeys]::SendWait('^w')
+  @{status='REPORTED';operation='close_tab'}|ConvertTo-Json -Compress
+ }
+ 'mouse_click' {
+  if ($element.Current.IsOffscreen) {throw 'offscreen mouse target'}
+  $rect=$element.Current.BoundingRectangle
+  if ($rect.Width -le 0 -or $rect.Height -le 0 -or
+      $rect.Width -gt 50000 -or $rect.Height -gt 50000) {throw 'invalid bounded rectangle'}
+  $element.SetFocus()
+  if ([Windows.Automation.AutomationElement]::FocusedElement.Current.ProcessId -ne $p.pid) {
+   throw 'target process not focused'
+  }
+  Add-Type -TypeDefinition @'
+using System;
+using System.Runtime.InteropServices;
+public static class OscarPointer {
+ [StructLayout(LayoutKind.Sequential)] public struct Mouse {
+  public int dx,dy; public uint data,flags,time; public UIntPtr extra;
+ }
+ [StructLayout(LayoutKind.Sequential)] public struct Input {public uint type;public Mouse mouse;}
+ [DllImport("user32.dll")] public static extern bool SetCursorPos(int x,int y);
+ [DllImport("user32.dll",SetLastError=true)]
+ public static extern uint SendInput(uint count,Input[] input,int size);
+ public static bool Click() {
+  var a=new Input[2]; a[0].mouse.flags=2; a[1].mouse.flags=4;
+  return SendInput(2,a,Marshal.SizeOf(typeof(Input)))==2;
+ }
+}
+'@
+  $x=[int]($rect.X+$rect.Width*$p.x_fraction);$y=[int]($rect.Y+$rect.Height*$p.y_fraction)
+  if ([Math]::Abs($x) -gt 32767 -or [Math]::Abs($y) -gt 32767) {throw 'coordinate bound'}
+  if (-not [OscarPointer]::SetCursorPos($x,$y) -or -not [OscarPointer]::Click()) {
+   throw 'input rejected by Windows'
+  }
+  @{status='REPORTED';operation='mouse_click';x=$x;y=$y}|ConvertTo-Json -Compress
+ }
  'set_text' {
   $pattern=$null
   if ($element.TryGetCurrentPattern([Windows.Automation.ValuePattern]::Pattern,[ref]$pattern)) {
@@ -98,7 +175,8 @@ switch ($p.operation) {
    $escaped=''; foreach ($c in $p.text.ToCharArray()) {
     if ('+^%~()[]{}'.Contains([string]$c)) { $escaped+='{'+$c+'}' } else {$escaped+=$c}
    }
-   [Windows.Forms.SendKeys]::SendWait('^a');[Windows.Forms.SendKeys]::SendWait($escaped)
+   [Windows.Forms.SendKeys]::SendWait('^a{BACKSPACE}')
+   if ($escaped.Length -gt 0) {[Windows.Forms.SendKeys]::SendWait($escaped)}
   }
   @{status='REPORTED';operation='set_text'}|ConvertTo-Json -Compress
  }
@@ -179,11 +257,21 @@ def discover_apps() -> list[InstalledApp]:
 
 
 class WindowsDesktop:
-    def __init__(self, *, permissions: frozenset[str], allowed_apps: tuple[InstalledApp, ...]):
+    def __init__(
+        self,
+        *,
+        permissions: frozenset[str],
+        allowed_apps: tuple[InstalledApp, ...],
+        workspace: Path | None = None,
+        catalog_apps: tuple[InstalledApp, ...] | None = None,
+    ):
         if os.name != "nt":
             raise OSError("Windows desktop unavailable")
         self.permissions, self.apps = permissions, {app.id: app for app in allowed_apps}
+        self.catalog_apps = catalog_apps if catalog_apps is not None else allowed_apps
+        self.workspace = workspace
         self.targets: dict[int, int] = {}
+        self.target_apps: dict[int, str] = {}
         self.shell = str(
             Path(os.environ["SystemRoot"])
             / "System32"
@@ -196,18 +284,28 @@ class WindowsDesktop:
         if not {"machine:host", "desktop:control"} <= self.permissions:
             raise PermissionError("explicit host and desktop control grants required")
 
-    def launch(self, app_id: str, *, arguments: tuple[str, ...] = ()) -> subprocess.Popen[bytes]:
+    def launch(self, app_id: str, *, artifact: str | None = None) -> subprocess.Popen[bytes]:
         self._authorize()
         app = self.apps[app_id]
-        if not app.available or app.launch_type != "native_exe" or arguments:
-            raise ValueError("only discovered native app launch without arguments is admitted")
+        if not app.available or app.launch_type != "native_exe":
+            raise ValueError("discovered native app required")
+        arguments = []
+        if artifact is not None:
+            from .windows_files import WindowsScopedFiles
+
+            if self.workspace is None or not isinstance(artifact, str):
+                raise ValueError("scoped app artifact required")
+            files = WindowsScopedFiles(self.workspace)
+            if len(files.read(artifact)) > 64_000:
+                raise ValueError("bounded app artifact required")
+            arguments.append(str(self.workspace.resolve().joinpath(*files.parts(artifact))))
         env = {
             key: os.environ[key]
             for key in ("SystemRoot", "TEMP", "TMP", "PATH")
             if key in os.environ
         }
         return subprocess.Popen(
-            [app.activation],
+            [app.activation, *arguments],
             env=env,
             stdin=subprocess.DEVNULL,
             stdout=subprocess.DEVNULL,
@@ -217,6 +315,8 @@ class WindowsDesktop:
     def bind(self, handle: int, pid: int, app_id: str) -> None:
         """Target must match a discovered app's actual process executable."""
         self._authorize()
+        if type(handle) is not int or type(pid) is not int or handle <= 0 or pid <= 0:
+            raise ValueError("real numeric window/process identity required")
         app = self.apps[app_id]
         import ctypes
         from ctypes import wintypes
@@ -245,23 +345,31 @@ class WindowsDesktop:
         finally:
             kernel.CloseHandle(process)
         self.targets[handle] = pid
+        self.target_apps[handle] = app_id
 
     def command(self, request: dict[str, Any]) -> list[str]:
         self._authorize()
         fields = {
             "windows": set(),
+            "focused": set(),
             "tree": {"handle", "pid"},
             "close": {"handle", "pid"},
             "read": {"handle", "pid", "runtime_id"},
             "focus": {"handle", "pid", "runtime_id"},
             "invoke": {"handle", "pid", "runtime_id"},
+            "select": {"handle", "pid", "runtime_id"},
+            "key": {"handle", "pid", "runtime_id", "key"},
+            "close_tab": {"handle", "pid", "runtime_id", "expected_title"},
+            "mouse_click": {"handle", "pid", "runtime_id", "x_fraction", "y_fraction"},
             "set_text": {"handle", "pid", "runtime_id", "text"},
         }
         operation = request.get("operation")
         if operation not in fields or set(request) != fields[operation] | {"operation"}:
             raise ValueError("invalid desktop operation")
-        if operation != "windows" and self.targets.get(request["handle"]) != request["pid"]:
-            raise PermissionError("unbound desktop target")
+        if operation not in {"windows", "focused"}:
+            if self.targets.get(request["handle"]) != request["pid"]:
+                raise PermissionError("unbound desktop target")
+            self.bind(request["handle"], request["pid"], self.target_apps[request["handle"]])
         if "runtime_id" in request and (
             not isinstance(request["runtime_id"], str) or len(request["runtime_id"]) > 200
         ):
@@ -270,6 +378,25 @@ class WindowsDesktop:
             not isinstance(request["text"], str) or len(request["text"]) > 8192
         ):
             raise ValueError("bounded text required")
+        if operation == "key" and request["key"] not in {
+            "select_all",
+            "backspace",
+            "enter",
+            "escape",
+            "tab",
+        }:
+            raise ValueError("fixed keyboard action required")
+        if operation == "close_tab" and (
+            self.apps[self.target_apps[request["handle"]]].name.casefold() != "notepad.exe"
+            or not isinstance(request["expected_title"], str)
+            or not 0 < len(request["expected_title"]) <= 1000
+        ):
+            raise ValueError("Notepad tab and exact observed title required")
+        if operation == "mouse_click" and any(
+            type(request[k]) not in {int, float} or not 0 <= request[k] <= 1
+            for k in ("x_fraction", "y_fraction")
+        ):
+            raise ValueError("mouse fallback must remain inside the observed element")
         payload = base64.b64encode(json.dumps(request).encode()).decode()
         script = base64.b64encode(BRIDGE.replace("__PAYLOAD__", payload).encode("utf-16-le"))
         return [self.shell, "-NoProfile", "-NonInteractive", "-EncodedCommand", script.decode()]
@@ -284,4 +411,6 @@ class WindowsDesktop:
 
     def catalog(self) -> list[dict[str, Any]]:
         self._authorize()
-        return [asdict(app) for app in self.apps.values()]
+        return [
+            {**asdict(app), "launch_authorized": app.id in self.apps} for app in self.catalog_apps
+        ]
