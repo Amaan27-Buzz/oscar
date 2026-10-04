@@ -466,6 +466,13 @@ No Slice 07 work begins until Gate B mandatory acceptance passes.
 
 ## Architecture invariants
 
+The [pre-manual Gate B patch](GATE-B-HARDENING.md) retains the chosen framework boundaries.
+Canonical archive generation and physical derived-index proofs gate recall; one scoped
+projection serves one relationship, and stale projections are excluded. FastEmbed replaces
+the default Torch ML runtime after bounded A–R comparison. Native credential enrollment
+uses durable intents and restart reconciliation across the SQLite/vault boundary.
+Owner OAuth/manual acceptance remains outstanding; Gate B remains PARTIAL.
+
 1. One intelligence, many embodiments.
 2. One continuing user relationship/interaction point.
 3. No ordinary desktop is the permanent host.

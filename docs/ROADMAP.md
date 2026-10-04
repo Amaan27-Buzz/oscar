@@ -439,3 +439,8 @@ The original ordered acceptance sequence below remains a contract, not a list of
 → Gate B PASS
 → only then Club C / Slice 07
 ```
+
+The [pre-manual Gate B hardening pass](GATE-B-HARDENING.md) improves BM25/ONNX retrieval,
+generation integrity, scoped graph rebuilds, credential recovery and evidence-bound claims.
+It adds no later-slice capability. Slice 05 remains COMPLETE for its documented local scope;
+Slice 06 and Gate B remain PARTIAL pending owner/private/manual acceptance.

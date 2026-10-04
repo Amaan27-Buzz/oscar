@@ -91,10 +91,12 @@ Archive-backed recall is an explicit composition API, with bounded source admiss
 RECALLED/INFERRED/UNKNOWN preservation and terminal transient-context cleanup.
 General model paraphrase entailment and an autonomous conversational memory product
 remain unverified. Consolidation is batch-local, checkpointed atomically, and run by
-one runner per relationship; original events remain intact. Changed generations need
-explicit index rebuilding. Graphiti 0.30.2 emitted missing-property compatibility
-warnings during Neo4j search; acceptance succeeded, but this is not a warning-free
-deployment claim. CPU models and optional SDK/browser dependencies are locally installed.
+one runner per relationship; original events remain intact. The pre-manual hardening
+patch now fences outdated generations and physical projection loss before retrieval.
+Supported BM25/IDF replaces hand-hashed lexical retrieval; FastEmbed is the selected
+local ML default. The reproduced Graphiti missing `reference_time` property came from
+our null-valued edge field and is corrected without warning suppression. See
+[the hardening measurements and limitations](GATE-B-HARDENING.md).
 
 ## Owner/private acceptance boundary
 
@@ -102,7 +104,8 @@ No configured registered OAuth client was found. The official GitHub device flow
 uses a native vault, transaction nonce, bounded single polls, minimal initial
 `user:email` scope, expiry checks and ambiguous-exchange blocking. GitHub OAuth App
 device tokens have no refresh flow. Native vault/SQLite updates cannot commit atomically;
-interrupted enrollment may leave an orphan reference requiring owner review.
+durable enrollment/disconnect intents and restart reconciliation now recover known
+references. Ambiguous provider exchanges still block rather than replay.
 Local disconnect deletes the local credential and explicitly marks remote revocation
 pending; actual provider revocation/private identity/read/federation remain unverified.
 Do not borrow browser or gh credentials. A gist is unlisted rather than private and
@@ -124,6 +127,10 @@ Its checks must match the latest branch SHA; local Windows results do not prove 
 The initial Ubuntu job caught platform-specific native handle stubs; the adapter now
 loads its Windows-only module at the native boundary and keeps the public API typed.
 Private OAuth remains unverified regardless of green quality checks.
+
+The pre-manual patch is separately recorded in [the hardening ledger](GATE-B-HARDENING.md)
+and its synthetic automated evidence. It does not repeat physical/manual desktop
+acceptance, authorize OAuth, merge this PR or change Gate B to PASS.
 
 CI snapshot on implementation commit `449aefc90ca6ae6d85bcb5181c892747d8a46ce6`:
 [Brain contracts run](https://github.com/amaansyed27/oscar/actions/runs/37190449095)

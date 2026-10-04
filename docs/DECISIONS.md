@@ -307,6 +307,22 @@ A partial gate is not skipped because it is demoable or because a short-term alp
 
 **Decision:** `ENGINEERING.md` owns code/system-design quality: smallest coherent solution, high cohesion/low coupling, typed validated boundaries, explicit state ownership, bounded failure/retry, dependency discipline, contract-focused tests, least privilege and small reversible changes.
 
+## ADR-035 — Generation-fenced local memory and recoverable vault enrollment
+
+**Decision:** retain SQLite/WAL/FTS5, Qdrant, Graphiti/Neo4j, Playwright and native Windows
+UIA/Credential Manager. Use FastEmbed 0.8.1 BGE small v1.5 and MiniLM reranking as the local
+default after equal A–R fixture quality; sentence-transformers 6.1.0 is a separate optional
+comparison backend. Replace hand-hashed lexical vectors with supported Qdrant BM25 document
+and query embeddings plus IDF, dense/sparse RRF and reranking.
+
+Canonical writes advance durable archive generations. Derived projections are usable only
+with matching generation/model identity and physical completion digest. Failure never rolls
+back canonical history. Scoped Graphiti ownership and namespaced IDs protect unrelated data.
+Persist enrollment/disconnect intent before native vault mutation and reconcile on restart;
+never replay an ambiguous external token exchange or invent remote revocation confirmation.
+See [measurements, versions and limits](GATE-B-HARDENING.md). This changes no Gate B completion
+claim and grants no owner/private/manual acceptance.
+
 ## Current accepted boundaries
 
 ### Gate A

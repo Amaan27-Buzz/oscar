@@ -60,7 +60,28 @@ def run(root: Path, uri: str) -> dict[str, Any]:
         note_event, note = retain(
             "When travelling without internet I use local models", at=start + 200
         )
+        identifier_event, identifier_memory = retain(
+            "Project build identifier OSCAR_GATEB_7F31", at=start + 220
+        )
         assert fabric.rebuild("synthetic-owner") == ()
+        m = vector.models
+        indices, values = vector.sparse.query("OSCAR_GATEB_7F31")
+        exact = vector.client.query_points(
+            vector.collection,
+            query=m.SparseVector(indices=indices, values=values),
+            using="lexical",
+            limit=5,
+            with_payload=True,
+        ).points
+        assert identifier_memory.id in [p.payload["memory_id"] for p in exact if p.payload]
+        assert identifier_memory.id in vector.query("OSCAR_GATEB_7F31", "synthetic-owner")
+        assert (
+            vector.client.get_collection(vector.collection)
+            .config.params.sparse_vectors["lexical"]
+            .modifier
+            == m.Modifier.IDF
+        )
+        checks.append("exact rare build identifier uses native BM25 plus configured Qdrant IDF")
         other = GraphitiIndex(uri, "neo4j", "", group + "_other", embedding, reranker)
         try:
             records = archive.memories("synthetic-owner", include_history=True)
@@ -215,8 +236,8 @@ def run(root: Path, uri: str) -> dict[str, Any]:
             "status": "VERIFIED",
             "observed_at": time(),
             "relationship": "synthetic-owner",
-            "source_event_ids": [old_event.id, new_event.id, note_event.id],
-            "memory_ids": [old.id, new.id, note.id],
+            "source_event_ids": [old_event.id, new_event.id, note_event.id, identifier_event.id],
+            "memory_ids": [old.id, new.id, note.id, identifier_memory.id],
             "graph_group": group,
             "embedding": embedding.identity,
             "reranker": reranker.identity,

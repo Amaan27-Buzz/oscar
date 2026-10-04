@@ -183,6 +183,8 @@ class SparseEmbeddingProvider(Protocol):
 
     def embed(self, text: str) -> tuple[list[int], list[float]]: ...
 
+    def query(self, text: str) -> tuple[list[int], list[float]]: ...
+
 
 class BM25Embedding:
     """Supported FastEmbed Qdrant BM25; corpus IDF is applied by Qdrant."""
@@ -197,6 +199,12 @@ class BM25Embedding:
         if not 0 < len(text) <= 64_000:
             raise ValueError("bounded sparse embedding required")
         vector = next(iter(self.model.embed([text])))
+        return [int(i) for i in vector.indices], [float(v) for v in vector.values]
+
+    def query(self, text: str) -> tuple[list[int], list[float]]:
+        if not 0 < len(text) <= 4000:
+            raise ValueError("bounded sparse query required")
+        vector = next(iter(self.model.query_embed(text)))
         return [int(i) for i in vector.indices], [float(v) for v in vector.values]
 
 
@@ -232,6 +240,8 @@ class QdrantIndex:
         return None
 
     def rebuild(self, records: Sequence[MemoryRecord], *, relationship: str | None = None) -> None:
+        if len(records) > 10_000:
+            raise ValueError("bounded derived projection required")
         self.generation = None
         m = self.models
         relationships = {record.relationship_id for record in records}
@@ -310,7 +320,7 @@ class QdrantIndex:
         if not 1 <= limit <= 100:
             raise ValueError("bounded Qdrant query required")
         m = self.models
-        indices, values = self.sparse.embed(query)
+        indices, values = self.sparse.query(query)
         restriction = m.Filter(
             must=[m.FieldCondition(key="relationship_id", match=m.MatchValue(value=relationship))]
         )
@@ -476,7 +486,6 @@ class GraphitiIndex:
         await self.graph.driver.execute_query(
             "MATCH (n:OSCARProjectionState {group_id:$group}) DELETE n", group=self.group
         )
-        owned_ids: list[str] = []
 
         def identifier(kind: str, value: str) -> str:
             return str(uuid5(NAMESPACE_URL, f"oscar:{self.group}:{kind}:{value}"))
@@ -502,7 +511,6 @@ class GraphitiIndex:
                     group=self.group,
                 )
                 episode_ids.append(episode.uuid)
-                owned_ids.append(episode.uuid)
             subject_id = identifier(
                 "entity", (record.entity_ids[0] if record.entity_ids else record.relationship_id)
             )
@@ -523,12 +531,11 @@ class GraphitiIndex:
             )
             await subject.save(self.graph.driver)
             await target.save(self.graph.driver)
-            owned_ids.extend([subject_id, target_id])
             # Stamp ownership before any subsequent failure can strand unowned projection nodes.
             await self.graph.driver.execute_query(
                 "MATCH (n {group_id:$group}) WHERE n.uuid IN $ids SET n:OSCARMemoryProjection",
                 group=self.group,
-                ids=owned_ids,
+                ids=[subject_id, target_id],
             )
             edge = self.edges.EntityEdge(
                 uuid=identifier("memory", record.id),
@@ -574,8 +581,12 @@ class GraphitiIndex:
         )
 
     def rebuild(self, records: Sequence[MemoryRecord], *, relationship: str | None = None) -> None:
+        if len(records) > 10_000:
+            raise ValueError("bounded derived projection required")
         self.generation = None
-        self.loop.run_until_complete(self._rebuild(records, relationship))
+        self.loop.run_until_complete(
+            asyncio.wait_for(self._rebuild(records, relationship), timeout=300)
+        )
         self.generation = digest(records)
 
     def current_digest(self) -> str | None:

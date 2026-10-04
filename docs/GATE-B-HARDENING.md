@@ -1,0 +1,179 @@
+# Gate B pre-manual hardening — 2026-10-04
+
+Starting branch/PR head: `447ad2eef86deeab2cc924bc88c4f5afb123b687`.
+Branch: `gate-b/completion`; [draft PR 12](https://github.com/amaansyed27/oscar/pull/12)
+targets `work`. This pass does not perform physical/manual desktop acceptance,
+owner OAuth authorization, merge, or Slice 07 work.
+
+**Slice 05 COMPLETE; Slice 06 PARTIAL; Gate B PARTIAL.** Prior scoped acceptance
+remains historical evidence. Owner/private/manual acceptance is still required.
+
+## Dependency decision
+
+Official package metadata was checked on this pass: Playwright 1.63.0,
+qdrant-client 1.19.1, graphiti-core 0.30.2, sentence-transformers 6.1.0,
+FastEmbed 0.8.1. Retain Playwright, native Microsoft UI Automation, Windows
+Credential Manager, canonical SQLite/WAL/FTS5, Qdrant and Graphiti/Neo4j.
+No orchestration framework replaces OSCAR or Jev.
+
+FastEmbed 0.8.1 is pinned in the `memory` extra. It supplies supported
+`Qdrant/bm25`, dense ONNX embeddings and an ONNX cross-encoder. The separate
+`memory-reference` extra contains sentence-transformers 6.1.0 solely for
+reproducing the baseline/model comparison; it is not a second default runtime.
+The existing immutable Neo4j image reports **2026.09.0** and passes the native
+Graphiti 0.30.2 path. No speculative Neo4j upgrade was needed.
+
+Sources: [FastEmbed releases](https://github.com/qdrant/fastembed/releases),
+[Playwright releases](https://github.com/microsoft/playwright-python/releases),
+[Graphiti releases](https://github.com/getzep/graphiti/releases),
+[Neo4j releases](https://neo4j.com/release-notes/),
+[Qdrant hybrid queries](https://qdrant.tech/documentation/search/hybrid-queries/),
+[Qdrant hybrid baseline](https://qdrant.tech/course/beginners/module-3/hybrid-search-in-qdrant/).
+
+## Bounded model comparison
+
+`scripts/benchmark_memory.py` runs the same actual A–R synthetic evaluation for
+three candidates. The optional third candidate isolates the runtime change by
+using the same MiniLM dense model through ONNX. Five positive retrieval queries
+and six unsupported assertions are a small fixture, not a general quality claim.
+
+| Candidate | Dense top-5 | Full retrieval top-5 | Unsupported accepted | Dense batch median | Rerank batch median |
+| --- | --- | --- | --- | --- | --- |
+| sentence-transformers MiniLM + existing cross-encoder | 5/5 | 5/5 | 0/6 | 11.61 ms | 10.28 ms |
+| FastEmbed BGE small v1.5 + Xenova MiniLM L6 | 5/5 | 5/5 | 0/6 | 9.94 ms | 6.76 ms |
+| FastEmbed MiniLM + Xenova MiniLM L6 | 5/5 | 5/5 | 0/6 | 5.62 ms | 8.11 ms |
+
+All three pass A–R, the three temporal cases and entity cases. BM25 alone hits
+4/5; semantic retrieval supplies the paraphrase case. Batch timing uses two short
+texts and five samples, with ordinary laptop background activity. An earlier
+measurement reversed the small BGE/Torch dense timing difference; these numbers
+do not establish a universal performance ranking.
+
+Default: **FastEmbed BAAI/bge-small-en-v1.5**, **Qdrant/bm25 + Qdrant IDF**,
+RRF, **FastEmbed Xenova/ms-marco-MiniLM-L-6-v2**. Equivalent fixture quality and
+one ONNX runtime justify replacing the Torch default. BGE's tested ONNX artifact
+is 66,465,124 bytes versus MiniLM's 90,387,630 bytes; its supported input limit
+is 512 tokens versus MiniLM's 256. This favors BGE's size/context tradeoff despite
+MiniLM's faster tiny dense batch; improved long-input quality is not claimed.
+The reranker artifact is 90,992,115 bytes. In the final sequential cached run,
+construction took 10.60 seconds for the Torch pair, 0.57 seconds for BGE/ONNX and
+0.56 seconds for MiniLM/ONNX. The first Torch construction includes SDK imports.
+Separate fresh-process observations were 30.53 seconds versus 1.90 seconds before
+adding artifact fingerprints; these are single observations with background load,
+not a standardized cold-start ranking. Initial ONNX download/load took 146 seconds
+for BGE/reranker and a further 91 seconds for the optional MiniLM candidate.
+Model startup/download observations,
+artifact revisions and complete fixture results are in the evidence JSON.
+
+Dense/reranker loaders are offline by default. Preload public models explicitly,
+then set `FASTEMBED_CACHE_PATH` to that cache. Their identities fingerprint the
+actual ONNX/tokenizer artifacts, so changing a cached model fences old projections.
+EmbeddingProvider, SparseEmbeddingProvider and Reranker remain replaceable.
+
+## Generation integrity and failure behavior
+
+SQLite triggers advance a per-relationship archive generation in the same
+transaction as canonical event, memory, entity or alias changes. This covers
+retention, correction, consolidation and forget. Derived states record relationship,
+adapter/model identity, generation, digest, state and update time.
+
+Rebuild writes REBUILDING before touching the index. It reads at most 10,000
+canonical records; an oversized rebuild is refused, and Graphiti rebuild has a
+300-second cancellation deadline. Completion stamps a physical
+projection digest last, then records CURRENT in SQLite. A crash before either
+stamp cannot manufacture freshness. Failure records FAILED without undoing
+canonical history. Concurrent archive writes leave a generation mismatch, and a
+write during retrieval fences that recall as UNKNOWN. There is no automatic
+unbounded rebuild daemon.
+
+Retrieval requires matching archive generation, durable CURRENT state and actual
+physical digest/model identity. Otherwise the index is explicitly OUTDATED and
+excluded. Active/structured context, FTS5/exact archive and remaining valid indexes
+continue. Lost Qdrant storage, separate service failures, embedding and reranker
+failures are exercised. No fallback to a model guess is admitted.
+
+## Graphiti compatibility and isolation
+
+The old adapter's `reference_time=None` was saved through Graphiti's public
+EntityEdge API. Neo4j does not retain a property with a null value; Graphiti's
+native vector/fulltext projections then read a missing property and emitted
+01N52. The warning reproduced before the patch. Edges now explicitly carry
+canonical reference time, validity intervals and source-episode references.
+Native acceptance runs without these warnings; no logging filter hides them.
+
+The database target is explicit. All episode/entity/object/edge UUIDs are
+namespaced by OSCAR projection group. A group/collection represents one relationship;
+cross-relationship rebuilds, including an empty unrelated relationship, are blocked.
+Only ownership-labelled projection nodes are reset. Foreign relationships touching
+owned nodes block destructive rebuild rather than being detached. Forget deletes
+only owned matching edges. A second group and an unrelated same-group node survive
+repeated rebuilds. No database-wide clear is used.
+
+Graphiti LLM extraction remains disabled. OSCAR's validated Memory Writer owns
+canonical facts; graph search returns canonical IDs for independent admission.
+
+## Credential enrollment/recovery
+
+Enrollment stores a durable intent and predetermined opaque vault reference before
+writing native credentials. Device enrollment progresses through enrolling_device
+to pending. Token exchange has a durable polling intent; a lost external response
+is failed/ambiguous and never automatically replayed. Validated token metadata is
+persisted as enrolling_token before vault write, then ready/authorized is committed
+before the obsolete device reference is deleted.
+
+Restart deliberately aborts undelivered device enrollment. A staged validated token
+with a matching native entry can become ready; a missing/expired entry requires
+reauthorization. Authorized device-reference cleanup is idempotent. Local disconnect
+persists revoke_pending before native deletion, then local-disconnected state.
+Fault injection covers twelve boundaries, and a real child-process crash after a
+native token write recovers without another provider request. SQLite never contains
+device/access token bytes.
+
+Remote revocation stays UNKNOWN/owner-action-required. This registered-client device
+flow cannot confirm provider revocation without additional provider credentials.
+Local deletion is not a logout-everywhere claim. The vault/SQLite pair is recoverable,
+not an atomic cross-store transaction or protection from a malicious same-account host.
+
+## Claim and manual-harness boundaries
+
+The bounded response context retains claim ID/type, canonical event/memory IDs,
+retrieval paths, epistemic state, confidence and temporal interpretation. Claims
+must match current canonical evidence at the requested historical instant. Empty
+support, failed required retrieval, unresolved entities, forgotten/expired or
+superseded cached support produce UNKNOWN. A lucky exact guess without retrieval
+is unsupported. RECALLED remains distinct from VERIFIED; arbitrary paraphrase
+entailment remains outside this exact-source verifier.
+
+Each manual run has a unique fixture ID and exclusive evidence root. Mutations
+require the bound PID/window, current fixture title and unchanged fixture editor
+content. Stale prior fixture windows are reported, not closed. Ambiguous close or
+discard state stops for owner review. Own browser/server resources are cleaned;
+actions and failure metadata remain for debugging. Worker operations are bounded
+and new actions stop at the overall deadline. A failed precondition is explicit;
+an existing root is refused. This pass tests the harness's ownership guards,
+but does not run physical/manual desktop acceptance.
+
+Owner command from the repository root:
+
+```powershell
+$root = ".oscar\manual-gate-b-" + (Get-Date -Format "yyyyMMdd-HHmmss")
+python scripts\verify_gate_b_interactive.py --root $root --desktop
+```
+
+Remaining mandatory work includes owner manual review, registered-client private
+OAuth/readback/revocation limitations, private live-authority federation and broader
+continuous conversational acceptance. Sunday/Android/OEM, voice, hardware and private
+cloud accounts remain unverified. Do not start Slice 07 or merge PR 12.
+
+## Automated quality evidence
+
+The full Windows suite passes **384 tests**. Ruff, format, strict mypy (48 source
+files), repository/local Markdown contracts, value-silent secret scan and Git diff
+checks pass. A–R runs pass for all three candidates; native index acceptance covers
+exact identifiers, IDF, scope, temporal/source readback, reopen, drift/rebuild, forget,
+group isolation and injected local ML outages. The additional unit regressions
+include canonical process interruption, concurrent-write fencing, physical marker
+loss, separate index outages, unsupported claims, twelve enrollment/disconnect fault
+boundaries and a native-vault process crash. Full results and artifact hashes live in
+[the synthetic evidence bundle](evidence/gate-b-hardening-2026-10-04.json).
+CI must be checked at the latest PR head; manual/OAuth acceptance remains absent.

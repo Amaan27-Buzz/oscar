@@ -99,7 +99,7 @@ def run(
                 )
             ]
         )
-        indices, values = vector.sparse.embed(query)
+        indices, values = vector.sparse.query(query)
         for path, value in (
             ("dense", query_embedding(embedder, query)),
             ("lexical", m.SparseVector(indices=indices, values=values)),
