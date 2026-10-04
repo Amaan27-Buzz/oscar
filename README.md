@@ -289,7 +289,7 @@ See [`docs/CLUB-A-CHECKPOINT.md`](docs/CLUB-A-CHECKPOINT.md), [`docs/CLUB-B-CHEC
 | 04 | Native Model Router + cloud intelligence | ✅ Gate A accepted |
 | 05 | Real machine Worker + remote continuation | ✅ COMPLETE, accepted local-alpha scope |
 | 06 | Memory Fabric + Personal Policy + live context | ✅ COMPLETE, accepted local-alpha scope |
-| 07 | OSCAR Edge + reflexes | Current implementation; physical acceptance pending |
+| 07 | OSCAR Edge + reflexes | COMPLETE FOR SOFTWARE / SIMULATED EDGE FOUNDATION; physical DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED |
 | 08 | Voice Core + Identity + Match/Map + Persona runtime | Planned |
 | 09 | Sunday + communication + Grid owner controls | Planned |
 | 10 | Desktop Interaction Runtime | Planned |
@@ -346,3 +346,19 @@ A slice is not complete because an agent says it is complete. Implementation, te
 - [Security](docs/SECURITY.md)
 - [Design system](DESIGN.md)
 - [Taste / quality bar](TASTE.md)
+
+## Owner scope decision — 2026-10-05
+
+Slice 07: **COMPLETE FOR SOFTWARE / SIMULATED EDGE FOUNDATION**.
+**PHYSICAL EDGE ACCEPTANCE DEFERRED BY OWNER** — `DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED`.
+Protocol, firmware, Grid integration, ESP32/Pico cross-builds and deterministic
+safety contracts in simulation are accepted for continuation. Historical
+simulator evidence remains **SIMULATED**. No physical GPIO, watchdog, UART,
+E-stop or ESP32/Pico silicon PASS is claimed. Gate C remains **PARTIAL**.
+
+Return to real ESP32/Pico acceptance during Slice 15 physical/device expansion
+and/or Slice 16 reliability/security hardening. Physical failure, loss/recovery,
+watchdog and safety/reflex verification remain mandatory before Slice 17
+Unified Alpha can PASS. The hardware acceptance guide is preserved.
+The owner authorizes Slice 08 after Slice 07 integration; Slice 09/10, deployment
+and Galaxy Tab Home Node remain outside this work.

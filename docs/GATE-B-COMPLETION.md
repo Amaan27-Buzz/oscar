@@ -1,6 +1,6 @@
 # Gate B completion ledger
 
-> Current status reconciliation, 2026-10-05: PR #12 is merged at `97c0622507df3f724ecf0c8b74aa7f4ae7784b08`; Gate B is frozen PASS. Slice 05/06 COMPLETE. Club C / Slice 07 is separately authorized in draft PR #13. The dated evidence below retains its historical status wording.
+> Current status reconciliation, 2026-10-05: PR #12 is merged at `97c0622507df3f724ecf0c8b74aa7f4ae7784b08`; Gate B is frozen PASS. Slice 05/06 COMPLETE. Slice 07 software is accepted for continuation; physical Edge acceptance is DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED. Slice 08 is authorized after integration. The dated evidence below retains its historical status wording.
 
 Working branch: `gate-b/completion`. Baseline fetched on 2026-10-04:
 `main=d90e3624d5e8cf68874c9bb136ed54a8ddbb6f9a`,

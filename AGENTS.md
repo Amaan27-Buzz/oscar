@@ -362,7 +362,7 @@ Use ignored local fixtures or synthetic test data.
 
 Verified scoped foundations include native Windows file/process/Git work, useful Codex delegation with independent verification, cancellation, coordinator/Worker restart/recovery, ambiguous mutation blocking, local selected memory continuity and bounded owner-reviewed policy authoring.
 
-Verified acceptance includes native Windows/Codex work, typed PowerShell, registered Notepad/UIA, isolated browser, separate owner control, native credentials, canonical WAL/FTS5, real Qdrant/Graphiti/Neo4j, local embedding/reranking, memory evaluation and owner-reviewed policy candidates. The owner completed physical machine acceptance and registered GitHub device OAuth with exactly `user:email`, real private reads, new-process restart, controlled private/public federation and local credential deletion/absence checks. Slice 05 and Slice 06 are COMPLETE for the documented local-alpha scope; Gate B is PASS. Remote provider revocation remains `UNKNOWN_OWNER_ACTION_REQUIRED`; private writes were not authorized and are optional. General conversational recall integration remains a composition boundary, not a proven autonomous product. See [Gate B completion ledger](docs/GATE-B-COMPLETION.md). Slice 07 is current work under separate owner authorization.
+Verified acceptance includes native Windows/Codex work, typed PowerShell, registered Notepad/UIA, isolated browser, separate owner control, native credentials, canonical WAL/FTS5, real Qdrant/Graphiti/Neo4j, local embedding/reranking, memory evaluation and owner-reviewed policy candidates. The owner completed physical machine acceptance and registered GitHub device OAuth with exactly `user:email`, real private reads, new-process restart, controlled private/public federation and local credential deletion/absence checks. Slice 05 and Slice 06 are COMPLETE for the documented local-alpha scope; Gate B is PASS. Remote provider revocation remains `UNKNOWN_OWNER_ACTION_REQUIRED`; private writes were not authorized and are optional. General conversational recall integration remains a composition boundary, not a proven autonomous product. See [Gate B completion ledger](docs/GATE-B-COMPLETION.md). Slice 07 software foundation is accepted for continuation under the owner scope decision below.
 
 
 Final physical/manual machine acceptance PASSED in owner run
@@ -372,4 +372,20 @@ Slice 06 is COMPLETE and Gate B PASS after owner OAuth run `oauth-gate-b-2026100
 The dedicated [owner OAuth harness](docs/GATE-B-OAUTH-ACCEPTANCE.md) has passed real owner acceptance with
 exactly `user:email`, restart, federation and local disconnect. Never borrow credentials or authorize autonomously: the owner
 must supply a registered Client ID and interact with GitHub. This acceptance recording itself grants no later work. Separate owner authorization
-now permits Slice 07 only; deployment, Sunday/Android and merging PR 13 remain out of scope.
+now permits Slice 07 closure/PR 13 integration and Slice 08 on a separate draft PR; deployment and Sunday/Android remain out of scope.
+
+## Owner scope decision — 2026-10-05
+
+Slice 07: **COMPLETE FOR SOFTWARE / SIMULATED EDGE FOUNDATION**.
+**PHYSICAL EDGE ACCEPTANCE DEFERRED BY OWNER** — `DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED`.
+Protocol, firmware, Grid integration, ESP32/Pico cross-builds and deterministic
+safety contracts in simulation are accepted for continuation. Historical
+simulator evidence remains **SIMULATED**. No physical GPIO, watchdog, UART,
+E-stop or ESP32/Pico silicon PASS is claimed. Gate C remains **PARTIAL**.
+
+Return to real ESP32/Pico acceptance during Slice 15 physical/device expansion
+and/or Slice 16 reliability/security hardening. Physical failure, loss/recovery,
+watchdog and safety/reflex verification remain mandatory before Slice 17
+Unified Alpha can PASS. The hardware acceptance guide is preserved.
+The owner authorizes Slice 08 after Slice 07 integration; Slice 09/10, deployment
+and Galaxy Tab Home Node remain outside this work.

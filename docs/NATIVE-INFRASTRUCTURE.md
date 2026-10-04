@@ -303,3 +303,19 @@ The native foundation now lives in `oscar/contracts.py`, `storage.py`, `runtime.
 `python -m oscar proof` uses a real loopback HTTP reference server. `python -m oscar grid-proof` disconnects a reference node and observes actual lease expiry while preserving the objective. These are reference-node proofs; Sunday/Desktop/Edge hardware, public TLS/outbound rendezvous, state replication and a vendor deployment have not been implemented or verified. The reference target shares the coordinator SQLite store and binds only to loopback. Session handles cannot be serialized; stored session token digests are distinct from provider credentials, which are never persisted.
 
 `Transport` is the adapter boundary for future network deployments. This does not establish a production secure Internet transport. See [the Club A checkpoint](CLUB-A-CHECKPOINT.md). No Latch/SwitchRoute service dependency was added.
+
+## Owner scope decision — 2026-10-05
+
+Slice 07: **COMPLETE FOR SOFTWARE / SIMULATED EDGE FOUNDATION**.
+**PHYSICAL EDGE ACCEPTANCE DEFERRED BY OWNER** — `DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED`.
+Protocol, firmware, Grid integration, ESP32/Pico cross-builds and deterministic
+safety contracts in simulation are accepted for continuation. Historical
+simulator evidence remains **SIMULATED**. No physical GPIO, watchdog, UART,
+E-stop or ESP32/Pico silicon PASS is claimed. Gate C remains **PARTIAL**.
+
+Return to real ESP32/Pico acceptance during Slice 15 physical/device expansion
+and/or Slice 16 reliability/security hardening. Physical failure, loss/recovery,
+watchdog and safety/reflex verification remain mandatory before Slice 17
+Unified Alpha can PASS. The hardware acceptance guide is preserved.
+The owner authorizes Slice 08 after Slice 07 integration; Slice 09/10, deployment
+and Galaxy Tab Home Node remain outside this work.

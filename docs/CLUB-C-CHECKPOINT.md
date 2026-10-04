@@ -45,12 +45,15 @@ Out of scope for this slice:
 
 ## Status
 
-- Slice 07: IMPLEMENTATION / physical acceptance pending
+- Slice 07: COMPLETE FOR SOFTWARE / SIMULATED EDGE FOUNDATION; physical DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED
 - Gate C: PARTIAL / not yet accepted
 
 This checkpoint must be updated with real implementation evidence as Slice 07 progresses. Simulated behavior must not be promoted to physical verification.
 
-## Slice 07 implementation evidence — 2026-10-05
+## Historical Slice 07 implementation evidence — 2026-10-05
+
+The pre-rescope observations below are preserved; the owner decision supersedes
+the historical status and scope restrictions, not the recorded evidence.
 
 - Starting checkpoint: `9fde9385af6b34c4f76991e2d871ab0909296af5`.
 - Existing branch `club-c/slice-07-edge`, draft PR #13; no merge.
@@ -69,3 +72,19 @@ This checkpoint must be updated with real implementation evidence as Slice 07 pr
 - [Architecture/protocol/research](EDGE.md); [exact owner hardware guide](EDGE-HARDWARE-ACCEPTANCE.md).
 - Slice 07 PARTIAL / OWNER_HARDWARE_REQUIRED; Gate C PARTIAL.
 - Slices 08–10, Oracle deployment, Galaxy Tab and self-extension not started.
+
+## Owner scope decision — 2026-10-05
+
+Slice 07: **COMPLETE FOR SOFTWARE / SIMULATED EDGE FOUNDATION**.
+**PHYSICAL EDGE ACCEPTANCE DEFERRED BY OWNER** — `DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED`.
+Protocol, firmware, Grid integration, ESP32/Pico cross-builds and deterministic
+safety contracts in simulation are accepted for continuation. Historical
+simulator evidence remains **SIMULATED**. No physical GPIO, watchdog, UART,
+E-stop or ESP32/Pico silicon PASS is claimed. Gate C remains **PARTIAL**.
+
+Return to real ESP32/Pico acceptance during Slice 15 physical/device expansion
+and/or Slice 16 reliability/security hardening. Physical failure, loss/recovery,
+watchdog and safety/reflex verification remain mandatory before Slice 17
+Unified Alpha can PASS. The hardware acceptance guide is preserved.
+The owner authorizes Slice 08 after Slice 07 integration; Slice 09/10, deployment
+and Galaxy Tab Home Node remain outside this work.

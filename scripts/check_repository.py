@@ -54,6 +54,17 @@ def main() -> int:
                     continue
                 if not (path.parent / target).exists():
                     failures.append("broken local Markdown link in " + name)
+    # Owner deferral is scope, never evidence of physical acceptance.
+    for name in ("docs/BUILD-GATES.md", "docs/ROADMAP.md", "docs/EDGE.md"):
+        contract = (root / name).read_text(encoding="utf-8")
+        for marker in (
+            "COMPLETE FOR SOFTWARE / SIMULATED EDGE FOUNDATION",
+            "DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED",
+            "Slice 17",
+            "Unified Alpha",
+        ):
+            if marker not in contract:
+                failures.append("deferred Edge acceptance contract absent: " + name)
     if sensitive_found:
         failures.append("secret-safety FAIL (material and locations suppressed)")
     for failure in sorted(set(failures)):

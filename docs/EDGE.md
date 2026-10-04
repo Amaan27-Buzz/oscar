@@ -2,8 +2,8 @@
 
 Current scope: Core/Grid → ESP32 gateway → UART → Pico deterministic controller.
 These boards are Edge nodes, never Core hosts. Gate A/B remain frozen PASS.
-Slice 07 is PARTIAL until owner physical acceptance; simulator success cannot
-complete this slice. Voice, Sunday/Android, Desktop Interaction, deployment and
+Slice 07 is COMPLETE FOR SOFTWARE / SIMULATED EDGE FOUNDATION. Physical acceptance
+is DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED; simulation proves no physical PASS. Voice, Sunday/Android, Desktop Interaction, deployment and
 Galaxy Tab work are excluded. Wake-on-LAN is not advertised or implemented.
 
 ## Framework and link decision
@@ -166,3 +166,19 @@ acceptance is claimed; do not substitute silently.
 See [hardware acceptance](EDGE-HARDWARE-ACCEPTANCE.md) for exact parts, wiring,
 Windows commands and manual observations. See [Club C checkpoint](CLUB-C-CHECKPOINT.md)
 for checks and current status. Simulator scenarios must stay labeled SIMULATED.
+
+## Owner scope decision — 2026-10-05
+
+Slice 07: **COMPLETE FOR SOFTWARE / SIMULATED EDGE FOUNDATION**.
+**PHYSICAL EDGE ACCEPTANCE DEFERRED BY OWNER** — `DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED`.
+Protocol, firmware, Grid integration, ESP32/Pico cross-builds and deterministic
+safety contracts in simulation are accepted for continuation. Historical
+simulator evidence remains **SIMULATED**. No physical GPIO, watchdog, UART,
+E-stop or ESP32/Pico silicon PASS is claimed. Gate C remains **PARTIAL**.
+
+Return to real ESP32/Pico acceptance during Slice 15 physical/device expansion
+and/or Slice 16 reliability/security hardening. Physical failure, loss/recovery,
+watchdog and safety/reflex verification remain mandatory before Slice 17
+Unified Alpha can PASS. The hardware acceptance guide is preserved.
+The owner authorizes Slice 08 after Slice 07 integration; Slice 09/10, deployment
+and Galaxy Tab Home Node remain outside this work.

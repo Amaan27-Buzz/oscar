@@ -1,6 +1,6 @@
 # Slice 07 owner hardware acceptance
 
-**Status: NOT RUN / OWNER_HARDWARE_REQUIRED.** Initial Windows inventory found
+**Status: DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED.** Initial Windows inventory found
 no `Win32_SerialPort` devices; that does not prove no boards exist elsewhere.
 ESP-IDF and Pico SDK/toolchains were not detected in the initial shell. Host C
 simulation uses installed Visual Studio 2022 Build Tools. Firmware cross-build
@@ -158,7 +158,7 @@ explicit confirmation under the native PersonalPolicy boundary.
     VERIFIED / FAILED / UNKNOWN per step, never infer whole-slice PASS.
 
 Owner must return observations for mandatory physical scenarios. A physical
-failure keeps Slice 07 PARTIAL; a simulator result never substitutes for it.
+failure prevents physical acceptance and Unified Alpha PASS; a simulator result never substitutes for it.
 
 ## Explicit watchdog fault builds (owner only)
 
@@ -189,3 +189,19 @@ idf.py -C edge/esp32 -p COM7 flash monitor
 ```
 
 These opt-in diagnostic pins are not runtime capabilities or remote tools.
+
+## Owner scope decision — 2026-10-05
+
+Slice 07: **COMPLETE FOR SOFTWARE / SIMULATED EDGE FOUNDATION**.
+**PHYSICAL EDGE ACCEPTANCE DEFERRED BY OWNER** — `DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED`.
+Protocol, firmware, Grid integration, ESP32/Pico cross-builds and deterministic
+safety contracts in simulation are accepted for continuation. Historical
+simulator evidence remains **SIMULATED**. No physical GPIO, watchdog, UART,
+E-stop or ESP32/Pico silicon PASS is claimed. Gate C remains **PARTIAL**.
+
+Return to real ESP32/Pico acceptance during Slice 15 physical/device expansion
+and/or Slice 16 reliability/security hardening. Physical failure, loss/recovery,
+watchdog and safety/reflex verification remain mandatory before Slice 17
+Unified Alpha can PASS. The hardware acceptance guide is preserved.
+The owner authorizes Slice 08 after Slice 07 integration; Slice 09/10, deployment
+and Galaxy Tab Home Node remain outside this work.
