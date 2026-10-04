@@ -460,7 +460,7 @@ OSCAR monitors provider/auth health, Grid connectivity, capability staleness, ta
 
 **PARTIAL.** Verified scoped work includes native Windows file/process/Git execution, useful Codex delegation with independent verification, cancellation, coordinator/Worker restart/recovery, ambiguous mutation blocking, local selected memory continuity and bounded owner-reviewed policy authoring.
 
-Gate B completion still requires the planned Slice 05/06 work: typed PowerShell, installed-app discovery, Windows UI Automation/computer use, browser capability, owner-control continuation, production Memory Fabric, open-ended policy, real private OAuth/connector acceptance, secure credential-storage boundary and live-authority-vs-memory federation.
+Verified local acceptance now includes typed PowerShell, registered Notepad/UIA, isolated browser, separate owner control, native credentials, canonical WAL/FTS5, real Qdrant/Graphiti/Neo4j with local embedding/reranking, memory evaluation and owner-reviewed model policy candidates. Slice 05 is COMPLETE for this Windows local-alpha scope; Slice 06 and Gate B remain PARTIAL. Real private OAuth, provider revocation and private-source/live-memory federation require owner authorization. General conversational recall integration remains a composition boundary, not a proven autonomous product. See [Gate B completion ledger](GATE-B-COMPLETION.md).
 
 No Slice 07 work begins until Gate B mandatory acceptance passes.
 

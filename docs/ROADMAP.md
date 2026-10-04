@@ -63,9 +63,9 @@ Verified typed deterministic/epistemic routing for known/world/recall/verify/rea
 
 Jev is now also the architectural owner of Memory Preflight/retrieval escalation requirements defined in [MEMORY.md](MEMORY.md); the production Memory Fabric implementation is Slice 06 work.
 
-## Slice 03 — Native Transport + Capability Catalog + Connection Grid foundation 🚧
+## Slice 03 — Native Transport + Capability Catalog + Connection Grid foundation ✅
 
-Reference foundation verified. Broader deployment remains evolutionary work.
+Slice 03 is accepted and complete for its planned reference foundation. Public deployment remains later deployment scope.
 
 Verified behavior includes scoped pairing/auth, capability advertisement/search, replay protection, correlation, cancellation, progress, heartbeats, durable leases, disconnect/expiry/reclaim and explicit availability states.
 
@@ -88,9 +88,9 @@ Implemented/verified scope includes:
 
 **Gate A — PASS.**
 
-## Slice 05 — Real machine Worker + remote continuation ⏭️
+## Slice 05 — Real machine Worker + remote continuation ✅
 
-**Scoped native Windows foundation verified; full slice still incomplete.**
+**COMPLETE for Windows local-alpha acceptance in this candidate.** Typed PowerShell, registered Notepad/UIA, browser fixture/public-page work and separate owner-control continuation have now been exercised. See [completion ledger](GATE-B-COMPLETION.md). Trusted-host execution is not a sandbox; independent network stores, phone/power and hostile-host isolation remain unverified.
 
 Already verified in the local Windows pass:
 
@@ -104,7 +104,7 @@ Already verified in the local Windows pass:
 - ambiguous post-mutation Worker loss blocks replay;
 - explicit trusted-host boundary rather than fake sandbox claims.
 
-### Remaining mandatory Slice 05 completion
+### Slice 05 acceptance contract — exercised for stated local scope
 
 #### 05A — Typed terminal / PowerShell
 
@@ -168,7 +168,7 @@ Sleep/shutdown/restart may be modeled only if real OS capability exists. These a
 
 The previous planned managed-memory backend has been retired. OSCAR now owns a free/self-hosted Memory Fabric.
 
-Existing verified foundation includes selected local memory, restart continuity, entity references, explicit structured Personal Policy, live-source precedence and bounded owner-confirmed message/send policy interpretation.
+Verified local acceptance now includes typed PowerShell, registered Notepad/UIA, isolated browser, separate owner control, native credentials, canonical WAL/FTS5, real Qdrant/Graphiti/Neo4j with local embedding/reranking, memory evaluation and owner-reviewed model policy candidates. Slice 05 is COMPLETE for this Windows local-alpha scope; Slice 06 and Gate B remain PARTIAL. Real private OAuth, provider revocation and private-source/live-memory federation require owner authorization. General conversational recall integration remains a composition boundary, not a proven autonomous product. See [Gate B completion ledger](GATE-B-COMPLETION.md).
 
 ### 06A — Canonical Event Archive
 
@@ -406,9 +406,9 @@ Manual integration checkpoints remain in [BUILD-GATES.md](BUILD-GATES.md).
 
 ## Current next step
 
-**Finish Gate B completely. Do not start Slice 07.**
+Owner OAuth client registration/authorization → private connector lifecycle → private live-authority federation → reconcile acceptance/CI → review. Gate B remains PARTIAL; no Slice 07.
 
-Immediate order:
+The original ordered acceptance sequence below remains a contract, not a list of unimplemented items:
 
 ```text
 05 machine gaps

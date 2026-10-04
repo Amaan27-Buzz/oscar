@@ -1,0 +1,539 @@
+{
+  "schema": 1,
+  "observed_at": 1791103638.8320174,
+  "platform": "win32",
+  "baseline": {
+    "main": "d90e3624d5e8cf68874c9bb136ed54a8ddbb6f9a",
+    "work_before_ff": "a34844133e9fc7f81ca21f5bfec966ff819777d3",
+    "work_start": "d90e3624d5e8cf68874c9bb136ed54a8ddbb6f9a",
+    "ff_unique_work_commits": 0,
+    "ff_main_commits": 21,
+    "pr10_merge": "cfa8c2fdeb2de0b4dbb2d912102be476f718ef4e"
+  },
+  "status": {
+    "slice05": "COMPLETE for stated Windows local-alpha acceptance",
+    "slice06": "PARTIAL",
+    "gate_b": "PARTIAL"
+  },
+  "acceptance": {
+    "machine": {
+      "status": "VERIFIED",
+      "scope": "reference network Worker verification",
+      "platform": "win32",
+      "observed_at": 1791071410.7331452,
+      "task_id": "538b82861ed04c7e886b6e61335211ef",
+      "correlation_id": "6ddc2f01bdca48c58a4609bc09be1bde",
+      "artifact_commit": "ed5a84a1f711a339f76c619c76c2a27485a55bd7",
+      "capabilities": [
+        "machine.files.write",
+        "machine.files.read",
+        "machine.files.list",
+        "machine.files.search",
+        "machine.executables",
+        "machine.git",
+        "machine.repository",
+        "machine.command",
+        "machine.agent.claude-code"
+      ],
+      "coding_agents_advertised": [
+        "claude-code"
+      ],
+      "coding_agent_tests": [
+        {
+          "capability": "machine.agent.claude-code",
+          "test": "--version subprocess only; no model task",
+          "success": true
+        }
+      ],
+      "checks": [
+        "separate Core/Worker processes",
+        "real loopback HTTP",
+        "file/Git work",
+        "durable progress/checkpoint",
+        "lost response + Core/Worker restart",
+        "reconnect/reclaim + idempotent completed replay",
+        "independent bytes/Git tree",
+        "HTTP pause/resume/cancel",
+        "real mid-command Worker death BLOCKED; replay ambiguous"
+      ],
+      "limitations": [
+        "shared SQLite reference authority",
+        "loopback-only transport",
+        "Windows verified on this host",
+        "authenticated coding-agent tasks unverified",
+        "public TLS/rendezvous and independent stores unverified"
+      ],
+      "state_path": ".oscar\\worker-completion-01\\core.sqlite",
+      "workspace": ".oscar\\worker-completion-01\\repository"
+    },
+    "continuation": {
+      "status": "VERIFIED",
+      "platform": "win32",
+      "observed_at": 1791071446.935245,
+      "start_coordinator_pid": 46868,
+      "recovery_coordinator_pid": 27740,
+      "task_id": "212f6c48c4d44166ac2f07d73c2eb0a1",
+      "pid": 27740,
+      "checks": [
+        "completed result reused once after coordinator OS-process restart",
+        "Worker OS-process restart and reconnect",
+        "independent Git/file evidence",
+        "selected project memory persisted and stays RECALLED",
+        "live filesystem overrides stale memory",
+        "owner-confirmed policy persisted",
+        "policy cannot grant permissions",
+        "conflicting policies BLOCK",
+        "forget removes live OSCAR row; no secure-erasure claim"
+      ],
+      "limitations": [
+        "shared SQLite authority, loopback transport",
+        "Supermemory not configured/exercised",
+        "live-record forget is not secure disk erasure"
+      ]
+    },
+    "codex": {
+      "status": "VERIFIED",
+      "platform": "win32",
+      "observed_at": 1791071491.424782,
+      "task_id": "39ae98e4b9a04b64aedf0ef0b1ac65d0",
+      "correlation_id": "3e192758450c43beb6ef48dc7feaf85f",
+      "objective": "repair nested interval merge while preserving contract",
+      "initial_head": "ddf94c31920917d7dee66e8f872fb4c5deb9e285",
+      "artifact_sha256": "4af72063e693b32d64fd7549d902d5cc3acc8855a494ff0a037ce0261f808754",
+      "result_status": "REPORTED",
+      "verification_status": "verified",
+      "checks": [
+        "baseline independently fails",
+        "real authenticated Codex mutation",
+        "nine independent behavior cases pass",
+        "Git sole-file diff and baseline",
+        "lost-result restart/reconnect/recovery",
+        "one execution, identical hash",
+        "real invalid Codex task FAILED without mutation"
+      ],
+      "workspace": "D:\\TheDawnlightGroup\\DawnlightLabs\\oscar\\.oscar\\codex-completion-01\\repository",
+      "state_path": "D:\\TheDawnlightGroup\\DawnlightLabs\\oscar\\.oscar\\codex-completion-01\\state.sqlite"
+    },
+    "codex_cancellation": {
+      "status": "VERIFIED",
+      "platform": "win32",
+      "observed_at": 1791071653.0106533,
+      "task_id": "940efb0a45ca491693d9966101967a8f",
+      "checks": [
+        "actual Codex subprocess started",
+        "native HTTP cancel -> Job Object termination",
+        "task CANCELLED",
+        "artifact hash unchanged; terminal cancellation cannot replay"
+      ]
+    },
+    "owner_control": {
+      "status": "VERIFIED",
+      "observed_at": 1791071989.6796854,
+      "task_id": "41a9b4f295f5483f9028e58df4e4de79",
+      "correlation_id": "79a30ee8f6a746c09cd208d5b8c14bb8",
+      "worker_pid": 44896,
+      "first_control_pid": 10984,
+      "second_control_pid": 33632,
+      "original_core_pid": 51908,
+      "recovery_core_pid": 50696,
+      "cancel_task_id": "8d8436c165854004ad64e6f2bf6514b2",
+      "checks": [
+        "separate scoped owner processes",
+        "Core terminated while Worker continued under unchanged lease",
+        "completed result survives natural lease expiry and Core restart",
+        "one consequential execution, independently exact file",
+        "target-scoped pause/resume/cancel/revoke"
+      ],
+      "limitations": [
+        "shared SQLite and loopback HTTP; no public TLS/cloud",
+        "Windows pause is before next subprocess; running process is not frozen"
+      ]
+    },
+    "interactive": {
+      "platform": "win32",
+      "observed_at": 1791074295.7556396,
+      "desktop": {
+        "status": "VERIFIED",
+        "app_id": "fadd1beb64126f0f9b3414560439fae0",
+        "source": "registry:HKCU:256:SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\App Paths\\notepad.exe",
+        "activation": "C:\\Program Files\\WindowsApps\\Microsoft.WindowsNotepad_11.2607.14.0_x64__8wekyb3d8bbwe\\Notepad\\Notepad.exe",
+        "catalog_records": 87,
+        "launch_pid": 12324,
+        "observed_pid": 51156,
+        "window_handle": 3607142,
+        "runtime_id": "42.3935266",
+        "proof_sha256": "95e41de436023eb3c0e0ffef61d8357b455f024bfce4c59f465a27933465db6e",
+        "verification": "separate UIA observer process readback and test-tab absence",
+        "cleanup": "empty document, closed test tab, no workspace files"
+      },
+      "browser_fixture": {
+        "status": "VERIFIED",
+        "url": "http://127.0.0.1:54426",
+        "verification": "independent HTTP server state GET after browser submit",
+        "artifact_sha256": "d5b20ba0521addd2d754fc47db83c7f7cedfa99c7e2b07c18336fe4a0368cb03"
+      },
+      "browser_public": {
+        "status": "VERIFIED",
+        "url": "https://example.com/",
+        "title": "Example Domain",
+        "verification": "independent HTTPS title/marker read"
+      },
+      "actions": [
+        {
+          "task_id": "6de849e94ea443f09be29c5191c59505",
+          "correlation_id": "ad33bf365526452fa873a8f8ee5d7b09",
+          "capability": "machine.apps",
+          "result_status": "REPORTED",
+          "result_sha256": "3a76368804d1955313d4d604c20b9d53dc16a5e9fed78b74c99255cd9c7d946c",
+          "observed_at": 1791074295.7724922
+        },
+        {
+          "task_id": "3ca79d07c2c44e26b822c1a4e4792f40",
+          "correlation_id": "a7950a9d2ee045abae7f0605f9bb5ae6",
+          "capability": "machine.apps",
+          "result_status": "REPORTED",
+          "result_sha256": "bfae6ff0584a550f7f67aa03dae3f7852824c448c50f1ce40cc08c0d350ca71d",
+          "observed_at": 1791074295.8283596
+        },
+        {
+          "task_id": "3a1ad0c7dc3f4715853aabe36bc06932",
+          "correlation_id": "ebdb4e9ea1c047dcab0a92198fd12a6d",
+          "capability": "machine.desktop",
+          "result_status": "REPORTED",
+          "result_sha256": "f7fd0aac440c2d671e95fde9529b44365b17205af5557ef4e1d13317c4079735",
+          "observed_at": 1791074297.2447178
+        },
+        {
+          "task_id": "67065e7658ac4794bfbdaae7c123c1c3",
+          "correlation_id": "646d1405406e46e998dfcfc985e33cd9",
+          "capability": "machine.desktop",
+          "result_status": "REPORTED",
+          "result_sha256": "6882d96c6fcf16b1291582d486e5a4e70ed5c1b376fbe1e7f0e67a611bd965f1",
+          "observed_at": 1791074298.3768494
+        },
+        {
+          "task_id": "6d05e262ec534273a34c577de7acb3c5",
+          "correlation_id": "77726310203e44a096c0b9d8824d66be",
+          "capability": "machine.desktop",
+          "result_status": "REPORTED",
+          "result_sha256": "f8d0c1b1ee7f3bd06a5fbeeb88caaa069c83a090a7b8816c5bbb5480eb29f5b7",
+          "observed_at": 1791074299.591404,
+          "verification_status": "VERIFIED",
+          "evidence_id": "45e5188d474042478744d054821ea490",
+          "verification_method": "separate UIA focused-process readback"
+        },
+        {
+          "task_id": "829566f79a06401ba991143a447d97c6",
+          "correlation_id": "a4869c8a84d04c65b3fc3dbe47163885",
+          "capability": "machine.desktop",
+          "result_status": "REPORTED",
+          "result_sha256": "d56b583c8f7b2ad8399ce4cd675a23398738ecdb107e3e7c6d22e4fbe7779041",
+          "observed_at": 1791074301.464127,
+          "verification_status": "VERIFIED",
+          "evidence_id": "ab7ef7b4339f444aaccad606758155e5",
+          "verification_method": "separate UIA text readback"
+        },
+        {
+          "task_id": "e88a7d94461448ee9a1c8953ef6cde93",
+          "correlation_id": "5659add881f84550aae2d7fac497bba6",
+          "capability": "machine.desktop",
+          "result_status": "REPORTED",
+          "result_sha256": "bfa30eb04aca821aa625ca52fdb54e58900f61176cde081c1e31f84bb0dc46f2",
+          "observed_at": 1791074303.5841966
+        },
+        {
+          "task_id": "3df97cd800e444d3a1c9bf4b456eaf80",
+          "correlation_id": "da8dd8b0b5b0446ebe749bd982c41335",
+          "capability": "machine.desktop",
+          "result_status": "REPORTED",
+          "result_sha256": "bfa30eb04aca821aa625ca52fdb54e58900f61176cde081c1e31f84bb0dc46f2",
+          "observed_at": 1791074304.557316,
+          "verification_status": "VERIFIED",
+          "evidence_id": "cdc0a21835b94a60a25118b6699c5a03",
+          "verification_method": "separate UIA empty text readback"
+        },
+        {
+          "task_id": "0ed64cc849eb4b9b8cda5b3544ecc8cb",
+          "correlation_id": "2f7630012dc648d1b6a5511c76e506b0",
+          "capability": "machine.desktop",
+          "result_status": "REPORTED",
+          "result_sha256": "31cd0271fcc885dd9819216c5553102436e319c3896fbf5cb5b4650f1bf96f3a",
+          "observed_at": 1791074306.8196673
+        },
+        {
+          "task_id": "de5298aec2b24a4faa6cb24622931c58",
+          "correlation_id": "5e168653c3d64f869261d7edca2d88e3",
+          "capability": "machine.desktop",
+          "result_status": "REPORTED",
+          "result_sha256": "936b0a83256fb18ffce76dd93a513cd49ede8943bb65ff9450b7d8f46ee2105b",
+          "observed_at": 1791074309.2505553,
+          "verification_status": "VERIFIED",
+          "evidence_id": "3f64fc2fa87e4de089b74b4a069725e3",
+          "verification_method": "separate UIA test-tab absence"
+        },
+        {
+          "task_id": "5afb85c584c7469194c65d986b511112",
+          "correlation_id": "29c7ef706aac4f7886f9d0b3853596e0",
+          "capability": "machine.browser",
+          "result_status": "REPORTED",
+          "result_sha256": "a308bec6d1878944ae8f03413bf2419b8b2cfb8903addeba9c83efe1e7f08759",
+          "observed_at": 1791074311.1366923,
+          "verification_status": "VERIFIED",
+          "evidence_id": "cbecc91366334bac8e3faf0db06a4bb2",
+          "verification_method": "independent server GET after browser submission"
+        },
+        {
+          "task_id": "10480b5cceed48819f5f50b6e1036dd1",
+          "correlation_id": "3ad776472c9542269104e73483b740d2",
+          "capability": "machine.browser",
+          "result_status": "REPORTED",
+          "result_sha256": "17354386814061731eab63a8d0d3906c0fe36504cb095a05492de916d71067e2",
+          "observed_at": 1791074315.3725164,
+          "verification_status": "VERIFIED",
+          "evidence_id": "f4a15610312549ed9744c150397fdbe7",
+          "verification_method": "independent HTTPS title and content marker"
+        }
+      ]
+    },
+    "indexes": {
+      "status": "VERIFIED",
+      "observed_at": 1791103815.9116054,
+      "relationship": "synthetic-owner",
+      "source_event_ids": [
+        "cf9016c7d8f44a64be2663af5c85373f",
+        "3e62b8479c4945f285ec366c0522e570",
+        "cb38be371f7d4c8794088071eaf51df6"
+      ],
+      "memory_ids": [
+        "5b1463a809b7415a9190af9c70c7a701",
+        "b341f91a1e424ef7868ea18d55e0542a",
+        "e03f64a1f7c64e47b043befc020316a3"
+      ],
+      "graph_group": "oscar_c3e42fe8c6956e44e268",
+      "embedding": "sentence-transformers:sentence-transformers/all-MiniLM-L6-v2:1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
+      "reranker": "cross-encoder:cross-encoder/ms-marco-MiniLM-L6-v2:233902d25c440f23af6f7d6e94d2946bac0bee0a",
+      "checks": [
+        "real Qdrant dense+sparse RRF paraphrase and relationship filter",
+        "real Graphiti native hybrid search against Neo4j",
+        "canonical time filters distinguish current Zed and historical VS Code",
+        "real local embedding/reranker paraphrase candidates with source IDs",
+        "unsupported personal claim UNKNOWN; retrieved claim remains RECALLED",
+        "independent Neo4j query confirms source episode IDs and validity interval",
+        "canonical archive and Qdrant reopen preserve one relationship",
+        "deleted derived collection gives explicit fallback and canonical rebuild",
+        "forget fences cached evidence, deletes native index entries, survives rebuild"
+      ],
+      "limitations": [
+        "synthetic local fixture only",
+        "Neo4j fixture has loopback ports and no authentication; never load private data",
+        "exact claim validation; arbitrary paraphrased entailment remains UNKNOWN",
+        "forget is not secure disk erasure"
+      ]
+    },
+    "memory_evaluation": {
+      "status": "VERIFIED",
+      "observed_at": 1791073365.4586236,
+      "cases": [
+        {
+          "case": "A",
+          "name": "exact",
+          "status": "PASS"
+        },
+        {
+          "case": "B",
+          "name": "semantic paraphrase",
+          "status": "PASS",
+          "paths": [
+            "3-qdrant-hybrid",
+            "4-graphiti-temporal"
+          ]
+        },
+        {
+          "case": "C",
+          "name": "three-year gap",
+          "status": "PASS"
+        },
+        {
+          "case": "D",
+          "name": "temporal current",
+          "status": "PASS"
+        },
+        {
+          "case": "E",
+          "name": "historical",
+          "status": "PASS"
+        },
+        {
+          "case": "F",
+          "name": "correction provenance",
+          "status": "PASS"
+        },
+        {
+          "case": "G",
+          "name": "live source outranks recalled archive",
+          "status": "PASS"
+        },
+        {
+          "case": "H",
+          "name": "ambiguous alias",
+          "status": "PASS"
+        },
+        {
+          "case": "I",
+          "name": "similar names distinct",
+          "status": "PASS"
+        },
+        {
+          "case": "J",
+          "name": "project scope",
+          "status": "PASS"
+        },
+        {
+          "case": "K",
+          "name": "negative retrieval",
+          "status": "PASS"
+        },
+        {
+          "case": "L",
+          "name": "empty active/structured triggers escalation",
+          "status": "PASS"
+        },
+        {
+          "case": "M",
+          "name": "inference remains INFERRED",
+          "status": "PASS"
+        },
+        {
+          "case": "N",
+          "name": "plausible unsupported claims",
+          "status": "PASS",
+          "rejected": 6
+        },
+        {
+          "case": "O",
+          "name": "forget",
+          "status": "PASS"
+        },
+        {
+          "case": "P",
+          "name": "both native indexes rebuild",
+          "status": "PASS"
+        },
+        {
+          "case": "Q",
+          "name": "restart reopen",
+          "status": "PASS"
+        },
+        {
+          "case": "R",
+          "name": "one relationship across episodes",
+          "status": "PASS",
+          "episodes": 167
+        }
+      ],
+      "metrics": {
+        "positive_top5_hit_rate": 1.0,
+        "positive_queries": 5,
+        "unsupported_claim_acceptance_rate": 0.0,
+        "unsupported_claim_queries": 6,
+        "temporal_cases_passed": 3,
+        "entity_error_cases": 0
+      },
+      "limitations": [
+        "small synthetic dataset; no universal hallucination claim",
+        "exact sourced assertion verifier; arbitrary model paraphrases remain UNKNOWN",
+        "reopen evidence here; separate process continuity evaluated independently",
+        "Neo4j loopback synthetic fixture without auth; no private records"
+      ]
+    },
+    "live_policy": {
+      "status": "VERIFIED",
+      "fixture_only": true,
+      "candidate_id": "8e60d4673d504d49ba192b61b7640d2f",
+      "task_id": "afadfa6525de495eb9e037b35d36f5a9",
+      "result_status": "REPORTED",
+      "task_state": "blocked",
+      "checks": [
+        "live native router candidate was inactive",
+        "exact synthetic owner review",
+        "policy survives database reopen",
+        "Worker enforces ASK",
+        "independent absent file"
+      ]
+    },
+    "consolidation": {
+      "status": "VERIFIED",
+      "observed_at": 1791103756.092787,
+      "processes": 3,
+      "checks": [
+        "bounded separate process batches",
+        "durable cursor resumes",
+        "six original events intact",
+        "three scoped merges",
+        "rebuild explicitly required"
+      ],
+      "checkpoints": [
+        {
+          "checkpoint": {
+            "cursor": 2,
+            "upper": 6,
+            "merged": 1,
+            "complete": false
+          },
+          "index_rebuild_required": true
+        },
+        {
+          "checkpoint": {
+            "cursor": 4,
+            "upper": 6,
+            "merged": 2,
+            "complete": false
+          },
+          "index_rebuild_required": true
+        },
+        {
+          "checkpoint": {
+            "cursor": 6,
+            "upper": 6,
+            "merged": 3,
+            "complete": true
+          },
+          "index_rebuild_required": true
+        }
+      ]
+    }
+  },
+  "additional_native_regressions": [
+    "browser cancelled after real loopback navigation",
+    "browser timeout after real loopback navigation",
+    "native artifact CREATE_NEW rejects dangling symlink",
+    "artifact bounds and reserved DOS paths",
+    "scoped cancellation admission fence",
+    "native Credential Manager rotation/expiry/reopen/delete",
+    "bounded consolidation checkpoint/reopen/atomic rollback"
+  ],
+  "unverified": [
+    "owner-authorized private OAuth lifecycle",
+    "private live-source federation",
+    "provider revocation",
+    "independent network node stores/public TLS",
+    "actual Samsung Android",
+    "Sunday/voice/Edge/hardware",
+    "automatic general conversational claim entailment",
+    "secure disk erasure",
+    "hostile-host containment"
+  ],
+  "quality": {
+    "windows_tests": 372,
+    "windows_result": "PASS",
+    "windows_seconds": 86.558,
+    "ruff": "PASS",
+    "format": "PASS",
+    "mypy": "PASS: 48 source files",
+    "repository_and_local_links": "PASS",
+    "secret_scan": "PASS, value silent",
+    "diff_check": "PASS",
+    "ubuntu": "pending exact-head CI",
+    "external_links": "pending CI"
+  }
+}

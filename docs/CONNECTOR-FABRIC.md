@@ -20,8 +20,10 @@ idempotency, Runtime and independent Evidence/Verification remain authoritative.
   action requiring that consequence, even with a write/destructive grant.
 - Environment secret resolver is a platform-supplied reference boundary, not a
   vault. OAuth refresh/revoke and authenticated MCP session are adapter protocols.
-  PKCE S256 generation is implemented. Enrollment, token refresh, device flow and
-  OS secure storage are **not implemented or live verified**.
+  PKCE S256 generation is implemented. GitHub registered-client device enrollment
+  and Windows Credential Manager are implemented; native credential lifecycle is exercised.
+  Real owner OAuth authorization/private reads/provider revocation remain unverified.
+  GitHub OAuth App device grants do not support refresh; local disconnect does not revoke remotely.
 - Provider results remain REPORTED. `ConnectorVerifier` independently fetches a
   correlated resource and compares explicit expected fields before verification.
   Gmail sent-recipient/header verification and arbitrary nested/batch-update
@@ -175,3 +177,7 @@ and Microsoft [create event](https://learn.microsoft.com/en-us/graph/api/user-po
 Google warns some emails may still be sent with notifications suppressed; update/delete
 can affect pre-existing attendees unknown to the request. Microsoft attendee invitations
 cannot be disabled. These are reference contract tests, not live private-account tests.
+
+## Gate B local completion candidate — 2026-10-04
+
+`python -m oscar.oauth_cli --state <local.sqlite> --owner-authorized --begin <registered-client-id>` starts only the official GitHub device flow. One `--poll <transaction-id>` reads its nonce from stdin; no polling loop or token output. Tokens/device credentials live in OSCAR-owned native Credential Manager references. Interrupted exchange is ambiguous and blocked rather than replayed. A registered client is currently absent. Provider revocation needs the legitimate provider settings/app boundary; local disconnect is explicitly pending remote revocation. No CLI/browser tokens are borrowed. Verified local acceptance now includes typed PowerShell, registered Notepad/UIA, isolated browser, separate owner control, native credentials, canonical WAL/FTS5, real Qdrant/Graphiti/Neo4j with local embedding/reranking, memory evaluation and owner-reviewed model policy candidates. Slice 05 is COMPLETE for this Windows local-alpha scope; Slice 06 and Gate B remain PARTIAL. Real private OAuth, provider revocation and private-source/live-memory federation require owner authorization. General conversational recall integration remains a composition boundary, not a proven autonomous product. See [Gate B completion ledger](GATE-B-COMPLETION.md).

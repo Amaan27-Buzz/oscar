@@ -1,5 +1,6 @@
 """Bounded multi-path recall, context assembly and evidence-bound claim checking."""
 
+import json
 import re
 from dataclasses import dataclass
 from time import time
@@ -214,6 +215,7 @@ class MemoryFabric:
         support = [hit.memory for hit in evidence.hits if hit.memory.id in claim.memory_ids]
         if not support or set(claim.memory_ids) != {memory.id for memory in support}:
             return Epistemic.UNKNOWN
+        source_states = []
         # Evidence captured before forget/expiry is no longer admissible.
         for memory in support:
             row = self.archive.db.execute(
@@ -223,7 +225,7 @@ class MemoryFabric:
                 return Epistemic.UNKNOWN
             try:
                 for identifier in memory.event_ids:
-                    self.archive.event(identifier)
+                    source_states.append(self.archive.event(identifier).status)
             except KeyError:
                 return Epistemic.UNKNOWN
         events = {identifier for memory in support for identifier in memory.event_ids}
@@ -232,7 +234,13 @@ class MemoryFabric:
         # This verifier proves exact sourced assertions only, not arbitrary model entailment.
         if not any(claim.text == memory.content for memory in support):
             return Epistemic.UNKNOWN
-        if any(memory.status == Epistemic.INFERRED for memory in support):
+        if Epistemic.UNKNOWN in source_states or any(
+            memory.status == Epistemic.UNKNOWN for memory in support
+        ):
+            return Epistemic.UNKNOWN
+        if Epistemic.INFERRED in source_states or any(
+            memory.status == Epistemic.INFERRED for memory in support
+        ):
             return Epistemic.INFERRED
         return Epistemic.RECALLED
 
@@ -248,24 +256,8 @@ class MemoryFabric:
     ) -> dict[str, Any]:
         if not 1000 <= max_chars <= 32_000:
             raise ValueError("bounded context required")
-        selected = []
-        remaining = max_chars - len(objective)
-        for hit in evidence.hits:
-            if len(hit.memory.content) > remaining:
-                continue
-            remaining -= len(hit.memory.content)
-            selected.append(
-                {
-                    "memory_id": hit.memory.id,
-                    "event_ids": hit.memory.event_ids,
-                    "content": hit.memory.content,
-                    "status": Epistemic.RECALLED,
-                    "source_status": hit.memory.status,
-                    "valid_from": hit.memory.valid_from,
-                    "valid_to": hit.memory.valid_to,
-                }
-            )
-        return {
+        selected: list[dict[str, Any]] = []
+        context = {
             "objective": objective,
             "project": project,
             "memories": selected,
@@ -273,6 +265,35 @@ class MemoryFabric:
             "policy_ids": policy_ids,
             "assembled_at": time(),
         }
+        if len(json.dumps(context)) > max_chars:
+            raise ValueError("objective/live/policy context exceeds bound")
+        for hit in evidence.hits:
+            state = self.check_claim(
+                HistoricalClaim(
+                    hit.memory.content,
+                    hit.memory.event_ids,
+                    (hit.memory.id,),
+                    Epistemic.RECALLED,
+                    1,
+                ),
+                evidence,
+            )
+            if state == Epistemic.UNKNOWN:
+                continue
+            selected.append(
+                {
+                    "memory_id": hit.memory.id,
+                    "event_ids": hit.memory.event_ids,
+                    "content": hit.memory.content,
+                    "status": state,
+                    "source_status": hit.memory.status,
+                    "valid_from": hit.memory.valid_from,
+                    "valid_to": hit.memory.valid_to,
+                }
+            )
+            if len(json.dumps(context)) > max_chars:
+                selected.pop()
+        return context
 
     def rebuild(self, relationship: str) -> tuple[str, ...]:
         records = self.archive.memories(relationship, include_history=True, limit=10_000)

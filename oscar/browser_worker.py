@@ -10,6 +10,33 @@ from typing import Any
 from urllib.parse import urlsplit
 from urllib.request import HTTPRedirectHandler, Request, build_opener
 
+from oscar.capabilities import ScopedFiles
+from oscar.windows_files import WindowsScopedFiles
+
+_posix_os: Any = os
+
+
+def write_artifact(artifact: Path, data: bytes) -> None:
+    """Pin the directory and create a new regular file; never follow an existing leaf."""
+    if len(WindowsScopedFiles.parts(artifact.name)) != 1:
+        raise ValueError("artifact basename required")
+    if len(data) > 4_000_000:
+        raise ValueError("artifact bound exceeded")
+    if os.name == "nt":
+        files = WindowsScopedFiles(artifact.parent)
+        files.create_bytes(artifact.name, data)
+    else:
+        files_posix = ScopedFiles(artifact.parent)
+        with files_posix.directory(".") as directory:
+            descriptor = os.open(
+                artifact.name,
+                os.O_WRONLY | os.O_CREAT | os.O_EXCL | _posix_os.O_NOFOLLOW,
+                0o600,
+                dir_fd=directory,
+            )
+            with os.fdopen(descriptor, "wb") as stream:
+                stream.write(data)
+
 
 class NoDownloadRedirects(HTTPRedirectHandler):
     def redirect_request(self, *args: Any, **kwargs: Any) -> None:
@@ -23,6 +50,11 @@ def bounded_download(
 
     Browser cookies never leave the context. Blob/JS/authenticated downloads are unsupported.
     """
+    if type(maximum) is not int or not 1 <= maximum <= 1_000_000:
+        raise ValueError("bounded download required")
+    if type(timeout) not in {int, float} or not 0 < timeout <= 120:
+        raise ValueError("bounded download timeout required")
+    WindowsScopedFiles.parts(artifact.name)
     if origin(url) not in allowed:
         raise PermissionError("download origin outside grant")
     with build_opener(NoDownloadRedirects()).open(
@@ -32,11 +64,12 @@ def bounded_download(
     if len(data) > maximum:
         raise ValueError("download bound exceeded")
     # Exclusive creation rejects preexisting files, including links/reparse targets.
-    with artifact.open("xb") as stream:
-        stream.write(data)
+    write_artifact(artifact, data)
 
 
 def origin(url: str) -> str:
+    if not isinstance(url, str) or len(url) > 8000:
+        raise ValueError("bounded HTTP(S) URL required")
     parsed = urlsplit(url)
     if (
         parsed.username
@@ -73,6 +106,8 @@ def validate(request: dict[str, Any]) -> None:
         "download": {"selector", "path", "max_bytes"},
     }
     for step in steps:
+        if not isinstance(step, dict):
+            raise ValueError("structured browser step required")
         operation = step.get("operation")
         if operation not in fields or set(step) != fields[operation] | {"operation"}:
             raise ValueError("unsupported browser operation")
@@ -91,6 +126,8 @@ def validate(request: dict[str, Any]) -> None:
             or ":" in step["path"]
         ):
             raise ValueError("artifact must be a new workspace basename")
+        if "path" in step:
+            WindowsScopedFiles.parts(step["path"])
         if operation == "download" and (
             type(step["max_bytes"]) is not int or not 1 <= step["max_bytes"] <= 1_000_000
         ):
@@ -111,13 +148,16 @@ def run(request: dict[str, Any], root: Path) -> dict[str, Any]:
     with sync_playwright() as playwright:
         browser = playwright.chromium.launch(headless=True, env=env)
         context = browser.new_context(accept_downloads=False)
+
         # Recheck redirects, subresources and navigation at the network boundary.
-        context.route(
-            "**/*",
-            lambda route: route.continue_()
-            if origin(route.request.url) in request["origins"]
-            else route.abort(),
-        )
+        def authorize_route(route: Any) -> None:
+            try:
+                permitted = origin(route.request.url) in request["origins"]
+            except ValueError:
+                permitted = False
+            route.continue_() if permitted else route.abort()
+
+        context.route("**/*", authorize_route)
         page = context.new_page()
         page.on("dialog", lambda dialog: dialog.dismiss())
         page.on("popup", lambda popup: popup.close())
@@ -159,9 +199,7 @@ def run(request: dict[str, Any], root: Path) -> dict[str, Any]:
                     )
                 elif operation == "screenshot":
                     artifact = root / step["path"]
-                    if artifact.exists():
-                        raise ValueError("artifact overwrite rejected")
-                    page.screenshot(path=str(artifact), full_page=False)
+                    write_artifact(artifact, page.screenshot(full_page=False))
                 elif operation == "download":
                     artifact = root / step["path"]
                     if artifact.exists():

@@ -258,3 +258,7 @@ When a durable rule changes, update the canonical owner first and reconcile affe
 - architecture decision → `DECISIONS.md` plus affected domain docs.
 
 After propagation, re-read canonical files before claiming completion.
+
+## Gate B local completion candidate — 2026-10-04
+
+Verified local acceptance now includes typed PowerShell, registered Notepad/UIA, isolated browser, separate owner control, native credentials, canonical WAL/FTS5, real Qdrant/Graphiti/Neo4j with local embedding/reranking, memory evaluation and owner-reviewed model policy candidates. Slice 05 is COMPLETE for this Windows local-alpha scope; Slice 06 and Gate B remain PARTIAL. Real private OAuth, provider revocation and private-source/live-memory federation require owner authorization. General conversational recall integration remains a composition boundary, not a proven autonomous product. See [Gate B completion ledger](GATE-B-COMPLETION.md).

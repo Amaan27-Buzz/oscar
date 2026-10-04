@@ -249,3 +249,7 @@ Connector private inputs are staged as transient references. Losing active input
 context blocks instead of recovering private content from durable history. Worker
 process logs and connector bodies never become generic router/ledger telemetry.
 Memory retention is selected separately. See [CLUB-B-CHECKPOINT.md](CLUB-B-CHECKPOINT.md).
+
+## Gate B local completion candidate — 2026-10-04
+
+OwnerControl uses existing Grid/Runtime leases, target-scoped owner grants and separate processes. Cancellation atomically rechecks executor identity in the task transition. Windows pause is cooperative before the next subprocess, not arbitrary process suspension. Canonical consolidation has bounded durable checkpoints; failure rolls back the checkpoint and evidence merge together. Derived generations are invalidated after consolidation and rebuilt explicitly. Verified local acceptance now includes typed PowerShell, registered Notepad/UIA, isolated browser, separate owner control, native credentials, canonical WAL/FTS5, real Qdrant/Graphiti/Neo4j with local embedding/reranking, memory evaluation and owner-reviewed model policy candidates. Slice 05 is COMPLETE for this Windows local-alpha scope; Slice 06 and Gate B remain PARTIAL. Real private OAuth, provider revocation and private-source/live-memory federation require owner authorization. General conversational recall integration remains a composition boundary, not a proven autonomous product. See [Gate B completion ledger](GATE-B-COMPLETION.md).

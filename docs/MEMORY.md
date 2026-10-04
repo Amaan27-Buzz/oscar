@@ -435,18 +435,9 @@ None silently substitutes for another.
 
 The existing `oscar.continuity.LocalMemory` and SQLite-backed records verify selected local retention, restart continuity, evidence state, entity references, live-source precedence and forget of the live OSCAR record for the documented Windows/reference cases.
 
-The production Memory Fabric described above is **not yet fully implemented**. Gate B completion must add and verify:
+The archive/index/retrieval implementation is now exercised on this Windows laptop with synthetic retained sources. Verified local acceptance now includes typed PowerShell, registered Notepad/UIA, isolated browser, separate owner control, native credentials, canonical WAL/FTS5, real Qdrant/Graphiti/Neo4j with local embedding/reranking, memory evaluation and owner-reviewed model policy candidates. Slice 05 is COMPLETE for this Windows local-alpha scope; Slice 06 and Gate B remain PARTIAL. Real private OAuth, provider revocation and private-source/live-memory federation require owner authorization. General conversational recall integration remains a composition boundary, not a proven autonomous product. See [Gate B completion ledger](GATE-B-COMPLETION.md).
 
-- canonical Event Archive/WAL/FTS5 behavior;
-- Qdrant OSS derived semantic index;
-- Graphiti + Neo4j Community temporal/entity index;
-- replaceable local embedding and reranking path;
-- Jev Memory Preflight and retrieval planner;
-- expected-memory miss escalation;
-- evidence-bound recalled claims;
-- correction/supersession propagation;
-- rebuild/drift behavior;
-- evaluation suite.
+Canonical admission rechecks forgotten/expired/inferred sources even when a recalled object was cached. Context has a total serialized bound and terminal tasks release transient context. Consolidation runs in bounded batches with a durable atomic cursor; it preserves source events, merges only matching evidence inside a batch and invalidates derived generations. Run one runner per relationship, then explicitly rebuild derived indexes. A completed pass requires explicit restart. No automatic unbounded daemon, model-extracted global summaries, or private unauthenticated Neo4j deployment is claimed.
 
 The prior planned Supermemory integration has been retired. Historical checkpoint references to it describe the earlier plan, not a current dependency.
 

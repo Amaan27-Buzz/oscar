@@ -1,5 +1,6 @@
 """Canonical retained history. Derived stores never own events or permission."""
 
+import hashlib
 import json
 import math
 import re
@@ -7,6 +8,7 @@ import sqlite3
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from time import time
+from urllib.parse import urlsplit
 
 from .contracts import Epistemic, new_id
 from .credentials import redact_runtime_secrets
@@ -114,7 +116,16 @@ class EventArchive:
             if prior.relationship_id != event.relationship_id:
                 raise ValueError("correction cannot cross relationships")
         payload = json.dumps(asdict(event), sort_keys=True)
-        if redact_runtime_secrets(payload) != payload:
+        source = urlsplit(event.source)
+        if (
+            source.username
+            or source.password
+            or source.query
+            or source.fragment
+            or len(payload.encode()) > 100_000
+            or len(event.entity_ids) > 64
+            or redact_runtime_secrets(payload) != payload
+        ):
             raise ValueError("credential material cannot enter event metadata")
         with self.db:
             existing = self.db.execute(
@@ -342,7 +353,11 @@ class MemoryWriter:
             kind,
             project,
             entities,
-            Epistemic.INFERRED if inferred else Epistemic.REPORTED,
+            Epistemic.INFERRED
+            if inferred or any(e.status == Epistemic.INFERRED for e in events)
+            else Epistemic.UNKNOWN
+            if any(e.status == Epistemic.UNKNOWN for e in events)
+            else Epistemic.REPORTED,
             starts,
             supersedes=supersedes,
             sensitivity=events[0].sensitivity,
@@ -386,6 +401,70 @@ class MemoryWriter:
     def consolidate(self, relationship: str, *, limit: int = 100) -> int:
         """Bounded idempotent evidence merge, preserving originals and inference status."""
         records = self.archive.memories(relationship, limit=limit)
+        return self._merge(records)
+
+    def consolidate_step(
+        self, relationship: str, *, batch_size: int = 100, restart: bool = False
+    ) -> dict[str, int | bool]:
+        """One atomic background batch. A durable cursor resumes after process loss.
+
+        Deduplication is deliberately batch-local; no unsupported global summary/alias merge.
+        A completed pass requires explicit restart to process later retained events.
+        """
+        if type(batch_size) is not int or not 1 <= batch_size <= 100:
+            raise ValueError("bounded consolidation batch required")
+        key = "consolidation:" + hashlib.sha256(relationship.encode()).hexdigest()
+        row = self.archive.db.execute(
+            "SELECT value FROM archive_metadata WHERE key=?", (key,)
+        ).fetchone()
+        job = (
+            json.loads(row[0])
+            if row and not restart
+            else {
+                "cursor": 0,
+                "upper": self.archive.db.execute(
+                    "SELECT COALESCE(MAX(rowid),0) FROM archive_memories WHERE relationship=?",
+                    (relationship,),
+                ).fetchone()[0],
+                "merged": 0,
+                "complete": False,
+            }
+        )
+        if job["complete"]:
+            return job
+        rows = self.archive.db.execute(
+            "SELECT rowid,payload FROM archive_memories WHERE relationship=? AND forgotten=0 "
+            "AND rowid>? AND rowid<=? ORDER BY rowid LIMIT ?",
+            (relationship, job["cursor"], job["upper"], batch_size),
+        ).fetchall()
+        records = []
+        for _cursor, payload in rows:
+            data = json.loads(payload)
+            if data.get("valid_to") is not None or (
+                data.get("expires_at") is not None and data["expires_at"] <= time()
+            ):
+                continue
+            records.append(
+                MemoryRecord(
+                    **{
+                        **data,
+                        "event_ids": tuple(data["event_ids"]),
+                        "entity_ids": tuple(data["entity_ids"]),
+                        "status": Epistemic(data["status"]),
+                    }
+                )
+            )
+        job["cursor"] = rows[-1][0] if rows else job["upper"]
+        job["complete"] = job["cursor"] >= job["upper"] or len(rows) < batch_size
+        self._merge(records, checkpoint=(key, job))
+        return job
+
+    def _merge(
+        self,
+        records: list[MemoryRecord],
+        *,
+        checkpoint: tuple[str, dict[str, int | bool]] | None = None,
+    ) -> int:
         seen: dict[tuple[str, str | None, str, Epistemic], MemoryRecord] = {}
         merged = 0
         with self.archive.db:
@@ -417,4 +496,15 @@ class MemoryWriter:
                     merged += 1
                 else:
                     seen[key] = memory
+            if merged:
+                self.archive.db.execute(
+                    "DELETE FROM archive_metadata WHERE key LIKE '%:generation'"
+                )
+            if checkpoint:
+                checkpoint_key, job = checkpoint
+                job["merged"] += merged
+                self.archive.db.execute(
+                    "INSERT OR REPLACE INTO archive_metadata VALUES(?,?)",
+                    (checkpoint_key, json.dumps(job)),
+                )
         return merged

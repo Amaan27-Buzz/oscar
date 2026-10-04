@@ -113,7 +113,7 @@ class OpenPolicyAuthoring:
                         new_id(),
                         item["capability"],
                         PolicyEffect(item["effect"]),
-                        "owner-reviewed model interpretation",
+                        "model candidate; owner confirmation required",
                         now,
                         now,
                         item["conditions"],

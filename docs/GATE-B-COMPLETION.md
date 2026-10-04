@@ -8,30 +8,30 @@ Working branch: `gate-b/completion`. Baseline fetched on 2026-10-04:
 This ledger tracks mandatory acceptance; unchecked items remain current Gate B work.
 Historical acceptance is not relabeled as current execution.
 
-- [ ] Useful Codex objective independently verified on current implementation
-- [ ] Scoped filesystem/Git work
-- [ ] Typed PowerShell, filtered environment, timeout and cancellation
-- [ ] Legitimate installed-app catalog and harmless app launch
-- [ ] Bounded real UI Automation mutation and independent readback
-- [ ] Typed isolated browser: local interactive fixture and public page
-- [ ] Worker disconnect, actual process-tree cancellation and no duplicate recovery
-- [ ] Ambiguous interrupted mutation BLOCKS
-- [ ] Separate owner-control observation, disconnect/reconnect and continuation
-- [ ] One relationship, canonical SQLite WAL/FTS5 archive and restart
-- [ ] Source-bound Memory Writer and scoped preferences
-- [ ] Real Qdrant hybrid retrieval, scope filtering, restart and rebuild
-- [ ] Real Graphiti/Neo4j temporal/entity retrieval and rebuild
-- [ ] Replaceable local embeddings and reranker with truthful fallback
-- [ ] Jev mandatory preflight, bounded escalation and context assembly
-- [ ] Evidence-bound recall and unsupported historical claims UNKNOWN
-- [ ] Temporal correction, current/history distinction, aliases and ambiguity
-- [ ] Forget across archive/FTS/vector/graph; no secure-erasure claim
-- [ ] Bounded consolidation preserves sources
-- [ ] A–R memory evaluation with measured errors
-- [ ] Open-ended policy candidate, exact review/confirmation, conflict/expiry
-- [ ] Native secure credential write/read/rotate/expiry/delete/restart
+- [x] Useful Codex objective independently verified on current implementation
+- [x] Scoped filesystem/Git work
+- [x] Typed PowerShell, filtered environment, timeout and cancellation
+- [x] Legitimate installed-app catalog and harmless Notepad launch
+- [x] Bounded real UI Automation mutation and independent readback
+- [x] Typed isolated browser: local interactive fixture and public page
+- [x] Worker disconnect, actual process-tree cancellation and no duplicate recovery
+- [x] Ambiguous interrupted mutation BLOCKS
+- [x] Separate owner-control observation, disconnect/reconnect and continuation
+- [x] One relationship, canonical SQLite WAL/FTS5 archive and restart
+- [x] Source-bound Memory Writer and scoped preferences
+- [x] Real Qdrant hybrid retrieval, scope filtering, restart and rebuild
+- [x] Real Graphiti/Neo4j temporal/entity retrieval and rebuild
+- [x] Replaceable local embeddings and reranker with truthful fallback
+- [x] Jev preflight, bounded retrieval/context composition API
+- [x] Exact evidence-bound recall and unsupported historical claims UNKNOWN
+- [x] Temporal correction, current/history distinction, aliases and ambiguity
+- [x] Forget across archive/FTS/vector/graph; no secure-erasure claim
+- [x] Bounded consolidation preserves sources; durable atomic batch cursor
+- [x] A–R memory evaluation with measured errors
+- [x] Model policy candidate, exact fixture confirmation, conflict/expiry
+- [x] Native secure credential write/read/rotate/expiry/delete/restart
 - [ ] Real owner-authorized OAuth/private read and lifecycle
-- [ ] Explicitly approved reversible private write/readback/cleanup
+- [ ] Reversible private write/readback/cleanup only if separately approved
 - [ ] Live file/project/task/private/public federation beats stale recall
 - [ ] Full Windows suite, cross-platform CI, lint/types/repository/links/secrets
 
@@ -49,3 +49,67 @@ Retrieved 2026-10-04. These define API choices; observed acceptance is separate.
 - [GitHub OAuth/device authorization](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps) and [Google installed-app OAuth](https://developers.google.com/identity/protocols/oauth2/native-app): registered client, minimal scopes, owner authorization, bounded lifecycle.
 
 No Slice 07, Sunday, voice, polished UI or physical power action is authorized by this pass.
+
+## Candidate decision and observed acceptance
+
+Slice 05 **COMPLETE for Windows local-alpha acceptance**. Slice 06 **PARTIAL**.
+Gate B **PARTIAL**. [Machine-readable evidence](evidence/gate-b-completion-2026-10-04.json)
+records baseline, correlation/task IDs, hashes, independent checks and explicit limitations.
+No private OAuth or Android observation is inferred from successful local tests.
+
+| Capability | Actual laptop observation |
+|---|---|
+| Machine/Codex | Nested interval bug repaired in disposable Git repo; baseline fails, nine independent cases pass; sole-file diff/hash; failed invocation; actual cancel; restart/recovery without duplicate mutation |
+| Files/process/Git | Existing native acceptance rerun; reparse-aware files, allowlists, filtered environment, native Job Objects, output/time bounds, Git commit; interrupted ambiguous mutation BLOCKED |
+| PowerShell | Discovered real executable/version, typed UTF-8 write, environment/cwd, timeout and cancellation tests |
+| Installed app/UIA | 87 registered records; explicitly allowlisted packaged Notepad; actual broker PID bound independently; observed element input/readback, keyboard/mouse, empty test-tab close; owner window preserved |
+| Browser | Fresh isolated Chromium; local form submit confirmed by independent server GET; screenshot and anonymous bounded anchor download; example.com independently checked via HTTPS; real navigation followed by timeout/cancel |
+| Owner control | Separate control/Core/Worker processes; control exit and Core termination leave permitted Worker running; unchanged lease/result recovered after natural expiry; pause/resume/cancel/revoke; no duplicate |
+| Memory | Canonical SQLite WAL/FTS5; real Qdrant local disk and Graphiti SDK against Neo4j Community; CPU MiniLM embeddings and cross-encoder reranker; both derived indexes destroyed/rebuilt; canonical events preserved |
+| Memory reliability | A–R 18 synthetic cases pass; five positive-query top-5 hits 5/5, unsupported claim acceptance 0/6, temporal 3/3, entity error cases 0; exact claim verifier, not universal hallucination proof |
+| Policy | Real native Model Router candidate; ambiguous wording blocked; precise ASK rule remains inactive before synthetic owner confirmation; database reopen then actual Worker blocks write, independent absent file |
+| Credentials | Actual Credential Manager write/read/rotate/expiry/separate-process reopen/delete; opaque SQLite references; device-flow protocol tests do not prove a private OAuth lifecycle |
+
+## Runtime boundaries
+
+`InteractiveWorker` composes existing leases/Dispatcher/dedup with typed Windows and
+Playwright adapters. App discovery never grants launch authority. Browser support is
+advertised only after selected-interpreter/Chromium probing. Native `CREATE_NEW`
+artifact creation rejects even a dangling Windows symlink; directories are pinned.
+Anonymous HTTP anchor downloads enforce a streaming bound; authenticated/blob/JS
+downloads are unsupported. All meaningful executor receipts stay **REPORTED**;
+independent UIA/HTTP/Git/files/tests determine verification.
+
+Approved interpreters/agents/Git still run as the Windows user. Cwd/path scopes and
+Job Objects **are not a sandbox**. UIA and broker app activation can touch an existing
+user process; no elevation/UIPI bypass or broker-tree containment is claimed.
+Windows pause is before the next subprocess, not arbitrary process suspension.
+Local control still shares SQLite and loopback HTTP. Credentials do not isolate the
+same host account. Private data must not enter the unauthenticated synthetic Neo4j fixture.
+
+Archive-backed recall is an explicit composition API, with bounded source admission,
+RECALLED/INFERRED/UNKNOWN preservation and terminal transient-context cleanup.
+General model paraphrase entailment and an autonomous conversational memory product
+remain unverified. Consolidation is batch-local, checkpointed atomically, and run by
+one runner per relationship; original events remain intact. Changed generations need
+explicit index rebuilding. Graphiti 0.30.2 emitted missing-property compatibility
+warnings during Neo4j search; acceptance succeeded, but this is not a warning-free
+deployment claim. CPU models and optional SDK/browser dependencies are locally installed.
+
+## Owner/private acceptance boundary
+
+No configured registered OAuth client was found. The official GitHub device flow
+uses a native vault, transaction nonce, bounded single polls, minimal initial
+`user:email` scope, expiry checks and ambiguous-exchange blocking. GitHub OAuth App
+device tokens have no refresh flow. Native vault/SQLite updates cannot commit atomically;
+interrupted enrollment may leave an orphan reference requiring owner review.
+Local disconnect deletes the local credential and explicitly marks remote revocation
+pending; actual provider revocation/private identity/read/federation remain unverified.
+Do not borrow browser or gh credentials. A gist is unlisted rather than private and
+its `gist` scope/write/delete acceptance requires separate approval.
+
+Sunday future assistant role/overlay/attention retreat/widgets/notifications/RemoteInput
+and Chief-of-Staff/privacy direction already lives in canonical design docs. No
+Samsung/OEM, Sunday, voice, hardware or managed-memory acceptance is claimed.
+Older failed Notepad acceptance attempts may leave empty synthetic OSCAR tabs for
+manual review; never close the owner window or unrelated document to clean them up.

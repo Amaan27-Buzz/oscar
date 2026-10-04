@@ -2,6 +2,10 @@
 
 Significant OSCAR milestones are recorded here. Detailed implementation status is canonical in `docs/ROADMAP.md`; detailed acceptance evidence remains in `docs/evidence/` and Git history.
 
+## 2026-10-04 — Gate B local completion candidate
+
+Verified local acceptance now includes typed PowerShell, registered Notepad/UIA, isolated browser, separate owner control, native credentials, canonical WAL/FTS5, real Qdrant/Graphiti/Neo4j with local embedding/reranking, memory evaluation and owner-reviewed model policy candidates. Slice 05 is COMPLETE for this Windows local-alpha scope; Slice 06 and Gate B remain PARTIAL. Real private OAuth, provider revocation and private-source/live-memory federation require owner authorization. General conversational recall integration remains a composition boundary, not a proven autonomous product. See [Gate B completion ledger](docs/GATE-B-COMPLETION.md).
+
 ## 2026-10-04 — OSCAR Memory Fabric architecture replaces managed memory dependency
 
 - Retired the planned Supermemory dependency from active architecture.

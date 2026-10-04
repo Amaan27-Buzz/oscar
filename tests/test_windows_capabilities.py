@@ -1,17 +1,21 @@
+import importlib.util
 import json
 import os
 import subprocess
 import sys
 import unittest
 from concurrent.futures import ThreadPoolExecutor
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from threading import Event, Thread
 from time import sleep, time
 from unittest.mock import patch
 
-from oscar.browser_worker import validate
+from oscar.browser_worker import bounded_download, validate, write_artifact
 from oscar.contracts import TaskState
 from oscar.grid import Grid, Node, NodeRole
+from oscar.interactive_worker import InteractiveWorker
 from oscar.jev import Intent
 from oscar.machine import MachineScope, MachineVerifier, MachineWorker
 from oscar.powershell import command, discover
@@ -38,6 +42,44 @@ class BrowserBoundaryTests(unittest.TestCase):
         ):
             with self.assertRaises(ValueError):
                 validate(self.plan([step]))
+
+    def test_artifacts_reject_windows_devices_and_preserve_existing_files(self):
+        for name in ("NUL", "CON.png", "COM1.txt", "a\\b", "trailing.", "trailing "):
+            with self.assertRaises(ValueError):
+                validate(self.plan([{"operation": "screenshot", "path": name}]))
+        with TemporaryDirectory() as temporary:
+            artifact = Path(temporary) / "proof.png"
+            write_artifact(artifact, b"original")
+            with self.assertRaises(FileExistsError):
+                write_artifact(artifact, b"replacement")
+            self.assertEqual(b"original", artifact.read_bytes())
+            with self.assertRaises(ValueError):
+                write_artifact(Path(temporary) / "too-big", b"a" * 4_000_001)
+
+    def test_download_enforces_bounds_before_network_and_before_creation(self):
+        from io import BytesIO
+
+        with TemporaryDirectory() as temporary:
+            artifact = Path(temporary) / "download"
+            with self.assertRaises(ValueError):
+                bounded_download("https://example.com", artifact, [], -1, 1)
+            with patch("oscar.browser_worker.build_opener") as opener:
+                opener.return_value.open.return_value = BytesIO(b"oversized")
+                with self.assertRaisesRegex(ValueError, "bound exceeded"):
+                    bounded_download("https://example.com", artifact, ["https://example.com"], 3, 1)
+            self.assertFalse(artifact.exists())
+
+    def test_existing_link_is_never_followed(self):
+        with TemporaryDirectory() as temporary:
+            artifact = Path(temporary) / "link"
+            target = Path(temporary) / "missing-target"
+            try:
+                artifact.symlink_to(target)
+            except OSError:
+                self.skipTest("host does not grant symbolic-link creation")
+            with self.assertRaises(FileExistsError):
+                write_artifact(artifact, b"unsafe")
+            self.assertFalse(target.exists())
 
 
 @unittest.skipUnless(os.name == "nt", "actual Windows native acceptance")
@@ -172,6 +214,102 @@ class NativeCredentialTests(unittest.TestCase):
     def test_cannot_access_unrelated_credential_targets(self):
         with self.assertRaises(ValueError):
             WindowsCredentialStore().read("Microsoft:user-credential")
+
+
+@unittest.skipUnless(
+    os.name == "nt" and importlib.util.find_spec("playwright"),
+    "actual Windows with optional Playwright installation",
+)
+class BrowserLifecycleTests(unittest.TestCase):
+    def setUp(self):
+        self.temp = TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.root = Path(self.temp.name)
+        self.visited = Event()
+        visited = self.visited
+
+        class Handler(BaseHTTPRequestHandler):
+            def do_GET(self):
+                visited.set()
+                self.send_response(200)
+                self.end_headers()
+                self.wfile.write(b"<html><body>bounded synthetic fixture</body></html>")
+
+            def log_message(self, *args):
+                pass
+
+        self.server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+        self.addCleanup(self.server.server_close)
+        self.addCleanup(self.server.shutdown)
+        Thread(target=self.server.serve_forever, daemon=True).start()
+        self.origin = f"http://127.0.0.1:{self.server.server_port}"
+        self.store = Store(self.root / "state.sqlite")
+        self.addCleanup(self.store.close)
+        grid = Grid(self.store)
+        grants = (
+            "advertise",
+            "heartbeat",
+            "execute",
+            "cancel",
+            "machine:host",
+            "files:read",
+            "files:write",
+            "browser:control",
+        )
+        grid.register(Node("browser-fixture", NodeRole.DESKTOP, grants))
+        session = grid.pair("browser-fixture", grants)
+        worker = InteractiveWorker(
+            self.store,
+            grid,
+            session,
+            MachineScope(self.root, True, (sys.executable,)),
+            browser=True,
+        )
+        if not worker.browser_python:
+            self.skipTest("selected interpreter has no installed Chromium")
+        grid.advertise(session, worker.capabilities())
+        self.runtime = Runtime(self.store, grid, MachineVerifier(worker.files))
+        self.transports = {
+            session.node_id: (
+                Dispatcher(self.store, grid, session.node_id, worker.executors()),
+                session,
+            )
+        }
+
+    def task(self, timeout):
+        plan = {
+            "origins": [self.origin],
+            "steps": [
+                {"operation": "navigate", "url": self.origin},
+                {"operation": "wait", "selector": "#never-present"},
+            ],
+            "timeout": timeout,
+            "max_text": 100,
+        }
+        return self.runtime.create(
+            Intent(
+                "bounded browser interruption",
+                "capability",
+                capability_kind="browser",
+                parameters={"request": plan, "timeout": timeout},
+            )
+        )
+
+    def test_cancel_after_real_browser_has_reached_fixture(self):
+        task = self.task(20)
+        with ThreadPoolExecutor(max_workers=1) as pool:
+            future = pool.submit(self.runtime.run, task.id, self.transports)
+            self.assertTrue(self.visited.wait(10), "Chromium must actually reach the local fixture")
+            self.runtime.cancel(task.id, self.transports)
+            self.assertEqual(TaskState.CANCELLED, future.result(timeout=5).state)
+        self.assertEqual(TaskState.CANCELLED, self.runtime.run(task.id, self.transports).state)
+
+    def test_timeout_after_real_navigation(self):
+        task = self.task(3)
+        result = self.runtime.run(task.id, self.transports)
+        self.assertTrue(self.visited.is_set())
+        self.assertEqual(TaskState.FAILED, result.state)
+        self.assertEqual("command_timeout", result.blocker)
 
 
 if __name__ == "__main__":

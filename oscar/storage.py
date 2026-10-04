@@ -126,9 +126,14 @@ class Store:
         evidence: Evidence | None = None,
         expected: TaskState | None = None,
         expected_lease: str | None = None,
+        expected_node: str | None = None,
     ) -> Task:
         with self.transaction():
             task = self.task(identifier)
+            if expected_node is not None:
+                lease = self.get("lease", task.lease_id or "")
+                if lease["node_id"] != expected_node:
+                    raise PermissionError("task executor changed outside owner control target")
             if expected is not None and task.state != expected:
                 raise StateConflict("task state changed; another runner may own it")
             if expected_lease is not None and task.lease_id != expected_lease:

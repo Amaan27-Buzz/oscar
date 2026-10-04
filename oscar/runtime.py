@@ -40,6 +40,18 @@ class Runtime:
         self.on_verification = on_verification
         self.memory, self.relationship_id = memory, relationship_id
         self.active_context: dict[str, dict[str, Any]] = {}
+        self.store.task_resources.add(self)
+
+    def task_transitioned(self, task: Task) -> None:
+        if task.state not in {
+            TaskState.PLANNED,
+            TaskState.EXECUTING,
+            TaskState.AWAITING_RESULT,
+            TaskState.RESULT_RECEIVED,
+            TaskState.VERIFYING,
+            TaskState.PARTIALLY_VERIFIED,
+        }:
+            self.active_context.pop(task.id, None)
 
     def create(
         self, intent: Intent, initiator: str = "owner", retry_budget: int = 2, mode: str = "auto"
@@ -116,6 +128,8 @@ class Runtime:
                 },
             )
         if recall and self.memory:
+            while len(self.active_context) >= 100:
+                self.active_context.pop(next(iter(self.active_context)))
             self.active_context[task.id] = self.memory.context(
                 recall,
                 objective=intent.text,
@@ -295,12 +309,16 @@ class Runtime:
                 self.grid.release(lease_id)
 
     def cancel(
-        self, task_id: str, transports: Mapping[str, tuple[Transport, SessionHandle]] | None = None
+        self,
+        task_id: str,
+        transports: Mapping[str, tuple[Transport, SessionHandle]] | None = None,
+        *,
+        expected_node: str | None = None,
     ) -> Task:
         task = self.store.task(task_id)
         if task.state in {TaskState.VERIFIED, TaskState.FAILED, TaskState.CANCELLED}:
             return task
-        task = self.store.transition(task_id, TaskState.CANCELLED)
+        task = self.store.transition(task_id, TaskState.CANCELLED, expected_node=expected_node)
         self.store.audit(task.id, "cancel_requested", {"correlation_id": task.correlation_id})
         if task.lease_id:
             lease = self.store.get("lease", task.lease_id)

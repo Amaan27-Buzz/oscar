@@ -3,6 +3,8 @@
 import hashlib
 import json
 import os
+import signal
+import subprocess
 from pathlib import Path
 from time import time
 from typing import Any
@@ -10,6 +12,54 @@ from typing import Any
 from .capabilities import Cancellation
 from .contracts import Action, Capability, Result, new_id
 from .machine import MachineWorker
+
+
+def browser_available(executable: str, workspace: Path) -> bool:
+    """Probe the selected interpreter and browser installation, without launching a page."""
+    script = (
+        "from pathlib import Path; from playwright.sync_api import sync_playwright; "
+        "p=sync_playwright().start(); "
+        "print(int(Path(p.chromium.executable_path).is_file())); p.stop()"
+    )
+    env = {k: os.environ[k] for k in ("PATH", "SystemRoot", "TEMP", "TMP") if k in os.environ}
+    job: Any = None
+    process = None
+    try:
+        if os.name == "nt":
+            from .windows_process import WindowsJob
+
+            job = WindowsJob()
+            process = job.start(
+                [executable, "-I", "-c", script],
+                cwd=workspace,
+                env=env,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.DEVNULL,
+            )
+        else:
+            process = subprocess.Popen(
+                [executable, "-I", "-c", script],
+                cwd=workspace,
+                env=env,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.DEVNULL,
+                start_new_session=True,
+            )
+        output, _ = process.communicate(timeout=8)
+        return process.returncode == 0 and output.strip() == b"1"
+    except (OSError, subprocess.SubprocessError):
+        return False
+    finally:
+        if job:
+            job.close()
+        elif process and process.poll() is None:
+            posix: Any = os
+            signals: Any = signal
+            posix.killpg(process.pid, signals.SIGKILL)
+        if process:
+            process.wait(timeout=3)
+            if process.stdout:
+                process.stdout.close()
 
 
 class InteractiveWorker(MachineWorker):
@@ -35,6 +85,8 @@ class InteractiveWorker(MachineWorker):
             if browser and self.scope.trusted_host_execution
             else None
         )
+        if self.browser_python and not browser_available(self.browser_python, self.scope.root):
+            self.browser_python = None
         if desktop and os.name == "nt" and self.scope.trusted_host_execution:
             from .windows_desktop import WindowsDesktop, discover_apps
 

@@ -317,6 +317,6 @@ PASS for the documented Brain foundation.
 
 PARTIAL. Verified scoped foundations include native Windows machine execution, useful Codex delegation with independent verification, cancellation, restart/recovery, ambiguity blocking, local selected-memory continuity and bounded owner-reviewed policy interpretation.
 
-Mandatory Gate B completion now includes typed PowerShell, installed-app capability, Windows UI Automation/computer-use, browser runtime, owner-control continuation, production Memory Fabric, open-ended policy, real private OAuth/connector lifecycle, secure credential storage and live-authority-vs-memory federation.
+Verified local acceptance now includes typed PowerShell, registered Notepad/UIA, isolated browser, separate owner control, native credentials, canonical WAL/FTS5, real Qdrant/Graphiti/Neo4j with local embedding/reranking, memory evaluation and owner-reviewed model policy candidates. Slice 05 is COMPLETE for this Windows local-alpha scope; Slice 06 and Gate B remain PARTIAL. Real private OAuth, provider revocation and private-source/live-memory federation require owner authorization. General conversational recall integration remains a composition boundary, not a proven autonomous product. See [Gate B completion ledger](GATE-B-COMPLETION.md).
 
 Club C does not begin until Gate B mandatory acceptance passes.

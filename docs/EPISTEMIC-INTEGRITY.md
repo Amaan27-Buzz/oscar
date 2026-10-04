@@ -325,3 +325,7 @@ Do not show `Done` while verifying, `Thinking` while blocked on auth, `Working` 
 13. Strongest user-facing claim cannot exceed strongest evidence.
 14. Freshness-sensitive claims require current authoritative evidence when reasonably obtainable; otherwise qualify/UNKNOWN.
 15. Persona, Personal Policy, memory and permission remain separate authority layers.
+
+## Gate B local completion candidate — 2026-10-04
+
+Historical claim checking proves exact source-bound assertions; arbitrary paraphrase entailment remains UNKNOWN. Context rechecks forget/expiry and preserves INFERRED. The A–R local benchmark measures five positive queries and six unsupported claims, not a universal zero-hallucination guarantee. Verified local acceptance now includes typed PowerShell, registered Notepad/UIA, isolated browser, separate owner control, native credentials, canonical WAL/FTS5, real Qdrant/Graphiti/Neo4j with local embedding/reranking, memory evaluation and owner-reviewed model policy candidates. Slice 05 is COMPLETE for this Windows local-alpha scope; Slice 06 and Gate B remain PARTIAL. Real private OAuth, provider revocation and private-source/live-memory federation require owner authorization. General conversational recall integration remains a composition boundary, not a proven autonomous product. See [Gate B completion ledger](GATE-B-COMPLETION.md).

@@ -365,9 +365,12 @@ input immutability, invalid-input rejection, sole-file Git diff and baseline HEA
 before VERIFIED. Lost result/restart recovery kept the same artifact hash and one
 execution. Real Codex cancellation and invalid invocation were exercised separately.
 See [local acceptance evidence](evidence/club-b-windows-2026-10-04.json) and
-[checkpoint](CLUB-B-CHECKPOINT.md). Browser/computer-use, independent node stores,
-public remote transport, power and phone supervision remain unverified.
+[checkpoint](CLUB-B-CHECKPOINT.md). Browser and Notepad/UIA now have current laptop evidence in the [completion ledger](GATE-B-COMPLETION.md). Independent node stores, public remote transport, power and phone supervision remain unverified.
 
 Windows API research uses Microsoft's [Job Objects](https://learn.microsoft.com/en-us/windows/win32/procthread/job-objects)
 and [reparse/file operations](https://learn.microsoft.com/en-us/windows/win32/fileio/reparse-points-and-file-operations)
 contracts; platform claims above additionally require the recorded actual laptop tests.
+
+## Gate B local completion candidate — 2026-10-04
+
+InteractiveWorker composes typed PowerShell, application IDs, UIA and browser operations with existing Worker leases/dedup/Job Objects. Discovery is not launch authority: app IDs and selected executables require explicit allowlists. Playwright is advertised only when the selected interpreter and Chromium probe succeed. Browser artifact creation uses pinned directories and native CREATE_NEW; anonymous anchor downloads enforce streaming bounds. App activation can broker into an existing user process and is not contained by a new Job. Verified local acceptance now includes typed PowerShell, registered Notepad/UIA, isolated browser, separate owner control, native credentials, canonical WAL/FTS5, real Qdrant/Graphiti/Neo4j with local embedding/reranking, memory evaluation and owner-reviewed model policy candidates. Slice 05 is COMPLETE for this Windows local-alpha scope; Slice 06 and Gate B remain PARTIAL. Real private OAuth, provider revocation and private-source/live-memory federation require owner authorization. General conversational recall integration remains a composition boundary, not a proven autonomous product. See [Gate B completion ledger](GATE-B-COMPLETION.md).

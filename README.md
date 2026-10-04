@@ -266,17 +266,7 @@ Anything unavailable or genuinely blocked remains explicit, but planned mandator
 - **Gate A — PASS.** Core Loop, TypeSafe Jev, reference Transport/Grid, adaptive model routing, real multi-provider evidence and source-qualified live search/freshness acceptance are accepted for their documented scope.
 - **Gate B — PARTIAL.** Native Windows Worker, useful Codex delegation with independent verification, cancellation, process restart/recovery, ambiguity blocking, local memory continuity and bounded owner-confirmed policy interpretation are verified for their documented scope.
 
-Gate B is not complete yet. Remaining planned work includes:
-
-- typed PowerShell/terminal acceptance;
-- installed-application catalog;
-- Windows UI Automation/computer-use;
-- typed browser runtime and independent verification;
-- owner-control long-running continuation/reconnect;
-- production OSCAR Memory Fabric (Event Archive/FTS5 + Qdrant + Graphiti/Neo4j + Jev recall/claim controls + evaluation);
-- open-ended Personal Policy interpretation/confirmation;
-- real private connector/OAuth lifecycle and secure credential-storage boundary;
-- live-context federation proving current authoritative state beats stale recall.
+Verified local acceptance now includes typed PowerShell, registered Notepad/UIA, isolated browser, separate owner control, native credentials, canonical WAL/FTS5, real Qdrant/Graphiti/Neo4j with local embedding/reranking, memory evaluation and owner-reviewed model policy candidates. Slice 05 is COMPLETE for this Windows local-alpha scope; Slice 06 and Gate B remain PARTIAL. Real private OAuth, provider revocation and private-source/live-memory federation require owner authorization. General conversational recall integration remains a composition boundary, not a proven autonomous product. See [Gate B completion ledger](docs/GATE-B-COMPLETION.md).
 
 Club C does not start until Gate B's required acceptance is complete.
 
@@ -289,9 +279,9 @@ See [`docs/CLUB-A-CHECKPOINT.md`](docs/CLUB-A-CHECKPOINT.md), [`docs/CLUB-B-CHEC
 | 00 | Repository/architecture foundation | ✅ Complete |
 | 01 | OSCAR Core Loop | ✅ Verified foundation |
 | 02 | TypeSafe Jev | ✅ Verified foundation |
-| 03 | Native Transport + Catalog + Grid foundation | 🚧 Reference verified; deployment evolves |
+| 03 | Native Transport + Catalog + Grid foundation | ✅ Accepted reference foundation; deployment evolves |
 | 04 | Native Model Router + cloud intelligence | ✅ Gate A accepted |
-| 05 | Real machine Worker + remote continuation | 🚧 Gate B completion in progress |
+| 05 | Real machine Worker + remote continuation | ✅ Windows local-alpha acceptance candidate |
 | 06 | Memory Fabric + Personal Policy + live context | 🚧 Gate B completion in progress |
 | 07 | OSCAR Edge + reflexes | Planned after Gate B PASS |
 | 08 | Voice Core + Identity + Match/Map + Persona runtime | Planned |

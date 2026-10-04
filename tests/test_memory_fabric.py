@@ -76,6 +76,22 @@ class FabricTests(unittest.TestCase):
         recalled = self.fabric.retrieve("owner", "Pine Lantern", project="old-project")
         self.assertEqual(old.id, recalled.hits[0].memory.id)
 
+    def test_source_inference_cannot_be_promoted_by_extractor_flag(self):
+        for state in (Epistemic.INFERRED, Epistemic.UNKNOWN):
+            event = SourceEvent(
+                "owner", "Uncertain synthetic claim " + state, "fixture", self.start, status=state
+            )
+            self.archive.append(event, retain_authorized=True)
+            memory = self.writer.retain(
+                (event.id,), event.content, "semantic", inferred=False, retain_authorized=True
+            )
+            self.assertEqual(state, memory.status)
+            retrieved = self.fabric.retrieve("owner", event.content)
+            claim = HistoricalClaim(
+                event.content, (event.id,), (memory.id,), Epistemic.RECALLED, 0.5
+            )
+            self.assertEqual(state, self.fabric.check_claim(claim, retrieved))
+
     def test_temporal_correction_preserves_original(self):
         old_event, old = self.memory("My editor is VS Code")
         new_event, new = self.memory(
@@ -264,6 +280,66 @@ class FabricTests(unittest.TestCase):
         self.assertTrue(
             decide(Intent("Explain Sunday", kind="reason"), ("Sunday",)).memory_required
         )
+
+    def test_background_batches_resume_and_preserve_original_events(self):
+        events = [self.memory("same retained scoped evidence")[0] for _ in range(6)]
+        first = self.writer.consolidate_step("owner", batch_size=2)
+        self.assertFalse(first["complete"])
+        self.assertEqual(1, first["merged"])
+        self.archive.close()
+        self.archive = EventArchive(self.path)
+        self.writer = MemoryWriter(self.archive)
+        self.assertEqual(2, self.writer.consolidate_step("owner", batch_size=2)["merged"])
+        final = self.writer.consolidate_step("owner", batch_size=2)
+        self.assertTrue(final["complete"])
+        self.assertEqual(3, final["merged"])
+        self.assertEqual(final, self.writer.consolidate_step("owner", batch_size=2))
+        for event in events:
+            self.assertEqual(event, self.archive.event(event.id))
+        self.assertEqual(3, len(self.archive.memories("owner")))
+
+    def test_background_batch_failure_cannot_commit_cursor_without_mutation(self):
+        import sqlite3
+
+        for _ in range(2):
+            self.memory("same retained scoped evidence")
+        self.archive.db.execute(
+            "CREATE TRIGGER fault BEFORE UPDATE ON archive_memories "
+            "BEGIN SELECT RAISE(ABORT, 'synthetic fault'); END"
+        )
+        with self.assertRaises(sqlite3.IntegrityError):
+            self.writer.consolidate_step("owner", batch_size=2)
+        self.assertEqual(
+            0,
+            self.archive.db.execute(
+                "SELECT COUNT(*) FROM archive_metadata WHERE key LIKE 'consolidation:%'"
+            ).fetchone()[0],
+        )
+        self.archive.db.execute("DROP TRIGGER fault")
+        self.assertEqual(1, self.writer.consolidate_step("owner", batch_size=2)["merged"])
+
+    def test_context_keeps_inference_and_rechecks_forget_and_total_bound(self):
+        _, memory = self.memory("derived interpretation", inferred=True)
+        evidence = self.fabric.retrieve("owner", "derived interpretation")
+        context = self.fabric.context(
+            evidence, objective="recall", project=None, live={}, policy_ids=()
+        )
+        self.assertEqual(Epistemic.INFERRED, context["memories"][0]["status"])
+        self.fabric.forget(memory.id, owner_authorized=True, forget_sources=True)
+        self.assertEqual(
+            [],
+            self.fabric.context(evidence, objective="recall", project=None, live={}, policy_ids=())[
+                "memories"
+            ],
+        )
+        with self.assertRaises(ValueError):
+            self.fabric.context(
+                evidence,
+                objective="recall",
+                project=None,
+                live={"oversized": "a" * 13000},
+                policy_ids=(),
+            )
 
 
 if __name__ == "__main__":

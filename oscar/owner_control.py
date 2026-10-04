@@ -56,7 +56,9 @@ class OwnerControl:
         task = self.store.task(task_id)
         if operation == "cancel":
             task = self.runtime.cancel(
-                task_id, {self.target.node_id: (self.transport, self.target)}
+                task_id,
+                {self.target.node_id: (self.transport, self.target)},
+                expected_node=self.target.node_id,
             )
             return {"task_id": task_id, "state": task.state}
         if task.state not in {TaskState.EXECUTING, TaskState.AWAITING_RESULT}:
