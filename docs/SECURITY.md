@@ -434,3 +434,20 @@ worker and closes an owned headless Chromium process tree. Neither package ancho
 nor cwd scope is a sandbox. Failed browser operations retain only bounded allowlisted
 categories, exception classes, exit codes and byte counts, never arbitrary page, URL,
 cookie, credential or exception text. See [the focused repair](GATE-B-HARDENING.md).
+
+
+The owner's final physical/manual machine acceptance PASSED in run
+`manual-gate-b-20261004-200734`; desktop/local/public browser phases are VERIFIED.
+The [prepared GitHub OAuth/federation acceptance](GATE-B-OAUTH-ACCEPTANCE.md) uses
+the existing native vault, opaque references and Connector Fabric; private email
+addresses remain transient. The controlled synthetic past count remains RECALLED;
+current provider count facts remain REPORTED, with separate source/temporal provenance.
+Real owner OAuth/private federation is not yet exercised. Gate B remains PARTIAL.
+
+Full-suite verification exposed asynchronous `KILL_ON_JOB_CLOSE` teardown: the
+browser timeout returned before an owned descendant released its artifact cwd.
+Job shutdown now explicitly terminates only that job, queries its bounded process
+list, rechecks job membership to reject PID reuse and waits on owned process handles
+for at most three seconds. Handles close even on drain failure; unrelated owner
+processes are never terminated by PID. See Microsoft's
+[Job Objects contract](https://learn.microsoft.com/en-us/windows/win32/procthread/job-objects).

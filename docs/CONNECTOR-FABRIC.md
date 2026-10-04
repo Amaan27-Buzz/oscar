@@ -233,3 +233,12 @@ cannot be disabled. These are reference contract tests, not live private-account
 ## Gate B local completion candidate — 2026-10-04
 
 `python -m oscar.oauth_cli --state <local.sqlite> --owner-authorized --begin <registered-client-id>` starts only the official GitHub device flow. One `--poll <transaction-id>` reads its nonce from stdin; no polling loop or token output. Tokens/device credentials live in OSCAR-owned native Credential Manager references. Interrupted exchange is ambiguous and blocked rather than replayed. A registered client is currently absent. Provider revocation needs the legitimate provider settings/app boundary; local disconnect is explicitly pending remote revocation. No CLI/browser tokens are borrowed. Verified local acceptance now includes typed PowerShell, registered Notepad/UIA, isolated browser, separate owner control, native credentials, canonical WAL/FTS5, real Qdrant/Graphiti/Neo4j with local embedding/reranking, memory evaluation and owner-reviewed model policy candidates. Slice 05 is COMPLETE for this Windows local-alpha scope; Slice 06 and Gate B remain PARTIAL. Real private OAuth, provider revocation and private-source/live-memory federation require owner authorization. General conversational recall integration remains a composition boundary, not a proven autonomous product. See [Gate B completion ledger](GATE-B-COMPLETION.md).
+
+
+The owner's final physical/manual machine acceptance PASSED in run
+`manual-gate-b-20261004-200734`; desktop/local/public browser phases are VERIFIED.
+The [prepared GitHub OAuth/federation acceptance](GATE-B-OAUTH-ACCEPTANCE.md) uses
+the existing native vault, opaque references and Connector Fabric; private email
+addresses remain transient. The controlled synthetic past count remains RECALLED;
+current provider count facts remain REPORTED, with separate source/temporal provenance.
+Real owner OAuth/private federation is not yet exercised. Gate B remains PARTIAL.

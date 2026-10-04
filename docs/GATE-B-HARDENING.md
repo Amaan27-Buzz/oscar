@@ -293,3 +293,37 @@ real Chromium lifecycle tests; the focused selection passes 50 tests. Eleven new
 regressions were added. Ruff, format, strict mypy (48 source files), repository
 contracts, local Markdown links, value-silent secret scan and Git diff checks pass.
 Ubuntu and external links must be checked on this repair's exact PR head.
+
+
+## Subsequent owner physical/manual machine PASS
+
+**FINAL PHYSICAL/MANUAL MACHINE ACCEPTANCE PASSED** in owner run
+`.oscar/manual-gate-b-20261004-200734`. Desktop, local browser and public browser
+phases are VERIFIED, with independent UIA/HTTP/HTTPS observations and owned cleanup.
+The stale prior OSCAR fixture was reported and not mutated. See
+[the preserved owner evidence summary](evidence/gate-b-owner-machine-pass-2026-10-04.json).
+This supersedes the outstanding manual rerun status above; earlier failures remain
+valid historical evidence. No agent physical rerun was needed.
+
+[The owner OAuth/federation harness](GATE-B-OAUTH-ACCEPTANCE.md) is prepared using
+existing OSCAR device flow/vault/connector/archive/federation components. Only
+synthetic provider responses are exercised here. Real private OAuth and federation
+remain outstanding; Slice 05 COMPLETE, Slice 06 PARTIAL and Gate B PARTIAL.
+
+Preparation verification also reproduced a browser timeout cleanup race in the
+existing Windows Job Object boundary. The result was correctly a timeout, but a
+descendant could still hold the artifact directory after asynchronous job close.
+The repair explicitly terminates the exact job and waits on bounded, membership-
+checked process handles before release, with kill-on-close retained as a backstop.
+Existing real cancellation/timeout tests pass without weaker cleanup assertions.
+Contract regressions cover owned-process drain, foreign PID rejection, bounded
+failure and idempotent close. No owner window or unrelated process is touched.
+
+
+Preparation quality: **427 Windows tests pass in 108.682 seconds with no skips**;
+91 focused OAuth/credential/connector/federation/job contract tests pass. Nineteen
+regressions were added. Ruff, format, strict mypy (48 source files), repository
+contracts, local Markdown links, secret scan and Git diff review pass. The native
+vault process-reopen test uses only synthetic credentials/provider responses.
+Real OAuth remains NOT AUTHORIZED; real private federation remains NOT EXERCISED.
+Check Ubuntu/Windows/external-link CI at the final PR head.

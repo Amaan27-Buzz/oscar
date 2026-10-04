@@ -30,6 +30,7 @@ Historical acceptance is not relabeled as current execution.
 - [x] A–R memory evaluation with measured errors
 - [x] Model policy candidate, exact fixture confirmation, conflict/expiry
 - [x] Native secure credential write/read/rotate/expiry/delete/restart
+- [x] Final physical/manual machine acceptance by owner (2026-10-04, run 200734)
 - [ ] Real owner-authorized OAuth/private read and lifecycle
 - [ ] Reversible private write/readback/cleanup only if separately approved
 - [ ] Live file/project/task/private/public federation beats stale recall
@@ -103,7 +104,9 @@ our null-valued edge field and is corrected without warning suppression. See
 No configured registered OAuth client was found. The official GitHub device flow
 uses a native vault, transaction nonce, bounded single polls, minimal initial
 `user:email` scope, expiry checks and ambiguous-exchange blocking. GitHub OAuth App
-device tokens have no refresh flow. Native vault/SQLite updates cannot commit atomically;
+device adapter does not implement refresh. GitHub now supports expiring OAuth App
+tokens/refresh; this acceptance requires disabling token expiration on the registered
+app. Native vault/SQLite updates cannot commit atomically;
 durable enrollment/disconnect intents and restart reconciliation now recover known
 references. Ambiguous provider exchanges still block rather than replay.
 Local disconnect deletes the local credential and explicitly marks remote revocation
@@ -152,4 +155,25 @@ Notepad sub-phase and cleanup, then failed at the first local browser execution.
 Source-checkout direct-file imports were independently reproduced and repaired;
 preflight now exercises the real worker launch. See [the focused browser repair](GATE-B-HARDENING.md)
 for diagnostics, automated evidence and the pinned-interpreter owner command.
-Overall manual acceptance remains outstanding. OAuth has not started; Gate B is PARTIAL.
+At that failed attempt, overall manual acceptance remained outstanding. The later
+owner PASS below supersedes that status; OAuth remains unperformed and Gate B PARTIAL.
+
+
+## Current owner machine PASS and private acceptance preparation
+
+**FINAL PHYSICAL/MANUAL MACHINE ACCEPTANCE PASSED.** The owner completed
+`.oscar/manual-gate-b-20261004-200734`, fixture
+`99e765885f3b4674bc7a517a4db2523d`: owned Notepad discovery/launch/binding, focus,
+text mutation/readback, clear/readback and test-tab cleanup; local isolated Chromium,
+independent HTTP state verification, bounded download/screenshot; public Example
+Domain and independent HTTPS title/content verification. All three report phases
+are VERIFIED. A prior OSCAR fixture window was reported and correctly not mutated.
+The original root/file set/hashes are preserved; prior failed attempts remain historical
+evidence. See [the owner PASS record](evidence/gate-b-owner-machine-pass-2026-10-04.json).
+
+[The dedicated OAuth/federation harness](GATE-B-OAUTH-ACCEPTANCE.md) is prepared and
+tested with synthetic providers/native vault fixtures. Real OAuth is NOT AUTHORIZED
+and real private federation is NOT EXERCISED. Client ID and explicit owner GitHub
+interaction are required. No borrowed credentials, client secret, gist scope or write
+is used. Slice 05 COMPLETE; Slice 06 PARTIAL; Gate B PARTIAL; Slice 07 NOT STARTED.
+No deployment, Sunday/Android implementation or PR merge is performed.

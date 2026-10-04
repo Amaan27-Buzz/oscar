@@ -525,7 +525,9 @@ Canonical archive generation and physical derived-index proofs gate recall; one 
 projection serves one relationship, and stale projections are excluded. FastEmbed replaces
 the default Torch ML runtime after bounded A–R comparison. Native credential enrollment
 uses durable intents and restart reconciliation across the SQLite/vault boundary.
-Owner OAuth/manual acceptance remains outstanding; Gate B remains PARTIAL.
+Final physical/manual machine acceptance PASSED in the owner run on 2026-10-04.
+Owner OAuth/private federation remains outstanding; Gate B remains PARTIAL. See
+[the prepared acceptance path](GATE-B-OAUTH-ACCEPTANCE.md).
 
 1. One intelligence, many embodiments.
 2. One continuing user relationship/interaction point.

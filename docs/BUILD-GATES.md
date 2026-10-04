@@ -278,8 +278,14 @@ not additional Gate B requirements. Build the Tab node only after OSCAR is fully
 deployed and its main Core architecture is operational.
 
 Slice 05 remains COMPLETE for the documented Windows local-alpha scope; Slice 06
-and Gate B remain PARTIAL. Owner OAuth is NOT STARTED, final owner manual acceptance
-OUTSTANDING, Slice 07 NOT STARTED and PR 12 DRAFT/UNMERGED. The harness repair at
+and Gate B remain PARTIAL. Owner OAuth is NOT AUTHORIZED; final physical/manual
+machine acceptance PASSED
+in owner run `manual-gate-b-20261004-200734`. Private OAuth/federation acceptance remains
+outstanding, Slice 07 NOT STARTED and PR 12 DRAFT/UNMERGED. The harness repair at
 `c9cb7d2d20fb444cce98e2749eeea5425d4a0ee1` is independently reviewed with 25 focused
 regressions passing and exact-head CI green; it is not a physical acceptance PASS.
 The prior owner focus failure and its evidence remain unchanged.
+
+See [owner OAuth acceptance preparation](GATE-B-OAUTH-ACCEPTANCE.md) and
+[physical machine PASS evidence](evidence/gate-b-owner-machine-pass-2026-10-04.json).
+The reported prior stale OSCAR fixture was not mutated; it does not invalidate the PASS.

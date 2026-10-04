@@ -1,7 +1,8 @@
 """Registered GitHub OAuth device enrollment; tokens live only in the native vault.
 
 No borrowed CLI/browser tokens. One poll per explicit call, respecting server interval.
-GitHub OAuth App device grants do not use a redirect/PKCE or support refresh tokens.
+GitHub OAuth App device grants do not use a redirect/PKCE. This adapter does not
+implement refresh; acceptance uses an app configured without expiring-token grants.
 """
 
 import hashlib
@@ -265,7 +266,7 @@ class GitHubDeviceFlow:
             "credential_ref": token_ref,
             "scopes": sorted(scopes),
             "expires_at": now + expiry if expiry else None,
-            "refresh": "unsupported OAuth App grant",
+            "refresh": "not implemented by this adapter",
             "state": "enrolling_token",
             "transaction_id": identifier,
             "remote_revocation": "UNKNOWN",
@@ -310,7 +311,13 @@ def github_manifest() -> ConnectorManifest:
         "https://api.github.com",
         (
             ConnectorCapability("github.owner", "GET", "/user", (), verification="unavailable"),
-            ConnectorCapability("github.emails", "GET", "/user/emails", ("user:email",)),
+            ConnectorCapability(
+                "github.emails",
+                "GET",
+                "/user/emails",
+                ("user:email",),
+                query_fields=("per_page", "page"),
+            ),
             ConnectorCapability(
                 "github.gist.create",
                 "POST",

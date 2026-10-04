@@ -1,0 +1,67 @@
+{
+  "status": "FINAL_PHYSICAL_MANUAL_MACHINE_ACCEPTANCE_PASSED",
+  "starting_sha": "a2800e2e594953e946560ae437ebd3983785ccdf",
+  "owner_evidence_root": ".oscar/manual-gate-b-20261004-200734",
+  "fixture_id": "99e765885f3b4674bc7a517a4db2523d",
+  "desktop": "VERIFIED",
+  "local_browser": "VERIFIED",
+  "public_browser": "VERIFIED",
+  "provenance": "Physical execution by owner; report/actions and retained synthetic artifacts independently inspected without rerunning UI.",
+  "source_sha256": {
+    "actions.json": "aba847d2ef0c4bf899bea58b151e9d3710560f8c2e541038fab0aa13cb8a69c7",
+    "fixture.json": "f4e4fc5ca42f6dd23f95ec27312606cf1c8d2183c19c9c3c5e5a5d4d654c1c6d",
+    "report.json": "9731df5e282cfba26837a0d187e9414fe43326a84d0cad33b7a43e62678ce45e",
+    "runtime.sqlite": "fa54c7dd4db0a2930b419d87a6e8d23d72aa5ebb4838ccb72d742debd4cec47f",
+    "workspace/fixture.png": "d5b20ba0521addd2d754fc47db83c7f7cedfa99c7e2b07c18336fe4a0368cb03",
+    "workspace/fixture.txt": "c09a703a51631ed937b59b76a1edc6bbcbd5cbd44fc76f91da8f9b79bcf43f2c"
+  },
+  "stale_fixture_windows": {
+    "count": 1,
+    "handling": "prior OSCAR fixture reported; not mutated; does not invalidate current fixture acceptance"
+  },
+  "independent_checks": [
+    "reported scoped UIA focus/text/clear/test-tab absence",
+    "retained download matches exact synthetic bytes",
+    "retained screenshot PNG signature and report hash match",
+    "owner report includes independent HTTP state and HTTPS title/content verification"
+  ],
+  "owner_evidence_preserved_unchanged": true,
+  "oauth": "NOT_AUTHORIZED",
+  "private_federation": "NOT_EXERCISED",
+  "slice_05": "COMPLETE",
+  "slice_06": "PARTIAL",
+  "gate_b": "PARTIAL",
+  "slice_07": "NOT_STARTED",
+  "preparation_verification": {
+    "windows_full_suite": {
+      "tests": 427,
+      "seconds": 108.682,
+      "status": "PASS",
+      "skips": 0
+    },
+    "focused_oauth_credential_connector_federation_and_job_contracts": {
+      "tests": 91,
+      "status": "PASS"
+    },
+    "new_tests": 19,
+    "native_synthetic_restart": "actual child process reopened native vault/storage, authenticated against synthetic HTTP fixture, then credential deleted",
+    "real_oauth_authorized": false,
+    "real_private_federation_exercised": false,
+    "ruff": "PASS",
+    "format": "PASS",
+    "strict_mypy": {
+      "source_files": 48,
+      "status": "PASS"
+    },
+    "repository_local_links_secret_scan": "PASS",
+    "git_diff_check": "PASS",
+    "exact_head_ci": "CHECK_CURRENT_PR_12_HEAD"
+  },
+  "job_cleanup_repair": {
+    "observed_failure": "existing browser timeout succeeded, but immediate temporary-directory cleanup repeatedly failed with WinError 32",
+    "cause": "asynchronous job close did not confirm process exit/file release",
+    "repair": "capture membership-checked process handles before termination; terminate only the exact job; second bounded process snapshot; wait at most three seconds; always close handles",
+    "test_weakening": false,
+    "owner_processes_mutated": false
+  }
+}

@@ -363,3 +363,13 @@ Use ignored local fixtures or synthetic test data.
 Verified scoped foundations include native Windows file/process/Git work, useful Codex delegation with independent verification, cancellation, coordinator/Worker restart/recovery, ambiguous mutation blocking, local selected memory continuity and bounded owner-reviewed policy authoring.
 
 Verified local acceptance now includes typed PowerShell, registered Notepad/UIA, isolated browser, separate owner control, native credentials, canonical WAL/FTS5, real Qdrant/Graphiti/Neo4j with local embedding/reranking, memory evaluation and owner-reviewed model policy candidates. Slice 05 is COMPLETE for this Windows local-alpha scope; Slice 06 and Gate B remain PARTIAL. Real private OAuth, provider revocation and private-source/live-memory federation require owner authorization. General conversational recall integration remains a composition boundary, not a proven autonomous product. See [Gate B completion ledger](docs/GATE-B-COMPLETION.md). No Slice 07.
+
+
+Final physical/manual machine acceptance PASSED in owner run
+`manual-gate-b-20261004-200734` (desktop/local/public browser VERIFIED; prior stale
+fixture untouched). Slice 05 is COMPLETE for its documented local-alpha scope;
+Slice 06 and Gate B remain PARTIAL pending real owner OAuth/private federation.
+The dedicated [owner OAuth harness](docs/GATE-B-OAUTH-ACCEPTANCE.md) is prepared with
+synthetic tests only. Never borrow credentials or authorize autonomously: the owner
+must supply a registered Client ID and interact with GitHub. No Slice 07, deployment,
+Sunday/Android implementation or merge is authorized by this preparation.

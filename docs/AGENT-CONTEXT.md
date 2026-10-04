@@ -280,3 +280,12 @@ After propagation, re-read canonical files before claiming completion.
 ## Gate B local completion candidate — 2026-10-04
 
 Verified local acceptance now includes typed PowerShell, registered Notepad/UIA, isolated browser, separate owner control, native credentials, canonical WAL/FTS5, real Qdrant/Graphiti/Neo4j with local embedding/reranking, memory evaluation and owner-reviewed model policy candidates. Slice 05 is COMPLETE for this Windows local-alpha scope; Slice 06 and Gate B remain PARTIAL. Real private OAuth, provider revocation and private-source/live-memory federation require owner authorization. General conversational recall integration remains a composition boundary, not a proven autonomous product. See [Gate B completion ledger](GATE-B-COMPLETION.md).
+
+
+The owner's final physical/manual machine acceptance PASSED in run
+`manual-gate-b-20261004-200734`; desktop/local/public browser phases are VERIFIED.
+The [prepared GitHub OAuth/federation acceptance](GATE-B-OAUTH-ACCEPTANCE.md) uses
+the existing native vault, opaque references and Connector Fabric; private email
+addresses remain transient. The controlled synthetic past count remains RECALLED;
+current provider count facts remain REPORTED, with separate source/temporal provenance.
+Real owner OAuth/private federation is not yet exercised. Gate B remains PARTIAL.

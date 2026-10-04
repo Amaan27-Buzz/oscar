@@ -470,3 +470,12 @@ The prior planned Supermemory integration has been retired. Historical checkpoin
 13. Memory does not grant permission, modify Personal Policy or weaken safety.
 14. Sensitive voice/communication retention remains separately controlled.
 15. Any managed memory service is optional; OSCAR must remain operable with the free/self-hosted stack.
+
+
+The owner's final physical/manual machine acceptance PASSED in run
+`manual-gate-b-20261004-200734`; desktop/local/public browser phases are VERIFIED.
+The [prepared GitHub OAuth/federation acceptance](GATE-B-OAUTH-ACCEPTANCE.md) uses
+the existing native vault, opaque references and Connector Fabric; private email
+addresses remain transient. The controlled synthetic past count remains RECALLED;
+current provider count facts remain REPORTED, with separate source/temporal provenance.
+Real owner OAuth/private federation is not yet exercised. Gate B remains PARTIAL.

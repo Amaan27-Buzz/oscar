@@ -3,6 +3,7 @@
 import ctypes
 import subprocess
 from ctypes import wintypes
+from time import monotonic
 from typing import Any
 
 _win32: Any = ctypes
@@ -45,6 +46,14 @@ class ThreadEntry(ctypes.Structure):
     ]
 
 
+class ProcessIds(ctypes.Structure):
+    _fields_ = [
+        ("assigned", wintypes.DWORD),
+        ("count", wintypes.DWORD),
+        ("ids", ctypes.c_size_t * 4096),
+    ]
+
+
 class WindowsJob:
     def __init__(self) -> None:
         self.kernel: Any = _win32.WinDLL("kernel32", use_last_error=True)
@@ -62,6 +71,16 @@ class WindowsJob:
             "Thread32Next": ([wintypes.HANDLE, ctypes.POINTER(ThreadEntry)], wintypes.BOOL),
             "OpenThread": ([wintypes.DWORD, wintypes.BOOL, wintypes.DWORD], wintypes.HANDLE),
             "ResumeThread": ([wintypes.HANDLE], wintypes.DWORD),
+            "TerminateJobObject": ([wintypes.HANDLE, wintypes.UINT], wintypes.BOOL),
+            "QueryInformationJobObject": (
+                [wintypes.HANDLE, ctypes.c_int, ctypes.c_void_p, wintypes.DWORD, ctypes.c_void_p],
+                wintypes.BOOL,
+            ),
+            "IsProcessInJob": (
+                [wintypes.HANDLE, wintypes.HANDLE, ctypes.POINTER(wintypes.BOOL)],
+                wintypes.BOOL,
+            ),
+            "WaitForSingleObject": ([wintypes.HANDLE, wintypes.DWORD], wintypes.DWORD),
         }
         for name, (args, result) in signatures.items():
             function = getattr(self.kernel, name)
@@ -121,6 +140,51 @@ class WindowsJob:
             raise
 
     def close(self) -> None:
-        if self.handle:
+        if not self.handle:
+            return
+        processes = []
+        owned_processes = []
+        seen = set()
+        deadline = monotonic() + 3
+        try:
+            # KILL_ON_JOB_CLOSE is asynchronous. Retain the job while explicitly
+            # terminating, then wait for its own processes to release cwd/files.
+            # Capture handles before termination removes PIDs from the job list.
+            # A second snapshot admits children born just before termination.
+            for after_termination in (False, True):
+                if after_termination and not self.kernel.TerminateJobObject(self.handle, 1):
+                    raise _win32.WinError(_win32.get_last_error())
+                ids = ProcessIds()
+                if not self.kernel.QueryInformationJobObject(
+                    self.handle, 3, ctypes.byref(ids), ctypes.sizeof(ids), None
+                ):
+                    raise _win32.WinError(_win32.get_last_error())
+                if ids.count > len(ids.ids):
+                    raise OSError("job process drain bound exceeded")
+                for pid in ids.ids[: ids.count]:
+                    if pid in seen:
+                        continue
+                    seen.add(pid)
+                    process = self.kernel.OpenProcess(0x100000 | 0x1000, False, pid)
+                    if not process:
+                        if _win32.get_last_error() == 87:  # Process already exited.
+                            continue
+                        raise _win32.WinError(_win32.get_last_error())
+                    processes.append(process)
+                    owned = wintypes.BOOL()
+                    if not self.kernel.IsProcessInJob(process, self.handle, ctypes.byref(owned)):
+                        raise _win32.WinError(_win32.get_last_error())
+                    if owned.value:  # PID reuse cannot admit an unrelated owner process.
+                        owned_processes.append(process)
+            for process in owned_processes:
+                remaining = max(0, int((deadline - monotonic()) * 1000))
+                result = self.kernel.WaitForSingleObject(process, remaining)
+                if result == 258:
+                    raise OSError("job process drain deadline exceeded")
+                if result != 0:
+                    raise _win32.WinError(_win32.get_last_error())
+        finally:
+            for process in processes:
+                self.kernel.CloseHandle(process)
             self.kernel.CloseHandle(self.handle)
             self.handle = None
