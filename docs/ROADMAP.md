@@ -164,11 +164,11 @@ This proves OSCAR is conceptually independent of the computer executing the task
 
 Sleep/shutdown/restart may be modeled only if real OS capability exists. These are high-risk and require explicit owner confirmation. Do not shut down the development machine merely to satisfy automated Gate B acceptance.
 
-## Slice 06 — OSCAR Memory Fabric + Personal Policy + live context ⏭️
+## Slice 06 — OSCAR Memory Fabric + Personal Policy + live context ✅
 
 The previous planned managed-memory backend has been retired. OSCAR now owns a free/self-hosted Memory Fabric.
 
-Verified local acceptance now includes typed PowerShell, registered Notepad/UIA, isolated browser, separate owner control, native credentials, canonical WAL/FTS5, real Qdrant/Graphiti/Neo4j with local embedding/reranking, memory evaluation and owner-reviewed model policy candidates. Slice 05 is COMPLETE for this Windows local-alpha scope; Slice 06 and Gate B remain PARTIAL. Real private OAuth, provider revocation and private-source/live-memory federation require owner authorization. General conversational recall integration remains a composition boundary, not a proven autonomous product. See [Gate B completion ledger](GATE-B-COMPLETION.md).
+Verified acceptance includes native Windows/Codex work, typed PowerShell, registered Notepad/UIA, isolated browser, separate owner control, native credentials, canonical WAL/FTS5, real Qdrant/Graphiti/Neo4j, local embedding/reranking, memory evaluation and owner-reviewed policy candidates. The owner completed physical machine acceptance and registered GitHub device OAuth with exactly `user:email`, real private reads, new-process restart, controlled private/public federation and local credential deletion/absence checks. Slice 05 and Slice 06 are COMPLETE for the documented local-alpha scope; Gate B is PASS. Remote provider revocation remains `UNKNOWN_OWNER_ACTION_REQUIRED`; private writes were not authorized and are optional. General conversational recall integration remains a composition boundary, not a proven autonomous product. See [Gate B completion ledger](GATE-B-COMPLETION.md).
 
 ### 06A — Canonical Event Archive
 
@@ -394,7 +394,7 @@ perception / communication
 | Club | Slices | Focus | Status |
 |---|---:|---|---|
 | A — Brain | 01–04 | Core + Controller + Transport/Grid foundation + adaptive Model Router | **PASS** |
-| B — Can Do Work | 05–06 | Real machine/continuation + Memory Fabric + policy/live context | **PARTIAL — current work** |
+| B — Can Do Work | 05–06 | Real machine/continuation + Memory Fabric + policy/live context | **PASS for documented local-alpha scope** |
 | C — Embodied Core | 07–08 | Edge/reflexes + Voice/Identity/Persona | Planned after Gate B PASS |
 | D1 — Sunday | 09 | Android embodiment + communication + owner controls | Planned |
 | D2 — Desktop | 10 | Desktop interaction runtime | Planned |
@@ -406,7 +406,9 @@ Manual integration checkpoints remain in [BUILD-GATES.md](BUILD-GATES.md).
 
 ## Current next step
 
-Owner OAuth client registration/authorization → private connector lifecycle → private live-authority federation → reconcile acceptance/CI → review. Gate B remains PARTIAL; no Slice 07.
+Mandatory acceptance is complete: owner physical machine and GitHub OAuth/private
+federation runs passed. Review PR 12 for merge after exact-head CI. Gate B PASS;
+Slice 07 remains NOT STARTED and requires a separate instruction.
 
 The original ordered acceptance sequence below remains a contract, not a list of unimplemented items:
 
@@ -443,7 +445,7 @@ The original ordered acceptance sequence below remains a contract, not a list of
 The [pre-manual Gate B hardening pass](GATE-B-HARDENING.md) improves BM25/ONNX retrieval,
 generation integrity, scoped graph rebuilds, credential recovery and evidence-bound claims.
 It adds no later-slice capability. Slice 05 remains COMPLETE for its documented local scope;
-Slice 06 and Gate B remain PARTIAL pending real owner OAuth/private federation.
+Slice 06 is COMPLETE and Gate B PASS after the owner OAuth/federation run.
 The later physical/manual machine PASS is recorded below.
 
 
@@ -461,11 +463,11 @@ Tab S6 Lite Home Node, decision-model evaluation and full Auth Broker expansion 
 not additional Gate B requirements. Build the Tab node only after OSCAR is fully
 deployed and its main Core architecture is operational.
 
-Slice 05 remains COMPLETE for the documented Windows local-alpha scope; Slice 06
-and Gate B remain PARTIAL. Owner OAuth is NOT AUTHORIZED; final physical/manual
-machine acceptance PASSED
-in owner run `manual-gate-b-20261004-200734`. Private OAuth/federation acceptance remains
-outstanding, Slice 07 NOT STARTED and PR 12 DRAFT/UNMERGED. The harness repair at
+Slice 05 and Slice 06 are COMPLETE for the documented local-alpha scope; Gate B
+is PASS. Owner physical/manual machine acceptance passed in run
+`manual-gate-b-20261004-200734`; OAuth/private federation passed in run
+`oauth-gate-b-20261004-234817`. Remote revocation remains unknown; no private write
+was authorized. Slice 07 NOT STARTED and PR 12 DRAFT/UNMERGED. The harness repair at
 `c9cb7d2d20fb444cce98e2749eeea5425d4a0ee1` is independently reviewed with 25 focused
 regressions passing and exact-head CI green; it is not a physical acceptance PASS.
 The prior owner focus failure and its evidence remain unchanged.

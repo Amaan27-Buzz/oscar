@@ -339,9 +339,9 @@ PASS for the documented Brain foundation.
 
 ### Gate B
 
-PARTIAL. Verified scoped foundations include native Windows machine execution, useful Codex delegation with independent verification, cancellation, restart/recovery, ambiguity blocking, local selected-memory continuity and bounded owner-reviewed policy interpretation.
+PASS for the documented local-alpha scope. Verified scoped foundations include native Windows machine execution, useful Codex delegation with independent verification, cancellation, restart/recovery, ambiguity blocking, local selected-memory continuity and bounded owner-reviewed policy interpretation.
 
-Verified local acceptance now includes typed PowerShell, registered Notepad/UIA, isolated browser, separate owner control, native credentials, canonical WAL/FTS5, real Qdrant/Graphiti/Neo4j with local embedding/reranking, memory evaluation and owner-reviewed model policy candidates. Slice 05 is COMPLETE for this Windows local-alpha scope; Slice 06 and Gate B remain PARTIAL. Real private OAuth, provider revocation and private-source/live-memory federation require owner authorization. General conversational recall integration remains a composition boundary, not a proven autonomous product. See [Gate B completion ledger](GATE-B-COMPLETION.md).
+Verified acceptance includes native Windows/Codex work, typed PowerShell, registered Notepad/UIA, isolated browser, separate owner control, native credentials, canonical WAL/FTS5, real Qdrant/Graphiti/Neo4j, local embedding/reranking, memory evaluation and owner-reviewed policy candidates. The owner completed physical machine acceptance and registered GitHub device OAuth with exactly `user:email`, real private reads, new-process restart, controlled private/public federation and local credential deletion/absence checks. Slice 05 and Slice 06 are COMPLETE for the documented local-alpha scope; Gate B is PASS. Remote provider revocation remains `UNKNOWN_OWNER_ACTION_REQUIRED`; private writes were not authorized and are optional. General conversational recall integration remains a composition boundary, not a proven autonomous product. See [Gate B completion ledger](GATE-B-COMPLETION.md).
 
 Club C does not begin until Gate B mandatory acceptance passes.
 
@@ -368,7 +368,8 @@ Local disconnect never implies provider revocation without evidence.
 GitHub is the first intended real Gate B auth proof, not the universal auth design.
 The existing native vault, enrollment state machine and provider protocols are
 foundations; full broker/provider expansion is later work and not a new Gate B
-requirement. Owner OAuth remains NOT STARTED.
+requirement. Owner GitHub OAuth acceptance passed in run `oauth-gate-b-20261004-234817`;
+remote revocation remains UNKNOWN_OWNER_ACTION_REQUIRED.
 
 ## ADR-038 — Free-first replaceable deployment and deferred Home Node
 

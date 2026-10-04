@@ -31,9 +31,9 @@ Historical acceptance is not relabeled as current execution.
 - [x] Model policy candidate, exact fixture confirmation, conflict/expiry
 - [x] Native secure credential write/read/rotate/expiry/delete/restart
 - [x] Final physical/manual machine acceptance by owner (2026-10-04, run 200734)
-- [ ] Real owner-authorized OAuth/private read and lifecycle
-- [ ] Reversible private write/readback/cleanup only if separately approved
-- [ ] Live file/project/task/private/public federation beats stale recall
+- [x] Real owner-authorized OAuth/private read and lifecycle (run 234817)
+- Optional, NOT AUTHORIZED: reversible private write/readback/cleanup; no `gist` grant
+- [x] Live file/project/task/private/public federation beats stale recall
 - [x] Full Windows suite, cross-platform CI, lint/types/repository/links/secrets
 
 ## Current official sources
@@ -53,10 +53,11 @@ No Slice 07, Sunday, voice, polished UI or physical power action is authorized b
 
 ## Candidate decision and observed acceptance
 
-Slice 05 **COMPLETE for Windows local-alpha acceptance**. Slice 06 **PARTIAL**.
-Gate B **PARTIAL**. [Machine-readable evidence](evidence/gate-b-completion-2026-10-04.json)
-records baseline, correlation/task IDs, hashes, independent checks and explicit limitations.
-No private OAuth or Android observation is inferred from successful local tests.
+Slice 05 **COMPLETE for Windows local-alpha acceptance**. Slice 06 **COMPLETE**.
+Gate B **PASS for documented local-alpha acceptance**, following the independent
+2026-10-05 review below. [Current machine-readable evidence](evidence/gate-b-final-acceptance-2026-10-05.json)
+links the preserved prior implementation and owner acceptance records. Android
+acceptance is not inferred. The earlier observations below retain their chronology.
 
 | Capability | Actual laptop observation |
 |---|---|
@@ -99,9 +100,9 @@ local ML default. The reproduced Graphiti missing `reference_time` property came
 our null-valued edge field and is corrected without warning suppression. See
 [the hardening measurements and limitations](GATE-B-HARDENING.md).
 
-## Owner/private acceptance boundary
+## Historical owner/private acceptance boundary before owner run 234817
 
-No configured registered OAuth client was found. The official GitHub device flow
+At the initial implementation acceptance, no configured registered OAuth client was found. The official GitHub device flow
 uses a native vault, transaction nonce, bounded single polls, minimal initial
 `user:email` scope, expiry checks and ambiguous-exchange blocking. GitHub OAuth App
 device adapter does not implement refresh. GitHub now supports expiring OAuth App
@@ -147,8 +148,9 @@ also passed. This records an observed commit; PR checks remain the authority for
 The owner manual attempt on 2026-10-04 failed after the click's independent focus
 check and exposed invocation/diagnostic harness defects. It is not a capability
 PASS. The [focused repair and failure evidence](GATE-B-HARDENING.md) document the
-bounded independent focus wait and safe owner rerun. Final manual acceptance is
-still outstanding; Slice 05 COMPLETE, Slice 06 PARTIAL and Gate B PARTIAL remain.
+bounded independent focus wait and safe owner rerun. At that attempt, final manual acceptance was still outstanding; Slice 05 COMPLETE,
+Slice 06 PARTIAL and Gate B PARTIAL were the recorded states. Later owner PASS
+records below supersede those statuses.
 
 The subsequent owner rerun `.oscar/manual-gate-b-20261004-190338` passed the owned
 Notepad sub-phase and cleanup, then failed at the first local browser execution.
@@ -156,10 +158,11 @@ Source-checkout direct-file imports were independently reproduced and repaired;
 preflight now exercises the real worker launch. See [the focused browser repair](GATE-B-HARDENING.md)
 for diagnostics, automated evidence and the pinned-interpreter owner command.
 At that failed attempt, overall manual acceptance remained outstanding. The later
-owner PASS below supersedes that status; OAuth remains unperformed and Gate B PARTIAL.
+owner PASS below supersedes that status. OAuth was unperformed at that point;
+the final review below records the subsequent OAuth acceptance and Gate B PASS.
 
 
-## Current owner machine PASS and private acceptance preparation
+## Owner machine PASS and historical private acceptance preparation
 
 **FINAL PHYSICAL/MANUAL MACHINE ACCEPTANCE PASSED.** The owner completed
 `.oscar/manual-gate-b-20261004-200734`, fixture
@@ -171,9 +174,66 @@ are VERIFIED. A prior OSCAR fixture window was reported and correctly not mutate
 The original root/file set/hashes are preserved; prior failed attempts remain historical
 evidence. See [the owner PASS record](evidence/gate-b-owner-machine-pass-2026-10-04.json).
 
-[The dedicated OAuth/federation harness](GATE-B-OAUTH-ACCEPTANCE.md) is prepared and
-tested with synthetic providers/native vault fixtures. Real OAuth is NOT AUTHORIZED
-and real private federation is NOT EXERCISED. Client ID and explicit owner GitHub
+[The dedicated OAuth/federation harness](GATE-B-OAUTH-ACCEPTANCE.md) was prepared and
+tested with synthetic providers/native vault fixtures. At preparation, real OAuth
+was NOT AUTHORIZED and real private federation was NOT EXERCISED. Client ID and explicit owner GitHub
 interaction are required. No borrowed credentials, client secret, gist scope or write
-is used. Slice 05 COMPLETE; Slice 06 PARTIAL; Gate B PARTIAL; Slice 07 NOT STARTED.
+was used in preparation. At that point: Slice 05 COMPLETE; Slice 06 PARTIAL;
+Gate B PARTIAL; Slice 07 NOT STARTED. The final review below supersedes that status.
 No deployment, Sunday/Android implementation or PR merge is performed.
+
+## Final owner OAuth acceptance and independent gate review — 2026-10-05
+
+Starting reviewed implementation: `68305308105f3b9424451010d546e118fd5e2506`.
+Owner root `.oscar/oauth-gate-b-20261004-234817` completed with
+`PRIVATE_READ_LIFECYCLE_AND_FEDERATION_CHECKS_PASSED`. The owner manually authorized
+the registered GitHub OAuth App; exact scope **user:email** is independently present
+in the enrollment and connection metadata. Real `/user` and bounded page-one
+`/user/emails` read contracts passed. Provider facts remain REPORTED.
+
+A new process reopened SQLite/native Credential Manager and repeated both reads,
+with the same salted identity digest. Raw private payloads remained transient;
+no addresses/tokens/device codes are copied into committed evidence. Database
+inspection used separate immutable copies, never opened the original root for
+writing. Original file set and SHA256s were rechecked unchanged.
+
+NOW selected current authenticated GitHub state; HISTORY retrieved the controlled
+synthetic past `-1` event with its event/memory IDs and RECALLED state. Canonical
+history is unchanged and public `python/cpython` source composition passed. This
+proves bounded live/private/public composition, not arbitrary conversational recall.
+The earlier local filesystem/project/task federation acceptance also remains valid.
+
+Local disconnect deleted the credential and checked absence. This review separately
+checked both owned credential/device references absent in native Credential Manager.
+Persisted state is `locally_disconnected_provider_revocation_pending`, with remote
+revocation **UNKNOWN_OWNER_ACTION_REQUIRED**. No provider revocation is claimed.
+This provider flow requires legitimate owner settings/app action for remote revocation;
+truthful disconnect semantics satisfy the scoped lifecycle contract. Refresh is not
+implemented by this adapter; this run used the non-expiring app configuration.
+
+| Mandatory group | Decision and evidence |
+|---|---|
+| B1 useful real machine work | ACCEPTED: independently tested Codex mutation, files/Git/PowerShell, owner Notepad/UIA and isolated local/public browser, actual cancellation, blocked ambiguity, no duplicate recovery |
+| B2 continuation/owner control | ACCEPTED: separate control/Core/Worker processes, control disconnect and coordinator restart, existing authorization/lease/result recovered, cooperative pause/resume/cancel/revoke |
+| B3 canonical memory | ACCEPTED: WAL/FTS5 provenance, real Qdrant/Graphiti/Neo4j retrieval, restart/rebuild, generation fencing, correction/alias/forget tests |
+| B4 controller recall reliability | ACCEPTED: mandatory preflight, bounded expansion, evidence-bound claims, unsupported claims UNKNOWN, RECALLED distinct from VERIFIED |
+| B5 writer/evaluation | ACCEPTED: scoped source-bound candidates, consolidation preserves events, A–R evaluation and hardening retrieval/temporal/entity/outage regressions |
+| B6 Personal Policy | ACCEPTED: real model candidate plus exact trusted-owner confirmation, ambiguity/conflict/expiry blocking, restart and independently observed Worker enforcement; no permission creation |
+| B7 private OAuth/lifecycle | ACCEPTED: registered owner device flow, exactly user:email, real read/restart/native-vault/local-delete checks; remote revocation explicitly unknown; conditional write NOT AUTHORIZED, optional |
+| B8 live context versus memory | ACCEPTED: previous local file/project/task proof plus real private/public composition, NOW live authority, HISTORY RECALLED, unchanged canonical history |
+
+**Slice 05 COMPLETE · Slice 06 COMPLETE · Gate B PASS** for the documented local-alpha
+scope. No mandatory acceptance item remains outstanding. PR 12 stays draft/unmerged
+pending owner review. Slice 07 is NOT STARTED. No new OAuth flow, private write,
+deployment, Sunday/Android, decision-model evaluation or hardware work was performed.
+Earlier failed attempts and original conservative report gate statuses are unchanged.
+
+Non-blocking limitations: trusted-host execution is not a sandbox; cooperative pause;
+shared SQLite/loopback control; no independent remote deployment; unauthenticated
+synthetic Neo4j fixture; bounded structural claim verification, not arbitrary entailment;
+no secure erasure; Android/OEM/voice/Edge, managed-memory services and broader private
+connectors remain unverified. Owner may review/revoke GitHub authorization separately.
+
+Final local verification: **427 Windows tests PASS, no skips, 107.321 seconds**.
+Focused Gate B/OAuth/federation and quality results are recorded in the current
+machine-readable record. Exact-head PR CI is required before merge readiness.

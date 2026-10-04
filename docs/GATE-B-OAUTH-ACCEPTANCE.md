@@ -3,9 +3,9 @@
 GitHub is the first real Auth Broker/provider proof, not OAuth independently owned
 by every plugin. This harness reuses `GitHubDeviceFlow`, the Windows native vault,
 opaque `CredentialRef`, `ConnectorFabric` and the existing GitHub manifests.
-**Prepared and tested with synthetic responses; real owner OAuth is not authorized.**
-Slice 05 is COMPLETE; Slice 06 and Gate B remain PARTIAL. No Slice 07, Sunday/Android,
-deployment, private write or merge is authorized by this preparation.
+**Real owner acceptance PASSED in `oauth-gate-b-20261004-234817`.**
+Slice 05/06 COMPLETE; Gate B PASS for the documented local-alpha scope. No Slice 07, Sunday/Android,
+deployment, private write or merge is authorized by this acceptance recording.
 
 ## Registered OAuth App setup
 
@@ -114,7 +114,9 @@ and restart failure metadata. Prior failed roots are never erased or reused.
 An unexpected process crash may leave owned enrollment state: review that root and
 native-vault references; existing recovery never blindly repeats the exchange.
 
-No real OAuth/federation PASS is recorded until the owner supplies a Client ID and
-completes this path. A successful harness result still requires review against
-[the remaining Gate B checklist](GATE-B-COMPLETION.md); it does not automatically
-change Gate B to PASS.
+The owner completed this path and the independent final B1–B8 review accepted it.
+See [the final Gate B checklist](GATE-B-COMPLETION.md) and
+[redacted machine-readable record](evidence/gate-b-final-acceptance-2026-10-05.json).
+The original report conservatively says Gate B PARTIAL because the harness cannot
+automatically decide overall gate status; it remains unchanged. This separate review
+records PASS. Remote revocation remains UNKNOWN_OWNER_ACTION_REQUIRED.

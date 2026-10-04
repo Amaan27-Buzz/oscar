@@ -441,7 +441,7 @@ None silently substitutes for another.
 
 The existing `oscar.continuity.LocalMemory` and SQLite-backed records verify selected local retention, restart continuity, evidence state, entity references, live-source precedence and forget of the live OSCAR record for the documented Windows/reference cases.
 
-The archive/index/retrieval implementation is now exercised on this Windows laptop with synthetic retained sources. Verified local acceptance now includes typed PowerShell, registered Notepad/UIA, isolated browser, separate owner control, native credentials, canonical WAL/FTS5, real Qdrant/Graphiti/Neo4j with local embedding/reranking, memory evaluation and owner-reviewed model policy candidates. Slice 05 is COMPLETE for this Windows local-alpha scope; Slice 06 and Gate B remain PARTIAL. Real private OAuth, provider revocation and private-source/live-memory federation require owner authorization. General conversational recall integration remains a composition boundary, not a proven autonomous product. See [Gate B completion ledger](GATE-B-COMPLETION.md).
+The archive/index/retrieval implementation is now exercised on this Windows laptop with synthetic retained sources. Verified acceptance includes native Windows/Codex work, typed PowerShell, registered Notepad/UIA, isolated browser, separate owner control, native credentials, canonical WAL/FTS5, real Qdrant/Graphiti/Neo4j, local embedding/reranking, memory evaluation and owner-reviewed policy candidates. The owner completed physical machine acceptance and registered GitHub device OAuth with exactly `user:email`, real private reads, new-process restart, controlled private/public federation and local credential deletion/absence checks. Slice 05 and Slice 06 are COMPLETE for the documented local-alpha scope; Gate B is PASS. Remote provider revocation remains `UNKNOWN_OWNER_ACTION_REQUIRED`; private writes were not authorized and are optional. General conversational recall integration remains a composition boundary, not a proven autonomous product. See [Gate B completion ledger](GATE-B-COMPLETION.md).
 
 Canonical admission rechecks forgotten/expired/inferred and temporally superseded sources even when a recalled object was cached. Context has a total serialized bound and terminal tasks release transient context. Consolidation runs in bounded batches with a durable atomic cursor; it preserves source events and merges only matching evidence inside a batch. Run one consolidation runner per relationship. A completed consolidation pass requires explicit restart. No automatic unbounded daemon, model-extracted global summaries, or private unauthenticated Neo4j deployment is claimed.
 
@@ -474,8 +474,10 @@ The prior planned Supermemory integration has been retired. Historical checkpoin
 
 The owner's final physical/manual machine acceptance PASSED in run
 `manual-gate-b-20261004-200734`; desktop/local/public browser phases are VERIFIED.
-The [prepared GitHub OAuth/federation acceptance](GATE-B-OAUTH-ACCEPTANCE.md) uses
+The [accepted GitHub OAuth/federation path](GATE-B-OAUTH-ACCEPTANCE.md) uses
 the existing native vault, opaque references and Connector Fabric; private email
 addresses remain transient. The controlled synthetic past count remains RECALLED;
 current provider count facts remain REPORTED, with separate source/temporal provenance.
-Real owner OAuth/private federation is not yet exercised. Gate B remains PARTIAL.
+Owner run `oauth-gate-b-20261004-234817` passed real private OAuth and controlled
+federation. Slice 06 COMPLETE; Gate B PASS. Remote revocation remains
+`UNKNOWN_OWNER_ACTION_REQUIRED`. See [final acceptance](GATE-B-COMPLETION.md).

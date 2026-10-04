@@ -399,7 +399,7 @@ Calendar, Drive and Contacts; Microsoft for Outlook, Calendar, OneDrive and Team
 GitHub for GitHub capabilities. Account/tenant/audience/scopes remain explicit;
 shared provider code does not merge identities or authorize unrelated scopes.
 GitHub device OAuth is only the first intended real Gate B authentication proof,
-currently NOT STARTED by the owner. The full broker expansion is a future design,
+accepted in owner run `oauth-gate-b-20261004-234817`. The full broker expansion is a future design,
 not a claim that every auth mode/provider is implemented. See
 [CONNECTOR-FABRIC.md](CONNECTOR-FABRIC.md) and [SECURITY.md](SECURITY.md).
 
@@ -512,9 +512,9 @@ OSCAR monitors provider/auth health, Grid connectivity, capability staleness, ta
 
 ### Gate B
 
-**PARTIAL.** Verified scoped work includes native Windows file/process/Git execution, useful Codex delegation with independent verification, cancellation, coordinator/Worker restart/recovery, ambiguous mutation blocking, local selected memory continuity and bounded owner-reviewed policy authoring.
+**PASS for documented local-alpha scope.** Verified scoped work includes native Windows file/process/Git execution, useful Codex delegation with independent verification, cancellation, coordinator/Worker restart/recovery, ambiguous mutation blocking, local selected memory continuity and bounded owner-reviewed policy authoring.
 
-Verified local acceptance now includes typed PowerShell, registered Notepad/UIA, isolated browser, separate owner control, native credentials, canonical WAL/FTS5, real Qdrant/Graphiti/Neo4j with local embedding/reranking, memory evaluation and owner-reviewed model policy candidates. Slice 05 is COMPLETE for this Windows local-alpha scope; Slice 06 and Gate B remain PARTIAL. Real private OAuth, provider revocation and private-source/live-memory federation require owner authorization. General conversational recall integration remains a composition boundary, not a proven autonomous product. See [Gate B completion ledger](GATE-B-COMPLETION.md).
+Verified acceptance includes native Windows/Codex work, typed PowerShell, registered Notepad/UIA, isolated browser, separate owner control, native credentials, canonical WAL/FTS5, real Qdrant/Graphiti/Neo4j, local embedding/reranking, memory evaluation and owner-reviewed policy candidates. The owner completed physical machine acceptance and registered GitHub device OAuth with exactly `user:email`, real private reads, new-process restart, controlled private/public federation and local credential deletion/absence checks. Slice 05 and Slice 06 are COMPLETE for the documented local-alpha scope; Gate B is PASS. Remote provider revocation remains `UNKNOWN_OWNER_ACTION_REQUIRED`; private writes were not authorized and are optional. General conversational recall integration remains a composition boundary, not a proven autonomous product. See [Gate B completion ledger](GATE-B-COMPLETION.md).
 
 No Slice 07 work begins until Gate B mandatory acceptance passes.
 
@@ -526,8 +526,9 @@ projection serves one relationship, and stale projections are excluded. FastEmbe
 the default Torch ML runtime after bounded A–R comparison. Native credential enrollment
 uses durable intents and restart reconciliation across the SQLite/vault boundary.
 Final physical/manual machine acceptance PASSED in the owner run on 2026-10-04.
-Owner OAuth/private federation remains outstanding; Gate B remains PARTIAL. See
-[the prepared acceptance path](GATE-B-OAUTH-ACCEPTANCE.md).
+Owner OAuth/private federation PASSED; Gate B is PASS for the documented scope.
+Remote provider revocation remains UNKNOWN_OWNER_ACTION_REQUIRED. See
+[the accepted path](GATE-B-OAUTH-ACCEPTANCE.md).
 
 1. One intelligence, many embodiments.
 2. One continuing user relationship/interaction point.

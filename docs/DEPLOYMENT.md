@@ -116,14 +116,15 @@ physical safety remains local and deterministic during Core/Grid/network loss.
 
 ## Gate and deployment boundary
 
-Slice 05 stays COMPLETE for its documented Windows local-alpha scope; Slice 06
-and Gate B stay PARTIAL. Owner OAuth is NOT STARTED; final owner manual acceptance
-is OUTSTANDING; Slice 07 is NOT STARTED; PR 12 stays DRAFT/UNMERGED.
+Slice 05/06 COMPLETE for the documented local-alpha scope; Gate B PASS after
+owner physical machine and GitHub OAuth/federation acceptance. Remote revocation
+remains unknown. Slice 07 NOT STARTED; PR 12 stays DRAFT/UNMERGED.
 
 Oracle deployment, Vercel deployment, Galaxy Tab expansion, post-Gate-B System-1
 evaluation and full Auth Broker expansion are later work, not Gate B completion
 requirements. Current local control shares SQLite/loopback; these docs do not
-claim that remote Core deployment, private connectors or phone control exist.
+claim remote Core deployment or phone control. The bounded GitHub private
+read/restart/federation path has been accepted; broader connectors remain unverified.
 
 See [architecture](ARCHITECTURE.md), [Grid](CONNECTION-GRID.md),
 [authentication boundary](CONNECTOR-FABRIC.md), [security](SECURITY.md) and

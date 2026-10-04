@@ -9,8 +9,9 @@ idempotency, Runtime and independent Evidence/Verification remain authoritative.
 
 ## Shared authentication target architecture
 
-GitHub OAuth is only the **first intended real Gate B authentication proof**.
-Owner authorization has NOT STARTED, and private acceptance remains unverified.
+GitHub OAuth is only the **first accepted real Gate B authentication proof**.
+Owner run `oauth-gate-b-20261004-234817` passed authorization, private reads, restart,
+controlled federation and local disconnect; remote revocation remains unknown.
 It is not a design for independent OAuth implementations in every plugin.
 
 ```text
@@ -74,8 +75,9 @@ does not mean an arbitrary plugin is allowed to inspect the native vault.
   vault. OAuth refresh/revoke and authenticated MCP session are adapter protocols.
   PKCE S256 generation is implemented. GitHub registered-client device enrollment
   and Windows Credential Manager are implemented; native credential lifecycle is exercised.
-  Real owner OAuth authorization/private reads/provider revocation remain unverified.
-  GitHub OAuth App device grants do not support refresh; local disconnect does not revoke remotely.
+  Real owner GitHub authorization/private reads/restart/disconnect are accepted.
+  This adapter does not implement refresh; acceptance used non-expiring grants.
+  Local disconnect does not revoke remotely: UNKNOWN_OWNER_ACTION_REQUIRED.
 - Provider results remain REPORTED. `ConnectorVerifier` independently fetches a
   correlated resource and compares explicit expected fields before verification.
   Gmail sent-recipient/header verification and arbitrary nested/batch-update
@@ -232,13 +234,15 @@ cannot be disabled. These are reference contract tests, not live private-account
 
 ## Gate B local completion candidate — 2026-10-04
 
-`python -m oscar.oauth_cli --state <local.sqlite> --owner-authorized --begin <registered-client-id>` starts only the official GitHub device flow. One `--poll <transaction-id>` reads its nonce from stdin; no polling loop or token output. Tokens/device credentials live in OSCAR-owned native Credential Manager references. Interrupted exchange is ambiguous and blocked rather than replayed. A registered client is currently absent. Provider revocation needs the legitimate provider settings/app boundary; local disconnect is explicitly pending remote revocation. No CLI/browser tokens are borrowed. Verified local acceptance now includes typed PowerShell, registered Notepad/UIA, isolated browser, separate owner control, native credentials, canonical WAL/FTS5, real Qdrant/Graphiti/Neo4j with local embedding/reranking, memory evaluation and owner-reviewed model policy candidates. Slice 05 is COMPLETE for this Windows local-alpha scope; Slice 06 and Gate B remain PARTIAL. Real private OAuth, provider revocation and private-source/live-memory federation require owner authorization. General conversational recall integration remains a composition boundary, not a proven autonomous product. See [Gate B completion ledger](GATE-B-COMPLETION.md).
+`python -m oscar.oauth_cli --state <local.sqlite> --owner-authorized --begin <registered-client-id>` starts only the official GitHub device flow. One `--poll <transaction-id>` reads its nonce from stdin; no polling loop or token output. Tokens/device credentials live in OSCAR-owned native Credential Manager references. Interrupted exchange is ambiguous and blocked rather than replayed. A registered client was used in the owner acceptance run; no client secret was needed. Provider revocation needs the legitimate provider settings/app boundary; local disconnect is explicitly pending remote revocation. No CLI/browser tokens are borrowed. Verified acceptance includes native Windows/Codex work, typed PowerShell, registered Notepad/UIA, isolated browser, separate owner control, native credentials, canonical WAL/FTS5, real Qdrant/Graphiti/Neo4j, local embedding/reranking, memory evaluation and owner-reviewed policy candidates. The owner completed physical machine acceptance and registered GitHub device OAuth with exactly `user:email`, real private reads, new-process restart, controlled private/public federation and local credential deletion/absence checks. Slice 05 and Slice 06 are COMPLETE for the documented local-alpha scope; Gate B is PASS. Remote provider revocation remains `UNKNOWN_OWNER_ACTION_REQUIRED`; private writes were not authorized and are optional. General conversational recall integration remains a composition boundary, not a proven autonomous product. See [Gate B completion ledger](GATE-B-COMPLETION.md).
 
 
 The owner's final physical/manual machine acceptance PASSED in run
 `manual-gate-b-20261004-200734`; desktop/local/public browser phases are VERIFIED.
-The [prepared GitHub OAuth/federation acceptance](GATE-B-OAUTH-ACCEPTANCE.md) uses
+The [accepted GitHub OAuth/federation path](GATE-B-OAUTH-ACCEPTANCE.md) uses
 the existing native vault, opaque references and Connector Fabric; private email
 addresses remain transient. The controlled synthetic past count remains RECALLED;
 current provider count facts remain REPORTED, with separate source/temporal provenance.
-Real owner OAuth/private federation is not yet exercised. Gate B remains PARTIAL.
+Owner run `oauth-gate-b-20261004-234817` passed real private OAuth and controlled
+federation. Slice 06 COMPLETE; Gate B PASS. Remote revocation remains
+`UNKNOWN_OWNER_ACTION_REQUIRED`. See [final acceptance](GATE-B-COMPLETION.md).

@@ -8,6 +8,10 @@ owner OAuth authorization, merge, or Slice 07 work.
 **Slice 05 COMPLETE; Slice 06 PARTIAL; Gate B PARTIAL.** Prior scoped acceptance
 remains historical evidence. Owner/private/manual acceptance is still required.
 
+Current status supersedes the historical pass statuses below: Slice 05/06 COMPLETE;
+Gate B PASS after owner machine and OAuth/federation acceptance. See
+[the final independent review](GATE-B-COMPLETION.md). Earlier failures/evidence are preserved.
+
 ## Dependency decision
 
 Official package metadata was checked on this pass: Playwright 1.63.0,

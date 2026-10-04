@@ -158,9 +158,9 @@ Laya/Jev or another replaceable classification provider cannot grant permission,
 change source authority or waive confirmation. `oscar/jev.py` is historical naming
 for OSCAR-owned logic, not an external authority dependency.
 
-GitHub is the first intended real authentication proof, currently NOT STARTED.
-The implemented enrollment/recovery state machine is not proof of owner account
-access or a fully generalized Auth Broker. Local disconnect deletes a local secret;
+GitHub is the first real authentication proof, accepted by the owner in run
+`oauth-gate-b-20261004-234817`. Registered device flow, exactly `user:email`, private
+reads, restart and local disconnect passed. This is not a fully generalized Auth Broker. Local disconnect deletes a local secret;
 provider revocation remains UNKNOWN/PENDING owner action until independent provider
 evidence confirms it. See [connector/auth design](CONNECTOR-FABRIC.md).
 
@@ -425,7 +425,7 @@ The task remains partial/recoverable.
 
 Native Windows Credential Manager is exercised for synthetic write/read/rotation/expiry/process-reopen/delete. Known runtime secret material is rejected from durable objectives/policy/archive and remains filtered from child environment. Credential Manager does not isolate secrets from the same Windows account or malicious host code. Browser contexts are nonpersistent and origin-scoped; screenshots/downloads are bounded exclusive artifacts, not sandbox claims. UIA uses observed IDs/PID/executable, fixed patterns and bounded input; UIPI/elevation is not bypassed. Notepad broker activation may reuse an existing user process. Neo4j acceptance is an unauthenticated loopback synthetic fixture: NEVER load private history into it. Native vault and SQLite commits cannot be one atomic transaction. Durable enrollment/disconnect intents now precede native mutations, and restart reconciles known references. Ambiguous external exchanges never replay; missing/expired credentials require reauthorization. Local disconnect exposes remote revocation UNKNOWN/owner-action-required. Raw device/access tokens remain exclusively in the native vault. See [crash boundaries and scoped cleanup](GATE-B-HARDENING.md).
 
-Verified local acceptance includes the previously documented typed PowerShell, Notepad/UIA, browser, owner-control, credentials and memory cases. This hardening pass does not repeat physical/manual desktop acceptance or authorize OAuth. Slice 05 is COMPLETE for the Windows local-alpha scope; Slice 06 and Gate B remain PARTIAL. Real private OAuth, provider revocation and private-source/live-memory federation require owner authorization. General conversational recall integration remains a composition boundary, not a proven autonomous product. See [Gate B completion ledger](GATE-B-COMPLETION.md).
+Verified local acceptance includes the previously documented typed PowerShell, Notepad/UIA, browser, owner-control, credentials and memory cases. The later owner physical and OAuth runs are accepted in the completion ledger. Slice 05/06 are COMPLETE; Gate B PASS. Remote revocation remains UNKNOWN_OWNER_ACTION_REQUIRED; no private write was authorized. General conversational recall integration remains a composition boundary, not a proven autonomous product. See [Gate B completion ledger](GATE-B-COMPLETION.md).
 
 
 Browser source loading is anchored to the trusted OSCAR package with isolated Python
@@ -438,11 +438,13 @@ cookie, credential or exception text. See [the focused repair](GATE-B-HARDENING.
 
 The owner's final physical/manual machine acceptance PASSED in run
 `manual-gate-b-20261004-200734`; desktop/local/public browser phases are VERIFIED.
-The [prepared GitHub OAuth/federation acceptance](GATE-B-OAUTH-ACCEPTANCE.md) uses
+The [accepted GitHub OAuth/federation path](GATE-B-OAUTH-ACCEPTANCE.md) uses
 the existing native vault, opaque references and Connector Fabric; private email
 addresses remain transient. The controlled synthetic past count remains RECALLED;
 current provider count facts remain REPORTED, with separate source/temporal provenance.
-Real owner OAuth/private federation is not yet exercised. Gate B remains PARTIAL.
+Owner run `oauth-gate-b-20261004-234817` passed real private OAuth and controlled
+federation. Slice 06 COMPLETE; Gate B PASS. Remote revocation remains
+`UNKNOWN_OWNER_ACTION_REQUIRED`. See [final acceptance](GATE-B-COMPLETION.md).
 
 Full-suite verification exposed asynchronous `KILL_ON_JOB_CLOSE` teardown: the
 browser timeout returned before an owned descendant released its artifact cwd.
