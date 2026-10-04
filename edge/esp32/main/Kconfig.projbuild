@@ -1,0 +1,5 @@
+menu "OSCAR Edge test profile"
+config OSCAR_EDGE_WATCHDOG_TEST
+    bool "Owner watchdog fault test on GPIO27 (not production)"
+    default n
+endmenu

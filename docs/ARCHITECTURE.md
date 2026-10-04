@@ -516,7 +516,7 @@ OSCAR monitors provider/auth health, Grid connectivity, capability staleness, ta
 
 Verified acceptance includes native Windows/Codex work, typed PowerShell, registered Notepad/UIA, isolated browser, separate owner control, native credentials, canonical WAL/FTS5, real Qdrant/Graphiti/Neo4j, local embedding/reranking, memory evaluation and owner-reviewed policy candidates. The owner completed physical machine acceptance and registered GitHub device OAuth with exactly `user:email`, real private reads, new-process restart, controlled private/public federation and local credential deletion/absence checks. Slice 05 and Slice 06 are COMPLETE for the documented local-alpha scope; Gate B is PASS. Remote provider revocation remains `UNKNOWN_OWNER_ACTION_REQUIRED`; private writes were not authorized and are optional. General conversational recall integration remains a composition boundary, not a proven autonomous product. See [Gate B completion ledger](GATE-B-COMPLETION.md).
 
-No Slice 07 work begins until Gate B mandatory acceptance passes.
+Gate B is frozen PASS; Slice 07 software is accepted for continuation; physical acceptance is owner-deferred.
 
 ## Architecture invariants
 
@@ -547,3 +547,51 @@ Remote provider revocation remains UNKNOWN_OWNER_ACTION_REQUIRED. See
 15. `CAN PERCEIVE`, `CAN RETAIN` and `CAN ACT` are independent boundaries.
 16. Notification access never implies unrestricted source-app access.
 17. A gate is completed end-to-end before development advances to the next Club unless the owner explicitly changes the plan.
+
+## Club C / Slice 07 Edge composition
+
+Gate B is frozen PASS. Core/Grid → outbound HTTPS ESP32 gateway → typed 3.3 V
+UART → deterministic Pico GPIO/ADC/interlock controller. These are Edge nodes,
+never Core hosts. Shared C wire/parser/controller contracts run in firmware and
+host reference simulation. See [Edge architecture](EDGE.md) and [owner physical
+acceptance](EDGE-HARDWARE-ACCEPTANCE.md). Native Grid scopes, PersonalPolicy and
+Action Ledger guard physical requests; local safety needs no model/network.
+
+Capability Evolution remains future non-blocking backlog: OSCAR may detect
+repeated capability gaps or inefficient browser/computer/phone automation and
+propose a Skill/plugin/MCP/native adapter. A Builder Worker such as Codex may
+build it only after owner authorization, tests and permission review. Generated
+capabilities gain no authority automatically. No self-extension in Slice 07.
+
+## Owner scope decision — 2026-10-05
+
+Slice 07: **COMPLETE FOR SOFTWARE / SIMULATED EDGE FOUNDATION**.
+**PHYSICAL EDGE ACCEPTANCE DEFERRED BY OWNER** — `DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED`.
+Protocol, firmware, Grid integration, ESP32/Pico cross-builds and deterministic
+safety contracts in simulation are accepted for continuation. Historical
+simulator evidence remains **SIMULATED**. No physical GPIO, watchdog, UART,
+E-stop or ESP32/Pico silicon PASS is claimed. Gate C remains **PARTIAL**.
+
+Return to real ESP32/Pico acceptance during Slice 15 physical/device expansion
+and/or Slice 16 reliability/security hardening. Physical failure, loss/recovery,
+watchdog and safety/reflex verification remain mandatory before Slice 17
+Unified Alpha can PASS. The hardware acceptance guide is preserved.
+The owner authorizes Slice 08 after Slice 07 integration; Slice 09/10, deployment
+and Galaxy Tab Home Node remain outside this work.
+
+## Capability Evolution — future backlog
+
+Repeated inefficient or impossible browser/computer/phone workflows may produce
+an owner-reviewable proposal:
+
+```text
+existing Skill sufficient? → create/refine Skill
+API/native integration better? → propose Plugin / MCP / provider adapter
+device integration needed? → propose native capability
+```
+
+Only after owner authorization may a Builder Worker such as Codex build it.
+Generated capabilities gain **zero authority automatically**. Promotion requires
+permission review, OAuth/API scopes, credential boundary, Personal Policy,
+verification, tests, capability registration and rollback/removal. This is future
+architecture/backlog work, not current self-modification.

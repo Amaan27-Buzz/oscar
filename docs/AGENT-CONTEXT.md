@@ -57,8 +57,7 @@ Python/Fluid bounded web/API/relay workloads. The Galaxy Tab S6 Lite (2021) is a
 future Home Node only after full deployment and operational Core architecture.
 None of deployment, Tab implementation, decision-model evaluation or full broker
 expansion is a Gate B requirement. Owner OAuth and final manual
-machine acceptance PASSED; Slice 05/06 COMPLETE, Gate B PASS, Slice 07 NOT
-STARTED, PR 12 DRAFT/UNMERGED. Historical evidence retains its original vocabulary.
+machine acceptance PASSED; Slice 05/06 COMPLETE, Gate B PASS, Slice 07 software is accepted; physical acceptance is deferred by owner, PR 12 MERGED; Gate B frozen PASS. Historical evidence retains its original vocabulary.
 
 ## Context loading
 
@@ -291,3 +290,19 @@ current provider count facts remain REPORTED, with separate source/temporal prov
 Owner run `oauth-gate-b-20261004-234817` passed real private OAuth and controlled
 federation. Slice 06 COMPLETE; Gate B PASS. Remote revocation remains
 `UNKNOWN_OWNER_ACTION_REQUIRED`. See [final acceptance](GATE-B-COMPLETION.md).
+
+## Owner scope decision — 2026-10-05
+
+Slice 07: **COMPLETE FOR SOFTWARE / SIMULATED EDGE FOUNDATION**.
+**PHYSICAL EDGE ACCEPTANCE DEFERRED BY OWNER** — `DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED`.
+Protocol, firmware, Grid integration, ESP32/Pico cross-builds and deterministic
+safety contracts in simulation are accepted for continuation. Historical
+simulator evidence remains **SIMULATED**. No physical GPIO, watchdog, UART,
+E-stop or ESP32/Pico silicon PASS is claimed. Gate C remains **PARTIAL**.
+
+Return to real ESP32/Pico acceptance during Slice 15 physical/device expansion
+and/or Slice 16 reliability/security hardening. Physical failure, loss/recovery,
+watchdog and safety/reflex verification remain mandatory before Slice 17
+Unified Alpha can PASS. The hardware acceptance guide is preserved.
+The owner authorizes Slice 08 after Slice 07 integration; Slice 09/10, deployment
+and Galaxy Tab Home Node remain outside this work.

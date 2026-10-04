@@ -385,3 +385,29 @@ Sunday remains the everyday phone embodiment, Desktop the execution Worker, and
 ESP32/Pico the local deterministic Edge. The tablet does not imply the full
 Qdrant/Neo4j/ML stack is practical on Android. Deployment, Home Node, decision-model
 evaluation and full Auth Broker expansion are not Gate B completion requirements.
+
+## ADR-039 — Native Edge gateway and shared deterministic controller
+
+Decision (2026-10-05): ESP-IDF 6.1 ESP32 gateway plus Pico SDK 2.3.1 RP2040
+controller. Short 3.3 V 115200 UART is the reference link after comparing UART,
+I2C and SPI. Host reference and firmware compile the same bounded version-1 C
+codec/parser/controller. Native Grid and PersonalPolicy govern Core requests;
+local stop/safe-state remains independent. No full Python runtime on ESP32,
+managed framework or dangerous actuator profile. See [comparison](EDGE.md).
+Owner rescope accepts the simulated software foundation for continuation; physical acceptance remains mandatory before Unified Alpha.
+
+## Owner scope decision — 2026-10-05
+
+Slice 07: **COMPLETE FOR SOFTWARE / SIMULATED EDGE FOUNDATION**.
+**PHYSICAL EDGE ACCEPTANCE DEFERRED BY OWNER** — `DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED`.
+Protocol, firmware, Grid integration, ESP32/Pico cross-builds and deterministic
+safety contracts in simulation are accepted for continuation. Historical
+simulator evidence remains **SIMULATED**. No physical GPIO, watchdog, UART,
+E-stop or ESP32/Pico silicon PASS is claimed. Gate C remains **PARTIAL**.
+
+Return to real ESP32/Pico acceptance during Slice 15 physical/device expansion
+and/or Slice 16 reliability/security hardening. Physical failure, loss/recovery,
+watchdog and safety/reflex verification remain mandatory before Slice 17
+Unified Alpha can PASS. The hardware acceptance guide is preserved.
+The owner authorizes Slice 08 after Slice 07 integration; Slice 09/10, deployment
+and Galaxy Tab Home Node remain outside this work.

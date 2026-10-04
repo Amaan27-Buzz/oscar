@@ -92,3 +92,12 @@ Use clear imperative messages where practical, for example:
 ## Security
 
 Do not commit secrets, API keys, OAuth tokens, voice embeddings, private recordings or user memory/state. See `SECURITY.md` and `docs/SECURITY.md`.
+
+## Owner-approved Slice 07 rescope
+
+Slice 07 is COMPLETE FOR SOFTWARE / SIMULATED EDGE FOUNDATION; physical Edge
+acceptance is DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED. This explicit owner
+decision permits Slice 08 continuation; it does not grant physical PASS or Gate C
+PASS. Return during Slice 15/16 and verify before Slice 17 Unified Alpha PASS.
+Preserve the [hardware guide](docs/EDGE-HARDWARE-ACCEPTANCE.md) and historical
+SIMULATED evidence.

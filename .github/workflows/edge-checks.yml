@@ -1,0 +1,51 @@
+name: Edge reference and firmware
+on:
+  pull_request:
+  push:
+    branches: [main, work]
+permissions:
+  contents: read
+jobs:
+  pico:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y gcc-arm-none-eabi libnewlib-arm-none-eabi
+      - run: git clone --depth 1 --branch 2.3.1 --recurse-submodules https://github.com/raspberrypi/pico-sdk.git "$RUNNER_TEMP/pico-sdk"
+      - name: Build exact RP2040 reference board
+        run: |
+          export PICO_SDK_PATH="$RUNNER_TEMP/pico-sdk"
+          cmake -S edge/pico -B .tmp/pico -DPICO_BOARD=pico
+          cmake --build .tmp/pico --parallel 2
+          cmake -S edge/pico -B .tmp/pico-watchdog -DPICO_BOARD=pico -DEDGE_WATCHDOG_TEST=ON
+          cmake --build .tmp/pico-watchdog --parallel 2
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pico-reference-firmware
+          path: .tmp/pico/*.uf2
+  esp32:
+    runs-on: ubuntu-latest
+    container: espressif/idf:v6.1
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build ESP32 reference gateway
+        shell: bash
+        run: |
+          . /opt/esp/idf/export.sh
+          cd edge/esp32
+          idf.py set-target esp32
+          idf.py build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: esp32-reference-firmware
+          path: |
+            edge/esp32/build/*.bin
+            edge/esp32/build/bootloader/*.bin
+            edge/esp32/build/partition_table/*.bin
+      - name: Compile owner-only watchdog fault option
+        shell: bash
+        run: |
+          . /opt/esp/idf/export.sh
+          cd edge/esp32
+          python -c "from pathlib import Path; p=Path('sdkconfig'); p.write_text(p.read_text().replace('# CONFIG_OSCAR_EDGE_WATCHDOG_TEST is not set', 'CONFIG_OSCAR_EDGE_WATCHDOG_TEST=y'))"
+          idf.py build

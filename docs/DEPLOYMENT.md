@@ -118,7 +118,7 @@ physical safety remains local and deterministic during Core/Grid/network loss.
 
 Slice 05/06 COMPLETE for the documented local-alpha scope; Gate B PASS after
 owner physical machine and GitHub OAuth/federation acceptance. Remote revocation
-remains unknown. Slice 07 NOT STARTED; PR 12 stays DRAFT/UNMERGED.
+remains unknown. Slice 07 software is accepted; physical acceptance is deferred by owner; PR 12 is MERGED; Gate B frozen PASS.
 
 Oracle deployment, Vercel deployment, Galaxy Tab expansion, post-Gate-B System-1
 evaluation and full Auth Broker expansion are later work, not Gate B completion
@@ -129,3 +129,19 @@ read/restart/federation path has been accepted; broader connectors remain unveri
 See [architecture](ARCHITECTURE.md), [Grid](CONNECTION-GRID.md),
 [authentication boundary](CONNECTOR-FABRIC.md), [security](SECURITY.md) and
 [current gates](BUILD-GATES.md).
+
+## Owner scope decision — 2026-10-05
+
+Slice 07: **COMPLETE FOR SOFTWARE / SIMULATED EDGE FOUNDATION**.
+**PHYSICAL EDGE ACCEPTANCE DEFERRED BY OWNER** — `DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED`.
+Protocol, firmware, Grid integration, ESP32/Pico cross-builds and deterministic
+safety contracts in simulation are accepted for continuation. Historical
+simulator evidence remains **SIMULATED**. No physical GPIO, watchdog, UART,
+E-stop or ESP32/Pico silicon PASS is claimed. Gate C remains **PARTIAL**.
+
+Return to real ESP32/Pico acceptance during Slice 15 physical/device expansion
+and/or Slice 16 reliability/security hardening. Physical failure, loss/recovery,
+watchdog and safety/reflex verification remain mandatory before Slice 17
+Unified Alpha can PASS. The hardware acceptance guide is preserved.
+The owner authorizes Slice 08 after Slice 07 integration; Slice 09/10, deployment
+and Galaxy Tab Home Node remain outside this work.

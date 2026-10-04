@@ -1,5 +1,7 @@
 # Club B checkpoint
 
+> Current status reconciliation, 2026-10-05: PR #12 is merged at `97c0622507df3f724ecf0c8b74aa7f4ae7784b08`; Gate B is frozen PASS. Slice 05/06 COMPLETE. Slice 07 software is accepted for continuation; physical Edge acceptance is DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED. Slice 08 is authorized after integration. The dated evidence below retains its historical status wording.
+
 **Slice 05 COMPLETE for stated Windows local-alpha acceptance · Slice 06 COMPLETE · Gate B PASS.**
 
 Gate A remains PASS. No Slice 07/Club C work is accepted. These are candidate branch observations, not a merged product release.
