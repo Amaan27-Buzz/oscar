@@ -288,7 +288,7 @@ class OAuthAcceptanceTests(unittest.TestCase):
             (["--owner-authorized"], "precondition.fresh_root"),
         ):
             with (
-                patch("scripts.verify_gate_b_oauth.os.name", "nt"),
+                patch("scripts.verify_gate_b_oauth.os", SimpleNamespace(name="nt")),
                 patch.object(
                     sys,
                     "argv",
