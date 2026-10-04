@@ -42,7 +42,7 @@ native OS / official API
 → unsupported / ask
 ```
 
-Channel events feed the entity graph, World Model, LRA and Personal Policy as appropriate.
+Channel events feed the entity graph, World Model, OSCAR Memory Fabric and Personal Policy as appropriate.
 
 ## 2. Durable Execution Runtime
 
@@ -106,7 +106,7 @@ adapter/provider owner
 version
 ```
 
-Jev/Workers search the catalog first and load the detailed contract only for a small relevant candidate set.
+Controller/Workers search the catalog first and load the detailed contract only for a small relevant candidate set.
 
 Conceptual flow:
 
@@ -193,7 +193,7 @@ User / Environment
         ↓
 Perception Fabric → World Model
         ↓
-       Jev
+       Controller
         ↓
 Executive Planner
         ↓
@@ -238,7 +238,7 @@ Running through all of it:
 ## Club B reference continuation and privacy
 
 The native runtime now accepts explicit structured capability objectives through
-Jev, preserving the existing durable task/plan/Action/Result/evidence path. Grid
+Controller, preserving the existing durable task/plan/Action/Result/evidence path. Grid
 renewal fences the current unexpired lease; Worker progress stores metadata-only
 checkpoints. Authenticated pause/resume extends the existing version-1 envelope
 additively; older targets reject unsupported controls. No storage migration or

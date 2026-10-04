@@ -21,7 +21,7 @@ Prove:
 
 ```text
 request
-→ Jev
+→ Controller
 → capability/model/retrieval decision
 → native transport/router
 → execution
@@ -110,9 +110,9 @@ Required acceptance:
 - stale/failed derived index falls back truthfully rather than inventing memory;
 - forget removes/tombstones active OSCAR memory/index state according to policy without false secure-erasure claims.
 
-### B4 — Jev memory reliability
+### B4 — Controller memory reliability
 
-Jev must perform memory dependency preflight rather than let the reasoning model guess whether memory exists.
+Controller must perform memory dependency preflight rather than let the reasoning model guess whether memory exists.
 
 Required behavior:
 
@@ -248,7 +248,7 @@ Required scenarios include combining multiple live sources into the World Model,
 
 Deliberately break the integrated system.
 
-Required scenarios include provider/auth failure, coordinator/node/Edge loss, Grid resync, Action Ledger/Undo, memory-index failure/rebuild, unknown/partial/blocked reporting, voice spoof/false-positive checks, capture retention/deletion, Persona truthfulness regression and one complete end-to-end scenario across perception/communication → World Model/Jev/Memory Fabric → policy/planning → capability/model routing → Grid/Worker/device → ledger/artifact → verification → Sunday/voice/text result.
+Required scenarios include provider/auth failure, coordinator/node/Edge loss, Grid resync, Action Ledger/Undo, memory-index failure/rebuild, unknown/partial/blocked reporting, voice spoof/false-positive checks, capture retention/deletion, Persona truthfulness regression and one complete end-to-end scenario across perception/communication → World Model/Controller/Memory Fabric → policy/planning → capability/model routing → Grid/Worker/device → ledger/artifact → verification → Sunday/voice/text result.
 
 **Pass:** major subsystems operate as one evidence-backed developer alpha and remaining limitations are explicit.
 
@@ -261,3 +261,25 @@ Required scenarios include provider/auth failure, coordinator/node/Edge loss, Gr
 | Gate C — Embodied OSCAR | 07–10 | Planned |
 | Gate D — JARVIS Layer | 11–14 | Planned |
 | Gate E — Unified Alpha | 15–17 | Planned |
+
+
+## Reconciliation boundary — 2026-10-04
+
+The OSCAR-owned Decision / Epistemic Controller applies hard deterministic authority
+rules; `oscar/jev.py` is a historical/internal module name, not a TypeSafe Jev
+dependency. Separate deterministic/Laya/hybrid evaluation starts only after Gate B
+PASS. GitHub is the first intended private authentication proof; the shared Auth
+Broker/provider architecture does not require independent OAuth per plugin.
+
+[Deployment architecture](DEPLOYMENT.md) selects free-first Oracle persistent Core
+and Vercel bounded Python/web/API/relay candidates. Deployment, the future Galaxy
+Tab S6 Lite Home Node, decision-model evaluation and full Auth Broker expansion are
+not additional Gate B requirements. Build the Tab node only after OSCAR is fully
+deployed and its main Core architecture is operational.
+
+Slice 05 remains COMPLETE for the documented Windows local-alpha scope; Slice 06
+and Gate B remain PARTIAL. Owner OAuth is NOT STARTED, final owner manual acceptance
+OUTSTANDING, Slice 07 NOT STARTED and PR 12 DRAFT/UNMERGED. The harness repair at
+`c9cb7d2d20fb444cce98e2749eeea5425d4a0ee1` is independently reviewed with 25 focused
+regressions passing and exact-head CI green; it is not a physical acceptance PASS.
+The prior owner focus failure and its evidence remain unchanged.

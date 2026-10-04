@@ -79,7 +79,7 @@ Avoid creating microservices, plugin frameworks, generic managers, deep inherita
 
 ## Specialist-first rule
 
-OSCAR should orchestrate the best available capability instead of reproducing it poorly. The implementation should preserve this behavior from the beginning: coding agents for repository work, computer-use for GUI verification, installed/connected engineering tools for hardware/design/simulation, native OSCAR Transport for connected execution, native OSCAR Model Router for model selection, and LRA/Supermemory for long-term memory.
+OSCAR should orchestrate the best available capability instead of reproducing it poorly. The implementation should preserve this behavior from the beginning: coding agents for repository work, computer-use for GUI verification, installed/connected engineering tools for hardware/design/simulation, native OSCAR Transport for connected execution, native OSCAR Model Router for model selection, and the OSCAR-owned Memory Fabric for long-term memory.
 
 Physical actions remain native OSCAR Edge/device capabilities. Engineering applications are replaceable capabilities, not architectural dependencies.
 
@@ -148,7 +148,7 @@ runs just Heavy. Heavy uses a bounded text sentinel; the other two compare a sma
 JSON response. Every request uses fresh discovery and unchanged default funding
 policy. A genuine no-eligible-route block is truthful acceptance, not generation
 success. Search checks present Tavily slots and then executes the exact first
-freshness objective through Jev/reference transport/native inventories/Tavily.
+freshness objective through Controller/reference transport/native inventories/Tavily.
 It requires all current preflights/native inventories, provenance and per-provider
 relevant official evidence or explicit UNKNOWN after bounded official attempts.
 Unproven completion stays PARTIAL; factual excerpts remain REPORTED and the task

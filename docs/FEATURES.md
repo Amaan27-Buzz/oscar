@@ -62,7 +62,7 @@ This is OSCAR's capability backlog. Listing a feature here does **not** mean it 
 - Provenance to source events.
 - Same-name/ambiguous identities remain separate without evidence.
 
-### Jev Memory Preflight
+### Controller Memory Preflight
 
 - Cheap memory-dependency classification on each interaction.
 - Mandatory retrieval for historical/personal/project/entity/artifact/preference references.
@@ -275,7 +275,7 @@ Unsupported capture remains unsupported. Capture is never designed as covert rec
 - profiles/embeddings are sensitive;
 - OSCAR TTS excluded from learning/matching.
 
-## Jev
+## Controller
 
 - Typed `known / world / recall / verify / reason / reported / specialist / worker / unknown` routing.
 - Deterministic path where sufficient.
@@ -320,7 +320,7 @@ Unsupported capture remains unsupported. Capture is never designed as covert rec
 - Bounded retry/recovery/reroute.
 - Durable task IDs/checkpoints/leases/heartbeats/cancellation/deadlines.
 - Executive coordination across priority/deadline/dependency/resource/interruptibility/risk/cost.
-- Never bypass Jev, Personal Policy or permissions.
+- Never bypass Controller, Personal Policy or permissions.
 
 ## Capability Catalog
 

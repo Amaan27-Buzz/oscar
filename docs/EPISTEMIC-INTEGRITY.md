@@ -83,7 +83,7 @@ Semantic similarity, graph proximity, reranking score and model confidence do no
 
 ### Retrieval miss is not proof of absence
 
-If Jev expects historical/personal memory and a first retrieval returns nothing useful:
+If Controller expects historical/personal memory and a first retrieval returns nothing useful:
 
 ```text
 expected memory
@@ -173,7 +173,8 @@ Examples:
 - current owner preference can supersede older preference history;
 - a historical question may deliberately select an older temporally valid memory.
 
-Jev decides which authority policy fits the claim.
+The Controller applies hard deterministic, claim-specific source-authority rules;
+a replaceable decision model cannot redefine them.
 
 ## Evidence-backed action reporting
 
@@ -265,7 +266,7 @@ When new evidence contradicts an earlier claim:
 
 Avoid ambiguous success language when meaningful parts remain unverified.
 
-## Relationship to Jev
+## Relationship to Controller
 
 ```text
 known      → direct evidence sufficient
@@ -279,12 +280,12 @@ worker     → delegated responsibility
 unknown    → retrieve/ask rather than fabricate
 ```
 
-Jev also owns:
+Controller also owns:
 
 - freshness classification;
 - Memory Preflight;
 - retrieval escalation when historical context is expected;
-- claim-specific authority selection;
+- application of hard deterministic claim-specific authority rules;
 - requirement for source-backed recall before historical/personal assertions.
 
 ## Action Ledger

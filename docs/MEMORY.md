@@ -48,7 +48,7 @@ retrieval           relationships
       + local reranker
              │
              ▼
-   Jev Memory Preflight
+   Controller Memory Preflight
    authority/conflict logic
              │
              ▼
@@ -153,11 +153,15 @@ OSCAR distinguishes at least:
 
 Personal Policy is not a memory class. Permission is not a memory class. Voice Match/Voice Map embeddings remain dedicated sensitive system data.
 
-## Jev Memory Preflight
+## Controller Memory Preflight
+
+The Controller is OSCAR's own Decision / Epistemic Controller. Its current Python
+module `oscar/jev.py` has a temporary historical/internal name; TypeSafe Jev is not
+a required runtime/API. Replaceable decision models cannot grant memory authority.
 
 Memory retrieval is not left to the language model's intuition.
 
-Every interaction receives a cheap Jev preflight that asks whether the objective depends on personal/history/project/entity context.
+Every interaction receives a cheap Controller preflight that asks whether the objective depends on personal/history/project/entity context.
 
 Retrieval is mandatory when the request plausibly references:
 
@@ -172,7 +176,7 @@ A deterministic question such as `2 + 2` does not need memory retrieval.
 
 Core rule:
 
-> The reasoning model does not decide whether memory exists. Jev decides whether memory retrieval is required.
+> The reasoning model does not decide whether memory exists. Controller decides whether memory retrieval is required.
 
 ## Retrieval ladder
 
@@ -193,7 +197,7 @@ Do not jump directly from one empty vector query to `I don't remember`.
 
 ### Expected-memory misses
 
-If Jev classifies a request as clearly historical/personal and retrieval returns no useful result:
+If Controller classifies a request as clearly historical/personal and retrieval returns no useful result:
 
 ```text
 expected_memory = true
@@ -271,7 +275,9 @@ hard safety / permission / Personal Policy
 
 Authority is claim-specific. A live filesystem read outranks memory of a file. Current weather outranks an old weather memory. A current explicit preference can supersede an older preference.
 
-Jev chooses the authority policy and whether verification/live retrieval is required.
+The Controller applies OSCAR's hard deterministic, claim-specific authority rules
+and determines whether verification/live retrieval is required. A decision model
+cannot change live-vs-memory precedence or turn recalled history into current truth.
 
 ## Memory formation
 
@@ -335,7 +341,7 @@ confidence
 
 Same names do not prove identity. Unknown or ambiguous entities remain separate until evidence supports a merge.
 
-Jev resolves likely entity IDs before broad historical retrieval when doing so improves precision.
+Controller resolves likely entity IDs before broad historical retrieval when doing so improves precision.
 
 ## Background consolidation
 
@@ -455,7 +461,7 @@ The prior planned Supermemory integration has been retired. Historical checkpoin
 4. OSCAR never says `I remember X` without retrieved/active-context evidence for X.
 5. Personal/historical factual claims require source event/memory provenance.
 6. A failed retrieval is not proof the memory does not exist.
-7. Jev escalates retrieval before returning UNKNOWN when historical memory is expected.
+7. Controller escalates retrieval before returning UNKNOWN when historical memory is expected.
 8. Live/current authoritative evidence outranks stale memory.
 9. History is superseded temporally, not silently overwritten.
 10. No single retrieval mechanism is trusted as complete.

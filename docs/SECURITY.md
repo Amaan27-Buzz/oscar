@@ -142,9 +142,34 @@ Do not use one blanket shared secret across phone, desktop, cloud and Edge.
 
 Cloud compromise must not bypass local safety interlocks.
 
+## Auth Broker and decision-controller authority
+
+OSCAR owns the shared Auth Broker target, with reusable provider adapters and
+opaque CredentialRef values. Plugins declare auth profile/scopes/risk/readback;
+only trusted broker/transport code resolves raw secrets for required protocol I/O.
+Native/server vaults contain secrets; durable state contains references and lifecycle
+metadata. Provider/account/tenant/audience boundaries are not erased by reuse.
+Ask for minimum initial scopes; subsequent upgrades require appropriate owner
+consent and OSCAR permission checks. OAuth consent never overrides Personal Policy,
+consequential-action confirmation or local deterministic safety.
+
+The Decision / Epistemic Controller applies these hard deterministic rules.
+Laya/Jev or another replaceable classification provider cannot grant permission,
+change source authority or waive confirmation. `oscar/jev.py` is historical naming
+for OSCAR-owned logic, not an external authority dependency.
+
+GitHub is the first intended real authentication proof, currently NOT STARTED.
+The implemented enrollment/recovery state machine is not proof of owner account
+access or a fully generalized Auth Broker. Local disconnect deletes a local secret;
+provider revocation remains UNKNOWN/PENDING owner action until independent provider
+evidence confirms it. See [connector/auth design](CONNECTOR-FABRIC.md).
+
 ## Cloud coordinator security
 
 The cloud coordinator is replaceable infrastructure, not a root of unlimited authority.
+[DEPLOYMENT.md](DEPLOYMENT.md) separates the Oracle stateful Core candidate from
+Vercel bounded Python API/web/relay functions. Neither is deployed in this pass;
+the future Home Node cannot bypass Core permissions or local Edge safety.
 
 - provider admin credentials stay out of low-trust nodes;
 - cloud adapters expose only scoped OSCAR contracts;

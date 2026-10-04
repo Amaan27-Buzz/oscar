@@ -68,7 +68,7 @@ Safe conceptual flow for consequential durable rules:
 
 ```text
 user instruction
-→ Jev recognizes durable policy change
+→ Controller recognizes durable policy change
 → interpret candidate structured rule
 → resolve scope/conflicts/permission dependencies
 → show concise interpretation when material
@@ -331,7 +331,7 @@ objective / event
 → permission / owner revocation state
 → applicable Personal Policy
 → Protocol/Worker state
-→ Jev / Executive decision
+→ Controller / Executive decision
 → execute / ask / defer / block
 → verify mutation where practical
 → Persona shapes presentation only

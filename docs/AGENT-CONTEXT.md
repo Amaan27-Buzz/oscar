@@ -13,7 +13,8 @@ OSCAR keeps one canonical project truth and uses thin agent-specific adapters. D
 | `TASTE.md` | qualitative quality/motion/anti-slop bar |
 | `docs/PRODUCT.md` | product north star |
 | `docs/CHIEF-OF-STAFF.md` | ambient context, commitments, schedule/proactivity and Sunday presence |
-| `docs/ARCHITECTURE.md` | system boundaries and ownership |
+| `docs/ARCHITECTURE.md` | system boundaries and OSCAR-owned Decision / Epistemic Controller |
+| [deployment](DEPLOYMENT.md) | free-first replaceable Core/API hosts and deferred Home Node |
 | `docs/MEMORY.md` | OSCAR-owned one-relationship Memory Fabric |
 | `docs/ROADMAP.md` | implementation order/current slice |
 | `docs/BUILD-GATES.md` | cross-slice manual verification checkpoints |
@@ -42,6 +43,22 @@ OSCAR keeps one canonical project truth and uses thin agent-specific adapters. D
 | `image-prompts/` | optional visual-reference prompt library, not implementation truth |
 
 Agent-specific files point back to these rather than becoming independent definitions.
+
+## Reconciled ownership and current boundary
+
+Controller means OSCAR's Decision / Epistemic Controller. `oscar/jev.py` is an
+unchanged historical/internal filename; no TypeSafe Jev runtime/API is required.
+Laya/Jev decision providers remain replaceable beneath OSCAR's hard deterministic
+authority rules, with evaluation only after Gate B PASS. Auth Broker/provider/vault
+expansion is a target design, not implemented universal authentication.
+
+Oracle is the preferred free-first persistent Core candidate; Vercel supports
+Python/Fluid bounded web/API/relay workloads. The Galaxy Tab S6 Lite (2021) is a
+future Home Node only after full deployment and operational Core architecture.
+None of deployment, Tab implementation, decision-model evaluation or full broker
+expansion is a Gate B requirement. Owner OAuth is NOT STARTED, final manual
+acceptance OUTSTANDING, Slice 05 COMPLETE, Slice 06/Gate B PARTIAL, Slice 07 NOT
+STARTED, PR 12 DRAFT/UNMERGED. Historical evidence retains its original vocabulary.
 
 ## Context loading
 
@@ -124,7 +141,7 @@ one interaction point
 → derived Qdrant semantic/hybrid index
 → derived Graphiti + Neo4j temporal/entity index
 → Retrieval Fusion / local reranker
-→ Jev Memory Preflight + authority checks
+→ Controller Memory Preflight + authority checks
 → Context Assembly
 → reasoning/action
 → Claim Verification
@@ -135,7 +152,7 @@ Rules:
 - canonical Event Archive survives derived-index replacement/loss;
 - Qdrant/Graphiti/Neo4j are rebuildable indexes, not truth owners;
 - no managed memory service is mandatory;
-- personal/history references trigger Jev retrieval before reasoning;
+- personal/history references trigger Controller retrieval before reasoning;
 - failed first retrieval is not proof of absent memory;
 - retrieval broadens through structured state → FTS/archive → Qdrant → Graphiti → aliases/time expansion → bounded deep archive → UNKNOWN;
 - no `I remember X` without actually retrieved/active evidence;
@@ -150,14 +167,14 @@ See `docs/MEMORY.md`.
 ## Routing boundaries
 
 ```text
-Jev                  → what class of action/evidence is needed?
+Controller           → what class of action/evidence is needed?
 Capability selection → which executor/tool/device should act?
 Model Router         → which provider/model/credential should reason?
 ```
 
 Coding agents, terminal, computer use and installed applications are executable capabilities, not provider keys.
 
-Memory retrieval is also not model routing: Jev can require recall before any reasoning model is selected.
+Memory retrieval is also not model routing: Controller can require recall before any reasoning model is selected.
 
 ## Connection Grid
 

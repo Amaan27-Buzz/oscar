@@ -9,7 +9,7 @@ OSCAR does **not** depend on the separate SwitchRoute runtime. SwitchRoute remai
 OSCAR is **not one model**.
 
 ```text
-Jev
+Controller
 → decide whether model reasoning is needed
 → OSCAR Model Router
 → provider → account/quota pool → model → credential
@@ -40,7 +40,7 @@ Do not collapse all routing into one generic router.
 ```text
 request / objective
       ↓
-     Jev
+     Controller
       ↓
 ├─ deterministic capability
 ├─ live retrieval / search / verification
@@ -50,7 +50,7 @@ request / objective
 └─ ask user
 ```
 
-- **Jev** chooses the class of action.
+- **Controller** chooses the class of action.
 - **Capability selection** chooses an executable tool/app/device/specialist.
 - **Model Router** chooses provider/account-pool/model/credential only after a model path is selected.
 - **Search/live retrieval** is a capability path, not just another model.

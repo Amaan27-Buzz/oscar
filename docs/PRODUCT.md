@@ -57,7 +57,7 @@ SQLite + WAL + FTS5
                 │
         Retrieval Fusion + reranker
                 │
-        Jev Memory Preflight
+        Controller Memory Preflight
                 │
           Context Assembly
 ```
@@ -69,7 +69,7 @@ Product memory guarantees we design toward:
 - OSCAR does not say `I remember X` unless X was actually retrieved or remains in active context with provenance;
 - personal/historical claims bind to source events/memories;
 - an empty first retrieval is not treated as proof of absent memory;
-- Jev broadens retrieval before returning UNKNOWN when memory is expected;
+- Controller broadens retrieval before returning UNKNOWN when memory is expected;
 - live authoritative state beats stale recall for current-state questions;
 - corrections supersede old current facts without destroying history;
 - model-derived inference never silently becomes fact;
@@ -154,7 +154,7 @@ OSCAR does not depend on separate Latch/SwitchRoute runtimes.
 - Latch-derived ideas → OSCAR Transport + Capability Fabric.
 - SwitchRoute-derived ideas → OSCAR Model Router.
 
-Jev decides action/evidence class; capability selection chooses executor; Model Router chooses a model/provider only after reasoning is required.
+Controller decides action/evidence class; capability selection chooses executor; Model Router chooses a model/provider only after reasoning is required.
 
 ## Persona
 
@@ -191,8 +191,8 @@ Raw audio, transcripts, summaries and derived memory are separate retention deci
 4. **Personal Policy is first-class.** Explicit desired behavior is distinct from memory, Persona and permissions.
 5. **Communication belongs to OSCAR.** Calls/messages/email/meetings/dictation/follow-up share one identity/context architecture.
 6. **Reflexes bypass intelligence.** Emergency stop/mute/cancel and deterministic controls do not wait on cloud reasoning.
-7. **Use models only where useful.** Jev decides whether reasoning is needed.
-8. **Know when context is missing.** Jev retrieves/expands/asks rather than guessing personal/current facts.
+7. **Use models only where useful.** Controller decides whether reasoning is needed.
+8. **Know when context is missing.** Controller retrieves/expands/asks rather than guessing personal/current facts.
 9. **Never claim more than evidence supports.** External success testimony is not objective verification.
 10. **Get faster with experience.** Verified procedures may become evaluated reusable automation.
 11. **Workers recover before escalating.** Repair/reroute is bounded and never expands authority.

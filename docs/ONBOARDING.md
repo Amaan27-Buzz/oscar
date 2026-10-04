@@ -261,7 +261,7 @@ Test a chain such as:
 
 ```text
 current context / voice / notification
-→ World Model / Jev
+→ World Model / Controller
 → permission + Personal Policy
 → capability/search/model route
 → remote/local execution

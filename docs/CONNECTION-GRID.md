@@ -108,50 +108,62 @@ A cloud deployment can provide an always-reachable rendezvous and durable coordi
 
 The cloud component should remain portable. OSCAR should be deployable as:
 
-- a lightweight persistent VM/container;
-- an event-driven/serverless coordinator where long-lived process state is unnecessary;
-- a user-supplied paid cloud deployment;
-- a free-tier deployment where the provider's limits are acceptable.
+- a free-tier persistent VM/container where verified provider limits are acceptable;
+- free-tier bounded API/relay functions with separately demonstrated durable state;
+- a self-hosted compatible deployment;
+- an optional owner-selected paid BYOC deployment.
 
 Cloud deployment is **replaceable infrastructure**, not OSCAR's identity.
 
-### Free / low-cost deployment candidates
+### Free-first deployment candidates
 
-Provider offerings change, so re-verify before deployment. As researched on **2026-10-01**:
+Official Oracle and Vercel sources checked on **2026-10-04**; recheck actual
+account/region eligibility and limits before deployment. Detailed sources and
+lifecycle constraints live in [DEPLOYMENT.md](DEPLOYMENT.md).
 
-| Provider | Useful current free option | Suitability for OSCAR |
-|---|---|---|
-| Oracle Cloud | Always Free AMD/Ampere compute and related storage/network services | Strong candidate for a small persistent coordinator when capacity/account availability permits |
-| Google Cloud | Free Tier includes one `e2-micro` instance per month in eligible US regions plus limited disk/egress | Good small persistent coordinator option; billing/account eligibility still applies |
-| Cloudflare Workers + Durable Objects | Workers Free plan; SQLite-backed Durable Objects available on Free; hibernating WebSockets supported | Excellent rendezvous/event/control-plane option; not a general always-running VM |
-| Deno Deploy | Free plan with request/egress allowances | Good stateless/event API or lightweight coordinator; not a conventional persistent daemon |
-| AWS | Lambda has always-free monthly request/compute allowance; new EC2 free access is credit/time limited | Good serverless or paid BYOC option; do not treat EC2 as forever-free |
-| Render | Free web services exist but spin down after inactivity and have monthly limits | Development/fallback only, not the sole always-on coordinator |
-| Koyeb | One free web instance but it scales to zero after inactivity | Development/fallback only, not the sole always-on coordinator |
-| Fly.io | Short free trial; persistent Machines are paid | Paid low-cost option, not a free baseline |
+| Provider | Verified documented free option | Intended OSCAR role |
+| --- | --- | --- |
+| [Oracle Always Free](https://docs.oracle.com/en-us/iaas/Content/FreeTier/freetier_topic-Always_Free_Resources.htm) | A1: 2 OCPUs and 12 GB RAM total; 200 GB combined boot/block storage | strongest current first persistent/stateful Core candidate, subject to capacity, eligibility, ARM64 testing and idle reclamation |
+| [Vercel Hobby](https://vercel.com/docs/plans/hobby) | free personal/non-commercial Python Functions with bounded Fluid usage | strong web/API/frontend/callback/webhook/stateless connector/relay candidate; Functions alone are not a persistent Core |
 
-OSCAR should support a **BYOC** path for AWS, GCP, Azure, Oracle, Hetzner, DigitalOcean, Vultr or any compatible deployment target without making one provider mandatory.
+Earlier exploration included Google Cloud, Cloudflare Workers/Durable Objects,
+Deno Deploy, AWS, Render and Koyeb. Their 2026-10-01 allowance observations are not
+reasserted as current selections here; re-verify current free tiers and lifecycle
+limits before choosing one. Paid hosts and trial-only offers are optional BYOC
+choices, not the recommended free baseline. Hosting remains replaceable.
 
 ## Recommended availability shape
 
-For the first practical alpha:
-
 ```text
-Cloud rendezvous / durable coordination
-        │
-        ├── Sunday = owner control + notifications + remote supervision
-        ├── Desktop = high-capability executor
-        └── Edge = local always-on perception/reflex/safety
+OSCAR Core = persistent identity/state/memory/task coordination
+                       |
+                Connection Grid
+          +------------+------------+
+          |            |            |
+        Sunday       Desktop      Home Node (later)
+      main phone      Worker      Galaxy Tab S6 Lite
+                                     |
+                                ESP32 / Pico Edge
 ```
 
-A useful free-first baseline can combine:
+Prefer Oracle Always Free for the first persistent stateful Core if actual
+capacity/eligibility and ARM64 acceptance permit. Vercel is complementary bounded
+Python/API/web/relay infrastructure. A temporary Function filesystem or process
+memory cannot substitute for demonstrated durable archive/leases/recovery.
+No deployment acceptance is claimed.
 
-- Cloudflare Durable Objects/Workers for rendezvous/control-plane behavior where suitable;
-- Oracle Always Free or Google Free Tier VM when a persistent lightweight coordinator is desired;
-- Sunday as the owner's always-carried control surface;
-- OSCAR Edge as the local always-on reflex/presence layer.
+The owner's Samsung Galaxy Tab S6 Lite (2021) is a post-deployment expansion node:
+local always-on Grid presence, LAN/Bluetooth, ESP32/Pico bridging and permissioned
+sensors/notifications/control where Android permits. Optional local services or
+lightweight survival/cache/checkpoint state require later practical testing; do not
+assume the full canonical Qdrant/Neo4j/ML stack fits Android.
+**Do not build the Tab/Home Node until OSCAR is fully deployed and the main Core
+architecture is operational.** This is not a Gate B requirement. ESP32/Pico are
+local nerves/reflexes/sensors/actuators, not full Core hosts; safety remains local
+and deterministic during higher-layer loss.
 
-Do not build distributed consensus machinery before there is a concrete need. Early OSCAR can use one preferred coordinator with durable leases/checkpoints and explicit failover rules.
+Early development still uses one preferred coordinator with durable leases,
+checkpoints and explicit failover rules rather than speculative consensus machinery.
 
 ## Remote continuation — Codex Remote-style behavior
 

@@ -42,7 +42,7 @@ Perception Fabric
        ▼
 World Model + current commitments / attention
        │
-      Jev
+      Controller
        │
  ┌─────┼──────────────────────────────────────────┐
  │     │                    │                     │
@@ -101,7 +101,7 @@ Core owns responsibilities that must remain coherent across embodiments:
 - active objectives/tasks/Workers/Protocols;
 - permission and Personal Policy evaluation;
 - Persona selection/context triggers;
-- Jev routing and evidence requirements;
+- Controller routing and evidence requirements;
 - capability discovery/delegation/reroute decisions;
 - event prioritization;
 - verification strategy;
@@ -161,9 +161,30 @@ Losing either derived index must not erase OSCAR's history. Derived indexes are 
 
 See [MEMORY.md](MEMORY.md).
 
-## 5. Jev — intent + epistemic + retrieval routing
+## 5. Decision / Epistemic Controller — intent + evidence routing
 
-TypeSafe Jev decides what kind of evidence/action path is required:
+OSCAR owns the **Decision / Epistemic Controller** (shortened to **Controller**
+throughout active docs). It owns intent classification, memory preflight,
+freshness/live-source decisions, evidence requirements, capability class,
+verification requirements, ambiguity/ASK-vs-ACT decisions and model-tier
+recommendations. The Model Router still selects the actual provider/model;
+capability selection still chooses the executor.
+
+The current implementation is OSCAR-owned deterministic Python logic in
+`oscar/jev.py`. That module name is a temporary historical/internal name, not a
+TypeSafe Jev runtime/API dependency. It is not renamed in this Gate B pass.
+
+Hard deterministic rules remain authoritative for safety, permissions, Personal
+Policy, live-vs-memory authority, required confirmation and consequential actions.
+A decision model may propose a classification; it cannot override these rules.
+After Gate B PASS, a separate System-1 evaluation will compare the current
+deterministic controller, Laya, and deterministic + Laya hybrid. Laya, Jev or a
+similar decision model is a replaceable implementation/provider beneath OSCAR's
+controller, never the owner of its authority semantics. No such model is selected,
+required or evaluated here. Model-tier recommendation is a controller contract;
+this does not claim a new implemented model recommendation path tonight.
+
+The controller decides what kind of evidence/action path is required:
 
 ```text
 known      → direct evidence sufficient
@@ -177,7 +198,7 @@ worker     → delegated Worker
 unknown    → retrieve/ask instead of fabricate
 ```
 
-Jev also performs a **Memory Preflight**. If the request plausibly depends on previous user/project/entity/task/artifact/preference/history context, retrieval is mandatory before a historical/personal claim is generated.
+Controller also performs a **Memory Preflight**. If the request plausibly depends on previous user/project/entity/task/artifact/preference/history context, retrieval is mandatory before a historical/personal claim is generated.
 
 The reasoning model does not decide whether memory exists.
 
@@ -196,7 +217,7 @@ active context
 
 An empty retrieval result is not proof that memory never existed.
 
-Jev, capability selection and Model Router remain separate decisions.
+Controller, capability selection and Model Router remain separate decisions.
 
 ## 6. Evidence-bound recall
 
@@ -339,7 +360,7 @@ Personal Policy can constrain behavior but cannot grant a missing permission. Me
 
 Coordinates multiple objectives/commitments using priority, deadline, dependencies, flexibility, resource/device availability, cost, risk and interruptibility.
 
-It may schedule, parallelize, pause, pre-empt, reroute, defer and—where policy permits—replan flexible work. It never bypasses Jev, permissions or Personal Policy.
+It may schedule, parallelize, pause, pre-empt, reroute, defer and—where policy permits—replan flexible work. It never bypasses Controller, permissions or Personal Policy.
 
 ## 14. Durable Execution Runtime
 
@@ -363,6 +384,25 @@ Models reason; they do not receive authority automatically.
 
 OSCAR-owned typed transport provides node/session identity, pairing/scoped credentials, task/event/action/result transport, capability advertisement, correlation IDs, reconnect/backoff, progress, replay protection/idempotency, version negotiation, audit/provenance and outbound-first private-device rendezvous.
 
+## Shared Auth Broker and provider adapters
+
+OSCAR's target Auth Broker owns shared OAuth2/PKCE, Device Flow, API key,
+MCP/session authentication, refresh/expiry, incremental scope upgrades,
+disconnect/revocation state and the native/server vault abstraction. Connectors
+carry an opaque CredentialRef and provider/auth profile/scopes/capabilities/risk/
+readback declarations; plugins do not independently implement every auth lifecycle.
+Trusted broker/provider transport code resolves secrets only where protocol I/O
+requires them. Raw tokens do not go to plugins when an opaque reference suffices.
+
+One provider adapter is reused across related capabilities: Google for Gmail,
+Calendar, Drive and Contacts; Microsoft for Outlook, Calendar, OneDrive and Teams;
+GitHub for GitHub capabilities. Account/tenant/audience/scopes remain explicit;
+shared provider code does not merge identities or authorize unrelated scopes.
+GitHub device OAuth is only the first intended real Gate B authentication proof,
+currently NOT STARTED by the owner. The full broker expansion is a future design,
+not a claim that every auth mode/provider is implemented. See
+[CONNECTOR-FABRIC.md](CONNECTOR-FABRIC.md) and [SECURITY.md](SECURITY.md).
+
 ## 18. Connection Grid
 
 ### Sunday
@@ -371,15 +411,29 @@ Preferred owner-control/approval surface and strongest everyday Chief-of-Staff e
 
 ### Cloud coordinator
 
-Replaceable rendezvous/durable coordination. Free-tier, paid or BYOC infrastructure is possible; cloud is not identity.
+Replaceable persistent Core coordination owns identity/state/memory/task
+coordination above the Grid. The preferred free-first stateful host candidate is
+Oracle Always Free; Vercel Python Functions are a separate bounded API/web/relay
+candidate. Neither is deployed or mandatory. See [DEPLOYMENT.md](DEPLOYMENT.md).
 
 ### Desktop nodes
 
 High-capability execution: coding agents, terminal, filesystem, browser, computer use, installed apps, GPU/local models and long-running work.
 
+### Future Home Node
+
+The owner's Samsung Galaxy Tab S6 Lite (2021) is a future always-on local Grid
+node and LAN/Bluetooth/ESP32/Pico bridge where Android permits. Build only after
+OSCAR is fully deployed and the main Core architecture is operational. Do not
+assume it runs the canonical Qdrant + Neo4j + ML stack or makes Android system
+privilege available. It is not a Gate B requirement.
+
 ### Edge
 
-Persistent local wake/Sentry signals, sensors/GPIO/actuators and deterministic safety/reflexes.
+ESP32/Pico are nerves/reflexes/sensors/actuators, not full OSCAR Core hosts.
+Hardware safety is local and deterministic. Edge capabilities may provide local
+wake/Sentry signals, sensors, GPIO, actuators and safety/reflex behavior where
+actually implemented and advertised.
 
 Availability can degrade:
 
@@ -454,7 +508,7 @@ OSCAR monitors provider/auth health, Grid connectivity, capability staleness, ta
 
 ### Gate A
 
-**PASS.** Core Loop/Jev/reference Grid, adaptive model routing and source-qualified search/freshness acceptance are verified for their documented scope.
+**PASS.** Core Loop/Controller/reference Grid, adaptive model routing and source-qualified search/freshness acceptance are verified for their documented scope.
 
 ### Gate B
 

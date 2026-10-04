@@ -182,7 +182,7 @@ Persona changes should be simple:
 "On calls, sound professional and don't ramble."
 ```
 
-Jev translates the request into a proposed PersonaProfile/trigger update.
+Controller translates the request into a proposed PersonaProfile/trigger update.
 
 Consequential or broad changes receive a concise confirmation when useful.
 

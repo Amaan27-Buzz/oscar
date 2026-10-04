@@ -25,7 +25,7 @@ Build OSCAR's nervous system first, finish each planned gate end-to-end, then at
 
 ```text
 objective / event
-→ current context + Jev
+→ current context + Controller
 → memory/live retrieval/capability/model decision
 → permission + Personal Policy
 → execute
@@ -57,11 +57,11 @@ Verified evidence-backed objective → action → result → independent verific
 
 See [Club A checkpoint](CLUB-A-CHECKPOINT.md).
 
-## Slice 02 — TypeSafe Jev ✅
+## Slice 02 — OSCAR Decision / Epistemic Controller ✅
 
 Verified typed deterministic/epistemic routing for known/world/recall/verify/reason/reported/specialist/worker/unknown paths, with conservative handling of missing capability and freshness-sensitive retrieval.
 
-Jev is now also the architectural owner of Memory Preflight/retrieval escalation requirements defined in [MEMORY.md](MEMORY.md); the production Memory Fabric implementation is Slice 06 work.
+Controller is now also the architectural owner of Memory Preflight/retrieval escalation requirements defined in [MEMORY.md](MEMORY.md); the production Memory Fabric implementation is Slice 06 work.
 
 ## Slice 03 — Native Transport + Capability Catalog + Connection Grid foundation ✅
 
@@ -213,7 +213,7 @@ Implement as derived/rebuildable state:
 - optional Model Router/provider paths without architectural dependence;
 - no provider-specific memory truth.
 
-### 06E — Jev Memory Preflight + Retrieval Planner
+### 06E — Controller Memory Preflight + Retrieval Planner
 
 Every interaction gets a cheap memory-dependency classification.
 
@@ -377,7 +377,7 @@ Run one end-to-end scenario across:
 
 ```text
 perception / communication
-→ World Model / Chief-of-Staff context / Jev
+→ World Model / Chief-of-Staff context / Controller
 → Memory Fabric / live evidence
 → Personal Policy + Persona
 → Executive / Durable Runtime
@@ -393,7 +393,7 @@ perception / communication
 
 | Club | Slices | Focus | Status |
 |---|---:|---|---|
-| A — Brain | 01–04 | Core + Jev + Transport/Grid foundation + adaptive Model Router | **PASS** |
+| A — Brain | 01–04 | Core + Controller + Transport/Grid foundation + adaptive Model Router | **PASS** |
 | B — Can Do Work | 05–06 | Real machine/continuation + Memory Fabric + policy/live context | **PARTIAL — current work** |
 | C — Embodied Core | 07–08 | Edge/reflexes + Voice/Identity/Persona | Planned after Gate B PASS |
 | D1 — Sunday | 09 | Android embodiment + communication + owner controls | Planned |
@@ -423,7 +423,7 @@ The original ordered acceptance sequence below remains a contract, not a list of
 → Qdrant
 → Graphiti + Neo4j
 → local embeddings/reranker
-→ Jev Memory Preflight/retrieval escalation
+→ Controller Memory Preflight/retrieval escalation
 → evidence-bound claims
 → Memory Writer/consolidation
 → correction/forget/rebuild/evals
@@ -444,3 +444,25 @@ The [pre-manual Gate B hardening pass](GATE-B-HARDENING.md) improves BM25/ONNX r
 generation integrity, scoped graph rebuilds, credential recovery and evidence-bound claims.
 It adds no later-slice capability. Slice 05 remains COMPLETE for its documented local scope;
 Slice 06 and Gate B remain PARTIAL pending owner/private/manual acceptance.
+
+
+## Reconciliation boundary — 2026-10-04
+
+The OSCAR-owned Decision / Epistemic Controller applies hard deterministic authority
+rules; `oscar/jev.py` is a historical/internal module name, not a TypeSafe Jev
+dependency. Separate deterministic/Laya/hybrid evaluation starts only after Gate B
+PASS. GitHub is the first intended private authentication proof; the shared Auth
+Broker/provider architecture does not require independent OAuth per plugin.
+
+[Deployment architecture](DEPLOYMENT.md) selects free-first Oracle persistent Core
+and Vercel bounded Python/web/API/relay candidates. Deployment, the future Galaxy
+Tab S6 Lite Home Node, decision-model evaluation and full Auth Broker expansion are
+not additional Gate B requirements. Build the Tab node only after OSCAR is fully
+deployed and its main Core architecture is operational.
+
+Slice 05 remains COMPLETE for the documented Windows local-alpha scope; Slice 06
+and Gate B remain PARTIAL. Owner OAuth is NOT STARTED, final owner manual acceptance
+OUTSTANDING, Slice 07 NOT STARTED and PR 12 DRAFT/UNMERGED. The harness repair at
+`c9cb7d2d20fb444cce98e2749eeea5425d4a0ee1` is independently reviewed with 25 focused
+regressions passing and exact-head CI green; it is not a physical acceptance PASS.
+The prior owner focus failure and its evidence remain unchanged.

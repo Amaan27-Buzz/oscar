@@ -26,9 +26,16 @@ The visual/interaction direction is defined by `DESIGN.md` and `TASTE.md`.
 The Grid is the product-visible relationship between:
 
 - **Sunday** — owner control/approval/notifications/Chief-of-Staff presence;
-- **Cloud coordinator** — rendezvous and durable coordination;
+- **OSCAR Core on replaceable hosts** — identity/state/memory/task coordination;
 - **Desktop nodes** — high-capability execution;
-- **OSCAR Edge** — persistent local perception/reflex/safety.
+- **Home Node (future)** — owner's Galaxy Tab S6 Lite (2021), local Grid/bridge roles
+  only after OSCAR is fully deployed and the main Core architecture is operational;
+- **OSCAR Edge** — ESP32/Pico nerves/reflexes/sensors/actuators with deterministic safety.
+
+Oracle is the preferred free-first persistent Core candidate; Vercel Python/Fluid
+Functions are a bounded API/web/relay candidate. Neither is deployed here. The
+Home Node is not a Gate B requirement and does not imply Android can host the full
+Qdrant/Neo4j/ML stack. See [DEPLOYMENT.md](DEPLOYMENT.md).
 
 Normal UI stays compact:
 

@@ -45,9 +45,17 @@ Embedding/reranking are replaceable OSCAR capabilities.
 
 See `docs/MEMORY.md`.
 
-## ADR-004 — Jev owns memory preflight and epistemic retrieval routing
+## ADR-004 — OSCAR owns the Decision / Epistemic Controller
 
-**Decision:** TypeSafe Jev decides whether a request requires known/world/recall/verify/reason/reported/specialist/worker/unknown paths and whether memory retrieval is mandatory.
+**Decision:** OSCAR owns intent/epistemic routing and decides whether a request requires known/world/recall/verify/reason/reported/specialist/worker/unknown paths and whether memory retrieval is mandatory.
+
+The Controller owns intent classification, memory preflight, freshness/live-source
+decisions, evidence and verification requirements, capability class, ambiguity/
+ASK-vs-ACT decisions and model-tier recommendations. Safety, permissions,
+Personal Policy, live-vs-memory precedence, confirmations and consequential-action
+rules remain hard deterministic authority. Model routing and executor selection
+remain separate. `oscar/jev.py` is an unchanged historical/internal module name
+for OSCAR's deterministic logic; no TypeSafe Jev runtime/API is required.
 
 For personal/historical/project/entity/artifact/preference references, retrieval precedes historical factual claims.
 
@@ -137,7 +145,7 @@ Latch remains reference/prototype material, not a required runtime.
 **Decision:** keep three boundaries distinct:
 
 ```text
-Jev                  → what class of action/evidence is needed?
+Controller           → what class of action/evidence is needed?
 Capability selection → which executor/tool/device should act?
 Model Router         → which provider/model/credential should reason?
 ```
@@ -336,3 +344,43 @@ PARTIAL. Verified scoped foundations include native Windows machine execution, u
 Verified local acceptance now includes typed PowerShell, registered Notepad/UIA, isolated browser, separate owner control, native credentials, canonical WAL/FTS5, real Qdrant/Graphiti/Neo4j with local embedding/reranking, memory evaluation and owner-reviewed model policy candidates. Slice 05 is COMPLETE for this Windows local-alpha scope; Slice 06 and Gate B remain PARTIAL. Real private OAuth, provider revocation and private-source/live-memory federation require owner authorization. General conversational recall integration remains a composition boundary, not a proven autonomous product. See [Gate B completion ledger](GATE-B-COMPLETION.md).
 
 Club C does not begin until Gate B mandatory acceptance passes.
+
+
+## ADR-036 — Decision models are replaceable beneath OSCAR's controller
+
+**Decision:** after Gate B PASS, run a separate System-1 evaluation of current
+deterministic control versus Laya versus deterministic + Laya hybrid. No Laya/Jev
+model/provider owns OSCAR's authority semantics, and no such evaluation or runtime
+dependency begins during Gate B. Current `jev.py` naming stays until a later scoped
+rename. Historical checkpoints retain the terminology used when they were written.
+
+## ADR-037 — Shared authentication, reusable provider adapters
+
+**Decision:** OSCAR owns the target Auth Broker and opaque CredentialRef boundary;
+plugins declare provider, auth type/profile, required incremental scopes,
+capabilities, risk and independent readback rather than each building OAuth.
+Google authentication is shared by Gmail/Calendar/Drive/Contacts; Microsoft by
+Outlook/Calendar/OneDrive/Teams; GitHub by GitHub capabilities. Provider/account/
+tenant/audience boundaries and permissions remain explicit. Native/server vaults
+hold raw secrets; only trusted broker/transport code resolves them for protocol I/O.
+Local disconnect never implies provider revocation without evidence.
+
+GitHub is the first intended real Gate B auth proof, not the universal auth design.
+The existing native vault, enrollment state machine and provider protocols are
+foundations; full broker/provider expansion is later work and not a new Gate B
+requirement. Owner OAuth remains NOT STARTED.
+
+## ADR-038 — Free-first replaceable deployment and deferred Home Node
+
+**Decision:** Oracle Always Free is the preferred first persistent/stateful Core
+candidate; Vercel Hobby Python/Fluid Functions are a bounded web/API/callback/
+webhook/relay candidate. Official allowances and lifecycle constraints checked on
+2026-10-04 live in [DEPLOYMENT.md](DEPLOYMENT.md). Neither host is OSCAR's identity,
+a deployment claim or a paid baseline requirement.
+
+The owner's Samsung Galaxy Tab S6 Lite (2021) becomes a possible Home Node only
+after OSCAR is fully deployed and the main Core architecture is operational.
+Sunday remains the everyday phone embodiment, Desktop the execution Worker, and
+ESP32/Pico the local deterministic Edge. The tablet does not imply the full
+Qdrant/Neo4j/ML stack is practical on Android. Deployment, Home Node, decision-model
+evaluation and full Auth Broker expansion are not Gate B completion requirements.

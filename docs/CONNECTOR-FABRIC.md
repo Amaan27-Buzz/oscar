@@ -3,9 +3,61 @@
 OSCAR prefers official structured authenticated APIs, then official connectors,
 reviewed MCP sessions, authorized app automation and computer-use fallback.
 `ConnectorFabric` is a capability source for the existing Grid catalog, not another
-registry competing with it. Jev selects a capability class; provider manifests
+registry competing with it. Controller selects a capability class; provider manifests
 contain service facts. Existing Dispatcher target authorization, action correlation,
 idempotency, Runtime and independent Evidence/Verification remain authoritative.
+
+## Shared authentication target architecture
+
+GitHub OAuth is only the **first intended real Gate B authentication proof**.
+Owner authorization has NOT STARTED, and private acceptance remains unverified.
+It is not a design for independent OAuth implementations in every plugin.
+
+```text
+OSCAR Auth Broker
+├── OAuth2 / PKCE
+├── Device Flow
+├── API Key
+├── MCP/session auth
+├── refresh / expiry
+├── incremental scope upgrades
+├── disconnect / revocation state
+├── native/server vault abstraction
+└── opaque CredentialRef
+
+Reusable provider adapters
+├── Google Auth    -> Gmail / Calendar / Drive / Contacts
+├── Microsoft Auth -> Outlook / Calendar / OneDrive / Teams
+└── GitHub Auth    -> GitHub capabilities
+```
+
+Plugins/connectors primarily declare provider, auth type/profile, required scopes,
+capabilities, risk and verification/readback. The broker and reusable provider
+adapters own enrollment/lifecycle and scope upgrades. Start with the minimum
+scopes for the current objective; do not request every future permission during
+first authorization. A later upgrade needs owner consent, explicit scope tracking
+and permission rechecks; provider consent is not an OSCAR permission grant.
+
+Connectors carry opaque CredentialRef values. Plugins must not receive raw tokens
+when an opaque reference suffices. Only trusted broker/provider transport code may
+resolve a secret transiently for authenticated protocol I/O. Never place raw tokens
+in manifests, task state, logs or SQLite. Reuse provider code across capabilities
+while retaining explicit provider/account/tenant/audience/scope identity; one
+credential cannot silently authorize another account or provider service.
+Native Windows and future server vaults sit behind a replaceable store boundary.
+
+Local credential deletion and remote revocation confirmation remain separate.
+Refresh/expiry/revoke support is provider-specific; unsupported remote revocation
+stays UNKNOWN/PENDING owner action. The current GitHub registered-client flow
+cannot confirm provider revocation without the required provider credentials.
+
+This is target architecture, not a new broker implementation. Existing CredentialRef,
+SecretResolver, AuthSession/PKCE, GitHub device enrollment, native vault and durable
+recovery are implemented foundations. Broad Google/Microsoft provider enrollment,
+server vault deployment, generalized incremental upgrades and every auth profile
+are not accepted. Full Auth Broker expansion is later work, not an added Gate B
+requirement. Existing trusted HTTP transport resolves raw bytes for requests; this
+does not mean an arbitrary plugin is allowed to inspect the native vault.
 
 ## Implemented boundary
 

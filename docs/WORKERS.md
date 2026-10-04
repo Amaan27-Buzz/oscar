@@ -179,14 +179,14 @@ The runtime provides persisted checkpoints, heartbeats, lease expiry/reclaim, st
 
 A Worker must not remain indefinitely `Working` because its executor vanished.
 
-## Jev and autonomous recovery
+## Controller and autonomous recovery
 
 Workers should not bother the user for routine recoverable problems.
 
 ```text
 Worker encounters issue
         ↓
-Jev evaluates
+Controller evaluates
         ↓
 Can fix safely/confidently?
   yes → repair/retry → verify → continue
@@ -286,7 +286,7 @@ Consequential actions remain attributable to OSCAR task/Protocol, Worker, capabi
 1. Workers belong to OSCAR; they are not separate assistant silos.
 2. Workers use the best available real device/service capability instead of requiring a cloud computer.
 3. Creation/editing work through normal voice/chat.
-4. Jev enables self-repair/rerouting before unnecessary escalation.
+4. Controller enables self-repair/rerouting before unnecessary escalation.
 5. Workers can collaborate while Executive Planner owns global coordination.
 6. Persistent Workers use durable execution state/recovery semantics.
 7. Workers search capabilities progressively rather than loading every tool definition.

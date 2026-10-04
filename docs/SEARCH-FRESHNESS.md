@@ -23,7 +23,7 @@ Examples include:
 
 ## Freshness decision
 
-Jev now classifies whether an objective is:
+Controller now classifies whether an objective is:
 
 ```text
 stable
@@ -66,7 +66,7 @@ Keys are separate credential slots; they may share an account quota pool.
 Three keys do not imply three times the credits. Provider identity, product/pool,
 slot health, rate/quota/cooldown and secrecy remain separate concerns.
 
-The search adapter must remain replaceable so OSCAR can later use other search/research providers or native provider search without redesigning Jev/Core.
+The search adapter must remain replaceable so OSCAR can later use other search/research providers or native provider search without redesigning Controller/Core.
 
 Tavily currently exposes Search, Extract, Crawl, Map and Research APIs. The first implementation only needs the smallest useful search/retrieval contract; do not overbuild the integration.
 
@@ -87,7 +87,7 @@ models do not imply generation or funding. Officially retired entries remain
 excluded even when the API lists them.
 
 [search.py](../oscar/search.py) now implements Tavily through that same protocol.
-Harness composes native inventory and web retrieval without changing Jev. Search
+Harness composes native inventory and web retrieval without changing Controller. Search
 uses the current official Bearer-authenticated `POST /search` contract: explicit
 basic depth, automatic cost escalation/answers/raw pages disabled, usage enabled,
 15-second calls, a 30-second generic-search budget and a 90-second configured-provider
@@ -265,7 +265,7 @@ with complete provenance and qualified known/UNKNOWN constraint states:
 Expected behavior:
 
 ```text
-Jev detects freshness-sensitive objective
+Controller detects freshness-sensitive objective
 → live search/provider inventory
 → authoritative current sources
 → prefer official pages; reconcile conflicting evidence by claim scope

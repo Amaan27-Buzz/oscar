@@ -177,7 +177,7 @@ Detailed behavior is canonical in [MODEL-ROUTING.md](MODEL-ROUTING.md).
 - graceful degradation.
 
 ```text
-Jev decides: reasoning needed?
+Controller decides: reasoning needed?
         ↓
 OSCAR Model Router
         ↓
@@ -191,7 +191,7 @@ verification if required
 Keep these boundaries separate:
 
 ```text
-Jev                  = which class of action?
+Controller                  = which class of action?
 Capability selection = which executor/tool/device?
 Model Router         = which provider/model/credential?
 ```
