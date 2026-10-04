@@ -2,11 +2,11 @@
 
 import json
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from time import time
 from typing import Any
 
-from .contracts import Epistemic
+from .contracts import Epistemic, new_id
 from .event_archive import EventArchive, MemoryRecord
 from .memory_indexes import DerivedIndex, Reranker, digest
 
@@ -26,6 +26,8 @@ class RecallSet:
     attempts: tuple[str, ...]
     unavailable: tuple[str, ...]
     ambiguous_entities: tuple[str, ...] = ()
+    at: float | None = None
+    retrieval_succeeded: bool = False
 
 
 @dataclass(frozen=True)
@@ -35,6 +37,10 @@ class HistoricalClaim:
     memory_ids: tuple[str, ...]
     status: Epistemic
     confidence: float
+    id: str = field(default_factory=new_id)
+    claim_type: str = "historical_exact"
+    retrieval_paths: tuple[str, ...] = ()
+    temporal_interpretation: str = "retrieval_time"
 
 
 def memory_preflight(text: str, known_names: tuple[str, ...] = ()) -> bool:
@@ -106,6 +112,7 @@ class MemoryFabric:
         if not relationship or not 0 < len(query) <= 4000 or not 1 <= limit <= 20:
             raise ValueError("bounded scoped retrieval required")
         attempts, unavailable = [], []
+        generation = self.archive.generation(relationship)
         entities = self.archive.resolve(relationship, entity_alias) if entity_alias else ()
         if len(entities) > 1:
             return RecallSet((), ("entity-resolution",), (), entities)
@@ -137,6 +144,16 @@ class MemoryFabric:
                 unavailable.append(name)
                 continue
             try:
+                if self.archive.index_state(relationship, index.identity) != "CURRENT":
+                    unavailable.append(name + ":OUTDATED")
+                    continue
+                row = self.archive.db.execute(
+                    "SELECT digest FROM archive_index_state WHERE relationship=? AND identity=?",
+                    (relationship, index.identity),
+                ).fetchone()
+                if not row or index.current_digest() != row[0]:
+                    unavailable.append(name + ":OUTDATED")
+                    continue
                 accept(index.query(query, relationship, limit=50), name)
             except Exception:
                 # Provider failure is explicit; archive candidates still undergo provenance checks.
@@ -204,10 +221,27 @@ class MemoryFabric:
         )
         if not hits:
             attempts.append("7-UNKNOWN")
-        return RecallSet(hits, tuple(attempts), tuple(unavailable))
+        if generation != self.archive.generation(relationship):
+            return RecallSet(
+                (),
+                tuple(attempts) + ("7-UNKNOWN",),
+                tuple(unavailable) + ("concurrent-archive-update",),
+                at=at,
+            )
+        return RecallSet(
+            hits, tuple(attempts), tuple(unavailable), at=at, retrieval_succeeded=bool(hits)
+        )
 
     def check_claim(self, claim: HistoricalClaim, evidence: RecallSet) -> Epistemic:
-        if not 0 <= claim.confidence <= 1 or claim.status not in {
+        if (
+            evidence.ambiguous_entities
+            or not evidence.retrieval_succeeded
+            or "7-UNKNOWN" in evidence.attempts
+            or not claim.id
+            or claim.claim_type != "historical_exact"
+            or claim.temporal_interpretation != "retrieval_time"
+            or not 0 <= claim.confidence <= 1
+        ) or claim.status not in {
             Epistemic.RECALLED,
             Epistemic.INFERRED,
         }:
@@ -218,6 +252,16 @@ class MemoryFabric:
         source_states = []
         # Evidence captured before forget/expiry is no longer admissible.
         for memory in support:
+            current = self.archive.memories(memory.relationship_id, at=evidence.at, limit=10_000)
+            if memory not in current:
+                return Epistemic.UNKNOWN
+            hit = next(hit for hit in evidence.hits if hit.memory.id == memory.id)
+            if (
+                not hit.paths
+                or claim.retrieval_paths
+                and not set(claim.retrieval_paths) <= set(hit.paths)
+            ):
+                return Epistemic.UNKNOWN
             row = self.archive.db.execute(
                 "SELECT forgotten FROM archive_memories WHERE id=?", (memory.id,)
             ).fetchone()
@@ -268,21 +312,25 @@ class MemoryFabric:
         if len(json.dumps(context)) > max_chars:
             raise ValueError("objective/live/policy context exceeds bound")
         for hit in evidence.hits:
-            state = self.check_claim(
-                HistoricalClaim(
-                    hit.memory.content,
-                    hit.memory.event_ids,
-                    (hit.memory.id,),
-                    Epistemic.RECALLED,
-                    1,
-                ),
-                evidence,
+            claim = HistoricalClaim(
+                hit.memory.content,
+                hit.memory.event_ids,
+                (hit.memory.id,),
+                Epistemic.RECALLED,
+                1,
+                retrieval_paths=hit.paths,
             )
+            state = self.check_claim(claim, evidence)
             if state == Epistemic.UNKNOWN:
                 continue
             selected.append(
                 {
                     "memory_id": hit.memory.id,
+                    "claim_id": claim.id,
+                    "claim_type": "historical_exact",
+                    "retrieval_paths": hit.paths,
+                    "confidence": 1,
+                    "temporal_interpretation": {"at": evidence.at, "mode": "retrieval_time"},
                     "event_ids": hit.memory.event_ids,
                     "content": hit.memory.content,
                     "status": state,
@@ -296,24 +344,50 @@ class MemoryFabric:
         return context
 
     def rebuild(self, relationship: str) -> tuple[str, ...]:
+        generation = self.archive.generation(relationship)
+        count = self.archive.db.execute(
+            "SELECT count(*) FROM archive_memories WHERE relationship=? AND forgotten=0",
+            (relationship,),
+        ).fetchone()[0]
+        if count > 10_000:
+            raise ValueError("derived rebuild exceeds bound; archive remains authoritative")
         records = self.archive.memories(relationship, include_history=True, limit=10_000)
         failed = []
         for index in (self.vector, self.graph):
             if index is None:
                 continue
+            if self.archive.db.execute(
+                "SELECT 1 FROM archive_index_state WHERE identity=? AND relationship<>? LIMIT 1",
+                (index.identity, relationship),
+            ).fetchone():
+                failed.append(index.identity)
+                continue
+            with self.archive.db:
+                self.archive.db.execute(
+                    "INSERT OR REPLACE INTO archive_index_state VALUES(?,?,?,?,?,?)",
+                    (relationship, index.identity, generation, None, "REBUILDING", time()),
+                )
             try:
-                index.rebuild(records)
+                index.rebuild(records, relationship=relationship)
                 with self.archive.db:
                     self.archive.db.execute(
-                        "INSERT OR REPLACE INTO archive_metadata VALUES(?,?)",
-                        (index.identity + ":generation", digest(records)),
+                        "INSERT OR REPLACE INTO archive_index_state VALUES(?,?,?,?,?,?)",
+                        (
+                            relationship,
+                            index.identity,
+                            generation,
+                            digest(records),
+                            "CURRENT",
+                            time(),
+                        ),
                     )
             except Exception:
                 failed.append(index.identity)
                 with self.archive.db:
                     self.archive.db.execute(
-                        "DELETE FROM archive_metadata WHERE key=?",
-                        (index.identity + ":generation",),
+                        "UPDATE archive_index_state SET state='FAILED' "
+                        "WHERE relationship=? AND identity=?",
+                        (relationship, index.identity),
                     )
         return tuple(failed)
 

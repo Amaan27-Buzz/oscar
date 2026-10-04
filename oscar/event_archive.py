@@ -81,7 +81,44 @@ class EventArchive:
             CREATE TABLE IF NOT EXISTS archive_tombstones (
                 id TEXT PRIMARY KEY, forgotten_at REAL NOT NULL);
             CREATE TABLE IF NOT EXISTS archive_metadata (key TEXT PRIMARY KEY, value TEXT);
+            CREATE TABLE IF NOT EXISTS archive_generations (
+                relationship TEXT PRIMARY KEY, generation INTEGER NOT NULL);
+            CREATE TABLE IF NOT EXISTS archive_index_state (
+                relationship TEXT NOT NULL, identity TEXT NOT NULL, generation INTEGER,
+                digest TEXT, state TEXT NOT NULL, updated_at REAL NOT NULL,
+                PRIMARY KEY(relationship,identity));
         """)
+        # Transactional triggers also cover consolidation, corrections and forgotten rows.
+        for table in ("events", "memories", "entities", "aliases"):
+            for operation in ("INSERT", "UPDATE", "DELETE"):
+                reference = "OLD" if operation == "DELETE" else "NEW"
+                self.db.executescript(f"""
+                    CREATE TRIGGER IF NOT EXISTS generation_{table}_{operation}
+                    AFTER {operation} ON archive_{table} BEGIN
+                        INSERT INTO archive_generations VALUES({reference}.relationship,1)
+                        ON CONFLICT(relationship) DO UPDATE SET generation=generation+1;
+                    END;
+                """)
+        self.db.execute("""
+            INSERT OR IGNORE INTO archive_generations
+            SELECT DISTINCT relationship,1 FROM archive_events
+        """)
+        self.db.commit()
+
+    def generation(self, relationship: str) -> int:
+        row = self.db.execute(
+            "SELECT generation FROM archive_generations WHERE relationship=?", (relationship,)
+        ).fetchone()
+        return int(row[0]) if row else 0
+
+    def index_state(self, relationship: str, identity: str) -> str:
+        row = self.db.execute(
+            "SELECT generation,state FROM archive_index_state WHERE relationship=? AND identity=?",
+            (relationship, identity),
+        ).fetchone()
+        if not row or row[0] != self.generation(relationship):
+            return "OUTDATED"
+        return str(row[1])
 
     def close(self) -> None:
         self.db.close()

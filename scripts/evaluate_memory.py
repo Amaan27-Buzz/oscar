@@ -3,7 +3,7 @@
 import argparse
 import json
 from pathlib import Path
-from time import time
+from time import perf_counter, time
 from typing import Any
 
 from oscar.capabilities import ScopedFiles
@@ -14,16 +14,29 @@ from oscar.event_archive import EventArchive, MemoryWriter, SourceEvent
 from oscar.fabric_backend import FabricBackend
 from oscar.jev import Intent, decide
 from oscar.memory_fabric import HistoricalClaim, MemoryFabric
-from oscar.memory_indexes import GraphitiIndex, LocalEmbedding, LocalReranker, QdrantIndex
+from oscar.memory_indexes import (
+    EmbeddingProvider,
+    FastEmbedding,
+    FastReranker,
+    GraphitiIndex,
+    QdrantIndex,
+    Reranker,
+    query_embedding,
+)
 
 
-def run(root: Path) -> dict[str, Any]:
+def run(
+    root: Path,
+    *,
+    embedding: EmbeddingProvider | None = None,
+    ranking: Reranker | None = None,
+) -> dict[str, Any]:
     root = root.resolve()
     root.mkdir(parents=True, exist_ok=False)
     archive = EventArchive(root / "archive.sqlite")
     writer = MemoryWriter(archive)
-    embedder = LocalEmbedding(revision="1110a243fdf4706b3f48f1d95db1a4f5529b4d41")
-    reranker = LocalReranker(revision="233902d25c440f23af6f7d6e94d2946bac0bee0a")
+    embedder = embedding or FastEmbedding()
+    reranker = ranking or FastReranker()
     vector = QdrantIndex(root / "vectors", "oscar_evaluation", embedder)
     group = "oscar_eval_" + str(int(time()))
     graph = GraphitiIndex("bolt://127.0.0.1:17687", "neo4j", "", group, embedder, reranker)
@@ -32,6 +45,7 @@ def run(root: Path) -> dict[str, Any]:
     now = time()
     rows = []
     hits = []
+    retrieval_metrics: dict[str, list[dict[str, Any]]] = {"dense": [], "lexical": []}
 
     def remember(
         text: str,
@@ -76,6 +90,35 @@ def run(root: Path) -> dict[str, Any]:
         result = fabric.retrieve(owner, query, project=project, at=at, limit=5)
         found = wanted.id in [hit.memory.id for hit in result.hits]
         hits.append(found)
+        m = vector.models
+        eligible = archive.memories(owner, project=project, at=at, limit=10_000)
+        restriction = m.Filter(
+            must=[
+                m.FieldCondition(
+                    key="memory_id", match=m.MatchAny(any=[record.id for record in eligible])
+                )
+            ]
+        )
+        indices, values = vector.sparse.embed(query)
+        for path, value in (
+            ("dense", query_embedding(embedder, query)),
+            ("lexical", m.SparseVector(indices=indices, values=values)),
+        ):
+            started = perf_counter()
+            candidates = vector.client.query_points(
+                vector.collection,
+                query=value,
+                using=path,
+                query_filter=restriction,
+                limit=5,
+                with_payload=True,
+            ).points
+            retrieval_metrics[path].append(
+                {
+                    "hit": wanted.id in [p.payload["memory_id"] for p in candidates if p.payload],
+                    "query_seconds": perf_counter() - started,
+                }
+            )
         return result
 
     try:
@@ -249,6 +292,14 @@ def run(root: Path) -> dict[str, Any]:
             "observed_at": time(),
             "cases": rows,
             "metrics": {
+                "component_retrieval": {
+                    path: {
+                        "top5_hit_rate": sum(r["hit"] for r in values) / len(values),
+                        "queries": len(values),
+                        "query_seconds": [r["query_seconds"] for r in values],
+                    }
+                    for path, values in retrieval_metrics.items()
+                },
                 "positive_top5_hit_rate": sum(hits) / len(hits),
                 "positive_queries": len(hits),
                 "unsupported_claim_acceptance_rate": false_claims / len(unsupported),

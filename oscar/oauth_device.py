@@ -75,6 +75,10 @@ def post(path: str, fields: dict[str, str]) -> dict[str, Any]:
         raise RuntimeError("official OAuth endpoint unavailable or rejected") from None
 
 
+def no_fault(stage: str) -> None:
+    pass
+
+
 class GitHubDeviceFlow:
     SCOPES = frozenset({"user:email", "gist"})
 
@@ -84,8 +88,49 @@ class GitHubDeviceFlow:
         vault: Vault,
         request: Callable[[str, dict[str, str]], dict[str, Any]] = post,
         clock: Callable[[], float] = time,
+        fault: Callable[[str], None] = no_fault,
     ):
         self.store, self.vault, self.request, self.clock = store, vault, request, clock
+        self.fault = fault
+        self.recover()
+
+    def recover(self) -> None:
+        """Reconcile only durable owned references. Never replay an OAuth exchange."""
+        for pending in self.store.all("oauth_pending"):
+            if pending["state"] in {"authorized", "failed_recovery", "rejected", "expired"}:
+                self.vault.delete(pending["device_ref"])
+            if pending["state"] in {"enrolling_device", "polling"}:
+                # A challenge may never have reached the owner; exchange outcome is ambiguous.
+                pending["state"] = "failed_recovery"
+                self.store.put("oauth_pending", pending["id"], pending)
+                self.vault.delete(pending["device_ref"])
+            elif pending["state"] == "pending":
+                try:
+                    self.vault.read(pending["device_ref"])
+                except (KeyError, PermissionError):
+                    pending["state"] = "failed_recovery"
+                    self.store.put("oauth_pending", pending["id"], pending)
+        for connection in self.store.all("oauth_connection"):
+            state = connection["state"]
+            if state == "revoke_pending":
+                self.vault.delete(connection["credential_ref"])
+                connection["state"] = "locally_disconnected_provider_revocation_pending"
+            elif state in {"enrolling_token", "ready"}:
+                try:
+                    self.vault.read(connection["credential_ref"])
+                except (KeyError, PermissionError):
+                    connection["state"] = "failed_recovery_reauthorization_required"
+                    self.vault.delete(connection["credential_ref"])
+                else:
+                    connection["state"] = "ready"
+                if state == "enrolling_token":
+                    pending = self.store.get("oauth_pending", connection["id"])
+                    pending["state"] = (
+                        "authorized" if connection["state"] == "ready" else "failed_recovery"
+                    )
+                    self.store.put("oauth_pending", pending["id"], pending)
+                    self.vault.delete(pending["device_ref"])
+            self.store.put("oauth_connection", connection["id"], connection)
 
     def begin(
         self,
@@ -118,7 +163,7 @@ class GitHubDeviceFlow:
         nonce = secrets.token_urlsafe(32)
         identifier = secrets.token_hex(16)
         expires = self.clock() + data["expires_in"]
-        reference = self.vault.put(data["device_code"], expires_at=expires)
+        reference = secrets.token_hex(16)
         self.store.put(
             "oauth_pending",
             identifier,
@@ -131,9 +176,16 @@ class GitHubDeviceFlow:
                 "interval": data["interval"],
                 "next_poll": self.clock() + data["interval"],
                 "scopes": sorted(scopes),
-                "state": "pending",
+                "state": "enrolling_device",
             },
         )
+        self.fault("device_intent")
+        self.vault.put(data["device_code"], expires_at=expires, reference=reference)
+        self.fault("device_written")
+        pending = self.store.get("oauth_pending", identifier)
+        pending["state"] = "pending"
+        self.store.put("oauth_pending", identifier, pending)
+        self.fault("device_active")
         # Owner code/nonce go only to the interactive caller; they are not stored/logged here.
         return {
             "id": identifier,
@@ -165,6 +217,7 @@ class GitHubDeviceFlow:
         if pending["state"] == "expired":
             self.vault.delete(pending["device_ref"])
             raise PermissionError("device authorization expired")
+        self.fault("exchange_intent")
         try:
             data = self.request(
                 "/login/oauth/access_token",
@@ -179,6 +232,7 @@ class GitHubDeviceFlow:
             self.store.put("oauth_pending", identifier, pending)
             raise RuntimeError("token exchange outcome ambiguous; no automatic replay") from None
         error = data.get("error")
+        self.fault("exchange_returned")
         if error in {"authorization_pending", "slow_down"}:
             pending["state"] = "pending"
             if error == "slow_down":
@@ -204,11 +258,7 @@ class GitHubDeviceFlow:
         expiry = data.get("expires_in")
         if expiry is not None and (type(expiry) is not int or not 0 < expiry <= 86400):
             raise ValueError("unsupported expiry contract")
-        token_ref = self.vault.put(
-            data["access_token"], expires_at=now + expiry if expiry else None
-        )
-        self.vault.delete(pending["device_ref"])
-        pending["state"] = "authorized"
+        token_ref = secrets.token_hex(16)
         connection = {
             "id": identifier,
             "client_id": pending["client_id"],
@@ -216,20 +266,41 @@ class GitHubDeviceFlow:
             "scopes": sorted(scopes),
             "expires_at": now + expiry if expiry else None,
             "refresh": "unsupported OAuth App grant",
-            "state": "ready",
+            "state": "enrolling_token",
+            "transaction_id": identifier,
+            "remote_revocation": "UNKNOWN",
+            "updated_at": now,
         }
+        self.store.put("oauth_connection", identifier, connection)
+        self.fault("token_intent")
+        self.vault.put(
+            data["access_token"], expires_at=connection["expires_at"], reference=token_ref
+        )
+        self.fault("token_written")
+        connection["state"] = "ready"
+        pending["state"] = "authorized"
         with self.store.transaction():
             self.store.put("oauth_pending", identifier, pending)
             self.store.put("oauth_connection", identifier, connection)
+        self.fault("token_active")
+        self.vault.delete(pending["device_ref"])
+        self.fault("device_deleted")
         return connection
 
     def disconnect(self, identifier: str, *, owner_authorized: bool) -> None:
         if not owner_authorized:
             raise PermissionError("owner disconnect authority required")
         connection = self.store.get("oauth_connection", identifier)
+        connection["state"] = "revoke_pending"
+        connection["remote_revocation"] = "UNKNOWN_OWNER_ACTION_REQUIRED"
+        connection["updated_at"] = self.clock()
+        self.store.put("oauth_connection", identifier, connection)
+        self.fault("disconnect_intent")
         self.vault.delete(connection["credential_ref"])
+        self.fault("credential_deleted")
         connection["state"] = "locally_disconnected_provider_revocation_pending"
         self.store.put("oauth_connection", identifier, connection)
+        self.fault("disconnect_recorded")
 
 
 def github_manifest() -> ConnectorManifest:

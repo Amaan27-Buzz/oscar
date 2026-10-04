@@ -2,6 +2,7 @@
 
 import argparse
 import hashlib
+import importlib.util
 import json
 import os
 import sys
@@ -23,6 +24,11 @@ from oscar.runtime import Runtime
 from oscar.storage import Store
 from oscar.transport import Dispatcher
 from oscar.windows_desktop import WindowsDesktop, discover_apps
+
+
+def fixture_window(windows: list[dict[str, Any]], bound: dict[str, Any], fixture: str) -> bool:
+    matches = [w for w in windows if w["handle"] == bound["handle"] and w["pid"] == bound["pid"]]
+    return len(matches) == 1 and fixture in matches[0]["name"]
 
 
 class Fixture(BaseHTTPRequestHandler):
@@ -69,8 +75,26 @@ class Fixture(BaseHTTPRequestHandler):
 
 def run(root: Path, *, desktop: bool) -> dict[str, Any]:
     root.mkdir(parents=True, exist_ok=False)
+    fixture_id = new_id()
+    fixture_name = "OSCAR-acceptance-" + fixture_id + ".txt"
+    deadline = time() + 600
+    (root / "fixture.json").write_text(
+        json.dumps({"fixture_id": fixture_id, "fixture_name": fixture_name, "root": str(root)}),
+        encoding="utf-8",
+    )
     workspace = root / "workspace"
     workspace.mkdir()
+    manifest = discover()
+    if manifest is None:
+        raise RuntimeError("PowerShell precondition failed; no tasks started")
+    apps = tuple(discover_apps())
+    notepad = next(
+        (app for app in apps if app.available and app.name.casefold() == "notepad.exe"), None
+    )
+    if desktop and notepad is None:
+        raise RuntimeError("registered Notepad precondition failed; no desktop mutation")
+    if importlib.util.find_spec("playwright") is None:
+        raise RuntimeError("Playwright precondition failed; install the pinned browser extra")
     store = Store(root / "runtime.sqlite")
     grid = Grid(store)
     scopes = (
@@ -87,9 +111,7 @@ def run(root: Path, *, desktop: bool) -> dict[str, Any]:
     )
     grid.register(Node("laptop-interactive", NodeRole.DESKTOP, scopes))
     session = grid.pair("laptop-interactive", scopes)
-    manifest = discover()
-    assert manifest is not None
-    observer = WindowsDesktop(permissions=frozenset(scopes), allowed_apps=tuple(discover_apps()))
+    observer = WindowsDesktop(permissions=frozenset(scopes), allowed_apps=apps)
     worker = InteractiveWorker(
         store,
         grid,
@@ -98,13 +120,7 @@ def run(root: Path, *, desktop: bool) -> dict[str, Any]:
             workspace, True, (sys.executable, manifest.executable, observer.shell), max_timeout=120
         ),
         desktop=desktop,
-        desktop_app_ids=(
-            next(
-                app.id
-                for app in observer.apps.values()
-                if app.available and app.name.casefold() == "notepad.exe"
-            ),
-        ),
+        desktop_app_ids=(notepad.id,) if notepad else (),
         browser=True,
     )
     grid.advertise(session, worker.capabilities())
@@ -112,8 +128,43 @@ def run(root: Path, *, desktop: bool) -> dict[str, Any]:
     dispatcher = Dispatcher(store, grid, session.node_id, worker.executors())
     transports = {session.node_id: (dispatcher, session)}
     records = []
+    owned_editor: dict[str, Any] | None = None
+    owned_text = ""
 
     def execute(kind: str, request: dict[str, Any]) -> dict[str, Any]:
+        nonlocal owned_text
+        if time() >= deadline:
+            raise TimeoutError("interactive acceptance deadline exceeded")
+        if (
+            kind == "desktop_control"
+            and request["operation"]
+            in {
+                "mouse_click",
+                "set_text",
+                "key",
+                "invoke",
+                "close_tab",
+            }
+            and not fixture_window(
+                observer.observe({"operation": "windows"}), request, fixture_name
+            )
+        ):
+            raise PermissionError("fixture is no longer active; no owner-window mutation")
+        if (
+            kind == "desktop_control"
+            and request["operation"]
+            in {
+                "mouse_click",
+                "set_text",
+                "key",
+                "invoke",
+                "close_tab",
+            }
+            and owned_editor is not None
+        ):
+            observed = observer.observe({"operation": "read", **owned_editor})
+            if observed["text"].strip() != owned_text:
+                raise PermissionError("fixture content changed outside this run; no mutation")
         task = runtime.create(
             Intent(
                 "Gate B synthetic interactive objective",
@@ -134,6 +185,10 @@ def run(root: Path, *, desktop: bool) -> dict[str, Any]:
         assert completed.state == TaskState.PARTIALLY_VERIFIED
         action = store.get("planned_action", task.id)
         output = json.loads(worker.outputs.pop(action["id"]))
+        if kind == "desktop_control" and request["operation"] == "set_text":
+            owned_text = request["text"]
+        elif kind == "desktop_control" and request.get("key") == "backspace":
+            owned_text = ""
         records.append(
             {
                 "task_id": task.id,
@@ -144,6 +199,7 @@ def run(root: Path, *, desktop: bool) -> dict[str, Any]:
                 "observed_at": time(),
             }
         )
+        (root / "actions.json").write_text(json.dumps(records, indent=2), encoding="utf-8")
         return output
 
     def verified(method: str, observed: bytes) -> None:
@@ -170,10 +226,16 @@ def run(root: Path, *, desktop: bool) -> dict[str, Any]:
         "platform": sys.platform,
         "observed_at": time(),
         "desktop": "UNVERIFIED",
+        "fixture_id": fixture_id,
     }
     try:
         if desktop:
-            fixture_name = "OSCAR-acceptance-" + root.name + ".txt"
+            previous = observer.observe({"operation": "windows"})
+            report["stale_fixture_windows"] = [
+                {"handle": w["handle"], "pid": w["pid"]}
+                for w in previous
+                if "OSCAR-acceptance-" in w["name"]
+            ]
             (workspace / fixture_name).write_bytes(b"")
             app = next(
                 app
@@ -214,6 +276,7 @@ def run(root: Path, *, desktop: bool) -> dict[str, Any]:
                 raise RuntimeError("new empty Notepad editor is ambiguous; no mutation")
             editor = editors[0]
             selector = {**bound, "runtime_id": editor["runtime_id"]}
+            owned_editor = selector
             execute(
                 "desktop_control",
                 {"operation": "mouse_click", **selector, "x_fraction": 0.5, "y_fraction": 0.5},
@@ -273,7 +336,7 @@ def run(root: Path, *, desktop: bool) -> dict[str, Any]:
                     if e["name"] in {"Don't save", "Don’t save"}
                     and "InvokePatternIdentifiers.Pattern" in e["patterns"]
                 ]
-                if len(discard) != 1:
+                if len(discard) != 1 or not any(fixture_name in e["name"] for e in current):
                     raise RuntimeError("close/discard requires manual review")
                 execute(
                     "desktop_control",
@@ -301,11 +364,13 @@ def run(root: Path, *, desktop: bool) -> dict[str, Any]:
                 "verification": "separate UIA observer process readback and test-tab absence",
                 "cleanup": "empty document, closed test tab, no workspace files",
             }
-        server = ThreadingHTTPServer(("127.0.0.1", 0), Fixture)
+        # Per-run handler state prevents successful prior proof from leaking into reruns.
+        handler = type("RunFixture", (Fixture,), {"state": ""})
+        server = ThreadingHTTPServer(("127.0.0.1", 0), handler)
         thread = Thread(target=server.serve_forever, daemon=True)
         thread.start()
         local = "http://127.0.0.1:" + str(server.server_port)
-        proof = "synthetic-browser-proof"
+        proof = "synthetic-browser-proof-" + fixture_id
         plan = {
             "origins": [local],
             "timeout": 60,
@@ -382,7 +447,24 @@ def main() -> int:
     args = parser.parse_args()
     if os.name != "nt":
         raise SystemExit("real Windows desktop acceptance requires Windows")
-    report = run(args.root.resolve(), desktop=args.desktop)
+    root = args.root.resolve()
+    print("Artifact/evidence root: " + str(root), flush=True)
+    if root.exists():
+        raise SystemExit("acceptance root already exists; choose a fresh timestamp root")
+    try:
+        report = run(root, desktop=args.desktop)
+    except Exception as error:
+        report = {
+            "status": "FAILED",
+            "error_type": type(error).__name__,
+            "error": str(error),
+            "root": str(root),
+            "cleanup": "only owned browser/server resources; fixture tab may require owner review",
+        }
+        if root.exists():
+            (root / "failure.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
+        print(json.dumps(report, indent=2))
+        return 1
     (args.root / "report.json").write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(report, indent=2))
     return 0

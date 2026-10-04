@@ -10,15 +10,15 @@ from typing import Any
 from oscar.contracts import Epistemic
 from oscar.event_archive import EventArchive, MemoryWriter, SourceEvent
 from oscar.memory_fabric import HistoricalClaim, MemoryFabric
-from oscar.memory_indexes import GraphitiIndex, LocalEmbedding, LocalReranker, QdrantIndex
+from oscar.memory_indexes import FastEmbedding, FastReranker, GraphitiIndex, QdrantIndex
 
 
 def run(root: Path, uri: str) -> dict[str, Any]:
     root.mkdir(parents=True, exist_ok=False)
     archive = EventArchive(root / "archive.sqlite")
     writer = MemoryWriter(archive)
-    embedding = LocalEmbedding(revision="1110a243fdf4706b3f48f1d95db1a4f5529b4d41")
-    reranker = LocalReranker(revision="233902d25c440f23af6f7d6e94d2946bac0bee0a")
+    embedding = FastEmbedding()
+    reranker = FastReranker()
     vector = QdrantIndex(root / "qdrant", "oscar_acceptance", embedding)
     group = "oscar_" + hashlib.sha256(str(root.resolve()).encode()).hexdigest()[:20]
     graph = GraphitiIndex(uri, "neo4j", "", group, embedding, reranker)
@@ -61,6 +61,59 @@ def run(root: Path, uri: str) -> dict[str, Any]:
             "When travelling without internet I use local models", at=start + 200
         )
         assert fabric.rebuild("synthetic-owner") == ()
+        other = GraphitiIndex(uri, "neo4j", "", group + "_other", embedding, reranker)
+        try:
+            records = archive.memories("synthetic-owner", include_history=True)
+            other.rebuild(records)
+            other_digest = other.current_digest()
+            sentinel = "oscar-sentinel-" + group
+            graph.loop.run_until_complete(
+                graph.graph.driver.execute_query(
+                    "CREATE (:Entity {uuid:$id,group_id:$group,name:'unrelated sentinel'})",
+                    id=sentinel,
+                    group=group,
+                )
+            )
+            assert fabric.rebuild("synthetic-owner") == ()
+            assert other.current_digest() == other_digest
+            assert new.id in other.query("preferred code editor", "synthetic-owner")
+            rows, _, _ = graph.loop.run_until_complete(
+                graph.graph.driver.execute_query(
+                    "MATCH (n {uuid:$id}) RETURN n.name AS name",
+                    id=sentinel,
+                )
+            )
+            assert rows[0]["name"] == "unrelated sentinel"
+            graph.loop.run_until_complete(
+                graph.graph.driver.execute_query(
+                    "MATCH (n:OSCARMemoryProjection {group_id:$group}),(s {uuid:$id}) "
+                    "WITH n,s LIMIT 1 CREATE (n)-[:RELATES_TO {uuid:$edge,group_id:$group}]->(s)",
+                    id=sentinel,
+                    edge=sentinel + "_edge",
+                    group=group,
+                )
+            )
+            try:
+                graph.rebuild(records)
+            except RuntimeError:
+                pass
+            else:
+                raise AssertionError("foreign relationship must block destructive rebuild")
+            graph.loop.run_until_complete(
+                graph.graph.driver.execute_query(
+                    "MATCH ()-[r {uuid:$id}]->() DELETE r",
+                    id=sentinel + "_edge",
+                )
+            )
+            graph.loop.run_until_complete(
+                graph.graph.driver.execute_query(
+                    "MATCH (n {uuid:$id}) DELETE n",
+                    id=sentinel,
+                )
+            )
+            checks.append("rebuild preserves second group and unrelated same-group node")
+        finally:
+            other.close()
         assert new.id in vector.query("Which programming editor do I favour?", "synthetic-owner")
         assert not vector.query("editor", "unrelated-owner")
         checks.append("real Qdrant dense+sparse RRF paraphrase and relationship filter")
@@ -87,18 +140,50 @@ def run(root: Path, uri: str) -> dict[str, Any]:
         )
         assert fabric.check_claim(unsupported, current) == Epistemic.UNKNOWN
         checks.append("unsupported personal claim UNKNOWN; retrieved claim remains RECALLED")
+
+        def unavailable(*args: Any, **kwargs: Any) -> Any:
+            raise OSError("injected local ML outage")
+
+        original_rank = reranker.rank
+        reranker.rank = unavailable  # type: ignore[method-assign]
+        try:
+            degraded = fabric.retrieve("synthetic-owner", "source code editor")
+            assert degraded.hits and "reranker" in degraded.unavailable
+        finally:
+            reranker.rank = original_rank  # type: ignore[method-assign]
+        original_embed, original_query = embedding.embed, embedding.query
+        embedding.embed = unavailable  # type: ignore[method-assign]
+        embedding.query = unavailable  # type: ignore[method-assign]
+        try:
+            degraded = fabric.retrieve("synthetic-owner", "source code editor")
+            assert degraded.hits and "3-qdrant-hybrid" in degraded.unavailable
+            assert "4-graphiti-temporal" in degraded.unavailable
+        finally:
+            embedding.embed = original_embed  # type: ignore[method-assign]
+            embedding.query = original_query  # type: ignore[method-assign]
+        checks.append(
+            "independent injected reranker and embedding failures preserve archive recall"
+        )
         # Independently inspect actual native temporal relationship properties.
         rows, _, _ = graph.loop.run_until_complete(
             graph.graph.driver.execute_query(
                 "MATCH ()-[r:RELATES_TO {group_id:$group}]->() "
-                "RETURN r.uuid AS id,r.valid_at AS starts,"
+                "RETURN r.memory_id AS id,r.reference_time AS reference_time,r.valid_at AS starts,"
                 "r.invalid_at AS ends,r.episodes AS events",
                 group=group,
             )
         )
         by_id = {row["id"]: row for row in rows}
         assert by_id[old.id]["ends"] is not None and by_id[new.id]["ends"] is None
-        assert old_event.id in by_id[old.id]["events"]
+        rows, _, _ = graph.loop.run_until_complete(
+            graph.graph.driver.execute_query(
+                "MATCH (n:Episodic {group_id:$group}) WHERE n.uuid IN $ids RETURN n.name AS event",
+                group=group,
+                ids=by_id[old.id]["events"],
+            )
+        )
+        assert old_event.id in [r["event"] for r in rows]
+        assert all(row["reference_time"] is not None for row in by_id.values())
         checks.append("independent Neo4j query confirms source episode IDs and validity interval")
         vector.close()
         archive.close()
@@ -111,7 +196,7 @@ def run(root: Path, uri: str) -> dict[str, Any]:
         # Drift is injected only into the synthetic, adapter-owned derived collection.
         vector.client.delete_collection(vector.collection)
         degraded = fabric.retrieve("synthetic-owner", "source code editor")
-        assert "3-qdrant-hybrid" in degraded.unavailable and degraded.hits
+        assert "3-qdrant-hybrid:OUTDATED" in degraded.unavailable and degraded.hits
         assert fabric.rebuild("synthetic-owner") == ()
         assert new.id in vector.query("source code editor", "synthetic-owner")
         checks.append("deleted derived collection gives explicit fallback and canonical rebuild")
