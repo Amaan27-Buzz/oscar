@@ -42,3 +42,10 @@ jobs:
             edge/esp32/build/*.bin
             edge/esp32/build/bootloader/*.bin
             edge/esp32/build/partition_table/*.bin
+      - name: Compile owner-only watchdog fault option
+        shell: bash
+        run: |
+          . /opt/esp/idf/export.sh
+          cd edge/esp32
+          python -c "from pathlib import Path; p=Path('sdkconfig'); p.write_text(p.read_text().replace('# CONFIG_OSCAR_EDGE_WATCHDOG_TEST is not set', 'CONFIG_OSCAR_EDGE_WATCHDOG_TEST=y'))"
+          idf.py build

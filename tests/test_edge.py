@@ -137,6 +137,20 @@ class FirmwareReferenceTests(unittest.TestCase):
         self.assertEqual(len(self.gateway.events), 8)
         self.assertEqual(self.gateway.dropped_events, 11)
 
+    def test_simulated_watchdog_expiry_of_both_nodes(self) -> None:
+        self.gateway.send(Kind.GPIO_WRITE, 1, 1)
+        self.assertFalse(self.gateway.watchdog_expiry().output)
+        self.assertFalse(self.gateway.reset().output)
+        self.gateway.send(Kind.GPIO_WRITE, 1, 1)
+        self.assertFalse(self.gateway.watchdog_expiry(gateway=True).output)
+        self.assertFalse(self.gateway.reset().output)
+
+    def test_duplicate_and_malformed_messages_do_not_refresh_safety_lease(self) -> None:
+        self.gateway.send(Kind.GPIO_WRITE, 1, 1)
+        raw = Frame(Kind.GPIO_WRITE, 100, self.gateway.sequence, 1, 1).encode()
+        self.assertTrue(self.pico.step(1400, raw).output)
+        self.assertFalse(self.pico.step(1500, raw).output)
+
 
 class EdgeIntegrationTests(unittest.TestCase):
     def setUp(self) -> None:
@@ -224,6 +238,7 @@ class EdgeIntegrationTests(unittest.TestCase):
         url = f"http://127.0.0.1:{listener.server_port}/edge/v1/exchange"
         raw = (100).to_bytes(4, "little") + b"\x01" + bytes(40)
         headers = {
+            "X-OSCAR-Node": "desk-edge",
             "Authorization": "Bearer " + self.session.token,
             "X-OSCAR-Session": self.session.id,
         }

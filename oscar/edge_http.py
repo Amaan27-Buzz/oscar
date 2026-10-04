@@ -37,6 +37,8 @@ def server(
                 if self.headers.get("Transfer-Encoding") is not None:
                     raise ValueError("chunked request forbidden")
                 session_id = self.headers.get("X-OSCAR-Session", "")
+                if self.headers.get("X-OSCAR-Node") != bridge.node_id:
+                    raise PermissionError("node identity denied")
                 token = self.headers.get("Authorization", "")
                 if not token.startswith("Bearer ") or len(token) > 200 or len(session_id) > 64:
                     raise PermissionError("session denied")

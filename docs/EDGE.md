@@ -61,7 +61,8 @@ Logical channel 0 = digital input, 1 = configured harmless output/status LED,
 2 = raw ADC sample (0–4095 on reference Pico). Reads require value 0; output
 and display accept only 0/1. Reflex/safe/stop use channel/value 0.
 EVENT reports channel 0 input change, channel 1 stop-latch value 2, or channel 2
-ADC sample. Events carry an independent sequence space, not an action ACK.
+ADC sample. Gateway assigns a monotonic event correlation sequence per boot so
+a Pico reset cannot collide with earlier Core event identifiers. Events carry an independent sequence space, not an action ACK.
 Source wall-clock timestamp is unavailable on Pico; Core records receipt time
 and preserves device evidence as REPORTED rather than current VERIFIED truth.
 
@@ -92,7 +93,7 @@ backlog. Pico bounds serial work to 40 bytes per safety-loop iteration.
 The ESP32 uses outbound HTTPS POST `/edge/v1/exchange`, pinned owner CA and no
 redirects. A 45-byte request contains boot u32, healthy u8, optional 20-byte
 receipt and optional 20-byte event (zeroes mean absent). Response is 204 or one
-20-byte command. Headers use the existing opaque Grid session and bearer token.
+20-byte command. Headers carry explicit node identity plus the existing opaque Grid session and bearer token.
 Protocol route is versioned; incompatible physical versions cannot negotiate.
 Network timeout 700 ms; exchanges slower than 1000 ms cannot refresh Core
 authority. Poll period 250 ms; HTTP retry backoff 250/500/1000/2000/4000 ms.
@@ -105,7 +106,8 @@ framework. Owner pairing uses `Grid.pair`; firmware cannot enroll itself or
 expand its permissions. Every queued operation checks owner grants and Personal
 Policy; every mutation requires explicit confirmation. Delivery rechecks policy,
 node/session scopes, health, boot and a one-second command expiry. Reboot/loss
-discards pending work with UNKNOWN evidence. No resumed backlog energizes GPIO.
+discards pending work with UNKNOWN evidence. Core restart persists the sequence
+fence but never replays a pending physical request. Late receipts remain UNKNOWN. No resumed backlog energizes GPIO.
 
 The advertised test profile is `edge.gpio.read`, `edge.gpio.write`,
 `edge.sensor.read`, `edge.display`, `edge.health`, `edge.reflex.status`,

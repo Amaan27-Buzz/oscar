@@ -17,6 +17,7 @@ void network_task(void *unused) {
     esp_http_client_set_method(http, HTTP_METHOD_POST);
     esp_http_client_set_header(http, "Authorization", auth);
     esp_http_client_set_header(http, "X-OSCAR-Session", gateway.session);
+    esp_http_client_set_header(http, "X-OSCAR-Node", gateway.node);
     esp_http_client_set_header(http, "Content-Type", "application/octet-stream");
     unsigned attempt = 0;
     edge_message receipt = {0}, event = {0};

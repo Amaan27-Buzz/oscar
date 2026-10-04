@@ -14,7 +14,7 @@ behavior. Stop before owner wiring, BOOTSEL, reset, flashing and observations.
   [DevKitC guide](https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32/esp32-devkitc/user_guide.html).
 - **Raspberry Pi Pico, original RP2040, non-W**, headered variant or soldered
   headers; `PICO_BOARD=pico`. See official
-  [Pico board documentation](https://github.com/raspberrypi/documentation/blob/develop/documentation/asciidoc/microcontrollers/pico-series.adoc).
+  [Pico board documentation](https://github.com/raspberrypi/documentation/blob/master/documentation/asciidoc/microcontrollers/pico-series.adoc).
 - Two USB data cables matching those boards, two USB ports, breadboard and
   jumper wires; one LED, one 1 kΩ LED resistor, one 10 kΩ pulldown resistor,
   two momentary switches, optional 10 kΩ potentiometer for ADC demonstration.
@@ -152,8 +152,8 @@ explicit confirmation under the native PersonalPolicy boundary.
    until exercised, silicon watchdog expiry remains UNVERIFIED.
 9. Type `stop`: local latch holds LOW across Core and gateway reconnect. Owner
    Pico reset with interlock released can clear it; it must still boot LOW.
-10. Stop the console and revoke the test node/session in its local Grid store
-    before retaining/distributing fixture files. Removing ESP32 NVS requires an
+10. Stop the console and run `python -m scripts.edge_owner disconnect` to revoke
+    the local test node/session before retaining fixture files. Removing ESP32 NVS requires an
     owner-approved erase; it is not performed automatically. Capture results as
     VERIFIED / FAILED / UNKNOWN per step, never infer whole-slice PASS.
 

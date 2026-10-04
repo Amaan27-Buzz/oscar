@@ -55,9 +55,16 @@ This checkpoint must be updated with real implementation evidence as Slice 07 pr
 - Starting checkpoint: `9fde9385af6b34c4f76991e2d871ab0909296af5`.
 - Existing branch `club-c/slice-07-edge`, draft PR #13; no merge.
 - Local Windows shared C reference built using MSVC 19.44 with warnings as errors.
-- SIMULATED protocol/controller/Grid acceptance: 16 focused tests PASS.
-- Existing OSCAR full regression suite: 443 tests PASS, local Python 3.14.
-- Cross-firmware CI is a separate check; final results recorded after remote runs.
+- SIMULATED protocol/controller/Grid acceptance: 20 focused tests PASS.
+- Existing OSCAR full regression suite: 447 tests PASS, local Python 3.14.
+- ESP-IDF 6.1 and Pico SDK 2.3.1 cross-builds PASS at source revision
+  `2ed47351ccf20d680cae73ff43666c7db9a37bbf` in
+  [firmware CI run](https://github.com/amaansyed27/oscar/actions/runs/37228712560).
+  Pico normal and watchdog variants compiled. Final PR-head checks are authoritative
+  in draft PR #13; normal ESP32 artifacts are distinct from watchdog diagnostics.
+- Ruff lint/format, strict mypy (51 modules), repository links/secret safety PASS.
+- [SIMULATED evidence record](evidence/edge-simulated-2026-10-05.json) includes source hashes.
+- Historical Gate B evidence preserved; active status reconciled with merged PR #12.
 - Owner physical wiring/flash, silicon watchdog and electrical timing: NOT RUN.
 - [Architecture/protocol/research](EDGE.md); [exact owner hardware guide](EDGE-HARDWARE-ACCEPTANCE.md).
 - Slice 07 PARTIAL / OWNER_HARDWARE_REQUIRED; Gate C PARTIAL.

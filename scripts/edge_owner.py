@@ -11,6 +11,7 @@ import json
 import ssl
 from pathlib import Path
 from threading import Thread
+from urllib.parse import urlparse
 
 from oscar.edge import KINDS, EdgeBridge
 from oscar.edge_http import server
@@ -21,7 +22,7 @@ from oscar.storage import Store
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("mode", choices=("enroll", "serve"))
+    parser.add_argument("mode", choices=("enroll", "serve", "disconnect"))
     parser.add_argument("--directory", type=Path, default=Path(".oscar/edge"))
     parser.add_argument("--bind", default="0.0.0.0")
     parser.add_argument("--port", type=int, default=8443)
@@ -34,18 +35,29 @@ def main() -> int:
     store = Store(directory / "core.db")
     grid = Grid(store, heartbeat_ttl=2)
     node_id = "desk-edge"
+    if args.mode == "disconnect":
+        grid.revoke(node_id)
+        store.close()
+        print("Local test node revoked. Firmware NVS and files preserved for owner cleanup.")
+        return 0
     if args.mode == "enroll":
         if (directory / "provision.csv").exists():
             raise ValueError(
                 "existing provisioning preserved; revoke deliberately before replacing"
             )
-        scopes = ("heartbeat", "advertise", *KINDS)
-        grid.register(Node(node_id, NodeRole.EDGE, scopes))
-        session = grid.pair(node_id, scopes, ttl=86400)
         ssid = input("Owner Wi-Fi SSID: ")
         password = getpass.getpass("Owner Wi-Fi password: ")
         url = input("HTTPS Core URL, including /edge/v1/exchange: ")
-        if not url.startswith("https://") or not url.endswith("/edge/v1/exchange"):
+        parsed = urlparse(url)
+        if (
+            parsed.scheme != "https"
+            or not parsed.hostname
+            or parsed.path != "/edge/v1/exchange"
+            or parsed.username
+            or parsed.password
+            or parsed.query
+            or parsed.fragment
+        ):
             raise ValueError("explicit HTTPS exchange URL required")
         ca = (directory / "core-cert.pem").read_text()
         values = {
@@ -53,8 +65,6 @@ def main() -> int:
             "password": password,
             "url": url,
             "node": node_id,
-            "session": session.id,
-            "token": session.token,
             "ca": ca,
         }
         if any(
@@ -62,6 +72,13 @@ def main() -> int:
             for k, n in (("ssid", 33), ("password", 65), ("url", 256), ("ca", 2048))
         ):
             raise ValueError("provisioning exceeds firmware bound")
+        scopes = ("heartbeat", "advertise", *KINDS)
+        try:
+            grid.store.get("node", node_id)
+        except KeyError:
+            grid.register(Node(node_id, NodeRole.EDGE, scopes))
+        session = grid.pair(node_id, scopes, ttl=86400)
+        values.update(session=session.id, token=session.token)
         path = directory / "provision.csv"
         with path.open("w", newline="", encoding="utf-8") as output:
             writer = csv.writer(output)

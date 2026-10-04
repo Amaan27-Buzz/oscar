@@ -1,0 +1,60 @@
+{
+  "slice": "07",
+  "date": "2026-10-05",
+  "evidence_class": "SIMULATED",
+  "starting_sha": "9fde9385af6b34c4f76991e2d871ab0909296af5",
+  "gate_a": "PASS",
+  "gate_b": "frozen PASS",
+  "gate_c": "PARTIAL",
+  "slice_07": "PARTIAL / OWNER_HARDWARE_REQUIRED",
+  "host": "Windows; MSVC 19.44; Python 3.14",
+  "focused_tests": {
+    "count": 20,
+    "status": "PASS"
+  },
+  "full_suite": {
+    "count": 447,
+    "status": "PASS",
+    "seconds": 111.693
+  },
+  "checks": [
+    "Ruff lint",
+    "Ruff format",
+    "mypy",
+    "repository local links/secret safety"
+  ],
+  "scenarios": [
+    "encode/decode/bounds/version/CRC",
+    "stream resync/partial expiry",
+    "GPIO/input/sensor/status LED",
+    "duplicate/conflicting replay",
+    "dropped frames/retries",
+    "delayed ACK",
+    "link lease expiry",
+    "ESP32 reset",
+    "Pico reset",
+    "Core disconnect/reconnect",
+    "local interlock/stop latch",
+    "harmless reflex",
+    "simulated watchdog reset",
+    "event queue overflow",
+    "Grid capability withdrawal",
+    "permission/confirmation/policy/session denial",
+    "Core restart fences pending work",
+    "native real loopback HTTP transport with SIMULATED device data"
+  ],
+  "physical": {
+    "status": "NOT RUN",
+    "boards_detected": "no initial Win32_SerialPort entries",
+    "electrical_timing": "UNKNOWN",
+    "silicon_watchdog": "UNKNOWN",
+    "wiring_flash": "OWNER_HARDWARE_REQUIRED"
+  },
+  "later_slices": "08-10 NOT STARTED; no deployment/Home Node/self-extension",
+  "source_sha256": {
+    "edge/protocol/edge.h": "82a0dea590af8270661399d77d7323494ebd4ab43db8004d9a1818e6f28e4750",
+    "edge/protocol/codec.c": "da54db86b9cd1f76712fcfdef509addfbac5ac30a12906e790a980e6a20f4860",
+    "edge/protocol/stream.c": "79fad52800b44c6308c59a10ebede018d806aec42b73582ce05fc5354db42983",
+    "edge/pico/controller.c": "c330cbc31e09b130cdd16f86513d8b82b76af15a1e0f7201e18eb6c9d91a862f"
+  }
+}

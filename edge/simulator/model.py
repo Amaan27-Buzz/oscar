@@ -137,3 +137,13 @@ class Gateway:
             self.dropped_events += 1
         else:
             self.events.append(event)
+
+    def watchdog_expiry(self, *, gateway: bool = False) -> Observation:
+        """SIMULATED stalled feed/reset; no claim about physical watchdog registers."""
+        self.now += 1000 if not gateway else 5000
+        if gateway:
+            self.healthy = False
+            self.boot += 1
+            self.sequence = 1
+            return self.pico.step(self.now)
+        return self.pico.step(self.now, reset=True)
