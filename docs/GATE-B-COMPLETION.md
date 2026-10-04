@@ -33,7 +33,7 @@ Historical acceptance is not relabeled as current execution.
 - [ ] Real owner-authorized OAuth/private read and lifecycle
 - [ ] Reversible private write/readback/cleanup only if separately approved
 - [ ] Live file/project/task/private/public federation beats stale recall
-- [ ] Full Windows suite, cross-platform CI, lint/types/repository/links/secrets
+- [x] Full Windows suite, cross-platform CI, lint/types/repository/links/secrets
 
 ## Current official sources
 
@@ -124,3 +124,11 @@ Its checks must match the latest branch SHA; local Windows results do not prove 
 The initial Ubuntu job caught platform-specific native handle stubs; the adapter now
 loads its Windows-only module at the native boundary and keeps the public API typed.
 Private OAuth remains unverified regardless of green quality checks.
+
+CI snapshot on implementation commit `449aefc90ca6ae6d85bcb5181c892747d8a46ce6`:
+[Brain contracts run](https://github.com/amaansyed27/oscar/actions/runs/37190449095)
+passed Windows (372 tests, two optional browser skips) and Ubuntu (372 tests, 23
+platform skips), lint/format/types and repository/secret checks. The optional browser
+cases passed on the real laptop. [External links](https://github.com/amaansyed27/oscar/actions/runs/37190449046)
+and [repository contracts](https://github.com/amaansyed27/oscar/actions/runs/37190449068)
+also passed. This records an observed commit; PR checks remain the authority for later commits.

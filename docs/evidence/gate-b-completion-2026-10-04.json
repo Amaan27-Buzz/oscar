@@ -533,7 +533,28 @@
     "repository_and_local_links": "PASS",
     "secret_scan": "PASS, value silent",
     "diff_check": "PASS",
-    "ubuntu": "pending exact-head CI",
-    "external_links": "pending CI"
+    "ubuntu": "PASS in recorded CI snapshot",
+    "external_links": "PASS in recorded CI snapshot",
+    "ci_snapshot": {
+      "observed_at": 1791104395.349882,
+      "implementation_sha": "449aefc90ca6ae6d85bcb5181c892747d8a46ce6",
+      "pr": 12,
+      "brain_run": 37190449095,
+      "windows": {
+        "status": "PASS",
+        "tests": 372,
+        "skipped": 2,
+        "seconds": 157.352
+      },
+      "ubuntu": {
+        "status": "PASS",
+        "tests": 372,
+        "skipped": 23,
+        "seconds": 43.783
+      },
+      "external_links_run": 37190449046,
+      "repository_contract_run": 37190449068,
+      "all_checks": "PASS"
+    }
   }
 }
