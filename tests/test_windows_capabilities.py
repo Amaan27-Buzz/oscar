@@ -233,7 +233,13 @@ class BrowserLifecycleTests(unittest.TestCase):
                 visited.set()
                 self.send_response(200)
                 self.end_headers()
-                self.wfile.write(b"<html><body>bounded synthetic fixture</body></html>")
+                if self.path == "/download":
+                    self.wfile.write(b"synthetic-download")
+                else:
+                    self.wfile.write(
+                        b"<html><title>Scoped fixture</title><body>bounded synthetic fixture"
+                        b'<a id="download" href="/download">download</a></body></html>'
+                    )
 
             def log_message(self, *args):
                 pass
@@ -310,6 +316,50 @@ class BrowserLifecycleTests(unittest.TestCase):
         self.assertTrue(self.visited.is_set())
         self.assertEqual(TaskState.FAILED, result.state)
         self.assertEqual("command_timeout", result.blocker)
+
+    def test_real_worker_keeps_download_and_screenshot_in_artifact_workspace(self):
+        plan = {
+            "origins": [self.origin],
+            "steps": [
+                {"operation": "navigate", "url": self.origin},
+                {"operation": "inspect"},
+                {
+                    "operation": "download",
+                    "selector": "#download",
+                    "path": "proof.txt",
+                    "max_bytes": 100,
+                },
+                {"operation": "screenshot", "path": "proof.png"},
+            ],
+            "timeout": 15,
+            "max_text": 100,
+        }
+        task = self.runtime.create(
+            Intent(
+                "scoped browser artifacts",
+                "capability",
+                capability_kind="browser",
+                parameters={"request": plan},
+            )
+        )
+        result = self.runtime.run(task.id, self.transports)
+        self.assertEqual(TaskState.PARTIALLY_VERIFIED, result.state)
+        self.assertTrue(self.visited.is_set())
+        self.assertEqual(b"synthetic-download", (self.root / "proof.txt").read_bytes())
+        self.assertTrue((self.root / "proof.png").read_bytes().startswith(b"\x89PNG\r\n\x1a\n"))
+        original = (self.root / "proof.png").read_bytes()
+        failed = self.runtime.create(
+            Intent(
+                "reject artifact overwrite",
+                "capability",
+                capability_kind="browser",
+                parameters={"request": plan},
+            )
+        )
+        failure = self.runtime.run(failed.id, self.transports)
+        self.assertEqual(TaskState.FAILED, failure.state)
+        self.assertEqual("browser.plan_execution", failure.blocker)
+        self.assertEqual(original, (self.root / "proof.png").read_bytes())
 
 
 if __name__ == "__main__":

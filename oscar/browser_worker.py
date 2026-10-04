@@ -134,9 +134,34 @@ def validate(request: dict[str, Any]) -> None:
             raise ValueError("bounded download required")
 
 
+class BrowserFailure(RuntimeError):
+    def __init__(self, category: str, error_type: str):
+        self.category = category
+        self.error_type = error_type
+        super().__init__(category)
+
+
+def playwright_runtime() -> Any:
+    try:
+        return importlib.import_module("playwright.sync_api").sync_playwright
+    except ImportError as error:
+        raise BrowserFailure("browser.playwright_unavailable", type(error).__name__) from error
+
+
+def probe() -> None:
+    with playwright_runtime()() as playwright:
+        if not Path(playwright.chromium.executable_path).is_file():
+            raise BrowserFailure("browser.chromium_unavailable", "FileNotFoundError")
+        try:
+            browser = playwright.chromium.launch(headless=True)
+            browser.close()
+        except Exception as error:
+            raise BrowserFailure("browser.playwright_launch", type(error).__name__) from error
+
+
 def run(request: dict[str, Any], root: Path) -> dict[str, Any]:
     validate(request)
-    sync_playwright = importlib.import_module("playwright.sync_api").sync_playwright
+    sync_playwright = playwright_runtime()
 
     started = monotonic()
     env = {
@@ -146,8 +171,15 @@ def run(request: dict[str, Any], root: Path) -> dict[str, Any]:
     }
     observations = []
     with sync_playwright() as playwright:
-        browser = playwright.chromium.launch(headless=True, env=env)
-        context = browser.new_context(accept_downloads=False)
+        try:
+            browser = playwright.chromium.launch(headless=True, env=env)
+        except Exception as error:
+            raise BrowserFailure("browser.playwright_launch", type(error).__name__) from error
+        try:
+            context = browser.new_context(accept_downloads=False)
+        except Exception as error:
+            browser.close()
+            raise BrowserFailure("browser.playwright_launch", type(error).__name__) from error
 
         # Recheck redirects, subresources and navigation at the network boundary.
         def authorize_route(route: Any) -> None:
@@ -216,10 +248,32 @@ def run(request: dict[str, Any], root: Path) -> dict[str, Any]:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--request", required=True)
+    mode = parser.add_mutually_exclusive_group(required=True)
+    mode.add_argument("--request")
+    mode.add_argument("--probe", action="store_true")
     args = parser.parse_args()
-    print(json.dumps(run(json.loads(args.request), Path.cwd())))
-    return 0
+    try:
+        if args.probe:
+            probe()
+            print(json.dumps({"category": "browser.ready"}))
+        else:
+            print(json.dumps(run(json.loads(args.request), Path.cwd())))
+        return 0
+    except BrowserFailure as error:
+        print(json.dumps({"category": error.category, "error_type": error.error_type}))
+    except Exception as error:
+        # Exception messages can contain selectors, URLs, DOM, cookies or tokens.
+        print(
+            json.dumps(
+                {
+                    "category": "browser.playwright_launch"
+                    if args.probe
+                    else "browser.plan_execution",
+                    "error_type": type(error).__name__,
+                }
+            )
+        )
+    return 1
 
 
 if __name__ == "__main__":

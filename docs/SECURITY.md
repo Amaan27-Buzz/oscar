@@ -426,3 +426,11 @@ The task remains partial/recoverable.
 Native Windows Credential Manager is exercised for synthetic write/read/rotation/expiry/process-reopen/delete. Known runtime secret material is rejected from durable objectives/policy/archive and remains filtered from child environment. Credential Manager does not isolate secrets from the same Windows account or malicious host code. Browser contexts are nonpersistent and origin-scoped; screenshots/downloads are bounded exclusive artifacts, not sandbox claims. UIA uses observed IDs/PID/executable, fixed patterns and bounded input; UIPI/elevation is not bypassed. Notepad broker activation may reuse an existing user process. Neo4j acceptance is an unauthenticated loopback synthetic fixture: NEVER load private history into it. Native vault and SQLite commits cannot be one atomic transaction. Durable enrollment/disconnect intents now precede native mutations, and restart reconciles known references. Ambiguous external exchanges never replay; missing/expired credentials require reauthorization. Local disconnect exposes remote revocation UNKNOWN/owner-action-required. Raw device/access tokens remain exclusively in the native vault. See [crash boundaries and scoped cleanup](GATE-B-HARDENING.md).
 
 Verified local acceptance includes the previously documented typed PowerShell, Notepad/UIA, browser, owner-control, credentials and memory cases. This hardening pass does not repeat physical/manual desktop acceptance or authorize OAuth. Slice 05 is COMPLETE for the Windows local-alpha scope; Slice 06 and Gate B remain PARTIAL. Real private OAuth, provider revocation and private-source/live-memory federation require owner authorization. General conversational recall integration remains a composition boundary, not a proven autonomous product. See [Gate B completion ledger](GATE-B-COMPLETION.md).
+
+
+Browser source loading is anchored to the trusted OSCAR package with isolated Python
+imports; the artifact cwd remains under MachineScope. Preflight exercises that same
+worker and closes an owned headless Chromium process tree. Neither package anchoring
+nor cwd scope is a sandbox. Failed browser operations retain only bounded allowlisted
+categories, exception classes, exit codes and byte counts, never arbitrary page, URL,
+cookie, credential or exception text. See [the focused repair](GATE-B-HARDENING.md).

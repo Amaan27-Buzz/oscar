@@ -2,7 +2,6 @@
 
 import argparse
 import hashlib
-import importlib.util
 import json
 import os
 import sys
@@ -18,7 +17,7 @@ from urllib.request import urlopen
 
 from oscar.contracts import Epistemic, Evidence, TaskState, new_id
 from oscar.grid import Grid, Node, NodeRole
-from oscar.interactive_worker import InteractiveWorker
+from oscar.interactive_worker import InteractiveWorker, browser_diagnostic
 from oscar.jev import Intent
 from oscar.machine import MachineScope, MachineVerifier
 from oscar.powershell import discover
@@ -223,10 +222,6 @@ def run(root: Path, *, desktop: bool) -> dict[str, Any]:
     )
     if desktop and notepad is None:
         raise AcceptanceFailure("precondition.notepad", "registered Notepad", "unavailable")
-    if importlib.util.find_spec("playwright") is None:
-        raise AcceptanceFailure(
-            "precondition.playwright", "pinned browser extra installed", "unavailable"
-        )
     store = Store(root / "runtime.sqlite")
     grid = Grid(store)
     scopes = (
@@ -255,6 +250,10 @@ def run(root: Path, *, desktop: bool) -> dict[str, Any]:
         desktop_app_ids=(notepad.id,) if notepad else (),
         browser=True,
     )
+    if worker.browser_python is None:
+        diagnostic = worker.browser_probe
+        store.close()
+        raise AcceptanceFailure(diagnostic["category"], "available browser worker", diagnostic)
     grid.advertise(session, worker.capabilities())
     runtime = Runtime(store, grid, MachineVerifier(worker.files))
     dispatcher = Dispatcher(store, grid, session.node_id, worker.executors())
@@ -327,6 +326,14 @@ def run(root: Path, *, desktop: bool) -> dict[str, Any]:
         result = next(r for r in store.all("result") if r["task_id"] == task.id)
         require(result["status"] == "REPORTED", "runtime.reported", "REPORTED", result["status"])
         if not result["success"]:
+            if kind == "browser":
+                action = store.get("planned_action", task.id)
+                diagnostic = browser_diagnostic(worker.outputs.pop(action["id"], ""), 1)
+                raise AcceptanceFailure(
+                    diagnostic["category"],
+                    "successful browser execution",
+                    {"kind": kind, "task_id": task.id, **diagnostic},
+                )
             raise AcceptanceFailure(
                 "runtime.operation",
                 "successful REPORTED receipt",

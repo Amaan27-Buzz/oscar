@@ -225,3 +225,71 @@ regressions. Ruff, format, strict mypy (48 source files), repository contracts,
 local Markdown links, secret scan and Git diff checks pass. Cross-platform and
 external-link CI must match the final repair head on draft PR 12. No physical
 manual rerun was performed by the agent.
+
+## Owner desktop success and browser launch repair (2026-10-04)
+
+The owner rerun `.oscar/manual-gate-b-20261004-190338` passed the owned Notepad
+sub-phase: binding, independent focus/text/empty-text readback, owned tab closure
+and empty fixture deletion. Its SQLite evidence includes independent test-tab
+absence; `actions.json` alone does not contain the final verification update.
+No stale fixture windows were reported. The first local browser action failed at
+`runtime.operation`. **Overall final manual acceptance remains outstanding.**
+The original owner evidence directory remains unchanged. See
+[the bounded browser repair evidence](evidence/gate-b-browser-launch-repair-2026-10-04.json).
+
+Independent reproduction showed direct-file execution of `oscar/browser_worker.py`
+from an artifact directory fails with `ModuleNotFoundError: No module named 'oscar'`.
+The acceptance venv could resolve the source and masked this failure; a fresh venv
+without pip or OSCAR reproduced it. The owner's original generic failure did not
+retain subprocess stderr, so its exact stderr cannot be reconstructed.
+
+`InteractiveWorker` now invokes a fixed OSCAR-owned package entrypoint. Python
+isolated mode (`-I`) excludes cwd, user-site and `PYTHONPATH`; standard importlib
+package loading anchors `oscar.browser_worker` to this Worker's trusted source
+package, separately from the artifact cwd. No `sys.path` modification, global
+`PYTHONPATH` or editable installation is required. Dependencies still must be
+installed in the explicitly allowed interpreter. The Machine Worker's executable,
+cwd, environment, timeout, output and Job Object authorization remains unchanged.
+Playwright contexts remain nonpersistent with explicit origin admission and pinned,
+exclusive artifact creation. This remains trusted-host execution, not a sandbox.
+
+Preflight uses the same command builder, interpreter and artifact cwd with
+`--probe`, loads the actual worker and launches/closes headless Chromium without
+opening a page. An eight-second subprocess deadline, bounded output and process-tree
+cleanup apply. Missing Playwright, missing Chromium, worker import and launch errors
+have distinct categories; an unavailable path never advertises `machine.browser`.
+The harness checks this before starting desktop actions.
+
+Browser failures emit category and exception class only. The Worker retains only
+allowlisted categories/classes, exit code and byte count from bounded output;
+arbitrary stderr, URLs, selectors, page contents, cookies and credentials are
+discarded. The harness records a named `browser.*` failure instead of generic
+`success: false`. Timeout/cancellation retain their existing runtime semantics.
+There is no automatic retry of an action or mutation.
+
+New automated regressions exercise an uninstalled source checkout, poisoned cwd/
+`PYTHONPATH`, missing dependencies/executable, actual import failure, unavailable
+capability advertisement, output bounds/redaction and scoped subprocess cwd.
+Real synthetic Chromium execution independently checks download bytes and PNG
+signature in a disposable artifact workspace, then rejects an overwrite through
+the real failed Worker path. Existing origin/reparse-point/isolation, cancellation,
+timeout and stale-owner-window protections remain in the suite. These automated
+checks do not replace the owner's final manual acceptance.
+
+Use the pinned acceptance interpreter from the repository root for the rerun:
+
+```powershell
+$root = ".oscar\manual-gate-b-" + (Get-Date -Format "yyyyMMdd-HHmmss")
+& .\.oscar\gate-b-venv\Scripts\python.exe -m scripts.verify_gate_b_interactive --root $root --desktop
+```
+
+The general `python -m scripts.verify_gate_b_interactive` command remains valid
+when `python` selects an interpreter with the browser extra and Chromium installed.
+Slice 05 remains COMPLETE for the recorded Windows local-alpha scope; Slice 06 and
+Gate B remain PARTIAL. OAuth and Slice 07 are NOT STARTED; PR 12 stays draft/unmerged.
+
+Repair verification: **408 Windows tests pass in 97.392 seconds**, including all
+real Chromium lifecycle tests; the focused selection passes 50 tests. Eleven new
+regressions were added. Ruff, format, strict mypy (48 source files), repository
+contracts, local Markdown links, value-silent secret scan and Git diff checks pass.
+Ubuntu and external links must be checked on this repair's exact PR head.

@@ -146,3 +146,10 @@ check and exposed invocation/diagnostic harness defects. It is not a capability
 PASS. The [focused repair and failure evidence](GATE-B-HARDENING.md) document the
 bounded independent focus wait and safe owner rerun. Final manual acceptance is
 still outstanding; Slice 05 COMPLETE, Slice 06 PARTIAL and Gate B PARTIAL remain.
+
+The subsequent owner rerun `.oscar/manual-gate-b-20261004-190338` passed the owned
+Notepad sub-phase and cleanup, then failed at the first local browser execution.
+Source-checkout direct-file imports were independently reproduced and repaired;
+preflight now exercises the real worker launch. See [the focused browser repair](GATE-B-HARDENING.md)
+for diagnostics, automated evidence and the pinned-interpreter owner command.
+Overall manual acceptance remains outstanding. OAuth has not started; Gate B is PARTIAL.
