@@ -1,5 +1,7 @@
 # Gate B pre-manual hardening — 2026-10-04
 
+> Current status reconciliation, 2026-10-05: PR #12 is merged at `97c0622507df3f724ecf0c8b74aa7f4ae7784b08`; Gate B is frozen PASS. Slice 05/06 COMPLETE. Club C / Slice 07 is separately authorized in draft PR #13. The dated evidence below retains its historical status wording.
+
 Starting branch/PR head: `447ad2eef86deeab2cc924bc88c4f5afb123b687`.
 Branch: `gate-b/completion`; [draft PR 12](https://github.com/amaansyed27/oscar/pull/12)
 targets `work`. This pass does not perform physical/manual desktop acceptance,

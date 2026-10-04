@@ -118,7 +118,7 @@ physical safety remains local and deterministic during Core/Grid/network loss.
 
 Slice 05/06 COMPLETE for the documented local-alpha scope; Gate B PASS after
 owner physical machine and GitHub OAuth/federation acceptance. Remote revocation
-remains unknown. Slice 07 NOT STARTED; PR 12 stays DRAFT/UNMERGED.
+remains unknown. Slice 07 is current Club C work; PR 12 is MERGED; Gate B frozen PASS.
 
 Oracle deployment, Vercel deployment, Galaxy Tab expansion, post-Gate-B System-1
 evaluation and full Auth Broker expansion are later work, not Gate B completion

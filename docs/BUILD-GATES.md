@@ -258,7 +258,7 @@ Required scenarios include provider/auth failure, coordinator/node/Edge loss, Gr
 |---|---|---|
 | Gate A — Brain | 01–04 | **PASS** |
 | Gate B — Can Do Work | 05–06 | **PASS for documented local-alpha acceptance** |
-| Gate C — Embodied OSCAR | 07–10 | Planned |
+| Gate C — Embodied OSCAR | 07–10 | PARTIAL; Slice 07 current, 08–10 unbuilt |
 | Gate D — JARVIS Layer | 11–14 | Planned |
 | Gate E — Unified Alpha | 15–17 | Planned |
 
@@ -280,7 +280,7 @@ deployed and its main Core architecture is operational.
 Slice 05/06 COMPLETE; Gate B PASS for the documented local-alpha scope. Owner
 physical machine run `manual-gate-b-20261004-200734` and OAuth/federation run
 `oauth-gate-b-20261004-234817` passed. Remote revocation remains unknown, optional
-private writes were not authorized, Slice 07 NOT STARTED and PR 12 DRAFT/UNMERGED. The harness repair at
+private writes were not authorized, Slice 07 is current Club C work and PR 12 MERGED; Gate B frozen PASS. The harness repair at
 `c9cb7d2d20fb444cce98e2749eeea5425d4a0ee1` is independently reviewed with 25 focused
 regressions passing and exact-head CI green; it is not a physical acceptance PASS.
 The prior owner focus failure and its evidence remain unchanged.
@@ -288,3 +288,10 @@ The prior owner focus failure and its evidence remain unchanged.
 See [owner OAuth acceptance](GATE-B-OAUTH-ACCEPTANCE.md) and
 [physical machine PASS evidence](evidence/gate-b-owner-machine-pass-2026-10-04.json).
 The reported prior stale OSCAR fixture was not mutated; it does not invalidate the PASS.
+
+## Club C current boundary — 2026-10-05
+
+Gate C PARTIAL; only Slice 07 authorized after frozen Gate B PASS. Edge host
+simulation and firmware compilation are separate evidence classes; neither
+grants physical PASS. Owner ESP32/Pico acceptance is mandatory: [exact hardware
+sequence](EDGE-HARDWARE-ACCEPTANCE.md). Slices 08–10 not started. See [checkpoint](CLUB-C-CHECKPOINT.md).

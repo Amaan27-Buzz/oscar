@@ -516,7 +516,7 @@ OSCAR monitors provider/auth health, Grid connectivity, capability staleness, ta
 
 Verified acceptance includes native Windows/Codex work, typed PowerShell, registered Notepad/UIA, isolated browser, separate owner control, native credentials, canonical WAL/FTS5, real Qdrant/Graphiti/Neo4j, local embedding/reranking, memory evaluation and owner-reviewed policy candidates. The owner completed physical machine acceptance and registered GitHub device OAuth with exactly `user:email`, real private reads, new-process restart, controlled private/public federation and local credential deletion/absence checks. Slice 05 and Slice 06 are COMPLETE for the documented local-alpha scope; Gate B is PASS. Remote provider revocation remains `UNKNOWN_OWNER_ACTION_REQUIRED`; private writes were not authorized and are optional. General conversational recall integration remains a composition boundary, not a proven autonomous product. See [Gate B completion ledger](GATE-B-COMPLETION.md).
 
-No Slice 07 work begins until Gate B mandatory acceptance passes.
+Gate B is frozen PASS; Slice 07 is current separately authorized work.
 
 ## Architecture invariants
 
@@ -547,3 +547,18 @@ Remote provider revocation remains UNKNOWN_OWNER_ACTION_REQUIRED. See
 15. `CAN PERCEIVE`, `CAN RETAIN` and `CAN ACT` are independent boundaries.
 16. Notification access never implies unrestricted source-app access.
 17. A gate is completed end-to-end before development advances to the next Club unless the owner explicitly changes the plan.
+
+## Club C / Slice 07 Edge composition
+
+Gate B is frozen PASS. Core/Grid → outbound HTTPS ESP32 gateway → typed 3.3 V
+UART → deterministic Pico GPIO/ADC/interlock controller. These are Edge nodes,
+never Core hosts. Shared C wire/parser/controller contracts run in firmware and
+host reference simulation. See [Edge architecture](EDGE.md) and [owner physical
+acceptance](EDGE-HARDWARE-ACCEPTANCE.md). Native Grid scopes, PersonalPolicy and
+Action Ledger guard physical requests; local safety needs no model/network.
+
+Capability Evolution remains future non-blocking backlog: OSCAR may detect
+repeated capability gaps or inefficient browser/computer/phone automation and
+propose a Skill/plugin/MCP/native adapter. A Builder Worker such as Codex may
+build it only after owner authorization, tests and permission review. Generated
+capabilities gain no authority automatically. No self-extension in Slice 07.

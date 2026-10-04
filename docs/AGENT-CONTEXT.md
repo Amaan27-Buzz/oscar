@@ -57,8 +57,7 @@ Python/Fluid bounded web/API/relay workloads. The Galaxy Tab S6 Lite (2021) is a
 future Home Node only after full deployment and operational Core architecture.
 None of deployment, Tab implementation, decision-model evaluation or full broker
 expansion is a Gate B requirement. Owner OAuth and final manual
-machine acceptance PASSED; Slice 05/06 COMPLETE, Gate B PASS, Slice 07 NOT
-STARTED, PR 12 DRAFT/UNMERGED. Historical evidence retains its original vocabulary.
+machine acceptance PASSED; Slice 05/06 COMPLETE, Gate B PASS, Slice 07 is current Club C work, PR 12 MERGED; Gate B frozen PASS. Historical evidence retains its original vocabulary.
 
 ## Context loading
 

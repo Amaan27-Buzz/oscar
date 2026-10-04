@@ -453,3 +453,16 @@ list, rechecks job membership to reject PID reuse and waits on owned process han
 for at most three seconds. Handles close even on drain failure; unrelated owner
 processes are never terminated by PID. See Microsoft's
 [Job Objects contract](https://learn.microsoft.com/en-us/windows/win32/procthread/job-objects).
+
+## Slice 07 Edge boundary
+
+See [Edge safety/security](EDGE.md) and [owner acceptance](EDGE-HARDWARE-ACCEPTANCE.md).
+Physical requests require Grid scope, owner grant, PersonalPolicy and explicit
+mutation confirmation. One-day per-node sessions are locally provisioned;
+outbound HTTPS validates the owner CA and rejects redirects. UART CRC is
+integrity, not authentication. This profile is a physically controlled,
+low-energy LED fixture. Local stop latch/safe LOW outrank Core authority.
+No remote stop-clear, arbitrary GPIO, dangerous actuator or OTA capability.
+Secure boot/NVS encryption/eFuse commissioning is unverified and requires an
+owner-reviewed board plan. Never publish ignored NVS CSV/bin, session stores,
+Wi-Fi passwords or TLS keys. Physical results remain pending.

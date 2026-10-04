@@ -318,7 +318,7 @@ A green unit suite alone is insufficient.
 
 Once Gate B passes, merge/review/freeze its accepted baseline before Slice 07 begins.
 
-## Slice 07 — OSCAR Edge + reflexes ◻️
+## Slice 07 — OSCAR Edge + reflexes 🚧
 
 Starts only after Gate B PASS.
 
@@ -395,7 +395,7 @@ perception / communication
 |---|---:|---|---|
 | A — Brain | 01–04 | Core + Controller + Transport/Grid foundation + adaptive Model Router | **PASS** |
 | B — Can Do Work | 05–06 | Real machine/continuation + Memory Fabric + policy/live context | **PASS for documented local-alpha scope** |
-| C — Embodied Core | 07–08 | Edge/reflexes + Voice/Identity/Persona | Planned after Gate B PASS |
+| C — Embodied Core | 07–08 | Edge/reflexes + Voice/Identity/Persona | PARTIAL; Slice 07 current |
 | D1 — Sunday | 09 | Android embodiment + communication + owner controls | Planned |
 | D2 — Desktop | 10 | Desktop interaction runtime | Planned |
 | E1 — Awareness | 11–13 | World Model/Sentry + commissioning + presence | Planned |
@@ -407,8 +407,8 @@ Manual integration checkpoints remain in [BUILD-GATES.md](BUILD-GATES.md).
 ## Current next step
 
 Mandatory acceptance is complete: owner physical machine and GitHub OAuth/private
-federation runs passed. Review PR 12 for merge after exact-head CI. Gate B PASS;
-Slice 07 remains NOT STARTED and requires a separate instruction.
+federation runs passed. PR 12 merged at `97c0622507df3f724ecf0c8b74aa7f4ae7784b08`; Gate B frozen PASS.
+Owner authorized Club C / Slice 07 on branch `club-c/slice-07-edge`, draft PR 13.
 
 The original ordered acceptance sequence below remains a contract, not a list of unimplemented items:
 
@@ -467,7 +467,7 @@ Slice 05 and Slice 06 are COMPLETE for the documented local-alpha scope; Gate B
 is PASS. Owner physical/manual machine acceptance passed in run
 `manual-gate-b-20261004-200734`; OAuth/private federation passed in run
 `oauth-gate-b-20261004-234817`. Remote revocation remains unknown; no private write
-was authorized. Slice 07 NOT STARTED and PR 12 DRAFT/UNMERGED. The harness repair at
+was authorized. Slice 07 is current Club C work and PR 12 MERGED; Gate B frozen PASS. The harness repair at
 `c9cb7d2d20fb444cce98e2749eeea5425d4a0ee1` is independently reviewed with 25 focused
 regressions passing and exact-head CI green; it is not a physical acceptance PASS.
 The prior owner focus failure and its evidence remain unchanged.
@@ -475,3 +475,13 @@ The prior owner focus failure and its evidence remain unchanged.
 See [owner OAuth acceptance preparation](GATE-B-OAUTH-ACCEPTANCE.md) and
 [physical machine PASS evidence](evidence/gate-b-owner-machine-pass-2026-10-04.json).
 The reported prior stale OSCAR fixture was not mutated; it does not invalidate the PASS.
+
+## Current Club C / Slice 07 — 2026-10-05
+
+Branch `club-c/slice-07-edge`, draft PR #13, starts at
+`9fde9385af6b34c4f76991e2d871ab0909296af5`. PR #12 merged; main/work baseline
+`97c0622507df3f724ecf0c8b74aa7f4ae7784b08`; Gate A/B PASS; 05/06 COMPLETE.
+Current Edge implementation/simulator work precedes mandatory owner wiring,
+flash and real acceptance. See [checkpoint](CLUB-C-CHECKPOINT.md).
+Slice 07 is not COMPLETE; Gate C PARTIAL. Slices 08–10 remain unbuilt.
+Capability Evolution is deferred, as recorded in [architecture](ARCHITECTURE.md).

@@ -45,7 +45,20 @@ Out of scope for this slice:
 
 ## Status
 
-- Slice 07: NOT STARTED
+- Slice 07: IMPLEMENTATION / physical acceptance pending
 - Gate C: PARTIAL / not yet accepted
 
 This checkpoint must be updated with real implementation evidence as Slice 07 progresses. Simulated behavior must not be promoted to physical verification.
+
+## Slice 07 implementation evidence — 2026-10-05
+
+- Starting checkpoint: `9fde9385af6b34c4f76991e2d871ab0909296af5`.
+- Existing branch `club-c/slice-07-edge`, draft PR #13; no merge.
+- Local Windows shared C reference built using MSVC 19.44 with warnings as errors.
+- SIMULATED protocol/controller/Grid acceptance: 16 focused tests PASS.
+- Existing OSCAR full regression suite: 443 tests PASS, local Python 3.14.
+- Cross-firmware CI is a separate check; final results recorded after remote runs.
+- Owner physical wiring/flash, silicon watchdog and electrical timing: NOT RUN.
+- [Architecture/protocol/research](EDGE.md); [exact owner hardware guide](EDGE-HARDWARE-ACCEPTANCE.md).
+- Slice 07 PARTIAL / OWNER_HARDWARE_REQUIRED; Gate C PARTIAL.
+- Slices 08–10, Oracle deployment, Galaxy Tab and self-extension not started.

@@ -356,3 +356,13 @@ Edge offline
 ## Gate B local completion candidate — 2026-10-04
 
 Separate local owner-control/core/Worker processes now demonstrate continued execution across control disconnect/Core termination, natural lease expiry, reconnect and independently verified exactly-once recovery. Authority still shares SQLite plus loopback HTTP; independent stores/public remote deployment/phone control remain unverified. Verified acceptance includes native Windows/Codex work, typed PowerShell, registered Notepad/UIA, isolated browser, separate owner control, native credentials, canonical WAL/FTS5, real Qdrant/Graphiti/Neo4j, local embedding/reranking, memory evaluation and owner-reviewed policy candidates. The owner completed physical machine acceptance and registered GitHub device OAuth with exactly `user:email`, real private reads, new-process restart, controlled private/public federation and local credential deletion/absence checks. Slice 05 and Slice 06 are COMPLETE for the documented local-alpha scope; Gate B is PASS. Remote provider revocation remains `UNKNOWN_OWNER_ACTION_REQUIRED`; private writes were not authorized and are optional. General conversational recall integration remains a composition boundary, not a proven autonomous product. See [Gate B completion ledger](GATE-B-COMPLETION.md).
+
+## Slice 07 Edge integration
+
+The native [Edge adapter](EDGE.md) uses NodeRole.EDGE, existing opaque Grid
+pairing/session scopes, heartbeat and Capability contracts. Healthy Desk Edge
+exposes only the configured harmless test profile. Controller loss withdraws
+capabilities; heartbeat expiry removes a dead gateway. Reconnect never restores
+an old HIGH output. ACKs remain REPORTED; simulator evidence remains SIMULATED.
+Independent physical readback/owner observation is mandatory. No deployment or
+phone implementation is implied by this local acceptance composition.

@@ -385,3 +385,13 @@ Sunday remains the everyday phone embodiment, Desktop the execution Worker, and
 ESP32/Pico the local deterministic Edge. The tablet does not imply the full
 Qdrant/Neo4j/ML stack is practical on Android. Deployment, Home Node, decision-model
 evaluation and full Auth Broker expansion are not Gate B completion requirements.
+
+## ADR-039 — Native Edge gateway and shared deterministic controller
+
+Decision (2026-10-05): ESP-IDF 6.1 ESP32 gateway plus Pico SDK 2.3.1 RP2040
+controller. Short 3.3 V 115200 UART is the reference link after comparing UART,
+I2C and SPI. Host reference and firmware compile the same bounded version-1 C
+codec/parser/controller. Native Grid and PersonalPolicy govern Core requests;
+local stop/safe-state remains independent. No full Python runtime on ESP32,
+managed framework or dangerous actuator profile. See [comparison](EDGE.md).
+Simulation does not complete Slice 07; owner physical acceptance is mandatory.

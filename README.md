@@ -287,9 +287,9 @@ See [`docs/CLUB-A-CHECKPOINT.md`](docs/CLUB-A-CHECKPOINT.md), [`docs/CLUB-B-CHEC
 | 02 | OSCAR Decision / Epistemic Controller | ✅ Verified foundation |
 | 03 | Native Transport + Catalog + Grid foundation | ✅ Accepted reference foundation; deployment evolves |
 | 04 | Native Model Router + cloud intelligence | ✅ Gate A accepted |
-| 05 | Real machine Worker + remote continuation | ✅ Windows local-alpha acceptance candidate |
-| 06 | Memory Fabric + Personal Policy + live context | 🚧 Gate B completion in progress |
-| 07 | OSCAR Edge + reflexes | Planned after Gate B PASS |
+| 05 | Real machine Worker + remote continuation | ✅ COMPLETE, accepted local-alpha scope |
+| 06 | Memory Fabric + Personal Policy + live context | ✅ COMPLETE, accepted local-alpha scope |
+| 07 | OSCAR Edge + reflexes | Current implementation; physical acceptance pending |
 | 08 | Voice Core + Identity + Match/Map + Persona runtime | Planned |
 | 09 | Sunday + communication + Grid owner controls | Planned |
 | 10 | Desktop Interaction Runtime | Planned |
