@@ -157,7 +157,7 @@ Owner command from the repository root:
 
 ```powershell
 $root = ".oscar\manual-gate-b-" + (Get-Date -Format "yyyyMMdd-HHmmss")
-python scripts\verify_gate_b_interactive.py --root $root --desktop
+python -m scripts.verify_gate_b_interactive --root $root --desktop
 ```
 
 Remaining mandatory work includes owner manual review, registered-client private
@@ -177,3 +177,51 @@ loss, separate index outages, unsupported claims, twelve enrollment/disconnect f
 boundaries and a native-vault process crash. Full results and artifact hashes live in
 [the synthetic evidence bundle](evidence/gate-b-hardening-2026-10-04.json).
 CI must be checked at the latest PR head; manual/OAuth acceptance remains absent.
+
+
+## Owner manual failure and focused harness repair (2026-10-04)
+
+The owner run `.oscar/manual-gate-b-20261004-175011` is a **failed manual
+acceptance attempt that exposed harness defects**, not a capability PASS.
+Direct-file invocation failed to resolve `oscar.interactive_worker`; repository-root
+module invocation entered the harness. Five successful REPORTED actions ended at
+`desktop mouse_click`, followed by the one-shot independent focus assertion.
+The synthetic fixture remained zero bytes. The old failure record contains a blank
+`AssertionError`; it did not retain the actual focused PID, so asynchronous settling
+is a possible cause rather than a proven explanation of the Windows focus state.
+See [the bounded failure evidence](evidence/gate-b-manual-harness-failure-2026-10-04.json).
+The original ignored owner evidence root is preserved unchanged.
+
+The documented command above now uses the package module. Automated `--help`
+invocation from the repository root checks imports without driving the desktop or
+changing global `PYTHONPATH`. After a typed click, independent read-only UIA snapshots
+poll for at most three seconds with short sleeps and remaining-budget subprocess
+limits. Each snapshot brackets focus with exact window PID/handle, fixture title,
+editor runtime ID and empty-content checks. The previously observed focus may
+remain briefly while settling; it never counts as success. A different foreign PID
+or changed fixture identity blocks immediately. Only the exact bound PID passes.
+No retry click or focus mutation is added.
+
+All acceptance assertions are named checks. Failure evidence records phase/check,
+exception type, safe expected/observed summaries, traceback file/line/function,
+fixture/target identity, last successful action/capability, actions path, evidence
+root and cleanup state. Text/title/URL content is represented by hashes and lengths;
+private desktop contents and arbitrary exception messages are not dumped.
+Stale OSCAR windows are reported and remain for owner review; no prior or unrelated
+window is closed. Failed roots are never reused or erased.
+
+Automated harness regressions cover delayed focus, foreign focus, timeout, before/
+after identity changes, stale-window protection, diagnostic persistence, safe rerun,
+observer timeout propagation and native PowerShell syntax parsing without executing
+UI actions. These tests do not constitute physical acceptance.
+Slice 05 remains COMPLETE for its recorded Windows local-alpha scope; Slice 06 and
+Gate B remain PARTIAL. Final owner manual acceptance and private OAuth acceptance
+remain outstanding. This repair does not authorize or start OAuth or Slice 07.
+
+
+Focused repair automated evidence: **397 Windows tests pass in 87.992 seconds**;
+the focused harness/hardening selection passes 25 tests, including 13 new harness
+regressions. Ruff, format, strict mypy (48 source files), repository contracts,
+local Markdown links, secret scan and Git diff checks pass. Cross-platform and
+external-link CI must match the final repair head on draft PR 12. No physical
+manual rerun was performed by the agent.

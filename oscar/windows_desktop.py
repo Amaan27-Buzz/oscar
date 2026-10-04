@@ -90,6 +90,18 @@ if ($null -eq $element -or $element.Current.ProcessId -ne $p.pid -or $element.Cu
 }
 switch ($p.operation) {
  'read' { Describe $element |ConvertTo-Json -Compress -Depth 6 }
+ 'focus_snapshot' {
+  $beforeWindow=Describe $window;$beforeEditor=Describe $element
+  $focused=[Windows.Automation.AutomationElement]::FocusedElement
+  $focus=@{pid=0;handle=0;runtime_id=$null}
+  if ($null -ne $focused) {
+   $focus=@{pid=$focused.Current.ProcessId;handle=$focused.Current.NativeWindowHandle;
+    runtime_id=(@($focused.GetRuntimeId()) -join '.')}
+  }
+  @{windows=@($beforeWindow,(Describe $window));
+    editors=@($beforeEditor,(Describe $element));focused=$focus} |
+   ConvertTo-Json -Compress -Depth 6
+ }
  'focus' {
   $element.SetFocus()
   Describe ([Windows.Automation.AutomationElement]::FocusedElement) |
@@ -355,6 +367,7 @@ class WindowsDesktop:
             "tree": {"handle", "pid"},
             "close": {"handle", "pid"},
             "read": {"handle", "pid", "runtime_id"},
+            "focus_snapshot": {"handle", "pid", "runtime_id"},
             "focus": {"handle", "pid", "runtime_id"},
             "invoke": {"handle", "pid", "runtime_id"},
             "select": {"handle", "pid", "runtime_id"},
@@ -401,10 +414,14 @@ class WindowsDesktop:
         script = base64.b64encode(BRIDGE.replace("__PAYLOAD__", payload).encode("utf-16-le"))
         return [self.shell, "-NoProfile", "-NonInteractive", "-EncodedCommand", script.decode()]
 
-    def observe(self, request: dict[str, Any]) -> Any:
+    def observe(self, request: dict[str, Any], *, timeout: float = 15) -> Any:
         """Independent observer process; no successful executor response is consulted."""
+        if not 0 < timeout <= 15:
+            raise ValueError("observer timeout must be positive and at most 15 seconds")
         env = {key: os.environ[key] for key in ("SystemRoot", "TEMP", "TMP") if key in os.environ}
-        result = subprocess.run(self.command(request), env=env, capture_output=True, timeout=15)
+        result = subprocess.run(
+            self.command(request), env=env, capture_output=True, timeout=min(15, timeout)
+        )
         if result.returncode or len(result.stdout) > 128_000:
             raise OSError("bounded UI Automation observation failed")
         return json.loads(result.stdout.decode("utf-8-sig"))

@@ -139,3 +139,10 @@ platform skips), lint/format/types and repository/secret checks. The optional br
 cases passed on the real laptop. [External links](https://github.com/amaansyed27/oscar/actions/runs/37190449046)
 and [repository contracts](https://github.com/amaansyed27/oscar/actions/runs/37190449068)
 also passed. This records an observed commit; PR checks remain the authority for later commits.
+
+
+The owner manual attempt on 2026-10-04 failed after the click's independent focus
+check and exposed invocation/diagnostic harness defects. It is not a capability
+PASS. The [focused repair and failure evidence](GATE-B-HARDENING.md) document the
+bounded independent focus wait and safe owner rerun. Final manual acceptance is
+still outstanding; Slice 05 COMPLETE, Slice 06 PARTIAL and Gate B PARTIAL remain.

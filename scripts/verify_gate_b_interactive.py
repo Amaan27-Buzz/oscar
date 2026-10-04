@@ -8,8 +8,10 @@ import os
 import sys
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+from subprocess import TimeoutExpired
 from threading import Thread
-from time import sleep, time
+from time import monotonic, sleep, time
+from traceback import extract_tb
 from typing import Any
 from urllib.parse import parse_qs
 from urllib.request import urlopen
@@ -29,6 +31,134 @@ from oscar.windows_desktop import WindowsDesktop, discover_apps
 def fixture_window(windows: list[dict[str, Any]], bound: dict[str, Any], fixture: str) -> bool:
     matches = [w for w in windows if w["handle"] == bound["handle"] and w["pid"] == bound["pid"]]
     return len(matches) == 1 and fixture in matches[0]["name"]
+
+
+class AcceptanceFailure(RuntimeError):
+    def __init__(self, check: str, expected: Any, observed: Any):
+        self.check = check
+        self.expected = expected
+        self.observed = observed
+        super().__init__(f"{check}: expected {expected!r}; observed {observed!r}")
+
+
+def require(condition: bool, check: str, expected: Any, observed: Any) -> None:
+    """Only pass non-secret summaries, identities or hashes to diagnostics."""
+    if not condition:
+        raise AcceptanceFailure(check, expected, observed)
+
+
+def text_summary(value: str) -> dict[str, Any]:
+    return {"length": len(value), "sha256": hashlib.sha256(value.encode()).hexdigest()}
+
+
+def wait_for_focus(
+    observer: Any,
+    selector: dict[str, Any],
+    fixture: str,
+    *,
+    prior_pid: int = 0,
+    timeout: float = 3.0,
+) -> dict[str, Any]:
+    """Read-only independent polling; never refocus, click or accept foreign focus."""
+    deadline = monotonic() + timeout
+    observed: dict[str, Any] = {"pid": None}
+
+    while monotonic() < deadline:
+        try:
+            snapshot = observer.observe(
+                {"operation": "focus_snapshot", **selector},
+                timeout=deadline - monotonic(),
+            )
+            require(monotonic() <= deadline, "desktop.focus_readback", selector, observed)
+            windows = snapshot["windows"]
+            require(
+                len(windows) == 2
+                and all(fixture_window([window], selector, fixture) for window in windows),
+                "desktop.focus_identity",
+                selector,
+                {"fixture_window_matches": False},
+            )
+            editors = snapshot["editors"]
+            require(
+                len(editors) == 2
+                and all(
+                    editor.get("runtime_id") == selector["runtime_id"]
+                    and editor.get("pid") == selector["pid"]
+                    and editor.get("text") is not None
+                    and editor["text"].strip() == ""
+                    for editor in editors
+                ),
+                "desktop.focus_identity",
+                {**selector, "empty_editor": True},
+                [
+                    {
+                        "pid": editor.get("pid"),
+                        "runtime_id": editor.get("runtime_id"),
+                        "text": text_summary(editor.get("text") or ""),
+                    }
+                    for editor in editors
+                ],
+            )
+            focused = snapshot["focused"]
+            observed = {key: focused.get(key) for key in ("pid", "handle", "runtime_id")}
+            require(
+                focused.get("pid") in {0, None, prior_pid, selector["pid"]},
+                "desktop.focus_readback",
+                {"target_pid": selector["pid"], "unchanged_prior_pid": prior_pid},
+                observed,
+            )
+            if focused.get("pid") == selector["pid"]:
+                return observed
+        except AcceptanceFailure:
+            raise
+        except (OSError, PermissionError, TimeoutError, TimeoutExpired) as error:
+            raise AcceptanceFailure(
+                "desktop.focus_readback",
+                selector,
+                {**observed, "observer_error_type": type(error).__name__},
+            ) from error
+        sleep(min(0.1, max(0, deadline - monotonic())))
+    raise AcceptanceFailure("desktop.focus_readback", selector, observed)
+
+
+def failure_evidence(root: Path, error: Exception, context: dict[str, Any]) -> dict[str, Any]:
+    check = (
+        error.check
+        if isinstance(error, AcceptanceFailure)
+        else context.get("check", "precondition")
+    )
+    message = (
+        str(error)
+        if isinstance(error, AcceptanceFailure)
+        else (f"{check}: {type(error).__name__}; inspect traceback locations and action receipt")
+    )
+    if not context.get("fixture_id") and (root / "fixture.json").exists():
+        context["fixture_id"] = json.loads((root / "fixture.json").read_text(encoding="utf-8"))[
+            "fixture_id"
+        ]
+    report = {
+        "status": "FAILED",
+        "root": str(root),
+        "phase": check.split(".")[0],
+        "check": check,
+        "error_type": type(error).__name__,
+        "error": message,
+        "expected": error.expected if isinstance(error, AcceptanceFailure) else "check succeeds",
+        "observed": error.observed if isinstance(error, AcceptanceFailure) else "exception raised",
+        "traceback": [
+            {"file": frame.filename, "line": frame.lineno, "function": frame.name}
+            for frame in extract_tb(error.__traceback__)
+        ],
+        "fixture_id": context.get("fixture_id"),
+        "bound_target": context.get("bound_target"),
+        "stale_fixture_windows": context.get("stale_fixture_windows", []),
+        "last_successful_action": context.get("last_successful_action"),
+        "actions_path": str(root / "actions.json"),
+        "cleanup": context.get("cleanup", {"fixture_tab": "owner review; never blindly closed"}),
+    }
+    if root.exists():
+        (root / "failure.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
+    return report
 
 
 class Fixture(BaseHTTPRequestHandler):
@@ -86,15 +216,17 @@ def run(root: Path, *, desktop: bool) -> dict[str, Any]:
     workspace.mkdir()
     manifest = discover()
     if manifest is None:
-        raise RuntimeError("PowerShell precondition failed; no tasks started")
+        raise AcceptanceFailure("precondition.powershell", "available PowerShell", "unavailable")
     apps = tuple(discover_apps())
     notepad = next(
         (app for app in apps if app.available and app.name.casefold() == "notepad.exe"), None
     )
     if desktop and notepad is None:
-        raise RuntimeError("registered Notepad precondition failed; no desktop mutation")
+        raise AcceptanceFailure("precondition.notepad", "registered Notepad", "unavailable")
     if importlib.util.find_spec("playwright") is None:
-        raise RuntimeError("Playwright precondition failed; install the pinned browser extra")
+        raise AcceptanceFailure(
+            "precondition.playwright", "pinned browser extra installed", "unavailable"
+        )
     store = Store(root / "runtime.sqlite")
     grid = Grid(store)
     scopes = (
@@ -128,13 +260,25 @@ def run(root: Path, *, desktop: bool) -> dict[str, Any]:
     dispatcher = Dispatcher(store, grid, session.node_id, worker.executors())
     transports = {session.node_id: (dispatcher, session)}
     records = []
+    context: dict[str, Any] = {
+        "fixture_id": fixture_id,
+        "check": "runtime.setup",
+        "cleanup": {
+            "store": "open",
+            "server": "not started",
+            "fixture_tab": "owner review; never blindly closed",
+        },
+    }
     owned_editor: dict[str, Any] | None = None
     owned_text = ""
 
     def execute(kind: str, request: dict[str, Any]) -> dict[str, Any]:
         nonlocal owned_text
+        context["check"] = kind + "." + request.get("operation", "execute")
         if time() >= deadline:
-            raise TimeoutError("interactive acceptance deadline exceeded")
+            raise AcceptanceFailure(
+                "runtime.deadline", "complete within 600 seconds", "deadline elapsed"
+            )
         if (
             kind == "desktop_control"
             and request["operation"]
@@ -149,7 +293,9 @@ def run(root: Path, *, desktop: bool) -> dict[str, Any]:
                 observer.observe({"operation": "windows"}), request, fixture_name
             )
         ):
-            raise PermissionError("fixture is no longer active; no owner-window mutation")
+            raise AcceptanceFailure(
+                "desktop.mutation_identity", "active owned fixture", {"fixture_matches": False}
+            )
         if (
             kind == "desktop_control"
             and request["operation"]
@@ -164,7 +310,11 @@ def run(root: Path, *, desktop: bool) -> dict[str, Any]:
         ):
             observed = observer.observe({"operation": "read", **owned_editor})
             if observed["text"].strip() != owned_text:
-                raise PermissionError("fixture content changed outside this run; no mutation")
+                raise AcceptanceFailure(
+                    "desktop.mutation_content",
+                    text_summary(owned_text),
+                    text_summary(observed["text"].strip()),
+                )
         task = runtime.create(
             Intent(
                 "Gate B synthetic interactive objective",
@@ -175,14 +325,19 @@ def run(root: Path, *, desktop: bool) -> dict[str, Any]:
         )
         completed = runtime.run(task.id, transports)
         result = next(r for r in store.all("result") if r["task_id"] == task.id)
-        assert result["status"] == "REPORTED", result
+        require(result["status"] == "REPORTED", "runtime.reported", "REPORTED", result["status"])
         if not result["success"]:
-            action = store.get("planned_action", task.id)
-            raise RuntimeError(
-                f"interactive operation failed: {kind}: {result['error']}: "
-                + worker.outputs.get(action["id"], "")
+            raise AcceptanceFailure(
+                "runtime.operation",
+                "successful REPORTED receipt",
+                {"kind": kind, "task_id": task.id, "success": False},
             )
-        assert completed.state == TaskState.PARTIALLY_VERIFIED
+        require(
+            completed.state == TaskState.PARTIALLY_VERIFIED,
+            "runtime.state",
+            TaskState.PARTIALLY_VERIFIED.value,
+            completed.state.value,
+        )
         action = store.get("planned_action", task.id)
         output = json.loads(worker.outputs.pop(action["id"]))
         if kind == "desktop_control" and request["operation"] == "set_text":
@@ -194,11 +349,13 @@ def run(root: Path, *, desktop: bool) -> dict[str, Any]:
                 "task_id": task.id,
                 "correlation_id": task.correlation_id,
                 "capability": action["capability_id"],
+                "operation": request.get("operation", "execute"),
                 "result_status": result["status"],
                 "result_sha256": json.loads(result["value"])["sha256"],
                 "observed_at": time(),
             }
         )
+        context["last_successful_action"] = records[-1].copy()
         (root / "actions.json").write_text(json.dumps(records, indent=2), encoding="utf-8")
         return output
 
@@ -236,6 +393,7 @@ def run(root: Path, *, desktop: bool) -> dict[str, Any]:
                 for w in previous
                 if "OSCAR-acceptance-" in w["name"]
             ]
+            context["stale_fixture_windows"] = report["stale_fixture_windows"]
             (workspace / fixture_name).write_bytes(b"")
             app = next(
                 app
@@ -243,7 +401,12 @@ def run(root: Path, *, desktop: bool) -> dict[str, Any]:
                 if app.available and app.name.casefold() == "notepad.exe"
             )
             catalog = execute("installed_app", {"operation": "catalog"})
-            assert any(record["id"] == app.id for record in catalog)
+            require(
+                any(record["id"] == app.id for record in catalog),
+                "desktop.catalog",
+                app.id,
+                {"catalog_records": len(catalog)},
+            )
             launch = execute(
                 "installed_app", {"operation": "launch", "app_id": app.id, "artifact": fixture_name}
             )
@@ -262,8 +425,11 @@ def run(root: Path, *, desktop: bool) -> dict[str, Any]:
                     break
                 sleep(0.2)
             if target is None:
-                raise RuntimeError("no independently identified new Notepad window; no mutation")
+                raise AcceptanceFailure(
+                    "desktop.fixture_window", "new bound fixture window", "not found"
+                )
             bound = {"handle": target["handle"], "pid": target["pid"]}
+            context["bound_target"] = bound
             execute("desktop_control", {"operation": "bind", **bound, "app_id": app.id})
             tree = execute("desktop_control", {"operation": "tree", **bound})
             editors = [
@@ -273,25 +439,38 @@ def run(root: Path, *, desktop: bool) -> dict[str, Any]:
                 and element["text"] in {"", "\r\n"}
             ]
             if len(editors) != 1:
-                raise RuntimeError("new empty Notepad editor is ambiguous; no mutation")
+                raise AcceptanceFailure(
+                    "desktop.fixture_editor", {"empty_editors": 1}, {"empty_editors": len(editors)}
+                )
             editor = editors[0]
             selector = {**bound, "runtime_id": editor["runtime_id"]}
             owned_editor = selector
+            context["bound_target"] = selector
+            context["check"] = "desktop.focus_readback"
+            prior_pid = observer.observe({"operation": "focused"}).get("pid", 0)
             execute(
                 "desktop_control",
                 {"operation": "mouse_click", **selector, "x_fraction": 0.5, "y_fraction": 0.5},
             )
-            focused = observer.observe({"operation": "focused"})
-            assert focused["pid"] == target["pid"]
+            context["check"] = "desktop.focus_readback"
+            focused = wait_for_focus(observer, selector, fixture_name, prior_pid=prior_pid)
             verified("separate UIA focused-process readback", str(focused["pid"]).encode())
             proof = "OSCAR-GATE-B-" + str(int(time()))
             execute("desktop_control", {"operation": "set_text", **selector, "text": proof})
+            context["check"] = "desktop.text_readback"
             independently_read = observer.observe({"operation": "read", **selector})
-            assert independently_read["text"].strip() == proof
+            require(
+                independently_read["text"].strip() == proof,
+                "desktop.text_readback",
+                text_summary(proof),
+                text_summary(independently_read["text"].strip()),
+            )
             verified("separate UIA text readback", independently_read["text"].strip().encode())
             execute("desktop_control", {"operation": "key", **selector, "key": "select_all"})
             execute("desktop_control", {"operation": "key", **selector, "key": "backspace"})
-            assert observer.observe({"operation": "read", **selector})["text"].strip() == ""
+            context["check"] = "desktop.empty_after_clear"
+            empty = observer.observe({"operation": "read", **selector})["text"].strip()
+            require(empty == "", "desktop.empty_after_clear", text_summary(""), text_summary(empty))
             verified("separate UIA empty text readback", b"")
             current = observer.observe({"operation": "tree", **bound})
             indexed = {e["runtime_id"]: e for e in current}
@@ -319,13 +498,22 @@ def run(root: Path, *, desktop: bool) -> dict[str, Any]:
                     for w in observer.observe({"operation": "windows"})
                     if w["handle"] == bound["handle"]
                 )
-                assert fixture_name in observed["name"]
+                require(
+                    fixture_name in observed["name"],
+                    "desktop.close_identity",
+                    {**bound, "fixture_match": True},
+                    {"fixture_match": False},
+                )
                 execute(
                     "desktop_control",
                     {"operation": "close_tab", **selector, "expected_title": observed["name"]},
                 )
             else:
-                raise RuntimeError("test-tab close is ambiguous; manual cleanup required")
+                raise AcceptanceFailure(
+                    "desktop.fixture_close",
+                    {"close_buttons": 1},
+                    {"close_buttons": len(close_buttons)},
+                )
             sleep(0.5)
             remaining = observer.observe({"operation": "windows"})
             if any(fixture_name in window["name"] for window in remaining):
@@ -337,19 +525,33 @@ def run(root: Path, *, desktop: bool) -> dict[str, Any]:
                     and "InvokePatternIdentifiers.Pattern" in e["patterns"]
                 ]
                 if len(discard) != 1 or not any(fixture_name in e["name"] for e in current):
-                    raise RuntimeError("close/discard requires manual review")
+                    raise AcceptanceFailure(
+                        "desktop.fixture_discard",
+                        "one owned discard action",
+                        {"discard_actions": len(discard)},
+                    )
                 execute(
                     "desktop_control",
                     {"operation": "invoke", **bound, "runtime_id": discard[0]["runtime_id"]},
                 )
                 sleep(0.5)
-            assert not any(
+            context["check"] = "desktop.fixture_tab_absent"
+            still_open = any(
                 fixture_name in w["name"] for w in observer.observe({"operation": "windows"})
             )
+            require(not still_open, "desktop.fixture_tab_absent", False, still_open)
             verified("separate UIA test-tab absence", fixture_name.encode())
-            assert (workspace / fixture_name).read_bytes() == b""
+            context["check"] = "desktop.fixture_file_empty"
+            fixture_bytes = (workspace / fixture_name).read_bytes()
+            require(fixture_bytes == b"", "desktop.fixture_file_empty", 0, len(fixture_bytes))
             (workspace / fixture_name).unlink()
-            assert not list(workspace.iterdir())
+            require(
+                not list(workspace.iterdir()),
+                "desktop.workspace_cleanup",
+                {"files": 0},
+                {"files": len(list(workspace.iterdir()))},
+            )
+            context["cleanup"]["fixture_tab"] = "owned fixture closed; empty file removed"
             report["desktop"] = {
                 "status": "VERIFIED",
                 "app_id": app.id,
@@ -369,6 +571,7 @@ def run(root: Path, *, desktop: bool) -> dict[str, Any]:
         server = ThreadingHTTPServer(("127.0.0.1", 0), handler)
         thread = Thread(target=server.serve_forever, daemon=True)
         thread.start()
+        context["cleanup"]["server"] = "running"
         local = "http://127.0.0.1:" + str(server.server_port)
         proof = "synthetic-browser-proof-" + fixture_id
         plan = {
@@ -392,11 +595,32 @@ def run(root: Path, *, desktop: bool) -> dict[str, Any]:
         }
         try:
             result = execute("browser", plan)
+            context["check"] = "browser.fixture_server_readback"
             with urlopen(local + "/state", timeout=5) as response:
                 actual = json.load(response)
-            assert actual["value"] == proof
-            assert (workspace / "fixture.txt").read_bytes() == b"bounded fixture download\n"
-            assert result["observations"][0]["title"] == "OSCAR accepted"
+            require(
+                actual["value"] == proof,
+                "browser.fixture_server_readback",
+                text_summary(proof),
+                text_summary(actual["value"]),
+            )
+            context["check"] = "browser.download_readback"
+            download = (workspace / "fixture.txt").read_bytes()
+            require(
+                download == b"bounded fixture download\n",
+                "browser.download_readback",
+                {
+                    "bytes": len(b"bounded fixture download\n"),
+                    "sha256": hashlib.sha256(b"bounded fixture download\n").hexdigest(),
+                },
+                {"bytes": len(download), "sha256": hashlib.sha256(download).hexdigest()},
+            )
+            require(
+                result["observations"][0]["title"] == "OSCAR accepted",
+                "browser.result_title",
+                text_summary("OSCAR accepted"),
+                text_summary(result["observations"][0]["title"]),
+            )
             verified("independent server GET after browser submission", actual["value"].encode())
             report["browser_fixture"] = {
                 "status": "VERIFIED",
@@ -410,6 +634,9 @@ def run(root: Path, *, desktop: bool) -> dict[str, Any]:
             server.shutdown()
             server.server_close()
             thread.join(timeout=5)
+            context["cleanup"]["server"] = (
+                "closed" if not thread.is_alive() else "thread still alive"
+            )
         plan = {
             "origins": ["https://example.com"],
             "timeout": 60,
@@ -420,13 +647,27 @@ def run(root: Path, *, desktop: bool) -> dict[str, Any]:
             ],
         }
         public = execute("browser", plan)["observations"][0]
+        context["check"] = "browser.public_source_readback"
         with urlopen("https://example.com/", timeout=15) as response:
             source = response.read(64_000).decode()
-        assert public["url"] == "https://example.com/"
+        require(
+            public["url"] == "https://example.com/",
+            "browser.public_url",
+            text_summary("https://example.com/"),
+            text_summary(public["url"]),
+        )
         marker = "This domain is for use in documentation examples"
-        assert public["title"] == "Example Domain" and marker in public["text"]
-        assert "<title>Example Domain</title>" in source
-        assert marker in source
+        require(
+            public["title"] == "Example Domain",
+            "browser.public_title",
+            text_summary("Example Domain"),
+            text_summary(public["title"]),
+        )
+        require(marker in public["text"], "browser.public_marker", True, False)
+        require(
+            "<title>Example Domain</title>" in source, "browser.public_source_title", True, False
+        )
+        require(marker in source, "browser.public_source_marker", True, False)
         verified("independent HTTPS title and content marker", source.encode())
         report["browser_public"] = {
             "status": "VERIFIED",
@@ -436,8 +677,16 @@ def run(root: Path, *, desktop: bool) -> dict[str, Any]:
         }
         report["actions"] = records
         return report
+    except Exception as error:
+        context["cleanup"]["store"] = "closing"
+        failure_evidence(root, error, context)
+        raise
     finally:
         store.close()
+        if (root / "failure.json").exists():
+            saved = json.loads((root / "failure.json").read_text(encoding="utf-8"))
+            saved["cleanup"]["store"] = "closed"
+            (root / "failure.json").write_text(json.dumps(saved, indent=2), encoding="utf-8")
 
 
 def main() -> int:
@@ -446,23 +695,25 @@ def main() -> int:
     parser.add_argument("--desktop", action="store_true")
     args = parser.parse_args()
     if os.name != "nt":
-        raise SystemExit("real Windows desktop acceptance requires Windows")
+        raise SystemExit(
+            "precondition.platform: expected Windows; observed non-Windows; no actions started"
+        )
     root = args.root.resolve()
     print("Artifact/evidence root: " + str(root), flush=True)
     if root.exists():
-        raise SystemExit("acceptance root already exists; choose a fresh timestamp root")
+        raise SystemExit(
+            f"precondition.root: expected fresh evidence root; observed existing {root}; "
+            "no actions started; choose a fresh timestamp root"
+        )
     try:
         report = run(root, desktop=args.desktop)
     except Exception as error:
-        report = {
-            "status": "FAILED",
-            "error_type": type(error).__name__,
-            "error": str(error),
-            "root": str(root),
-            "cleanup": "only owned browser/server resources; fixture tab may require owner review",
-        }
-        if root.exists():
-            (root / "failure.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
+        failure = root / "failure.json"
+        report = (
+            json.loads(failure.read_text(encoding="utf-8"))
+            if failure.exists()
+            else failure_evidence(root, error, {"check": "precondition.setup"})
+        )
         print(json.dumps(report, indent=2))
         return 1
     (args.root / "report.json").write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
