@@ -113,6 +113,7 @@ class PlaybackStreamTests(unittest.TestCase):
                 self.closed = False
                 self.aborted = False
                 self.interrupt = False
+                self.abort_error = False
                 streams.append(self)
 
             def start(self) -> None:
@@ -131,6 +132,8 @@ class PlaybackStreamTests(unittest.TestCase):
 
             def abort(self) -> None:
                 self.aborted = True
+                if self.abort_error:
+                    raise RuntimeError("synthetic device loss")
 
         sd = SimpleNamespace(RawOutputStream=Stream)
         playback = SoundDevicePlayback(0, PlaybackReference())
@@ -154,4 +157,13 @@ class PlaybackStreamTests(unittest.TestCase):
                 playback.play(AudioChunk(chunk.pcm, 16000, "neural", "voice", "second"), token)
             self.assertTrue(streams[1].aborted)
             self.assertTrue(streams[1].closed)
+            self.assertIsNone(playback.stream)
+
+            token = StopToken()
+            playback.play(chunk, token)
+            streams[-1].abort_error = True
+            streams[-1].interrupt = True
+            with self.assertRaises(VoiceError):
+                playback.play(chunk, token)
+            self.assertTrue(streams[-1].closed)
             self.assertIsNone(playback.stream)

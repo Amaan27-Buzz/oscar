@@ -452,7 +452,10 @@ class SoundDevicePlayback:
         stream, self.stream = self.stream, None
         self.utterance = None
         if stream is not None:
-            stream.close()
+            try:
+                stream.close()
+            except Exception:
+                raise VoiceError("playback cleanup unverified") from None
 
     def play(self, chunk: AudioChunk, stop: StopToken) -> None:
         with self.lock:
@@ -481,12 +484,16 @@ class SoundDevicePlayback:
                         raise VoiceError("playback underflow")
                     stop.check()
             except (VoiceCancelled, VoiceError):
-                self.cancel()
-                self._close()
+                try:
+                    self.cancel()
+                finally:
+                    self._close()
                 raise
             except Exception:
-                self.cancel()
-                self._close()
+                try:
+                    self.cancel()
+                finally:
+                    self._close()
                 raise VoiceError("audio playback unavailable or disconnected") from None
 
     def finish(self, utterance_id: str) -> None:
@@ -503,7 +510,10 @@ class SoundDevicePlayback:
         # Do not take the write lock: abort must interrupt an active native write.
         stream = self.stream
         if stream is not None:
-            stream.abort()
+            try:
+                stream.abort()
+            except Exception:
+                raise VoiceError("playback cancellation unverified") from None
 
 
 def read_wave(
