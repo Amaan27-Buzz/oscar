@@ -2,7 +2,7 @@
 
 OSCAR's first-run experience should feel like commissioning a personal system, not clicking through generic app permissions.
 
-Setup establishes identity, Persona, Voice Identity, Voice Match/Map, Connection Grid, devices, model/search providers, Personal Policy, Sunday/Android capabilities, Sentry/capture behavior and safety before proactive/autonomous behavior is trusted.
+Setup establishes identity, Persona, Voice Identity, Voice Match/Map, Connection Grid, devices, model/search providers, Personal Policy, OSCAR Mobile/Android capabilities, Sentry/capture behavior and safety before proactive/autonomous behavior is trusted.
 
 ## Goals
 
@@ -12,7 +12,7 @@ Setup establishes identity, Persona, Voice Identity, Voice Match/Map, Connection
 - make privacy/permissions understandable;
 - distinguish perception, retention and action authority;
 - distinguish Voice Match, Voice Map, Sentry awareness and recording/capture;
-- establish owner control through Sunday;
+- establish owner control through OSCAR Mobile;
 - configure a recognizable OSCAR Persona without weakening truth/safety;
 - finish with evidence-backed system health.
 
@@ -22,7 +22,7 @@ Setup establishes identity, Persona, Voice Identity, Voice Match/Map, Connection
 
 Explain briefly:
 
-- Sunday is OSCAR on the phone;
+- OSCAR Mobile is OSCAR on the phone;
 - desktop machines are optional execution nodes;
 - Edge handles persistent local presence/reflex/safety;
 - cloud can provide replaceable rendezvous/durable coordination;
@@ -91,7 +91,7 @@ Test deterministic commands such as `Oscar`, `Mute`, `Stop`, `Cancel`, `Listen`,
 Pair available roles:
 
 ```text
-Sunday      owner control / approvals / notifications / current context
+OSCAR Mobile      owner control / approvals / notifications / current context
 Cloud       rendezvous / durable coordination
 Desktop     high-capability execution
 Edge        local presence / reflex / safety
@@ -111,7 +111,7 @@ Configure native Model Router providers/constraints and verify at least one real
 
 Configure search/live-source providers. Current/freshness-sensitive facts should use current authoritative sources rather than stale priors.
 
-### 12. Sunday / Android system integration
+### 12. OSCAR Mobile / Android system integration
 
 On supported Android devices, configure separately:
 
@@ -204,7 +204,7 @@ Test remote continuation:
 ```text
 start harmless long-running task
 → leave task active
-→ observe from Sunday
+→ observe from OSCAR Mobile
 → pause/cancel or let complete
 → verify result
 ```
@@ -245,7 +245,7 @@ For each source choose consent/disclosure behavior, raw-media retention, transcr
 
 ### 23. Personal protocols / routines
 
-Offer high-value examples such as leaving → Away mode, machine online → advertise capability, long-running desktop task → keep running + report to Sunday, sleep routine, incoming call while unavailable, or morning/day brief.
+Offer high-value examples such as leaving → Away mode, machine online → advertise capability, long-running desktop task → keep running + report to OSCAR Mobile, sleep routine, incoming call while unavailable, or morning/day brief.
 
 ### 24. Worker autonomy
 
@@ -270,7 +270,7 @@ current context / voice / notification
 → response through current surface
 ```
 
-Where available also test Sentry states, barge-in/self-voice suppression, provider fallback, Grid disconnect/reconnect, remote desktop continuation, Sunday owner control, capture pause/retention, Persona context trigger, notification exclusions/replies, Orb retreat, widget refresh and emergency stop.
+Where available also test Sentry states, barge-in/self-voice suppression, provider fallback, Grid disconnect/reconnect, remote desktop continuation, OSCAR Mobile owner control, capture pause/retention, Persona context trigger, notification exclusions/replies, Orb retreat, widget refresh and emergency stop.
 
 ## Completion screen
 
@@ -288,7 +288,7 @@ Persona                 Custom
 Voice Match             Enrolled
 Sentry                   Aware
 Daily Journal           Off / Configured
-Sunday assistant role    Selected / Not available / Not configured
+OSCAR Mobile assistant role    Selected / Not available / Not configured
 Orb overlay              Verified / Off
 Notifications            Allowed / Limited / Off
 Schedule automation      Suggest-only / Policy-scoped

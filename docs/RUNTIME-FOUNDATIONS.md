@@ -124,7 +124,7 @@ This is **progressive capability loading**, not a mega-prompt.
 The catalog includes:
 
 - native OSCAR transport/node capabilities;
-- Sunday/device capabilities;
+- OSCAR Mobile/device capabilities;
 - desktop machine capabilities;
 - Edge hardware actions;
 - plugins/connectors;

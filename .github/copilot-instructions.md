@@ -19,7 +19,7 @@ Key constraints:
 - prefer specialist tools/agents over reimplementing them poorly;
 - keep hardware safety deterministic and local;
 - keep reflex commands off heavy-model paths;
-- preserve Sunday as OSCAR on the phone, not a separate assistant;
+- preserve OSCAR Mobile as OSCAR on the phone, not a separate assistant;
 - update README/roadmap/domain docs with completed slices and verify those docs before claiming propagation is complete;
 - for UI, avoid generic AI dashboards, card walls, glassmorphism, neon HUDs and purple gradient AI styling;
 - visually verify substantial UI work and respect reduced motion/native platform behavior.

@@ -34,7 +34,7 @@ OSCAR is designed as one continuous relationship rather than a collection of dis
 You ↔ OSCAR
 ```
 
-Text, voice, Sunday, desktop, communications, Workers and Edge all contribute to the same continuity where policy permits. Internally OSCAR segments events, episodes, objectives, entities and memories for retrieval and scaling, but the user should not have to find an old chat to recover context.
+Text, voice, OSCAR Mobile, desktop, communications, Workers and Edge all contribute to the same continuity where policy permits. Internally OSCAR segments events, episodes, objectives, entities and memories for retrieval and scaling, but the user should not have to find an old chat to recover context.
 
 The canonical history belongs to OSCAR. Managed memory vendors are optional, never required infrastructure.
 
@@ -129,7 +129,7 @@ See [`docs/CHIEF-OF-STAFF.md`](docs/CHIEF-OF-STAFF.md).
                            │
         ┌──────────────────┼──────────────────┐
         ▼                  ▼                  ▼
-      Sunday            Cloud             Desktop(s)
+      OSCAR Mobile            Cloud             Desktop(s)
  owner control       rendezvous/state      high compute
         │                                     │
         └──────────────────┬──────────────────┘
@@ -138,7 +138,7 @@ See [`docs/CHIEF-OF-STAFF.md`](docs/CHIEF-OF-STAFF.md).
                   local reflex / safety
 ```
 
-- **Sunday** — OSCAR on the phone; preferred owner-control, approval, notification and Chief-of-Staff surface.
+- **OSCAR Mobile** — OSCAR on the phone; preferred owner-control, approval, notification and Chief-of-Staff surface.
 - **Cloud** — replaceable rendezvous/durable coordination.
 - **Desktop** — optional high-capability execution: coding agents, terminal, filesystem, browser/computer use, installed apps, GPU/local models.
 - **Edge** — persistent local wake, sensors, GPIO, reflexes and deterministic safety.
@@ -147,9 +147,9 @@ No ordinary laptop/desktop is OSCAR's permanent host. Losing one node should red
 
 See [`docs/CONNECTION-GRID.md`](docs/CONNECTION-GRID.md).
 
-## Sunday — phone embodiment
+## OSCAR Mobile — phone embodiment
 
-Sunday should feel **present, not launched**.
+OSCAR Mobile should feel **present, not launched**.
 
 On Android, the product direction is to use legitimate platform capabilities where supported and explicitly granted:
 
@@ -164,7 +164,7 @@ On Android, the product direction is to use legitimate platform capabilities whe
 
 Notification visibility is not unrestricted source-app access. OEM/device behavior remains unverified until tested on target hardware.
 
-See [`docs/SUNDAY-DESIGN.md`](docs/SUNDAY-DESIGN.md), [`docs/SURFACES.md`](docs/SURFACES.md) and [`docs/CHIEF-OF-STAFF.md`](docs/CHIEF-OF-STAFF.md).
+See [`docs/MOBILE-DESIGN.md`](docs/MOBILE-DESIGN.md), [`docs/SURFACES.md`](docs/SURFACES.md) and [`docs/CHIEF-OF-STAFF.md`](docs/CHIEF-OF-STAFF.md).
 
 ## Native infrastructure
 
@@ -237,13 +237,13 @@ See [`docs/PERSONA.md`](docs/PERSONA.md), [`docs/PERSONAL-POLICY.md`](docs/PERSO
 |---|---|
 | Chief of Staff | Current context → schedule/task/communication coordination within policy |
 | Memory Fabric | OSCAR Event Archive + FTS5 + Qdrant + Graphiti/Neo4j + Controller evidence-bound recall |
-| Connection Grid | Sunday + replaceable cloud + Desktop + Edge availability/control fabric |
+| Connection Grid | OSCAR Mobile + replaceable cloud + Desktop + Edge availability/control fabric |
 | Epistemic Integrity | KNOWN/INFERRED/RECALLED/REPORTED/VERIFIED/UNKNOWN remain distinct |
 | Controller | Decide execute/retrieve/verify/reason/delegate/ask; mandatory memory preflight when needed |
 | Search/freshness | Current authoritative evidence outranks stale manifests/model priors/memory |
 | Model Router | Adaptive provider/model/credential routing with health/quota/funding evidence |
 | Machine Workers | Filesystem/Git/terminal/Codex/browser/apps as discovered capabilities |
-| Sunday | Android embodiment, assistant presence, Orb/widgets, notifications, owner control |
+| OSCAR Mobile | Android embodiment, assistant presence, Orb/widgets, notifications, owner control |
 | Desktop | Dictate / Edit / Ask / Act + machine capability surface |
 | World Model | Live current-state graph with freshness/provenance |
 | Communication | Calls/messages/email/meetings/dictation/follow-up where supported |
@@ -291,7 +291,7 @@ See [`docs/CLUB-A-CHECKPOINT.md`](docs/CLUB-A-CHECKPOINT.md), [`docs/CLUB-B-CHEC
 | 06 | Memory Fabric + Personal Policy + live context | ✅ COMPLETE, accepted local-alpha scope |
 | 07 | OSCAR Edge + reflexes | COMPLETE FOR SOFTWARE / SIMULATED EDGE FOUNDATION; physical DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED |
 | 08 | Voice Core + Identity + Match/Map + Persona runtime | COMPLETE FOR SOFTWARE / REFERENCE VOICE FOUNDATION; physical acceptance owner-deferred |
-| 09 | Sunday + communication + Grid owner controls | PARTIAL; initial software/emulated foundation, draft PR #15; real device acceptance NOT RUN |
+| 09 | OSCAR Mobile + communication + Grid owner controls | PARTIAL; Kotlin/Compose software rebuild candidate, draft PR #15; real device acceptance NOT RUN |
 | 10 | Desktop Interaction Runtime | Planned |
 | 11 | World Model + Perception + Sentry + Daily Journal | Planned |
 | 12 | Commissioning/setup | Planned |
@@ -336,7 +336,7 @@ A slice is not complete because an agent says it is complete. Implementation, te
 - [Search + freshness](docs/SEARCH-FRESHNESS.md)
 - [Connection Grid](docs/CONNECTION-GRID.md)
 - [Model routing](docs/MODEL-ROUTING.md)
-- [Sunday design](docs/SUNDAY-DESIGN.md)
+- [OSCAR Mobile design](docs/MOBILE-DESIGN.md)
 - [Communication](docs/COMMUNICATION.md)
 - [Personal Policy](docs/PERSONAL-POLICY.md)
 - [Persona](docs/PERSONA.md)
@@ -364,20 +364,20 @@ The 2026-10-05 scope authorized Slice 08. The 2026-10-06 owner decision addition
 authorizes Slice 09 software after Slice 08 integration; Slice 10, deployment and
 Galaxy Tab Home Node remain outside this work.
 
-## Current Slice 08 — owner scope, 2026-10-06
+## Slice 08 owner closure scope — 2026-10-06
 
 Owner-authorized closure scope: **COMPLETE FOR SOFTWARE / REFERENCE VOICE FOUNDATION**.
 Physical status: `DEFERRED_BY_OWNER / CONSOLIDATED_GATE_C_ACCEPTANCE_REQUIRED`.
 This is not a physical PASS. Gate C remains **PARTIAL**.
-The quality candidate on `club-c/slice-08-voice`, PR #14 into `work`, has measured
-local reference evidence against baseline `e8ac8f8bca1cb0cb7909523ac6af906ee289366f`;
-integration requires green exact-head CI.
+Slice 08 PR #14 integrated after green exact-head CI. Accepted main/work:
+`92a11aa05083f1983186976ba64bd30aa9f1f2a0`. Historical reference research baseline:
+`e8ac8f8bca1cb0cb7909523ac6af906ee289366f`.
 Existing owner harnesses remain mandatory inputs to later consolidated acceptance.
 Microphone, real-room AEC/barge-in/self-wake, owner Match/Map calibration, playback,
 Android voice and naturalness remain NOT RUN. Windows reference evidence never
 implies Android acceptance. See [Voice Core](docs/VOICE-CORE.md) and
 [consolidated Gate C acceptance](docs/GATE-C-CONSOLIDATED-ACCEPTANCE.md).
-Slice 09 Sunday software may begin after clean Slice 08 integration; Slice 09 must
+Slice 09 OSCAR Mobile software may begin after clean Slice 08 integration; Slice 09 must
 remain a draft and stop before owner/device acceptance. Slice 10, deployment and
 Galaxy Tab Home Node are not authorized. Physical Edge remains
 `DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED`, mandatory before Slice 17 PASS.
@@ -391,7 +391,7 @@ local-optimization phase rather than simply growing into a larger cloud wrapper.
 The durable direction is:
 
 - Voice Core stays platform-independent; Windows is only the current reference and
-  Android/Sunday is a first-class target using the same core contracts behind
+  Android/OSCAR Mobile is a first-class target using the same core contracts behind
   platform adapters.
 - Add owner-controlled **Operating Logs** for model/tool/plugin/Worker routing,
   latency, retries, failures, verification and capability gaps. These are separate
@@ -411,10 +411,10 @@ Slice 08 PR #14 merged; accepted main/work baseline
 `92a11aa05083f1983186976ba64bd30aa9f1f2a0`. Slice 08 is
 **COMPLETE FOR SOFTWARE / REFERENCE VOICE FOUNDATION**; physical voice is
 `DEFERRED_BY_OWNER / CONSOLIDATED_GATE_C_ACCEPTANCE_REQUIRED`, never physical PASS.
-Sunday initial software foundation is on `club-c/slice-09-sunday`, draft PR #15
+OSCAR Mobile Kotlin/Compose rebuild is on `club-c/slice-09-sunday`, draft PR #15
 into `work`, **PARTIAL / OWNER_DEVICE_ACCEPTANCE_NOT_RUN**. Core/loopback,
-SDK build and emulated UI evidence are separate from actual phone/OEM acceptance.
-See [Sunday foundation](docs/SUNDAY-FOUNDATION.md) for implementation, limits and the next owner boundary.
+Gradle/JVM/emulated evidence is separate from actual phone/OEM acceptance.
+See [OSCAR Mobile foundation](docs/MOBILE-FOUNDATION.md) for implementation, limits and the next owner boundary.
 Slice 09 must not merge in this run. Gate C remains PARTIAL. Slice 10, deployment
 and Home Node are not started. Post-alpha Operating Logs, specialist-model training
 and home-server migration remain documented future work, not implemented.

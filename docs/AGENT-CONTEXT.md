@@ -12,7 +12,7 @@ OSCAR keeps one canonical project truth and uses thin agent-specific adapters. D
 | [brand assets](../assets/brand/README.md) | canonical OSCAR Orb SVG and compatibility asset rules |
 | `TASTE.md` | qualitative quality/motion/anti-slop bar |
 | `docs/PRODUCT.md` | product north star |
-| `docs/CHIEF-OF-STAFF.md` | ambient context, commitments, schedule/proactivity and Sunday presence |
+| `docs/CHIEF-OF-STAFF.md` | ambient context, commitments, schedule/proactivity and OSCAR Mobile presence |
 | `docs/ARCHITECTURE.md` | system boundaries and OSCAR-owned Decision / Epistemic Controller |
 | [deployment](DEPLOYMENT.md) | free-first replaceable Core/API hosts and deferred Home Node |
 | `docs/MEMORY.md` | OSCAR-owned one-relationship Memory Fabric |
@@ -22,7 +22,7 @@ OSCAR keeps one canonical project truth and uses thin agent-specific adapters. D
 | `docs/EPISTEMIC-INTEGRITY.md` | evidence/verification/non-yes-man contract |
 | `docs/RUNTIME-FOUNDATIONS.md` | durable tasks, capabilities, channels, artifacts and automation evaluation |
 | `docs/NATIVE-INFRASTRUCTURE.md` | native transport/model-routing infrastructure |
-| `docs/CONNECTION-GRID.md` | Sunday/cloud/desktop/Edge availability/control fabric |
+| `docs/CONNECTION-GRID.md` | OSCAR Mobile/cloud/desktop/Edge availability/control fabric |
 | `docs/MODEL-ROUTING.md` | provider/model/credential routing |
 | `docs/SEARCH-FRESHNESS.md` | current-source/freshness authority contract |
 | `docs/PERSONAL-POLICY.md` | explicit user behavioral rules |
@@ -32,8 +32,8 @@ OSCAR keeps one canonical project truth and uses thin agent-specific adapters. D
 | `docs/CONNECTOR-FABRIC.md` | structured service/API connector boundary |
 | `docs/WORKERS.md` | delegated Worker lifecycle/recovery |
 | `docs/ORCHESTRATION.md` | routing, Skills, Workers, routines and Protocols |
-| `docs/SURFACES.md` | Sunday/desktop/cloud/Edge surface roles |
-| `docs/SUNDAY-DESIGN.md` | Sunday mobile interaction direction |
+| `docs/SURFACES.md` | OSCAR Mobile/desktop/cloud/Edge surface roles |
+| `docs/MOBILE-DESIGN.md` | OSCAR Mobile mobile interaction direction |
 | `docs/UI-AVATAR.md` | avatar/state/motion language |
 | `docs/ONBOARDING.md` | commissioning |
 | `docs/SECURITY.md` | permissions, transport, capture/Grid security |
@@ -70,10 +70,10 @@ More context is not automatically better. Load `AGENTS.md`, `ENGINEERING.md`, `d
 - `docs/ARCHITECTURE.md`
 - `docs/CLUB-B-CHECKPOINT.md` for current acceptance evidence.
 
-### Ambient / schedule / Sunday
+### Ambient / schedule / OSCAR Mobile
 
 - `docs/CHIEF-OF-STAFF.md`
-- `docs/SUNDAY-DESIGN.md`
+- `docs/MOBILE-DESIGN.md`
 - `docs/PERSONAL-POLICY.md`
 - `docs/COMMUNICATION.md`
 - `docs/SURFACES.md`
@@ -105,7 +105,7 @@ More context is not automatically better. Load `AGENTS.md`, `ENGINEERING.md`, `d
 - `docs/PERSONA.md`
 - `DESIGN.md`
 - `TASTE.md`
-- `docs/SUNDAY-DESIGN.md`
+- `docs/MOBILE-DESIGN.md`
 - `docs/UI-AVATAR.md`
 
 ### Workers / orchestration
@@ -178,7 +178,7 @@ Memory retrieval is also not model routing: Controller can require recall before
 ## Connection Grid
 
 ```text
-Sunday      = preferred owner control / approvals / notifications
+OSCAR Mobile      = preferred owner control / approvals / notifications
 Cloud       = replaceable rendezvous + durable coordination
 Desktop     = high-capability execution
 Edge        = local awareness / reflex / safety
@@ -308,20 +308,20 @@ The 2026-10-05 scope authorized Slice 08. The 2026-10-06 owner decision addition
 authorizes Slice 09 software after Slice 08 integration; Slice 10, deployment and
 Galaxy Tab Home Node remain outside this work.
 
-## Current Slice 08 — owner scope, 2026-10-06
+## Slice 08 owner closure scope — 2026-10-06
 
 Owner-authorized closure scope: **COMPLETE FOR SOFTWARE / REFERENCE VOICE FOUNDATION**.
 Physical status: `DEFERRED_BY_OWNER / CONSOLIDATED_GATE_C_ACCEPTANCE_REQUIRED`.
 This is not a physical PASS. Gate C remains **PARTIAL**.
-The quality candidate on `club-c/slice-08-voice`, PR #14 into `work`, has measured
-local reference evidence against baseline `e8ac8f8bca1cb0cb7909523ac6af906ee289366f`;
-integration requires green exact-head CI.
+Slice 08 PR #14 integrated after green exact-head CI. Accepted main/work:
+`92a11aa05083f1983186976ba64bd30aa9f1f2a0`. Historical reference research baseline:
+`e8ac8f8bca1cb0cb7909523ac6af906ee289366f`.
 Existing owner harnesses remain mandatory inputs to later consolidated acceptance.
 Microphone, real-room AEC/barge-in/self-wake, owner Match/Map calibration, playback,
 Android voice and naturalness remain NOT RUN. Windows reference evidence never
 implies Android acceptance. See [Voice Core](VOICE-CORE.md) and
 [consolidated Gate C acceptance](GATE-C-CONSOLIDATED-ACCEPTANCE.md).
-Slice 09 Sunday software may begin after clean Slice 08 integration; Slice 09 must
+Slice 09 OSCAR Mobile software may begin after clean Slice 08 integration; Slice 09 must
 remain a draft and stop before owner/device acceptance. Slice 10, deployment and
 Galaxy Tab Home Node are not authorized. Physical Edge remains
 `DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED`, mandatory before Slice 17 PASS.
@@ -332,7 +332,7 @@ Galaxy Tab Home Node are not authorized. Physical Edge remains
 Durable future direction after stable Slice 17 Unified Alpha:
 
 - Voice Core is cross-platform; Windows is only a reference implementation and
-  Android/Sunday must reuse the same contracts through platform adapters.
+  Android/OSCAR Mobile must reuse the same contracts through platform adapters.
 - Add owner-controlled Operating Logs for model/tool/plugin/capability/Worker
   calls, routing, timing, failure/retry/fallback and verification. Keep them
   separate from conversation/capture/memory data and never silently train on them.
@@ -350,10 +350,10 @@ Slice 08 PR #14 merged; accepted main/work baseline
 `92a11aa05083f1983186976ba64bd30aa9f1f2a0`. Slice 08 is
 **COMPLETE FOR SOFTWARE / REFERENCE VOICE FOUNDATION**; physical voice is
 `DEFERRED_BY_OWNER / CONSOLIDATED_GATE_C_ACCEPTANCE_REQUIRED`, never physical PASS.
-Sunday initial software foundation is on `club-c/slice-09-sunday`, draft PR #15
+OSCAR Mobile Kotlin/Compose rebuild is on `club-c/slice-09-sunday`, draft PR #15
 into `work`, **PARTIAL / OWNER_DEVICE_ACCEPTANCE_NOT_RUN**. Core/loopback,
-SDK build and emulated UI evidence are separate from actual phone/OEM acceptance.
-See [Sunday foundation](SUNDAY-FOUNDATION.md) for implementation, limits and the next owner boundary.
+Gradle/JVM/emulated evidence is separate from actual phone/OEM acceptance.
+See [OSCAR Mobile foundation](MOBILE-FOUNDATION.md) for implementation, limits and the next owner boundary.
 Slice 09 must not merge in this run. Gate C remains PARTIAL. Slice 10, deployment
 and Home Node are not started. Post-alpha Operating Logs, specialist-model training
 and home-server migration remain documented future work, not implemented.

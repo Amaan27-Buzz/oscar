@@ -55,7 +55,7 @@ Do not mark a slice complete while the repository documentation still describes 
 - OSCAR Event Archive owns canonical memory; semantic/graph indexes are derived.
 - OSCAR owns native Transport/Grid; Latch is reference material, not a dependency.
 - OSCAR owns native Model Router/fallbacks; SwitchRoute is reference material.
-- Sunday is OSCAR on the phone, not a separate assistant.
+- OSCAR Mobile is OSCAR on the phone, not a separate assistant.
 - PCs are optional worker nodes, not OSCAR's host.
 - ESP32/Pico own edge presence and deterministic hardware behavior.
 - Hardware safety must not depend on an LLM or Internet connection.

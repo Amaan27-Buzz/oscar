@@ -15,7 +15,7 @@ Examples:
 - `For university meetings, always make detailed notes.`
 - `For casual calls, do not keep transcripts.`
 - `If someone asks when I am free, share free slots but never event names.`
-- `When I leave home, keep approved desktop jobs running and tell me on Sunday when they finish.`
+- `When I leave home, keep approved desktop jobs running and tell me on OSCAR Mobile when they finish.`
 - `After a verified overnight render, shut down the desktop.`
 - `Keep daily summaries of meetings and calls, but delete raw audio after transcription.`
 - `You may move study blocks automatically, but never move class or appointments.`
@@ -189,7 +189,7 @@ Examples:
 
 Weak activity evidence should result in conservative behavior rather than overconfident assumptions.
 
-## Sunday / Orb / notification policy
+## OSCAR Mobile / Orb / notification policy
 
 Examples:
 
@@ -219,7 +219,7 @@ These rules apply only if the target node currently advertises the required capa
 
 `keep running` does not create a power-control or Wake-on-LAN capability that does not exist.
 
-Sunday owner pause/cancel/revoke controls remain bounded by permissions and cannot override local hardware emergency safety.
+OSCAR Mobile owner pause/cancel/revoke controls remain bounded by permissions and cannot override local hardware emergency safety.
 
 ## Sentry / Context Capture / Daily Journal policy
 
@@ -378,7 +378,7 @@ Sensitive policy is personal data and follows OSCAR privacy/retention controls.
 
 Connector mutations and machine executors recheck policy at execution. `ask` needs confirmation; `deny` remains denied even with confirmation. Preference values can be evaluated but are not automatically interpreted/applied to unrelated subsystems.
 
-Open-ended bounded model interpretation now produces inactive candidates through the native Model Router. Exact trusted-owner confirmation is required; ambiguity/conflict/expiry block. Numeric constraints never grant capabilities. General quiet-hour parsing, Sunday approval identity and a policy UI remain unverified. The bounded local message/send editor below supersedes the original unimplemented status for those exact phrases only. The reference editor is the typed `save(..., owner_authorized=True)` composition API; it is not a remotely exposed unauthenticated approval endpoint.
+Open-ended bounded model interpretation now produces inactive candidates through the native Model Router. Exact trusted-owner confirmation is required; ambiguity/conflict/expiry block. Numeric constraints never grant capabilities. General quiet-hour parsing, OSCAR Mobile approval identity and a policy UI remain unverified. The bounded local message/send editor below supersedes the original unimplemented status for those exact phrases only. The reference editor is the typed `save(..., owner_authorized=True)` composition API; it is not a remotely exposed unauthenticated approval endpoint.
 
 ## Bounded local owner-review authoring — 2026-10-04
 
@@ -402,7 +402,7 @@ compound instructions and unrecognized phrases request clarification rather than
 guessing. Confirmed rules persist across actual coordinator-process restart and
 affect later policy evaluation. Permissions remain an independent prerequisite;
 equal-ranking structured policy conflicts still BLOCK. This local owner editor
-is not a remote identity/approval service. The model-backed candidate path below supersedes the model-parsing limitation. General arbitrary language semantics, quiet hours, policy UI and Sunday biometric authorization remain partial/unverified.
+is not a remote identity/approval service. The model-backed candidate path below supersedes the model-parsing limitation. General arbitrary language semantics, quiet hours, policy UI and OSCAR Mobile biometric authorization remain partial/unverified.
 
 ## Gate B local completion candidate — 2026-10-04
 

@@ -76,7 +76,7 @@ ONNX and native whisper/sherpa permit future Android/Linux/macOS bindings withou
 Python becoming a mobile requirement. Android on-device phonemization/runtime,
 latency, memory and model-license packaging require separate validation.
 
-Use lightweight local wake/VAD on Sunday; select available local/on-device STT/TTS
+Use lightweight local wake/VAD on OSCAR Mobile; select available local/on-device STT/TTS
 or authenticated LAN/Desktop inference as a capability. Desktop loss becomes
 explicit degraded/unavailable state, with platform speech only as a declared
 fallback. Home Node serving is an architectural path, not deployed here. Cloud
@@ -85,7 +85,7 @@ Voice Identity never becomes a Windows System.Speech registry voice name.
 
 Capture/playback, audio sessions/focus, permissions, AEC, Bluetooth routing,
 background lifecycle and acceleration stay platform adapters. Windows evidence
-never implies Sunday acceptance. Preserve the [consolidated owner run](GATE-C-CONSOLIDATED-ACCEPTANCE.md).
+never implies OSCAR Mobile acceptance. Preserve the [consolidated owner run](GATE-C-CONSOLIDATED-ACCEPTANCE.md).
 Operating Logs, specialist training and home-server migration stay
 [post-alpha](POST-ALPHA-EVOLUTION.md), unimplemented.
 

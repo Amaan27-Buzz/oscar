@@ -1,6 +1,0 @@
-<voice-interaction-service xmlns:android="http://schemas.android.com/apk/res/android"
-    android:sessionService="io.dawnlight.oscar.sunday.AssistantSessionService"
-    android:recognitionService="io.dawnlight.oscar.sunday.UnavailableRecognitionService"
-    android:supportsAssist="true"
-    android:supportsLaunchVoiceAssistFromKeyguard="false"
-    android:supportsLocalInteraction="true" />

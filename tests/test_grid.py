@@ -175,3 +175,11 @@ class GridTests(unittest.TestCase):
         self.assertEqual(reconnect_delay(10), 30)
         with self.assertRaises(ValueError):
             reconnect_delay(21)
+
+    def test_mobile_role_preserves_legacy_availability(self):
+        r = self.r
+        for role in (NodeRole.CLOUD, NodeRole.MOBILE, NodeRole.EDGE):
+            node_id = role.value.lower().replace(" ", "-")
+            r.grid.register(Node(node_id, role, ("heartbeat",)))
+            r.grid.heartbeat(r.grid.pair(node_id, ("heartbeat",)))
+        self.assertEqual(r.grid.availability(), Availability.FULL)

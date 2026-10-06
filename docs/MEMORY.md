@@ -1,6 +1,6 @@
 # OSCAR Memory Fabric
 
-OSCAR should feel like one continuous relationship, not a collection of disconnected chat threads. The user-facing primitive is one persistent interaction point across text, voice, Sunday, desktop, communications, Workers and physical surfaces.
+OSCAR should feel like one continuous relationship, not a collection of disconnected chat threads. The user-facing primitive is one persistent interaction point across text, voice, OSCAR Mobile, desktop, communications, Workers and physical surfaces.
 
 Internal segmentation exists only for engineering quality, retrieval, retention and scaling. The user should not have to remember which old chat contains a fact.
 

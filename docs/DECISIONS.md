@@ -10,14 +10,14 @@ When a durable architecture assumption changes, update this file and the affecte
 
 **Implications:**
 
-- Sunday is OSCAR on the phone, not a second assistant;
+- OSCAR Mobile is OSCAR on the phone, not a second assistant;
 - Desktop machines are optional capability nodes, not the permanent host;
 - cloud is replaceable infrastructure, not identity;
 - Edge provides local presence/reflex/safety where used.
 
 ## ADR-002 — User experience is one continuous relationship
 
-**Decision:** voice, text, Sunday, desktop, communications, Workers and physical surfaces share one continuing OSCAR relationship.
+**Decision:** voice, text, OSCAR Mobile, desktop, communications, Workers and physical surfaces share one continuing OSCAR relationship.
 
 The user is not required to create/manage chat threads to preserve or retrieve memory.
 
@@ -166,10 +166,10 @@ See `docs/SEARCH-FRESHNESS.md`.
 
 ## ADR-014 — Connection Grid is OSCAR's availability/control fabric
 
-**Decision:** Sunday, replaceable cloud coordination, Desktop nodes and Edge form one Connection Grid over OSCAR-owned transport/capability contracts.
+**Decision:** OSCAR Mobile, replaceable cloud coordination, Desktop nodes and Edge form one Connection Grid over OSCAR-owned transport/capability contracts.
 
 ```text
-Sunday      = preferred owner control / approvals / notifications
+OSCAR Mobile      = preferred owner control / approvals / notifications
 Cloud       = replaceable rendezvous + durable coordination
 Desktop     = high-capability execution
 Edge        = local awareness / reflex / safety
@@ -267,9 +267,9 @@ Undo exists only where a real compensation exists.
 
 One success is not enough to create trusted automation.
 
-## ADR-028 — Sunday is OSCAR on Android, not a separate assistant
+## ADR-028 — OSCAR Mobile is OSCAR on Android, not a separate assistant
 
-**Decision:** Sunday is the primary everyday phone embodiment/owner-control surface.
+**Decision:** OSCAR Mobile is the primary everyday phone embodiment/owner-control surface.
 
 Where supported and explicitly granted it may use Android assistant/voice interaction, optional Orb overlay, widgets, notification context, legitimate notification replies, biometric/PIN approval and Grid supervision.
 
@@ -381,7 +381,7 @@ a deployment claim or a paid baseline requirement.
 
 The owner's Samsung Galaxy Tab S6 Lite (2021) becomes a possible Home Node only
 after OSCAR is fully deployed and the main Core architecture is operational.
-Sunday remains the everyday phone embodiment, Desktop the execution Worker, and
+OSCAR Mobile remains the everyday phone embodiment, Desktop the execution Worker, and
 ESP32/Pico the local deterministic Edge. The tablet does not imply the full
 Qdrant/Neo4j/ML stack is practical on Android. Deployment, Home Node, decision-model
 evaluation and full Auth Broker expansion are not Gate B completion requirements.
@@ -413,20 +413,20 @@ The 2026-10-05 scope authorized Slice 08. The 2026-10-06 owner decision addition
 authorizes Slice 09 software after Slice 08 integration; Slice 10, deployment and
 Galaxy Tab Home Node remain outside this work.
 
-## Current Slice 08 — owner scope, 2026-10-06
+## Slice 08 owner closure scope — 2026-10-06
 
 Owner-authorized closure scope: **COMPLETE FOR SOFTWARE / REFERENCE VOICE FOUNDATION**.
 Physical status: `DEFERRED_BY_OWNER / CONSOLIDATED_GATE_C_ACCEPTANCE_REQUIRED`.
 This is not a physical PASS. Gate C remains **PARTIAL**.
-The quality candidate on `club-c/slice-08-voice`, PR #14 into `work`, has measured
-local reference evidence against baseline `e8ac8f8bca1cb0cb7909523ac6af906ee289366f`;
-integration requires green exact-head CI.
+Slice 08 PR #14 integrated after green exact-head CI. Accepted main/work:
+`92a11aa05083f1983186976ba64bd30aa9f1f2a0`. Historical reference research baseline:
+`e8ac8f8bca1cb0cb7909523ac6af906ee289366f`.
 Existing owner harnesses remain mandatory inputs to later consolidated acceptance.
 Microphone, real-room AEC/barge-in/self-wake, owner Match/Map calibration, playback,
 Android voice and naturalness remain NOT RUN. Windows reference evidence never
 implies Android acceptance. See [Voice Core](VOICE-CORE.md) and
 [consolidated Gate C acceptance](GATE-C-CONSOLIDATED-ACCEPTANCE.md).
-Slice 09 Sunday software may begin after clean Slice 08 integration; Slice 09 must
+Slice 09 OSCAR Mobile software may begin after clean Slice 08 integration; Slice 09 must
 remain a draft and stop before owner/device acceptance. Slice 10, deployment and
 Galaxy Tab Home Node are not authorized. Physical Edge remains
 `DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED`, mandatory before Slice 17 PASS.
@@ -436,7 +436,7 @@ Galaxy Tab Home Node are not authorized. Physical Edge remains
 
 ### Decision — Voice Core is platform-neutral
 
-Windows is the first exercised reference, not the product boundary. Android/Sunday
+Windows is the first exercised reference, not the product boundary. Android/OSCAR Mobile
 must consume the same Voice Core contracts through native adapters. Linux/macOS and
 future Home Node surfaces follow the same rule. Platform acceptance remains
 independent.
@@ -470,10 +470,31 @@ Slice 08 PR #14 merged; accepted main/work baseline
 `92a11aa05083f1983186976ba64bd30aa9f1f2a0`. Slice 08 is
 **COMPLETE FOR SOFTWARE / REFERENCE VOICE FOUNDATION**; physical voice is
 `DEFERRED_BY_OWNER / CONSOLIDATED_GATE_C_ACCEPTANCE_REQUIRED`, never physical PASS.
-Sunday initial software foundation is on `club-c/slice-09-sunday`, draft PR #15
+OSCAR Mobile Kotlin/Compose rebuild is on `club-c/slice-09-sunday`, draft PR #15
 into `work`, **PARTIAL / OWNER_DEVICE_ACCEPTANCE_NOT_RUN**. Core/loopback,
-SDK build and emulated UI evidence are separate from actual phone/OEM acceptance.
-See [Sunday foundation](SUNDAY-FOUNDATION.md) for implementation, limits and the next owner boundary.
+Gradle/JVM/emulated evidence is separate from actual phone/OEM acceptance.
+See [OSCAR Mobile foundation](MOBILE-FOUNDATION.md) for implementation, limits and the next owner boundary.
 Slice 09 must not merge in this run. Gate C remains PARTIAL. Slice 10, deployment
 and Home Node are not started. Post-alpha Operating Logs, specialist-model training
 and home-server migration remain documented future work, not implemented.
+
+## OSCAR Mobile naming and application composition — 2026-10-06
+
+The owner retired Sunday as the active product name and rejected its initial UI.
+The product/app is OSCAR; technical distinction OSCAR Mobile. Active project and
+package names migrate to mobile; historical evidence and compatibility contracts
+remain intact. The existing branch/PR identity is retained.
+
+Use Kotlin/Compose, coroutines/Flow and native supported Android mechanisms. Four
+primary destinations (OSCAR, Activity, Devices, Settings), contextual approvals and
+independent screen composables keep one continuous presence and allow a later
+visual redesign without changing Core/runtime authority. CoreSession owns transient
+readback, never reasoning/memory/policy. Existing security/audio boundaries are reused.
+
+New package identity requires later scoped re-enrollment; no secret copying or
+implicit authority upgrade. Legacy record keys preserve replay/consumption fences.
+Raw retention remains off. The canonical Orb is unchanged with nine state hooks;
+expressive animation remains Slice 13. Text reasoning/retrieval stays in existing
+scoped Core capabilities and responses remain REPORTED without independent evidence.
+PR #15 stays an owner-review candidate, not physical acceptance.
+See [implementation and migration](MOBILE-FOUNDATION.md).

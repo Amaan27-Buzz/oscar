@@ -69,7 +69,7 @@ Slice 03 is accepted and complete for its planned reference foundation. Public d
 
 Verified behavior includes scoped pairing/auth, capability advertisement/search, replay protection, correlation, cancellation, progress, heartbeats, durable leases, disconnect/expiry/reclaim and explicit availability states.
 
-Later deployment work still includes public TLS/outbound rendezvous, independent network-node stores and real Sunday/Desktop/Edge deployment.
+Later deployment work still includes public TLS/outbound rendezvous, independent network-node stores and real OSCAR Mobile/Desktop/Edge deployment.
 
 ## Slice 04 — Native Model Router + cloud intelligence ✅/🚧
 
@@ -339,7 +339,7 @@ Deliverables:
 
 Deliverables include wake/VAD/STT, barge-in/echo cancellation, stable VoiceProfile, speaking modes/fallback, Voice Match, Voice Map, self-voice suppression, multi-device arbitration and Persona runtime/context triggers.
 
-## Slice 09 — Sunday + communication + Connection Grid owner controls ◻️
+## Slice 09 — OSCAR Mobile + communication + Connection Grid owner controls ◻️
 
 Native Android embodiment including assistant role where supported, OSCAR Orb overlay, attention-aware retreat, widgets, notification listener, legitimate notification replies, voice/text continuity, biometric/PIN approvals, Grid owner controls, remote task supervision, initial communication actions and Samsung/OEM real-device acceptance.
 
@@ -353,7 +353,7 @@ Coherent current truth across people/places/devices/apps/projects/tasks/commitme
 
 ## Slice 12 — Commissioning / setup ◻️
 
-Identity, Persona, Personal Policy starter rules, Voice Identity/Match/Map, Connection Grid pairing, model/cloud setup, Sunday/Desktop/Edge pairing, Sentry/capture setup and human-readable perceive/retain/act permission matrix.
+Identity, Persona, Personal Policy starter rules, Voice Identity/Match/Map, Connection Grid pairing, model/cloud setup, OSCAR Mobile/Desktop/Edge pairing, Sentry/capture setup and human-readable perceive/retain/act permission matrix.
 
 ## Slice 13 — Avatar / presence UI ◻️
 
@@ -386,7 +386,7 @@ perception / communication
 → Worker / device / action
 → ledger / artifact
 → verification
-→ voice/text/Sunday report
+→ voice/text/OSCAR Mobile report
 ```
 
 ## Review clubs
@@ -396,7 +396,7 @@ perception / communication
 | A — Brain | 01–04 | Core + Controller + Transport/Grid foundation + adaptive Model Router | **PASS** |
 | B — Can Do Work | 05–06 | Real machine/continuation + Memory Fabric + policy/live context | **PASS for documented local-alpha scope** |
 | C — Embodied Core | 07–08 | Edge/reflexes + Voice/Identity/Persona | PARTIAL; Slice 07 software accepted, physical deferred |
-| D1 — Sunday | 09 | Android embodiment + communication + owner controls | Planned |
+| D1 — OSCAR Mobile | 09 | Android embodiment + communication + owner controls | Planned |
 | D2 — Desktop | 10 | Desktop interaction runtime | Planned |
 | E1 — Awareness | 11–13 | World Model/Sentry + commissioning + presence | Planned |
 | E2 — Executive | 14 | Chief-of-Staff planner + Workers + learning | Planned |
@@ -507,7 +507,7 @@ Galaxy Tab Home Node remain outside this work.
 
 ## Accepted implementation sequence
 
-07 Edge software foundation → 08 Voice → 09 Sunday → 10 Desktop →
+07 Edge software foundation → 08 Voice → 09 OSCAR Mobile → 10 Desktop →
 11–14 Awareness / Presence / Executive → 15 Physical/device expansion →
 16 reliability/security hardening → 17 Unified Alpha.
 
@@ -518,20 +518,20 @@ contracts. Slice 17 cannot PASS without genuine deferred physical Edge acceptanc
 Capability Evolution is future backlog; see the authorization and lifecycle
 contract in [architecture](ARCHITECTURE.md). No self-modification is implemented.
 
-## Current Slice 08 — owner scope, 2026-10-06
+## Slice 08 owner closure scope — 2026-10-06
 
 Owner-authorized closure scope: **COMPLETE FOR SOFTWARE / REFERENCE VOICE FOUNDATION**.
 Physical status: `DEFERRED_BY_OWNER / CONSOLIDATED_GATE_C_ACCEPTANCE_REQUIRED`.
 This is not a physical PASS. Gate C remains **PARTIAL**.
-The quality candidate on `club-c/slice-08-voice`, PR #14 into `work`, has measured
-local reference evidence against baseline `e8ac8f8bca1cb0cb7909523ac6af906ee289366f`;
-integration requires green exact-head CI.
+Slice 08 PR #14 integrated after green exact-head CI. Accepted main/work:
+`92a11aa05083f1983186976ba64bd30aa9f1f2a0`. Historical reference research baseline:
+`e8ac8f8bca1cb0cb7909523ac6af906ee289366f`.
 Existing owner harnesses remain mandatory inputs to later consolidated acceptance.
 Microphone, real-room AEC/barge-in/self-wake, owner Match/Map calibration, playback,
 Android voice and naturalness remain NOT RUN. Windows reference evidence never
 implies Android acceptance. See [Voice Core](VOICE-CORE.md) and
 [consolidated Gate C acceptance](GATE-C-CONSOLIDATED-ACCEPTANCE.md).
-Slice 09 Sunday software may begin after clean Slice 08 integration; Slice 09 must
+Slice 09 OSCAR Mobile software may begin after clean Slice 08 integration; Slice 09 must
 remain a draft and stop before owner/device acceptance. Slice 10, deployment and
 Galaxy Tab Home Node are not authorized. Physical Edge remains
 `DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED`, mandatory before Slice 17 PASS.
@@ -546,7 +546,7 @@ post-alpha evolution track rather than renumbering the current mandatory slices:
    model/tool/plugin/Worker routing, latency, failures, retries, outcomes,
    verification and capability gaps. This is separate from conversation capture.
 2. **P2 — Voice Evolution:** apply measured Elocution findings to a natural,
-   expressive, original OSCAR Voice Identity across Windows, Android/Sunday and
+   expressive, original OSCAR Voice Identity across Windows, Android/OSCAR Mobile and
    Home Node hardware.
 3. **P3 — Specialist Model Fabric:** use recurring real task clusters and evals to
    build smaller task-optimized models where they beat general models for quality,
@@ -556,7 +556,7 @@ post-alpha evolution track rather than renumbering the current mandatory slices:
    server laptop; keep cloud models for intentional major-work escalation.
 
 Cross-platform Voice portability is already an architectural rule: Windows may be
-the reference implementation, but Android/Sunday must reuse the same Voice Core
+the reference implementation, but Android/OSCAR Mobile must reuse the same Voice Core
 contracts rather than force a redesign.
 
 See [Post-Alpha Evolution](POST-ALPHA-EVOLUTION.md).
@@ -567,10 +567,10 @@ Slice 08 PR #14 merged; accepted main/work baseline
 `92a11aa05083f1983186976ba64bd30aa9f1f2a0`. Slice 08 is
 **COMPLETE FOR SOFTWARE / REFERENCE VOICE FOUNDATION**; physical voice is
 `DEFERRED_BY_OWNER / CONSOLIDATED_GATE_C_ACCEPTANCE_REQUIRED`, never physical PASS.
-Sunday initial software foundation is on `club-c/slice-09-sunday`, draft PR #15
+OSCAR Mobile Kotlin/Compose rebuild is on `club-c/slice-09-sunday`, draft PR #15
 into `work`, **PARTIAL / OWNER_DEVICE_ACCEPTANCE_NOT_RUN**. Core/loopback,
-SDK build and emulated UI evidence are separate from actual phone/OEM acceptance.
-See [Sunday foundation](SUNDAY-FOUNDATION.md) for implementation, limits and the next owner boundary.
+Gradle/JVM/emulated evidence is separate from actual phone/OEM acceptance.
+See [OSCAR Mobile foundation](MOBILE-FOUNDATION.md) for implementation, limits and the next owner boundary.
 Slice 09 must not merge in this run. Gate C remains PARTIAL. Slice 10, deployment
 and Home Node are not started. Post-alpha Operating Logs, specialist-model training
 and home-server migration remain documented future work, not implemented.

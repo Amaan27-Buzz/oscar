@@ -16,13 +16,13 @@ Minimal copy. No fake testimonials, metrics or feature grid.
 
 Design a product page explaining OSCAR through elegant spatial storytelling rather than a dashboard.
 
-Show a simple flow: user/environment → OSCAR → capabilities across Sunday, desktop, cloud and Edge → evidence-backed result.
+Show a simple flow: user/environment → OSCAR → capabilities across OSCAR Mobile, desktop, cloud and Edge → evidence-backed result.
 
 Use large editorial typography, sparse diagrams, tactile linework and a few physical-looking node objects. Avoid complex architecture charts and sci-fi treatment.
 
-## Sunday + Desktop ecosystem
+## OSCAR Mobile + Desktop ecosystem
 
-Design a product-story page showing Sunday mobile and OSCAR Desktop as two embodiments of the same intelligence.
+Design a product-story page showing OSCAR Mobile mobile and OSCAR Desktop as two embodiments of the same intelligence.
 
 Use one phone and one desktop composition connected by shared task state. Show a task beginning on desktop and continuing on phone without a chat-transfer metaphor.
 
@@ -44,9 +44,9 @@ Use calm, precise visual language. No surveillance dashboard or waveform theatre
 
 Design a web product page for OSCAR Connection Grid.
 
-Show Sunday, cloud coordinator, desktop machine and OSCAR Edge as a resilient connected mesh. Sunday is the owner control surface; desktop provides high compute; Edge preserves local reflex/safety; cloud provides rendezvous/durable coordination.
+Show OSCAR Mobile, cloud coordinator, desktop machine and OSCAR Edge as a resilient connected mesh. OSCAR Mobile is the owner control surface; desktop provides high compute; Edge preserves local reflex/safety; cloud provides rendezvous/durable coordination.
 
-Do not make a network-admin dashboard. Use a sparse spatial composition with four beautifully designed node objects and a small state rail such as `Sunday · Here`, `Cloud · Healthy`, `Desktop · Working`, `Desk Edge · Aware`.
+Do not make a network-admin dashboard. Use a sparse spatial composition with four beautifully designed node objects and a small state rail such as `OSCAR Mobile · Here`, `Cloud · Healthy`, `Desktop · Working`, `Desk Edge · Aware`.
 
 ## Privacy / trust
 
@@ -68,7 +68,7 @@ The same OSCAR can be witty, steady, formal or playful while truthfulness and sa
 
 Design a simple get-started page for OSCAR.
 
-Show installation/availability for Sunday, Desktop and optional Edge/Cloud in a calm product layout. Avoid pricing-table SaaS design. Present a small commissioning sequence and current platform availability honestly.
+Show installation/availability for OSCAR Mobile, Desktop and optional Edge/Cloud in a calm product layout. Avoid pricing-table SaaS design. Present a small commissioning sequence and current platform availability honestly.
 
 ## Docs entry
 

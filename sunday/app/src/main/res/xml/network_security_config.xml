@@ -1,8 +1,0 @@
-<network-security-config>
-    <base-config cleartextTrafficPermitted="false" />
-    <!-- Local software acceptance only. Core enrollment never uses public cleartext. -->
-    <domain-config cleartextTrafficPermitted="true">
-        <domain>127.0.0.1</domain>
-        <domain>localhost</domain>
-    </domain-config>
-</network-security-config>

@@ -20,7 +20,7 @@ Before using any prompt, read:
 
 - `DESIGN.md`
 - `TASTE.md`
-- `docs/SUNDAY-DESIGN.md`
+- `docs/MOBILE-DESIGN.md`
 - `docs/UI-AVATAR.md`
 - `docs/SURFACES.md`
 - `docs/VOICE-SENTRY.md`
@@ -81,7 +81,7 @@ Do not make the avatar occupy most of every screen.
 ## Prompt files
 
 - `web.md` — public website and web/account surfaces.
-- `sunday-mobile.md` — Sunday mobile app.
+- `oscar-mobile.md` — OSCAR Mobile mobile app.
 - `desktop.md` — desktop presence, overlays and management surfaces.
 - `system-surfaces.md` — onboarding, Sentry, Workers, memory, Personal Policy, Persona, Connection Grid, devices, ledger and degraded states.
 

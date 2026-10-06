@@ -1,0 +1,4 @@
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false" />
+    <!-- Local software acceptance only. Core enrollment never uses public cleartext. -->
+</network-security-config>

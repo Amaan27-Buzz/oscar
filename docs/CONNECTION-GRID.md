@@ -2,7 +2,7 @@
 
 ## Purpose
 
-OSCAR should not feel tied to one machine. The **Connection Grid** is the persistent availability and control fabric across Sunday, desktop machines, cloud coordination and OSCAR Edge.
+OSCAR should not feel tied to one machine. The **Connection Grid** is the persistent availability and control fabric across OSCAR Mobile, desktop machines, cloud coordination and OSCAR Edge.
 
 The product goal is not literal immortality. Phones run out of power, clouds fail, networks split and devices reboot. The goal is **no single ordinary node failure should erase OSCAR's presence, task state or control path**.
 
@@ -11,7 +11,7 @@ The system should degrade gracefully rather than disappear.
 ```text
                      OWNER / USER
                           │
-                       Sunday
+                       OSCAR Mobile
              authority console + kill switch
                           │
           ┌───────────────┼────────────────┐
@@ -35,7 +35,7 @@ Every node advertises what it can do now.
 Examples:
 
 ```text
-Sunday
+OSCAR Mobile
   notifications
   biometric approval
   phone context
@@ -73,11 +73,11 @@ Cloud
 
 A node may request work on another node only through scoped capabilities and policy. `connected` never means `unrestricted remote control`.
 
-## Sunday is the owner control surface
+## OSCAR Mobile is the owner control surface
 
-Sunday should be the highest-priority everyday owner control surface because the phone usually stays with the user while laptops and desktops come and go.
+OSCAR Mobile should be the highest-priority everyday owner control surface because the phone usually stays with the user while laptops and desktops come and go.
 
-Sunday should provide, where technically supported:
+OSCAR Mobile should provide, where technically supported:
 
 - `Pause OSCAR autonomy`;
 - `Stop all non-safety work`;
@@ -100,7 +100,7 @@ local hardware safety / emergency stop
         > OSCAR Executive / Workers
 ```
 
-Sunday is a control authority, not a magical guarantee of uptime. If Sunday is offline, other permitted Grid nodes keep their existing responsibilities within policy.
+OSCAR Mobile is a control authority, not a magical guarantee of uptime. If OSCAR Mobile is offline, other permitted Grid nodes keep their existing responsibilities within policy.
 
 ## Cloud coordinator
 
@@ -140,7 +140,7 @@ OSCAR Core = persistent identity/state/memory/task coordination
                 Connection Grid
           +------------+------------+
           |            |            |
-        Sunday       Desktop      Home Node (later)
+        OSCAR Mobile       Desktop      Home Node (later)
       main phone      Worker      Galaxy Tab S6 Lite
                                      |
                                 ESP32 / Pico Edge
@@ -174,15 +174,15 @@ Example:
 ```text
 user starts Codex/render/build on desktop
 → task enters Durable Execution Runtime
-→ user leaves home with Sunday
+→ user leaves home with OSCAR Mobile
 → desktop keeps working
 → progress/results flow through Connection Grid
-→ Sunday can inspect / approve / cancel / redirect
+→ OSCAR Mobile can inspect / approve / cancel / redirect
 → executor reports completion
 → OSCAR independently verifies expected result where practical
 → if Personal Policy permits: save/checkpoint work
 → optionally close apps / sleep / shut down desktop
-→ task remains visible from Sunday/cloud
+→ task remains visible from OSCAR Mobile/cloud
 ```
 
 The desktop does not need the user physically present for an already-authorized task to continue.
@@ -230,7 +230,7 @@ Rules:
 
 1. Any authenticated node may submit only actions allowed by its scope.
 2. Capability execution is checked again at the authoritative target.
-3. Sunday can revoke/pause user-authorized autonomous work but cannot defeat local hardware safety.
+3. OSCAR Mobile can revoke/pause user-authorized autonomous work but cannot defeat local hardware safety.
 4. Workers cannot grant themselves new node permissions.
 5. A disconnected node loses live capabilities but does not erase durable task state.
 6. Duplicate/replayed commands are rejected through correlation IDs/idempotency/replay protection.
@@ -239,14 +239,14 @@ Rules:
 
 ## Grid UI
 
-The Connection Grid should be visible from Sunday and desktop as a compact operational surface, not a network-admin dashboard.
+The Connection Grid should be visible from OSCAR Mobile and desktop as a compact operational surface, not a network-admin dashboard.
 
 Normal view:
 
 ```text
 OSCAR Grid
 
-Sunday        Here
+OSCAR Mobile        Here
 Cloud         Healthy
 Desktop       Working · 1 task
 Desk Edge     Aware
@@ -262,7 +262,7 @@ Expand a node only when needed to see:
 - permissions;
 - version/update state.
 
-Owner-level emergency controls remain immediately reachable on Sunday.
+Owner-level emergency controls remain immediately reachable on OSCAR Mobile.
 
 ## Availability semantics
 
@@ -270,13 +270,13 @@ OSCAR should use explicit availability levels rather than one binary `online` st
 
 ```text
 FULL
-core + cloud + Sunday + available nodes
+core + cloud + OSCAR Mobile + available nodes
 
 CONNECTED
 core available but some capability nodes absent
 
 LOCAL
-cloud unavailable; Sunday/Edge/local paths continue where possible
+cloud unavailable; OSCAR Mobile/Edge/local paths continue where possible
 
 REFLEX_ONLY
 only deterministic Edge safety/reflex behavior remains
@@ -323,11 +323,11 @@ Examples:
 
 ```text
 cloud unavailable
-→ Sunday and Edge retain allowed local capability
+→ OSCAR Mobile and Edge retain allowed local capability
 → desktop task may continue locally
 → durable updates queue until rendezvous returns
 
-Sunday offline
+OSCAR Mobile offline
 → existing tasks continue within policy
 → no new owner-critical approval can be fabricated
 
@@ -345,7 +345,7 @@ Edge offline
 ## Invariants
 
 1. No ordinary desktop machine is OSCAR's permanent host.
-2. Sunday is the preferred owner control/kill-switch surface, not a substitute for hardware safety.
+2. OSCAR Mobile is the preferred owner control/kill-switch surface, not a substitute for hardware safety.
 3. Edge keeps local presence/reflex/safety available even when higher layers disappear.
 4. Cloud is replaceable and may be free, paid or self-hosted.
 5. Remote work uses the same Durable Execution Runtime and evidence/verification model as local work.
@@ -384,20 +384,20 @@ The 2026-10-05 scope authorized Slice 08. The 2026-10-06 owner decision addition
 authorizes Slice 09 software after Slice 08 integration; Slice 10, deployment and
 Galaxy Tab Home Node remain outside this work.
 
-## Current Slice 08 — owner scope, 2026-10-06
+## Slice 08 owner closure scope — 2026-10-06
 
 Owner-authorized closure scope: **COMPLETE FOR SOFTWARE / REFERENCE VOICE FOUNDATION**.
 Physical status: `DEFERRED_BY_OWNER / CONSOLIDATED_GATE_C_ACCEPTANCE_REQUIRED`.
 This is not a physical PASS. Gate C remains **PARTIAL**.
-The quality candidate on `club-c/slice-08-voice`, PR #14 into `work`, has measured
-local reference evidence against baseline `e8ac8f8bca1cb0cb7909523ac6af906ee289366f`;
-integration requires green exact-head CI.
+Slice 08 PR #14 integrated after green exact-head CI. Accepted main/work:
+`92a11aa05083f1983186976ba64bd30aa9f1f2a0`. Historical reference research baseline:
+`e8ac8f8bca1cb0cb7909523ac6af906ee289366f`.
 Existing owner harnesses remain mandatory inputs to later consolidated acceptance.
 Microphone, real-room AEC/barge-in/self-wake, owner Match/Map calibration, playback,
 Android voice and naturalness remain NOT RUN. Windows reference evidence never
 implies Android acceptance. See [Voice Core](VOICE-CORE.md) and
 [consolidated Gate C acceptance](GATE-C-CONSOLIDATED-ACCEPTANCE.md).
-Slice 09 Sunday software may begin after clean Slice 08 integration; Slice 09 must
+Slice 09 OSCAR Mobile software may begin after clean Slice 08 integration; Slice 09 must
 remain a draft and stop before owner/device acceptance. Slice 10, deployment and
 Galaxy Tab Home Node are not authorized. Physical Edge remains
 `DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED`, mandatory before Slice 17 PASS.
@@ -408,10 +408,10 @@ Slice 08 PR #14 merged; accepted main/work baseline
 `92a11aa05083f1983186976ba64bd30aa9f1f2a0`. Slice 08 is
 **COMPLETE FOR SOFTWARE / REFERENCE VOICE FOUNDATION**; physical voice is
 `DEFERRED_BY_OWNER / CONSOLIDATED_GATE_C_ACCEPTANCE_REQUIRED`, never physical PASS.
-Sunday initial software foundation is on `club-c/slice-09-sunday`, draft PR #15
+OSCAR Mobile Kotlin/Compose rebuild is on `club-c/slice-09-sunday`, draft PR #15
 into `work`, **PARTIAL / OWNER_DEVICE_ACCEPTANCE_NOT_RUN**. Core/loopback,
-SDK build and emulated UI evidence are separate from actual phone/OEM acceptance.
-See [Sunday foundation](SUNDAY-FOUNDATION.md) for implementation, limits and the next owner boundary.
+Gradle/JVM/emulated evidence is separate from actual phone/OEM acceptance.
+See [OSCAR Mobile foundation](MOBILE-FOUNDATION.md) for implementation, limits and the next owner boundary.
 Slice 09 must not merge in this run. Gate C remains PARTIAL. Slice 10, deployment
 and Home Node are not started. Post-alpha Operating Logs, specialist-model training
 and home-server migration remain documented future work, not implemented.

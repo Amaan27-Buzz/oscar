@@ -37,7 +37,7 @@ Uses:
 - SceneLab GitHub/project context
 - image generation
 - research tools
-- Sunday or desktop node when app-only access is required
+- OSCAR Mobile or desktop node when app-only access is required
 
 Allowed:
 - monitor mentions
@@ -81,7 +81,7 @@ A Worker does not inherently own a virtual machine.
 It plans against currently available OSCAR capabilities:
 
 ```text
-Sunday
+OSCAR Mobile
 - phone apps
 - calls/messages
 - notifications
@@ -118,7 +118,7 @@ A Worker is not necessarily another generic LLM.
 Coding Worker      → Codex + repository + tests
 Design Worker      → Codex + Impeccable + visual verification
 Research Worker    → research capability + native model routing when useful
-Phone Worker       → Sunday
+Phone Worker       → OSCAR Mobile
 GUI Worker         → Computer Use
 Hardware Worker    → OSCAR Edge + installed engineering/device tools
 Social Worker      → Channel/API/plugin/browser/phone capabilities

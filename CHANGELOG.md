@@ -71,7 +71,7 @@ Verified local acceptance now includes typed PowerShell, registered Notepad/UIA,
 ## 2026-09-29 — Repository foundation
 
 - Established OSCAR product/architecture/engineering/design direction.
-- Established one-intelligence/many-embodiments topology: Sunday, replaceable cloud coordination, Desktop nodes and OSCAR Edge.
+- Established one-intelligence/many-embodiments topology: OSCAR Mobile, replaceable cloud coordination, Desktop nodes and OSCAR Edge.
 - Established Voice/Sentry/Persona/Personal Policy/Workers/Protocols/World Model/Perception/Executive/Action Ledger/Artifact directions.
 - Established Quietly Alive + Playful Precision design language.
 - Added slice roadmap, Build Gates and thin coding-agent adapter architecture.
@@ -105,20 +105,20 @@ The 2026-10-05 scope authorized Slice 08. The 2026-10-06 owner decision addition
 authorizes Slice 09 software after Slice 08 integration; Slice 10, deployment and
 Galaxy Tab Home Node remain outside this work.
 
-## Current Slice 08 — owner scope, 2026-10-06
+## Slice 08 owner closure scope — 2026-10-06
 
 Owner-authorized closure scope: **COMPLETE FOR SOFTWARE / REFERENCE VOICE FOUNDATION**.
 Physical status: `DEFERRED_BY_OWNER / CONSOLIDATED_GATE_C_ACCEPTANCE_REQUIRED`.
 This is not a physical PASS. Gate C remains **PARTIAL**.
-The quality candidate on `club-c/slice-08-voice`, PR #14 into `work`, has measured
-local reference evidence against baseline `e8ac8f8bca1cb0cb7909523ac6af906ee289366f`;
-integration requires green exact-head CI.
+Slice 08 PR #14 integrated after green exact-head CI. Accepted main/work:
+`92a11aa05083f1983186976ba64bd30aa9f1f2a0`. Historical reference research baseline:
+`e8ac8f8bca1cb0cb7909523ac6af906ee289366f`.
 Existing owner harnesses remain mandatory inputs to later consolidated acceptance.
 Microphone, real-room AEC/barge-in/self-wake, owner Match/Map calibration, playback,
 Android voice and naturalness remain NOT RUN. Windows reference evidence never
 implies Android acceptance. See [Voice Core](docs/VOICE-CORE.md) and
 [consolidated Gate C acceptance](docs/GATE-C-CONSOLIDATED-ACCEPTANCE.md).
-Slice 09 Sunday software may begin after clean Slice 08 integration; Slice 09 must
+Slice 09 OSCAR Mobile software may begin after clean Slice 08 integration; Slice 09 must
 remain a draft and stop before owner/device acceptance. Slice 10, deployment and
 Galaxy Tab Home Node are not authorized. Physical Edge remains
 `DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED`, mandatory before Slice 17 PASS.
@@ -129,10 +129,20 @@ Slice 08 PR #14 merged; accepted main/work baseline
 `92a11aa05083f1983186976ba64bd30aa9f1f2a0`. Slice 08 is
 **COMPLETE FOR SOFTWARE / REFERENCE VOICE FOUNDATION**; physical voice is
 `DEFERRED_BY_OWNER / CONSOLIDATED_GATE_C_ACCEPTANCE_REQUIRED`, never physical PASS.
-Sunday initial software foundation is on `club-c/slice-09-sunday`, draft PR #15
+OSCAR Mobile Kotlin/Compose rebuild is on `club-c/slice-09-sunday`, draft PR #15
 into `work`, **PARTIAL / OWNER_DEVICE_ACCEPTANCE_NOT_RUN**. Core/loopback,
-SDK build and emulated UI evidence are separate from actual phone/OEM acceptance.
-See [Sunday foundation](docs/SUNDAY-FOUNDATION.md) for implementation, limits and the next owner boundary.
+Gradle/JVM/emulated evidence is separate from actual phone/OEM acceptance.
+See [OSCAR Mobile foundation](docs/MOBILE-FOUNDATION.md) for implementation, limits and the next owner boundary.
 Slice 09 must not merge in this run. Gate C remains PARTIAL. Slice 10, deployment
 and Home Node are not started. Post-alpha Operating Logs, specialist-model training
 and home-server migration remain documented future work, not implemented.
+
+## Slice 09 OSCAR Mobile rebuild candidate — 2026-10-06
+
+Retired active Sunday naming; migrated project/package to mobile /
+io.dawnlight.oscar.mobile, app label OSCAR. Rebuilt application composition with
+Kotlin/Compose, four destinations, contextual approval, typed StateFlow readback,
+independent privacy controls and canonical Orb state hooks. Retained scoped Grid,
+Keystore/PSS, notification and native audio adapters; added Core-owned deny/retry.
+Historical evidence and legacy enrollment/replay contracts remain preserved.
+Gate C PARTIAL; owner/device acceptance NOT RUN; PR #15 is not merged.

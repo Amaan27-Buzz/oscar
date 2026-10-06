@@ -15,6 +15,8 @@ from .storage import StateConflict, Store
 
 
 class NodeRole(StrEnum):
+    MOBILE = "OSCAR Mobile"
+    # Stored/wire compatibility for previously enrolled nodes; not an active product name.
     SUNDAY = "Sunday"
     CLOUD = "Cloud"
     DESKTOP = "Desktop"
@@ -174,11 +176,12 @@ class Grid:
 
     def availability(self) -> Availability:
         roles = {node["role"] for node in self.nodes() if node["status"] == "online"}
-        if {r.value for r in NodeRole} <= roles:
+        mobile = bool(roles & {NodeRole.MOBILE, NodeRole.SUNDAY})
+        if mobile and {NodeRole.CLOUD, NodeRole.DESKTOP, NodeRole.EDGE} <= roles:
             return Availability.FULL
         if NodeRole.CLOUD in roles:
             return Availability.CONNECTED
-        if roles & {NodeRole.SUNDAY, NodeRole.DESKTOP}:
+        if roles & {NodeRole.MOBILE, NodeRole.SUNDAY, NodeRole.DESKTOP}:
             return Availability.LOCAL
         if NodeRole.EDGE in roles:
             return Availability.REFLEX_ONLY
