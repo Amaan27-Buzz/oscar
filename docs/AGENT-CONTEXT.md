@@ -306,3 +306,21 @@ watchdog and safety/reflex verification remain mandatory before Slice 17
 Unified Alpha can PASS. The hardware acceptance guide is preserved.
 The owner authorizes Slice 08 after Slice 07 integration; Slice 09/10, deployment
 and Galaxy Tab Home Node remain outside this work.
+
+## Post-alpha evolution direction
+
+Durable future direction after stable Slice 17 Unified Alpha:
+
+- Voice Core is cross-platform; Windows is only a reference implementation and
+  Android/Sunday must reuse the same contracts through platform adapters.
+- Add owner-controlled Operating Logs for model/tool/plugin/capability/Worker
+  calls, routing, timing, failure/retry/fallback and verification. Keep them
+  separate from conversation/capture/memory data and never silently train on them.
+- Use real operating evidence to drive Elocution-informed expressive Voice Identity
+  work and a Specialist Model Fabric of smaller task-optimized models.
+- Gradually migrate Core, memory, voice, models and orchestration to the owner's
+  dedicated home-server laptop; cloud remains explicit escalation for major work.
+- This is future post-alpha scope, not a current implementation claim.
+
+Canonical detail: [Post-Alpha Evolution](POST-ALPHA-EVOLUTION.md).
+
