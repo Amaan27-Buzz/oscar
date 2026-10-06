@@ -420,3 +420,30 @@ Sentry/cloud intelligence may coordinate or alert but never replaces those paths
 7. Persona cannot weaken voice/privacy/security rules.
 8. OSCAR's own TTS never becomes an external speaker identity.
 9. Local safety/reflex paths continue if cloud/model layers fail.
+
+## Post-alpha evolution direction
+
+### Cross-platform voice rule
+
+Voice Core is not a Windows subsystem. Windows is the current reference surface.
+Sunday/Android is a first-class target and must reuse the same contracts for
+wake/VAD, STT, Voice Identity/TTS, barge-in, self-voice suppression, Voice Match,
+Voice Map, Persona and arbitration.
+
+Platform-specific capture/playback, permissions, Bluetooth/audio routing, AEC,
+lifecycle and acceleration stay behind adapters. Real acceptance remains
+per-platform; Windows verification cannot be promoted to Android verification.
+
+### Future expressive voice evolution
+
+After stable Unified Alpha, findings from the separate Elocution research project
+should be evaluated for OSCAR Voice Identity: natural prosody, modulation, pacing,
+expressiveness, low first-audio latency, streaming, interruption and consistent
+identity across surfaces.
+
+The target is an original OSCAR voice with the natural expressive qualities the
+owner wants, not an exact celebrity impersonation. The future stack must be
+benchmarked across desktop, Android/Sunday and Home Node hardware.
+
+See [Post-Alpha Evolution](POST-ALPHA-EVOLUTION.md).
+
