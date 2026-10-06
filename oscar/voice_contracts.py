@@ -84,15 +84,15 @@ class Transcript:
 @dataclass(frozen=True)
 class VoiceProfile:
     identity: str = "oscar"
-    preferred_voice: str = "local-system"
-    provider: str = "windows-system-speech"
-    model: str = "installed-voice"
+    preferred_voice: str = "oscar-reference"
+    provider: str = "kokoro"
+    model: str = "kokoro-82m-v1.0"
     rate: float = 1.0
     style: str = "steady"
     mode: str = "balanced"
     local_only: bool = True
     interruptible: bool = True
-    fallback: tuple[str, ...] = ("windows-system-speech",)
+    fallback: tuple[str, ...] = ("piper",)
     voice_bindings: tuple[tuple[str, str, str], ...] = ()
     version: int = 1
 

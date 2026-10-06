@@ -56,7 +56,11 @@ class LocalVoiceModelTests(unittest.TestCase):
         output = list(
             WindowsSpeech().synthesize(
                 "Oscar. What is two plus three?",
-                VoiceProfile(),
+                VoiceProfile(
+                    preferred_voice="local-system",
+                    provider="windows-system-speech",
+                    model="installed-voice",
+                ),
                 "reference-model-test",
                 StopToken(),
             )
@@ -111,13 +115,50 @@ class LocalVoiceModelTests(unittest.TestCase):
         stream = iter(
             WindowsSpeech().synthesize(
                 "A longer original sentence for cancellation of local synthesis output.",
-                VoiceProfile(),
+                VoiceProfile(
+                    preferred_voice="local-system",
+                    provider="windows-system-speech",
+                    model="installed-voice",
+                ),
                 "cancellation-test",
                 token,
             )
         )
         first = next(stream)
         self.assertEqual(first.rate, 16000)
+        token.cancel()
+        with self.assertRaises(VoiceCancelled):
+            next(stream)
+
+
+@unittest.skipUnless(
+    os.environ.get("OSCAR_VOICE_MODELS") == "1" and os.name == "nt",
+    "optional prepared neural reference executor not requested",
+)
+class NeuralReferenceTests(unittest.TestCase):
+    def test_prepared_neural_response_and_cancel(self) -> None:
+        from pathlib import Path
+
+        from oscar.voice_identity import oscar_voice_profile
+        from scripts.voice_owner import synthesis_models
+
+        if not Path(".oscar/voice/quality/kokoro-fp32.onnx").is_file():
+            self.skipTest("prepared neural model absent")
+        token = StopToken()
+        stream = iter(
+            synthesis_models().synthesize(
+                "The task is waiting for your approval. It has not executed.",
+                oscar_voice_profile(),
+                "neural-reference",
+                token,
+            )
+        )
+        chunk = next(stream)
+        self.assertEqual(chunk.provider, "kokoro")
+        self.assertEqual(chunk.voice, "oscar-reference")
+        self.assertEqual(chunk.utterance_id, "neural-reference")
+        self.assertEqual(chunk.rate, 24000)
+        self.assertLessEqual(len(chunk.pcm), 4800)
         token.cancel()
         with self.assertRaises(VoiceCancelled):
             next(stream)

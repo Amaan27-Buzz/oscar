@@ -439,47 +439,71 @@ class SoundDeviceCapture:
 
 
 class SoundDevicePlayback:
+    """One stream per utterance; cancelled generations cannot close a newer stream."""
+
     def __init__(self, device: int, reference: PlaybackReference):
         self.device, self.reference = device, reference
         self.stream: Any = None
+        self.utterance: str | None = None
+        self.rate = 0
         self.lock = Lock()
+
+    def _close(self) -> None:
+        stream, self.stream = self.stream, None
+        self.utterance = None
+        if stream is not None:
+            stream.close()
 
     def play(self, chunk: AudioChunk, stop: StopToken) -> None:
         with self.lock:
             stop.check()
-            self._play(chunk, stop)
-
-    def _play(self, chunk: AudioChunk, stop: StopToken) -> None:
-        sd, np = optional("sounddevice"), optional("numpy")
-        audio = np.frombuffer(chunk.pcm, dtype="<i2")
-        try:
-            with sd.RawOutputStream(
-                device=self.device,
-                samplerate=chunk.rate,
-                channels=1,
-                dtype="int16",
-                blocksize=0,
-                extra_settings=audio_settings(sd, self.device),
-            ) as stream:
-                self.stream = stream
+            sd, np = optional("sounddevice"), optional("numpy")
+            try:
+                if self.utterance != chunk.utterance_id or self.rate != chunk.rate:
+                    self.cancel()
+                    self._close()
+                    self.stream = sd.RawOutputStream(
+                        device=self.device,
+                        samplerate=chunk.rate,
+                        channels=1,
+                        dtype="int16",
+                        blocksize=0,
+                        extra_settings=audio_settings(sd, self.device),
+                    )
+                    self.stream.start()
+                    self.utterance, self.rate = chunk.utterance_id, chunk.rate
+                audio = np.frombuffer(chunk.pcm, dtype="<i2")
                 for offset in range(0, len(audio), chunk.rate // 32):
                     stop.check()
                     pcm = audio[offset : offset + chunk.rate // 32].tobytes()
                     self.reference.add(pcm, chunk.rate, monotonic())
-                    if stream.write(pcm):
+                    if self.stream.write(pcm):
                         raise VoiceError("playback underflow")
-        except VoiceCancelled:
-            raise
-        except VoiceError:
-            raise
-        except Exception:
-            raise VoiceError("audio playback unavailable or disconnected") from None
-        finally:
-            self.stream = None
+                    stop.check()
+            except (VoiceCancelled, VoiceError):
+                self.cancel()
+                self._close()
+                raise
+            except Exception:
+                self.cancel()
+                self._close()
+                raise VoiceError("audio playback unavailable or disconnected") from None
+
+    def finish(self, utterance_id: str) -> None:
+        with self.lock:
+            if self.stream is not None and self.utterance == utterance_id:
+                try:
+                    self.stream.stop()  # drain successful output; cancellation aborts independently
+                except Exception:
+                    raise VoiceError("playback completion unverified") from None
+                finally:
+                    self._close()
 
     def cancel(self) -> None:
-        if self.stream is not None:
-            self.stream.abort()
+        # Do not take the write lock: abort must interrupt an active native write.
+        stream = self.stream
+        if stream is not None:
+            stream.abort()
 
 
 def read_wave(

@@ -9,6 +9,8 @@ import re
 import subprocess
 import threading
 import wave
+from datetime import UTC, datetime
+from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 from statistics import median
 from time import perf_counter
@@ -17,11 +19,20 @@ from oscar.voice_adapters import (
     FasterWhisper,
     KokoroSpeech,
     PiperSpeech,
+    SherpaEmbedding,
     WindowsSpeech,
     optional,
     read_wave,
 )
-from oscar.voice_contracts import StopToken, VoiceCancelled, VoiceProfile
+from oscar.voice_contracts import (
+    AudioFrame,
+    Origin,
+    StopToken,
+    Transcript,
+    VoiceCancelled,
+    VoiceError,
+    VoiceProfile,
+)
 
 TEXTS = (
     "Oscar. The connection is restored. Your task is still waiting for approval.",
@@ -44,6 +55,38 @@ def errors(expected: str, actual: str) -> tuple[int, int]:
             nxt.append(min(nxt[-1] + 1, row[j] + 1, row[j - 1] + (left != right)))
         row = nxt
     return row[-1], len(a)
+
+
+class ParakeetReference:
+    """Existing sherpa executor, only an explicit local benchmark candidate."""
+
+    def __init__(self, model: Path):
+        files = {part: model / (part + ".int8.onnx") for part in ("encoder", "decoder", "joiner")}
+        if any(not p.is_file() for p in files.values()) or not (model / "tokens.txt").is_file():
+            raise VoiceError("Parakeet local assets missing")
+        self.engine = optional("sherpa_onnx").OfflineRecognizer.from_transducer(
+            **{name: str(path) for name, path in files.items()},
+            tokens=str(model / "tokens.txt"),
+            model_type="nemo_transducer",
+            num_threads=4,
+        )
+
+    def transcribe(self, frames: tuple, final: bool, stop: StopToken) -> Transcript:
+        stop.check()
+        stream = self.engine.create_stream()
+        audio = optional("numpy").asarray([v for f in frames for v in f.samples], dtype="float32")
+        stream.accept_waveform(16000, audio)
+        self.engine.decode_stream(stream)
+        stop.check()
+        return Transcript(
+            str(stream.result.text).strip(),
+            final,
+            None,
+            None,
+            frames[0].timestamp,
+            frames[-1].timestamp + len(frames[-1].samples) / 16000,
+            "sherpa-parakeet-v3-reference",
+        )
 
 
 class Resources:
@@ -103,36 +146,160 @@ def wav(chunks: list, path: Path) -> None:
         out.writeframes(b"".join(c.pcm for c in chunks))
 
 
+def assess_samples(root: Path, model: Path, device: str, compute: str) -> int:
+    """Reference roundtrip/consistency metrics cannot verify human naturalness."""
+    from oscar.voice_identity import cosine
+
+    np = optional("numpy")
+    stt = FasterWhisper(model, device=device, compute_type=compute)
+    speaker = Path(".oscar/voice/models/speaker.onnx")
+    with speaker.open("rb") as source:
+        digest = hashlib.file_digest(source, "sha256").hexdigest()
+    embedding = SherpaEmbedding(speaker, digest)
+    reports = []
+    for provider, voice in (
+        ("kokoro", "oscar-reference"),
+        ("piper", "alba"),
+        ("windows-system-speech", "local-system"),
+    ):
+        vectors, rows = [], []
+        total_errors = total_words = 0
+        for i, text in enumerate(TEXTS):
+            with wave.open(str(root / f"{provider}-{voice}-{i}.wav"), "rb") as audio:
+                if audio.getnchannels() != 1 or audio.getsampwidth() != 2:
+                    raise ValueError("reference PCM format required")
+                rate = audio.getframerate()
+                values = (
+                    np.frombuffer(audio.readframes(audio.getnframes()), dtype="<i2").astype(
+                        "float32"
+                    )
+                    / 32768
+                )
+            peak = float(np.max(np.abs(values)))
+            rms = float(np.sqrt(np.mean(values * values)))
+            values = np.interp(
+                np.arange(int(len(values) * 16000 / rate)) * rate / 16000,
+                np.arange(len(values)),
+                values,
+            )
+            frames = tuple(
+                AudioFrame(
+                    tuple(float(v) for v in values[j : j + 512]),
+                    j / 16000,
+                    "synthetic-quality",
+                    origin=Origin.SIMULATED,
+                )
+                for j in range(0, len(values), 512)
+            )
+            result = stt.transcribe(frames, True, StopToken())
+            wrong, count = errors(text, result.text)
+            total_errors += wrong
+            total_words += count
+            vectors.append(embedding.extract(frames, StopToken()))
+            rows.append(
+                {
+                    "fixture": i,
+                    "transcript_status": "REPORTED",
+                    "transcript": result.text,
+                    "word_errors": wrong,
+                    "words": count,
+                    "peak": peak,
+                    "rms": rms,
+                }
+            )
+        consistency = [cosine(a, b) for i, a in enumerate(vectors) for b in vectors[i + 1 :]]
+        reports.append(
+            {
+                "provider": provider,
+                "roundtrip_wer": total_errors / total_words,
+                "speaker_cosine_mean": sum(consistency) / len(consistency),
+                "rows": rows,
+            }
+        )
+    report = {
+        "evidence_class": "REFERENCE / OWNER_NATURALNESS_ACCEPTANCE_NOT_RUN",
+        "interpretation": (
+            "roundtrip errors mix ASR and TTS; synthetic speaker cosine "
+            "is not perceptual identity or authorization"
+        ),
+        "raw_embeddings_retained": False,
+        "reports": reports,
+    }
+    (root / "sample-quality.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
+    print(
+        json.dumps({"metrics": [{k: v for k, v in row.items() if k != "rows"} for row in reports]})
+    )
+    return 0
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("kind", choices=("fixtures", "stt", "tts"))
+    parser.add_argument("kind", choices=("fixtures", "stt", "tts", "assess"))
     parser.add_argument("--model", type=Path)
     parser.add_argument("--voices", type=Path)
+    parser.add_argument(
+        "--public-jfk", type=Path, help="optional hash-bound public recorded fixture"
+    )
     parser.add_argument("--provider", default="faster-whisper")
     parser.add_argument("--device", choices=("cpu", "cuda"), default="cpu")
     parser.add_argument("--compute", default="int8")
     parser.add_argument("--voice", default="bm_george")
+    parser.add_argument("--rate", type=float, default=0.95)
     parser.add_argument("--root", type=Path, default=Path(".oscar/voice/quality"))
     args = parser.parse_args()
     os.environ["HF_HUB_OFFLINE"] = "1"
+    if args.kind == "stt" and args.provider not in {"faster-whisper", "parakeet"}:
+        parser.error("unsupported reference STT provider")
+    if args.kind == "tts" and args.provider not in {"kokoro", "piper", "windows-system-speech"}:
+        parser.error("unsupported reference TTS provider")
+    if args.provider == "parakeet" and args.device != "cpu":
+        parser.error("Parakeet reference binding is CPU only")
     root = args.root.resolve()
     if not root.is_relative_to((Path.cwd() / ".oscar/voice").resolve()):
         raise ValueError("benchmark output stays in ignored voice storage")
     root.mkdir(parents=True, exist_ok=True)
     fixtures = root / "fixtures"
     fixtures.mkdir(exist_ok=True)
-    profile = VoiceProfile(preferred_voice=args.voice, provider=args.provider)
+    profile = VoiceProfile(preferred_voice=args.voice, provider=args.provider, rate=args.rate)
+    if args.kind == "assess":
+        return assess_samples(root, args.model, args.device, args.compute)
     if args.kind == "fixtures":
         manifest = []
         for i, text in enumerate(TEXTS):
             path = fixtures / f"{i}.wav"
-            chunks = list(WindowsSpeech().synthesize(text, VoiceProfile(), str(i), StopToken()))
+            chunks = list(
+                WindowsSpeech().synthesize(
+                    text,
+                    VoiceProfile(
+                        preferred_voice="local-system",
+                        provider="windows-system-speech",
+                        model="installed-voice",
+                    ),
+                    str(i),
+                    StopToken(),
+                )
+            )
             wav(chunks, path)
             manifest.append(
                 {
                     "file": path.name,
                     "text": text,
                     "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+                }
+            )
+        if args.public_jfk:
+            body = args.public_jfk.read_bytes()
+            digest = hashlib.sha256(body).hexdigest()
+            if digest != "59dfb9a4acb36fe2a2affc14bacbee2920ff435cb13cc314a08c13f66ba7860e":
+                raise ValueError("public fixture checksum mismatch")
+            (fixtures / "jfk.wav").write_bytes(body)
+            manifest.append(
+                {
+                    "file": "jfk.wav",
+                    "text": "And so my fellow Americans ask not what your country can do for you "
+                    "ask what you can do for your country",
+                    "sha256": digest,
+                    "source": "https://github.com/ggml-org/whisper.cpp/blob/master/samples/jfk.wav",
                 }
             )
         (fixtures / "manifest.json").write_text(json.dumps(manifest, indent=2))
@@ -145,6 +312,7 @@ def main() -> int:
         "provider": args.provider,
         "device": args.device,
         "compute": args.compute,
+        "speaking_rate": args.rate,
         "model": str(args.model),
         "microphone": "NOT_RUN",
         "playback": "NOT_RUN",
@@ -152,13 +320,45 @@ def main() -> int:
         "resource_scope": "process RSS/CPU, whole GPU sampled; not kernel peak",
         "rows": [],
     }
+    report["observed_at"] = datetime.now(UTC).isoformat()
+    report["fixture_manifest_sha256"] = hashlib.sha256(
+        (fixtures / "manifest.json").read_bytes()
+    ).hexdigest()
+    report["source_sha256"] = {
+        name: hashlib.sha256(Path(name).read_bytes()).hexdigest()
+        for name in (
+            "scripts/benchmark_voice.py",
+            "oscar/voice_adapters.py",
+            "oscar/voice_contracts.py",
+            "oscar/voice_identity.py",
+        )
+    }
+    report["packages"] = {}
+    for name in (
+        "faster-whisper",
+        "ctranslate2",
+        "sherpa-onnx",
+        "onnxruntime",
+        "onnxruntime-gpu",
+        "kokoro-onnx",
+        "piper-tts",
+        "numpy",
+    ):
+        try:
+            report["packages"][name] = version(name)
+        except PackageNotFoundError:
+            pass
     rows = report["rows"]
     resources = Resources()
     resources.start()
     try:
         start = perf_counter()
         if args.kind == "stt":
-            engine = FasterWhisper(args.model, device=args.device, compute_type=args.compute)
+            engine = (
+                ParakeetReference(args.model)
+                if args.provider == "parakeet"
+                else FasterWhisper(args.model, device=args.device, compute_type=args.compute)
+            )
         elif args.provider == "kokoro":
             engine = KokoroSpeech(args.model, args.voices, device=args.device)
         elif args.provider == "piper":
@@ -269,14 +469,21 @@ def main() -> int:
         report["failure"] = str(exc)[:200]
     finally:
         report["resources"] = resources.finish()
-    if args.model:
+    if args.model and args.model.exists():
         report["model_bytes"] = (
-            sum(p.stat().st_size for p in args.model.rglob("*") if p.is_file())
+            sum(
+                p.stat().st_size
+                for p in args.model.rglob("*")
+                if p.is_file()
+                and ".cache" not in p.parts
+                and p.suffix != ".part"
+                and not any(part.endswith("-parts") for part in p.parts)
+            )
             if args.model.is_dir()
             else args.model.stat().st_size
         )
     model_name = args.model.name if args.model else "system"
-    output = root / f"{args.kind}-{args.provider}-{model_name}-{args.device}.json"
+    output = root / f"{args.kind}-{args.provider}-{model_name}-{args.device}-{args.compute}.json"
     output.write_text(json.dumps(report, indent=2), encoding="utf-8")
     print(json.dumps({k: v for k, v in report.items() if k != "rows"}, indent=2))
     return 0 if report["status"] == "REFERENCE_EXECUTED" else 1

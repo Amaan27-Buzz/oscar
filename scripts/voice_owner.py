@@ -129,7 +129,9 @@ def preflight() -> int:
 def reference() -> int:
     wake, vad, stt, embedding = models()
     token = StopToken()
-    profile = VoiceProfile()
+    profile = VoiceProfile(
+        preferred_voice="local-system", provider="windows-system-speech", model="installed-voice"
+    )
     started = perf_counter()
     iterator = iter(
         WindowsSpeech().synthesize("Oscar. What is two plus three?", profile, "reference", token)
@@ -396,13 +398,19 @@ def run(device: int, output: int, seconds: int, allowed: bool, require_match: bo
         expressive, profile = PersonaProfile().express(
             response, oscar_voice_profile(), serious=response.state != TaskState.VERIFIED
         )
+        utterance_id = new_id()
         try:
-            for chunk in synthesis.synthesize(expressive.text, profile, new_id(), token):
+            for chunk in synthesis.synthesize(expressive.text, profile, utterance_id, token):
                 playback.play(chunk, token)
         except VoiceCancelled:
             pass
         except VoiceError:
             print("TTS/playback failed; text result remains available.")
+        finally:
+            try:
+                playback.finish(utterance_id)
+            except VoiceError:
+                print("Playback completion unverified; text result remains available.")
 
     Thread(target=capture_worker, daemon=True).start()
     Thread(target=keyboard, daemon=True).start()

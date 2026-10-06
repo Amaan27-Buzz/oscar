@@ -2,7 +2,8 @@
 
 Owner closure scope: **COMPLETE FOR SOFTWARE / REFERENCE VOICE FOUNDATION**.
 Physical status: `DEFERRED_BY_OWNER / CONSOLIDATED_GATE_C_ACCEPTANCE_REQUIRED`.
-Quality candidate validation continues on PR #14; Gate C remains PARTIAL.
+Software/reference validation is recorded for PR #14; integration requires green
+exact-head CI. Gate C remains PARTIAL.
 Reconciled baseline: `e8ac8f8bca1cb0cb7909523ac6af906ee289366f`.
 See [quality pass](VOICE-QUALITY.md) and [consolidated acceptance](GATE-C-CONSOLIDATED-ACCEPTANCE.md).
 Slice 07 is COMPLETE FOR SOFTWARE / SIMULATED EDGE FOUNDATION; physical Edge
@@ -66,7 +67,8 @@ The owner harness is intentionally restricted to integer addition, with explicit
 Local wake is sherpa English GigaSpeech Zipformer int8 (configurable OSCAR BPE
 keyword); VAD is Silero ONNX. The bilingual 2025 model is an alternative, not a
 reason to replace the measured English baseline. STT is local faster-whisper
-base.en/CPU/int8; no implicit download or cloud fallback at inference. Partial
+the quality-selected local binding with explicit base.en/CPU/int8 fallback; no
+implicit download or cloud fallback at inference. Partial
 transcripts use bounded rolling snapshots and are provisional. Interfaces permit
 replacement; hosted STT through an audio-capable Router adapter is future optional
 work because the current Router provider boundary is text-oriented.
@@ -74,11 +76,16 @@ work because the current Router provider boundary is text-oriented.
 VoiceProfile owns identity ID/version, preferred voice/provider/model, rate, style,
 latency/quality mode, privacy, interruption and per-provider fallback bindings.
 Fallback preserves this logical identity/configuration; identical timbre across
-vendors is not promised. Windows System.Speech is the exercised local adapter;
-it prepares bounded original speech as temporary PCM16 WAV, deletes it and streams
-PCM chunks to interruptible playback. It does not provide native incremental
-neural synthesis. Piper's optional adapter yields audio chunks; its runtime/model
-execution remains unverified here. Unsupported prosody controls are not fabricated.
+vendors is not promised. Kokoro full-precision ONNX is the current original reference neural binding;
+Piper is the lighter neural fallback. System.Speech is an emergency Windows
+binding and the synthetic fixture generator, not the intended OSCAR voice.
+The neural owner harness composes these through the existing SynthesisChain.
+Kokoro streams sentences as 100 ms PCM chunks; this is sentence-buffered synthesis,
+not native token-to-audio streaming. Piper yields native sentence audio. The
+emergency adapter prepares temporary PCM16 WAV, deletes it and yields chunks.
+Native inference cannot be preempted mid-kernel; output is fenced/cancelled before
+it becomes audible. See the [quality evidence](VOICE-QUALITY.md). Unsupported
+prosody controls are not fabricated.
 
 Fallback retries only before audible output; a partial failure never repeats the
 utterance through another provider. Cancellation propagates at chunk/segment
@@ -173,8 +180,8 @@ Prepared ignored local environment/models are at `.tmp/voice-env` and
 
 ```powershell
 py -3.12 -m venv .tmp/voice-env
-.tmp/voice-env/Scripts/python.exe -m pip install '.[voice]'
-.tmp/voice-env/Scripts/python.exe -m scripts.voice_setup
+.tmp/voice-env/Scripts/python.exe -m pip install '.[voice,voice-kokoro,voice-piper,voice-benchmark]'
+.tmp/voice-env/Scripts/python.exe -m scripts.voice_setup --quality
 .tmp/voice-env/Scripts/python.exe -m scripts.voice_owner preflight
 ```
 

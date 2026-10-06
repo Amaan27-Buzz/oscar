@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-10-06 — Slice 08 software/reference quality closure
+
+- Reconciled authoritative post-alpha docs; preserved future scope and voice portability.
+- Benchmarked local RTX 5060 Whisper/Distil/Parakeet and Kokoro/Piper/emergency speech.
+- Selected turbo quality STT and original Kokoro reference identity, with explicit fallbacks.
+- Fixed utterance playback reuse and cancellation fencing; preserved owner harnesses.
+- Physical voice acceptance is owner-deferred to the consolidated Gate C run; no physical PASS.
+
 Significant OSCAR milestones are recorded here. Detailed implementation status is canonical in `docs/ROADMAP.md`; detailed acceptance evidence remains in `docs/evidence/` and Git history.
 
 ## 2026-10-04 — Gate B local completion candidate
@@ -102,8 +110,9 @@ Galaxy Tab Home Node remain outside this work.
 Owner-authorized closure scope: **COMPLETE FOR SOFTWARE / REFERENCE VOICE FOUNDATION**.
 Physical status: `DEFERRED_BY_OWNER / CONSOLIDATED_GATE_C_ACCEPTANCE_REQUIRED`.
 This is not a physical PASS. Gate C remains **PARTIAL**.
-The quality candidate on `club-c/slice-08-voice`, PR #14 into `work`, is being
-validated against baseline `e8ac8f8bca1cb0cb7909523ac6af906ee289366f`.
+The quality candidate on `club-c/slice-08-voice`, PR #14 into `work`, has measured
+local reference evidence against baseline `e8ac8f8bca1cb0cb7909523ac6af906ee289366f`;
+integration requires green exact-head CI.
 Existing owner harnesses remain mandatory inputs to later consolidated acceptance.
 Microphone, real-room AEC/barge-in/self-wake, owner Match/Map calibration, playback,
 Android voice and naturalness remain NOT RUN. Windows reference evidence never

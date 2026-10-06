@@ -426,8 +426,9 @@ Sentry/cloud intelligence may coordinate or alert but never replaces those paths
 Owner-authorized closure scope: **COMPLETE FOR SOFTWARE / REFERENCE VOICE FOUNDATION**.
 Physical status: `DEFERRED_BY_OWNER / CONSOLIDATED_GATE_C_ACCEPTANCE_REQUIRED`.
 This is not a physical PASS. Gate C remains **PARTIAL**.
-The quality candidate on `club-c/slice-08-voice`, PR #14 into `work`, is being
-validated against baseline `e8ac8f8bca1cb0cb7909523ac6af906ee289366f`.
+The quality candidate on `club-c/slice-08-voice`, PR #14 into `work`, has measured
+local reference evidence against baseline `e8ac8f8bca1cb0cb7909523ac6af906ee289366f`;
+integration requires green exact-head CI.
 Existing owner harnesses remain mandatory inputs to later consolidated acceptance.
 Microphone, real-room AEC/barge-in/self-wake, owner Match/Map calibration, playback,
 Android voice and naturalness remain NOT RUN. Windows reference evidence never
