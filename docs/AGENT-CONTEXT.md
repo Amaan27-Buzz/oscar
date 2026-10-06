@@ -304,21 +304,27 @@ Return to real ESP32/Pico acceptance during Slice 15 physical/device expansion
 and/or Slice 16 reliability/security hardening. Physical failure, loss/recovery,
 watchdog and safety/reflex verification remain mandatory before Slice 17
 Unified Alpha can PASS. The hardware acceptance guide is preserved.
-The owner authorizes Slice 08 after Slice 07 integration; Slice 09/10, deployment
-and Galaxy Tab Home Node remain outside this work.
+The 2026-10-05 scope authorized Slice 08. The 2026-10-06 owner decision additionally
+authorizes Slice 09 software after Slice 08 integration; Slice 10, deployment and
+Galaxy Tab Home Node remain outside this work.
 
-## Current Slice 08 — 2026-10-05
+## Current Slice 08 — owner scope, 2026-10-06
 
-Slice 07 PR #13 merged; accepted synchronized main/work baseline
-`9e443cac61281d7d890724b9ef593c0d58d145f3`. Slice 08 is on
-`club-c/slice-08-voice`, draft PR #14 into `work`, **PARTIAL /
-OWNER_MICROPHONE_ACCEPTANCE_REQUIRED**. Local voice software and deterministic
-reference contracts are implemented; owner microphone, room echo/barge-in and
-speaker calibration remain NOT RUN. Gate C remains PARTIAL.
-See [Voice Core](VOICE-CORE.md) for adapters, tests, reference latency and owner steps.
-Slice 09/10, Oracle deployment and Galaxy Tab Home Node are NOT STARTED.
-Physical Edge remains DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED, mandatory
-before Slice 17 Unified Alpha PASS.
+Owner-authorized closure scope: **COMPLETE FOR SOFTWARE / REFERENCE VOICE FOUNDATION**.
+Physical status: `DEFERRED_BY_OWNER / CONSOLIDATED_GATE_C_ACCEPTANCE_REQUIRED`.
+This is not a physical PASS. Gate C remains **PARTIAL**.
+The quality candidate on `club-c/slice-08-voice`, PR #14 into `work`, is being
+validated against baseline `e8ac8f8bca1cb0cb7909523ac6af906ee289366f`.
+Existing owner harnesses remain mandatory inputs to later consolidated acceptance.
+Microphone, real-room AEC/barge-in/self-wake, owner Match/Map calibration, playback,
+Android voice and naturalness remain NOT RUN. Windows reference evidence never
+implies Android acceptance. See [Voice Core](VOICE-CORE.md) and
+[consolidated Gate C acceptance](GATE-C-CONSOLIDATED-ACCEPTANCE.md).
+Slice 09 Sunday software may begin after clean Slice 08 integration; Slice 09 must
+remain a draft and stop before owner/device acceptance. Slice 10, deployment and
+Galaxy Tab Home Node are not authorized. Physical Edge remains
+`DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED`, mandatory before Slice 17 PASS.
+
 
 ## Post-alpha evolution direction
 

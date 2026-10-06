@@ -1,7 +1,10 @@
 # Slice 08 Voice Core
 
-Status: PARTIAL / OWNER_MICROPHONE_ACCEPTANCE_REQUIRED. Draft PR #14 into work.
-Accepted baseline: `9e443cac61281d7d890724b9ef593c0d58d145f3` (PR 13 merged).
+Owner closure scope: **COMPLETE FOR SOFTWARE / REFERENCE VOICE FOUNDATION**.
+Physical status: `DEFERRED_BY_OWNER / CONSOLIDATED_GATE_C_ACCEPTANCE_REQUIRED`.
+Quality candidate validation continues on PR #14; Gate C remains PARTIAL.
+Reconciled baseline: `e8ac8f8bca1cb0cb7909523ac6af906ee289366f`.
+See [quality pass](VOICE-QUALITY.md) and [consolidated acceptance](GATE-C-CONSOLIDATED-ACCEPTANCE.md).
 Slice 07 is COMPLETE FOR SOFTWARE / SIMULATED EDGE FOUNDATION; physical Edge
 remains DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED and mandatory before Unified Alpha.
 
@@ -96,8 +99,9 @@ This reference suppressor is **not full calibrated room AEC**. Nonlinear echo,
 reverberation, driver latency, quiet double-talk and endpoint processing can defeat
 it. It may decline automatic barge-in when evidence is uncertain. WASAPI AEC
 capability is researched, not enabled/verified by PortAudio alone. Full physical
-self-wake suppression and human barge-in remain acceptance requirements; an owner
-failure keeps Slice 08 PARTIAL and requires repair, not a scope waiver.
+self-wake suppression and human barge-in remain acceptance requirements; a physical
+failure must be repaired before consolidated Gate C PASS; software closure cannot
+be promoted to physical acceptance.
 
 ## Match, Map, arbitration and Persona
 

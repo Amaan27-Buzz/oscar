@@ -174,3 +174,20 @@ class PersonaProfile:
                 mode="serious" if serious else voice.mode,
             ),
         )
+
+
+def oscar_voice_profile() -> VoiceProfile:
+    """Original logical identity; a reference binding, pending owner naturalness review."""
+    return VoiceProfile(
+        preferred_voice="oscar-reference",
+        provider="kokoro",
+        model="kokoro-82m-v1.0",
+        rate=0.95,
+        style="calm-composed",
+        fallback=("piper", "windows-system-speech"),
+        voice_bindings=(
+            ("kokoro", "oscar-reference", "kokoro-82m-v1.0"),
+            ("piper", "alba", "en_GB-alba-medium"),
+            ("windows-system-speech", "local-system", "installed-voice"),
+        ),
+    )

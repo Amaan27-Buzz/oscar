@@ -16,6 +16,8 @@ from oscar.harness import Harness
 from oscar.policy import PersonalPolicy
 from oscar.voice_adapters import (
     FasterWhisper,
+    KokoroSpeech,
+    PiperSpeech,
     PlaybackReference,
     SherpaEmbedding,
     SherpaWake,
@@ -29,7 +31,9 @@ from oscar.voice_adapters import (
 )
 from oscar.voice_contracts import (
     AudioFrame,
+    Recognizer,
     StopToken,
+    Synthesizer,
     Transcript,
     VoiceCancelled,
     VoiceError,
@@ -37,7 +41,7 @@ from oscar.voice_contracts import (
     VoiceResponse,
 )
 from oscar.voice_core import VoiceCore
-from oscar.voice_identity import PersonaProfile, VoiceMap, VoiceMatch
+from oscar.voice_identity import PersonaProfile, VoiceMap, VoiceMatch, oscar_voice_profile
 from oscar.voice_runtime import RecognitionChain, SynthesisChain, VoiceSession
 from scripts.voice_setup import KWS
 
@@ -47,12 +51,39 @@ ROOT = Path(".oscar/voice")
 def models() -> tuple[SherpaWake, SileroVAD, RecognitionChain, SherpaEmbedding]:
     root = ROOT / "models"
     digest = hashlib.sha256((root / "speaker.onnx").read_bytes()).hexdigest()
+    recognizers: list[Recognizer] = []
+    preferred = ROOT / "quality/turbo"
+    if (preferred / "model.bin").is_file():
+        try:
+            recognizers.append(FasterWhisper(preferred, device="cuda", compute_type="float16"))
+        except VoiceError:
+            print("Preferred GPU STT unavailable; explicit CPU fallback.")
+    recognizers.append(FasterWhisper(root / "whisper-base.en"))
     return (
         SherpaWake(root / KWS, root / "keywords.txt"),
         SileroVAD(root / "silero_vad.onnx"),
-        RecognitionChain((FasterWhisper(root / "whisper-base.en"),)),
+        RecognitionChain(tuple(recognizers)),
         SherpaEmbedding(root / "speaker.onnx", digest),
     )
+
+
+def synthesis_models() -> SynthesisChain:
+    """Only prepared assets; emergency System.Speech does not become primary identity."""
+    adapters: list[Synthesizer] = []
+    quality = ROOT / "quality"
+    if (quality / "kokoro-parallel.onnx").is_file() and (quality / "voices-hf.bin").is_file():
+        try:
+            adapters.append(
+                KokoroSpeech(quality / "kokoro-parallel.onnx", quality / "voices-hf.bin")
+            )
+        except VoiceError:
+            print("Neural TTS unavailable; explicit fallback.")
+    if (quality / "piper-full.onnx").is_file():
+        try:
+            adapters.append(PiperSpeech(quality / "piper-full.onnx"))
+        except VoiceError:
+            print("Piper unavailable; emergency platform fallback.")
+    return SynthesisChain(tuple(adapters) + (WindowsSpeech(),))
 
 
 def preflight() -> int:
@@ -266,6 +297,7 @@ def run(device: int, output: int, seconds: int, allowed: bool, require_match: bo
         generation += 1
         output_token, input_token = StopToken(), StopToken()
 
+    synthesis = synthesis_models()
     session = VoiceSession(wake, vad, interrupt)
 
     def capture_worker() -> None:
@@ -351,12 +383,10 @@ def run(device: int, output: int, seconds: int, allowed: bool, require_match: bo
 
     def speak(response: VoiceResponse, token: StopToken) -> None:
         expressive, profile = PersonaProfile().express(
-            response, VoiceProfile(), serious=response.state != TaskState.VERIFIED
+            response, oscar_voice_profile(), serious=response.state != TaskState.VERIFIED
         )
         try:
-            for chunk in SynthesisChain((WindowsSpeech(),)).synthesize(
-                expressive.text, profile, new_id(), token
-            ):
+            for chunk in synthesis.synthesize(expressive.text, profile, new_id(), token):
                 playback.play(chunk, token)
         except VoiceCancelled:
             pass

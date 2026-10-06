@@ -313,8 +313,9 @@ Return to real ESP32/Pico acceptance during Slice 15 physical/device expansion
 and/or Slice 16 reliability/security hardening. Physical failure, loss/recovery,
 watchdog and safety/reflex verification remain mandatory before Slice 17
 Unified Alpha can PASS. The hardware acceptance guide is preserved.
-The owner authorizes Slice 08 after Slice 07 integration; Slice 09/10, deployment
-and Galaxy Tab Home Node remain outside this work.
+The 2026-10-05 scope authorized Slice 08. The 2026-10-06 owner decision additionally
+authorizes Slice 09 software after Slice 08 integration; Slice 10, deployment and
+Galaxy Tab Home Node remain outside this work.
 
 ## Slice 08 verification boundary
 
@@ -324,3 +325,11 @@ optional voice NumPy dependency. `OSCAR_VOICE_MODELS=1` opts into the prepared
 Windows local-model tests with synthetic audio, never microphone acceptance.
 See [Voice Core](docs/VOICE-CORE.md) for exact owner interaction and evidence classes.
 No raw room audio or speaker enrollment is obtained autonomously.
+
+## Voice portability and evidence boundary
+
+Shared Voice Core contracts stay portable across Windows, Android/Sunday,
+Linux/macOS and future Home Nodes. Capture/playback, sessions, permissions,
+AEC, Bluetooth, lifecycle and acceleration are adapters. Windows is a reference.
+Reference fixtures cannot prove microphone, room, speaker or naturalness acceptance.
+See [consolidated acceptance](docs/GATE-C-CONSOLIDATED-ACCEPTANCE.md).

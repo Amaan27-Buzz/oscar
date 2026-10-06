@@ -2,6 +2,7 @@
 
 import io
 import json
+import re
 import subprocess
 import tempfile
 import wave
@@ -98,12 +99,26 @@ class FasterWhisper:
     id = "faster-whisper"
     local = True
 
-    def __init__(self, model: Path):
+    def __init__(
+        self, model: Path, *, device: str = "cpu", compute_type: str = "int8", beam_size: int = 5
+    ):
+        if (
+            device not in {"cpu", "cuda"}
+            or compute_type not in {"int8", "float16", "int8_float16"}
+            or not 1 <= beam_size <= 10
+        ):
+            raise ValueError("invalid STT execution configuration")
+        self.beam_size = beam_size
+        self.id = f"faster-whisper/{model.name}/{device}/{compute_type}"
         if not model.is_dir():
             raise VoiceError("STT local model missing; no implicit download")
         try:
             self.engine = optional("faster_whisper").WhisperModel(
-                str(model), device="cpu", compute_type="int8", cpu_threads=4, local_files_only=True
+                str(model),
+                device=device,
+                compute_type=compute_type,
+                cpu_threads=4,
+                local_files_only=True,
             )
         except Exception:
             raise VoiceError("local STT model unavailable or incomplete") from None
@@ -116,7 +131,10 @@ class FasterWhisper:
             raise VoiceError("empty STT input")
         try:
             segments, info = self.engine.transcribe(
-                samples(frames), beam_size=1, vad_filter=False, condition_on_previous_text=False
+                samples(frames),
+                beam_size=self.beam_size,
+                vad_filter=False,
+                condition_on_previous_text=False,
             )
             text = []
             for segment in segments:
@@ -240,6 +258,65 @@ class PiperSpeech:
             raise
         except Exception:
             raise VoiceError("Piper synthesis failed") from None
+
+
+class KokoroSpeech:
+    """Local sentence synthesis with bounded PCM delivery; no implicit downloads."""
+
+    id = "kokoro"
+    local = True
+
+    def __init__(self, model: Path, voices: Path):
+        if not model.is_file() or not voices.is_file():
+            raise VoiceError("Kokoro local assets missing; no implicit download")
+        try:
+            ort = optional("onnxruntime")
+            options = ort.SessionOptions()
+            options.intra_op_num_threads = 4
+            options.inter_op_num_threads = 1
+            session = ort.InferenceSession(
+                str(model), sess_options=options, providers=["CPUExecutionProvider"]
+            )
+            self.engine = optional("kokoro_onnx").Kokoro.from_session(session, str(voices))
+        except Exception:
+            raise VoiceError("Kokoro initialization failed") from None
+
+    def synthesize(
+        self, text: str, profile: VoiceProfile, utterance_id: str, stop: StopToken
+    ) -> Iterable[AudioChunk]:
+        stop.check()
+        np = optional("numpy")
+        try:
+            # ponytail: sentence buffering; native streaming if measured latency requires it.
+            for sentence in re.split(r"(?<=[.!?])\s+", text[:4096]):
+                stop.check()
+                if not sentence.strip():
+                    continue
+                voice = profile.preferred_voice
+                if voice == "oscar-reference":
+                    voice = (
+                        self.engine.get_voice_style("bm_george") * 0.65
+                        + self.engine.get_voice_style("bm_lewis") * 0.35
+                    )
+                audio, rate = self.engine.create(
+                    sentence, voice=voice, speed=profile.rate, lang="en-gb"
+                )
+                stop.check()
+                pcm = (np.clip(audio, -1, 1) * 32767).astype("<i2").tobytes()
+                size = int(rate) // 10 * 2
+                for offset in range(0, len(pcm), size):
+                    stop.check()
+                    yield AudioChunk(
+                        pcm[offset : offset + size],
+                        int(rate),
+                        self.id,
+                        profile.preferred_voice,
+                        utterance_id,
+                    )
+        except VoiceCancelled:
+            raise
+        except Exception:
+            raise VoiceError("Kokoro synthesis failed") from None
 
 
 class PlaybackReference:
