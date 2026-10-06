@@ -176,3 +176,13 @@ Optional G2P/phonemizer/eSpeak components have their own GPL terms; an Apache
 model or MIT wrapper is not a blanket license for a bundled distribution. Review
 all runtime/voice terms before shipping combined binaries. This is local reference
 execution, not a distribution-license clearance.
+
+## Integrated cold-start boundary
+
+An unprimed integrated reference observed about 10.5 seconds preparing/synthesizing
+its first response. The owner harness now prepares and silently primes synthesis
+before starting capture. Generated startup PCM is discarded and never played.
+The subsequent reference measured **3373 ms startup preparation**, **457 ms final
+STT** and **609 ms first result audio**. These are separate costs on a synthetic
+arithmetic task, not a controlled universal cold-start improvement or microphone
+latency claim. Startup time remains visible; no instant-readiness claim is made.

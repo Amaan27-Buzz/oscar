@@ -82,7 +82,10 @@ def synthesis_models() -> SynthesisChain:
             adapters.append(PiperSpeech(quality / "piper-parallel.onnx"))
         except VoiceError:
             print("Piper unavailable; emergency platform fallback.")
-    return SynthesisChain(tuple(adapters) + (WindowsSpeech(),))
+    chain = SynthesisChain(tuple(adapters) + (WindowsSpeech(),))
+    # Prime prepared synthesis before listening; generated startup PCM is discarded, never played.
+    list(chain.synthesize("Ready.", oscar_voice_profile(), "startup-warmup", StopToken()))
+    return chain
 
 
 def preflight() -> int:
@@ -122,12 +125,16 @@ def preflight() -> int:
             except Exception:
                 print("  shared-mode 16k mono format: unavailable; choose another endpoint")
     models()
+    synthesis_models()
     print("Local models load. Device inventory only; microphone/playback NOT RUN.")
     return 0
 
 
 def reference() -> int:
     wake, vad, stt, embedding = models()
+    startup_tts = perf_counter()
+    synthesis = synthesis_models()
+    startup_tts_ms = (perf_counter() - startup_tts) * 1000
     token = StopToken()
     profile = VoiceProfile(
         preferred_voice="local-system", provider="windows-system-speech", model="installed-voice"
@@ -189,11 +196,10 @@ def reference() -> int:
     latencies["core_handoff_ms"] = (perf_counter() - started) * 1000
     response_started = perf_counter()
     response_stream = iter(
-        synthesis_models().synthesize(
-            result.text, oscar_voice_profile(), "reference-response", StopToken()
-        )
+        synthesis.synthesize(result.text, oscar_voice_profile(), "reference-response", StopToken())
     )
     response_chunk = next(response_stream)
+    latencies["startup_tts_prepare_ms"] = startup_tts_ms
     latencies["response_first_audio_ms"] = (perf_counter() - response_started) * 1000
     response_chunks = [response_chunk, *response_stream]
     latencies["response_synthesis_total_ms"] = (perf_counter() - response_started) * 1000

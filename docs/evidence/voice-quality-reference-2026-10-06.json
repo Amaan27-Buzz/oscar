@@ -866,5 +866,28 @@
     "Piper voice MODEL_CARD declares CC-BY-4.0 dataset; GPL runtime terms are separate",
     "Qwen3 ASR/TTS, Chatterbox, F5 and whisper.cpp runtime researched but not locally executed",
     "benchmarks span candidate revisions; source hashes are retained where recorded; no exact-head physical claims"
-  ]
+  ],
+  "integrated_reference": {
+    "evidence_class": "REFERENCE_MODEL_EXECUTION_SYNTHETIC_AUDIO",
+    "microphone": "NOT_RUN",
+    "speaker_playback": "NOT_RUN",
+    "response_tts_provider": "kokoro",
+    "latency": {
+      "tts_total_ms": 381.1542000003101,
+      "first_tts_audio_ms": 380.56589999905555,
+      "wake_vad_inference_total_ms": 77.69809999808786,
+      "partial_stt_ms": 1690.0334000019939,
+      "final_stt_ms": 457.22010000099544,
+      "speaker_embedding_ms": 61.913200002891244,
+      "core_handoff_ms": 335.2685999998357,
+      "startup_tts_prepare_ms": 3373.327599998447,
+      "response_first_audio_ms": 609.0917999972589,
+      "response_synthesis_total_ms": 609.1438999974343
+    },
+    "task_state": "verified",
+    "epistemic": "VERIFIED",
+    "real_device_performance": "UNKNOWN",
+    "voice_owner_source_sha256": "f36fe525a9d84865cecf3406a97b4d1ac2736224e44924b980764e5d51fd7641",
+    "interpretation": "silent startup priming measured separately; fixture Core result verified; no microphone/playback"
+  }
 }
