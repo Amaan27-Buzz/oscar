@@ -514,3 +514,28 @@ contracts. Slice 17 cannot PASS without genuine deferred physical Edge acceptanc
 
 Capability Evolution is future backlog; see the authorization and lifecycle
 contract in [architecture](ARCHITECTURE.md). No self-modification is implemented.
+
+## Post-alpha evolution direction
+
+After Slice 17 Unified Alpha is stable in sustained owner use, continue with a
+post-alpha evolution track rather than renumbering the current mandatory slices:
+
+1. **P1 — Operating Intelligence:** local owner-controlled operating telemetry for
+   model/tool/plugin/Worker routing, latency, failures, retries, outcomes,
+   verification and capability gaps. This is separate from conversation capture.
+2. **P2 — Voice Evolution:** apply measured Elocution findings to a natural,
+   expressive, original OSCAR Voice Identity across Windows, Android/Sunday and
+   Home Node hardware.
+3. **P3 — Specialist Model Fabric:** use recurring real task clusters and evals to
+   build smaller task-optimized models where they beat general models for quality,
+   latency or local operability.
+4. **P4 — Home-server independence:** move persistent Core, Memory Fabric, voice,
+   specialist models and increasing orchestration to the owner's dedicated home
+   server laptop; keep cloud models for intentional major-work escalation.
+
+Cross-platform Voice portability is already an architectural rule: Windows may be
+the reference implementation, but Android/Sunday must reuse the same Voice Core
+contracts rather than force a redesign.
+
+See [Post-Alpha Evolution](POST-ALPHA-EVOLUTION.md).
+
