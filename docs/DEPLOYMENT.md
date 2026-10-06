@@ -145,3 +145,25 @@ watchdog and safety/reflex verification remain mandatory before Slice 17
 Unified Alpha can PASS. The hardware acceptance guide is preserved.
 The owner authorizes Slice 08 after Slice 07 integration; Slice 09/10, deployment
 and Galaxy Tab Home Node remain outside this work.
+
+## Post-alpha evolution direction
+
+### Dedicated home-server target
+
+The intended mature deployment is an owner-controlled dedicated home-server
+laptop, not the current development machine.
+
+Where hardware permits it should eventually host the persistent Core, Memory
+Fabric, local Model Router, Operating Logs, specialist model pool, local voice
+services, durable Workers/queues and home/device coordination.
+
+The baseline daily experience should progressively become cloud-independent.
+Cloud models remain available as explicit replaceable escalation for major work,
+frontier capability, recovery and temporary orchestration while local
+orchestration matures.
+
+This migration happens after measured stable-alpha use; it does not change current
+Gate/Cloud deployment claims.
+
+See [Post-Alpha Evolution](POST-ALPHA-EVOLUTION.md).
+
