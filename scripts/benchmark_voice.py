@@ -160,7 +160,7 @@ def main() -> int:
         if args.kind == "stt":
             engine = FasterWhisper(args.model, device=args.device, compute_type=args.compute)
         elif args.provider == "kokoro":
-            engine = KokoroSpeech(args.model, args.voices)
+            engine = KokoroSpeech(args.model, args.voices, device=args.device)
         elif args.provider == "piper":
             engine = PiperSpeech(args.model)
         else:

@@ -342,4 +342,3 @@ Durable future direction after stable Slice 17 Unified Alpha:
 - This is future post-alpha scope, not a current implementation claim.
 
 Canonical detail: [Post-Alpha Evolution](POST-ALPHA-EVOLUTION.md).
-

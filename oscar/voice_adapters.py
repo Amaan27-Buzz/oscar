@@ -242,10 +242,17 @@ class PiperSpeech:
     def synthesize(
         self, text: str, profile: VoiceProfile, utterance_id: str, stop: StopToken
     ) -> Iterable[AudioChunk]:
+        stop.check()
         p = optional("piper")
         config = p.SynthesisConfig(length_scale=1 / profile.rate)
         try:
-            for chunk in self.voice.synthesize(text, syn_config=config):
+            stream = iter(self.voice.synthesize(text, syn_config=config))
+            while True:
+                stop.check()
+                try:
+                    chunk = next(stream)
+                except StopIteration:
+                    break
                 stop.check()
                 yield AudioChunk(
                     bytes(chunk.audio_int16_bytes),
@@ -266,7 +273,9 @@ class KokoroSpeech:
     id = "kokoro"
     local = True
 
-    def __init__(self, model: Path, voices: Path):
+    def __init__(self, model: Path, voices: Path, *, device: str = "cpu"):
+        if device not in {"cpu", "cuda"}:
+            raise ValueError("invalid neural TTS device")
         if not model.is_file() or not voices.is_file():
             raise VoiceError("Kokoro local assets missing; no implicit download")
         try:
@@ -274,9 +283,12 @@ class KokoroSpeech:
             options = ort.SessionOptions()
             options.intra_op_num_threads = 4
             options.inter_op_num_threads = 1
-            session = ort.InferenceSession(
-                str(model), sess_options=options, providers=["CPUExecutionProvider"]
-            )
+            provider = "CUDAExecutionProvider" if device == "cuda" else "CPUExecutionProvider"
+            if provider not in ort.get_available_providers():
+                raise VoiceError("requested neural TTS accelerator unavailable")
+            session = ort.InferenceSession(str(model), sess_options=options, providers=[provider])
+            if session.get_providers()[0] != provider:
+                raise VoiceError("requested neural TTS accelerator failed")
             self.engine = optional("kokoro_onnx").Kokoro.from_session(session, str(voices))
         except Exception:
             raise VoiceError("Kokoro initialization failed") from None

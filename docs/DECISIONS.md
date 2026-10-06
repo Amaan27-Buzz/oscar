@@ -462,4 +462,3 @@ kept as explicit escalation for difficult/major work rather than a mandatory
 dependency.
 
 See [Post-Alpha Evolution](POST-ALPHA-EVOLUTION.md).
-

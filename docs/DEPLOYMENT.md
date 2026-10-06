@@ -167,4 +167,3 @@ This migration happens after measured stable-alpha use; it does not change curre
 Gate/Cloud deployment claims.
 
 See [Post-Alpha Evolution](POST-ALPHA-EVOLUTION.md).
-

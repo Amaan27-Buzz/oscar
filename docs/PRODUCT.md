@@ -209,7 +209,7 @@ Raw audio, transcripts, summaries and derived memory are separate retention deci
 Gate A/B are PASS for their documented scope. Slice 07 is COMPLETE FOR SOFTWARE /
 SIMULATED EDGE FOUNDATION; physical Edge acceptance is DEFERRED_BY_OWNER /
 NOT_PHYSICALLY_VERIFIED. Gate C remains PARTIAL. Slice 07 PR #13 is merged;
-Slice 08 is PARTIAL / OWNER_MICROPHONE_ACCEPTANCE_REQUIRED on draft PR #14.
+Slice 08 software/reference quality candidate is on draft PR #14; physical acceptance is owner-deferred.
 Physical verification returns during Slice 15/16 and is
 mandatory before Slice 17 Unified Alpha PASS.
 
@@ -251,4 +251,3 @@ Windows is only the current Voice reference implementation; Android/Sunday is a
 first-class surface using the same Voice Core contracts.
 
 See [Post-Alpha Evolution](POST-ALPHA-EVOLUTION.md).
-

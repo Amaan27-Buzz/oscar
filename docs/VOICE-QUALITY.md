@@ -54,7 +54,7 @@ No microphone/playback, room AEC, owner Voice Match, Android or naturalness PASS
 
 ## Original Voice Identity and Elocution
 
-Read-only [Elocution](https://github.com/amaansyed27/Elocution) contained architecture
+Read-only Elocution (owner-private `amaansyed27/Elocution`) contained architecture
 and evaluation plans, not model/performance results. Reuse its separation of
 identity, delivery and downstream DSP, and its insistence on human listening.
 Do not build its speculative performance-planner schema in Slice 08.

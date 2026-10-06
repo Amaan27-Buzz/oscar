@@ -71,16 +71,15 @@ def synthesis_models() -> SynthesisChain:
     """Only prepared assets; emergency System.Speech does not become primary identity."""
     adapters: list[Synthesizer] = []
     quality = ROOT / "quality"
-    if (quality / "kokoro-parallel.onnx").is_file() and (quality / "voices-hf.bin").is_file():
+    neural = quality / "kokoro-fp32.onnx"
+    if neural.is_file() and (quality / "voices-hf.bin").is_file():
         try:
-            adapters.append(
-                KokoroSpeech(quality / "kokoro-parallel.onnx", quality / "voices-hf.bin")
-            )
+            adapters.append(KokoroSpeech(neural, quality / "voices-hf.bin"))
         except VoiceError:
-            print("Neural TTS unavailable; explicit fallback.")
-    if (quality / "piper-full.onnx").is_file():
+            print("Kokoro unavailable; explicit neural fallback.")
+    if (quality / "piper-parallel.onnx").is_file():
         try:
-            adapters.append(PiperSpeech(quality / "piper-full.onnx"))
+            adapters.append(PiperSpeech(quality / "piper-parallel.onnx"))
         except VoiceError:
             print("Piper unavailable; emergency platform fallback.")
     return SynthesisChain(tuple(adapters) + (WindowsSpeech(),))
@@ -186,10 +185,22 @@ def reference() -> int:
         )
         result = core.handle(final, token, granted=frozenset({"math"}))
     latencies["core_handoff_ms"] = (perf_counter() - started) * 1000
+    response_started = perf_counter()
+    response_stream = iter(
+        synthesis_models().synthesize(
+            result.text, oscar_voice_profile(), "reference-response", StopToken()
+        )
+    )
+    response_chunk = next(response_stream)
+    latencies["response_first_audio_ms"] = (perf_counter() - response_started) * 1000
+    response_chunks = [response_chunk, *response_stream]
+    latencies["response_synthesis_total_ms"] = (perf_counter() - response_started) * 1000
     report = {
         "evidence_class": "REFERENCE_MODEL_EXECUTION_SYNTHETIC_AUDIO",
         "microphone": "NOT_RUN",
         "speaker_playback": "NOT_RUN",
+        "response_tts_provider": response_chunk.provider,
+        "response_pcm_bytes": sum(len(c.pcm) for c in response_chunks),
         "owner_voice": "NOT_RUN",
         "source_audio": "Windows System.Speech synthetic original acceptance phrase",
         "python": platform.python_version(),

@@ -410,7 +410,7 @@ Mandatory acceptance is complete: owner physical machine and GitHub OAuth/privat
 federation runs passed. PR 12 merged at `97c0622507df3f724ecf0c8b74aa7f4ae7784b08`; Gate B frozen PASS.
 PR #13 is merged; main/work share `9e443cac61281d7d890724b9ef593c0d58d145f3`.
 Current authorized work is Slice 08 on `club-c/slice-08-voice`, draft PR #14,
-PARTIAL / OWNER_MICROPHONE_ACCEPTANCE_REQUIRED. Slices 09/10 remain unbuilt.
+software/reference closure scope with physical acceptance owner-deferred. Slice 09 software is authorized after 08 integration; Slice 10 remains unbuilt.
 
 The original ordered acceptance sequence below remains a contract, not a list of unimplemented items:
 
@@ -485,7 +485,7 @@ Historical Slice 07 branch `club-c/slice-07-edge`, PR #13 (now merged), started 
 `97c0622507df3f724ecf0c8b74aa7f4ae7784b08`; Gate A/B PASS; 05/06 COMPLETE.
 The software/simulator foundation is accepted for continuation. Mandatory owner
 wiring, flash and real acceptance return during Slice 15/16. See [checkpoint](CLUB-C-CHECKPOINT.md).
-Slice 07 is COMPLETE FOR SOFTWARE / SIMULATED EDGE FOUNDATION. Gate C PARTIAL; Slice 08 is current PARTIAL work; 09–10 remain unbuilt.
+Slice 07 is COMPLETE FOR SOFTWARE / SIMULATED EDGE FOUNDATION. Gate C PARTIAL; Slice 08 quality candidate is current work; Slice 09 software follows integration; Slice 10 remains unbuilt.
 Capability Evolution is deferred, as recorded in [architecture](ARCHITECTURE.md).
 
 ## Owner scope decision — 2026-10-05
@@ -559,4 +559,3 @@ the reference implementation, but Android/Sunday must reuse the same Voice Core
 contracts rather than force a redesign.
 
 See [Post-Alpha Evolution](POST-ALPHA-EVOLUTION.md).
-

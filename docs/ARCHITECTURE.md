@@ -648,4 +648,3 @@ specialist models and orchestration onto the owner's dedicated home-server lapto
 Cloud models remain replaceable escalation for major/frontier work.
 
 See [Post-Alpha Evolution](POST-ALPHA-EVOLUTION.md).
-

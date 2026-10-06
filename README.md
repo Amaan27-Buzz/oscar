@@ -403,4 +403,3 @@ The durable direction is:
 - Never silently turn private conversations or telemetry into training data.
 
 See [Post-Alpha Evolution](docs/POST-ALPHA-EVOLUTION.md).
-

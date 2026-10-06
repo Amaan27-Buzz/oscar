@@ -464,4 +464,3 @@ owner wants, not an exact celebrity impersonation. The future stack must be
 benchmarked across desktop, Android/Sunday and Home Node hardware.
 
 See [Post-Alpha Evolution](POST-ALPHA-EVOLUTION.md).
-

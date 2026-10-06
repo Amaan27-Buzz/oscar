@@ -400,4 +400,3 @@ Slice 09 Sunday software may begin after clean Slice 08 integration; Slice 09 mu
 remain a draft and stop before owner/device acceptance. Slice 10, deployment and
 Galaxy Tab Home Node are not authorized. Physical Edge remains
 `DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED`, mandatory before Slice 17 PASS.
-

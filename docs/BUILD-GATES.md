@@ -258,7 +258,7 @@ Required scenarios include provider/auth failure, coordinator/node/Edge loss, Gr
 |---|---|---|
 | Gate A — Brain | 01–04 | **PASS** |
 | Gate B — Can Do Work | 05–06 | **PASS for documented local-alpha acceptance** |
-| Gate C — Embodied OSCAR | 07–10 | PARTIAL; Slice 07 software accepted, physical deferred; 08 PARTIAL / owner microphone required, 09–10 unbuilt |
+| Gate C — Embodied OSCAR | 07–10 | PARTIAL; Slice 07 software accepted, physical deferred; 08 software/reference closure scope, physical voice deferred; 09 authorized after 08 integration, 10 unbuilt |
 | Gate D — JARVIS Layer | 11–14 | Planned |
 | Gate E — Unified Alpha | 15–17 | Planned |
 
@@ -329,4 +329,3 @@ Slice 09 Sunday software may begin after clean Slice 08 integration; Slice 09 mu
 remain a draft and stop before owner/device acceptance. Slice 10, deployment and
 Galaxy Tab Home Node are not authorized. Physical Edge remains
 `DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED`, mandatory before Slice 17 PASS.
-
