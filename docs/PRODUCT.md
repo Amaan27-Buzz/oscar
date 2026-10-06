@@ -233,3 +233,22 @@ See `docs/ROADMAP.md` and `docs/BUILD-GATES.md`.
 - covert/silently enabled recording;
 - letting Persona reduce truthfulness/safety;
 - putting an LLM in a hardware emergency-control loop.
+
+## Post-alpha evolution direction
+
+After stable Unified Alpha, OSCAR should improve from measured owner use rather
+than from speculative feature growth. Owner-controlled Operating Logs expose
+routing/tool/model/Worker performance and recurring capability gaps without being
+the same thing as conversation capture or Memory.
+
+Those observations feed an Elocution-informed cross-platform Voice Evolution track
+and a Specialist Model Fabric of smaller task-optimized local models. The mature
+deployment progressively moves routine OSCAR operation and orchestration onto the
+owner's dedicated home-server laptop, while cloud models remain intentional
+escalation for major/frontier work.
+
+Windows is only the current Voice reference implementation; Android/Sunday is a
+first-class surface using the same Voice Core contracts.
+
+See [Post-Alpha Evolution](POST-ALPHA-EVOLUTION.md).
+

@@ -608,3 +608,38 @@ See [Voice Core](VOICE-CORE.md) for adapters, tests, reference latency and owner
 Slice 09/10, Oracle deployment and Galaxy Tab Home Node are NOT STARTED.
 Physical Edge remains DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED, mandatory
 before Slice 17 Unified Alpha PASS.
+
+## Post-alpha evolution direction
+
+### Voice portability invariant
+
+Voice Core is surface-independent. Wake/VAD, STT, Voice Identity/TTS, barge-in,
+self-voice suppression, Voice Match, Voice Map, Persona, policy and arbitration
+remain shared contracts across Windows, Android/Sunday, Linux/macOS and future
+Home Node surfaces. Platform-specific audio, lifecycle, permissions, AEC and
+hardware acceleration live behind adapters.
+
+Windows is a current reference implementation only. Android/Sunday is a first-class
+target. Windows evidence never implies Android verification.
+
+### Post-alpha adaptive local intelligence
+
+After stable Unified Alpha use, owner-controlled Operating Logs should provide
+structured evidence about model/provider routes, capability/plugin/Worker calls,
+latency, fallback/retry behavior, verification outcomes, failures and recurring
+capability gaps. Operating telemetry is not conversation capture and must not
+silently become training data.
+
+Measured gaps drive two optimization tracks:
+
+- **Voice Evolution:** use Elocution findings to improve OSCAR's original,
+  expressive, natural, cross-surface Voice Identity.
+- **Specialist Model Fabric:** train/fine-tune/distill smaller models for recurring
+  OSCAR task families only when measured evals show a real advantage.
+
+The target deployment progressively moves persistent Core, Memory Fabric, voice,
+specialist models and orchestration onto the owner's dedicated home-server laptop.
+Cloud models remain replaceable escalation for major/frontier work.
+
+See [Post-Alpha Evolution](POST-ALPHA-EVOLUTION.md).
+

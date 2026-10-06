@@ -424,3 +424,36 @@ See [Voice Core](VOICE-CORE.md) for adapters, tests, reference latency and owner
 Slice 09/10, Oracle deployment and Galaxy Tab Home Node are NOT STARTED.
 Physical Edge remains DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED, mandatory
 before Slice 17 Unified Alpha PASS.
+
+## Post-alpha evolution direction
+
+### Decision — Voice Core is platform-neutral
+
+Windows is the first exercised reference, not the product boundary. Android/Sunday
+must consume the same Voice Core contracts through native adapters. Linux/macOS and
+future Home Node surfaces follow the same rule. Platform acceptance remains
+independent.
+
+### Decision — Operating telemetry is separate from captured content
+
+After stable Unified Alpha, OSCAR may record owner-controlled structured Operating
+Logs describing calls, routes, tools/plugins/capabilities, Workers, timing,
+fallbacks, failures and verification. This is a separate data class from
+conversation recording, Context Capture, Daily Journal and Memory. Telemetry is
+not training data unless the owner explicitly promotes it under defined
+provenance/redaction/retention rules.
+
+### Decision — specialize locally before assuming a giant local model
+
+Real sustained usage should identify repeatable task families where smaller
+specialist models can outperform a general model for latency, resource use or
+quality. Promote specialists only through evals and keep them replaceable behind
+OSCAR contracts. Over time orchestration itself may migrate to optimized local
+models.
+
+The long-term host is the owner's dedicated home-server laptop, with cloud models
+kept as explicit escalation for difficult/major work rather than a mandatory
+dependency.
+
+See [Post-Alpha Evolution](POST-ALPHA-EVOLUTION.md).
+

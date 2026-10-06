@@ -495,3 +495,22 @@ See [Voice Core](VOICE-CORE.md) for adapters, tests, reference latency and owner
 Slice 09/10, Oracle deployment and Galaxy Tab Home Node are NOT STARTED.
 Physical Edge remains DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED, mandatory
 before Slice 17 Unified Alpha PASS.
+
+## Post-alpha evolution direction
+
+Future Operating Logs are a distinct owner-controlled observability data class.
+They should prefer structured metadata about model/tool/plugin/capability/Worker
+calls, timing, routing, retries, failures and verification rather than raw content.
+
+Security/privacy rules:
+
+- do not log secrets or credentials;
+- conversation/capture data and operating telemetry use separate controls;
+- telemetry does not silently become training data;
+- promotion into training/evaluation data requires explicit owner authorization,
+  minimization/redaction, provenance and a removal/retention policy;
+- external model outputs may be used for training only when terms, licensing and
+  policy permit.
+
+See [Post-Alpha Evolution](POST-ALPHA-EVOLUTION.md).
+

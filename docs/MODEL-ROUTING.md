@@ -521,3 +521,29 @@ At minimum verify:
 13. freshness-sensitive routing metadata can be backed by current authoritative sources.
 
 See [NATIVE-INFRASTRUCTURE.md](NATIVE-INFRASTRUCTURE.md), [RUNTIME-FOUNDATIONS.md](RUNTIME-FOUNDATIONS.md), [EPISTEMIC-INTEGRITY.md](EPISTEMIC-INTEGRITY.md), [SEARCH-FRESHNESS.md](SEARCH-FRESHNESS.md) and [BUILD-GATES.md](BUILD-GATES.md).
+
+## Post-alpha evolution direction
+
+After stable Unified Alpha, the Model Router may gain a locally hosted Specialist
+Model Fabric. Specialist models are introduced from measured recurring task gaps,
+not pre-created speculatively. Each model remains replaceable, scope-bounded,
+evaluated, versioned and equipped with a fallback/escalation route.
+
+The long-term routing preference is:
+
+```text
+deterministic / retrieval path if sufficient
+→ measured local specialist when qualified
+→ broader local general model
+→ cloud/frontier escalation when justified
+```
+
+Over time, orchestration itself may move onto optimized local models when measured
+quality is sufficient. The owner-controlled dedicated home-server laptop is the
+intended mature local host.
+
+Operating telemetry used to make these routing decisions is separate from
+conversation/capture data and is not training data by default.
+
+See [Post-Alpha Evolution](POST-ALPHA-EVOLUTION.md).
+

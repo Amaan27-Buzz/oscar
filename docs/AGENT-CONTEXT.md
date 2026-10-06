@@ -319,3 +319,21 @@ See [Voice Core](VOICE-CORE.md) for adapters, tests, reference latency and owner
 Slice 09/10, Oracle deployment and Galaxy Tab Home Node are NOT STARTED.
 Physical Edge remains DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED, mandatory
 before Slice 17 Unified Alpha PASS.
+
+## Post-alpha evolution direction
+
+Durable future direction after stable Slice 17 Unified Alpha:
+
+- Voice Core is cross-platform; Windows is only a reference implementation and
+  Android/Sunday must reuse the same contracts through platform adapters.
+- Add owner-controlled Operating Logs for model/tool/plugin/capability/Worker
+  calls, routing, timing, failure/retry/fallback and verification. Keep them
+  separate from conversation/capture/memory data and never silently train on them.
+- Use real operating evidence to drive Elocution-informed expressive Voice Identity
+  work and a Specialist Model Fabric of smaller task-optimized models.
+- Gradually migrate Core, memory, voice, models and orchestration to the owner's
+  dedicated home-server laptop; cloud remains explicit escalation for major work.
+- This is future post-alpha scope, not a current implementation claim.
+
+Canonical detail: [Post-Alpha Evolution](POST-ALPHA-EVOLUTION.md).
+
