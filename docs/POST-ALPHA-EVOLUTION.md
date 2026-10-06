@@ -254,3 +254,17 @@ celebrity identity. This does not implement Operating Logs, specialist-model
 training or home-server migration. Those remain future after stable Unified Alpha.
 Physical voice acceptance is owner-deferred to the
 [consolidated Gate C run](GATE-C-CONSOLIDATED-ACCEPTANCE.md); Gate C remains PARTIAL.
+
+## Current Slice 09 — 2026-10-06
+
+Slice 08 PR #14 merged; accepted main/work baseline
+`92a11aa05083f1983186976ba64bd30aa9f1f2a0`. Slice 08 is
+**COMPLETE FOR SOFTWARE / REFERENCE VOICE FOUNDATION**; physical voice is
+`DEFERRED_BY_OWNER / CONSOLIDATED_GATE_C_ACCEPTANCE_REQUIRED`, never physical PASS.
+Sunday initial software foundation is on `club-c/slice-09-sunday`, draft PR #15
+into `work`, **PARTIAL / OWNER_DEVICE_ACCEPTANCE_NOT_RUN**. Core/loopback,
+SDK build and emulated UI evidence are separate from actual phone/OEM acceptance.
+See [Sunday foundation](SUNDAY-FOUNDATION.md) for implementation, limits and the next owner boundary.
+Slice 09 must not merge in this run. Gate C remains PARTIAL. Slice 10, deployment
+and Home Node are not started. Post-alpha Operating Logs, specialist-model training
+and home-server migration remain documented future work, not implemented.

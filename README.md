@@ -291,7 +291,7 @@ See [`docs/CLUB-A-CHECKPOINT.md`](docs/CLUB-A-CHECKPOINT.md), [`docs/CLUB-B-CHEC
 | 06 | Memory Fabric + Personal Policy + live context | ✅ COMPLETE, accepted local-alpha scope |
 | 07 | OSCAR Edge + reflexes | COMPLETE FOR SOFTWARE / SIMULATED EDGE FOUNDATION; physical DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED |
 | 08 | Voice Core + Identity + Match/Map + Persona runtime | COMPLETE FOR SOFTWARE / REFERENCE VOICE FOUNDATION; physical acceptance owner-deferred |
-| 09 | Sunday + communication + Grid owner controls | Planned |
+| 09 | Sunday + communication + Grid owner controls | PARTIAL; initial software/emulated foundation, draft PR #15; real device acceptance NOT RUN |
 | 10 | Desktop Interaction Runtime | Planned |
 | 11 | World Model + Perception + Sentry + Daily Journal | Planned |
 | 12 | Commissioning/setup | Planned |
@@ -404,3 +404,17 @@ The durable direction is:
 - Never silently turn private conversations or telemetry into training data.
 
 See [Post-Alpha Evolution](docs/POST-ALPHA-EVOLUTION.md).
+
+## Current Slice 09 — 2026-10-06
+
+Slice 08 PR #14 merged; accepted main/work baseline
+`92a11aa05083f1983186976ba64bd30aa9f1f2a0`. Slice 08 is
+**COMPLETE FOR SOFTWARE / REFERENCE VOICE FOUNDATION**; physical voice is
+`DEFERRED_BY_OWNER / CONSOLIDATED_GATE_C_ACCEPTANCE_REQUIRED`, never physical PASS.
+Sunday initial software foundation is on `club-c/slice-09-sunday`, draft PR #15
+into `work`, **PARTIAL / OWNER_DEVICE_ACCEPTANCE_NOT_RUN**. Core/loopback,
+SDK build and emulated UI evidence are separate from actual phone/OEM acceptance.
+See [Sunday foundation](docs/SUNDAY-FOUNDATION.md) for implementation, limits and the next owner boundary.
+Slice 09 must not merge in this run. Gate C remains PARTIAL. Slice 10, deployment
+and Home Node are not started. Post-alpha Operating Logs, specialist-model training
+and home-server migration remain documented future work, not implemented.

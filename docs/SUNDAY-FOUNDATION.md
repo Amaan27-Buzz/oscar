@@ -1,7 +1,7 @@
 # Slice 09 Sunday Android foundation
 
-Status: **PARTIAL / SOFTWARE_FOUNDATION_IN_PROGRESS**. No physical Android acceptance.
-Branch: `club-c/slice-09-sunday`, draft PR into `work`; do not merge this slice.
+Status: **PARTIAL / INITIAL_SOFTWARE_FOUNDATION_IMPLEMENTED**. No physical Android acceptance.
+Branch: `club-c/slice-09-sunday`, draft PR #15 into `work`; do not merge this slice.
 Accepted Slice 08 baseline: `92a11aa05083f1983186976ba64bd30aa9f1f2a0`.
 Slice 08 head: `db918b508ccdec81a06d81a9cc24aff69e8aad79`, merged via PR #14.
 All seven exact-head checks passed. Main/work were independently read back equal.
@@ -70,3 +70,89 @@ advertised authenticated Desktop/LAN capability; loss is explicit degradation.
 Home-server migration, Operating Logs and specialist training remain
 [post-alpha](POST-ALPHA-EVOLUTION.md), unimplemented. See the
 [consolidated Gate C acceptance plan](GATE-C-CONSOLIDATED-ACCEPTANCE.md).
+
+## Implemented initial path and actual evidence
+
+`oscar/sunday.py` is a bounded adapter of existing Grid/Runtime/PersonalPolicy,
+with no mobile task engine. The native Java app calls the same Core and shows
+current source-qualified state. Native AudioRecord/AudioTrack, audio focus,
+AEC availability/binding, headset routing, foreground-service and selected-assistant
+boundaries compile against SDK 36. The recognizer/binding is explicitly
+**not commissioned**; no on-device wake/STT/TTS or autonomous Android voice is claimed.
+
+Session credentials use Android Keystore AES-GCM and backup is disabled. Owner
+confirmation uses a Keystore RSA-PSS/SHA-256 key with MGF1/SHA-256 and 32-byte salt.
+The biometric/device-credential path uses a **15-second authentication window**,
+not per-use CryptoObject proof or hardware attestation. Core enrollment is trusted
+and out-of-band; a signed challenge never grants missing permission. Older/OEM
+PSS/MGF1 support can fail closed and is unverified until device commissioning.
+
+Core checks current role/scopes, one-use challenge expiry, task/plan fingerprint,
+policy after confirmation and target authorization. Text receipts are hash-only,
+request identity changes/replays are rejected, and pending text tasks are bounded.
+Snapshot, inspect, approve/cancel and reply permits use existing task/ledger state.
+Approvals currently execute only the adapter's harmless addition plans; inspection
+and cancellation reuse existing controlled target state. Broader consequential
+approval and conversational/recall composition are not implemented by this client.
+
+Notification context defaults OFF with an explicit package allowlist. Retention is
+OFF. Reply authority is a separate switch plus Core communications/reply grants,
+Personal Policy and signed owner confirmation. The target rechecks the current
+notification/content/action fingerprint, real free-form RemoteInput/PendingIntent,
+permit lifetime and one-use consumption. A send accepted by Android is only
+**REPORTED / delivery NOT_VERIFIED**. No actual notification send was run here.
+
+The native app follows the canonical Orb SVG unchanged, native controls and the
+existing warm design world. It retains no second chat/task database, rejects
+untrusted/cleartext remote origins, uses no redirect/mutation retry, and fences
+background/stale UI requests. Local disconnect is not remote revocation.
+
+[Nonprivate evidence](evidence/sunday-reference-2026-10-06.json):
+
+- local SDK/JDK compile, DEX, APK packaging, debug signing/verification and exact
+  Orb bytes PASS; this is a reference APK, not a production signing/release claim;
+- six real Core/loopback security cases PASS with pinned cryptography 50.0.2;
+- shared Java/Python RSA-PSS interoperability led to independently VERIFIED Core
+  result 5, using a synthetic JVM key (not Android owner biometrics/Keystore signing);
+- local full regression 489 tests PASS, seven optional/platform checks skipped;
+- Ruff/format/strict mypy/repository/local links/secret/diff checks PASS;
+- isolated temporary Android 36.1 emulator launched the native app, saved an
+  encrypted scoped session (plaintext token/origin absent from preferences),
+  restored it after process restart, created a planned Core task from text and
+  displayed verified result/evidence readback. These are **EMULATED / REFERENCE**;
+- portrait was visually inspected; landscape capture/behavior remains unverified.
+
+The original AVD was full and was left untouched. A fresh temporary AVD needed
+three-button navigation to avoid its image's `mapper.ranchu` / RegionSampling
+`hasReadColorBufferDma` assertion. This was an isolated emulator workaround;
+Sunday does not change navigation on real phones and no OEM support is inferred.
+
+## Reproduce without touching an owner phone
+
+```powershell
+py -3.12 -m venv .tmp/sunday-env
+.tmp/sunday-env/Scripts/python.exe -m pip install '.[dev,sunday]'
+.tmp/sunday-env/Scripts/python.exe -m unittest tests.test_sunday -v
+.tmp/sunday-env/Scripts/python.exe -m scripts.sunday_reference
+python -m scripts.build_sunday
+```
+
+The SDK-native build uses installed SDK 36/build-tools 36.0.0/JDK 21, writes a new
+ignored `.tmp/sunday-sdk-*` output and verifies the reference APK. The Gradle
+8.13/AGP 8.13.2 project is configured; **Gradle execution was NOT RUN locally**.
+`--serve-emulator-fixture` creates an explicitly temporary software-only Core,
+synthetic scoped session and bounded 15-minute loopback fixture. It is not deployment,
+production enrollment or a permanent development-laptop host. No real credentials
+are borrowed; fixture tokens, private keys, APKs and screenshots stay out of Git.
+
+## Next genuine owner/device boundary
+
+No owner action is required during this software run. Later consolidated acceptance
+requires a trusted real Core origin/TLS and registered phone public key/session,
+then owner interaction on the actual phone for lock/Keystore/PSS support,
+biometric/PIN signing, assistant selection/invocation, permission grant/revocation,
+notification sources and one legitimate reply/readback, foreground lifecycle,
+headset routing and voice runtime commissioning. Android microphone/playback,
+room AEC, barge-in/self-wake, Match/Map, naturalness and Grid handoff/arbitration
+remain required and NOT RUN on real hardware. Surface recognition is not authority.
+Slice 09 remains PARTIAL/draft. Do not merge it. Gate C remains PARTIAL.

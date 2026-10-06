@@ -1,0 +1,223 @@
+"""Real loopback/Core and synthetic owner keys, never Android device acceptance."""
+
+import base64
+import hashlib
+import importlib.util
+import json
+import tempfile
+import unittest
+from pathlib import Path
+from time import time
+from urllib.error import HTTPError
+from urllib.request import Request, urlopen
+
+from oscar.contracts import TaskState
+from oscar.grid import Node, NodeRole, SessionHandle
+from oscar.harness import Harness
+from oscar.policy import PersonalPolicy, PolicyEffect, PolicyRule
+from oscar.storage import StateConflict
+from oscar.sunday import Sunday, SundayServer
+
+
+@unittest.skipUnless(importlib.util.find_spec("cryptography"), "optional Sunday security executor")
+class SundayTests(unittest.TestCase):
+    def setUp(self) -> None:
+        from cryptography.hazmat.primitives import serialization
+        from cryptography.hazmat.primitives.asymmetric import rsa
+
+        self.temp = tempfile.TemporaryDirectory()
+        root = Path(self.temp.name)
+        self.h = Harness(
+            root / "core.db", root / "workspace", Path("config/development-models.json")
+        )
+        self.now = [time()]
+        self.h.grid.clock = lambda: self.now[0]
+        self.scopes = (
+            "sunday:connect",
+            "sunday:inspect",
+            "sunday:text",
+            "heartbeat",
+            "math",
+            "control:inspect:" + self.h.node_id,
+            "control:approve:" + self.h.node_id,
+            "control:cancel:" + self.h.node_id,
+            "notifications:reply",
+            "communications:send",
+        )
+        self.h.grid.register(Node("reference-sunday", NodeRole.SUNDAY, self.scopes))
+        self.session = self.h.grid.pair("reference-sunday", self.scopes)
+        self.key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+        encoded = base64.b64encode(
+            self.key.public_key().public_bytes(
+                serialization.Encoding.DER, serialization.PublicFormat.SubjectPublicKeyInfo
+            )
+        ).decode()
+        self.policy = PersonalPolicy(self.h.store)
+        self.core = Sunday(
+            self.h.runtime, self.policy, {self.h.node_id: (self.h.dispatcher, self.h.session)}
+        )
+        with self.assertRaises(PermissionError):
+            self.core.register_owner_key(self.session, encoded, owner_authorized=False)
+        self.core.register_owner_key(self.session, encoded, owner_authorized=True)
+
+    def tearDown(self) -> None:
+        self.h.store.close()
+        self.temp.cleanup()
+
+    def envelope(self, operation: str, payload: dict, identifier: str = "request") -> dict:
+        return {"version": 1, "operation": operation, "request_id": identifier, "payload": payload}
+
+    def call(self, operation: str, payload: dict, identifier: str = "request") -> dict:
+        return self.core.request(self.session, self.envelope(operation, payload, identifier))
+
+    def signed(self, challenge: dict) -> dict:
+        from cryptography.hazmat.primitives import hashes
+        from cryptography.hazmat.primitives.asymmetric import padding
+
+        signature = self.key.sign(
+            base64.b64decode(challenge["signing_payload"]),
+            padding.PSS(mgf=padding.MGF1(hashes.SHA256()), salt_length=32),
+            hashes.SHA256(),
+        )
+        return {
+            "challenge_id": challenge["challenge_id"],
+            "signature": base64.b64encode(signature).decode(),
+        }
+
+    def test_real_loopback_signed_core_task_and_wrong_token(self) -> None:
+        with SundayServer(self.core) as server:
+            headers = {
+                "Authorization": "Bearer " + self.session.token,
+                "X-Oscar-Node": self.session.node_id,
+                "X-Oscar-Session": self.session.id,
+            }
+
+            def post(operation: str, payload: dict, identifier: str) -> dict:
+                request = Request(
+                    server.url + "/v1/sunday",
+                    data=json.dumps(self.envelope(operation, payload, identifier)).encode(),
+                    headers=headers,
+                )
+                with urlopen(request, timeout=5) as response:
+                    return json.loads(response.read())
+
+            proposed = post("text", {"text": "what is two plus three"}, "text")
+            self.assertEqual(proposed["state"], TaskState.PLANNED)
+            challenge = post(
+                "challenge", {"operation": "approve", "task_id": proposed["task_id"]}, "challenge"
+            )
+            result = post("complete", self.signed(challenge), "approve")
+            self.assertEqual(result["state"], TaskState.VERIFIED)
+            self.assertTrue(result["evidence_ids"])
+            self.assertEqual(result["value"], "5")
+            self.assertEqual(self.h.store.all("result")[-1]["value"], "5")
+            headers["Authorization"] = "Bearer invalid-reference-token"
+            with self.assertRaises(HTTPError) as rejected:
+                post("snapshot", {}, "snapshot")
+            self.assertEqual(rejected.exception.code, 403)
+            self.assertNotIn(self.session.token, str(rejected.exception))
+            rejected.exception.close()
+
+    def test_idempotency_replay_and_unsupported_text(self) -> None:
+        proposed = self.call("text", {"text": "2 + 3"}, "same")
+        self.assertTrue(self.call("text", {"text": "2 + 3"}, "same")["replayed"])
+        self.assertEqual(len(self.h.store.all("task")), 1)
+        with self.assertRaises(StateConflict):
+            self.call("text", {"text": "3 + 4"}, "same")
+        blocked = self.call("text", {"text": "send an email"}, "unsupported")
+        self.assertEqual(blocked["state"], TaskState.BLOCKED)
+        self.assertEqual(len(self.h.store.all("task")), 1)
+        challenge = self.call("challenge", {"operation": "cancel", "task_id": proposed["task_id"]})
+        signed = self.signed(challenge)
+        result = self.call("complete", signed, "cancel")
+        self.assertEqual(result["state"], TaskState.CANCELLED)
+        with self.assertRaises(PermissionError):
+            self.call("complete", signed, "replay")
+
+    def test_changed_plan_expiry_wrong_signature_and_revocation(self) -> None:
+        proposed = self.call("text", {"text": "2 + 3"}, "text")
+        task_id = proposed["task_id"]
+        challenge = self.call("challenge", {"operation": "approve", "task_id": task_id})
+        self.h.store.put(
+            "plan", task_id, {"kind": "addition", "parameters": {"expression": "8 + 9"}}
+        )
+        with self.assertRaises(StateConflict):
+            self.call("complete", self.signed(challenge), "changed")
+        challenge = self.call("challenge", {"operation": "approve", "task_id": task_id}, "new")
+        with self.assertRaises(PermissionError):
+            self.call(
+                "complete",
+                {
+                    "challenge_id": challenge["challenge_id"],
+                    "signature": base64.b64encode(b"not-a-signature").decode(),
+                },
+                "wrong",
+            )
+        self.now[0] += 31
+        with self.assertRaises(PermissionError):
+            self.call("complete", self.signed(challenge), "expired")
+        self.h.grid.revoke(self.session.node_id)
+        with self.assertRaises(PermissionError):
+            self.call("snapshot", {}, "revoked")
+        self.assertEqual(self.h.store.task(task_id).state, TaskState.PLANNED)
+
+    def test_policy_and_scope_rechecked_after_confirmation(self) -> None:
+        proposed = self.call("text", {"text": "2 + 3"}, "text")
+        challenge = self.call("challenge", {"operation": "approve", "task_id": proposed["task_id"]})
+        self.policy.save(
+            PolicyRule("deny-math", "math.add", PolicyEffect.DENY, "owner", 1, 1, {}),
+            owner_authorized=True,
+        )
+        with self.assertRaises(PermissionError):
+            self.call("complete", self.signed(challenge), "denied")
+        self.assertFalse(self.h.store.all("result"))
+        invalid = SessionHandle(self.session.id, "another-node", self.session.token)
+        with self.assertRaises((PermissionError, KeyError)):
+            self.core.request(invalid, self.envelope("snapshot", {}))
+
+    def test_reply_source_policy_and_missing_communication_grant(self) -> None:
+        payload = {
+            "operation": "reply",
+            "package": "example.messaging",
+            "key_hash": hashlib.sha256(b"reference").hexdigest(),
+            "text_hash": hashlib.sha256(b"neutral reply").hexdigest(),
+        }
+        challenge = self.call("challenge", payload)
+        self.policy.save(
+            PolicyRule(
+                "source-deny",
+                "notification.reply",
+                PolicyEffect.DENY,
+                "owner",
+                1,
+                1,
+                {"app": "example.messaging"},
+            ),
+            owner_authorized=True,
+        )
+        with self.assertRaises(PermissionError):
+            self.call("complete", self.signed(challenge), "source-denied")
+        row = self.h.store.get("session", self.session.id)
+        row["scopes"].remove("communications:send")
+        self.h.store.put("session", self.session.id, row)
+        with self.assertRaises(PermissionError):
+            self.call("complete", self.signed(challenge), "send-denied")
+        first = self.call("text", {"text": "2 + 3"}, "first-text")
+        second = self.call("text", {"text": "4 + 5"}, "second-text")
+        self.assertNotEqual(first["task_id"], second["task_id"])
+
+    def test_reply_permit_is_not_delivery_and_retains_no_text(self) -> None:
+        payload = {
+            "operation": "reply",
+            "package": "example.messaging",
+            "key_hash": hashlib.sha256(b"reference-notification").hexdigest(),
+            "text_hash": hashlib.sha256(b"Original neutral reference reply").hexdigest(),
+        }
+        challenge = self.call("challenge", payload)
+        result = self.call("complete", self.signed(challenge), "reply")
+        self.assertEqual(result["permit"]["text_hash"], payload["text_hash"])
+        self.assertEqual(result["status"], "REPORTED")
+        self.assertIn("NOT_VERIFIED", result["verification"])
+        rows = json.dumps(self.h.store.all("sunday_challenge"))
+        self.assertNotIn("Original neutral reference reply", rows)
+        self.assertFalse(self.h.store.all("task"))

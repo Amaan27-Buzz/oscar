@@ -1,0 +1,71 @@
+{
+  "date": "2026-10-06",
+  "scope": "PARTIAL / INITIAL_SOFTWARE_FOUNDATION; owner device acceptance NOT_RUN",
+  "baseline": "92a11aa05083f1983186976ba64bd30aa9f1f2a0",
+  "draft_pr": 15,
+  "branch": "club-c/slice-09-sunday",
+  "android_build": {
+    "evidence_class": "REFERENCE_LOCAL_ANDROID_BUILD",
+    "apk_sha256": "49a2666a2e6b20c9f4f8a4ac9ffdd61bdd75f78a0c4c0884eaaa84fc6a903088",
+    "bytes": 74353,
+    "sdk": 36,
+    "min_sdk": 30,
+    "source_sha256": {
+      "sunday\\app\\src\\main\\AndroidManifest.xml": "2adc8a2faa6c31b61a57a077c7694e995941f5e5760a7287e4e3743cb48fb62e",
+      "sunday\\app\\src\\main\\res\\values\\styles.xml": "f2cbaacc9d7b22fff31b6b0431a17fe7795b44c9f59de9d55d861d8c5af9d526",
+      "sunday\\app\\src\\main\\res\\xml\\network_security_config.xml": "9288c27ebe231a4cdb174ccf05ad9d7b98ce32df6c4e7a630ef3d7300f6a8ad4",
+      "sunday\\app\\src\\main\\res\\xml\\voice_interaction.xml": "3daa0c0e1edda4bf4252b01ba077ceaf30c1c0488b22f5dd9f48f8e108bd9358",
+      "sunday\\app\\src\\main\\java\\io\\dawnlight\\oscar\\sunday\\AssistantService.java": "6f99f16c2963ae8552bb14ca32074d98ad7d3767096ba3aaf63f8cc519a08855",
+      "sunday\\app\\src\\main\\java\\io\\dawnlight\\oscar\\sunday\\AssistantSessionService.java": "58a76ca17db93a637f5846705692c99c12c2e619c6903d7f4ef91461d648fda0",
+      "sunday\\app\\src\\main\\java\\io\\dawnlight\\oscar\\sunday\\CoreClient.java": "98259bd3416f3afcc355ccee1c6d8b8b5ad0ef07da4fd99f5a6311710c222111",
+      "sunday\\app\\src\\main\\java\\io\\dawnlight\\oscar\\sunday\\MainActivity.java": "d8d0794196ce76202b7b8525aa4befa7841906b2a6eb0fa29eb2b80bd15bf2ce",
+      "sunday\\app\\src\\main\\java\\io\\dawnlight\\oscar\\sunday\\MicrophoneService.java": "8f990df3af90d0838a63fbed4c20f02240910dbda198a79169f0daf8c45acbdc",
+      "sunday\\app\\src\\main\\java\\io\\dawnlight\\oscar\\sunday\\NativeVoice.java": "e462a0d61cd60401cba88fba428ab91afb9ba993efe58b7fc9020cbff4eb38b3",
+      "sunday\\app\\src\\main\\java\\io\\dawnlight\\oscar\\sunday\\NotificationBoundary.java": "6084c5ebbcd58433d9fbc58eb8e173debd4f353362ec622c299d89cf1dea2da5",
+      "sunday\\app\\src\\main\\java\\io\\dawnlight\\oscar\\sunday\\OwnerWire.java": "033a4fe9a147308ef989c3042cc07c438fc45defee4ba3bf6172e0bdc89bb1df",
+      "sunday\\app\\src\\main\\java\\io\\dawnlight\\oscar\\sunday\\SessionVault.java": "bf3b3ab67265afe64ac9cefeda4e65c7627a1974f2dfced95b572635d10e4cb2",
+      "sunday\\app\\src\\main\\java\\io\\dawnlight\\oscar\\sunday\\UnavailableRecognitionService.java": "eeffab452c8278e77e12de6c4ab1d9d8b3cbba71272c847bdbc78baefb481c38"
+    },
+    "signature": "VERIFIED_DEBUG_REFERENCE_ONLY",
+    "canonical_orb": "EXACT_SOURCE_BYTES",
+    "device_install": "NOT_RUN",
+    "owner_android_acceptance": "DEFERRED_BY_OWNER"
+  },
+  "jvm_reference": {
+    "evidence_class": "REFERENCE_JVM_CORE_LOOPBACK",
+    "signature": "VERIFIED_PSS_INTEROPERABILITY",
+    "task_state": "verified",
+    "value": "5",
+    "evidence_ids": [
+      "6d215415fa46454caeb68c67fff00587"
+    ],
+    "android_keystore": "NOT_RUN",
+    "owner_biometric_pin": "NOT_RUN",
+    "physical_android": "NOT_RUN"
+  },
+  "emulated_reference": {
+    "evidence_class": "EMULATED_SOFTWARE_ONLY",
+    "native_launch": "VERIFIED",
+    "core_connection": "VERIFIED_REFERENCE_CORE",
+    "text_to_core_planned_task": "VERIFIED",
+    "verified_task_value_readback": "5",
+    "encrypted_session_no_plaintext_in_preferences": true,
+    "restart_restore": "VERIFIED",
+    "portrait_landscape": "PORTRAIT_CAPTURED_LANDSCAPE_NOT_VERIFIED",
+    "biometric_pin": "NOT_RUN",
+    "assistant_role": "NOT_RUN",
+    "microphone_playback_aec_bluetooth": "NOT_RUN",
+    "notification_reply_delivery": "NOT_RUN",
+    "physical_owner_device": "DEFERRED_BY_OWNER",
+    "emulator_navigation_workaround": "temporary AVD three-button overlay; source image graphics assertion; no app or owner-device workaround"
+  },
+  "regressions": {
+    "local_full": "489 PASS; 7 optional/platform checks skipped",
+    "pinned_sunday_security": "6 PASS with cryptography 50.0.2",
+    "ruff_format_mypy_repository_links_secrets": "PASS"
+  },
+  "device_and_oem": "NOT_RUN",
+  "android_biometric_pin_keystore_signing": "NOT_RUN",
+  "audio_bluetooth_assistant_role_replies": "NOT_RUN",
+  "gate_c": "PARTIAL"
+}
