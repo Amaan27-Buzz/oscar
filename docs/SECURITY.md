@@ -482,3 +482,22 @@ watchdog and safety/reflex verification remain mandatory before Slice 17
 Unified Alpha can PASS. The hardware acceptance guide is preserved.
 The owner authorizes Slice 08 after Slice 07 integration; Slice 09/10, deployment
 and Galaxy Tab Home Node remain outside this work.
+
+## Post-alpha evolution direction
+
+Future Operating Logs are a distinct owner-controlled observability data class.
+They should prefer structured metadata about model/tool/plugin/capability/Worker
+calls, timing, routing, retries, failures and verification rather than raw content.
+
+Security/privacy rules:
+
+- do not log secrets or credentials;
+- conversation/capture data and operating telemetry use separate controls;
+- telemetry does not silently become training data;
+- promotion into training/evaluation data requires explicit owner authorization,
+  minimization/redaction, provenance and a removal/retention policy;
+- external model outputs may be used for training only when terms, licensing and
+  policy permit.
+
+See [Post-Alpha Evolution](POST-ALPHA-EVOLUTION.md).
+
