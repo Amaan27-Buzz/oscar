@@ -421,6 +421,25 @@ Sentry/cloud intelligence may coordinate or alert but never replaces those paths
 8. OSCAR's own TTS never becomes an external speaker identity.
 9. Local safety/reflex paths continue if cloud/model layers fail.
 
+## Current Slice 08 — owner scope, 2026-10-06
+
+Owner-authorized closure scope: **COMPLETE FOR SOFTWARE / REFERENCE VOICE FOUNDATION**.
+Physical status: `DEFERRED_BY_OWNER / CONSOLIDATED_GATE_C_ACCEPTANCE_REQUIRED`.
+This is not a physical PASS. Gate C remains **PARTIAL**.
+The quality candidate on `club-c/slice-08-voice`, PR #14 into `work`, has measured
+local reference evidence against baseline `e8ac8f8bca1cb0cb7909523ac6af906ee289366f`;
+integration requires green exact-head CI.
+Existing owner harnesses remain mandatory inputs to later consolidated acceptance.
+Microphone, real-room AEC/barge-in/self-wake, owner Match/Map calibration, playback,
+Android voice and naturalness remain NOT RUN. Windows reference evidence never
+implies Android acceptance. See [Voice Core](VOICE-CORE.md) and
+[consolidated Gate C acceptance](GATE-C-CONSOLIDATED-ACCEPTANCE.md).
+Slice 09 Sunday software may begin after clean Slice 08 integration; Slice 09 must
+remain a draft and stop before owner/device acceptance. Slice 10, deployment and
+Galaxy Tab Home Node are not authorized. Physical Edge remains
+`DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED`, mandatory before Slice 17 PASS.
+
+
 ## Post-alpha evolution direction
 
 ### Cross-platform voice rule
@@ -446,4 +465,3 @@ owner wants, not an exact celebrity impersonation. The future stack must be
 benchmarked across desktop, Android/Sunday and Home Node hardware.
 
 See [Post-Alpha Evolution](POST-ALPHA-EVOLUTION.md).
-

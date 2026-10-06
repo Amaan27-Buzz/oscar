@@ -270,3 +270,13 @@ Identity is shared; composition remains platform-native.
 5. Perception, retention and action authority stay independent.
 6. Platform-specific capabilities remain unverified until exercised on target hardware.
 7. Notification visibility never implies unrestricted source-app access.
+
+## Current Slice 08 — 2026-10-06
+
+Owner closure scope: **COMPLETE FOR SOFTWARE / REFERENCE VOICE FOUNDATION**.
+Physical status: `DEFERRED_BY_OWNER / CONSOLIDATED_GATE_C_ACCEPTANCE_REQUIRED`.
+Quality candidate is under validation in PR #14. Gate C remains PARTIAL.
+See [Voice Core](VOICE-CORE.md), [quality pass](VOICE-QUALITY.md) and
+[consolidated acceptance](GATE-C-CONSOLIDATED-ACCEPTANCE.md).
+Slice 09 software is authorized after Slice 08 integration; device acceptance is
+owner-deferred. Slice 10, deployment and Home Node remain out of scope.

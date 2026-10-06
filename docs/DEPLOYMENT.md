@@ -143,8 +143,9 @@ Return to real ESP32/Pico acceptance during Slice 15 physical/device expansion
 and/or Slice 16 reliability/security hardening. Physical failure, loss/recovery,
 watchdog and safety/reflex verification remain mandatory before Slice 17
 Unified Alpha can PASS. The hardware acceptance guide is preserved.
-The owner authorizes Slice 08 after Slice 07 integration; Slice 09/10, deployment
-and Galaxy Tab Home Node remain outside this work.
+The 2026-10-05 scope authorized Slice 08. The 2026-10-06 owner decision additionally
+authorizes Slice 09 software after Slice 08 integration; Slice 10, deployment and
+Galaxy Tab Home Node remain outside this work.
 
 ## Post-alpha evolution direction
 
@@ -166,4 +167,3 @@ This migration happens after measured stable-alpha use; it does not change curre
 Gate/Cloud deployment claims.
 
 See [Post-Alpha Evolution](POST-ALPHA-EVOLUTION.md).
-

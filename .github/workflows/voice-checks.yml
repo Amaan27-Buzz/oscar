@@ -1,0 +1,20 @@
+name: Voice reference contracts
+on:
+  pull_request:
+  push:
+    branches: [main, work]
+permissions:
+  contents: read
+jobs:
+  acoustic-reference:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install numpy==2.5.3
+      - name: Deterministic contracts and numeric playback reference
+        run: python -m unittest tests.test_voice -v
+      - name: Optional model/device distinction
+        run: python -m unittest tests.test_voice_models -v

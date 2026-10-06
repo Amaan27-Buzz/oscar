@@ -290,7 +290,7 @@ See [`docs/CLUB-A-CHECKPOINT.md`](docs/CLUB-A-CHECKPOINT.md), [`docs/CLUB-B-CHEC
 | 05 | Real machine Worker + remote continuation | ✅ COMPLETE, accepted local-alpha scope |
 | 06 | Memory Fabric + Personal Policy + live context | ✅ COMPLETE, accepted local-alpha scope |
 | 07 | OSCAR Edge + reflexes | COMPLETE FOR SOFTWARE / SIMULATED EDGE FOUNDATION; physical DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED |
-| 08 | Voice Core + Identity + Match/Map + Persona runtime | Planned |
+| 08 | Voice Core + Identity + Match/Map + Persona runtime | COMPLETE FOR SOFTWARE / REFERENCE VOICE FOUNDATION; physical acceptance owner-deferred |
 | 09 | Sunday + communication + Grid owner controls | Planned |
 | 10 | Desktop Interaction Runtime | Planned |
 | 11 | World Model + Perception + Sentry + Daily Journal | Planned |
@@ -360,8 +360,28 @@ Return to real ESP32/Pico acceptance during Slice 15 physical/device expansion
 and/or Slice 16 reliability/security hardening. Physical failure, loss/recovery,
 watchdog and safety/reflex verification remain mandatory before Slice 17
 Unified Alpha can PASS. The hardware acceptance guide is preserved.
-The owner authorizes Slice 08 after Slice 07 integration; Slice 09/10, deployment
-and Galaxy Tab Home Node remain outside this work.
+The 2026-10-05 scope authorized Slice 08. The 2026-10-06 owner decision additionally
+authorizes Slice 09 software after Slice 08 integration; Slice 10, deployment and
+Galaxy Tab Home Node remain outside this work.
+
+## Current Slice 08 — owner scope, 2026-10-06
+
+Owner-authorized closure scope: **COMPLETE FOR SOFTWARE / REFERENCE VOICE FOUNDATION**.
+Physical status: `DEFERRED_BY_OWNER / CONSOLIDATED_GATE_C_ACCEPTANCE_REQUIRED`.
+This is not a physical PASS. Gate C remains **PARTIAL**.
+The quality candidate on `club-c/slice-08-voice`, PR #14 into `work`, has measured
+local reference evidence against baseline `e8ac8f8bca1cb0cb7909523ac6af906ee289366f`;
+integration requires green exact-head CI.
+Existing owner harnesses remain mandatory inputs to later consolidated acceptance.
+Microphone, real-room AEC/barge-in/self-wake, owner Match/Map calibration, playback,
+Android voice and naturalness remain NOT RUN. Windows reference evidence never
+implies Android acceptance. See [Voice Core](docs/VOICE-CORE.md) and
+[consolidated Gate C acceptance](docs/GATE-C-CONSOLIDATED-ACCEPTANCE.md).
+Slice 09 Sunday software may begin after clean Slice 08 integration; Slice 09 must
+remain a draft and stop before owner/device acceptance. Slice 10, deployment and
+Galaxy Tab Home Node are not authorized. Physical Edge remains
+`DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED`, mandatory before Slice 17 PASS.
+
 
 ## Post-alpha evolution direction
 
@@ -384,4 +404,3 @@ The durable direction is:
 - Never silently turn private conversations or telemetry into training data.
 
 See [Post-Alpha Evolution](docs/POST-ALPHA-EVOLUTION.md).
-

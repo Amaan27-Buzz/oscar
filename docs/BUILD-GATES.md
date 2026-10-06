@@ -258,7 +258,7 @@ Required scenarios include provider/auth failure, coordinator/node/Edge loss, Gr
 |---|---|---|
 | Gate A — Brain | 01–04 | **PASS** |
 | Gate B — Can Do Work | 05–06 | **PASS for documented local-alpha acceptance** |
-| Gate C — Embodied OSCAR | 07–10 | PARTIAL; Slice 07 software accepted, physical deferred; 08 next, 09–10 unbuilt |
+| Gate C — Embodied OSCAR | 07–10 | PARTIAL; Slice 07 software accepted, physical deferred; 08 software/reference closure scope, physical voice deferred; 09 authorized after 08 integration, 10 unbuilt |
 | Gate D — JARVIS Layer | 11–14 | Planned |
 | Gate E — Unified Alpha | 15–17 | Planned |
 
@@ -294,7 +294,7 @@ The reported prior stale OSCAR fixture was not mutated; it does not invalidate t
 Gate C PARTIAL; Slice 07 closure/integration and Slice 08 authorized after frozen Gate B PASS. Edge host
 simulation and firmware compilation are separate evidence classes; neither
 grants physical PASS. Owner ESP32/Pico acceptance is mandatory: [exact hardware
-sequence](EDGE-HARDWARE-ACCEPTANCE.md). Slices 08–10 not started. See [checkpoint](CLUB-C-CHECKPOINT.md).
+sequence](EDGE-HARDWARE-ACCEPTANCE.md). Slice 08 software/reference closure has owner scope; physical voice acceptance is consolidated and deferred. Slice 09 software is authorized after Slice 08 integration; Slice 10 is not started. See [checkpoint](CLUB-C-CHECKPOINT.md).
 
 ## Owner scope decision — 2026-10-05
 
@@ -309,5 +309,24 @@ Return to real ESP32/Pico acceptance during Slice 15 physical/device expansion
 and/or Slice 16 reliability/security hardening. Physical failure, loss/recovery,
 watchdog and safety/reflex verification remain mandatory before Slice 17
 Unified Alpha can PASS. The hardware acceptance guide is preserved.
-The owner authorizes Slice 08 after Slice 07 integration; Slice 09/10, deployment
-and Galaxy Tab Home Node remain outside this work.
+The 2026-10-05 scope authorized Slice 08. The 2026-10-06 owner decision additionally
+authorizes Slice 09 software after Slice 08 integration; Slice 10, deployment and
+Galaxy Tab Home Node remain outside this work.
+
+## Current Slice 08 — owner scope, 2026-10-06
+
+Owner-authorized closure scope: **COMPLETE FOR SOFTWARE / REFERENCE VOICE FOUNDATION**.
+Physical status: `DEFERRED_BY_OWNER / CONSOLIDATED_GATE_C_ACCEPTANCE_REQUIRED`.
+This is not a physical PASS. Gate C remains **PARTIAL**.
+The quality candidate on `club-c/slice-08-voice`, PR #14 into `work`, has measured
+local reference evidence against baseline `e8ac8f8bca1cb0cb7909523ac6af906ee289366f`;
+integration requires green exact-head CI.
+Existing owner harnesses remain mandatory inputs to later consolidated acceptance.
+Microphone, real-room AEC/barge-in/self-wake, owner Match/Map calibration, playback,
+Android voice and naturalness remain NOT RUN. Windows reference evidence never
+implies Android acceptance. See [Voice Core](VOICE-CORE.md) and
+[consolidated Gate C acceptance](GATE-C-CONSOLIDATED-ACCEPTANCE.md).
+Slice 09 Sunday software may begin after clean Slice 08 integration; Slice 09 must
+remain a draft and stop before owner/device acceptance. Slice 10, deployment and
+Galaxy Tab Home Node are not authorized. Physical Edge remains
+`DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED`, mandatory before Slice 17 PASS.

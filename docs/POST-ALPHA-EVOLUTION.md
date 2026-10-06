@@ -245,3 +245,12 @@ onto the dedicated home-server laptop. Reduce cloud use to intentional escalatio
 This direction succeeds when OSCAR becomes more capable from measured real use
 while remaining one coherent intelligence, locally operable, portable across
 surfaces, evidence-backed and owner-controlled.
+
+## Current Slice 08 quality pass boundary — 2026-10-06
+
+The [local voice quality pass](VOICE-QUALITY.md) applies the current portability
+invariant and reuses Elocution's identity/delivery separation without importing a
+celebrity identity. This does not implement Operating Logs, specialist-model
+training or home-server migration. Those remain future after stable Unified Alpha.
+Physical voice acceptance is owner-deferred to the
+[consolidated Gate C run](GATE-C-CONSOLIDATED-ACCEPTANCE.md); Gate C remains PARTIAL.
