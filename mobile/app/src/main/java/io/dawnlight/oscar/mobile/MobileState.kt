@@ -112,11 +112,18 @@ fun parseSnapshot(json: JSONObject): CoreSnapshot {
     val parsedNodes = (0 until nodes.length()).map {
         val node = nodes.getJSONObject(it)
         val capabilities = node.getJSONArray("capabilities")
-        require(capabilities.length() <= 256 && node.get("paired") is Boolean)
+        require(capabilities.length() <= 256 && node.get("paired") is Boolean && node.get("protocol_version") == 1)
         val status = node.bounded("status", 32)
         require(status in setOf("online", "offline", "degraded"))
-        CoreNode(node.bounded("id", 80), node.bounded("role", 80).let { if (it == "Sunday") "OSCAR Mobile" else it }, status,
-            node.getBoolean("paired"), if (status == "offline") emptyList() else (0 until capabilities.length()).map { index -> capabilities.getJSONObject(index).bounded("kind", 80) })
+        val identifier = node.bounded("id", 80)
+        CoreNode(identifier, node.bounded("role", 80).let { if (it == "Sunday") "OSCAR Mobile" else it }, status,
+            node.getBoolean("paired"), if (status == "offline") emptyList() else (0 until capabilities.length()).map { index ->
+                val capability = capabilities.getJSONObject(index)
+                require(capability.bounded("node_id", 80) == identifier && capability.get("version") == 1)
+                capability.bounded("id", 128)
+                capability.bounded("input_kind", 128)
+                capability.bounded("name", 256)
+            })
     }
     require(parsedTasks.map { it.id }.distinct().size == parsedTasks.size && parsedNodes.map { it.id }.distinct().size == parsedNodes.size)
     val observed = json.get("observed_at_ms")

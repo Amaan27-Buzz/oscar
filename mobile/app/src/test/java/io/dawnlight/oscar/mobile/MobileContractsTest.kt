@@ -27,7 +27,7 @@ class MobileContractsTest {
         assertEquals("Needs approval", parseTask(task()).label)
         assertEquals("Completed · verified", parseTask(task("verified")).label)
         val snapshot = JSONObject().put("tasks", org.json.JSONArray(listOf(task(status = "offline")))).put("nodes", org.json.JSONArray(listOf(
-            JSONObject("""{"id":"desktop","role":"Desktop","status":"offline","paired":true,"capabilities":[{"kind":"addition"}]}"""))))
+            JSONObject("""{"id":"desktop","role":"Desktop","status":"offline","paired":true,"protocol_version":1,"capabilities":[{"input_kind":"addition"}]}"""))))
             .put("observed_at_ms", 1L)
         assertTrue(parseSnapshot(snapshot).nodes.first().capabilities.isEmpty())
     }
@@ -67,5 +67,15 @@ class MobileContractsTest {
         assertTrue(approval.acceptsPermit(permit))
         assertFalse(approval.acceptsPermit(permit.put("package", "another.source")))
         rejected { Approval.parse(json.put("target", "another.source")) }
+    }
+    @Test fun actualCoreSnapshotContractDecodesCapabilitiesAndEvidence() {
+        val text = javaClass.getResourceAsStream("/core_snapshot.json")!!.bufferedReader().use { it.readText() }
+        val snapshot = parseSnapshot(JSONObject(text))
+        assertTrue(snapshot.nodes.first().capabilities.contains("Integer addition"))
+        assertTrue(snapshot.nodes.any { it.role == "OSCAR Mobile" })
+        assertEquals("5", snapshot.tasks.first().value)
+        val wrong = JSONObject(text)
+        wrong.getJSONArray("nodes").getJSONObject(0).getJSONArray("capabilities").getJSONObject(0).put("node_id", "another-node")
+        rejected { parseSnapshot(wrong) }
     }
 }

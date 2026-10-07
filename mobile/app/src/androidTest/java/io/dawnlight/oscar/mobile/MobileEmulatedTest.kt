@@ -95,4 +95,19 @@ class MobileEmulatedTest {
         compose.onNodeWithText("Send").assertIsNotEnabled()
         compose.runOnIdle { SessionVault(compose.activity).forget() }
     }
+    @Test fun explicitLoopbackFixtureReadback() {
+        val arguments = androidx.test.platform.app.InstrumentationRegistry.getArguments()
+        val origin = arguments.getString("reference_fixture_url")
+        org.junit.Assume.assumeTrue("Opt-in disposable emulator/Core fixture only", origin != null)
+        require(origin!!.startsWith("http://127.0.0.1:"))
+        val stored = SessionVault(compose.activity).load()
+        assertNotNull("Pair the disposable reference session through the app first", stored)
+        assertEquals(origin, stored.getString("url"))
+        assertEquals("reference-mobile-software", stored.getString("node_id"))
+        assertEquals(arguments.getString("reference_session_id"), stored.getString("session_id"))
+        assertEquals(arguments.getString("reference_token_digest"), NotificationBoundary.hash(stored.getString("token")))
+        val snapshot = parseSnapshot(CoreClient(stored).call("snapshot", org.json.JSONObject()))
+        assertTrue(snapshot.nodes.any { it.role == "OSCAR Mobile" })
+        assertTrue(snapshot.tasks.any { it.state == "verified" && it.value == "5" })
+    }
 }

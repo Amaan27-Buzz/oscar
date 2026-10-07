@@ -55,7 +55,8 @@ class CoreSession(application: Application) : AndroidViewModel(application) {
             val snapshot = parseSnapshot(call("snapshot", JSONObject()))
             if (!active) return
             val old = mutable.value
-            val next = old.fenced(old.copy(link = Link.CONNECTED, snapshot = snapshot), epoch)
+            val next = old.fenced(old.copy(link = Link.CONNECTED, snapshot = snapshot,
+                message = if (old.link == Link.CONNECTED) old.message else null), epoch)
             if (next == old) return
             mutable.value = next
             alerts.changed(old.snapshot, snapshot)
