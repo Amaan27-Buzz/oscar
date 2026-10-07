@@ -125,7 +125,8 @@ def run_surface(
         try:
             stdout, stderr = process.communicate(
                 # Hosted cold WPF/CNG startup measured 28s; keep reference startup bounded.
-                json.dumps(bootstrap) + "\n", timeout=60 if self_check else None
+                json.dumps(bootstrap) + "\n",
+                timeout=60 if self_check else None,
             )
         except subprocess.TimeoutExpired:
             process.terminate()
