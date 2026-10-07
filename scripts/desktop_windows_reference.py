@@ -9,6 +9,9 @@ import os
 import subprocess
 import tempfile
 from pathlib import Path
+from queue import Queue
+from threading import Thread
+from time import monotonic, sleep
 from typing import Any
 
 from oscar.desktop import Desktop
@@ -20,7 +23,7 @@ from oscar.interactive_worker import InteractiveWorker
 from oscar.machine import MachineScope
 from oscar.policy import PersonalPolicy
 from oscar.transport import Dispatcher
-from oscar.windows_desktop import InstalledApp
+from oscar.windows_desktop import InstalledApp, WindowsDesktop
 
 FIXTURE = r"""
 param([string]$StopFile)
@@ -39,6 +42,19 @@ $timer=[Windows.Threading.DispatcherTimer]::new();$timer.Interval=[TimeSpan]::Fr
 $timer.Add_Tick({if (Test-Path -LiteralPath $StopFile) {$w.Close()}});$timer.Start()
 $w.ShowDialog()|Out-Null;$timer.Stop()
 """
+
+
+def fixture_tree(desktop: WindowsDesktop, identity: dict[str, Any]) -> Any:
+    """Wait for cold accessibility startup before any action. Only read operations retry."""
+    deadline = monotonic() + 60
+    while monotonic() < deadline:
+        try:
+            return desktop.observe(
+                {"operation": "tree", **identity}, timeout=min(15, deadline - monotonic())
+            )
+        except (OSError, subprocess.SubprocessError):
+            sleep(0.1)
+    raise RuntimeError("reference accessibility unavailable before action; nothing applied")
 
 
 def main() -> int:
@@ -71,10 +87,11 @@ def main() -> int:
         try:
             assert process.stdout
             # The fixture has no secrets/content in its readiness line.
-            from concurrent.futures import ThreadPoolExecutor
-
-            with ThreadPoolExecutor(max_workers=1) as pool:
-                identity = json.loads(pool.submit(process.stdout.readline).result(timeout=20))
+            readiness: Queue[str] = Queue(maxsize=1)
+            stream = process.stdout
+            reader = Thread(target=lambda: readiness.put(stream.readline()), daemon=True)
+            reader.start()
+            identity = json.loads(readiness.get(timeout=20))
             with Harness(
                 temporary / "core.db",
                 temporary / "workspace",
@@ -163,7 +180,8 @@ def main() -> int:
                         {"version": 1, "operation": op, "request_id": new_id(), "payload": payload},
                     )
 
-                tree = worker.desktop.observe({"operation": "tree", **identity})
+                tree = fixture_tree(worker.desktop, identity)
+                harness.grid.heartbeat(worker_session)
                 field = next(row for row in tree if row["automation_id"] == "oscar-fixture-text")
                 captured = call(
                     "capture",

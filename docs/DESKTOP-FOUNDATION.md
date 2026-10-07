@@ -207,6 +207,9 @@ registered WPF field capture, signed Dictate application through InteractiveWork
 independent UIA readback, 8192-character Unicode pipes, stale-write rejection and
 database content absence. They never operate the owner's applications/clipboard
 or open a microphone. The render is visually inspected separately from those APIs.
+Hosted cold-start preparation has a bounded 60-second reference deadline and may
+retry read-only fixture discovery before any action. Individual observer calls
+remain bounded to 15 seconds; mutation retries are never used to obtain a PASS.
 
 See [reference evidence](evidence/desktop-reference-2026-10-07.json).
 Exact-head CI is authoritative in the draft PR's checks and includes the new

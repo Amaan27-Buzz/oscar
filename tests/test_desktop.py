@@ -218,6 +218,14 @@ class DesktopTests(unittest.TestCase):
 
         with patch.object(Observer, "observe", side_effect=subprocess.TimeoutExpired("fixture", 1)):
             self.assertIsNone(compare_text(Observer(), {"operation": "read"}, "expected"))
+        from scripts.desktop_windows_reference import fixture_tree
+
+        with patch.object(
+            Observer, "observe", side_effect=[subprocess.TimeoutExpired("fixture", 1), []]
+        ) as read:
+            self.assertEqual(fixture_tree(Observer(), {"handle": 1, "pid": 2}), [])
+            self.assertEqual(read.call_count, 2)
+            self.assertTrue(all(c.args[0]["operation"] == "tree" for c in read.call_args_list))
 
     def test_selection_unavailable_and_core_context_unavailable(self) -> None:
         view = self.call("capture", {"source": "selection"})
