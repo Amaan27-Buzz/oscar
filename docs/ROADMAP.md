@@ -339,9 +339,26 @@ Deliverables:
 
 Deliverables include wake/VAD/STT, barge-in/echo cancellation, stable VoiceProfile, speaking modes/fallback, Voice Match, Voice Map, self-voice suppression, multi-device arbitration and Persona runtime/context triggers.
 
-## Slice 09 — OSCAR Mobile + communication + Connection Grid owner controls ◻️
+## Slice 09 — OSCAR Mobile + communication + Connection Grid owner controls ✅/🚧
 
-Native Android embodiment including assistant role where supported, OSCAR Orb overlay, attention-aware retreat, widgets, notification listener, legitimate notification replies, voice/text continuity, biometric/PIN approvals, Grid owner controls, remote task supervision, initial communication actions and Samsung/OEM real-device acceptance.
+Software/runtime foundation accepted and merged in PR #15. OSCAR Mobile now has the Kotlin/Compose app structure, scoped Grid/session security, owner approvals, notification boundaries, assistant-service integration, Android audio adapters, Orb state hooks, task supervision and truthful degraded states.
+
+Physical Android owner/device acceptance remains deferred as part of consolidated Gate C: real enrollment, biometric/PIN, assistant selection, notification reply delivery, microphone/playback, Bluetooth, room AEC/barge-in/self-wake, Voice Match/Map and naturalness are not yet physically verified.
+
+### Slice 09R — OSCAR Mobile UI redesign track ◻️
+
+The functional app may continue into later slices while the mobile visual/interaction system is redesigned section by section. 09R is **non-blocking for Slices 10–16 but required before Slice 17 Unified Alpha PASS**.
+
+- **09R.1 — Presence / Home + Orb**
+- **09R.2 — Interaction**
+- **09R.3 — Activity + Approvals**
+- **09R.4 — Devices / Connection Grid**
+- **09R.5 — Voice**
+- **09R.6 — Privacy + Permissions**
+- **09R.7 — Settings + System Surfaces**
+- **09R.8 — Motion, Accessibility + Final Mobile Polish**
+
+See [OSCAR Mobile UI Redesign Track](MOBILE-UI-REDESIGN.md).
 
 ## Slice 10 — Desktop Interaction Runtime ◻️
 
@@ -396,7 +413,7 @@ perception / communication
 | A — Brain | 01–04 | Core + Controller + Transport/Grid foundation + adaptive Model Router | **PASS** |
 | B — Can Do Work | 05–06 | Real machine/continuation + Memory Fabric + policy/live context | **PASS for documented local-alpha scope** |
 | C — Embodied Core | 07–08 | Edge/reflexes + Voice/Identity/Persona | PARTIAL; Slice 07 software accepted, physical deferred |
-| D1 — OSCAR Mobile | 09 | Android embodiment + communication + owner controls | Planned |
+| D1 — OSCAR Mobile | 09 + 09R | Android embodiment + communication + owner controls + redesign | Software foundation accepted; physical + 09R pending |
 | D2 — Desktop | 10 | Desktop interaction runtime | Planned |
 | E1 — Awareness | 11–13 | World Model/Sentry + commissioning + presence | Planned |
 | E2 — Executive | 14 | Chief-of-Staff planner + Workers + learning | Planned |
@@ -406,11 +423,15 @@ Manual integration checkpoints remain in [BUILD-GATES.md](BUILD-GATES.md).
 
 ## Current next step
 
-Mandatory acceptance is complete: owner physical machine and GitHub OAuth/private
-federation runs passed. PR 12 merged at `97c0622507df3f724ecf0c8b74aa7f4ae7784b08`; Gate B frozen PASS.
-PR #13 is merged; main/work share `9e443cac61281d7d890724b9ef593c0d58d145f3`.
-Current authorized work is Slice 08 on `club-c/slice-08-voice`, draft PR #14,
-software/reference closure scope with physical acceptance owner-deferred. Slice 09 software is authorized after 08 integration; Slice 10 remains unbuilt.
+Slices 07–09 now have their accepted software/reference foundations. PR #15 merged
+OSCAR Mobile into `work`; physical Edge, Voice and Android acceptance remain explicitly
+owner-deferred, so Gate C is still PARTIAL.
+
+Current next backend/runtime work is **Slice 10 — Desktop Interaction Runtime**.
+The parallel **09R OSCAR Mobile UI redesign track** may proceed section by section
+without blocking Slices 10–16, but it must be integrated before Slice 17 Unified Alpha PASS.
+Post-alpha Operating Logs, Elocution-derived voice evolution, specialist models and
+home-server migration remain out of scope until after stable Unified Alpha.
 
 The original ordered acceptance sequence below remains a contract, not a list of unimplemented items:
 
