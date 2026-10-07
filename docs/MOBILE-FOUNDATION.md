@@ -175,3 +175,29 @@ InputManager compatibility fix; it is test infrastructure only.
 
 Operating Logs, Elocution/model research, specialist/Singularity training and
 home-server migration remain post-alpha only. Slice 10 is not started.
+
+## Owner-review candidate evidence — 2026-10-07
+
+**SOFTWARE OWNER-REVIEW CANDIDATE / OWNER_DEVICE_ACCEPTANCE_NOT_RUN**.
+PR #15 remains draft and unmerged; main/work remain the accepted Slice 08 baseline.
+[Source-bound evidence](evidence/mobile-rebuild-reference-2026-10-07.json) records:
+
+- 497 Python regressions PASS, nine optional/platform checks skipped; 13 Mobile
+  Core/security cases include existing Router reasoning, concurrent cancellation,
+  legacy policy constraints, replay, crash admission and scoped target execution.
+- Eight JVM checks PASS, including actual Core snapshot decoding; APK/test-APK,
+  Android lint (zero errors), packaged SVG bytes/native-render digests PASS.
+- Six software cases PASS on isolated API 35, plus one explicitly configured live
+  loopback/Core readback case PASS. The opt-in case is skipped without its disposable
+  fixture. Native Keystore AES-GCM storage is EMULATED, not owner signing acceptance.
+- Actual app pairing, Core task submission, scoped approval details, process restart
+  and encrypted session/task restore PASS in the disposable emulator. Task 4 + 5
+  remained planned; no biometric/PIN confirmation or phone-side execution is claimed.
+- Canonical Orb visibly renders through native Compose; the renderer/export tool
+  preserves the original SVG geometry, gradients and shadow.
+- API 36.1 testing was interrupted by the installed image's native task-snapshot
+  crash (`hasReadColorBufferDma`); five cases completed before abort. This remains
+  INCOMPLETE_PLATFORM_FAILURE, not API 36.1 or real-device PASS.
+
+Exact final-head checks are authoritative in [PR #15](https://github.com/amaansyed27/oscar/pull/15).
+Emulator/software/reference results never satisfy the deferred physical owner gate.

@@ -1,0 +1,134 @@
+{
+  "date": "2026-10-07",
+  "evidence_classes": [
+    "REFERENCE",
+    "EMULATED",
+    "SIMULATED_MODEL_RESPONSE"
+  ],
+  "accepted_baseline": "92a11aa05083f1983186976ba64bd30aa9f1f2a0",
+  "initial_pr15_head": "305f730ed6bd559271be3b0a2d56cf0a6f49d563",
+  "validated_runtime_head": "b3ef026f99badfd720663d736cc8caafc951c4c8",
+  "application": {
+    "label": "OSCAR",
+    "project": "mobile",
+    "module": ":app",
+    "package": "io.dawnlight.oscar.mobile",
+    "compile_target_sdk": 36,
+    "minimum_api": 30
+  },
+  "build": {
+    "evidence_class": "REFERENCE",
+    "apk_sha256": "aa33227717c53ac99853fb7e5e4e3c71e177495db79a18a1f60ef3d7c16525b8",
+    "orb_sha256": "728aeac3c9aa590b67d45c469735e919ede93a8503964e24f0f4af18cda066c5",
+    "native_orb_render_sha256": "ff39a1c8abe1b2e46849cadb58ff93d6fa41d8344eea7e496f659d984c813ea1",
+    "package": "io.dawnlight.oscar.mobile",
+    "build": "Kotlin/Compose Gradle debug reference, not production signing",
+    "owner_device_acceptance": "OWNER_DEVICE_ACCEPTANCE_NOT_RUN"
+  },
+  "jvm_tests": [
+    {
+      "name": "io.dawnlight.oscar.mobile.CoreTransportTest",
+      "tests": 1,
+      "failures": 0
+    },
+    {
+      "name": "io.dawnlight.oscar.mobile.MobileContractsTest",
+      "tests": 7,
+      "failures": 0
+    }
+  ],
+  "python_regressions": {
+    "tests": 497,
+    "skipped": 9,
+    "result": "PASS"
+  },
+  "core_boundary": {
+    "tests": 13,
+    "result": "PASS",
+    "model_route": "Existing Controller/Router/Runtime with simulated provider; response REPORTED, not verified model inference"
+  },
+  "emulated": {
+    "api": 35,
+    "emulator": "36.5.11",
+    "tests": 6,
+    "result": "PASS",
+    "optional_live_fixture": {
+      "tests": 1,
+      "result": "PASS"
+    },
+    "paired_core_readback": "PASS",
+    "actual_core_task_submission": "PASS_PLANNED_NOT_EXECUTED",
+    "approval_details": "PASS_RENDERED_NO_BIOMETRIC_CONFIRMATION",
+    "process_restart_encrypted_session_and_task_restore": "PASS",
+    "orb_visible": "PASS_CANONICAL_NATIVE_RENDER"
+  },
+  "api36_1_attempt": {
+    "result": "INCOMPLETE_PLATFORM_FAILURE",
+    "observed": "Five cases passed before task snapshot service native crash",
+    "diagnostic": "system_server TaskSnapshotPer: !rcEnc->featureInfo()->hasReadColorBufferDma",
+    "not_promoted_to_pass": true
+  },
+  "physical_status": "OWNER_DEVICE_ACCEPTANCE_NOT_RUN",
+  "gate_c": "PARTIAL",
+  "pr15": "DRAFT_NOT_MERGED",
+  "not_run": [
+    "owner phone enrollment",
+    "real biometric/PIN",
+    "assistant role selection/invocation",
+    "real notification access/reply/delivery",
+    "physical microphone/playback",
+    "Bluetooth/headset",
+    "real room AEC/barge-in/self-wake",
+    "Voice Match/Map calibration",
+    "owner naturalness"
+  ],
+  "not_started": [
+    "Slice 10",
+    "Elocution inspection or integration",
+    "Operating Logs",
+    "specialist/Singularity model training",
+    "home-server migration"
+  ],
+  "source_sha256": {
+    "mobile/app/build.gradle.kts": "179e41542fca85b0f394021a0f8d4f3b5b94a24f5231c5a81fd074705a4d275f",
+    "mobile/app/src/androidTest/java/io/dawnlight/oscar/mobile/MobileEmulatedTest.kt": "613e4554038ef742bae27e59c8f8af8d7ed7498407f49048dc0ef7c4798d2177",
+    "mobile/app/src/debug/res/xml/network_security_config.xml": "0e579d59c71bd5ea251e23036f21f693a81ab905564e80b318e11f0d3703e202",
+    "mobile/app/src/main/AndroidManifest.xml": "7befcc097929aaeb6696433e25f0f58d065784c13bdca32b6e7102b18d4bbc1d",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/AssistantService.java": "7239d1562c8a2468c9490589f473013ea1fa2acf238cff08afd553b9d27e7530",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/AssistantSessionService.java": "6fdcf5190b8a1b94cd3636f0418bcc49b48eaf99fbcafef7ec5bd90506b7019b",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/CoreClient.java": "345ddf8cf89ac1fe044f6386ceddf68aa6b1dd86644a1724edd3c6e345d6102a",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/CoreSession.kt": "2546713e0ca29242e783b9a815ab8f068f6260ffd0d9dce5cf33b5d24f5241e7",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/InteractionScreens.kt": "35d3ac29b212355096fa11f30df1fc08fb18819844ce05bec5a319e15ae29470",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/MainActivity.kt": "7fdad761cd21ac9345e4618b81f8baffda238e5ff5f117dddf7d10d770fbf7a3",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/MicrophoneService.java": "400ec302b4bb56bba43a2e6b0f9a6ddf7334e4750d5f35418e8d6bbdfdde4702",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/MobileState.kt": "c18fbbcc9b8c88a89e0a54d97b78d404ce7cd6d4ffecb1176974011e9040541d",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/NativeVoice.java": "17ad70dacafd91b8c5fee9c44c3a4f24ec87e5fabc4996df89f180b7f0787861",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/NotificationBoundary.java": "0add337563b754d395a13c6c3abd354216ed890508862e52ef28d1400eb88907",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/OscarApp.kt": "89c6f9e8554974022b8dd9ff286d29763c0f08ed8143bf3fccf122a28b2d1768",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/OwnerConfirmation.kt": "2664b01a2a28bc648dd29252bab4339452c044aa8f3cca43a9023c4eab9dde2a",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/OwnerWire.java": "77fceb9d187d3786ee49e0f20e9cb0168e942245327169eccbd078b84fb023c7",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/SessionVault.java": "9d8d29b4fe145cdc44bb231a177064f01d4c6432574d1b44b9ac7406db606c0c",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/SettingsScreen.kt": "618abcc1dcdf9dcaf938b0b3095f012c4ed4066ed80aa8cf488771c35cb1f842",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/TaskNotifications.kt": "caa31526ad702a181031e185c4825e4bb653d4a86ea37aea512ee4cdbb91ce00",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/UnavailableRecognitionService.java": "183026298c9fa59d84f4c6ef95007cdd772373ac1f533eb5d5003a9e246330d5",
+    "mobile/app/src/main/res/drawable-nodpi/oscar_orb.png": "ff39a1c8abe1b2e46849cadb58ff93d6fa41d8344eea7e496f659d984c813ea1",
+    "mobile/app/src/main/res/values/styles.xml": "f217fcf597db3954e7467cf504d7c5d0141b928a48e3926290472c434c144f6d",
+    "mobile/app/src/main/res/xml/network_security_config.xml": "4fdabf200428330cb5858de3454c6b01907e64533e8547a07b3380ca31b8b631",
+    "mobile/app/src/main/res/xml/voice_interaction.xml": "c7a7ef2a8cf2662f83c3bf069fe6e7811606a90600e80d73bbdfad3988148054",
+    "mobile/app/src/test/java/io/dawnlight/oscar/mobile/CoreTransportTest.kt": "5055cc9e661f70dcffae5417f4803e36ea571664bc2bd7caddf654f6176021bc",
+    "mobile/app/src/test/java/io/dawnlight/oscar/mobile/MobileContractsTest.kt": "3f74d8c9fe54efbfcde4342f294c46c979bf78d2451c214dddab900f11451856",
+    "mobile/app/src/test/resources/core_snapshot.json": "7ff8eded4acb5d856be1067bbfa887512f7cfccc9feafe5e11210d89b2ac7d7b",
+    "mobile/build.gradle.kts": "ee8c97cbe30706b7596dc5f91347c98b55466b8f5877cc7dd847774d52d1696f",
+    "mobile/gradle/wrapper/gradle-wrapper.jar": "81a82aaea5abcc8ff68b3dfcb58b3c3c429378efd98e7433460610fecd7ae45f",
+    "mobile/gradle/wrapper/gradle-wrapper.properties": "fbbc719f4d201f4bb8516470ea125b96904ec69b41561db1a0336737daa4a3df",
+    "mobile/gradle.properties": "7b3397d27c5798d55f08f46a3e6a93f5f6f09ed9d6a60aa7902c65f881a5a48e",
+    "mobile/gradlew": "734b3879d3501dce471cf0522d3bcbafe76873d9fc5129345b67fb43bd15e933",
+    "mobile/gradlew.bat": "57931b17dd228e5c24dac90e815d0bf82477e831a4618dfab4136f5446b42a9f",
+    "mobile/orb-render.json": "bc914b631569a2216277b73357249e1d356da4cb25f638477ff19a7e092a2ee0",
+    "mobile/settings.gradle.kts": "8dc4834b021a3ebdeee8e007af30498aa2b484368d2852ee3d2b4f778c64925f",
+    "oscar/grid.py": "544243b685397e57e3329ddd4326714cb9a314dc1d28502d0ecf5eff53786d72",
+    "oscar/mobile.py": "132f2a407394e62201d12f32fd3b4e4f493c98df80d5dab5d5c1faa7050ea88d",
+    "scripts/build_mobile.py": "4ef3705c42d836fd3bf57006d303dc20446d4d33240a4db23d79572fb5cb4f61",
+    "scripts/mobile_reference.py": "5d6eaddc2871d3a57b0ca66d391111038791e4647311c5722c08194d9c7e122d"
+  }
+}

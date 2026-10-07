@@ -121,3 +121,15 @@ See [OSCAR Mobile foundation](MOBILE-FOUNDATION.md) for implementation, limits a
 Slice 09 must not merge in this run. Gate C remains PARTIAL. Slice 10, deployment
 and Home Node are not started. Post-alpha Operating Logs, specialist-model training
 and home-server migration remain documented future work, not implemented.
+
+## OSCAR Mobile owner-review candidate — 2026-10-07
+
+Slice 09 is **SOFTWARE OWNER-REVIEW CANDIDATE / OWNER_DEVICE_ACCEPTANCE_NOT_RUN**,
+not merged. Native Kotlin/Compose application, scoped Core text/task/approval flow,
+encrypted session restore and canonical Orb are source-bound in
+[the rebuilt Mobile evidence](evidence/mobile-rebuild-reference-2026-10-07.json).
+497 Python regressions, eight JVM checks and six isolated API 35 software cases
+passed; a separate live loopback readback case passed. Android 36.1 emulator
+snapshot failure remains incomplete platform evidence. Real phone, biometric,
+assistant, notifications/replies and audio/voice/OEM acceptance remain deferred.
+Gate C remains PARTIAL; Slice 10 and post-alpha model/server work are not started.
