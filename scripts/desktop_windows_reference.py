@@ -91,7 +91,8 @@ def main() -> int:
             stream = process.stdout
             reader = Thread(target=lambda: readiness.put(stream.readline()), daemon=True)
             reader.start()
-            identity = json.loads(readiness.get(timeout=20))
+            # Use the same measured cold WPF startup budget as the native render reference.
+            identity = json.loads(readiness.get(timeout=60))
             with Harness(
                 temporary / "core.db",
                 temporary / "workspace",
