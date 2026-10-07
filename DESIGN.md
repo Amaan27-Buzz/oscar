@@ -164,7 +164,7 @@ Every surface gets **one dominant idea**.
 
 Examples:
 
-- Sunday Home → OSCAR presence + whether anything needs attention.
+- OSCAR Mobile Home → OSCAR presence + whether anything needs attention.
 - Listening → an active conversational turn.
 - Sentry → current awareness + the one thing worth surfacing.
 - Worker detail → responsibility + current meaningful state.
@@ -299,7 +299,7 @@ Fluid does not mean heavy.
 
 Shared identity does not mean identical layouts.
 
-### Sunday / mobile
+### OSCAR Mobile / mobile
 
 - feels native and thumb-aware;
 - voice/text are peers, not mutually exclusive modes;

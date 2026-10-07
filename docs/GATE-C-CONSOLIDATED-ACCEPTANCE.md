@@ -14,7 +14,7 @@ repeated isolated device interruptions during software foundation work.
    own-output/self-wake suppression; test headset/speaker and quiet double-talk.
 4. Owner Voice Match enrollment/negative/uncertain cases and separately permitted
    Voice Map linkage/unknown/change/multiple-speaker behavior; no authority from Map.
-5. Sunday/Android microphone, playback, background/lifecycle/permission revocation,
+5. OSCAR Mobile/Android microphone, playback, background/lifecycle/permission revocation,
    audio focus, Bluetooth/headset routing and supported native AEC on target OEM.
 6. Grid handoff/arbitration, stale/lost node/lease expiry/reconnect, remote task
    inspect/approve/cancel, Android biometric/PIN boundary and degraded/offline UI.
@@ -41,3 +41,12 @@ must be repaired or explicitly rescoped by the owner; no fabricated PASS.
 
 Operating Logs, specialist training and home-server migration remain future
 [post-alpha work](POST-ALPHA-EVOLUTION.md), not part of this acceptance deferral.
+
+## OSCAR Mobile rebuilt application acceptance
+
+The active app is OSCAR, package io.dawnlight.oscar.mobile. Historical Sunday
+evidence is preserved; its UI is retired. Use the prepared
+[Mobile owner checklist](MOBILE-OWNER-ACCEPTANCE.md) during the consolidated owner
+run. Pairing, biometrics/PIN, Android permission interactions, assistant selection,
+notification replies, physical audio/Bluetooth/AEC and Match/Map remain
+OWNER_DEVICE_ACCEPTANCE_NOT_RUN. Emulator/software tests never promote Gate C PASS.

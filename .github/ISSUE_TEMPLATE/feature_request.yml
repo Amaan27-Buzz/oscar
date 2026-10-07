@@ -8,7 +8,7 @@ body:
     attributes:
       label: User goal
       description: What should the user be able to accomplish?
-      placeholder: "e.g. Continue a task from Sunday on the desktop without restating context"
+      placeholder: "e.g. Continue a task from OSCAR Mobile on the desktop without restating context"
     validations:
       required: true
   - type: textarea

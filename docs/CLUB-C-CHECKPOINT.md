@@ -37,7 +37,7 @@ Original Slice 07 scope (physical verification is rescheduled by owner below):
 Out of scope for this slice:
 
 - Slice 08 voice/Voice Identity/Match/Map/Persona runtime;
-- Slice 09 Sunday/Android/communication owner controls;
+- Slice 09 OSCAR Mobile/Android/communication owner controls;
 - Slice 10 polished Desktop Interaction Runtime;
 - Oracle/Vercel deployment;
 - Galaxy Tab Home Node implementation;
@@ -90,20 +90,46 @@ The 2026-10-05 scope authorized Slice 08. The 2026-10-06 owner decision addition
 authorizes Slice 09 software after Slice 08 integration; Slice 10, deployment and
 Galaxy Tab Home Node remain outside this work.
 
-## Current Slice 08 — owner scope, 2026-10-06
+## Slice 08 owner closure scope — 2026-10-06
 
 Owner-authorized closure scope: **COMPLETE FOR SOFTWARE / REFERENCE VOICE FOUNDATION**.
 Physical status: `DEFERRED_BY_OWNER / CONSOLIDATED_GATE_C_ACCEPTANCE_REQUIRED`.
 This is not a physical PASS. Gate C remains **PARTIAL**.
-The quality candidate on `club-c/slice-08-voice`, PR #14 into `work`, has measured
-local reference evidence against baseline `e8ac8f8bca1cb0cb7909523ac6af906ee289366f`;
-integration requires green exact-head CI.
+Slice 08 PR #14 integrated after green exact-head CI. Accepted main/work:
+`92a11aa05083f1983186976ba64bd30aa9f1f2a0`. Historical reference research baseline:
+`e8ac8f8bca1cb0cb7909523ac6af906ee289366f`.
 Existing owner harnesses remain mandatory inputs to later consolidated acceptance.
 Microphone, real-room AEC/barge-in/self-wake, owner Match/Map calibration, playback,
 Android voice and naturalness remain NOT RUN. Windows reference evidence never
 implies Android acceptance. See [Voice Core](VOICE-CORE.md) and
 [consolidated Gate C acceptance](GATE-C-CONSOLIDATED-ACCEPTANCE.md).
-Slice 09 Sunday software may begin after clean Slice 08 integration; Slice 09 must
+Slice 09 OSCAR Mobile software may begin after clean Slice 08 integration; Slice 09 must
 remain a draft and stop before owner/device acceptance. Slice 10, deployment and
 Galaxy Tab Home Node are not authorized. Physical Edge remains
 `DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED`, mandatory before Slice 17 PASS.
+
+## Current Slice 09 — 2026-10-06
+
+Slice 08 PR #14 merged; accepted main/work baseline
+`92a11aa05083f1983186976ba64bd30aa9f1f2a0`. Slice 08 is
+**COMPLETE FOR SOFTWARE / REFERENCE VOICE FOUNDATION**; physical voice is
+`DEFERRED_BY_OWNER / CONSOLIDATED_GATE_C_ACCEPTANCE_REQUIRED`, never physical PASS.
+OSCAR Mobile Kotlin/Compose rebuild is on `club-c/slice-09-sunday`, draft PR #15
+into `work`, **PARTIAL / OWNER_DEVICE_ACCEPTANCE_NOT_RUN**. Core/loopback,
+Gradle/JVM/emulated evidence is separate from actual phone/OEM acceptance.
+See [OSCAR Mobile foundation](MOBILE-FOUNDATION.md) for implementation, limits and the next owner boundary.
+Slice 09 must not merge in this run. Gate C remains PARTIAL. Slice 10, deployment
+and Home Node are not started. Post-alpha Operating Logs, specialist-model training
+and home-server migration remain documented future work, not implemented.
+
+## OSCAR Mobile owner-review candidate — 2026-10-07
+
+Slice 09 is **SOFTWARE OWNER-REVIEW CANDIDATE / OWNER_DEVICE_ACCEPTANCE_NOT_RUN**,
+not merged. Native Kotlin/Compose application, scoped Core text/task/approval flow,
+encrypted session restore and canonical Orb are source-bound in
+[the rebuilt Mobile evidence](evidence/mobile-rebuild-reference-2026-10-07.json).
+497 Python regressions, eight JVM checks and six isolated API 35 software cases
+passed; a separate live loopback readback case passed. Android 36.1 emulator
+snapshot failure remains incomplete platform evidence. Real phone, biometric,
+assistant, notifications/replies and audio/voice/OEM acceptance remain deferred.
+Gate C remains PARTIAL; Slice 10 and post-alpha model/server work are not started.

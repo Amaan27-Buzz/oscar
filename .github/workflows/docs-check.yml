@@ -53,7 +53,7 @@ jobs:
             docs/WORKERS.md
             docs/ORCHESTRATION.md
             docs/SURFACES.md
-            docs/SUNDAY-DESIGN.md
+            docs/MOBILE-DESIGN.md
             docs/VOICE-SENTRY.md
             docs/ONBOARDING.md
             docs/UI-AVATAR.md
@@ -61,7 +61,7 @@ jobs:
             docs/SECURITY.md
             image-prompts/README.md
             image-prompts/web.md
-            image-prompts/sunday-mobile.md
+            image-prompts/oscar-mobile.md
             image-prompts/desktop.md
             image-prompts/system-surfaces.md
             assets/brand/oscar-logo.png

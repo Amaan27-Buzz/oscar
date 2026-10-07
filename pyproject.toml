@@ -17,6 +17,8 @@ memory-reference = ["sentence-transformers==6.1.0"]
 voice = ["sherpa-onnx==1.13.8", "sounddevice==0.5.6", "numpy==2.5.3",
          "faster-whisper==1.2.1", "sentencepiece==0.2.1"]
 voice-kokoro = ["kokoro-onnx==0.6.1"]
+sunday = ["cryptography==50.0.2"]
+mobile = ["cryptography==50.0.2"]
 voice-benchmark = ["psutil==7.2.2"]
 voice-piper = ["piper-tts==1.8.0"]
 

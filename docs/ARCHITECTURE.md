@@ -17,7 +17,7 @@ managed memory systems  → optional adapters only
 ```text
                          User
                           │
-                       Sunday
+                       OSCAR Mobile
               owner control / approvals
                           │
           ┌───────────────┼────────────────┐
@@ -64,7 +64,7 @@ historical evidence    current authority     native Model Router
                                       │
                                       ▼
                                Connection Grid
-                         Sunday • Cloud • Desktop • Edge
+                         OSCAR Mobile • Cloud • Desktop • Edge
                                       │
                                       ▼
                     Apps / Channels / Devices / Specialists
@@ -405,7 +405,7 @@ not a claim that every auth mode/provider is implemented. See
 
 ## 18. Connection Grid
 
-### Sunday
+### OSCAR Mobile
 
 Preferred owner-control/approval surface and strongest everyday Chief-of-Staff embodiment. It can inspect/pause/cancel/revoke authorized work but cannot bypass local hardware safety.
 
@@ -475,9 +475,9 @@ Notification visibility never implies unrestricted app access.
 
 Awareness, transcription, raw audio retention, transcript retention, summaries and memory extraction are separate controls.
 
-## 22. Sunday / Android
+## 22. OSCAR Mobile / Android
 
-Sunday is OSCAR on the phone, not another assistant.
+OSCAR Mobile is OSCAR on the phone, not another assistant.
 
 Target platform integrations where legitimate and explicitly granted include assistant-role/voice interaction, optional Orb overlay, attention-aware retreat/reappearance, widgets, notification-listener context, legitimate notification replies, biometric/PIN approval and Connection Grid supervision.
 
@@ -597,20 +597,20 @@ permission review, OAuth/API scopes, credential boundary, Personal Policy,
 verification, tests, capability registration and rollback/removal. This is future
 architecture/backlog work, not current self-modification.
 
-## Current Slice 08 — owner scope, 2026-10-06
+## Slice 08 owner closure scope — 2026-10-06
 
 Owner-authorized closure scope: **COMPLETE FOR SOFTWARE / REFERENCE VOICE FOUNDATION**.
 Physical status: `DEFERRED_BY_OWNER / CONSOLIDATED_GATE_C_ACCEPTANCE_REQUIRED`.
 This is not a physical PASS. Gate C remains **PARTIAL**.
-The quality candidate on `club-c/slice-08-voice`, PR #14 into `work`, has measured
-local reference evidence against baseline `e8ac8f8bca1cb0cb7909523ac6af906ee289366f`;
-integration requires green exact-head CI.
+Slice 08 PR #14 integrated after green exact-head CI. Accepted main/work:
+`92a11aa05083f1983186976ba64bd30aa9f1f2a0`. Historical reference research baseline:
+`e8ac8f8bca1cb0cb7909523ac6af906ee289366f`.
 Existing owner harnesses remain mandatory inputs to later consolidated acceptance.
 Microphone, real-room AEC/barge-in/self-wake, owner Match/Map calibration, playback,
 Android voice and naturalness remain NOT RUN. Windows reference evidence never
 implies Android acceptance. See [Voice Core](VOICE-CORE.md) and
 [consolidated Gate C acceptance](GATE-C-CONSOLIDATED-ACCEPTANCE.md).
-Slice 09 Sunday software may begin after clean Slice 08 integration; Slice 09 must
+Slice 09 OSCAR Mobile software may begin after clean Slice 08 integration; Slice 09 must
 remain a draft and stop before owner/device acceptance. Slice 10, deployment and
 Galaxy Tab Home Node are not authorized. Physical Edge remains
 `DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED`, mandatory before Slice 17 PASS.
@@ -622,11 +622,11 @@ Galaxy Tab Home Node are not authorized. Physical Edge remains
 
 Voice Core is surface-independent. Wake/VAD, STT, Voice Identity/TTS, barge-in,
 self-voice suppression, Voice Match, Voice Map, Persona, policy and arbitration
-remain shared contracts across Windows, Android/Sunday, Linux/macOS and future
+remain shared contracts across Windows, Android/OSCAR Mobile, Linux/macOS and future
 Home Node surfaces. Platform-specific audio, lifecycle, permissions, AEC and
 hardware acceleration live behind adapters.
 
-Windows is a current reference implementation only. Android/Sunday is a first-class
+Windows is a current reference implementation only. Android/OSCAR Mobile is a first-class
 target. Windows evidence never implies Android verification.
 
 ### Post-alpha adaptive local intelligence
@@ -649,3 +649,27 @@ specialist models and orchestration onto the owner's dedicated home-server lapto
 Cloud models remain replaceable escalation for major/frontier work.
 
 See [Post-Alpha Evolution](POST-ALPHA-EVOLUTION.md).
+
+## Current Slice 09 — 2026-10-06
+
+Slice 08 PR #14 merged; accepted main/work baseline
+`92a11aa05083f1983186976ba64bd30aa9f1f2a0`. Slice 08 is
+**COMPLETE FOR SOFTWARE / REFERENCE VOICE FOUNDATION**; physical voice is
+`DEFERRED_BY_OWNER / CONSOLIDATED_GATE_C_ACCEPTANCE_REQUIRED`, never physical PASS.
+OSCAR Mobile Kotlin/Compose rebuild is on `club-c/slice-09-sunday`, draft PR #15
+into `work`, **PARTIAL / OWNER_DEVICE_ACCEPTANCE_NOT_RUN**. Core/loopback,
+Gradle/JVM/emulated evidence is separate from actual phone/OEM acceptance.
+See [OSCAR Mobile foundation](MOBILE-FOUNDATION.md) for implementation, limits and the next owner boundary.
+Slice 09 must not merge in this run. Gate C remains PARTIAL. Slice 10, deployment
+and Home Node are not started. Post-alpha Operating Logs, specialist-model training
+and home-server migration remain documented future work, not implemented.
+
+## OSCAR Mobile application boundary
+
+Native Kotlin/Compose UI and Android adapters exchange scoped state/commands with
+Core; they do not implement a second intelligence. MainActivity owns composition
+only. CoreSession owns foreground session/readback StateFlow; typed decoding rejects
+invalid remote payloads. Screen composables consume state/actions independently.
+Keystore, OwnerConfirmation, notification and portable PCM/audio adapters are
+platform boundaries. New package identities require explicit trusted enrollment.
+See [Mobile architecture](MOBILE-FOUNDATION.md).

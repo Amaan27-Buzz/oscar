@@ -30,7 +30,7 @@ oscar/
 │   ├── MEMORY.md
 │   ├── ORCHESTRATION.md
 │   ├── SURFACES.md
-│   ├── SUNDAY-DESIGN.md
+│   ├── MOBILE-DESIGN.md
 │   ├── VOICE-SENTRY.md
 │   ├── ONBOARDING.md
 │   ├── UI-AVATAR.md

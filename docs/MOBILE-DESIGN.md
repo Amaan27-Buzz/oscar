@@ -1,18 +1,18 @@
-# Sunday visual direction
+# OSCAR Mobile visual direction
 
-Sunday is OSCAR on the phone. This document captures the durable mobile interaction direction; `DESIGN.md` is the global design system and `TASTE.md` is the qualitative quality bar.
+OSCAR Mobile is OSCAR on the phone. This document captures the durable mobile interaction direction; `DESIGN.md` is the global design system and `TASTE.md` is the qualitative quality bar.
 
 ## Surface mode
 
-**Present, not launched.** Sunday should feel like the phone embodiment of an intelligence that is already there. It must help the user speak, type, understand OSCAR's current state, approve actions, supervise remote work and receive meaningful proactive information without looking like a chatbot or productivity dashboard.
+**Present, not launched.** OSCAR Mobile should feel like the phone embodiment of an intelligence that is already there. It must help the user speak, type, understand OSCAR's current state, approve actions, supervise remote work and receive meaningful proactive information without looking like a chatbot or productivity dashboard.
 
-Sunday is also the strongest everyday **Chief-of-Staff surface**: current schedule, tasks, weather, notifications, communications and active work should converge into one calm answer to `what needs me now?` rather than forcing the user to manually reconcile separate apps.
+OSCAR Mobile is also the strongest everyday **Chief-of-Staff surface**: current schedule, tasks, weather, notifications, communications and active work should converge into one calm answer to `what needs me now?` rather than forcing the user to manually reconcile separate apps.
 
 See `CHIEF-OF-STAFF.md`.
 
 ## Direction contract
 
-**THESIS — Quietly Alive.** Sunday is sparse, warm and responsive. Its character comes from OSCAR's weighted physical presence, fluid state transitions and immediate response. It refuses transcript-first chat, giant microphone CTAs, card walls and generic AI ornament.
+**THESIS — Quietly Alive.** OSCAR Mobile is sparse, warm and responsive. Its character comes from OSCAR's weighted physical presence, fluid state transitions and immediate response. It refuses transcript-first chat, giant microphone CTAs, card walls and generic AI ornament.
 
 **PLAYFUL PRECISION.** Use broad whitespace, editorial hierarchy and minimal chrome, with precise tactile controls and state-driven motion. Personality is approachable but never cute-first.
 
@@ -26,8 +26,8 @@ See `CHIEF-OF-STAFF.md`.
 
 ### Future direction reaffirmed — documentation only, 2026-10-04
 
-The local Club B pass does not implement Sunday/voice/UI or advance Slice 07.
-Future Sunday acceptance must distinguish four independent controls:
+The local Club B pass does not implement OSCAR Mobile/voice/UI or advance Slice 07.
+Future OSCAR Mobile acceptance must distinguish four independent controls:
 
 | Control | Meaning | Does not grant |
 |---|---|---|
@@ -51,7 +51,7 @@ notification source, exclude a person/app and forget retained context. No Androi
 or OEM behavior is verified by this Windows pass. All assistant/overlay/hotspot/
 widget/notification/reply behavior remains untested on the actual Samsung phone.
 
-Sunday should integrate with Android through legitimate platform capabilities instead of visually pretending to be a system assistant.
+OSCAR Mobile should integrate with Android through legitimate platform capabilities instead of visually pretending to be a system assistant.
 
 Target direction, subject to Android/OEM support and explicit user choice:
 
@@ -65,7 +65,7 @@ Being selected as the phone assistant does not grant unrelated permissions autom
 
 ## The OSCAR Orb overlay
 
-Sunday may expose the OSCAR Orb above other apps through Android's legitimate application-overlay mechanism when the user explicitly grants that permission.
+OSCAR Mobile may expose the OSCAR Orb above other apps through Android's legitimate application-overlay mechanism when the user explicitly grants that permission.
 
 The Orb should feel **available, not intrusive**.
 
@@ -99,7 +99,7 @@ Attention-aware retreat should use current evidence such as active media, presen
 
 ## Home-screen widgets
 
-Sunday should support configurable Android widgets with genuinely glanceable information and direct actions.
+OSCAR Mobile should support configurable Android widgets with genuinely glanceable information and direct actions.
 
 Potential widget families:
 
@@ -107,7 +107,7 @@ Potential widget families:
 - **Next** — next commitment, buffer/travel warning and meaningful conflict;
 - **Focus** — current priority/task block and quick defer/complete controls;
 - **Work** — one active Worker/remote task with verified state;
-- **Grid** — compact Sunday/Cloud/Desktop/Edge health;
+- **Grid** — compact OSCAR Mobile/Cloud/Desktop/Edge health;
 - **Privacy** — Sentry/capture/Orb state and quick pause;
 - **Brief** — morning/day summary or `what needs me now?`.
 
@@ -129,7 +129,7 @@ A useful home state may quietly combine calendar/tasks/weather/notifications/cur
 
 ## Presence and acoustic state model
 
-Sunday must not reduce voice to `Talk to OSCAR` versus `Type instead`.
+OSCAR Mobile must not reduce voice to `Talk to OSCAR` versus `Type instead`.
 
 ### Sentry aware
 
@@ -153,7 +153,7 @@ Typing is another input modality in the same OSCAR context and does not automati
 
 ## Notification awareness
 
-When the user explicitly grants Android notification-listener access, Sunday can ingest the notification events/content Android legitimately exposes into the Perception Fabric.
+When the user explicitly grants Android notification-listener access, OSCAR Mobile can ingest the notification events/content Android legitimately exposes into the Perception Fabric.
 
 This should support:
 
@@ -177,9 +177,9 @@ Source/app/person exclusions are first-class. Banking/security/OTP/password-like
 
 ## Notification replies
 
-When a notification exposes a legitimate Android reply action/`RemoteInput`, Sunday may use that action for a user-approved or policy-authorized reply.
+When a notification exposes a legitimate Android reply action/`RemoteInput`, OSCAR Mobile may use that action for a user-approved or policy-authorized reply.
 
-If no reply action exists, Sunday must use another legitimate connector/API/device capability or report direct reply unavailable. Do not fabricate WhatsApp/Signal/other app write access from notification visibility.
+If no reply action exists, OSCAR Mobile must use another legitimate connector/API/device capability or report direct reply unavailable. Do not fabricate WhatsApp/Signal/other app write access from notification visibility.
 
 Drafting and sending remain separate states. A send attempt is not verified delivery unless authoritative evidence supports it.
 
@@ -249,7 +249,7 @@ Purpose: explain what OSCAR is aware of without surveillance aesthetics.
 
 ### Continuity Capture / Daily Journal
 
-When explicitly enabled, Sunday should make selected capture sources and retention understandable without turning into a recorder app.
+When explicitly enabled, OSCAR Mobile should make selected capture sources and retention understandable without turning into a recorder app.
 
 Show:
 
@@ -278,12 +278,12 @@ The user should be able to say `move the flexible stuff`, `protect two hours for
 
 ### Connection Grid
 
-Sunday is the preferred owner control surface.
+OSCAR Mobile is the preferred owner control surface.
 
 The normal Grid view should stay compact:
 
 ```text
-Sunday        Here
+OSCAR Mobile        Here
 Cloud         Healthy
 Desktop       Working · 1 task
 Desk Edge     Aware
@@ -332,12 +332,12 @@ See `PERSONA.md`.
 
 ## Remote task continuation
 
-Sunday should make it ordinary to walk away from a computer while work continues.
+OSCAR Mobile should make it ordinary to walk away from a computer while work continues.
 
 ```text
 Desktop task running
-→ user leaves with Sunday
-→ Sunday shows current state/executor
+→ user leaves with OSCAR Mobile
+→ OSCAR Mobile shows current state/executor
 → approve / pause / cancel / inspect remotely
 → task finishes
 → OSCAR verifies result where possible
@@ -362,7 +362,7 @@ A good interaction surface remains compact while idle, opens for text when focus
 
 ## Fluid motion
 
-Sunday should feel alive through **continuous state transformation**, not decorative animation.
+OSCAR Mobile should feel alive through **continuous state transformation**, not decorative animation.
 
 > State A should physically become State B where practical.
 
@@ -403,7 +403,7 @@ The overlay Orb and in-app avatar are the same identity language but can use dif
 
 ## Robustness cases
 
-Check Sunday against:
+Check OSCAR Mobile against:
 
 - no tasks;
 - many background tasks with only the relevant one surfaced;

@@ -16,7 +16,7 @@ self-voice suppression, Voice Match, Voice Map, Persona, policy and arbitration
 must be reusable across:
 
 - Windows desktop/reference runtime;
-- Sunday on Android;
+- OSCAR Mobile on Android;
 - Linux and macOS desktop nodes;
 - future Home Node/server surfaces;
 - future physical/embedded surfaces where the hardware class is appropriate.
@@ -26,7 +26,7 @@ control, echo cancellation, permissions, Bluetooth/headset routing, lifecycle an
 hardware acceleration.
 
 **Windows is the current reference implementation, not the architecture.**
-Android/Sunday is a first-class target and must not require redesigning Voice Core.
+Android/OSCAR Mobile is a first-class target and must not require redesigning Voice Core.
 A platform is VERIFIED only after real acceptance on that platform.
 
 ## 2. Stable alpha usage produces operating telemetry
@@ -114,7 +114,7 @@ The goal is to learn from expressive-voice experiments, not to make OSCAR an exa
 celebrity impersonation. Voice Identity remains an original, provider-independent
 OSCAR asset.
 
-Any future expressive-voice stack must be benchmarked on desktop, Android/Sunday
+Any future expressive-voice stack must be benchmarked on desktop, Android/OSCAR Mobile
 and the Home Node target rather than optimized only for Windows.
 
 ## 5. Specialist Model Fabric — small models before one giant local model
@@ -230,7 +230,7 @@ analysis.
 
 ### P2 — Voice Evolution
 Bring measured Elocution findings into OSCAR Voice Identity and benchmark expressive
-local voice across Windows, Android/Sunday and Home Node hardware.
+local voice across Windows, Android/OSCAR Mobile and Home Node hardware.
 
 ### P3 — Specialist Model Fabric
 Use real task clusters and evals to build/register small optimized models. Start
@@ -254,3 +254,17 @@ celebrity identity. This does not implement Operating Logs, specialist-model
 training or home-server migration. Those remain future after stable Unified Alpha.
 Physical voice acceptance is owner-deferred to the
 [consolidated Gate C run](GATE-C-CONSOLIDATED-ACCEPTANCE.md); Gate C remains PARTIAL.
+
+## Current Slice 09 — 2026-10-06
+
+Slice 08 PR #14 merged; accepted main/work baseline
+`92a11aa05083f1983186976ba64bd30aa9f1f2a0`. Slice 08 is
+**COMPLETE FOR SOFTWARE / REFERENCE VOICE FOUNDATION**; physical voice is
+`DEFERRED_BY_OWNER / CONSOLIDATED_GATE_C_ACCEPTANCE_REQUIRED`, never physical PASS.
+OSCAR Mobile Kotlin/Compose rebuild is on `club-c/slice-09-sunday`, draft PR #15
+into `work`, **PARTIAL / OWNER_DEVICE_ACCEPTANCE_NOT_RUN**. Core/loopback,
+Gradle/JVM/emulated evidence is separate from actual phone/OEM acceptance.
+See [OSCAR Mobile foundation](MOBILE-FOUNDATION.md) for implementation, limits and the next owner boundary.
+Slice 09 must not merge in this run. Gate C remains PARTIAL. Slice 10, deployment
+and Home Node are not started. Post-alpha Operating Logs, specialist-model training
+and home-server migration remain documented future work, not implemented.

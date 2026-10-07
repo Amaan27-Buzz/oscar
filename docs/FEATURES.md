@@ -27,7 +27,7 @@ This is OSCAR's capability backlog. Listing a feature here does **not** mean it 
 
 ### One persistent relationship
 
-- One user-facing OSCAR interaction point across text, voice, Sunday, desktop, communication, Workers and Edge.
+- One user-facing OSCAR interaction point across text, voice, OSCAR Mobile, desktop, communication, Workers and Edge.
 - Internal turns/episodes/projects/objectives/entities remain structured without forcing chat-thread management on the user.
 - Dynamic Active Context assembled from current objective/project/entities/commitments, recent conversation, retrieved history and World Model state.
 
@@ -142,9 +142,9 @@ See [MEMORY.md](MEMORY.md).
 
 ## Connection Grid / availability
 
-- One availability/control fabric across Sunday, cloud coordinator, desktop nodes and Edge.
+- One availability/control fabric across OSCAR Mobile, cloud coordinator, desktop nodes and Edge.
 - No ordinary laptop/desktop as permanent host.
-- Sunday as preferred everyday owner-control/kill-switch surface.
+- OSCAR Mobile as preferred everyday owner-control/kill-switch surface.
 - Remote inspect/pause/cancel/revoke of authorized work.
 - Replaceable cloud rendezvous/durable coordination.
 - Desktop high-capability execution.
@@ -190,7 +190,7 @@ See [MEMORY.md](MEMORY.md).
 
 ## Universal live context/search
 
-- Federated current-source retrieval across files/drives, mail, messages, knowledge systems, browser, GitHub, calendar, Sunday, desktops, Edge and Workers.
+- Federated current-source retrieval across files/drives, mail, messages, knowledge systems, browser, GitHub, calendar, OSCAR Mobile, desktops, Edge and Workers.
 - Live authoritative state preferred over stale memory.
 - Provenance/source authority/freshness preserved.
 - Public search remains distinct from browser automation.
@@ -335,7 +335,7 @@ Unsupported capture remains unsupported. Capture is never designed as covert rec
 - Real compensation only when supported.
 - First-class docs, media, code changes, reports, meeting notes, deployments, firmware builds, datasets/models/evaluations with provenance/version/location/verification.
 
-## Sunday
+## OSCAR Mobile
 
 - Native Android embodiment.
 - Present-not-launched behavior.

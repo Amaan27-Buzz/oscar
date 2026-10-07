@@ -72,7 +72,7 @@ Present
 
 Where practical, the same object should persist across these transformations rather than disappear and reappear in unrelated page layouts.
 
-On desktop, a compact OSCAR presence can expand into a contextual overlay from its actual origin. On Sunday, the presence object can recompose with the current interaction instead of requiring a full-screen mode switch.
+On desktop, a compact OSCAR presence can expand into a contextual overlay from its actual origin. On OSCAR Mobile, the presence object can recompose with the current interaction instead of requiring a full-screen mode switch.
 
 ## State language
 
@@ -149,9 +149,9 @@ The avatar must not conflate microphone/privacy states.
 
 Critical privacy states must always have a text/icon cue in addition to expression/motion.
 
-## Sunday
+## OSCAR Mobile
 
-On Sunday, the avatar is a recurring presence rather than a full-screen mascot.
+On OSCAR Mobile, the avatar is a recurring presence rather than a full-screen mascot.
 
 Expected uses:
 
@@ -226,7 +226,7 @@ Important states should also have at least one of:
 
 - text label;
 - sound cue;
-- haptic cue on Sunday;
+- haptic cue on OSCAR Mobile;
 - distinct iconography.
 
 Color alone is never sufficient for critical state.

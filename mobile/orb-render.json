@@ -1,0 +1,11 @@
+{
+  "source": "assets/brand/oscar-orb.svg",
+  "source_sha256": "728aeac3c9aa590b67d45c469735e919ede93a8503964e24f0f4af18cda066c5",
+  "render_sha256": "ff39a1c8abe1b2e46849cadb58ff93d6fa41d8344eea7e496f659d984c813ea1",
+  "renderer": "Chromium 154.0.4258.53",
+  "size": [
+    1164,
+    1164
+  ],
+  "geometry": "unchanged canonical SVG; intrinsic size, 2x raster"
+}

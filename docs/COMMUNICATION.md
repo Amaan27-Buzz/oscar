@@ -23,7 +23,7 @@ Where platform capability and permission allow, OSCAR may cover:
 - communication history linked to people/projects/tasks;
 - optional Sentry Context Capture / Daily Journal continuity.
 
-Sunday is the primary mobile execution/control surface. Desktop and other nodes can provide equivalent capabilities where technically supported.
+OSCAR Mobile is the primary mobile execution/control surface. Desktop and other nodes can provide equivalent capabilities where technically supported.
 
 ## Universal Channel Gateway
 
@@ -63,7 +63,7 @@ Do not pretend an app exposes call control/audio/message capability when it does
 
 ## Android notification awareness
 
-With explicit notification-listener access, Sunday may treat Android notification events/content as current communication evidence.
+With explicit notification-listener access, OSCAR Mobile may treat Android notification events/content as current communication evidence.
 
 This can support:
 
@@ -413,3 +413,17 @@ Long-running communication responsibilities use Durable Execution Runtime where 
 Structured Gmail/Graph mail, Calendar and Slack operations have native connector manifests/adapters through the existing catalog and permission ledger. Sending is external communication; reads do not grant write authority. OAuth/service-account authentication remains unverified in the current reference. Bodies/results are active task context, not default durable communication capture.
 
 Gmail recipient/header read-back, deployed provider push subscriptions and real private account acceptance remain PARTIAL. See [CONNECTOR-FABRIC.md](CONNECTOR-FABRIC.md).
+
+## Current Slice 09 — 2026-10-06
+
+Slice 08 PR #14 merged; accepted main/work baseline
+`92a11aa05083f1983186976ba64bd30aa9f1f2a0`. Slice 08 is
+**COMPLETE FOR SOFTWARE / REFERENCE VOICE FOUNDATION**; physical voice is
+`DEFERRED_BY_OWNER / CONSOLIDATED_GATE_C_ACCEPTANCE_REQUIRED`, never physical PASS.
+OSCAR Mobile Kotlin/Compose rebuild is on `club-c/slice-09-sunday`, draft PR #15
+into `work`, **PARTIAL / OWNER_DEVICE_ACCEPTANCE_NOT_RUN**. Core/loopback,
+Gradle/JVM/emulated evidence is separate from actual phone/OEM acceptance.
+See [OSCAR Mobile foundation](MOBILE-FOUNDATION.md) for implementation, limits and the next owner boundary.
+Slice 09 must not merge in this run. Gate C remains PARTIAL. Slice 10, deployment
+and Home Node are not started. Post-alpha Operating Logs, specialist-model training
+and home-server migration remain documented future work, not implemented.

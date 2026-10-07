@@ -6,7 +6,7 @@ Use the global rules in `image-prompts/README.md`.
 
 Design OSCAR's first commissioning screen.
 
-Explain through composition, not a paragraph: one intelligence across Sunday, desktop, cloud and Edge. Use a small OSCAR presence object, one calm headline and a simple visual relationship between embodiments.
+Explain through composition, not a paragraph: one intelligence across OSCAR Mobile, desktop, cloud and Edge. Use a small OSCAR presence object, one calm headline and a simple visual relationship between embodiments.
 
 The screen should feel like commissioning personal infrastructure, not signing up for another app.
 
@@ -40,7 +40,7 @@ Separate local wake/VAD, speaker recognition, transcription, raw audio retention
 
 ## Onboarding — Connection Grid
 
-Design setup for Sunday, cloud coordinator, desktop and Edge pairing.
+Design setup for OSCAR Mobile, cloud coordinator, desktop and Edge pairing.
 
 Show each node joining OSCAR with a verified/partial/unavailable state. Include optional free/paid cloud choice without turning setup into cloud-infrastructure administration.
 
@@ -114,7 +114,7 @@ Show identity, health, available sensors/actions, one current physical state and
 
 ## Connection Grid — availability failure
 
-Design the Grid during partial outage: cloud unavailable, Sunday still present, desktop task continuing locally, Edge healthy.
+Design the Grid during partial outage: cloud unavailable, OSCAR Mobile still present, desktop task continuing locally, Edge healthy.
 
 Communicate graceful degradation with explicit availability state such as `Local` rather than a generic offline error. Show what continues to work and what is queued.
 
@@ -130,7 +130,7 @@ Avoid audit-log aesthetics in the default view.
 
 Design a concise sensitive-action approval surface.
 
-Show consequence, target, why OSCAR is asking, and clear approve/deny. For critical actions include Sunday biometric/PIN requirement. Do not bury the consequence in prose.
+Show consequence, target, why OSCAR is asking, and clear approve/deny. For critical actions include OSCAR Mobile biometric/PIN requirement. Do not bury the consequence in prose.
 
 ## Failure / self-recovery
 

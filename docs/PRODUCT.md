@@ -115,11 +115,11 @@ See `docs/CHIEF-OF-STAFF.md`.
 
 ## One intelligence, many embodiments
 
-### Sunday
+### OSCAR Mobile
 
-Sunday is OSCAR on the phone. It is the preferred everyday owner-control surface because the phone usually remains with the user while laptops/desktops come and go.
+OSCAR Mobile is OSCAR on the phone. It is the preferred everyday owner-control surface because the phone usually remains with the user while laptops/desktops come and go.
 
-Subject to platform support and permissions, Sunday provides voice/text, notifications, communication context/actions, camera/sensors, biometric approval, remote task supervision, Connection Grid controls and everyday Chief-of-Staff presence.
+Subject to platform support and permissions, OSCAR Mobile provides voice/text, notifications, communication context/actions, camera/sensors, biometric approval, remote task supervision, Connection Grid controls and everyday Chief-of-Staff presence.
 
 On Android, use legitimate platform capabilities where supported: assistant/voice-interaction role, optional application overlay for the OSCAR Orb, home-screen widgets, notification-listener context and legitimate notification replies when a real reply action exists.
 
@@ -141,7 +141,7 @@ A replaceable cloud coordinator may provide rendezvous, durable coordination, re
 
 ## Connection Grid
 
-Sunday, cloud coordination, Desktop nodes and Edge form the OSCAR Connection Grid. Nodes advertise capabilities dynamically and communicate through OSCAR-owned transport.
+OSCAR Mobile, cloud coordination, Desktop nodes and Edge form the OSCAR Connection Grid. Nodes advertise capabilities dynamically and communicate through OSCAR-owned transport.
 
 The user should be able to start useful work on one machine, leave, inspect/approve/cancel remotely, receive a verified result and optionally permit power actions when a real capability exists.
 
@@ -247,7 +247,21 @@ deployment progressively moves routine OSCAR operation and orchestration onto th
 owner's dedicated home-server laptop, while cloud models remain intentional
 escalation for major/frontier work.
 
-Windows is only the current Voice reference implementation; Android/Sunday is a
+Windows is only the current Voice reference implementation; Android/OSCAR Mobile is a
 first-class surface using the same Voice Core contracts.
 
 See [Post-Alpha Evolution](POST-ALPHA-EVOLUTION.md).
+
+## Current Slice 09 — 2026-10-06
+
+Slice 08 PR #14 merged; accepted main/work baseline
+`92a11aa05083f1983186976ba64bd30aa9f1f2a0`. Slice 08 is
+**COMPLETE FOR SOFTWARE / REFERENCE VOICE FOUNDATION**; physical voice is
+`DEFERRED_BY_OWNER / CONSOLIDATED_GATE_C_ACCEPTANCE_REQUIRED`, never physical PASS.
+OSCAR Mobile Kotlin/Compose rebuild is on `club-c/slice-09-sunday`, draft PR #15
+into `work`, **PARTIAL / OWNER_DEVICE_ACCEPTANCE_NOT_RUN**. Core/loopback,
+Gradle/JVM/emulated evidence is separate from actual phone/OEM acceptance.
+See [OSCAR Mobile foundation](MOBILE-FOUNDATION.md) for implementation, limits and the next owner boundary.
+Slice 09 must not merge in this run. Gate C remains PARTIAL. Slice 10, deployment
+and Home Node are not started. Post-alpha Operating Logs, specialist-model training
+and home-server migration remain documented future work, not implemented.

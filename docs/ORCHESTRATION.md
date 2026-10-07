@@ -24,7 +24,7 @@ Desktop machine node
 - Blender
 - FFmpeg
 
-Sunday
+OSCAR Mobile
 - notifications
 - phone actions
 - calls/messages
@@ -85,7 +85,7 @@ coding               → Codex / coding specialist
 notes/knowledge      → connected native knowledge tool
 email/calendar       → structured service adapter
 GUI-only workflow    → computer use
-phone/app workflow   → Sunday
+phone/app workflow   → OSCAR Mobile
 communication        → Channel Gateway + best native adapter
 hardware design      → installed/connected engineering capability
 physical action      → OSCAR Edge
@@ -113,7 +113,7 @@ The separate SwitchRoute project is reference/prototype material, not a required
 
 Cross-device/worker execution uses OSCAR's native Transport + Capability Fabric.
 
-It carries typed task/event/action/result/progress messages to Sunday, desktop nodes, Edge, cloud/background executors and adapters.
+It carries typed task/event/action/result/progress messages to OSCAR Mobile, desktop nodes, Edge, cloud/background executors and adapters.
 
 The separate Latch project is reference/prototype material, not a required deployed service.
 
@@ -159,7 +159,7 @@ A Worker may coordinate:
 - Codex;
 - Computer Use;
 - browser/terminal/apps;
-- Sunday/phone capabilities;
+- OSCAR Mobile/phone capabilities;
 - plugins/connectors/APIs;
 - Universal Channel Gateway;
 - native OSCAR Model Router → ChatGPT/other providers;

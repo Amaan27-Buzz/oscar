@@ -2,7 +2,7 @@
 
 OSCAR should behave as a continuously available, context-aware personal Chief of Staff, not as a chatbot the user repeatedly opens and prompts.
 
-This document owns the durable product contract for day-to-day context awareness, schedule/task coordination, interruption behavior and proactive assistance. Sunday, World Model, Perception Fabric, Communication, Personal Policy and the Executive Planner implement different parts of this contract.
+This document owns the durable product contract for day-to-day context awareness, schedule/task coordination, interruption behavior and proactive assistance. OSCAR Mobile, World Model, Perception Fabric, Communication, Personal Policy and the Executive Planner implement different parts of this contract.
 
 ## North star
 
@@ -164,13 +164,13 @@ silent context update
 → urgent escalation
 ```
 
-## Sunday: Android embodiment
+## OSCAR Mobile: Android embodiment
 
-Sunday should become the strongest everyday embodiment of this Chief-of-Staff behavior.
+OSCAR Mobile should become the strongest everyday embodiment of this Chief-of-Staff behavior.
 
 ### Selected Android assistant
 
-Where Android/device policy supports it, Sunday should qualify for the Android assistant role and use the platform voice-interaction contracts rather than faking a default-assistant experience.
+Where Android/device policy supports it, OSCAR Mobile should qualify for the Android assistant role and use the platform voice-interaction contracts rather than faking a default-assistant experience.
 
 Target direction:
 
@@ -182,7 +182,7 @@ Target direction:
 
 ### OSCAR Orb overlay
 
-Sunday may expose a persistent OSCAR Orb using legitimate Android overlay capability when the user grants it.
+OSCAR Mobile may expose a persistent OSCAR Orb using legitimate Android overlay capability when the user grants it.
 
 The Orb is not a permanent intrusive bubble. Its presence is attention-aware:
 
@@ -204,7 +204,7 @@ The system may reposition or hide overlay windows, so overlay state is best-effo
 
 ### Home-screen widgets
 
-Sunday should support configurable Android widgets, including small/medium/large forms, for glanceable state and direct actions.
+OSCAR Mobile should support configurable Android widgets, including small/medium/large forms, for glanceable state and direct actions.
 
 Examples:
 
@@ -221,7 +221,7 @@ Widgets remain lightweight and state-driven; they are not miniature dashboards.
 
 ### Notification awareness
 
-With explicit notification-listener access, Sunday may ingest notification events/content exposed by Android into the Perception Fabric.
+With explicit notification-listener access, OSCAR Mobile may ingest notification events/content exposed by Android into the Perception Fabric.
 
 Rules:
 
@@ -240,7 +240,7 @@ If the app does not expose an actionable reply, OSCAR must use an official conne
 
 ### Media/activity awareness
 
-An enabled notification listener can support access to active media-session information on Android. Sunday may use media/playback state as one attention signal for Orb retreat and interruption policy.
+An enabled notification listener can support access to active media-session information on Android. OSCAR Mobile may use media/playback state as one attention signal for Orb retreat and interruption policy.
 
 `media active` does not automatically mean `never interrupt`; urgency and explicit policy still matter.
 
@@ -331,7 +331,7 @@ The planner should optimize for user intent, not maximum automation.
 
 ## Privacy controls
 
-Sunday should provide fast controls for:
+OSCAR Mobile should provide fast controls for:
 
 - pause proactive awareness;
 - disable notification source/app/person;
@@ -357,7 +357,7 @@ The user should always be able to understand what OSCAR is observing, what it is
 
 ## Acceptance scenarios
 
-Future Sunday/Executive acceptance should include at least:
+Future OSCAR Mobile/Executive acceptance should include at least:
 
 1. OSCAR selected as Android assistant on a real supported device.
 2. Orb overlay appears, retreats during active media/focus context and remains invokable.
@@ -376,7 +376,7 @@ Future Sunday/Executive acceptance should include at least:
 2. Current context is freshness-qualified and source-backed.
 3. Perception, retention and action authority are separate.
 4. Proactivity is policy-bounded and interruption-aware.
-5. Sunday should be present without being visually intrusive.
+5. OSCAR Mobile should be present without being visually intrusive.
 6. Android assistant/overlay/widget/notification capabilities are platform-specific and must be verified on target devices.
 7. Notification access never implies unrestricted app access.
 8. Schedule and communication mutations require real capability, authority and verification.

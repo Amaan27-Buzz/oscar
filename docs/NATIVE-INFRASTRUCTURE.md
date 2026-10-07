@@ -10,7 +10,7 @@ Their useful architecture/logic is folded into OSCAR natively:
 
 1. **OSCAR Transport + Capability Fabric** — informed by Latch.
 2. **OSCAR Model Router** — informed by SwitchRoute.
-3. **OSCAR Connection Grid** — the availability/control fabric connecting Sunday, cloud, desktop and Edge through those native contracts.
+3. **OSCAR Connection Grid** — the availability/control fabric connecting OSCAR Mobile, cloud, desktop and Edge through those native contracts.
 
 The separate repositories remain reference/prototype sources only.
 
@@ -21,7 +21,7 @@ The separate repositories remain reference/prototype sources only.
 Provide one secure typed transport between OSCAR Core and capability-bearing surfaces such as:
 
 - desktop machine nodes;
-- Sunday;
+- OSCAR Mobile;
 - Edge devices;
 - cloud coordinators/background workers;
 - ChatGPT/tool surfaces;
@@ -51,7 +51,7 @@ Conceptually:
 OSCAR Core
    │
 OSCAR Transport + Capability Fabric
-   ├─ Sunday
+   ├─ OSCAR Mobile
    ├─ Desktop nodes
    ├─ Edge
    ├─ Cloud coordinator
@@ -75,7 +75,7 @@ ESP32-class devices use a small native OSCAR Edge client/protocol. Home devices 
 The Connection Grid is the runtime topology built on native transport.
 
 ```text
-                 Sunday
+                 OSCAR Mobile
         owner controls + approvals
                     │
       ┌─────────────┼─────────────┐
@@ -88,7 +88,7 @@ Detailed behavior lives in [CONNECTION-GRID.md](CONNECTION-GRID.md).
 
 ## Roles
 
-### Sunday
+### OSCAR Mobile
 
 - preferred everyday owner-control surface;
 - biometric/PIN confirmation;
@@ -96,7 +96,7 @@ Detailed behavior lives in [CONNECTION-GRID.md](CONNECTION-GRID.md).
 - remote task continuation;
 - notifications and handoff.
 
-Sunday is not a substitute for local physical safety and is not assumed infallibly online.
+OSCAR Mobile is not a substitute for local physical safety and is not assumed infallibly online.
 
 ### Cloud coordinator
 
@@ -128,10 +128,10 @@ A desktop task may continue after the user leaves:
 ```text
 start task on Desktop
 → persist objective/checkpoint/lease
-→ user leaves with Sunday
+→ user leaves with OSCAR Mobile
 → desktop continues
 → progress/results flow through Grid
-→ Sunday can inspect / approve / cancel
+→ OSCAR Mobile can inspect / approve / cancel
 → verify result
 → optional sleep/shutdown machine if permitted
 ```
@@ -294,13 +294,13 @@ This preserves:
 
 Roadmap slices remain canonical. Build Gates in [BUILD-GATES.md](BUILD-GATES.md) provide cross-slice manual checkpoints.
 
-Gate A should prove native transport/model routing. Gate B should prove useful machine work and remote continuation. Later gates should prove Connection Grid failover/degradation, Sunday owner controls and Edge safety separation.
+Gate A should prove native transport/model routing. Gate B should prove useful machine work and remote continuation. Later gates should prove Connection Grid failover/degradation, OSCAR Mobile owner controls and Edge safety separation.
 
 ## Club A implementation checkpoint
 
 The native foundation now lives in `oscar/contracts.py`, `storage.py`, `runtime.py`, `capabilities.py`, `grid.py` and `transport.py`. SQLite is the durable task/ledger/lease authority. Transport targets authenticate per-node sessions, recheck capability scope and bind commands to task/correlation/lease IDs. Replay nonces and action idempotency are durable. Started actions with uncertain outcomes block replay.
 
-`python -m oscar proof` uses a real loopback HTTP reference server. `python -m oscar grid-proof` disconnects a reference node and observes actual lease expiry while preserving the objective. These are reference-node proofs; Sunday/Desktop/Edge hardware, public TLS/outbound rendezvous, state replication and a vendor deployment have not been implemented or verified. The reference target shares the coordinator SQLite store and binds only to loopback. Session handles cannot be serialized; stored session token digests are distinct from provider credentials, which are never persisted.
+`python -m oscar proof` uses a real loopback HTTP reference server. `python -m oscar grid-proof` disconnects a reference node and observes actual lease expiry while preserving the objective. These are reference-node proofs; OSCAR Mobile/Desktop/Edge hardware, public TLS/outbound rendezvous, state replication and a vendor deployment have not been implemented or verified. The reference target shares the coordinator SQLite store and binds only to loopback. Session handles cannot be serialized; stored session token digests are distinct from provider credentials, which are never persisted.
 
 `Transport` is the adapter boundary for future network deployments. This does not establish a production secure Internet transport. See [the Club A checkpoint](CLUB-A-CHECKPOINT.md). No Latch/SwitchRoute service dependency was added.
 

@@ -54,7 +54,7 @@ Load additionally when relevant:
 - `TASTE.md`
 - `docs/PERSONA.md`
 - `docs/UI-AVATAR.md`
-- `docs/SUNDAY-DESIGN.md`
+- `docs/MOBILE-DESIGN.md`
 
 ### Workers / orchestration
 
@@ -215,7 +215,7 @@ Gate B must include meaningful tests for exact recall, paraphrase recall, tempor
 OSCAR availability spans:
 
 ```text
-Sunday      = preferred owner control / approvals / notifications
+OSCAR Mobile      = preferred owner control / approvals / notifications
 Cloud       = replaceable rendezvous + durable coordination
 Desktop     = high-capability execution
 Edge        = local presence / reflex / safety
@@ -271,7 +271,7 @@ Do not say `done`, `fixed` or `works` when evidence is only partial/reported.
 2. Laptop/desktop nodes are optional.
 3. Hardware safety is local/deterministic.
 4. Voice and text share task/context state.
-5. Sunday is OSCAR on the phone, not a second assistant.
+5. OSCAR Mobile is OSCAR on the phone, not a second assistant.
 6. OSCAR owns the canonical Memory Fabric and one continuous relationship.
 7. World Model owns current-state representation; memory is historical evidence, not current truth by default.
 8. Controller chooses execute/retrieve/verify/reason/delegate/ask class and performs memory preflight when required.
@@ -301,9 +301,9 @@ Search is a first-class capability, not an excuse for stale reasoning.
 
 See `docs/SEARCH-FRESHNESS.md`.
 
-## Sunday / Android
+## OSCAR Mobile / Android
 
-Sunday uses legitimate Android platform capabilities rather than pretending to have system privilege. Assistant role, overlay, widgets, notification access, replies, microphone/camera and retention/action authority remain separate permissions/capabilities. OEM-specific behavior is unverified until exercised on the target device.
+OSCAR Mobile uses legitimate Android platform capabilities rather than pretending to have system privilege. Assistant role, overlay, widgets, notification access, replies, microphone/camera and retention/action authority remain separate permissions/capabilities. OEM-specific behavior is unverified until exercised on the target device.
 
 ## Persona / voice / Sentry
 
@@ -372,7 +372,7 @@ Slice 06 is COMPLETE and Gate B PASS after owner OAuth run `oauth-gate-b-2026100
 The dedicated [owner OAuth harness](docs/GATE-B-OAUTH-ACCEPTANCE.md) has passed real owner acceptance with
 exactly `user:email`, restart, federation and local disconnect. Never borrow credentials or authorize autonomously: the owner
 must supply a registered Client ID and interact with GitHub. This acceptance recording itself grants no later work. Separate owner authorization
-now permits Slice 07 closure/PR 13 integration and Slice 08 on a separate draft PR; deployment and Sunday/Android remain out of scope.
+now permits Slice 07 closure/PR 13 integration and Slice 08 on a separate draft PR; deployment and OSCAR Mobile/Android remain out of scope.
 
 ## Owner scope decision — 2026-10-05
 
@@ -391,20 +391,45 @@ The 2026-10-05 scope authorized Slice 08. The 2026-10-06 owner decision addition
 authorizes Slice 09 software after Slice 08 integration; Slice 10, deployment and
 Galaxy Tab Home Node remain outside this work.
 
-## Current Slice 08 — owner scope, 2026-10-06
+## Slice 08 owner closure scope — 2026-10-06
 
 Owner-authorized closure scope: **COMPLETE FOR SOFTWARE / REFERENCE VOICE FOUNDATION**.
 Physical status: `DEFERRED_BY_OWNER / CONSOLIDATED_GATE_C_ACCEPTANCE_REQUIRED`.
 This is not a physical PASS. Gate C remains **PARTIAL**.
-The quality candidate on `club-c/slice-08-voice`, PR #14 into `work`, has measured
-local reference evidence against baseline `e8ac8f8bca1cb0cb7909523ac6af906ee289366f`;
-integration requires green exact-head CI.
+Slice 08 PR #14 integrated after green exact-head CI. Accepted main/work:
+`92a11aa05083f1983186976ba64bd30aa9f1f2a0`. Historical reference research baseline:
+`e8ac8f8bca1cb0cb7909523ac6af906ee289366f`.
 Existing owner harnesses remain mandatory inputs to later consolidated acceptance.
 Microphone, real-room AEC/barge-in/self-wake, owner Match/Map calibration, playback,
 Android voice and naturalness remain NOT RUN. Windows reference evidence never
 implies Android acceptance. See [Voice Core](docs/VOICE-CORE.md) and
 [consolidated Gate C acceptance](docs/GATE-C-CONSOLIDATED-ACCEPTANCE.md).
-Slice 09 Sunday software may begin after clean Slice 08 integration; Slice 09 must
+Slice 09 OSCAR Mobile software may begin after clean Slice 08 integration; Slice 09 must
 remain a draft and stop before owner/device acceptance. Slice 10, deployment and
 Galaxy Tab Home Node are not authorized. Physical Edge remains
 `DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED`, mandatory before Slice 17 PASS.
+
+## Current Slice 09 — 2026-10-06
+
+Slice 08 PR #14 merged; accepted main/work baseline
+`92a11aa05083f1983186976ba64bd30aa9f1f2a0`. Slice 08 is
+**COMPLETE FOR SOFTWARE / REFERENCE VOICE FOUNDATION**; physical voice is
+`DEFERRED_BY_OWNER / CONSOLIDATED_GATE_C_ACCEPTANCE_REQUIRED`, never physical PASS.
+OSCAR Mobile Kotlin/Compose rebuild is on `club-c/slice-09-sunday`, draft PR #15
+into `work`, **PARTIAL / OWNER_DEVICE_ACCEPTANCE_NOT_RUN**. Core/loopback,
+Gradle/JVM/emulated evidence is separate from actual phone/OEM acceptance.
+See [OSCAR Mobile foundation](docs/MOBILE-FOUNDATION.md) for implementation, limits and the next owner boundary.
+Slice 09 must not merge in this run. Gate C remains PARTIAL. Slice 10, deployment
+and Home Node are not started. Post-alpha Operating Logs, specialist-model training
+and home-server migration remain documented future work, not implemented.
+
+## OSCAR Mobile rebuild owner direction — 2026-10-06
+
+OSCAR is the app/product; OSCAR Mobile is the technical surface name. Sunday is
+retired from active product direction; preserve historical evidence and legacy wire
+compatibility. Continue PR #15 with native Kotlin/Compose software, salvage sound
+security/platform contracts, and keep screens independently redesignable. Do not
+polish the retired UI, redraw the canonical Orb, create an Android brain or require
+owner/device interaction. Gate C PARTIAL; OWNER_DEVICE_ACCEPTANCE_NOT_RUN.
+No Elocution inspection/work, model training, Operating Logs, home-server migration
+or Slice 10. See [Mobile foundation](docs/MOBILE-FOUNDATION.md).

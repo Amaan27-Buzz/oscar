@@ -6,7 +6,7 @@ Cross-device coordination uses OSCAR-owned transport/capability contracts and th
 
 ## Shared surface principles
 
-Across Sunday, desktop and physical surfaces:
+Across OSCAR Mobile, desktop and physical surfaces:
 
 - OSCAR should feel **present**, not repeatedly launched;
 - voice and text are peers in one continuous context;
@@ -25,7 +25,7 @@ The visual/interaction direction is defined by `DESIGN.md` and `TASTE.md`.
 
 The Grid is the product-visible relationship between:
 
-- **Sunday** — owner control/approval/notifications/Chief-of-Staff presence;
+- **OSCAR Mobile** — owner control/approval/notifications/Chief-of-Staff presence;
 - **OSCAR Core on replaceable hosts** — identity/state/memory/task coordination;
 - **Desktop nodes** — high-capability execution;
 - **Home Node (future)** — owner's Galaxy Tab S6 Lite (2021), local Grid/bridge roles
@@ -40,7 +40,7 @@ Qdrant/Neo4j/ML stack. See [DEPLOYMENT.md](DEPLOYMENT.md).
 Normal UI stays compact:
 
 ```text
-Sunday        Here
+OSCAR Mobile        Here
 Cloud         Healthy
 Desktop       Working · 1 task
 Desk Edge     Aware
@@ -48,9 +48,9 @@ Desk Edge     Aware
 
 Expand only when the user needs capabilities, task ownership, health, permissions or remote controls.
 
-## Sunday — mobile
+## OSCAR Mobile — mobile
 
-Sunday is OSCAR on the phone and the preferred everyday owner-control and Chief-of-Staff surface.
+OSCAR Mobile is OSCAR on the phone and the preferred everyday owner-control and Chief-of-Staff surface.
 
 Primary goals:
 
@@ -73,7 +73,7 @@ Primary goals:
 - Persona configuration/preview;
 - seamless continuity when leaving the desk.
 
-Sunday must not frame normal use as `Talk to OSCAR` versus `Type instead`.
+OSCAR Mobile must not frame normal use as `Talk to OSCAR` versus `Type instead`.
 
 ### Orb presence
 
@@ -100,7 +100,7 @@ Widgets may expose next commitment, focus task, Worker state, Grid health, priva
 
 Notification-listener access is a current-context capability, not unrestricted access to the source app. Source/app/person exclusions and independent retention/reply authority are mandatory.
 
-See `SUNDAY-DESIGN.md` and `CHIEF-OF-STAFF.md`.
+See `MOBILE-DESIGN.md` and `CHIEF-OF-STAFF.md`.
 
 ## OSCAR Desktop — Windows/macOS
 
@@ -148,7 +148,7 @@ When the computer disappears, those capabilities disappear but durable task stat
 
 A machine task may continue without the user being physically present.
 
-Sunday can inspect/pause/cancel/approve. After verified completion, OSCAR may sleep/shut down the PC when a real capability and policy permit it.
+OSCAR Mobile can inspect/pause/cancel/approve. After verified completion, OSCAR may sleep/shut down the PC when a real capability and policy permit it.
 
 Remote power-on is only presented if Wake-on-LAN/remote-management/approved power capability is available.
 
@@ -189,7 +189,7 @@ Physical embodiment can combine microphone/speaker, avatar/status display, mute/
 OSCAR Voice Identity
         + Persona context
         ↓
-Sunday / Desktop / Desk speaker
+OSCAR Mobile / Desktop / Desk speaker
 ```
 
 Underlying TTS can differ while intended identity remains recognizable.
@@ -210,7 +210,7 @@ Current schedule/task/communication state should survive surface changes.
 
 ```text
 Desktop task running
-→ Sunday sees task + next commitment
+→ OSCAR Mobile sees task + next commitment
 → user leaves
 → notification changes schedule
 → World Model updates
@@ -244,7 +244,7 @@ native OS / official API
 Every node joins/leaves dynamically.
 
 ```text
-Sunday online      → mobile/owner/context controls
+OSCAR Mobile online      → mobile/owner/context controls
 Cloud online       → rendezvous/durable coordination
 PC online          → machine capabilities
 Edge online        → physical/local capabilities
@@ -265,7 +265,7 @@ Identity is shared; composition remains platform-native.
 
 1. Surfaces are embodiments of one OSCAR identity, not separate assistants.
 2. Surface disappearance must not erase durable task/context state.
-3. Sunday is the primary owner-control/Chief-of-Staff surface, not a hardware-safety override.
+3. OSCAR Mobile is the primary owner-control/Chief-of-Staff surface, not a hardware-safety override.
 4. Overlay/widget/avatar UI never substitutes for actual runtime state.
 5. Perception, retention and action authority stay independent.
 6. Platform-specific capabilities remain unverified until exercised on target hardware.
@@ -280,3 +280,17 @@ See [Voice Core](VOICE-CORE.md), [quality pass](VOICE-QUALITY.md) and
 [consolidated acceptance](GATE-C-CONSOLIDATED-ACCEPTANCE.md).
 Slice 09 software is authorized after Slice 08 integration; device acceptance is
 owner-deferred. Slice 10, deployment and Home Node remain out of scope.
+
+## Current Slice 09 — 2026-10-06
+
+Slice 08 PR #14 merged; accepted main/work baseline
+`92a11aa05083f1983186976ba64bd30aa9f1f2a0`. Slice 08 is
+**COMPLETE FOR SOFTWARE / REFERENCE VOICE FOUNDATION**; physical voice is
+`DEFERRED_BY_OWNER / CONSOLIDATED_GATE_C_ACCEPTANCE_REQUIRED`, never physical PASS.
+OSCAR Mobile Kotlin/Compose rebuild is on `club-c/slice-09-sunday`, draft PR #15
+into `work`, **PARTIAL / OWNER_DEVICE_ACCEPTANCE_NOT_RUN**. Core/loopback,
+Gradle/JVM/emulated evidence is separate from actual phone/OEM acceptance.
+See [OSCAR Mobile foundation](MOBILE-FOUNDATION.md) for implementation, limits and the next owner boundary.
+Slice 09 must not merge in this run. Gate C remains PARTIAL. Slice 10, deployment
+and Home Node are not started. Post-alpha Operating Logs, specialist-model training
+and home-server migration remain documented future work, not implemented.

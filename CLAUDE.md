@@ -9,7 +9,7 @@ Use `AGENTS.md` as the canonical repository-wide instruction set. For implementa
 
 When the task touches orchestration, Workers, Protocols, channels or long-running execution, also load `docs/RUNTIME-FOUNDATIONS.md` plus the relevant domain docs.
 
-When the task touches UI, UX, motion, Sunday, desktop apps or frontend implementation, also load:
+When the task touches UI, UX, motion, OSCAR Mobile, desktop apps or frontend implementation, also load:
 
 - `DESIGN.md`
 - `TASTE.md`

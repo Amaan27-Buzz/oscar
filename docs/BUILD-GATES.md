@@ -78,7 +78,7 @@ start bounded long-running task
 → independently verified final state
 ```
 
-This is a control-path proof, not Sunday UI.
+This is a control-path proof, not OSCAR Mobile UI.
 
 Optional physical sleep/shutdown acceptance may remain manual-pending; do not shut down the development machine merely to make Gate B green. The typed power capability, if present, must remain high risk and owner-confirmed.
 
@@ -224,8 +224,8 @@ Required scenarios include:
 - Voice Match vs Voice Map distinction;
 - multi-device voice arbitration;
 - Persona changes expression without changing truth/permission;
-- Sunday owner-control surface shows Connection Grid state;
-- start task on Desktop, leave, inspect/control from Sunday;
+- OSCAR Mobile owner-control surface shows Connection Grid state;
+- start task on Desktop, leave, inspect/control from OSCAR Mobile;
 - one supported communication path;
 - Dictate/Edit/Ask/Act against real desktop context;
 - degraded Grid state when one embodiment goes offline.
@@ -248,7 +248,7 @@ Required scenarios include combining multiple live sources into the World Model,
 
 Deliberately break the integrated system.
 
-Required scenarios include provider/auth failure, coordinator/node/Edge loss, Grid resync, Action Ledger/Undo, memory-index failure/rebuild, unknown/partial/blocked reporting, voice spoof/false-positive checks, capture retention/deletion, Persona truthfulness regression and one complete end-to-end scenario across perception/communication → World Model/Controller/Memory Fabric → policy/planning → capability/model routing → Grid/Worker/device → ledger/artifact → verification → Sunday/voice/text result.
+Required scenarios include provider/auth failure, coordinator/node/Edge loss, Grid resync, Action Ledger/Undo, memory-index failure/rebuild, unknown/partial/blocked reporting, voice spoof/false-positive checks, capture retention/deletion, Persona truthfulness regression and one complete end-to-end scenario across perception/communication → World Model/Controller/Memory Fabric → policy/planning → capability/model routing → Grid/Worker/device → ledger/artifact → verification → OSCAR Mobile/voice/text result.
 
 **Pass:** major subsystems operate as one evidence-backed developer alpha and remaining limitations are explicit.
 
@@ -313,20 +313,34 @@ The 2026-10-05 scope authorized Slice 08. The 2026-10-06 owner decision addition
 authorizes Slice 09 software after Slice 08 integration; Slice 10, deployment and
 Galaxy Tab Home Node remain outside this work.
 
-## Current Slice 08 — owner scope, 2026-10-06
+## Slice 08 owner closure scope — 2026-10-06
 
 Owner-authorized closure scope: **COMPLETE FOR SOFTWARE / REFERENCE VOICE FOUNDATION**.
 Physical status: `DEFERRED_BY_OWNER / CONSOLIDATED_GATE_C_ACCEPTANCE_REQUIRED`.
 This is not a physical PASS. Gate C remains **PARTIAL**.
-The quality candidate on `club-c/slice-08-voice`, PR #14 into `work`, has measured
-local reference evidence against baseline `e8ac8f8bca1cb0cb7909523ac6af906ee289366f`;
-integration requires green exact-head CI.
+Slice 08 PR #14 integrated after green exact-head CI. Accepted main/work:
+`92a11aa05083f1983186976ba64bd30aa9f1f2a0`. Historical reference research baseline:
+`e8ac8f8bca1cb0cb7909523ac6af906ee289366f`.
 Existing owner harnesses remain mandatory inputs to later consolidated acceptance.
 Microphone, real-room AEC/barge-in/self-wake, owner Match/Map calibration, playback,
 Android voice and naturalness remain NOT RUN. Windows reference evidence never
 implies Android acceptance. See [Voice Core](VOICE-CORE.md) and
 [consolidated Gate C acceptance](GATE-C-CONSOLIDATED-ACCEPTANCE.md).
-Slice 09 Sunday software may begin after clean Slice 08 integration; Slice 09 must
+Slice 09 OSCAR Mobile software may begin after clean Slice 08 integration; Slice 09 must
 remain a draft and stop before owner/device acceptance. Slice 10, deployment and
 Galaxy Tab Home Node are not authorized. Physical Edge remains
 `DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED`, mandatory before Slice 17 PASS.
+
+## Current Slice 09 — 2026-10-06
+
+Slice 08 PR #14 merged; accepted main/work baseline
+`92a11aa05083f1983186976ba64bd30aa9f1f2a0`. Slice 08 is
+**COMPLETE FOR SOFTWARE / REFERENCE VOICE FOUNDATION**; physical voice is
+`DEFERRED_BY_OWNER / CONSOLIDATED_GATE_C_ACCEPTANCE_REQUIRED`, never physical PASS.
+OSCAR Mobile Kotlin/Compose rebuild is on `club-c/slice-09-sunday`, draft PR #15
+into `work`, **PARTIAL / OWNER_DEVICE_ACCEPTANCE_NOT_RUN**. Core/loopback,
+Gradle/JVM/emulated evidence is separate from actual phone/OEM acceptance.
+See [OSCAR Mobile foundation](MOBILE-FOUNDATION.md) for implementation, limits and the next owner boundary.
+Slice 09 must not merge in this run. Gate C remains PARTIAL. Slice 10, deployment
+and Home Node are not started. Post-alpha Operating Logs, specialist-model training
+and home-server migration remain documented future work, not implemented.

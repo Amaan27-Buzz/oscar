@@ -40,7 +40,7 @@ Shared geometry should persist. `Verifying` must feel more deliberate/tight, not
 
 Design the desktop side of a task that will continue after the user leaves.
 
-Show a long-running Codex/build/render process attached to OSCAR Durable Execution Runtime. Offer a concise option such as `Keep running when I leave` or policy state, plus remote visibility through Sunday.
+Show a long-running Codex/build/render process attached to OSCAR Durable Execution Runtime. Offer a concise option such as `Keep running when I leave` or policy state, plus remote visibility through OSCAR Mobile.
 
 The interface should make it obvious the task can outlive the user's physical presence without making the PC OSCAR's host.
 
@@ -62,7 +62,7 @@ No wall of cards or KPI tiles.
 
 Design the Connection Grid from desktop.
 
-Show current nodes and capability availability with a restrained operational composition: Sunday, cloud coordinator, this desktop, Edge and any other paired node. The user should understand where work is running and which nodes are offline without seeing a network-admin console.
+Show current nodes and capability availability with a restrained operational composition: OSCAR Mobile, cloud coordinator, this desktop, Edge and any other paired node. The user should understand where work is running and which nodes are offline without seeing a network-admin console.
 
 ## Desktop — provider/router usage
 

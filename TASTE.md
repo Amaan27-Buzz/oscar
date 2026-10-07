@@ -40,7 +40,7 @@ Every surface should have one primary job.
 
 Examples:
 
-- Sunday Home → OSCAR presence + whether anything matters now.
+- OSCAR Mobile Home → OSCAR presence + whether anything matters now.
 - Listening → an active conversational turn.
 - Sentry → current awareness + the one meaningful event.
 - Worker detail → responsibility + current meaningful state.
@@ -215,7 +215,7 @@ If hierarchy requires five font styles in one compact view, simplify the hierarc
 
 ## Surface taste
 
-### Sunday / mobile
+### OSCAR Mobile / mobile
 
 - Feels like native personal system software, not a web app in a phone frame.
 - OSCAR feels present without occupying half the display.
