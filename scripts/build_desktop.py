@@ -26,6 +26,8 @@ def main() -> int:
         subprocess.run(command, cwd=directory, env=env, check=True)
 
     run([npm, "ci"])
+    # Rust's bundled context macro also runs during Clippy/tests on a clean checkout.
+    run([npm, "run", "build"])
     if args.checks:
         run([npm, "run", "typecheck"])
         run([npm, "test"])
