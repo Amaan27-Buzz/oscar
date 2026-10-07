@@ -3,7 +3,7 @@
 import hashlib
 import json
 from collections.abc import Callable
-from dataclasses import asdict
+from dataclasses import asdict, replace
 from http.client import HTTPException
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from threading import Thread
@@ -100,7 +100,39 @@ class Dispatcher:
                 "correlation_id": action.correlation_id,
             },
         )
-        result = self.executors[action.capability_id](action, cancellation)
+        private = self.store.transient.get(action.task_id)
+        execution = action
+        if "transient_digest" in action.parameters:
+            if private is None:
+                raise StateConflict("private payload unavailable; no replay")
+            objective = private["objective"]
+            material = json.dumps(
+                {
+                    "description": objective.description,
+                    "parameters": private["parameters"],
+                    "criterion": objective.criterion,
+                },
+                allow_nan=False,
+            )
+            if (
+                hashlib.sha256(material.encode()).hexdigest()
+                != action.parameters["transient_digest"]
+            ):
+                raise StateConflict("private payload changed after review")
+            execution = replace(action, parameters=private["parameters"])
+        ownership = self.store.get("plan", action.task_id).get("interaction")
+        if ownership:
+            with self.store.transaction():
+                lease = self.store.get("interaction_lease", ownership["resource"])
+                if (
+                    lease.get("task_id") != action.task_id
+                    or lease["expires"] <= self.grid.clock()
+                    or lease["generation"] != ownership["generation"]
+                ):
+                    raise StateConflict("interaction fence expired")
+                lease["expires"] = self.grid.clock() + 120
+                self.store.put("interaction_lease", ownership["resource"], lease)
+        result = self.executors[action.capability_id](execution, cancellation)
         if (
             result.action_id != action.id
             or result.task_id != action.task_id
@@ -108,6 +140,15 @@ class Dispatcher:
         ):
             raise ValueError("executor returned unrelated result")
         result = parse_result(record(result))
+        if private is not None:
+            private["result"] = result
+            # Content, artifacts and arbitrary errors never enter durable result/dedup rows.
+            result = replace(
+                result,
+                value=None,
+                artifact=None,
+                error="private executor failed" if result.error else None,
+            )
         self.store.complete_action(key, record(result))
         return result
 

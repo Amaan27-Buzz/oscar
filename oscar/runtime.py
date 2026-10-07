@@ -1,5 +1,6 @@
 """Evidence-backed core loop; planning, dispatch and independent verification stay separate."""
 
+import hashlib
 import json
 from collections.abc import Callable, Mapping
 from dataclasses import replace
@@ -54,7 +55,13 @@ class Runtime:
             self.active_context.pop(task.id, None)
 
     def create(
-        self, intent: Intent, initiator: str = "owner", retry_budget: int = 2, mode: str = "auto"
+        self,
+        intent: Intent,
+        initiator: str = "owner",
+        retry_budget: int = 2,
+        mode: str = "auto",
+        *,
+        transient: bool = False,
     ) -> Task:
         if not 0 <= retry_budget <= 5:
             raise ValueError("retry budget must be between zero and five")
@@ -106,6 +113,20 @@ class Runtime:
             retry_budget=retry_budget,
             decision=decision.execution_class,
         )
+        private_parameters = parameters
+        if transient:
+            if len(self.store.transient) >= 100:
+                raise StateConflict("transient task bound reached; discard finished interactions")
+            self.store.transient[task.id] = {
+                "parameters": parameters,
+                "objective": objective,
+            }
+            parameters = {"transient_digest": hashlib.sha256(material.encode()).hexdigest()}
+            objective = replace(
+                objective,
+                description="Private desktop interaction",
+                criterion={"kind": "unavailable"},
+            )
         with self.store.transaction():
             self.store.put("objective", objective.id, record(objective))
             self.store.put("task", task.id, record(task))
@@ -137,7 +158,7 @@ class Runtime:
                 live={},
                 policy_ids=(),
             )
-        self.verifier.bind_task(task.id, parameters)
+        self.verifier.bind_task(task.id, private_parameters)
         if decision.execution_class == ExecutionClass.ASK:
             return self.store.transition(task.id, TaskState.UNKNOWN, blocker=decision.reason)
         if not kind or not self.grid.search(kind):
@@ -157,6 +178,12 @@ class Runtime:
         if task.state != TaskState.PLANNED:
             return task
         plan = self.store.get("plan", task.id)
+        if "transient_digest" in plan["parameters"] and task.id not in self.store.transient:
+            return self.store.transition(
+                task.id,
+                TaskState.BLOCKED,
+                blocker="private context expired; create a fresh request",
+            )
         candidates = [c for c in self.grid.search(plan["kind"]) if c.node_id in transports]
         if not candidates:
             return self.store.transition(
@@ -202,8 +229,21 @@ class Runtime:
                 or result.correlation_id != task.correlation_id
             ):
                 raise ValueError("transport returned unrelated result")
-            self.store.put("result", result.id, record(result))
-            if result.artifact:
+            private = self.store.transient.get(task.id)
+            persisted = (
+                replace(
+                    result,
+                    value=None,
+                    artifact=None,
+                    error="private executor failed" if result.error else None,
+                )
+                if private
+                else result
+            )
+            self.store.put("result", result.id, record(persisted))
+            if private and "result" in private:
+                result = private["result"]
+            if result.artifact and not private:
                 self.store.put("artifact", result.artifact.id, record(result.artifact))
             self.store.audit(
                 task.id,
@@ -247,11 +287,14 @@ class Runtime:
                         in {"route_unavailable", "network_policy_blocked", "network_failure"}
                     )
                     else TaskState.FAILED,
-                    blocker=result.error or "executor reported failure",
+                    blocker=("private executor failed" if private else result.error)
+                    or "executor reported failure",
                     expected_lease=lease_id,
                 )
             self.store.transition(task.id, TaskState.VERIFYING, expected_lease=lease_id)
             objective = Objective(**self.store.get("objective", task.objective_id))
+            if private:
+                objective = private["objective"]
             verification = self.verifier.verify(objective, result)
             task = self.store.transition(
                 task.id, verification.state, evidence=verification.evidence, expected_lease=lease_id
@@ -263,6 +306,7 @@ class Runtime:
                     self.store.audit(task.id, "observation_link_unavailable", {"status": "UNKNOWN"})
             if (
                 result.artifact
+                and not private
                 and task.state == TaskState.VERIFIED
                 and verification.evidence.artifact_id == result.artifact.id
             ):
@@ -294,6 +338,13 @@ class Runtime:
             )
         finally:
             current = self.store.task(task.id)
+            ownership = plan.get("interaction")
+            if ownership:
+                with self.store.transaction():
+                    interaction = self.store.get("interaction_lease", ownership["resource"])
+                    if interaction.get("task_id") == task.id:
+                        interaction["expires"] = 0
+                        self.store.put("interaction_lease", ownership["resource"], interaction)
             # A different Store/process may have completed or cancelled the task.
             for resources in list(self.store.task_resources):
                 resources.task_transitioned(current)

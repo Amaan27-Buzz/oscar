@@ -433,3 +433,7 @@ polish the retired UI, redraw the canonical Orb, create an Android brain or requ
 owner/device interaction. Gate C PARTIAL; OWNER_DEVICE_ACCEPTANCE_NOT_RUN.
 No Elocution inspection/work, model training, Operating Logs, home-server migration
 or Slice 10. See [Mobile foundation](docs/MOBILE-FOUNDATION.md).
+
+## Current Slice 10 owner scope — 2026-10-07
+
+Owner accepted `main == work == 7043b9663fe6474e3457c7aa578e733f7a5a4c1a`; Slice 09 software is merged. The current authorized work is Slice 10 Desktop Interaction Runtime on `club-d2/slice-10-desktop`, draft PR into `work`, **OWNER_ACCEPTANCE_NOT_RUN**. Do not merge in this run or start Slice 11. This explicit authorization supersedes older Slice 10 prohibitions; it does not authorize 09R, deployment, Home Node or post-alpha work. Core stays authoritative and Windows UIA/browser/Worker remain the execution backend. Physical Edge, Voice and Mobile acceptance remain owner-deferred; Gate C PARTIAL. See [Desktop foundation](docs/DESKTOP-FOUNDATION.md).

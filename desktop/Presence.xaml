@@ -1,0 +1,83 @@
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="OSCAR" Width="540" Height="112" MinWidth="440" MinHeight="112"
+        Background="#F7F5EF" Foreground="#252525" FontFamily="Segoe UI"
+        WindowStartupLocation="CenterScreen" ResizeMode="CanResizeWithGrip">
+  <Window.Resources>
+    <Style TargetType="Button">
+      <Setter Property="Padding" Value="12,6"/>
+      <Setter Property="Margin" Value="0,0,8,0"/>
+      <Setter Property="Background" Value="#EAE7DF"/>
+      <Setter Property="BorderThickness" Value="0"/>
+    </Style>
+  </Window.Resources>
+  <DockPanel Margin="20,12">
+    <Grid DockPanel.Dock="Top" Height="56">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="56"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/>
+      </Grid.ColumnDefinitions>
+      <Image x:Name="Orb" Width="48" Height="48" AutomationProperties.Name="Canonical OSCAR Orb"/>
+      <StackPanel Grid.Column="1" Margin="12,4">
+        <TextBlock Text="OSCAR" FontSize="17" FontWeight="SemiBold"/>
+        <TextBlock x:Name="State" Text="Connecting to Core" FontSize="12"/>
+      </StackPanel>
+      <Button x:Name="Expand" Grid.Column="2" Content="Open" VerticalAlignment="Center"
+              AutomationProperties.Name="Expand or collapse OSCAR"/>
+    </Grid>
+    <ScrollViewer x:Name="Body" Visibility="Collapsed" Margin="0,12,0,0" VerticalScrollBarVisibility="Auto">
+    <StackPanel>
+      <TextBlock x:Name="Boundary" Text="One OSCAR relationship · transient context" FontSize="12"/>
+      <StackPanel Orientation="Horizontal" Margin="0,12,0,10">
+        <ComboBox x:Name="Mode" Width="112" SelectedIndex="0" AutomationProperties.Name="Interaction mode">
+          <ComboBoxItem Content="Ask"/><ComboBoxItem Content="Dictate"/>
+          <ComboBoxItem Content="Edit"/><ComboBoxItem Content="Act"/>
+        </ComboBox>
+        <ComboBox x:Name="CaptureSource" Width="170" Margin="12,0" SelectedIndex="0"
+                  AutomationProperties.Name="Context for next invocation">
+          <ComboBoxItem Content="No context" Tag=""/>
+          <ComboBoxItem Content="Selection on invoke" Tag="selection"/>
+          <ComboBoxItem Content="Focused field on invoke" Tag="focused"/>
+          <ComboBoxItem Content="Window on invoke" Tag="foreground"/>
+        </ComboBox>
+        <Button x:Name="Discard" Content="Discard"/>
+      </StackPanel>
+      <TextBox x:Name="Context" Text="No context attached" IsReadOnly="True" TextWrapping="Wrap"
+               MaxHeight="88" BorderThickness="0" Background="Transparent"
+               VerticalScrollBarVisibility="Auto" AutomationProperties.Name="Included transient context"/>
+      <StackPanel x:Name="ActFields" Visibility="Collapsed" Margin="0,10,0,0">
+        <TextBlock Text="Write exact file in the approved workspace"/>
+        <TextBox x:Name="ActPath" MaxLength="200" Margin="0,6,0,0"
+                 AutomationProperties.Name="Relative file path in approved Worker workspace"/>
+      </StackPanel>
+      <TextBox x:Name="Input" MinHeight="84" MaxHeight="160" TextWrapping="Wrap" AcceptsReturn="True"
+               VerticalScrollBarVisibility="Auto" MaxLength="4096" Margin="0,12,0,10"
+               AutomationProperties.Name="Question, dictated text, transformation instruction or file content"/>
+      <StackPanel Orientation="Horizontal">
+        <Button x:Name="Submit" Content="Continue"/>
+        <Button x:Name="Voice" Content="Push to dictate" ToolTip="Explicit microphone capture; release to stop"/>
+      </StackPanel>
+      <ScrollViewer MaxHeight="120" VerticalScrollBarVisibility="Auto" Margin="0,14,0,10">
+        <TextBlock x:Name="Result" TextWrapping="Wrap"/>
+      </ScrollViewer>
+      <ListBox x:Name="Tasks" MaxHeight="110" DisplayMemberPath="label"
+               AutomationProperties.Name="Shared Core tasks"/>
+      <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+        <Button x:Name="Approve" Content="Review approval" IsEnabled="False"/>
+        <Button x:Name="Cancel" Content="Cancel task" IsEnabled="False"/>
+        <Button x:Name="Preview" Content="Edit preview" IsEnabled="False"/>
+      </StackPanel>
+      <TextBox x:Name="PreviewText" IsReadOnly="True" TextWrapping="Wrap" MaxHeight="90"
+               Visibility="Collapsed" Margin="0,12,0,8" AutomationProperties.Name="Reviewed text preview"/>
+      <StackPanel x:Name="ApplyControls" Orientation="Horizontal" Visibility="Collapsed">
+        <ComboBox x:Name="Destination" Width="150" SelectedIndex="0" AutomationProperties.Name="Text destination">
+          <ComboBoxItem Content="OSCAR surface" Tag="surface"/>
+          <ComboBoxItem Content="Explicit clipboard" Tag="clipboard"/>
+          <ComboBoxItem Content="Captured field" Tag="focused"/>
+        </ComboBox>
+        <Button x:Name="Apply" Content="Accept preview" Margin="12,0"/>
+      </StackPanel>
+      <TextBlock x:Name="Shortcut" Margin="0,14,0,0" FontSize="11" TextWrapping="Wrap"/>
+    </StackPanel>
+    </ScrollViewer>
+  </DockPanel>
+</Window>

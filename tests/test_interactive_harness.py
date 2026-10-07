@@ -12,7 +12,7 @@ from types import SimpleNamespace
 from unittest.mock import patch
 
 from oscar.powershell import discover
-from oscar.windows_desktop import BRIDGE, WindowsDesktop
+from oscar.windows_desktop import BRIDGE, BRIDGE_PATH, WindowsDesktop
 from scripts.verify_gate_b_interactive import (
     AcceptanceFailure,
     failure_evidence,
@@ -212,14 +212,12 @@ class InteractiveHarnessTests(unittest.TestCase):
     def test_native_bridge_parses_without_running_desktop_actions(self):
         manifest = discover()
         self.assertIsNotNone(manifest)
-        encoded = base64.b64encode(BRIDGE.encode()).decode()
+        encoded = base64.b64encode(str(BRIDGE_PATH).encode()).decode()
         script = (
-            "$source=[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('"
-            + encoded
-            + "'));"
+            "$path=[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('" + encoded + "'));"
             "$tokens=$null;$errors=$null;"
-            "[void][System.Management.Automation.Language.Parser]::ParseInput("
-            "$source,[ref]$tokens,[ref]$errors);"
+            "[void][System.Management.Automation.Language.Parser]::ParseFile("
+            "$path,[ref]$tokens,[ref]$errors);"
             "if ($errors.Count) {$errors|ForEach-Object {$_.Message};exit 1}"
         )
         result = subprocess.run(

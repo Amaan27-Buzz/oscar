@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-10-07 — Slice 10 Desktop Interaction Runtime candidate
+
+- Added native WPF compact presence, canonical Orb/tray, configurable collision-aware global invocation and scoped Ask/Dictate/Edit/Act.
+- Reused Core tasks, signed authority, Controller/policy, Grid and Windows Worker/UIA/browser contracts.
+- Added typed opt-in transient context, final-transcript Dictate, Edit preview/apply fencing, independent destination readback and restart/replay/ownership safeguards.
+- Verified harmless WPF/CNG/Core and registered UIA Windows references; owner desktop/microphone/device acceptance remains NOT RUN. Gate C remains PARTIAL; draft is not merged.
+- See [Desktop foundation](docs/DESKTOP-FOUNDATION.md).
+
 ## 2026-10-06 — Slice 08 software/reference quality closure
 
 - Reconciled authoritative post-alpha docs; preserved future scope and voice portability.

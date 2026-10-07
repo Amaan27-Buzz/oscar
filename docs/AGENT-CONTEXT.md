@@ -1,5 +1,9 @@
 # Coding-agent context
 
+## Current Slice 10 owner scope — 2026-10-07
+
+Accepted starting baseline is `main == work == 7043b9663fe6474e3457c7aa578e733f7a5a4c1a`; Slice 09 software is merged. Slice 10 continues on `club-d2/slice-10-desktop` as a draft into `work`, never merged in this run. 09R, Slice 11, deployment, Home Node and post-alpha work are outside this scope. See [Desktop foundation](DESKTOP-FOUNDATION.md).
+
 OSCAR keeps one canonical project truth and uses thin agent-specific adapters. Do not duplicate the whole architecture into every tool prompt.
 
 ## Canonical files

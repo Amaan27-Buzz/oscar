@@ -498,3 +498,7 @@ expressive animation remains Slice 13. Text reasoning/retrieval stays in existin
 scoped Core capabilities and responses remain REPORTED without independent evidence.
 PR #15 stays an owner-review candidate, not physical acceptance.
 See [implementation and migration](MOBILE-FOUNDATION.md).
+
+## Decision — Native Desktop is a Core surface; private context is transient
+
+WPF on installed Windows PowerShell/.NET is the current shell. Reuse Core signed authority and existing Worker capabilities rather than adding a Rust/Tauri/WebView bridge or a desktop brain. Presentation, context, OS execution and verification remain separate. Private payloads use a digest-bound process-local Runtime path and anonymous UIA stdin; restart loses content and blocks execution. Cross-process private payload transport and strong native critical approval are not silently invented. See [tradeoffs and acceptance](DESKTOP-FOUNDATION.md).

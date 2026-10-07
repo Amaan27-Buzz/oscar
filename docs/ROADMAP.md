@@ -360,9 +360,9 @@ The functional app may continue into later slices while the mobile visual/intera
 
 See [OSCAR Mobile UI Redesign Track](MOBILE-UI-REDESIGN.md).
 
-## Slice 10 — Desktop Interaction Runtime ◻️
+## Slice 10 — Desktop Interaction Runtime 🚧
 
-Polished native desktop embodiment: ambient presence, Dictate/Edit/Ask/Act, focused app/window/selection/accessibility/screenshot context, approvals/task progress and fluid state transformations.
+Native Windows WPF software/reference candidate on `club-d2/slice-10-desktop`, draft into `work`. Compact presence, Ask/Dictate/Edit/Act, explicit typed context, signed approvals, Core task continuity, UIA expected-value application and independent readback. **OWNER_ACCEPTANCE_NOT_RUN**; not authorized to merge. See [Desktop foundation](DESKTOP-FOUNDATION.md). Screenshot capture is not advertised. Gate C stays PARTIAL.
 
 ## Slice 11 — World Model + Perception Fabric + persistent Sentry + optional Daily Journal ◻️
 
@@ -427,7 +427,7 @@ Slices 07–09 now have their accepted software/reference foundations. PR #15 me
 OSCAR Mobile into `work`; physical Edge, Voice and Android acceptance remain explicitly
 owner-deferred, so Gate C is still PARTIAL.
 
-Current next backend/runtime work is **Slice 10 — Desktop Interaction Runtime**.
+Current backend/runtime candidate is **Slice 10 — Desktop Interaction Runtime**. Stop at owner/manual desktop acceptance; do not begin Slice 11 or merge this draft.
 The parallel **09R OSCAR Mobile UI redesign track** may proceed section by section
 without blocking Slices 10–16, but it must be integrated before Slice 17 Unified Alpha PASS.
 Post-alpha Operating Logs, Elocution-derived voice evolution, specialist models and

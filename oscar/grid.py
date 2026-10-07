@@ -187,6 +187,38 @@ class Grid:
             return Availability.REFLEX_ONLY
         return Availability.OFFLINE
 
+    def claim_interaction(self, session: SessionHandle, resource: str) -> dict[str, Any]:
+        """Core-owned, expiring surface ownership; does not authorize execution or capture."""
+        self.authenticate(session, "heartbeat")
+        if not isinstance(resource, str) or not 0 < len(resource) <= 120:
+            raise ValueError("bounded interaction resource required")
+        with self.store.transaction():
+            try:
+                lease = self.store.get("interaction_lease", resource)
+                previous = self.store.get("session", lease["session"])
+                node = self.store.get("node", lease["node"])
+            except KeyError:
+                lease, previous, node = {}, {}, {}
+            live = (
+                lease.get("expires", 0) > self.clock()
+                and previous.get("expires_at", 0) > self.clock()
+                and not previous.get("revoked", True)
+                and not node.get("revoked", True)
+            )
+            if live and lease.get("task_id"):
+                raise StateConflict("a text application already owns this interaction")
+            if live and lease["session"] != session.id:
+                raise StateConflict("another surface owns this interaction")
+            generation = lease.get("generation", 0) + (0 if live else 1)
+            lease = {
+                "session": session.id,
+                "node": session.node_id,
+                "expires": self.clock() + 15,
+                "generation": generation,
+            }
+            self.store.put("interaction_lease", resource, lease)
+        return lease
+
     def lease(self, task_id: str, node_id: str, ttl: float = 20) -> str:
         if not 0 < ttl <= 300:
             raise ValueError("invalid lease lifetime")

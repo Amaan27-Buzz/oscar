@@ -1,0 +1,66 @@
+{
+  "starting_sha": "7043b9663fe6474e3457c7aa578e733f7a5a4c1a",
+  "branch": "club-d2/slice-10-desktop",
+  "observed_at": "2026-10-07T02:11:37.862867+00:00",
+  "platform": "Windows",
+  "python": "3.14.2",
+  "evidence_class": "REFERENCE",
+  "wpf_cng": {
+    "evidence": "REFERENCE_WPF_RENDER",
+    "native_cng_signed_core": "VERIFIED",
+    "owner_acceptance": "NOT_RUN",
+    "orb_source_sha256": "728aeac3c9aa590b67d45c469735e919ede93a8503964e24f0f4af18cda066c5"
+  },
+  "registered_worker_uia": {
+    "evidence": "REFERENCE_WINDOWS_WPF_UIA_WORKER",
+    "state": "VERIFIED",
+    "context": "fresh registered focused ValuePattern",
+    "application": "signed preview -> expected-value fence -> ValuePattern",
+    "verification": "independent UIA exact readback",
+    "pipe_boundary": "8192 Unicode characters roundtrip VERIFIED",
+    "stale_write": "rejected; destination unchanged VERIFIED",
+    "retention": "database content absence VERIFIED",
+    "owner_acceptance": "NOT_RUN",
+    "microphone": "NOT_RUN",
+    "evidence_ids": [
+      "1b0875be1b0d42d0b84a2e3d372db58b"
+    ]
+  },
+  "new_desktop_tests": {
+    "count": 25,
+    "scope": "SOFTWARE / SIMULATED fixtures; no physical acceptance"
+  },
+  "local_regressions": {
+    "command": "python -m unittest discover -s tests -t . -v",
+    "result": "PASS",
+    "tests": 522,
+    "seconds": 203.044,
+    "skipped": 6
+  },
+  "static_checks": [
+    "ruff check",
+    "ruff format --check",
+    "mypy oscar and desktop scripts"
+  ],
+  "canonical_orb": "source unchanged; source/render digests checked",
+  "visual_review": "WPF reference render inspected; no normal owner app/clipboard/microphone captured",
+  "exact_head_ci": "authoritative draft PR checks; no CI completion inferred from this local receipt",
+  "owner_desktop_acceptance": "OWNER_ACCEPTANCE_NOT_RUN",
+  "physical_edge": "DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED",
+  "physical_voice_mobile": "DEFERRED_BY_OWNER / CONSOLIDATED_GATE_C_ACCEPTANCE_REQUIRED",
+  "gate_c": "PARTIAL",
+  "limitations": [
+    "repository-run WPF alpha; no installer/macOS/Linux",
+    "selected-text preview uses surface/explicit clipboard; application requires explicit full focused field",
+    "private payload dispatch requires shared trusted Store object; independent network stores fail closed",
+    "critical actions await strong native owner approval",
+    "reference UI has no prepared voice adapter; physical audio NOT_RUN",
+    "GUI Act exposes exact file writing; advanced clients use existing typed capability plans"
+  ],
+  "scope_preserved": [
+    "09R untouched",
+    "Slice 11 not started",
+    "no deployment/Home Node/post-alpha work",
+    "draft not merged"
+  ]
+}

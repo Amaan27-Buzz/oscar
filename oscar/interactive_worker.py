@@ -277,7 +277,12 @@ class InteractiveWorker(MachineWorker):
                     output = json.dumps({"target_bound": True})
                 else:
                     code, output = self.run_command(
-                        action, cancellation, self.desktop.command(request), ".", 15
+                        action,
+                        cancellation,
+                        self.desktop.command(request),
+                        ".",
+                        15,
+                        input_data=self.desktop.input(request),
                     )
                     self.outputs[action.id] = output
                     if code:

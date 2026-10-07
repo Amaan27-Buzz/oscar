@@ -1,5 +1,9 @@
 # Build Gates
 
+## Slice 10 software/reference boundary
+
+Desktop candidate checks cover typed context, permission/freshness denial, signed approval/replay, preview/apply fencing, shared tasks, ownership, cancellation, private restart and real WPF/UIA/CNG reference execution. OWNER_ACCEPTANCE_NOT_RUN: everyday desktop contexts, prepared microphone/output routes and real Mobile continuity still require owner acceptance. Gate C remains PARTIAL; reference/CI success is not a physical PASS. See [Desktop foundation](DESKTOP-FOUNDATION.md).
+
 Build Gates group detailed roadmap slices into larger manual verification checkpoints. They do not replace slice exit conditions.
 
 At each Gate:

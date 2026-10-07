@@ -1,5 +1,9 @@
 # Security + Permissions
 
+## Desktop private context boundary
+
+Desktop perception, clipboard, microphone and action grants remain separate; no retention grant is inferred. Password/hidden/unregistered content fails closed, private inputs/results are process-local, and restart blocks replay. Signed session/digest/expiry challenges create no permanent grants; critical capabilities await strong owner approval. The fixed UIA source receives bounded private stdin rather than command-line text. See [Desktop foundation](DESKTOP-FOUNDATION.md).
+
 OSCAR acts across phones, computers, cloud services, communications and physical hardware. Security is architectural, not a later hardening pass.
 
 ## Core rules

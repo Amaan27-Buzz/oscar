@@ -1,5 +1,9 @@
 # OSCAR Connection Grid
 
+## Desktop interaction ownership
+
+Grid now stores expiring generation-fenced interaction leases alongside existing task/executor leases. A reviewed text application binds input ownership to its Core task and rechecks it at Dispatcher; loss expires ownership. Desktop tasks are inspectable by eligible Mobile owner sessions without a private desktop task universe. Real Mobile/Desktop handoff remains owner acceptance. See [Desktop foundation](DESKTOP-FOUNDATION.md).
+
 ## Purpose
 
 OSCAR should not feel tied to one machine. The **Connection Grid** is the persistent availability and control fabric across OSCAR Mobile, desktop machines, cloud coordination and OSCAR Edge.

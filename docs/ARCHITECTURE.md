@@ -1,5 +1,9 @@
 # System Architecture
 
+## Desktop foundation — current Slice 10
+
+Windows WPF presentation and explicit OS context adapters connect to the existing OSCAR Core. Core owns Controller, memory, tasks, policy, permission, routing and evidence; Runtime/Dispatcher resolve bounded process-local private inputs only after durable authorization. Desktop does not duplicate Worker/browser/UIA execution. See [Desktop foundation](DESKTOP-FOUNDATION.md).
+
 ## Overview
 
 OSCAR is a distributed personal-intelligence system: one coherent intelligence spanning cloud coordination, phone, desktop machines, communications and physical Edge hardware. No ordinary user computer is assumed to be permanently available.
