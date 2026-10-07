@@ -16,5 +16,11 @@ platform icons, thumbnails and previews. These legacy files predate this SVG;
 they are not asserted to be newly exported or pixel-identical derivatives.
 Future raster exports should derive from the canonical SVG.
 
+OSCAR Mobile's native `oscar_orb.png` is a deterministic Chromium 2x render of this
+unchanged SVG, including its filter/shadow. [Render receipt](../../mobile/orb-render.json)
+binds source and output digests; [the maintainer tool](../../scripts/render_mobile_orb.py)
+regenerates it. The APK packages the original SVG too. This is a format conversion,
+not new branding, geometry or an accepted expressive-avatar implementation.
+
 This asset establishes visual identity; it does not establish implemented UI,
 Android behavior, manual acceptance or any Gate B completion claim.

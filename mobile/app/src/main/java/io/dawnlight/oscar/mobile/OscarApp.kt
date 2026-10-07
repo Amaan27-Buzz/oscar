@@ -1,8 +1,6 @@
 package io.dawnlight.oscar.mobile
 
-import android.graphics.Color as AndroidColor
-import android.util.Base64
-import android.webkit.WebView
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -12,11 +10,12 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.*
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.json.JSONObject
 
@@ -35,12 +34,14 @@ private val Ink = Color(0xFF1A1B18)
     var pairing by remember { mutableStateOf(false) }
     var draft by remember { mutableStateOf("") }
     val destination = Destination.entries.firstOrNull { it.name == selected } ?: Destination.OSCAR
+    val focus = LocalFocusManager.current
+    val keyboard = LocalSoftwareKeyboardController.current
     OscarTheme {
-        Scaffold(containerColor = Paper, bottomBar = {
+        Scaffold(modifier = Modifier.imePadding(), containerColor = Paper, bottomBar = {
             Surface(tonalElevation = 0.dp) {
                 Row(Modifier.fillMaxWidth().navigationBarsPadding(), horizontalArrangement = Arrangement.SpaceEvenly) {
                     Destination.entries.forEach { item ->
-                        TextButton(onClick = { selected = item.name; settingsPage = "Settings" }, modifier = Modifier.weight(1f).heightIn(min = 56.dp)
+                        TextButton(onClick = { focus.clearFocus(); keyboard?.hide(); selected = item.name; settingsPage = "Settings" }, modifier = Modifier.weight(1f).heightIn(min = 56.dp)
                             .semantics { this.selected = item == destination }) { Text(item.label,
                                 color = if (item == destination) MaterialTheme.colorScheme.secondary else Ink,
                                 fontWeight = if (item == destination) androidx.compose.ui.text.font.FontWeight.SemiBold else androidx.compose.ui.text.font.FontWeight.Normal) }
@@ -48,7 +49,7 @@ private val Ink = Color(0xFF1A1B18)
                 }
             }
         }) { insets ->
-            Box(Modifier.fillMaxSize().padding(insets).imePadding(), contentAlignment = Alignment.TopCenter) {
+            Box(Modifier.fillMaxSize().padding(insets), contentAlignment = Alignment.TopCenter) {
             Column(Modifier.widthIn(max = 720.dp).fillMaxWidth().padding(horizontal = 24.dp)
                 .verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 Spacer(Modifier.height(8.dp))
@@ -61,8 +62,8 @@ private val Ink = Color(0xFF1A1B18)
                     TextButton(onClick = { pairing = true }) { Text("Connect Core") }
                 }
                 when (destination) {
-                    Destination.OSCAR -> PresenceScreen(state, draft, { draft = it }, { session.send(draft); draft = "" }, session::cancelRequest,
-                        { selected = Destination.ACTIVITY.name }, { selected = Destination.SETTINGS.name; settingsPage = "Voice" })
+                    Destination.OSCAR -> PresenceScreen(state, draft, { draft = it }, { focus.clearFocus(); keyboard?.hide(); session.send(draft); draft = "" }, session::cancelRequest,
+                        { focus.clearFocus(); keyboard?.hide(); selected = Destination.ACTIVITY.name }, { focus.clearFocus(); keyboard?.hide(); selected = Destination.SETTINGS.name; settingsPage = "Voice" })
                     Destination.ACTIVITY -> ActivityScreen(state, session::inspect, session::review)
                     Destination.DEVICES -> DevicesScreen(state, { pairing = true })
                     Destination.SETTINGS -> SettingsScreen(settingsPage, { settingsPage = it }, session, state)
@@ -115,15 +116,6 @@ private val Ink = Color(0xFF1A1B18)
     })
 }
 @Composable fun OscarOrb(presence: Presence) {
-    val context = LocalContext.current
-    AndroidView(modifier = Modifier.size(144.dp).testTag("orb").semantics { contentDescription = "OSCAR presence"; stateDescription = presence.name.lowercase() }, factory = {
-        WebView(context).apply {
-            setBackgroundColor(AndroidColor.TRANSPARENT)
-            settings.javaScriptEnabled = false; settings.allowFileAccess = false; settings.allowContentAccess = false; settings.blockNetworkLoads = true
-            importantForAccessibility = android.view.View.IMPORTANT_FOR_ACCESSIBILITY_NO
-            val svg = context.assets.open("oscar-orb.svg").use { it.readBytes() }
-            val encoded = Base64.encodeToString(svg, Base64.NO_WRAP)
-            loadDataWithBaseURL(null, "<html style='height:100%'><head><meta name='viewport' content='width=device-width,initial-scale=1'></head><body style='height:100%;margin:0;background:transparent'><img style='width:100%;height:100%;object-fit:contain' src='data:image/svg+xml;base64,$encoded'></body></html>", "text/html", "UTF-8", null)
-        }
-    }, update = { it.alpha = if (presence in setOf(Presence.UNAVAILABLE, Presence.MUTED)) 0.55f else 1f }, onRelease = { it.destroy() })
+    Image(painterResource(R.drawable.oscar_orb), contentDescription = "OSCAR presence",
+        modifier = Modifier.size(144.dp).testTag("orb").semantics { stateDescription = presence.name.lowercase() })
 }

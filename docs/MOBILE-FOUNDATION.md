@@ -106,8 +106,12 @@ Selected assistant role / VoiceInteractionService opens the same surface. Recogn
 explicitly reports unavailable until commissioned. Overlay/widgets are documented,
 unimplemented; OEM invocation/background behavior awaits device acceptance.
 
-Canonical `assets/brand/oscar-orb.svg` is packaged byte-for-byte and rendered without
-scripts, file/content access or network. Nine-state hooks: idle, attentive, listening,
+Canonical `assets/brand/oscar-orb.svg` is packaged byte-for-byte. Native Compose displays
+a deterministic 2x PNG render of that unchanged SVG, preserving gradients/shadow and
+geometry. `mobile/orb-render.json` binds both digests; builds reject stale artwork.
+`scripts.render_mobile_orb` is an optional maintainer render tool, not a runtime browser.
+This replaces the failing WebView renderer; no artwork is redrawn/reinterpreted.
+Nine-state hooks: idle, attentive, listening,
 thinking, speaking, waiting, muted, unavailable, error/attention. Current mapping uses
 only justified connection/task states. Expressive Orb/facial work remains Slice 13.
 

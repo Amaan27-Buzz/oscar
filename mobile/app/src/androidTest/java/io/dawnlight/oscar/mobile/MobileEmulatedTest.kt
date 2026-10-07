@@ -22,11 +22,18 @@ class MobileEmulatedTest {
         compose.onNodeWithText("Permissions & privacy").assertIsDisplayed()
         compose.onNodeWithText("OSCAR").performClick()
         compose.onNodeWithTag("orb").assertExists()
+        compose.runOnIdle {
+            val image = android.graphics.BitmapFactory.decodeResource(compose.activity.resources, R.drawable.oscar_orb)
+            assertEquals(1164, image.width); assertEquals(1164, image.height)
+            assertNotEquals(0, android.graphics.Color.alpha(image.getPixel(576, 584)))
+            assertNotEquals(image.getPixel(576, 584), image.getPixel(50, 50))
+            image.recycle()
+        }
     }
     @Test fun disconnectedAndVoiceUnavailableNeverAdvertiseSuccess() {
         compose.onNodeWithTag("interactionInput").performTextInput("2 + 3")
         compose.onNodeWithText("Send").assertIsNotEnabled()
-        compose.onNodeWithText("Voice").performClick()
+        compose.onNodeWithText("Voice").performScrollTo().performClick()
         compose.onNodeWithText("Android voice binding is not commissioned. Listening, playback, Voice Match and Voice Map are unavailable.").assertExists()
         val context = compose.activity
         assertFalse(context.getSharedPreferences("permissions", Context.MODE_PRIVATE).getBoolean("microphone_perception", false))

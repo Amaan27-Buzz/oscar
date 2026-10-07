@@ -23,7 +23,9 @@ import androidx.compose.ui.unit.dp
     state.snapshot?.tasks?.firstOrNull { it.state in setOf("executing", "awaiting_result", "result_received", "verifying") }?.let { task ->
         TextButton(onClick = activity) { Text("Running · ${task.description}") }
     }
-    OutlinedTextField(draft, { write(it.take(1000)) }, modifier = Modifier.fillMaxWidth().testTag("interactionInput"), label = { Text("Write to OSCAR") }, minLines = 2, maxLines = 5)
+    OutlinedTextField(draft, { write(it.take(1000)) }, modifier = Modifier.fillMaxWidth().testTag("interactionInput"), label = { Text("Write to OSCAR") }, minLines = 2, maxLines = 5,
+        keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(imeAction = androidx.compose.ui.text.input.ImeAction.Send),
+        keyboardActions = androidx.compose.foundation.text.KeyboardActions(onSend = { if (state.link == Link.CONNECTED && !state.busy && draft.isNotBlank()) send() }))
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         Button(onClick = send, enabled = state.link == Link.CONNECTED && !state.busy && draft.isNotBlank()) { Text("Send") }
         TextButton(onClick = voice) { Text("Voice") }

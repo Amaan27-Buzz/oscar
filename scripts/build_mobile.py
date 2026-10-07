@@ -23,6 +23,16 @@ def main() -> int:
         command.insert(0, "sh")
     subprocess.run(command, cwd=root / "mobile", check=True, timeout=1800)
     apk = root / "mobile/app/build/outputs/apk/debug/app-debug.apk"
+    render = root / "mobile/app/src/main/res/drawable-nodpi/oscar_orb.png"
+    receipt = json.loads((root / "mobile/orb-render.json").read_text(encoding="utf-8"))
+    if (
+        receipt["source_sha256"]
+        != hashlib.sha256((root / "assets/brand/oscar-orb.svg").read_bytes()).hexdigest()
+        or receipt["render_sha256"] != hashlib.sha256(render.read_bytes()).hexdigest()
+    ):
+        raise RuntimeError(
+            "Canonical Orb/native render mismatch; regenerate from the unchanged SVG"
+        )
     with zipfile.ZipFile(apk) as archive:
         orb = archive.read("assets/oscar-orb.svg")
         if orb != (root / "assets/brand/oscar-orb.svg").read_bytes():
@@ -33,6 +43,7 @@ def main() -> int:
         "evidence_class": "REFERENCE",
         "apk_sha256": hashlib.sha256(apk.read_bytes()).hexdigest(),
         "orb_sha256": hashlib.sha256(orb).hexdigest(),
+        "native_orb_render_sha256": receipt["render_sha256"],
         "package": "io.dawnlight.oscar.mobile",
         "build": "Kotlin/Compose Gradle debug reference, not production signing",
         "owner_device_acceptance": "OWNER_DEVICE_ACCEPTANCE_NOT_RUN",
