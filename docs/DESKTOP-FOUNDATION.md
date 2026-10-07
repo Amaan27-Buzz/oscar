@@ -9,41 +9,74 @@ Slice 09 software is accepted. The separate 09R redesign, Slice 11, deployment,
 Home Node and post-alpha work are outside this run. Physical Edge, Voice and
 Mobile acceptance remain owner-deferred under the consolidated Gate C contract.
 
-## Shell decision
+## Product shell — owner-selected Tauri
 
-Windows WPF, hosted by the installed Windows PowerShell/.NET runtime, is the
-native presentation boundary. Python uses the existing Core and Windows adapters.
-No new runtime dependency was added. Owner signing reuses the existing optional
-`mobile` cryptography extra; Windows CNG signs the native surface's decisions.
+The product shell is **Tauri 2 / Rust / React-TypeScript**, with Vite and custom
+CSS. The owner superseded the original WPF choice during PR #16 hardening.
+The reviewed Python/Core architecture is retained. Rust owns lifecycle, one
+resizable window, tray, invocation, authenticated transport and signing; React
+owns presentation. WPF now lives in `desktop/reference/wpf/` only as an
+independent deterministic Windows reference harness. Historical evidence remains
+historical, including the October 7 WPF receipt.
 
-Rust/Tauri would introduce a separate application build, browser host and bridge
-to a Python Core that already owns these contracts. WinUI would also introduce
-packaging/runtime requirements. WPF provides supported Windows controls, UIA,
-keyboard focus, tray integration and window-message invocation at the current
-boundary. A future shell can replace presentation without replacing Core tasks,
-policy, evidence or the Windows Worker. This is a repository-run alpha foundation,
-not an installer, portable executable or macOS/Linux acceptance.
-
-`desktop/Presence.xaml` owns layout; `desktop/Presence.ps1` owns presentation and
-native invocation. `oscar/desktop.py` is a scoped Core surface adapter. It reuses
-Mobile's signed challenges, scoped sessions, receipt deduplication, task inspection
-and cancellation. Legacy `sunday_*` record identities remain wire compatible;
-they do not create another assistant. `DesktopContext`, `WindowsContext`,
-`DesktopVerifier` and `DesktopVoice` separate context, Windows observation,
-verification and audio from presentation.
+Pinned supported toolchain: Tauri 2.12.1, Rust 1.99.0, React 19.3.0,
+TypeScript 7.0.2, Vite 8.3.3, Node LTS 24.21.0. No component framework or motion
+library is required. The canonical SVG is imported directly, unchanged.
 
 ```text
-WPF presence / Windows context adapter
-  ↔ authenticated loopback /v1/desktop
-  ↔ Desktop Core surface admission
-  ↔ Controller + Personal Policy + existing Runtime / Grid
-  ↔ existing Dispatcher / Worker / UIA / browser / files / terminal
-  → independent verification → shared task / Action Ledger
+React/TypeScript → bounded typed Tauri IPC/events → Rust native shell
+  ↔ authenticated loopback /v1/desktop → existing Desktop Core adapter
+  ↔ Controller / Personal Policy / Runtime / Grid
+  ↔ existing Worker / UIA / browser / files / Git / typed PowerShell
+  → independent readback → shared tasks / Action Ledger
 ```
 
-The local composition is not deployment. No ordinary PC becomes the permanent
-Core host. Non-loopback transport, Windows Hello approval, packaging and device
-acceptance are not represented as implemented.
+`desktop/src/` contains independently changeable interaction, Act and state
+presentation. `desktop/src-tauri/src/{protocol,core,signing,main}.rs` contains
+the typed boundary, native Core transport, CNG key and shell. Core still owns
+identity, memory, task truth, permissions, policy, routing and evidence.
+No desktop history, scheduler or reasoning engine is added.
+
+Only `desktop_command` and local event listening/window dragging are admitted.
+IPC uses closed enums and denies unknown fields. No shell/filesystem/HTTP plugin
+is exposed. Bundled content uses restrictive CSP without unsafe script/style,
+remote frames or external navigation. Development-only Vite style/HMR allowances
+are separate. React escapes private text; it does not store credentials or history.
+
+Trusted composition enrolls the native-generated public RSA key, then supplies
+scoped credentials through anonymous stdin. Rust keeps the bearer in zeroizing
+memory and the private key in Windows CNG handles; it never exports the private
+key. The WebView gets neither bootstrap nor signing payload. Core calls prohibit
+redirects/proxies, require explicit IPv4 loopback/port and bound response size.
+Mutations are not automatically retried. This is a trusted local alpha boundary,
+not a hostile-host or deployed remote transport claim.
+
+One window supports compact presence, interaction, focused approval and larger
+activity. Native state is projected through typed events; Rust polls the existing
+Core contract every two seconds with no parallel frontend polling. Stale context
+is visibly marked; local discard clears content even when Core acknowledgement
+is unavailable. Shared task metadata remains authoritative.
+
+Baseline accessibility includes labelled controls, keyboard mode navigation,
+visible focus, scalable typography, reduced-motion and forced-colors rules.
+The functional composition is not the final [10R redesign](DESKTOP-UI-REDESIGN.md).
+
+## Build and run the product reference
+
+Prerequisites: supported Windows/WebView2, Rust/MSVC Build Tools, Node LTS,
+existing OSCAR Python environment with the `mobile` cryptography extra.
+
+```powershell
+python -m scripts.build_desktop --checks
+python -m scripts.desktop_tauri
+python -m scripts.desktop_tauri --self-check
+```
+
+The build produces `desktop/src-tauri/target/debug/oscar-desktop.exe` with bundled
+React/assets. The launcher uses a disposable Core, workspace and registered UIA
+fixture, never owner applications. An unenrolled standalone executable stays
+degraded. Production installer/signing/update acceptance is NOT RUN. This
+reference launcher is not permanent deployment or production enrollment.
 
 ## Observable interactions
 
@@ -52,7 +85,7 @@ acceptance are not represented as implemented.
 | Ask | Typed question, explicit attached context, Core Controller routing, signed execution, response/evidence and cancellation | Missing memory/live/model capability blocks; model text remains REPORTED |
 | Dictate | Typed text or final Voice Core transcript → preview → explicit destination | No implicit insertion or microphone opening; no provisional transcript application |
 | Edit | Explicit fresh selected/focused text → Core transformation → result preview → accept → signed apply → independent readback | Model transformation is REPORTED; application verification proves destination text, not editorial quality |
-| Act | Typed existing capability plans through Runtime/Dispatcher; GUI exposes exact file writing in approved workspace | No invented natural-language automation; advanced clients use existing typed Worker contracts |
+| Act | Advertised Core catalog drives bounded files, Git, typed PowerShell, fixed program-version, isolated browser and registered-app forms through Runtime/Dispatcher | No invented natural-language automation; no raw arbitrary JSON, command-line execution or arbitrary executable selection |
 
 Core task state is authoritative: planned/approval, executing, awaiting result,
 verifying, verified, partially verified, blocked, failed, cancelled and unknown
@@ -60,10 +93,10 @@ stay distinct. Results are not promoted because an API returned success.
 The UI shows only currently advertised task actions. Private requests have zero
 automatic retries; an ambiguous outcome requires inspection and fresh intent.
 
-The unchanged canonical SVG supplies the identity. WPF/tray reuse the existing
-native PNG raster, checking both source and render digests against the existing
-render receipt. The SVG and Mobile artwork were not edited. State mapping covers
-idle, attentive, listening, thinking, speaking, waiting and error. No expressive
+The unchanged canonical SVG supplies WebView identity directly. Tray/package icons
+reuse the existing canonical raster. WPF reference checks retain their independent
+source/render digest verification. The SVG and Mobile artwork were not edited. State mapping covers
+idle, attentive, listening, thinking, speaking, waiting, unavailable and error. No expressive
 faces, simulated telemetry or Slice 13 motion system was added.
 
 ## Context, capture and insertion
@@ -128,16 +161,19 @@ payload and fail closed. This limitation is not hidden by cloud or deployment cl
 
 ## Authority, continuity and ownership
 
-Owner enrollment is a trusted composition API, never an HTTP operation. WPF's
-ephemeral RSA key and scoped session bootstrap travel through inherited stdin,
-not command-line arguments, files or logs. The key is imported into Windows CNG.
+Owner enrollment is a trusted composition API, never an HTTP operation. Rust generates an ephemeral RSA key inside Windows CNG; only its public key leaves
+the native side. Scoped session bootstrap travels through inherited stdin, not
+command-line arguments, files or logs.
 Challenges are session/node/operation/target/digest/expiry bound and single-use;
 changed tasks/plans/signatures, revoked grants and replay are rejected. The native
 review displays operation, target, capability, reason, consequence, policy and
 current state plus the private parameters being reviewed. It creates no permanent
 grant. Desktop-specific Personal Policy is rechecked as `source=desktop`.
 Capabilities marked critical are not admitted without a later strong-approval
-implementation/acceptance. This trusted local surface is not a hostile-host sandbox.
+implementation/acceptance. Explicit native MessageBox review signs eligible non-critical
+work only. Windows Hello UserConsentVerifier/WebAuthn mechanisms were researched
+in official Microsoft documentation but are not implemented or accepted here. No
+React password collection or strong-user-verification claim is made.
 
 Grid stores expiring, generation-fenced interaction ownership. Text applications
 bind ownership to one task, recheck before approval and again at Dispatcher, and
@@ -160,8 +196,9 @@ Model-only responses remain REPORTED/partially verified.
 
 ## Invocation and voice
 
-Native `RegisterHotKey`/`WM_HOTKEY` with `MOD_NOREPEAT`, default Ctrl+Alt+O,
-invokes the compact presence. Modifier bits/key are configurable in the launcher.
+Tauri native global-shortcut registration, default Ctrl+Alt+O, reveals interaction.
+The owner can configure Ctrl+Alt+A through Z. New registration precedes removal
+of the existing shortcut, so collision retains the working invocation.
 Registration failure reports a collision/unavailable shortcut and retains tray/
 presence clicks. No low-level keyboard/mouse hook is installed. Exit unregisters
 the shortcut and disposes tray/key/audio resources.
@@ -180,7 +217,7 @@ Prepared models, microphone/output device routing, real-room AEC/barge-in/self-w
 playback/naturalness and owner calibration remain independent Slice 08/Gate C
 acceptance. No new voice model was researched and no physical voice PASS is claimed.
 
-## Running the reference
+## Retained WPF/UIA reference harness
 
 From the repository root with its existing Python environment and optional
 `mobile` extra available:
@@ -214,7 +251,8 @@ Hosted cold-start preparation has a bounded 60-second reference deadline and may
 retry read-only fixture discovery before any action. Individual observer calls
 remain bounded to 15 seconds; mutation retries are never used to obtain a PASS.
 
-See [reference evidence](evidence/desktop-reference-2026-10-07.json).
+See [historical WPF evidence](evidence/desktop-reference-2026-10-07.json) and
+[new Tauri reference evidence](evidence/desktop-tauri-reference-2026-10-08.json).
 Exact-head CI is authoritative in the draft PR's checks and includes the new
 Windows workflow alongside all existing repository, Core, Edge, Voice and Mobile
 workflows. Remote CI success is not local owner/device acceptance.

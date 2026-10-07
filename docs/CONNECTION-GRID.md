@@ -419,3 +419,7 @@ See [OSCAR Mobile foundation](MOBILE-FOUNDATION.md) for implementation, limits a
 Slice 09 must not merge in this run. Gate C remains PARTIAL. Slice 10, deployment
 and Home Node are not started. Post-alpha Operating Logs, specialist-model training
 and home-server migration remain documented future work, not implemented.
+
+## Tauri surface continuity
+
+Rust projects existing Core task/capability state into local typed events; frontend state grants no authority. Worker withdrawal removes eligible Act forms. Surface restart/reconnect inspects existing shared tasks; it does not replay private work or invent task truth. Existing Grid interaction fencing remains authoritative. See [Desktop foundation](DESKTOP-FOUNDATION.md).

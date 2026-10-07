@@ -1,8 +1,5 @@
 <p align="center">
 
-## Slice 10 desktop candidate
-
-The accepted Slice 09 baseline is `7043b9663fe6474e3457c7aa578e733f7a5a4c1a`. Slice 10 adds a native Windows WPF presence and scoped Ask/Dictate/Edit/Act Core boundary on `club-d2/slice-10-desktop`; it remains an unmerged draft with **OWNER_ACCEPTANCE_NOT_RUN**. Gate C stays **PARTIAL**. See [Desktop foundation](docs/DESKTOP-FOUNDATION.md).
   <img src="assets/brand/oscar-orb.svg" width="180" alt="OSCAR Orb" />
 </p>
 
@@ -14,6 +11,9 @@ The accepted Slice 09 baseline is `7043b9663fe6474e3457c7aa578e733f7a5a4c1a`. Sl
 
 ---
 
+## Slice 10 desktop candidate
+
+The accepted Slice 09 baseline is `7043b9663fe6474e3457c7aa578e733f7a5a4c1a`. Slice 10 adds a Tauri 2 / Rust / React-TypeScript presence and scoped Ask/Dictate/Edit/Act Core boundary on `club-d2/slice-10-desktop`; it remains an unmerged draft with **OWNER_ACCEPTANCE_NOT_RUN**. Gate C stays **PARTIAL**. See [Desktop foundation](docs/DESKTOP-FOUNDATION.md).
 See [deployment architecture](docs/DEPLOYMENT.md) for the free-first persistent Core
 and separate web/API host candidates and the deferred Home Node. These are future
 deployment choices, not Gate B completion claims.

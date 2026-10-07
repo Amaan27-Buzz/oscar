@@ -361,3 +361,7 @@ See [OSCAR Mobile foundation](MOBILE-FOUNDATION.md) for implementation, limits a
 Slice 09 must not merge in this run. Gate C remains PARTIAL. Slice 10, deployment
 and Home Node are not started. Post-alpha Operating Logs, specialist-model training
 and home-server migration remain documented future work, not implemented.
+
+## Slice 10 continuation — 2026-10-08
+
+Remain on `club-d2/slice-10-desktop`, update draft PR #16 without merging. Product shell is Tauri 2/Rust/React-TypeScript; WPF is reference-only. Preserve Python/Core authority and private process-local limits. Owner acceptance NOT RUN; Gate C PARTIAL. No Slice 11, 09R, final 10R, deployment or post-alpha work. See [Desktop foundation](DESKTOP-FOUNDATION.md).

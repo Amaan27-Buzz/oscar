@@ -2,7 +2,8 @@
 
 ## 2026-10-07 — Slice 10 Desktop Interaction Runtime candidate
 
-- Added native WPF compact presence, canonical Orb/tray, configurable collision-aware global invocation and scoped Ask/Dictate/Edit/Act.
+- Added Tauri compact/expanded presence, canonical Orb/tray, configurable collision-aware global invocation and scoped Ask/Dictate/Edit/Act.
+- Owner-selected Tauri 2/Rust/React-TypeScript product shell supersedes WPF, retained only in `desktop/reference/wpf/`. Added bounded capability-driven Act forms, native CNG signing, restricted IPC/CSP, actual Windows debug executable and native/frontend CI checks. Documented future 10R track.
 - Reused Core tasks, signed authority, Controller/policy, Grid and Windows Worker/UIA/browser contracts.
 - Added typed opt-in transient context, final-transcript Dictate, Edit preview/apply fencing, independent destination readback and restart/replay/ownership safeguards.
 - Verified harmless WPF/CNG/Core and registered UIA Windows references; owner desktop/microphone/device acceptance remains NOT RUN. Gate C remains PARTIAL; draft is not merged.

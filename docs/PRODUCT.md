@@ -269,3 +269,7 @@ See [OSCAR Mobile foundation](MOBILE-FOUNDATION.md) for implementation, limits a
 Slice 09 must not merge in this run. Gate C remains PARTIAL. Slice 10, deployment
 and Home Node are not started. Post-alpha Operating Logs, specialist-model training
 and home-server migration remain documented future work, not implemented.
+
+## Slice 10 product shell continuation
+
+OSCAR Desktop uses Tauri 2/Rust/React-TypeScript presence and Ask/Dictate/Edit/Act, with one shared Core relationship. Advertised capabilities drive bounded Act forms. WPF is reference-only. Functional composition precedes the separate [10R redesign](DESKTOP-UI-REDESIGN.md); 10R must integrate before Slice 17 PASS.

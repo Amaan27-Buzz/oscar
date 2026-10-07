@@ -437,3 +437,11 @@ or Slice 10. See [Mobile foundation](docs/MOBILE-FOUNDATION.md).
 ## Current Slice 10 owner scope — 2026-10-07
 
 Owner accepted `main == work == 7043b9663fe6474e3457c7aa578e733f7a5a4c1a`; Slice 09 software is merged. The current authorized work is Slice 10 Desktop Interaction Runtime on `club-d2/slice-10-desktop`, draft PR into `work`, **OWNER_ACCEPTANCE_NOT_RUN**. Do not merge in this run or start Slice 11. This explicit authorization supersedes older Slice 10 prohibitions; it does not authorize 09R, deployment, Home Node or post-alpha work. Core stays authoritative and Windows UIA/browser/Worker remain the execution backend. Physical Edge, Voice and Mobile acceptance remain owner-deferred; Gate C PARTIAL. See [Desktop foundation](docs/DESKTOP-FOUNDATION.md).
+
+## Slice 10 Tauri owner continuation — 2026-10-08
+
+PR #16 remains draft and unmerged. The owner selected Tauri 2/Rust/React-TypeScript
+as the product shell; WPF is reference-only in `desktop/reference/wpf/`. Preserve
+the accepted Core architecture and authority. Native credentials/signing never
+enter React. 10R is documented future design work; do not implement final redesign,
+09R, Slice 11 or post-alpha work here. OWNER_ACCEPTANCE_NOT_RUN; Gate C PARTIAL.

@@ -362,7 +362,11 @@ See [OSCAR Mobile UI Redesign Track](MOBILE-UI-REDESIGN.md).
 
 ## Slice 10 — Desktop Interaction Runtime 🚧
 
-Native Windows WPF software/reference candidate on `club-d2/slice-10-desktop`, draft into `work`. Compact presence, Ask/Dictate/Edit/Act, explicit typed context, signed approvals, Core task continuity, UIA expected-value application and independent readback. **OWNER_ACCEPTANCE_NOT_RUN**; not authorized to merge. See [Desktop foundation](DESKTOP-FOUNDATION.md). Screenshot capture is not advertised. Gate C stays PARTIAL.
+Tauri 2 / Rust / React-TypeScript Windows software/reference candidate on `club-d2/slice-10-desktop`, draft into `work`. Compact presence, Ask/Dictate/Edit/Act, explicit typed context, signed approvals, Core task continuity, UIA expected-value application and independent readback. **OWNER_ACCEPTANCE_NOT_RUN**; not authorized to merge. See [Desktop foundation](DESKTOP-FOUNDATION.md). Screenshot capture is not advertised. Gate C stays PARTIAL.
+
+[10R — Desktop UI Redesign](DESKTOP-UI-REDESIGN.md) tracks six future surface passes.
+It may be non-blocking for Slices 11–16, but must integrate before Slice 17 PASS.
+No final 10R redesign is implemented in this continuation.
 
 ## Slice 11 — World Model + Perception Fabric + persistent Sentry + optional Daily Journal ◻️
 

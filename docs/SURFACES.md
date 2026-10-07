@@ -2,7 +2,7 @@
 
 ## Current Slice 10 Windows candidate
 
-WPF compact/expanded presence, canonical Orb, tray/global invocation, shared Core tasks, signed contextual approvals and explicit context are implemented as a software/reference candidate. Reliable insertion uses registered UIA ValuePattern with expected-value fencing and independent readback. Mac/Linux, normal owner use and real voice/device acceptance are not claimed. See [Desktop foundation](DESKTOP-FOUNDATION.md).
+Tauri compact/expanded presence, canonical Orb, tray/global invocation, shared Core tasks, signed contextual approvals and explicit context are implemented as a software/reference candidate. Reliable insertion uses registered UIA ValuePattern with expected-value fencing and independent readback. Mac/Linux, normal owner use and real voice/device acceptance are not claimed. See [Desktop foundation](DESKTOP-FOUNDATION.md).
 
 OSCAR is one intelligence expressed through multiple devices. Surfaces share identity, tasks, permissions, Personal Policy, Persona, memory, Voice Identity and capability contracts rather than becoming separate assistants.
 

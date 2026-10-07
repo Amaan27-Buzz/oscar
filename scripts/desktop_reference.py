@@ -85,7 +85,7 @@ def run_surface(
         "-NoProfile",
         "-STA",
         "-File",
-        str(ROOT / "desktop/Presence.ps1"),
+        str(ROOT / "desktop/reference/wpf/Presence.ps1"),
         "-HotkeyModifiers",
         str(modifiers),
         "-HotkeyKey",
