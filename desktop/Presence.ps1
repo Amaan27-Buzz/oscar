@@ -1,5 +1,7 @@
 param([int]$HotkeyModifiers=3,[int]$HotkeyKey=79,[switch]$SelfCheck,[string]$OutputDirectory)
 $ErrorActionPreference='Stop'
+function Reference-Stage($name) {if ($SelfCheck) {[Console]::Error.WriteLine('desktop.reference.stage='+$name)}}
+Reference-Stage 'bootstrap'
 Add-Type -AssemblyName PresentationFramework,PresentationCore,WindowsBase,System.Windows.Forms,System.Drawing,System.Net.Http
 Add-Type -TypeDefinition @'
 using System;
@@ -15,6 +17,7 @@ $bootstrap=[Console]::ReadLine()|ConvertFrom-Json
 if ($bootstrap.url -notmatch '^http://127\.0\.0\.1:[0-9]+$') {throw 'Loopback Core required'}
 $key=[Security.Cryptography.CngKey]::Import([Convert]::FromBase64String($bootstrap.pkcs8),[Security.Cryptography.CngKeyBlobFormat]::Pkcs8PrivateBlob)
 $rsa=[Security.Cryptography.RSACng]::new($key)
+Reference-Stage 'cng'
 $client=[Net.Http.HttpClient]::new()
 $client.Timeout=[TimeSpan]::FromSeconds(130)
 $client.DefaultRequestHeaders.Authorization=[Net.Http.Headers.AuthenticationHeaderValue]::new('Bearer',$bootstrap.token)
@@ -23,6 +26,7 @@ $client.DefaultRequestHeaders.Add('X-Oscar-Session',$bootstrap.session)
 $bootstrap.pkcs8=$null;$bootstrap.token=$null
 [xml]$xaml=Get-Content -LiteralPath (Join-Path $PSScriptRoot 'Presence.xaml') -Raw
 $window=[Windows.Markup.XamlReader]::Load([Xml.XmlNodeReader]::new($xaml))
+Reference-Stage 'xaml'
 $ui=@{}; @('Orb','State','Expand','Body','Boundary','Mode','CaptureSource','Discard','Context','ActFields','ActPath','Input','Submit','Voice','Result','Tasks','Approve','Cancel','Preview','PreviewText','ApplyControls','Destination','Apply','Shortcut')|ForEach-Object {$ui[$_]=$window.FindName($_)}
 $ui.Orb.Source=[Windows.Media.Imaging.BitmapImage]::new([Uri]$bootstrap.orb)
 $ui.Boundary.Text=$bootstrap.boundary
@@ -124,6 +128,7 @@ $timer.Add_Tick({
   }
  }
 })
+Reference-Stage 'tray'
 $tray=[Windows.Forms.NotifyIcon]::new()
 $orbBitmap=[Drawing.Bitmap]::new($bootstrap.orb);$iconHandle=$orbBitmap.GetHicon()
 $trayIcon=[Drawing.Icon]::FromHandle($iconHandle).Clone();$orbBitmap.Dispose()
@@ -140,6 +145,7 @@ $window.Add_SourceInitialized({
 })
 $window.Add_Closed({$timer.Stop();if ($script:hotkey) {[OscarHotkey]::UnregisterHotKey($script:handle,10)|Out-Null};$tray.Dispose();$trayIcon.Dispose();$client.Dispose();$rsa.Dispose();$key.Dispose()})
 if ($SelfCheck) {
+ Reference-Stage 'ready'
  function Reference-Post($op,$payload) {
   $data=@{version=1;operation=$op;request_id=[Guid]::NewGuid().ToString('N');payload=$payload}|ConvertTo-Json -Depth 20 -Compress
   $content=[Net.Http.StringContent]::new($data,[Text.Encoding]::UTF8,'application/json')
@@ -148,19 +154,25 @@ if ($SelfCheck) {
   $value=$response.Content.ReadAsStringAsync().GetAwaiter().GetResult()|ConvertFrom-Json
   $content.Dispose();$response.Dispose();return $value
  }
+ Reference-Stage 'propose'
  $proposed=Reference-Post 'interact' @{mode='Ask';text='2 + 3';context_id=''}
+ Reference-Stage 'challenge'
  $challenge=Reference-Post 'challenge' @{operation='approve';task_id=$proposed.task_id}
  $signature=$rsa.SignData([Convert]::FromBase64String($challenge.signing_payload),[Security.Cryptography.HashAlgorithmName]::SHA256,[Security.Cryptography.RSASignaturePadding]::Pss)
+ Reference-Stage 'complete'
  $result=Reference-Post 'complete' @{challenge_id=$challenge.challenge_id;signature=[Convert]::ToBase64String($signature)}
  if ($result.state -ne 'verified' -or $result.value -ne '5') {throw 'native signed Core result mismatch'}
+ Reference-Stage 'show'
  Expand-Presence
  Show-View $result
  $ui.State.Text='REFERENCE | owner acceptance not run'
  $window.UpdateLayout()
+ Reference-Stage 'render'
  $bitmap=[Windows.Media.Imaging.RenderTargetBitmap]::new([int]$window.ActualWidth,[int]$window.ActualHeight,96,96,[Windows.Media.PixelFormats]::Pbgra32)
  $bitmap.Render($window)
  $encoder=[Windows.Media.Imaging.PngBitmapEncoder]::new();$encoder.Frames.Add([Windows.Media.Imaging.BitmapFrame]::Create($bitmap))
  $file=[IO.File]::Create((Join-Path $OutputDirectory 'presence.png'));$encoder.Save($file);$file.Dispose()
  $window.Close()
+ Reference-Stage 'closed'
  [Console]::WriteLine('{"evidence":"REFERENCE_WPF_RENDER","native_cng_signed_core":"VERIFIED","owner_acceptance":"NOT_RUN"}')
 } else {$timer.Start();$window.ShowDialog()|Out-Null}

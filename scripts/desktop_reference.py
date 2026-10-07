@@ -22,6 +22,29 @@ from oscar.policy import PersonalPolicy
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def reference_stage(stderr: str) -> str:
+    """Only known acceptance markers can escape native diagnostics, never bootstrap material."""
+    stages = {
+        "bootstrap",
+        "cng",
+        "xaml",
+        "tray",
+        "ready",
+        "propose",
+        "challenge",
+        "complete",
+        "show",
+        "render",
+        "closed",
+    }
+    observed = [
+        line.removeprefix("desktop.reference.stage=")
+        for line in stderr.splitlines()
+        if line.removeprefix("desktop.reference.stage=") in stages
+    ]
+    return observed[-1] if observed else "unknown"
+
+
 def run_surface(
     core: Desktop,
     session: SessionHandle,
@@ -103,6 +126,12 @@ def run_surface(
             stdout, stderr = process.communicate(
                 json.dumps(bootstrap) + "\n", timeout=30 if self_check else None
             )
+        except subprocess.TimeoutExpired:
+            process.terminate()
+            _, diagnostic = process.communicate(timeout=5)
+            raise RuntimeError(
+                "native surface timeout at reference stage: " + reference_stage(diagnostic)
+            ) from None
         finally:
             if core.voice is not None:
                 core.voice.stop.cancel()
@@ -112,7 +141,9 @@ def run_surface(
                 process.wait(timeout=5)
         if process.returncode:
             # PowerShell diagnostic can contain bootstrap material: suppress it entirely.
-            raise RuntimeError("native surface failed; use metadata-only diagnostics")
+            raise RuntimeError(
+                "native surface failed at reference stage: " + reference_stage(stderr)
+            )
         if self_check:
             report = json.loads(stdout.strip())
             report["orb_source_sha256"] = receipt["source_sha256"]
