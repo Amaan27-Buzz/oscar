@@ -251,7 +251,11 @@ class DesktopTests(unittest.TestCase):
         self.assertIsNone(observed.destination)
 
     def test_private_executor_error_is_not_retained_in_task_or_ledger(self) -> None:
+        from scripts.desktop_reference import reference_stage
+
         marker = "PRIVATE ERROR CONTENT SENTINEL"
+        self.assertEqual(reference_stage("desktop.reference.stage=" + marker), "unknown")
+        self.assertEqual(reference_stage("desktop.reference.stage=cng\n" + marker), "cng")
 
         def failed(action, cancellation):
             return Result(
