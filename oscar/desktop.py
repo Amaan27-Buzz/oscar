@@ -389,7 +389,9 @@ class Desktop(Mobile):
                     Intent(
                         "Apply reviewed desktop text",
                         kind="capability",
-                        capability_kind="desktop_control",
+                        capability_kind="desktop_clipboard"
+                        if destination == "clipboard"
+                        else "desktop_control",
                         parameters={"request": request},
                         criterion=criterion,
                     ),

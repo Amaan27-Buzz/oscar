@@ -449,8 +449,16 @@ class DesktopTests(unittest.TestCase):
             "high",
         )
         node = self.h.store.get("node", self.h.node_id)
-        node["scopes"] += ["machine:host", "desktop:control"]
+        node["scopes"] += ["machine:host", "desktop:control", "desktop:clipboard"]
         node["capabilities"].append(record(cap))
+        clipboard_cap = replace(
+            cap,
+            id="fixture.clipboard",
+            name="fixture.clipboard",
+            input_kind="desktop_clipboard",
+            permissions=("machine:host", "desktop:control", "desktop:clipboard"),
+        )
+        node["capabilities"].append(record(clipboard_cap))
         self.h.store.put("node", self.h.node_id, node)
         self.h.session = self.h.grid.pair(self.h.node_id, tuple(node["scopes"]))
         self.core.targets = {self.h.node_id: (self.h.dispatcher, self.h.session)}
@@ -475,6 +483,7 @@ class DesktopTests(unittest.TestCase):
             )
 
         self.h.dispatcher.executors[cap.id] = execute
+        self.h.dispatcher.executors[clipboard_cap.id] = execute
 
         class Observer:
             def observe(self, request, *, timeout=15):
@@ -537,6 +546,20 @@ class DesktopTests(unittest.TestCase):
         self.assertEqual(state["clipboard"], "")
         self.assertEqual(self.confirm(proposed["task_id"])["state"], "verified")
         self.assertEqual(state["clipboard"], "explicit clipboard text")
+        from types import SimpleNamespace
+
+        from oscar.interactive_worker import InteractiveWorker
+        from oscar.machine import MachineScope
+
+        worker = InteractiveWorker(
+            self.h.store, self.h.grid, self.h.session, MachineScope(self.root / "workspace")
+        )
+        worker.desktop = SimpleNamespace(permissions={"desktop:clipboard"})
+        self.assertIn("machine.clipboard", [c.id for c in worker.capabilities()])
+        node = self.h.store.get("node", self.h.node_id)
+        node["scopes"].remove("desktop:clipboard")
+        self.h.store.put("node", self.h.node_id, node)
+        self.assertNotIn("machine.clipboard", [c.id for c in worker.capabilities()])
 
     def test_text_application_ownership_and_stale_context_at_approval(self) -> None:
         self.install_insertion()

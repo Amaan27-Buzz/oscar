@@ -99,6 +99,9 @@ Core routing policy.
 - Unsupported reliable insertion offers explicit interaction-surface or clipboard
   choices. Clipboard write/readback requires `desktop:clipboard` independently;
   no startup/polling read of the owner's clipboard occurs.
+  Worker advertises `machine.clipboard` only with that explicit target grant;
+  its separately scoped operation cannot execute UIA, or be bypassed through
+  the general `machine.desktop` capability. Revocation withdraws it.
 - Browser/file/node/image context source types are represented, but this capture
   adapter does not advertise those captures. Browser, files, terminal, Git and
   installed-app action plans continue to use their existing Worker capabilities.

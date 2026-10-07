@@ -152,6 +152,13 @@ def browser_available(executable: str, workspace: Path) -> bool:
 
 
 class InteractiveWorker(MachineWorker):
+    def clipboard_granted(self) -> bool:
+        try:
+            self.grid.authenticate(self.session, "desktop:clipboard")
+            return True
+        except (PermissionError, KeyError):
+            return False
+
     def __init__(
         self,
         *args: Any,
@@ -183,8 +190,11 @@ class InteractiveWorker(MachineWorker):
             from .windows_desktop import WindowsDesktop, discover_apps
 
             catalog = tuple(discover_apps())
+            desktop_permissions = {"machine:host", "desktop:control"}
+            if self.clipboard_granted():
+                desktop_permissions.add("desktop:clipboard")
             adapter = WindowsDesktop(
-                permissions=frozenset({"machine:host", "desktop:control"}),
+                permissions=frozenset(desktop_permissions),
                 allowed_apps=tuple(app for app in catalog if app.id in desktop_app_ids),
                 catalog_apps=catalog,
                 workspace=self.scope.root,
@@ -219,6 +229,20 @@ class InteractiveWorker(MachineWorker):
                     "high",
                 ),
             ]
+            if "desktop:clipboard" in self.desktop.permissions and self.clipboard_granted():
+                caps.append(
+                    Capability(
+                        "machine.clipboard",
+                        "machine.clipboard",
+                        "Explicit clipboard write/readback",
+                        "machine",
+                        self.session.node_id,
+                        ("machine:host", "desktop:control", "desktop:clipboard"),
+                        "desktop_clipboard",
+                        "metadata",
+                        "high",
+                    )
+                )
         if getattr(self, "browser_python", None):
             caps.append(
                 Capability(
@@ -236,9 +260,24 @@ class InteractiveWorker(MachineWorker):
         return caps
 
     def execute(self, action: Action, cancellation: Cancellation) -> Result:
-        if action.capability_id not in {"machine.apps", "machine.desktop", "machine.browser"}:
+        if action.capability_id not in {
+            "machine.apps",
+            "machine.desktop",
+            "machine.clipboard",
+            "machine.browser",
+        }:
             return super().execute(action, cancellation)
-        cap = next(c for c in self.capabilities() if c.id == action.capability_id)
+        cap = next((c for c in self.capabilities() if c.id == action.capability_id), None)
+        if cap is None:
+            return Result(
+                new_id(),
+                action.id,
+                action.task_id,
+                action.correlation_id,
+                action.capability_id,
+                False,
+                error="machine_blocked:capability_unavailable",
+            )
         if not self.policy.evaluate(cap.name, cap.permissions, frozenset(cap.permissions)).allowed:
             return Result(
                 new_id(),
@@ -269,7 +308,13 @@ class InteractiveWorker(MachineWorker):
                     )
                 else:
                     raise ValueError("typed app operation required")
-            elif cap.id == "machine.desktop":
+            elif cap.id in {"machine.desktop", "machine.clipboard"}:
+                if request.get("operation") in {"clipboard_write", "clipboard_read"}:
+                    if cap.id != "machine.clipboard":
+                        raise PermissionError("clipboard requires its separately scoped capability")
+                    self.grid.authenticate(self.session, "desktop:clipboard")
+                elif cap.id == "machine.clipboard":
+                    raise PermissionError("clipboard capability cannot execute UIA operations")
                 if set(request) == {"operation", "handle", "pid", "app_id"} and (
                     request["operation"] == "bind"
                 ):

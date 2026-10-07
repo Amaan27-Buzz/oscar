@@ -1,7 +1,7 @@
 {
   "starting_sha": "7043b9663fe6474e3457c7aa578e733f7a5a4c1a",
   "branch": "club-d2/slice-10-desktop",
-  "observed_at": "2026-10-07T02:11:37.862867+00:00",
+  "observed_at": "2026-10-07T08:27:36.673278+00:00",
   "platform": "Windows",
   "python": "3.14.2",
   "evidence_class": "REFERENCE",
@@ -23,7 +23,7 @@
     "owner_acceptance": "NOT_RUN",
     "microphone": "NOT_RUN",
     "evidence_ids": [
-      "1b0875be1b0d42d0b84a2e3d372db58b"
+      "07367fc21d3948e19ad5ab52eac0b066"
     ]
   },
   "new_desktop_tests": {
@@ -34,8 +34,10 @@
     "command": "python -m unittest discover -s tests -t . -v",
     "result": "PASS",
     "tests": 522,
-    "seconds": 203.044,
-    "skipped": 6
+    "seconds": 272.422,
+    "skipped": 8,
+    "isolated_browser_lifecycle": "3/3 PASS; two full-suite preflight skips revalidated without parallel native load",
+    "remaining_not_run": "6 optional prepared voice-model reference tests"
   },
   "static_checks": [
     "ruff check",
@@ -62,5 +64,9 @@
     "Slice 11 not started",
     "no deployment/Home Node/post-alpha work",
     "draft not merged"
-  ]
+  ],
+  "clipboard_scope": {
+    "software": "SIMULATED grant, explicit application and target revocation verified",
+    "actual_owner_clipboard": "NOT_RUN"
+  }
 }
