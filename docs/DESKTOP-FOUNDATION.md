@@ -259,6 +259,20 @@ workflows. Remote CI success is not local owner/device acceptance.
 
 ## Next genuine owner/manual boundary
 
+### 10R.0 lifecycle and baseline continuation
+
+Normal Tauri launch no longer reads inherited stdin. Uncommissioned Core means
+explicit unavailable UI, never implicit termination. Close hides the existing
+window; tray/global invocation reveals it; explicit tray Quit terminates.
+Debug and release executables use the Windows GUI subsystem; no attached debug
+console is required to keep the product alive.
+The disposable launcher explicitly opts into `--bootstrap-stdin`; its debug
+self-check remains intentionally short-lived. Native credential/signing and
+Core authority are unchanged. See [baseline, lifecycle findings and capture
+commands](ui/desktop/BASELINE.md) for the 52 engineering UI PNGs and development-only
+typed showcase. No presentation redesign occurred. Remote exact-head CI remains
+required after restoration of the account billing limit.
+
 Review the draft; do not merge automatically. Owner acceptance must exercise:
 normal presence/tray/hotkey collision and cleanup; intended real app registration;
 foreground selection/focus and inaccessible/sensitive fields; Ask with a permitted

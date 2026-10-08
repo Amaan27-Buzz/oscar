@@ -6,6 +6,7 @@ Opus/Antigravity visual polish. Canonical Orb geometry remains unchanged.
 
 | Sub-slice | Scope | Status |
 |---|---|---|
+| 10R.0 | Lifecycle stabilization and honest UI baseline capture | LOCAL baseline captured; remote CI billing-blocked |
 | 10R.1 | Presence / Orb / compact shell | NOT STARTED |
 | 10R.2 | Ask + interaction composition | NOT STARTED |
 | 10R.3 | Dictate + Edit | NOT STARTED |
@@ -16,6 +17,9 @@ Opus/Antigravity visual polish. Canonical Orb geometry remains unchanged.
 Refine section-by-section with owner review. Preserve typed/native security,
 freshness, explicit context, signed approval, shared task truth and accessibility.
 No frontend authority or separate OSCAR memory/history may be introduced.
+
+Use the [10R.0 baseline inventory](ui/desktop/BASELINE.md) for independent redesign
+of existing states. Capturing this engineering UI does not perform 10R.1–10R.6.
 
 10R may be non-blocking for Slices 11–16, but must be integrated before Slice 17
 Unified Alpha PASS. Mobile 09R remains a separate track. Gate C physical/device

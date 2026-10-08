@@ -24,6 +24,7 @@ jobs:
           toolchain: '1.99.0'
           components: rustfmt, clippy
       - run: python -m scripts.build_desktop --checks
+      - run: python -m scripts.desktop_baseline --lifecycle-only
       - run: python -m scripts.desktop_tauri --self-check
       - run: python -m unittest tests.test_desktop -v
       - run: python -m scripts.desktop_reference --self-check

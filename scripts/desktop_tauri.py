@@ -59,7 +59,11 @@ def run_surface(
     }
     with MobileServer(core) as server:
         process = subprocess.Popen(
-            [str(executable), *(["--reference-check"] if check else ["--interaction"])],
+            [
+                str(executable),
+                "--bootstrap-stdin",
+                *(["--reference-check"] if check else ["--interaction"]),
+            ],
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,

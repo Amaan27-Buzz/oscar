@@ -1,5 +1,15 @@
 # Changelog
 
+## 10R.0 — Desktop lifecycle and baseline capture
+
+- Separated ordinary uncommissioned Tauri lifecycle from inherited-stdin reference
+  bootstrap and intentional self-check exit. Close hides; tray/shortcut reveals;
+  explicit Quit terminates.
+- Captured 52 engineering UI PNGs using real components and bounded development-only
+  fixtures, including actual native menu/dialog, inventory and per-image manifest.
+  No UI redesign or Core/authority changes. Local checks passed; remote CI not
+  executed due account billing limit. PR #16 remains draft and unmerged.
+
 ## 2026-10-07 — Slice 10 Desktop Interaction Runtime candidate
 
 - Added Tauri compact/expanded presence, canonical Orb/tray, configurable collision-aware global invocation and scoped Ask/Dictate/Edit/Act.

@@ -365,3 +365,8 @@ and home-server migration remain documented future work, not implemented.
 ## Slice 10 continuation — 2026-10-08
 
 Remain on `club-d2/slice-10-desktop`, update draft PR #16 without merging. Product shell is Tauri 2/Rust/React-TypeScript; WPF is reference-only. Preserve Python/Core authority and private process-local limits. Owner acceptance NOT RUN; Gate C PARTIAL. No Slice 11, 09R, final 10R, deployment or post-alpha work. See [Desktop foundation](DESKTOP-FOUNDATION.md).
+
+Owner additionally authorized **10R.0 — lifecycle stabilization and baseline capture**.
+It preserves the engineering UI and all authority semantics; it does not authorize
+10R.1–10R.6 redesign. See [baseline inventory](ui/desktop/BASELINE.md). Remote CI is
+account-billing blocked; exact-head checks remain required before integration.

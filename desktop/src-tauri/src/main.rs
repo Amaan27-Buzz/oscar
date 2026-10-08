@@ -1,4 +1,4 @@
-#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+#![cfg_attr(target_os = "windows", windows_subsystem = "windows")]
 mod core;
 mod protocol;
 mod signing;
@@ -330,7 +330,11 @@ fn reference_check(app: tauri::AppHandle, client: Arc<CoreClient>) -> Result<(),
         serde_json::from_value(client.confirm(&review.review_id, true, |_| true)?)
             .map_err(|_| "apply response invalid")?;
     if applied.state != "verified" || applied.evidence_ids.is_empty() {
-        return Err("reference UIA readback not verified".into());
+        return Err(format!(
+            "reference UIA readback not verified: state={}, evidence={}",
+            applied.state,
+            applied.evidence_ids.len()
+        ));
     }
     let task = bridge
         .execute(
@@ -381,7 +385,18 @@ fn reference_check(app: tauri::AppHandle, client: Arc<CoreClient>) -> Result<(),
 }
 
 fn main() {
-    let check = std::env::args().any(|a| a == "--reference-check");
+    let check = cfg!(debug_assertions) && std::env::args().any(|a| a == "--reference-check");
+    let bootstrap_stdin = std::env::args().any(|a| a == "--bootstrap-stdin");
+    let baseline = if cfg!(debug_assertions) {
+        std::env::args().find(|a| {
+            matches!(
+                a.as_str(),
+                "--baseline-menu" | "--baseline-dialog" | "--lifecycle-check"
+            )
+        })
+    } else {
+        None
+    };
     let interaction = std::env::args().any(|a| a == "--interaction");
     let bridge = Arc::new(Bridge::new());
     let native = Native {
@@ -402,17 +417,39 @@ fn main() {
                 .build()?;
             let reveal=MenuItem::with_id(app,"reveal","Open OSCAR",true,None::<&str>)?;
             let compact=MenuItem::with_id(app,"compact","Compact presence",true,None::<&str>)?;
+            let hide=MenuItem::with_id(app,"hide","Hide OSCAR",true,None::<&str>)?;
             let quit=MenuItem::with_id(app,"quit","Quit",true,None::<&str>)?;
-            let menu=Menu::with_items(app,&[&reveal,&compact,&quit])?;
+            let menu=Menu::with_items(app,&[&reveal,&compact,&hide,&quit])?;
             TrayIconBuilder::new().icon(app.default_window_icon().ok_or("canonical tray icon missing")?.clone())
                 .tooltip("OSCAR").menu(&menu).show_menu_on_left_click(false)
                 .on_tray_icon_event(|tray,event|{if matches!(event,TrayIconEvent::Click{button:MouseButton::Left,button_state:MouseButtonState::Up,..}){invoke_presence(tray.app_handle().clone());}})
                 .on_menu_event(|app,event|match event.id.as_ref(){"reveal"=>invoke_presence(app.clone()),
-                    "compact"=>{let _=window_mode(app,&app.state::<Native>(),WindowMode::Compact);},"quit"=>app.exit(0),_=>{}}).build(app)?;
+                    "compact"=>{let _=window_mode(app,&app.state::<Native>(),WindowMode::Compact);emit(app,&app.state::<Native>());},
+                    "hide"=>{if let Some(w)=app.get_webview_window("main"){let _=w.hide();}},"quit"=>app.exit(0),_=>{}}).build(app)?;
             let state=app.state::<Native>();
             if let Err(error)=register_shortcut(app.handle(),&state,"Ctrl+Alt+O"){state.bridge.fail(error);}
             let handle=app.handle().clone();
             thread::spawn(move|| {
+                if let Some(baseline)=baseline {
+                    let state=handle.state::<Native>();
+                    for _ in 0..100 {if state.ready.load(Ordering::Acquire){break;}thread::sleep(Duration::from_millis(100));}
+                    if baseline=="--baseline-menu" {
+                        if let Some(window)=handle.get_webview_window("main"){let _=window.popup_menu_at(&menu,tauri::LogicalPosition::new(30.,30.));}
+                    }else if baseline=="--baseline-dialog" {
+                        owner_review(&handle,&ReviewView {review_id:"synthetic-unusable".into(),operation:"approve".into(),description:"Synthetic capture only".into(),target:"fixture-worker".into(),capability:"machine.files.write".into(),reason:"Development baseline capture".into(),consequence:"No action or signature is possible in this capture mode".into(),policy_reason:"Native presentation only; no Core or credentials".into(),evidence_state:"SIMULATED / unexecuted".into(),review:"notes/reference.txt\nSynthetic content only. This dialog cannot authorize work.".into(),expires_at_ms:0});
+                    }else {
+                        let window=handle.get_webview_window("main").expect("owned lifecycle window");
+                        window.close().expect("close request");thread::sleep(Duration::from_millis(700));
+                        assert!(!window.is_visible().expect("hidden"));
+                        invoke_presence(handle.clone());thread::sleep(Duration::from_millis(700));
+                        assert!(window.is_visible().expect("revealed"));
+                        assert!(state.bridge.view().window==WindowMode::Interaction);
+                        assert!(state.bridge.client().is_err());
+                        println!("LIFECYCLE_REFERENCE_PASS: uncommissioned, close/hide, reveal, explicit quit");
+                        handle.exit(0);
+                    }
+                    return;
+                }
                 let start=||->Result<Arc<CoreClient>,String>{
                     let signer=Arc::new(signing::Signer::new()?);
                     println!("{}",serde_json::json!({"owner_public_key":STANDARD.encode(signer.public_der()?)}));
@@ -423,8 +460,8 @@ fn main() {
                     Ok(Arc::new(CoreClient::new(bootstrap,signer)?))
                 };
                 let state=handle.state::<Native>();
-                let client=match start(){Ok(c)=>c,Err(e)=>{state.bridge.fail(e);emit(&handle,&state);if check{handle.exit(1);}return;}};
-                *state.bridge.client.lock().unwrap_or_else(|p|p.into_inner())=Some(client.clone());
+                let client=if bootstrap_stdin {match start(){Ok(c)=>Some(c),Err(e)=>{state.bridge.fail(e);emit(&handle,&state);None}}}else{None};
+                *state.bridge.client.lock().unwrap_or_else(|p|p.into_inner())=client.clone();
                 let mut emitted=View::default();
                 let mut shown=false;
                 while !state.stop.load(Ordering::Acquire) {
@@ -432,11 +469,12 @@ fn main() {
                         let _=window_mode(&handle,&state,WindowMode::Interaction);shown=true;
                     }
                     if check && state.ready.load(Ordering::Acquire) {
-                        if !cfg!(debug_assertions) || !client.reference {handle.exit(1);return;}
+                        let Some(client)=&client else{handle.exit(1);return;};
+                        if !client.reference {handle.exit(1);return;}
                         if let Err(error)=reference_check(handle.clone(),client.clone()){eprintln!("reference failed: {error}");handle.exit(1);}
                         return;
                     }
-                    let view=match state.bridge.refresh(){Ok(v)=>v,Err(e)=>state.bridge.fail(e)};
+                    let view=if client.is_some(){match state.bridge.refresh(){Ok(v)=>v,Err(e)=>state.bridge.fail(e)}}else{state.bridge.view()};
                     if view!=emitted {emit(&handle,&state);emitted=view;}
                     thread::sleep(Duration::from_secs(2));
                 }
@@ -444,7 +482,14 @@ fn main() {
             Ok(())
         })
         .build(tauri::generate_context!()).expect("native OSCAR shell")
-        .run(|app,event|{if matches!(event,tauri::RunEvent::Exit){app.state::<Native>().stop.store(true,Ordering::Release);}});
+        .run(|app,event|match event {
+            tauri::RunEvent::WindowEvent{label,event:tauri::WindowEvent::CloseRequested{api,..},..}=>{
+                api.prevent_close();if let Some(window)=app.get_webview_window(&label){let _=window.hide();}
+            },
+            tauri::RunEvent::ExitRequested{code:None,api,..}=>api.prevent_exit(),
+            tauri::RunEvent::Exit=>app.state::<Native>().stop.store(true,Ordering::Release),
+            _=>{}
+        });
 }
 
 #[cfg(test)]
