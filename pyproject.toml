@@ -28,6 +28,9 @@ oscar = "oscar.cli:main"
 [tool.setuptools.packages.find]
 include = ["oscar*"]
 
+[tool.setuptools.package-data]
+oscar = ["*.ps1"]
+
 [tool.ruff]
 target-version = "py312"
 line-length = 100

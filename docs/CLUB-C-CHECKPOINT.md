@@ -1,5 +1,9 @@
 # Club C checkpoint
 
+## Latest continuation — 2026-10-07
+
+Slice 09 software is accepted at `7043b9663fe6474e3457c7aa578e733f7a5a4c1a`. Slice 10 now has a Windows software/reference candidate with Tauri/CNG and registered Worker/UIA evidence; WPF is reference-only, not owner desktop acceptance. Edge, Voice and Mobile physical acceptance remain owner-deferred and Gate C is PARTIAL. This continuation supersedes older next-slice restrictions only for the explicitly authorized Slice 10 draft. See [Desktop foundation](DESKTOP-FOUNDATION.md).
+
 ## Baseline
 
 Club C starts only after Gate B PASS.

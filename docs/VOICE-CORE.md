@@ -1,5 +1,9 @@
 # Slice 08 Voice Core
 
+## Desktop Dictate adapter
+
+Slice 10 accepts final transcripts through the existing Voice Core contracts and provides an opt-in bounded local push-to-talk adapter. It adds no STT/TTS research, default microphone opening, recordings or physical voice evidence. The reference surface has no audio adapter and reports BLOCKED. Prepared microphone/output routes and real-room acceptance remain consolidated Gate C work. See [Desktop foundation](DESKTOP-FOUNDATION.md).
+
 Owner closure scope: **COMPLETE FOR SOFTWARE / REFERENCE VOICE FOUNDATION**.
 Physical status: `DEFERRED_BY_OWNER / CONSOLIDATED_GATE_C_ACCEPTANCE_REQUIRED`.
 Software/reference validation is recorded for PR #14; integration requires green

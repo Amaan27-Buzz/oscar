@@ -552,3 +552,13 @@ future design work for GPT-6.1 Sol at **High** thinking effort, with careful,
 slow, iteration-driven, owner-reviewable design rather than superficial first
 prototypes. No automatic winner selection, no production UI promotion before
 owner design acceptance, no Core/privacy/authority changes.
+
+## Decision — Native Desktop is a Core surface; private context is transient
+
+Historical October 7 shell decision, superseded by the October 8 owner decision below.
+
+WPF on installed Windows PowerShell/.NET is the current shell. Reuse Core signed authority and existing Worker capabilities rather than adding a Rust/Tauri/WebView bridge or a desktop brain. Presentation, context, OS execution and verification remain separate. Private payloads use a digest-bound process-local Runtime path and anonymous UIA stdin; restart loses content and blocks execution. Cross-process private payload transport and strong native critical approval are not silently invented. See [tradeoffs and acceptance](DESKTOP-FOUNDATION.md).
+
+## 2026-10-08 — Tauri product shell supersedes WPF
+
+Owner-selected Tauri 2/Rust/React-TypeScript replaces the October 7 presentation decision. Retain the accepted Python Desktop/Core runtime; WPF is reference-only. Native CNG signs bounded immutable reviews; React receives no credentials/signing payload. Critical actions remain blocked pending strong native confirmation. See [Desktop foundation](DESKTOP-FOUNDATION.md).

@@ -30,6 +30,8 @@ class Store:
         path.chmod(0o600)
         self.lock = RLock()
         self.task_resources: WeakSet[TaskResources] = WeakSet()
+        # Process-local private payloads. Durable plans carry only a digest; restart fails closed.
+        self.transient: dict[str, dict[str, Any]] = {}
         if self.db.execute("PRAGMA user_version").fetchone()[0] not in {0, 1}:
             self.db.close()
             raise StateConflict("unsupported storage schema; explicit migration required")
@@ -68,6 +70,7 @@ class Store:
                 self.db.execute("COMMIT")
 
     def close(self) -> None:
+        self.transient.clear()
         self.db.close()
 
     def put(self, kind: str, identifier: str, data: dict[str, Any]) -> None:

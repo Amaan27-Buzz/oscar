@@ -1,5 +1,9 @@
 # Security + Permissions
 
+## Desktop private context boundary
+
+Desktop perception, clipboard, microphone and action grants remain separate; no retention grant is inferred. Password/hidden/unregistered content fails closed, private inputs/results are process-local, and restart blocks replay. Signed session/digest/expiry challenges create no permanent grants; critical capabilities await strong owner approval. The fixed UIA source receives bounded private stdin rather than command-line text. See [Desktop foundation](DESKTOP-FOUNDATION.md).
+
 OSCAR acts across phones, computers, cloud services, communications and physical hardware. Security is architectural, not a later hardening pass.
 
 ## Core rules
@@ -534,3 +538,7 @@ See [OSCAR Mobile foundation](MOBILE-FOUNDATION.md) for implementation, limits a
 Slice 09 must not merge in this run. Gate C remains PARTIAL. Slice 10, deployment
 and Home Node are not started. Post-alpha Operating Logs, specialist-model training
 and home-server migration remain documented future work, not implemented.
+
+## Slice 10 native/WebView boundary
+
+Only bounded typed Tauri commands and local listen/drag permissions are exposed. Restrictive CSP and navigation allow only bundled local content. Rust owns loopback bearer lifetime, CNG private handles and immutable expiring review signatures. No arbitrary shell/path/plugin authority, frontend credentials or password collection. Explicit native review is non-critical only; Windows Hello remains NOT RUN. Context is private data, never authority. See [Desktop foundation](DESKTOP-FOUNDATION.md).

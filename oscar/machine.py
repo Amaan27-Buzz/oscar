@@ -251,10 +251,19 @@ class MachineWorker:
             raise StateConflict("worker disconnected")
 
     def run_command(
-        self, action: Action, cancellation: Cancellation, argv: list[str], cwd: str, timeout: float
+        self,
+        action: Action,
+        cancellation: Cancellation,
+        argv: list[str],
+        cwd: str,
+        timeout: float,
+        *,
+        input_data: bytes | None = None,
     ) -> tuple[int, str]:
         if not self.scope.trusted_host_execution:
             raise PermissionError("host subprocess execution is not enabled")
+        if input_data is not None and (os.name != "nt" or len(input_data) > 262144):
+            raise ValueError("bounded Windows pipe input required")
         if (
             not argv
             or not all(isinstance(a, str) and "\x00" not in a for a in argv)
@@ -282,7 +291,9 @@ class MachineWorker:
             env["CODEX_HOME"] = str(self.scope.codex_home)
         self.check(action, cancellation)
         if os.name == "nt":
-            return self.run_windows_command(action, cancellation, argv, directory, timeout, env)
+            return self.run_windows_command(
+                action, cancellation, argv, directory, timeout, env, input_data=input_data
+            )
         process = subprocess.Popen(
             argv,
             cwd=directory,
@@ -340,6 +351,8 @@ class MachineWorker:
         directory: Path,
         timeout: float,
         env: dict[str, str],
+        *,
+        input_data: bytes | None = None,
     ) -> tuple[int, str]:
         from .windows_files import WindowsScopedFiles
         from .windows_process import WindowsJob
@@ -359,13 +372,14 @@ class MachineWorker:
         stopping = Event()
         process: subprocess.Popen[bytes] | None = None
         reader: Thread | None = None
+        writer: Thread | None = None
         try:
             with WindowsScopedFiles(self.scope.root).pinned(directory):
                 process = job.start(
                     argv,
                     cwd=directory,
                     env=env,
-                    stdin=subprocess.DEVNULL,
+                    stdin=subprocess.PIPE if input_data is not None else subprocess.DEVNULL,
                     stdout=subprocess.PIPE,
                     stderr=subprocess.STDOUT,
                 )
@@ -389,6 +403,22 @@ class MachineWorker:
 
                 reader = Thread(target=collect, daemon=True)
                 reader.start()
+                if input_data is not None:
+
+                    def send_input() -> None:
+                        assert process is not None and process.stdin is not None
+                        try:
+                            process.stdin.write(input_data)
+                        except OSError:
+                            pass  # Executor's failure/readback determines outcome.
+                        finally:
+                            try:
+                                process.stdin.close()
+                            except OSError:
+                                pass
+
+                    writer = Thread(target=send_input, daemon=True)
+                    writer.start()
                 output = bytearray()
                 last_progress = 0.0
                 while True:
@@ -414,6 +444,8 @@ class MachineWorker:
         finally:
             stopping.set()
             job.close()
+            if writer:
+                writer.join(timeout=3)
             if process:
                 process.wait(timeout=3)
                 if reader:

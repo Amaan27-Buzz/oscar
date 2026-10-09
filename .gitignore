@@ -52,6 +52,7 @@ coverage/
 # Rust / Tauri
 /target/
 **/target/
+/desktop/src-tauri/gen/
 
 # Android / Kotlin
 .gradle/

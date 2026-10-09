@@ -9,6 +9,10 @@
 > and [Design](../DESIGN.md).
 
 
+## Current desktop software boundary
+
+OSCAR has a compact native Windows presence with Ask, Dictate, Edit and Act interaction modes. Explicit context and preview/apply are scoped Core operations, not separate agents or chat identities. The software/reference candidate awaits owner desktop acceptance; Gate C remains PARTIAL. See [Desktop foundation](DESKTOP-FOUNDATION.md).
+
 ## North star
 
 OSCAR is a persistent personal intelligence designed to do justice to the idea of JARVIS: one intelligence that understands natural language, perceives context, reasons, communicates, operates software, controls hardware, delegates to specialist systems, keeps working autonomously, learns successful procedures and appears through whichever trusted device is available.
@@ -274,3 +278,7 @@ See [OSCAR Mobile foundation](MOBILE-FOUNDATION.md) for implementation, limits a
 Slice 09 must not merge in this run. Gate C remains PARTIAL. Slice 10, deployment
 and Home Node are not started. Post-alpha Operating Logs, specialist-model training
 and home-server migration remain documented future work, not implemented.
+
+## Slice 10 product shell continuation
+
+OSCAR Desktop uses Tauri 2/Rust/React-TypeScript presence and Ask/Dictate/Edit/Act, with one shared Core relationship. Advertised capabilities drive bounded Act forms. WPF is reference-only. Functional composition precedes the separate [10R redesign](DESKTOP-UI-REDESIGN.md); 10R must integrate before Slice 17 PASS.

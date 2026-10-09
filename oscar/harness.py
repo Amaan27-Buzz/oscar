@@ -9,7 +9,7 @@ from .contracts import Action, Capability, Result, new_id
 from .credentials import CredentialPool
 from .discovery import HTTPDiscovery
 from .grid import Grid, Node, NodeRole
-from .models import ModelRequest, ProviderError, RoutingPolicy
+from .models import Mode, ModelRequest, ProviderError, RoutingPolicy
 from .providers import HTTPAdapter
 from .registry import Registry
 from .retrieval import ProviderInventorySource, RetrievalExecutor
@@ -30,6 +30,7 @@ class ModelExecutor:
             task_id=action.task_id,
             correlation_id=action.correlation_id,
             prompt=action.parameters["prompt"],
+            mode=Mode.PRIVATE if action.parameters.get("mode") == "private" else self.template.mode,
         )
         try:
             routed = self.router.execute(request, self.policy, cancellation.check)

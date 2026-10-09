@@ -46,6 +46,15 @@ def public_key(encoded: str) -> Any:
 
 
 class Mobile:
+    source = "mobile"
+
+    def approvable(self, task_id: str) -> bool:
+        return self.store.get("plan", task_id)["kind"] in {
+            "addition",
+            "model_reasoning",
+            "live_source",
+        }
+
     def __init__(
         self,
         runtime: Runtime,
@@ -108,8 +117,7 @@ class Mobile:
             target = str(self.store.get("lease", task.lease_id)["node_id"])
         else:
             association = self.store.get("sunday_task", task_id)
-            if association["node_id"] != session.node_id:
-                raise PermissionError("task belongs to another surface")
+            # Inspect grants authorize shared task readback; approval ownership is separate.
             target = str(association["target"])
         if target not in self.targets:
             raise PermissionError("target unavailable to this Core adapter")
@@ -142,11 +150,7 @@ class Mobile:
             row["id"] == task_id and row["node_id"] == session.node_id
             for row in self.store.all("sunday_task")
         )
-        owned = owned and self.store.get("plan", task_id)["kind"] in {
-            "addition",
-            "model_reasoning",
-            "live_source",
-        }
+        owned = owned and self.approvable(task_id)
         if owned and task.state == TaskState.PLANNED:
             if "control:approve:" + target in grants:
                 actions.append("approve")
@@ -326,12 +330,12 @@ class Mobile:
                 permission = (
                     "control:" + ("approve" if operation == "deny" else "cancel") + ":" + target,
                 )
-                policy_operation = "mobile." + operation
+                policy_operation = self.source + "." + operation
         else:
             task_id = ""
             permission = ("notifications:reply", "communications:send")
             policy_operation = "notification.reply"
-        context = {"node": session.node_id, "source": "mobile"}
+        context = {"node": session.node_id, "source": self.source}
         if operation == "reply":
             context.update(app=str(material["package"]), source=str(material["package"]))
         else:
@@ -346,7 +350,7 @@ class Mobile:
         )
         if not decision.allowed:
             raise PermissionError("owner decision blocked by permission or Personal Policy")
-        if operation != "reply":
+        if operation != "reply" and self.source == "mobile":
             # A naming change must not bypass previously authored source/operation rules.
             legacy = self.policy.evaluate(
                 policy_operation.replace("mobile.", "sunday."),
@@ -371,9 +375,7 @@ class Mobile:
         )
         if operation in {"approve", "retry", "deny"}:
             association = self.store.get("sunday_task", task_id)
-            if association["node_id"] != session.node_id or self.store.get("plan", task_id)[
-                "kind"
-            ] not in {"addition", "model_reasoning", "live_source"}:
+            if association["node_id"] != session.node_id or not self.approvable(task_id):
                 raise PermissionError("surface may approve only its scoped Core text plans")
             if operation == "deny":
                 self.runtime.cancel(task_id)
@@ -531,7 +533,7 @@ class MobileServer:
                     length = int(self.headers.get("Content-Length", "0"))
                     auth = self.headers.get("Authorization", "")
                     if (
-                        self.path not in {"/v1/mobile", "/v1/sunday"}
+                        self.path not in {"/v1/mobile", "/v1/sunday", "/v1/desktop"}
                         or not 0 < length <= 32768
                         or not auth.startswith("Bearer ")
                     ):

@@ -1,5 +1,9 @@
 # OSCAR Connection Grid
 
+## Desktop interaction ownership
+
+Grid now stores expiring generation-fenced interaction leases alongside existing task/executor leases. A reviewed text application binds input ownership to its Core task and rechecks it at Dispatcher; loss expires ownership. Desktop tasks are inspectable by eligible Mobile owner sessions without a private desktop task universe. Real Mobile/Desktop handoff remains owner acceptance. See [Desktop foundation](DESKTOP-FOUNDATION.md).
+
 ## Purpose
 
 OSCAR should not feel tied to one machine. The **Connection Grid** is the persistent availability and control fabric across OSCAR Mobile, desktop machines, cloud coordination and OSCAR Edge.
@@ -415,3 +419,7 @@ See [OSCAR Mobile foundation](MOBILE-FOUNDATION.md) for implementation, limits a
 Slice 09 must not merge in this run. Gate C remains PARTIAL. Slice 10, deployment
 and Home Node are not started. Post-alpha Operating Logs, specialist-model training
 and home-server migration remain documented future work, not implemented.
+
+## Tauri surface continuity
+
+Rust projects existing Core task/capability state into local typed events; frontend state grants no authority. Worker withdrawal removes eligible Act forms. Surface restart/reconnect inspects existing shared tasks; it does not replay private work or invent task truth. Existing Grid interaction fencing remains authoritative. See [Desktop foundation](DESKTOP-FOUNDATION.md).

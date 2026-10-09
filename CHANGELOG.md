@@ -30,6 +30,25 @@
 - Desktop PR #16 remains draft/unmerged; remote CI billing-blocked. Gate C remains PARTIAL with physical acceptance deferred.
 
 
+## 10R.0 — Desktop lifecycle and baseline capture
+
+- Separated ordinary uncommissioned Tauri lifecycle from inherited-stdin reference
+  bootstrap and intentional self-check exit. Close hides; tray/shortcut reveals;
+  explicit Quit terminates.
+- Captured 52 engineering UI PNGs using real components and bounded development-only
+  fixtures, including actual native menu/dialog, inventory and per-image manifest.
+  No UI redesign or Core/authority changes. Local checks passed; remote CI not
+  executed due account billing limit. PR #16 remains draft and unmerged.
+
+## 2026-10-07 — Slice 10 Desktop Interaction Runtime candidate
+
+- Added Tauri compact/expanded presence, canonical Orb/tray, configurable collision-aware global invocation and scoped Ask/Dictate/Edit/Act.
+- Owner-selected Tauri 2/Rust/React-TypeScript product shell supersedes WPF, retained only in `desktop/reference/wpf/`. Added bounded capability-driven Act forms, native CNG signing, restricted IPC/CSP, actual Windows debug executable and native/frontend CI checks. Documented future 10R track.
+- Reused Core tasks, signed authority, Controller/policy, Grid and Windows Worker/UIA/browser contracts.
+- Added typed opt-in transient context, final-transcript Dictate, Edit preview/apply fencing, independent destination readback and restart/replay/ownership safeguards.
+- Verified harmless WPF/CNG/Core and registered UIA Windows references; owner desktop/microphone/device acceptance remains NOT RUN. Gate C remains PARTIAL; draft is not merged.
+- See [Desktop foundation](docs/DESKTOP-FOUNDATION.md).
+
 ## 2026-10-06 — Slice 08 software/reference quality closure
 
 - Reconciled authoritative post-alpha docs; preserved future scope and voice portability.

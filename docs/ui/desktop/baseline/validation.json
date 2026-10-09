@@ -1,0 +1,19 @@
+{
+  "scope": "10R.0 lifecycle and baseline capture",
+  "starting_sha": "5f46f8b195ab557c85d66dec70eddf665cd3e3de",
+  "status": "LOCAL PASS / REMOTE CI NOT EXECUTED DUE ACCOUNT BILLING LIMIT",
+  "python": {"tests": 527, "result": "PASS", "optional_voice_skips": 6},
+  "rust": {"tests": 6, "format": "PASS", "clippy": "PASS", "result": "PASS"},
+  "frontend": {"tests": 7, "typecheck": "PASS", "build": "PASS", "production_showcase_exclusion": "PASS"},
+  "native_lifecycle": "REFERENCE PASS: GUI PE subsystem 2, ordinary no-bootstrap start, close/hide, shared invocation reveal, explicit quit",
+  "tauri_core_reference": "REFERENCE PASS: CNG/PSS, Ask, Dictate preview, simulated Edit transformation, real registered UIA apply/readback, typed Act file, cancel, restart/reconnect",
+  "uia_variance": "Some attempts returned UNKNOWN readback; later isolated ordinary reference passed. No observer weakening or ambiguous mutation replay.",
+  "independent_wpf_uia_reference": "REFERENCE PASS",
+  "mobile_jvm_core": "REFERENCE PASS",
+  "supplementary_android_build": "ENVIRONMENT_BLOCKED: pinned Gradle download connection timeout; compilation not reached",
+  "android_emulator_and_linux_firmware_matrix": "NOT_RUN_LOCAL; remote exact-head checks required before integration",
+  "repository_lint_format_types_links_secret_checks": "PASS",
+  "png_count": 52,
+  "owner_acceptance": "OWNER_ACCEPTANCE_NOT_RUN",
+  "gate_c": "PARTIAL"
+}

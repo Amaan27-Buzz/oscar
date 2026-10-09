@@ -10,6 +10,10 @@ The standalone lab and isolated Android module are software/reference foundation
 neither replaces the current app layout or proves device acceptance. Adoption is
 Slice 12 Desktop / Slice 13 Mobile; full Presence remains Slice 16.
 
+## Current Slice 10 Windows candidate
+
+Tauri compact/expanded presence, canonical Orb, tray/global invocation, shared Core tasks, signed contextual approvals and explicit context are implemented as a software/reference candidate. Reliable insertion uses registered UIA ValuePattern with expected-value fencing and independent readback. Mac/Linux, normal owner use and real voice/device acceptance are not claimed. See [Desktop foundation](DESKTOP-FOUNDATION.md).
+
 OSCAR is one intelligence expressed through multiple devices. Surfaces share identity, tasks, permissions, Personal Policy, Persona, memory, Voice Identity and capability contracts rather than becoming separate assistants.
 
 Cross-device coordination uses OSCAR-owned transport/capability contracts and the Connection Grid.

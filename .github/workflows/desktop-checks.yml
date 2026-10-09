@@ -1,0 +1,36 @@
+name: Desktop Tauri and Windows reference
+on:
+  pull_request:
+  push:
+    branches: [main, work]
+permissions:
+  contents: read
+jobs:
+  windows-reference:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install '.[dev,mobile]'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+          cache: npm
+          cache-dependency-path: desktop/package-lock.json
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: '1.99.0'
+          components: rustfmt, clippy
+      - run: python -m scripts.build_desktop --checks
+      - run: python -m scripts.desktop_baseline --lifecycle-only
+      - run: python -m scripts.desktop_tauri --self-check
+      - run: python -m unittest tests.test_desktop -v
+      - run: python -m scripts.desktop_reference --self-check
+      - run: python -m scripts.desktop_windows_reference
+      - run: python -m mypy oscar scripts/desktop_reference.py scripts/desktop_windows_reference.py scripts/desktop_tauri.py scripts/build_desktop.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: desktop-windows-reference
+          path: .oscar/desktop/

@@ -1,0 +1,70 @@
+// Development-only fixtures: existing product components, no native IPC or Core.
+import {App} from './App';
+import {initialView} from './bridge';
+import type {View,Task,Context,Capability,Review,Mode,Send,WindowMode} from './bridge';
+const timestamp=1791374400;
+const base:View={...initialView,link:'online',orb:'idle',window:'interaction',shortcut:'Ctrl+Alt+O · registered',observed_at_ms:timestamp*1000};
+const task=(state:string,extra:Partial<Task>={}):Task=>({task_id:`fixture-${state}`,state,description:'Synthetic desktop reference task',target:'fixture-worker',blocker:null,actions:[],generation:1,evidence_ids:[],response:null,response_status:null,value:null,epistemic:null,...extra});
+const context=(source='selection',extra:Partial<Context>={}):Context=>({id:'fixture-context',source,timestamp,scope:'Disposable fixture only',provenance:'SIMULATED structured UIA fixture · explicit owner capture',permission:'granted',freshness:'fresh',text:'Please review this synthetic project summary.',retained:false,...extra});
+const preview={preview_id:'fixture-preview',before:'This synthetic summary contains a long sentence that can be shortened.',after:'A shorter synthetic project summary.',epistemic:'REPORTED',expires:timestamp+15,destinations:['surface','clipboard','focused']};
+const review:Review={review_id:'fixture-review',operation:'approve',description:'Write exact synthetic artifact',target:'fixture-worker',capability:'machine.files.write',reason:'Explicit owner request',consequence:'Creates or replaces the reviewed workspace artifact',policy_reason:'Scoped workspace grant; signed owner confirmation required',evidence_state:'planned / unexecuted',review:'Relative path: notes/reference.txt\nExact content: Synthetic project summary.\nNo execution occurs in showcase.',expires_at_ms:(timestamp+30)*1000};
+const cap=(kind:string,operations:string[]):Capability=>({id:`fixture-worker::${kind}`,node:'fixture-worker',kind,label:`Fixture ${kind}`,summary:'Representative advertised capability; showcase cannot execute it',risk:'high',operations,programs:[],applications:[]});
+export interface Fixture {id:string;surface:string;state:string;why:string;mode:Mode;view:View;open:string[];destination?:string}
+export const fixtures:Fixture[]=[];
+function add(id:string,surface:string,state:string,patch:Partial<View>={},mode:Mode='Ask',open:string[]=[],destination?:string){fixtures.push({id,surface,state,why:`Inspect existing ${surface} presentation for ${state}`,mode,view:{...base,...patch},open,destination});}
+add('01-compact-idle','Presence','connected idle',{window:'compact'});
+add('02-compact-active','Presence','running with owner attention',{window:'compact',orb:'thinking',current:task('executing'),tasks:[task('executing'),task('planned',{actions:['approve']})]});
+add('03-compact-offline','Presence','Core unavailable',{window:'compact',link:'unavailable',orb:'unavailable'});
+add('10-ask-empty','Ask','empty');
+add('11-ask-context','Ask','attached explicit context',{context:context()},'Ask',['Provenance and permission']);
+add('12-ask-working','Ask','running',{orb:'thinking',current:task('executing',{actions:['cancel'],progress:{fraction:.4,step:'Reasoning',status:'REPORTED'}})});
+add('13-ask-result-reported','Ask','reported response',{orb:'attentive',current:task('partially_verified',{response:'Synthetic explanation: this text is model-reported, not independently verified.',response_status:'REPORTED',epistemic:'REPORTED'})});
+add('14-ask-result-verified','Ask','verified result',{orb:'attentive',current:task('verified',{value:'5',epistemic:'VERIFIED',evidence_ids:['synthetic-math-readback']})});
+add('15-ask-unknown','Ask','unknown outcome',{orb:'error',current:task('unknown',{blocker:'Readback unavailable; inspect before retry.'})});
+add('20-dictate-idle','Dictate','idle',{},'Dictate');
+add('21-dictate-listening','Dictate','listening fixture',{orb:'listening',voice:'listening'},'Dictate');
+add('22-dictate-processing','Dictate','processing fixture',{orb:'thinking',voice:'processing',message:'Final transcript is processing (fixture only).'},'Dictate');
+add('23-dictate-preview','Dictate','final transcript preview',{preview:{...preview,before:null}},'Dictate');
+add('24-dictate-destination','Dictate','explicit clipboard choice',{preview:{...preview,before:null}},'Dictate',[],'clipboard');
+add('30-edit-context','Edit','fresh focused context',{context:context('focused')},'Edit',['Provenance and permission']);
+add('31-edit-working','Edit','transform running',{context:context('focused'),orb:'thinking',current:task('executing',{actions:['cancel']})},'Edit');
+add('32-edit-before-after','Edit','before/after review',{context:context('focused'),preview},'Edit');
+add('33-edit-destination','Edit','captured field choice',{context:context('focused'),preview},'Edit',[],'focused');
+add('34-edit-unsupported','Edit','reliable insertion unavailable',{context:context(),preview:{...preview,destinations:['surface']},message:'Reliable insertion is unavailable; only the OSCAR surface is supported.'},'Edit');
+add('40-act-files','Act','bounded file write',{capabilities:[cap('file_write',['write_file']),cap('file_read',['read_file']),cap('directory_list',['list_files']),cap('file_search',['find_files'])]},'Act');
+add('41-act-git','Act','Git operations',{capabilities:[cap('git_operation',['git_branch','git_status','git_diff','git_log','git_branches'])]},'Act');
+add('42-act-powershell','Act','typed PowerShell',{capabilities:[cap('powershell',['ps_write_utf8','ps_environment','ps_file_hash'])]},'Act');
+add('43-act-browser','Act','isolated browser',{capabilities:[cap('browser',['inspect_page'])]},'Act');
+add('44-act-apps','Act','registered application',{capabilities:[{...cap('installed_app',['launch_app','list_apps']),applications:[{id:'fixture-editor',name:'Disposable fixture editor'}]}]},'Act');
+add('45-act-no-capability','Act','no advertised capability',{},'Act');
+add('46-act-terminal','Act','fixed registered program version',{capabilities:[{...cap('terminal_command',['program_version']),programs:[{id:'fixture-python',name:'python.exe'}]}]},'Act');
+add('47-act-worker-tools','Act','Worker tools discovery',{capabilities:[cap('executable_discovery',['worker_tools'])]},'Act');
+add('50-activity-empty','Activity','empty',{window:'activity'});
+add('51-activity-running','Activity','running and selected progress',{window:'activity',orb:'thinking',tasks:[task('executing')],current:task('executing',{actions:['cancel'],progress:{fraction:.6,step:'Reference readback',status:'REPORTED'}})});
+add('52-activity-mixed','Activity','mixed shared task truth',{window:'activity',tasks:['planned','executing','awaiting_result','verifying','partially_verified','verified','failed','blocked','cancelled','unknown'].map(s=>task(s,{description:`Synthetic ${s} task`,actions:s==='planned'?['approve','deny']:[]}))});
+add('60-approval-standard','Approval','standard owner review',{window:'approval',review});
+add('61-approval-detailed','Approval','exact detailed review',{window:'approval',review:{...review,review:review.review+'\nExpected previous value: Synthetic draft.\nResult must match exact reviewed bytes.\nIndependent resulting-state readback required.\nOutcome is UNKNOWN if readback is inaccessible.'}});
+add('70-context-none','Context','none');
+add('71-context-selection','Context','selection',{context:context()},'Ask',['Provenance and permission']);
+add('72-context-focused','Context','focused field',{context:context('focused')},'Ask',['Provenance and permission']);
+add('73-context-window','Context','foreground metadata',{context:context('foreground',{text:'Fixture editor · synthetic-document.txt',provenance:'SIMULATED foreground process/window metadata'})},'Ask',['Provenance and permission']);
+add('74-context-stale','Context','stale',{context:context('selection',{freshness:'stale'})},'Ask',['Provenance and permission']);
+add('75-context-denied','Context','permission denied',{message:'Context capture denied: no desktop:perceive:selection grant.'});
+add('76-context-unavailable','Context','structured selection unavailable',{message:'Selection unavailable; no screenshot inference or fallback occurred.'});
+add('80-invocation','Invocation','shortcut registered',{},'Ask',['Invocation']);
+add('81-shortcut-collision','Invocation','registration collision',{message:'Shortcut collision; existing invocation retained',shortcut:'Ctrl+Alt+O · existing registration retained'},'Ask',['Invocation']);
+add('90-core-unavailable','Degraded','Core unavailable',{link:'unavailable',orb:'unavailable',message:'Core unavailable; outcome UNKNOWN; inspect before retry.'});
+add('91-worker-unavailable','Degraded','Worker unavailable',{orb:'error',current:task('blocked',{blocker:'Worker lease expired; Worker capabilities withdrawn.'})},'Act');
+add('92-capability-withdrawn','Degraded','capability withdrawn',{message:'Previously advertised browser capability is no longer eligible.'},'Act');
+add('93-request-rejected','Degraded','Core rejected request',{message:'Core rejected interact; refresh task/context or permission.'});
+add('94-stale-context','Degraded','stale context rejected',{context:context('focused',{freshness:'stale'}),message:'Context stale; explicit recapture required before transformation.'},'Edit');
+add('95-offline-discard','Degraded','offline local discard',{link:'unavailable',orb:'unavailable',message:'Local content discarded; Core acknowledgement unavailable',tasks:[task('verified')],current:task('verified')});
+export const sizes:Record<WindowMode,[number,number]>={compact:[300,126],interaction:[580,760],approval:[620,780],activity:[820,780]};
+export function Showcase({fixture}:{fixture:Fixture}) {
+  const port:Send=async command=>{
+    if(command.kind==='ready'||command.kind==='refresh')return fixture.view;
+    if(command.kind==='window')return {...fixture.view,window:command.mode};
+    throw new Error('Showcase cannot execute product operations');
+  };
+  return <App port={port} events={async()=>()=>{}}/>;
+}

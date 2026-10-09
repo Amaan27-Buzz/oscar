@@ -1,4 +1,5 @@
 <p align="center">
+
   <img src="assets/brand/oscar-orb.svg" width="180" alt="OSCAR Orb" />
 </p>
 
@@ -27,6 +28,10 @@ are not replaced by local or screenshot checks. GitHub Actions is blocked by
 account billing limits. Historical sections below document earlier snapshots,
 not current implementation instructions.
 
+
+## Slice 10 desktop candidate
+
+The accepted Slice 09 baseline is `7043b9663fe6474e3457c7aa578e733f7a5a4c1a`. Slice 10 adds a Tauri 2 / Rust / React-TypeScript presence and scoped Ask/Dictate/Edit/Act Core boundary on `club-d2/slice-10-desktop`; it remains an unmerged draft with **OWNER_ACCEPTANCE_NOT_RUN**. Gate C stays **PARTIAL**. See [Desktop foundation](docs/DESKTOP-FOUNDATION.md).
 See [deployment architecture](docs/DEPLOYMENT.md) for the free-first persistent Core
 and separate web/API host candidates and the deferred Home Node. These are future
 deployment choices, not Gate B completion claims.
@@ -308,8 +313,8 @@ See [`docs/CLUB-A-CHECKPOINT.md`](docs/CLUB-A-CHECKPOINT.md), [`docs/CLUB-B-CHEC
 | 06 | Memory Fabric + Personal Policy + live context | ✅ COMPLETE, accepted local-alpha scope |
 | 07 | OSCAR Edge + reflexes | COMPLETE FOR SOFTWARE / SIMULATED EDGE FOUNDATION; physical DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED |
 | 08 | Voice Core + Identity + Match/Map + Persona runtime | COMPLETE FOR SOFTWARE / REFERENCE VOICE FOUNDATION; physical acceptance owner-deferred |
-| 09 | OSCAR Mobile + communication + Grid owner controls | PARTIAL; Kotlin/Compose software rebuild candidate, draft PR #15; real device acceptance NOT RUN |
-| 10 | Desktop Interaction Runtime | Planned |
+| 09 | OSCAR Mobile + communication + Grid owner controls | Accepted software foundation at `7043b96`; physical owner acceptance deferred |
+| 10 | Desktop Interaction Runtime | Draft software/Windows reference candidate; OWNER_ACCEPTANCE_NOT_RUN |
 | 11 | World Model + Perception + Sentry + Daily Journal | Planned |
 | 12 | Commissioning/setup | Planned |
 | 13 | Avatar/presence UI | Planned |
