@@ -21,12 +21,14 @@ export class ExpressionController {
   private cancelled=false;
   private settledDelivery:ExpressiveDelivery|null=null;
   private forceReduced=false;
+  private gaze:{x:number;y:number};
   readonly settings:Settings;
   readonly source:Source;
   constructor(source:Source,settings:Settings=defaults) {
     if(!/^[A-Za-z0-9:_-]{1,64}$/.test(source.id)||!['core','lab','fixture'].includes(source.kind))throw new Error('Invalid expression source');
     if(!Number.isFinite(settings.intensity)||settings.intensity<.35||settings.intensity>1||!Number.isFinite(settings.weight)||settings.weight<.7||settings.weight>1.5||!Number.isFinite(settings.gaze.x)||!Number.isFinite(settings.gaze.y)||Math.abs(settings.gaze.x)>10||Math.abs(settings.gaze.y)>7)throw new Error('Invalid expression settings');
     this.source=Object.freeze({...source});this.settings=Object.freeze({...settings,gaze:Object.freeze({...settings.gaze})});
+    this.gaze={...settings.gaze};
     this.held=poseFor({operation:'unknown',delivery:'hesitant'},settings.intensity,settings.gaze);
   }
   private resolve() {
@@ -38,8 +40,8 @@ export class ExpressionController {
   private poseAt(now:number):Pose {
     if(!this.motion)return this.held;
     const m=this.motion,t=Math.max(0,now-m.started),resolved=this.resolve();
-    if(this.reduced())return m.accent?sample(m.accent,t,this.settings,true).pose:poseFor(resolved,this.settings.intensity,this.settings.gaze);
-    return m.accent?sample(m.accent,t,this.settings,false).pose:blend(m.from,poseFor(resolved,this.settings.intensity,this.settings.gaze),t,this.settings.weight,m.velocity);
+    if(this.reduced())return m.accent?sample(m.accent,t,this.settings,true).pose:poseFor(resolved,this.settings.intensity,this.gaze);
+    return m.accent?sample(m.accent,t,this.settings,false).pose:blend(m.from,poseFor(resolved,this.settings.intensity,this.gaze),t,this.settings.weight,m.velocity);
   }
   private velocity(now:number) {
     if(!this.motion||this.reduced())return zeroVelocity();
@@ -55,7 +57,7 @@ export class ExpressionController {
   }
   private invalidate(outcome:AnimationOutcome) {
     this.finish(outcome);this.invalid=true;this.cancelled=true;
-    this.held=poseFor(this.resolve(),this.settings.intensity,this.settings.gaze);
+    this.held=poseFor(this.resolve(),this.settings.intensity,this.gaze);
   }
   receive(raw:unknown,now:number):'accepted'|'stale'|'invalid'|'source_mismatch' {
     const event=parseEvent(raw);
@@ -96,11 +98,22 @@ export class ExpressionController {
     return {pose,resolved,source:this.source,generation:this.lastGeneration,priority,animation:this.motion?(this.motion.accent?'accent':'settling'):this.cancelled?'cancelled':'held',moving:this.motion!==null,expiresAt:this.invalid?null:this.frame?.expiresAt??null};
   }
   suspend() {this.invalidate('lifecycle');}
+  /** Local explicit pointer target; critical/privacy/activity poses never track it. */
+  setGaze(gaze:{x:number;y:number},now:number) {
+    if(!Number.isFinite(gaze.x)||!Number.isFinite(gaze.y)||Math.abs(gaze.x)>10||Math.abs(gaze.y)>7)throw new Error('Invalid gaze target');
+    this.snapshot(now);
+    if(!this.frame||this.invalid||!['idle','attentive'].includes(this.resolve().operation)||this.motion?.accent)return;
+    if(gaze.x===this.gaze.x&&gaze.y===this.gaze.y)return;
+    const from={...this.poseAt(now)},velocity=this.velocity(now);this.gaze={...gaze};
+    this.finish('superseded');
+    this.motion={from,velocity,started:now,duration:this.reduced()?0:700,generation:this.frame.generation,transitionId:this.frame.transitionId,accent:null};
+    this.held=from;this.snapshot(now);
+  }
   setReducedMotion(reduced:boolean,now:number) {
     this.forceReduced=reduced;
     if(!this.frame)return;
     if(this.reduced()) {
-      this.held=poseFor(this.resolve(),this.settings.intensity,this.settings.gaze);
+      this.held=poseFor(this.resolve(),this.settings.intensity,this.gaze);
       if(!this.motion?.accent||this.motion.accent.beats.length===1)this.finish('cancelled');
     }
     this.snapshot(now);

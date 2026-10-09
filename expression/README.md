@@ -4,6 +4,12 @@ Slice 11.3 reusable presentation foundation, derived from the owner-reviewed v3
 character. Core retains all operational, permission, verification and audio truth.
 No network, microphone, TTS, memory, native credential or capability executor.
 
+Slice 12.1 adds an optional bounded local pointer target to the existing controller
+and React presence (`gaze: {x, y}`, ±10/±7). It retargets through the same weighted
+spring, preserving pose/velocity, operation, generation and expiry. Only idle/
+attentive presentation responds; critical/privacy/activity states reject tracking.
+Consumers that omit it retain the Slice 11 behaviour. No new wire field or engine.
+
 - `core/contract.ts`: version-1 bounded event, strict validation and animation-only outcomes.
 - `core/controller.ts`: source/generation/freshness admission, priority, state/accents,
   continuity, cancellation, expiry and lifecycle invalidation; no React dependency.

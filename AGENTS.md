@@ -4,6 +4,13 @@ Canonical instructions for Codex and other coding agents working on OSCAR.
 
 ## Current authoritative slice plan — 2026-10-09
 
+**Owner authorization — 2026-10-10:** Slice **12.1 Living Desktop Presence** is a
+separate local owner-review candidate based on integration `b9d3e049`. See
+`docs/ui/desktop/presence/README.md`. Preserve both unmerged foundation histories;
+work locally under the owner-reported GitHub access restriction. The prototype
+uses a DEV route/debug launch flag, not the default UI. Stop at visual review;
+12.2, Mobile redesign, Core authority changes and foundation merges are not authorized.
+
 **Canonical numbered roadmap: Slices 00–20.** Read `docs/SLICE-NUMBERING.md`,
 `docs/ROADMAP.md` and `docs/EXPRESSION-CORE.md` before proposing a slice.
 Current candidate: **11.1 Character/Expression Language + 11.2 Interactive

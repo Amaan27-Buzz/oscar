@@ -1,5 +1,6 @@
 #![cfg_attr(target_os = "windows", windows_subsystem = "windows")]
 mod core;
+mod presence;
 mod protocol;
 mod signing;
 use crate::{
@@ -25,6 +26,7 @@ use tauri_plugin_global_shortcut::{GlobalShortcutExt, Shortcut, ShortcutState};
 use windows_sys::Win32::UI::WindowsAndMessaging::{IDYES, MB_ICONQUESTION, MB_YESNO, MessageBoxW};
 
 struct Native {
+    presence: bool,
     bridge: Arc<Bridge>,
     shortcut: Mutex<Option<Shortcut>>,
     ready: AtomicBool,
@@ -38,21 +40,60 @@ fn window_mode(app: &tauri::AppHandle, state: &Native, mode: WindowMode) -> Resu
         .get_webview_window("main")
         .ok_or("desktop window unavailable")?;
     let (width, height) = match mode {
+        WindowMode::Compact if state.presence => presence::COMPACT,
+        WindowMode::Interaction if state.presence => presence::INTERACTION,
         WindowMode::Compact => (300., 126.),
         WindowMode::Interaction => (580., 760.),
         WindowMode::Approval => (620., 780.),
         WindowMode::Activity => (820., 780.),
     };
-    window
-        .set_size(tauri::LogicalSize::new(width, height))
-        .map_err(|_| "native window unavailable")?;
-    state
+    if state.presence {
+        presence::resize(&window, (width, height), false)?;
+    } else {
+        window
+            .set_size(tauri::LogicalSize::new(width, height))
+            .map_err(|_| "native window unavailable")?;
+    }
+    let mut view = state
         .bridge
         .view
         .lock()
-        .map_err(|_| "native state unavailable")?
-        .window = mode;
+        .map_err(|_| "native state unavailable")?;
+    view.window = mode;
+    if state.presence {
+        view.expression.generation += 1;
+    }
+    drop(view);
     Ok(state.bridge.view())
+}
+#[tauri::command]
+fn presence_window(
+    app: tauri::AppHandle,
+    state: tauri::State<'_, Native>,
+    action: presence::Action,
+) -> Result<(), String> {
+    if !cfg!(debug_assertions) || !state.presence {
+        return Err("presence prototype is not enabled".into());
+    }
+    let window = app
+        .get_webview_window("main")
+        .ok_or("presence window unavailable")?;
+    match action {
+        presence::Action::Hide => window.hide().map_err(|_| "hide unavailable".into()),
+        presence::Action::Pin => window
+            .set_always_on_top(true)
+            .map_err(|_| "pin unavailable".into()),
+        presence::Action::Float => window
+            .set_always_on_top(false)
+            .map_err(|_| "float unavailable".into()),
+        presence::Action::Edge => {
+            let size = window
+                .inner_size()
+                .map_err(|_| "size unavailable")?
+                .to_logical::<f64>(window.scale_factor().map_err(|_| "scale unavailable")?);
+            presence::resize(&window, (size.width, size.height), true)
+        }
+    }
 }
 fn register_shortcut(app: &tauri::AppHandle, state: &Native, value: &str) -> Result<View, String> {
     validate_shortcut(value)?;
@@ -398,8 +439,10 @@ fn main() {
         None
     };
     let interaction = std::env::args().any(|a| a == "--interaction");
+    let presence = cfg!(debug_assertions) && std::env::args().any(|a| a == "--living-presence");
     let bridge = Arc::new(Bridge::new());
     let native = Native {
+        presence,
         bridge: bridge.clone(),
         shortcut: Mutex::new(None),
         ready: AtomicBool::new(false),
@@ -409,12 +452,19 @@ fn main() {
         .plugin(tauri_plugin_global_shortcut::Builder::new().with_handler(|app,_,event|{
             if event.state==ShortcutState::Pressed{invoke_presence(app.clone());}
         }).build())
-        .invoke_handler(tauri::generate_handler![desktop_command])
+        .invoke_handler(tauri::generate_handler![desktop_command, presence_window])
         .setup(move|app| {
-            tauri::WebviewWindowBuilder::from_config(app, &app.config().app.windows[0])?
+            let mut config=app.config().app.windows[0].clone();
+            if presence { config.url=tauri::WebviewUrl::External("http://127.0.0.1:1420/?living".parse()?); }
+            let mut builder=tauri::WebviewWindowBuilder::from_config(app, &config)?;
+            if presence {
+                builder=builder.transparent(true).shadow(false).inner_size(132.,148.).min_inner_size(132.,148.).resizable(false);
+            }
+            let window=builder
                 .on_navigation(|url| url.scheme()=="tauri" || (url.scheme()=="http" && (url.host_str()==Some("tauri.localhost") ||
                     (cfg!(debug_assertions)&&url.host_str()==Some("127.0.0.1")&&url.port()==Some(1420)))))
                 .build()?;
+            if presence { presence::resize(&window,presence::COMPACT,true)?; }
             let reveal=MenuItem::with_id(app,"reveal","Open OSCAR",true,None::<&str>)?;
             let compact=MenuItem::with_id(app,"compact","Compact presence",true,None::<&str>)?;
             let hide=MenuItem::with_id(app,"hide","Hide OSCAR",true,None::<&str>)?;
@@ -474,7 +524,10 @@ fn main() {
                         if let Err(error)=reference_check(handle.clone(),client.clone()){eprintln!("reference failed: {error}");handle.exit(1);}
                         return;
                     }
-                    let view=if client.is_some(){match state.bridge.refresh(){Ok(v)=>v,Err(e)=>state.bridge.fail(e)}}else{state.bridge.view()};
+                    let view=if client.is_some(){match state.bridge.refresh(){Ok(v)=>v,Err(e)=>state.bridge.fail(e)}}else{
+                        if state.presence { let mut view=state.bridge.view.lock().unwrap_or_else(|p|p.into_inner());view.expression.generation+=1;view.expression.observed_at_ms=core::now_ms(); }
+                        state.bridge.view()
+                    };
                     if view!=emitted {emit(&handle,&state);emitted=view;}
                     thread::sleep(Duration::from_secs(2));
                 }

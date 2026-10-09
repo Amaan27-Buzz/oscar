@@ -1,5 +1,5 @@
 {
   "identifier":"desktop-ui", "description":"Bounded OSCAR commands and read-only native state events",
   "windows":["main"], "local":true,
-  "permissions":["allow-desktop-command","core:event:allow-listen","core:event:allow-unlisten","core:window:allow-start-dragging"]
+  "permissions":["allow-desktop-command","allow-presence-window","core:event:allow-listen","core:event:allow-unlisten","core:window:allow-start-dragging"]
 }

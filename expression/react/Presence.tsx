@@ -11,7 +11,7 @@ export function ExpressionOrb({snapshot,size=64}:{snapshot:ExpressionSnapshot;si
 }
 
 /** Source must be supplied by a trusted adapter. This component has no bridge, audio or execution APIs. */
-export function ExpressionPresence({event,source,size=64,onAnimationRecord}:{event:ExpressionEvent;source:Source;size?:number;onAnimationRecord?:(record:AnimationRecord)=>void}) {
+export function ExpressionPresence({event,source,size=64,onAnimationRecord,gaze}:{event:ExpressionEvent;source:Source;size?:number;onAnimationRecord?:(record:AnimationRecord)=>void;gaze?:{x:number;y:number}}) {
   const controller=useRef<{key:string;engine:ExpressionController}|null>(null);
   const key=`${source.kind}:${source.id}`;
   if(!controller.current||controller.current.key!==key)controller.current={key,engine:new ExpressionController(source)};
@@ -29,6 +29,7 @@ export function ExpressionPresence({event,source,size=64,onAnimationRecord}:{eve
       else if(next.expiresAt!==null)timer=setTimeout(refresh,Math.max(1,next.expiresAt-now));
     };
     engine.setReducedMotion(system.matches,Date.now());engine.receive(event,Date.now());
+    if(gaze)engine.setGaze(gaze,Date.now());
     if(document.hidden)engine.suspend();refresh();
     const visibility=()=>{
       if(document.hidden)engine.suspend();
@@ -38,6 +39,6 @@ export function ExpressionPresence({event,source,size=64,onAnimationRecord}:{eve
     const reduce=()=>{engine.setReducedMotion(system.matches,Date.now());visibility();};
     system.addEventListener('change',reduce);document.addEventListener('visibilitychange',visibility);
     return()=>{stopped=true;if(frame!==undefined)cancelAnimationFrame(frame);if(timer!==undefined)clearTimeout(timer);system.removeEventListener('change',reduce);document.removeEventListener('visibilitychange',visibility);};
-  },[engine,event]);
+  },[engine,event,gaze?.x,gaze?.y]);
   return <ExpressionOrb snapshot={snapshot} size={size}/>;
 }

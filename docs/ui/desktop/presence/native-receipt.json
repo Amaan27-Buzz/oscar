@@ -1,0 +1,53 @@
+{
+  "evidence": "REAL_TAURI_WEBVIEW2_DISPOSABLE_AUTHENTICATED_CORE",
+  "compact": {
+    "physical_width": 165,
+    "physical_height": 185,
+    "logical_width": 132.0,
+    "logical_height": 148.0,
+    "scale": 1.25
+  },
+  "expanded": {
+    "physical_width": 540,
+    "physical_height": 480,
+    "logical_width": 432.0,
+    "logical_height": 384.0,
+    "scale": 1.25
+  },
+  "transparency": {
+    "WebView_alpha": "VERIFIED 0..255",
+    "native_compositor": "INCONCLUSIVE / automation capture could not foreground target over owned backdrop"
+  },
+  "performance": {
+    "idle_puck_mutations": 0,
+    "raf_interval_median_ms": 6.099999999998545,
+    "raf_interval_p95_ms": 6.30000000000291,
+    "scope": "WebView scheduling and SVG rest; not whole-system CPU"
+  },
+  "arithmetic": "VERIFIED 2+3=5; harness execution, not GUI approval",
+  "offline_reconnect": "PASS epoch rotated; voice idle",
+  "window_controls": "PASS pin/float/edge requests; close hides; global shortcut restores focus",
+  "animation": {
+    "sampled_frames": 15,
+    "encoded_frames": 3,
+    "seconds": 1.129790500002855,
+    "source": "REAL_RENDERED_FRAME_SEQUENCE",
+    "alignment": "Content captures on a fixed canvas, anchored at bottom right"
+  },
+  "interrupted_window_sequence": {
+    "sampled_frames": 27,
+    "encoded_frames": 9,
+    "seconds": 2.15476050000143,
+    "source": "REAL_RENDERED_FRAME_SEQUENCE",
+    "alignment": "Content captures on a fixed canvas, anchored at bottom right"
+  },
+  "page_errors": [],
+  "owner_acceptance": "NOT RUN",
+  "physical_voice": "NOT RUN",
+  "initial_orb_rect": {
+    "x": 20,
+    "y": 16,
+    "width": 92,
+    "height": 84
+  }
+}

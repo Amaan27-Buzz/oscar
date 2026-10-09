@@ -13,6 +13,11 @@
 
 ## Current development and milestones
 
+Owner-authorized **Slice 12.1 Living Desktop Presence** is a separate local
+[visual-review candidate](docs/ui/desktop/presence/README.md) based on the integration
+below. It uses the existing Core and shared expression engine. Default Desktop,
+foundation PRs and later Slice 12.2 remain unchanged; owner/CI boundaries stay open.
+
 Owner-authorized local Desktop/Expression integration now has a
 [candidate report](docs/DESKTOP-EXPRESSION-INTEGRATION.md). Both foundation PRs
 remain unmerged; GitHub access is HTTP 403/account suspended. This prepares Slice 12

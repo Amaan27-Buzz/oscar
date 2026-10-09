@@ -2,7 +2,10 @@ import {createRoot} from 'react-dom/client';
 import {App} from './App';
 import './style.css';
 const root=createRoot(document.getElementById('root')!);
-if(import.meta.env.DEV && new URLSearchParams(location.search).has('integration')) {
+if(import.meta.env.DEV && new URLSearchParams(location.search).has('living')) {
+  document.documentElement.dataset.living='true';
+  void import('./presence/Living').then(({Living})=>root.render(<Living/>));
+} else if(import.meta.env.DEV && new URLSearchParams(location.search).has('integration')) {
   void import('./integration-fixture').then(({IntegrationFixture})=>root.render(<IntegrationFixture/>));
 } else if(import.meta.env.DEV && new URLSearchParams(location.search).has('presence')) {
   void import('./presence/Exploration').then(({Exploration})=>{

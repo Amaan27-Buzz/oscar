@@ -372,6 +372,11 @@ Keep `assets/brand/oscar-orb.svg` unmodified. Proposed derivatives are separate,
 
 ## Slice 12 — OSCAR Desktop experience and visual system ◻️
 
+**2026-10-10:** owner-authorized 12.1 has an isolated local
+[Living Desktop Presence candidate](ui/desktop/presence/README.md), based on
+`b9d3e049`. It stops at visual review. Default UI is not promoted; foundation
+merges, exact-head CI, wider native/owner acceptance and 12.2 are not completed here.
+
 The **entire former 10R track**, as a single formal top-level slice after 11:
 
 - **12.0 — Baseline:** 52 PNGs, manifest, lifecycle fix already produced in PR #16 (historical 10R.0).

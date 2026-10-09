@@ -41,6 +41,8 @@ def main() -> int:
             "10R.1 synthetic exploration",
             "presence-object",
             "SIMULATED DESKTOP EVENTS",
+            "living-presence",
+            "Synthetic preview · no execution or audio",
         )
     ):
         raise RuntimeError("development showcase must not enter the production frontend bundle")
