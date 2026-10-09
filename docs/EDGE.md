@@ -4,7 +4,7 @@ Current scope: Core/Grid → ESP32 gateway → UART → Pico deterministic contr
 These boards are Edge nodes, never Core hosts. Gate A/B remain frozen PASS.
 Slice 07 is COMPLETE FOR SOFTWARE / SIMULATED EDGE FOUNDATION. Physical acceptance
 is DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED; simulation proves no physical PASS. Voice, OSCAR Mobile/Android, Desktop Interaction, deployment and
-Galaxy Tab work are excluded from Slice 07. Slice 08 Voice is separate current work.
+Galaxy Tab work are excluded from Slice 07. Slice 08 Voice is a separate software/reference foundation already integrated; current owner-prioritized design work is Slice 11. See [canonical numbering](SLICE-NUMBERING.md).
 Wake-on-LAN is not advertised or implemented.
 
 ## Framework and link decision
