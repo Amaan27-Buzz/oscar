@@ -2,6 +2,33 @@
 
 Canonical instructions for Codex and other coding agents working on OSCAR.
 
+## Current authoritative slice plan — 2026-10-09
+
+**Canonical numbered roadmap: Slices 00–20.** Read `docs/SLICE-NUMBERING.md`,
+`docs/ROADMAP.md` and `docs/EXPRESSION-CORE.md` before proposing a slice.
+Active next work: **11.1 Character/Expression Language + 11.2 Interactive
+Expression Lab**. After explicit visual owner review: 11.3 shared render
+contract → 12 Desktop UX → 13 Mobile UX → 14–20 remaining roadmap.
+Old `09R/10R/13A/13B` labels and original Slice 17 Alpha are historical
+aliases only; do not use them in new plans or claim them as current.
+
+**Design quality bar:** The previous static smiling Orb on beige cards was
+rejected. The companion screenshots are references for responsive character,
+gaze, microexpressions, believable timing and ambient desktop presence—not
+artwork to copy. The owner expects GPT-6.1 Sol / High effort: thoughtful design
+research, careful iteration, independently critiqued motion, tiny-scale
+legibility and owner visual approval. Do not optimize for quick mockups.
+Preserve `assets/brand/oscar-orb.svg` as an immutable canonical source;
+reviewed expressive derivatives live separately. Real operational state and
+Persona delivery must be strictly separated.
+
+**Git:** PR #16 is an unmerged Desktop runtime candidate and its old 10R.1
+A/B/C screenshots are exploratory. Reconcile the draft branch against
+`origin/work` before continuing; protect unmerged code/evidence, respect
+GitHub billing-blocked remote CI, and never mark owner-device checks PASS.
+Gate C remains PARTIAL. See `docs/BUILD-GATES.md`.
+
+
 Detailed truth lives in the linked domain docs. Do not duplicate the whole architecture into tool-specific prompts.
 
 ## Read first
@@ -409,7 +436,7 @@ remain a draft and stop before owner/device acceptance. Slice 10, deployment and
 Galaxy Tab Home Node are not authorized. Physical Edge remains
 `DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED`, mandatory before Slice 17 PASS.
 
-## Current Slice 09 — 2026-10-06
+## Historical Slice 09 checkpoint — 2026-10-06 (not current guidance)
 
 Slice 08 PR #14 merged; accepted main/work baseline
 `92a11aa05083f1983186976ba64bd30aa9f1f2a0`. Slice 08 is
