@@ -414,7 +414,7 @@ Structured Gmail/Graph mail, Calendar and Slack operations have native connector
 
 Gmail recipient/header read-back, deployed provider push subscriptions and real private account acceptance remain PARTIAL. See [CONNECTOR-FABRIC.md](CONNECTOR-FABRIC.md).
 
-## Current Slice 09 — 2026-10-06
+## Historical Slice 09 checkpoint — 2026-10-06 (superseded)
 
 Slice 08 PR #14 merged; accepted main/work baseline
 `92a11aa05083f1983186976ba64bd30aa9f1f2a0`. Slice 08 is
