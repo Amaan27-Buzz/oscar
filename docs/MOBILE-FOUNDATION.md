@@ -113,7 +113,7 @@ geometry. `mobile/orb-render.json` binds both digests; builds reject stale artwo
 This replaces the failing WebView renderer; no artwork is redrawn/reinterpreted.
 Nine-state hooks: idle, attentive, listening,
 thinking, speaking, waiting, muted, unavailable, error/attention. Current mapping uses
-only justified connection/task states. Expressive Orb/facial work remains Slice 13.
+only justified connection/task states. Expressive Orb/character design is now Slice 11; full cross-device Presence is Slice 16. Native Mobile experience redesign is Slice 13. See [canonical numbering](SLICE-NUMBERING.md).
 
 AudioRecord/AudioTrack, focus/session, native AEC availability, headset routing and
 user-started microphone foreground service remain portable Voice adapters. Android
