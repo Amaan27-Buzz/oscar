@@ -344,7 +344,7 @@ Durable future direction after stable Slice 17 Unified Alpha:
 
 Canonical detail: [Post-Alpha Evolution](POST-ALPHA-EVOLUTION.md).
 
-## Current Slice 09 — 2026-10-06
+## Historical Slice 09 checkpoint — 2026-10-06 (superseded)
 
 Slice 08 PR #14 merged; accepted main/work baseline
 `92a11aa05083f1983186976ba64bd30aa9f1f2a0`. Slice 08 is
@@ -358,7 +358,7 @@ Slice 09 must not merge in this run. Gate C remains PARTIAL. Slice 10, deploymen
 and Home Node are not started. Post-alpha Operating Logs, specialist-model training
 and home-server migration remain documented future work, not implemented.
 
-## Current owner priority — early Expression Core (2026-10-09)
+## Historical interim 13A sequencing — 2026-10-09 (superseded by Slice 11)
 
 Owner explicitly prioritizes **13A.1 vocabulary → 13A.2 non-executing interactive
 Expression Lab → owner review → 13A.3 shared typed contract** ahead of final
