@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-09 — Canonical Slice 00–20 and character-first design direction
+
+- Consolidated overlapping 09R/10R/13A/13B work into one 00–20 sequence; historical PRs and screenshot paths retain original labels.
+- Next is Slice **11 Expression/Character**, then 12 Desktop UX and 13 Mobile UX; former World Model/commissioning/full Presence/Executive/physical/hardening/Unified Alpha moved to 14–20.
+- Rejected static smiling Orb/beige-card explorations as final designs. Required actual microexpressions, gaze, anticipation, physical timing, transition studies, reduced-motion and explicit visual owner review.
+- Aligned top-level instructions, domain docs, design standards, UI skills and image prompts; added documentation consistency tests.
+- Desktop PR #16 remains draft/unmerged; remote CI billing-blocked. Gate C remains PARTIAL with physical acceptance deferred.
+
+
 ## 2026-10-06 — Slice 08 software/reference quality closure
 
 - Reconciled authoritative post-alpha docs; preserved future scope and voice portability.
