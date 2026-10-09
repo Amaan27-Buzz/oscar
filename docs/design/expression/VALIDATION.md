@@ -44,10 +44,14 @@ test counts, source/fixture hashes and actual rendered atlas hash.
 
 ### Remote and integration boundary
 
-**LOCAL VALIDATION PASS / REMOTE CI NOT EXECUTED** applies to completed local
-checks; the remote exact-head check must be inspected after pushing. Billing
-rejected earlier jobs before steps executed. No exact-head CI green or merge
-approval is claimed. PR #16 remains open/draft at
+**LOCAL VALIDATION PASS / REMOTE CI NOT EXECUTED**. At implementation head
+`5cd3255220f2b92a5352f87e4142965791550ea3`, both
+[synthetic-lab](https://github.com/amaansyed27/oscar/actions/runs/37933229447/job/113828820305)
+and [native-expression](https://github.com/amaansyed27/oscar/actions/runs/37933229447/job/113828820794)
+have empty step lists. Their failure annotations state that recent account
+payments failed or the spending limit needs increasing; the jobs were not started.
+This is not a test-run failure. No exact-head CI green or merge approval is claimed.
+PR #16 remains open/draft at
 `e334c858195091c21cee5aa35b308b5933cc44bd`, read-only and unchanged.
 Neither PR merges automatically. Slice 12/13 screen adoption and real runtime
 adapters are future authorized work; no production UI is modified here.
