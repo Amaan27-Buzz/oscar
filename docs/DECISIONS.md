@@ -298,7 +298,7 @@ Gate A — Brain          Slices 01–04
 Gate B — Can Do Work    Slices 05–06
 Gate C — Embodied OSCAR Slices 07–10
 Gate D — JARVIS Layer   Slices 11–14
-Gate E — Unified Alpha  Slices 15–17
+Gate E — Unified Alpha  Slices 18–20
 ```
 
 A partial gate is not skipped because it is demoable or because a short-term alpha deadline is approaching. Mandatory planned work is completed/verified, genuinely blocked, or explicitly re-scoped by the owner before advancing.
