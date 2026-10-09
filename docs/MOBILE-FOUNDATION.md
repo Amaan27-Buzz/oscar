@@ -1,5 +1,13 @@
 # OSCAR Mobile — Slice 09
 
+> **Historical implementation report, recorded during PR #15 review
+> (2026-10-07).** PR #15 subsequently merged. SHA/branch/status language
+> below describes the original candidate, not today's branch state.
+> Current plan: [00–20](SLICE-NUMBERING.md), with Slice 11 Character,
+> Slice 12 Desktop UX, Slice 13 Mobile UX, Slice 16 full Presence;
+> current Mobile physical owner acceptance is still deferred.
+
+
 App/product **OSCAR**; technical distinction **OSCAR Mobile**.
 Branch `club-c/slice-09-sunday`, draft PR #15 into `work` is retained as the existing
 review identity. Accepted main/work: `92a11aa05083f1983186976ba64bd30aa9f1f2a0`;
