@@ -1,5 +1,14 @@
 # Product Vision
 
+> **Current plan (2026-10-09):** [Slices 00–20](SLICE-NUMBERING.md);
+> **11 Expression/Character → 12 Desktop UX → 13 Mobile UX → 14–20
+> awareness/commissioning/Presence/Executive/physical/hardening/Unified
+> Alpha**. The old 09R/10R/13A/13B naming is archival. Slice 10 remains
+> a draft candidate, not a visually accepted desktop product. The owner
+> rejected generic static Orb widgets; see [Expression Core](EXPRESSION-CORE.md)
+> and [Design](../DESIGN.md).
+
+
 ## North star
 
 OSCAR is a persistent personal intelligence designed to do justice to the idea of JARVIS: one intelligence that understands natural language, perceives context, reasons, communicates, operates software, controls hardware, delegates to specialist systems, keeps working autonomously, learns successful procedures and appears through whichever trusted device is available.
@@ -252,7 +261,7 @@ first-class surface using the same Voice Core contracts.
 
 See [Post-Alpha Evolution](POST-ALPHA-EVOLUTION.md).
 
-## Current Slice 09 — 2026-10-06
+## Historical Slice 09 checkpoint — 2026-10-06 (superseded)
 
 Slice 08 PR #14 merged; accepted main/work baseline
 `92a11aa05083f1983186976ba64bd30aa9f1f2a0`. Slice 08 is
