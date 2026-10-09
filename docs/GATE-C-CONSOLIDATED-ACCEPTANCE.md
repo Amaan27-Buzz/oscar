@@ -1,5 +1,11 @@
 # Consolidated Gate C embodiment acceptance
 
+> **Active 2026-10-09 numbering:** Gate C remains Slices 07–10 and
+> PARTIAL. Mandatory deferred physical checks return during Slices 18/19
+> and must genuinely pass for Slice 20 Unified Alpha. See
+> [canonical numbering](SLICE-NUMBERING.md). Earlier physical receipts
+> remain historical evidence, not acceptance on the new plan.
+
 Status: **DEFERRED_BY_OWNER / CONSOLIDATED_GATE_C_ACCEPTANCE_REQUIRED**.
 Gate C remains **PARTIAL**. Software/reference closure is not physical PASS.
 Owner decision: 2026-10-06. Run after the relevant embodiments exist, without
