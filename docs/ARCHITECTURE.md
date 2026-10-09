@@ -1,5 +1,14 @@
 # System Architecture
 
+> **Active slice sequence:** [canonical 00–20](SLICE-NUMBERING.md).
+> Next: **Slice 11 Character/Expression System** (presentation contract, no
+> new Core authority), then Slice 12 Desktop UX, Slice 13 Mobile UX;
+> Slice 14 World Model, 15 commissioning, 16 full Presence integration,
+> 17 Executive, 18 physical expansion, 19 hardening, 20 Unified Alpha.
+> Preserve dated pre-renumbering decisions and acceptance receipts as history.
+> The Desktop draft PR #16 is unmerged and cannot claim physical/CI PASS.
+
+
 ## Overview
 
 OSCAR is a distributed personal-intelligence system: one coherent intelligence spanning cloud coordination, phone, desktop machines, communications and physical Edge hardware. No ordinary user computer is assumed to be permanently available.
@@ -650,7 +659,7 @@ Cloud models remain replaceable escalation for major/frontier work.
 
 See [Post-Alpha Evolution](POST-ALPHA-EVOLUTION.md).
 
-## Current Slice 09 — 2026-10-06
+## Historical Slice 09 checkpoint — 2026-10-06 (superseded)
 
 Slice 08 PR #14 merged; accepted main/work baseline
 `92a11aa05083f1983186976ba64bd30aa9f1f2a0`. Slice 08 is
