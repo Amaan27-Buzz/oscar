@@ -10,6 +10,23 @@
 
 ---
 
+## Current development and milestones
+
+The [canonical sequential roadmap](docs/SLICE-NUMBERING.md) has **21
+top-level slices (00–20)**. Current priority is **Slice 11 —
+OSCAR Expression/Character System**, followed by **Slice 12 Desktop
+experience** and **Slice 13 Mobile experience**. The original Orb identity
+remains canonical; new expressions must be versioned, visibly reviewed and
+grounded in real state rather than generic smiley widgets. See the
+[Expression Core](docs/EXPRESSION-CORE.md) and [design brief](DESIGN.md).
+
+Slice 10 Tauri Desktop remains in unmerged [draft PR #16](https://github.com/amaansyed27/oscar/pull/16).
+Prior compact A/B/C screenshots are unapproved concepts. Gate C remains
+PARTIAL; physical Edge/Voice/Mobile/Desktop acceptance and GitHub remote CI
+are not replaced by local or screenshot checks. GitHub Actions is blocked by
+account billing limits. Historical sections below document earlier snapshots,
+not current implementation instructions.
+
 See [deployment architecture](docs/DEPLOYMENT.md) for the free-first persistent Core
 and separate web/API host candidates and the deferred Home Node. These are future
 deployment choices, not Gate B completion claims.
@@ -385,7 +402,7 @@ Galaxy Tab Home Node are not authorized. Physical Edge remains
 
 ## Post-alpha evolution direction
 
-After Slice 17 Unified Alpha is stable in normal owner use, OSCAR enters a measured
+After Slice 20 Unified Alpha is stable in normal owner use, OSCAR enters a measured
 local-optimization phase rather than simply growing into a larger cloud wrapper.
 
 The durable direction is:
@@ -405,7 +422,7 @@ The durable direction is:
 
 See [Post-Alpha Evolution](docs/POST-ALPHA-EVOLUTION.md).
 
-## Current Slice 09 — 2026-10-06
+## Historical Slice 09 checkpoint — 2026-10-06 (superseded)
 
 Slice 08 PR #14 merged; accepted main/work baseline
 `92a11aa05083f1983186976ba64bd30aa9f1f2a0`. Slice 08 is
