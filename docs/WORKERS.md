@@ -383,4 +383,4 @@ Quality candidate is under validation in PR #14. Gate C remains PARTIAL.
 See [Voice Core](VOICE-CORE.md), [quality pass](VOICE-QUALITY.md) and
 [consolidated acceptance](GATE-C-CONSOLIDATED-ACCEPTANCE.md).
 Slice 09 software is authorized after Slice 08 integration; device acceptance is
-owner-deferred. Slice 10, deployment and Home Node remain out of scope.
+owner-deferred. This statement describes the historical Slice 07/08 acceptance boundary. Current Slice 10 Desktop runtime is a draft PR; deployment and Home Node remain deferred. See [canonical numbering](SLICE-NUMBERING.md).
