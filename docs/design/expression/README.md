@@ -1,11 +1,12 @@
 # OSCAR character — owner review packet
 
-**Slice 11.1 + 11.2 / SIMULATED / OWNER VISUAL APPROVAL REQUIRED**
+**Slice 11.1–11.3 / SYNTHETIC ENGINEERING CANDIDATE / CROSS-DEVICE OWNER REVIEW OUTSTANDING**
 
 Start with the [running instructions](../../../design/expression-lab/README.md).
 The lab is a design instrument with no Core, microphone, application, private-data
 or credential connection. The immutable Orb remains the identity source.
-11.3 and Slice 12 are not started. Gate C remains PARTIAL.
+V3 direction is owner-approved for engineering continuation. 11.3 extracts the
+shared system; Slice 12 is not started. Gate C remains PARTIAL.
 
 ## Rationale and evaluation
 
@@ -16,6 +17,19 @@ or credential connection. The immutable Orb remains the identity source.
 - [Two substantive revision cycles](EVALUATION.md)
 - [Independent review and scoped verdict](REVIEW.md)
 - [Validation, draft PR and billing-blocked CI](VALIDATION.md)
+- [Shared contract, event-driven engine and arbitration](ENGINE.md)
+- [Later Desktop/Mobile integration boundary](INTEGRATION.md)
+
+## Slice 11.3 native and React evidence
+
+[React reference atlas](evidence/engine-v1/react-reference-atlas.png) and
+[native Compose atlas](evidence/engine-v1/android-native-atlas.png) render the same
+16 historical pose fixtures. The native capture is emulated, not physical.
+[Permitted phrase accent](evidence/engine-v1/react-permitted-accent.png),
+[new mute presentation](evidence/engine-v1/react-muted.png) and the
+[browser receipt](evidence/engine-v1/react-receipt.json) verify the extracted renderer.
+See the current [validation record](VALIDATION.md) for builds, native test limits
+and CI truth. Historical v3 study evidence below remains unchanged.
 
 ## Actual browser evidence
 
@@ -48,7 +62,7 @@ rejected subtle v2 study alongside the broader v3 trajectory.
 - [OS reduced motion / forced colors](evidence/motion-v3/system-reduced-forced-colors.png)
 - [Capture checks, compiled-artifact and image hashes](evidence/motion-v3/receipt.json)
 
-## Local evidence and limits
+## Historical 11.1–11.2 local evidence and limits
 
 Node 24.19 LTS: TypeScript + production build passed; 22 component, geometry,
 state/retarget/recovery and synthetic-isolation tests passed. Four existing
@@ -67,7 +81,7 @@ emotions are not established. Mouthless speech is finite choreography, not audio
 or lip sync. The companion screenshots were absent in this chat; their written
 intent guided the work. Android/Tauri/physical/performance acceptance is not run.
 
-## Owner decisions before 11.3
+## Remaining owner quality decisions before UI adoption
 
 1. Does the smaller opened eye retain OSCAR's personality and unequal face?
 2. Is the freer speaking/active puck travel playful enough, or too noticeable?

@@ -1,4 +1,4 @@
-# Two-mark character language — v2 proposal
+# Two-mark character language — reviewed v3 direction
 
 This is an owner-review design vocabulary, not a production state schema.
 All laboratory states are **SIMULATED VISUAL STATE — NO CORE EXECUTION**.
@@ -36,7 +36,9 @@ restrained concern, with no alarm pulse or success recovery.
 ## Geometry rules
 
 Source circles, face inset, gradients and contact shadow retain their numerical
-values. Versioned `design/expression-lab/src/Orb.tsx` owns only the v2 derivative.
+values. `expression/react/Orb.tsx` owns the extracted SVG derivative;
+`design/expression-lab/src/Orb.tsx` reexports it. Compose implements its geometry
+in `mobile/expression/` with documented native raster differences.
 Neutral matches the source mark coordinates and original cubic wink.
 
 The large disc remains circular. Slanted clipping lids traverse it rather than

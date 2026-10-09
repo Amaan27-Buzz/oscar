@@ -57,7 +57,25 @@ earlier GIFs are superseded for judging proportions.
 
 This is a scoped motion/evidence review, not owner approval or production acceptance.
 
-## Limits
+## Slice 11.3 engineering review
+
+The existing independent motion reviewer inspected the extracted TypeScript/React
+and native Kotlin/Compose paths, fixtures and browser/native atlases. It found a
+real Android admission defect: `JSONObject` accepts trailing garbage, unquoted
+keys and single quotes that JavaScript rejects. The native boundary now uses a
+bounded strict grammar before field validation. Both languages reject the same
+eight raw malformed fixtures, including private fields and unsafe generations.
+
+The reviewer independently exercised compiled Kotlin and TypeScript for these
+inputs and the expired older generation case. Both preserve newer waiting/mute
+state and reject malformed input. It reported no remaining critical issue in
+these reviewed paths. It did not rerun the full suites or rendering; native
+instrumentation and owner naturalness are separate evidence/acceptance boundaries.
+The parent inspected actual shared React/Compose fixture atlases: identity,
+opening smaller eye, gaze, broader travel and compact marks remain recognizable.
+Native shadow/anti-alias rasterization differs; no pixel-identical claim.
+
+## Historical review limits
 
 A separate read-only documentation pass checked design docs against model,
 renderer, controls, tests and capture source. Corrected the Edge-only maintainer

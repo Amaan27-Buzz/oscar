@@ -1,8 +1,11 @@
 # Slice 11.1–11.2 — Character study
 
-Status: **DESIGN PROPOSAL / SIMULATED LAB / OWNER VISUAL APPROVAL REQUIRED**.
+Historical 11.1–11.2 brief and exploration boundary. The owner subsequently
+approved v3 direction for engineering continuation and authorized 11.3; see the
+current [engine contract](ENGINE.md). Final cross-device visual acceptance remains
+outstanding. This brief preserves the reasoning and original scope below.
 Starting SHA: `45bb1459f61308291fec6e4e5885b6c77b707478` (verified origin/main and origin/work).
-Branch: `design/slice-11-expression`. No production renderer contract (11.3).
+Branch: `design/slice-11-expression`. At this initial study: no 11.3 renderer contract.
 
 ## Character hypothesis
 
@@ -46,7 +49,8 @@ freer, fun yellow-puck movement while active or speaking. Candidate v2 unfolds
 the wink into a **smaller** second eye, retaining the unequal proportions and
 canonical resting wink. Activity and speech have bounded, finite arcing puck
 travel; privacy, seriousness and degraded-state restrictions still apply.
-This authorizes exploration, **not visual acceptance or starting 11.3**.
+This initial permission authorized exploration. Later explicit 11.3 authorization
+supersedes that boundary; neither permission establishes final device quality.
 
 ## Three approaches considered
 
@@ -84,6 +88,6 @@ Canonical 00–20 numbering and Gate C PARTIAL remain intact.
 - Are concerned/unsure useful, restrained delivery cues rather than cartoon pain?
 - Is the newly opened smaller eye still recognizably OSCAR?
 - Is the freer mouthless speaking arc playful enough without becoming distracting?
-- Which expressions need less amplitude before any 11.3 work?
+- Which expressions need refinement before actual surface adoption?
 
 Owner acceptance is not inferred from build, tests, critique or screenshots.

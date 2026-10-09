@@ -1,0 +1,23 @@
+{
+  "classification": "SIMULATED EVENT-DRIVEN REACT RENDER / NO CORE EXECUTION",
+  "checks": [
+    "held speech has no repeated choreography",
+    "explicit accent moves",
+    "new mute stops speech presentation",
+    "OS reduced motion is static"
+  ],
+  "errors": [],
+  "external_requests": [],
+  "canonical_sha256": "728aeac3c9aa590b67d45c469735e919ede93a8503964e24f0f4af18cda066c5",
+  "artifacts": {
+    "react-muted.png": "839e0201870dceae45478499d46530adf37bb1cb825b271fd04a5576718d1336",
+    "react-permitted-accent.png": "c6d98bb1c04f0fb09cc5feadf1b54381568ed9332f55d7cc9176ceb9e659ffb9",
+    "react-reference-atlas.png": "f951a1ee8cdd42fcb0c6ce73ae49cdd0c3a1c94726d51d618909ccb15af5c36b"
+  },
+  "neutral_pixel_difference_bbox": null,
+  "built_sha256": {
+    "assets\\index-1ZhylpjQ.js": "97d5d623b169e14c40a6811f593d1146599f175637a635b2820e4c2872fd31be",
+    "assets\\index-Cjc8GyZM.css": "32c44bef456602a45ce17a6300d4f8a5eef0c04fa8791c1d5d95bdfd4fd77343",
+    "index.html": "269e436c35f602233a56dfa01c0acb6ae9f2a2deae950a4c1632f07ddb4d97f7"
+  }
+}

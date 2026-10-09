@@ -8,13 +8,12 @@ describe('synthetic instrument boundaries',()=>{
     const bytes=readFileSync(resolve('../../assets/brand/oscar-orb.svg'));
     expect(createHash('sha256').update(bytes).digest('hex')).toBe('728aeac3c9aa590b67d45c469735e919ede93a8503964e24f0f4af18cda066c5');
   });
-  it('runtime imports only local lab code, React and canonical SVG; no execution/data adapters',()=>{
-    const dir=resolve('src');
-    const allowed=new Set(['react','react-dom/client','./Lab','./Orb','./model','./style.css','../../../assets/brand/oscar-orb.svg']);
-    for(const file of readdirSync(dir).filter(f=>/\.tsx?$/.test(f)&&!f.includes('.test.'))) {
+  it('lab and shared runtime import only local presentation code, React and artwork; no execution/data adapters',()=>{
+    const allowed=new Set(['react','react-dom/client','./Lab','./Orb','./model','./EngineProof','./style.css','../../../assets/brand/oscar-orb.svg','../../../expression/core/motion','../../../expression/react/Orb','../../../expression/react/Presence','../../../expression/core/contract','../../../expression/fixtures/reference-v1.json','@oscar/expression/react','./arbitration.js','./contract.js','./controller.js','./motion.js','../motion-v1.json','../core/controller.js','../core/contract.js','../core/motion.js','./Orb.js']);
+    for(const dir of [resolve('src'),resolve('../../expression/core'),resolve('../../expression/react')])for(const file of readdirSync(dir).filter(f=>/\.tsx?$/.test(f)&&!f.includes('.test.'))) {
       const source=readFileSync(resolve(dir,file),'utf8');
       for(const match of source.matchAll(/(?:from\s*|import\s*)['"]([^'"]+)['"]/g))expect(allowed.has(match[1]),`${file}: ${match[1]}`).toBe(true);
-      expect(source).not.toMatch(/\b(fetch|WebSocket|XMLHttpRequest|Worker|EventSource|eval)\s*\(|navigator\.|localStorage|sessionStorage|indexedDB|@tauri|oscar\//);
+      expect(source).not.toMatch(/\b(fetch|WebSocket|XMLHttpRequest|Worker|EventSource|eval)\s*\(|navigator\.|localStorage|sessionStorage|indexedDB|@tauri|(?<!@)\boscar\//);
     }
   });
   it('built preview policy denies network, devices, frames and media',()=>{

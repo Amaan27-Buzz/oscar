@@ -1,0 +1,2572 @@
+{
+  "version": 1,
+  "baseline": "d992795af3508778a38498f1f9e05d85091c2806",
+  "poseCases": [
+    {
+      "name": "neutral",
+      "scene": {
+        "operation": "available",
+        "delivery": "composed"
+      },
+      "at": 1800,
+      "reduced": false,
+      "expected": {
+        "x": 0,
+        "y": 0,
+        "tilt": 0,
+        "body": 0,
+        "eye": 1,
+        "width": 1,
+        "arc": -16,
+        "slant": -4,
+        "span": 1,
+        "gx": 0,
+        "gy": 0,
+        "lid": 0,
+        "opening": 0
+      }
+    },
+    {
+      "name": "attentive",
+      "scene": {
+        "operation": "available",
+        "delivery": "attentive"
+      },
+      "at": 1800,
+      "reduced": false,
+      "expected": {
+        "x": -35,
+        "y": -22,
+        "tilt": -6,
+        "body": 0,
+        "eye": 1.04,
+        "width": 1,
+        "arc": -9,
+        "slant": -4,
+        "span": 1,
+        "gx": 11,
+        "gy": -3,
+        "lid": 0,
+        "opening": 0.9
+      }
+    },
+    {
+      "name": "opening-eye",
+      "scene": {
+        "operation": "listening",
+        "delivery": "attentive"
+      },
+      "at": 120,
+      "reduced": false,
+      "expected": {
+        "x": -16.000111461506993,
+        "y": -10.057212918661536,
+        "tilt": -2.7428762505440556,
+        "body": 0,
+        "eye": 1.0242565597667639,
+        "width": 1,
+        "arc": -10.460411154081008,
+        "slant": -4,
+        "span": 1,
+        "gx": 11,
+        "gy": -3,
+        "lid": 0,
+        "opening": 0.5457725947521865
+      }
+    },
+    {
+      "name": "curiosity",
+      "scene": {
+        "operation": "available",
+        "delivery": "curious"
+      },
+      "at": 1800,
+      "reduced": false,
+      "expected": {
+        "x": -28,
+        "y": -30,
+        "tilt": -10,
+        "body": -1,
+        "eye": 1.08,
+        "width": 1,
+        "arc": -27,
+        "slant": -17,
+        "span": 1,
+        "gx": 9,
+        "gy": -7,
+        "lid": 0,
+        "opening": 0.45
+      }
+    },
+    {
+      "name": "listening",
+      "scene": {
+        "operation": "listening",
+        "delivery": "attentive"
+      },
+      "at": 1800,
+      "reduced": false,
+      "expected": {
+        "x": -35,
+        "y": -22,
+        "tilt": -6,
+        "body": 0,
+        "eye": 1.04,
+        "width": 1,
+        "arc": -9,
+        "slant": -4,
+        "span": 1,
+        "gx": 11,
+        "gy": -3,
+        "lid": 0,
+        "opening": 0.9
+      }
+    },
+    {
+      "name": "thinking",
+      "scene": {
+        "operation": "processing",
+        "delivery": "focused"
+      },
+      "at": 1800,
+      "reduced": false,
+      "expected": {
+        "x": -32,
+        "y": -24,
+        "tilt": -8,
+        "body": 0,
+        "eye": 0.62,
+        "width": 1,
+        "arc": -2,
+        "slant": -7,
+        "span": 1,
+        "gx": -6,
+        "gy": -5,
+        "lid": 3,
+        "opening": 0.5
+      }
+    },
+    {
+      "name": "speaking",
+      "scene": {
+        "operation": "speaking",
+        "delivery": "composed"
+      },
+      "at": 2300,
+      "reduced": false,
+      "expected": {
+        "x": -114,
+        "y": 44,
+        "tilt": 17,
+        "body": 0,
+        "eye": 0.916,
+        "width": 1,
+        "arc": -16,
+        "slant": -4,
+        "span": 1,
+        "gx": 0,
+        "gy": 0,
+        "lid": 0,
+        "opening": 0.838
+      }
+    },
+    {
+      "name": "active-work",
+      "scene": {
+        "operation": "executing",
+        "delivery": "focused"
+      },
+      "at": 1150,
+      "reduced": false,
+      "expected": {
+        "x": -100,
+        "y": -58,
+        "tilt": -18,
+        "body": 0,
+        "eye": 0.62,
+        "width": 1,
+        "arc": -2,
+        "slant": -7,
+        "span": 1,
+        "gx": 8,
+        "gy": 3,
+        "lid": 3,
+        "opening": 0.8
+      }
+    },
+    {
+      "name": "concerned",
+      "scene": {
+        "operation": "available",
+        "delivery": "concerned"
+      },
+      "at": 1800,
+      "reduced": false,
+      "expected": {
+        "x": -3,
+        "y": 3,
+        "tilt": 2,
+        "body": 0,
+        "eye": 0.74,
+        "width": 1,
+        "arc": 23,
+        "slant": 17,
+        "span": 1,
+        "gx": -2,
+        "gy": 4,
+        "lid": -9,
+        "opening": 0
+      }
+    },
+    {
+      "name": "amused",
+      "scene": {
+        "operation": "available",
+        "delivery": "amused"
+      },
+      "at": 600,
+      "reduced": false,
+      "expected": {
+        "x": -19.999937590001455,
+        "y": 7.999975036000582,
+        "tilt": 7.999975036000582,
+        "body": 0,
+        "eye": 0.82,
+        "width": 1,
+        "arc": -29,
+        "slant": 1,
+        "span": 1,
+        "gx": -3,
+        "gy": 0,
+        "lid": -5,
+        "opening": 0
+      }
+    },
+    {
+      "name": "interrupted",
+      "scene": {
+        "operation": "available",
+        "delivery": "interrupted"
+      },
+      "at": 300,
+      "reduced": false,
+      "expected": {
+        "x": -30.057339099793694,
+        "y": -16.030580853223302,
+        "tilt": -9.017201729938108,
+        "body": 0,
+        "eye": 1.07,
+        "width": 1,
+        "arc": -3,
+        "slant": -11,
+        "span": 1,
+        "gx": -9,
+        "gy": -2,
+        "lid": 0,
+        "opening": 0.8
+      }
+    },
+    {
+      "name": "asleep",
+      "scene": {
+        "operation": "available",
+        "delivery": "asleep"
+      },
+      "at": 1800,
+      "reduced": false,
+      "expected": {
+        "x": -4,
+        "y": 9,
+        "tilt": 2,
+        "body": 1,
+        "eye": 0,
+        "width": 1,
+        "arc": 5,
+        "slant": 0,
+        "span": 1,
+        "gx": 0,
+        "gy": 8,
+        "lid": 0,
+        "opening": 0
+      }
+    },
+    {
+      "name": "unavailable",
+      "scene": {
+        "operation": "unavailable",
+        "delivery": "amused"
+      },
+      "at": 1800,
+      "reduced": false,
+      "expected": {
+        "x": -3,
+        "y": 8,
+        "tilt": 0,
+        "body": 0,
+        "eye": 0.52,
+        "width": 1,
+        "arc": 3,
+        "slant": 0,
+        "span": 1,
+        "gx": 0,
+        "gy": 5,
+        "lid": 0,
+        "opening": 0
+      }
+    },
+    {
+      "name": "unknown",
+      "scene": {
+        "operation": "unknown",
+        "delivery": "pleased"
+      },
+      "at": 1800,
+      "reduced": false,
+      "expected": {
+        "x": -6,
+        "y": 2,
+        "tilt": -4,
+        "body": 0,
+        "eye": 0.86,
+        "width": 0.96,
+        "arc": 3,
+        "slant": -18,
+        "span": 1,
+        "gx": -11,
+        "gy": 2,
+        "lid": 7,
+        "opening": 0
+      }
+    },
+    {
+      "name": "muted",
+      "scene": {
+        "operation": "muted",
+        "delivery": "amused"
+      },
+      "at": 1800,
+      "reduced": false,
+      "expected": {
+        "x": 0,
+        "y": 0,
+        "tilt": 0,
+        "body": 0,
+        "eye": 0.7,
+        "width": 1,
+        "arc": 0,
+        "slant": -4,
+        "span": 1,
+        "gx": 0,
+        "gy": 0,
+        "lid": 0,
+        "opening": 0
+      }
+    },
+    {
+      "name": "reduced-motion",
+      "scene": {
+        "operation": "speaking",
+        "delivery": "composed"
+      },
+      "at": 2300,
+      "reduced": true,
+      "expected": {
+        "x": -42,
+        "y": -6,
+        "tilt": 6,
+        "body": 0,
+        "eye": 1,
+        "width": 1,
+        "arc": -16,
+        "slant": -4,
+        "span": 1,
+        "gx": 0,
+        "gy": 0,
+        "lid": 0,
+        "opening": 0.95
+      }
+    }
+  ],
+  "traces": [
+    {
+      "name": "long-speech-and-explicit-accent",
+      "steps": [
+        {
+          "at": 0,
+          "event": {
+            "version": 1,
+            "source": {
+              "kind": "fixture",
+              "id": "cross-v1"
+            },
+            "generation": 1,
+            "transitionId": "event-1",
+            "eventTime": 1000000,
+            "expiresAt": 1030000,
+            "kind": "state",
+            "priority": "normal",
+            "operation": "speaking",
+            "delivery": "composed",
+            "availability": "available",
+            "muted": false,
+            "attention": "none",
+            "reducedMotion": false
+          },
+          "expected": {
+            "admission": "accepted",
+            "operation": "speaking",
+            "delivery": "composed",
+            "muted": false,
+            "generation": 1,
+            "priority": "activity",
+            "animation": "settling",
+            "moving": true,
+            "pose": {
+              "x": -6,
+              "y": 2,
+              "tilt": -4,
+              "body": 0,
+              "eye": 0.86,
+              "width": 0.96,
+              "arc": 3,
+              "slant": -18,
+              "span": 1,
+              "gx": -11,
+              "gy": 2,
+              "lid": 7,
+              "opening": 0
+            },
+            "records": []
+          }
+        },
+        {
+          "at": 700,
+          "expected": {
+            "admission": null,
+            "operation": "speaking",
+            "delivery": "composed",
+            "muted": false,
+            "generation": 1,
+            "priority": "activity",
+            "animation": "held",
+            "moving": false,
+            "pose": {
+              "x": -42,
+              "y": -6,
+              "tilt": 6,
+              "body": 0,
+              "eye": 1,
+              "width": 1,
+              "arc": -16,
+              "slant": -4,
+              "span": 1,
+              "gx": 0,
+              "gy": 0,
+              "lid": 0,
+              "opening": 0.95
+            },
+            "records": [
+              {
+                "generation": 1,
+                "transitionId": "event-1",
+                "outcome": "settled"
+              }
+            ]
+          }
+        },
+        {
+          "at": 10000,
+          "expected": {
+            "admission": null,
+            "operation": "speaking",
+            "delivery": "composed",
+            "muted": false,
+            "generation": 1,
+            "priority": "activity",
+            "animation": "held",
+            "moving": false,
+            "pose": {
+              "x": -42,
+              "y": -6,
+              "tilt": 6,
+              "body": 0,
+              "eye": 1,
+              "width": 1,
+              "arc": -16,
+              "slant": -4,
+              "span": 1,
+              "gx": 0,
+              "gy": 0,
+              "lid": 0,
+              "opening": 0.95
+            },
+            "records": []
+          }
+        },
+        {
+          "at": 10000,
+          "event": {
+            "version": 1,
+            "source": {
+              "kind": "fixture",
+              "id": "cross-v1"
+            },
+            "generation": 2,
+            "transitionId": "event-1",
+            "eventTime": 1010000,
+            "expiresAt": 1040000,
+            "kind": "state",
+            "priority": "normal",
+            "operation": "speaking",
+            "delivery": "composed",
+            "availability": "available",
+            "muted": false,
+            "attention": "none",
+            "reducedMotion": false
+          },
+          "expected": {
+            "admission": "accepted",
+            "operation": "speaking",
+            "delivery": "composed",
+            "muted": false,
+            "generation": 2,
+            "priority": "activity",
+            "animation": "held",
+            "moving": false,
+            "pose": {
+              "x": -42,
+              "y": -6,
+              "tilt": 6,
+              "body": 0,
+              "eye": 1,
+              "width": 1,
+              "arc": -16,
+              "slant": -4,
+              "span": 1,
+              "gx": 0,
+              "gy": 0,
+              "lid": 0,
+              "opening": 0.95
+            },
+            "records": []
+          }
+        },
+        {
+          "at": 10000,
+          "event": {
+            "version": 1,
+            "source": {
+              "kind": "fixture",
+              "id": "cross-v1"
+            },
+            "generation": 3,
+            "transitionId": "event-3",
+            "eventTime": 1010000,
+            "expiresAt": 1040000,
+            "kind": "accent",
+            "priority": "normal",
+            "operation": "speaking",
+            "delivery": "composed",
+            "availability": "available",
+            "muted": false,
+            "attention": "none",
+            "reducedMotion": false,
+            "accent": "phrase"
+          },
+          "expected": {
+            "admission": "accepted",
+            "operation": "speaking",
+            "delivery": "composed",
+            "muted": false,
+            "generation": 3,
+            "priority": "activity",
+            "animation": "accent",
+            "moving": true,
+            "pose": {
+              "x": -42,
+              "y": -6,
+              "tilt": 6,
+              "body": 0,
+              "eye": 1,
+              "width": 1,
+              "arc": -16,
+              "slant": -4,
+              "span": 1,
+              "gx": 0,
+              "gy": 0,
+              "lid": 0,
+              "opening": 0.95
+            },
+            "records": []
+          }
+        },
+        {
+          "at": 11200,
+          "expected": {
+            "admission": null,
+            "operation": "speaking",
+            "delivery": "composed",
+            "muted": false,
+            "generation": 3,
+            "priority": "activity",
+            "animation": "accent",
+            "moving": true,
+            "pose": {
+              "x": -110,
+              "y": -60,
+              "tilt": -9,
+              "body": 0,
+              "eye": 0.8799999999988334,
+              "width": 1,
+              "arc": -16,
+              "slant": -4,
+              "span": 1,
+              "gx": 0,
+              "gy": 0,
+              "lid": 0,
+              "opening": 0.7899999999984445
+            },
+            "records": []
+          }
+        },
+        {
+          "at": 12300,
+          "expected": {
+            "admission": null,
+            "operation": "speaking",
+            "delivery": "composed",
+            "muted": false,
+            "generation": 3,
+            "priority": "activity",
+            "animation": "accent",
+            "moving": true,
+            "pose": {
+              "x": -114,
+              "y": 44,
+              "tilt": 17,
+              "body": 0,
+              "eye": 0.916,
+              "width": 1,
+              "arc": -16,
+              "slant": -4,
+              "span": 1,
+              "gx": 0,
+              "gy": 0,
+              "lid": 0,
+              "opening": 0.838
+            },
+            "records": []
+          }
+        },
+        {
+          "at": 15200,
+          "expected": {
+            "admission": null,
+            "operation": "speaking",
+            "delivery": "composed",
+            "muted": false,
+            "generation": 3,
+            "priority": "activity",
+            "animation": "held",
+            "moving": false,
+            "pose": {
+              "x": -42,
+              "y": -6,
+              "tilt": 6,
+              "body": 0,
+              "eye": 1,
+              "width": 1,
+              "arc": -16,
+              "slant": -4,
+              "span": 1,
+              "gx": 0,
+              "gy": 0,
+              "lid": 0,
+              "opening": 0.95
+            },
+            "records": [
+              {
+                "generation": 3,
+                "transitionId": "event-3",
+                "outcome": "accent_finished"
+              }
+            ]
+          }
+        },
+        {
+          "at": 25000,
+          "expected": {
+            "admission": null,
+            "operation": "speaking",
+            "delivery": "composed",
+            "muted": false,
+            "generation": 3,
+            "priority": "activity",
+            "animation": "held",
+            "moving": false,
+            "pose": {
+              "x": -42,
+              "y": -6,
+              "tilt": 6,
+              "body": 0,
+              "eye": 1,
+              "width": 1,
+              "arc": -16,
+              "slant": -4,
+              "span": 1,
+              "gx": 0,
+              "gy": 0,
+              "lid": 0,
+              "opening": 0.95
+            },
+            "records": []
+          }
+        },
+        {
+          "at": 31000,
+          "event": {
+            "version": 1,
+            "source": {
+              "kind": "fixture",
+              "id": "cross-v1"
+            },
+            "generation": 4,
+            "transitionId": "event-4",
+            "eventTime": 1031000,
+            "expiresAt": 1061000,
+            "kind": "state",
+            "priority": "normal",
+            "operation": "idle",
+            "delivery": "composed",
+            "availability": "available",
+            "muted": false,
+            "attention": "none",
+            "reducedMotion": false
+          },
+          "expected": {
+            "admission": "accepted",
+            "operation": "idle",
+            "delivery": "composed",
+            "muted": false,
+            "generation": 4,
+            "priority": "delivery",
+            "animation": "settling",
+            "moving": true,
+            "pose": {
+              "x": -42,
+              "y": -6,
+              "tilt": 6,
+              "body": 0,
+              "eye": 1,
+              "width": 1,
+              "arc": -16,
+              "slant": -4,
+              "span": 1,
+              "gx": 0,
+              "gy": 0,
+              "lid": 0,
+              "opening": 0.95
+            },
+            "records": []
+          }
+        },
+        {
+          "at": 31700,
+          "expected": {
+            "admission": null,
+            "operation": "idle",
+            "delivery": "composed",
+            "muted": false,
+            "generation": 4,
+            "priority": "delivery",
+            "animation": "held",
+            "moving": false,
+            "pose": {
+              "x": 0,
+              "y": 0,
+              "tilt": 0,
+              "body": 0,
+              "eye": 1,
+              "width": 1,
+              "arc": -16,
+              "slant": -4,
+              "span": 1,
+              "gx": 0,
+              "gy": 0,
+              "lid": 0,
+              "opening": 0
+            },
+            "records": [
+              {
+                "generation": 4,
+                "transitionId": "event-4",
+                "outcome": "settled"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "stale-muted-approval-expiry",
+      "steps": [
+        {
+          "at": 0,
+          "event": {
+            "version": 1,
+            "source": {
+              "kind": "fixture",
+              "id": "cross-v1"
+            },
+            "generation": 1,
+            "transitionId": "event-1",
+            "eventTime": 1000000,
+            "expiresAt": 1030000,
+            "kind": "state",
+            "priority": "normal",
+            "operation": "speaking",
+            "delivery": "composed",
+            "availability": "available",
+            "muted": false,
+            "attention": "none",
+            "reducedMotion": false
+          },
+          "expected": {
+            "admission": "accepted",
+            "operation": "speaking",
+            "delivery": "composed",
+            "muted": false,
+            "generation": 1,
+            "priority": "activity",
+            "animation": "settling",
+            "moving": true,
+            "pose": {
+              "x": -6,
+              "y": 2,
+              "tilt": -4,
+              "body": 0,
+              "eye": 0.86,
+              "width": 0.96,
+              "arc": 3,
+              "slant": -18,
+              "span": 1,
+              "gx": -11,
+              "gy": 2,
+              "lid": 7,
+              "opening": 0
+            },
+            "records": []
+          }
+        },
+        {
+          "at": 1000,
+          "event": {
+            "version": 1,
+            "source": {
+              "kind": "fixture",
+              "id": "cross-v1"
+            },
+            "generation": 2,
+            "transitionId": "event-2",
+            "eventTime": 1001000,
+            "expiresAt": 1031000,
+            "kind": "accent",
+            "priority": "normal",
+            "operation": "speaking",
+            "delivery": "composed",
+            "availability": "available",
+            "muted": false,
+            "attention": "none",
+            "reducedMotion": false,
+            "accent": "phrase"
+          },
+          "expected": {
+            "admission": "accepted",
+            "operation": "speaking",
+            "delivery": "composed",
+            "muted": false,
+            "generation": 2,
+            "priority": "activity",
+            "animation": "accent",
+            "moving": true,
+            "pose": {
+              "x": -42,
+              "y": -6,
+              "tilt": 6,
+              "body": 0,
+              "eye": 1,
+              "width": 1,
+              "arc": -16,
+              "slant": -4,
+              "span": 1,
+              "gx": 0,
+              "gy": 0,
+              "lid": 0,
+              "opening": 0.95
+            },
+            "records": [
+              {
+                "generation": 1,
+                "transitionId": "event-1",
+                "outcome": "settled"
+              }
+            ]
+          }
+        },
+        {
+          "at": 2200,
+          "expected": {
+            "admission": null,
+            "operation": "speaking",
+            "delivery": "composed",
+            "muted": false,
+            "generation": 2,
+            "priority": "activity",
+            "animation": "accent",
+            "moving": true,
+            "pose": {
+              "x": -110,
+              "y": -60,
+              "tilt": -9,
+              "body": 0,
+              "eye": 0.8799999999988334,
+              "width": 1,
+              "arc": -16,
+              "slant": -4,
+              "span": 1,
+              "gx": 0,
+              "gy": 0,
+              "lid": 0,
+              "opening": 0.7899999999984445
+            },
+            "records": []
+          }
+        },
+        {
+          "at": 2200,
+          "event": {
+            "version": 1,
+            "source": {
+              "kind": "fixture",
+              "id": "cross-v1"
+            },
+            "generation": 3,
+            "transitionId": "event-3",
+            "eventTime": 1002200,
+            "expiresAt": 1032200,
+            "kind": "state",
+            "priority": "normal",
+            "operation": "unavailable",
+            "delivery": "composed",
+            "availability": "available",
+            "muted": false,
+            "attention": "none",
+            "reducedMotion": false
+          },
+          "expected": {
+            "admission": "accepted",
+            "operation": "unavailable",
+            "delivery": "subdued",
+            "muted": false,
+            "generation": 3,
+            "priority": "critical",
+            "animation": "settling",
+            "moving": true,
+            "pose": {
+              "x": -110,
+              "y": -60,
+              "tilt": -9,
+              "body": 0,
+              "eye": 0.8799999999988334,
+              "width": 1,
+              "arc": -16,
+              "slant": -4,
+              "span": 1,
+              "gx": 0,
+              "gy": 0,
+              "lid": 0,
+              "opening": 0.7899999999984445
+            },
+            "records": [
+              {
+                "generation": 2,
+                "transitionId": "event-2",
+                "outcome": "superseded"
+              }
+            ]
+          }
+        },
+        {
+          "at": 2300,
+          "event": {
+            "version": 1,
+            "source": {
+              "kind": "fixture",
+              "id": "cross-v1"
+            },
+            "generation": 2,
+            "transitionId": "event-2",
+            "eventTime": 1001000,
+            "expiresAt": 1031000,
+            "kind": "accent",
+            "priority": "normal",
+            "operation": "speaking",
+            "delivery": "composed",
+            "availability": "available",
+            "muted": false,
+            "attention": "none",
+            "reducedMotion": false,
+            "accent": "phrase"
+          },
+          "expected": {
+            "admission": "stale",
+            "operation": "unavailable",
+            "delivery": "subdued",
+            "muted": false,
+            "generation": 3,
+            "priority": "critical",
+            "animation": "settling",
+            "moving": true,
+            "pose": {
+              "x": -43.75470290546822,
+              "y": -17.743172677418467,
+              "tilt": -3.1194543338053737,
+              "body": 0,
+              "eye": 0.7128474246835345,
+              "width": 1,
+              "arc": -4.011398330958681,
+              "slant": -1.4760838591491958,
+              "span": 1,
+              "gx": 0,
+              "gy": 5,
+              "lid": 0,
+              "opening": 0.4231929597227388
+            },
+            "records": []
+          }
+        },
+        {
+          "at": 2700,
+          "event": {
+            "version": 1,
+            "source": {
+              "kind": "fixture",
+              "id": "cross-v1"
+            },
+            "generation": 4,
+            "transitionId": "event-4",
+            "eventTime": 1002700,
+            "expiresAt": 1032700,
+            "kind": "state",
+            "priority": "normal",
+            "operation": "listening",
+            "delivery": "composed",
+            "availability": "available",
+            "muted": true,
+            "attention": "none",
+            "reducedMotion": false
+          },
+          "expected": {
+            "admission": "accepted",
+            "operation": "muted",
+            "delivery": "composed",
+            "muted": true,
+            "generation": 4,
+            "priority": "privacy",
+            "animation": "settling",
+            "moving": true,
+            "pose": {
+              "x": -2.9630017847579753,
+              "y": 8.023233559717879,
+              "tilt": 0.002563158205990084,
+              "body": 0,
+              "eye": 0.52,
+              "width": 1,
+              "arc": 3,
+              "slant": 0,
+              "span": 1,
+              "gx": 0,
+              "gy": 5,
+              "lid": 0,
+              "opening": 0
+            },
+            "records": [
+              {
+                "generation": 3,
+                "transitionId": "event-3",
+                "outcome": "superseded"
+              }
+            ]
+          }
+        },
+        {
+          "at": 3000,
+          "event": {
+            "version": 1,
+            "source": {
+              "kind": "fixture",
+              "id": "cross-v1"
+            },
+            "generation": 5,
+            "transitionId": "event-5",
+            "eventTime": 1003000,
+            "expiresAt": 1033000,
+            "kind": "state",
+            "priority": "urgent",
+            "operation": "executing",
+            "delivery": "composed",
+            "availability": "available",
+            "muted": true,
+            "attention": "owner",
+            "reducedMotion": false
+          },
+          "expected": {
+            "admission": "accepted",
+            "operation": "waiting",
+            "delivery": "subdued",
+            "muted": true,
+            "generation": 5,
+            "priority": "attention",
+            "animation": "settling",
+            "moving": true,
+            "pose": {
+              "x": 0.022737134791207963,
+              "y": -0.06172429946518911,
+              "tilt": -0.000023202575117085,
+              "body": 0,
+              "eye": 0.7,
+              "width": 1,
+              "arc": 0,
+              "slant": -4,
+              "span": 1,
+              "gx": 0,
+              "gy": 0,
+              "lid": 0,
+              "opening": 0
+            },
+            "records": [
+              {
+                "generation": 4,
+                "transitionId": "event-4",
+                "outcome": "superseded"
+              }
+            ]
+          }
+        },
+        {
+          "at": 31000,
+          "event": {
+            "version": 1,
+            "source": {
+              "kind": "fixture",
+              "id": "cross-v1"
+            },
+            "generation": 2,
+            "transitionId": "event-2",
+            "eventTime": 1001000,
+            "expiresAt": 1031000,
+            "kind": "accent",
+            "priority": "normal",
+            "operation": "speaking",
+            "delivery": "composed",
+            "availability": "available",
+            "muted": false,
+            "attention": "none",
+            "reducedMotion": false,
+            "accent": "phrase"
+          },
+          "expected": {
+            "admission": "stale",
+            "operation": "waiting",
+            "delivery": "subdued",
+            "muted": true,
+            "generation": 5,
+            "priority": "attention",
+            "animation": "held",
+            "moving": false,
+            "pose": {
+              "x": -3,
+              "y": 8,
+              "tilt": 0,
+              "body": 0,
+              "eye": 0.52,
+              "width": 1,
+              "arc": 3,
+              "slant": 0,
+              "span": 1,
+              "gx": 0,
+              "gy": 5,
+              "lid": 0,
+              "opening": 0
+            },
+            "records": [
+              {
+                "generation": 5,
+                "transitionId": "event-5",
+                "outcome": "settled"
+              }
+            ]
+          }
+        },
+        {
+          "at": 33000,
+          "expected": {
+            "admission": null,
+            "operation": "unknown",
+            "delivery": "hesitant",
+            "muted": true,
+            "generation": 5,
+            "priority": "critical",
+            "animation": "cancelled",
+            "moving": false,
+            "pose": {
+              "x": -6,
+              "y": 2,
+              "tilt": -4,
+              "body": 0,
+              "eye": 0.86,
+              "width": 0.96,
+              "arc": 3,
+              "slant": -18,
+              "span": 1,
+              "gx": -11,
+              "gy": 2,
+              "lid": 7,
+              "opening": 0
+            },
+            "records": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "reaction-lifecycle-reduced",
+      "steps": [
+        {
+          "at": 0,
+          "event": {
+            "version": 1,
+            "source": {
+              "kind": "fixture",
+              "id": "cross-v1"
+            },
+            "generation": 1,
+            "transitionId": "event-1",
+            "eventTime": 1000000,
+            "expiresAt": 1030000,
+            "kind": "state",
+            "priority": "normal",
+            "operation": "idle",
+            "delivery": "amused",
+            "availability": "available",
+            "muted": false,
+            "attention": "none",
+            "reducedMotion": false
+          },
+          "expected": {
+            "admission": "accepted",
+            "operation": "idle",
+            "delivery": "amused",
+            "muted": false,
+            "generation": 1,
+            "priority": "delivery",
+            "animation": "accent",
+            "moving": true,
+            "pose": {
+              "x": -6,
+              "y": 2,
+              "tilt": -4,
+              "body": 0,
+              "eye": 0.86,
+              "width": 0.96,
+              "arc": 3,
+              "slant": -18,
+              "span": 1,
+              "gx": -11,
+              "gy": 2,
+              "lid": 7,
+              "opening": 0
+            },
+            "records": []
+          }
+        },
+        {
+          "at": 600,
+          "expected": {
+            "admission": null,
+            "operation": "idle",
+            "delivery": "amused",
+            "muted": false,
+            "generation": 1,
+            "priority": "delivery",
+            "animation": "accent",
+            "moving": true,
+            "pose": {
+              "x": -19.999956313001018,
+              "y": 7.999981277000437,
+              "tilt": 7.999962554000874,
+              "body": 0,
+              "eye": 0.82,
+              "width": 1,
+              "arc": -29,
+              "slant": 1,
+              "span": 1,
+              "gx": -3,
+              "gy": 0,
+              "lid": -5,
+              "opening": 0
+            },
+            "records": []
+          }
+        },
+        {
+          "at": 3200,
+          "expected": {
+            "admission": null,
+            "operation": "idle",
+            "delivery": "composed",
+            "muted": false,
+            "generation": 1,
+            "priority": "delivery",
+            "animation": "held",
+            "moving": false,
+            "pose": {
+              "x": 0,
+              "y": 0,
+              "tilt": 0,
+              "body": 0,
+              "eye": 1,
+              "width": 1,
+              "arc": -16,
+              "slant": -4,
+              "span": 1,
+              "gx": 0,
+              "gy": 0,
+              "lid": 0,
+              "opening": 0
+            },
+            "records": [
+              {
+                "generation": 1,
+                "transitionId": "event-1",
+                "outcome": "accent_finished"
+              }
+            ]
+          }
+        },
+        {
+          "at": 4000,
+          "event": {
+            "version": 1,
+            "source": {
+              "kind": "fixture",
+              "id": "cross-v1"
+            },
+            "generation": 2,
+            "transitionId": "event-1",
+            "eventTime": 1004000,
+            "expiresAt": 1034000,
+            "kind": "state",
+            "priority": "normal",
+            "operation": "idle",
+            "delivery": "amused",
+            "availability": "available",
+            "muted": false,
+            "attention": "none",
+            "reducedMotion": false
+          },
+          "expected": {
+            "admission": "accepted",
+            "operation": "idle",
+            "delivery": "composed",
+            "muted": false,
+            "generation": 2,
+            "priority": "delivery",
+            "animation": "held",
+            "moving": false,
+            "pose": {
+              "x": 0,
+              "y": 0,
+              "tilt": 0,
+              "body": 0,
+              "eye": 1,
+              "width": 1,
+              "arc": -16,
+              "slant": -4,
+              "span": 1,
+              "gx": 0,
+              "gy": 0,
+              "lid": 0,
+              "opening": 0
+            },
+            "records": []
+          }
+        },
+        {
+          "at": 5000,
+          "suspend": true,
+          "expected": {
+            "admission": null,
+            "operation": "unknown",
+            "delivery": "hesitant",
+            "muted": false,
+            "generation": 2,
+            "priority": "critical",
+            "animation": "cancelled",
+            "moving": false,
+            "pose": {
+              "x": -6,
+              "y": 2,
+              "tilt": -4,
+              "body": 0,
+              "eye": 0.86,
+              "width": 0.96,
+              "arc": 3,
+              "slant": -18,
+              "span": 1,
+              "gx": -11,
+              "gy": 2,
+              "lid": 7,
+              "opening": 0
+            },
+            "records": []
+          }
+        },
+        {
+          "at": 5100,
+          "event": {
+            "version": 1,
+            "source": {
+              "kind": "fixture",
+              "id": "cross-v1"
+            },
+            "generation": 2,
+            "transitionId": "event-1",
+            "eventTime": 1004000,
+            "expiresAt": 1034000,
+            "kind": "state",
+            "priority": "normal",
+            "operation": "idle",
+            "delivery": "amused",
+            "availability": "available",
+            "muted": false,
+            "attention": "none",
+            "reducedMotion": false
+          },
+          "expected": {
+            "admission": "stale",
+            "operation": "unknown",
+            "delivery": "hesitant",
+            "muted": false,
+            "generation": 2,
+            "priority": "critical",
+            "animation": "cancelled",
+            "moving": false,
+            "pose": {
+              "x": -6,
+              "y": 2,
+              "tilt": -4,
+              "body": 0,
+              "eye": 0.86,
+              "width": 0.96,
+              "arc": 3,
+              "slant": -18,
+              "span": 1,
+              "gx": -11,
+              "gy": 2,
+              "lid": 7,
+              "opening": 0
+            },
+            "records": []
+          }
+        },
+        {
+          "at": 5500,
+          "event": {
+            "version": 1,
+            "source": {
+              "kind": "fixture",
+              "id": "cross-v1"
+            },
+            "generation": 3,
+            "transitionId": "event-3",
+            "eventTime": 1005500,
+            "expiresAt": 1035500,
+            "kind": "state",
+            "priority": "normal",
+            "operation": "attentive",
+            "delivery": "composed",
+            "availability": "available",
+            "muted": false,
+            "attention": "none",
+            "reducedMotion": false
+          },
+          "expected": {
+            "admission": "accepted",
+            "operation": "attentive",
+            "delivery": "attentive",
+            "muted": false,
+            "generation": 3,
+            "priority": "delivery",
+            "animation": "settling",
+            "moving": true,
+            "pose": {
+              "x": -6,
+              "y": 2,
+              "tilt": -4,
+              "body": 0,
+              "eye": 0.86,
+              "width": 0.96,
+              "arc": 3,
+              "slant": -18,
+              "span": 1,
+              "gx": -11,
+              "gy": 2,
+              "lid": 7,
+              "opening": 0
+            },
+            "records": []
+          }
+        },
+        {
+          "at": 5600,
+          "expected": {
+            "admission": null,
+            "operation": "attentive",
+            "delivery": "attentive",
+            "muted": false,
+            "generation": 3,
+            "priority": "delivery",
+            "animation": "settling",
+            "moving": true,
+            "pose": {
+              "x": -14.807176882416215,
+              "y": -5.288698109585834,
+              "tilt": -4.607391509132153,
+              "body": 0,
+              "eye": 0.9435762876579203,
+              "width": 0.9785725083684267,
+              "arc": -4.571748422552412,
+              "slant": -9.166293507022186,
+              "span": 1,
+              "gx": 11,
+              "gy": -3,
+              "lid": 3.749811035525322,
+              "opening": 0.4178814382896015
+            },
+            "records": []
+          }
+        },
+        {
+          "at": 5700,
+          "reduce": true,
+          "expected": {
+            "admission": null,
+            "operation": "attentive",
+            "delivery": "attentive",
+            "muted": false,
+            "generation": 3,
+            "priority": "delivery",
+            "animation": "held",
+            "moving": false,
+            "pose": {
+              "x": -35,
+              "y": -22,
+              "tilt": -6,
+              "body": 0,
+              "eye": 1.04,
+              "width": 1,
+              "arc": -9,
+              "slant": -4,
+              "span": 1,
+              "gx": 11,
+              "gy": -3,
+              "lid": 0,
+              "opening": 0.9
+            },
+            "records": [
+              {
+                "generation": 3,
+                "transitionId": "event-3",
+                "outcome": "cancelled"
+              }
+            ]
+          }
+        },
+        {
+          "at": 20000,
+          "event": {
+            "version": 1,
+            "source": {
+              "kind": "fixture",
+              "id": "cross-v1"
+            },
+            "generation": 4,
+            "transitionId": "event-4",
+            "eventTime": 1020000,
+            "expiresAt": 1050000,
+            "kind": "state",
+            "priority": "normal",
+            "operation": "idle",
+            "delivery": "surprised",
+            "availability": "available",
+            "muted": false,
+            "attention": "none",
+            "reducedMotion": true
+          },
+          "expected": {
+            "admission": "accepted",
+            "operation": "idle",
+            "delivery": "surprised",
+            "muted": false,
+            "generation": 4,
+            "priority": "delivery",
+            "animation": "accent",
+            "moving": true,
+            "pose": {
+              "x": -58,
+              "y": -44,
+              "tilt": -13,
+              "body": -1,
+              "eye": 1.16,
+              "width": 1.08,
+              "arc": -5,
+              "slant": -4,
+              "span": 0.9,
+              "gx": 0,
+              "gy": -7,
+              "lid": 0,
+              "opening": 1
+            },
+            "records": []
+          }
+        },
+        {
+          "at": 20400,
+          "expected": {
+            "admission": null,
+            "operation": "idle",
+            "delivery": "surprised",
+            "muted": false,
+            "generation": 4,
+            "priority": "delivery",
+            "animation": "accent",
+            "moving": true,
+            "pose": {
+              "x": -58,
+              "y": -44,
+              "tilt": -13,
+              "body": -1,
+              "eye": 1.16,
+              "width": 1.08,
+              "arc": -5,
+              "slant": -4,
+              "span": 0.9,
+              "gx": 0,
+              "gy": -7,
+              "lid": 0,
+              "opening": 1
+            },
+            "records": []
+          }
+        },
+        {
+          "at": 21000,
+          "expected": {
+            "admission": null,
+            "operation": "idle",
+            "delivery": "composed",
+            "muted": false,
+            "generation": 4,
+            "priority": "delivery",
+            "animation": "accent",
+            "moving": true,
+            "pose": {
+              "x": 0,
+              "y": 0,
+              "tilt": 0,
+              "body": 0,
+              "eye": 1,
+              "width": 1,
+              "arc": -16,
+              "slant": -4,
+              "span": 1,
+              "gx": 0,
+              "gy": 0,
+              "lid": 0,
+              "opening": 0
+            },
+            "records": []
+          }
+        },
+        {
+          "at": 22700,
+          "expected": {
+            "admission": null,
+            "operation": "idle",
+            "delivery": "composed",
+            "muted": false,
+            "generation": 4,
+            "priority": "delivery",
+            "animation": "held",
+            "moving": false,
+            "pose": {
+              "x": 0,
+              "y": 0,
+              "tilt": 0,
+              "body": 0,
+              "eye": 1,
+              "width": 1,
+              "arc": -16,
+              "slant": -4,
+              "span": 1,
+              "gx": 0,
+              "gy": 0,
+              "lid": 0,
+              "opening": 0
+            },
+            "records": [
+              {
+                "generation": 4,
+                "transitionId": "event-4",
+                "outcome": "accent_finished"
+              }
+            ]
+          }
+        },
+        {
+          "at": 22800,
+          "reduce": false,
+          "expected": {
+            "admission": null,
+            "operation": "idle",
+            "delivery": "composed",
+            "muted": false,
+            "generation": 4,
+            "priority": "delivery",
+            "animation": "held",
+            "moving": false,
+            "pose": {
+              "x": 0,
+              "y": 0,
+              "tilt": 0,
+              "body": 0,
+              "eye": 1,
+              "width": 1,
+              "arc": -16,
+              "slant": -4,
+              "span": 1,
+              "gx": 0,
+              "gy": 0,
+              "lid": 0,
+              "opening": 0
+            },
+            "records": []
+          }
+        },
+        {
+          "at": 23000,
+          "event": {
+            "version": 1,
+            "source": {
+              "kind": "fixture",
+              "id": "cross-v1"
+            },
+            "generation": 5,
+            "transitionId": "event-5",
+            "eventTime": 1023000,
+            "expiresAt": 1053000,
+            "kind": "state",
+            "priority": "normal",
+            "operation": "idle",
+            "delivery": "surprised",
+            "availability": "available",
+            "muted": false,
+            "attention": "none",
+            "reducedMotion": false
+          },
+          "expected": {
+            "admission": "accepted",
+            "operation": "idle",
+            "delivery": "surprised",
+            "muted": false,
+            "generation": 5,
+            "priority": "delivery",
+            "animation": "accent",
+            "moving": true,
+            "pose": {
+              "x": 0,
+              "y": 0,
+              "tilt": 0,
+              "body": 0,
+              "eye": 1,
+              "width": 1,
+              "arc": -16,
+              "slant": -4,
+              "span": 1,
+              "gx": 0,
+              "gy": 0,
+              "lid": 0,
+              "opening": 0
+            },
+            "records": []
+          }
+        },
+        {
+          "at": 23200,
+          "reduce": true,
+          "expected": {
+            "admission": null,
+            "operation": "idle",
+            "delivery": "surprised",
+            "muted": false,
+            "generation": 5,
+            "priority": "delivery",
+            "animation": "accent",
+            "moving": true,
+            "pose": {
+              "x": -58,
+              "y": -44,
+              "tilt": -13,
+              "body": -1,
+              "eye": 1.16,
+              "width": 1.08,
+              "arc": -5,
+              "slant": -4,
+              "span": 0.9,
+              "gx": 0,
+              "gy": -7,
+              "lid": 0,
+              "opening": 1
+            },
+            "records": []
+          }
+        },
+        {
+          "at": 24000,
+          "expected": {
+            "admission": null,
+            "operation": "idle",
+            "delivery": "composed",
+            "muted": false,
+            "generation": 5,
+            "priority": "delivery",
+            "animation": "accent",
+            "moving": true,
+            "pose": {
+              "x": 0,
+              "y": 0,
+              "tilt": 0,
+              "body": 0,
+              "eye": 1,
+              "width": 1,
+              "arc": -16,
+              "slant": -4,
+              "span": 1,
+              "gx": 0,
+              "gy": 0,
+              "lid": 0,
+              "opening": 0
+            },
+            "records": []
+          }
+        },
+        {
+          "at": 25700,
+          "expected": {
+            "admission": null,
+            "operation": "idle",
+            "delivery": "composed",
+            "muted": false,
+            "generation": 5,
+            "priority": "delivery",
+            "animation": "held",
+            "moving": false,
+            "pose": {
+              "x": 0,
+              "y": 0,
+              "tilt": 0,
+              "body": 0,
+              "eye": 1,
+              "width": 1,
+              "arc": -16,
+              "slant": -4,
+              "span": 1,
+              "gx": 0,
+              "gy": 0,
+              "lid": 0,
+              "opening": 0
+            },
+            "records": [
+              {
+                "generation": 5,
+                "transitionId": "event-5",
+                "outcome": "accent_finished"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "invalid-source-and-presentation-cancel",
+      "steps": [
+        {
+          "at": 0,
+          "event": {
+            "version": 1,
+            "source": {
+              "kind": "fixture",
+              "id": "cross-v1"
+            },
+            "generation": 1,
+            "transitionId": "event-1",
+            "eventTime": 1000000,
+            "expiresAt": 1030000,
+            "kind": "state",
+            "priority": "normal",
+            "operation": "listening",
+            "delivery": "composed",
+            "availability": "available",
+            "muted": false,
+            "attention": "none",
+            "reducedMotion": false
+          },
+          "expected": {
+            "admission": "accepted",
+            "operation": "listening",
+            "delivery": "attentive",
+            "muted": false,
+            "generation": 1,
+            "priority": "activity",
+            "animation": "settling",
+            "moving": true,
+            "pose": {
+              "x": -6,
+              "y": 2,
+              "tilt": -4,
+              "body": 0,
+              "eye": 0.86,
+              "width": 0.96,
+              "arc": 3,
+              "slant": -18,
+              "span": 1,
+              "gx": -11,
+              "gy": 2,
+              "lid": 7,
+              "opening": 0
+            },
+            "records": []
+          }
+        },
+        {
+          "at": 200,
+          "event": {
+            "version": 1,
+            "source": {
+              "kind": "fixture",
+              "id": "cross-v1"
+            },
+            "generation": 2,
+            "transitionId": "event-2",
+            "eventTime": 1000200,
+            "expiresAt": 1030200,
+            "kind": "state",
+            "priority": "normal",
+            "operation": "idle",
+            "delivery": "composed",
+            "availability": "available",
+            "muted": false,
+            "attention": "none",
+            "reducedMotion": false,
+            "privateText": "synthetic-must-reject"
+          },
+          "expected": {
+            "admission": "invalid",
+            "operation": "unknown",
+            "delivery": "hesitant",
+            "muted": false,
+            "generation": 1,
+            "priority": "critical",
+            "animation": "cancelled",
+            "moving": false,
+            "pose": {
+              "x": -6,
+              "y": 2,
+              "tilt": -4,
+              "body": 0,
+              "eye": 0.86,
+              "width": 0.96,
+              "arc": 3,
+              "slant": -18,
+              "span": 1,
+              "gx": -11,
+              "gy": 2,
+              "lid": 7,
+              "opening": 0
+            },
+            "records": [
+              {
+                "generation": 1,
+                "transitionId": "event-1",
+                "outcome": "invalid"
+              }
+            ]
+          }
+        },
+        {
+          "at": 300,
+          "event": {
+            "version": 1,
+            "source": {
+              "kind": "lab",
+              "id": "cross-v1"
+            },
+            "generation": 2,
+            "transitionId": "event-2",
+            "eventTime": 1000300,
+            "expiresAt": 1030300,
+            "kind": "state",
+            "priority": "normal",
+            "operation": "idle",
+            "delivery": "composed",
+            "availability": "available",
+            "muted": false,
+            "attention": "none",
+            "reducedMotion": false
+          },
+          "expected": {
+            "admission": "source_mismatch",
+            "operation": "unknown",
+            "delivery": "hesitant",
+            "muted": false,
+            "generation": 1,
+            "priority": "critical",
+            "animation": "cancelled",
+            "moving": false,
+            "pose": {
+              "x": -6,
+              "y": 2,
+              "tilt": -4,
+              "body": 0,
+              "eye": 0.86,
+              "width": 0.96,
+              "arc": 3,
+              "slant": -18,
+              "span": 1,
+              "gx": -11,
+              "gy": 2,
+              "lid": 7,
+              "opening": 0
+            },
+            "records": []
+          }
+        },
+        {
+          "at": 400,
+          "event": {
+            "version": 1,
+            "source": {
+              "kind": "fixture",
+              "id": "cross-v1"
+            },
+            "generation": 3,
+            "transitionId": "event-3",
+            "eventTime": 1000400,
+            "expiresAt": 1030400,
+            "kind": "state",
+            "priority": "normal",
+            "operation": "speaking",
+            "delivery": "composed",
+            "availability": "available",
+            "muted": false,
+            "attention": "none",
+            "reducedMotion": false
+          },
+          "expected": {
+            "admission": "accepted",
+            "operation": "speaking",
+            "delivery": "composed",
+            "muted": false,
+            "generation": 3,
+            "priority": "activity",
+            "animation": "settling",
+            "moving": true,
+            "pose": {
+              "x": -6,
+              "y": 2,
+              "tilt": -4,
+              "body": 0,
+              "eye": 0.86,
+              "width": 0.96,
+              "arc": 3,
+              "slant": -18,
+              "span": 1,
+              "gx": -11,
+              "gy": 2,
+              "lid": 7,
+              "opening": 0
+            },
+            "records": []
+          }
+        },
+        {
+          "at": 800,
+          "event": {
+            "version": 1,
+            "source": {
+              "kind": "fixture",
+              "id": "cross-v1"
+            },
+            "generation": 4,
+            "transitionId": "event-4",
+            "eventTime": 1000800,
+            "expiresAt": 1030800,
+            "kind": "cancel",
+            "priority": "normal",
+            "operation": "speaking",
+            "delivery": "composed",
+            "availability": "available",
+            "muted": false,
+            "attention": "none",
+            "reducedMotion": false
+          },
+          "expected": {
+            "admission": "accepted",
+            "operation": "speaking",
+            "delivery": "composed",
+            "muted": false,
+            "generation": 4,
+            "priority": "activity",
+            "animation": "cancelled",
+            "moving": false,
+            "pose": {
+              "x": -42.203856899113596,
+              "y": -6.045301533136355,
+              "tilt": 6.056626916420443,
+              "body": 0,
+              "eye": 1,
+              "width": 1,
+              "arc": -16,
+              "slant": -4,
+              "span": 1,
+              "gx": 0,
+              "gy": 0,
+              "lid": 0,
+              "opening": 0.95
+            },
+            "records": [
+              {
+                "generation": 3,
+                "transitionId": "event-3",
+                "outcome": "cancelled"
+              }
+            ]
+          }
+        },
+        {
+          "at": 1200,
+          "expected": {
+            "admission": null,
+            "operation": "speaking",
+            "delivery": "composed",
+            "muted": false,
+            "generation": 4,
+            "priority": "activity",
+            "animation": "cancelled",
+            "moving": false,
+            "pose": {
+              "x": -42.203856899113596,
+              "y": -6.045301533136355,
+              "tilt": 6.056626916420443,
+              "body": 0,
+              "eye": 1,
+              "width": 1,
+              "arc": -16,
+              "slant": -4,
+              "span": 1,
+              "gx": 0,
+              "gy": 0,
+              "lid": 0,
+              "opening": 0.95
+            },
+            "records": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "reduced-phrase-and-blink",
+      "steps": [
+        {
+          "at": 0,
+          "event": {
+            "version": 1,
+            "source": {
+              "kind": "fixture",
+              "id": "cross-v1"
+            },
+            "generation": 1,
+            "transitionId": "event-1",
+            "eventTime": 1000000,
+            "expiresAt": 1030000,
+            "kind": "state",
+            "priority": "normal",
+            "operation": "speaking",
+            "delivery": "composed",
+            "availability": "available",
+            "muted": false,
+            "attention": "none",
+            "reducedMotion": true
+          },
+          "expected": {
+            "admission": "accepted",
+            "operation": "speaking",
+            "delivery": "composed",
+            "muted": false,
+            "generation": 1,
+            "priority": "activity",
+            "animation": "held",
+            "moving": false,
+            "pose": {
+              "x": -42,
+              "y": -6,
+              "tilt": 6,
+              "body": 0,
+              "eye": 1,
+              "width": 1,
+              "arc": -16,
+              "slant": -4,
+              "span": 1,
+              "gx": 0,
+              "gy": 0,
+              "lid": 0,
+              "opening": 0.95
+            },
+            "records": [
+              {
+                "generation": 1,
+                "transitionId": "event-1",
+                "outcome": "settled"
+              }
+            ]
+          }
+        },
+        {
+          "at": 500,
+          "event": {
+            "version": 1,
+            "source": {
+              "kind": "fixture",
+              "id": "cross-v1"
+            },
+            "generation": 2,
+            "transitionId": "event-2",
+            "eventTime": 1000500,
+            "expiresAt": 1030500,
+            "kind": "accent",
+            "priority": "normal",
+            "operation": "speaking",
+            "delivery": "composed",
+            "availability": "available",
+            "muted": false,
+            "attention": "none",
+            "reducedMotion": true,
+            "accent": "phrase"
+          },
+          "expected": {
+            "admission": "accepted",
+            "operation": "speaking",
+            "delivery": "composed",
+            "muted": false,
+            "generation": 2,
+            "priority": "activity",
+            "animation": "held",
+            "moving": false,
+            "pose": {
+              "x": -42,
+              "y": -6,
+              "tilt": 6,
+              "body": 0,
+              "eye": 1,
+              "width": 1,
+              "arc": -16,
+              "slant": -4,
+              "span": 1,
+              "gx": 0,
+              "gy": 0,
+              "lid": 0,
+              "opening": 0.95
+            },
+            "records": [
+              {
+                "generation": 2,
+                "transitionId": "event-2",
+                "outcome": "accent_finished"
+              }
+            ]
+          }
+        },
+        {
+          "at": 5200,
+          "expected": {
+            "admission": null,
+            "operation": "speaking",
+            "delivery": "composed",
+            "muted": false,
+            "generation": 2,
+            "priority": "activity",
+            "animation": "held",
+            "moving": false,
+            "pose": {
+              "x": -42,
+              "y": -6,
+              "tilt": 6,
+              "body": 0,
+              "eye": 1,
+              "width": 1,
+              "arc": -16,
+              "slant": -4,
+              "span": 1,
+              "gx": 0,
+              "gy": 0,
+              "lid": 0,
+              "opening": 0.95
+            },
+            "records": []
+          }
+        },
+        {
+          "at": 6000,
+          "event": {
+            "version": 1,
+            "source": {
+              "kind": "fixture",
+              "id": "cross-v1"
+            },
+            "generation": 3,
+            "transitionId": "event-3",
+            "eventTime": 1006000,
+            "expiresAt": 1036000,
+            "kind": "state",
+            "priority": "normal",
+            "operation": "speaking",
+            "delivery": "composed",
+            "availability": "available",
+            "muted": false,
+            "attention": "none",
+            "reducedMotion": false
+          },
+          "expected": {
+            "admission": "accepted",
+            "operation": "speaking",
+            "delivery": "composed",
+            "muted": false,
+            "generation": 3,
+            "priority": "activity",
+            "animation": "settling",
+            "moving": true,
+            "pose": {
+              "x": -42,
+              "y": -6,
+              "tilt": 6,
+              "body": 0,
+              "eye": 1,
+              "width": 1,
+              "arc": -16,
+              "slant": -4,
+              "span": 1,
+              "gx": 0,
+              "gy": 0,
+              "lid": 0,
+              "opening": 0.95
+            },
+            "records": []
+          }
+        },
+        {
+          "at": 6700,
+          "expected": {
+            "admission": null,
+            "operation": "speaking",
+            "delivery": "composed",
+            "muted": false,
+            "generation": 3,
+            "priority": "activity",
+            "animation": "held",
+            "moving": false,
+            "pose": {
+              "x": -42,
+              "y": -6,
+              "tilt": 6,
+              "body": 0,
+              "eye": 1,
+              "width": 1,
+              "arc": -16,
+              "slant": -4,
+              "span": 1,
+              "gx": 0,
+              "gy": 0,
+              "lid": 0,
+              "opening": 0.95
+            },
+            "records": [
+              {
+                "generation": 3,
+                "transitionId": "event-3",
+                "outcome": "settled"
+              }
+            ]
+          }
+        },
+        {
+          "at": 6700,
+          "event": {
+            "version": 1,
+            "source": {
+              "kind": "fixture",
+              "id": "cross-v1"
+            },
+            "generation": 4,
+            "transitionId": "event-4",
+            "eventTime": 1006700,
+            "expiresAt": 1036700,
+            "kind": "accent",
+            "priority": "normal",
+            "operation": "speaking",
+            "delivery": "composed",
+            "availability": "available",
+            "muted": false,
+            "attention": "none",
+            "reducedMotion": false,
+            "accent": "blink"
+          },
+          "expected": {
+            "admission": "accepted",
+            "operation": "speaking",
+            "delivery": "composed",
+            "muted": false,
+            "generation": 4,
+            "priority": "activity",
+            "animation": "accent",
+            "moving": true,
+            "pose": {
+              "x": -42,
+              "y": -6,
+              "tilt": 6,
+              "body": 0,
+              "eye": 1,
+              "width": 1,
+              "arc": -16,
+              "slant": -4,
+              "span": 1,
+              "gx": 0,
+              "gy": 0,
+              "lid": 0,
+              "opening": 0.95
+            },
+            "records": []
+          }
+        },
+        {
+          "at": 6860,
+          "expected": {
+            "admission": null,
+            "operation": "speaking",
+            "delivery": "composed",
+            "muted": false,
+            "generation": 4,
+            "priority": "activity",
+            "animation": "accent",
+            "moving": true,
+            "pose": {
+              "x": -42,
+              "y": -6,
+              "tilt": 6,
+              "body": 0,
+              "eye": 0,
+              "width": 1,
+              "arc": -16,
+              "slant": -4,
+              "span": 1,
+              "gx": 0,
+              "gy": 0,
+              "lid": 0,
+              "opening": 0
+            },
+            "records": []
+          }
+        },
+        {
+          "at": 7400,
+          "expected": {
+            "admission": null,
+            "operation": "speaking",
+            "delivery": "composed",
+            "muted": false,
+            "generation": 4,
+            "priority": "activity",
+            "animation": "held",
+            "moving": false,
+            "pose": {
+              "x": -42,
+              "y": -6,
+              "tilt": 6,
+              "body": 0,
+              "eye": 1,
+              "width": 1,
+              "arc": -16,
+              "slant": -4,
+              "span": 1,
+              "gx": 0,
+              "gy": 0,
+              "lid": 0,
+              "opening": 0.95
+            },
+            "records": [
+              {
+                "generation": 4,
+                "transitionId": "event-4",
+                "outcome": "accent_finished"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "malformedInputs": [
+    {
+      "name": "trailing-garbage",
+      "raw": "{\"version\":1,\"source\":{\"kind\":\"fixture\",\"id\":\"cross-v1\"},\"generation\":1,\"transitionId\":\"event-1\",\"eventTime\":1000000,\"expiresAt\":1030000,\"kind\":\"state\",\"priority\":\"normal\",\"operation\":\"idle\",\"delivery\":\"composed\",\"availability\":\"available\",\"muted\":false,\"attention\":\"none\",\"reducedMotion\":false} trailing garbage"
+    },
+    {
+      "name": "unquoted-key",
+      "raw": "{version:1,\"source\":{\"kind\":\"fixture\",\"id\":\"cross-v1\"},\"generation\":1,\"transitionId\":\"event-1\",\"eventTime\":1000000,\"expiresAt\":1030000,\"kind\":\"state\",\"priority\":\"normal\",\"operation\":\"idle\",\"delivery\":\"composed\",\"availability\":\"available\",\"muted\":false,\"attention\":\"none\",\"reducedMotion\":false}"
+    },
+    {
+      "name": "single-quotes",
+      "raw": "{'version':1,'source':{'kind':'fixture','id':'cross-v1'},'generation':1,'transitionId':'event-1','eventTime':1000000,'expiresAt':1030000,'kind':'state','priority':'normal','operation':'idle','delivery':'composed','availability':'available','muted':false,'attention':'none','reducedMotion':false}"
+    },
+    {
+      "name": "leading-zero",
+      "raw": "{\"version\":01,\"source\":{\"kind\":\"fixture\",\"id\":\"cross-v1\"},\"generation\":1,\"transitionId\":\"event-1\",\"eventTime\":1000000,\"expiresAt\":1030000,\"kind\":\"state\",\"priority\":\"normal\",\"operation\":\"idle\",\"delivery\":\"composed\",\"availability\":\"available\",\"muted\":false,\"attention\":\"none\",\"reducedMotion\":false}"
+    },
+    {
+      "name": "private-field",
+      "raw": "{\"version\":1,\"source\":{\"kind\":\"fixture\",\"id\":\"cross-v1\"},\"generation\":1,\"transitionId\":\"event-1\",\"eventTime\":1000000,\"expiresAt\":1030000,\"kind\":\"state\",\"priority\":\"normal\",\"operation\":\"idle\",\"delivery\":\"composed\",\"availability\":\"available\",\"muted\":false,\"attention\":\"none\",\"reducedMotion\":false,\"privateText\":\"synthetic-must-reject\"}"
+    },
+    {
+      "name": "string-boolean",
+      "raw": "{\"version\":1,\"source\":{\"kind\":\"fixture\",\"id\":\"cross-v1\"},\"generation\":1,\"transitionId\":\"event-1\",\"eventTime\":1000000,\"expiresAt\":1030000,\"kind\":\"state\",\"priority\":\"normal\",\"operation\":\"idle\",\"delivery\":\"composed\",\"availability\":\"available\",\"muted\":\"false\",\"attention\":\"none\",\"reducedMotion\":false}"
+    },
+    {
+      "name": "legacy-wire-operation",
+      "raw": "{\"version\":1,\"source\":{\"kind\":\"fixture\",\"id\":\"cross-v1\"},\"generation\":1,\"transitionId\":\"event-1\",\"eventTime\":1000000,\"expiresAt\":1030000,\"kind\":\"state\",\"priority\":\"normal\",\"operation\":\"available\",\"delivery\":\"composed\",\"availability\":\"available\",\"muted\":false,\"attention\":\"none\",\"reducedMotion\":false}"
+    },
+    {
+      "name": "unsafe-generation",
+      "raw": "{\"version\":1,\"source\":{\"kind\":\"fixture\",\"id\":\"cross-v1\"},\"generation\":9007199254740992,\"transitionId\":\"event-1\",\"eventTime\":1000000,\"expiresAt\":1030000,\"kind\":\"state\",\"priority\":\"normal\",\"operation\":\"idle\",\"delivery\":\"composed\",\"availability\":\"available\",\"muted\":false,\"attention\":\"none\",\"reducedMotion\":false}"
+    }
+  ]
+}

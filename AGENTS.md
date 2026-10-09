@@ -6,9 +6,13 @@ Canonical instructions for Codex and other coding agents working on OSCAR.
 
 **Canonical numbered roadmap: Slices 00–20.** Read `docs/SLICE-NUMBERING.md`,
 `docs/ROADMAP.md` and `docs/EXPRESSION-CORE.md` before proposing a slice.
-Active next work: **11.1 Character/Expression Language + 11.2 Interactive
-Expression Lab**. After explicit visual owner review: 11.3 shared render
-contract → 12 Desktop UX → 13 Mobile UX → 14–20 remaining roadmap.
+Current candidate: **11.1 Character/Expression Language + 11.2 Interactive
+Expression Lab + 11.3 shared render contract**. The owner approved broader v3
+movement for engineering continuation. Local shared-engine/React/native Compose
+validation is recorded in `docs/design/expression/VALIDATION.md`; final owner
+quality/device review and remote exact-head CI remain distinct merge boundaries.
+Do not begin 12 Desktop UX or 13 Mobile UX without separate authorization.
+Later sequence: 12 → 13 → 14–20 remaining roadmap.
 Old `09R/10R/13A/13B` labels and original Slice 17 Alpha are historical
 aliases only; do not use them in new plans or claim them as current.
 

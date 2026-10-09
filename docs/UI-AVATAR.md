@@ -2,10 +2,19 @@
 
 ## Current character-design contract — Slice 11
 
+The owner reviewed broader v3 movement and authorized **11.3 engineering**.
+The reusable [expression package](../expression/README.md) supplies a source-bound,
+validated event contract, deterministic controller and React/native Compose
+renderers. [Integration](design/expression/INTEGRATION.md) remains later UI work;
+the accepted Mobile screens and unmerged Desktop draft are unchanged.
+This authorization does not certify final cross-device visual quality or physical
+acceptance. Production speech uses actual upstream state and explicit optional
+accents, never a fixed utterance-length animation or inferred microphone/prosody.
+
 This document is the durable design intent; [Slice 11 Expression/Character
 System](EXPRESSION-CORE.md) owns the current detailed character vocabulary,
-interactive Expression Lab and shared renderer contract. Next design stages
-are **11.1 character language → 11.2 interactive lab → owner review → 11.3
+interactive Expression Lab and shared renderer contract. The design sequence
+is **11.1 character language → 11.2 interactive lab → owner review → 11.3
 shared rendering**, then **12 Desktop UX / 13 Mobile UX**. Full state-aware
 cross-device Presence is Slice 16.
 

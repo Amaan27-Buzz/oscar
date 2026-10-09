@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:oscar:expression:1",
+  "title": "OSCAR presentation event v1",
+  "description": "Provenance is not authentication. Runtime validators additionally enforce time <= observation+250ms, expiry > observation and expiry-time <=30000ms.",
+  "type": "object", "additionalProperties": false,
+  "required": ["version","source","generation","transitionId","eventTime","expiresAt","kind","priority","operation","delivery","availability","muted","attention","reducedMotion"],
+  "properties": {
+    "version": {"const": 1},
+    "source": {"type":"object","additionalProperties":false,"required":["kind","id"],"properties":{"kind":{"enum":["core","lab","fixture"]},"id":{"$ref":"#/$defs/id"}}},
+    "generation": {"$ref":"#/$defs/integer"}, "transitionId":{"$ref":"#/$defs/id"},
+    "eventTime":{"$ref":"#/$defs/integer"}, "expiresAt":{"$ref":"#/$defs/integer"},
+    "kind":{"enum":["state","accent","interrupt","cancel"]}, "priority":{"enum":["normal","urgent"]},
+    "operation":{"enum":["idle","attentive","listening","processing","executing","verifying","waiting","speaking","muted","unavailable","error","unknown"]},
+    "delivery":{"enum":["composed","attentive","curious","focused","amused","pleased","surprised","concerned","hesitant","subdued","resting","asleep","interrupted"]},
+    "availability":{"enum":["available","unavailable","unknown"]},"muted":{"type":"boolean"},
+    "attention":{"enum":["none","owner"]},"reducedMotion":{"type":"boolean"},"accent":{"enum":["phrase","engagement","blink"]}
+  },
+  "allOf":[{"if":{"properties":{"kind":{"const":"accent"}}},"then":{"required":["accent"]},"else":{"not":{"required":["accent"]}}}],
+  "$defs":{"id":{"type":"string","pattern":"^[A-Za-z0-9:_-]{1,64}$"},"integer":{"type":"integer","minimum":0,"maximum":9007199254740991}}
+}

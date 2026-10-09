@@ -1,9 +1,11 @@
 # OSCAR Expression / Character System — Slice 11
 
-**Status:** 11.1–11.2 DESIGN PROPOSAL / SIMULATED LAB / OWNER VISUAL REVIEW REQUIRED.
+**Status:** v3 direction approved for continuing engineering. 11.3 shared
+foundation implemented; local/cross-platform validation and owner quality review
+are recorded in the [engineering packet](design/expression/ENGINE.md).
 The independently runnable [Expression Lab](../design/expression-lab/README.md)
-and [character brief](design/expression/BRIEF.md) are a review candidate, not
-approved character art. **11.3 NOT STARTED**. Canonical IDs are defined in
+and [character brief](design/expression/BRIEF.md) preserve the reviewed character
+study. This is not blanket visual/device acceptance. Canonical IDs are defined in
 [Slice Numbering](SLICE-NUMBERING.md).
 
 **Order:** 11.1 → 11.2 → owner visual review → 11.3 → 12.1 Desktop Presence → rest of Slice 12 → Slice 13 Mobile. **Full cross-device Avatar/Presence integration is Slice 16** after World Model Slice 14 and commissioning Slice 15.
@@ -42,6 +44,23 @@ Explore a small number of techniques with objective comparisons, such as SVG tra
 Deliverables: interactive lab, screenshots/contact sheets for expression states, short animated preview, performance/reduced-motion checks, design decision record and explicit owner approval gate. **Do not promote a visual concept automatically.**
 
 ## 11.3 — Shared state/render contract
+
+Implemented in [`expression/`](../expression/README.md) and the isolated native
+[`mobile/expression/`](../mobile/expression/build.gradle.kts) library. The lab uses
+the extracted v3 mechanics; the event-driven React/Compose renderers are independent
+of lab controls and existing app layout. See [integration](design/expression/INTEGRATION.md).
+
+Version 1 bounds source/generation/transition ID, observation/expiry, operation,
+delivery, availability/privacy/attention, urgency, reduced motion and explicit
+presentation accents/cancellation. Strict parsers reject malformed/private fields;
+state admission is source-bound and generation/freshness fenced. Provenance is
+not authentication; the already trusted surface adapter must supply Core truth.
+
+Speaking starts/holds/ends through upstream state; speaking/executing choreography
+requires a permitted explicit accent. Requested idle reactions have finite
+recovery. Animation completion is not task/audio completion.
+No TTS, Elocution, Core mutation or PR #16 dependency. Shared reference fixtures
+exercise original v3 poses and controller traces in TypeScript/Kotlin.
 
 After the expression vocabulary and prototype are owner-reviewed, formalize a platform-neutral typed schema for operational states, delivery cues, event timestamps, priority, transition request, reduced-motion fallback and safe unknown/unavailable behavior.
 

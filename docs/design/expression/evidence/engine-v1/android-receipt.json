@@ -1,0 +1,46 @@
+{
+  "classification": "EMULATED NATIVE COMPOSE FIXTURES / NO CORE EXECUTION / NOT PHYSICAL ACCEPTANCE",
+  "api": 35,
+  "system_image": "Google APIs x86_64 API35 revision9",
+  "emulator": "36.5.11",
+  "test_activity": "isolated :expression test APK only",
+  "instrumentation": {
+    "tests": "3",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "timestamp": "2026-10-09T12:52:44"
+  },
+  "jvm": {
+    "tests": "5",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "timestamp": "2026-10-09T12:51:42.074Z"
+  },
+  "checks": [
+    "nativeFixtureAtlasAndCompactSizes",
+    "lifecycleAndNewMuteGenerationCannotResumeStaleSpeech",
+    "nativeJsonAdmissionRejectsLenientAndroidSyntax"
+  ],
+  "artifact_sha256": "e59890f279e9dc8540f669bf1c42c14ecaba09e802a9840af0945f420cc846fc",
+  "canonical_sha256": "728aeac3c9aa590b67d45c469735e919ede93a8503964e24f0f4af18cda066c5",
+  "source_sha256": {
+    "expression/fixtures/reference-v1.json": "5c3c75d7e1d089acb0de032d750a3da09ab1b87b1b8031cffc98d9d1cec194e5",
+    "expression/motion-v1.json": "0b1a5eb15380349eedb5b85131d4266556e8d2133e7b8c496298ca8b16999dbd",
+    "mobile/expression/src/androidTest/java/io/dawnlight/oscar/expression/ExpressionRenderingTest.kt": "4a3fded0a9f5db13f03719062bebc7c1c6013a2af0cfcee13b49a7cab8f3249d",
+    "mobile/expression/src/main/java/io/dawnlight/oscar/expression/Contract.kt": "16c04bae531a91888f33f878c70b31013780594c920d7a232229dcdbfff70870",
+    "mobile/expression/src/main/java/io/dawnlight/oscar/expression/Controller.kt": "d8de3af9b1f4d98002f532fba51b117cfc138fc15e41f718634b2dbe23b13808",
+    "mobile/expression/src/main/java/io/dawnlight/oscar/expression/ExpressionOrb.kt": "5e9410e4639b1e7bef8377d925298d2a1bdcb9f20cc272def5523b389bd0663e",
+    "mobile/expression/src/main/java/io/dawnlight/oscar/expression/Motion.kt": "25546c3a9ec03a9ce287316940024f02ed771bd72277994698274dc778437ebe",
+    "mobile/expression/src/main/java/io/dawnlight/oscar/expression/Previews.kt": "f47fdd89d4dd3b90ade6a25e78890867398b9989df8cd8b9a3569d1e39107e4f",
+    "mobile/expression/src/main/java/io/dawnlight/oscar/expression/WireJson.kt": "6a7b4227abc5283e97f78e8c0971186c477d82ff7df4988dccf1d91c09d3f30b",
+    "mobile/expression/src/test/java/io/dawnlight/oscar/expression/ExpressionTest.kt": "e4661c5eaebcebf380885f295ee5d892da2d39c2d6fc3abac2f577adc78b4d54"
+  },
+  "prior_api36_1_attempt": "PARTIAL: rendered atlas and 2 assertions completed; graphics DMA/system snapshot crash aborted runner teardown",
+  "limitations": [
+    "SVG/Skia blur and gradient/anti-alias rasterization differ",
+    "no physical-device, TalkBack, continuous native performance or owner naturalness acceptance",
+    "no Mobile screen or Core/voice integration"
+  ]
+}

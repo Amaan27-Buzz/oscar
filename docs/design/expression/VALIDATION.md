@@ -1,4 +1,59 @@
-# Slice 11.1–11.2 validation record
+# Slice 11 validation record
+
+## Current 11.3 engineering validation — 2026-10-09
+
+Starting reviewed head: `d992795af3508778a38498f1f9e05d85091c2806`.
+Branch: `design/slice-11-expression`; [draft PR #17](https://github.com/amaansyed27/oscar/pull/17) into `work`.
+V3 direction is owner-approved for engineering continuation, not blanket visual
+acceptance. Slice 11.3 is a reusable presentation foundation, not actual Core,
+voice, Desktop bridge or Mobile screen integration. Gate C remains PARTIAL.
+
+- Shared ESM/declarations, plain Node core import, lab TypeScript/Vite build: PASS.
+- 35 Vitest tests: PASS, retaining the 22 reviewed-v3 checks and adding contract,
+  source/generation/freshness/priority, held speech, explicit accents, heartbeat,
+  cancellation, invalidation, finite/reduced reaction recovery and React continuity.
+- Shared TypeScript/Kotlin fixtures: 16 original poses, five event traces, eight
+  strict malformed-wire inputs. Kotlin numeric agreement tolerance: 0.00001.
+- Native JVM tests: five tests PASS. Isolated Compose library/test-APK and accepted
+  `:app:compileDebugKotlin`: PASS. `:app` does not consume the expression module.
+- API 35 Google APIs x86_64 emulator: three native instrumentation tests PASS,
+  zero failures/errors/skips. Actual Compose atlas/compact drawing, lifecycle
+  invalidation/new mute semantics and strict Android JSON admission verified.
+- Fresh Edge/Chromium render/playback: PASS. Long speech stays held, a permitted
+  accent performs broad travel, newer mute stops speech, OS reduced motion is static.
+  No external requests or page errors; source hash unchanged and normalized neutral
+  canonical/derivative pixel-difference bounding box is null.
+- Repository required-file/link/value-silent secret checks, four canonical-numbering
+  tests and whitespace checks: PASS. Synthetic runtime imports contain no data,
+  audio, Core or execution adapters. Capture tool executed successfully.
+
+[Browser receipt](evidence/engine-v1/react-receipt.json) binds the rendered captures
+to the built bundle and canonical hash. The parent inspected the actual React and
+native Compose atlases; native anti-aliasing, blur and gradient rasterization differ.
+Original v0/v1/v2/v3 evidence is preserved unchanged. Shared sampled geometry and
+semantics agree; physical performance, TalkBack, owner naturalness and final target
+DPI/cross-device graphical quality remain outstanding.
+
+The initial owned API 36.1 emulator rendered the atlas and completed two test
+methods without assertion failures, but graphics DMA/system snapshot crashes
+aborted instrumentation teardown. This attempt is **PARTIAL**, not a runner PASS.
+The separate API 35 run completed successfully; its native receipt records the
+test counts, source/fixture hashes and actual rendered atlas hash.
+
+[Native validation receipt](evidence/engine-v1/android-receipt.json).
+
+### Remote and integration boundary
+
+**LOCAL VALIDATION PASS / REMOTE CI NOT EXECUTED** applies to completed local
+checks; the remote exact-head check must be inspected after pushing. Billing
+rejected earlier jobs before steps executed. No exact-head CI green or merge
+approval is claimed. PR #16 remains open/draft at
+`e334c858195091c21cee5aa35b308b5933cc44bd`, read-only and unchanged.
+Neither PR merges automatically. Slice 12/13 screen adoption and real runtime
+adapters are future authorized work; no production UI is modified here.
+
+## Historical Slice 11.1–11.2 validation record
+
 
 Status: **LOCAL VALIDATION PASS / REMOTE CI NOT EXECUTED**.
 Design status: **OWNER VISUAL APPROVAL REQUIRED**, not final character acceptance.

@@ -1,0 +1,13 @@
+{
+  "name": "@oscar/expression", "version": "0.1.0", "private": true, "type": "module",
+  "exports": {
+    ".": {"types":"./dist/core/index.d.ts","import":"./dist/core/index.js"},
+    "./react": {"types":"./dist/react/Presence.d.ts","import":"./dist/react/Presence.js"},
+    "./motion": {"types":"./dist/core/motion.d.ts","import":"./dist/core/motion.js"}
+  },
+  "scripts": {"build":"tsc -p tsconfig.json"},
+  "files": ["dist","contract-v1.schema.json","motion-v1.json","fixtures"],
+  "devDependencies": {"typescript":"7.0.2","react":"19.3.0","@types/react":"19.3.0"},
+  "peerDependencies": {"react": "^19.0.0"},
+  "peerDependenciesMeta": {"react": {"optional": true}}
+}

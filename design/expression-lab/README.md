@@ -2,14 +2,18 @@
 
 **SIMULATED VISUAL STATE — NO CORE EXECUTION**
 
-Slice 11.1 character proposal + 11.2 independently runnable review instrument.
-It is not Desktop infrastructure, a production screen or an approved mascot.
+Slice 11.1 character language + 11.2 review instrument, now consuming the 11.3
+shared engine. V3 direction is approved for continuing engineering; final
+cross-device visual quality remains owner review. This is not a production screen.
 
 Requirements: supported Node 24 LTS (24.15+; locally verified 24.19) or Node 26+,
 npm, and a browser. No OSCAR services, API keys, microphone or native shell.
 
 ```powershell
-cd D:\TheDawnlightGroup\DawnlightLabs\oscar\design\expression-lab
+cd D:\TheDawnlightGroup\DawnlightLabs\oscar\expression
+npm ci
+npm run build
+cd ../design/expression-lab
 npm ci
 npm test
 npm run dev
@@ -34,15 +38,16 @@ control and OS preference; state information remains readable and static.
 
 ## Architecture
 
-- `src/model.ts`: lab-only pose, arbitration and deterministic finite timeline.
-- `src/Orb.tsx`: versioned v2 SVG derivative, preserving source shell/puck/shadow,
-  with owner-authorized smaller-eye opening and finite playful puck travel.
+- `src/model.ts`: synthetic studies/vocabulary; imports shared arbitration/motion.
+- `src/Orb.tsx`: reexports the shared SVG derivative, preserving source identity.
+- `src/EngineProof.tsx`: `/?engine=1` event-driven renderer/fixture inspection.
 - `src/Lab.tsx`: reviewer controls and one virtual clock; no runtime adapter.
 - `src/*.test.*`: geometry/state/interrupt/component/isolation checks.
 - `tools/capture.py`: self-owned built preview + fresh isolated Chromium capture.
 
-These types are intentionally local. They are not the 11.3 cross-platform contract.
-No Android implementation, Desktop bridge, storage or audio features.
+The production-facing contract/controller lives in `../../expression/`; an
+isolated native sibling lives in `../../mobile/expression/`. Lab controls and
+finite demos remain development-only. No Desktop bridge, storage or audio.
 
 ## Reproduce evidence
 
@@ -51,14 +56,15 @@ Optional maintainer requirements: Python, Pillow, repository browser extra
 
 ```powershell
 npm run build
-python tools/capture.py --iteration motion-v3
+python tools/capture-engine.py
 ```
 
-The tool refuses an occupied port 1511, blocks requests outside its own loopback
+The engine tool refuses an occupied port 1512, blocks requests outside its own loopback
 origin, uses a fresh browser context with no grants, exercises controls, and writes
-PNG/GIF captures plus bundle/artifact hashes under
-`docs/design/expression/evidence/motion-v3/`. Close a manually started lab
-before capture. Screenshots are actual SVG browser renders; contact strips arrange
+three PNG captures plus bundle/artifact hashes under
+`docs/design/expression/evidence/engine-v1/`. `capture.py` remains the legacy study
+exporter; pass a new iteration name when creating new evidence, preserving archived
+v0/v1/v2/v3. Screenshots are actual SVG browser renders; contact strips arrange
 captured frames. The GIF is sampled at 10fps for inspection, not a native frame-rate
 claim. Initial study-v0/v1 artifacts are historical revision evidence.
 

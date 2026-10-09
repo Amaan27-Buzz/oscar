@@ -1,5 +1,15 @@
 # OSCAR Surfaces and Embodiments
 
+## Shared expression foundation — Slice 11.3
+
+Desktop and Mobile can consume the same [versioned presentation contract](../expression/README.md)
+through React/SVG and native Compose renderers. The contract/controller never own
+task, permission, verification or audio truth. Surfaces bind an authenticated source,
+qualify freshness, and provide newer state after lifecycle/source loss.
+The standalone lab and isolated Android module are software/reference foundations;
+neither replaces the current app layout or proves device acceptance. Adoption is
+Slice 12 Desktop / Slice 13 Mobile; full Presence remains Slice 16.
+
 OSCAR is one intelligence expressed through multiple devices. Surfaces share identity, tasks, permissions, Personal Policy, Persona, memory, Voice Identity and capability contracts rather than becoming separate assistants.
 
 Cross-device coordination uses OSCAR-owned transport/capability contracts and the Connection Grid.

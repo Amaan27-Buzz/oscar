@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10-09 — Slice 11.3 shared expression foundation
+
+- Extracted reviewed v3 motion into a reusable ESM package with strict versioned events, source/generation/freshness admission, event-driven speech hold/accents, interruption and lifecycle/reduced-motion handling.
+- Added independent React/SVG and isolated native Compose renderers; accepted Mobile screens/Core and draft Desktop PR #16 remain unchanged.
+- Added common pose/controller/malformed-input fixtures, native JVM/Compose validation and a small real-render evidence set. Animation outcomes never claim task, permission or audio completion.
+- V3 is approved for engineering, not blanket visual/device acceptance. Draft PR #17 remains unmerged; Slice 12 and later work are not started.
+
 ## 2026-10-09 — Owner-directed broader expression motion
 
 - Replaced subtle v2 accents with broad finite phrase/engagement travel, stronger attention/reaction posture and default intensity 1.0.
