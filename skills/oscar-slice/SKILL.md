@@ -5,12 +5,29 @@ description: Implement one OSCAR roadmap slice or narrow sub-slice end to end, i
 
 # OSCAR slice delivery skill
 
+## Canonical numbering and owner design priority
+
+Current numbering is **Slices 00–20** in `docs/SLICE-NUMBERING.md`.
+Use only canonical active identifiers in new work: **11 Character/Expression**
+next, then **12 Desktop UX**, **13 Mobile UX**, **14 World Model**,
+**15 commissioning**, **16 full Presence**, **17 Executive**, **18 physical**,
+**19 hardening**, **20 Unified Alpha**. Old `09R/10R/13A/13B` aliases
+are historical references, not concurrent slice sets.
+
+The owner expects high-effort, deep, character-first design, not a swift
+three-card UI exercise. If work concerns the avatar, read
+`docs/EXPRESSION-CORE.md` and `docs/UI-AVATAR.md` before designing.
+No visual approval is inferred from test success. Existing PR #16 is
+draft/unmerged and must be reconciled against `origin/work` safely.
+
+
+
 1. Read `AGENTS.md`, `ENGINEERING.md`, `docs/EPISTEMIC-INTEGRITY.md`, `docs/ROADMAP.md`, `docs/ARCHITECTURE.md`, `docs/DECISIONS.md`, and the relevant domain docs.
 2. Identify the exact slice/sub-slice boundary. Do not silently expand scope.
 3. Inspect existing code and connected infrastructure before designing replacements.
 4. Prefer the smallest coherent design; do not add speculative abstractions, services or dependencies.
 5. Identify module responsibilities, authoritative state ownership, trust boundaries and important failure modes before implementation.
-6. Prefer existing specialist capabilities: OSCAR-owned Controller/Memory Fabric, native OSCAR Transport/Model Router, Codex/computer-use Workers, Sunday, Edge nodes, and installed/connected specialist applications.
+6. Prefer existing specialist capabilities: OSCAR-owned Controller/Memory Fabric, native OSCAR Transport/Model Router, Codex/computer-use Workers, OSCAR Mobile, Edge nodes, and installed/connected specialist applications.
 7. Keep cross-subsystem contracts typed, validated and evolvable; isolate provider/platform details behind narrow adapters where appropriate.
 8. Define the slice's observable completion condition and verification plan before declaring it complete.
 9. Write an explicit test checklist.
