@@ -234,13 +234,18 @@ Required scenarios include:
 
 ## Gate D — JARVIS Layer
 
-**Slices:** 11–14
+**Slices:** 11–14 (with early 13A expression design/prototype extracted ahead of 10R/09R)
 
 Prove current-world awareness, persistent Sentry, commissioning and durable delegated work.
 
 Required scenarios include combining multiple live sources into the World Model, stale-state uncertainty, persistent Sentry without active conversation, capture/privacy boundaries, commissioning, durable Worker inspection, competing objectives, evaluated learned workflow and UI/avatar correspondence to real runtime state.
 
 **Pass:** OSCAR maintains coherent current awareness, durable responsibilities and optional continuity capture without collapsing privacy/evidence boundaries.
+
+**Owner order adjustment (2026-10-09):** expression-only foundation `13A.1–13A.3`
+is prioritized before desktop/mobile UI redesign. This is a design/renderer dependency,
+not an early Gate D PASS. Full state-bound Presence/Avatar acceptance (`13B`) remains
+after Slices 11–12. See [Expression Core](EXPRESSION-CORE.md).
 
 ## Gate E — Unified Alpha
 
