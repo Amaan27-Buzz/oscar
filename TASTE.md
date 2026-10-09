@@ -1,5 +1,30 @@
 # OSCAR Taste
 
+## Current character-first quality bar (2026-10-09)
+
+A warm minimalist UI with the same pasted static smile, status labels and
+rounded beige cards **does not count as OSCAR character design**. Before
+surrounding interface redesign (Slices 12 Desktop / 13 Mobile), implement and
+critically review the genuine expression vocabulary in **Slice 11**.
+
+The desktop-companion screenshots provided by the owner illustrate character
+responding to context outside a chat window; they are *behavioral references*
+and must never be copied as artwork. Carefully design gaze, microexpressions,
+puck mass/settling, attention, anticipation, hesitation, reaction to interruption,
+idle rest, recovery and reduced motion. Expressions remain honest about
+Core truth and actual permissions.
+
+For GPT-6.1 Sol / High-effort design sessions: research actual interaction
+patterns, analyze art geometry, document several reasoned hypotheses, prototype
+real animated behaviors, self-critique weak/AI-looking output, iterate, and
+show the owner a rigorous comparison before promoting anything. Do not stop
+because a screenshot looks passable or tests compile.
+
+[Canonical schedule](docs/SLICE-NUMBERING.md) ·
+[Expression plan](docs/EXPRESSION-CORE.md).
+
+
+
 This file is the opinionated quality bar for agents designing or reviewing OSCAR surfaces. `DESIGN.md` is normative; this file explains what “good” should feel like when several implementations satisfy the rules.
 
 ## The taste in one line
