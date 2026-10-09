@@ -1,0 +1,119 @@
+{
+  "starting_sha": "005ad3593879fd3d967bc920e7ee77bb12d40964",
+  "evidence": "SIMULATED_WINDOWS_CHROMIUM_PRESENTATION",
+  "native_windows_acceptance": "NOT_RUN",
+  "canonical_orb_sha256": "728aeac3c9aa590b67d45c469735e919ede93a8503964e24f0f4af18cda066c5",
+  "images": [
+    {
+      "file": "concept-a-idle.png",
+      "concept": "a",
+      "state": "idle",
+      "logical_width": 224,
+      "logical_height": 188,
+      "physical_width": 224,
+      "physical_height": 188,
+      "scale": 1,
+      "sha256": "44063b09ce26ae1ebd8a3ec4ff7495ad611517d6a83116cd1816785a86e6843c"
+    },
+    {
+      "file": "concept-a-active.png",
+      "concept": "a",
+      "state": "active",
+      "logical_width": 224,
+      "logical_height": 188,
+      "physical_width": 224,
+      "physical_height": 188,
+      "scale": 1,
+      "sha256": "e217af289f21935cd3110068bbce15fc25ed4b2f083dfcee7a42157b16ee0705"
+    },
+    {
+      "file": "concept-a-offline.png",
+      "concept": "a",
+      "state": "offline",
+      "logical_width": 224,
+      "logical_height": 188,
+      "physical_width": 224,
+      "physical_height": 188,
+      "scale": 1,
+      "sha256": "8a62bc1e91740b4780c1a43c1d7a48565f2bec8bebb1f6e9bc861d1bb4e32521"
+    },
+    {
+      "file": "concept-b-idle.png",
+      "concept": "b",
+      "state": "idle",
+      "logical_width": 344,
+      "logical_height": 156,
+      "physical_width": 344,
+      "physical_height": 156,
+      "scale": 1,
+      "sha256": "92fb95de7cab7ca385aab1abb5cd6589d519ea04e62fa9da7e445f47673ac48b"
+    },
+    {
+      "file": "concept-b-active.png",
+      "concept": "b",
+      "state": "active",
+      "logical_width": 344,
+      "logical_height": 156,
+      "physical_width": 344,
+      "physical_height": 156,
+      "scale": 1,
+      "sha256": "902e79ae9c0ab2748384747837759c565515abfbe151d73ec29a96db8f02756a"
+    },
+    {
+      "file": "concept-b-offline.png",
+      "concept": "b",
+      "state": "offline",
+      "logical_width": 344,
+      "logical_height": 156,
+      "physical_width": 344,
+      "physical_height": 156,
+      "scale": 1,
+      "sha256": "872834db84de29c572e536b317fd45f7b0e3f2c6e654fe5ea21bec5f0265a791"
+    },
+    {
+      "file": "concept-c-idle.png",
+      "concept": "c",
+      "state": "idle",
+      "logical_width": 192,
+      "logical_height": 112,
+      "physical_width": 192,
+      "physical_height": 112,
+      "scale": 1,
+      "sha256": "f7de4aefec34eab5576f2e3a49450ada188ee30a667e75a3b5fb462add7abfe3"
+    },
+    {
+      "file": "concept-c-active.png",
+      "concept": "c",
+      "state": "active",
+      "logical_width": 364,
+      "logical_height": 164,
+      "physical_width": 364,
+      "physical_height": 164,
+      "scale": 1,
+      "sha256": "b5e4b26c56958591add993281a1d0ca8296c2da61ea6a18a81c0389166239782"
+    },
+    {
+      "file": "concept-c-offline.png",
+      "concept": "c",
+      "state": "offline",
+      "logical_width": 304,
+      "logical_height": 156,
+      "physical_width": 304,
+      "physical_height": 156,
+      "scale": 1,
+      "sha256": "3a0b1b9420008e193b7c793ee4d158161b147aef49a2086867200c3d9aa84c52"
+    }
+  ],
+  "checks": [
+    "a: transitions, offline motion, keyboard expansion/Escape/focus PASS",
+    "b: transitions, offline motion, keyboard expansion/Escape/focus PASS",
+    "c: transitions, offline motion, keyboard expansion/Escape/focus PASS",
+    "a: emulated DPR 1.25 / reduced motion / forced colors PASS",
+    "b: emulated DPR 1.25 / reduced motion / forced colors PASS",
+    "c: emulated DPR 1.25 / reduced motion / forced colors PASS"
+  ],
+  "page_errors": [],
+  "external_requests": [],
+  "preview": "transitions.gif",
+  "preview_notes": "Browser samples, 10fps; not native or a performance benchmark."
+}

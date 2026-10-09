@@ -29,7 +29,16 @@ def main() -> int:
     # Rust's bundled context macro also runs during Clippy/tests on a clean checkout.
     run([npm, "run", "build"])
     bundled = "".join(p.read_text(encoding="utf-8") for p in (directory / "dist").rglob("*.js"))
-    if "fixture-context" in bundled or "DEVELOPMENT SHOWCASE" in bundled:
+    bundled += "".join(p.read_text(encoding="utf-8") for p in (directory / "dist").rglob("*.css"))
+    if any(
+        marker in bundled
+        for marker in (
+            "fixture-context",
+            "DEVELOPMENT SHOWCASE",
+            "10R.1 synthetic exploration",
+            "presence-object",
+        )
+    ):
         raise RuntimeError("development showcase must not enter the production frontend bundle")
     if args.checks:
         run([npm, "run", "typecheck"])
