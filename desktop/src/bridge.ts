@@ -14,10 +14,11 @@ export interface Capability {id:string;node:string;kind:string;label:string;summ
 export interface Preview {preview_id:string;before:string|null;after:string;epistemic:string;expires:number;destinations:string[]}
 export interface Review {review_id:string;operation:string;description:string;target:string;capability:string;reason:string;
   consequence:string;policy_reason:string;evidence_state:string;review:string;expires_at_ms:number}
-export interface View {link:string;orb:string;window:WindowMode;tasks:Task[];capabilities:Capability[];
+export interface ExpressionReadback {epoch:string;generation:number;observed_at_ms:number;voice_observed_at_ms:number;tasks_observed_at_ms:number;current_observed_at_ms:number}
+export interface View {expression:ExpressionReadback|null;link:string;orb:string;window:WindowMode;tasks:Task[];capabilities:Capability[];
   context:Context|null;preview:Preview|null;review:Review|null;current:Task|null;message:string|null;
   voice:string;shortcut:string;observed_at_ms:number;reference:boolean}
-export const initialView:View={link:'unconfigured',orb:'unavailable',window:'compact',tasks:[],capabilities:[],
+export const initialView:View={expression:null,link:'unconfigured',orb:'unavailable',window:'compact',tasks:[],capabilities:[],
   context:null,preview:null,review:null,current:null,message:null,voice:'idle',shortcut:'Not registered',observed_at_ms:0,reference:false};
 export type ActForm=
   |{operation:'write_file'|'ps_write_utf8';path:string;text:string}

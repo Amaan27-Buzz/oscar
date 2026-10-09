@@ -7,7 +7,7 @@ use std::{
     io::Read,
     sync::{
         Arc, Mutex,
-        atomic::{AtomicBool, Ordering},
+        atomic::{AtomicBool, AtomicU64, Ordering},
     },
     time::{Duration, SystemTime, UNIX_EPOCH},
 };
@@ -237,12 +237,17 @@ pub struct Bridge {
     pub view: Mutex<View>,
     pub capture_choice: Mutex<ContextChoice>,
     hide_private: AtomicBool,
+    voice_revision: AtomicU64,
 }
 impl Bridge {
     pub fn new() -> Self {
         Self {
             client: Mutex::new(None),
             view: Mutex::new(View {
+                expression: ExpressionReadback {
+                    epoch: uuid::Uuid::new_v4().simple().to_string(),
+                    ..Default::default()
+                },
                 link: "unconfigured".into(),
                 orb: "unavailable".into(),
                 voice: "idle".into(),
@@ -251,6 +256,7 @@ impl Bridge {
             }),
             capture_choice: Mutex::new(ContextChoice::None),
             hide_private: AtomicBool::new(false),
+            voice_revision: AtomicU64::new(0),
         }
     }
     pub fn client(&self) -> Result<Arc<CoreClient>, String> {
@@ -265,8 +271,11 @@ impl Bridge {
     }
     pub fn refresh(&self) -> Result<View, String> {
         let client = self.client()?;
-        if matches!(self.view().voice.as_str(), "listening" | "processing") {
-            self.response(client.request("voice", json!({"operation":"inspect"}))?)?;
+        if matches!(
+            self.view().voice.as_str(),
+            "listening" | "processing" | "speaking"
+        ) {
+            self.voice_request(json!({"operation":"inspect"}))?;
         }
         let (mut tasks, caps, at) = client.snapshot()?;
         if self.hide_private.load(Ordering::Acquire) {
@@ -279,6 +288,19 @@ impl Bridge {
         if let Some(current) = &view.current {
             view.current = tasks.iter().find(|t| t.task_id == current.task_id).cloned();
         }
+        if at < view.observed_at_ms {
+            return Ok(view.clone());
+        }
+        if view.link != "online" {
+            if view.voice != "muted" {
+                view.voice = "idle".into();
+            }
+            view.expression.voice_observed_at_ms = 0;
+        }
+        view.expression.generation += 1;
+        view.expression.observed_at_ms = at;
+        view.expression.tasks_observed_at_ms = at;
+        view.expression.current_observed_at_ms = at;
         view.tasks = tasks;
         view.capabilities = caps;
         view.observed_at_ms = at;
@@ -295,6 +317,15 @@ impl Bridge {
     pub fn fail(&self, message: String) -> View {
         let mut view = self.view.lock().unwrap_or_else(|p| p.into_inner());
         if message.starts_with("Core unavailable") {
+            if view.link == "online" {
+                view.expression.epoch = uuid::Uuid::new_v4().simple().to_string();
+            }
+            if view.voice != "muted" {
+                view.voice = "idle".into();
+            }
+            view.expression.voice_observed_at_ms = 0;
+            view.expression.generation += 1;
+            view.expression.observed_at_ms = now_ms();
             view.link = "unavailable".into();
             view.capabilities.clear();
         }
@@ -302,10 +333,30 @@ impl Bridge {
         view.orb = orb(&view.link, view.current.as_ref(), &view.voice);
         view.clone()
     }
+    fn voice_request(&self, payload: Value) -> Result<View, String> {
+        let revision = self.voice_revision.fetch_add(1, Ordering::SeqCst) + 1;
+        let epoch = self.view().expression.epoch;
+        let value = self.client()?.request("voice", payload)?;
+        self.response_fenced(value, Some((revision, epoch)))
+    }
     fn response(&self, value: Value) -> Result<View, String> {
+        self.response_fenced(value, None)
+    }
+    fn response_fenced(
+        &self,
+        value: Value,
+        voice_fence: Option<(u64, String)>,
+    ) -> Result<View, String> {
         let mut view = self.view.lock().map_err(|_| "native state unavailable")?;
+        if let Some((revision, epoch)) = voice_fence
+            && (revision != self.voice_revision.load(Ordering::SeqCst)
+                || epoch != view.expression.epoch)
+        {
+            return Ok(view.clone());
+        }
         view.message = value["message"].as_str().map(str::to_owned);
         if value["task_id"].is_string() {
+            view.expression.current_observed_at_ms = now_ms();
             view.current =
                 Some(serde_json::from_value(value.clone()).map_err(|_| "invalid Core task")?);
         }
@@ -327,8 +378,21 @@ impl Bridge {
             ));
             view.preview = None;
         }
-        if matches!(value["state"].as_str(), Some("listening" | "processing")) {
+        if matches!(
+            value["state"].as_str(),
+            Some(
+                "idle"
+                    | "listening"
+                    | "processing"
+                    | "speaking"
+                    | "muted"
+                    | "interrupted"
+                    | "cancelled"
+            )
+        ) && !value["task_id"].is_string()
+        {
             view.voice = value["state"].as_str().unwrap_or_default().into();
+            view.expression.voice_observed_at_ms = now_ms();
         }
         if value["preview_id"].is_string() || value["state"] == "blocked" {
             view.voice = "idle".into();
@@ -336,6 +400,8 @@ impl Bridge {
         if view.current.is_some() {
             view.orb = orb(&view.link, view.current.as_ref(), &view.voice);
         }
+        view.expression.generation += 1;
+        view.expression.observed_at_ms = now_ms();
         Ok(view.clone())
     }
     pub fn execute<F: FnOnce(&ReviewView) -> bool>(
@@ -450,12 +516,9 @@ impl Bridge {
             }
             Command::VoiceStart { context_id } => {
                 bound(&context_id, 80)?;
-                client.request(
-                    "voice",
-                    json!({"operation":"start","context_id":context_id}),
-                )?
+                return self.voice_request(json!({"operation":"start","context_id":context_id}));
             }
-            Command::VoiceStop => client.request("voice", json!({"operation":"stop"}))?,
+            Command::VoiceStop => return self.voice_request(json!({"operation":"stop"})),
             _ => return Err("native window command requires native handling".into()),
         };
         self.response(value)
@@ -490,6 +553,31 @@ mod tests {
         }
         assert!(bridge.execute(Command::Refresh, |_| true).is_err());
         assert_eq!(bridge.view().orb, "unavailable");
+    }
+    #[test]
+    fn voice_readback_is_fenced_and_disconnect_clears_activity() {
+        let bridge = Bridge::new();
+        let epoch = bridge.view().expression.epoch;
+        bridge.voice_revision.store(2, Ordering::SeqCst);
+        let stale = bridge
+            .response_fenced(json!({"state":"listening"}), Some((1, epoch.clone())))
+            .unwrap();
+        assert_eq!(stale.voice, "idle");
+        let live = bridge
+            .response_fenced(json!({"state":"listening"}), Some((2, epoch.clone())))
+            .unwrap();
+        assert_eq!(live.voice, "listening");
+        assert!(live.expression.voice_observed_at_ms > 0);
+        bridge.view.lock().unwrap().link = "online".into();
+        let offline = bridge.fail("Core unavailable; fixture".into());
+        assert_ne!(offline.expression.epoch, epoch);
+        assert_eq!(offline.voice, "idle");
+        assert_eq!(offline.expression.voice_observed_at_ms, 0);
+        let stale = bridge
+            .response_fenced(json!({"state":"speaking"}), Some((2, epoch)))
+            .unwrap();
+        assert_eq!(stale.voice, "idle");
+        assert_eq!(stale.expression.generation, offline.expression.generation);
     }
     #[test]
     fn stale_reviews_and_offline_discard_fail_closed() {

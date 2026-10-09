@@ -442,6 +442,11 @@ Manual integration checkpoints remain in [BUILD-GATES.md](BUILD-GATES.md).
 
 ## Current next step
 
+2026-10-09 owner scope: prepare Desktop/Expression integration only. The
+[isolated local candidate](DESKTOP-EXPRESSION-INTEGRATION.md) consumes the shared
+renderer through trusted native readback; it does not merge PR #16/#17 or approve
+Slice 12.1 visuals. Account recovery, exact-head CI and owner reviews remain boundaries.
+
 **Current authoritative numbering:** [00–20 sequential plan](SLICE-NUMBERING.md). The prior 09R/10R/13A/13B nomenclature is now archival only. Historical screenshots, branch names and acceptance records are not rewritten.
 
 **Current review: Slice 11.3 reusable expression foundation.** The owner approved

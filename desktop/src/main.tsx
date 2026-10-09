@@ -2,7 +2,9 @@ import {createRoot} from 'react-dom/client';
 import {App} from './App';
 import './style.css';
 const root=createRoot(document.getElementById('root')!);
-if(import.meta.env.DEV && new URLSearchParams(location.search).has('presence')) {
+if(import.meta.env.DEV && new URLSearchParams(location.search).has('integration')) {
+  void import('./integration-fixture').then(({IntegrationFixture})=>root.render(<IntegrationFixture/>));
+} else if(import.meta.env.DEV && new URLSearchParams(location.search).has('presence')) {
   void import('./presence/Exploration').then(({Exploration})=>{
     document.title='OSCAR 10R.1 — synthetic / no execution';
     document.documentElement.dataset.presence='exploration';

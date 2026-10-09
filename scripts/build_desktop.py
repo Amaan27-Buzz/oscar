@@ -25,6 +25,9 @@ def main() -> int:
     def run(command: list[str]) -> None:
         subprocess.run(command, cwd=directory, env=env, check=True)
 
+    # Build the local shared dependency before Vite resolves its ESM exports.
+    subprocess.run([npm, "ci"], cwd=ROOT / "expression", env=env, check=True)
+    subprocess.run([npm, "run", "build"], cwd=ROOT / "expression", env=env, check=True)
     run([npm, "ci"])
     # Rust's bundled context macro also runs during Clippy/tests on a clean checkout.
     run([npm, "run", "build"])
@@ -37,6 +40,7 @@ def main() -> int:
             "DEVELOPMENT SHOWCASE",
             "10R.1 synthetic exploration",
             "presence-object",
+            "SIMULATED DESKTOP EVENTS",
         )
     ):
         raise RuntimeError("development showcase must not enter the production frontend bundle")

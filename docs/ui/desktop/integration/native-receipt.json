@@ -1,0 +1,17 @@
+{
+  "evidence": "REFERENCE_REAL_TAURI_AND_DISPOSABLE_CORE",
+  "arithmetic": "VERIFIED 2 + 3 = 5 by Core readback",
+  "execution_authority": "Owner-authorized harmless deterministic test harness; native signed control tested separately by desktop_tauri self-check; no owner GUI acceptance",
+  "native_states": [
+    "available",
+    "waiting",
+    "verified-readback",
+    "unavailable",
+    "reconnected"
+  ],
+  "epoch_rotation": "PASS",
+  "voice_after_reconnect": "idle",
+  "audio": "NOT RUN; no adapter",
+  "page_errors": [],
+  "owner_acceptance": "NOT RUN"
+}

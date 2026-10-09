@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-10-09 — Local Desktop/Expression integration candidate
+
+- Preserved both unmerged foundation histories in an isolated local worktree.
+- Added native readback epochs/revisions, independent freshness and voice-response fencing;
+  wired the existing Orb slot to the shared validated Expression controller/renderer.
+- Added adapter tests and separate actual Tauri/disposable-Core versus synthetic React evidence.
+- No Core authority, canonical artwork, full UI redesign, PR merge or remote CI claim.
+
 ## 2026-10-09 — Slice 11.3 shared expression foundation
 
 - Extracted reviewed v3 motion into a reusable ESM package with strict versioned events, source/generation/freshness admission, event-driven speech hold/accents, interruption and lifecycle/reduced-motion handling.

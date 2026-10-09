@@ -1,0 +1,45 @@
+{
+  "evidence": "SIMULATED / no Core execution or audio",
+  "images": [
+    {
+      "file": "fixture-available.png",
+      "state": "available",
+      "evidence": "SIMULATED_DESKTOP_READBACK_REAL_REACT",
+      "sha256": "a38e9ce624d9536218a06b3f0b35cc5c791b4c6692f80847d6188bfb99f6862e"
+    },
+    {
+      "file": "fixture-working.png",
+      "state": "working",
+      "evidence": "SIMULATED_DESKTOP_READBACK_REAL_REACT",
+      "sha256": "4d11ccec21e6a5cc6c7f2c5b0c329e2ce8ccfbd8f96276338321b458006a4eb3"
+    },
+    {
+      "file": "fixture-waiting.png",
+      "state": "waiting",
+      "evidence": "SIMULATED_DESKTOP_READBACK_REAL_REACT",
+      "sha256": "2d8546cf524c8f1c43fa4c6c6c0457c817abaed298b0991f6840f70adadb9991"
+    },
+    {
+      "file": "fixture-speaking.png",
+      "state": "speaking",
+      "evidence": "SIMULATED_DESKTOP_READBACK_REAL_REACT",
+      "sha256": "b1841f70cdb1e6b9b0d1113b1725faf267fbadaac1d4cbde9ee037531e2ac4c9"
+    },
+    {
+      "file": "fixture-unavailable.png",
+      "state": "unavailable",
+      "evidence": "SIMULATED_DESKTOP_READBACK_REAL_REACT",
+      "sha256": "5b4b9bcae6aae89d4e572cee7d8a9c33ecc4f5d8de10d93f6b5bd9f0a7db7287"
+    },
+    {
+      "file": "fixture-interrupted.png",
+      "state": "interrupted",
+      "evidence": "SIMULATED_DESKTOP_READBACK_REAL_REACT",
+      "sha256": "69da26eedb6d5880ba6d560cd980f0f7e70d2eaabebc3763e2fe3ed3b170307d"
+    }
+  ],
+  "long_speech_hold": "PASS at 6.1 seconds",
+  "expiry": "PASS at 8.3 seconds",
+  "reduced_motion": "PASS static pose",
+  "page_errors": []
+}

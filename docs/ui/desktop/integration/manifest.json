@@ -1,0 +1,135 @@
+{
+  "canonical_orb_sha256": "728aeac3c9aa590b67d45c469735e919ede93a8503964e24f0f4af18cda066c5",
+  "artifacts": [
+    {
+      "file": "fixture-available.png",
+      "evidence": "SIMULATED_DESKTOP_READBACK_REAL_REACT",
+      "sha256": "a38e9ce624d9536218a06b3f0b35cc5c791b4c6692f80847d6188bfb99f6862e",
+      "dimensions": [
+        420,
+        170
+      ],
+      "frames": 1
+    },
+    {
+      "file": "fixture-interrupted.png",
+      "evidence": "SIMULATED_DESKTOP_READBACK_REAL_REACT",
+      "sha256": "69da26eedb6d5880ba6d560cd980f0f7e70d2eaabebc3763e2fe3ed3b170307d",
+      "dimensions": [
+        420,
+        170
+      ],
+      "frames": 1
+    },
+    {
+      "file": "fixture-sheet.png",
+      "evidence": "SIMULATED_DESKTOP_READBACK_REAL_REACT",
+      "sha256": "d3ca60f170c3c7e4ee2424e43e0877ec9855d0706d7b253050b76b51f7a594b5",
+      "dimensions": [
+        840,
+        510
+      ],
+      "frames": 1
+    },
+    {
+      "file": "fixture-speaking.png",
+      "evidence": "SIMULATED_DESKTOP_READBACK_REAL_REACT",
+      "sha256": "b1841f70cdb1e6b9b0d1113b1725faf267fbadaac1d4cbde9ee037531e2ac4c9",
+      "dimensions": [
+        420,
+        170
+      ],
+      "frames": 1
+    },
+    {
+      "file": "fixture-unavailable.png",
+      "evidence": "SIMULATED_DESKTOP_READBACK_REAL_REACT",
+      "sha256": "5b4b9bcae6aae89d4e572cee7d8a9c33ecc4f5d8de10d93f6b5bd9f0a7db7287",
+      "dimensions": [
+        420,
+        170
+      ],
+      "frames": 1
+    },
+    {
+      "file": "fixture-waiting.png",
+      "evidence": "SIMULATED_DESKTOP_READBACK_REAL_REACT",
+      "sha256": "2d8546cf524c8f1c43fa4c6c6c0457c817abaed298b0991f6840f70adadb9991",
+      "dimensions": [
+        420,
+        170
+      ],
+      "frames": 1
+    },
+    {
+      "file": "fixture-working.png",
+      "evidence": "SIMULATED_DESKTOP_READBACK_REAL_REACT",
+      "sha256": "4d11ccec21e6a5cc6c7f2c5b0c329e2ce8ccfbd8f96276338321b458006a4eb3",
+      "dimensions": [
+        420,
+        170
+      ],
+      "frames": 1
+    },
+    {
+      "file": "native-attention-transition.gif",
+      "evidence": "REFERENCE_REAL_TAURI_DISPOSABLE_CORE",
+      "sha256": "c1717b4b3e072b2d03e238de83fc6ef22423101c036b46bf61468a22d7b4fc9e",
+      "dimensions": [
+        375,
+        159
+      ],
+      "frames": 8
+    },
+    {
+      "file": "native-available.png",
+      "evidence": "REFERENCE_REAL_TAURI_DISPOSABLE_CORE",
+      "sha256": "6272cc47a0fe53887352583b84751447139693e175027baa01c7fe62c0a28d79",
+      "dimensions": [
+        393,
+        168
+      ],
+      "frames": 1
+    },
+    {
+      "file": "native-reconnected.png",
+      "evidence": "REFERENCE_REAL_TAURI_DISPOSABLE_CORE",
+      "sha256": "194b606dd3d92b128324292b3ea140ceeff4b6105c1ffe08a84ba89d607c3e54",
+      "dimensions": [
+        393,
+        168
+      ],
+      "frames": 1
+    },
+    {
+      "file": "native-unavailable.png",
+      "evidence": "REFERENCE_REAL_TAURI_DISPOSABLE_CORE",
+      "sha256": "77344adb8656fef055bd059eea04d29ddc36cf6abf71563bdb49cd5847763a58",
+      "dimensions": [
+        393,
+        168
+      ],
+      "frames": 1
+    },
+    {
+      "file": "native-verified-readback.png",
+      "evidence": "REFERENCE_REAL_TAURI_DISPOSABLE_CORE",
+      "sha256": "194b606dd3d92b128324292b3ea140ceeff4b6105c1ffe08a84ba89d607c3e54",
+      "dimensions": [
+        393,
+        168
+      ],
+      "frames": 1
+    },
+    {
+      "file": "native-waiting.png",
+      "evidence": "REFERENCE_REAL_TAURI_DISPOSABLE_CORE",
+      "sha256": "53750fae337775bf6462e752ae51abf7fa78da083968ade0ad1d73e8bc27f563",
+      "dimensions": [
+        393,
+        168
+      ],
+      "frames": 1
+    }
+  ]
+}

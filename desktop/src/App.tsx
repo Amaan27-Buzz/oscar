@@ -1,9 +1,10 @@
 import {useEffect,useState} from 'react';
-import orb from '../../assets/brand/oscar-orb.svg';
+import {DesktopExpression} from './DesktopExpression';
+import type {Source} from '@oscar/expression';
 import {Act} from './Act';
 import {initialView,send,subscribe,stateLabel,statuses} from './bridge';
 import type {Command,Mode,Send,View,ContextChoice} from './bridge';
-export function App({port=send,events=subscribe}:{port?:Send;events?:typeof subscribe}) {
+export function App({port=send,events=subscribe,expressionKind='core'}:{port?:Send;events?:typeof subscribe;expressionKind?:Source['kind']}) {
   const [view,setView]=useState<View>(initialView);const [mode,setMode]=useState<Mode>('Ask');
   const [text,setText]=useState('');const [busy,setBusy]=useState(false);const [error,setError]=useState('');
   const [choice,setChoice]=useState<ContextChoice>('none');const [destination,setDestination]=useState<'surface'|'clipboard'|'focused'>('surface');
@@ -19,7 +20,7 @@ export function App({port=send,events=subscribe}:{port?:Send;events?:typeof subs
   const expanded=view.window!=='compact';
   function ptt(start:boolean){void run(start?{kind:'voice_start',context_id:view.context?.id??''}:{kind:'voice_stop'});}
   return <main className={`oscar ${expanded?'expanded':'compact'}`} data-orb={view.orb}>
-    <header data-tauri-drag-region><img src={orb} alt="OSCAR Orb" draggable={false}/>
+    <header data-tauri-drag-region><DesktopExpression view={view} size={expanded?64:58} sourceKind={expressionKind}/>
       <div data-tauri-drag-region><h1>OSCAR</h1><p role="status" aria-live="polite">{stateLabel(view)}</p>
         {active>0&&<small>{active} active · {attention} need owner attention</small>}</div>
       <button aria-label={expanded?'Compact presence':'Expand OSCAR'} onClick={()=>run({kind:'window',mode:expanded?'compact':'interaction'})}>{expanded?'Compact':'Open'}</button>

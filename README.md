@@ -13,6 +13,11 @@
 
 ## Current development and milestones
 
+Owner-authorized local Desktop/Expression integration now has a
+[candidate report](docs/DESKTOP-EXPRESSION-INTEGRATION.md). Both foundation PRs
+remain unmerged; GitHub access is HTTP 403/account suspended. This prepares Slice 12
+without approving or starting its comprehensive visual redesign.
+
 The [canonical sequential roadmap](docs/SLICE-NUMBERING.md) has **21
 top-level slices (00–20)**. Current priority is **Slice 11 —
 OSCAR Expression/Character System**, followed by **Slice 12 Desktop

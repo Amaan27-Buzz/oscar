@@ -266,7 +266,17 @@ pub struct ReviewView {
     pub expires_at_ms: u64,
 }
 #[derive(Clone, Serialize, Default, PartialEq)]
+pub struct ExpressionReadback {
+    pub epoch: String,
+    pub generation: u64,
+    pub observed_at_ms: u64,
+    pub voice_observed_at_ms: u64,
+    pub tasks_observed_at_ms: u64,
+    pub current_observed_at_ms: u64,
+}
+#[derive(Clone, Serialize, Default, PartialEq)]
 pub struct View {
+    pub expression: ExpressionReadback,
     pub link: String,
     pub orb: String,
     pub window: WindowMode,
