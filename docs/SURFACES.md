@@ -21,13 +21,15 @@ Across OSCAR Mobile, desktop and physical surfaces:
 
 The visual/interaction direction is defined by `DESIGN.md` and `TASTE.md`.
 
-**Shared Expression Core:** [early 13A](EXPRESSION-CORE.md) defines a single
-OSCAR operational/expression vocabulary and platform-neutral state contract
-before expression-dependent 10R/09R redesign. The canonical Orb SVG is immutable;
-Desktop (Tauri/React) and Mobile (Compose) render the same authoritative state
-using platform-native mechanics. Full cross-device runtime/overlay/widget Presence
-integration remains 13B after Slices 11–12. Expressions never grant authority or
-imply verification, emotion detection or capture.
+**Shared Expression/Character System:** [Slice 11](EXPRESSION-CORE.md)
+defines one OSCAR operational/expression vocabulary and platform-neutral
+renderer contract before **Slice 12 Desktop UX** and **Slice 13 Mobile UX**.
+The canonical Orb SVG remains immutable; Desktop (Tauri/React) and Mobile
+(Compose) portray the same Core-authoritative states with native animation.
+Full cross-device runtime/overlay/widget Presence integration is **Slice 16**
+after World Model 14 and commissioning 15. No expression grants permission,
+detects user emotion, proves completion, or implies active capture.
+See [sequential numbering](SLICE-NUMBERING.md).
 
 ## Connection Grid
 
