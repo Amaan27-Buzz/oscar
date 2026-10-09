@@ -4,12 +4,28 @@ Status: **LOCAL VALIDATION PASS / REMOTE CI NOT EXECUTED**.
 Design status: **OWNER VISUAL APPROVAL REQUIRED**, not final character acceptance.
 
 Baseline: `45bb1459f61308291fec6e4e5885b6c77b707478`.
-Implementation: `71b999ca605e968b81a9efc7e3ef8ddd47447a24`.
+Initial v2 implementation: `71b999ca605e968b81a9efc7e3ef8ddd47447a24`.
 Branch: `design/slice-11-expression`.
 [Draft PR #17 into work](https://github.com/amaansyed27/oscar/pull/17).
-Documentation-only follow-up does not change the captured implementation.
+Historical documentation-only follow-up did not change v2. The subsequent owner
+motion revision changes the lab and is captured separately below.
 
-## Local checks
+## Owner motion revision — v3
+
+The owner rejected the prior motion as too slight and authorized broader travel.
+V3 uses authored phrase/engagement trajectories, default intensity 1.0, and
+continuous performed-pose/velocity handoffs between sequence events.
+Measured default 340px-stage travel: speech 66.9px x / 61.5px y; executing 61.9px x /
+41.1px y. Tests assert a minimum visible displacement as well as bounded geometry.
+
+TypeScript/build and **22 lab tests PASS**. Fresh browser capture checks PASS;
+see [v3 receipt](evidence/motion-v3/receipt.json). Canonical bytes and normalized
+neutral rendering are unchanged. The independent review found no motion rebuild
+necessary but caught GIF aspect-ratio distortion; v3 exports now preserve aspect.
+Earlier v0/v1/v2 GIFs are historical and geometrically distorted; use current v3
+GIFs or the earlier undistorted PNG sheets. Owner character approval remains pending.
+
+## Initial v2 local checks
 
 - Node 24.19 LTS, npm lockfile: TypeScript + Vite production build PASS.
 - 20 Vitest tests PASS: exhaustive operation/delivery degradation combinations,

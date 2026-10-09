@@ -51,13 +51,13 @@ Optional maintainer requirements: Python, Pillow, repository browser extra
 
 ```powershell
 npm run build
-python tools/capture.py --iteration candidate-v2
+python tools/capture.py --iteration motion-v3
 ```
 
 The tool refuses an occupied port 1511, blocks requests outside its own loopback
 origin, uses a fresh browser context with no grants, exercises controls, and writes
 PNG/GIF captures plus bundle/artifact hashes under
-`docs/design/expression/evidence/candidate-v2/`. Close a manually started lab
+`docs/design/expression/evidence/motion-v3/`. Close a manually started lab
 before capture. Screenshots are actual SVG browser renders; contact strips arrange
 captured frames. The GIF is sampled at 10fps for inspection, not a native frame-rate
 claim. Initial study-v0/v1 artifacts are historical revision evidence.

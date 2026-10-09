@@ -1,6 +1,6 @@
 # Motion language and complete transitions
 
-Proposal v2. Finite, deterministic, interruptible laboratory performance.
+Proposal v3. Finite, deterministic, interruptible laboratory performance.
 
 ## Timing and apparent weight
 
@@ -18,14 +18,20 @@ blinking, orbiting loader or repeating task flourish. Reviewer-triggered blink
 has one 160ms close/reopen envelope after 80ms, suppressed in privacy/degraded
 states and reduced motion.
 
-With the owner's additional permission, synthetic speaking opens the smaller eye
-and performs two phrase stresses around 650/1050ms on a finite playful puck arc
-between 400–1400ms. Executing has one arcing arrival at 240–900ms, then holds
-rather than looping as false progress. These do not read audio. A new interruption,
+The owner rejected v2 travel as too slight. V3 uses the shell interior as a real
+movement space: anticipation to one side, a high sweep, a low phrase accent,
+counter-lean, and follow-through to a held speaking posture. Speech travel runs
+350–4500ms, with stresses at 1200/2300ms; the study lasts 5200ms. Executing has
+a broader finite engagement sweep at 250–3250ms, then holds. Default intensity
+is 1.0. The path uses time-aware cubic Hermite segments with continuous velocity,
+not a random orbit; weight still controls entry and interruption settling.
+These do not read audio. A new interruption,
 mute, unavailable, error or waiting event removes speech choreography in the
 same render; the new physical pose then settles.
 
-Operational/delivery retargeting samples current pose and physical velocity.
+Operational/delivery retargeting and sequence events sample actual current pose
+and physical velocity, including travel already in flight. This prevents a jump
+to the old static target when a phrase is interrupted.
 Boundary changes stop incompatible motion immediately and start a zero-velocity
 settle; new sequence studies also start with zero velocity. Playback does not
 queue obsolete reactions. Pause freezes the timeline; replay uses the same

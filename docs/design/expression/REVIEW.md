@@ -43,6 +43,20 @@ The reviewer treated the parent's tests/build/browser/pixel-identity checks as
 capture corrections, not continuous smoothness or owner naturalness. Compact
 states still need labels; sixteen tiny standalone emotions are not established.
 
+## Owner motion follow-up — v3
+
+Owner feedback rejected v2's subtle movement. A fresh independent review compared
+v3 renders/source against v2 and found the new travel materially obvious, the
+puck still attached, and rigid circle/bevel/contact-shadow geometry preserved.
+It supported retaining the larger amplitude and found no motion rebuild necessary.
+
+The reviewer identified one P2 evidence-export defect: fixed 600×350 GIF resizing
+stretched the 1016×473 stage. The exporter now preserves source aspect ratio and
+both v3 GIFs/receipt were regenerated. Historical PNGs retain correct geometry;
+earlier GIFs are superseded for judging proportions.
+
+This is a scoped motion/evidence review, not owner approval or production acceptance.
+
 ## Limits
 
 A separate read-only documentation pass checked design docs against model,

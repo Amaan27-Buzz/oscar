@@ -49,6 +49,12 @@ def sheet(paths, destination, columns=4, labels=None):
     canvas.save(destination)
 
 
+def preview_frame(path):
+    with Image.open(path) as source:
+        frame=source.convert('RGB')
+        return frame.resize((600,round(frame.height*600/frame.width)))
+
+
 def capture(iteration, node):
     output = ROOT / "docs/design/expression/evidence" / iteration
     output.mkdir(parents=True, exist_ok=True)
@@ -112,7 +118,7 @@ def capture(iteration, node):
                     page.evaluate("document.querySelector('#pixel-comparison').remove()")
                     difference = ImageChops.difference(Image.open(original).convert('RGB'), Image.open(derived).convert('RGB'))
                     receipt["neutral_pixel_difference_bbox"] = difference.getbbox()
-                    if iteration == 'candidate-v2':
+                    if iteration in {'candidate-v2','motion-v3'}:
                         if difference.getbbox() is not None:
                             shutil.copyfile(original,output/'canonical-diagnostic.png')
                             shutil.copyfile(derived,output/'neutral-diagnostic.png')
@@ -159,7 +165,7 @@ def capture(iteration, node):
                         path = Path(temporary) / f"frame-{index:03}.png"
                         page.get_by_test_id("stage").screenshot(path=path)
                         frames.append(path)
-                    gif_frames = [Image.open(p).convert("RGB").resize((600, 350)) for p in frames]
+                    gif_frames = [preview_frame(p) for p in frames]
                     gif_frames[0].save(output / "curiosity-recovery.gif", save_all=True, append_images=gif_frames[1:], duration=100, loop=0)
                     page.get_by_label("Transition sequence").select_option("3")
                     page.get_by_role("button", name="Run sequence", exact=True).click()
@@ -171,19 +177,21 @@ def capture(iteration, node):
                         page.get_by_test_id("stage").screenshot(path=path)
                         transition_paths.append(path)
                     sheet(transition_paths, output / "interruption-sequence.png", 4, [f"{t} ms" for t in times])
-                    if iteration == 'candidate-v2':
+                    if iteration in {'candidate-v2','motion-v3'}:
                         # New owner-authorized eye opening and freer finite puck travel.
                         page.get_by_label('Operational state').select_option('speaking')
                         page.get_by_label('Expressive delivery').select_option('composed')
                         speech_frames=[]
-                        for index, milliseconds in enumerate(range(0, 1801, 100)):
+                        speech_end=5200 if iteration=='motion-v3' else 1800
+                        for index, milliseconds in enumerate(range(0,speech_end+1,100)):
                             seek(page, milliseconds)
                             path=Path(temporary) / f'speech-{index:03}.png'
                             page.get_by_test_id('stage').screenshot(path=path)
                             speech_frames.append(path)
-                        images=[Image.open(p).convert('RGB').resize((600,350)) for p in speech_frames]
+                        images=[preview_frame(p) for p in speech_frames]
                         images[0].save(output / 'speaking-puck.gif',save_all=True,append_images=images[1:],duration=100,loop=0)
-                        sheet([speech_frames[i] for i in [0,3,6,9,12,18]],output / 'speaking-frames.png',3,['0 ms','300 ms','600 ms','900 ms','1200 ms','1800 ms'])
+                        indices=[0,6,12,17,23,34,45,52] if iteration=='motion-v3' else [0,3,6,9,12,18]
+                        sheet([speech_frames[i] for i in indices],output / 'speaking-frames.png',4 if iteration=='motion-v3' else 3,[f'{i*100} ms' for i in indices])
                         page.get_by_label('Operational state').select_option('available')
                         page.get_by_label('Expressive delivery').select_option('surprised')
                         reaction_paths=[]
@@ -256,7 +264,7 @@ def capture(iteration, node):
                     expect(page.get_by_label("Reduced motion", exact=True)).to_be_disabled()
                     page.screenshot(path=output / "system-reduced-forced-colors.png", full_page=True)
                     receipt["checks"].append("OS reduced motion and forced colors")
-                    if iteration == 'candidate-v2':
+                    if iteration in {'candidate-v2','motion-v3'}:
                         page.emulate_media(reduced_motion='no-preference',forced_colors='none')
                         page.set_viewport_size({'width':1280,'height':900})
                         page.get_by_role('button',name='Return to neutral',exact=True).click()
@@ -268,10 +276,12 @@ def capture(iteration, node):
             finally:
                 server.terminate()
                 server.wait(timeout=10)
-    if iteration == 'candidate-v2':
-        studies=[output.parent/name/'expression-contact-sheet.png' for name in ['study-v0','study-v1','candidate-v2']]
+    if iteration in {'candidate-v2','motion-v3'}:
+        studies=[output.parent/name/'expression-contact-sheet.png' for name in ['study-v0','study-v1',iteration]]
         if all(path.exists() for path in studies):
-            sheet(studies,output/'iteration-comparison.png',3,['v0: scaled disc / shallow tension','v1: clipping lid / separate timing','v2: open wink / recovery / freer puck'])
+            sheet(studies,output/'iteration-comparison.png',3,['v0: scaled disc / shallow tension','v1: clipping lid / separate timing',f'{iteration}: open wink / recovery / freer puck'])
+        if iteration=='motion-v3':
+            sheet([output.parent/'candidate-v2/speaking-frames.png',output/'speaking-frames.png'],output/'motion-before-after.png',1,['v2: subtle one-second movement','v3: broad four-second phrase performance'])
     receipt["artifacts"] = {p.name: {"sha256": hashlib.sha256(p.read_bytes()).hexdigest(), "bytes": p.stat().st_size} for p in sorted(output.glob("*")) if p.suffix in {".png", ".gif"}}
     (output / "receipt.json").write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8")
     if receipt["errors"] or receipt["external_requests"]:
@@ -281,7 +291,7 @@ def capture(iteration, node):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--iteration", choices=["study-v0", "study-v1", "candidate-v2"], default="candidate-v2")
+    parser.add_argument("--iteration", choices=["study-v0", "study-v1", "candidate-v2", "motion-v3"], default="motion-v3")
     parser.add_argument("--node", default=shutil.which("node"))
     args = parser.parse_args()
     capture(args.iteration, args.node)

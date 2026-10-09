@@ -42,26 +42,26 @@ export type Pose = {
 export const canonical: Pose = {x:0,y:0,tilt:0,body:0,eye:1,width:1,arc:-16,slant:-4,span:1,gx:0,gy:0,lid:0,opening:0};
 const marks: Record<Delivery, Partial<Pose>> = {
   composed: {},
-  attentive: {x:-6,y:-6,eye:1.04,arc:-9,gx:11,gy:-3,opening:.9},
-  curious: {x:-8,y:-9,tilt:-5,body:-1,eye:1.08,arc:-27,slant:-17,gx:9,gy:-7,opening:.45},
+  attentive: {x:-35,y:-22,tilt:-6,eye:1.04,arc:-9,gx:11,gy:-3,opening:.9},
+  curious: {x:-28,y:-30,tilt:-10,body:-1,eye:1.08,arc:-27,slant:-17,gx:9,gy:-7,opening:.45},
   focused: {x:-11,y:-6,eye:.62,width:1,arc:-2,slant:-7,gx:3,gy:3,lid:3,opening:.55},
-  amused: {y:2,tilt:3,eye:.82,arc:-29,slant:1,gx:-3,lid:-5},
+  amused: {x:-20,y:8,tilt:8,eye:.82,arc:-29,slant:1,gx:-3,lid:-5},
   pleased: {y:-3,tilt:1,eye:.91,arc:-23,slant:-2},
-  surprised: {x:-15,y:-14,tilt:-4,body:-1,eye:1.16,width:1.08,arc:-5,span:.9,gy:-7,opening:1},
+  surprised: {x:-58,y:-44,tilt:-13,body:-1,eye:1.16,width:1.08,arc:-5,span:.9,gy:-7,opening:1},
   concerned: {x:-3,y:3,tilt:2,eye:.74,arc:23,slant:17,gx:-2,gy:4,lid:-9},
   hesitant: {x:-6,y:2,tilt:-4,eye:.86,width:.96,arc:3,slant:-18,gx:-11,gy:2,lid:7},
   subdued: {x:-3,y:8,tilt:0,eye:.52,arc:3,slant:0,gy:5},
   asleep: {x:-4,y:9,tilt:2,body:1,eye:.08,arc:5,slant:0,gy:8},
-  interrupted: {x:-9,y:-5,tilt:-3,eye:1.07,arc:-3,slant:-11,gx:-9,gy:-2,opening:.8},
+  interrupted: {x:-30,y:-16,tilt:-9,eye:1.07,arc:-3,slant:-11,gx:-9,gy:-2,opening:.8},
 };
-export function poseFor(scene: Scene, intensity = .75, gaze = {x:0,y:0}): Pose {
+export function poseFor(scene: Scene, intensity = 1, gaze = {x:0,y:0}): Pose {
   const resolved = arbitrate(scene);
   const p = {...canonical, ...marks[resolved.delivery]};
   if (resolved.operation === 'verifying') {p.eye=.51;p.arc=0;p.gx=0;p.tilt=0;p.lid=0;p.opening=.4;}
-  if (resolved.operation === 'executing') {p.x=-17;p.y=-11;p.gx=8;p.tilt=-5;p.opening=.8;}
-  if (resolved.operation === 'processing') {p.gx=-6;p.gy=-5;p.tilt=-3;p.opening=.5;}
+  if (resolved.operation === 'executing') {p.x=-42;p.y=-18;p.gx=8;p.tilt=-8;p.opening=.8;}
+  if (resolved.operation === 'processing') {p.x=-32;p.y=-24;p.gx=-6;p.gy=-5;p.tilt=-8;p.opening=.5;}
   if (resolved.operation === 'muted') {p.eye=.7;p.arc=0;p.gx=0;}
-  if (resolved.operation === 'speaking') {p.x=-10;p.y=-3;p.tilt=3;p.opening=.95;}
+  if (resolved.operation === 'speaking') {p.x=-42;p.y=-6;p.tilt=6;p.opening=.95;}
   const amount = clamp(intensity, .35, 1);
   for (const key of Object.keys(p) as (keyof Pose)[]) p[key] = canonical[key] + (p[key] - canonical[key]) * amount;
   if(['attentive','surprised','interrupted'].includes(resolved.delivery)||resolved.operation==='speaking') {
@@ -78,7 +78,7 @@ export function poseFor(scene: Scene, intensity = .75, gaze = {x:0,y:0}): Pose {
 export const clamp = (v:number, min:number, max:number) => Math.max(min, Math.min(max, Number.isFinite(v) ? v : min));
 export const zeroVelocity = (): Pose => Object.fromEntries(Object.keys(canonical).map(k=>[k,0])) as Pose;
 export type Settings = {intensity:number; weight:number; gaze:{x:number;y:number}};
-export const defaults: Settings = {intensity:.75,weight:1,gaze:{x:0,y:0}};
+export const defaults: Settings = {intensity:1,weight:1,gaze:{x:0,y:0}};
 
 // Closed-form damped spring: deterministic seek, bounded travel and velocity-aware retargeting.
 function spring(from:number,to:number,velocity:number,seconds:number,weight:number) {
@@ -122,7 +122,39 @@ export function study(from:Pose,scene:Scene,velocity=zeroVelocity(),blink=false)
   const recovery:Partial<Record<Delivery,number>>={surprised:850,amused:1400,pleased:1400,interrupted:650};
   const release=recovery[scene.delivery];
   if(release!==undefined)beats.push(beat(release,scene.operation,scene.delivery==='interrupted'?'attentive':'composed','Authored recovery; no result or perception claim'));
-  return {from,velocity,beats,duration:(release??0)+1800,blink};
+  return {from,velocity,beats,duration:(release??0)+(['speaking','executing'].includes(scene.operation)?5200:1800),blink};
+}
+
+// Authored phrase/engagement poses with continuous velocity, not a repeating idle orbit.
+type Travel = readonly [number,number,number,number];
+const speechTravel: Travel[] = [[350,0,0,0],[650,35,14,-9],[1200,-68,-54,-15],[1700,-15,-8,6],[2300,-72,50,11],[2850,24,24,8],[3400,-34,-38,-10],[4050,10,-14,-4],[4500,0,0,0]];
+const workTravel: Travel[] = [[250,0,0,0],[600,20,12,6],[1150,-58,-40,-10],[1900,-48,30,7],[2600,15,-15,-6],[3250,0,0,0]];
+function travelAt(points:Travel[],ms:number):[number,number,number] {
+  const segment=points.findIndex((point,i)=>i>0&&ms<point[0]);
+  if(ms<=points[0][0]||segment<0)return [0,0,0];
+  const a=points[segment-1],b=points[segment],before=points[Math.max(0,segment-2)],after=points[Math.min(points.length-1,segment+1)];
+  const duration=b[0]-a[0],u=(ms-a[0])/duration;
+  return [1,2,3].map(axis=>{
+    const start=segment===1?0:(b[axis]-before[axis])/(b[0]-before[0]);
+    const end=segment===points.length-1?0:(after[axis]-a[axis])/(after[0]-a[0]);
+    return (2*u**3-3*u**2+1)*a[axis]+(u**3-2*u**2+u)*duration*start+(-2*u**3+3*u**2)*b[axis]+(u**3-u**2)*duration*end;
+  }) as [number,number,number];
+}
+function perform(from:Pose,resolved:ReturnType<typeof arbitrate>,local:number,settings:Settings,velocity:Pose,reduced:boolean,blink:boolean) {
+  const to=poseFor(resolved,settings.intensity,settings.gaze);
+  const pose=reduced?to:blend(from,to,local,settings.weight,velocity);
+  if(!reduced&&!resolved.muted&&['speaking','executing'].includes(resolved.operation)) {
+    const [x,y,tilt]=travelAt(resolved.operation==='speaking'?speechTravel:workTravel,local);
+    pose.x+=x*settings.intensity;pose.y+=y*settings.intensity;pose.tilt+=tilt*settings.intensity;
+    if(resolved.operation==='speaking') {
+      const stress=Math.exp(-(((local-1200)/180)**2))+.7*Math.exp(-(((local-2300)/220)**2));
+      pose.eye=clamp(pose.eye-.12*stress,0,1.3);pose.opening=clamp(pose.opening-.16*stress,0,1);
+    }
+  }
+  if(blink&&!reduced&&local>80&&local<240&&!['unavailable','unknown','muted','error'].includes(resolved.operation)) {
+    const close=1-Math.sin(Math.PI*(local-80)/160);pose.eye*=close;pose.opening*=close;
+  }
+  return pose;
 }
 export function sample(study:Study,ms:number,settings:Settings,reduced=false,boundary:Constraints=clear) {
   const t=clamp(ms,0,study.duration);
@@ -130,33 +162,15 @@ export function sample(study:Study,ms:number,settings:Settings,reduced=false,bou
   let current=study.beats[0], start=0;
   for (const next of study.beats.slice(1)) {
     if(t<next.at) break;
-    from=poseFor(arbitrate(current.scene,boundary),settings.intensity,settings.gaze);
-    velocity=zeroVelocity();current=next;start=next.at;
+    const old=arbitrate(current.scene,boundary),elapsed=next.at-start;
+    const at=perform(from,old,elapsed,settings,velocity,reduced,study.blink);
+    const before=perform(from,old,Math.max(0,elapsed-.01),settings,velocity,reduced,study.blink);
+    velocity=Object.fromEntries((Object.keys(at) as (keyof Pose)[]).map(k=>[k,(at[k]-before[k])*100000])) as Pose;
+    from=at;current=next;start=next.at;
   }
   const resolved=arbitrate(current.scene,boundary);
-  const to=poseFor(resolved,settings.intensity,settings.gaze);
   const local=t-start;
-  const pose=reduced?to:blend(from,to,local,settings.weight,velocity);
-  const choreography=!reduced&&!resolved.muted&&resolved.operation==='speaking';
-  if(!reduced&&!resolved.muted&&resolved.operation==='executing'&&local>240&&local<900) {
-    const phase=(local-240)/660, arc=Math.sin(Math.PI*phase)*settings.intensity;
-    pose.x-=7*arc;pose.y-=5*arc*Math.sin(Math.PI*phase);pose.tilt-=3*arc;
-  }
-  if(choreography&&local>400&&local<1400) {
-    // Two authored phrase stresses; never random audio inference or ongoing idle motion.
-    const pulse=Math.exp(-(((local-650)/110)**2))+.6*Math.exp(-(((local-1050)/140)**2));
-    const envelope=Math.sin(Math.PI*clamp((local-400)/1000,0,1));
-    const arc=(local-400)/1000*Math.PI*2;
-    pose.eye-=.12*pulse;pose.opening-=.2*pulse;
-    pose.x+=20*envelope*Math.sin(arc)*settings.intensity;
-    pose.y-=13*envelope*Math.cos(arc)*settings.intensity;
-    pose.tilt+=6*envelope*Math.sin(arc)*settings.intensity;
-    pose.arc-=3*pulse;
-  }
-  if(study.blink&&!reduced&&local>80&&local<240&&!['unavailable','unknown','muted','error'].includes(resolved.operation)) {
-    const close=1-Math.sin(Math.PI*(local-80)/160);
-    pose.eye*=close;pose.opening*=close;
-  }
+  const pose=perform(from,resolved,local,settings,velocity,reduced,study.blink);
   return {pose,resolved,beat:current,local};
 }
 export function velocityAt(s:Study,t:number,settings:Settings,boundary=clear):Pose {

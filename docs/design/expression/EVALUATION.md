@@ -61,6 +61,22 @@ This is a render-geometry check, not owner design acceptance.
 Final independent verdict is recorded in [review](REVIEW.md). No automatic visual
 acceptance or production compatibility is claimed.
 
+## Owner revision — v3 broader movement
+
+The owner rejected v2's motion as too slight despite the prior scope-limited
+review. That feedback outranks the earlier reviewer verdict. The old speaking
+accent lasted only one second and its source-unit amplitude translated to a
+small screen displacement. Simply raising a few values would still produce a
+short, easily missed performance.
+
+V3 authors a longer broad phrase trajectory and a separate active engagement
+sweep: anticipation, high/low travel, counter-lean and follow-through. The default
+intensity is now 1.0. Attention, curiosity and surprise also have clearer posture.
+Sequence transitions sample actual travel and velocity rather than snapping to
+the prior static target. Tests require meaningful minimum default displacement,
+not merely finite coordinates. Rest/privacy/degraded states retain their restrictions.
+New evidence lives in `evidence/motion-v3/`; v2 evidence remains intact.
+
 ## Evidence scope
 
 `evidence/study-v0/` and `evidence/study-v1/` preserve the implemented iterations.

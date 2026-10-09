@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-09 — Owner-directed broader expression motion
+
+- Replaced subtle v2 accents with broad finite phrase/engagement travel, stronger attention/reaction posture and default intensity 1.0.
+- Preserved performed pose/velocity across sequence interruptions; added minimum-travel and continuity checks (22 lab tests PASS).
+- Corrected GIF aspect-ratio exports and captured separate v3 evidence. Character approval remains pending; no 11.3 or production integration.
+
 ## 2026-10-09 — Slice 11.1–11.2 expression review candidate
 
 - Added an independently runnable, non-executing React/TypeScript/SVG Expression Lab and character/state/motion design studies.

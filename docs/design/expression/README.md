@@ -23,28 +23,34 @@ All images come from the implemented lab. Frame strips/GIFs arrange browser
 captures; none is generated art, real listening, Core work or device acceptance.
 The 10fps GIFs are inspection previews; the lab itself stops instead of looping.
 
-![Expression atlas](evidence/candidate-v2/expression-contact-sheet.png)
+![Expression atlas](evidence/motion-v3/expression-contact-sheet.png)
 
-[Before / after across v0–v2](evidence/candidate-v2/iteration-comparison.png) shows
+[Before / after across v0–v3](evidence/motion-v3/iteration-comparison.png) shows
 the ellipse-to-lid change and later opened eye/closed rest. For actual motion:
 
-![Finite speaking puck study](evidence/candidate-v2/speaking-puck.gif)
+The owner requested substantially broader movement after v2. V3 speech traverses
+about **67px horizontally / 61px vertically** at the 340px stage; executing
+traverses **62px / 41px**. Both are finite authored performances.
+[Motion before/after](evidence/motion-v3/motion-before-after.png) preserves the
+rejected subtle v2 study alongside the broader v3 trajectory.
 
-![Curiosity, amusement and recovery](evidence/candidate-v2/curiosity-recovery.gif)
+![Finite speaking puck study](evidence/motion-v3/speaking-puck.gif)
 
-- [Surprise acquisition → recovery → stillness](evidence/candidate-v2/surprise-recovery.png)
-- [Thinking → interrupted → attentive](evidence/candidate-v2/interruption-sequence.png)
-- [Speaking frame sequence](evidence/candidate-v2/speaking-frames.png)
-- [32/48/64/96/128/192px comparison](evidence/candidate-v2/small-scale-comparison.png)
-- [Closed rest at three intensities](evidence/candidate-v2/closed-rest-intensity.png)
-- [Reduced-motion equivalents](evidence/candidate-v2/reduced-motion.png)
-- [Desktop](evidence/candidate-v2/desktop.png), [1280px](evidence/candidate-v2/desktop-1280.png), [390px lab](evidence/candidate-v2/mobile.png)
-- [OS reduced motion / forced colors](evidence/candidate-v2/system-reduced-forced-colors.png)
-- [Capture checks, compiled-artifact and image hashes](evidence/candidate-v2/receipt.json)
+![Curiosity, amusement and recovery](evidence/motion-v3/curiosity-recovery.gif)
+
+- [Surprise acquisition → recovery → stillness](evidence/motion-v3/surprise-recovery.png)
+- [Thinking → interrupted → attentive](evidence/motion-v3/interruption-sequence.png)
+- [Speaking frame sequence](evidence/motion-v3/speaking-frames.png)
+- [32/48/64/96/128/192px comparison](evidence/motion-v3/small-scale-comparison.png)
+- [Closed rest at three intensities](evidence/motion-v3/closed-rest-intensity.png)
+- [Reduced-motion equivalents](evidence/motion-v3/reduced-motion.png)
+- [Desktop](evidence/motion-v3/desktop.png), [1280px](evidence/motion-v3/desktop-1280.png), [390px lab](evidence/motion-v3/mobile.png)
+- [OS reduced motion / forced colors](evidence/motion-v3/system-reduced-forced-colors.png)
+- [Capture checks, compiled-artifact and image hashes](evidence/motion-v3/receipt.json)
 
 ## Local evidence and limits
 
-Node 24.19 LTS: TypeScript + production build passed; 20 component, geometry,
+Node 24.19 LTS: TypeScript + production build passed; 22 component, geometry,
 state/retarget/recovery and synthetic-isolation tests passed. Four existing
 canonical-slice documentation tests passed. Repository/link/secret checks passed.
 The capture harness exercised actual playback/pause, seek, conflicts, keyboard,

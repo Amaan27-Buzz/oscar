@@ -58,7 +58,7 @@ export function Lab() {
   const shownRequest=now.beat.scene;
   const button=(name:string,action:()=>void,primary=false)=><button className={primary?'primary':''} onClick={action}>{name}</button>;
   return <main>
-    <header className="page-head"><div><h1>OSCAR <span>Expression laboratory</span></h1><p>Character study v2 · Slice 11.1 + 11.2 · Owner review candidate</p></div><span className="proposal">Expressive derivative proposal</span></header>
+    <header className="page-head"><div><h1>OSCAR <span>Expression laboratory</span></h1><p>Character study v3 · Slice 11.1 + 11.2 · Owner review candidate</p></div><span className="proposal">Expressive derivative proposal</span></header>
     <div className="disclosure">{disclosure}</div>
     <nav aria-label="Study views" className="tabs">{(['stage','vocabulary','mechanics'] as const).map(t=><button key={t} aria-pressed={tab===t} onClick={()=>setTab(t)}>{t==='stage'?'Live study':t==='vocabulary'?'Expression atlas':'Geometry & restraint'}</button>)}</nav>
     <div className="workspace">

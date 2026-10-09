@@ -33,15 +33,11 @@ describe('geometry and finite motion',()=>{
     for(const operation of operations)for(const delivery of deliveries)for(const weight of [.7,1.5])for(const intensity of [.35,1]) {
       const settings={...defaults,weight,intensity,gaze:{x:10,y:-7}};
       const s=study(canonical,{operation,delivery});
-      for(let t=0;t<=1800;t+=20) {
-        const p=sample(s,t,settings).pose;
-        expect(Object.values(p).every(Number.isFinite)).toBe(true);
-        expect(Math.abs(p.x)).toBeLessThan(32);expect(Math.abs(p.y)).toBeLessThan(26);
-        expect(Math.abs(p.tilt)).toBeLessThan(9);
-        expect(p.eye).toBeGreaterThanOrEqual(0);expect(p.eye).toBeLessThan(1.3);
-        expect(p.opening).toBeGreaterThanOrEqual(0);expect(p.opening).toBeLessThanOrEqual(1);
-        expect(Math.abs(p.gx)).toBeLessThanOrEqual(14);expect(Math.abs(p.gy)).toBeLessThanOrEqual(10);
-      }
+      const poses=Array.from({length:Math.floor(s.duration/20)+1},(_,i)=>sample(s,i*20,settings).pose);
+      expect(poses.every(p=>Object.values(p).every(Number.isFinite))).toBe(true);
+      for(const [key,limit] of [['x',135],['y',86],['tilt',24],['gx',14],['gy',10]] as const)expect(Math.max(...poses.map(p=>Math.abs(p[key])))).toBeLessThanOrEqual(limit);
+      expect(Math.min(...poses.map(p=>p.eye))).toBeGreaterThanOrEqual(0);expect(Math.max(...poses.map(p=>p.eye))).toBeLessThan(1.3);
+      expect(Math.min(...poses.map(p=>p.opening))).toBeGreaterThanOrEqual(0);expect(Math.max(...poses.map(p=>p.opening))).toBeLessThanOrEqual(1);
     }
   });
   it('retargets mid-travel without a pose jump and retains body velocity',()=>{
@@ -104,7 +100,7 @@ describe('geometry and finite motion',()=>{
     expect(at40.x).toBe(0);expect(at40.gx).toBeGreaterThan(0);
     for(let i=0;i<40;i++) {
       const current=sample(s,80,defaults).pose;
-      expect(Math.abs(current.x)).toBeLessThan(32);expect(Math.abs(current.y)).toBeLessThan(26);
+      expect(Math.abs(current.x)).toBeLessThan(135);expect(Math.abs(current.y)).toBeLessThan(86);
       s=study(current,{operation:'available',delivery:i%2?'surprised':'concerned'},velocityAt(s,80,defaults));
       expect(sample(s,0,defaults).pose).toEqual(current);
     }
@@ -112,5 +108,23 @@ describe('geometry and finite motion',()=>{
   it('invalid operation and boundary samples remain unknown',()=>{
     expect(arbitrate({operation:'corrupt' as never,delivery:'amused'}).operation).toBe('unknown');
     expect(arbitrate(neutral,{...clear,availability:'corrupt' as never}).operation).toBe('unknown');
+  });
+  it('active performances visibly traverse the shell at default intensity',()=>{
+    for(const operation of ['speaking','executing'] as const) {
+      const s=study(canonical,{operation,delivery:'composed'});
+      const poses=Array.from({length:261},(_,i)=>sample(s,i*20,defaults).pose);
+      const span=(key:'x'|'y')=>Math.max(...poses.map(p=>p[key]))-Math.min(...poses.map(p=>p[key]));
+      expect(span('x')).toBeGreaterThan(90);
+      expect(span('y')).toBeGreaterThan(65);
+      expect(sample(s,s.duration,defaults).pose).toEqual(poseFor(s.beats[0].scene));
+    }
+  });
+  it('sequence events interrupt broad travel without a pose jump',()=>{
+    const sequence=sequences[8];
+    const s={from:canonical,velocity:study(canonical,neutral).velocity,beats:sequence.beats,duration:4100,blink:false};
+    for(const event of sequence.beats.slice(1)) {
+      const before=sample(s,event.at-.01,defaults).pose,at=sample(s,event.at,defaults).pose;
+      for(const key of ['x','y','tilt'] as const)expect(Math.abs(at[key]-before[key])).toBeLessThan(.02);
+    }
   });
 });

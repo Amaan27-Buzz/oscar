@@ -49,10 +49,12 @@ animated geometry, not an image swap. No mouth, pupil or eyebrow is added.
 
 Gaze translates red marks together within ±14/±10 source units, with different
 shape/tension on each mark. No pupils or independently wandering eyeballs.
-Puck pose is bounded (tested below 32 source units x / 26 y, tilt below 9°).
-Engagement travels farther into the shell; speech follows a finite playful arc.
-Shell rotation is less than puck rotation. The right-offset puck
-never becomes centered in the shell. No detached face or shell/puck shape deformation.
+V3 puck pose is bounded (tested within 135 source units x / 86 y, tilt within 24°).
+Default speaking/executing performances each traverse more than 90 units x and
+65 units y: about 53px/38px at the 340px stage. Engagement and speech explore
+the shell interior instead of hovering near one offset. At neutral the original
+right-offset geometry is restored. Shell rotation remains less than puck rotation;
+there is no detached face or shell/puck shape deformation.
 
 Intensity is bounded 0.35–1.0; weight 0.70–1.50. Controls cannot turn the system
 into a bouncing toy or erase its neutral geometry. Small marks are a perceptual
