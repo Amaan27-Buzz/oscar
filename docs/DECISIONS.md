@@ -396,7 +396,7 @@ local stop/safe-state remains independent. No full Python runtime on ESP32,
 managed framework or dangerous actuator profile. See [comparison](EDGE.md).
 Owner rescope accepts the simulated software foundation for continuation; physical acceptance remains mandatory before Unified Alpha.
 
-## ADR-040 — Move the expressive Orb foundation ahead of surface redesign
+## Historical ADR-040 — Earlier 13A proposal (superseded by canonical Slice 11)
 
 **Owner decision (2026-10-09):** prioritize an isolated cross-platform Expression
 Core as **early Slice 13A** before completing 10R Desktop and 09R Mobile visual
@@ -485,7 +485,7 @@ dependency.
 
 See [Post-Alpha Evolution](POST-ALPHA-EVOLUTION.md).
 
-## Current Slice 09 — 2026-10-06
+## Historical Slice 09 checkpoint — 2026-10-06 (superseded)
 
 Slice 08 PR #14 merged; accepted main/work baseline
 `92a11aa05083f1983186976ba64bd30aa9f1f2a0`. Slice 08 is
