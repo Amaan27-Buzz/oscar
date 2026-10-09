@@ -3,7 +3,7 @@
 Status: **FUTURE / AFTER STABLE UNIFIED ALPHA**.
 
 This document records the owner-approved direction for what OSCAR becomes after
-Slice 17 Unified Alpha is genuinely stable in everyday use. It is not a claim
+Slice 20 Unified Alpha is genuinely stable in everyday use. It is not a claim
 that these systems exist today, and it does not weaken any current Gate/acceptance
 requirement.
 
@@ -268,3 +268,11 @@ See [OSCAR Mobile foundation](MOBILE-FOUNDATION.md) for implementation, limits a
 Slice 09 must not merge in this run. Gate C remains PARTIAL. Slice 10, deployment
 and Home Node are not started. Post-alpha Operating Logs, specialist-model training
 and home-server migration remain documented future work, not implemented.
+
+
+## Numbering note — 2026-10-09
+
+The canonical Unified Alpha milestone is now **Slice 20**, previously
+Slice 17. This post-alpha roadmap remains unchanged in substance and
+starts only after the revised Slice 20 is stable. See
+[canonical slice map](SLICE-NUMBERING.md).
