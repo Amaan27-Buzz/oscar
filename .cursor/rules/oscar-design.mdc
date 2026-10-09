@@ -1,8 +1,20 @@
 ---
-description: OSCAR UI/UX design language and anti-slop rules for frontend, Sunday and desktop surfaces
+description: OSCAR UI/UX design language and anti-slop rules for frontend, OSCAR Mobile and desktop surfaces
 globs: "**/*.{tsx,jsx,css,scss,html,kt,kts,swift}"
 alwaysApply: false
 ---
+
+Current owner decision: **Slice 11 Expression/Character System first**,
+then **Slice 12 Desktop UX** and **Slice 13 Mobile UX**. Old 09R/10R/13A
+labels are historical. Read `docs/SLICE-NUMBERING.md` and
+`docs/EXPRESSION-CORE.md` before design. The previous smiling Orb + beige
+rounded-card concepts were rejected; design real microexpressions, gaze,
+weight, anticipation, recovery and state response before layout polish.
+Do not copy other desktop companion mascots; preserve the canonical
+`assets/brand/oscar-orb.svg`. Owner expects high-effort, iterative design,
+not rushed generic concepts; visual approval precedes promotion.
+
+
 
 Read `DESIGN.md`, `TASTE.md`, `docs/UI-AVATAR.md` and the relevant surface documentation before editing UI.
 
