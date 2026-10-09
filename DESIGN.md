@@ -86,6 +86,37 @@ The durable design blend is:
 
 The result should feel premium, warm, sparse, editorial, tactile and professional enough for daily use. Personality comes from state, voice, motion, timing and the OSCAR object — not from decorative AI styling.
 
+## Character before interface chrome — Slice 11
+
+The owner explicitly rejects a static, identical smiling Orb pasted onto three
+beige rounded widgets. The old desktop A/B/C screenshots are **unapproved
+engineering concepts**, not the final OSCAR character. A useful reference is
+a small expressive desktop companion that can signal attention and respond
+nonverbally while the larger application remains elsewhere. Study the **quality
+of presence and response**, do not reproduce the reference's pixel mascot.
+
+Character work comes **before** final Desktop Slice 12 / Mobile Slice 13
+visual styling. Establish the eyes/mark language, gaze, subtle asymmetry,
+center-of-mass and puck motion, anticipation, thoughtful timing, blink/recovery,
+quiet rest, interruptibility and reduced-motion equivalents in Slice 11.
+A smile that never changes conveys no meaningful state. Animations must reflect
+actual authoritative operational events; a Persona delivery cue must not
+imply a human emotion was detected or a task was verified.
+
+The canonical `assets/brand/oscar-orb.svg` remains unchanged. New reviewed
+expressive variants are separately versioned and must remain recognizably OSCAR;
+changing the brand identity is an explicit owner decision.
+
+**Quality requirement for GPT-6.1 Sol / High effort:** inspect assets and real
+interaction references first; write a design hypothesis; design a coherent
+character/movement system; implement a narrow expressive prototype; capture
+and critically evaluate motion, timing and tiny-size legibility; iterate
+substantively before asking the owner to approve. Do not optimize for speed,
+concept count, easy generic cards or automated screenshot PASS.
+
+See [Slice 11 Expression Core](docs/EXPRESSION-CORE.md) and
+[canonical slice numbering](docs/SLICE-NUMBERING.md).
+
 ## Playful precision
 
 OSCAR can be playful, but playfulness must come from **response and physicality**, not decoration.
