@@ -20,7 +20,7 @@ repeated isolated device interruptions during software foundation work.
    inspect/approve/cancel, Android biometric/PIN boundary and degraded/offline UI.
 7. One real supported communication/reply path with explicit permission and readback.
 8. Later Desktop Interaction integration, plus the retained physical Edge failure,
-   recovery/watchdog/safety acceptance in Slice 15/16 before Slice 17 PASS.
+   recovery/watchdog/safety acceptance in Slice 18/19 before Slice 20 PASS.
 
 ## Evidence and tools
 
