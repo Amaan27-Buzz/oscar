@@ -255,7 +255,7 @@ training or home-server migration. Those remain future after stable Unified Alph
 Physical voice acceptance is owner-deferred to the
 [consolidated Gate C run](GATE-C-CONSOLIDATED-ACCEPTANCE.md); Gate C remains PARTIAL.
 
-## Current Slice 09 — 2026-10-06
+## Historical Slice 09 checkpoint — 2026-10-06 (superseded)
 
 Slice 08 PR #14 merged; accepted main/work baseline
 `92a11aa05083f1983186976ba64bd30aa9f1f2a0`. Slice 08 is
