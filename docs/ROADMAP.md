@@ -570,7 +570,7 @@ Galaxy Tab Home Node are not authorized. Physical Edge remains
 
 ## Post-alpha evolution direction
 
-After Slice 17 Unified Alpha is stable in sustained owner use, continue with a
+After Slice 20 Unified Alpha is stable in sustained owner use, continue with a
 post-alpha evolution track rather than renumbering the current mandatory slices:
 
 1. **P1 — Operating Intelligence:** local owner-controlled operating telemetry for
