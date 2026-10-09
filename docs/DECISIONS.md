@@ -530,3 +530,25 @@ The owner prioritizes 13A.1–13A.2 expression design/lab next, then a reviewed
 and Mobile redesign. No early Sentry/World Model/commissioning/Elocution work
 is authorized by this visual sequencing change. Historical earlier-slice
 authorization notes are preserved as dated evidence rather than current bans.
+
+## Owner slice-numbering and character-design standard — 2026-10-09
+
+The active sequential numbering is **00–20**. Preserve accepted historical
+00–10 work, including Tauri runtime **draft PR #16**. Replace forward-facing
+`13A` with **11 Expression/Character System**, `10R` with **12 Desktop UX**,
+`09R` with **13 Mobile UX**; old 11 World Model → 14, 12 commissioning → 15,
+13B Presence → 16, 14 Executive → 17, 15 Physical → 18, 16 hardening → 19,
+17 Unified Alpha → **20**. Canonical crosswalk: [Slice Numbering](SLICE-NUMBERING.md).
+Dated earlier ADR sections remain historically accurate and are superseded for
+new work only.
+
+Owner explicitly rejects the static smiling Orb and generic beige-card
+appearance of prior 10R.1 A/B/C explorations. Supplied desktop companion images
+are **character and nonverbal reaction references**, not an instruction to copy
+the other mascot or replace the original OSCAR SVG. Expression must be studied
+first: eyes/gaze, timing, anticipation, small nonverbal reactions, apparent
+weight, sleep/idle, interruption and truthful state-driven delivery. Author
+future design work for GPT-6.1 Sol at **High** thinking effort, with careful,
+slow, iteration-driven, owner-reviewable design rather than superficial first
+prototypes. No automatic winner selection, no production UI promotion before
+owner design acceptance, no Core/privacy/authority changes.
