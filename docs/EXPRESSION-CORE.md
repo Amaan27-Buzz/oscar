@@ -1,6 +1,10 @@
 # OSCAR Expression / Character System — Slice 11
 
-**Status:** NEXT / DESIGN FIRST / NOT YET IMPLEMENTED. Canonical IDs are defined in [Slice Numbering](SLICE-NUMBERING.md).
+**Status:** 11.1–11.2 DESIGN PROPOSAL / SIMULATED LAB / OWNER VISUAL REVIEW REQUIRED.
+The independently runnable [Expression Lab](../design/expression-lab/README.md)
+and [character brief](design/expression/BRIEF.md) are a review candidate, not
+approved character art. **11.3 NOT STARTED**. Canonical IDs are defined in
+[Slice Numbering](SLICE-NUMBERING.md).
 
 **Order:** 11.1 → 11.2 → owner visual review → 11.3 → 12.1 Desktop Presence → rest of Slice 12 → Slice 13 Mobile. **Full cross-device Avatar/Presence integration is Slice 16** after World Model Slice 14 and commissioning Slice 15.
 

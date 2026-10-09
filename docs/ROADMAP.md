@@ -355,9 +355,12 @@ Tauri 2 / Rust / React-TypeScript Desktop, native tray/hotkey/window lifecycle, 
 
 The 52-screenshot baseline and A/B/C compact design explorations in PR #16 are archival reference outputs (historical 10R.0 and 10R.1). None of those concepts is approved for production. Do not mistake baseline capture or synthetic screenshots for owner-facing finished UI.
 
-## Slice 11 — OSCAR Expression / Character System ⏭️
+## Slice 11 — OSCAR Expression / Character System — owner-review candidate
 
-**Next owner-prioritized work.** Design character **before** choosing the surrounding widget/window styling. The provided desktop-companion references demonstrate presence, independent character, micro-reactions and nonverbal expression; do not copy their pixel-art character or replace the canonical Orb with a different mascot.
+**11.1–11.2 candidate:** [standalone Expression Lab](../design/expression-lab/README.md)
+and [character study](design/expression/BRIEF.md), **SIMULATED / OWNER VISUAL
+APPROVAL REQUIRED**. 11.3 and production integration are not started.
+Design character **before** choosing the surrounding widget/window styling. The provided desktop-companion references demonstrate presence, independent character, micro-reactions and nonverbal expression; do not copy their pixel-art character or replace the canonical Orb with a different mascot.
 
 - **11.1 — Character language:** facial marks, eyes/gaze, orientation, tempo, anticipation, nuanced microexpressions, idle/resting/reactive behavior, state priority and interruption; separate real Core operational status from safe expressive Persona delivery.
 - **11.2 — Interactive Expression Lab:** development-only, non-executing high-fidelity Orb expression/motion prototypes with fine controls, transition playback/scrubbing, small-scale tests and explicit owner visual review. No superficial AI-looking alternatives accepted merely because they compile.
@@ -429,7 +432,7 @@ Run the full integrated perception/communication → World Model/Controller/Memo
 | A — Brain | 01–04 | PASS |
 | B — Can Do Work | 05–06 | PASS for local-alpha scope |
 | C — Embodied foundations | 07–10 | PARTIAL; physical acceptance deferred and PR #16 pending |
-| Design / Character | 11–13 | NEXT (11), then 12 Desktop and 13 Mobile |
+| Design / Character | 11–13 | 11.1–11.2 owner-review candidate; 11.3 gated, then 12 Desktop and 13 Mobile |
 | D — Awareness / Chief-of-Staff | 14–17 | Planned |
 | E — Physical and Unified Alpha | 18–20 | Planned |
 
@@ -439,7 +442,7 @@ Manual integration checkpoints remain in [BUILD-GATES.md](BUILD-GATES.md).
 
 **Current authoritative numbering:** [00–20 sequential plan](SLICE-NUMBERING.md). The prior 09R/10R/13A/13B nomenclature is now archival only. Historical screenshots, branch names and acceptance records are not rewritten.
 
-**Next design task: Slice 11.1 + 11.2.** GPT-6.1 Sol on High thinking effort should do deep, deliberate character design and an interactive, non-executing Expression Lab; study the desktop-companion reference for believable persistent personality and state reaction **without copying its artwork**. Avoid a generic static smile, a decorative pill/card, shallow AI-looking concepts and rushing toward a screenshot count. Conduct explicit visual owner review before 11.3 shared renderer integration. Then return to 12.1 Desktop compact presence and 13 Mobile redesign.
+**Current design review: Slice 11.1 + 11.2.** Review the [character study](design/expression/BRIEF.md) and independently runnable Expression Lab. Its animations are simulated; they do not establish Core, Desktop or device behavior. Conduct explicit visual owner review before 11.3 shared renderer integration. Then return to 12.1 Desktop compact presence and 13 Mobile redesign.
 
 Desktop Slice 10 remains unmerged draft PR #16. Before subsequent branch work, reconcile the draft against updated `origin/work`; preserve existing work and evidence. GitHub Actions billing block is **not green CI**; no automatic merge. Gate C remains PARTIAL with physical Edge/Voice/Mobile/Desktop owner acceptance deferred. Remaining World Model, commissioning, executive work and full Presence integration follow Slices 14–17; physical/hardening/Unified Alpha now 18–20. Elocution/Operating Logs/specialists/home server remain **after stable Slice 20**.
 

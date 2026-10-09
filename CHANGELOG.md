@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-10-09 — Slice 11.1–11.2 expression review candidate
+
+- Added an independently runnable, non-executing React/TypeScript/SVG Expression Lab and character/state/motion design studies.
+- Retained canonical Orb bytes and geometry; proposed versioned lids, directed gaze, owner-authorized smaller-eye opening and finite playful puck travel.
+- Completed two substantive critique/revision cycles: facial mechanics/timing, then reaction recovery/closed rest/interruption and compact review controls.
+- Added browser-rendered contact sheets, transition/GIF previews, size/reduced-motion comparisons, evidence receipts and isolated tests.
+- **SIMULATED / OWNER VISUAL APPROVAL REQUIRED**. 11.3, Slice 12, production integration and merge are not started; Gate C remains PARTIAL. PR #16 is untouched.
+
 ## 2026-10-09 — Canonical Slice 00–20 and character-first design direction
 
 - Consolidated overlapping 09R/10R/13A/13B work into one 00–20 sequence; historical PRs and screenshot paths retain original labels.

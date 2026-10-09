@@ -1,0 +1,73 @@
+{
+  "iteration": "study-v1",
+  "classification": "SIMULATED VISUAL STATE \u2014 NO CORE EXECUTION",
+  "capture": "fresh Chromium / own built Vite preview / deterministic timeline samples",
+  "canonical_sha256": "728aeac3c9aa590b67d45c469735e919ede93a8503964e24f0f4af18cda066c5",
+  "built_sha256": {
+    "assets\\index-D4InJf1e.js": "b99d26e1e0d5f78ff0477e098f332db833191ff274f64014cfca94f8c4076e28",
+    "assets\\index-DmYX4mV1.css": "1f194ab7f0871de239e2e03d2380261b7c4402071d4927eee9ede035c59799cc",
+    "index.html": "393584d37d36cc1ea2cb9f3882c5997f73d3ce71445bb17936a85356106daef4"
+  },
+  "checks": [
+    "all 16 expressions rendered",
+    "real-time playback advances and pause holds",
+    "reduced motion holds one static pose per event",
+    "unavailable / unknown / mute / owner attention override speech and interruption",
+    "keyboard slider seek and button activation",
+    "390px responsive lab without horizontal overflow",
+    "OS reduced motion and forced colors"
+  ],
+  "external_requests": [],
+  "errors": [],
+  "browser": "154.0.4258.62",
+  "artifacts": {
+    "curiosity-recovery.gif": {
+      "sha256": "64bb5f003167104555811eed06a41e4cf675c52122bb98f32d962b225ca45f5f",
+      "bytes": 411585
+    },
+    "curious.png": {
+      "sha256": "19d3f79cf6310cfc73cb4c100a815c67255ef78959516697a00941a1db02cbbc",
+      "bytes": 58401
+    },
+    "desktop.png": {
+      "sha256": "e91dff9c8971ef0142143904521c168ec1b8109107f76d90d244c71eb798431d",
+      "bytes": 196159
+    },
+    "expression-contact-sheet.png": {
+      "sha256": "d0de2a994432169d2c1ebaa9bcfb3955932e972cab19874bf4595b2a02afa1aa",
+      "bytes": 178076
+    },
+    "interruption-sequence.png": {
+      "sha256": "5a79c4baaa888bf8a9c3da2668e31d2670e1f388f0313185247e878aae169ef4",
+      "bytes": 241661
+    },
+    "mobile.png": {
+      "sha256": "317512fce9fad695b5d9b99777d1646492176ebe8f7d034c869a39b119072d93",
+      "bytes": 163941
+    },
+    "reduced-motion.png": {
+      "sha256": "978d29b851d7daf0ba32343ef1234bb5bcd047a19a71c5cdb702b5035664472a",
+      "bytes": 135372
+    },
+    "scale-available.png": {
+      "sha256": "e434802dc447c4e28c088d18962f47fecd8116224ad78ea44e430db359d119f7",
+      "bytes": 59420
+    },
+    "scale-unavailable.png": {
+      "sha256": "2c1026b904690f6afe1ecdc3bcbe0a8e0386222ea145477bd28c62216cce4638",
+      "bytes": 54754
+    },
+    "scale-verifying.png": {
+      "sha256": "4a58b895163a519a59b220f69b89e5bc670e452cc660c65687ce864af84f9ea5",
+      "bytes": 54712
+    },
+    "small-scale-comparison.png": {
+      "sha256": "36a9905082a225450b3fc53c44b96cfab135a1c0b422ebeaaee0014296b59e39",
+      "bytes": 171877
+    },
+    "system-reduced-forced-colors.png": {
+      "sha256": "81c13dc8afc3ea6f5989624a4f547eecc48305fd56940c0de44f8bcd1b894588",
+      "bytes": 154055
+    }
+  }
+}

@@ -1,0 +1,100 @@
+{
+  "iteration": "candidate-v2",
+  "classification": "SIMULATED VISUAL STATE \u2014 NO CORE EXECUTION",
+  "capture": "fresh Chromium / own built Vite preview / deterministic timeline samples",
+  "canonical_sha256": "728aeac3c9aa590b67d45c469735e919ede93a8503964e24f0f4af18cda066c5",
+  "built_sha256": {
+    "assets\\index-Cjc8GyZM.css": "32c44bef456602a45ce17a6300d4f8a5eef0c04fa8791c1d5d95bdfd4fd77343",
+    "assets\\index-quZcmU7J.js": "ca44f3b110ab02e68f082db738c2a0fa89d49b53653240cdc8b87a24fec935ca",
+    "index.html": "f47618903b344accb7ac6e2705b66a3489560f1fb13121493459b5e0b7ce4aaf"
+  },
+  "checks": [
+    "neutral source/derivative pixel comparison recorded",
+    "all 16 expressions rendered",
+    "real-time playback advances and pause holds",
+    "reduced motion holds one static pose per event",
+    "unavailable / unknown / mute / owner attention override speech and interruption",
+    "keyboard slider seek and button activation",
+    "390px responsive lab without horizontal overflow",
+    "OS reduced motion and forced colors",
+    "1280px responsive viewport"
+  ],
+  "external_requests": [],
+  "errors": [],
+  "browser": "154.0.4258.62",
+  "neutral_pixel_difference_bbox": null,
+  "artifacts": {
+    "closed-rest-intensity.png": {
+      "sha256": "ffcb52ee4a966b596acf9fb7ea75984b29e2b7f29b113679632b04627c2993f7",
+      "bytes": 181229
+    },
+    "curiosity-recovery.gif": {
+      "sha256": "6a7f076bad85d29e988c120d21254d5ae333c8492bd82b988056121ddb912dc0",
+      "bytes": 459789
+    },
+    "curious.png": {
+      "sha256": "8b05659dec64b87f8489f1122c677e0864bea830aae9e39e10c36db8525cd56f",
+      "bytes": 58597
+    },
+    "desktop-1280.png": {
+      "sha256": "642626c7461084884f34f242f4edcd60ea667f9449d8be63963a6aebe1f25d2c",
+      "bytes": 194223
+    },
+    "desktop.png": {
+      "sha256": "dd132b6208b34ce83eb4ad1e4538699e3e70a4b168014cc59320210d10534be7",
+      "bytes": 197205
+    },
+    "expression-contact-sheet.png": {
+      "sha256": "b0b4005dae3d10f2a22de657e88a1dff782c9baa499250dab3f3ce385a0bce23",
+      "bytes": 180720
+    },
+    "interruption-sequence.png": {
+      "sha256": "2970c49778e430f8a2b32defa012540eedc784a636d6d6a9556d52e53a02baa6",
+      "bytes": 260641
+    },
+    "iteration-comparison.png": {
+      "sha256": "554a66fd7f8d3cc96afa1ee489b210f531d3ce74ec34a9fc6e088b4f04bb8104",
+      "bytes": 288543
+    },
+    "mobile.png": {
+      "sha256": "ea0261302289b817cf4d731996096a31e6a1d93f6500121b40ba367fed372e2f",
+      "bytes": 164686
+    },
+    "reduced-motion.png": {
+      "sha256": "35c7fd74ea9d3f60b1b413d5b8d946faaf1aee2e496e76b1800d02b7ce639a6c",
+      "bytes": 136423
+    },
+    "scale-available.png": {
+      "sha256": "ab75a32c0426d48bd2fc837bfa64ccea92d68047470ef88e100bed0bc3ec4f8a",
+      "bytes": 61068
+    },
+    "scale-unavailable.png": {
+      "sha256": "02203de6bbc6e4d97f6a76b8a5cf39dbeff218c995f1e6c89479db4ecb20091b",
+      "bytes": 55569
+    },
+    "scale-verifying.png": {
+      "sha256": "3bc668a2bc21fbc784001c8f187e263ad1eeccdc6bfe7ed582f76ff64f6cc87c",
+      "bytes": 56168
+    },
+    "small-scale-comparison.png": {
+      "sha256": "2759ce26ccc564ccafcf92dac8e46a81d4c96446fac0ffcbf76f9d34d63bbe00",
+      "bytes": 175688
+    },
+    "speaking-frames.png": {
+      "sha256": "c3c5539930ad39997d8823623a5cd670b1130e3786d33a08cdae7ec9b60c68e1",
+      "bytes": 255287
+    },
+    "speaking-puck.gif": {
+      "sha256": "be82c6b2be2711f26f5ce12a56b8cb1a455a4110dd2129dd7503d088064e3a88",
+      "bytes": 281564
+    },
+    "surprise-recovery.png": {
+      "sha256": "f84582c684a76f8ffa6c1e35d2bef86aa9cf3bfd35b1e9c86bb3d912c920de1c",
+      "bytes": 281670
+    },
+    "system-reduced-forced-colors.png": {
+      "sha256": "f67a5e44fdefd9d456e6d6babeb00467900aff6097a4bc1b1e8877a9e8b6b7ff",
+      "bytes": 154696
+    }
+  }
+}
