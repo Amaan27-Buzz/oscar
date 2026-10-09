@@ -15,13 +15,14 @@ The app remains **OSCAR**. **OSCAR Mobile** is only the technical distinction.
 - Do not move reasoning, policy, memory, task authority or model routing into Android.
 - Do not widen permissions or capability scopes to make a design work.
 - Keep the canonical `assets/brand/oscar-orb.svg` unchanged.
-- Full expressive Orb/facial/personality behavior remains Slice 13.
+- Early Slice 13A establishes the shared expression vocabulary, dev-only lab and typed Desktop/Compose rendering contract **before** expression-dependent visual redesign; full runtime/overlay/widget Presence integration remains **13B**, after Slices 11–12. See [Expression Core](EXPRESSION-CORE.md).
+- Do not independently invent Mobile-only expressions or alter the canonical Orb.
 - Every redesign sub-slice must retain functional accessibility and truthful degraded states.
 - Visual work may run in parallel with Slices 10–16, but the complete redesign must be integrated and accepted before Slice 17 Unified Alpha PASS.
 
 ## 09R.1 — Presence / Home + Orb
 
-Establish the mobile visual language around the Orb and OSCAR state.
+Establish the mobile visual language around the Orb and OSCAR state **using the approved 13A expression vocabulary/contract**. Defer expression-specific final visual choices until 13A is reviewed.
 
 Scope:
 - home/presence composition;
@@ -32,7 +33,7 @@ Scope:
 - listening/thinking/speaking/waiting/degraded visual hooks;
 - motion baseline and reduced-motion behavior.
 
-Do not implement Slice 13 expressive faces here.
+Do not independently implement the full 13B Presence/Avatar system here.
 
 ## 09R.2 — Interaction
 
@@ -142,4 +143,6 @@ The redesign track is complete only when:
 5. real-device visual/interaction review is completed during the consolidated owner acceptance phase.
 
 Until then Slice 09's software/runtime foundation remains accepted, while mobile
-visual refinement remains open. Slice 10 and later backend/runtime work may proceed.
+visual refinement remains open. Early 13A is a shared visual dependency; the original
+13B Presence integration remains in its later roadmap position. Slice 10 and later
+backend/runtime work may proceed without misrepresenting visual acceptance.
