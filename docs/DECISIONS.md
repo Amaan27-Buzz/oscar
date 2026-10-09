@@ -396,6 +396,27 @@ local stop/safe-state remains independent. No full Python runtime on ESP32,
 managed framework or dangerous actuator profile. See [comparison](EDGE.md).
 Owner rescope accepts the simulated software foundation for continuation; physical acceptance remains mandatory before Unified Alpha.
 
+## ADR-040 — Move the expressive Orb foundation ahead of surface redesign
+
+**Owner decision (2026-10-09):** prioritize an isolated cross-platform Expression
+Core as **early Slice 13A** before completing 10R Desktop and 09R Mobile visual
+redesigns. 13A.1 specifies expression vocabulary and safe arbitration; 13A.2
+prototypes the canonical Orb's expressions in a non-executing interactive lab;
+13A.3 defines shared typed state/render semantics for React and Compose.
+Every visual candidate needs owner approval; no current 10R.1 concept is
+automatically promoted.
+
+The unchanged `assets/brand/oscar-orb.svg` is canonical. Render derivatives
+must be versioned separately and traceable to it. Separate authoritative
+operational/epistemic state from Persona expression; visual behavior cannot
+infer owner/user emotion, imply perception, authorize actions or present
+unverified work as verified. Full embodied/runtime Presence, overlays, widgets
+and physical integration remain **13B** in the original Slice 13 position
+after Slices 11–12. This order change does **not** advance Build Gates:
+Gate C remains PARTIAL; owner/device checks and exact-head CI are still required.
+
+See [Expression Core plan](EXPRESSION-CORE.md).
+
 ## Owner scope decision — 2026-10-05
 
 Slice 07: **COMPLETE FOR SOFTWARE / SIMULATED EDGE FOUNDATION**.
@@ -498,3 +519,14 @@ expressive animation remains Slice 13. Text reasoning/retrieval stays in existin
 scoped Core capabilities and responses remain REPORTED without independent evidence.
 PR #15 stays an owner-review candidate, not physical acceptance.
 See [implementation and migration](MOBILE-FOUNDATION.md).
+
+
+## Owner sequencing update — 2026-10-09
+
+Active desktop draft PR #16 contains Tauri Slice 10 and isolated 10R.1 compact
+concepts; it is **unmerged**, with CI blocked by the GitHub account billing limit.
+The owner prioritizes 13A.1–13A.2 expression design/lab next, then a reviewed
+13A.3 contract, before returning to expression-dependent compact desktop
+and Mobile redesign. No early Sentry/World Model/commissioning/Elocution work
+is authorized by this visual sequencing change. Historical earlier-slice
+authorization notes are preserved as dated evidence rather than current bans.
