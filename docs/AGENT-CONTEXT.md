@@ -357,3 +357,21 @@ See [OSCAR Mobile foundation](MOBILE-FOUNDATION.md) for implementation, limits a
 Slice 09 must not merge in this run. Gate C remains PARTIAL. Slice 10, deployment
 and Home Node are not started. Post-alpha Operating Logs, specialist-model training
 and home-server migration remain documented future work, not implemented.
+
+## Current owner priority — early Expression Core (2026-10-09)
+
+Owner explicitly prioritizes **13A.1 vocabulary → 13A.2 non-executing interactive
+Expression Lab → owner review → 13A.3 shared typed contract** ahead of final
+expression-dependent desktop 10R and mobile 09R visual decisions. Original
+`assets/brand/oscar-orb.svg` stays unchanged; approved visual derivatives remain
+separate/versioned. Operational Core state is authoritative; Persona expression
+cannot imply emotion detection, voice Match, permission, task truth or verification.
+
+Full Presence integration is **13B**, still after Slices 11–12. 10R.1 A/B/C
+compact previews in draft PR #16 are not approved; PR #16 is unmerged and remote
+CI is billing-blocked. Reconcile `work/main` planning changes with the draft
+branch before continuing its code. Gate C remains PARTIAL, real-device acceptance
+and exact-head CI remain mandatory. See [Expression Core](EXPRESSION-CORE.md) and
+[Roadmap](ROADMAP.md). This supersedes earlier sequencing notes only; preserve
+dated historical evidence. Elocution/Operating Logs/specialist/home-server work
+remain post-alpha.
