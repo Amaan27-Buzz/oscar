@@ -83,3 +83,12 @@ For Slice 11 (and subsequent 12/13), the user will run **GPT-6.1 Sol with High t
 `main` and `work` hold the accepted plan; PR #16 still holds the unmerged Tauri runtime and exploration artifacts. **Reconcile its base against `origin/work` before implementation, but preserve its tests, reference assets and history.** Do not bypass blocked GitHub Actions with fabricated green checks. No automatic PR #16 merge.
 
 Next activity is **Slice 11.1 + 11.2**, followed by owner visual review; only then design the shared 11.3 renderer and resume 12.1 Desktop compact presence. No Slice 14 World Model, Elocution or other post-alpha work is authorized by this renumbering.
+
+## Maintainer verification
+
+The lightweight repository test `tests/test_canonical_slice_docs.py`
+guards unique current roadmap headings, character/UI dependencies and key
+entrypoint links. Dated past-acceptance records are **not** globally
+search-and-replaced because their original slice numbers and status
+claims document the historical event. Future wording must use the new
+numbering and explicitly mark any historical snapshot.
