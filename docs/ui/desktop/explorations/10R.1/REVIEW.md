@@ -238,4 +238,3 @@ a documentation change. Neither reviewer independently benchmarked animation.
 - `docs/DESKTOP-UI-REDESIGN.md`: 10R.1 owner-review status and link.
 - This directory: review, manifest, nine state PNGs, three DPR/reduced/forced-color
   PNGs, contact sheet and transition GIF.
-

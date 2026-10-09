@@ -83,5 +83,3 @@ html[data-presence] {background:#e8e3d9}
 html[data-presence]::view-transition-group(oscar-orb),html[data-presence]::view-transition-group(oscar-shell) {animation-duration:380ms;animation-timing-function:cubic-bezier(.16,1,.3,1)}
 html[data-presence]::view-transition-old(root),html[data-presence]::view-transition-new(root) {animation:none}
 @media(prefers-reduced-motion:reduce){html[data-presence]::view-transition-group(*){animation:none}}
-
-

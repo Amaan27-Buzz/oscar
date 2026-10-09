@@ -42,4 +42,3 @@ it('switches fixtures without faking work or approvals and supports Escape',asyn
   fireEvent.keyDown(screen.getByRole('button',{name:'Compact presence'}),{key:'Escape'});
   expect(screen.getByRole('button',{name:'Open OSCAR interaction'})).toBeDefined();
 });
-
