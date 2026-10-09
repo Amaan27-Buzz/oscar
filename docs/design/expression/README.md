@@ -15,6 +15,7 @@ or credential connection. The immutable Orb remains the identity source.
 - [Motion and ten complete transitions](MOTION.md)
 - [Two substantive revision cycles](EVALUATION.md)
 - [Independent review and scoped verdict](REVIEW.md)
+- [Validation, draft PR and billing-blocked CI](VALIDATION.md)
 
 ## Actual browser evidence
 
@@ -51,6 +52,8 @@ OS reduced motion, forced colors and 390/1280/1440px layouts with no external
 requests or browser errors. The normalized neutral derivative/source comparison
 is pixel-identical; source SHA-256 is unchanged.
 
+**LOCAL VALIDATION PASS / REMOTE CI NOT EXECUTED**: GitHub jobs were rejected
+before steps ran due to account billing/spending limits; see [record](VALIDATION.md).
 These are local browser/prototype checks. The independent review scored four
 original defects resolved but did not establish continuous naturalness or owner
 acceptance. Small-size identity survives; sixteen independently readable tiny
