@@ -1,5 +1,31 @@
 # Avatar + Interaction Language
 
+## Current character-design contract — Slice 11
+
+This document is the durable design intent; [Slice 11 Expression/Character
+System](EXPRESSION-CORE.md) owns the current detailed character vocabulary,
+interactive Expression Lab and shared renderer contract. Next design stages
+are **11.1 character language → 11.2 interactive lab → owner review → 11.3
+shared rendering**, then **12 Desktop UX / 13 Mobile UX**. Full state-aware
+cross-device Presence is Slice 16.
+
+The old desktop compact A/B/C exercises are *not* accepted art: all three
+reused essentially one static smiling face and generic beige widgets. The
+owner expects a genuinely responsive character with nuanced eye/gaze timing,
+asymmetry, weight, anticipation, microreaction, rest/idle, interruptions and
+perceptual continuity. The companion reference images show expressive
+presence, not an alternate mascot to copy. Study character **before**
+polishing frame/card/window treatments. Reject emoji faces and cosmetic
+looping animations.
+
+The canonical `assets/brand/oscar-orb.svg` must not be overwritten;
+derived expressions must be separately versioned and visually owner-reviewed.
+Only authoritative operational state controls truth/safety/approval; delivery
+cues never infer user emotion or verified outcome. See
+[canonical numbering](SLICE-NUMBERING.md).
+
+
+
 ## Identity
 
 OSCAR's avatar is a core interaction surface, not decorative branding and not a mascot that should dominate every screen.
