@@ -241,7 +241,7 @@ Edge firmware and Voice CI gate integration on PR #14. The current model/resourc
 record is [quality reference evidence](evidence/voice-quality-reference-2026-10-06.json).
 No microphone, playback or owner biometric/naturalness acceptance is inferred.
 
-## Current Slice 09 — 2026-10-06
+## Historical Slice 09 checkpoint — 2026-10-06 (superseded)
 
 Slice 08 PR #14 merged; accepted main/work baseline
 `92a11aa05083f1983186976ba64bd30aa9f1f2a0`. Slice 08 is
