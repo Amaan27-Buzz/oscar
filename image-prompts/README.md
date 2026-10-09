@@ -1,5 +1,22 @@
 # OSCAR Image Prompts
 
+## Current image/design sequence
+
+Visual-reference prompts support **Slice 11 expressive character design**,
+then **Slice 12 Desktop** and **Slice 13 Mobile**. Existing old 10R.1
+screenshots are rejected exploration evidence, not the selected visual
+identity. Canonical schedule: `docs/SLICE-NUMBERING.md`;
+character language: `docs/EXPRESSION-CORE.md`.
+
+Avoid static smiling Orb stickers and generic beige floating cards. Image
+generation can explore a *visual sequence* of different expressive
+character states or inform a design hypothesis, but working interactive
+animation, latency, context responsiveness, motion and accessibility are
+evaluated in the real Expression Lab. Never copy the owner's reference
+desktop companion artwork. Preserve the original Orb SVG unmodified.
+
+
+
 This folder contains page/surface prompts for visual exploration and reference generation.
 
 These prompts are **not** a replacement for coded UI. OSCAR's current design workflow is:
