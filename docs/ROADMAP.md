@@ -360,9 +360,23 @@ The functional app may continue into later slices while the mobile visual/intera
 
 See [OSCAR Mobile UI Redesign Track](MOBILE-UI-REDESIGN.md).
 
-## Slice 10 — Desktop Interaction Runtime ◻️
+## Slice 10 — Desktop Interaction Runtime 🚧
 
-Polished native desktop embodiment: ambient presence, Dictate/Edit/Ask/Act, focused app/window/selection/accessibility/screenshot context, approvals/task progress and fluid state transformations.
+Tauri 2 / Rust / React-TypeScript desktop candidate is in draft PR #16 (unmerged). Its local-reference Ask/Dictate/Edit/Act, typed Core/Worker context, signed approvals, task continuity, tray and lifecycle foundations are implemented, with real owner/device acceptance and exact-head GitHub CI still outstanding. GitHub Actions currently has an account billing/spending blocker; local checks do not replace remote CI.
+
+The 10R.0 baseline captured 52 UI-state screenshots, and 10R.1 explored three **unapproved** compact presence concepts. The owner decided to develop shared expressions first (early 13A), then revisit compact/expanded visual design. Do not promote any of the three concepts automatically.
+
+### Early Slice 13A — OSCAR Expression Core ⏭️
+
+**Owner-authorized order change (2026-10-09).** Extract the visual/expression foundation from the originally planned Slice 13 so UI decisions do not precede OSCAR's expressive identity.
+
+- **13A.1 — Expression vocabulary and mechanics:** define operational vs expressive-delivery states, eye/gaze/puck/shell variations, transition and priority rules, safe fallbacks.
+- **13A.2 — Interactive Expression Lab:** isolated synthetic-state prototype, multiple face/motion candidates, small-scale and reduced-motion checks, owner visual approval.
+- **13A.3 — Shared typed expression contract:** Core-to-presentation state semantics and Desktop React/Android Compose renderers; no new Core authority.
+
+Keep the original `assets/brand/oscar-orb.svg` unchanged. Expressions may change via approved, versioned render variants—not a silent replacement of the canonical Orb. Operational/epistemic state must remain authoritative; Persona cannot imply new permissions, perception, emotion detection or task verification.
+
+Next visual work after 13A approval: **10R.1 Desktop compact presence** using the B/C lessons, followed by remaining 10R work and the shared-system **09R Mobile redesign**. These remain required before Slice 17 PASS. See [Expression Core](EXPRESSION-CORE.md).
 
 ## Slice 11 — World Model + Perception Fabric + persistent Sentry + optional Daily Journal ◻️
 
@@ -372,9 +386,9 @@ Coherent current truth across people/places/devices/apps/projects/tasks/commitme
 
 Identity, Persona, Personal Policy starter rules, Voice Identity/Match/Map, Connection Grid pairing, model/cloud setup, OSCAR Mobile/Desktop/Edge pairing, Sentry/capture setup and human-readable perceive/retain/act permission matrix.
 
-## Slice 13 — Avatar / presence UI ◻️
+## Slice 13B — Full Avatar / presence integration ◻️
 
-Reusable blue-shell/yellow-puck presence with weighted motion, real runtime states, reduced motion and compact/overlay/widget variants. Avatar expresses real state; it never substitutes for it.
+The early **13A** expression vocabulary, laboratory and shared renderer contracts are brought forward before 10R/09R redesign. **13B remains here** after Slices 11–12, completing runtime-aware, cross-device expressive Presence: real state integration, weighted motion, compact/overlay/widget variants, attention/retreat, accessibility and physical-device acceptance. Avatar expresses authoritative state; it never substitutes for it. See [Expression Core](EXPRESSION-CORE.md).
 
 ## Slice 14 — Executive Planner + durable Workers + learning ◻️
 
@@ -414,8 +428,8 @@ perception / communication
 | B — Can Do Work | 05–06 | Real machine/continuation + Memory Fabric + policy/live context | **PASS for documented local-alpha scope** |
 | C — Embodied Core | 07–08 | Edge/reflexes + Voice/Identity/Persona | PARTIAL; Slice 07 software accepted, physical deferred |
 | D1 — OSCAR Mobile | 09 + 09R | Android embodiment + communication + owner controls + redesign | Software foundation accepted; physical + 09R pending |
-| D2 — Desktop | 10 | Desktop interaction runtime | Planned |
-| E1 — Awareness | 11–13 | World Model/Sentry + commissioning + presence | Planned |
+| D2 — Desktop | 10 + 10R | Tauri desktop runtime + visual redesign; early shared 13A expression dependency | Draft PR #16, local reference; CI/owner acceptance pending |
+| E1 — Awareness | 11–13B (+ early 13A) | World Model/Sentry + commissioning + full Presence integration; 13A visual foundation early | Planned / 13A prioritized |
 | E2 — Executive | 14 | Chief-of-Staff planner + Workers + learning | Planned |
 | F — Unified Alpha | 15–17 | Physical expansion + hardening + integrated alpha | Planned |
 
@@ -427,13 +441,13 @@ Slices 07–09 now have their accepted software/reference foundations. PR #15 me
 OSCAR Mobile into `work`; physical Edge, Voice and Android acceptance remain explicitly
 owner-deferred, so Gate C is still PARTIAL.
 
-Current next backend/runtime work is **Slice 10 — Desktop Interaction Runtime**.
-The parallel **09R OSCAR Mobile UI redesign track** may proceed section by section
-without blocking Slices 10–16, but it must be integrated before Slice 17 Unified Alpha PASS.
+Current active desktop implementation is Slice 10 in **draft PR #16**, not yet merged. The owner has **prioritized 13A.1–13A.2 Expression Core design/lab next**, with 13A.3 shared renderer contracts after review, **before resuming 10R.1 compact presence**. The 10R.1 A/B/C concepts remain exploratory and unpromoted.
+
+OSCAR Mobile 09R shares the eventual 13A expression system. The remaining 13B full Presence integration stays after Slices 11–12. Both 10R and 09R remain required before Slice 17 Unified Alpha PASS.
 Post-alpha Operating Logs, Elocution-derived voice evolution, specialist models and
 home-server migration remain out of scope until after stable Unified Alpha.
 
-The original ordered acceptance sequence below remains a contract, not a list of unimplemented items:
+The original historical Gate B acceptance sequence below remains an archival contract, not the current work order. The 2026-10-09 owner-approved early-13A sequencing above supersedes only visual-expression scheduling:
 
 ```text
 05 machine gaps
