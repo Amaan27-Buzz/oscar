@@ -234,7 +234,7 @@ Required scenarios include:
 
 ## Gate D — JARVIS Layer
 
-**Slices:** 11–14 (with early 13A expression design/prototype extracted ahead of 10R/09R)
+**Slices:** 14–17 (World Model, commissioning, full Presence integration and Executive Planner)
 
 Prove current-world awareness, persistent Sentry, commissioning and durable delegated work.
 
@@ -242,14 +242,16 @@ Required scenarios include combining multiple live sources into the World Model,
 
 **Pass:** OSCAR maintains coherent current awareness, durable responsibilities and optional continuity capture without collapsing privacy/evidence boundaries.
 
-**Owner order adjustment (2026-10-09):** expression-only foundation `13A.1–13A.3`
-is prioritized before desktop/mobile UI redesign. This is a design/renderer dependency,
-not an early Gate D PASS. Full state-bound Presence/Avatar acceptance (`13B`) remains
-after Slices 11–12. See [Expression Core](EXPRESSION-CORE.md).
+**Owner sequencing decision (2026-10-09):** after existing 00–10 foundations,
+Slice 11 designs the expressive character; Slice 12 refines Desktop UX and
+Slice 13 Mobile UX. These are a **visual/interaction review checkpoint**, not
+automatic Gate C or D PASS. Full runtime-bound Presence/Avatar integration is
+Slice 16, after Slice 14 World Model and Slice 15 commissioning. See
+[canonical numbering](SLICE-NUMBERING.md) and [Expression Core](EXPRESSION-CORE.md).
 
 ## Gate E — Unified Alpha
 
-**Slices:** 15–17
+**Slices:** 18–20
 
 Deliberately break the integrated system.
 
@@ -259,13 +261,19 @@ Required scenarios include provider/auth failure, coordinator/node/Edge loss, Gr
 
 ## Status
 
-| Gate | Slices | Status |
+| Gate / checkpoint | Canonical slices | Status |
 |---|---|---|
 | Gate A — Brain | 01–04 | **PASS** |
 | Gate B — Can Do Work | 05–06 | **PASS for documented local-alpha acceptance** |
-| Gate C — Embodied OSCAR | 07–10 | PARTIAL; Slice 07 software accepted, physical deferred; 08 software/reference closure scope, physical voice deferred; 09 authorized after 08 integration, 10 unbuilt |
-| Gate D — JARVIS Layer | 11–14 | Planned |
-| Gate E — Unified Alpha | 15–17 | Planned |
+| Gate C — Embodied OSCAR | 07–10 | **PARTIAL:** software foundations reference-accepted; Edge/Voice/Mobile/Desktop device acceptance deferred; Desktop PR #16 not merged |
+| Design / Character checkpoint | 11–13 | **NEXT:** Slice 11 visual design/lab, then Desktop and Mobile owner-reviewed experience |
+| Gate D — JARVIS Layer | 14–17 | Planned |
+| Gate E — Unified Alpha | 18–20 | Planned |
+
+No approved visual prototype proves that OSCAR can execute, perceive, verify,
+listen or hold physical safety authority. Conversely, deferring Gate C physical
+testing does not prohibit the owner-prioritized Slice 11 design laboratory.
+Old gate/slice references in historical evidence preserve their original labels.
 
 
 ## Reconciliation boundary — 2026-10-04
