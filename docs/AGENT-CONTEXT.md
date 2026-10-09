@@ -375,3 +375,23 @@ and exact-head CI remain mandatory. See [Expression Core](EXPRESSION-CORE.md) an
 [Roadmap](ROADMAP.md). This supersedes earlier sequencing notes only; preserve
 dated historical evidence. Elocution/Operating Logs/specialist/home-server work
 remain post-alpha.
+
+## ACTIVE PLAN — sequential Slice 00–20 (2026-10-09)
+
+Use [canonical numbering crosswalk](SLICE-NUMBERING.md), not old `09R`,
+`10R`, `13A`, `13B` in new prompts or future-facing docs. Preserve
+historical paths/commit receipts. **11 Expression/Character next**; after owner
+visual approval, **12 Desktop UX**, **13 Mobile UX**, **14 World Model**,
+**15 commissioning**, **16 full cross-device Presence**, **17 Executive**,
+**18 Physical**, **19 hardening**, **20 Unified Alpha**.
+
+OSCAR's look must not be a generic AI rounded card or fixed happy-face Orb.
+Owner's desktop-companion reference emphasizes responsive *character*,
+microexpressions, physical timing, and nonverbal communication. Do not copy that
+other mascot, override `assets/brand/oscar-orb.svg`, or use fake emotion/task
+inference. Next prompts are intended for GPT-6.1 Sol, High effort: do rigorous
+real design study, polished transitions, iterate after critique, and leave
+owner review gates before production promotion. Core truth/permission/Persona
+separation remains absolute. Desktop draft PR #16 remains unmerged,
+CI billing-blocked and in need of origin/work reconciliation. Gate C PARTIAL;
+physical device acceptance deferred. Post-alpha tasks now follow stable Slice 20.
