@@ -345,107 +345,103 @@ Software/runtime foundation accepted and merged in PR #15. OSCAR Mobile now has 
 
 Physical Android owner/device acceptance remains deferred as part of consolidated Gate C: real enrollment, biometric/PIN, assistant selection, notification reply delivery, microphone/playback, Bluetooth, room AEC/barge-in/self-wake, Voice Match/Map and naturalness are not yet physically verified.
 
-### Slice 09R — OSCAR Mobile UI redesign track ◻️
+### Desktop/Mobile design scheduling
 
-The functional app may continue into later slices while the mobile visual/interaction system is redesigned section by section. 09R is **non-blocking for Slices 10–16 but required before Slice 17 Unified Alpha PASS**.
+The Android product foundation is Slice 09; its **visual redesign is now Slice 13**, not a 09R suffix. The Desktop software/runtime foundation is **Slice 10**, and its **visual redesign is now Slice 12**. Historical screenshot and PR paths retain the old identifiers as provenance. See the [canonical numbering map](SLICE-NUMBERING.md).
 
-- **09R.1 — Presence / Home + Orb**
-- **09R.2 — Interaction**
-- **09R.3 — Activity + Approvals**
-- **09R.4 — Devices / Connection Grid**
-- **09R.5 — Voice**
-- **09R.6 — Privacy + Permissions**
-- **09R.7 — Settings + System Surfaces**
-- **09R.8 — Motion, Accessibility + Final Mobile Polish**
+## Slice 10 — OSCAR Desktop runtime foundation 🚧
 
-See [OSCAR Mobile UI Redesign Track](MOBILE-UI-REDESIGN.md).
+Tauri 2 / Rust / React-TypeScript Desktop, native tray/hotkey/window lifecycle, typed Ask/Dictate/Edit/Act through the authoritative Core, privacy-bounded context, signed approvals, Worker reuse and local reference tests. **Draft PR #16 is unmerged.** Owner/device acceptance remains unrun, and exact-head CI is billing-blocked rather than passed.
 
-## Slice 10 — Desktop Interaction Runtime 🚧
+The 52-screenshot baseline and A/B/C compact design explorations in PR #16 are archival reference outputs (historical 10R.0 and 10R.1). None of those concepts is approved for production. Do not mistake baseline capture or synthetic screenshots for owner-facing finished UI.
 
-Tauri 2 / Rust / React-TypeScript desktop candidate is in draft PR #16 (unmerged). Its local-reference Ask/Dictate/Edit/Act, typed Core/Worker context, signed approvals, task continuity, tray and lifecycle foundations are implemented, with real owner/device acceptance and exact-head GitHub CI still outstanding. GitHub Actions currently has an account billing/spending blocker; local checks do not replace remote CI.
+## Slice 11 — OSCAR Expression / Character System ⏭️
 
-The 10R.0 baseline captured 52 UI-state screenshots, and 10R.1 explored three **unapproved** compact presence concepts. The owner decided to develop shared expressions first (early 13A), then revisit compact/expanded visual design. Do not promote any of the three concepts automatically.
+**Next owner-prioritized work.** Design character **before** choosing the surrounding widget/window styling. The provided desktop-companion references demonstrate presence, independent character, micro-reactions and nonverbal expression; do not copy their pixel-art character or replace the canonical Orb with a different mascot.
 
-### Early Slice 13A — OSCAR Expression Core ⏭️
+- **11.1 — Character language:** facial marks, eyes/gaze, orientation, tempo, anticipation, nuanced microexpressions, idle/resting/reactive behavior, state priority and interruption; separate real Core operational status from safe expressive Persona delivery.
+- **11.2 — Interactive Expression Lab:** development-only, non-executing high-fidelity Orb expression/motion prototypes with fine controls, transition playback/scrubbing, small-scale tests and explicit owner visual review. No superficial AI-looking alternatives accepted merely because they compile.
+- **11.3 — Shared renderer contract:** after owner feedback, platform-neutral typed expression semantics with Desktop React/SVG and Android Compose rendering adapters.
 
-**Owner-authorized order change (2026-10-09).** Extract the visual/expression foundation from the originally planned Slice 13 so UI decisions do not precede OSCAR's expressive identity.
+Keep `assets/brand/oscar-orb.svg` unmodified. Proposed derivatives are separate, versioned and owner-approved. Real activity/privacy/permission/truth must never be synthesized from a visual animation. See [Expression Core](EXPRESSION-CORE.md) and [design quality bar](SLICE-NUMBERING.md).
 
-- **13A.1 — Expression vocabulary and mechanics:** define operational vs expressive-delivery states, eye/gaze/puck/shell variations, transition and priority rules, safe fallbacks.
-- **13A.2 — Interactive Expression Lab:** isolated synthetic-state prototype, multiple face/motion candidates, small-scale and reduced-motion checks, owner visual approval.
-- **13A.3 — Shared typed expression contract:** Core-to-presentation state semantics and Desktop React/Android Compose renderers; no new Core authority.
+## Slice 12 — OSCAR Desktop experience and visual system ◻️
 
-Keep the original `assets/brand/oscar-orb.svg` unchanged. Expressions may change via approved, versioned render variants—not a silent replacement of the canonical Orb. Operational/epistemic state must remain authoritative; Persona cannot imply new permissions, perception, emotion detection or task verification.
+The **entire former 10R track**, as a single formal top-level slice after 11:
 
-Next visual work after 13A approval: **10R.1 Desktop compact presence** using the B/C lessons, followed by remaining 10R work and the shared-system **09R Mobile redesign**. These remain required before Slice 17 PASS. See [Expression Core](EXPRESSION-CORE.md).
+- **12.0 — Baseline:** 52 PNGs, manifest, lifecycle fix already produced in PR #16 (historical 10R.0).
+- **12.1 — Compact Presence / Orb:** revisit the three previous A/B/C experiments with the approved *expressive* character; do not rubber-stamp an AI-generated widget.
+- **12.2 — Ask + interaction composition.**
+- **12.3 — Dictate + Edit.**
+- **12.4 — Act + context.**
+- **12.5 — Activity + approvals.**
+- **12.6 — Motion + accessibility + coherent final polish.**
 
-## Slice 11 — World Model + Perception Fabric + persistent Sentry + optional Daily Journal ◻️
+Build mature UI behavior, thoughtful interaction narratives, real motion and platform constraints, staged owner review. Preserve the Tauri/Core/security contract. See current-branch `docs/DESKTOP-UI-REDESIGN.md` (historical identifiers and prototype evidence); canonical IDs here supersede it.
 
-Coherent current truth across people/places/devices/apps/projects/tasks/commitments, freshness/provenance, screen/device/sensor/location/communication/acoustic inputs, time/weather/calendar/tasks/notifications/media state, Sentry modes and optional retention-controlled Context Capture/Daily Journal.
+## Slice 13 — OSCAR Mobile experience and visual system ◻️
 
-## Slice 12 — Commissioning / setup ◻️
+The **entire former 09R track**, implemented section by section in Kotlin/Compose after 11's character system:
 
-Identity, Persona, Personal Policy starter rules, Voice Identity/Match/Map, Connection Grid pairing, model/cloud setup, OSCAR Mobile/Desktop/Edge pairing, Sentry/capture setup and human-readable perceive/retain/act permission matrix.
+- **13.1 — Home / Presence + expressive Orb.**
+- **13.2 — Conversation and interaction.**
+- **13.3 — Activity + approvals.**
+- **13.4 — Devices / Connection Grid.**
+- **13.5 — Voice interaction.**
+- **13.6 — Privacy / permissions.**
+- **13.7 — Settings / system surfaces.**
+- **13.8 — Motion / accessibility / owner-polished convergence.**
 
-## Slice 13B — Full Avatar / presence integration ◻️
+Use the same character/expression contract as Desktop with native Android composition. No separate assistant identity, duplicated Core authority or framework-style generic UI. See [Mobile UX plan](MOBILE-UI-REDESIGN.md).
 
-The early **13A** expression vocabulary, laboratory and shared renderer contracts are brought forward before 10R/09R redesign. **13B remains here** after Slices 11–12, completing runtime-aware, cross-device expressive Presence: real state integration, weighted motion, compact/overlay/widget variants, attention/retreat, accessibility and physical-device acceptance. Avatar expresses authoritative state; it never substitutes for it. See [Expression Core](EXPRESSION-CORE.md).
+## Slice 14 — World Model + Perception Fabric + Sentry + optional Daily Journal ◻️
 
-## Slice 14 — Executive Planner + durable Workers + learning ◻️
+Coherent freshness-/provenance-qualified current truth across people/places/devices/apps/projects/tasks/commitments; optional explicitly permitted screen/device/sensor/location/communication/acoustic inputs, time/weather/calendar/notifications/media state, persistent Sentry modes and retention-controlled Journal/Capture. This is former Slice 11; no earlier World Model implementation claim is made.
 
-Priority/deadline/dependency planning, explicit commitment model, schedule conflicts, focus blocks, travel/weather-aware planning, policy-bounded automatic replanning, proactive brief, interruption policy, Worker lifecycle/recovery and evaluated learned automation.
+## Slice 15 — Commissioning / setup ◻️
 
-## Slice 15 — Physical/device expansion + specialist engineering ◻️
+Identity, Persona/Personal Policy starter rules, Voice Identity/Match/Map, Connection Grid and surface pairing, model/cloud setup, Sentry/capture setup and human-readable perceive/retain/act permissions. This is former Slice 12.
 
-Broaden Edge/device onboarding, smart-home/environment adapters, cameras/sensors/actuators and specialist CAD/circuit/simulation/3D/numerical/diagnostic routing.
+## Slice 16 — Full Avatar / Presence integration ◻️
 
-## Slice 16 — Reliability/security/truthfulness hardening ◻️
+Finish the **runtime/device-facing** Presence work after World Model/commissioning: genuine state projection, small/expanded/overlay/widget variants, focus retreat, cross-device behavior, real audio/perception context, accessibility, latency and real-device owner acceptance. Uses Slice 11's reviewed Expression System; this is former 13B.
 
-Deliberately break providers, auth, Grid nodes, leases, Workers, Memory Fabric derived indexes, capture sources, persona/voice identity, privacy/retention, notification/assistant/overlay permissions and physical paths. Verify graceful degradation, revocation and no false-success behavior.
+## Slice 17 — Executive Planner + durable Workers + learning ◻️
 
-## Slice 17 — Unified alpha ◻️
+Priority/deadline/dependency planning, explicit commitments, scheduling conflicts, focus/travel/weather aware planning, policy-bounded replanning, proactive brief, interruption policy, Worker lifecycle/recovery and evaluated learning. Former Slice 14.
 
-Run one end-to-end scenario across:
+## Slice 18 — Physical/device expansion + specialist engineering ◻️
 
-```text
-perception / communication
-→ World Model / Chief-of-Staff context / Controller
-→ Memory Fabric / live evidence
-→ Personal Policy + Persona
-→ Executive / Durable Runtime
-→ capability / search / model routing
-→ Connection Grid node
-→ Worker / device / action
-→ ledger / artifact
-→ verification
-→ voice/text/OSCAR Mobile report
-```
+Widen Edge/device onboarding, real ESP32/Pico acceptance, smart-home/environment adapters, cameras/sensors/actuators, and specialist CAD/circuit/simulation/3D/numerical/diagnostic routing. Former Slice 15; no physical PASS until exercised.
 
-## Review clubs
+## Slice 19 — Reliability/security/truthfulness hardening ◻️
 
-| Club | Slices | Focus | Status |
-|---|---:|---|---|
-| A — Brain | 01–04 | Core + Controller + Transport/Grid foundation + adaptive Model Router | **PASS** |
-| B — Can Do Work | 05–06 | Real machine/continuation + Memory Fabric + policy/live context | **PASS for documented local-alpha scope** |
-| C — Embodied Core | 07–08 | Edge/reflexes + Voice/Identity/Persona | PARTIAL; Slice 07 software accepted, physical deferred |
-| D1 — OSCAR Mobile | 09 + 09R | Android embodiment + communication + owner controls + redesign | Software foundation accepted; physical + 09R pending |
-| D2 — Desktop | 10 + 10R | Tauri desktop runtime + visual redesign; early shared 13A expression dependency | Draft PR #16, local reference; CI/owner acceptance pending |
-| E1 — Awareness | 11–13B (+ early 13A) | World Model/Sentry + commissioning + full Presence integration; 13A visual foundation early | Planned / 13A prioritized |
-| E2 — Executive | 14 | Chief-of-Staff planner + Workers + learning | Planned |
-| F — Unified Alpha | 15–17 | Physical expansion + hardening + integrated alpha | Planned |
+Provider/auth/Node/Worker/memory/capture/persona/voice/privacy failures, replay/revocation, degraded state, retention, physical faults and required real-device acceptance. Former Slice 16.
+
+## Slice 20 — Unified Alpha ◻️
+
+Run the full integrated perception/communication → World Model/Controller/Memory → Personal Policy/Persona → Executive Runtime → Grid/Worker/device → Action Ledger/evidence → verification → Mobile/Desktop/Voice report scenario. **Gate C, Design, Gate D and Gate E evidence must be complete for the claimed scope.** Former Slice 17. Do not mislabel simulator/remote-CI-blocked work as PASS.
+
+## Review clubs / checkpoints
+
+| Area | Canonical slices | Status |
+|---|---|---|
+| A — Brain | 01–04 | PASS |
+| B — Can Do Work | 05–06 | PASS for local-alpha scope |
+| C — Embodied foundations | 07–10 | PARTIAL; physical acceptance deferred and PR #16 pending |
+| Design / Character | 11–13 | NEXT (11), then 12 Desktop and 13 Mobile |
+| D — Awareness / Chief-of-Staff | 14–17 | Planned |
+| E — Physical and Unified Alpha | 18–20 | Planned |
 
 Manual integration checkpoints remain in [BUILD-GATES.md](BUILD-GATES.md).
 
 ## Current next step
 
-Slices 07–09 now have their accepted software/reference foundations. PR #15 merged
-OSCAR Mobile into `work`; physical Edge, Voice and Android acceptance remain explicitly
-owner-deferred, so Gate C is still PARTIAL.
+**Current authoritative numbering:** [00–20 sequential plan](SLICE-NUMBERING.md). The prior 09R/10R/13A/13B nomenclature is now archival only. Historical screenshots, branch names and acceptance records are not rewritten.
 
-Current active desktop implementation is Slice 10 in **draft PR #16**, not yet merged. The owner has **prioritized 13A.1–13A.2 Expression Core design/lab next**, with 13A.3 shared renderer contracts after review, **before resuming 10R.1 compact presence**. The 10R.1 A/B/C concepts remain exploratory and unpromoted.
+**Next design task: Slice 11.1 + 11.2.** GPT-6.1 Sol on High thinking effort should do deep, deliberate character design and an interactive, non-executing Expression Lab; study the desktop-companion reference for believable persistent personality and state reaction **without copying its artwork**. Avoid a generic static smile, a decorative pill/card, shallow AI-looking concepts and rushing toward a screenshot count. Conduct explicit visual owner review before 11.3 shared renderer integration. Then return to 12.1 Desktop compact presence and 13 Mobile redesign.
 
-OSCAR Mobile 09R shares the eventual 13A expression system. The remaining 13B full Presence integration stays after Slices 11–12. Both 10R and 09R remain required before Slice 17 Unified Alpha PASS.
-Post-alpha Operating Logs, Elocution-derived voice evolution, specialist models and
-home-server migration remain out of scope until after stable Unified Alpha.
+Desktop Slice 10 remains unmerged draft PR #16. Before subsequent branch work, reconcile the draft against updated `origin/work`; preserve existing work and evidence. GitHub Actions billing block is **not green CI**; no automatic merge. Gate C remains PARTIAL with physical Edge/Voice/Mobile/Desktop owner acceptance deferred. Remaining World Model, commissioning, executive work and full Presence integration follow Slices 14–17; physical/hardening/Unified Alpha now 18–20. Elocution/Operating Logs/specialists/home server remain **after stable Slice 20**.
 
 The original historical Gate B acceptance sequence below remains an archival contract, not the current work order. The 2026-10-09 owner-approved early-13A sequencing above supersedes only visual-expression scheduling:
 
