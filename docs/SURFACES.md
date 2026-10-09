@@ -21,6 +21,14 @@ Across OSCAR Mobile, desktop and physical surfaces:
 
 The visual/interaction direction is defined by `DESIGN.md` and `TASTE.md`.
 
+**Shared Expression Core:** [early 13A](EXPRESSION-CORE.md) defines a single
+OSCAR operational/expression vocabulary and platform-neutral state contract
+before expression-dependent 10R/09R redesign. The canonical Orb SVG is immutable;
+Desktop (Tauri/React) and Mobile (Compose) render the same authoritative state
+using platform-native mechanics. Full cross-device runtime/overlay/widget Presence
+integration remains 13B after Slices 11–12. Expressions never grant authority or
+imply verification, emotion detection or capture.
+
 ## Connection Grid
 
 The Grid is the product-visible relationship between:
