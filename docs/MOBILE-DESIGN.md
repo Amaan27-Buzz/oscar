@@ -1,5 +1,22 @@
 # OSCAR Mobile visual direction
 
+## Current Mobile design sequencing
+
+The Mobile functional foundation is **Slice 09**. Final Mobile UX redesign
+is **Slice 13**, after reviewed **Slice 11 Expression/Character System**,
+using a shared operational-state vocabulary with Desktop Slice 12.
+Full cross-device Presence is Slice 16. Historical `09R` identifiers are
+retained only in earlier artifacts; see [slice numbering](SLICE-NUMBERING.md).
+
+The previous static smiling Orb on beige card experiments are not the design
+target. OSCAR should have nonverbal reactions, expressive timing, attention
+and meaningful gestures while remaining technically restrained. On Android,
+build a dedicated native Compose renderer rather than importing desktop UI
+frames. Do not copy the small reference companion mascot or infer task truth,
+human emotion, microphone availability or permissions from expression.
+
+
+
 OSCAR Mobile is OSCAR on the phone. This document captures the durable mobile interaction direction; `DESIGN.md` is the global design system and `TASTE.md` is the qualitative quality bar.
 
 ## Surface mode
