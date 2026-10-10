@@ -1,5 +1,5 @@
 # Preserve bytes of imported historical evidence and hashed capture receipts.
-INDEPENDENT-REVIEW.md -text
-OWNER-VERDICT.md -text
-independent-evidence/** -text
-quality-recovery/evidence/** -text
+INDEPENDENT-REVIEW.md -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+OWNER-VERDICT.md -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+independent-evidence/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+quality-recovery/evidence/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
