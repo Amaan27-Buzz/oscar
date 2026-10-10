@@ -1,0 +1,205 @@
+{
+  "reviewed_commit": "5fea2071e891adf0fac7f9838ee556c9a60e1e1c",
+  "input_method": "Windows Computer Use @oai/sky: returned owned window, UIA targets, native keystrokes, WGC screenshots. No Playwright/browser DOM used for this native audit.",
+  "scope": "Isolated WebView profiles and disposable authenticated OSCAR Harness/MobileServer. Harmless arithmetic only; no real owner credentials, mic, external model calls or destructive work.",
+  "scale": "Observed physical origins versus logical size changes are consistent with125% (375/300 and295/236). Other OS scaling/monitors not changed or tested.",
+  "anchor": {
+    "compact_origin": [
+      1733,
+      933
+    ],
+    "compact_logical_size": [
+      132,
+      148
+    ],
+    "expanded_origin": [
+      1358,
+      638
+    ],
+    "expanded_logical_size": [
+      432,
+      384
+    ],
+    "physical_delta": [
+      375,
+      295
+    ],
+    "supported": "Bottom-right/Orb position continuity in this observed case; units qualified by125% scale."
+  },
+  "observations": [
+    {
+      "step": 1,
+      "experience": "Uncommissioned startup",
+      "result": "Observed Offline, Core unavailable, actions disabled",
+      "image": "01-native-offline.png"
+    },
+    {
+      "step": 2,
+      "experience": "Orb invocation",
+      "result": "Observed native transparent margins over underlying application; warm writing surface readable",
+      "image": "02-native-offline-expanded.png"
+    },
+    {
+      "step": 3,
+      "experience": "Escape retreat",
+      "result": "Observed return to compact Offline; intermediate captures contained fade ghosts and were not used as settled evidence",
+      "image": "03-native-offline-retreated.png"
+    },
+    {
+      "step": 4,
+      "experience": "Authenticated rest",
+      "result": "Observed Here through real disposable Core/native adapter",
+      "image": "04-native-rest.png"
+    },
+    {
+      "step": 5,
+      "experience": "Writing expansion",
+      "result": "Observed normal composition; UIA focus exposed root document, so automatic editable focus alone not established",
+      "image": "05-native-invoked.png"
+    },
+    {
+      "step": 6,
+      "experience": "Text entry",
+      "result": "Targeted known editable UIA input; native type_text appended Still here. visibly. No submission of this draft.",
+      "image": "06-native-draft.png"
+    },
+    {
+      "step": 7,
+      "experience": "Escape + CtrlAltO reinvocation",
+      "result": "Draft preserved but persistent Window confirmation expired. Try opening the presence again. warning appeared, with scrollbar despite Here/Ask available",
+      "image": "07-native-reinvoke-warning.png"
+    },
+    {
+      "step": 8,
+      "experience": "Ask after natural fixture Worker lease expiry",
+      "result": "Ask callback ran but no task/feedback. Kept as observation only pending controlled reproduction14; fixture lapse was not an app crash.",
+      "image": "08-native-ask-no-feedback.png"
+    },
+    {
+      "step": 9,
+      "experience": "Ask2+3 with maintained Worker heartbeat",
+      "backend": {
+        "state": "planned",
+        "message": null,
+        "task_id": "056613a4468a4c1d85189e5313cb40a9"
+      },
+      "result": "Actual approval required; settled facial eyes narrow/subdued as in offline",
+      "image": "09-native-approval-settled.png"
+    },
+    {
+      "step": 10,
+      "experience": "Real fixture execution",
+      "backend": {
+        "state": "awaiting_result"
+      },
+      "result": "Harness programmatically starts safe math, pauses executor then releases; native shows Waiting truthfully. This is NOT GUI owner approval acceptance.",
+      "image": "10-native-awaiting-result.png"
+    },
+    {
+      "step": 11,
+      "experience": "Result",
+      "backend": {
+        "state": "verified",
+        "value": "5"
+      },
+      "result": "Native local bounded answer displays VERIFIED5",
+      "image": "11-native-result.png"
+    },
+    {
+      "step": 12,
+      "experience": "Core stopped",
+      "result": "Real HTTPserver shutdown; native shows Offline/unknownwork/requestsdisabled",
+      "image": "12-native-disconnected.png"
+    },
+    {
+      "step": 13,
+      "experience": "Core restored",
+      "result": "Real server resumed; native shows Here and prior VERIFIED5. No real speech/listening commissioned.",
+      "image": "13-native-reconnected.png"
+    },
+    {
+      "step": 14,
+      "experience": "Executor loss while Core stays connected",
+      "backend": {
+        "state": "blocked",
+        "message": "Core/Worker capability unavailable or ambiguous; nothing executed",
+        "task_id": null
+      },
+      "result": "Explicit h.grid.disconnect(worker), then Ask again+Ask2+3. No new task/execution. Settled native remains input2+3/Ask/Here without blocker or explanation.",
+      "image": "14-native-blocked-no-feedback.png"
+    },
+    {
+      "step": 15,
+      "experience": "Close/hide and explicit exit",
+      "result": "AltF4 hid ordinary owned window: sky.list_windows returned none while process still running. Existing --baseline-menu reference displayed native Open/Compact/Hide/Quit menu. SDK selection/activation dismissed popup and did not expose a separately targetable menu, so Quit action/tray navigation remain UNVERIFIED. Owned fixture processes terminated only for cleanup; not reported as UI Quit success."
+    }
+  ],
+  "limits": [
+    "Nofull-rate live gaze/puck/interruption recording obtained; original GIFs are coarse",
+    "NoOSscaling changes or multiple monitors",
+    "Noactualbackgroundthrough-click; no input sent to underlying application toolbar",
+    "Noassistive-technology conformance audit",
+    "NoUIowner confirmation, physical voice or real phone/Edge",
+    "No fullscreen/DWMshadow/per-process CPU/GPU validation",
+    "Compositing observed against an underlyingdarkapplication, not every wallpaper/theme/taskbar setting"
+  ],
+  "integrity": "Original ZIP and source captures/review files preserved; only NEW audit evidence and two requested LOCAL reports created.",
+  "images": [
+    {
+      "file": "01-native-offline.png",
+      "sha256": "bfecea25a542f4f0ee245aead219d3e8f4ab4aeb2a21827088666d63dbf0e60d"
+    },
+    {
+      "file": "02-native-offline-expanded.png",
+      "sha256": "c41099fd7c3b479f2f50fdb1218f6d343d5888beb2b80e158bb6565dc12569ad"
+    },
+    {
+      "file": "03-native-offline-retreated.png",
+      "sha256": "125fdb63b4ef3c7db1d55220db6bc5950ef419f9a593e5e6f05f43743804ef6d"
+    },
+    {
+      "file": "04-native-rest.png",
+      "sha256": "ad3d8900669e8bd5561f682b086a2e4eb833da69896f4a04fd362ef567f6f930"
+    },
+    {
+      "file": "05-native-invoked.png",
+      "sha256": "249acbe78be97eed154fa3e8a315ee1b952a89eaa97d97ebf49b037b9c45280f"
+    },
+    {
+      "file": "06-native-draft.png",
+      "sha256": "fcd7cc4b20687a3d685db6138b88110b2b528ac5f772df23ae7babe7c3e5799e"
+    },
+    {
+      "file": "07-native-reinvoke-warning.png",
+      "sha256": "a7fec02a6bf77c014fcce569f87b4e6106e39d214d8069056a6f703953b3203f"
+    },
+    {
+      "file": "08-native-ask-no-feedback.png",
+      "sha256": "f543f02c5dcd3da1d195164f346c844103ab51356585c7cd0ea9176cbe973d22"
+    },
+    {
+      "file": "09-native-approval-settled.png",
+      "sha256": "a82f34426ac2ae042ef1b19068ca636164f0262383744d3bebbbd8974da8496f"
+    },
+    {
+      "file": "10-native-awaiting-result.png",
+      "sha256": "e69ce53d09b1d259eef715e140fa4ddd1910e78d067600e1f8d29f55b3754a7a"
+    },
+    {
+      "file": "11-native-result.png",
+      "sha256": "f283473d0e894501a108e9d66456f629ef674c89c675ebf1a4da2b4704fd43f6"
+    },
+    {
+      "file": "12-native-disconnected.png",
+      "sha256": "31eb8fa5df247549d25c9c27dd83c2ed7cd79ca6dd94a91d4259619761ee8c3f"
+    },
+    {
+      "file": "13-native-reconnected.png",
+      "sha256": "f283473d0e894501a108e9d66456f629ef674c89c675ebf1a4da2b4704fd43f6"
+    },
+    {
+      "file": "14-native-blocked-no-feedback.png",
+      "sha256": "bbac19ca4d4063e8044b0b35a21533ee6e0ae145713796978abd0f8b1a47ef0e"
+    }
+  ]
+}

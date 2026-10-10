@@ -1,0 +1,6 @@
+{
+  "native": "original Tauri/WebView2, original frontend, disposable Core",
+  "cycles": 12,
+  "warnings_reproduced": 0,
+  "draft": "Unfinished reference draft"
+}

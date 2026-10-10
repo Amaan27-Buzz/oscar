@@ -1,0 +1,79 @@
+{
+  "reviewed_commit": "5fea2071e891adf0fac7f9838ee556c9a60e1e1c",
+  "source": "original local candidate worktree",
+  "privacy": "Synthetic math/drafts and native application crops; no credential values, private recordings or owner archives included.",
+  "files": [
+    {
+      "file": "INDEPENDENT-REVIEW.md",
+      "sha256": "bdb7c5b1deb4311ef4dceccf8cfdf89cd349754f4911ac40eb76ee4dd758f681"
+    },
+    {
+      "file": "OWNER-VERDICT.md",
+      "sha256": "9fcb7f9679c3506c1bd53ff756107f2c7a2067a68193969f99f0915c09897516"
+    },
+    {
+      "file": "independent-evidence/01-native-offline.png",
+      "sha256": "bfecea25a542f4f0ee245aead219d3e8f4ab4aeb2a21827088666d63dbf0e60d"
+    },
+    {
+      "file": "independent-evidence/02-native-offline-expanded.png",
+      "sha256": "c41099fd7c3b479f2f50fdb1218f6d343d5888beb2b80e158bb6565dc12569ad"
+    },
+    {
+      "file": "independent-evidence/03-native-offline-retreated.png",
+      "sha256": "125fdb63b4ef3c7db1d55220db6bc5950ef419f9a593e5e6f05f43743804ef6d"
+    },
+    {
+      "file": "independent-evidence/04-native-rest.png",
+      "sha256": "ad3d8900669e8bd5561f682b086a2e4eb833da69896f4a04fd362ef567f6f930"
+    },
+    {
+      "file": "independent-evidence/05-native-invoked.png",
+      "sha256": "249acbe78be97eed154fa3e8a315ee1b952a89eaa97d97ebf49b037b9c45280f"
+    },
+    {
+      "file": "independent-evidence/06-native-draft.png",
+      "sha256": "fcd7cc4b20687a3d685db6138b88110b2b528ac5f772df23ae7babe7c3e5799e"
+    },
+    {
+      "file": "independent-evidence/07-native-reinvoke-warning.png",
+      "sha256": "a7fec02a6bf77c014fcce569f87b4e6106e39d214d8069056a6f703953b3203f"
+    },
+    {
+      "file": "independent-evidence/08-native-ask-no-feedback.png",
+      "sha256": "f543f02c5dcd3da1d195164f346c844103ab51356585c7cd0ea9176cbe973d22"
+    },
+    {
+      "file": "independent-evidence/09-native-approval-settled.png",
+      "sha256": "a82f34426ac2ae042ef1b19068ca636164f0262383744d3bebbbd8974da8496f"
+    },
+    {
+      "file": "independent-evidence/10-native-awaiting-result.png",
+      "sha256": "e69ce53d09b1d259eef715e140fa4ddd1910e78d067600e1f8d29f55b3754a7a"
+    },
+    {
+      "file": "independent-evidence/11-native-result.png",
+      "sha256": "f283473d0e894501a108e9d66456f629ef674c89c675ebf1a4da2b4704fd43f6"
+    },
+    {
+      "file": "independent-evidence/12-native-disconnected.png",
+      "sha256": "31eb8fa5df247549d25c9c27dd83c2ed7cd79ca6dd94a91d4259619761ee8c3f"
+    },
+    {
+      "file": "independent-evidence/13-native-reconnected.png",
+      "sha256": "f283473d0e894501a108e9d66456f629ef674c89c675ebf1a4da2b4704fd43f6"
+    },
+    {
+      "file": "independent-evidence/14-native-blocked-no-feedback.png",
+      "sha256": "bbac19ca4d4063e8044b0b35a21533ee6e0ae145713796978abd0f8b1a47ef0e"
+    },
+    {
+      "file": "independent-evidence/annotated-failure-comparison.png",
+      "sha256": "ea3d928204d1b98873fb53a0e68333c80e345358c3b994e8ef05936ed4545cd2"
+    },
+    {
+      "file": "independent-evidence/native-runtime-review.json",
+      "sha256": "203a658b4a5839a5c642ff8cea7b0bfbde40a57726746931bc3913c22d5259bb"
+    }
+  ]
+}

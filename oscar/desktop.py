@@ -129,6 +129,7 @@ class Desktop(Mobile):
             else (route.capability_kind)
         )
         eligible = []
+        permission_denied = False
         if private_model and kind != "model_reasoning":
             return {
                 "state": "blocked",
@@ -152,11 +153,20 @@ class Desktop(Mobile):
             )
             if check.allowed or check.reason == "personal policy requires confirmation":
                 eligible.append(cap)
+            else:
+                permission_denied = True
         if len(eligible) != 1:
             return {
                 "state": "blocked",
                 "epistemic": "UNKNOWN",
-                "message": "Core/Worker capability unavailable or ambiguous; nothing executed",
+                "reason": "permission_denied"
+                if not eligible and permission_denied
+                else "capability_unavailable",
+                "message": (
+                    "Permission or Personal Policy denied this request; nothing executed"
+                    if not eligible and permission_denied
+                    else "Core/Worker capability unavailable or ambiguous; nothing executed"
+                ),
             }
         target = eligible[0].node_id
         self.authenticate(session, "control:inspect:" + target)

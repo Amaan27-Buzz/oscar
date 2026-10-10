@@ -1,0 +1,70 @@
+{
+  "source": "ACTUAL_TAURI_WEBVIEW2_SCREencast",
+  "not": "synthetic browser or whole-desktop compositor video",
+  "alignment": "Actual frames aligned bottom-right on neutral canvas; raw PNGs retained",
+  "seconds": 5.0,
+  "frames": [
+    {
+      "file": "0000.png",
+      "native_timestamp": 1791656845.486313,
+      "elapsed_ms": 43
+    },
+    {
+      "file": "0001.png",
+      "native_timestamp": 1791656845.981413,
+      "elapsed_ms": 528
+    },
+    {
+      "file": "0002.png",
+      "native_timestamp": 1791656846.49713,
+      "elapsed_ms": 1045
+    },
+    {
+      "file": "0003.png",
+      "native_timestamp": 1791656847.017225,
+      "elapsed_ms": 1558
+    },
+    {
+      "file": "0004.png",
+      "native_timestamp": 1791656847.550936,
+      "elapsed_ms": 2089
+    },
+    {
+      "file": "0005.png",
+      "native_timestamp": 1791656848.084048,
+      "elapsed_ms": 2628
+    },
+    {
+      "file": "0006.png",
+      "native_timestamp": 1791656848.612227,
+      "elapsed_ms": 3149
+    },
+    {
+      "file": "0007.png",
+      "native_timestamp": 1791656849.134002,
+      "elapsed_ms": 3671
+    },
+    {
+      "file": "0008.png",
+      "native_timestamp": 1791656849.666942,
+      "elapsed_ms": 4202
+    },
+    {
+      "file": "0009.png",
+      "native_timestamp": 1791656850.200877,
+      "elapsed_ms": 4735
+    }
+  ],
+  "settled_snapshot": {
+    "url": "http://127.0.0.1:1420/?living",
+    "width": 432,
+    "height": 384,
+    "focus": "presence-ask",
+    "operation": "attentive",
+    "attention": "none",
+    "scroll": {
+      "height": 256,
+      "scroll": 256
+    }
+  }
+}

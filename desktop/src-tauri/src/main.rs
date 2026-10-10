@@ -60,6 +60,7 @@ fn window_mode(app: &tauri::AppHandle, state: &Native, mode: WindowMode) -> Resu
         .lock()
         .map_err(|_| "native state unavailable")?;
     view.window = mode;
+    view.window_revision += 1;
     if state.presence {
         view.expression.generation += 1;
     }
@@ -211,7 +212,7 @@ async fn desktop_command(
     .map_err(|_| "native request failed; inspect before retry")?;
     let view = match view {
         Ok(v) => v,
-        Err(error) => state.bridge.fail(error),
+        Err(error) => state.bridge.fail_request(error),
     };
     if view.review.is_some() {
         let _ = window_mode(&app, &state, WindowMode::Approval);
@@ -486,7 +487,7 @@ fn main() {
                     if baseline=="--baseline-menu" {
                         if let Some(window)=handle.get_webview_window("main"){let _=window.popup_menu_at(&menu,tauri::LogicalPosition::new(30.,30.));}
                     }else if baseline=="--baseline-dialog" {
-                        owner_review(&handle,&ReviewView {review_id:"synthetic-unusable".into(),operation:"approve".into(),description:"Synthetic capture only".into(),target:"fixture-worker".into(),capability:"machine.files.write".into(),reason:"Development baseline capture".into(),consequence:"No action or signature is possible in this capture mode".into(),policy_reason:"Native presentation only; no Core or credentials".into(),evidence_state:"SIMULATED / unexecuted".into(),review:"notes/reference.txt\nSynthetic content only. This dialog cannot authorize work.".into(),expires_at_ms:0});
+                        owner_review(&handle,&ReviewView {review_id:"synthetic-unusable".into(),task_id:"synthetic-unusable".into(),operation:"approve".into(),description:"Synthetic capture only".into(),target:"fixture-worker".into(),capability:"machine.files.write".into(),reason:"Development baseline capture".into(),consequence:"No action or signature is possible in this capture mode".into(),policy_reason:"Native presentation only; no Core or credentials".into(),evidence_state:"SIMULATED / unexecuted".into(),review:"notes/reference.txt\nSynthetic content only. This dialog cannot authorize work.".into(),expires_at_ms:0});
                     }else {
                         let window=handle.get_webview_window("main").expect("owned lifecycle window");
                         window.close().expect("close request");thread::sleep(Duration::from_millis(700));

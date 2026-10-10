@@ -1,14 +1,16 @@
-import {useEffect,useState} from 'react';
+import {useEffect,useRef,useState} from 'react';
 import {DesktopExpression} from './DesktopExpression';
 import type {Source} from '@oscar/expression';
 import {Act} from './Act';
 import {initialView,send,subscribe,stateLabel,statuses} from './bridge';
 import type {Command,Mode,Send,View,ContextChoice} from './bridge';
-export function App({port=send,events=subscribe,expressionKind='core'}:{port?:Send;events?:typeof subscribe;expressionKind?:Source['kind']}) {
+export function App({port=send,events=subscribe,expressionKind='core',focusReview=false}:{port?:Send;events?:typeof subscribe;expressionKind?:Source['kind'];focusReview?:boolean}) {
   const [view,setView]=useState<View>(initialView);const [mode,setMode]=useState<Mode>('Ask');
   const [text,setText]=useState('');const [busy,setBusy]=useState(false);const [error,setError]=useState('');
   const [choice,setChoice]=useState<ContextChoice>('none');const [destination,setDestination]=useState<'surface'|'clipboard'|'focused'>('surface');
   const [shortcut,setShortcut]=useState('Ctrl+Alt+O');
+  const approval=useRef<HTMLElement|null>(null);
+  useEffect(()=>{if(focusReview&&view.review){approval.current?.focus({preventScroll:true});approval.current?.scrollIntoView({block:'start'});}},[focusReview,view.review?.review_id]);
   useEffect(()=>{let active=true;let stop:(()=>void)|undefined;
     events(v=>{if(active)setView(v);}).then(fn=>{if(active)stop=fn;else fn();}).catch(()=>{if(active)setError('Native event bridge unavailable.');});
     port({kind:'ready'}).then(v=>{if(active)setView(v);}).catch(()=>{if(active)setError('Open OSCAR through the native desktop executable.');});
@@ -68,7 +70,7 @@ export function App({port=send,events=subscribe,expressionKind='core'}:{port?:Se
         <label>Destination<select value={destination} onChange={e=>setDestination(e.target.value as typeof destination)}>{view.preview.destinations.map(d=><option key={d} value={d}>{d==='surface'?'OSCAR surface':d==='focused'?'Captured field':'Explicit clipboard'}</option>)}</select></label>
         <button disabled={busy||!online} onClick={()=>run({kind:'apply',preview_id:view.preview!.preview_id,destination})}>Accept this preview</button>
       </section>}
-      {view.review&&<section aria-label="Owner approval" className="approval"><h2>Owner decision</h2><dl>{[['What',view.review.description],['Operation',view.review.operation],['Target',view.review.target],['Capability',view.review.capability],['Reason',view.review.reason],['Consequence',view.review.consequence],['Policy',view.review.policy_reason],['Current evidence/state',view.review.evidence_state]].map(([label,value])=><div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl>
+      {view.review&&<section ref={approval} tabIndex={focusReview?-1:undefined} aria-label="Owner approval" className="approval"><h2>Owner decision</h2><dl>{[['What',view.review.description],['Operation',view.review.operation],['Target',view.review.target],['Capability',view.review.capability],['Reason',view.review.reason],['Consequence',view.review.consequence],['Policy',view.review.policy_reason],['Current evidence/state',view.review.evidence_state]].map(([label,value])=><div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl>
         <details open><summary>Exact reviewed material</summary><pre>{view.review.review}</pre></details><p>This approval grants no permanent authority. Native confirmation follows; signing stays outside the WebView.</p>
         <div className="actions"><button disabled={busy||!online} onClick={()=>run({kind:'confirm',review_id:view.review!.review_id,accept:true})}>Continue to native confirmation</button>
           <button disabled={busy} onClick={()=>run({kind:'confirm',review_id:view.review!.review_id,accept:false})}>Dismiss review</button></div>

@@ -1,7 +1,7 @@
 use tauri::WebviewWindow;
 
 pub const COMPACT: (f64, f64) = (132., 148.);
-pub const INTERACTION: (f64, f64) = (432., 384.);
+pub const INTERACTION: (f64, f64) = (432., 416.);
 
 fn placement(
     old: (f64, f64, f64, f64),

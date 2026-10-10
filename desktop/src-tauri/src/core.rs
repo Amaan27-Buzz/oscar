@@ -96,12 +96,14 @@ impl CoreClient {
                 },
             ))
             .send()
-            .map_err(|_| "Core unavailable; outcome UNKNOWN; inspect before retry")?;
-        if !response.status().is_success() {
-            return Err(format!(
-                "Core rejected {operation}; refresh task/context or permission"
-            ));
-        }
+            .map_err(|error| {
+                if error.is_timeout() {
+                    "Core request timed out; outcome UNKNOWN; inspect before retry"
+                } else {
+                    "Core unavailable; outcome UNKNOWN; inspect before retry"
+                }
+            })?;
+        let status = response.status();
         let mut bytes = Vec::new();
         response
             .take(65537)
@@ -116,6 +118,27 @@ impl CoreClient {
             .contains(self.token.as_str())
         {
             return Err("Core credential cannot enter presentation".into());
+        }
+        if !status.is_success() {
+            let reason = value["message"]
+                .as_str()
+                .or_else(|| value["error"].as_str())
+                .unwrap_or("Inspect Core for details");
+            return Err(
+                if status.as_u16() == 401
+                    || (status.as_u16() == 403 && value["error"] == "permission_denied")
+                {
+                    format!("Permission denied by Core: {reason}")
+                } else if matches!(status.as_u16(), 408 | 504) {
+                    "Core request timed out; outcome UNKNOWN; inspect before retry".into()
+                } else if status.is_server_error() {
+                    format!(
+                        "Core returned an error; outcome UNKNOWN; inspect before retry: {reason}"
+                    )
+                } else {
+                    format!("Core rejected {operation}: {reason}")
+                },
+            );
         }
         Ok(value)
     }
@@ -168,6 +191,7 @@ impl CoreClient {
         let id = uuid::Uuid::new_v4().simple().to_string();
         let view = ReviewView {
             review_id: id.clone(),
+            task_id: task_id.into(),
             operation: text("operation")?,
             description: text("description")?,
             target: text("target")?,
@@ -277,7 +301,9 @@ impl Bridge {
         ) {
             self.voice_request(json!({"operation":"inspect"}))?;
         }
-        let (mut tasks, caps, at) = client.snapshot()?;
+        let (mut tasks, caps, at) = client
+            .snapshot()
+            .map_err(|error| format!("Core unavailable; {error}"))?;
         if self.hide_private.load(Ordering::Acquire) {
             for task in &mut tasks {
                 task.response = None;
@@ -285,23 +311,53 @@ impl Bridge {
             }
         }
         let mut view = self.view.lock().map_err(|_| "native state unavailable")?;
-        if let Some(current) = &view.current {
-            view.current = tasks.iter().find(|t| t.task_id == current.task_id).cloned();
-        }
         if at < view.observed_at_ms {
             return Ok(view.clone());
+        }
+        // A snapshot started before a command must not erase its newer task/approval readback.
+        if at >= view.expression.current_observed_at_ms {
+            if let Some(current) = &view.current {
+                view.current = tasks.iter().find(|t| t.task_id == current.task_id).cloned();
+            }
+            view.expression.current_observed_at_ms = at;
         }
         if view.link != "online" {
             if view.voice != "muted" {
                 view.voice = "idle".into();
             }
             view.expression.voice_observed_at_ms = 0;
+            if view
+                .message
+                .as_deref()
+                .is_some_and(|m| m.starts_with("Core unavailable"))
+            {
+                view.message = None;
+            }
         }
         view.expression.generation += 1;
         view.expression.observed_at_ms = at;
         view.expression.tasks_observed_at_ms = at;
-        view.expression.current_observed_at_ms = at;
         view.tasks = tasks;
+        if view.review.as_ref().is_some_and(|review| {
+            review.expires_at_ms <= now_ms()
+                || !view
+                    .current
+                    .as_ref()
+                    .filter(|task| {
+                        task.task_id == review.task_id
+                            && view.expression.current_observed_at_ms
+                                >= view.expression.tasks_observed_at_ms
+                    })
+                    .or_else(|| {
+                        view.tasks
+                            .iter()
+                            .find(|task| task.task_id == review.task_id)
+                    })
+                    .is_some_and(|task| task.actions.contains(&review.operation))
+        }) {
+            client.invalidate_reviews();
+            view.review = None;
+        }
         view.capabilities = caps;
         view.observed_at_ms = at;
         view.link = "online".into();
@@ -324,13 +380,32 @@ impl Bridge {
                 view.voice = "idle".into();
             }
             view.expression.voice_observed_at_ms = 0;
-            view.expression.generation += 1;
-            view.expression.observed_at_ms = now_ms();
             view.link = "unavailable".into();
             view.capabilities.clear();
         }
         view.message = Some(message);
+        view.expression.generation += 1;
+        view.expression.observed_at_ms = now_ms();
         view.orb = orb(&view.link, view.current.as_ref(), &view.voice);
+        view.clone()
+    }
+    pub fn fail_request(&self, message: String) -> View {
+        let kind = if message.starts_with("Permission denied") {
+            FeedbackKind::Denied
+        } else if message.starts_with("Core unavailable") || message.contains("outcome UNKNOWN") {
+            FeedbackKind::Unknown
+        } else {
+            FeedbackKind::Rejected
+        };
+        self.fail(message.clone());
+        let mut view = self.view.lock().unwrap_or_else(|p| p.into_inner());
+        view.feedback = Some(RequestFeedback {
+            kind,
+            message,
+            observed_at_ms: now_ms(),
+        });
+        view.expression.generation += 1;
+        view.expression.observed_at_ms = now_ms();
         view.clone()
     }
     fn voice_request(&self, payload: Value) -> Result<View, String> {
@@ -356,6 +431,7 @@ impl Bridge {
         }
         view.message = value["message"].as_str().map(str::to_owned);
         if value["task_id"].is_string() {
+            view.feedback = None;
             view.expression.current_observed_at_ms = now_ms();
             view.current =
                 Some(serde_json::from_value(value.clone()).map_err(|_| "invalid Core task")?);
@@ -367,11 +443,24 @@ impl Bridge {
         if value["state"] == "blocked" && !value["task_id"].is_string() {
             view.current = None;
             view.orb = "unavailable".into();
+            view.feedback = Some(RequestFeedback {
+                kind: if value["reason"] == "permission_denied" {
+                    FeedbackKind::Denied
+                } else {
+                    FeedbackKind::Blocked
+                },
+                message: value["message"]
+                    .as_str()
+                    .unwrap_or("Core blocked this request. Inspect the current state.")
+                    .into(),
+                observed_at_ms: now_ms(),
+            });
         }
         if value["state"] == "verified"
             && value["value"].is_string()
             && !value["task_id"].is_string()
         {
+            view.feedback = None;
             view.message = Some(format!(
                 "VERIFIED · OSCAR surface only: {}",
                 value["value"].as_str().unwrap_or_default()
@@ -427,6 +516,7 @@ impl Bridge {
                 task.value = None;
             }
             view.message = None;
+            view.feedback = None;
             drop(view);
             let acknowledged = if let Ok(client) = self.client() {
                 client.invalidate_reviews();
@@ -595,6 +685,7 @@ mod tests {
         .expect("client");
         let view = ReviewView {
             review_id: "stale".into(),
+            task_id: "fixture".into(),
             operation: "approve".into(),
             description: "fixture".into(),
             target: "worker".into(),
@@ -649,5 +740,151 @@ mod tests {
             .expect("response");
         assert!(blocked.current.is_none());
         assert_eq!(blocked.orb, "unavailable");
+    }
+    #[test]
+    fn request_feedback_is_specific_fresh_and_never_fabricates_a_task() {
+        let bridge = Bridge::new();
+        bridge.view.lock().unwrap().link = "online".into();
+        let blocked = bridge.response(json!({"state":"blocked","reason":"capability_unavailable","message":"Worker unavailable; nothing executed"})).unwrap();
+        assert!(matches!(
+            blocked.feedback.unwrap().kind,
+            FeedbackKind::Blocked
+        ));
+        assert!(blocked.current.is_none());
+        let denied = bridge.response(json!({"state":"blocked","reason":"permission_denied","message":"Policy denies this request"})).unwrap();
+        assert!(matches!(
+            denied.feedback.unwrap().kind,
+            FeedbackKind::Denied
+        ));
+        let revision = denied.expression.generation;
+        let unknown = bridge
+            .fail_request("Core request timed out; outcome UNKNOWN; inspect before retry".into());
+        assert!(matches!(
+            unknown.feedback.unwrap().kind,
+            FeedbackKind::Unknown
+        ));
+        assert!(unknown.expression.generation > revision);
+        assert!(unknown.current.is_none());
+        let resolved = bridge.response(json!({"task_id":"exact","state":"planned","target":"fixture","actions":["approve"]})).unwrap();
+        assert!(resolved.feedback.is_none());
+        assert_eq!(resolved.current.unwrap().state, "planned");
+    }
+    #[test]
+    fn http_permission_rejection_and_uncertain_server_failure_remain_distinct() {
+        use std::net::TcpListener;
+        for (status, body, expected) in [
+            (
+                403,
+                r#"{"error":"permission_denied","message":"Core denied permission"}"#,
+                "Permission denied by Core",
+            ),
+            (
+                403,
+                r#"{"error":"request rejected; refresh trusted Core state"}"#,
+                "Core rejected interact",
+            ),
+            (503, r#"{"error":"Core unavailable"}"#, "outcome UNKNOWN"),
+        ] {
+            let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+            let url = format!("http://{}", listener.local_addr().unwrap());
+            let server = std::thread::spawn(move || {
+                use std::io::Write;
+                let (mut connection, _) = listener.accept().unwrap();
+                let mut request = [0; 4096];
+                assert!(connection.read(&mut request).unwrap() > 0);
+                write!(connection, "HTTP/1.1 {status} Fixture\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{body}", body.len()).unwrap();
+            });
+            let client = CoreClient::new(
+                Bootstrap {
+                    url,
+                    node: "fixture".into(),
+                    session: "fixture".into(),
+                    token: "disposable-reference-token-only".into(),
+                    reference: true,
+                    reference_target: None,
+                },
+                Arc::new(Signer::new().unwrap()),
+            )
+            .unwrap();
+            let error = client.request("interact", json!({})).unwrap_err();
+            assert!(error.contains(expected), "{error}");
+            server.join().unwrap();
+        }
+    }
+    #[test]
+    fn older_snapshot_preserves_new_task_and_fresh_completion_retires_review() {
+        use std::{io::Write, net::TcpListener};
+        let base = now_ms().saturating_sub(2000);
+        let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+        let url = format!("http://{}", listener.local_addr().unwrap());
+        let server = std::thread::spawn(move || {
+            let responses = [
+                json!({"tasks":[],"observed_at_ms":base+200}),
+                json!({"capabilities":[]}),
+                json!({"tasks":[{"task_id":"new","state":"verified","target":"fixture","actions":[]}],"observed_at_ms":base+600}),
+                json!({"capabilities":[]}),
+            ];
+            for response in responses {
+                let (mut connection, _) = listener.accept().unwrap();
+                let mut request = [0; 4096];
+                assert!(connection.read(&mut request).unwrap() > 0);
+                let body = response.to_string();
+                write!(
+                    connection,
+                    "HTTP/1.1 200 OK\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{body}",
+                    body.len()
+                )
+                .unwrap();
+            }
+        });
+        let client = Arc::new(
+            CoreClient::new(
+                Bootstrap {
+                    url,
+                    node: "fixture".into(),
+                    session: "fixture".into(),
+                    token: "disposable-reference-token-only".into(),
+                    reference: true,
+                    reference_target: None,
+                },
+                Arc::new(Signer::new().unwrap()),
+            )
+            .unwrap(),
+        );
+        let bridge = Bridge::new();
+        *bridge.client.lock().unwrap() = Some(client);
+        {
+            let mut view = bridge.view.lock().unwrap();
+            view.observed_at_ms = base;
+            view.expression.current_observed_at_ms = base + 400;
+            view.current = Some(TaskView {
+                task_id: "new".into(),
+                state: "planned".into(),
+                actions: vec!["approve".into()],
+                ..Default::default()
+            });
+            view.review = Some(ReviewView {
+                review_id: "review".into(),
+                task_id: "new".into(),
+                operation: "approve".into(),
+                description: "Fixture".into(),
+                target: "fixture".into(),
+                capability: "math.add".into(),
+                reason: "Owner review".into(),
+                consequence: "Add integers".into(),
+                policy_reason: "Fixture".into(),
+                evidence_state: "planned".into(),
+                review: "2+3".into(),
+                expires_at_ms: now_ms() + 30000,
+            });
+        }
+        let older = bridge.refresh().unwrap();
+        assert_eq!(older.current.unwrap().state, "planned");
+        assert!(older.review.is_some());
+        assert_eq!(older.expression.current_observed_at_ms, base + 400);
+        let fresh = bridge.refresh().unwrap();
+        assert_eq!(fresh.current.unwrap().state, "verified");
+        assert!(fresh.review.is_none());
+        server.join().unwrap();
     }
 }

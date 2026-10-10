@@ -16,6 +16,20 @@ function mount(overrides:Partial<View>={}) {
   return {port,emit:(v:Partial<View>)=>{view={...view,...v};update(view);}};
 }
 describe('OSCAR surface contract',()=>{
+  it('the presence handoff focuses the actual review without making a decision',async()=>{
+    const review={review_id:'review',task_id:'exact',operation:'approve',description:'Add 2 and 3',target:'worker',capability:'math.add',reason:'Owner request',consequence:'Add integers',policy_reason:'Scoped grant',evidence_state:'planned',review:'2 + 3',expires_at_ms:Date.now()+30000};
+    const port=vi.fn(async()=>({...initialView,window:'approval' as const,link:'online',review}));
+    const scroll=vi.fn();
+    const original=HTMLElement.prototype.scrollIntoView;HTMLElement.prototype.scrollIntoView=scroll;
+    try {
+      render(<App port={port} events={async()=>()=>{}} focusReview/>);
+      const section=await screen.findByRole('region',{name:'Owner approval'});
+      await waitFor(()=>expect(document.activeElement).toBe(section));
+      expect(scroll).toHaveBeenCalledWith({block:'start'});
+      expect(port.mock.calls).toHaveLength(1);
+      expect(screen.getByText('2 + 3')).toBeTruthy();
+    } finally {HTMLElement.prototype.scrollIntoView=original;}
+  });
   it('supports keyboard mode navigation and visible semantic focus',async()=>{
     mount();const ask=await screen.findByRole('tab',{name:'Ask'});ask.focus();
     fireEvent.keyDown(ask,{key:'ArrowRight'});

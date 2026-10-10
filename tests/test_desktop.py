@@ -297,7 +297,20 @@ class DesktopTests(unittest.TestCase):
         self.h.grid.disconnect(self.h.node_id)
         view = self.ask()
         self.assertEqual(view["state"], "blocked")
+        self.assertEqual(view["reason"], "capability_unavailable")
         self.assertEqual(self.h.store.all("task"), [])
+
+    def test_proposal_distinguishes_permission_denial_from_missing_capability(self) -> None:
+        self.core.policy.save(
+            PolicyRule("deny-proposal", "math.add", PolicyEffect.DENY, "owner", time(), time(), {}),
+            owner_authorized=True,
+        )
+        view = self.ask()
+        self.assertEqual(view["state"], "blocked")
+        self.assertEqual(view["reason"], "permission_denied")
+        self.assertIn("Permission or Personal Policy denied", view["message"])
+        self.assertEqual(self.h.store.all("task"), [])
+        self.assertEqual(self.h.store.all("action"), [])
 
     def test_approval_policy_rechecked_and_no_permanent_grant(self) -> None:
         proposal = self.ask()

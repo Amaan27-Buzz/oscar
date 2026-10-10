@@ -40,10 +40,10 @@ class MotionData(raw: String) {
             boundary.availability == "unavailable" || op == "unavailable" -> { op = "unavailable"; cue = "subdued" }
             boundary.availability !in listOf("available", "unavailable") || op == "unknown" -> { op = "unknown"; cue = "hesitant" }
             op == "error" -> cue = "concerned"
-            boundary.owner || op == "waiting" -> { op = "waiting"; cue = "subdued" }
+            boundary.owner || op == "waiting" -> { op = "waiting"; cue = if (boundary.owner || cue == "attentive") "attentive" else "subdued" }
             boundary.muted || op == "muted" -> { op = "muted"; cue = "composed" }
             op in listOf("processing", "executing", "verifying") -> cue = "focused"
-            op == "listening" || (op == "attentive" && cue != "interrupted") -> cue = "attentive"
+            op == "listening" || (op == "attentive" && cue !in listOf("interrupted", "resting", "curious")) -> cue = "attentive"
             op == "speaking" && cue in listOf("asleep", "interrupted", "subdued") -> cue = "composed"
         }
         val muted = boundary.muted || scene.operation == "muted" || op == "muted"

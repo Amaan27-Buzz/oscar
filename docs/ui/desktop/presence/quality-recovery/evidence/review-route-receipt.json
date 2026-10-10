@@ -1,0 +1,21 @@
+{
+  "checks": [
+    "actual native review section focused",
+    "Owner decision visible in first viewport",
+    "exact arithmetic review material and native-confirmation path present",
+    "opening focused review made no decision"
+  ],
+  "native": {
+    "evidence": "AUTHENTICATED_DISPOSABLE_CORE",
+    "pid": 60284,
+    "native_debug_port": 64316,
+    "commands": "status block restore deny allow work execute finish reported failure disconnect reconnect cleanup"
+  },
+  "fixture_log": [
+    "{\"evidence\": \"AUTHENTICATED_DISPOSABLE_CORE\", \"pid\": 60284, \"native_debug_port\": 64316, \"commands\": \"status block restore deny allow work execute finish reported failure disconnect reconnect cleanup\"}",
+    "{\"core_response\": {\"state\": \"planned\", \"reason\": null, \"message\": null, \"task_id\": \"166d7eff627f4e7588bbeec1ed6388e6\"}}",
+    "{\"process_running\": true, \"tasks\": [{\"id\": \"166d7eff627f4e7588bbeec1ed6388e6\", \"state\": \"planned\"}], \"actions\": 0}",
+    "\"Owned fixture cleanup; not evidence of UI Quit\""
+  ],
+  "scope": "actual native Tauri/WebView2 content and authenticated disposable Core; no GUI approval or OS focus claim"
+}

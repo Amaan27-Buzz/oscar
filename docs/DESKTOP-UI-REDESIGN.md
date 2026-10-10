@@ -1,5 +1,12 @@
 # Slice 12 — OSCAR Desktop Experience / Visual Redesign
 
+**2026-10-11 status:** owner-authorized Slice 12.1 quality recovery is isolated on
+`fix/slice-12-1-presence-quality`, based on `5fea2071e891adf0fac7f9838ee556c9a60e1e1c`.
+See [corrective native evidence and review](ui/desktop/presence/quality-recovery/README.md).
+The prior 6.7/10 verdict and original captures are preserved. Default-presence
+promotion and merge require owner approval. Slice 12.2 remains NOT STARTED.
+The older status table below records the earlier exploratory checkpoint.
+
 Future targeted design track on the accepted Tauri 2/Rust/React-TypeScript shell.
 This Slice 10 run establishes functional surfaces and accessibility, not final
 Opus/Antigravity visual polish. Canonical Orb geometry remains unchanged.

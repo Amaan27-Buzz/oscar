@@ -254,6 +254,7 @@ pub struct PreviewView {
 #[derive(Clone, Serialize, PartialEq)]
 pub struct ReviewView {
     pub review_id: String,
+    pub task_id: String,
     pub operation: String,
     pub description: String,
     pub target: String,
@@ -274,12 +275,27 @@ pub struct ExpressionReadback {
     pub tasks_observed_at_ms: u64,
     pub current_observed_at_ms: u64,
 }
+#[derive(Clone, Serialize, PartialEq)]
+#[serde(rename_all = "snake_case")]
+pub enum FeedbackKind {
+    Blocked,
+    Denied,
+    Unknown,
+    Rejected,
+}
+#[derive(Clone, Serialize, PartialEq)]
+pub struct RequestFeedback {
+    pub kind: FeedbackKind,
+    pub message: String,
+    pub observed_at_ms: u64,
+}
 #[derive(Clone, Serialize, Default, PartialEq)]
 pub struct View {
     pub expression: ExpressionReadback,
     pub link: String,
     pub orb: String,
     pub window: WindowMode,
+    pub window_revision: u64,
     pub tasks: Vec<TaskView>,
     pub capabilities: Vec<CapabilityView>,
     pub context: Option<ContextView>,
@@ -287,6 +303,7 @@ pub struct View {
     pub review: Option<ReviewView>,
     pub current: Option<TaskView>,
     pub message: Option<String>,
+    pub feedback: Option<RequestFeedback>,
     pub voice: String,
     pub shortcut: String,
     pub observed_at_ms: u64,

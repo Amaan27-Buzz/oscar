@@ -12,14 +12,15 @@ export interface Choice {id:string;name:string}
 export interface Capability {id:string;node:string;kind:string;label:string;summary:string;risk:string;
   operations:string[];programs:Choice[];applications:Choice[]}
 export interface Preview {preview_id:string;before:string|null;after:string;epistemic:string;expires:number;destinations:string[]}
-export interface Review {review_id:string;operation:string;description:string;target:string;capability:string;reason:string;
+export interface Review {review_id:string;task_id?:string;operation:string;description:string;target:string;capability:string;reason:string;
   consequence:string;policy_reason:string;evidence_state:string;review:string;expires_at_ms:number}
 export interface ExpressionReadback {epoch:string;generation:number;observed_at_ms:number;voice_observed_at_ms:number;tasks_observed_at_ms:number;current_observed_at_ms:number}
+export interface RequestFeedback {kind:'blocked'|'denied'|'unknown'|'rejected';message:string;observed_at_ms:number}
 export interface View {expression:ExpressionReadback|null;link:string;orb:string;window:WindowMode;tasks:Task[];capabilities:Capability[];
   context:Context|null;preview:Preview|null;review:Review|null;current:Task|null;message:string|null;
-  voice:string;shortcut:string;observed_at_ms:number;reference:boolean}
+  voice:string;shortcut:string;observed_at_ms:number;reference:boolean;window_revision?:number;feedback?:RequestFeedback|null}
 export const initialView:View={expression:null,link:'unconfigured',orb:'unavailable',window:'compact',tasks:[],capabilities:[],
-  context:null,preview:null,review:null,current:null,message:null,voice:'idle',shortcut:'Not registered',observed_at_ms:0,reference:false};
+  context:null,preview:null,review:null,current:null,message:null,voice:'idle',shortcut:'Not registered',observed_at_ms:0,reference:false,window_revision:0,feedback:null};
 export type ActForm=
   |{operation:'write_file'|'ps_write_utf8';path:string;text:string}
   |{operation:'read_file'|'ps_file_hash';path:string}

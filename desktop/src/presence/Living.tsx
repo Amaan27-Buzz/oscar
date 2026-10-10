@@ -3,7 +3,7 @@ import {ExpressionPresence} from '@oscar/expression/react';
 import type {ExpressionEvent,Source} from '@oscar/expression';
 import {App} from '../App';
 import {initialView,send,subscribe,statuses} from '../bridge';
-import type {Command,Send,View} from '../bridge';
+import type {Command,Send,View,WindowMode} from '../bridge';
 import {DesktopExpressionAdapter} from '../expression';
 import './living.css';
 
@@ -25,59 +25,109 @@ export function LivingPresence({port=send,events=subscribe,sourceKind='core',win
   const [expired,setExpired]=useState(true),[open,setOpen]=useState(false),[leaving,setLeaving]=useState(false);
   const [hover,setHover]=useState(false),[draft,setDraft]=useState(''),[busy,setBusy]=useState(false);
   const [error,setError]=useState(''),[pinned,setPinned]=useState(false);
+  const [requestError,setRequestError]=useState('');
+  const [editingFeedback,setEditingFeedback]=useState('');
+  const [submitted,setSubmitted]=useState<{taskId:string;text:string}|null>(null);
   const [answerDismissed,setAnswerDismissed]=useState<string|null>(null);
   const lastFocused=useRef<HTMLElement|null>(null);
   const orb=useRef<HTMLButtonElement>(null),input=useRef<HTMLTextAreaElement>(null);
   const retreatTimer=useRef<ReturnType<typeof setTimeout>|undefined>(undefined);
+  const windowIntent=useRef(0),requestedWindow=useRef<WindowMode|null>(null),requests=useRef(0);
+  const latest=useRef(initialView),activeAccent=useRef('');
   const presentationGeneration=useRef(0);
-  const lastWindow=useRef(initialView.window);
   const [presentation,setPresentation]=useState<ExpressionEvent|null>(null);
   const [gaze,setGaze]=useState({x:0,y:0});const pointerAt=useRef(0);
   function accept(next:View) {
     const accepted=adapter.current.receive(next,Date.now());
     if(!accepted)return false;
-    setView(next);setEvent(accepted);setExpired(false);
-    if(next.window!==lastWindow.current){setOpen(next.window==='interaction');setLeaving(false);lastWindow.current=next.window;}
+    const windowChanged=next.window!==latest.current.window||next.window_revision!==latest.current.window_revision;
+    latest.current=next;setView(next);setEvent(accepted);setExpired(false);
+    if(windowChanged){
+      clearTimeout(retreatTimer.current);
+      if(next.window==='interaction'&&requestedWindow.current==='compact'){windowIntent.current++;requestedWindow.current=null;}
+      setOpen(next.window==='interaction');setLeaving(false);setError('');
+    }
     return true;
   }
   useEffect(()=>{let alive=true;let stop:(()=>void)|undefined;
     events(next=>{if(alive)accept(next);}).then(fn=>{if(alive)stop=fn;else fn();})
-      .catch(()=>{if(alive)setError('Native connection unavailable.');});
+      .catch(()=>{if(alive)setRequestError('Native connection unavailable. Inspect the current state before sending.');});
     port({kind:'ready'}).then(next=>{if(alive)accept(next);})
-      .catch(()=>{if(alive)setError('Open the native presence prototype.');});
+      .catch(()=>{if(alive)setRequestError('Open the native presence prototype.');});
     return()=>{alive=false;stop?.();clearTimeout(retreatTimer.current);};
   },[port,events]);
   useEffect(()=>{if(!event)return;const timer=setTimeout(()=>setExpired(true),Math.max(1,event.expiresAt-Date.now()));return()=>clearTimeout(timer);},[event]);
   useEffect(()=>{if(!event)return;
     const quiet=event.operation==='attentive'&&event.kind==='state'&&!expired;
-    setPresentation({...event,generation:++presentationGeneration.current,
+    const frame={...event,generation:++presentationGeneration.current,
       transitionId:quiet?`${event.transitionId}:${open?'invoked':hover?'hover':'rest'}`:event.transitionId,
-      delivery:quiet?(open?'attentive':hover?'curious':'resting'):event.delivery});
+      delivery:quiet?(open?'attentive':hover?'curious':'resting'):event.delivery} as ExpressionEvent;
+    setPresentation(frame);
+    // One existing engagement phrase per real executing transition; heartbeats never replay it.
+    const key=`${event.source.id}:${event.transitionId}`;
+    if(!expired&&event.operation==='executing'&&!event.muted&&event.attention==='none'&&event.kind==='state'&&activeAccent.current!==key){
+      const timer=setTimeout(()=>{
+        if(Date.now()>=frame.expiresAt)return;
+        activeAccent.current=key;
+        setPresentation({...frame,generation:++presentationGeneration.current,kind:'accent',accent:'engagement'});
+      },70);
+      return()=>clearTimeout(timer);
+    }
   },[event,open,hover,expired]);
-  useEffect(()=>{if(open&&!leaving&&view.window==='interaction')input.current?.focus();},[open,leaving,view.window]);
+  useEffect(()=>{if(open&&!leaving&&view.window==='interaction')input.current?.focus();},[open,leaving,view.window,view.window_revision]);
   const available=!expired&&event?.availability==='available'&&event.operation!=='unknown';
   const operation=expired?'unknown':event?.operation??'unavailable';
   const owner=available&&event?.attention==='owner';
-  const pending=view.tasks.find(t=>t.actions.includes('approve'))??view.current;
+  const feedback=!expired?(view.feedback??(requestError?{kind:'unknown' as const,message:requestError,observed_at_ms:0}:null)):null;
+  const feedbackKey=feedback?`${view.expression?.epoch}:${feedback.kind}:${feedback.observed_at_ms}`:'';
+  const editing=feedbackKey!==''&&editingFeedback===feedbackKey;
+  const pending=(view.current?.actions.includes('approve')?view.current:null)??view.tasks.find(t=>t.actions.includes('approve'));
   const task=(view.current&&!terminal.includes(view.current.state)?view.current:null)??view.tasks.find(t=>!terminal.includes(t.state))??view.current;
-  const label=owner?'Review needed':available&&operation==='attentive'&&view.voice==='interrupted'?'Interrupted':labels[operation]??'State unknown';
+  const label=owner?'Review needed':view.link==='online'&&feedback?feedback.kind==='denied'?'Permission denied':feedback.kind==='unknown'?'Check outcome':'Request blocked':available&&operation==='attentive'&&view.voice==='interrupted'?'Interrupted':labels[operation]??'State unknown';
   const workspace=view.window==='activity'||view.window==='approval';
-  const answer=available&&task&&['verified','partially_verified'].includes(task.state)&&answerDismissed!==task.task_id&&(task.value??task.response);
-  const headline=owner?'A decision for you.':operation==='unknown'?'Let’s check the state.':!available?'Connection paused.':operation==='error'?'Something stopped.':
+  const answer=!editing&&available&&task&&['verified','partially_verified'].includes(task.state)&&answerDismissed!==task.task_id&&(task.value??task.response);
+  const headline=owner?'Your decision is needed.':editing?'Revise your request.':view.link==='online'&&feedback?feedback.kind==='denied'?'This request isn’t permitted.':feedback.kind==='unknown'?'Let’s check the outcome.':feedback.kind==='blocked'?'This request didn’t start.':'Core rejected this request.':operation==='unknown'?'Let’s check the state.':!available?'Connection paused.':operation==='error'?'Something stopped.':
     task?.state==='blocked'?'Work is blocked.':operation==='waiting'?'Waiting.':operation==='processing'?'Processing.':operation==='verifying'?'Checking the result.':operation==='executing'?'I’m on it.':
     operation==='listening'?'Listening.':operation==='speaking'?'Speaking.':answer?'Here’s the result.':'What’s on your mind?';
   useEffect(()=>{const focused=lastFocused.current;
     if(open&&!workspace&&focused&&!focused.isConnected&&document.activeElement===document.body)orb.current?.focus();
   },[operation,owner,answer,open,workspace]);
   async function run(command:Command) {
-    setBusy(true);setError('');
-    try {const accepted=accept(await port(command));if(!accepted&&command.kind==='window')setError('Window confirmation expired. Try opening the presence again.');return accepted;}
-    catch {setError('Request unavailable. Inspect Core before retrying.');return false;}
-    finally {setBusy(false);}
+    const intent=command.kind==='window'?++windowIntent.current:0;
+    if(command.kind==='window')requestedWindow.current=command.mode;
+    requests.current++;setBusy(true);
+    try {
+      const next=await port(command),accepted=accept(next);
+      if(command.kind==='window'){
+        if(intent!==windowIntent.current)return true;
+        const current=latest.current;
+        // An emitted snapshot may have consumed this reply already. Rejection by the expression fence is not resize failure.
+        const confirmed=next.window===command.mode&&current.window===command.mode&&
+          next.expression?.epoch===current.expression?.epoch&&current.expression!==null&&next.expression!==null&&
+          current.expression.generation>=next.expression.generation;
+        if(confirmed){setError('');return true;}
+        if(accepted)setError('The window did not reach the requested size. Open it again or use the tray.');
+        return false;
+      }
+      if(accepted&&command.kind==='interact'&&!next.feedback)setRequestError('');
+      if(command.kind==='interact'&&next.current&&next.current.task_id===latest.current.current?.task_id&&
+        next.expression?.epoch===latest.current.expression?.epoch){
+        setSubmitted({taskId:next.current.task_id,text:command.text});
+      }
+      return accepted;
+    }
+    catch {
+      if(command.kind==='window'){
+        if(intent!==windowIntent.current)return true;
+        setError('The window could not change size. Open it again or use the tray.');
+      }else setRequestError('The request outcome is unknown. Inspect Activity before sending it again.');
+      return false;
+    }
+    finally {requests.current--;setBusy(requests.current>0);}
   }
   function invoke() {clearTimeout(retreatTimer.current);setLeaving(false);void run({kind:'window',mode:'interaction'});}
   function retreat() {
-    if(!open||leaving)return;setLeaving(true);orb.current?.focus();
+    if(!open||leaving)return;requestedWindow.current='compact';setLeaving(true);orb.current?.focus();
     const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
     retreatTimer.current=setTimeout(()=>{void run({kind:'window',mode:'compact'}).then(ok=>{if(!ok)setLeaving(false);});},reduced?0:180);
   }
@@ -91,6 +141,7 @@ export function LivingPresence({port=send,events=subscribe,sourceKind='core',win
   }
   async function ask() {
     if(!available||busy||!draft.trim())return;
+    setEditingFeedback('');
     await run({kind:'interact',mode:'Ask',text:draft,context_id:view.context?.id??''});
   }
   function track(e:React.PointerEvent<HTMLButtonElement>) {
@@ -102,14 +153,19 @@ export function LivingPresence({port=send,events=subscribe,sourceKind='core',win
     data-operation={operation} data-attention={owner?'owner':'none'} onFocusCapture={e=>{lastFocused.current=e.target as HTMLElement;}}
     onBlurCapture={e=>{if(e.relatedTarget&&!e.currentTarget.contains(e.relatedTarget as Node))lastFocused.current=null;}}
     onKeyDown={e=>{if(e.key==='Escape'&&workspace){e.preventDefault();void run({kind:'window',mode:'compact'});}}}>
-    {workspace?<div className="living-workspace"><App port={port} events={events} expressionKind={sourceKind}/></div>:<>
+    {workspace?<div className="living-workspace"><button className="workspace-return" onClick={()=>run({kind:'window',mode:'interaction'})}>Back to presence</button>{feedback&&<p className="workspace-feedback" role="alert">{feedback.message}</p>}<App port={port} events={events} expressionKind={sourceKind} focusReview/></div>:<>
       <div className="writing-leaf" inert={!open||leaving} aria-hidden={!open||leaving}>
         <div className="leaf-top" data-tauri-drag-region><span data-tauri-drag-region>OSCAR</span>
           <details className="presence-settings"><summary>Presence</summary><div><button aria-pressed={pinned} onClick={()=>native(pinned?'float':'pin')}>{pinned?'Unpin':'Pin on top'}</button><button onClick={()=>native('edge')}>To screen edge</button><button onClick={()=>native('hide')}>Hide to tray</button></div></details>
-          <button onClick={retreat} aria-label="Return to presence">Close</button></div>
+          <button onClick={retreat} aria-label="Return to presence">Back</button></div>
         <h1>{headline}</h1>
-        {owner?<div className="attention-copy"><p>{pending?.description??'A task requires your review.'}</p><p className="leaf-secondary">Nothing is approved by opening this surface.</p>
-          <button className="leaf-primary" disabled={busy||!pending} onClick={()=>pending&&run({kind:'review',task_id:pending.task_id,operation:'approve'})}>Review decision <Arrow/></button></div>:
+        {owner?<div className="attention-copy">{submitted?.taskId===pending?.task_id?<><p className="leaf-secondary">Your submitted request</p><p className="review-description submitted-request">{submitted!.text}</p></>:<p className="review-description">{pending?.description??'A task requires your review.'}</p>}<p className="leaf-secondary">Your approval is required before this task can run. Review the full details before deciding; opening review grants nothing.</p>
+          <div className="leaf-actions"><button className="leaf-primary" disabled={busy||!pending} onClick={()=>pending&&run({kind:'review',task_id:pending.task_id,operation:'approve'})}>Review decision <Arrow/></button><button onClick={retreat}>Leave pending</button>
+          </div></div>:
+        view.link==='online'&&feedback&&!editing?<div className="attention-copy request-feedback" role="alert"><p>{feedback.message}</p>
+          <p className="leaf-secondary">{feedback.kind==='unknown'?'An uncertain outcome is never retried automatically. Inspect Activity first.':feedback.kind==='denied'?'Review the permission or policy in Activity. Repeating the request will not grant access.':'Check capability availability before submitting again. Your draft is preserved.'}</p>
+          <div className="leaf-actions"><button className="leaf-primary" disabled={busy} onClick={()=>run(feedback.kind==='blocked'?{kind:'refresh'}:{kind:'window',mode:'activity'})}>{feedback.kind==='blocked'?'Check availability':'Inspect Activity'} <Arrow/></button>
+          {['blocked','denied'].includes(feedback.kind)&&<button disabled={busy} onClick={()=>{setEditingFeedback(feedbackKey);requestAnimationFrame(()=>input.current?.focus());}}>Edit request</button>}</div></div>:
         !available?<div className="attention-copy"><p>{operation==='unknown'?(expired?'The last observation expired. Check Core for current activity.':'Core reports an unresolved state. Inspect it before continuing.'):'Core is unavailable. Work status is unknown; new requests are disabled.'}</p>
           <button className="leaf-primary" disabled={busy} onClick={()=>run({kind:'refresh'})}>Check connection <Arrow/></button></div>:
         task&&(!terminal.includes(task.state)||task.state==='failed')?<div className="attention-copy"><p>{task.blocker??task.description}</p><p className="leaf-secondary">{task.state==='planned'?'Waiting':statuses[task.state]??'Unknown outcome'} · {task.evidence_ids.length} evidence references</p>
@@ -122,8 +178,11 @@ export function LivingPresence({port=send,events=subscribe,sourceKind='core',win
           <div className="leaf-submit"><span className="leaf-secondary">Enter to ask · Shift + Enter for a line</span><button type="submit" className="leaf-primary" disabled={busy||!draft.trim()}>Ask <Arrow/></button></div>
         </form>}
         {error&&<p className="leaf-error" role="alert">{error}</p>}
+        {editing&&feedback&&<p className="leaf-error" role="status">Last request: {feedback.message}</p>}
+        {requestError&&!feedback&&<p className="leaf-error" role="alert">{requestError}</p>}
+        {owner&&feedback&&<p className="leaf-error" role="alert">{feedback.message}</p>}
         {!error&&view.context&&<p className="leaf-secondary">Attached: {view.context.source}. Review in workspace.</p>}
-        <div className="leaf-bottom"><button onClick={()=>run({kind:'window',mode:'activity'})}>Open workspace</button><span>{view.reference?'Reference Core':'No background capture'}</span></div>
+        <div className="leaf-bottom"><button onClick={()=>run({kind:'window',mode:'activity'})}>Activity <Arrow/></button><span>{view.reference?'Reference Core':'No background capture'}</span></div>
       </div>
       <div className="presence-object">
         <button className="character-button" ref={orb} aria-label={`OSCAR: ${label}. ${open?'Return to presence':'Open interaction'}`} aria-expanded={open}

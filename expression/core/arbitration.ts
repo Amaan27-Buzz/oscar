@@ -20,12 +20,13 @@ export function arbitrate(request: Scene, boundary: Constraints = clear) {
   } else if (operation === 'error') {
     delivery = 'concerned'; reason = 'Failure suppresses playful delivery; no success cue.';
   } else if (boundary.ownerAttention || operation === 'waiting') {
-    operation = 'waiting'; delivery = 'subdued'; reason = 'Owner attention holds still; expressions never approve.';
+    operation = 'waiting'; delivery = boundary.ownerAttention || delivery==='attentive' ? 'attentive' : 'subdued';
+    reason = 'Owner review holds an attentive pose; waiting never approves or starts work.';
   } else if (boundary.muted || operation === 'muted') {
     operation = 'muted'; delivery = 'composed'; reason = 'Conversational mute suppresses listening and speech choreography.';
   } else if (['processing','executing','verifying'].includes(operation)) {
     delivery = 'focused'; reason = 'Serious work constrains delivery, without claiming a result.';
-  } else if (operation === 'listening' || (operation === 'attentive' && delivery!=='interrupted')) {
+  } else if (operation === 'listening' || (operation === 'attentive' && !['interrupted','resting','curious'].includes(delivery))) {
     delivery = 'attentive'; reason = 'Listening posture requires this explicit synthetic listening selection.';
   } else if (operation === 'speaking' && ['asleep','interrupted','subdued'].includes(delivery)) {
     delivery = 'composed'; reason = 'Speaking excludes sleep, interruption and withdrawn presentation.';

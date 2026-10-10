@@ -1,0 +1,59 @@
+{
+  "date": "2026-10-11",
+  "candidate_base": "5fea2071e891adf0fac7f9838ee556c9a60e1e1c",
+  "integration_ancestor": "b9d3e049aef5148a10c710626b9e6b06771c9229",
+  "desktop": {
+    "tests": 36,
+    "files": 5,
+    "failed": 0,
+    "skipped": 0,
+    "typecheck": "PASS",
+    "production_build": "PASS",
+    "prototype_exclusion": "PASS"
+  },
+  "expression_lab": {
+    "tests": 36,
+    "files": 5,
+    "failed": 0,
+    "skipped": 0
+  },
+  "rust": {
+    "tests": 11,
+    "failed": 0,
+    "ignored": 0,
+    "fmt": "PASS",
+    "clippy": "PASS",
+    "debug_build": "PASS"
+  },
+  "python": {
+    "command": "python -m unittest tests.test_desktop tests.test_mobile tests.test_desktop_presence tests.test_desktop_living_review tests.test_desktop_baseline tests.test_canonical_slice_docs",
+    "tests": 50,
+    "failed": 0,
+    "skipped": 0,
+    "seconds": 14.977,
+    "mypy_source_files": 63,
+    "ruff": "PASS"
+  },
+  "kotlin_expression": {
+    "junit_tests": 5,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "physical": "NOT VERIFIED"
+  },
+  "native": {
+    "suite_assertions": 13,
+    "interruption_assertions": 1,
+    "lifecycle_stdout": "LIFECYCLE_REFERENCE_PASS: uncommissioned, close/hide, reveal, explicit quit",
+    "lifecycle_exit": 0,
+    "lifecycle_warning": "[1011/011243.586:ERROR:ui\\gfx\\win\\window_impl.cc:172] Failed to unregister class Chrome_WidgetWin_0. Error = 1412",
+    "device_pixel_ratio": 1.25,
+    "scope": "authenticated disposable Core and actual Tauri/WebView2; programmatic task progression and scripted model outcomes",
+    "post_review_route_assertions": 4
+  },
+  "repo_checks": "PASS",
+  "canonical_svg_blob": "cb38546cf40c585e1ea5a1f3000832ca10c92ba5",
+  "historical_provenance_hashes_verified": 18,
+  "remote_ci": "NOT RUN; GitHub Actions disabled",
+  "owner_approval": "NOT GRANTED"
+}

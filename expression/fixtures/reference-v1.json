@@ -1123,7 +1123,7 @@
           "expected": {
             "admission": "accepted",
             "operation": "waiting",
-            "delivery": "subdued",
+            "delivery": "attentive",
             "muted": true,
             "generation": 5,
             "priority": "attention",
@@ -1178,26 +1178,26 @@
           "expected": {
             "admission": "stale",
             "operation": "waiting",
-            "delivery": "subdued",
+            "delivery": "attentive",
             "muted": true,
             "generation": 5,
             "priority": "attention",
             "animation": "held",
             "moving": false,
             "pose": {
-              "x": -3,
-              "y": 8,
-              "tilt": 0,
+              "x": -35,
+              "y": -22,
+              "tilt": -6,
               "body": 0,
-              "eye": 0.52,
+              "eye": 1.04,
               "width": 1,
-              "arc": 3,
-              "slant": 0,
+              "arc": -9,
+              "slant": -4,
               "span": 1,
-              "gx": 0,
-              "gy": 5,
+              "gx": 11,
+              "gy": -3,
               "lid": 0,
-              "opening": 0
+              "opening": 0.9
             },
             "records": [
               {

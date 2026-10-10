@@ -1,0 +1,20 @@
+[
+  {
+    "file": "before-idle.png",
+    "width": 132,
+    "height": 148,
+    "originX": 1733,
+    "originY": 933,
+    "method": "WINDOWS_COMPUTER_USE_CAPTURE",
+    "source": "actual Tauri above owned reference backdrop"
+  },
+  {
+    "file": "before-blocked.png",
+    "width": 432,
+    "height": 384,
+    "originX": 1358,
+    "originY": 638,
+    "method": "WINDOWS_COMPUTER_USE_CAPTURE",
+    "source": "actual Tauri above owned reference backdrop"
+  }
+]

@@ -1,0 +1,1897 @@
+{
+  "checks": [
+    "active phrase superseded by authoritative verified result"
+  ],
+  "native": {
+    "evidence": "AUTHENTICATED_DISPOSABLE_CORE",
+    "pid": 56344,
+    "native_debug_port": 64338,
+    "commands": "status block restore deny allow work execute finish reported failure disconnect reconnect cleanup"
+  },
+  "reference_limits": [
+    "programmatic runtime progression is not GUI owner approval",
+    "scripted model is not real inference",
+    "CDP is actual native WebView2; OS focus/tray/compositor/DPI coverage not established"
+  ],
+  "fixture_log": [
+    "{\"evidence\": \"AUTHENTICATED_DISPOSABLE_CORE\", \"pid\": 56344, \"native_debug_port\": 64338, \"commands\": \"status block restore deny allow work execute finish reported failure disconnect reconnect cleanup\"}",
+    "{\"core_response\": {\"state\": \"planned\", \"reason\": null, \"message\": null, \"task_id\": \"43a5b6cee2d6472fa5700ae4697d3cd1\"}}",
+    "{\"reference_programmatic_progression\": \"43a5b6cee2d6472fa5700ae4697d3cd1\", \"actual_core_state\": \"executing\", \"gui_owner_approval\": false}",
+    "{\"actual_tasks\": [{\"state\": \"verified\"}]}",
+    "\"Owned fixture cleanup; not evidence of UI Quit\""
+  ],
+  "snapshot": {
+    "width": 432,
+    "height": 416,
+    "scale": 1.25,
+    "focus": ""
+  },
+  "recordings": {
+    "native-interrupt-recovery": [
+      {
+        "file": "native-interrupt-recovery/0000.png",
+        "at_ms": 9
+      },
+      {
+        "file": "native-interrupt-recovery/0001.png",
+        "at_ms": 25
+      },
+      {
+        "file": "native-interrupt-recovery/0002.png",
+        "at_ms": 30
+      },
+      {
+        "file": "native-interrupt-recovery/0003.png",
+        "at_ms": 120
+      },
+      {
+        "file": "native-interrupt-recovery/0004.png",
+        "at_ms": 130
+      },
+      {
+        "file": "native-interrupt-recovery/0005.png",
+        "at_ms": 137
+      },
+      {
+        "file": "native-interrupt-recovery/0006.png",
+        "at_ms": 141
+      },
+      {
+        "file": "native-interrupt-recovery/0007.png",
+        "at_ms": 146
+      },
+      {
+        "file": "native-interrupt-recovery/0008.png",
+        "at_ms": 164
+      },
+      {
+        "file": "native-interrupt-recovery/0009.png",
+        "at_ms": 166
+      },
+      {
+        "file": "native-interrupt-recovery/0010.png",
+        "at_ms": 177
+      },
+      {
+        "file": "native-interrupt-recovery/0011.png",
+        "at_ms": 189
+      },
+      {
+        "file": "native-interrupt-recovery/0012.png",
+        "at_ms": 195
+      },
+      {
+        "file": "native-interrupt-recovery/0013.png",
+        "at_ms": 208
+      },
+      {
+        "file": "native-interrupt-recovery/0014.png",
+        "at_ms": 224
+      },
+      {
+        "file": "native-interrupt-recovery/0015.png",
+        "at_ms": 227
+      },
+      {
+        "file": "native-interrupt-recovery/0016.png",
+        "at_ms": 242
+      },
+      {
+        "file": "native-interrupt-recovery/0017.png",
+        "at_ms": 249
+      },
+      {
+        "file": "native-interrupt-recovery/0018.png",
+        "at_ms": 259
+      },
+      {
+        "file": "native-interrupt-recovery/0019.png",
+        "at_ms": 268
+      },
+      {
+        "file": "native-interrupt-recovery/0020.png",
+        "at_ms": 280
+      },
+      {
+        "file": "native-interrupt-recovery/0021.png",
+        "at_ms": 286
+      },
+      {
+        "file": "native-interrupt-recovery/0022.png",
+        "at_ms": 297
+      },
+      {
+        "file": "native-interrupt-recovery/0023.png",
+        "at_ms": 309
+      },
+      {
+        "file": "native-interrupt-recovery/0024.png",
+        "at_ms": 319
+      },
+      {
+        "file": "native-interrupt-recovery/0025.png",
+        "at_ms": 327
+      },
+      {
+        "file": "native-interrupt-recovery/0026.png",
+        "at_ms": 339
+      },
+      {
+        "file": "native-interrupt-recovery/0027.png",
+        "at_ms": 349
+      },
+      {
+        "file": "native-interrupt-recovery/0028.png",
+        "at_ms": 361
+      },
+      {
+        "file": "native-interrupt-recovery/0029.png",
+        "at_ms": 375
+      },
+      {
+        "file": "native-interrupt-recovery/0030.png",
+        "at_ms": 378
+      },
+      {
+        "file": "native-interrupt-recovery/0031.png",
+        "at_ms": 390
+      },
+      {
+        "file": "native-interrupt-recovery/0032.png",
+        "at_ms": 406
+      },
+      {
+        "file": "native-interrupt-recovery/0033.png",
+        "at_ms": 409
+      },
+      {
+        "file": "native-interrupt-recovery/0034.png",
+        "at_ms": 419
+      },
+      {
+        "file": "native-interrupt-recovery/0035.png",
+        "at_ms": 431
+      },
+      {
+        "file": "native-interrupt-recovery/0036.png",
+        "at_ms": 441
+      },
+      {
+        "file": "native-interrupt-recovery/0037.png",
+        "at_ms": 449
+      },
+      {
+        "file": "native-interrupt-recovery/0038.png",
+        "at_ms": 461
+      },
+      {
+        "file": "native-interrupt-recovery/0039.png",
+        "at_ms": 470
+      },
+      {
+        "file": "native-interrupt-recovery/0040.png",
+        "at_ms": 482
+      },
+      {
+        "file": "native-interrupt-recovery/0041.png",
+        "at_ms": 497
+      },
+      {
+        "file": "native-interrupt-recovery/0042.png",
+        "at_ms": 500
+      },
+      {
+        "file": "native-interrupt-recovery/0043.png",
+        "at_ms": 509
+      },
+      {
+        "file": "native-interrupt-recovery/0044.png",
+        "at_ms": 527
+      },
+      {
+        "file": "native-interrupt-recovery/0045.png",
+        "at_ms": 529
+      },
+      {
+        "file": "native-interrupt-recovery/0046.png",
+        "at_ms": 540
+      },
+      {
+        "file": "native-interrupt-recovery/0047.png",
+        "at_ms": 552
+      },
+      {
+        "file": "native-interrupt-recovery/0048.png",
+        "at_ms": 559
+      },
+      {
+        "file": "native-interrupt-recovery/0049.png",
+        "at_ms": 570
+      },
+      {
+        "file": "native-interrupt-recovery/0050.png",
+        "at_ms": 582
+      },
+      {
+        "file": "native-interrupt-recovery/0051.png",
+        "at_ms": 588
+      },
+      {
+        "file": "native-interrupt-recovery/0052.png",
+        "at_ms": 605
+      },
+      {
+        "file": "native-interrupt-recovery/0053.png",
+        "at_ms": 618
+      },
+      {
+        "file": "native-interrupt-recovery/0054.png",
+        "at_ms": 620
+      },
+      {
+        "file": "native-interrupt-recovery/0055.png",
+        "at_ms": 630
+      },
+      {
+        "file": "native-interrupt-recovery/0056.png",
+        "at_ms": 647
+      },
+      {
+        "file": "native-interrupt-recovery/0057.png",
+        "at_ms": 649
+      },
+      {
+        "file": "native-interrupt-recovery/0058.png",
+        "at_ms": 667
+      },
+      {
+        "file": "native-interrupt-recovery/0059.png",
+        "at_ms": 677
+      },
+      {
+        "file": "native-interrupt-recovery/0060.png",
+        "at_ms": 683
+      },
+      {
+        "file": "native-interrupt-recovery/0061.png",
+        "at_ms": 690
+      },
+      {
+        "file": "native-interrupt-recovery/0062.png",
+        "at_ms": 704
+      },
+      {
+        "file": "native-interrupt-recovery/0063.png",
+        "at_ms": 710
+      },
+      {
+        "file": "native-interrupt-recovery/0064.png",
+        "at_ms": 725
+      },
+      {
+        "file": "native-interrupt-recovery/0065.png",
+        "at_ms": 734
+      },
+      {
+        "file": "native-interrupt-recovery/0066.png",
+        "at_ms": 740
+      },
+      {
+        "file": "native-interrupt-recovery/0067.png",
+        "at_ms": 751
+      },
+      {
+        "file": "native-interrupt-recovery/0068.png",
+        "at_ms": 769
+      },
+      {
+        "file": "native-interrupt-recovery/0069.png",
+        "at_ms": 773
+      },
+      {
+        "file": "native-interrupt-recovery/0070.png",
+        "at_ms": 783
+      },
+      {
+        "file": "native-interrupt-recovery/0071.png",
+        "at_ms": 794
+      },
+      {
+        "file": "native-interrupt-recovery/0072.png",
+        "at_ms": 801
+      },
+      {
+        "file": "native-interrupt-recovery/0073.png",
+        "at_ms": 818
+      },
+      {
+        "file": "native-interrupt-recovery/0074.png",
+        "at_ms": 826
+      },
+      {
+        "file": "native-interrupt-recovery/0075.png",
+        "at_ms": 831
+      },
+      {
+        "file": "native-interrupt-recovery/0076.png",
+        "at_ms": 843
+      },
+      {
+        "file": "native-interrupt-recovery/0077.png",
+        "at_ms": 859
+      },
+      {
+        "file": "native-interrupt-recovery/0078.png",
+        "at_ms": 862
+      },
+      {
+        "file": "native-interrupt-recovery/0079.png",
+        "at_ms": 873
+      },
+      {
+        "file": "native-interrupt-recovery/0080.png",
+        "at_ms": 889
+      },
+      {
+        "file": "native-interrupt-recovery/0081.png",
+        "at_ms": 893
+      },
+      {
+        "file": "native-interrupt-recovery/0082.png",
+        "at_ms": 903
+      },
+      {
+        "file": "native-interrupt-recovery/0083.png",
+        "at_ms": 921
+      },
+      {
+        "file": "native-interrupt-recovery/0084.png",
+        "at_ms": 923
+      },
+      {
+        "file": "native-interrupt-recovery/0085.png",
+        "at_ms": 934
+      },
+      {
+        "file": "native-interrupt-recovery/0086.png",
+        "at_ms": 949
+      },
+      {
+        "file": "native-interrupt-recovery/0087.png",
+        "at_ms": 955
+      },
+      {
+        "file": "native-interrupt-recovery/0088.png",
+        "at_ms": 986
+      },
+      {
+        "file": "native-interrupt-recovery/0089.png",
+        "at_ms": 1004
+      },
+      {
+        "file": "native-interrupt-recovery/0090.png",
+        "at_ms": 1010
+      },
+      {
+        "file": "native-interrupt-recovery/0091.png",
+        "at_ms": 1027
+      },
+      {
+        "file": "native-interrupt-recovery/0092.png",
+        "at_ms": 1041
+      },
+      {
+        "file": "native-interrupt-recovery/0093.png",
+        "at_ms": 1061
+      },
+      {
+        "file": "native-interrupt-recovery/0094.png",
+        "at_ms": 1077
+      },
+      {
+        "file": "native-interrupt-recovery/0095.png",
+        "at_ms": 1092
+      },
+      {
+        "file": "native-interrupt-recovery/0096.png",
+        "at_ms": 1131
+      },
+      {
+        "file": "native-interrupt-recovery/0097.png",
+        "at_ms": 1136
+      },
+      {
+        "file": "native-interrupt-recovery/0098.png",
+        "at_ms": 1542
+      },
+      {
+        "file": "native-interrupt-recovery/0099.png",
+        "at_ms": 1550
+      },
+      {
+        "file": "native-interrupt-recovery/0100.png",
+        "at_ms": 1554
+      },
+      {
+        "file": "native-interrupt-recovery/0101.png",
+        "at_ms": 1567
+      },
+      {
+        "file": "native-interrupt-recovery/0102.png",
+        "at_ms": 1579
+      },
+      {
+        "file": "native-interrupt-recovery/0103.png",
+        "at_ms": 1585
+      },
+      {
+        "file": "native-interrupt-recovery/0104.png",
+        "at_ms": 1597
+      },
+      {
+        "file": "native-interrupt-recovery/0105.png",
+        "at_ms": 1609
+      },
+      {
+        "file": "native-interrupt-recovery/0106.png",
+        "at_ms": 1615
+      },
+      {
+        "file": "native-interrupt-recovery/0107.png",
+        "at_ms": 1630
+      },
+      {
+        "file": "native-interrupt-recovery/0108.png",
+        "at_ms": 1639
+      },
+      {
+        "file": "native-interrupt-recovery/0109.png",
+        "at_ms": 1645
+      },
+      {
+        "file": "native-interrupt-recovery/0110.png",
+        "at_ms": 1658
+      },
+      {
+        "file": "native-interrupt-recovery/0111.png",
+        "at_ms": 1671
+      },
+      {
+        "file": "native-interrupt-recovery/0112.png",
+        "at_ms": 1676
+      },
+      {
+        "file": "native-interrupt-recovery/0113.png",
+        "at_ms": 1688
+      },
+      {
+        "file": "native-interrupt-recovery/0114.png",
+        "at_ms": 1700
+      },
+      {
+        "file": "native-interrupt-recovery/0115.png",
+        "at_ms": 1707
+      },
+      {
+        "file": "native-interrupt-recovery/0116.png",
+        "at_ms": 1719
+      },
+      {
+        "file": "native-interrupt-recovery/0117.png",
+        "at_ms": 1730
+      },
+      {
+        "file": "native-interrupt-recovery/0118.png",
+        "at_ms": 1737
+      },
+      {
+        "file": "native-interrupt-recovery/0119.png",
+        "at_ms": 1749
+      },
+      {
+        "file": "native-interrupt-recovery/0120.png",
+        "at_ms": 1761
+      },
+      {
+        "file": "native-interrupt-recovery/0121.png",
+        "at_ms": 1766
+      },
+      {
+        "file": "native-interrupt-recovery/0122.png",
+        "at_ms": 1779
+      },
+      {
+        "file": "native-interrupt-recovery/0123.png",
+        "at_ms": 1792
+      },
+      {
+        "file": "native-interrupt-recovery/0124.png",
+        "at_ms": 1798
+      },
+      {
+        "file": "native-interrupt-recovery/0125.png",
+        "at_ms": 1809
+      },
+      {
+        "file": "native-interrupt-recovery/0126.png",
+        "at_ms": 1822
+      },
+      {
+        "file": "native-interrupt-recovery/0127.png",
+        "at_ms": 1827
+      },
+      {
+        "file": "native-interrupt-recovery/0128.png",
+        "at_ms": 1840
+      },
+      {
+        "file": "native-interrupt-recovery/0129.png",
+        "at_ms": 1852
+      },
+      {
+        "file": "native-interrupt-recovery/0130.png",
+        "at_ms": 1858
+      },
+      {
+        "file": "native-interrupt-recovery/0131.png",
+        "at_ms": 1870
+      },
+      {
+        "file": "native-interrupt-recovery/0132.png",
+        "at_ms": 1883
+      },
+      {
+        "file": "native-interrupt-recovery/0133.png",
+        "at_ms": 1887
+      },
+      {
+        "file": "native-interrupt-recovery/0134.png",
+        "at_ms": 1901
+      },
+      {
+        "file": "native-interrupt-recovery/0135.png",
+        "at_ms": 1913
+      },
+      {
+        "file": "native-interrupt-recovery/0136.png",
+        "at_ms": 1918
+      },
+      {
+        "file": "native-interrupt-recovery/0137.png",
+        "at_ms": 1930
+      },
+      {
+        "file": "native-interrupt-recovery/0138.png",
+        "at_ms": 1944
+      },
+      {
+        "file": "native-interrupt-recovery/0139.png",
+        "at_ms": 1949
+      },
+      {
+        "file": "native-interrupt-recovery/0140.png",
+        "at_ms": 1961
+      },
+      {
+        "file": "native-interrupt-recovery/0141.png",
+        "at_ms": 1973
+      },
+      {
+        "file": "native-interrupt-recovery/0142.png",
+        "at_ms": 1980
+      },
+      {
+        "file": "native-interrupt-recovery/0143.png",
+        "at_ms": 1991
+      },
+      {
+        "file": "native-interrupt-recovery/0144.png",
+        "at_ms": 2003
+      },
+      {
+        "file": "native-interrupt-recovery/0145.png",
+        "at_ms": 2009
+      },
+      {
+        "file": "native-interrupt-recovery/0146.png",
+        "at_ms": 2022
+      },
+      {
+        "file": "native-interrupt-recovery/0147.png",
+        "at_ms": 2033
+      },
+      {
+        "file": "native-interrupt-recovery/0148.png",
+        "at_ms": 2038
+      },
+      {
+        "file": "native-interrupt-recovery/0149.png",
+        "at_ms": 2051
+      },
+      {
+        "file": "native-interrupt-recovery/0150.png",
+        "at_ms": 2065
+      },
+      {
+        "file": "native-interrupt-recovery/0151.png",
+        "at_ms": 2071
+      },
+      {
+        "file": "native-interrupt-recovery/0152.png",
+        "at_ms": 2081
+      },
+      {
+        "file": "native-interrupt-recovery/0153.png",
+        "at_ms": 2094
+      },
+      {
+        "file": "native-interrupt-recovery/0154.png",
+        "at_ms": 2101
+      },
+      {
+        "file": "native-interrupt-recovery/0155.png",
+        "at_ms": 2112
+      },
+      {
+        "file": "native-interrupt-recovery/0156.png",
+        "at_ms": 2124
+      },
+      {
+        "file": "native-interrupt-recovery/0157.png",
+        "at_ms": 2131
+      },
+      {
+        "file": "native-interrupt-recovery/0158.png",
+        "at_ms": 2143
+      },
+      {
+        "file": "native-interrupt-recovery/0159.png",
+        "at_ms": 2155
+      },
+      {
+        "file": "native-interrupt-recovery/0160.png",
+        "at_ms": 2160
+      },
+      {
+        "file": "native-interrupt-recovery/0161.png",
+        "at_ms": 2173
+      },
+      {
+        "file": "native-interrupt-recovery/0162.png",
+        "at_ms": 2186
+      },
+      {
+        "file": "native-interrupt-recovery/0163.png",
+        "at_ms": 2192
+      },
+      {
+        "file": "native-interrupt-recovery/0164.png",
+        "at_ms": 2203
+      },
+      {
+        "file": "native-interrupt-recovery/0165.png",
+        "at_ms": 2214
+      },
+      {
+        "file": "native-interrupt-recovery/0166.png",
+        "at_ms": 2221
+      },
+      {
+        "file": "native-interrupt-recovery/0167.png",
+        "at_ms": 2233
+      },
+      {
+        "file": "native-interrupt-recovery/0168.png",
+        "at_ms": 2245
+      },
+      {
+        "file": "native-interrupt-recovery/0169.png",
+        "at_ms": 2251
+      },
+      {
+        "file": "native-interrupt-recovery/0170.png",
+        "at_ms": 2265
+      },
+      {
+        "file": "native-interrupt-recovery/0171.png",
+        "at_ms": 2276
+      },
+      {
+        "file": "native-interrupt-recovery/0172.png",
+        "at_ms": 2282
+      },
+      {
+        "file": "native-interrupt-recovery/0173.png",
+        "at_ms": 2293
+      },
+      {
+        "file": "native-interrupt-recovery/0174.png",
+        "at_ms": 2306
+      },
+      {
+        "file": "native-interrupt-recovery/0175.png",
+        "at_ms": 2311
+      },
+      {
+        "file": "native-interrupt-recovery/0176.png",
+        "at_ms": 2322
+      },
+      {
+        "file": "native-interrupt-recovery/0177.png",
+        "at_ms": 2336
+      },
+      {
+        "file": "native-interrupt-recovery/0178.png",
+        "at_ms": 2342
+      },
+      {
+        "file": "native-interrupt-recovery/0179.png",
+        "at_ms": 2355
+      },
+      {
+        "file": "native-interrupt-recovery/0180.png",
+        "at_ms": 2366
+      },
+      {
+        "file": "native-interrupt-recovery/0181.png",
+        "at_ms": 2374
+      },
+      {
+        "file": "native-interrupt-recovery/0182.png",
+        "at_ms": 2385
+      },
+      {
+        "file": "native-interrupt-recovery/0183.png",
+        "at_ms": 2398
+      },
+      {
+        "file": "native-interrupt-recovery/0184.png",
+        "at_ms": 2403
+      },
+      {
+        "file": "native-interrupt-recovery/0185.png",
+        "at_ms": 2415
+      },
+      {
+        "file": "native-interrupt-recovery/0186.png",
+        "at_ms": 2428
+      },
+      {
+        "file": "native-interrupt-recovery/0187.png",
+        "at_ms": 2432
+      },
+      {
+        "file": "native-interrupt-recovery/0188.png",
+        "at_ms": 2445
+      },
+      {
+        "file": "native-interrupt-recovery/0189.png",
+        "at_ms": 2457
+      },
+      {
+        "file": "native-interrupt-recovery/0190.png",
+        "at_ms": 2465
+      },
+      {
+        "file": "native-interrupt-recovery/0191.png",
+        "at_ms": 2476
+      },
+      {
+        "file": "native-interrupt-recovery/0192.png",
+        "at_ms": 2488
+      },
+      {
+        "file": "native-interrupt-recovery/0193.png",
+        "at_ms": 2494
+      },
+      {
+        "file": "native-interrupt-recovery/0194.png",
+        "at_ms": 2505
+      },
+      {
+        "file": "native-interrupt-recovery/0195.png",
+        "at_ms": 2518
+      },
+      {
+        "file": "native-interrupt-recovery/0196.png",
+        "at_ms": 2524
+      },
+      {
+        "file": "native-interrupt-recovery/0197.png",
+        "at_ms": 2536
+      },
+      {
+        "file": "native-interrupt-recovery/0198.png",
+        "at_ms": 2549
+      },
+      {
+        "file": "native-interrupt-recovery/0199.png",
+        "at_ms": 2555
+      },
+      {
+        "file": "native-interrupt-recovery/0200.png",
+        "at_ms": 2566
+      },
+      {
+        "file": "native-interrupt-recovery/0201.png",
+        "at_ms": 2578
+      },
+      {
+        "file": "native-interrupt-recovery/0202.png",
+        "at_ms": 2585
+      },
+      {
+        "file": "native-interrupt-recovery/0203.png",
+        "at_ms": 2596
+      },
+      {
+        "file": "native-interrupt-recovery/0204.png",
+        "at_ms": 2608
+      },
+      {
+        "file": "native-interrupt-recovery/0205.png",
+        "at_ms": 2615
+      },
+      {
+        "file": "native-interrupt-recovery/0206.png",
+        "at_ms": 2627
+      },
+      {
+        "file": "native-interrupt-recovery/0207.png",
+        "at_ms": 2639
+      },
+      {
+        "file": "native-interrupt-recovery/0208.png",
+        "at_ms": 2644
+      },
+      {
+        "file": "native-interrupt-recovery/0209.png",
+        "at_ms": 2657
+      },
+      {
+        "file": "native-interrupt-recovery/0210.png",
+        "at_ms": 2670
+      },
+      {
+        "file": "native-interrupt-recovery/0211.png",
+        "at_ms": 2675
+      },
+      {
+        "file": "native-interrupt-recovery/0212.png",
+        "at_ms": 2687
+      },
+      {
+        "file": "native-interrupt-recovery/0213.png",
+        "at_ms": 2699
+      },
+      {
+        "file": "native-interrupt-recovery/0214.png",
+        "at_ms": 2707
+      },
+      {
+        "file": "native-interrupt-recovery/0215.png",
+        "at_ms": 2717
+      },
+      {
+        "file": "native-interrupt-recovery/0216.png",
+        "at_ms": 2729
+      },
+      {
+        "file": "native-interrupt-recovery/0217.png",
+        "at_ms": 2735
+      },
+      {
+        "file": "native-interrupt-recovery/0218.png",
+        "at_ms": 2748
+      },
+      {
+        "file": "native-interrupt-recovery/0219.png",
+        "at_ms": 2760
+      },
+      {
+        "file": "native-interrupt-recovery/0220.png",
+        "at_ms": 2765
+      },
+      {
+        "file": "native-interrupt-recovery/0221.png",
+        "at_ms": 2778
+      },
+      {
+        "file": "native-interrupt-recovery/0222.png",
+        "at_ms": 2794
+      },
+      {
+        "file": "native-interrupt-recovery/0223.png",
+        "at_ms": 2796
+      },
+      {
+        "file": "native-interrupt-recovery/0224.png",
+        "at_ms": 2808
+      },
+      {
+        "file": "native-interrupt-recovery/0225.png",
+        "at_ms": 2820
+      },
+      {
+        "file": "native-interrupt-recovery/0226.png",
+        "at_ms": 2827
+      },
+      {
+        "file": "native-interrupt-recovery/0227.png",
+        "at_ms": 2839
+      },
+      {
+        "file": "native-interrupt-recovery/0228.png",
+        "at_ms": 2851
+      },
+      {
+        "file": "native-interrupt-recovery/0229.png",
+        "at_ms": 2857
+      },
+      {
+        "file": "native-interrupt-recovery/0230.png",
+        "at_ms": 2870
+      },
+      {
+        "file": "native-interrupt-recovery/0231.png",
+        "at_ms": 2881
+      },
+      {
+        "file": "native-interrupt-recovery/0232.png",
+        "at_ms": 2887
+      },
+      {
+        "file": "native-interrupt-recovery/0233.png",
+        "at_ms": 2900
+      },
+      {
+        "file": "native-interrupt-recovery/0234.png",
+        "at_ms": 2913
+      },
+      {
+        "file": "native-interrupt-recovery/0235.png",
+        "at_ms": 2917
+      },
+      {
+        "file": "native-interrupt-recovery/0236.png",
+        "at_ms": 2928
+      },
+      {
+        "file": "native-interrupt-recovery/0237.png",
+        "at_ms": 2942
+      },
+      {
+        "file": "native-interrupt-recovery/0238.png",
+        "at_ms": 2949
+      },
+      {
+        "file": "native-interrupt-recovery/0239.png",
+        "at_ms": 2960
+      },
+      {
+        "file": "native-interrupt-recovery/0240.png",
+        "at_ms": 2974
+      },
+      {
+        "file": "native-interrupt-recovery/0241.png",
+        "at_ms": 2978
+      },
+      {
+        "file": "native-interrupt-recovery/0242.png",
+        "at_ms": 2991
+      },
+      {
+        "file": "native-interrupt-recovery/0243.png",
+        "at_ms": 3002
+      },
+      {
+        "file": "native-interrupt-recovery/0244.png",
+        "at_ms": 3009
+      },
+      {
+        "file": "native-interrupt-recovery/0245.png",
+        "at_ms": 3021
+      },
+      {
+        "file": "native-interrupt-recovery/0246.png",
+        "at_ms": 3033
+      },
+      {
+        "file": "native-interrupt-recovery/0247.png",
+        "at_ms": 3039
+      },
+      {
+        "file": "native-interrupt-recovery/0248.png",
+        "at_ms": 3052
+      },
+      {
+        "file": "native-interrupt-recovery/0249.png",
+        "at_ms": 3063
+      },
+      {
+        "file": "native-interrupt-recovery/0250.png",
+        "at_ms": 3068
+      },
+      {
+        "file": "native-interrupt-recovery/0251.png",
+        "at_ms": 3083
+      },
+      {
+        "file": "native-interrupt-recovery/0252.png",
+        "at_ms": 3093
+      },
+      {
+        "file": "native-interrupt-recovery/0253.png",
+        "at_ms": 3099
+      },
+      {
+        "file": "native-interrupt-recovery/0254.png",
+        "at_ms": 3112
+      },
+      {
+        "file": "native-interrupt-recovery/0255.png",
+        "at_ms": 3125
+      },
+      {
+        "file": "native-interrupt-recovery/0256.png",
+        "at_ms": 3130
+      },
+      {
+        "file": "native-interrupt-recovery/0257.png",
+        "at_ms": 3141
+      },
+      {
+        "file": "native-interrupt-recovery/0258.png",
+        "at_ms": 3154
+      },
+      {
+        "file": "native-interrupt-recovery/0259.png",
+        "at_ms": 3161
+      },
+      {
+        "file": "native-interrupt-recovery/0260.png",
+        "at_ms": 3172
+      },
+      {
+        "file": "native-interrupt-recovery/0261.png",
+        "at_ms": 3184
+      },
+      {
+        "file": "native-interrupt-recovery/0262.png",
+        "at_ms": 3191
+      },
+      {
+        "file": "native-interrupt-recovery/0263.png",
+        "at_ms": 3204
+      },
+      {
+        "file": "native-interrupt-recovery/0264.png",
+        "at_ms": 3214
+      },
+      {
+        "file": "native-interrupt-recovery/0265.png",
+        "at_ms": 3222
+      },
+      {
+        "file": "native-interrupt-recovery/0266.png",
+        "at_ms": 3233
+      },
+      {
+        "file": "native-interrupt-recovery/0267.png",
+        "at_ms": 3245
+      },
+      {
+        "file": "native-interrupt-recovery/0268.png",
+        "at_ms": 3251
+      },
+      {
+        "file": "native-interrupt-recovery/0269.png",
+        "at_ms": 3264
+      },
+      {
+        "file": "native-interrupt-recovery/0270.png",
+        "at_ms": 3275
+      },
+      {
+        "file": "native-interrupt-recovery/0271.png",
+        "at_ms": 3280
+      },
+      {
+        "file": "native-interrupt-recovery/0272.png",
+        "at_ms": 3293
+      },
+      {
+        "file": "native-interrupt-recovery/0273.png",
+        "at_ms": 3306
+      },
+      {
+        "file": "native-interrupt-recovery/0274.png",
+        "at_ms": 3311
+      },
+      {
+        "file": "native-interrupt-recovery/0275.png",
+        "at_ms": 3324
+      },
+      {
+        "file": "native-interrupt-recovery/0276.png",
+        "at_ms": 3336
+      },
+      {
+        "file": "native-interrupt-recovery/0277.png",
+        "at_ms": 3342
+      },
+      {
+        "file": "native-interrupt-recovery/0278.png",
+        "at_ms": 3353
+      },
+      {
+        "file": "native-interrupt-recovery/0279.png",
+        "at_ms": 3367
+      },
+      {
+        "file": "native-interrupt-recovery/0280.png",
+        "at_ms": 3372
+      },
+      {
+        "file": "native-interrupt-recovery/0281.png",
+        "at_ms": 3384
+      },
+      {
+        "file": "native-interrupt-recovery/0282.png",
+        "at_ms": 3396
+      },
+      {
+        "file": "native-interrupt-recovery/0283.png",
+        "at_ms": 3401
+      },
+      {
+        "file": "native-interrupt-recovery/0284.png",
+        "at_ms": 3414
+      },
+      {
+        "file": "native-interrupt-recovery/0285.png",
+        "at_ms": 3426
+      },
+      {
+        "file": "native-interrupt-recovery/0286.png",
+        "at_ms": 3432
+      },
+      {
+        "file": "native-interrupt-recovery/0287.png",
+        "at_ms": 3445
+      },
+      {
+        "file": "native-interrupt-recovery/0288.png",
+        "at_ms": 3457
+      },
+      {
+        "file": "native-interrupt-recovery/0289.png",
+        "at_ms": 3463
+      },
+      {
+        "file": "native-interrupt-recovery/0290.png",
+        "at_ms": 3475
+      },
+      {
+        "file": "native-interrupt-recovery/0291.png",
+        "at_ms": 3487
+      },
+      {
+        "file": "native-interrupt-recovery/0292.png",
+        "at_ms": 3493
+      },
+      {
+        "file": "native-interrupt-recovery/0293.png",
+        "at_ms": 3504
+      },
+      {
+        "file": "native-interrupt-recovery/0294.png",
+        "at_ms": 3517
+      },
+      {
+        "file": "native-interrupt-recovery/0295.png",
+        "at_ms": 3523
+      },
+      {
+        "file": "native-interrupt-recovery/0296.png",
+        "at_ms": 3536
+      },
+      {
+        "file": "native-interrupt-recovery/0297.png",
+        "at_ms": 3549
+      },
+      {
+        "file": "native-interrupt-recovery/0298.png",
+        "at_ms": 3553
+      },
+      {
+        "file": "native-interrupt-recovery/0299.png",
+        "at_ms": 3566
+      },
+      {
+        "file": "native-interrupt-recovery/0300.png",
+        "at_ms": 3578
+      },
+      {
+        "file": "native-interrupt-recovery/0301.png",
+        "at_ms": 3583
+      },
+      {
+        "file": "native-interrupt-recovery/0302.png",
+        "at_ms": 3597
+      },
+      {
+        "file": "native-interrupt-recovery/0303.png",
+        "at_ms": 3609
+      },
+      {
+        "file": "native-interrupt-recovery/0304.png",
+        "at_ms": 3614
+      },
+      {
+        "file": "native-interrupt-recovery/0305.png",
+        "at_ms": 3628
+      },
+      {
+        "file": "native-interrupt-recovery/0306.png",
+        "at_ms": 3639
+      },
+      {
+        "file": "native-interrupt-recovery/0307.png",
+        "at_ms": 3644
+      },
+      {
+        "file": "native-interrupt-recovery/0308.png",
+        "at_ms": 3658
+      },
+      {
+        "file": "native-interrupt-recovery/0309.png",
+        "at_ms": 3670
+      },
+      {
+        "file": "native-interrupt-recovery/0310.png",
+        "at_ms": 3676
+      },
+      {
+        "file": "native-interrupt-recovery/0311.png",
+        "at_ms": 3687
+      },
+      {
+        "file": "native-interrupt-recovery/0312.png",
+        "at_ms": 3699
+      },
+      {
+        "file": "native-interrupt-recovery/0313.png",
+        "at_ms": 3706
+      },
+      {
+        "file": "native-interrupt-recovery/0314.png",
+        "at_ms": 3717
+      },
+      {
+        "file": "native-interrupt-recovery/0315.png",
+        "at_ms": 3730
+      },
+      {
+        "file": "native-interrupt-recovery/0316.png",
+        "at_ms": 3736
+      },
+      {
+        "file": "native-interrupt-recovery/0317.png",
+        "at_ms": 3748
+      },
+      {
+        "file": "native-interrupt-recovery/0318.png",
+        "at_ms": 3760
+      },
+      {
+        "file": "native-interrupt-recovery/0319.png",
+        "at_ms": 3766
+      },
+      {
+        "file": "native-interrupt-recovery/0320.png",
+        "at_ms": 3778
+      },
+      {
+        "file": "native-interrupt-recovery/0321.png",
+        "at_ms": 3789
+      },
+      {
+        "file": "native-interrupt-recovery/0322.png",
+        "at_ms": 3796
+      },
+      {
+        "file": "native-interrupt-recovery/0323.png",
+        "at_ms": 3809
+      },
+      {
+        "file": "native-interrupt-recovery/0324.png",
+        "at_ms": 3820
+      },
+      {
+        "file": "native-interrupt-recovery/0325.png",
+        "at_ms": 3826
+      },
+      {
+        "file": "native-interrupt-recovery/0326.png",
+        "at_ms": 3839
+      },
+      {
+        "file": "native-interrupt-recovery/0327.png",
+        "at_ms": 3851
+      },
+      {
+        "file": "native-interrupt-recovery/0328.png",
+        "at_ms": 3856
+      },
+      {
+        "file": "native-interrupt-recovery/0329.png",
+        "at_ms": 3868
+      },
+      {
+        "file": "native-interrupt-recovery/0330.png",
+        "at_ms": 3880
+      },
+      {
+        "file": "native-interrupt-recovery/0331.png",
+        "at_ms": 3887
+      },
+      {
+        "file": "native-interrupt-recovery/0332.png",
+        "at_ms": 3899
+      },
+      {
+        "file": "native-interrupt-recovery/0333.png",
+        "at_ms": 3911
+      },
+      {
+        "file": "native-interrupt-recovery/0334.png",
+        "at_ms": 3917
+      },
+      {
+        "file": "native-interrupt-recovery/0335.png",
+        "at_ms": 3929
+      },
+      {
+        "file": "native-interrupt-recovery/0336.png",
+        "at_ms": 3941
+      },
+      {
+        "file": "native-interrupt-recovery/0337.png",
+        "at_ms": 3947
+      },
+      {
+        "file": "native-interrupt-recovery/0338.png",
+        "at_ms": 3959
+      },
+      {
+        "file": "native-interrupt-recovery/0339.png",
+        "at_ms": 3973
+      },
+      {
+        "file": "native-interrupt-recovery/0340.png",
+        "at_ms": 3977
+      },
+      {
+        "file": "native-interrupt-recovery/0341.png",
+        "at_ms": 3990
+      },
+      {
+        "file": "native-interrupt-recovery/0342.png",
+        "at_ms": 4002
+      },
+      {
+        "file": "native-interrupt-recovery/0343.png",
+        "at_ms": 4008
+      },
+      {
+        "file": "native-interrupt-recovery/0344.png",
+        "at_ms": 4020
+      },
+      {
+        "file": "native-interrupt-recovery/0345.png",
+        "at_ms": 4031
+      },
+      {
+        "file": "native-interrupt-recovery/0346.png",
+        "at_ms": 4038
+      },
+      {
+        "file": "native-interrupt-recovery/0347.png",
+        "at_ms": 4051
+      },
+      {
+        "file": "native-interrupt-recovery/0348.png",
+        "at_ms": 4062
+      },
+      {
+        "file": "native-interrupt-recovery/0349.png",
+        "at_ms": 4068
+      },
+      {
+        "file": "native-interrupt-recovery/0350.png",
+        "at_ms": 4080
+      },
+      {
+        "file": "native-interrupt-recovery/0351.png",
+        "at_ms": 4093
+      },
+      {
+        "file": "native-interrupt-recovery/0352.png",
+        "at_ms": 4099
+      },
+      {
+        "file": "native-interrupt-recovery/0353.png",
+        "at_ms": 4111
+      },
+      {
+        "file": "native-interrupt-recovery/0354.png",
+        "at_ms": 4123
+      },
+      {
+        "file": "native-interrupt-recovery/0355.png",
+        "at_ms": 4129
+      },
+      {
+        "file": "native-interrupt-recovery/0356.png",
+        "at_ms": 4141
+      },
+      {
+        "file": "native-interrupt-recovery/0357.png",
+        "at_ms": 4153
+      },
+      {
+        "file": "native-interrupt-recovery/0358.png",
+        "at_ms": 4159
+      },
+      {
+        "file": "native-interrupt-recovery/0359.png",
+        "at_ms": 4174
+      },
+      {
+        "file": "native-interrupt-recovery/0360.png",
+        "at_ms": 4184
+      },
+      {
+        "file": "native-interrupt-recovery/0361.png",
+        "at_ms": 4190
+      },
+      {
+        "file": "native-interrupt-recovery/0362.png",
+        "at_ms": 4202
+      },
+      {
+        "file": "native-interrupt-recovery/0363.png",
+        "at_ms": 4215
+      },
+      {
+        "file": "native-interrupt-recovery/0364.png",
+        "at_ms": 4220
+      },
+      {
+        "file": "native-interrupt-recovery/0365.png",
+        "at_ms": 4233
+      },
+      {
+        "file": "native-interrupt-recovery/0366.png",
+        "at_ms": 4245
+      },
+      {
+        "file": "native-interrupt-recovery/0367.png",
+        "at_ms": 4250
+      },
+      {
+        "file": "native-interrupt-recovery/0368.png",
+        "at_ms": 4745
+      },
+      {
+        "file": "native-interrupt-recovery/0369.png",
+        "at_ms": 4747
+      },
+      {
+        "file": "native-interrupt-recovery/0370.png",
+        "at_ms": 4752
+      },
+      {
+        "file": "native-interrupt-recovery/0371.png",
+        "at_ms": 4760
+      },
+      {
+        "file": "native-interrupt-recovery/0372.png",
+        "at_ms": 4771
+      },
+      {
+        "file": "native-interrupt-recovery/0373.png",
+        "at_ms": 4778
+      },
+      {
+        "file": "native-interrupt-recovery/0374.png",
+        "at_ms": 4790
+      },
+      {
+        "file": "native-interrupt-recovery/0375.png",
+        "at_ms": 4801
+      },
+      {
+        "file": "native-interrupt-recovery/0376.png",
+        "at_ms": 4807
+      },
+      {
+        "file": "native-interrupt-recovery/0377.png",
+        "at_ms": 4820
+      },
+      {
+        "file": "native-interrupt-recovery/0378.png",
+        "at_ms": 4832
+      },
+      {
+        "file": "native-interrupt-recovery/0379.png",
+        "at_ms": 4838
+      },
+      {
+        "file": "native-interrupt-recovery/0380.png",
+        "at_ms": 4850
+      },
+      {
+        "file": "native-interrupt-recovery/0381.png",
+        "at_ms": 4862
+      },
+      {
+        "file": "native-interrupt-recovery/0382.png",
+        "at_ms": 4867
+      },
+      {
+        "file": "native-interrupt-recovery/0383.png",
+        "at_ms": 4880
+      },
+      {
+        "file": "native-interrupt-recovery/0384.png",
+        "at_ms": 4892
+      },
+      {
+        "file": "native-interrupt-recovery/0385.png",
+        "at_ms": 4898
+      },
+      {
+        "file": "native-interrupt-recovery/0386.png",
+        "at_ms": 4920
+      },
+      {
+        "file": "native-interrupt-recovery/0387.png",
+        "at_ms": 4925
+      },
+      {
+        "file": "native-interrupt-recovery/0388.png",
+        "at_ms": 4938
+      },
+      {
+        "file": "native-interrupt-recovery/0389.png",
+        "at_ms": 4951
+      },
+      {
+        "file": "native-interrupt-recovery/0390.png",
+        "at_ms": 4956
+      },
+      {
+        "file": "native-interrupt-recovery/0391.png",
+        "at_ms": 4968
+      },
+      {
+        "file": "native-interrupt-recovery/0392.png",
+        "at_ms": 4981
+      },
+      {
+        "file": "native-interrupt-recovery/0393.png",
+        "at_ms": 4987
+      },
+      {
+        "file": "native-interrupt-recovery/0394.png",
+        "at_ms": 4999
+      },
+      {
+        "file": "native-interrupt-recovery/0395.png",
+        "at_ms": 5020
+      },
+      {
+        "file": "native-interrupt-recovery/0396.png",
+        "at_ms": 5034
+      },
+      {
+        "file": "native-interrupt-recovery/0397.png",
+        "at_ms": 5045
+      },
+      {
+        "file": "native-interrupt-recovery/0398.png",
+        "at_ms": 5051
+      },
+      {
+        "file": "native-interrupt-recovery/0399.png",
+        "at_ms": 5070
+      },
+      {
+        "file": "native-interrupt-recovery/0400.png",
+        "at_ms": 5074
+      },
+      {
+        "file": "native-interrupt-recovery/0401.png",
+        "at_ms": 5082
+      },
+      {
+        "file": "native-interrupt-recovery/0402.png",
+        "at_ms": 5094
+      },
+      {
+        "file": "native-interrupt-recovery/0403.png",
+        "at_ms": 5107
+      },
+      {
+        "file": "native-interrupt-recovery/0404.png",
+        "at_ms": 5112
+      },
+      {
+        "file": "native-interrupt-recovery/0405.png",
+        "at_ms": 5124
+      },
+      {
+        "file": "native-interrupt-recovery/0406.png",
+        "at_ms": 5137
+      },
+      {
+        "file": "native-interrupt-recovery/0407.png",
+        "at_ms": 5142
+      },
+      {
+        "file": "native-interrupt-recovery/0408.png",
+        "at_ms": 5152
+      },
+      {
+        "file": "native-interrupt-recovery/0409.png",
+        "at_ms": 5165
+      },
+      {
+        "file": "native-interrupt-recovery/0410.png",
+        "at_ms": 5172
+      },
+      {
+        "file": "native-interrupt-recovery/0411.png",
+        "at_ms": 5182
+      },
+      {
+        "file": "native-interrupt-recovery/0412.png",
+        "at_ms": 5197
+      },
+      {
+        "file": "native-interrupt-recovery/0413.png",
+        "at_ms": 5203
+      },
+      {
+        "file": "native-interrupt-recovery/0414.png",
+        "at_ms": 5214
+      },
+      {
+        "file": "native-interrupt-recovery/0415.png",
+        "at_ms": 5226
+      },
+      {
+        "file": "native-interrupt-recovery/0416.png",
+        "at_ms": 5233
+      },
+      {
+        "file": "native-interrupt-recovery/0417.png",
+        "at_ms": 5245
+      },
+      {
+        "file": "native-interrupt-recovery/0418.png",
+        "at_ms": 5258
+      },
+      {
+        "file": "native-interrupt-recovery/0419.png",
+        "at_ms": 5263
+      },
+      {
+        "file": "native-interrupt-recovery/0420.png",
+        "at_ms": 5275
+      },
+      {
+        "file": "native-interrupt-recovery/0421.png",
+        "at_ms": 5287
+      },
+      {
+        "file": "native-interrupt-recovery/0422.png",
+        "at_ms": 5293
+      },
+      {
+        "file": "native-interrupt-recovery/0423.png",
+        "at_ms": 5305
+      },
+      {
+        "file": "native-interrupt-recovery/0424.png",
+        "at_ms": 5317
+      },
+      {
+        "file": "native-interrupt-recovery/0425.png",
+        "at_ms": 5325
+      },
+      {
+        "file": "native-interrupt-recovery/0426.png",
+        "at_ms": 5336
+      },
+      {
+        "file": "native-interrupt-recovery/0427.png",
+        "at_ms": 5348
+      },
+      {
+        "file": "native-interrupt-recovery/0428.png",
+        "at_ms": 5355
+      },
+      {
+        "file": "native-interrupt-recovery/0429.png",
+        "at_ms": 5366
+      },
+      {
+        "file": "native-interrupt-recovery/0430.png",
+        "at_ms": 5379
+      },
+      {
+        "file": "native-interrupt-recovery/0431.png",
+        "at_ms": 5383
+      },
+      {
+        "file": "native-interrupt-recovery/0432.png",
+        "at_ms": 5395
+      },
+      {
+        "file": "native-interrupt-recovery/0433.png",
+        "at_ms": 5407
+      },
+      {
+        "file": "native-interrupt-recovery/0434.png",
+        "at_ms": 5414
+      },
+      {
+        "file": "native-interrupt-recovery/0435.png",
+        "at_ms": 5426
+      },
+      {
+        "file": "native-interrupt-recovery/0436.png",
+        "at_ms": 5438
+      },
+      {
+        "file": "native-interrupt-recovery/0437.png",
+        "at_ms": 5445
+      },
+      {
+        "file": "native-interrupt-recovery/0438.png",
+        "at_ms": 5457
+      },
+      {
+        "file": "native-interrupt-recovery/0439.png",
+        "at_ms": 5468
+      },
+      {
+        "file": "native-interrupt-recovery/0440.png",
+        "at_ms": 5474
+      },
+      {
+        "file": "native-interrupt-recovery/0441.png",
+        "at_ms": 5487
+      },
+      {
+        "file": "native-interrupt-recovery/0442.png",
+        "at_ms": 5499
+      },
+      {
+        "file": "native-interrupt-recovery/0443.png",
+        "at_ms": 5506
+      },
+      {
+        "file": "native-interrupt-recovery/0444.png",
+        "at_ms": 5516
+      },
+      {
+        "file": "native-interrupt-recovery/0445.png",
+        "at_ms": 5529
+      },
+      {
+        "file": "native-interrupt-recovery/0446.png",
+        "at_ms": 5536
+      },
+      {
+        "file": "native-interrupt-recovery/0447.png",
+        "at_ms": 5548
+      },
+      {
+        "file": "native-interrupt-recovery/0448.png",
+        "at_ms": 5559
+      },
+      {
+        "file": "native-interrupt-recovery/0449.png",
+        "at_ms": 5566
+      },
+      {
+        "file": "native-interrupt-recovery/0450.png",
+        "at_ms": 5578
+      },
+      {
+        "file": "native-interrupt-recovery/0451.png",
+        "at_ms": 5590
+      },
+      {
+        "file": "native-interrupt-recovery/0452.png",
+        "at_ms": 5596
+      },
+      {
+        "file": "native-interrupt-recovery/0453.png",
+        "at_ms": 5609
+      },
+      {
+        "file": "native-interrupt-recovery/0454.png",
+        "at_ms": 5620
+      },
+      {
+        "file": "native-interrupt-recovery/0455.png",
+        "at_ms": 5625
+      },
+      {
+        "file": "native-interrupt-recovery/0456.png",
+        "at_ms": 5638
+      },
+      {
+        "file": "native-interrupt-recovery/0457.png",
+        "at_ms": 5651
+      },
+      {
+        "file": "native-interrupt-recovery/0458.png",
+        "at_ms": 5657
+      },
+      {
+        "file": "native-interrupt-recovery/0459.png",
+        "at_ms": 5668
+      },
+      {
+        "file": "native-interrupt-recovery/0460.png",
+        "at_ms": 5681
+      },
+      {
+        "file": "native-interrupt-recovery/0461.png",
+        "at_ms": 5686
+      },
+      {
+        "file": "native-interrupt-recovery/0462.png",
+        "at_ms": 5699
+      },
+      {
+        "file": "native-interrupt-recovery/0463.png",
+        "at_ms": 5710
+      },
+      {
+        "file": "native-interrupt-recovery/0464.png",
+        "at_ms": 5718
+      },
+      {
+        "file": "native-interrupt-recovery/0465.png",
+        "at_ms": 5729
+      }
+    ]
+  }
+}

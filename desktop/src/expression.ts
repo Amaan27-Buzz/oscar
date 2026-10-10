@@ -55,6 +55,7 @@ export class DesktopExpressionAdapter {
       else if(tasks.some(t=>['planned','awaiting_result','blocked'].includes(t.state)))operation='waiting';
       else if(tasks.some(t=>t.state==='result_received'))operation='processing';
       else if(view.current?.state==='cancelled')kind='cancel';
+      else if(view.feedback)operation=view.feedback.kind==='unknown'?'unknown':'waiting';
     }
     const intent=[operation,availability,attention,muted,kind].join(':');
     if(intent!==this.intent) {this.intent=intent;this.transition++;} else kind='state';

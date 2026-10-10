@@ -1,0 +1,1506 @@
+{
+  "checks": [
+    "ten rapid/settled native cycles retain draft",
+    "no obsolete confirmation warning",
+    "native editable DOM focus",
+    "visible exact blocked reason"
+  ],
+  "native": {
+    "evidence": "AUTHENTICATED_DISPOSABLE_CORE",
+    "pid": 60904,
+    "native_debug_port": 62082,
+    "commands": "status block restore deny allow work execute finish reported failure disconnect reconnect cleanup"
+  },
+  "reference_limits": [
+    "programmatic runtime progression is not GUI owner approval",
+    "scripted model is not real inference",
+    "CDP is actual native WebView2; OS focus/tray/compositor/DPI coverage not established"
+  ],
+  "fixture_log": [
+    "{\"evidence\": \"AUTHENTICATED_DISPOSABLE_CORE\", \"pid\": 60904, \"native_debug_port\": 62082, \"commands\": \"status block restore deny allow work execute finish reported failure disconnect reconnect cleanup\"}",
+    "\"REFERENCE Worker disconnected; Core remains online\"",
+    "{\"core_response\": {\"state\": \"blocked\", \"reason\": \"capability_unavailable\", \"message\": \"Core/Worker capability unavailable or ambiguous; nothing executed\", \"task_id\": null}}",
+    "{\"process_running\": true, \"tasks\": [], \"actions\": 0}",
+    "\"REFERENCE Worker restored through Grid heartbeat\"",
+    "{\"disposable_policy\": \"deny\"}",
+    "{\"core_response\": {\"state\": \"blocked\", \"reason\": \"capability_unavailable\", \"message\": \"Core/Worker capability unavailable or ambiguous; nothing executed\", \"task_id\": null}}",
+    "\"Owned fixture cleanup; not evidence of UI Quit\""
+  ],
+  "snapshot": null,
+  "recordings": {
+    "native-invoke-retreat": [
+      {
+        "file": "native-invoke-retreat/0000.png",
+        "at_ms": 11
+      },
+      {
+        "file": "native-invoke-retreat/0001.png",
+        "at_ms": 116
+      },
+      {
+        "file": "native-invoke-retreat/0002.png",
+        "at_ms": 124
+      },
+      {
+        "file": "native-invoke-retreat/0003.png",
+        "at_ms": 132
+      },
+      {
+        "file": "native-invoke-retreat/0004.png",
+        "at_ms": 141
+      },
+      {
+        "file": "native-invoke-retreat/0005.png",
+        "at_ms": 153
+      },
+      {
+        "file": "native-invoke-retreat/0006.png",
+        "at_ms": 159
+      },
+      {
+        "file": "native-invoke-retreat/0007.png",
+        "at_ms": 172
+      },
+      {
+        "file": "native-invoke-retreat/0008.png",
+        "at_ms": 183
+      },
+      {
+        "file": "native-invoke-retreat/0009.png",
+        "at_ms": 187
+      },
+      {
+        "file": "native-invoke-retreat/0010.png",
+        "at_ms": 201
+      },
+      {
+        "file": "native-invoke-retreat/0011.png",
+        "at_ms": 213
+      },
+      {
+        "file": "native-invoke-retreat/0012.png",
+        "at_ms": 218
+      },
+      {
+        "file": "native-invoke-retreat/0013.png",
+        "at_ms": 231
+      },
+      {
+        "file": "native-invoke-retreat/0014.png",
+        "at_ms": 244
+      },
+      {
+        "file": "native-invoke-retreat/0015.png",
+        "at_ms": 249
+      },
+      {
+        "file": "native-invoke-retreat/0016.png",
+        "at_ms": 257
+      },
+      {
+        "file": "native-invoke-retreat/0017.png",
+        "at_ms": 269
+      },
+      {
+        "file": "native-invoke-retreat/0018.png",
+        "at_ms": 275
+      },
+      {
+        "file": "native-invoke-retreat/0019.png",
+        "at_ms": 291
+      },
+      {
+        "file": "native-invoke-retreat/0020.png",
+        "at_ms": 304
+      },
+      {
+        "file": "native-invoke-retreat/0021.png",
+        "at_ms": 309
+      },
+      {
+        "file": "native-invoke-retreat/0022.png",
+        "at_ms": 318
+      },
+      {
+        "file": "native-invoke-retreat/0023.png",
+        "at_ms": 330
+      },
+      {
+        "file": "native-invoke-retreat/0024.png",
+        "at_ms": 337
+      },
+      {
+        "file": "native-invoke-retreat/0025.png",
+        "at_ms": 348
+      },
+      {
+        "file": "native-invoke-retreat/0026.png",
+        "at_ms": 362
+      },
+      {
+        "file": "native-invoke-retreat/0027.png",
+        "at_ms": 366
+      },
+      {
+        "file": "native-invoke-retreat/0028.png",
+        "at_ms": 380
+      },
+      {
+        "file": "native-invoke-retreat/0029.png",
+        "at_ms": 394
+      },
+      {
+        "file": "native-invoke-retreat/0030.png",
+        "at_ms": 399
+      },
+      {
+        "file": "native-invoke-retreat/0031.png",
+        "at_ms": 429
+      },
+      {
+        "file": "native-invoke-retreat/0032.png",
+        "at_ms": 434
+      },
+      {
+        "file": "native-invoke-retreat/0033.png",
+        "at_ms": 439
+      },
+      {
+        "file": "native-invoke-retreat/0034.png",
+        "at_ms": 452
+      },
+      {
+        "file": "native-invoke-retreat/0035.png",
+        "at_ms": 458
+      },
+      {
+        "file": "native-invoke-retreat/0036.png",
+        "at_ms": 470
+      },
+      {
+        "file": "native-invoke-retreat/0037.png",
+        "at_ms": 485
+      },
+      {
+        "file": "native-invoke-retreat/0038.png",
+        "at_ms": 494
+      },
+      {
+        "file": "native-invoke-retreat/0039.png",
+        "at_ms": 500
+      },
+      {
+        "file": "native-invoke-retreat/0040.png",
+        "at_ms": 517
+      },
+      {
+        "file": "native-invoke-retreat/0041.png",
+        "at_ms": 520
+      },
+      {
+        "file": "native-invoke-retreat/0042.png",
+        "at_ms": 532
+      },
+      {
+        "file": "native-invoke-retreat/0043.png",
+        "at_ms": 544
+      },
+      {
+        "file": "native-invoke-retreat/0044.png",
+        "at_ms": 549
+      },
+      {
+        "file": "native-invoke-retreat/0045.png",
+        "at_ms": 562
+      },
+      {
+        "file": "native-invoke-retreat/0046.png",
+        "at_ms": 576
+      },
+      {
+        "file": "native-invoke-retreat/0047.png",
+        "at_ms": 581
+      },
+      {
+        "file": "native-invoke-retreat/0048.png",
+        "at_ms": 592
+      },
+      {
+        "file": "native-invoke-retreat/0049.png",
+        "at_ms": 604
+      },
+      {
+        "file": "native-invoke-retreat/0050.png",
+        "at_ms": 609
+      },
+      {
+        "file": "native-invoke-retreat/0051.png",
+        "at_ms": 626
+      },
+      {
+        "file": "native-invoke-retreat/0052.png",
+        "at_ms": 638
+      },
+      {
+        "file": "native-invoke-retreat/0053.png",
+        "at_ms": 642
+      },
+      {
+        "file": "native-invoke-retreat/0054.png",
+        "at_ms": 651
+      },
+      {
+        "file": "native-invoke-retreat/0055.png",
+        "at_ms": 669
+      },
+      {
+        "file": "native-invoke-retreat/0056.png",
+        "at_ms": 675
+      },
+      {
+        "file": "native-invoke-retreat/0057.png",
+        "at_ms": 683
+      },
+      {
+        "file": "native-invoke-retreat/0058.png",
+        "at_ms": 695
+      },
+      {
+        "file": "native-invoke-retreat/0059.png",
+        "at_ms": 702
+      },
+      {
+        "file": "native-invoke-retreat/0060.png",
+        "at_ms": 711
+      },
+      {
+        "file": "native-invoke-retreat/0061.png",
+        "at_ms": 724
+      },
+      {
+        "file": "native-invoke-retreat/0062.png",
+        "at_ms": 730
+      },
+      {
+        "file": "native-invoke-retreat/0063.png",
+        "at_ms": 746
+      },
+      {
+        "file": "native-invoke-retreat/0064.png",
+        "at_ms": 757
+      },
+      {
+        "file": "native-invoke-retreat/0065.png",
+        "at_ms": 762
+      },
+      {
+        "file": "native-invoke-retreat/0066.png",
+        "at_ms": 774
+      },
+      {
+        "file": "native-invoke-retreat/0067.png",
+        "at_ms": 787
+      },
+      {
+        "file": "native-invoke-retreat/0068.png",
+        "at_ms": 792
+      },
+      {
+        "file": "native-invoke-retreat/0069.png",
+        "at_ms": 808
+      },
+      {
+        "file": "native-invoke-retreat/0070.png",
+        "at_ms": 821
+      },
+      {
+        "file": "native-invoke-retreat/0071.png",
+        "at_ms": 826
+      },
+      {
+        "file": "native-invoke-retreat/0072.png",
+        "at_ms": 839
+      },
+      {
+        "file": "native-invoke-retreat/0073.png",
+        "at_ms": 850
+      },
+      {
+        "file": "native-invoke-retreat/0074.png",
+        "at_ms": 857
+      },
+      {
+        "file": "native-invoke-retreat/0075.png",
+        "at_ms": 876
+      },
+      {
+        "file": "native-invoke-retreat/0076.png",
+        "at_ms": 882
+      },
+      {
+        "file": "native-invoke-retreat/0077.png",
+        "at_ms": 900
+      },
+      {
+        "file": "native-invoke-retreat/0078.png",
+        "at_ms": 917
+      },
+      {
+        "file": "native-invoke-retreat/0079.png",
+        "at_ms": 922
+      },
+      {
+        "file": "native-invoke-retreat/0080.png",
+        "at_ms": 932
+      },
+      {
+        "file": "native-invoke-retreat/0081.png",
+        "at_ms": 946
+      },
+      {
+        "file": "native-invoke-retreat/0082.png",
+        "at_ms": 951
+      },
+      {
+        "file": "native-invoke-retreat/0083.png",
+        "at_ms": 965
+      },
+      {
+        "file": "native-invoke-retreat/0084.png",
+        "at_ms": 977
+      },
+      {
+        "file": "native-invoke-retreat/0085.png",
+        "at_ms": 982
+      },
+      {
+        "file": "native-invoke-retreat/0086.png",
+        "at_ms": 993
+      },
+      {
+        "file": "native-invoke-retreat/0087.png",
+        "at_ms": 1007
+      },
+      {
+        "file": "native-invoke-retreat/0088.png",
+        "at_ms": 1012
+      },
+      {
+        "file": "native-invoke-retreat/0089.png",
+        "at_ms": 1025
+      },
+      {
+        "file": "native-invoke-retreat/0090.png",
+        "at_ms": 1037
+      },
+      {
+        "file": "native-invoke-retreat/0091.png",
+        "at_ms": 1044
+      },
+      {
+        "file": "native-invoke-retreat/0092.png",
+        "at_ms": 1054
+      },
+      {
+        "file": "native-invoke-retreat/0093.png",
+        "at_ms": 1068
+      },
+      {
+        "file": "native-invoke-retreat/0094.png",
+        "at_ms": 1076
+      },
+      {
+        "file": "native-invoke-retreat/0095.png",
+        "at_ms": 1086
+      },
+      {
+        "file": "native-invoke-retreat/0096.png",
+        "at_ms": 1098
+      },
+      {
+        "file": "native-invoke-retreat/0097.png",
+        "at_ms": 1104
+      },
+      {
+        "file": "native-invoke-retreat/0098.png",
+        "at_ms": 1117
+      },
+      {
+        "file": "native-invoke-retreat/0099.png",
+        "at_ms": 1130
+      },
+      {
+        "file": "native-invoke-retreat/0100.png",
+        "at_ms": 1136
+      },
+      {
+        "file": "native-invoke-retreat/0101.png",
+        "at_ms": 1146
+      },
+      {
+        "file": "native-invoke-retreat/0102.png",
+        "at_ms": 1160
+      },
+      {
+        "file": "native-invoke-retreat/0103.png",
+        "at_ms": 1165
+      },
+      {
+        "file": "native-invoke-retreat/0104.png",
+        "at_ms": 1179
+      },
+      {
+        "file": "native-invoke-retreat/0105.png",
+        "at_ms": 1190
+      },
+      {
+        "file": "native-invoke-retreat/0106.png",
+        "at_ms": 1198
+      },
+      {
+        "file": "native-invoke-retreat/0107.png",
+        "at_ms": 1206
+      },
+      {
+        "file": "native-invoke-retreat/0108.png",
+        "at_ms": 1220
+      },
+      {
+        "file": "native-invoke-retreat/0109.png",
+        "at_ms": 1227
+      },
+      {
+        "file": "native-invoke-retreat/0110.png",
+        "at_ms": 1237
+      },
+      {
+        "file": "native-invoke-retreat/0111.png",
+        "at_ms": 1249
+      },
+      {
+        "file": "native-invoke-retreat/0112.png",
+        "at_ms": 1255
+      },
+      {
+        "file": "native-invoke-retreat/0113.png",
+        "at_ms": 1269
+      },
+      {
+        "file": "native-invoke-retreat/0114.png",
+        "at_ms": 1278
+      },
+      {
+        "file": "native-invoke-retreat/0115.png",
+        "at_ms": 1285
+      },
+      {
+        "file": "native-invoke-retreat/0116.png",
+        "at_ms": 1297
+      },
+      {
+        "file": "native-invoke-retreat/0117.png",
+        "at_ms": 1310
+      },
+      {
+        "file": "native-invoke-retreat/0118.png",
+        "at_ms": 1315
+      },
+      {
+        "file": "native-invoke-retreat/0119.png",
+        "at_ms": 1327
+      },
+      {
+        "file": "native-invoke-retreat/0120.png",
+        "at_ms": 1339
+      },
+      {
+        "file": "native-invoke-retreat/0121.png",
+        "at_ms": 1345
+      },
+      {
+        "file": "native-invoke-retreat/0122.png",
+        "at_ms": 1357
+      },
+      {
+        "file": "native-invoke-retreat/0123.png",
+        "at_ms": 1373
+      },
+      {
+        "file": "native-invoke-retreat/0124.png",
+        "at_ms": 1389
+      },
+      {
+        "file": "native-invoke-retreat/0125.png",
+        "at_ms": 1396
+      },
+      {
+        "file": "native-invoke-retreat/0126.png",
+        "at_ms": 1404
+      },
+      {
+        "file": "native-invoke-retreat/0127.png",
+        "at_ms": 1415
+      },
+      {
+        "file": "native-invoke-retreat/0128.png",
+        "at_ms": 1427
+      },
+      {
+        "file": "native-invoke-retreat/0129.png",
+        "at_ms": 1435
+      },
+      {
+        "file": "native-invoke-retreat/0130.png",
+        "at_ms": 1445
+      },
+      {
+        "file": "native-invoke-retreat/0131.png",
+        "at_ms": 1457
+      },
+      {
+        "file": "native-invoke-retreat/0132.png",
+        "at_ms": 1480
+      },
+      {
+        "file": "native-invoke-retreat/0133.png",
+        "at_ms": 1493
+      },
+      {
+        "file": "native-invoke-retreat/0134.png",
+        "at_ms": 1499
+      },
+      {
+        "file": "native-invoke-retreat/0135.png",
+        "at_ms": 1513
+      },
+      {
+        "file": "native-invoke-retreat/0136.png",
+        "at_ms": 1521
+      },
+      {
+        "file": "native-invoke-retreat/0137.png",
+        "at_ms": 1528
+      },
+      {
+        "file": "native-invoke-retreat/0138.png",
+        "at_ms": 1541
+      },
+      {
+        "file": "native-invoke-retreat/0139.png",
+        "at_ms": 1552
+      },
+      {
+        "file": "native-invoke-retreat/0140.png",
+        "at_ms": 1559
+      },
+      {
+        "file": "native-invoke-retreat/0141.png",
+        "at_ms": 1570
+      },
+      {
+        "file": "native-invoke-retreat/0142.png",
+        "at_ms": 1584
+      },
+      {
+        "file": "native-invoke-retreat/0143.png",
+        "at_ms": 1589
+      },
+      {
+        "file": "native-invoke-retreat/0144.png",
+        "at_ms": 1601
+      },
+      {
+        "file": "native-invoke-retreat/0145.png",
+        "at_ms": 1612
+      },
+      {
+        "file": "native-invoke-retreat/0146.png",
+        "at_ms": 1619
+      },
+      {
+        "file": "native-invoke-retreat/0147.png",
+        "at_ms": 1631
+      },
+      {
+        "file": "native-invoke-retreat/0148.png",
+        "at_ms": 1642
+      },
+      {
+        "file": "native-invoke-retreat/0149.png",
+        "at_ms": 1650
+      },
+      {
+        "file": "native-invoke-retreat/0150.png",
+        "at_ms": 1662
+      },
+      {
+        "file": "native-invoke-retreat/0151.png",
+        "at_ms": 1673
+      },
+      {
+        "file": "native-invoke-retreat/0152.png",
+        "at_ms": 1685
+      },
+      {
+        "file": "native-invoke-retreat/0153.png",
+        "at_ms": 1692
+      },
+      {
+        "file": "native-invoke-retreat/0154.png",
+        "at_ms": 1704
+      },
+      {
+        "file": "native-invoke-retreat/0155.png",
+        "at_ms": 1710
+      },
+      {
+        "file": "native-invoke-retreat/0156.png",
+        "at_ms": 1722
+      },
+      {
+        "file": "native-invoke-retreat/0157.png",
+        "at_ms": 1734
+      },
+      {
+        "file": "native-invoke-retreat/0158.png",
+        "at_ms": 1742
+      },
+      {
+        "file": "native-invoke-retreat/0159.png",
+        "at_ms": 1752
+      },
+      {
+        "file": "native-invoke-retreat/0160.png",
+        "at_ms": 1764
+      },
+      {
+        "file": "native-invoke-retreat/0161.png",
+        "at_ms": 1771
+      },
+      {
+        "file": "native-invoke-retreat/0162.png",
+        "at_ms": 1783
+      },
+      {
+        "file": "native-invoke-retreat/0163.png",
+        "at_ms": 1794
+      },
+      {
+        "file": "native-invoke-retreat/0164.png",
+        "at_ms": 1800
+      },
+      {
+        "file": "native-invoke-retreat/0165.png",
+        "at_ms": 1812
+      },
+      {
+        "file": "native-invoke-retreat/0166.png",
+        "at_ms": 1825
+      },
+      {
+        "file": "native-invoke-retreat/0167.png",
+        "at_ms": 1831
+      },
+      {
+        "file": "native-invoke-retreat/0168.png",
+        "at_ms": 1844
+      },
+      {
+        "file": "native-invoke-retreat/0169.png",
+        "at_ms": 1854
+      },
+      {
+        "file": "native-invoke-retreat/0170.png",
+        "at_ms": 1861
+      },
+      {
+        "file": "native-invoke-retreat/0171.png",
+        "at_ms": 1872
+      },
+      {
+        "file": "native-invoke-retreat/0172.png",
+        "at_ms": 1884
+      },
+      {
+        "file": "native-invoke-retreat/0173.png",
+        "at_ms": 1891
+      },
+      {
+        "file": "native-invoke-retreat/0174.png",
+        "at_ms": 1901
+      },
+      {
+        "file": "native-invoke-retreat/0175.png",
+        "at_ms": 1914
+      },
+      {
+        "file": "native-invoke-retreat/0176.png",
+        "at_ms": 1920
+      },
+      {
+        "file": "native-invoke-retreat/0177.png",
+        "at_ms": 1931
+      },
+      {
+        "file": "native-invoke-retreat/0178.png",
+        "at_ms": 1944
+      },
+      {
+        "file": "native-invoke-retreat/0179.png",
+        "at_ms": 1949
+      },
+      {
+        "file": "native-invoke-retreat/0180.png",
+        "at_ms": 1961
+      },
+      {
+        "file": "native-invoke-retreat/0181.png",
+        "at_ms": 1974
+      },
+      {
+        "file": "native-invoke-retreat/0182.png",
+        "at_ms": 1981
+      },
+      {
+        "file": "native-invoke-retreat/0183.png",
+        "at_ms": 2002
+      },
+      {
+        "file": "native-invoke-retreat/0184.png",
+        "at_ms": 2009
+      },
+      {
+        "file": "native-invoke-retreat/0185.png",
+        "at_ms": 2020
+      },
+      {
+        "file": "native-invoke-retreat/0186.png",
+        "at_ms": 2032
+      },
+      {
+        "file": "native-invoke-retreat/0187.png",
+        "at_ms": 2037
+      },
+      {
+        "file": "native-invoke-retreat/0188.png",
+        "at_ms": 2050
+      },
+      {
+        "file": "native-invoke-retreat/0189.png",
+        "at_ms": 2063
+      },
+      {
+        "file": "native-invoke-retreat/0190.png",
+        "at_ms": 2068
+      },
+      {
+        "file": "native-invoke-retreat/0191.png",
+        "at_ms": 2095
+      },
+      {
+        "file": "native-invoke-retreat/0192.png",
+        "at_ms": 2103
+      },
+      {
+        "file": "native-invoke-retreat/0193.png",
+        "at_ms": 2123
+      },
+      {
+        "file": "native-invoke-retreat/0194.png",
+        "at_ms": 2131
+      },
+      {
+        "file": "native-invoke-retreat/0195.png",
+        "at_ms": 2135
+      },
+      {
+        "file": "native-invoke-retreat/0196.png",
+        "at_ms": 2145
+      },
+      {
+        "file": "native-invoke-retreat/0197.png",
+        "at_ms": 2157
+      },
+      {
+        "file": "native-invoke-retreat/0198.png",
+        "at_ms": 2166
+      },
+      {
+        "file": "native-invoke-retreat/0199.png",
+        "at_ms": 2175
+      },
+      {
+        "file": "native-invoke-retreat/0200.png",
+        "at_ms": 2189
+      },
+      {
+        "file": "native-invoke-retreat/0201.png",
+        "at_ms": 2196
+      },
+      {
+        "file": "native-invoke-retreat/0202.png",
+        "at_ms": 2206
+      },
+      {
+        "file": "native-invoke-retreat/0203.png",
+        "at_ms": 2218
+      },
+      {
+        "file": "native-invoke-retreat/0204.png",
+        "at_ms": 2225
+      },
+      {
+        "file": "native-invoke-retreat/0205.png",
+        "at_ms": 2237
+      },
+      {
+        "file": "native-invoke-retreat/0206.png",
+        "at_ms": 2249
+      },
+      {
+        "file": "native-invoke-retreat/0207.png",
+        "at_ms": 2255
+      },
+      {
+        "file": "native-invoke-retreat/0208.png",
+        "at_ms": 2266
+      },
+      {
+        "file": "native-invoke-retreat/0209.png",
+        "at_ms": 2278
+      },
+      {
+        "file": "native-invoke-retreat/0210.png",
+        "at_ms": 2288
+      },
+      {
+        "file": "native-invoke-retreat/0211.png",
+        "at_ms": 2297
+      },
+      {
+        "file": "native-invoke-retreat/0212.png",
+        "at_ms": 2310
+      },
+      {
+        "file": "native-invoke-retreat/0213.png",
+        "at_ms": 2318
+      },
+      {
+        "file": "native-invoke-retreat/0214.png",
+        "at_ms": 2328
+      },
+      {
+        "file": "native-invoke-retreat/0215.png",
+        "at_ms": 2340
+      },
+      {
+        "file": "native-invoke-retreat/0216.png",
+        "at_ms": 2346
+      },
+      {
+        "file": "native-invoke-retreat/0217.png",
+        "at_ms": 2356
+      },
+      {
+        "file": "native-invoke-retreat/0218.png",
+        "at_ms": 2370
+      },
+      {
+        "file": "native-invoke-retreat/0219.png",
+        "at_ms": 2377
+      },
+      {
+        "file": "native-invoke-retreat/0220.png",
+        "at_ms": 2390
+      },
+      {
+        "file": "native-invoke-retreat/0221.png",
+        "at_ms": 2399
+      },
+      {
+        "file": "native-invoke-retreat/0222.png",
+        "at_ms": 2410
+      },
+      {
+        "file": "native-invoke-retreat/0223.png",
+        "at_ms": 2421
+      },
+      {
+        "file": "native-invoke-retreat/0224.png",
+        "at_ms": 2434
+      },
+      {
+        "file": "native-invoke-retreat/0225.png",
+        "at_ms": 2443
+      },
+      {
+        "file": "native-invoke-retreat/0226.png",
+        "at_ms": 2451
+      },
+      {
+        "file": "native-invoke-retreat/0227.png",
+        "at_ms": 2460
+      },
+      {
+        "file": "native-invoke-retreat/0228.png",
+        "at_ms": 2469
+      },
+      {
+        "file": "native-invoke-retreat/0229.png",
+        "at_ms": 2480
+      },
+      {
+        "file": "native-invoke-retreat/0230.png",
+        "at_ms": 2492
+      },
+      {
+        "file": "native-invoke-retreat/0231.png",
+        "at_ms": 2497
+      },
+      {
+        "file": "native-invoke-retreat/0232.png",
+        "at_ms": 2511
+      },
+      {
+        "file": "native-invoke-retreat/0233.png",
+        "at_ms": 2521
+      },
+      {
+        "file": "native-invoke-retreat/0234.png",
+        "at_ms": 2526
+      },
+      {
+        "file": "native-invoke-retreat/0235.png",
+        "at_ms": 2540
+      },
+      {
+        "file": "native-invoke-retreat/0236.png",
+        "at_ms": 2550
+      },
+      {
+        "file": "native-invoke-retreat/0237.png",
+        "at_ms": 2556
+      },
+      {
+        "file": "native-invoke-retreat/0238.png",
+        "at_ms": 2569
+      },
+      {
+        "file": "native-invoke-retreat/0239.png",
+        "at_ms": 2580
+      },
+      {
+        "file": "native-invoke-retreat/0240.png",
+        "at_ms": 2586
+      },
+      {
+        "file": "native-invoke-retreat/0241.png",
+        "at_ms": 2608
+      },
+      {
+        "file": "native-invoke-retreat/0242.png",
+        "at_ms": 2613
+      },
+      {
+        "file": "native-invoke-retreat/0243.png",
+        "at_ms": 2626
+      },
+      {
+        "file": "native-invoke-retreat/0244.png",
+        "at_ms": 2638
+      },
+      {
+        "file": "native-invoke-retreat/0245.png",
+        "at_ms": 2644
+      },
+      {
+        "file": "native-invoke-retreat/0246.png",
+        "at_ms": 2656
+      },
+      {
+        "file": "native-invoke-retreat/0247.png",
+        "at_ms": 2669
+      },
+      {
+        "file": "native-invoke-retreat/0248.png",
+        "at_ms": 2675
+      },
+      {
+        "file": "native-invoke-retreat/0249.png",
+        "at_ms": 2705
+      },
+      {
+        "file": "native-invoke-retreat/0250.png",
+        "at_ms": 2711
+      },
+      {
+        "file": "native-invoke-retreat/0251.png",
+        "at_ms": 2723
+      },
+      {
+        "file": "native-invoke-retreat/0252.png",
+        "at_ms": 2738
+      },
+      {
+        "file": "native-invoke-retreat/0253.png",
+        "at_ms": 2742
+      },
+      {
+        "file": "native-invoke-retreat/0254.png",
+        "at_ms": 2751
+      },
+      {
+        "file": "native-invoke-retreat/0255.png",
+        "at_ms": 2765
+      },
+      {
+        "file": "native-invoke-retreat/0256.png",
+        "at_ms": 2773
+      },
+      {
+        "file": "native-invoke-retreat/0257.png",
+        "at_ms": 2783
+      },
+      {
+        "file": "native-invoke-retreat/0258.png",
+        "at_ms": 2799
+      },
+      {
+        "file": "native-invoke-retreat/0259.png",
+        "at_ms": 2805
+      },
+      {
+        "file": "native-invoke-retreat/0260.png",
+        "at_ms": 2819
+      },
+      {
+        "file": "native-invoke-retreat/0261.png",
+        "at_ms": 2825
+      },
+      {
+        "file": "native-invoke-retreat/0262.png",
+        "at_ms": 2834
+      },
+      {
+        "file": "native-invoke-retreat/0263.png",
+        "at_ms": 2846
+      },
+      {
+        "file": "native-invoke-retreat/0264.png",
+        "at_ms": 2858
+      },
+      {
+        "file": "native-invoke-retreat/0265.png",
+        "at_ms": 2862
+      },
+      {
+        "file": "native-invoke-retreat/0266.png",
+        "at_ms": 2873
+      },
+      {
+        "file": "native-invoke-retreat/0267.png",
+        "at_ms": 2885
+      },
+      {
+        "file": "native-invoke-retreat/0268.png",
+        "at_ms": 2893
+      },
+      {
+        "file": "native-invoke-retreat/0269.png",
+        "at_ms": 2904
+      },
+      {
+        "file": "native-invoke-retreat/0270.png",
+        "at_ms": 2920
+      },
+      {
+        "file": "native-invoke-retreat/0271.png",
+        "at_ms": 2928
+      },
+      {
+        "file": "native-invoke-retreat/0272.png",
+        "at_ms": 2937
+      },
+      {
+        "file": "native-invoke-retreat/0273.png",
+        "at_ms": 2948
+      },
+      {
+        "file": "native-invoke-retreat/0274.png",
+        "at_ms": 2956
+      },
+      {
+        "file": "native-invoke-retreat/0275.png",
+        "at_ms": 2969
+      },
+      {
+        "file": "native-invoke-retreat/0276.png",
+        "at_ms": 2976
+      },
+      {
+        "file": "native-invoke-retreat/0277.png",
+        "at_ms": 2982
+      },
+      {
+        "file": "native-invoke-retreat/0278.png",
+        "at_ms": 2995
+      },
+      {
+        "file": "native-invoke-retreat/0279.png",
+        "at_ms": 3011
+      },
+      {
+        "file": "native-invoke-retreat/0280.png",
+        "at_ms": 3016
+      },
+      {
+        "file": "native-invoke-retreat/0281.png",
+        "at_ms": 3024
+      },
+      {
+        "file": "native-invoke-retreat/0282.png",
+        "at_ms": 3041
+      },
+      {
+        "file": "native-invoke-retreat/0283.png",
+        "at_ms": 3046
+      },
+      {
+        "file": "native-invoke-retreat/0284.png",
+        "at_ms": 3054
+      },
+      {
+        "file": "native-invoke-retreat/0285.png",
+        "at_ms": 3066
+      },
+      {
+        "file": "native-invoke-retreat/0286.png",
+        "at_ms": 3072
+      },
+      {
+        "file": "native-invoke-retreat/0287.png",
+        "at_ms": 3085
+      },
+      {
+        "file": "native-invoke-retreat/0288.png",
+        "at_ms": 3097
+      },
+      {
+        "file": "native-invoke-retreat/0289.png",
+        "at_ms": 3103
+      },
+      {
+        "file": "native-invoke-retreat/0290.png",
+        "at_ms": 3114
+      },
+      {
+        "file": "native-invoke-retreat/0291.png",
+        "at_ms": 3128
+      },
+      {
+        "file": "native-invoke-retreat/0292.png",
+        "at_ms": 3132
+      },
+      {
+        "file": "native-invoke-retreat/0293.png",
+        "at_ms": 3143
+      },
+      {
+        "file": "native-invoke-retreat/0294.png",
+        "at_ms": 3156
+      },
+      {
+        "file": "native-invoke-retreat/0295.png",
+        "at_ms": 3162
+      },
+      {
+        "file": "native-invoke-retreat/0296.png",
+        "at_ms": 3173
+      },
+      {
+        "file": "native-invoke-retreat/0297.png",
+        "at_ms": 3187
+      },
+      {
+        "file": "native-invoke-retreat/0298.png",
+        "at_ms": 3192
+      },
+      {
+        "file": "native-invoke-retreat/0299.png",
+        "at_ms": 3204
+      },
+      {
+        "file": "native-invoke-retreat/0300.png",
+        "at_ms": 3219
+      },
+      {
+        "file": "native-invoke-retreat/0301.png",
+        "at_ms": 3233
+      },
+      {
+        "file": "native-invoke-retreat/0302.png",
+        "at_ms": 3244
+      },
+      {
+        "file": "native-invoke-retreat/0303.png",
+        "at_ms": 3248
+      },
+      {
+        "file": "native-invoke-retreat/0304.png",
+        "at_ms": 3261
+      },
+      {
+        "file": "native-invoke-retreat/0305.png",
+        "at_ms": 3274
+      },
+      {
+        "file": "native-invoke-retreat/0306.png",
+        "at_ms": 3278
+      },
+      {
+        "file": "native-invoke-retreat/0307.png",
+        "at_ms": 3292
+      },
+      {
+        "file": "native-invoke-retreat/0308.png",
+        "at_ms": 3321
+      },
+      {
+        "file": "native-invoke-retreat/0309.png",
+        "at_ms": 3325
+      },
+      {
+        "file": "native-invoke-retreat/0310.png",
+        "at_ms": 3338
+      },
+      {
+        "file": "native-invoke-retreat/0311.png",
+        "at_ms": 3350
+      },
+      {
+        "file": "native-invoke-retreat/0312.png",
+        "at_ms": 3356
+      },
+      {
+        "file": "native-invoke-retreat/0313.png",
+        "at_ms": 3370
+      },
+      {
+        "file": "native-invoke-retreat/0314.png",
+        "at_ms": 3382
+      },
+      {
+        "file": "native-invoke-retreat/0315.png",
+        "at_ms": 3388
+      },
+      {
+        "file": "native-invoke-retreat/0316.png",
+        "at_ms": 3399
+      },
+      {
+        "file": "native-invoke-retreat/0317.png",
+        "at_ms": 3413
+      },
+      {
+        "file": "native-invoke-retreat/0318.png",
+        "at_ms": 3420
+      },
+      {
+        "file": "native-invoke-retreat/0319.png",
+        "at_ms": 3431
+      },
+      {
+        "file": "native-invoke-retreat/0320.png",
+        "at_ms": 3444
+      },
+      {
+        "file": "native-invoke-retreat/0321.png",
+        "at_ms": 3450
+      },
+      {
+        "file": "native-invoke-retreat/0322.png",
+        "at_ms": 3464
+      },
+      {
+        "file": "native-invoke-retreat/0323.png",
+        "at_ms": 3473
+      },
+      {
+        "file": "native-invoke-retreat/0324.png",
+        "at_ms": 3479
+      },
+      {
+        "file": "native-invoke-retreat/0325.png",
+        "at_ms": 3491
+      },
+      {
+        "file": "native-invoke-retreat/0326.png",
+        "at_ms": 3503
+      },
+      {
+        "file": "native-invoke-retreat/0327.png",
+        "at_ms": 3508
+      },
+      {
+        "file": "native-invoke-retreat/0328.png",
+        "at_ms": 3521
+      },
+      {
+        "file": "native-invoke-retreat/0329.png",
+        "at_ms": 3533
+      },
+      {
+        "file": "native-invoke-retreat/0330.png",
+        "at_ms": 3541
+      },
+      {
+        "file": "native-invoke-retreat/0331.png",
+        "at_ms": 3550
+      },
+      {
+        "file": "native-invoke-retreat/0332.png",
+        "at_ms": 3562
+      },
+      {
+        "file": "native-invoke-retreat/0333.png",
+        "at_ms": 3571
+      },
+      {
+        "file": "native-invoke-retreat/0334.png",
+        "at_ms": 3580
+      },
+      {
+        "file": "native-invoke-retreat/0335.png",
+        "at_ms": 3599
+      },
+      {
+        "file": "native-invoke-retreat/0336.png",
+        "at_ms": 3602
+      },
+      {
+        "file": "native-invoke-retreat/0337.png",
+        "at_ms": 3609
+      },
+      {
+        "file": "native-invoke-retreat/0338.png",
+        "at_ms": 3622
+      },
+      {
+        "file": "native-invoke-retreat/0339.png",
+        "at_ms": 3628
+      },
+      {
+        "file": "native-invoke-retreat/0340.png",
+        "at_ms": 3642
+      },
+      {
+        "file": "native-invoke-retreat/0341.png",
+        "at_ms": 3654
+      },
+      {
+        "file": "native-invoke-retreat/0342.png",
+        "at_ms": 3659
+      },
+      {
+        "file": "native-invoke-retreat/0343.png",
+        "at_ms": 3672
+      },
+      {
+        "file": "native-invoke-retreat/0344.png",
+        "at_ms": 3683
+      },
+      {
+        "file": "native-invoke-retreat/0345.png",
+        "at_ms": 3690
+      },
+      {
+        "file": "native-invoke-retreat/0346.png",
+        "at_ms": 3701
+      },
+      {
+        "file": "native-invoke-retreat/0347.png",
+        "at_ms": 3713
+      },
+      {
+        "file": "native-invoke-retreat/0348.png",
+        "at_ms": 3720
+      },
+      {
+        "file": "native-invoke-retreat/0349.png",
+        "at_ms": 3732
+      },
+      {
+        "file": "native-invoke-retreat/0350.png",
+        "at_ms": 3743
+      },
+      {
+        "file": "native-invoke-retreat/0351.png",
+        "at_ms": 3749
+      },
+      {
+        "file": "native-invoke-retreat/0352.png",
+        "at_ms": 3762
+      },
+      {
+        "file": "native-invoke-retreat/0353.png",
+        "at_ms": 3774
+      },
+      {
+        "file": "native-invoke-retreat/0354.png",
+        "at_ms": 3779
+      },
+      {
+        "file": "native-invoke-retreat/0355.png",
+        "at_ms": 3793
+      },
+      {
+        "file": "native-invoke-retreat/0356.png",
+        "at_ms": 3804
+      },
+      {
+        "file": "native-invoke-retreat/0357.png",
+        "at_ms": 3812
+      },
+      {
+        "file": "native-invoke-retreat/0358.png",
+        "at_ms": 3822
+      },
+      {
+        "file": "native-invoke-retreat/0359.png",
+        "at_ms": 3835
+      },
+      {
+        "file": "native-invoke-retreat/0360.png",
+        "at_ms": 3842
+      },
+      {
+        "file": "native-invoke-retreat/0361.png",
+        "at_ms": 3853
+      },
+      {
+        "file": "native-invoke-retreat/0362.png",
+        "at_ms": 3866
+      },
+      {
+        "file": "native-invoke-retreat/0363.png",
+        "at_ms": 3872
+      },
+      {
+        "file": "native-invoke-retreat/0364.png",
+        "at_ms": 3884
+      },
+      {
+        "file": "native-invoke-retreat/0365.png",
+        "at_ms": 3897
+      },
+      {
+        "file": "native-invoke-retreat/0366.png",
+        "at_ms": 3904
+      },
+      {
+        "file": "native-invoke-retreat/0367.png",
+        "at_ms": 3914
+      }
+    ]
+  }
+}

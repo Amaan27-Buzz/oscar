@@ -1,5 +1,8 @@
 # Slice 12.1 — Living Desktop Presence
 
+**2026-10-11 corrective candidate:** see the [quality recovery review package](quality-recovery/README.md).
+The original captures and assessments below are historical and preserved.
+
 **LOCAL OWNER-REVIEW CANDIDATE / DEFAULT UI UNCHANGED.**
 Built from clean `b9d3e049aef5148a10c710626b9e6b06771c9229` on
 `codex/slice-12-1-living-presence`, isolated in `oscar-desktop-presence`.

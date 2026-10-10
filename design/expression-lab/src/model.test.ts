@@ -16,7 +16,7 @@ describe('lab arbitration',()=>{
     }
     const waiting=arbitrate({operation:'listening',delivery:'amused'},{...clear,muted:true,ownerAttention:true});
     expect(waiting.label).toBe('waiting · conversational mute');
-    expect(waiting.delivery).toBe('subdued');
+    expect(waiting.delivery).toBe('attentive');
     expect(arbitrate({operation:'muted',delivery:'composed'},{...clear,availability:'unavailable'}).label).toBe('unavailable · conversational mute');
   });
   it('never turns pleasure into verification, consent or perception',()=>{
@@ -25,6 +25,16 @@ describe('lab arbitration',()=>{
     expect(arbitrate({operation:'error',delivery:'amused'}).delivery).toBe('concerned');
     expect(arbitrate({operation:'waiting',delivery:'pleased'}).operation).toBe('waiting');
     expect(arbitrate({operation:'available',delivery:'attentive'}).operation).toBe('available');
+  });
+  it('quiet rest and curiosity remain distinct, while owner attention is awake without starting work',()=>{
+    const rest=poseFor({operation:'attentive',delivery:'resting'});
+    const curious=poseFor({operation:'attentive',delivery:'curious'});
+    expect(rest).toEqual(canonical);expect(curious.x).not.toBe(rest.x);
+    const review=arbitrate({operation:'executing',delivery:'amused'},{...clear,ownerAttention:true});
+    expect(review.operation).toBe('waiting');
+    const held=poseFor(review);
+    expect(held.opening).toBeGreaterThan(.7);
+    expect(held.x).toBeLessThan(poseFor({operation:'unavailable',delivery:'subdued'}).x);
   });
 });
 describe('geometry and finite motion',()=>{

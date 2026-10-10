@@ -547,7 +547,14 @@ class MobileServer:
                         core.request(session, json.loads(self.rfile.read(length))), allow_nan=False
                     ).encode()
                     self.send_response(200)
-                except (ValueError, TypeError, KeyError, PermissionError, StateConflict):
+                except PermissionError:
+                    body = (
+                        b'{"error":"permission_denied",'
+                        b'"message":"Core denied permission or Personal Policy; '
+                        b'inspect the current request"}'
+                    )
+                    self.send_response(403)
+                except (ValueError, TypeError, KeyError, StateConflict):
                     body = b'{"error":"request rejected; refresh trusted Core state"}'
                     self.send_response(403)
                 except Exception:
