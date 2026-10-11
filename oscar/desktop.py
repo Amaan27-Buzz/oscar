@@ -79,8 +79,8 @@ class Desktop(Mobile):
         claim = json.loads(base64.b64decode(challenge["payload"]))
         if claim["operation"] == "approve":
             task_id = claim["material"]["task_id"]
-            private = self.store.transient.get(task_id)
-            if private is None:
+            private = self.private_for(session, task_id)
+            if not private:
                 raise PermissionError("private request expired; recreate it")
             ownership = self.store.get("plan", task_id).get("interaction")
             if ownership:
@@ -203,9 +203,8 @@ class Desktop(Mobile):
 
     def inspect(self, session: SessionHandle, task_id: str) -> dict[str, Any]:
         view = super().inspect(session, task_id)
-        private = self.store.transient.get(task_id, {})
-        if private.get("discarded"):
-            private = {}
+        private = self.private_for(session, task_id)
+        response_length = 0
         try:
             association = self.store.get("sunday_task", task_id)
         except KeyError:
@@ -224,6 +223,7 @@ class Desktop(Mobile):
             result = private["result"]
             if result.success and result.value is not None:
                 view["response"] = result.value[:8192]
+                response_length = len(result.value)
                 view["response_status"] = Epistemic.REPORTED
                 if view["state"] == TaskState.VERIFIED and (
                     self.store.get("plan", task_id)["kind"] == "addition"
@@ -233,6 +233,7 @@ class Desktop(Mobile):
             output = self.worker_outputs.get(str(view["target"]), {}).get(result.action_id)
             if result.success and output is not None:
                 view["response"] = output[:8192]
+                response_length = len(output)
                 view["response_status"] = Epistemic.REPORTED
         if "retry" in view["actions"]:
             view["actions"].remove("retry")  # private input cannot be blindly replayed
@@ -263,13 +264,7 @@ class Desktop(Mobile):
                     }
                 ]
         view["mode"] = desktop_record.get("mode", "")
-        view["response_truncated"] = False
-        if (
-            view.get("response")
-            and "result" in private
-            and isinstance(private["result"].value, str)
-        ):
-            view["response_truncated"] = len(private["result"].value) > 8192
+        view["response_truncated"] = bool(view.get("response")) and response_length > 8192
         if self.store.get("plan", task_id)["kind"] == "memory" and view.get("response"):
             from .memory_executor import recall_text
 
@@ -302,6 +297,7 @@ class Desktop(Mobile):
                     "Retrieve again before relying on it."
                 )
                 view["response_status"] = Epistemic.UNKNOWN
+                view["response_truncated"] = False
         view["orb"] = orb_state(view["state"])
         try:
             checkpoint = self.store.get("worker_checkpoint", task_id)
@@ -314,15 +310,38 @@ class Desktop(Mobile):
             view["progress"] = None
         return view
 
+    def private_for(self, session: SessionHandle, task_id: str) -> dict[str, Any]:
+        try:
+            record = self.store.get("desktop_task", task_id)
+            association = self.store.get("sunday_task", task_id)
+        except KeyError:
+            return {}
+        private = self.store.transient.get(task_id, {})
+        if (
+            record.get("session_id") != session.id
+            or association.get("node_id") != session.node_id
+            or private.get("discarded")
+        ):
+            return {}
+        return private
+
     def challenge(self, session: SessionHandle, payload: dict[str, Any]) -> dict[str, Any]:
+        import json
+
+        if payload.get("operation") != "reply":
+            state = self.inspect(session, str(payload.get("task_id")))["state"]
+            private = self.private_for(session, str(payload.get("task_id")))
+            review = json.dumps(private.get("parameters", {}), ensure_ascii=False)
+            if len(review.encode("utf-8")) > 24_000:
+                raise ValueError(
+                    "Exact review exceeds its safe display bound; shorten the request or context. "
+                    "Nothing was approved."
+                )
         view = super().challenge(session, payload)
         if payload.get("operation") != "reply":
             view["confirmation"] = "explicit_desktop_owner_review"
-            view["evidence_state"] = self.inspect(session, str(payload["task_id"]))["state"]
-            import json
-
-            private = self.store.transient.get(str(payload["task_id"]), {})
-            view["review"] = json.dumps(private.get("parameters", {}), ensure_ascii=False)[:12000]
+            view["evidence_state"] = state
+            view["review"] = review
         return view
 
     def request(self, session: SessionHandle, data: dict[str, Any]) -> dict[str, Any]:

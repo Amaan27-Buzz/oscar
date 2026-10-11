@@ -18,12 +18,12 @@
   "classification": "REFERENCE_VERIFIED",
   "native": {
     "evidence": "AUTHENTICATED_DISPOSABLE_CORE",
-    "pid": 61844,
-    "native_debug_port": 65092,
+    "pid": 74372,
+    "native_debug_port": 57063,
     "commands": "status block restore deny allow work execute finish reported failure disconnect reconnect cleanup"
   },
   "fixture_log": [
-    "{\"evidence\": \"AUTHENTICATED_DISPOSABLE_CORE\", \"pid\": 61844, \"native_debug_port\": 65092, \"commands\": \"status block restore deny allow work execute finish reported failure disconnect reconnect cleanup\"}",
+    "{\"evidence\": \"AUTHENTICATED_DISPOSABLE_CORE\", \"pid\": 74372, \"native_debug_port\": 57063, \"commands\": \"status block restore deny allow work execute finish reported failure disconnect reconnect cleanup\"}",
     "{\"core_response\": {\"state\": null, \"reason\": null, \"message\": null, \"task_id\": null}}",
     "{\"core_response\": {\"state\": null, \"reason\": null, \"message\": null, \"task_id\": null}}",
     "{\"process_running\": true, \"tasks\": [], \"actions\": 0}",

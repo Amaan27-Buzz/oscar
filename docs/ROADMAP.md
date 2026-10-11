@@ -361,7 +361,8 @@ The 52-screenshot baseline and A/B/C compact design explorations in PR #16 are a
 [reusable expression foundation](../expression/README.md), React/SVG and isolated
 native Compose rendering with shared fixture validation. See [engineering packet](design/expression/ENGINE.md).
 Final cross-device visual/device quality and exact-head CI remain review boundaries.
-Production Desktop/Mobile adoption and Slice 12 are not started.
+Production Desktop/Mobile adoption is not promoted. Slice 12 software work is
+authorized separately under the Group 1 status below.
 Design character **before** choosing the surrounding widget/window styling. The provided desktop-companion references demonstrate presence, independent character, micro-reactions and nonverbal expression; do not copy their pixel-art character or replace the canonical Orb with a different mascot.
 
 - **11.1 — Character language:** facial marks, eyes/gaze, orientation, tempo, anticipation, nuanced microexpressions, idle/resting/reactive behavior, state priority and interruption; separate real Core operational status from safe expressive Persona delivery.
@@ -371,6 +372,15 @@ Design character **before** choosing the surrounding widget/window styling. The 
 Keep `assets/brand/oscar-orb.svg` unmodified. Proposed derivatives are separate, versioned and owner-approved. Real activity/privacy/permission/truth must never be synthesized from a visual animation. See [Expression Core](EXPRESSION-CORE.md) and [design quality bar](SLICE-NUMBERING.md).
 
 ## Slice 12 — OSCAR Desktop experience and visual system ◻️
+
+**2026-10-11:** the owner authorized the software-first Group 1 program.
+Slice 12.2–12.6 software/reference completion is on a separate candidate from
+verified 12.1 corrective `da8fddae`, with autonomous regression and independent
+review. See [the Group 1 report](development/GROUP-01-DESKTOP-COMPLETION.md)
+and [cumulative acceptance ledger](development/SOFTWARE-ALPHA-ACCEPTANCE-LEDGER.md).
+Consolidated manual/physical/owner acceptance remains deferred, not PASS.
+No default promotion, accepted-baseline merge or Group 2 begins in this assignment.
+The dated 12.1 statement below preserves its earlier review boundary.
 
 **2026-10-10:** owner-authorized 12.1 has an isolated local
 [Living Desktop Presence candidate](ui/desktop/presence/README.md), based on
@@ -439,7 +449,7 @@ Run the full integrated perception/communication → World Model/Controller/Memo
 | A — Brain | 01–04 | PASS |
 | B — Can Do Work | 05–06 | PASS for local-alpha scope |
 | C — Embodied foundations | 07–10 | PARTIAL; physical acceptance deferred and PR #16 pending |
-| Design / Character | 11–13 | Slice 11 engineering candidate; cross-platform/owner/CI review before merge; 12/13 not started |
+| Design / Character | 11–13 | Slice 11 shared candidate; Group 1 Slice 12 software/reference candidate; owner/device acceptance deferred; Slice 13 not begun |
 | D — Awareness / Chief-of-Staff | 14–17 | Planned |
 | E — Physical and Unified Alpha | 18–20 | Planned |
 

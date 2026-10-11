@@ -84,3 +84,10 @@ html[data-living]:has(.preview-controls) .living-presence{position:fixed;right:2
 .decision-sheet{border-top:3px solid #ffc83d}.decision-sheet dl{margin:12px 0}.decision-sheet dl div{margin:12px 0}.decision-sheet dt{font-size:12px;font-weight:600;color:var(--secondary)}.decision-sheet dd{margin:4px 0;font-size:14px}
 .activity-surface pre{font-family:inherit;font-size:14px;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere;padding:0;background:transparent;max-height:240px;overflow:auto}
 .activity-surface details{margin-top:18px}.activity-surface summary{cursor:pointer;padding:6px 0;font-size:13px}.activity-surface :focus-visible{outline:2px solid #1d6fd6;outline-offset:3px}
+.activity-surface{position:absolute;left:16px;right:16px;top:16px;bottom:112px;height:auto;padding:18px 24px;border-radius:8px 8px 20px 8px;box-shadow:0 6px 12px #171d2625}
+.activity-surface header{position:sticky;top:-18px;z-index:1;background:var(--leaf);padding:8px 0}.activity-surface h1{font-size:24px}
+.activity-surface .leaf-actions{padding-bottom:8px}.activity-surface h3{font-size:13px}
+.leaf-bottom>div{display:flex;gap:6px;flex-wrap:wrap}.leaf-bottom>span{max-width:110px;text-align:right}
+.living-presence input:focus-visible,.living-presence select:focus-visible,.living-presence summary:focus-visible,.action-surface:focus-visible{outline:2px solid #1d6fd6;outline-offset:3px}
+@media(max-width:400px){.writing-leaf,.activity-surface{padding-left:16px;padding-right:16px}.leaf-bottom{align-items:flex-start}.leaf-bottom>span{max-width:90px}.decision-sheet dd{font-size:13px}}
+@media(forced-colors:active){.activity-surface,.decision-sheet{border:1px solid CanvasText}.activity-list li{border-color:CanvasText}}

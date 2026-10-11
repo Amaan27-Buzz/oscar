@@ -1,6 +1,6 @@
 # Group 1 — Desktop completion
 
-Status: **IN PROGRESS / SOFTWARE CANDIDATE, NOT OWNER APPROVED**.
+Status: **SOFTWARE/REFERENCE COMPLETE CANDIDATE — NOT OWNER APPROVED OR PRODUCTION READY**.
 Owner authorization 2026-10-11 covers Slice 12.2–12.6 and a draft PR only.
 Manual/device acceptance is consolidated in the
 [cumulative ledger](SOFTWARE-ALPHA-ACCEPTANCE-LEDGER.md); it no longer stops
@@ -193,3 +193,131 @@ Independent review found loss of recall provenance in the new inspector. Added
 canonical source IDs and historical/inference warnings with RECALLED/INFERRED
 regressions. Direct Rust pending-review invalidation covers failed task-switch
 readback. Manual native consent, physical audio and OS configuration remain deferred.
+
+## 12.6 — Motion/accessibility/software integration checkpoint
+
+The shared ExpressionController and immutable Orb are reused without a replacement
+engine. Weighted movement, asymmetric eyes, pointer attention, interruption and
+recovery retain their approved semantics. Heartbeats do not replay accents. The
+Orb now persists across Activity as well as compact, reading, text and action
+surfaces. Activity uses a 620×760 logical writing leaf rather than the legacy
+820-wide workspace. Focusable response/decision regions, Act entry focus, linked
+text tabs, explicit preview destinations, contrast/forced-color rules and wrapping
+support keyboard use. Reduced motion removes leaf travel while operational state
+and expiry remain functional. Native work-area/DPI placement retains its existing
+scale/negative-origin clamp contract. No wallpaper/blur/click-through promise.
+
+Actual native recording: 47 archived captures, ~127ms median capture cadence,
+zero animation callbacks during a settled 3.2-second idle measurement and ~0.020
+seconds renderer task time in that interval. The ~106 SVG-unit puck range covers
+the whole recorded invocation/attention/work sequence, not isolated work travel.
+The GIF preserves recorded segment cadence with waits between segments cut; it is
+WebView2 content, not a compositor recording or a 60fps measurement. Independent
+review inspected multiple frames and verified all raw hashes. Owner naturalness,
+OS compositor smoothness and physical DPI remain deferred.
+
+Local checks: Desktop **56 / 10 files**, Expression Lab/shared engine **36 / 5**,
+Rust **12**, all PASS; TypeScript/build, Rust fmt/Clippy/development build, Ruff
+**145 files**, mypy **68 files**, repository links/secrets and WPF/native-CNG
+reference PASS. Integrated native rerun passes Ask **9**, Text **12**, Act **7**,
+Activity **9** assertions; polish **10**. Native self-check independently verifies
+registered WPF expected-value/readback, typed files, cancellation, reconnect,
+restart/shared-task continuity and real CNG/PSS. No owner consent, microphone,
+provider inference or device PASS is inferred from those reference results.
+
+Stage review ACCEPTS bounded software closure. A separate fresh final code/UX
+review independently found and reproduced two defects: exact review material was
+silently sliced, and Worker-output truncation used the wrong source length. Both
+are corrected and independently reproduced again: complete review up to 24,000
+UTF-8 bytes, fail closed before challenge creation above it; native matching bound;
+excerpt flags from the actual selected output. Replacement-session key enrollment
+also does not transfer prior private inputs: ordinary task metadata and safe
+signed denial/cancellation remain available, but approval needs the original live
+private request or a fresh request. This explicitly narrows an ambiguous review
+boundary without creating new authority. Three regressions cover these paths.
+
+Final independent assessment: **7.8/10, ACCEPT bounded software baseline**, no
+remaining demonstrated P0/P1/P2 release blocker in the tested scope. Visual score
+is advisory. Remaining design limits include dense consequential review text,
+caption/background judgement on a real wallpaper, and motion cadence/compositor
+acceptance. Only the owner approves the product; no default promotion or merge.
+
+
+## Final integrated results and recommendation
+
+The canonical full command `python -m unittest discover -s tests -t . -q` ran
+**551 tests in 118.017 seconds:545 executed successfully, 6 skipped, 0 failures**.
+All six skips are unrequested optional Windows/local-model/neural reference
+executors. The earlier command without `-t .` failed 12 relative imports; it is
+preserved as a validation failure, not CI or product success. ResourceWarnings
+from disposable HTTP-error fixtures remain visible; no assertion failed.
+
+Desktop56, Expression36 and Rust12 tests passed. Ruff checks and formatting for
+`oscar tests scripts` (145 files), strict mypy68 files, TypeScript/production build,
+Rust formatting/Clippy/development build, repository links/secrets and canonical
+numbering tests passed. A broad `ruff check .` reports60 pre-existing formatting
+violations in historical expression capture scripts outside the configured gate;
+those unrelated historical scripts were not rewritten. No remote CI claim.
+
+Cross-stage native runs verified a draft through invocation/reversal, bounded Ask
+into reader, distinct Text drafts/preview/expiry/discard, a typed disposable-file
+Act, exact owner review with no consent, task-change/expiry/offline/reconnect and
+persistent Orb across Activity. The final Core corrections were independently
+reproduced and followed by a full 551 run plus native Activity/CNG/UIA/lifecycle.
+Registered WPF independent readback, signed cancellation, native restart/shared
+tasks and safe scoped files passed. The owned uncommissioned lifecycle reference
+passed close/hide, reveal and explicit exit. Human tray/hotkey foreground comfort,
+real applications/audio and sustained owner use are still deferred.
+
+Receipts: [local checks](../ui/desktop/completion/evidence/local-checks.json),
+[native evidence packet](../ui/desktop/completion/README.md),
+[root causes/regressions](DESKTOP-COMPLETION-REGRESSIONS.md),
+[final independent review](reviews/GROUP-01-INDEPENDENT.md),
+[owner verdict](../ui/desktop/completion/OWNER-VERDICT.md).
+Original 12.1 captures/reports, foundation branches and migration backups are
+preserved. Final-curated evidence is privacy-reviewed disposable content: synthetic
+math/model/text, temporary paths and public reference markers; no owner content,
+credentials, bootstrap tokens, private recordings or profile archives are included.
+Curated PNGs/GIF and receipts are in Git; raw motion 47 frames/logs/prior-run captures
+are in `D:\TheDawnlightGroup\DawnlightLabs\oscar-local-evidence\group-01-desktop-20261011`,
+with an `archive-manifest.json` SHA256/byte manifest. This is a new evidence archive,
+not a modification of migration backups.
+
+### Commits and integration boundary
+
+- Verified base: `da8fddae50112c8859b21247d0cbaa617be8667e`.
+- Scope/ledger: `2701884c0de84e5eb5aa07e9a2025018f11a5734`.
+- 12.2 Ask: `d1afb438a55bd8e329060e391405cd3ae2341f07`.
+- 12.3 Text: `e4c5abdd61817f0101c43fbd8b60957a845d4f59`.
+- 12.4 Act: `c2225f4`.
+- 12.5 Activity: `0535d64`.
+- 12.6 integrated commit and draft PR are recorded below after publication.
+
+The production entry still renders App; Living remains a DEV opt-in and native
+prototype flag. Shared typed Act validation, Core privacy/preview/voice fixes and
+additive readback metadata improve existing functional paths, so production
+controls are not claimed pixel-identical. No automatic default-presence promotion.
+No second memory store, expression engine, action executor or authorization system.
+Existing main/work and corrective/original candidates remain unmerged.
+
+**Recommendation: ACCEPT bounded Group 1 software/reference candidate as the
+baseline for the next authorized software group.** Independent review found no
+remaining demonstrated software release blocker. This is not owner approval,
+production readiness, distribution acceptance or an instruction to begin Group 2.
+
+### Dependencies and deferred acceptance for Slice 13 / later groups
+
+Use the same Core/Controller/Grid/session, portable Voice Core and shared expression
+contract; additive Desktop result/evidence fields do not create mobile authority.
+Mobile UI must bind approvals to current signed material and preserve context
+freshness/source/privacy. Commission real adapters and credentials only under the
+later authorized commissioning scope; unavailable providers stay blocked. No React
+working-context history may be migrated as a second phone memory system.
+
+Consolidated obligations remain in the ledger: owner visual/naturalness and actual
+wallpaper/desktop comfort; OS focus/hotkey/tray/hit regions; physical 100/125/150%
+DPI/multiple monitors/taskbar/fullscreen/compositor; screen readers; microphone,
+room echo/barge-in/voice quality; phone/OEM and Edge hardware; strong critical-risk
+confirmation and distribution. Critical actions stay unavailable; ordinary native
+MessageBox/CNG reference is not Windows Hello. Gate C stays PARTIAL. Group 2 has not
+started, and accepted main/work/default UI are not promoted by this candidate.

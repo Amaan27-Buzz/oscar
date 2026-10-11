@@ -185,7 +185,7 @@ impl CoreClient {
         }
         let text = |name: &str| -> Result<String, String> {
             let text = value[name].as_str().ok_or("invalid Core review")?;
-            bound(text, 12000)?;
+            bound(text, if name == "review" { 24000 } else { 12000 })?;
             Ok(text.into())
         };
         let id = uuid::Uuid::new_v4().simple().to_string();

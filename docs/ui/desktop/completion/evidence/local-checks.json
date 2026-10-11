@@ -1,0 +1,62 @@
+{
+  "classification": "SOFTWARE_VERIFIED",
+  "python": {
+    "command": "python -m unittest discover -s tests -t . -q",
+    "tests": 551,
+    "skipped": 6,
+    "failed": 0,
+    "seconds": 118.017,
+    "skip_scope": "5 optional Windows/local-model tests and1 optional neural reference; not requested"
+  },
+  "desktop": {
+    "tests": 56,
+    "files": 10,
+    "failed": 0,
+    "typecheck_build": "PASS"
+  },
+  "expression": {
+    "tests": 36,
+    "files": 5,
+    "failed": 0,
+    "build": "PASS"
+  },
+  "rust": {
+    "tests": 12,
+    "failed": 0,
+    "ignored": 0,
+    "fmt_clippy": "PASS",
+    "native_debug_build": "PASS --no-default-features"
+  },
+  "ruff": {
+    "scope": "oscar tests scripts",
+    "files_formatted": 145,
+    "status": "PASS"
+  },
+  "mypy": {
+    "source_files": 68,
+    "status": "PASS"
+  },
+  "repository": "Required files, Markdown links, removed references and value-silent secrets PASS",
+  "canonical_svg_sha256": "728aeac3c9aa590b67d45c469735e919ede93a8503964e24f0f4af18cda066c5",
+  "native_checks": {
+    "Ask": 9,
+    "Text": 12,
+    "Act": 7,
+    "Activity": 9,
+    "Polish": 10,
+    "classification": "REFERENCE_VERIFIED"
+  },
+  "lifecycle": "LIFECYCLE_REFERENCE_PASS: uncommissioned, close/hide, reveal, explicit quit",
+  "independent_review": {
+    "recommendation": "ACCEPT bounded software baseline",
+    "score": 7.8,
+    "remaining_demonstrated_P0_P1_P2": 0
+  },
+  "limits": [
+    "All checks local; GitHub Actions not enabled or claimed",
+    "Reference model/voice fixtures do not establish physical audio or inference",
+    "Owner/device/compositor/DPI/screen-reader/consent acceptance deferred",
+    "Initial incorrect unittest discovery failed12 relative imports; canonical final run passed",
+    "Historical expression capture-script Ruff violations outside configured scope not rewritten"
+  ]
+}

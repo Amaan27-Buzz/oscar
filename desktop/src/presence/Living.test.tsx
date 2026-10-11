@@ -15,6 +15,16 @@ function harness() {
   return {port,update:(patch:Partial<View>)=>{view={...view,...patch};const next=snapshot();act(()=>push(next));return next;},stale:()=>act(()=>push({...view,link:'online',voice:'speaking',expression:{...view.expression!,generation:0}}))};
 }
 describe('living Desktop presence',()=>{
+  it('retains the character in Activity and recovers an uncertain IPC warning only after task inspection',async()=>{
+    const h=harness();await screen.findByText('Here');
+    const current={task_id:'check',state:'verified',description:'Read back task',target:'fixture',blocker:null,actions:[],generation:1,evidence_ids:[],response:null,response_status:null,value:null,epistemic:null};
+    h.update({window:'activity',current,tasks:[current]});
+    expect(screen.getByRole('button',{name:/OSCAR: Here/})).toBeTruthy();
+    h.port.mockRejectedValueOnce(new Error('Unknown IPC outcome'));
+    fireEvent.click(screen.getByRole('button',{name:'Refresh Core'}));await screen.findByText(/The request outcome is unknown/);
+    fireEvent.click(screen.getByRole('button',{name:/VerifiedRead back task/}));
+    await waitFor(()=>expect(screen.queryByText(/The request outcome is unknown/)).toBeNull());
+  });
   it('an uncertain Apply IPC outcome keeps the text tools from offering a blind retry',async()=>{
     const h=harness();await screen.findByText('Here');
     h.update({window:'tools',preview:{preview_id:'exact',before:null,after:'reference',epistemic:'REPORTED',expires:Date.now()/1000+15,destinations:['surface'],mode:'Dictate'}});

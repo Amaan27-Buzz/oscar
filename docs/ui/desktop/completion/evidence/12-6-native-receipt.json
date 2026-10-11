@@ -1,0 +1,35 @@
+{
+  "checks": [
+    "settled idle does not run a continuous animation loop",
+    "retreat and reinvocation preserve draft and input focus",
+    "reinvocation has no obsolete confirmation warning",
+    "native sequence has readable changing puck poses",
+    "Activity retains the same responsive character",
+    "Activity uses a bounded progressive surface",
+    "native pin reports applied state",
+    "reduced motion removes leaf travel and transitions",
+    "expanded content has no horizontal overflow",
+    "connection restoration preserves actual verified result"
+  ],
+  "completed": true,
+  "classification": "REFERENCE_VERIFIED",
+  "metrics": {
+    "idle_seconds": 3.2,
+    "idle_animation_callbacks": 0,
+    "renderer_task_seconds": 0.019705999999999998,
+    "capture_intervals_ms": {
+      "median": 127,
+      "max": 140,
+      "frames": 47
+    },
+    "whole_sequence_puck_x_travel_svg_units": 105.92498881955399
+  },
+  "raw_archive": "D:\\TheDawnlightGroup\\DawnlightLabs\\oscar-local-evidence\\group-01-desktop-20261011\\12-6-motion-03",
+  "limits": [
+    "Actual WebView2 content recording with observed capture timing; not compositor or full renderer FPS",
+    "Segments retain capture cadence; waits between segments are cut",
+    "Scripted authenticated Core and trusted disposable task progression",
+    "Reduced-motion preference emulated; actual OS accessibility/device/DPI deferred",
+    "Metric label corrected after review: whole sequence, not isolated work segment"
+  ]
+}

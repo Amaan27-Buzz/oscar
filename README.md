@@ -13,6 +13,14 @@
 
 ## Current development and milestones
 
+**2026-10-11:** [Group 1 Desktop software completion](docs/development/GROUP-01-DESKTOP-COMPLETION.md)
+implements Slice12.2–12.6 on a separate draft candidate based on verified12.1
+corrections. [Native reference evidence](docs/ui/desktop/completion/README.md)
+and the [cumulative acceptance ledger](docs/development/SOFTWARE-ALPHA-ACCEPTANCE-LEDGER.md)
+separate software proof from consolidated owner/manual/device acceptance.
+Repository: private `Amaan27-Buzz/oscar`. No default UI promotion or merge.
+The following integration/milestone notes are historical snapshots.
+
 Owner-authorized **Slice 12.1 Living Desktop Presence** is a separate local
 [visual-review candidate](docs/ui/desktop/presence/README.md) based on the integration
 below. It uses the existing Core and shared expression engine. Default Desktop,

@@ -1,0 +1,248 @@
+{
+  "12-2-blocked.png": {
+    "bytes": 41067,
+    "sha256": "7f8926199a310466696cf39b98a65b59110d55ba8febfa07a3877015a13d0827",
+    "width": 540,
+    "height": 520,
+    "frames": 1
+  },
+  "12-2-bounded-result.png": {
+    "bytes": 36599,
+    "sha256": "8c9e98ed1aa12efc077443fab17ec0689f0dee518c7a174c3212d24da6eb20d7",
+    "width": 540,
+    "height": 520,
+    "frames": 1
+  },
+  "12-2-compact.png": {
+    "bytes": 10394,
+    "sha256": "fe2bf5590b4829f0bbb7960763b5393e7b3efe59fe058ad673b61da5e74cfb73",
+    "width": 165,
+    "height": 185,
+    "frames": 1
+  },
+  "12-2-expanded-response.png": {
+    "bytes": 77976,
+    "sha256": "1865bb7e1259e4c74c0e240f8e72eccd7636188a2307e082a32d48039384a96b",
+    "width": 675,
+    "height": 850,
+    "frames": 1
+  },
+  "12-2-native-receipt.json": {
+    "bytes": 2431,
+    "sha256": "78eee297fbdf4a1a6652cd24af76fb9f41bb46e3541f17e56dd51dbb637b3d61"
+  },
+  "12-2-offline.png": {
+    "bytes": 37202,
+    "sha256": "5b111c6ccb5fc6cac99f0e2f6d5205ff9654abab91049ba9e359ab5d426eb623",
+    "width": 675,
+    "height": 850,
+    "frames": 1
+  },
+  "12-2-overlap-before.png": {
+    "bytes": 43571,
+    "sha256": "81ebd38613b0e40e3956dccc2ed670cb1b610abd34ed7fed64d2e78bca0b2c27",
+    "width": 540,
+    "height": 520,
+    "frames": 1
+  },
+  "12-2-verified.png": {
+    "bytes": 28738,
+    "sha256": "e99696256383b5583024e3a221061ed0b91ede2830fc88a4d3015b2c07b0202b",
+    "width": 540,
+    "height": 520,
+    "frames": 1
+  },
+  "12-2-working.png": {
+    "bytes": 32313,
+    "sha256": "93a017c2999280469243550e2a72c9fce271b0d366c1538fe42f3b176dfd5041",
+    "width": 540,
+    "height": 520,
+    "frames": 1
+  },
+  "12-3-expired-preview.png": {
+    "bytes": 55498,
+    "sha256": "ecaf832451f3ff9c950489713902947f3cae94e4dff218afb99143673edf0d1b",
+    "width": 675,
+    "height": 900,
+    "frames": 1
+  },
+  "12-3-native-cng-uia-receipt.json": {
+    "bytes": 568,
+    "sha256": "c470f1378c0eef487eb5922be1996eebf7d060c1bb1ee84962a59d34647c5e61"
+  },
+  "12-3-native-receipt.json": {
+    "bytes": 1733,
+    "sha256": "def2c351c6f8ec31bc0d6b187be9c6e0d1e613173a53610c32b002f4b3c1fe1f"
+  },
+  "12-3-preview.png": {
+    "bytes": 54655,
+    "sha256": "d758f83f9564efc628803fcd882c6bbd5111979270c3048b4887b9152f6f79d2",
+    "width": 675,
+    "height": 900,
+    "frames": 1
+  },
+  "12-3-surface-result.png": {
+    "bytes": 45943,
+    "sha256": "a14907190eeec79561e593e79d197f257f48087197ea53ff0de3602dad78986d",
+    "width": 675,
+    "height": 900,
+    "frames": 1
+  },
+  "12-3-unavailable-microphone.png": {
+    "bytes": 47911,
+    "sha256": "2b8573f38d3dc0327071d7c81c1d0621e279cf8dc80a2f0159902243e8d4cee5",
+    "width": 675,
+    "height": 900,
+    "frames": 1
+  },
+  "12-4-after-clear.png": {
+    "bytes": 53284,
+    "sha256": "4038ba7e921ceb4e170996e01278b648550cb3311eea3fa82d1b889961dd69d6",
+    "width": 675,
+    "height": 800,
+    "frames": 1
+  },
+  "12-4-browser-reference-receipt.json": {
+    "bytes": 1713,
+    "sha256": "b7ed85a2c9d7dbaab1ac484e62736b849c2b6082ab09fbf54bcfaf3516048d09"
+  },
+  "12-4-native-receipt.json": {
+    "bytes": 1538,
+    "sha256": "5474dd3ead9ec0758ae88f9e439e437c7a012e35535cda1cac005576222b30e7"
+  },
+  "12-4-pending-decision.png": {
+    "bytes": 48292,
+    "sha256": "d4d8addc6555bcfce5947b49beed52de84e588a4f07a37f6943fad8efd5ef942",
+    "width": 675,
+    "height": 800,
+    "frames": 1
+  },
+  "12-4-scoped-action.png": {
+    "bytes": 54620,
+    "sha256": "b8838a69dc61dec94459e2521b53b3f40c5dd3a40f3f9b8d2f8f01a1ba600cde",
+    "width": 675,
+    "height": 800,
+    "frames": 1
+  },
+  "12-4-verified-file.png": {
+    "bytes": 54239,
+    "sha256": "e929ca8d91b89f846fe12608e7565311d7bf0f1d349791fefba3ea0040618cec",
+    "width": 675,
+    "height": 800,
+    "frames": 1
+  },
+  "12-4-withdrawn-capability.png": {
+    "bytes": 50568,
+    "sha256": "08af752e7b968159b804307d152e0b6100f55680b427242dfff2b9aaf8d885e6",
+    "width": 675,
+    "height": 800,
+    "frames": 1
+  },
+  "12-5-approval.png": {
+    "bytes": 68295,
+    "sha256": "5a20d8381256d036741ff7574e047631dc0fc3dea36d18ffd35e81580599abbc",
+    "width": 775,
+    "height": 975,
+    "frames": 1
+  },
+  "12-5-expired.png": {
+    "bytes": 70442,
+    "sha256": "dd8bc762f4a24df30225078909c53199add8185df4c3131e8057aa5da1b7610a",
+    "width": 775,
+    "height": 975,
+    "frames": 1
+  },
+  "12-5-native-receipt.json": {
+    "bytes": 755,
+    "sha256": "897c4867aef681888aa9afdde18968ae5c98d5ad7c816882afc62dcc12697ead"
+  },
+  "12-5-offline.png": {
+    "bytes": 69253,
+    "sha256": "127b82db520b4c2f19483cdedf0990a51b4a45d32e89a380bc1017ece319789d",
+    "width": 775,
+    "height": 975,
+    "frames": 1
+  },
+  "12-5-verified.png": {
+    "bytes": 58863,
+    "sha256": "57d6104c4abee3bc6224822d6957ad838b48975b629aef12601c8b7a365f4ca4",
+    "width": 775,
+    "height": 975,
+    "frames": 1
+  },
+  "12-5-working.png": {
+    "bytes": 55302,
+    "sha256": "afd503adbde832299dc3289322ea68db231f3117b8ec6be7be552cde37837f83",
+    "width": 775,
+    "height": 975,
+    "frames": 1
+  },
+  "12-6-activity.png": {
+    "bytes": 51687,
+    "sha256": "d9a3077327fd6b3f66933a2f80c4b70ecdfdeef6b349fca0f232b7a29335e0bf",
+    "width": 775,
+    "height": 950,
+    "frames": 1
+  },
+  "12-6-attention.png": {
+    "bytes": 40044,
+    "sha256": "9ec102531615c44f16ce30ae31f97841becd94e7dabcff27071c7fbcc3f18444",
+    "width": 540,
+    "height": 520,
+    "frames": 1
+  },
+  "12-6-character-sequence.png": {
+    "bytes": 48991,
+    "sha256": "25d0504915d42e1e54409e83255e76dd268b591a1e94b04b094d36e42259ab04",
+    "width": 1056,
+    "height": 178,
+    "frames": 1
+  },
+  "12-6-compact.png": {
+    "bytes": 10393,
+    "sha256": "9a3fb7a89e81e248cd6642ce15c58f1e4b2e8776dded38d290a6be1ef90ba339",
+    "width": 165,
+    "height": 185,
+    "frames": 1
+  },
+  "12-6-native-cng-uia-receipt.json": {
+    "bytes": 520,
+    "sha256": "ae49141c32ff6a58814d616803127f82b9a323600df84477e3da294285060ab7"
+  },
+  "12-6-native-motion.gif": {
+    "bytes": 311247,
+    "sha256": "bc7b21d0460c2d80a4664e75a40684d5e7020205f27eb1b725ec0499d52a9bb9",
+    "width": 540,
+    "height": 520,
+    "frames": 41
+  },
+  "12-6-native-receipt.json": {
+    "bytes": 1530,
+    "sha256": "b7492702f1c0b006dd27f10a25a262caf0ebf132e670de3749a4ef0cb6e41e27"
+  },
+  "12-6-offline.png": {
+    "bytes": 38170,
+    "sha256": "3d628d5895147f6a16225e5d245cafde804cbee3a04c1ef36e92f01a36192f64",
+    "width": 540,
+    "height": 520,
+    "frames": 1
+  },
+  "12-6-reduced-motion.png": {
+    "bytes": 32234,
+    "sha256": "3e7c520cf3f5ff299f156571974e45eacd8c33678ef676de897e9f9d4b035165",
+    "width": 540,
+    "height": 520,
+    "frames": 1
+  },
+  "12-6-working.png": {
+    "bytes": 32772,
+    "sha256": "64c45ae24ffbdf0147948743165e2aeacea5d03c2f5861db068d8aa2cc051648",
+    "width": 540,
+    "height": 520,
+    "frames": 1
+  },
+  "local-checks.json": {
+    "bytes": 1900,
+    "sha256": "a951ebfbba8ff26169309f407936b40b53b7e5600ab961daff5bda95ee4b8ba4"
+  }
+}

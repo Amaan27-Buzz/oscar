@@ -1,6 +1,15 @@
 # Slice 12 — OSCAR Desktop Experience / Visual Redesign
 
-**2026-10-11 status:** owner-authorized Slice 12.1 quality recovery is isolated on
+**2026-10-11 current status:** Group 1 implements12.2–12.6 on
+`build/slice-12-desktop-completion` from verified corrective `da8fddae`.
+See [software completion](development/GROUP-01-DESKTOP-COMPLETION.md),
+[curated native evidence](ui/desktop/completion/README.md) and
+[deferred acceptance ledger](development/SOFTWARE-ALPHA-ACCEPTANCE-LEDGER.md).
+Manual visual/physical/device acceptance is consolidated under the owner's
+software-first authorization; it does not block this software scope. No default
+promotion or accepted-baseline merge. Group2/Slice13 is not started.
+
+**Earlier12.1 checkpoint:** owner-authorized Slice 12.1 quality recovery is isolated on
 `fix/slice-12-1-presence-quality`, based on `5fea2071e891adf0fac7f9838ee556c9a60e1e1c`.
 See [corrective native evidence and review](ui/desktop/presence/quality-recovery/README.md).
 The prior 6.7/10 verdict and original captures are preserved. Default-presence

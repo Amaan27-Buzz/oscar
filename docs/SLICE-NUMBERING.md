@@ -20,7 +20,7 @@ The owner rejected mixing numbered slices with 09R, 10R, 13A/13B and prematurely
 | 09 | OSCAR Mobile foundation | Software merged; device acceptance deferred |
 | 10 | OSCAR Desktop runtime foundation | **Draft PR #16, unmerged**; local-reference foundation and screenshot experiments |
 | **11** | **OSCAR Expression / Character System** | **v3 approved for engineering; 11.3 shared foundation candidate; owner/device/CI boundaries retained** |
-| **12** | OSCAR Desktop visual/interaction design | Pending 11 expression review; includes all former 10R work |
+| **12** | OSCAR Desktop visual/interaction design | Group 1 software/reference candidate12.2–12.6; manual/owner/device acceptance deferred; no promotion/merge |
 | **13** | OSCAR Mobile visual/interaction design | Pending 11; includes all former 09R work |
 | 14 | World Model, Perception, Sentry, optional Journal | Planned |
 | 15 | Commissioning and setup | Planned |
@@ -82,9 +82,13 @@ For Slice 11 (and subsequent 12/13), the user will run **GPT-6.1 Sol with High t
 
 `main` and `work` hold the accepted plan; PR #16 still holds the unmerged Tauri runtime and exploration artifacts. **Reconcile its base against `origin/work` before implementation, but preserve its tests, reference assets and history.** Do not bypass blocked GitHub Actions with fabricated green checks. No automatic PR #16 merge.
 
-Current activity is **review of the Slice 11.3 shared foundation candidate**;
-the owner approved v3 movement for engineering. See the [engineering record](design/expression/ENGINE.md).
-Final visual/device quality and remote CI are separate; Slice 12 is not started.
+Current activity is **Group 1 Desktop software completion**, authorized2026-10-11,
+on `build/slice-12-desktop-completion` from verified12.1 corrective commit.
+See the [Group 1 report](development/GROUP-01-DESKTOP-COMPLETION.md) and
+[cumulative acceptance ledger](development/SOFTWARE-ALPHA-ACCEPTANCE-LEDGER.md).
+The prior11.3 engineering record and draft histories are retained; their older
+workflow statements are historical. Final owner/device and remote CI remain
+separate. No production promotion, accepted-baseline merge or Group2 begins here.
 No Slice 14 World Model, Elocution or other post-alpha work is authorized by this renumbering.
 
 ## Maintainer verification

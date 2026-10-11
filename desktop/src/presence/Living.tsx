@@ -128,6 +128,8 @@ export function LivingPresence({port=send,events=subscribe,sourceKind='core',win
         return false;
       }
       if(accepted&&command.kind==='interact'&&!next.feedback)setRequestError('');
+      if(command.kind==='inspect'&&!next.feedback&&next.current?.task_id===command.task_id&&
+        latest.current.current?.task_id===command.task_id&&next.expression?.epoch===latest.current.expression?.epoch)setRequestError('');
       if((command.kind==='interact'||command.kind==='act')&&!next.feedback&&next.current&&next.current.task_id===latest.current.current?.task_id&&
         next.expression&&latest.current.expression&&next.expression.epoch===latest.current.expression.epoch&&
         next.expression.generation<=latest.current.expression.generation){
@@ -210,6 +212,7 @@ export function LivingPresence({port=send,events=subscribe,sourceKind='core',win
           <button onClick={()=>run({kind:'window',mode:view.window==='tools'?'interaction':'tools'})}>{view.window==='tools'?'Ask':'Text tools'}</button>
           <button onClick={()=>run({kind:'window',mode:view.window==='actions'?'interaction':'actions'})}>{view.window==='actions'?'Ask':'Act'}</button></div><span>{view.reference?'Reference Core':'No background capture'}</span></div>
       </div>
+    </>}
       <div className="presence-object">
         <button className="character-button" ref={orb} aria-label={`OSCAR: ${label}. ${open?'Return to presence':'Open interaction'}`} aria-expanded={open}
           onClick={open&&!leaving?retreat:invoke} onPointerEnter={()=>setHover(true)} onPointerMove={track}
@@ -219,7 +222,6 @@ export function LivingPresence({port=send,events=subscribe,sourceKind='core',win
         <p className="presence-caption" role="status" aria-live="polite">{label}</p>
       </div>
       {!open&&error&&<p className="compact-error" role="alert">Connection unavailable</p>}
-    </>}
   </main>;
 }
 function withoutPrivateContent(view:View):View {

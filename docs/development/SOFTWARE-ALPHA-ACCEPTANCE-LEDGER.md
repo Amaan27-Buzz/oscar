@@ -15,8 +15,8 @@ and later corrections linked; do not erase historical acceptance reports.
 ## Group 1 — Desktop Slice 12
 
 Base: `da8fddae50112c8859b21247d0cbaa617be8667e`, branch
-`build/slice-12-desktop-completion`. Candidate software work is in progress.
-`BLOCKED` below means proof has not yet been supplied, not permission to stop.
+`build/slice-12-desktop-completion`. Candidate software/reference work is complete in the tested scope; owner/device/production approval is not given.
+Future `BLOCKED` entries require a scoped engineering resolution; deferred acceptance never becomes physical PASS.
 
 | ID | Requirement | Classification | Evidence / remaining work |
 |---|---|---|---|
@@ -44,12 +44,12 @@ Base: `da8fddae50112c8859b21247d0cbaa617be8667e`, branch
 | D25-04 | Reconnect, task switching and readback ordering | REFERENCE_VERIFIED | Native offline/reconnect; Rust switched-review invalidation and content fences |
 | D25-05 | Exact task/action/scope-bound approval and native signing | REFERENCE_VERIFIED | Existing actual CNG/PSS reference; exact review; opening grants nothing |
 | D25-06 | Denial, expiry, replay rejection and truthful attention | REFERENCE_VERIFIED | Native actual expiry/task-change; software signature/replay/grant regressions |
-| D26-01 | Canonical identity and shared weighted responsive motion | BLOCKED | Shared engine, no second renderer |
-| D26-02 | Spatial continuity, interruption and reduced motion | BLOCKED | Native content captures and regressions |
-| D26-03 | Keyboard/focus and semantic accessibility | BLOCKED | Component/native DOM evidence |
-| D26-04 | Contrast, long text, DPI-aware bounds and layout | BLOCKED | Automated geometry/contrast reference checks |
-| D26-05 | Idle stillness/resource work and coherent error/recovery | BLOCKED | Controller/rendering/runtime checks |
-| D26-06 | Final cross-stage native reference and independent code/UX review | BLOCKED | Required before Group 1 software closure |
+| D26-01 | Canonical identity and shared weighted responsive motion | REFERENCE_VERIFIED | Unchanged canonical SHA256; shared engine36 tests, actual native motion/multi-frame review |
+| D26-02 | Spatial continuity, interruption and reduced motion | REFERENCE_VERIFIED | Native10 checks; preference emulated, draft/focus/recovery preserved |
+| D26-03 | Keyboard/focus and semantic accessibility | SOFTWARE_VERIFIED | Desktop56 tests, native semantic focus/tab/expiry, real screen reader deferred |
+| D26-04 | Contrast, long text, DPI-aware bounds and layout | REFERENCE_VERIFIED | Native wrapping/overflow and Rust100/125/150% placement math; physical configurations deferred |
+| D26-05 | Idle stillness/resource work and coherent error/recovery | REFERENCE_VERIFIED | Idle RAF0/3.2s, native reconnect, source flags, stale presentation/error regressions |
+| D26-06 | Final cross-stage native reference and independent code/UX review | REFERENCE_VERIFIED | Ask/Text/Act/Activity/Polish native receipts; fresh final review accepted after reproduced fixes |
 
 ## Consolidated manual / device acceptance
 
@@ -60,7 +60,7 @@ Base: `da8fddae50112c8859b21247d0cbaa617be8667e`, branch
 | WIN-DPI | 100%/125%/150%, multiple monitors, taskbar/fullscreen/compositor/hit regions | OWNER_VERIFICATION_DEFERRED | Real configurations; synthetic dimensions are reference only |
 | WIN-ACCESS | Actual screen reader and OS accessibility preferences | OWNER_VERIFICATION_DEFERRED | Human assistive-technology acceptance |
 | VOICE-PHYSICAL | Microphone/output/room AEC/barge-in/self-wake/naturalness | HARDWARE_VERIFICATION_DEFERRED | Existing consolidated Voice acceptance harness |
-| STRONG-APPROVAL | Critical-risk native owner confirmation | OWNER_VERIFICATION_DEFERRED | Remains unavailable until implemented and accepted; ordinary MessageBox is not strong verification |
+| STRONG-APPROVAL | Critical-risk native owner confirmation | BLOCKED | Not advertised/implemented; preserve rejection, revisit stronger confirmation in later authorized software hardening; ordinary MessageBox is not strong verification |
 | EDGE-PHYSICAL | Edge UART/GPIO/watchdog/interlock/E-stop silicon | HARDWARE_VERIFICATION_DEFERRED | Preserve existing Gate C obligations; no Group 1 physical claim |
 | MOBILE-DEVICE | Phone/OEM enrollment, assistant/overlay/audio/notification and owner controls | HARDWARE_VERIFICATION_DEFERRED | Consolidated real-device checks after software program |
 | DISTRIBUTION | Installer, signing/update and deployed interoperability | OWNER_VERIFICATION_DEFERRED | No development binary equals production acceptance |

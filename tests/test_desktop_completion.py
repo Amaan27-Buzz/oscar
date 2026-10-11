@@ -108,6 +108,53 @@ class AskCompletionTests(unittest.TestCase):
         self.assertIsNone(view.get("value"))
         self.assertNotIn("private-session-sentinel", str(view))
 
+    def test_replacement_session_key_does_not_grant_prior_private_review(self):
+        task = self.base.ask("Explain private-review-sentinel")
+        replacement = self.h.grid.pair(self.base.session.node_id, self.base.scopes)
+        self.core.register_owner_key(replacement, self.base.encoded, owner_authorized=True)
+        self.assertNotIn("approve", self.core.inspect(replacement, task["task_id"])["actions"])
+        with self.assertRaises(StateConflict):
+            self.core.challenge(replacement, {"task_id": task["task_id"], "operation": "approve"})
+        denial = self.core.challenge(replacement, {"task_id": task["task_id"], "operation": "deny"})
+        self.assertEqual("{}", denial["review"])
+        self.assertNotIn("private-review-sentinel", str(denial))
+
+    def test_exact_review_is_complete_or_rejected_before_challenge_creation(self):
+        import json
+
+        task = self.base.ask()
+        private = self.h.store.transient[task["task_id"]]
+        private["parameters"] = {"context": "x" * 8192, "instruction": "y" * 4096}
+        review = self.core.challenge(
+            self.base.session, {"task_id": task["task_id"], "operation": "approve"}
+        )
+        self.assertEqual(private["parameters"], json.loads(review["review"]))
+        count = len(self.h.store.all("sunday_challenge"))
+        private["parameters"] = {"context": "漢" * 8192}
+        with self.assertRaisesRegex(ValueError, "Exact review exceeds"):
+            self.core.challenge(
+                self.base.session, {"task_id": task["task_id"], "operation": "approve"}
+            )
+        self.assertEqual(count, len(self.h.store.all("sunday_challenge")))
+
+    def test_worker_output_truncation_describes_the_selected_source(self):
+        self.h.dispatcher.executors["models.reason"] = lambda action, cancel: Result(
+            new_id(),
+            action.id,
+            action.task_id,
+            action.correlation_id,
+            action.capability_id,
+            True,
+            value="short",
+        )
+        task = self.base.ask("Explain a worker output reference")
+        self.base.confirm(task["task_id"])
+        result = self.h.store.transient[task["task_id"]]["result"]
+        self.core.worker_outputs[self.h.node_id] = {result.action_id: "x" * 9000}
+        view = self.core.inspect(self.base.session, task["task_id"])
+        self.assertEqual(8192, len(view["response"]))
+        self.assertTrue(view["response_truncated"])
+
     def test_sourced_memory_uses_existing_fabric_and_forget_withdraws_recall(self):
         archive = EventArchive(self.base.root / "archive.db")
         self.addCleanup(archive.close)

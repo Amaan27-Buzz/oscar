@@ -45,6 +45,7 @@ fn window_mode(app: &tauri::AppHandle, state: &Native, mode: WindowMode) -> Resu
         WindowMode::Compact => (300., 126.),
         WindowMode::Interaction => (580., 760.),
         WindowMode::Approval => (620., 780.),
+        WindowMode::Activity if state.presence => (620., 760.),
         WindowMode::Activity => (820., 780.),
         WindowMode::Reading => (540., 680.),
         WindowMode::Tools => (540., 720.),

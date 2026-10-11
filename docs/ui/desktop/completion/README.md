@@ -76,3 +76,24 @@ No owner files, browser profile or applications are mutated.
 [Nine-assertion native receipt](evidence/12-5-native-receipt.json).
 Run `python -m scripts.desktop_activity_acceptance` with the development binary.
 Opening/dismissing a review is tested; no human consent is accepted by this runner.
+
+## Slice 12.6 integrated presence
+
+[Compact](evidence/12-6-compact.png) · [attention](evidence/12-6-attention.png) ·
+[work](evidence/12-6-working.png) · [Activity with persistent Orb](evidence/12-6-activity.png) ·
+[reduced motion](evidence/12-6-reduced-motion.png) · [offline](evidence/12-6-offline.png).
+[Native motion GIF](evidence/12-6-native-motion.gif) ·
+[unaltered native crops with frame labels](evidence/12-6-character-sequence.png) ·
+[ten-assertion receipt and metrics](evidence/12-6-native-receipt.json).
+
+Run `python -m scripts.desktop_polish_acceptance --archive <external-new-directory>`.
+Raw frames/manifests stay outside Git. GIF segments retain native capture cadence;
+waits between segments are cut. A neutral canvas accommodates changing native
+window sizes without rescaling. This is WebView2 content, not wallpaper/compositor
+capture. See [owner verdict](OWNER-VERDICT.md) and
+[fresh final independent review](../../../development/reviews/GROUP-01-INDEPENDENT.md).
+
+The development presence remains opt-in (`--living-presence` with localhost Vite);
+release builds/default UI are not promoted. Build development IPC with
+`cargo +1.99.0 build --no-default-features`; production custom-protocol does not
+allow development URL IPC. Do not widen capabilities to work around that boundary.
