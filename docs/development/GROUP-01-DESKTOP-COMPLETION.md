@@ -289,9 +289,13 @@ not a modification of migration backups.
 - Scope/ledger: `2701884c0de84e5eb5aa07e9a2025018f11a5734`.
 - 12.2 Ask: `d1afb438a55bd8e329060e391405cd3ae2341f07`.
 - 12.3 Text: `e4c5abdd61817f0101c43fbd8b60957a845d4f59`.
-- 12.4 Act: `c2225f4`.
-- 12.5 Activity: `0535d64`.
-- 12.6 integrated commit and draft PR are recorded below after publication.
+- 12.4 Act: `c2225f4fdf67a4d9fc748df597382c66c9b6d831`.
+- 12.5 Activity: `0535d642bc6bb962102cd35f61cdd5d611469003`.
+- 12.6 tested implementation: `2ddb8df73ca60517e4708a0f0163d0201f55d5fa`.
+- Draft PR: [Buzz #2](https://github.com/Amaan27-Buzz/oscar/pull/2), targeting
+  `fix/slice-12-1-presence-quality`; OPEN/DRAFT, not merged.
+- Subsequent publication/report changes contain documentation only; final remote
+  HEAD is provided in the task handoff and visible in the draft PR.
 
 The production entry still renders App; Living remains a DEV opt-in and native
 prototype flag. Shared typed Act validation, Core privacy/preview/voice fixes and
@@ -321,3 +325,7 @@ room echo/barge-in/voice quality; phone/OEM and Edge hardware; strong critical-r
 confirmation and distribution. Critical actions stay unavailable; ordinary native
 MessageBox/CNG reference is not Windows Hello. Gate C stays PARTIAL. Group 2 has not
 started, and accepted main/work/default UI are not promoted by this candidate.
+
+Publication: pushed only `build/slice-12-desktop-completion` to the Buzz repository.
+Draft PR #2 is attached for review. Corrective base/main/work refs were independently
+rechecked unchanged. No merge, default promotion or next group was performed.

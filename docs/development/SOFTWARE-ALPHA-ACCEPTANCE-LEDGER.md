@@ -70,3 +70,8 @@ Future `BLOCKED` entries require a scoped engineering resolution; deferred accep
 Groups 2–6 will add their authorized canonical slice scopes, software evidence and
 deferred acceptance here. They are not begun or pre-certified by Group 1. This
 ledger follows the program through its final consolidated acceptance phase.
+
+Group 1 publication: [draft PR #2](https://github.com/Amaan27-Buzz/oscar/pull/2)
+against verified corrective base; software candidate accepted by independent review,
+not owner approved or promoted. Final tests551 total/545 passed/6 skips; Desktop56,
+Expression36, Rust12; native/reference receipts linked in the Group 1 report.
