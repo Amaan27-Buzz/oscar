@@ -74,18 +74,3 @@ import androidx.compose.ui.unit.dp
         }
     }, confirmButton = { TextButton(onClick = close) { Text("Back") } })
 }
-@Composable fun DevicesScreen(state: MobileState, connect: () -> Unit) {
-    Text("Connection Grid", style = MaterialTheme.typography.titleLarge)
-    Text("Capabilities belong to the nodes that currently report them. Offline nodes cannot execute new work.")
-    if (state.snapshot == null) Text("No current Grid snapshot is available.")
-    state.snapshot?.nodes?.forEach { node ->
-        HorizontalDivider()
-        Text(node.role, style = MaterialTheme.typography.titleMedium)
-        Text("${node.id}\n${node.status} · ${if (node.paired) "Paired" else "Not paired"}")
-        Text(if (node.capabilities.isEmpty()) "No currently available capabilities" else "Available: ${node.capabilities.distinct().joinToString(", ")}")
-        val tasks = state.snapshot.tasks.filter { it.target == node.id }
-        if (tasks.isNotEmpty()) Text("${tasks.size} associated task(s). Inspect in Activity.")
-    }
-    TextButton(onClick = connect) { Text("Connect this phone") }
-    Text("Power and wake controls appear only when a real scoped capability is available.", style = MaterialTheme.typography.bodySmall)
-}

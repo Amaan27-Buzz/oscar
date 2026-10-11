@@ -13,6 +13,7 @@ data class CoreTask(
     val response: String? = null,
     val responseTruncated: Boolean = false,
     val progress: CoreProgress? = null, val artifacts: List<CoreArtifact> = emptyList(), val ownership: String = "planned",
+    val origin: String = "Core", val originNode: String? = null,
 ) {
     val label: String get() = if (state in setOf("executing", "awaiting_result", "result_received", "verifying") && nodeStatus != "online") "Executor unavailable · outcome UNKNOWN" else when (state) {
         "planned" -> "Needs approval"
@@ -39,6 +40,7 @@ data class MobileState(
     val draft: String = "", val inspected: CoreTask? = null, val privateSuppressed: Boolean = false,
     val restoring: Boolean = false,
     val replyPreview: String? = null,
+    val connectedNode: String? = null,
 ) {
     fun coreNow(localNow: Long): Long = if (link == Link.CONNECTED && observedAt > 0 && snapshot != null)
         localNow + snapshot.observedAt - observedAt else localNow
@@ -52,7 +54,7 @@ data class MobileState(
     }
     fun fenced(next: MobileState, expectedEpoch: Long): MobileState = if (epoch == expectedEpoch) next else this
     fun unavailable(message: String) = copy(epoch = epoch + 1, link = Link.DEGRADED, busy = false,
-        snapshot = null, approval = null, replyPreview = null, inspected = null, interactions = emptyList(), observedAt = 0, restoring = false, message = message)
+        snapshot = null, connectedNode = null, approval = null, replyPreview = null, inspected = null, interactions = emptyList(), observedAt = 0, restoring = false, message = message)
 }
 
 private val taskStates = setOf("planned", "executing", "awaiting_result", "result_received", "verifying", "verified", "partially_verified", "failed", "blocked", "cancelled", "unknown")
@@ -106,9 +108,12 @@ fun parseTask(json: JSONObject): CoreTask {
     } else emptyList()
     val ownership = if (json.has("ownership")) json.bounded("ownership", 16) else "planned"
     require(ownership in setOf("planned", "leased", "none", "expired"))
+    val origin = if (json.has("origin_surface")) json.bounded("origin_surface", 32) else "Core"
+    require(origin in setOf("Core", "Desktop", "Mobile"))
+    val originNode = if (json.has("origin_node") && !json.isNull("origin_node")) json.bounded("origin_node", 80) else null
     return CoreTask(json.bounded("task_id", 80), json.bounded("description", 256), state,
         json.bounded("target", 80), status, generation, if (status == "online") actions else actions.filter { it in setOf("cancel", "deny") },
-        evidence, value, blocker, response, json.optBoolean("response_truncated", false), progress, artifacts, ownership)
+        evidence, value, blocker, response, json.optBoolean("response_truncated", false), progress, artifacts, ownership, origin, originNode)
 }
 fun CoreSnapshot.withoutPrivate() = copy(tasks = tasks.map { it.copy(description = "Private request hidden", response = null, value = null,
     artifacts = emptyList(), progress = it.progress?.copy(step = "Worker checkpoint available"),

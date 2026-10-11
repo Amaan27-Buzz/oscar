@@ -101,3 +101,6 @@ Group 1 publication: [draft PR #2](https://github.com/Amaan27-Buzz/oscar/pull/2)
 against verified corrective base; software candidate accepted by independent review,
 not owner approved or promoted. Final tests551 total/545 passed/6 skips; Desktop56,
 Expression36, Rust12; native/reference receipts linked in the Group 1 report.
+
+| M34-01 | Native Grid truth, progressive detail and local disconnect | REFERENCE_VERIFIED | API35 captured; JVM21 and Core56 PASS; no invented controls |
+| M34-02 | Desktop origin / network interruption and recovery | REFERENCE_VERIFIED | Genuine isolated Core + Desktop adapter HTTP; same task readback, private source isolation; physical networking deferred |

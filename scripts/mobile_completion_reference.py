@@ -138,13 +138,27 @@ def run(*, serve: bool = False) -> dict:
                     ):
                         raise PermissionError("reference fixture admission denied")
                     command = json.loads(self.rfile.read(length))
-                    if set(command) != {"operation", "task_id"} or command["operation"] != "deny":
-                        raise ValueError("fixture supports signed denial only")
-                    if not mobile.private_for(owner, command["task_id"]):
-                        raise PermissionError("task is not this disposable session's request")
-                    data = json.dumps(
-                        signed(mobile_server, owner, command["task_id"], "deny")
-                    ).encode()
+                    if set(command) != {"operation", "task_id"}:
+                        raise ValueError("invalid reference control")
+                    if command["operation"] == "network_off" and command["task_id"] == "":
+                        mobile_server.server.shutdown()
+                        mobile_server.thread.join(timeout=3)
+                        data = b'{"reference_network":"off"}'
+                    elif command["operation"] == "network_on" and command["task_id"] == "":
+                        if not mobile_server.thread.is_alive():
+                            mobile_server.thread = Thread(
+                                target=mobile_server.server.serve_forever, daemon=True
+                            )
+                            mobile_server.thread.start()
+                        data = b'{"reference_network":"on"}'
+                    elif command["operation"] == "deny" and mobile.private_for(
+                        owner, command["task_id"]
+                    ):
+                        data = json.dumps(
+                            signed(mobile_server, owner, command["task_id"], "deny")
+                        ).encode()
+                    else:
+                        raise PermissionError("reference action unavailable")
                     self.send_response(200)
                 except (PermissionError, ValueError, KeyError):
                     data = b'{"error":"reference_denial_unavailable"}'

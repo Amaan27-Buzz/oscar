@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
         HorizontalDivider()
         Text(task.description, style = MaterialTheme.typography.titleMedium, modifier = Modifier.testTag("task-description-${task.id}"))
         Text(task.label, modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite })
+        Text("From ${task.origin}", style = MaterialTheme.typography.bodySmall)
         Text("${when(task.ownership) { "leased" -> "Executor"; "none" -> "Last target"; "expired" -> "Lease unavailable"; else -> "Planned target" }}: ${task.target} · ${task.nodeStatus}", style = MaterialTheme.typography.bodySmall)
         task.progress?.let { Text("${if (it.current) "Worker checkpoint" else "Previous checkpoint"}: ${(it.fraction * 100).toInt()}% · ${it.step} · REPORTED", style = MaterialTheme.typography.bodyMedium) }
         task.blocker?.let { Text(it) }

@@ -1,0 +1,10 @@
+{
+  "slice": "13.4",
+  "classification": "REFERENCE_VERIFIED",
+  "device": "API35 emulator-5582",
+  "jvm": 21,
+  "core": 56,
+  "native_grid": "PASS",
+  "runner": "python -m scripts.mobile_completion_android",
+  "physical": "NOT_RUN"
+}

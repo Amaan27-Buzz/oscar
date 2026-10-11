@@ -73,7 +73,7 @@ private val Ink = Color(0xFF1A1B18)
                     Destination.OSCAR -> PresenceScreen(state, draft, session::writeDraft, { focus.clearFocus(); keyboard?.hide(); session.send(draft) }, session::cancelRequest,
                         { focus.clearFocus(); keyboard?.hide(); selected = Destination.ACTIVITY.name }, { focus.clearFocus(); keyboard?.hide(); selected = Destination.SETTINGS.name; settingsPage = "Voice" })
                     Destination.ACTIVITY -> ActivityScreen(state, session::inspect, session::review)
-                    Destination.DEVICES -> DevicesScreen(state, { pairing = true })
+                    Destination.DEVICES -> DevicesScreen(state, { pairing = true }, session::disconnect)
                     Destination.SETTINGS -> SettingsScreen(settingsPage, { settingsPage = it }, session, state)
                 }
                 state.message?.let { Text(it, modifier = Modifier.testTag("message").semantics { liveRegion = LiveRegionMode.Polite }) }

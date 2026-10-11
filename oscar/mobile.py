@@ -209,6 +209,12 @@ class Mobile:
             if task.attempts < task.retry_budget + 1 and "control:approve:" + target in grants:
                 actions.append("retry")
         view["actions"] = actions
+        try:
+            self.store.get("desktop_task", task_id)
+            view["origin_surface"] = "Desktop"
+        except KeyError:
+            view["origin_surface"] = "Mobile" if association else "Core"
+        view["origin_node"] = association.get("node_id")
         lease = self.store.get("lease", task.lease_id) if task.lease_id else None
         live_lease = bool(
             lease

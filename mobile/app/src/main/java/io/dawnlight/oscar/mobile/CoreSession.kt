@@ -71,7 +71,7 @@ class CoreSession(application: Application) : AndroidViewModel(application) {
             val snapshot = if (mutable.value.privateSuppressed) received.withoutPrivate() else received
             if (!active) return
             val old = mutable.value
-            val next = old.fenced(old.copy(link = Link.CONNECTED, snapshot = snapshot, observedAt = System.currentTimeMillis(),
+            val next = old.fenced(old.copy(link = Link.CONNECTED, connectedNode = client?.nodeId(), snapshot = snapshot, observedAt = System.currentTimeMillis(),
                 inspected = old.inspected?.let { selected -> snapshot.tasks.find { it.id == selected.id } },
                 message = if (old.link == Link.CONNECTED) old.message else null), epoch)
             if (next == old) return

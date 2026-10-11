@@ -194,3 +194,21 @@ During interruption, WHPX launch failed and software emulation did not boot. Aft
 the owner stopped gaming, the1536MB/2-core reference AVD booted and native checks
 resumed. Smaller-memory success is observed; RAM as the cause is an inference.
 No host permissions, security settings, original AVD data or app dependency changed.
+
+## 13.4 — Devices and Connection Grid
+
+Compact native nodes disclose current trust, health, advertised capabilities and
+associated active tasks. This phone is identified only by the admitted Mobile node;
+Cloud/Edge appear only when configured. Home Node remains unsupported. No invented
+power, remote revocation or approval authority appears. Local credential removal is
+real and is described separately from trusted Core revocation.
+
+Actual Desktop-origin task metadata reaches Mobile over isolated Core HTTP without
+its private input or Desktop-session approval. The reference stops and restarts the
+Mobile HTTP acceptor; Android clears private state on loss and reads back the same
+canonical task after reconnection. JVM app16 + expression5, Core56 and two isolated
+native Grid runs pass, including the new reproducible Android runner. API35 native
+capture reviewed; no physical remote network or phone claim.
+
+[Capture](../ui/mobile/completion/captures/13-4-reference-grid.png),
+[independent review](reviews/group-02/13-4-INDEPENDENT.md).

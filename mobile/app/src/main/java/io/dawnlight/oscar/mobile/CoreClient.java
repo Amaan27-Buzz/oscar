@@ -19,6 +19,7 @@ final class CoreClient {
     }
     String binding() throws Exception { return NotificationBoundary.hash(session.optString("url") + "\n" + session.optString("node_id") + "\n" + session.optString("session_id")); }
     boolean matches(Approval approval) { return session.optString("node_id").equals(approval.getNodeId()) && session.optString("session_id").equals(approval.getSessionId()); }
+    String nodeId() { return session.optString("node_id"); }
     static void validateEndpoint(String endpoint) throws Exception {
         URI uri = new URI(endpoint);
         boolean local = BuildConfig.DEBUG && "http".equals(uri.getScheme()) &&

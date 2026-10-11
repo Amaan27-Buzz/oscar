@@ -26,6 +26,18 @@ class MobileCompletionTest {
         compose.runOnIdle { androidx.lifecycle.ViewModelProvider(compose.activity)[CoreSession::class.java].disconnect() }
         compose.waitUntil(5000) { SessionVault(compose.activity).load() == null }
     }
+    private fun control(operation: String, task: String = "") {
+        val arguments = androidx.test.platform.app.InstrumentationRegistry.getArguments()
+        val connection = java.net.URI(arguments.getString("group02_control")!!).toURL().openConnection() as java.net.HttpURLConnection
+        try {
+            connection.requestMethod = "POST"; connection.doOutput = true; connection.connectTimeout = 5000; connection.readTimeout = 8000
+            connection.setRequestProperty("X-Reference-Token", arguments.getString("group02_control_token"))
+            val data = org.json.JSONObject().put("operation", operation).put("task_id", task).toString().toByteArray()
+            connection.setFixedLengthStreamingMode(data.size); connection.outputStream.use { it.write(data) }
+            assertEquals(200, connection.responseCode)
+            connection.inputStream.close()
+        } finally { connection.disconnect() }
+    }
     private fun capture(name: String, tag: String? = null) {
         compose.runOnIdle {
             assertTrue(compose.activity.window.attributes.flags and android.view.WindowManager.LayoutParams.FLAG_SECURE != 0)
@@ -220,6 +232,39 @@ class MobileCompletionTest {
         compose.waitUntil(10_000) { session.state.value.snapshot?.tasks?.any { it.id == id && it.state == "cancelled" } == true }
         assertNull(session.state.value.approval)
         capture("13-3-reference-denied-readback")
+    }
+    @Test fun referenceGridShowsDesktopOriginAndRecoversActualNetworkLoss() {
+        val arguments = androidx.test.platform.app.InstrumentationRegistry.getArguments()
+        val origin = arguments.getString("group02_origin")
+        org.junit.Assume.assumeTrue("Explicit disposable Grid/Core fixture", origin != null)
+        val fixture = org.json.JSONObject().put("url", origin).put("node_id", "reference-mobile-software")
+            .put("session_id", arguments.getString("group02_session")).put("token", arguments.getString("group02_token"))
+        val session = androidx.lifecycle.ViewModelProvider(compose.activity)[CoreSession::class.java]
+        compose.runOnIdle { session.connect(fixture) }
+        compose.waitUntil(10_000) { session.state.value.link == Link.CONNECTED }
+        val desktop = session.state.value.snapshot!!.tasks.single { it.id == arguments.getString("group02_desktop_task") }
+        assertEquals("Desktop", desktop.origin); assertEquals("group02-reference-desktop", desktop.originNode)
+        assertFalse(desktop.description.contains("8 + 9")); assertFalse("approve" in desktop.actions)
+        compose.onNodeWithText("Devices").performClick()
+        compose.onNodeWithTag("device-group02-reference-desktop").performScrollTo().performClick()
+        compose.onNodeWithText("No currently advertised executor capabilities").assertExists()
+        capture("13-4-reference-grid")
+        compose.onNodeWithText("Activity").performClick()
+        compose.onNodeWithTag("task-description-${desktop.id}").assertExists()
+        control("network_off")
+        try {
+            compose.runOnIdle { session.refreshNow() }
+            compose.waitUntil(15_000) { session.state.value.link == Link.DEGRADED }
+            assertNull(session.state.value.snapshot); assertNull(session.state.value.approval)
+            compose.onNodeWithText("Devices").performClick()
+            compose.onNodeWithText("No current Grid snapshot is available.").assertExists()
+        } finally { control("network_on") }
+        compose.runOnIdle { session.refreshNow() }
+        compose.waitUntil(10_000) { session.state.value.link == Link.CONNECTED }
+        assertTrue(session.state.value.snapshot!!.tasks.any { it.id == desktop.id })
+        compose.onNodeWithText("Disconnect and remove local credentials").performScrollTo().performClick()
+        compose.waitUntil(5000) { SessionVault(compose.activity).load() == null }
+        assertNull(session.state.value.snapshot)
     }
 }
 
