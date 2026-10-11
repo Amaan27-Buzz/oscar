@@ -40,7 +40,7 @@ import kotlinx.coroutines.withContext
             Text("OSCAR Mobile · ${BuildConfig.VERSION_NAME}", style = MaterialTheme.typography.titleLarge)
             Text("Core owns identity, memory, policy, tasks, routing and evidence. This phone is its Android embodiment.")
             Text("Gate C PARTIAL · OWNER_DEVICE_ACCEPTANCE_NOT_RUN. Voice, biometric, assistant-role, notification replies, AEC and Bluetooth require consolidated acceptance.")
-            Text("No conversation archive is stored by the app. Current interaction is transient and cleared when leaving the foreground.")
+            Text("No conversation archive is stored by the app. Only your unsent draft is encrypted locally for recovery; responses and decisions are cleared when leaving the foreground. A different source or discard clears the draft.")
             TextButton(onClick = session::publicIdentity) { Text("Show public owner identity") }
         }
         else -> {

@@ -18,13 +18,17 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.json.JSONObject
 import io.dawnlight.oscar.expression.ExpressionPresence
 import androidx.compose.ui.unit.Dp
+import androidx.activity.compose.BackHandler
 
 private val Paper = Color(0xFFF5F1E7)
 private val Ink = Color(0xFF1A1B18)
 @Composable fun OscarTheme(content: @Composable () -> Unit) {
     MaterialTheme(colorScheme = lightColorScheme(primary = Ink, onPrimary = Color(0xFFFFFDF8),
         secondary = Color(0xFF1D6FD6), tertiary = Color(0xFFFFC83D), background = Paper,
-        surface = Paper, onBackground = Ink, onSurface = Ink, error = Color(0xFFD94F45)),
+        surface = Paper, surfaceContainer = Color(0xFFFAF7EF), surfaceContainerHigh = Color(0xFFFAF7EF),
+        surfaceContainerHighest = Color(0xFFFFFDF8), surfaceContainerLow = Paper, surfaceContainerLowest = Color(0xFFFFFDF8),
+        surfaceTint = Color.Transparent, onBackground = Ink, onSurface = Ink, onSurfaceVariant = Color(0xFF625F57),
+        outline = Color(0xFF8B877E), outlineVariant = Color(0xFFDDD7CA), error = Color(0xFFB6322B)),
         shapes = Shapes(small = androidx.compose.foundation.shape.RoundedCornerShape(8.dp), medium = androidx.compose.foundation.shape.RoundedCornerShape(12.dp), large = androidx.compose.foundation.shape.RoundedCornerShape(12.dp)), content = content)
 }
 @Composable fun OscarApp(session: CoreSession, confirmation: OwnerConfirmation) {
@@ -32,10 +36,13 @@ private val Ink = Color(0xFF1A1B18)
     var selected by rememberSaveable { mutableStateOf(Destination.OSCAR.name) }
     var settingsPage by rememberSaveable { mutableStateOf("Settings") }
     var pairing by remember { mutableStateOf(false) }
-    var draft by remember { mutableStateOf("") }
+    val draft = state.draft
     val destination = Destination.entries.firstOrNull { it.name == selected } ?: Destination.OSCAR
     val focus = LocalFocusManager.current
     val keyboard = LocalSoftwareKeyboardController.current
+    BackHandler(destination != Destination.OSCAR || settingsPage != "Settings") {
+        if (settingsPage != "Settings") settingsPage = "Settings" else selected = Destination.OSCAR.name
+    }
     OscarTheme {
         Scaffold(modifier = Modifier.imePadding(), containerColor = MaterialTheme.colorScheme.background, bottomBar = {
             Surface(tonalElevation = 0.dp) {
@@ -63,13 +70,16 @@ private val Ink = Color(0xFF1A1B18)
                     TextButton(onClick = { pairing = true }) { Text("Connect Core") }
                 }
                 when (destination) {
-                    Destination.OSCAR -> PresenceScreen(state, draft, { draft = it }, { focus.clearFocus(); keyboard?.hide(); session.send(draft); draft = "" }, session::cancelRequest,
+                    Destination.OSCAR -> PresenceScreen(state, draft, session::writeDraft, { focus.clearFocus(); keyboard?.hide(); session.send(draft) }, session::cancelRequest,
                         { focus.clearFocus(); keyboard?.hide(); selected = Destination.ACTIVITY.name }, { focus.clearFocus(); keyboard?.hide(); selected = Destination.SETTINGS.name; settingsPage = "Voice" })
                     Destination.ACTIVITY -> ActivityScreen(state, session::inspect, session::review)
                     Destination.DEVICES -> DevicesScreen(state, { pairing = true })
                     Destination.SETTINGS -> SettingsScreen(settingsPage, { settingsPage = it }, session, state)
                 }
                 state.message?.let { Text(it, modifier = Modifier.testTag("message").semantics { liveRegion = LiveRegionMode.Polite }) }
+                if (draft.isNotEmpty() || state.interactions.isNotEmpty() || state.privateSuppressed) {
+                    TextButton(onClick = session::discard) { Text(if (state.privateSuppressed) "Clear Core private context" else "Discard private interaction") }
+                }
                 Spacer(Modifier.height(16.dp))
             }
             }
@@ -89,6 +99,7 @@ private val Ink = Color(0xFF1A1B18)
     AlertDialog(onDismissRequest = close, title = { Text("Connect this phone") }, text = {
         Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text("Use a scoped session issued by your trusted Core. This does not grant phone permissions or enroll owner signing authority.")
+            Text("Connecting a different source clears the previous private draft and readback.")
             OutlinedTextField(origin, { origin = it.take(256) }, label = { Text("Trusted HTTPS Core origin") }, singleLine = true)
             OutlinedTextField(node, { node = it.take(80) }, label = { Text("Paired node ID") }, singleLine = true)
             OutlinedTextField(id, { id = it.take(80) }, label = { Text("Session ID") }, singleLine = true)

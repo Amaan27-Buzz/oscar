@@ -1,0 +1,51 @@
+{
+  "stage": "13.2",
+  "jvm": {
+    "app": 12,
+    "expression": 5,
+    "failures": 0
+  },
+  "full_app_api35": {
+    "tests": 12,
+    "executed": 11,
+    "optional_skipped": 1,
+    "failures": 0
+  },
+  "extra_long_reported_reference": {
+    "tests": 1,
+    "failures": 0
+  },
+  "final_source_draft_recreation": {
+    "tests": 2,
+    "failures": 0
+  },
+  "expression_api35": {
+    "tests": 3,
+    "failures": 0
+  },
+  "core_security": {
+    "tests": 54,
+    "failures": 0
+  },
+  "independent": {
+    "fresh_jvm": 17,
+    "interrupted_pairing_native": "PASS",
+    "draft_initial_immediate_assertion": "FAILED",
+    "draft_unchanged_retry": "PASS",
+    "corrected_wait_and_loading_parent_rerun": "PASS"
+  },
+  "captures": {
+    "13-2-reference-home-response.png": {
+      "sha256": "60bc39fb4da365e49d5d84074b104140413e8ee9c47383a9e7f5f95738f3e646",
+      "classification": "REFERENCE_VERIFIED"
+    },
+    "13-2-long-reported-simulated.png": {
+      "sha256": "46415286cacef990969788a33dfd89c99ca49cfafbd53d65279cabe6c0e3ae5e",
+      "classification": "SIMULATED_ONLY"
+    }
+  },
+  "physical": "HARDWARE_VERIFICATION_DEFERRED",
+  "process_kill": "PENDING_13_8",
+  "desktop_networking": "PENDING_13_4",
+  "reader_final": "PASS_AFTER_NEUTRAL_THEME_AND_TOP_REPORTED_CAVEAT"
+}

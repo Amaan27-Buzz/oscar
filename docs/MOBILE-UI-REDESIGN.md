@@ -1,6 +1,11 @@
 # Slice 13 — OSCAR Mobile Visual / Interaction Design
 
-Status: **PLANNED / START AFTER SLICE 11 CHARACTER REVIEW / REQUIRED BEFORE SLICE 20 UNIFIED ALPHA PASS**.
+Status: **GROUP 2 SOFTWARE IMPLEMENTATION IN PROGRESS / OWNER VISUAL AND DEVICE ACCEPTANCE DEFERRED / REQUIRED BEFORE SLICE 20 UNIFIED ALPHA PASS**.
+
+Owner authorization 2026-10-11 covers autonomous 13.1–13.8 software/reference
+implementation and a draft PR, with consolidated manual acceptance. See
+[Group 2](development/GROUP-02-MOBILE-COMPLETION.md) and the
+[cumulative ledger](development/SOFTWARE-ALPHA-ACCEPTANCE-LEDGER.md).
 
 Slice 09 established the Android product/runtime foundation. This track refines the
 actual OSCAR Mobile experience without reopening Core, Grid, authority, policy,

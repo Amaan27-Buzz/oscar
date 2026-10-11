@@ -11,10 +11,14 @@ data class CoreTask(
     val nodeStatus: String, val generation: Int, val actions: List<String>,
     val evidence: List<String>, val value: String?, val blocker: String?,
     val response: String? = null,
+    val responseTruncated: Boolean = false,
 ) {
     val label: String get() = when (state) {
         "planned" -> "Needs approval"
-        "executing", "awaiting_result", "result_received", "verifying" -> "Running"
+        "executing" -> "Working"
+        "awaiting_result" -> "Waiting for Worker"
+        "result_received" -> "Reported · awaiting verification"
+        "verifying" -> "Verifying"
         "verified" -> "Completed · verified"
         "partially_verified" -> "Partially verified"
         "unknown" -> "Waiting · outcome unknown"
@@ -55,6 +59,8 @@ data class MobileState(
     val snapshot: CoreSnapshot? = null, val interactions: List<Interaction> = emptyList(),
     val approval: Approval? = null, val message: String? = null,
     val observedAt: Long = 0,
+    val draft: String = "", val inspected: CoreTask? = null, val privateSuppressed: Boolean = false,
+    val restoring: Boolean = false,
 ) {
     val presence: Presence get() = when {
         link == Link.DEGRADED -> Presence.ERROR
@@ -66,7 +72,7 @@ data class MobileState(
     }
     fun fenced(next: MobileState, expectedEpoch: Long): MobileState = if (epoch == expectedEpoch) next else this
     fun unavailable(message: String) = copy(epoch = epoch + 1, link = Link.DEGRADED, busy = false,
-        snapshot = null, approval = null, message = message)
+        snapshot = null, approval = null, inspected = null, interactions = emptyList(), observedAt = 0, restoring = false, message = message)
 }
 
 private val taskStates = setOf("planned", "executing", "awaiting_result", "result_received", "verifying", "verified", "partially_verified", "failed", "blocked", "cancelled", "unknown")
@@ -98,13 +104,16 @@ fun parseTask(json: JSONObject): CoreTask {
     val status = json.bounded("node_status", 32)
     val response = if (json.has("response")) {
         require(json.bounded("response_status", 32) == "REPORTED")
-        json.bounded("response", 4096)
+        json.bounded("response", 8192)
     } else null
     require(status in setOf("online", "offline", "degraded"))
+    require(!json.has("response_truncated") || json.get("response_truncated") is Boolean)
     return CoreTask(json.bounded("task_id", 80), json.bounded("description", 256), state,
         json.bounded("target", 80), status, generation, if (status == "online") actions else actions.filter { it in setOf("cancel", "deny") },
-        evidence, value, blocker, response)
+        evidence, value, blocker, response, json.optBoolean("response_truncated", false))
 }
+fun CoreSnapshot.withoutPrivate() = copy(tasks = tasks.map { it.copy(description = "Private request hidden", response = null, value = null,
+    blocker = it.blocker?.let { "Inspect Core before continuing" }, actions = it.actions.filter { action -> action in setOf("deny", "cancel") }) })
 fun parseSnapshot(json: JSONObject): CoreSnapshot {
     val tasks = json.getJSONArray("tasks")
     val nodes = json.getJSONArray("nodes")

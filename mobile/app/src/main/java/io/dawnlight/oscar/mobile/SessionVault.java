@@ -26,12 +26,7 @@ final class SessionVault {
         store.load(null);
         return store;
     }
-    synchronized void save(JSONObject session) throws Exception {
-        CoreClient.validateEndpoint(session.getString("url"));
-        if (!session.getString("node_id").matches("[A-Za-z0-9_-]{1,80}") ||
-            !session.getString("session_id").matches("[A-Za-z0-9_-]{1,80}") ||
-            !session.getString("token").matches("[A-Za-z0-9_-]{20,200}"))
-            throw new SecurityException("Invalid scoped session");
+    private SecretKey secretKey() throws Exception {
         KeyStore store = keys();
         if (!store.containsAlias(VAULT)) {
             KeyGenerator generator = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, "AndroidKeyStore");
@@ -41,12 +36,20 @@ final class SessionVault {
                 .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE).build());
             generator.generateKey();
         }
+        return (SecretKey) keys().getKey(VAULT, null);
+    }
+    synchronized void save(JSONObject session) throws Exception {
+        CoreClient.validateEndpoint(session.getString("url"));
+        if (!session.getString("node_id").matches("[A-Za-z0-9_-]{1,80}") ||
+            !session.getString("session_id").matches("[A-Za-z0-9_-]{1,80}") ||
+            !session.getString("token").matches("[A-Za-z0-9_-]{20,200}"))
+            throw new SecurityException("Invalid scoped session");
         Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
-        cipher.init(Cipher.ENCRYPT_MODE, (SecretKey) keys().getKey(VAULT, null));
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey());
         JSONObject sealed = new JSONObject().put("iv", Base64.encodeToString(cipher.getIV(), Base64.NO_WRAP))
             .put("body", Base64.encodeToString(cipher.doFinal(session.toString().getBytes(StandardCharsets.UTF_8)), Base64.NO_WRAP));
         if (!context.getSharedPreferences("session", Context.MODE_PRIVATE).edit()
-            .putString("sealed", sealed.toString()).commit())
+            .putString("sealed", sealed.toString()).remove("draft").remove("privacy_pending").commit())
             throw new SecurityException("Session persistence unverified");
     }
     synchronized JSONObject load() throws Exception {
@@ -57,6 +60,36 @@ final class SessionVault {
         cipher.init(Cipher.DECRYPT_MODE, (SecretKey) keys().getKey(VAULT, null),
             new GCMParameterSpec(128, Base64.decode(sealed.getString("iv"), Base64.NO_WRAP)));
         return new JSONObject(new String(cipher.doFinal(Base64.decode(sealed.getString("body"), Base64.NO_WRAP)), StandardCharsets.UTF_8));
+    }
+    synchronized void saveDraft(String text, String binding) throws Exception { saveDraft(text, binding, suppressed(binding)); }
+    synchronized void saveDraft(String text, String binding, boolean hidden) throws Exception {
+        if (text.length() > 1000) throw new SecurityException("Draft exceeds boundary");
+        JSONObject current = load();
+        if (!(current == null ? "unpaired" : new CoreClient(current).binding()).equals(binding)) throw new SecurityException("Draft source changed");
+        var edit = context.getSharedPreferences("session", Context.MODE_PRIVATE).edit();
+        if (hidden) edit.putString("privacy_pending", binding); else edit.remove("privacy_pending");
+        if (text.isEmpty()) { if (!edit.remove("draft").commit()) throw new SecurityException("Private recovery deletion unverified"); return; }
+        Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey());
+        cipher.updateAAD(binding.getBytes(StandardCharsets.UTF_8));
+        JSONObject sealed = new JSONObject().put("iv", Base64.encodeToString(cipher.getIV(), Base64.NO_WRAP))
+            .put("body", Base64.encodeToString(cipher.doFinal(text.getBytes(StandardCharsets.UTF_8)), Base64.NO_WRAP));
+        if (!edit.putString("draft", sealed.toString()).commit()) throw new SecurityException("Draft persistence unverified");
+    }
+    synchronized String loadDraft(String binding) throws Exception {
+        String value = context.getSharedPreferences("session", Context.MODE_PRIVATE).getString("draft", null);
+        if (value == null) return "";
+        JSONObject sealed = new JSONObject(value);
+        Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+        cipher.init(Cipher.DECRYPT_MODE, (SecretKey) keys().getKey(VAULT, null),
+            new GCMParameterSpec(128, Base64.decode(sealed.getString("iv"), Base64.NO_WRAP)));
+        cipher.updateAAD(binding.getBytes(StandardCharsets.UTF_8));
+        String text = new String(cipher.doFinal(Base64.decode(sealed.getString("body"), Base64.NO_WRAP)), StandardCharsets.UTF_8);
+        if (text.length() > 1000) throw new SecurityException("Draft exceeds boundary");
+        return text;
+    }
+    synchronized boolean suppressed(String binding) {
+        return binding.equals(context.getSharedPreferences("session", Context.MODE_PRIVATE).getString("privacy_pending", null));
     }
     synchronized String publicIdentity() throws Exception {
         if (!context.getSystemService(KeyguardManager.class).isDeviceSecure())

@@ -81,6 +81,10 @@ Base: `dcfd31bca6fbd8080f4c20bebe3d448e4bd8dc2f`, separate branch
 | M31-01 | Shared native Orb, state truth, freshness, epoch and reduced motion | SOFTWARE_VERIFIED | App10+Expression5 JVM, expression3 API35 rendering tests; immutable canonical artwork |
 | M31-02 | Native Home, one relevant item and unavailable/accessibility labels | REFERENCE_VERIFIED | App8 Compose/one optional fixture skip; actual Home capture, simulated verifying capture; independent13.1 review |
 | M31-03 | Microphone denial and local revoke boundary | SOFTWARE_VERIFIED | Grant checked before every PCM delivery, service stop on revoke; denied Compose case; in-flight synthetic proof13.5 |
+| M32-01 | Text continuity, short/long reading and epistemic labels | REFERENCE_VERIFIED | Real isolated Core native flow; long REPORTED reader SIMULATED_ONLY; JVM12+5/native11+1 extra |
+| M32-02 | Draft encryption, source isolation, recreation and late callbacks | SOFTWARE_VERIFIED | AES-GCM source AAD; epoch/wire serialization; interrupted-save + native crypto/recreation regressions |
+| M32-03 | Privacy-safe discard and foreground recovery | REFERENCE_VERIFIED | Real Core acknowledgement; atomic pending marker and new-ViewModel suppression; no implicit cancel/replay |
+| M32-04 | Abrupt process death | OWNER_VERIFICATION_DEFERRED | Reference process-kill test scheduled13.8; phone recovery remains consolidated acceptance |
 
 Every Group 1 consolidated obligation above carries forward unchanged, especially
 STRONG-APPROVAL BLOCKED and Windows/Voice/phone/Edge/manual verification.

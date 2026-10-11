@@ -106,3 +106,45 @@ Actual [native captures](../ui/mobile/completion/captures/13-1-home-unavailable.
 FLAG_SECURE and temporarily clear it only inside disposable instrumentation.
 Duplicate disconnected copy and detailed task labeling remain scoped later-stage
 refinements, not privacy or execution defects. Phone/motion quality approval is deferred.
+
+## 13.2 — Interaction / recovery
+
+Home presents the latest interaction rather than a transcript archive. Short state
+and response excerpts expand into a selectable native reading dialog; REPORTED
+and excerpt warnings precede long content. Actual execution, waiting, result
+received, verification, partial, blocked and UNKNOWN labels stay distinct. Core
+provides same-session continuity. Android stores no reasoning or chat memory.
+
+Only the unsent form draft is encrypted locally using existing AES-GCM/Keystore,
+with origin/node/session-bound AAD; it is excluded from saved-state bundles.
+Navigation/recreation/background preserve the draft. Replacement source and
+discard clear it. Explicit restore disables editing until IO finishes and does
+not overwrite an unknown saved draft on interruption. Network/source loss clears
+responses/inspection/decisions; local cancellation does not claim remote cancellation.
+
+All transport admissions and credential saves/deletion/public-key creation are
+wire-serialized and epoch-fenced. Noncancellable local commits cannot reorder
+replacement pairing/deletion. Independent review found and fixed the late-save
+old-client race: replacement immediately retires the old client. It also found
+and fixed split discard persistence: draft deletion and the pending suppression
+marker now commit atomically. A pending Core discard hides private readback even
+after new-ViewModel recovery; no automatic action replay occurs. Discard success
+requires Core acknowledgement and preserves ongoing verification/execution.
+
+Validation: **12 app + 5 expression JVM**, full API35 app **11 executed / one
+optional skipped**, extra long-response case **1 PASS**, final source/draft
+regressions **2 PASS**, expression native **3 PASS**, Core/security/Grid **54 PASS**.
+Real isolated Core Home → text → response → Activity → Home → discard → foreground
+restore passed. It used a Cloud reference executor; Desktop readback is 13.4.
+Independent fresh JVM **17 PASS**, interrupted-pairing native PASS. Independent
+draft recreation hit an immediate assertion before async restore, then passed an
+unchanged isolated retry. The test now waits for actual restored state; corrected
+parent rerun passes. Earlier capture-root ambiguity and competing simultaneous
+instrumentation failures are retained locally; native modules now run serially.
+
+Actual [short Core interaction](../ui/mobile/completion/captures/13-2-reference-home-response.png),
+[simulated long reported reader](../ui/mobile/completion/captures/13-2-long-reported-simulated.png),
+[receipt](../ui/mobile/completion/evidence/13-2.json) and
+[independent review](reviews/13-2-INDEPENDENT.md). Capture review corrected inherited
+purple Material dialog defaults and moved epistemic caveats above long content.
+Abrupt process death is exercised during 13.8; physical/native owner use is deferred.
