@@ -20,12 +20,12 @@ Base: `da8fddae50112c8859b21247d0cbaa617be8667e`, branch
 
 | ID | Requirement | Classification | Evidence / remaining work |
 |---|---|---|---|
-| D22-01 | Natural text input and response; repeated-interaction continuity | BLOCKED | Implement and test |
-| D22-02 | Current/private context and Controller Memory Preflight | BLOCKED | Trace existing Runtime/Memory Fabric; no React memory |
-| D22-03 | Bounded compact results and readable expanded/long response | BLOCKED | Implement and test |
-| D22-04 | Real progress/waiting/completion and evidence distinctions | BLOCKED | Native task readback; no invented token streaming |
-| D22-05 | Keyboard interaction, interruption and authorized cancellation | BLOCKED | Implement and test |
-| D22-06 | Offline/failure recovery; unavailable capability/model | BLOCKED | Extend corrective regressions |
+| D22-01 | Natural text input and response; repeated-interaction continuity | REFERENCE_VERIFIED | Native arithmetic/model fixture; Core same-session RAM continuity and private-mode regression |
+| D22-02 | Current/private context and Controller Memory Preflight | SOFTWARE_VERIFIED | Existing Runtime preflight plus scoped MemoryExecutor; canonical FTS recall/source/forget tests; no React memory |
+| D22-03 | Bounded compact results and readable expanded/long response | REFERENCE_VERIFIED | Native 600-character excerpt, 540×680 reading window, focus/overflow assertions |
+| D22-04 | Real progress/waiting/completion and evidence distinctions | REFERENCE_VERIFIED | Actual task states; REPORTED versus VERIFIED; no Core token-stream contract exists |
+| D22-05 | Keyboard interaction, interruption and authorized cancellation | SOFTWARE_VERIFIED | Reversal/draft/focus and duplicate reply tests; only advertised cancel review, not implicit consent |
+| D22-06 | Offline/failure recovery; unavailable capability/model | REFERENCE_VERIFIED | Native Core loss/reconnect/withdrawn capability; no fake queue/retry/model prior fallback |
 | D23-01 | Dictation entry/output and authoritative voice state | BLOCKED | Voice Core adapter and reference fixture |
 | D23-02 | Draft recovery and interruption/cancellation | BLOCKED | Implement and test |
 | D23-03 | Focused/selection context where advertised | BLOCKED | Registered disposable UIA target |

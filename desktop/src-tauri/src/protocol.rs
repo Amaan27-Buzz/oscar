@@ -22,6 +22,7 @@ pub enum WindowMode {
     Interaction,
     Approval,
     Activity,
+    Reading,
 }
 
 #[derive(Clone, Copy, Deserialize, Serialize)]
@@ -206,6 +207,12 @@ pub struct TaskView {
     pub epistemic: Option<String>,
     #[serde(default)]
     pub progress: Option<Progress>,
+    #[serde(default)]
+    pub mode: String,
+    #[serde(default)]
+    pub response_truncated: bool,
+    #[serde(default)]
+    pub source_event_ids: Vec<String>,
 }
 #[derive(Clone, Serialize, Deserialize, PartialEq)]
 pub struct Progress {

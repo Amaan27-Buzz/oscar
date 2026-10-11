@@ -108,6 +108,8 @@ class Runtime:
                 )
         elif kind == "live_source":
             parameters = {"query": intent.text, "freshness": decision.freshness.value}
+        elif kind == "memory":
+            parameters = {"query": intent.text}
         material = json.dumps(
             {"description": intent.text, "parameters": parameters, "criterion": criterion},
             allow_nan=False,

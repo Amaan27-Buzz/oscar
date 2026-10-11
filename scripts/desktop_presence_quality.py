@@ -68,7 +68,9 @@ def main() -> int:
                     action.correlation_id,
                     action.capability_id,
                     model_mode[0] != "failure",
-                    value="A scripted reference answer; no real model inference.",
+                    value=("A scripted reference answer; no real model inference. " * 140)
+                    if model_mode[0] == "long"
+                    else "A scripted reference answer; no real model inference.",
                     error="reference executor failure" if model_mode[0] == "failure" else None,
                 )
 
@@ -201,8 +203,8 @@ def main() -> int:
                                 owner_authorized=True,
                             )
                             print(json.dumps({"disposable_policy": command}), flush=True)
-                        elif command in {"reported", "failure"}:
-                            model_mode[0] = "failure" if command == "failure" else "reported"
+                        elif command in {"reported", "failure", "long"}:
+                            model_mode[0] = command
                             print(
                                 json.dumps(
                                     {

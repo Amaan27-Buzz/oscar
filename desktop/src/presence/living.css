@@ -49,3 +49,10 @@ html[data-living]:has(.preview-controls) .living-presence{position:fixed;right:2
 @media(forced-colors:active){.writing-leaf,.presence-caption,.presence-settings[open] div{background:Canvas;color:CanvasText;border:1px solid CanvasText}.living-presence .leaf-primary{background:ButtonFace;color:ButtonText;border:1px solid ButtonText}.character-button svg{forced-color-adjust:none}.leaf-secondary,.leaf-bottom{color:CanvasText}}
 
 .presence-answer{flex:1;min-height:0}.presence-answer pre{background:transparent;padding:0;margin:6px 0;max-height:80px;overflow:auto;font-size:15px;line-height:1.45}.presence-answer>div{display:flex;gap:12px}.presence-answer>div button{margin-left:-8px}
+.presence-answer{display:flex;flex-direction:column;gap:6px}
+.presence-answer .response-text{display:block;flex:1;min-height:0;max-height:112px;overflow:auto;scrollbar-width:thin}
+.presence-answer .response-text pre{max-height:none;overflow:visible;white-space:pre-wrap;overflow-wrap:anywhere;font-family:inherit}
+.presence-answer.is-reading{display:flex;flex-direction:column;gap:8px}
+.presence-answer.is-reading .response-text{flex:1;max-height:none;min-height:0;line-height:1.55}
+.presence-answer .result-actions{display:flex;flex-wrap:wrap;gap:8px;flex-shrink:0}
+.leaf-top,.writing-leaf h1,.leaf-bottom{flex-shrink:0}

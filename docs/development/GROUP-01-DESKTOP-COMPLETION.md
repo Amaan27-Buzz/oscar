@@ -59,3 +59,39 @@ published. GitHub Actions remain disabled; all reported checks are local.
 Final report will record each implementation, architecture change, exact tests,
 cross-stage/native scenarios, independent findings/corrections, curated evidence,
 deferred obligations, commits, draft PR and dependencies for Slice 13.
+
+## 12.2 — Ask software checkpoint
+
+Bounded compact answers expand into a keyboard-focusable native reading surface.
+Ask continues through actual Core tasks, actual progress and advertised cancellation
+review. Failed/blocked/unknown outcomes never imply a started task or blind retry.
+Accepted submissions clear only their own draft; unfinished input survives retreat.
+Plain-text response wrapping/scrolling remains safe against executable markup.
+
+Core derives bounded working context from successful same-session transient Ask
+tasks; it is labelled reported data and routes subsequent model reasoning privately.
+Discard removes it; restart does not recreate private history. A read-only scoped
+MemoryExecutor consumes the existing MemoryFabric/Controller route. Worker testimony
+remains REPORTED; Core rechecks exact retained support before exposing RECALLED or
+INFERRED and source event IDs. Forget withdraws support. No memory grant, auto-retention
+or model-prior fallback is introduced. Missing capability stays blocked.
+
+Local validation: Desktop **39 tests / 6 files**, TypeScript/build PASS; focused
+Core/Desktop/Memory **93 tests, 0 failures/skips**; Rust **11 tests, 0 failed/ignored**,
+fmt/Clippy/native debug build PASS; Ruff PASS; mypy **64 source files** PASS.
+The native reference passed **nine assertions** plus reading/footer geometry, with
+curated screenshots in [the evidence packet](../ui/desktop/completion/README.md).
+
+Observed and repaired before advancement: missing reading size in historical
+showcase type map; clean-worktree frontend build ordering before Rust context;
+duplicate interact event/reply retaining a submitted draft; response actions
+overlapping the footer; new-session same-node private readback; a failed native
+runner incorrectly classifying a partial run as verified. Final native receipt is
+complete and conditional failure classification is fixed. Failed reading receipt
+is preserved in the separate local evidence archive, not copied as a new frame dump.
+
+[Independent review](reviews/12-2-INDEPENDENT.md): initial HOLD, then **ACCEPT
+bounded software closure** after fixes; independently **28 frontend + 34 Python
+tests** and the original privacy reproduction passed. This does not certify real
+inference, subjective motion, OS focus or owner/device use. Default production
+entry/composition and immutable canonical SVG remain unchanged.

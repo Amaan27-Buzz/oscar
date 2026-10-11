@@ -15,6 +15,16 @@ function harness() {
   return {port,update:(patch:Partial<View>)=>{view={...view,...patch};const next=snapshot();act(()=>push(next));return next;},stale:()=>act(()=>push({...view,link:'online',voice:'speaking',expression:{...view.expression!,generation:0}}))};
 }
 describe('living Desktop presence',()=>{
+  it('an already-emitted interact acknowledgement clears only the accepted submitted draft',async()=>{
+    const h=harness();await screen.findByText('Here');
+    fireEvent.click(screen.getByRole('button',{name:/OSCAR: Here/}));await screen.findByLabelText('Ask OSCAR');
+    fireEvent.change(screen.getByLabelText('Ask OSCAR'),{target:{value:'2 + 3'}});
+    const current={task_id:'accepted',state:'partially_verified',description:'Result',target:'fixture',blocker:null,actions:[],generation:1,evidence_ids:[],response:'5',response_status:'REPORTED',value:null,epistemic:null};
+    h.port.mockImplementationOnce(async()=>h.update({current}));
+    fireEvent.click(screen.getByRole('button',{name:'Ask'}));await screen.findByRole('button',{name:'Ask again'});
+    fireEvent.click(screen.getByRole('button',{name:'Ask again'}));
+    await waitFor(()=>expect((screen.getByLabelText('Ask OSCAR') as HTMLTextAreaElement).value).toBe(''));
+  });
   it('invokes with focus, asks once, preserves draft on retreat and returns focus to character',async()=>{
     const h=harness();await screen.findByText('Here');
     fireEvent.click(screen.getByRole('button',{name:/OSCAR: Here/}));

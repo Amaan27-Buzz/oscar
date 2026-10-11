@@ -1,11 +1,12 @@
 import { invoke } from '@tauri-apps/api/core';
 import { listen } from '@tauri-apps/api/event';
-export type WindowMode='compact'|'interaction'|'approval'|'activity';
+export type WindowMode='compact'|'interaction'|'approval'|'activity'|'reading';
 export type ContextChoice='none'|'selection'|'focused'|'foreground';
 export type Mode='Ask'|'Dictate'|'Edit'|'Act';
 export interface Task { task_id:string; state:string; description:string; target:string; blocker:string|null;
   actions:string[]; generation:number; evidence_ids:string[]; response:string|null; response_status:string|null;
-  value:string|null; epistemic:string|null;progress?:{fraction:number;step:string;status:string}|null }
+  value:string|null; epistemic:string|null;progress?:{fraction:number;step:string;status:string}|null;
+  mode?:string;response_truncated?:boolean;source_event_ids?:string[] }
 export interface Context {id:string;source:string;timestamp:number;scope:string;provenance:string;permission:string;
   freshness:string;text:string|null;retained:boolean}
 export interface Choice {id:string;name:string}

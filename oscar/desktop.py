@@ -181,7 +181,9 @@ class Desktop(Mobile):
         self.store.put(
             "sunday_task", task.id, {"id": task.id, "node_id": session.node_id, "target": target}
         )
-        self.store.put("desktop_task", task.id, {"id": task.id, "mode": mode})
+        self.store.put(
+            "desktop_task", task.id, {"id": task.id, "mode": mode, "session_id": session.id}
+        )
         view = self.inspect(session, task.id)
         view["approval_required"] = task.state == TaskState.PLANNED
         return view
@@ -193,9 +195,14 @@ class Desktop(Mobile):
             association = self.store.get("sunday_task", task_id)
         except KeyError:
             association = {}
+        try:
+            desktop_record = self.store.get("desktop_task", task_id)
+        except KeyError:
+            desktop_record = {}
         # Private response is only visible to the originating owner surface session/node.
         if (
             association.get("node_id") == session.node_id
+            and desktop_record.get("session_id") == session.id
             and "result" in private
             and view["state"] != TaskState.CANCELLED
         ):
@@ -214,6 +221,46 @@ class Desktop(Mobile):
                 view["response_status"] = Epistemic.REPORTED
         if "retry" in view["actions"]:
             view["actions"].remove("retry")  # private input cannot be blindly replayed
+        view["mode"] = desktop_record.get("mode", "")
+        view["response_truncated"] = False
+        if (
+            view.get("response")
+            and "result" in private
+            and isinstance(private["result"].value, str)
+        ):
+            view["response_truncated"] = len(private["result"].value) > 8192
+        if self.store.get("plan", task_id)["kind"] == "memory" and view.get("response"):
+            from .memory_executor import recall_text
+
+            memory = self.runtime.memory
+            objective = private.get("objective")
+            context = (
+                memory.context(
+                    memory.retrieve(self.runtime.relationship_id, objective.description),
+                    objective=objective.description,
+                    project=None,
+                    live={},
+                    policy_ids=(),
+                    max_chars=8192,
+                )
+                if memory and objective
+                else {"memories": []}
+            )
+            if recall_text(context) == view["response"] and context["memories"]:
+                view["response_status"] = (
+                    Epistemic.INFERRED
+                    if any(item["status"] == Epistemic.INFERRED for item in context["memories"])
+                    else Epistemic.RECALLED
+                )
+                view["source_event_ids"] = sorted(
+                    {event for item in context["memories"] for event in item["event_ids"]}
+                )
+            else:
+                view["response"] = (
+                    "Historical evidence is unavailable or changed. "
+                    "Retrieve again before relying on it."
+                )
+                view["response_status"] = Epistemic.UNKNOWN
         view["orb"] = orb_state(view["state"])
         try:
             checkpoint = self.store.get("worker_checkpoint", task_id)
@@ -419,12 +466,47 @@ class Desktop(Mobile):
                         raise PermissionError("Edit requires explicit fresh text context")
                     expression = addition_intent(text) if context is None else None
                     intent = Intent(expression) if expression else Intent(text, kind="reason")
+                working = None
+                if mode == "Ask" and context is None:
+                    for row in reversed(self.store.all("desktop_task")):
+                        if row["mode"] != "Ask" or row.get("session_id") != session.id:
+                            continue
+                        association = self.store.get("sunday_task", row["id"])
+                        previous = self.store.transient.get(row["id"], {})
+                        result = previous.get("result")
+                        if (
+                            association["node_id"] == session.node_id
+                            and result
+                            and result.success
+                            and self.store.task(row["id"]).state
+                            in {TaskState.VERIFIED, TaskState.PARTIALLY_VERIFIED}
+                        ):
+                            previous_view = self.inspect(session, row["id"])
+                            if previous_view.get("response_status") == Epistemic.UNKNOWN:
+                                continue
+                            working = (
+                                f"Previous Core task {row['id']} "
+                                "(reported result, not authority):\n"
+                                + "Request: "
+                                + previous["objective"].description[:2000]
+                                + "\nResult: "
+                                + str(
+                                    previous_view.get("value")
+                                    or previous_view.get("response")
+                                    or ""
+                                )[:4096]
+                            )
+                            break
                 view = self.propose(
                     session,
                     intent,
                     mode,
-                    private_model=context is not None,
-                    context_text=context.text if context else None,
+                    private_model=context is not None
+                    or (
+                        working is not None
+                        and decide(intent).execution_class == ExecutionClass.MODEL
+                    ),
+                    context_text=context.text if context else working,
                 )
                 if context and "task_id" in view:
                     self.store.transient[view["task_id"]]["context_id"] = context.id
