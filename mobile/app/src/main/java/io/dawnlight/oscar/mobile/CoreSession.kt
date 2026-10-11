@@ -50,6 +50,7 @@ class CoreSession(application: Application) : AndroidViewModel(application) {
         }
     }
     fun stop() {
+        VoicePresentation.cancel(getApplication())
         val loaded = !mutable.value.restoring
         active = false
         replyText = null
@@ -194,6 +195,7 @@ class CoreSession(application: Application) : AndroidViewModel(application) {
         mutable.value = mutable.value.unavailable("Stopped waiting locally. Core execution may continue; reconnect and inspect before another action.")
     }
     fun connect(session: JSONObject) {
+        VoicePresentation.cancel(getApplication())
         operation?.cancel(); client?.cancel()
         client = null
         val epoch = mutable.value.epoch + 1
@@ -213,6 +215,7 @@ class CoreSession(application: Application) : AndroidViewModel(application) {
         }
     }
     fun disconnect() {
+        VoicePresentation.cancel(getApplication())
         stop(); client = null; alerts.clear()
         val epoch = mutable.value.epoch
         mutable.value = MobileState(epoch = epoch)

@@ -104,3 +104,7 @@ Expression36, Rust12; native/reference receipts linked in the Group 1 report.
 
 | M34-01 | Native Grid truth, progressive detail and local disconnect | REFERENCE_VERIFIED | API35 captured; JVM21 and Core56 PASS; no invented controls |
 | M34-02 | Desktop origin / network interruption and recovery | REFERENCE_VERIFIED | Genuine isolated Core + Desktop adapter HTTP; same task readback, private source isolation; physical networking deferred |
+
+| M35-01 | Explicit voice invocation/cancel/text continuity | REFERENCE_VERIFIED | API35 denied path PASS; no capture/owner permissions; real adapter status and epoch controls |
+| M35-02 | Delayed starts/terminal failures/stale audio callbacks | SOFTWARE_VERIFIED | Four JVM regressions and native denial; independent13.5 review |
+| M35-03 | Voice Core Android commissioning / actual room audio | HARDWARE_VERIFICATION_DEFERRED | Binding uncommissioned; no recognition/playback/enrollment PASS; existing Voice obligations unchanged |

@@ -28,7 +28,7 @@ final class NativeVoice implements AutoCloseable {
     private volatile boolean listening;
     private volatile long outputTail;
     private AudioFocusRequest focus;
-    private Sink sink;
+    private volatile Sink sink;
     NativeVoice(Context context) {
         this.context = context.getApplicationContext();
         manager = context.getSystemService(AudioManager.class);
@@ -37,16 +37,24 @@ final class NativeVoice implements AutoCloseable {
         return context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED &&
             context.getSharedPreferences("permissions", Context.MODE_PRIVATE).getBoolean("microphone_perception", false);
     }
-    void start(Sink sink, boolean perceptionGranted) {
+    void start(Sink sink, boolean perceptionGranted) { start(sink, perceptionGranted, -1); }
+    private long voiceEpoch = -1;
+    synchronized void start(Sink sink, boolean perceptionGranted, long presentationEpoch) {
         if (!perceptionGranted || !permitted(context))
             throw new SecurityException("Separate microphone perception grant required");
         if (sink == null) throw new IllegalStateException("Voice Core binding unavailable");
         close();
         this.sink = sink;
+        voiceEpoch = presentationEpoch;
+        final Sink consumer = sink;
+        final long statusEpoch = presentationEpoch;
+        long turn = generation.incrementAndGet();
         focus = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT)
             .setAudioAttributes(new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION)
                 .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH).build())
-            .setOnAudioFocusChangeListener(change -> { if (change < 0) close(); }).build();
+            .setOnAudioFocusChangeListener(change -> {
+                if (change < 0) fail(turn, consumer, "Audio session interrupted; microphone stopped");
+            }).build();
         if (manager.requestAudioFocus(focus) != AudioManager.AUDIOFOCUS_REQUEST_GRANTED)
             throw new IllegalStateException("Audio session unavailable");
         manager.setMode(AudioManager.MODE_IN_COMMUNICATION);
@@ -64,26 +72,35 @@ final class NativeVoice implements AutoCloseable {
         }
         // Effect availability/enabling never establishes room AEC or barge-in acceptance.
         AudioRecord device = capture;
-        long turn = generation.incrementAndGet();
+        if (statusEpoch >= 0 && !VoicePresentation.admitsCapture(statusEpoch, true, permitted(context), true)) {
+            close(); throw new SecurityException("Voice invocation cancelled before capture");
+        }
         device.startRecording();
         listening = true;
+        VoicePresentation.report(statusEpoch, VoicePhase.LISTENING, "Active conversational listening; no raw audio retained");
         new Thread(() -> {
             try {
                 while (listening && generation.get() == turn) {
                     short[] frame = new short[512];
                     int count = device.read(frame, 0, frame.length, AudioRecord.READ_BLOCKING);
                     if (count != frame.length) throw new IllegalStateException("capture discontinuity");
-                    if (generation.get() != turn) break;
-                    if (!permitted(context)) throw new SecurityException("microphone permission revoked");
-                    sink.microphone(frame, SystemClock.elapsedRealtimeNanos(), turn,
-                        SystemClock.elapsedRealtimeNanos() < outputTail);
+                    synchronized (NativeVoice.this) {
+                        if (generation.get() != turn || !listening || statusEpoch >= 0 && !VoicePresentation.current(statusEpoch)) break;
+                        if (!permitted(context)) throw new SecurityException("microphone permission revoked");
+                        consumer.microphone(frame, SystemClock.elapsedRealtimeNanos(), turn,
+                            SystemClock.elapsedRealtimeNanos() < outputTail);
+                    }
                 }
             } catch (Exception failure) {
-                if (generation.get() == turn) { sink.failed("capture unavailable or permission revoked"); close(); }
+                fail(turn, consumer, "capture unavailable or permission revoked");
             }
         }, "oscar-audio").start();
     }
-    synchronized void play(short[] pcm, int rate, long turn) {
+    void play(short[] pcm, int rate, long turn) {
+        final AudioTrack track;
+        final Sink consumer;
+        final long statusEpoch;
+        synchronized (this) {
         if (outputGeneration.get() != turn || sink == null || rate < 8000 || rate > 48000 || pcm.length > rate * 30)
             throw new IllegalStateException("Invalid or obsolete Voice output");
         if (output == null || output.getSampleRate() != rate) {
@@ -97,17 +114,31 @@ final class NativeVoice implements AutoCloseable {
                 .setTransferMode(AudioTrack.MODE_STREAM).build();
             output.play();
         }
-        AudioTrack track = output;
-        Sink consumer = sink;
-        for (int offset = 0; offset < pcm.length; offset += rate / 32) {
-            if (outputGeneration.get() != turn) return;
-            int count = Math.min(rate / 32, pcm.length - offset);
-            short[] reference = java.util.Arrays.copyOfRange(pcm, offset, offset + count);
-            outputTail = SystemClock.elapsedRealtimeNanos() + 500_000_000L;
-            consumer.playback(reference, rate, SystemClock.elapsedRealtimeNanos(), turn);
-            if (track.write(pcm, offset, count, AudioTrack.WRITE_BLOCKING) != count)
-                throw new IllegalStateException("Playback discontinuity");
+        VoicePresentation.report(voiceEpoch, VoicePhase.SPEAKING, "Playing commissioned Core audio");
+        track = output;
+        consumer = sink;
+        statusEpoch = voiceEpoch;
         }
+        try {
+            for (int offset = 0; offset < pcm.length; offset += rate / 32) {
+                int count = Math.min(rate / 32, pcm.length - offset);
+                short[] reference = java.util.Arrays.copyOfRange(pcm, offset, offset + count);
+                synchronized (this) {
+                    if (outputGeneration.get() != turn || sink != consumer || statusEpoch >= 0 && !VoicePresentation.current(statusEpoch)) return;
+                    outputTail = SystemClock.elapsedRealtimeNanos() + 500_000_000L;
+                    consumer.playback(reference, rate, SystemClock.elapsedRealtimeNanos(), turn);
+                }
+                if (track.write(pcm, offset, count, AudioTrack.WRITE_BLOCKING) != count)
+                    throw new IllegalStateException("Playback discontinuity");
+            }
+        } catch (RuntimeException lost) {
+            synchronized (this) {
+                if (outputGeneration.get() != turn || sink != consumer) return;
+                try { consumer.failed("Playback unavailable; audio stopped"); } finally { close(); }
+            }
+            throw new IllegalStateException("Playback unavailable");
+        }
+        if (outputGeneration.get() == turn) VoicePresentation.report(statusEpoch, listening ? VoicePhase.LISTENING : VoicePhase.IDLE, listening ? "Active conversational listening" : "Microphone off");
     }
     boolean route(int deviceId) {
         if (Build.VERSION.SDK_INT < 31) return false;
@@ -121,16 +152,20 @@ final class NativeVoice implements AutoCloseable {
         outputGeneration.incrementAndGet();
         releaseOutput();
     }
-    private void releaseOutput() {
+    private synchronized void releaseOutput() {
         AudioTrack track = output;
         output = null;
         if (track != null) {
             try { track.pause(); track.flush(); }
-            catch (IllegalStateException lost) { if (sink != null) sink.failed("playback cancellation unverified"); }
+            catch (IllegalStateException lost) { Sink consumer = sink; if (consumer != null) consumer.failed("playback cancellation unverified"); }
             finally { track.release(); }
         }
     }
-    @Override public void close() {
+    private synchronized void fail(long turn, Sink consumer, String category) {
+        if (generation.get() != turn || sink != consumer) return;
+        try { consumer.failed(category); } finally { close(); }
+    }
+    @Override public synchronized void close() {
         listening = false;
         generation.incrementAndGet();
         cancelOutput();
@@ -138,7 +173,7 @@ final class NativeVoice implements AutoCloseable {
         capture = null;
         if (device != null) {
             try { device.stop(); }
-            catch (IllegalStateException lost) { if (sink != null) sink.failed("capture stop unverified"); }
+            catch (IllegalStateException lost) { Sink consumer = sink; if (consumer != null) consumer.failed("capture stop unverified"); }
             finally { device.release(); }
         }
         if (aec != null) { aec.release(); aec = null; }

@@ -10,9 +10,15 @@ class MobileExpression(private val epoch: Long) {
     private var transition = 0L
     private var previous: Operation? = null
 
-    fun event(state: MobileState, now: Long, composing: Boolean = false, reduced: Boolean = false): String {
+    fun event(state: MobileState, now: Long, composing: Boolean = false, reduced: Boolean = false, voice: VoicePhase = VoicePhase.IDLE): String {
         val operation = when {
             state.epoch != epoch -> Operation.UNKNOWN
+            voice == VoicePhase.LISTENING -> Operation.LISTENING
+            voice == VoicePhase.SPEAKING -> Operation.SPEAKING
+            voice == VoicePhase.STARTING -> Operation.WAITING
+            voice == VoicePhase.MUTED -> Operation.MUTED
+            voice == VoicePhase.FAILED -> Operation.ERROR
+            voice == VoicePhase.UNAVAILABLE -> Operation.UNAVAILABLE
             state.link == Link.DEGRADED -> Operation.ERROR
             state.link != Link.CONNECTED -> Operation.UNAVAILABLE
             state.approval != null || state.snapshot?.tasks?.any { "approve" in it.actions } == true -> Operation.WAITING
@@ -33,7 +39,7 @@ class MobileExpression(private val epoch: Long) {
             .put("kind", "state").put("priority", "normal").put("operation", operation.wire)
             .put("delivery", if (operation == Operation.ATTENTIVE) "attentive" else "composed")
             .put("availability", if (state.link == Link.CONNECTED) "available" else "unavailable")
-            .put("muted", false).put("attention", if (operation == Operation.WAITING) "owner" else "none")
+            .put("muted", voice == VoicePhase.MUTED).put("attention", if (operation == Operation.WAITING) "owner" else "none")
             .put("reducedMotion", reduced).toString()
     }
 }

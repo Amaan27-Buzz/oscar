@@ -212,3 +212,25 @@ capture reviewed; no physical remote network or phone claim.
 
 [Capture](../ui/mobile/completion/captures/13-4-reference-grid.png),
 [independent review](reviews/group-02/13-4-INDEPENDENT.md).
+
+## 13.5 — Voice presentation and cancellation
+
+Voice invocation opens an explicit native control surface without recording. It
+shares the current text draft/Core context. Microphone/audio status comes from the
+existing AudioRecord/AudioTrack adapter; permissions, unavailable binding, failure,
+listening and speaking remain distinct. Source/background/cancellation retires the
+presentation epoch. Delayed service starts, failed terminal status and late audio
+focus/capture/output callbacks are fenced; native output cancellation remains
+interruptible. No new reasoning, speech model, training or capture runtime.
+
+Android Voice Core binding is uncommissioned: production capture/recognition and
+playback are unavailable until legitimately configured. Match/Map/Identity entry
+points explain their unavailable commissioning path, with real route readback in
+Voice settings. No synthetic success or microphone grant was used.
+
+JVM app20 + expression5 PASS; Core56 PASS; denied voice → cancel → preserved text
+native PASS23s. Independent review reproduced callback defects and fixed them with
+four small lifecycle regressions. The initial text assertion used exact matching
+for a substring and failed; corrected exact-message/state waits pass. Actual
+[denied voice capture](../ui/mobile/completion/captures/13-5-voice-denied-reference.png)
+reviewed. Acoustic/audio/phone validation remains deferred, not a voice runtime PASS.

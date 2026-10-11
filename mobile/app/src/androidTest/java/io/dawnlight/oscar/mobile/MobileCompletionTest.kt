@@ -56,6 +56,20 @@ class MobileCompletionTest {
             compose.activity.window.addFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE)
         }
     }
+    @Test fun voiceInvocationCancellationPreservesTextWithoutCapture() {
+        compose.onNodeWithTag("interactionInput").performTextInput("Synthetic voice continuation")
+        compose.onNodeWithText("Voice").performClick()
+        compose.onNodeWithTag("voiceStatus").assertTextContains("Microphone off")
+        assertEquals(null, MicrophoneService.binding)
+        compose.onNodeWithText("Start listening").performClick()
+        compose.waitUntil(5000) { VoicePresentation.state.value.phase == VoicePhase.MUTED }
+        compose.waitUntil(5000) { compose.onAllNodesWithText("Microphone permission or OSCAR perception grant is off").fetchSemanticsNodes().isNotEmpty() }
+        compose.onNodeWithTag("voiceStatus").assertTextEquals("Microphone permission or OSCAR perception grant is off")
+        capture("13-5-voice-denied-reference")
+        compose.onNodeWithText("Cancel voice").performClick()
+        compose.onNodeWithTag("interactionInput").assertTextContains("Synthetic voice continuation")
+        assertEquals(VoicePhase.IDLE, VoicePresentation.state.value.phase)
+    }
     @Test fun homeUnavailableAndSharedExpressionRender() {
         compose.onNodeWithTag("orb").assertExists()
         compose.onNodeWithText("OSCAR is not connected").assertExists()

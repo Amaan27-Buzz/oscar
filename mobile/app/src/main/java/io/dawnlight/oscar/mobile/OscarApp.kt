@@ -35,20 +35,22 @@ private val Ink = Color(0xFF1A1B18)
     val state by session.state.collectAsStateWithLifecycle()
     var selected by rememberSaveable { mutableStateOf(Destination.OSCAR.name) }
     var settingsPage by rememberSaveable { mutableStateOf("Settings") }
+    var voiceOpen by remember(state.epoch) { mutableStateOf(false) }
+    DisposableEffect(state.epoch) { onDispose { VoicePresentation.cancel(session.getApplication()) } }
     var pairing by remember { mutableStateOf(false) }
     val draft = state.draft
     val destination = Destination.entries.firstOrNull { it.name == selected } ?: Destination.OSCAR
     val focus = LocalFocusManager.current
     val keyboard = LocalSoftwareKeyboardController.current
-    BackHandler(destination != Destination.OSCAR || settingsPage != "Settings") {
-        if (settingsPage != "Settings") settingsPage = "Settings" else selected = Destination.OSCAR.name
+    BackHandler(voiceOpen || destination != Destination.OSCAR || settingsPage != "Settings") {
+        if (voiceOpen) { VoicePresentation.cancel(session.getApplication()); voiceOpen = false } else if (settingsPage != "Settings") settingsPage = "Settings" else selected = Destination.OSCAR.name
     }
     OscarTheme {
         Scaffold(modifier = Modifier.imePadding(), containerColor = MaterialTheme.colorScheme.background, bottomBar = {
             Surface(tonalElevation = 0.dp) {
                 Row(Modifier.fillMaxWidth().navigationBarsPadding(), horizontalArrangement = Arrangement.SpaceEvenly) {
                     Destination.entries.forEach { item ->
-                        TextButton(onClick = { focus.clearFocus(); keyboard?.hide(); selected = item.name; settingsPage = "Settings" }, modifier = Modifier.weight(1f).heightIn(min = 56.dp)
+                        TextButton(onClick = { VoicePresentation.cancel(session.getApplication()); voiceOpen = false; focus.clearFocus(); keyboard?.hide(); selected = item.name; settingsPage = "Settings" }, modifier = Modifier.weight(1f).heightIn(min = 56.dp)
                             .semantics { this.selected = item == destination }) { Text(item.label,
                                 color = if (item == destination) MaterialTheme.colorScheme.secondary else Ink,
                                 fontWeight = if (item == destination) androidx.compose.ui.text.font.FontWeight.SemiBold else androidx.compose.ui.text.font.FontWeight.Normal) }
@@ -70,8 +72,8 @@ private val Ink = Color(0xFF1A1B18)
                     TextButton(onClick = { pairing = true }) { Text("Connect Core") }
                 }
                 when (destination) {
-                    Destination.OSCAR -> PresenceScreen(state, draft, session::writeDraft, { focus.clearFocus(); keyboard?.hide(); session.send(draft) }, session::cancelRequest,
-                        { focus.clearFocus(); keyboard?.hide(); selected = Destination.ACTIVITY.name }, { focus.clearFocus(); keyboard?.hide(); selected = Destination.SETTINGS.name; settingsPage = "Voice" })
+                    Destination.OSCAR -> if (voiceOpen) VoiceExperience({ voiceOpen = false }, { VoicePresentation.cancel(session.getApplication()); voiceOpen = false; selected = Destination.SETTINGS.name; settingsPage = "Privacy" }) else PresenceScreen(state, draft, session::writeDraft, { focus.clearFocus(); keyboard?.hide(); session.send(draft) }, session::cancelRequest,
+                        { focus.clearFocus(); keyboard?.hide(); selected = Destination.ACTIVITY.name }, { focus.clearFocus(); keyboard?.hide(); voiceOpen = true })
                     Destination.ACTIVITY -> ActivityScreen(state, session::inspect, session::review)
                     Destination.DEVICES -> DevicesScreen(state, { pairing = true }, session::disconnect)
                     Destination.SETTINGS -> SettingsScreen(settingsPage, { settingsPage = it }, session, state)
@@ -120,8 +122,9 @@ private val Ink = Color(0xFF1A1B18)
     })
 }
 @Composable fun OscarOrb(state: MobileState, composing: Boolean = false, size: Dp = 108.dp, reduced: Boolean = false) {
+    val voice by VoicePresentation.state.collectAsStateWithLifecycle()
     val adapter = remember(state.epoch) { MobileExpression(state.epoch) }
-    val event = remember(state, composing, reduced) { adapter.event(state, System.currentTimeMillis(), composing, reduced) }
+    val event = remember(state, composing, reduced, voice) { adapter.event(state, System.currentTimeMillis(), composing, reduced, voice.phase) }
     Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
         ExpressionPresence(event, adapter.source, size, reduced, Modifier.testTag("orb"))
     }

@@ -1,0 +1,9 @@
+{
+  "slice": "13.5",
+  "native": "denial/cancel/text PASS23s",
+  "jvm": 25,
+  "core": 56,
+  "capture": "actual API35 denied",
+  "audio": "NOT_RUN",
+  "binding": "uncommissioned"
+}
