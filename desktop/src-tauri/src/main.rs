@@ -47,6 +47,7 @@ fn window_mode(app: &tauri::AppHandle, state: &Native, mode: WindowMode) -> Resu
         WindowMode::Approval => (620., 780.),
         WindowMode::Activity => (820., 780.),
         WindowMode::Reading => (540., 680.),
+        WindowMode::Tools => (540., 720.),
     };
     if state.presence {
         presence::resize(&window, (width, height), false)?;

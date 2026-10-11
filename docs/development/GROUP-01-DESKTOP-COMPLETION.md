@@ -95,3 +95,46 @@ bounded software closure** after fixes; independently **28 frontend + 34 Python
 tests** and the original privacy reproduction passed. This does not certify real
 inference, subjective motion, OS focus or owner/device use. Default production
 entry/composition and immutable canonical SVG remain unchanged.
+
+## 12.3 — Dictate/Edit software checkpoint
+
+The same writing leaf expands into text tools with separate local mode drafts,
+linked tab/panel semantics, explicit voice start/finish/cancel, supported context
+capture on invocation, provenance/permission/retention/expiry disclosure and
+selection/focused-field editing. Window identity alone is not editable text.
+Unregistered/inaccessible targets and unsupported reliable replacement remain
+unavailable. Preview is destination-specific: focused Dictate discloses the whole
+appended field, not only its transcript. Apply checks current offered destination,
+context/preview expiry and effective UNKNOWN feedback. Consumption retires the
+preview; no automatic replay exists. Core/Worker still fence expected value and
+independently read back the actual destination.
+
+Voice uses the existing portable capture/Recognizer/Transcript/StopToken contract.
+Finish publishes actual processing then preview; cancellation fences recognition
+and removes any owned preview. No opening, panel switch or animation starts audio.
+Capture/model absence is explicit. Tests use simulated audio and a scripted
+recognizer; no microphone, physical speech quality or inference acceptance.
+
+Discard clears all presentation drafts, context/preview/review/private responses,
+including the temporarily embedded old workspace's local Act state. Native
+content revisions reject obsolete command replies/errors; privacy suppression
+also covers late snapshots and voice previews. Active work is not implicitly
+cancelled: private output is hidden and released after completion. Concurrent
+discard preserves independent verification without redisplaying private results.
+
+Validation: Desktop **44 tests / 7 files**, TypeScript/build PASS; Rust **12 tests**,
+fmt/Clippy/native debug build PASS; mypy **64 source files**, Ruff PASS. Focused
+Core/Desktop/Voice tests are recorded in the final stage receipt (64 cases after
+the completion/discard addition). Native text tools passed **12 assertions**,
+including actual 15-second expiry, no implicit listening, no-target disable,
+separate retained drafts, preview/surface scope, and clear-all without task/action.
+The separate `desktop_tauri --self-check` passed real native CNG/PSS,
+registered WPF field readback, typed file action, cancellation, reconnect and
+restart continuity; transformation remained SIMULATED/REPORTED and GUI consent
+was not exercised. Curated [text evidence](../ui/desktop/completion/README.md).
+
+Independent review initially held the stage for local UNKNOWN IPC feedback not
+reaching Apply's guard. Corrected with a thrown-port regression; final
+[review](reviews/12-3-INDEPENDENT.md) **ACCEPTS bounded software closure** after
+**33 frontend + 41 Python** independent checks. The successful concurrent-discard
+test also closes its coverage advisory. No manual/device boundary becomes PASS.

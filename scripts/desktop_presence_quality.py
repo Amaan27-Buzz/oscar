@@ -104,7 +104,25 @@ def main() -> int:
             with socket.socket() as probe:
                 probe.bind(("127.0.0.1", 0))
                 debug_port = probe.getsockname()[1]
-            env = dict(os.environ)
+            env = {
+                k: os.environ[k]
+                for k in (
+                    "SystemRoot",
+                    "windir",
+                    "SystemDrive",
+                    "TEMP",
+                    "TMP",
+                    "PATH",
+                    "USERPROFILE",
+                    "LOCALAPPDATA",
+                    "APPDATA",
+                    "ProgramData",
+                    "ProgramFiles",
+                    "ProgramFiles(x86)",
+                    "CommonProgramFiles",
+                )
+                if k in os.environ
+            }
             env["WEBVIEW2_USER_DATA_FOLDER"] = str(path / "webview")
             env["WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS"] = f"--remote-debugging-port={debug_port}"
             with MobileServer(core) as server:

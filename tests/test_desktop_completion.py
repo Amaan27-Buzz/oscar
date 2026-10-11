@@ -1,14 +1,18 @@
 """Core integration regressions for the software-first Desktop composition."""
 
 import unittest
+from threading import Event, Thread
 from time import time
 
 from oscar.contracts import Capability, Epistemic, Result, new_id
+from oscar.desktop_context import ContextSource
+from oscar.desktop_voice import DesktopVoice
 from oscar.event_archive import EventArchive, MemoryWriter, SourceEvent
 from oscar.grid import Node, NodeRole
 from oscar.memory_executor import MemoryExecutor
 from oscar.memory_fabric import MemoryFabric
 from oscar.transport import Dispatcher
+from oscar.voice_contracts import AudioFrame, Origin, Transcript
 
 from . import test_desktop
 
@@ -152,3 +156,113 @@ class AskCompletionTests(unittest.TestCase):
         self.assertEqual("blocked", task["state"])
         self.assertNotIn("task_id", task)
         self.assertEqual([], self.h.store.all("action"))
+
+    def test_focused_dictation_preview_discloses_complete_checked_replacement(self):
+        context = self.base.attach(text="Before ")
+        preview = self.base.ask("spoken", "Dictate", context)
+        self.assertEqual("Before ", preview["focused_before"])
+        self.assertEqual("Before spoken", preview["focused_after"])
+        self.assertEqual("spoken", preview["after"])
+        self.assertEqual(self.core.previews[preview["preview_id"]]["expires"], preview["expires"])
+        self.assertEqual("Dictate", preview["mode"])
+
+    def test_window_identity_is_not_an_editable_text_selection(self):
+        context = self.base.attach(source=ContextSource.FOREGROUND)
+        with self.assertRaises(PermissionError):
+            self.base.ask("shorten", "Edit", context)
+        self.assertEqual([], self.h.store.all("action"))
+
+    def test_discarded_active_private_result_cannot_resurface_after_completion(self):
+        task = self.base.ask("Explain a reference")
+        self.h.store.transition(task["task_id"], "executing")
+        self.base.call("discard", {})
+        self.assertTrue(self.h.store.transient[task["task_id"]]["discarded"])
+        self.h.runtime.cancel(task["task_id"])
+        self.assertNotIn(task["task_id"], self.h.store.transient)
+
+    def test_discard_during_execution_keeps_verification_but_releases_private_result(self):
+        entered, release = Event(), Event()
+        executor = self.h.dispatcher.executors["math.add"]
+
+        def held(action, cancellation):
+            entered.set()
+            self.assertTrue(release.wait(3))
+            return executor(action, cancellation)
+
+        self.h.dispatcher.executors["math.add"] = held
+        task = self.base.ask("2 + 3")
+        thread = Thread(target=self.h.runtime.run, args=(task["task_id"], self.core.targets))
+        thread.start()
+        try:
+            self.assertTrue(entered.wait(2))
+            self.base.call("discard", {})
+        finally:
+            release.set()
+            thread.join(3)
+        self.assertEqual("verified", self.h.store.task(task["task_id"]).state)
+        self.assertNotIn(task["task_id"], self.h.store.transient)
+        self.assertIsNone(self.core.inspect(self.base.session, task["task_id"]).get("value"))
+
+    def voice_fixture(self):
+        class Capture:
+            closed = False
+            calls = 0
+
+            def frames(self, stop):
+                self.calls += 1
+                yield AudioFrame((0.1,) * 1600, time(), "reference", origin=Origin.SIMULATED)
+                stop.event.wait(3)
+
+            def close(self):
+                self.closed = True
+
+        class Recognizer:
+            local = True
+            started, release = Event(), Event()
+
+            def transcribe(self, frames, final, stop):
+                self.started.set()
+                self.release.wait(3)
+                return Transcript("spoken reference", True, "en", None, 0, 1, "SIMULATED")
+
+        capture, recognizer = Capture(), Recognizer()
+        self.core.voice = DesktopVoice(self.core, capture, recognizer)
+        return capture, recognizer
+
+    def test_voice_finish_publishes_processing_then_preview_not_a_phantom_listening_state(self):
+        capture, recognizer = self.voice_fixture()
+        self.base.call("voice", {"operation": "start", "context_id": ""})
+        self.assertEqual("processing", self.base.call("voice", {"operation": "stop"})["state"])
+        self.assertTrue(recognizer.started.wait(2))
+        recognizer.release.set()
+        self.core.voice.thread.join(3)
+        preview = self.base.call("voice", {"operation": "inspect"})
+        self.assertEqual("spoken reference", preview["after"])
+        self.assertEqual(
+            preview["preview_id"], self.base.call("voice", {"operation": "stop"})["preview_id"]
+        )
+        self.assertTrue(capture.closed)
+
+    def test_voice_cancellation_fences_delayed_recognition_and_is_session_bound(self):
+        capture, recognizer = self.voice_fixture()
+        self.base.call("voice", {"operation": "start", "context_id": ""})
+        self.base.call("voice", {"operation": "stop"})
+        self.assertTrue(recognizer.started.wait(2))
+        other = self.h.grid.pair(self.base.session.node_id, self.base.scopes)
+        with self.assertRaises(PermissionError):
+            self.core.voice.cancel(other)
+        self.assertEqual("cancelled", self.base.call("voice", {"operation": "cancel"})["state"])
+        recognizer.release.set()
+        self.core.voice.thread.join(3)
+        self.assertEqual({}, self.core.previews)
+        self.assertEqual("cancelled", self.core.voice.view["state"])
+        self.assertTrue(capture.closed)
+
+    def test_microphone_denial_never_opens_capture(self):
+        capture, _ = self.voice_fixture()
+        session = self.h.store.get("session", self.base.session.id)
+        session["scopes"].remove("desktop:microphone")
+        self.h.store.put("session", self.base.session.id, session)
+        with self.assertRaises(PermissionError):
+            self.base.call("voice", {"operation": "start", "context_id": ""})
+        self.assertEqual(0, capture.calls)

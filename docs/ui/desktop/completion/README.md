@@ -32,6 +32,26 @@ record `FAILED`, not a success classification. Historical 12.1 evidence stays
 unchanged. New raw motion sequences will be archived outside Git, under the local
 Group 1 evidence archive, with checksums/manifests and curated GIFs in this packet.
 
+## Slice 12.3 Dictate/Edit
+
+[Preview](evidence/12-3-preview.png) · [surface-only delivery](evidence/12-3-surface-result.png) ·
+[expiry](evidence/12-3-expired-preview.png) ·
+[unavailable microphone adapter](evidence/12-3-unavailable-microphone.png).
+[Native text receipt](evidence/12-3-native-receipt.json) contains 12 assertions.
+[Native CNG/UIA receipt](evidence/12-3-native-cng-uia-receipt.json) separately proves
+real registered-field readback and native reference signing, not human consent.
+
+```powershell
+python -m scripts.desktop_text_acceptance
+python -m scripts.desktop_tauri --self-check
+```
+
+No physical microphone is opened by these reference workflows. Voice lifecycle
+regressions use explicitly simulated frames/transcripts. Clipboard is tested in
+software fixtures; the owner's clipboard is not touched. Selection-only capture
+offers only supported destinations; full-field replacement requires a fresh
+registered focused-field context and expected-value fencing.
+
 See [development report](../../../development/GROUP-01-DESKTOP-COMPLETION.md),
 [cumulative acceptance ledger](../../../development/SOFTWARE-ALPHA-ACCEPTANCE-LEDGER.md),
 and [independent Ask review](../../../development/reviews/12-2-INDEPENDENT.md).

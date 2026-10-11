@@ -71,6 +71,7 @@ class DesktopContext:
             "id": self.id,
             "source": self.source,
             "timestamp": self.observed_at,
+            "expires_at": self.observed_at + self.ttl,
             "scope": self.scope,
             "provenance": self.provenance,
             "freshness": "fresh" if self.fresh(now) else "stale/unavailable",

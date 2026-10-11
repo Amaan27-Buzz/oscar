@@ -5,7 +5,7 @@ Presentation never executes apps. Private payloads expire on restart, not into m
 
 from typing import Any
 
-from .contracts import Epistemic, TaskState, new_id
+from .contracts import Epistemic, Task, TaskState, new_id
 from .desktop_actions import form_intent, public_capability
 from .desktop_context import ContextSource, DesktopContext, WindowsContext
 from .grid import NodeRole, SessionHandle
@@ -48,6 +48,19 @@ class Desktop(Mobile):
         self.voice: Any = (
             None  # Explicitly installed prepared Voice Core adapter, never auto-capture.
         )
+        self.store.task_resources.add(self)
+
+    def task_transitioned(self, task: Task) -> None:
+        if task.state not in {
+            TaskState.PLANNED,
+            TaskState.EXECUTING,
+            TaskState.AWAITING_RESULT,
+            TaskState.RESULT_RECEIVED,
+            TaskState.VERIFYING,
+        }:
+            private = self.store.transient.get(task.id, {})
+            if private.get("discarded"):
+                self.store.transient.pop(task.id, None)
 
     def authenticate(self, session: SessionHandle, scope: str) -> None:
         scope = scope.replace("mobile:", "desktop:", 1)
@@ -191,6 +204,8 @@ class Desktop(Mobile):
     def inspect(self, session: SessionHandle, task_id: str) -> dict[str, Any]:
         view = super().inspect(session, task_id)
         private = self.store.transient.get(task_id, {})
+        if private.get("discarded"):
+            private = {}
         try:
             association = self.store.get("sunday_task", task_id)
         except KeyError:
@@ -378,6 +393,8 @@ class Desktop(Mobile):
                 }
             if payload == {"operation": "stop"}:
                 return dict(self.voice.finish(session))
+            if payload == {"operation": "cancel"}:
+                return dict(self.voice.cancel(session))
             if payload == {"operation": "inspect"}:
                 return dict(self.voice.inspect(session))
             if set(payload) == {"operation", "context_id"} and payload["operation"] == "start":
@@ -393,6 +410,8 @@ class Desktop(Mobile):
                 lease = self.grid.claim_interaction(session, resource)
                 return {"owner": session.node_id, "expires": lease["expires"]}
             if op == "discard" and not payload:
+                if self.voice is not None and self.voice.owner == session.id:
+                    self.voice.cancel(session)
                 self.contexts = {k: v for k, v in self.contexts.items() if v[0] != session.id}
                 for task_id in list(self.store.transient):
                     try:
@@ -401,8 +420,12 @@ class Desktop(Mobile):
                         if association["node_id"] == session.node_id and state not in {
                             TaskState.EXECUTING,
                             TaskState.AWAITING_RESULT,
+                            TaskState.RESULT_RECEIVED,
+                            TaskState.VERIFYING,
                         }:
                             self.store.transient.pop(task_id, None)
+                        elif association["node_id"] == session.node_id:
+                            self.store.transient[task_id]["discarded"] = True
                     except KeyError:
                         continue
                 self.previews = {
@@ -462,7 +485,11 @@ class Desktop(Mobile):
                         criterion=plan["criterion"],
                     )
                 else:
-                    if mode == "Edit" and context is None:
+                    if mode == "Edit" and (
+                        context is None
+                        or context.source not in {ContextSource.FOCUSED, ContextSource.SELECTION}
+                        or context.text is None
+                    ):
                         raise PermissionError("Edit requires explicit fresh text context")
                     expression = addition_intent(text) if context is None else None
                     intent = Intent(expression) if expression else Intent(text, kind="reason")
@@ -473,6 +500,8 @@ class Desktop(Mobile):
                             continue
                         association = self.store.get("sunday_task", row["id"])
                         previous = self.store.transient.get(row["id"], {})
+                        if previous.get("discarded"):
+                            continue
                         result = previous.get("result")
                         if (
                             association["node_id"] == session.node_id
@@ -543,6 +572,7 @@ class Desktop(Mobile):
                         "value": preview["text"],
                         "epistemic": "VERIFIED",
                         "scope": "interaction surface only",
+                        "preview_consumed": True,
                     }
                 context = preview["context"]
                 if destination == "clipboard":
@@ -593,6 +623,7 @@ class Desktop(Mobile):
                     ),
                     preview["mode"],
                 )
+                view["preview_consumed"] = True
                 if context and "task_id" in view and destination == "focused":
                     self.store.transient[view["task_id"]]["context_id"] = context.id
                 if "task_id" in view:
@@ -627,6 +658,7 @@ class Desktop(Mobile):
         if len(replacement) > 8192:
             raise ValueError("destination exceeds bounded text size")
         identifier = new_id()
+        expires = self.grid.clock() + 15
         self.previews[identifier] = {
             "session": session.id,
             "text": text,
@@ -634,14 +666,17 @@ class Desktop(Mobile):
             "replacement": replacement,
             "mode": mode,
             "used": False,
-            "expires": self.grid.clock() + 15,
+            "expires": expires,
         }
         return {
             "preview_id": identifier,
             "before": context.text if context else None,
             "after": text,
             "epistemic": "REPORTED",
-            "expires": self.grid.clock() + 15,
+            "expires": expires,
+            "focused_before": context.original if context and context.destination else None,
+            "focused_after": replacement if context and context.destination else None,
+            "mode": mode,
             "destinations": ["surface", "clipboard"]
             + (["focused"] if context and context.destination else []),
         }

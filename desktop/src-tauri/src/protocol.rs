@@ -23,6 +23,7 @@ pub enum WindowMode {
     Approval,
     Activity,
     Reading,
+    Tools,
 }
 
 #[derive(Clone, Copy, Deserialize, Serialize)]
@@ -136,6 +137,7 @@ pub enum Command {
         context_id: String,
     },
     VoiceStop,
+    VoiceCancel,
     Shortcut {
         accelerator: String,
     },
@@ -225,6 +227,8 @@ pub struct ContextView {
     pub id: String,
     pub source: String,
     pub timestamp: f64,
+    #[serde(default)]
+    pub expires_at: Option<f64>,
     pub scope: String,
     pub provenance: String,
     pub permission: String,
@@ -257,6 +261,12 @@ pub struct PreviewView {
     pub epistemic: String,
     pub expires: f64,
     pub destinations: Vec<String>,
+    #[serde(default)]
+    pub focused_before: Option<String>,
+    #[serde(default)]
+    pub focused_after: Option<String>,
+    #[serde(default)]
+    pub mode: String,
 }
 #[derive(Clone, Serialize, PartialEq)]
 pub struct ReviewView {

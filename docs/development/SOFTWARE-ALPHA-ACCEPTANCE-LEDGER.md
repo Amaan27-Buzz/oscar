@@ -26,12 +26,12 @@ Base: `da8fddae50112c8859b21247d0cbaa617be8667e`, branch
 | D22-04 | Real progress/waiting/completion and evidence distinctions | REFERENCE_VERIFIED | Actual task states; REPORTED versus VERIFIED; no Core token-stream contract exists |
 | D22-05 | Keyboard interaction, interruption and authorized cancellation | SOFTWARE_VERIFIED | Reversal/draft/focus and duplicate reply tests; only advertised cancel review, not implicit consent |
 | D22-06 | Offline/failure recovery; unavailable capability/model | REFERENCE_VERIFIED | Native Core loss/reconnect/withdrawn capability; no fake queue/retry/model prior fallback |
-| D23-01 | Dictation entry/output and authoritative voice state | BLOCKED | Voice Core adapter and reference fixture |
-| D23-02 | Draft recovery and interruption/cancellation | BLOCKED | Implement and test |
-| D23-03 | Focused/selection context where advertised | BLOCKED | Registered disposable UIA target |
-| D23-04 | Exact destination-aware preview and explicit selection | BLOCKED | Implement and test |
-| D23-05 | Authorized apply, expected-value conflict and independent readback | BLOCKED | Existing Runtime/Worker/native signing boundary |
-| D23-06 | Denied mic/app permissions; no editable target | BLOCKED | Negative-path tests |
+| D23-01 | Dictation entry/output and authoritative voice state | SOFTWARE_VERIFIED | Voice Core start/finish/cancel/late-recognition tests; simulated audio/transcript, physical acceptance deferred |
+| D23-02 | Draft recovery and interruption/cancellation | REFERENCE_VERIFIED | Native separate mode drafts, retreat/reinvoke, clear-all; software session/generation cancellation tests |
+| D23-03 | Focused/selection context where advertised | REFERENCE_VERIFIED | Real registered WPF/UIA and CNG native self-check; selection-only capture never promises unsupported insertion |
+| D23-04 | Exact destination-aware preview and explicit selection | SOFTWARE_VERIFIED | Full focused append/replacement, expiry/destination/unknown-IPC regressions; native preview/expiry path |
+| D23-05 | Authorized apply, expected-value conflict and independent readback | REFERENCE_VERIFIED | Existing real Tauri CNG/PSS + registered-field independent readback; consumed-preview fencing; no GUI consent claim |
+| D23-06 | Denied mic/app permissions; no editable target | REFERENCE_VERIFIED | Native missing adapter/no target; software microphone denial opens zero capture; stale/foreign/context negatives |
 | D24-01 | Current window/focus/selection and explicit supported capture | BLOCKED | No unsupported screenshot/tree claim |
 | D24-02 | Live Catalog selection, typed requests and scope/risk disclosure | BLOCKED | Existing Core/Worker contracts |
 | D24-03 | Approval, task progress and cancellation | BLOCKED | Implement and test |

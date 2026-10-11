@@ -15,6 +15,17 @@ function harness() {
   return {port,update:(patch:Partial<View>)=>{view={...view,...patch};const next=snapshot();act(()=>push(next));return next;},stale:()=>act(()=>push({...view,link:'online',voice:'speaking',expression:{...view.expression!,generation:0}}))};
 }
 describe('living Desktop presence',()=>{
+  it('an uncertain Apply IPC outcome keeps the text tools from offering a blind retry',async()=>{
+    const h=harness();await screen.findByText('Here');
+    h.update({window:'tools',preview:{preview_id:'exact',before:null,after:'reference',epistemic:'REPORTED',expires:Date.now()/1000+15,destinations:['surface'],mode:'Dictate'}});
+    await screen.findByRole('button',{name:'Apply reviewed text'});
+    h.port.mockRejectedValueOnce(new Error('IPC outcome unknown'));
+    fireEvent.click(screen.getByRole('button',{name:'Apply reviewed text'}));
+    await screen.findByRole('alert');
+    expect((screen.getByRole('button',{name:'Apply reviewed text'}) as HTMLButtonElement).disabled).toBe(true);
+    fireEvent.click(screen.getByRole('button',{name:'Apply reviewed text'}));
+    expect(h.port.mock.calls.filter(([command])=>command.kind==='apply')).toHaveLength(1);
+  });
   it('an already-emitted interact acknowledgement clears only the accepted submitted draft',async()=>{
     const h=harness();await screen.findByText('Here');
     fireEvent.click(screen.getByRole('button',{name:/OSCAR: Here/}));await screen.findByLabelText('Ask OSCAR');

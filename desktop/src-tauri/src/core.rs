@@ -262,6 +262,7 @@ pub struct Bridge {
     pub capture_choice: Mutex<ContextChoice>,
     hide_private: AtomicBool,
     voice_revision: AtomicU64,
+    content_revision: AtomicU64,
 }
 impl Bridge {
     pub fn new() -> Self {
@@ -281,6 +282,7 @@ impl Bridge {
             capture_choice: Mutex::new(ContextChoice::None),
             hide_private: AtomicBool::new(false),
             voice_revision: AtomicU64::new(0),
+            content_revision: AtomicU64::new(0),
         }
     }
     pub fn client(&self) -> Result<Arc<CoreClient>, String> {
@@ -304,15 +306,15 @@ impl Bridge {
         let (mut tasks, caps, at) = client
             .snapshot()
             .map_err(|error| format!("Core unavailable; {error}"))?;
+        let mut view = self.view.lock().map_err(|_| "native state unavailable")?;
+        if at < view.observed_at_ms {
+            return Ok(view.clone());
+        }
         if self.hide_private.load(Ordering::Acquire) {
             for task in &mut tasks {
                 task.response = None;
                 task.value = None;
             }
-        }
-        let mut view = self.view.lock().map_err(|_| "native state unavailable")?;
-        if at < view.observed_at_ms {
-            return Ok(view.clone());
         }
         // A snapshot started before a command must not erase its newer task/approval readback.
         if at >= view.expression.current_observed_at_ms {
@@ -409,20 +411,28 @@ impl Bridge {
         view.clone()
     }
     fn voice_request(&self, payload: Value) -> Result<View, String> {
+        let content_revision = self.content_revision.load(Ordering::SeqCst);
         let revision = self.voice_revision.fetch_add(1, Ordering::SeqCst) + 1;
         let epoch = self.view().expression.epoch;
         let value = self.client()?.request("voice", payload)?;
-        self.response_fenced(value, Some((revision, epoch)))
+        self.response_fenced(value, Some((revision, epoch)), Some(content_revision))
     }
+    #[cfg(test)]
     fn response(&self, value: Value) -> Result<View, String> {
-        self.response_fenced(value, None)
+        self.response_fenced(value, None, None)
     }
     fn response_fenced(
         &self,
         value: Value,
         voice_fence: Option<(u64, String)>,
+        content_fence: Option<u64>,
     ) -> Result<View, String> {
         let mut view = self.view.lock().map_err(|_| "native state unavailable")?;
+        if content_fence
+            .is_some_and(|revision| revision != self.content_revision.load(Ordering::SeqCst))
+        {
+            return Ok(view.clone());
+        }
         if let Some((revision, epoch)) = voice_fence
             && (revision != self.voice_revision.load(Ordering::SeqCst)
                 || epoch != view.expression.epoch)
@@ -435,10 +445,17 @@ impl Bridge {
             view.expression.current_observed_at_ms = now_ms();
             view.current =
                 Some(serde_json::from_value(value.clone()).map_err(|_| "invalid Core task")?);
+            if self.hide_private.load(Ordering::Acquire)
+                && let Some(task) = &mut view.current
+            {
+                task.response = None;
+                task.value = None;
+            }
         }
-        if value["preview_id"].is_string() {
+        if value["preview_id"].is_string() && !self.hide_private.load(Ordering::Acquire) {
             view.preview =
                 Some(serde_json::from_value(value.clone()).map_err(|_| "invalid preview")?);
+            view.feedback = None;
         }
         if value["state"] == "blocked" && !value["task_id"].is_string() {
             view.current = None;
@@ -486,6 +503,9 @@ impl Bridge {
         if value["preview_id"].is_string() || value["state"] == "blocked" {
             view.voice = "idle".into();
         }
+        if value["state"] == "cancelled" && !value["task_id"].is_string() {
+            view.preview = None;
+        }
         if view.current.is_some() {
             view.orb = orb(&view.link, view.current.as_ref(), &view.voice);
         }
@@ -497,6 +517,24 @@ impl Bridge {
         &self,
         cmd: Command,
         owner_review: F,
+    ) -> Result<View, String> {
+        let revision = if matches!(cmd, Command::Ready | Command::Refresh) {
+            None
+        } else {
+            Some(self.content_revision.fetch_add(1, Ordering::SeqCst) + 1)
+        };
+        let result = self.execute_at(cmd, owner_review, revision);
+        if revision.is_some_and(|revision| revision != self.content_revision.load(Ordering::SeqCst))
+        {
+            return Ok(self.view());
+        }
+        result
+    }
+    fn execute_at<F: FnOnce(&ReviewView) -> bool>(
+        &self,
+        cmd: Command,
+        owner_review: F,
+        revision: Option<u64>,
     ) -> Result<View, String> {
         if matches!(cmd, Command::Ready) {
             return Ok(self.view());
@@ -530,11 +568,15 @@ impl Bridge {
             } else {
                 Some("Local content discarded; Core acknowledgement unavailable".into())
             };
+            view.expression.generation += 1;
             return Ok(view.clone());
         }
         if matches!(
             cmd,
-            Command::Interact { .. } | Command::Act { .. } | Command::Capture { .. }
+            Command::Interact { .. }
+                | Command::Act { .. }
+                | Command::Capture { .. }
+                | Command::VoiceStart { .. }
         ) {
             self.hide_private.store(false, Ordering::Release);
         }
@@ -565,14 +607,27 @@ impl Bridge {
                 if matches!(source, ContextChoice::None) {
                     return Err("choose an explicit context source".into());
                 }
-                let value = client.request("capture", json!({"source":source}))?;
+                let payload = if client.reference
+                    && matches!(source, ContextChoice::Focused | ContextChoice::Selection)
+                {
+                    if let Some(target) = &client.reference_target {
+                        json!({"source":source,"target":target})
+                    } else {
+                        json!({"source":source})
+                    }
+                } else {
+                    json!({"source":source})
+                };
+                let value = client.request("capture", payload)?;
                 let context: ContextView = serde_json::from_value(value)
                     .map_err(|_| "Context unavailable or not permitted".to_string())?;
-                self.view
-                    .lock()
-                    .map_err(|_| "native state unavailable")?
-                    .context = Some(context);
-                return Ok(self.view());
+                let mut view = self.view.lock().map_err(|_| "native state unavailable")?;
+                if revision == Some(self.content_revision.load(Ordering::SeqCst)) {
+                    view.context = Some(context);
+                    view.feedback = None;
+                    view.expression.generation += 1;
+                }
+                return Ok(view.clone());
             }
             Command::Preview { task_id } => {
                 bound(&task_id, 80)?;
@@ -583,25 +638,37 @@ impl Bridge {
                 destination,
             } => {
                 bound(&preview_id, 80)?;
-                client.request(
+                let result = client.request(
                     "apply",
                     json!({"preview_id":preview_id,"destination":destination}),
-                )?
+                )?;
+                let mut view = self.view.lock().map_err(|_| "native state unavailable")?;
+                if revision == Some(self.content_revision.load(Ordering::SeqCst))
+                    && (result["task_id"].is_string()
+                        || result["state"] == "verified"
+                        || result["preview_consumed"] == true)
+                {
+                    view.preview = None;
+                }
+                drop(view);
+                result
             }
             Command::Review { task_id, operation } => {
                 let review = client.review(&task_id, operation)?;
-                self.view
-                    .lock()
-                    .map_err(|_| "native state unavailable")?
-                    .review = Some(review);
-                return Ok(self.view());
+                let mut view = self.view.lock().map_err(|_| "native state unavailable")?;
+                if revision == Some(self.content_revision.load(Ordering::SeqCst)) {
+                    view.review = Some(review);
+                    view.expression.generation += 1;
+                }
+                return Ok(view.clone());
             }
             Command::Confirm { review_id, accept } => {
                 let result = client.confirm(&review_id, accept, owner_review)?;
-                self.view
-                    .lock()
-                    .map_err(|_| "native state unavailable")?
-                    .review = None;
+                let mut view = self.view.lock().map_err(|_| "native state unavailable")?;
+                if revision == Some(self.content_revision.load(Ordering::SeqCst)) {
+                    view.review = None;
+                }
+                drop(view);
                 result
             }
             Command::VoiceStart { context_id } => {
@@ -609,14 +676,29 @@ impl Bridge {
                 return self.voice_request(json!({"operation":"start","context_id":context_id}));
             }
             Command::VoiceStop => return self.voice_request(json!({"operation":"stop"})),
+            Command::VoiceCancel => return self.voice_request(json!({"operation":"cancel"})),
             _ => return Err("native window command requires native handling".into()),
         };
-        self.response(value)
+        self.response_fenced(value, None, revision)
     }
 }
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn discarded_or_obsolete_content_cannot_reappear_from_late_response() {
+        let bridge = Bridge::new();
+        bridge.content_revision.store(2, Ordering::SeqCst);
+        let old = bridge.response_fenced(json!({"task_id":"old","state":"partially_verified","target":"fixture","response":"private sentinel"}), None, Some(1)).unwrap();
+        assert!(old.current.is_none());
+        bridge.hide_private.store(true, Ordering::Release);
+        let hidden = bridge.response_fenced(json!({"task_id":"same","state":"partially_verified","target":"fixture","response":"private sentinel","value":"private sentinel"}), None, Some(2)).unwrap();
+        let task = hidden.current.unwrap();
+        assert!(task.response.is_none());
+        assert!(task.value.is_none());
+        let preview = bridge.response_fenced(json!({"preview_id":"late","before":"private sentinel","after":"private sentinel","epistemic":"REPORTED","expires":99,"destinations":["surface"]}), None, Some(2)).unwrap();
+        assert!(preview.preview.is_none());
+    }
     #[test]
     fn connection_and_public_state_cannot_export_secrets() {
         let bootstrap = |url: &str| Bootstrap {
@@ -650,11 +732,11 @@ mod tests {
         let epoch = bridge.view().expression.epoch;
         bridge.voice_revision.store(2, Ordering::SeqCst);
         let stale = bridge
-            .response_fenced(json!({"state":"listening"}), Some((1, epoch.clone())))
+            .response_fenced(json!({"state":"listening"}), Some((1, epoch.clone())), None)
             .unwrap();
         assert_eq!(stale.voice, "idle");
         let live = bridge
-            .response_fenced(json!({"state":"listening"}), Some((2, epoch.clone())))
+            .response_fenced(json!({"state":"listening"}), Some((2, epoch.clone())), None)
             .unwrap();
         assert_eq!(live.voice, "listening");
         assert!(live.expression.voice_observed_at_ms > 0);
@@ -664,7 +746,7 @@ mod tests {
         assert_eq!(offline.voice, "idle");
         assert_eq!(offline.expression.voice_observed_at_ms, 0);
         let stale = bridge
-            .response_fenced(json!({"state":"speaking"}), Some((2, epoch)))
+            .response_fenced(json!({"state":"speaking"}), Some((2, epoch)), None)
             .unwrap();
         assert_eq!(stale.voice, "idle");
         assert_eq!(stale.expression.generation, offline.expression.generation);

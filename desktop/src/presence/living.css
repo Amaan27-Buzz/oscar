@@ -56,3 +56,15 @@ html[data-living]:has(.preview-controls) .living-presence{position:fixed;right:2
 .presence-answer.is-reading .response-text{flex:1;max-height:none;min-height:0;line-height:1.55}
 .presence-answer .result-actions{display:flex;flex-wrap:wrap;gap:8px;flex-shrink:0}
 .leaf-top,.writing-leaf h1,.leaf-bottom{flex-shrink:0}
+.text-tools{flex:1;min-height:0;overflow:auto;scrollbar-width:thin;padding-right:4px}
+.text-mode-tabs{display:flex;gap:14px;margin:0 0 12px}
+.text-mode-tabs [aria-selected=true]{box-shadow:0 1px #242723;font-weight:600}
+.text-tools label{display:block;font-size:12px;font-weight:600;margin:10px 0 4px}
+.text-tools textarea{width:100%;height:76px;min-height:76px}
+.text-tools select{width:100%;font:inherit;padding:6px 0;border:0;border-bottom:1px solid #c5c3b9;background:transparent;color:inherit;border-radius:0}
+.text-tools pre{font-family:inherit;font-size:14px;white-space:pre-wrap;overflow-wrap:anywhere;max-height:140px;overflow:auto;background:transparent;padding:0;line-height:1.5}
+.text-tools h2{font-size:18px;font-weight:600;line-height:1.25;margin:20px 0 10px}
+.text-tools h3{font-size:12px;font-weight:600;margin:12px 0 4px}
+.context-details{font-size:12px;margin-bottom:12px}.context-details summary{cursor:pointer;padding:6px 0}
+.context-details p,.voice-controls p{font-size:12px;line-height:1.45;margin:6px 0;color:var(--secondary);overflow-wrap:anywhere}
+.voice-controls{margin:8px 0 12px}.text-receipt{font-size:13px;white-space:pre-wrap;overflow-wrap:anywhere}
