@@ -6,7 +6,9 @@ export type Mode='Ask'|'Dictate'|'Edit'|'Act';
 export interface Task { task_id:string; state:string; description:string; target:string; blocker:string|null;
   actions:string[]; generation:number; evidence_ids:string[]; response:string|null; response_status:string|null;
   value:string|null; epistemic:string|null;progress?:{fraction:number;step:string;status:string}|null;
-  mode?:string;response_truncated?:boolean;source_event_ids?:string[] }
+  mode?:string;response_truncated?:boolean;source_event_ids?:string[];
+  evidence?:{id:string;source:string;method:string;observed_at:number;matches:boolean|null;status:string}[];
+  artifacts?:{id:string;kind:string;status:string;content_hash:string|null}[] }
 export interface Context {id:string;source:string;timestamp:number;expires_at?:number;scope:string;provenance:string;permission:string;
   freshness:string;text:string|null;retained:boolean}
 export interface Choice {id:string;name:string}

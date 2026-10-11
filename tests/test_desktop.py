@@ -368,7 +368,8 @@ class DesktopTests(unittest.TestCase):
     def test_restart_private_input_loss_blocks_execution(self) -> None:
         proposal = self.ask()
         self.h.store.transient.clear()  # Process restart drops private content.
-        with self.assertRaises(PermissionError):
+        self.assertNotIn("approve", self.core.inspect(self.session, proposal["task_id"])["actions"])
+        with self.assertRaises(StateConflict):
             self.confirm(proposal["task_id"])
         view = self.h.runtime.run(proposal["task_id"], self.core.targets)
         self.assertEqual(view.state, TaskState.BLOCKED)

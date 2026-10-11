@@ -216,6 +216,26 @@ pub struct TaskView {
     pub response_truncated: bool,
     #[serde(default)]
     pub source_event_ids: Vec<String>,
+    #[serde(default)]
+    pub evidence: Vec<EvidenceView>,
+    #[serde(default)]
+    pub artifacts: Vec<ArtifactView>,
+}
+#[derive(Clone, Serialize, Deserialize, PartialEq)]
+pub struct EvidenceView {
+    pub id: String,
+    pub source: String,
+    pub method: String,
+    pub observed_at: f64,
+    pub matches: Option<bool>,
+    pub status: String,
+}
+#[derive(Clone, Serialize, Deserialize, PartialEq)]
+pub struct ArtifactView {
+    pub id: String,
+    pub kind: String,
+    pub status: String,
+    pub content_hash: Option<String>,
 }
 #[derive(Clone, Serialize, Deserialize, PartialEq)]
 pub struct Progress {

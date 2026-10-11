@@ -1,7 +1,7 @@
 import {useEffect,useRef,useState} from 'react';
 import {ExpressionPresence} from '@oscar/expression/react';
 import type {ExpressionEvent,Source} from '@oscar/expression';
-import {App} from '../App';
+import {Activity} from './Activity';
 import {initialView,send,subscribe} from '../bridge';
 import type {Command,Send,View,WindowMode} from '../bridge';
 import {DesktopExpressionAdapter} from '../expression';
@@ -38,7 +38,6 @@ export function LivingPresence({port=send,events=subscribe,sourceKind='core',win
   const [answerDismissed,setAnswerDismissed]=useState<string|null>(null);
   const [toolMode,setToolMode]=useState<TextMode>('Dictate');
   const [toolDrafts,setToolDrafts]=useState({Dictate:'',Edit:''});
-  const [privateRevision,setPrivateRevision]=useState(0);
   const [actionDraft,setActionDraft]=useState(emptyActionDraft);
   const discarding=useRef(false),resumeWindow=useRef<WindowMode>('interaction');
   const lastFocused=useRef<HTMLElement|null>(null);
@@ -109,7 +108,7 @@ export function LivingPresence({port=send,events=subscribe,sourceKind='core',win
   },[operation,owner,answer,open,workspace]);
   async function run(command:Command) {
     if(command.kind==='discard'){
-      discarding.current=true;setDraft('');setToolDrafts({Dictate:'',Edit:''});setActionDraft(emptyActionDraft);setSubmitted(null);setPrivateRevision(n=>n+1);setView(v=>withoutPrivateContent(v));
+      discarding.current=true;setDraft('');setToolDrafts({Dictate:'',Edit:''});setActionDraft(emptyActionDraft);setSubmitted(null);setView(v=>withoutPrivateContent(v));
     }else if(['interact','act','capture','voice_start'].includes(command.kind))discarding.current=false;
     const intent=command.kind==='window'?++windowIntent.current:0;
     if(command.kind==='window')requestedWindow.current=command.mode;
@@ -179,8 +178,7 @@ export function LivingPresence({port=send,events=subscribe,sourceKind='core',win
     data-operation={operation} data-attention={owner?'owner':'none'} onFocusCapture={e=>{lastFocused.current=e.target as HTMLElement;}}
     onBlurCapture={e=>{if(e.relatedTarget&&!e.currentTarget.contains(e.relatedTarget as Node))lastFocused.current=null;}}
     onKeyDown={e=>{if(e.key==='Escape'&&workspace){e.preventDefault();void run({kind:'window',mode:'compact'});}}}>
-    {workspace?<div className="living-workspace"><button className="workspace-return" onClick={()=>run({kind:'window',mode:resumeWindow.current})}>Back to presence</button>{feedback&&<p className="workspace-feedback" role="alert">{feedback.message}</p>}<App key={privateRevision} port={async command=>{if(!await run(command))throw new Error('Inspect current Core state');return latest.current;}}
-      events={callback=>events(next=>{accept(next);callback(latest.current);})} expressionKind={sourceKind} focusReview/></div>:<>
+    {workspace?<Activity view={{...view,feedback}} available={available} busy={busy} run={run} back={()=>void run({kind:'window',mode:resumeWindow.current})}/>:<>
       <div className="writing-leaf" inert={!open||leaving} aria-hidden={!open||leaving}>
         <div className="leaf-top" data-tauri-drag-region><span data-tauri-drag-region>OSCAR</span>
           <details className="presence-settings"><summary>Presence</summary><div><button aria-pressed={pinned} onClick={()=>native(pinned?'float':'pin')}>{pinned?'Unpin':'Pin on top'}</button><button onClick={()=>native('edge')}>To screen edge</button><button onClick={()=>native('hide')}>Hide to tray</button></div></details>
@@ -225,7 +223,7 @@ export function LivingPresence({port=send,events=subscribe,sourceKind='core',win
   </main>;
 }
 function withoutPrivateContent(view:View):View {
-  const redact=(task:View['current'])=>task?{...task,response:null,value:null,source_event_ids:[]}:null;
+  const redact=(task:View['current'])=>task?{...task,response:null,value:null,source_event_ids:[],artifacts:[]}:null;
   return {...view,context:null,preview:null,review:null,message:null,feedback:null,current:redact(view.current),tasks:view.tasks.map(task=>redact(task)!)};
 }
 function Arrow(){return <svg aria-hidden="true" viewBox="0 0 16 16" width="16" height="16"><path d="M3 8h9M8 3l5 5-5 5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>;}

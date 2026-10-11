@@ -67,3 +67,12 @@ and [independent Ask review](../../../development/reviews/12-2-INDEPENDENT.md).
 [isolated-browser reference](evidence/12-4-browser-reference-receipt.json).
 Run `python -m scripts.desktop_act_acceptance` with the owned development server.
 No owner files, browser profile or applications are mutated.
+
+## Slice 12.5 Activity/approvals
+
+[Exact decision](evidence/12-5-approval.png) · [working](evidence/12-5-working.png) ·
+[verified evidence](evidence/12-5-verified.png) · [expired review](evidence/12-5-expired.png) ·
+[offline history](evidence/12-5-offline.png).
+[Nine-assertion native receipt](evidence/12-5-native-receipt.json).
+Run `python -m scripts.desktop_activity_acceptance` with the development binary.
+Opening/dismissing a review is tested; no human consent is accepted by this runner.

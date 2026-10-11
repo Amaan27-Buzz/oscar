@@ -38,12 +38,12 @@ Base: `da8fddae50112c8859b21247d0cbaa617be8667e`, branch
 | D24-04 | Failure/recovery and independently verified outcome | REFERENCE_VERIFIED | Native temporary file readback and separately isolated browser reference |
 | D24-05 | Inspectable evidence, context freshness/provenance | SOFTWARE_VERIFIED | Current task evidence references; explicit captured source/permission/expiry |
 | D24-06 | Suggested/planned/executing/blocked/reported/verified distinctions | REFERENCE_VERIFIED | Actual Core state; Prepare does not execute; Worker testimony stays REPORTED |
-| D25-01 | Active/completed/blocked/failed tasks and pending decisions | BLOCKED | Unified progressive disclosure |
-| D25-02 | Progress, ownership, artifacts/results and evidence | BLOCKED | Core task/action readback |
-| D25-03 | Advertised cancel/continuation only | BLOCKED | No private replay or fictional resume |
-| D25-04 | Reconnect, task switching and readback ordering | BLOCKED | Core/native/React regressions |
-| D25-05 | Exact task/action/scope-bound approval and native signing | BLOCKED | Signed reference checks |
-| D25-06 | Denial, expiry, replay rejection and truthful attention | BLOCKED | Negative-path tests |
+| D25-01 | Active/completed/blocked/failed tasks and pending decisions | REFERENCE_VERIFIED | Single controlled native Activity; current/shared dedup |
+| D25-02 | Progress, ownership, artifacts/results and evidence | SOFTWARE_VERIFIED | Worker/progress and sanitized evidence; session-bound artifact metadata; recall sources and temporal warning |
+| D25-03 | Advertised cancel/continuation only | SOFTWARE_VERIFIED | Signed deny/cancel only; no private retry/resume; missing payload withdraws approve |
+| D25-04 | Reconnect, task switching and readback ordering | REFERENCE_VERIFIED | Native offline/reconnect; Rust switched-review invalidation and content fences |
+| D25-05 | Exact task/action/scope-bound approval and native signing | REFERENCE_VERIFIED | Existing actual CNG/PSS reference; exact review; opening grants nothing |
+| D25-06 | Denial, expiry, replay rejection and truthful attention | REFERENCE_VERIFIED | Native actual expiry/task-change; software signature/replay/grant regressions |
 | D26-01 | Canonical identity and shared weighted responsive motion | BLOCKED | Shared engine, no second renderer |
 | D26-02 | Spatial continuity, interruption and reduced motion | BLOCKED | Native content captures and regressions |
 | D26-03 | Keyboard/focus and semantic accessibility | BLOCKED | Component/native DOM evidence |

@@ -314,6 +314,8 @@ impl Bridge {
             for task in &mut tasks {
                 task.response = None;
                 task.value = None;
+                task.source_event_ids.clear();
+                task.artifacts.clear();
             }
         }
         // A snapshot started before a command must not erase its newer task/approval readback.
@@ -450,6 +452,8 @@ impl Bridge {
             {
                 task.response = None;
                 task.value = None;
+                task.source_event_ids.clear();
+                task.artifacts.clear();
             }
         }
         if value["preview_id"].is_string() && !self.hide_private.load(Ordering::Acquire) {
@@ -548,10 +552,14 @@ impl Bridge {
             for task in &mut view.tasks {
                 task.response = None;
                 task.value = None;
+                task.source_event_ids.clear();
+                task.artifacts.clear();
             }
             if let Some(task) = &mut view.current {
                 task.response = None;
                 task.value = None;
+                task.source_event_ids.clear();
+                task.artifacts.clear();
             }
             view.message = None;
             view.feedback = None;
@@ -601,6 +609,11 @@ impl Bridge {
             } => client.request("act", form.core_payload(&capability_id)?)?,
             Command::Inspect { task_id } => {
                 bound(&task_id, 80)?;
+                client.invalidate_reviews();
+                self.view
+                    .lock()
+                    .map_err(|_| "native state unavailable")?
+                    .review = None;
                 client.request("inspect", json!({"task_id":task_id}))?
             }
             Command::Capture { source } => {
@@ -654,6 +667,7 @@ impl Bridge {
                 result
             }
             Command::Review { task_id, operation } => {
+                client.invalidate_reviews();
                 let review = client.review(&task_id, operation)?;
                 let mut view = self.view.lock().map_err(|_| "native state unavailable")?;
                 if revision == Some(self.content_revision.load(Ordering::SeqCst)) {
@@ -784,7 +798,7 @@ mod tests {
             Pending {
                 challenge_id: "challenge".into(),
                 body: vec![],
-                view,
+                view: view.clone(),
             },
         );
         assert!(
@@ -795,11 +809,53 @@ mod tests {
                 .is_err()
         );
         assert!(client.confirm("stale", true, |_| true).is_err());
+        let fresh = ReviewView {
+            expires_at_ms: now_ms() + 30000,
+            ..view
+        };
+        client.pending.lock().unwrap().insert(
+            "fresh".into(),
+            Pending {
+                challenge_id: "challenge".into(),
+                body: vec![],
+                view: fresh.clone(),
+            },
+        );
+        let switching = Bridge::new();
+        *switching.client.lock().unwrap() = Some(Arc::new(client));
+        switching.view.lock().unwrap().review = Some(fresh);
+        assert!(
+            switching
+                .execute(
+                    Command::Inspect {
+                        task_id: "other".into()
+                    },
+                    |_| panic!("inspection grants no consent")
+                )
+                .is_err()
+        );
+        assert!(switching.view().review.is_none());
+        assert!(
+            switching
+                .client()
+                .unwrap()
+                .pending
+                .lock()
+                .unwrap()
+                .is_empty()
+        );
         let bridge = Bridge::new();
         bridge.view.lock().expect("view").current = Some(TaskView {
             task_id: "known".into(),
             state: "verified".into(),
             response: Some("private fixture".into()),
+            source_event_ids: vec!["private-source".into()],
+            artifacts: vec![ArtifactView {
+                id: "private-artifact".into(),
+                kind: "file".into(),
+                status: "REPORTED".into(),
+                content_hash: None,
+            }],
             ..Default::default()
         });
         let discarded = bridge
@@ -809,6 +865,15 @@ mod tests {
             discarded.current.as_ref().expect("shared task").state,
             "verified"
         );
+        assert!(
+            discarded
+                .current
+                .as_ref()
+                .unwrap()
+                .source_event_ids
+                .is_empty()
+        );
+        assert!(discarded.current.as_ref().unwrap().artifacts.is_empty());
         assert!(
             discarded
                 .current

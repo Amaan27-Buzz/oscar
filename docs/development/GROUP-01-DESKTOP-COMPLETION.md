@@ -161,3 +161,35 @@ The independent review found the cross-mode competing-proposal defect; its fix
 and two component regressions passed. Initial locator failure and a deficient test
 fixture were corrected before closure. The final complete receipt supersedes the
 failed receipt preserved outside Git. See the stage review and curated evidence.
+
+## 12.5 — Activity/approvals software checkpoint
+
+The candidate now has one controlled Activity/decision surface, fed by the same
+admitted native readback. It replaces the embedded App and its second subscription.
+Current task is immediately deduplicated into shared history before polling catches
+up. Active/waiting and completed/partial/failed work are progressively disclosed;
+real Worker ownership, reported progress, results, execution evidence metadata and
+canonical recall sources retain their distinct provenance. Artifact identifiers,
+kind/status/hash omit private locations and are session-bound. No private replay or
+fictional continuation is offered; a fresh scoped request is required.
+
+Exact task/operation/target/capability/plan material precedes native confirmation.
+Opening or dismissing never grants consent. Expiry/current-action guards disable
+obsolete confirmation; native Inspect invalidates pending reviews even if its
+readback fails. Native content revisions fence reordered replies. Discard/restart
+withdraws approval when private inputs are gone, while safe denial remains offered.
+No new client-side permission system exists.
+
+Local validation: Desktop **55 tests / 10 files**, TypeScript/build PASS;
+Desktop/completion/Mobile **56 tests, 0 failures/skips**; Rust **12 tests**,
+fmt/Clippy PASS; Ruff/mypy **64 files** PASS. Native Activity **nine assertions**
+PASS: planned exact review/focus, no consent on dismissal, task-change retirement,
+verification disclosure, actual 30-second expiry, offline controls and reconnect.
+The development binary requires `cargo +1.99.0 build --no-default-features`;
+production custom-protocol intentionally rejects a development URL. An initial
+wrong-mode native failure is archived separately; permissions were not widened.
+
+Independent review found loss of recall provenance in the new inspector. Added
+canonical source IDs and historical/inference warnings with RECALLED/INFERRED
+regressions. Direct Rust pending-review invalidation covers failed task-switch
+readback. Manual native consent, physical audio and OS configuration remain deferred.

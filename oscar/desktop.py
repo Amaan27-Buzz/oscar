@@ -236,6 +236,32 @@ class Desktop(Mobile):
                 view["response_status"] = Epistemic.REPORTED
         if "retry" in view["actions"]:
             view["actions"].remove("retry")  # private input cannot be blindly replayed
+        if "approve" in view["actions"] and not private:
+            view["actions"].remove("approve")
+        view["evidence"] = [
+            {
+                key: row[key]
+                for key in ("id", "source", "method", "observed_at", "matches", "status")
+            }
+            for row in self.store.all("evidence")
+            if row["task_id"] == task_id
+        ]
+        view["artifacts"] = []
+        if (
+            desktop_record.get("session_id") == session.id
+            and association.get("node_id") == session.node_id
+        ):
+            result = private.get("result")
+            if result and result.artifact:
+                artifact = result.artifact
+                view["artifacts"] = [
+                    {
+                        "id": artifact.id,
+                        "kind": artifact.kind,
+                        "status": artifact.status,
+                        "content_hash": artifact.content_hash,
+                    }
+                ]
         view["mode"] = desktop_record.get("mode", "")
         view["response_truncated"] = False
         if (

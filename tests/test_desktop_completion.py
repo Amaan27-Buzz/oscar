@@ -11,6 +11,7 @@ from oscar.event_archive import EventArchive, MemoryWriter, SourceEvent
 from oscar.grid import Node, NodeRole
 from oscar.memory_executor import MemoryExecutor
 from oscar.memory_fabric import MemoryFabric
+from oscar.storage import StateConflict
 from oscar.transport import Dispatcher
 from oscar.voice_contracts import AudioFrame, Origin, Transcript
 
@@ -23,6 +24,29 @@ class AskCompletionTests(unittest.TestCase):
         self.base.setUp()
         self.addCleanup(self.base.tearDown)
         self.h, self.core = self.base.h, self.base.core
+
+    def test_discarded_plan_withdraws_approval_but_keeps_safe_denial(self):
+        task = self.base.ask("2 + 3")
+        self.assertIn("approve", task["actions"])
+        self.base.call("discard", {})
+        view = self.core.inspect(self.base.session, task["task_id"])
+        self.assertNotIn("approve", view["actions"])
+        self.assertIn("deny", view["actions"])
+        with self.assertRaises(StateConflict):
+            self.core.challenge(
+                self.base.session, {"task_id": task["task_id"], "operation": "approve"}
+            )
+
+    def test_evidence_metadata_is_inspectable_without_private_paths_or_input(self):
+        task = self.base.ask("2 + 3")
+        self.base.confirm(task["task_id"])
+        view = self.core.inspect(self.base.session, task["task_id"])
+        self.assertTrue(view["evidence"])
+        self.assertTrue(view["evidence"][0]["matches"])
+        self.assertEqual(
+            {"id", "source", "method", "observed_at", "matches", "status"}, set(view["evidence"][0])
+        )
+        self.assertEqual([], view["artifacts"])
 
     def test_follow_up_uses_only_same_session_successful_core_working_context(self):
         self.h.dispatcher.executors["models.reason"] = lambda action, cancel: Result(
