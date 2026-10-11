@@ -71,20 +71,20 @@ Future `BLOCKED` entries require a scoped engineering resolution; deferred accep
 ## Group 2 — Mobile Slice 13
 
 Base: `dcfd31bca6fbd8080f4c20bebe3d448e4bd8dc2f`, separate branch
-`build/slice-13-mobile-completion`. IN PROGRESS; no owner/device acceptance.
+`build/slice-13-mobile-completion`. SOFTWARE / REFERENCE CANDIDATE; no owner/device acceptance.
 
 | ID | Requirement | Classification | Evidence / remaining work |
 |---|---|---|---|
 | M00-01 | Verified Group 1 and accepted Mobile foundation | SOFTWARE_VERIFIED | Exact baseline551/6 optional skips; Android APK/JVM PASS, JVM/Core readback |
 | M00-02 | Session-private discard/readback/approval and exact review | SOFTWARE_VERIFIED | Independent118 tests, regression reproductions and [review](reviews/GROUP-02-BASELINE.md) |
-| M00-03 | API36.1 Compose reference | FAILED | Historical SurfaceFlinger DMA crash reproduced on separate AVD; API35 fallback under preparation |
+| M00-03 | API36.1 Compose reference | FAILED | Historical SurfaceFlinger DMA crash reproduced on separate AVD; API35 isolated fallback now passes; API36.1 historical platform failure retained |
 | M31-01 | Shared native Orb, state truth, freshness, epoch and reduced motion | SOFTWARE_VERIFIED | App10+Expression5 JVM, expression3 API35 rendering tests; immutable canonical artwork |
 | M31-02 | Native Home, one relevant item and unavailable/accessibility labels | REFERENCE_VERIFIED | App8 Compose/one optional fixture skip; actual Home capture, simulated verifying capture; independent13.1 review |
 | M31-03 | Microphone denial and local revoke boundary | SOFTWARE_VERIFIED | Grant checked before every PCM delivery, service stop on revoke; denied Compose case; in-flight synthetic proof13.5 |
 | M32-01 | Text continuity, short/long reading and epistemic labels | REFERENCE_VERIFIED | Real isolated Core native flow; long REPORTED reader SIMULATED_ONLY; JVM12+5/native11+1 extra |
 | M32-02 | Draft encryption, source isolation, recreation and late callbacks | SOFTWARE_VERIFIED | AES-GCM source AAD; epoch/wire serialization; interrupted-save + native crypto/recreation regressions |
 | M32-03 | Privacy-safe discard and foreground recovery | REFERENCE_VERIFIED | Real Core acknowledgement; atomic pending marker and new-ViewModel suppression; no implicit cancel/replay |
-| M32-04 | Abrupt process death | OWNER_VERIFICATION_DEFERRED | Reference process-kill test scheduled13.8; phone recovery remains consolidated acceptance |
+| M32-04 | Process replacement / encrypted draft recovery | REFERENCE_VERIFIED | Actual foreground force-stop/relaunch PID change and draft recovery; low-memory/OEM/phone acceptance remains deferred |
 | M33-01 | Task supervision, real ownership, progress and evidence | SOFTWARE_VERIFIED | Current lease/action/time qualification; prior progress explicit; Core56/JVM20; selectable inspector |
 | M33-02 | Complete exact review, scope, audience and generation | REFERENCE_VERIFIED | Native full review; length-framed signed display digest; changed material/generation/expiry regressions |
 | M33-03 | Opening/dismissal/expiry/unavailable confirmation grants nothing | REFERENCE_VERIFIED | API35 actual review/expiry/readback; real Android unavailable handoff; separate reference-signed denial/no execution |
@@ -93,8 +93,8 @@ Base: `dcfd31bca6fbd8080f4c20bebe3d448e4bd8dc2f`, separate branch
 Every Group 1 consolidated obligation above carries forward unchanged, especially
 STRONG-APPROVAL BLOCKED and Windows/Voice/phone/Edge/manual verification.
 
-Groups 2–6 will add their authorized canonical slice scopes, software evidence and
-deferred acceptance here. They are not begun or pre-certified by Group 1. This
+Group2 adds its separately authorized Mobile software/reference evidence here.
+Groups3–6 remain unbegun and are not pre-certified by earlier groups. This
 ledger follows the program through its final consolidated acceptance phase.
 
 Group 1 publication: [draft PR #2](https://github.com/Amaan27-Buzz/oscar/pull/2)
@@ -116,3 +116,8 @@ Expression36, Rust12; native/reference receipts linked in the Group 1 report.
 | M37-01 | Settings, appearance/reduced motion, diagnostics / system handoffs | REFERENCE_VERIFIED | JVM25; actual API35 platform and persisted reduced-motion recreation |
 | M37-02 | Bounded Persona preview | SIMULATED_ONLY | Shared fixture expression; unsaved, no Core policy mutation |
 | M37-03 | Overlay/widget / full Presence / mutable routing commissioning | BLOCKED | Absent platform implementation remains explicitly unavailable; owns Slice16 integration, no new runtime |
+
+| M38-01 | Native narrow/landscape/large, font1.8, actual IME and cancellation | REFERENCE_VERIFIED | Three actual AVD size/density runs; keyboard-visible and field-bound assertions; phone/OEM NOT_RUN |
+| M38-02 | Lifecycle/source restoration, epoch fences and process replacement | REFERENCE_VERIFIED | Full native app21/4 intentional skips; actual process replacement; no automatic task replay |
+| M38-03 | Contrast, dark bars, TalkBack labels and restrained motion | SOFTWARE_VERIFIED | Independent contrast4.823:1; shared state/held motion contracts; actual renders; sustained assistive technology deferred |
+| M38-04 | Final owner/device/physical/strong confirmation | OWNER_VERIFICATION_DEFERRED | All Group1 obligations preserved; strong critical-risk confirmation still BLOCKED; no production/owner approval |

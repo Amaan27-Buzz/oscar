@@ -1,0 +1,150 @@
+{
+  "device": "API35 emulator-5582",
+  "phone": "NOT_RUN",
+  "files": [
+    {
+      "path": "docs/ui/mobile/completion/captures/13-1-home-unavailable.png",
+      "sha256": "c16f8b70032195c572d1b0263dac641c70f19059a23519466b06c33108cfaad6",
+      "bytes": 127210,
+      "classification": "REFERENCE_VERIFIED"
+    },
+    {
+      "path": "docs/ui/mobile/completion/captures/13-1-verifying-simulated.png",
+      "sha256": "bf4384c2953eba2e1c2b84ab9dfb2f342c3a04738602f11ada9e7d4aeac92b6c",
+      "bytes": 94278,
+      "classification": "SIMULATED_ONLY"
+    },
+    {
+      "path": "docs/ui/mobile/completion/captures/13-2-long-reported-simulated.png",
+      "sha256": "46415286cacef990969788a33dfd89c99ca49cfafbd53d65279cabe6c0e3ae5e",
+      "bytes": 260825,
+      "classification": "SIMULATED_ONLY"
+    },
+    {
+      "path": "docs/ui/mobile/completion/captures/13-2-reference-home-response.png",
+      "sha256": "60bc39fb4da365e49d5d84074b104140413e8ee9c47383a9e7f5f95738f3e646",
+      "bytes": 148905,
+      "classification": "REFERENCE_VERIFIED"
+    },
+    {
+      "path": "docs/ui/mobile/completion/captures/13-3-reference-approval.png",
+      "sha256": "db9b5b58f5adef1fba0f997a1e42f1e9123f7182024423a51ce266b352045bb9",
+      "bytes": 159605,
+      "classification": "REFERENCE_VERIFIED"
+    },
+    {
+      "path": "docs/ui/mobile/completion/captures/13-3-reference-denied-readback.png",
+      "sha256": "a0c9502c9770286650630226328402a8396ec6494a47c12f8e53218e6d42a3ce",
+      "bytes": 153551,
+      "classification": "REFERENCE_VERIFIED"
+    },
+    {
+      "path": "docs/ui/mobile/completion/captures/13-4-reference-grid.png",
+      "sha256": "556938a1bbb3a3ed33569205148de5765825c66acc83cd03bac0e15800c4f33b",
+      "bytes": 206962,
+      "classification": "REFERENCE_VERIFIED"
+    },
+    {
+      "path": "docs/ui/mobile/completion/captures/13-5-voice-denied-reference.png",
+      "sha256": "5c3af39560b22a46df7e6aa2a3da334c61a8532c42161a15c88bca10f3159baf",
+      "bytes": 203111,
+      "classification": "REFERENCE_VERIFIED"
+    },
+    {
+      "path": "docs/ui/mobile/completion/captures/13-6-reference-privacy.png",
+      "sha256": "49f5128253987b243ee8ac85c775ff34023a503551876ac4ff49ccc3de72dd78",
+      "bytes": 178938,
+      "classification": "REFERENCE_VERIFIED"
+    },
+    {
+      "path": "docs/ui/mobile/completion/captures/13-7-accessibility-reference.png",
+      "sha256": "0feca4d964ed811ea1d4cd34f9d09dbe9b7193b0e9535e6f5b8781fbb0a5f1f4",
+      "bytes": 141236,
+      "classification": "REFERENCE_VERIFIED"
+    },
+    {
+      "path": "docs/ui/mobile/completion/captures/13-7-persona-preview-simulated.png",
+      "sha256": "9461aa4be58f1c3aace3ec2168031a9878c0b99be51bda2cc50ddd06e6dc4df6",
+      "bytes": 160825,
+      "classification": "SIMULATED_ONLY"
+    },
+    {
+      "path": "docs/ui/mobile/completion/captures/13-7-platform-reference.png",
+      "sha256": "59b27364dc892283b9ad87a7bdea647d9a7932aa2337ca36817a51d0cc22620f",
+      "bytes": 216479,
+      "classification": "REFERENCE_VERIFIED"
+    },
+    {
+      "path": "docs/ui/mobile/completion/captures/13-8-dark-large-text-landscape-reference.png",
+      "sha256": "0553947922b78f74d4132b9957de9180508f9e9df8d91dfde015948b3ab37653",
+      "bytes": 80812,
+      "classification": "REFERENCE_VERIFIED"
+    },
+    {
+      "path": "docs/ui/mobile/completion/captures/13-8-dark-large-text-large-reference.png",
+      "sha256": "67cc3ba03c4a33c89a6efa24dfeef20cb5ce0109da71cd2ca9dc1abb9210cd5e",
+      "bytes": 141569,
+      "classification": "REFERENCE_VERIFIED"
+    },
+    {
+      "path": "docs/ui/mobile/completion/captures/13-8-dark-large-text-narrow-reference.png",
+      "sha256": "f36bd3e013f595249a2e2b8cb0344cae1c4eef0969bec1fc06f75c973dc4c136",
+      "bytes": 99649,
+      "classification": "REFERENCE_VERIFIED"
+    },
+    {
+      "path": "docs/ui/mobile/completion/captures/13-8-dark-large-text-reference.png",
+      "sha256": "8664c97acdaf75ab44dcbe7a086d10def86a57988697119af170d87d19881071",
+      "bytes": 196985,
+      "classification": "REFERENCE_VERIFIED"
+    },
+    {
+      "path": "docs/ui/mobile/completion/captures/13-8-ime-large-text-landscape-reference.png",
+      "sha256": "56e8461cf9b0e55fe01940b14093aa0c8dc2c8b69aa85842935b8b34ef3f35e8",
+      "bytes": 59641,
+      "classification": "REFERENCE_VERIFIED"
+    },
+    {
+      "path": "docs/ui/mobile/completion/captures/13-8-ime-large-text-large-reference.png",
+      "sha256": "bd6eafc45907794736e4bd28eb6611bb6761f62e7f9c42e12e21aefc579fd92a",
+      "bytes": 103680,
+      "classification": "REFERENCE_VERIFIED"
+    },
+    {
+      "path": "docs/ui/mobile/completion/captures/13-8-ime-large-text-narrow-reference.png",
+      "sha256": "808d08b292c238a9b9c544f497f4ae315ddbe9252816d40cc986ed97535b3318",
+      "bytes": 88851,
+      "classification": "REFERENCE_VERIFIED"
+    },
+    {
+      "path": "docs/ui/mobile/completion/captures/13-8-ime-large-text-reference.png",
+      "sha256": "b0a049f457ecafac82924ec3a609862582d0fed0fe1dddaaaa8d3947002b9c6b",
+      "bytes": 191959,
+      "classification": "REFERENCE_VERIFIED"
+    },
+    {
+      "path": "docs/ui/mobile/completion/captures/13-8-voice-large-text-landscape-reference.png",
+      "sha256": "bf76cdd01ac2ab0e08bf33819ba53aa009b7c672f7c70d64d508fcfa501d3796",
+      "bytes": 81657,
+      "classification": "REFERENCE_VERIFIED"
+    },
+    {
+      "path": "docs/ui/mobile/completion/captures/13-8-voice-large-text-large-reference.png",
+      "sha256": "7dd4569893f5977e16921fff636b8d827e6936b5c71e8c5a1e1d8c7f857bd096",
+      "bytes": 134391,
+      "classification": "REFERENCE_VERIFIED"
+    },
+    {
+      "path": "docs/ui/mobile/completion/captures/13-8-voice-large-text-narrow-reference.png",
+      "sha256": "7920fd8e00b52c6dc36b74e4d23d9157af7afe4d5a500ff9b361534311b39fe9",
+      "bytes": 104475,
+      "classification": "REFERENCE_VERIFIED"
+    },
+    {
+      "path": "docs/ui/mobile/completion/captures/13-8-voice-large-text-reference.png",
+      "sha256": "665879d8296b95283bc9e253d325fd90e97e5f8c33bafa3cce67f4d9f592333b",
+      "bytes": 125311,
+      "classification": "REFERENCE_VERIFIED"
+    }
+  ]
+}

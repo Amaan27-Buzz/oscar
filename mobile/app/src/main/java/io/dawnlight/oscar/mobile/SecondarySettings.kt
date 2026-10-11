@@ -12,7 +12,6 @@ import io.dawnlight.oscar.expression.ExpressionPresence
 import io.dawnlight.oscar.expression.Source
 import io.dawnlight.oscar.expression.SourceKind
 import org.json.JSONObject
-
 val LocalReducedMotion = compositionLocalOf { false }
 @Composable fun appearancePreference(key: String, fallback: String): String {
     val context = LocalContext.current

@@ -5,11 +5,13 @@ import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import org.junit.Assert.*
 import org.junit.Rule
+import org.junit.Before
 import org.junit.Test
 
 /** EMULATED software evidence only. No owner grants or physical capability acceptance. */
 class MobileEmulatedTest {
     @get:Rule val compose = createAndroidComposeRule<MainActivity>()
+    @Before fun emulatorOnlyFixture() { org.junit.Assume.assumeTrue(android.os.Build.HARDWARE in setOf("ranchu", "goldfish")) }
     @Test fun navigationAndRestorationKeepOneRelationship() {
         compose.onNodeWithText("Activity").performClick()
         compose.onNodeWithText("Ongoing work").assertIsDisplayed()
@@ -34,7 +36,8 @@ class MobileEmulatedTest {
         compose.onNodeWithTag("interactionInput").performTextInput("2 + 3")
         compose.onNodeWithText("Send").assertIsNotEnabled()
         compose.onNodeWithText("Voice").performScrollTo().performClick()
-        compose.onNodeWithText("Android voice binding is not commissioned. Listening, playback, Voice Match and Voice Map are unavailable.").assertExists()
+        compose.onNodeWithTag("voiceStatus").assertTextContains("Microphone off")
+        compose.onNodeWithText("Voice Identity is managed by Core. Android playback and enrollment are uncommissioned; Voice Match / Map never authorize an action.").assertExists()
         val context = compose.activity
         assertFalse(context.getSharedPreferences("permissions", Context.MODE_PRIVATE).getBoolean("microphone_perception", false))
         assertNull(MicrophoneService.binding)

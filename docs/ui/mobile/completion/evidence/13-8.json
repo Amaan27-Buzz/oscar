@@ -1,0 +1,22 @@
+{
+  "slice": "13.8",
+  "core_tests": 559,
+  "core_optional_skips": 6,
+  "jvm_app": 20,
+  "jvm_expression": 5,
+  "app_native_total": 25,
+  "app_native_executed": 21,
+  "app_native_intentional_skips": 4,
+  "native_failures": 0,
+  "expression_native": 3,
+  "system_motion_opt_in": 1,
+  "independent_core": 57,
+  "independent_native": 2,
+  "matrix_runs": 3,
+  "lint_errors": 0,
+  "lint_advisories": 15,
+  "mypy_files": 64,
+  "reference": "API35 emulator; actual isolated Core/Desktop HTTP",
+  "physical": "NOT_RUN",
+  "p0_p1_unresolved": 0
+}

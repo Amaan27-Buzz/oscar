@@ -55,7 +55,7 @@ object VoicePresentation {
     Text("Voice", style = MaterialTheme.typography.titleLarge)
     Text(status.detail, modifier = Modifier.testTag("voiceStatus").semantics { liveRegion = LiveRegionMode.Polite; stateDescription = status.phase.name })
     Text("Acoustic awareness is uncommissioned. Opening Voice does not record. Active listening requires both grants and a commissioned Core binding.")
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         Button(onClick = { VoicePresentation.start(context) }, enabled = status.phase !in setOf(VoicePhase.STARTING, VoicePhase.LISTENING, VoicePhase.SPEAKING)) { Text("Start listening") }
         TextButton(onClick = { VoicePresentation.cancel(context); close() }) { Text("Cancel voice") }
     }

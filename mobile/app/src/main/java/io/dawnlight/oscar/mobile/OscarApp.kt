@@ -3,6 +3,7 @@ package io.dawnlight.oscar.mobile
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
@@ -25,8 +26,13 @@ import androidx.activity.compose.BackHandler
 private val Paper = Color(0xFFF5F1E7)
 private val Ink = Color(0xFF1A1B18)
 @Composable fun OscarTheme(content: @Composable () -> Unit) {
+    val activity = androidx.activity.compose.LocalActivity.current
     val appearance = appearancePreference("theme", "system")
     val dark = appearance == "dark" || (appearance == "system" && isSystemInDarkTheme())
+    SideEffect {
+        val mask = android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS or android.view.WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS
+        activity?.window?.insetsController?.setSystemBarsAppearance(if (dark) 0 else mask, mask)
+    }
     val owner = androidx.lifecycle.compose.LocalLifecycleOwner.current
     var systemMotionOff by remember { mutableStateOf(!android.animation.ValueAnimator.areAnimatorsEnabled()) }
     DisposableEffect(owner) {
@@ -44,7 +50,7 @@ private val Ink = Color(0xFF1A1B18)
         surfaceContainerHighest = Color(0xFF30342D), surfaceContainerLow = Color(0xFF20231E), surfaceContainerLowest = Color(0xFF151713),
         surfaceTint = Color.Transparent, onBackground = Color(0xFFF0EEE6), onSurface = Color(0xFFF0EEE6), onSurfaceVariant = Color(0xFFC2C4B9),
         outline = Color(0xFF999D8D), outlineVariant = Color(0xFF44493C), error = Color(0xFFFFB4A9)) else lightColorScheme(primary = Ink, onPrimary = Color(0xFFFFFDF8),
-        secondary = Color(0xFF1D6FD6), tertiary = Color(0xFFFFC83D), background = Paper,
+        secondary = Color(0xFF1B68C8), tertiary = Color(0xFFFFC83D), background = Paper,
         surface = Paper, surfaceContainer = Color(0xFFFAF7EF), surfaceContainerHigh = Color(0xFFFAF7EF),
         surfaceContainerHighest = Color(0xFFFFFDF8), surfaceContainerLow = Paper, surfaceContainerLowest = Color(0xFFFFFDF8),
         surfaceTint = Color.Transparent, onBackground = Ink, onSurface = Ink, onSurfaceVariant = Color(0xFF625F57),
@@ -61,6 +67,9 @@ private val Ink = Color(0xFF1A1B18)
     var pairing by remember { mutableStateOf(false) }
     val draft = state.draft
     val destination = Destination.entries.firstOrNull { it.name == selected } ?: Destination.OSCAR
+    val window = LocalWindowInfo.current.containerSize
+    val widthDp = with(LocalDensity.current) { window.width.toDp() }
+    val heightDp = with(LocalDensity.current) { window.height.toDp() }
     val focus = LocalFocusManager.current
     val keyboard = LocalSoftwareKeyboardController.current
     BackHandler(voiceOpen || destination != Destination.OSCAR || settingsPage != "Settings") {
@@ -69,25 +78,28 @@ private val Ink = Color(0xFF1A1B18)
     OscarTheme {
         Scaffold(modifier = Modifier.imePadding(), containerColor = MaterialTheme.colorScheme.background, bottomBar = {
             Surface(tonalElevation = 0.dp) {
-                Row(Modifier.fillMaxWidth().navigationBarsPadding(), horizontalArrangement = Arrangement.SpaceEvenly) {
+                BoxWithConstraints(Modifier.fillMaxWidth().navigationBarsPadding()) {
+                val columns = if (LocalDensity.current.fontScale > 1.3f && maxWidth < 600.dp) 2 else 4
+                FlowRow(Modifier.fillMaxWidth(), maxItemsInEachRow = columns, horizontalArrangement = Arrangement.SpaceEvenly) {
                     Destination.entries.forEach { item ->
-                        TextButton(onClick = { VoicePresentation.cancel(session.getApplication()); voiceOpen = false; focus.clearFocus(); keyboard?.hide(); selected = item.name; settingsPage = "Settings" }, modifier = Modifier.weight(1f).heightIn(min = 56.dp)
+                        TextButton(onClick = { VoicePresentation.cancel(session.getApplication()); voiceOpen = false; focus.clearFocus(); keyboard?.hide(); selected = item.name; settingsPage = "Settings" }, modifier = Modifier.fillMaxWidth(1f / columns).heightIn(min = 56.dp).testTag("destination-${item.name}")
                             .semantics { this.selected = item == destination }) { Text(item.label,
-                                color = if (item == destination) MaterialTheme.colorScheme.secondary else Ink,
+                                color = if (item == destination) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onSurface,
                                 fontWeight = if (item == destination) androidx.compose.ui.text.font.FontWeight.SemiBold else androidx.compose.ui.text.font.FontWeight.Normal) }
                     }
+                }
                 }
             }
         }) { insets ->
             Box(Modifier.fillMaxSize().padding(insets), contentAlignment = Alignment.TopCenter) {
-            Column(Modifier.widthIn(max = 720.dp).fillMaxWidth().padding(horizontal = 24.dp)
+            Column(Modifier.widthIn(max = 720.dp).fillMaxWidth().padding(horizontal = if (widthDp < 360.dp) 16.dp else 24.dp)
                 .verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 Spacer(Modifier.height(8.dp))
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                     Text(if (destination == Destination.OSCAR) "OSCAR" else destination.label, style = MaterialTheme.typography.headlineSmall, modifier = Modifier.weight(1f).semantics { heading() })
                     TextButton(onClick = session::refreshNow, enabled = !state.busy) { Text("Refresh") }
                 }
-                OscarOrb(state, composing = draft.isNotBlank(), size = if (destination == Destination.OSCAR) 108.dp else 40.dp)
+                OscarOrb(state, composing = draft.isNotBlank(), size = if (destination == Destination.OSCAR) { if (heightDp < 420.dp) 72.dp else 108.dp } else 40.dp)
                 if (state.link != Link.CONNECTED) {
                     Text(when (state.link) { Link.CONNECTING -> "Connecting to Core"; Link.DEGRADED -> "Core unavailable"; else -> "Connect to your OSCAR Core" }, modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite })
                     TextButton(onClick = { pairing = true }) { Text("Connect Core") }

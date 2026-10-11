@@ -1,0 +1,8 @@
+{
+  "classification": "REFERENCE_VERIFIED",
+  "before_pid": "5579",
+  "after_pid": "5621",
+  "draft_recovered": true,
+  "automatic_task_replay": false,
+  "method": "force-stop foreground isolated app then explicit relaunch"
+}

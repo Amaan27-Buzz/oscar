@@ -2,7 +2,7 @@
 
 Owner authorization: 2026-10-11, Slice 13.1–13.8, autonomous software validation,
 independent review, checkpoint commits and a draft PR only. Slice 14 is not begun.
-Status: **IN PROGRESS / NOT OWNER APPROVED / NOT PRODUCTION READY**.
+Status: **SOFTWARE / REFERENCE CANDIDATE — OWNER AND DEVICE ACCEPTANCE DEFERRED — NOT PRODUCTION READY**.
 
 ## Baseline and boundaries
 
@@ -279,3 +279,116 @@ executed/2 optional process-preparation skips), Core57 and mypy64 PASS. Actual
 and [independent review](reviews/group-02/13-7-INDEPENDENT.md). Initial preview
 assertion was ambiguous between live and simulated Orbs; corrected count passes.
 Large-font smoke is distinct from actual display matrix testing in13.8.
+
+## 13.8 — Motion, accessibility and integration
+
+One existing shared expression controller remains on the same screen tree across
+navigation; operational truth controls the Orb, with source/epoch expiry and no
+private content in expression events. Stable transitions coalesce refreshes; the
+renderer sleeps after settling and pauses offscreen/background. No decorative
+continuous animation or background polling/capture was added.
+
+Actual window bounds govern narrow/landscape spacing and Orb size. Navigation and
+voice/task action rows wrap at large font size. Text follows Android scaling;
+headings, selected navigation, state announcements, field labels and reduced-motion
+switch semantics are explicit. System disabled animators and OSCAR reduced motion
+reach shared held-state rendering. Light selected-text contrast corrected from
+4.333 to4.823:1; explicit dark theme now controls native status/navigation icon
+appearance. Back/IME/focus handling preserves current context. Native privacy flags
+and Android backup/device-transfer exclusions protect private app state.
+
+Genuine API35 display matrix passed720x1280/320dpi,1280x720/160dpi and1280x1800/160dpi,
+with injected app font scale1.8, actual visible Android keyboard, field bounds above
+keyboard and Voice cancel→preserved text. This is emulator reference, never OEM or
+physical display acceptance. Earlier Compose-only captures omitted the system
+keyboard; final window captures include it. Android foreground restrictions are
+preserved; actual microphone/playback commissioning remains unavailable.
+
+Actual foreground process force-stop and explicit relaunch changed PID5579→5621;
+the encrypted synthetic unsent draft recovered. No task mutation is automatically
+replayed. This is process replacement proof, not every low-memory/OEM kill path.
+The first harness incorrectly used Gradle's post-test-uninstalled APK; it now uses
+installed direct instrumentation. A later UI observation was obscured by the
+reference image's Messages ANR dialog; stopping only that isolated fixture app
+revealed the correctly recovered draft, and a fresh full recovery run passed.
+
+Final full Core559 tests:553 executed/6 optional skips; Ruff/format and mypy64 PASS.
+Android app20 + expression5 JVM PASS; full native app25 total/21 executed/4 intentional
+skips PASS. Those skips are old optional fixture plus opt-in process helpers/system
+animation setting. Process helpers are separately exercised. Full-native initial
+failures came from an obsolete Voice-screen expectation and fixture draft
+concatenation; updated truthful screen assertions and isolated replacement pass.
+All destructive native fixtures now guard emulator hardware. No permissions or
+private owner accounts/audio were used. Final expression/system-motion receipts
+and independent closure are sealed with delivery evidence below.
+
+[Display matrix](../ui/mobile/completion/evidence/13-8-matrix.json),
+[process receipt](../ui/mobile/completion/evidence/13-8-process-recovery.json),
+[fresh adversarial review](reviews/group-02/FINAL-INDEPENDENT.md).
+
+## Remaining acceptance and Group3 handoff
+
+No demonstrated P0/P1 is accepted as a manual deferral. Subjective character timing,
+owner visual review, sustained TalkBack, phone/OEM lifecycle and background rules,
+actual acoustic capture/playback/AEC/barge-in/Match/Map, owner biometric/PIN/signing,
+real notification ingestion/replies and physical networking remain consolidated
+owner/device acceptance. Existing strong critical-risk confirmation remains
+BLOCKED; every unresolved Group1 Windows/Voice/Edge obligation carries forward.
+
+Commissioned Android Voice binding, mutable Core Persona/routing/privacy policy,
+remote revocation, overlay/widgets and full cross-device Presence are explicitly
+unavailable. This closes the supported visual/control software track, not those
+future runtime capabilities or production readiness. No promotion, owner approval,
+merge or release is claimed.
+
+Group3 receives shared expression/source contracts, scoped Mobile/Core adapters,
+exact review/signing boundaries, private-session regressions, independent reviews,
+curated native evidence and cumulative ledger. Canonical Slice14 World Model /
+Perception / Sentry must preserve the three independent grants and evidence truth;
+15 commissioning,16 full Presence,18 physical expansion and19 hardening own their
+remaining runtime/device obligations. Slice14 and Group3 are not begun.
+
+## Reproduction
+
+Use isolated API35 AVD (1536MB/two cores) with Android SDK/JDK21 and pinned Gradle.
+`python -m scripts.mobile_completion_android` runs actual isolated Core/Grid HTTP
+and native app tests; `--process-recovery` runs installed instrumentation plus real
+process replacement. It always targets emulator-5582, not an owner phone. Run
+`:expression:connectedDebugAndroidTest` serially, never competing instrumentation.
+Display matrix commands change only that reference AVD with `adb -s emulator-5582
+shell wm size/density`, run the dark/font/IME test, then reset overrides. System
+animator-disable test is opt-in and restores the setting afterwards. Raw synthetic
+native stills are archived outside Git with a SHA256 receipt; no motion frame
+sequence or acoustic acceptance is inferred from stills.
+
+## Checkpoint commits and final gates
+
+| Stage | Commit |
+|---|---|
+| Phase0 privacy/security | `0cf44d3` |
+| 13.1 Home/shared expression | `d4bf477` |
+| 13.2 Interaction/private recovery | `740f08e` |
+| 13.3 Task supervision/exact decisions | `0a5ef8c` |
+| 13.4 Grid/device truth | `5475926` |
+| 13.5 Explicit voice/cancellation | `1ec2eb5` |
+| 13.6 Independent privacy grants | `011b342` |
+| 13.7 Settings/system surfaces | `5b1c3ec` |
+
+Final gates: Android APK/JVM/lint PASS (20app+5expression JVM;0lint errors,
+15 dependency/KTX advisories). Lint's new context-cast rule prompted replacement
+with existing Compose LocalActivity; no security/permission lint suppression.
+Shared expression native3 PASS; actual Android animator-disabled theme test1 PASS
+and original setting restored. Independent final Core57 plus plan/session/discard
+attack reproductions PASS; independent native source replacement/Voice2 PASS.
+Full app21 executed/4 intentional skips PASS. Core559 total/553 executed/6 optional
+skips; Ruff/format/mypy64 and repository links/value-silent secret scan PASS.
+
+Fresh review scores7.5 visual/7 interaction are advisory, not an owner quality PASS.
+Demonstrated contrast, system-bar icons, IME evidence and fixture safety issues were
+corrected, independently inspected and rerun. No unresolved demonstrated P0/P1.
+Canonical Orb byte-matches baseline SHA256
+`728aeac3c9aa590b67d45c469735e919ede93a8503964e24f0f4af18cda066c5`.
+Curated still checksum manifest and raw archive receipt accompany final evidence.
+The raw archive includes historical intermediate captures, not accepted motion or
+physical evidence. Final implementation checkpoint/draft publication readback are
+recorded after Git sealing below.

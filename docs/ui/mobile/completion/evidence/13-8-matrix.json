@@ -1,0 +1,34 @@
+{
+  "classification": "REFERENCE_VERIFIED",
+  "serial": "emulator-5582",
+  "physical": "NOT_RUN",
+  "runs": [
+    {
+      "name": "narrow",
+      "size": "720x1280",
+      "density": "320",
+      "fontScale": 1.8,
+      "actualIME": "visible and field above keyboard",
+      "voice": "denied/cancel/text preserved",
+      "result": "PASS"
+    },
+    {
+      "name": "landscape",
+      "size": "1280x720",
+      "density": "160",
+      "fontScale": 1.8,
+      "actualIME": "visible and field above keyboard",
+      "voice": "denied/cancel/text preserved",
+      "result": "PASS"
+    },
+    {
+      "name": "large",
+      "size": "1280x1800",
+      "density": "160",
+      "fontScale": 1.8,
+      "actualIME": "visible and field above keyboard",
+      "voice": "denied/cancel/text preserved",
+      "result": "PASS"
+    }
+  ]
+}

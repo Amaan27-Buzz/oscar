@@ -40,7 +40,7 @@ final class NativeVoice implements AutoCloseable {
     void start(Sink sink, boolean perceptionGranted) { start(sink, perceptionGranted, -1); }
     private long voiceEpoch = -1;
     synchronized void start(Sink sink, boolean perceptionGranted, long presentationEpoch) {
-        if (!perceptionGranted || !permitted(context))
+        if (context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED || !perceptionGranted || !permitted(context))
             throw new SecurityException("Separate microphone perception grant required");
         if (sink == null) throw new IllegalStateException("Voice Core binding unavailable");
         close();

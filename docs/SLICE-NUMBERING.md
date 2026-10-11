@@ -21,7 +21,7 @@ The owner rejected mixing numbered slices with 09R, 10R, 13A/13B and prematurely
 | 10 | OSCAR Desktop runtime foundation | **Draft PR #16, unmerged**; local-reference foundation and screenshot experiments |
 | **11** | **OSCAR Expression / Character System** | **v3 approved for engineering; 11.3 shared foundation candidate; owner/device/CI boundaries retained** |
 | **12** | OSCAR Desktop visual/interaction design | Group 1 software/reference candidate12.2–12.6; manual/owner/device acceptance deferred; no promotion/merge |
-| **13** | OSCAR Mobile visual/interaction design | Pending 11; includes all former 09R work |
+| **13** | OSCAR Mobile visual/interaction design | Group2 software/reference candidate13.1–13.8; owner/phone/OEM/audio acceptance deferred; no promotion/merge |
 | 14 | World Model, Perception, Sentry, optional Journal | Planned |
 | 15 | Commissioning and setup | Planned |
 | 16 | Full cross-device Avatar/Presence integration | Planned; extends 11 |

@@ -55,6 +55,7 @@ coverage/
 /desktop/src-tauri/gen/
 
 # Android / Kotlin
+.kotlin/
 .gradle/
 **/build/
 local.properties

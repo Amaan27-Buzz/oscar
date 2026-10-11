@@ -42,7 +42,7 @@ import androidx.compose.ui.unit.dp
         modifier = Modifier.fillMaxWidth().testTag("interactionInput"), label = { Text("Write to OSCAR") }, minLines = 2, maxLines = 5,
         keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(imeAction = androidx.compose.ui.text.input.ImeAction.Send),
         keyboardActions = androidx.compose.foundation.text.KeyboardActions(onSend = { if (canSend) send() }))
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         Button(onClick = send, enabled = canSend) { Text("Send") }
         TextButton(onClick = voice) { Text("Voice") }
         if (state.busy) TextButton(onClick = cancel) { Text("Stop waiting") }

@@ -18,11 +18,15 @@ import java.io.File
 /** Disposable native Compose/reference evidence. No owner data or permission commissioning. */
 class MobileCompletionTest {
     @get:Rule val compose = createAndroidComposeRule<MainActivity>()
+    private var isolated = false
     @Before fun isolateLocalFixture() {
+        org.junit.Assume.assumeTrue(android.os.Build.HARDWARE in setOf("ranchu", "goldfish"))
+        isolated = true
         compose.runOnIdle { androidx.lifecycle.ViewModelProvider(compose.activity)[CoreSession::class.java].disconnect() }
         compose.waitUntil(5000) { SessionVault(compose.activity).load() == null }
     }
     @After fun removeLocalFixture() {
+        if (!isolated) return
         compose.runOnIdle { androidx.lifecycle.ViewModelProvider(compose.activity)[CoreSession::class.java].disconnect() }
         compose.waitUntil(5000) { SessionVault(compose.activity).load() == null }
     }

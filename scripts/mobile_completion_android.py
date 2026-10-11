@@ -13,6 +13,7 @@ from pathlib import Path
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--class", dest="test_class")
+    parser.add_argument("--process-recovery", action="store_true")
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]
     os.chdir(root)
@@ -63,6 +64,13 @@ def main() -> int:
         )
     wrapper = root / "mobile/gradlew.bat"
     command = [str(wrapper), ":app:connectedDebugAndroidTest", "--console=plain"]
+    if args.process_recovery:
+        command = [
+            str(wrapper),
+            ":app:assembleDebug",
+            ":app:assembleDebugAndroidTest",
+            "--console=plain",
+        ]
     mapping = {
         "group02_origin": "url",
         "group02_session": "session_id",
@@ -75,6 +83,11 @@ def main() -> int:
         command.append(
             "-Pandroid.testInstrumentationRunnerArguments." + name + "=" + fixture[field]
         )
+    if args.process_recovery:
+        args.test_class = (
+            "io.dawnlight.oscar.mobile.SettingsIntegrationTest#prepareProcessDeathRecovery"
+        )
+        command.append("-Pandroid.testInstrumentationRunnerArguments.group02_process_prepare=true")
     if args.test_class:
         command.append("-Pandroid.testInstrumentationRunnerArguments.class=" + args.test_class)
     with (output / "android-reference-gradle.log").open("w") as log:
@@ -85,6 +98,84 @@ def main() -> int:
             stdout=log,
             stderr=subprocess.STDOUT,
         )
+    if not result.returncode and args.process_recovery:
+
+        def device(*parts):
+            return subprocess.run(
+                ["adb", "-s", serial, "shell", *parts], capture_output=True, text=True, timeout=30
+            )
+
+        # Gradle's connected runner removes APK/data afterwards; direct instrumentation
+        # keeps this disposable app installed for genuine process replacement.
+        for apk in ("app-debug.apk", "../androidTest/debug/app-debug-androidTest.apk"):
+            path = root / "mobile/app/build/outputs/apk/debug" / apk
+            subprocess.run(
+                ["adb", "-s", serial, "install", "-r", str(path.resolve())],
+                check=True,
+                capture_output=True,
+            )
+        package = "io.dawnlight.oscar.mobile"
+        runner = package + ".test/androidx.test.runner.AndroidJUnitRunner"
+        prepared = device(
+            "am",
+            "instrument",
+            "-w",
+            "-e",
+            "class",
+            "io.dawnlight.oscar.mobile.SettingsIntegrationTest#prepareProcessDeathRecovery",
+            "-e",
+            "group02_process_prepare",
+            "true",
+            runner,
+        )
+        assert "OK (1 test)" in prepared.stdout, "Reference process fixture preparation failed"
+        activity = package + "/.MainActivity"
+        assert device("am", "start", "-W", "-n", activity).returncode == 0
+        before_pid = device("pidof", package).stdout.strip()
+        assert before_pid
+        assert device("am", "force-stop", package).returncode == 0
+        assert not device("pidof", package).stdout.strip()
+        assert device("am", "start", "-W", "-n", activity).returncode == 0
+        after_pid = device("pidof", package).stdout.strip()
+        assert after_pid and after_pid != before_pid
+        recovered = False
+        for _ in range(10):
+            device("uiautomator", "dump", "/sdcard/oscar-group02-recovery.xml")
+            view = device("cat", "/sdcard/oscar-group02-recovery.xml").stdout
+            if "Group02 synthetic process recovery" in view:
+                recovered = True
+                break
+            time.sleep(0.5)
+        assert recovered, "Encrypted unsent draft absent after process replacement"
+        (output / "process-recovery.json").write_text(
+            json.dumps(
+                {
+                    "classification": "REFERENCE_VERIFIED",
+                    "before_pid": before_pid,
+                    "after_pid": after_pid,
+                    "draft_recovered": True,
+                    "automatic_task_replay": False,
+                    "method": "force-stop foreground isolated app then explicit relaunch",
+                },
+                indent=2,
+            )
+            + "\n"
+        )
+        clean = device(
+            "am",
+            "instrument",
+            "-w",
+            "-e",
+            "class",
+            "io.dawnlight.oscar.mobile.SettingsIntegrationTest#clearProcessDeathFixture",
+            "-e",
+            "group02_process_prepare",
+            "true",
+            runner,
+        )
+        (output / "process-recovery-cleanup.log").write_text(clean.stdout)
+        assert "OK (1 test)" in clean.stdout, "Reference cleanup failed"
+        print("REFERENCE actual process replacement and encrypted draft recovery: PASS")
     print("REFERENCE emulator/Core test exit:", result.returncode)
     return result.returncode
 
