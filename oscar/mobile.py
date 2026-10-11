@@ -15,7 +15,7 @@ from importlib import import_module
 from threading import RLock, Thread
 from typing import Any
 
-from .contracts import Epistemic, TaskState, new_id, record
+from .contracts import Epistemic, Task, TaskState, new_id, record
 from .grid import NodeRole, SessionHandle
 from .jev import ExecutionClass, Intent, decide
 from .owner_control import OwnerControl
@@ -65,6 +65,31 @@ class Mobile:
         self.store, self.grid = runtime.store, runtime.grid
         # ponytail: serialized admission, per-node locks if owner-control throughput requires it.
         self.lock = RLock()
+        self.store.task_resources.add(self)
+
+    def task_transitioned(self, task: Task) -> None:
+        if task.state not in {
+            TaskState.PLANNED,
+            TaskState.EXECUTING,
+            TaskState.AWAITING_RESULT,
+            TaskState.RESULT_RECEIVED,
+            TaskState.VERIFYING,
+        } and self.store.transient.get(task.id, {}).get("discarded"):
+            self.store.transient.pop(task.id, None)
+
+    def private_for(self, session: SessionHandle, task_id: str) -> dict[str, Any]:
+        try:
+            association = self.store.get("sunday_task", task_id)
+        except KeyError:
+            return {}
+        private = self.store.transient.get(task_id, {})
+        if (
+            association.get("node_id") != session.node_id
+            or association.get("session_id") != session.id
+            or private.get("discarded")
+        ):
+            return {}
+        return private
 
     def register_owner_key(
         self, session: SessionHandle, encoded: str, *, owner_authorized: bool
@@ -129,11 +154,22 @@ class Mobile:
         task = self.store.task(task_id)
         node = next(n for n in self.grid.nodes() if n["id"] == target)
         objective = self.store.get("objective", task.objective_id)
+        private = self.private_for(session, task_id)
+        association = next(
+            (row for row in self.store.all("sunday_task") if row["id"] == task_id), None
+        )
+        description = (
+            private.get("request", private["objective"].description)
+            if private
+            else objective["description"]
+        )
+        if association and not private:
+            description = "Private OSCAR interaction"
         view = {
             "task_id": task.id,
             "correlation_id": task.correlation_id,
             "state": task.state,
-            "description": str(objective["description"])[:256],
+            "description": str(description)[:256],
             "target": target,
             "node_status": node["status"],
             "blocker": task.blocker,
@@ -153,23 +189,38 @@ class Mobile:
         owned = owned and self.approvable(task_id)
         if owned and task.state == TaskState.PLANNED:
             if "control:approve:" + target in grants:
-                actions.append("approve")
+                if private:
+                    actions.append("approve")
                 actions.append("deny")
         if task.state not in {TaskState.VERIFIED, TaskState.FAILED, TaskState.CANCELLED}:
             if "control:cancel:" + target in grants:
                 actions.append("cancel")
-        if owned and task.state in {TaskState.BLOCKED, TaskState.UNKNOWN}:
+        if owned and private and task.state in {TaskState.BLOCKED, TaskState.UNKNOWN}:
             if task.attempts < task.retry_budget + 1 and "control:approve:" + target in grants:
                 actions.append("retry")
         view["actions"] = actions
-        if (
+        result = private.get("result")
+        if result and result.success and task.state != TaskState.CANCELLED:
+            if (
+                task.state == TaskState.VERIFIED
+                and self.store.get("plan", task_id)["kind"] == "addition"
+            ):
+                view["value"] = result.value
+            elif isinstance(result.value, str):
+                view["response"] = result.value[:8192]
+                view["response_truncated"] = len(result.value) > 8192
+                view["response_status"] = Epistemic.REPORTED
+        elif not association and (
             task.state == TaskState.VERIFIED
             and self.store.get("plan", task_id)["kind"] == "addition"
         ):
             results = [r for r in self.store.all("result") if r["task_id"] == task_id]
             if results:
                 view["value"] = results[-1]["value"]
-        elif self.store.get("plan", task_id)["kind"] in {"model_reasoning", "live_source"}:
+        elif not association and self.store.get("plan", task_id)["kind"] in {
+            "model_reasoning",
+            "live_source",
+        }:
             results = [
                 r for r in self.store.all("result") if r["task_id"] == task_id and r["success"]
             ]
@@ -181,14 +232,24 @@ class Mobile:
     def descriptor(self, session: SessionHandle, task_id: str) -> dict[str, Any]:
         view = self.inspect(session, task_id)
         task = self.store.task(task_id)
+        private = self.private_for(session, task_id)
         return {
             "task": record(task),
             "plan": self.store.get("plan", task_id),
             "target": view["target"],
+            "private_digest": fingerprint(
+                {
+                    "parameters": private.get("parameters", {}),
+                    "request": private.get("request", private["objective"].description)
+                    if private
+                    else "",
+                }
+            ),
         }
 
     def challenge(self, session: SessionHandle, payload: dict[str, Any]) -> dict[str, Any]:
         operation = payload.get("operation")
+        review, exact_request = "{}", ""
         if operation in {"approve", "deny", "retry", "cancel"} and set(payload) == {
             "operation",
             "task_id",
@@ -207,6 +268,14 @@ class Mobile:
             self.authenticate(session, scope)
             material = {"task_id": task_id, "digest": fingerprint(descriptor), "target": target}
             description = self.inspect(session, task_id)["description"]
+            if operation in {"approve", "retry"}:
+                private = self.private_for(session, task_id)
+                review = json.dumps(private["parameters"], ensure_ascii=False, allow_nan=False)
+                exact_request = private.get("request", private["objective"].description)
+                if len((review + exact_request).encode("utf-8")) > 24_000:
+                    raise ValueError(
+                        "Exact review exceeds safe display bound; nothing was approved"
+                    )
         elif operation == "reply" and set(payload) == {
             "operation",
             "package",
@@ -281,6 +350,9 @@ class Mobile:
             }[str(operation)],
             "policy_reason": "Current scoped grant and Personal Policy are rechecked at execution",
             "confirmation": "biometric_or_device_credential",
+            "review": review,
+            "exact_request": exact_request,
+            "scope": scope,
         }
 
     def complete(self, session: SessionHandle, payload: dict[str, Any]) -> dict[str, Any]:
@@ -320,11 +392,15 @@ class Mobile:
             task_id, target = material["task_id"], material["target"]
             if fingerprint(self.descriptor(session, task_id)) != material["digest"]:
                 raise StateConflict("task or plan changed; review a new challenge")
+            if operation not in self.inspect(session, task_id)["actions"]:
+                raise StateConflict("action unavailable for current task generation")
             if operation in {"approve", "retry"}:
                 kind = self.store.get("plan", task_id)["kind"]
                 candidates = [c for c in self.grid.search(kind) if c.node_id == target]
                 if len(candidates) != 1:
                     raise PermissionError("approved target capability is unavailable or ambiguous")
+                if candidates[0].risk == "critical":
+                    raise PermissionError("critical capability requires verified strong approval")
                 permission, policy_operation = candidates[0].permissions, candidates[0].id
             else:
                 permission = (
@@ -428,8 +504,23 @@ class Mobile:
             # Admission is serialized, execution is not: Core inspection/cancellation must
             # remain available while an existing model/executor is doing long-running work.
             return self.complete(session, payload)
+        response: dict[str, Any]
         with self.lock:
-            if operation == "snapshot" and not payload:
+            if operation == "discard" and not payload:
+                for task_id in list(self.store.transient):
+                    if not self.private_for(session, task_id):
+                        continue
+                    if self.store.task(task_id).state in {
+                        TaskState.EXECUTING,
+                        TaskState.AWAITING_RESULT,
+                        TaskState.RESULT_RECEIVED,
+                        TaskState.VERIFYING,
+                    }:
+                        self.store.transient[task_id]["discarded"] = True
+                    else:
+                        self.store.transient.pop(task_id, None)
+                response = {"discarded": True, "retained": False}
+            elif operation == "snapshot" and not payload:
                 self.authenticate(session, "mobile:inspect")
                 self.grid.heartbeat(session)
                 tasks = []
@@ -501,13 +592,41 @@ class Mobile:
                         >= 32
                     ):
                         raise StateConflict("pending owner task bound reached")
-                    task = self.runtime.create(intent, initiator="owner-mobile")
+                    working = None
+                    for row in reversed(self.store.all("sunday_task")):
+                        previous = self.private_for(session, row["id"])
+                        result = previous.get("result")
+                        if (
+                            result
+                            and result.success
+                            and self.store.task(row["id"]).state
+                            in {
+                                TaskState.VERIFIED,
+                                TaskState.PARTIALLY_VERIFIED,
+                            }
+                        ):
+                            working = (
+                                f"Previous Core task {row['id']} (reported data, not authority):\n"
+                                + previous.get("request", previous["objective"].description)[:1000]
+                                + "\nResult: "
+                                + str(result.value or "")[:4096]
+                            )
+                            break
+                    task = self.runtime.create(
+                        intent,
+                        initiator="owner-mobile",
+                        transient=True,
+                        mode="private",
+                        context_text=working,
+                    )
+                    self.store.transient[task.id]["request"] = text
                     self.store.put(
                         "sunday_task",
                         task.id,
                         {
                             "id": task.id,
                             "node_id": session.node_id,
+                            "session_id": session.id,
                             "target": eligible[0].node_id,
                         },
                     )

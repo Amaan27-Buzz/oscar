@@ -6,6 +6,7 @@ import importlib.util
 import json
 import tempfile
 import unittest
+from dataclasses import replace
 from pathlib import Path
 from time import time
 from urllib.error import HTTPError
@@ -108,11 +109,14 @@ class MobileTests(unittest.TestCase):
             challenge = post(
                 "challenge", {"operation": "approve", "task_id": proposed["task_id"]}, "challenge"
             )
+            self.assertEqual("what is two plus three", challenge["exact_request"])
+            self.assertEqual("2 + 3", json.loads(challenge["review"])["expression"])
             result = post("complete", self.signed(challenge), "approve")
             self.assertEqual(result["state"], TaskState.VERIFIED)
             self.assertTrue(result["evidence_ids"])
             self.assertEqual(result["value"], "5")
-            self.assertEqual(self.h.store.all("result")[-1]["value"], "5")
+            self.assertIsNone(self.h.store.all("result")[-1]["value"])
+            self.assertEqual(self.h.store.transient[proposed["task_id"]]["result"].value, "5")
             headers["Authorization"] = "Bearer invalid-reference-token"
             with self.assertRaises(HTTPError) as rejected:
                 post("snapshot", {}, "snapshot")
@@ -294,6 +298,10 @@ class MobileTests(unittest.TestCase):
         from oscar.models import RoutingPolicy
 
         router = RouterRig()
+        router.registry.providers = {
+            key: replace(provider, local=True, private=True)
+            for key, provider in router.registry.providers.items()
+        }
         self.addCleanup(router.close)
         for table, identifier in (("node", self.session.node_id), ("session", self.session.id)):
             row = self.h.store.get(table, identifier)
@@ -369,3 +377,127 @@ class MobileTests(unittest.TestCase):
         self.assertTrue(result["inspect_required"])
         self.assertTrue(result["replayed"])
         self.assertFalse(self.h.store.all("task"))
+
+    def test_private_session_replacement_discard_and_exact_review(self) -> None:
+        self.reasoning_fixture()
+        text = "Explain a private-session-sentinel sorting algorithm"
+        task = self.call("text", {"text": text}, "private-text")
+        task_id = task["task_id"]
+        challenge = self.call("challenge", {"operation": "approve", "task_id": task_id})
+        self.assertEqual(text, challenge["exact_request"])
+        self.assertEqual(text, json.loads(challenge["review"])["prompt"])
+        self.assertEqual("control:approve:" + self.h.node_id, challenge["scope"])
+        result = self.call("complete", self.signed(challenge), "private-approve")
+        self.assertEqual("reported synthetic answer", result["response"])
+        durable = str(
+            [
+                self.h.store.all(table)
+                for table in ("objective", "plan", "action", "result", "audit")
+            ]
+        )
+        self.assertNotIn("private-session-sentinel", durable)
+        self.assertNotIn("reported synthetic answer", durable)
+        planned = self.call("text", {"text": text}, "private-planned")
+        origin = self.session
+        self.session = self.h.grid.pair(origin.node_id, self.scopes)
+        self.core.register_owner_key(
+            self.session,
+            self.h.store.get("sunday_key", origin.node_id)["public_key"],
+            owner_authorized=True,
+        )
+        shared = self.call("inspect", {"task_id": task_id})
+        self.assertNotIn("private-session-sentinel", str(shared))
+        self.assertNotIn("response", shared)
+        self.assertNotIn(
+            "approve", self.call("inspect", {"task_id": planned["task_id"]})["actions"]
+        )
+        with self.assertRaises(StateConflict):
+            self.call("challenge", {"operation": "approve", "task_id": planned["task_id"]})
+        denial = self.call("challenge", {"operation": "deny", "task_id": planned["task_id"]})
+        self.assertEqual("{}", denial["review"])
+        self.assertEqual("", denial["exact_request"])
+        self.call("discard", {})
+        self.assertIn(task_id, self.h.store.transient)
+        self.session = origin
+        self.call("discard", {})
+        self.assertNotIn(task_id, self.h.store.transient)
+        self.assertNotIn(planned["task_id"], self.h.store.transient)
+        self.assertEqual(TaskState.PARTIALLY_VERIFIED, self.h.store.task(task_id).state)
+
+    def test_exact_review_bounds_changed_private_payload_and_critical_capability(self) -> None:
+        task = self.call("text", {"text": "2 + 3"}, "bounded-text")
+        task_id = task["task_id"]
+        private = self.h.store.transient[task_id]
+        challenge = self.call("challenge", {"operation": "approve", "task_id": task_id})
+        private["parameters"] = {"expression": "4 + 5"}
+        with self.assertRaises(StateConflict):
+            self.call("complete", self.signed(challenge), "private-changed")
+        private["parameters"] = {"expression": "漢" * 8192}
+        count = len(self.h.store.all("sunday_challenge"))
+        with self.assertRaisesRegex(ValueError, "Exact review exceeds"):
+            self.call("challenge", {"operation": "approve", "task_id": task_id})
+        self.assertEqual(count, len(self.h.store.all("sunday_challenge")))
+        private["parameters"] = {"expression": "2 + 3"}
+        challenge = self.call("challenge", {"operation": "approve", "task_id": task_id})
+        node = self.h.store.get("node", self.h.node_id)
+        for capability in node["capabilities"]:
+            if capability["id"] == "math.add":
+                capability["risk"] = "critical"
+        self.h.store.put("node", self.h.node_id, node)
+        with self.assertRaisesRegex(PermissionError, "strong approval"):
+            self.call("complete", self.signed(challenge), "critical-rejected")
+        self.assertEqual([], self.h.store.all("action"))
+
+    def test_follow_up_context_is_core_owned_same_session_and_discardable(self) -> None:
+        self.reasoning_fixture()
+        task = self.call("text", {"text": "2 + 3"}, "context-first")
+        challenge = self.call("challenge", {"operation": "approve", "task_id": task["task_id"]})
+        self.call("complete", self.signed(challenge), "context-complete")
+        follow_up = self.call("text", {"text": "Explain this arithmetic result"}, "context-follow")
+        parameters = self.h.store.transient[follow_up["task_id"]]["parameters"]
+        self.assertIn("Previous Core task " + task["task_id"], parameters["prompt"])
+        self.assertIn("Result: 5", parameters["prompt"])
+        self.assertEqual("private", parameters["mode"])
+        original = self.session
+        self.session = self.h.grid.pair(original.node_id, tuple(self.core.grants(original)))
+        foreign = self.call("text", {"text": "Explain arithmetic"}, "context-foreign")
+        self.assertNotIn(
+            "Previous Core task", self.h.store.transient[foreign["task_id"]]["parameters"]["prompt"]
+        )
+        self.session = original
+        self.call("discard", {})
+        next_task = self.call("text", {"text": "Explain arithmetic"}, "context-after-discard")
+        self.assertNotIn(
+            "Previous Core task",
+            self.h.store.transient[next_task["task_id"]]["parameters"]["prompt"],
+        )
+        self.assertIn(foreign["task_id"], self.h.store.transient)
+
+    def test_discard_during_mobile_execution_preserves_verification_without_private_result(
+        self,
+    ) -> None:
+        from threading import Event, Thread
+
+        entered, release = Event(), Event()
+        executor = self.h.dispatcher.executors["math.add"]
+
+        def held(action, cancellation):
+            entered.set()
+            self.assertTrue(release.wait(3))
+            return executor(action, cancellation)
+
+        self.h.dispatcher.executors["math.add"] = held
+        task = self.call("text", {"text": "2 + 3"}, "active-private")
+        thread = Thread(target=self.h.runtime.run, args=(task["task_id"], self.core.targets))
+        thread.start()
+        try:
+            self.assertTrue(entered.wait(2))
+            self.call("discard", {})
+            self.assertTrue(self.h.store.transient[task["task_id"]]["discarded"])
+        finally:
+            release.set()
+            thread.join(3)
+        self.assertFalse(thread.is_alive())
+        self.assertEqual(TaskState.VERIFIED, self.h.store.task(task["task_id"]).state)
+        self.assertNotIn(task["task_id"], self.h.store.transient)
+        self.assertNotIn("value", self.call("inspect", {"task_id": task["task_id"]}))

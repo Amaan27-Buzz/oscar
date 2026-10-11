@@ -4,7 +4,8 @@ Owner strategy decision: 2026-10-11. Build and autonomously validate the softwar
 first; consolidate manual visual, real-device and physical acceptance at the end
 of Groups 1–6. Deferred acceptance does not block authorized software development
 and never becomes physical or production PASS. Security and truthful state remain
-mandatory. Group 2 and Slice 13 are not authorized in this assignment.
+mandatory. Group 2 / Slice 13.1–13.8 is separately authorized on 2026-10-11;
+Slice 14 remains outside the assignment.
 
 Allowed classifications: `SOFTWARE_VERIFIED`, `REFERENCE_VERIFIED`,
 `SIMULATED_ONLY`, `OWNER_VERIFICATION_DEFERRED`,
@@ -66,6 +67,20 @@ Future `BLOCKED` entries require a scoped engineering resolution; deferred accep
 | DISTRIBUTION | Installer, signing/update and deployed interoperability | OWNER_VERIFICATION_DEFERRED | No development binary equals production acceptance |
 
 ## Future group tracking
+
+## Group 2 — Mobile Slice 13
+
+Base: `dcfd31bca6fbd8080f4c20bebe3d448e4bd8dc2f`, separate branch
+`build/slice-13-mobile-completion`. IN PROGRESS; no owner/device acceptance.
+
+| ID | Requirement | Classification | Evidence / remaining work |
+|---|---|---|---|
+| M00-01 | Verified Group 1 and accepted Mobile foundation | SOFTWARE_VERIFIED | Exact baseline551/6 optional skips; Android APK/JVM PASS, JVM/Core readback |
+| M00-02 | Session-private discard/readback/approval and exact review | SOFTWARE_VERIFIED | Independent118 tests, regression reproductions and [review](reviews/GROUP-02-BASELINE.md) |
+| M00-03 | API36.1 Compose reference | FAILED | Historical SurfaceFlinger DMA crash reproduced on separate AVD; API35 fallback under preparation |
+
+Every Group 1 consolidated obligation above carries forward unchanged, especially
+STRONG-APPROVAL BLOCKED and Windows/Voice/phone/Edge/manual verification.
 
 Groups 2–6 will add their authorized canonical slice scopes, software evidence and
 deferred acceptance here. They are not begun or pre-certified by Group 1. This

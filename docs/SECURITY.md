@@ -1,5 +1,21 @@
 # Security + Permissions
 
+## Group 2 Mobile private-session boundary
+
+New Mobile text tasks use the existing Runtime transient privacy path; request,
+model input/result and same-session working context are not a new durable archive.
+Private readback/review/approval requires the originating node and session. Shared
+task metadata and permitted denial/cancellation remain available without inheriting
+private input. Legacy persisted private content is withheld rather than silently
+migrated or deleted. Discard is session-scoped and never implicitly cancels active
+work; verification survives while private presentation is withdrawn.
+
+Owner review includes exact request, full bounded plan material and permission
+scope. The signed descriptor binds the request and private parameter digest.
+Reviews exceeding 24,000 combined UTF-8 bytes are rejected before challenge
+creation. Android biometric/PIN success is not Core attestation of strong critical
+confirmation: critical capabilities remain blocked under the current contract.
+
 ## Desktop private context boundary
 
 Desktop perception, clipboard, microphone and action grants remain separate; no retention grant is inferred. Password/hidden/unregistered content fails closed, private inputs/results are process-local, and restart blocks replay. Signed session/digest/expiry challenges create no permanent grants; critical capabilities await strong owner approval. The fixed UIA source receives bounded private stdin rather than command-line text. See [Desktop foundation](DESKTOP-FOUNDATION.md).

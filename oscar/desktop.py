@@ -461,15 +461,21 @@ class Desktop(Mobile):
                 for task_id in list(self.store.transient):
                     try:
                         association = self.store.get("sunday_task", task_id)
+                        record = self.store.get("desktop_task", task_id)
+                        if (
+                            association.get("node_id") != session.node_id
+                            or record.get("session_id") != session.id
+                        ):
+                            continue
                         state = self.store.task(task_id).state
-                        if association["node_id"] == session.node_id and state not in {
+                        if state not in {
                             TaskState.EXECUTING,
                             TaskState.AWAITING_RESULT,
                             TaskState.RESULT_RECEIVED,
                             TaskState.VERIFYING,
                         }:
                             self.store.transient.pop(task_id, None)
-                        elif association["node_id"] == session.node_id:
+                        else:
                             self.store.transient[task_id]["discarded"] = True
                     except KeyError:
                         continue

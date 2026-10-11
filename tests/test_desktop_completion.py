@@ -37,6 +37,34 @@ class AskCompletionTests(unittest.TestCase):
                 self.base.session, {"task_id": task["task_id"], "operation": "approve"}
             )
 
+    def test_discard_is_session_scoped_for_planned_active_and_finished_tasks(self):
+        own_planned = self.base.ask()["task_id"]
+        own_active = self.base.ask()["task_id"]
+        self.h.store.transition(own_active, "executing")
+        original = self.base.session
+        self.base.session = self.h.grid.pair(original.node_id, self.base.scopes)
+        other_planned = self.base.ask()["task_id"]
+        other_active = self.base.ask()["task_id"]
+        self.h.store.transition(other_active, "executing")
+        other_finished = self.base.ask()["task_id"]
+        self.h.runtime.run(other_finished, self.core.targets)
+        unknown_session = self.base.ask()["task_id"]
+        record = self.h.store.get("desktop_task", unknown_session)
+        record.pop("session_id")
+        self.h.store.put("desktop_task", unknown_session, record)
+        other_private = {
+            identifier: dict(self.h.store.transient[identifier])
+            for identifier in (other_planned, other_active, other_finished, unknown_session)
+        }
+        self.base.session = original
+        self.base.call("discard", {})
+        self.assertNotIn(own_planned, self.h.store.transient)
+        self.assertTrue(self.h.store.transient[own_active]["discarded"])
+        for identifier, private in other_private.items():
+            with self.subTest(task_id=identifier):
+                self.assertEqual(private, self.h.store.transient.get(identifier))
+        self.assertEqual("verified", self.h.store.task(other_finished).state)
+
     def test_evidence_metadata_is_inspectable_without_private_paths_or_input(self):
         task = self.base.ask("2 + 3")
         self.base.confirm(task["task_id"])
