@@ -148,3 +148,49 @@ Actual [short Core interaction](../ui/mobile/completion/captures/13-2-reference-
 [independent review](reviews/13-2-INDEPENDENT.md). Capture review corrected inherited
 purple Material dialog defaults and moved epistemic caveats above long content.
 Abrupt process death is exercised during 13.8; physical/native owner use is deferred.
+
+## 13.3 — Activity / consequential decisions
+
+Native Active/Finished supervision and a selectable task inspector expose actual
+states, target ownership, evidence references and session-available artifact
+metadata. Live ownership requires a current active Grid lease and online node.
+Worker progress stays REPORTED; mismatched lease/action, stale timestamp and
+prior attempts become explicitly previous checkpoints. Offline execution is
+UNKNOWN rather than animated working. Only advertised control actions appear.
+
+Approval review presents complete exact request, plan, consequence, target and
+permission scope. Length-framed UTF-8 display digest and task generation are in
+the existing signed Core claim; changed display/audience/scope/generation/expiry
+fails closed. Reply preview matches the signed text hash. Native confirmation
+callbacks are epoch/current-decision fenced and cancelled on disposal. Opening,
+dismissing or unavailable Android confirmation grants nothing. Core remains exact
+expiry/policy/execution authority; critical-risk strong confirmation stays BLOCKED.
+
+Fresh Core observation qualifies the client clock; local timer timing is advisory
+under device clock changes/transport latency. A 250ms admission tolerance does
+not extend Core authority. Native testing reproduced a clock-domain rejection,
+then passed after correction. It also exposed missing polling restart after local
+disconnect/reconnect; foreground pairing now restarts the existing polling loop.
+
+Validation: **15 app + 5 expression JVM**, independent **20 JVM + 18 Core**, focused
+Core/Grid/Desktop/reference **56 PASS**, full API35 Compose **13 executed / one
+optional fixture skip**, exact native approval/inspection/expiry/denial scenario
+PASS. Real Core expiry precedes explicit test-clock effect dispatch; no physical
+timing quality claim. The real Android handoff on the insecure reference AVD fails
+closed. A separate reference-only RSA signer denies through actual Core HTTP;
+canonical cancellation and absence of execution are read back. This is not owner
+consent, a fabricated biometric success or an Android signing acceptance claim.
+
+[Independent review](reviews/13-3-INDEPENDENT.md) accepts bounded closure after
+ownership, progress, generation and clock corrections. Curated
+[approval](../ui/mobile/completion/captures/13-3-reference-approval.png) and
+[cancelled readback](../ui/mobile/completion/captures/13-3-reference-denied-readback.png)
+retain explicit reference provenance. The new disposable HTTP fixture uses the
+existing Core/Runtime/Grid and actual Desktop/Mobile adapters; its separate admin
+port supports only signed denial for its own synthetic session. No product API,
+owner enrollment, private account or remote deployment was added.
+
+During interruption, WHPX launch failed and software emulation did not boot. After
+the owner stopped gaming, the1536MB/2-core reference AVD booted and native checks
+resumed. Smaller-memory success is observed; RAM as the cause is an inference.
+No host permissions, security settings, original AVD data or app dependency changed.

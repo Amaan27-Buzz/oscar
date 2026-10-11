@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
             state.link == Link.DEGRADED -> "Connection needs attention"
             state.link != Link.CONNECTED -> "OSCAR is not connected"
             state.approval != null || state.snapshot?.tasks?.any { "approve" in it.actions } == true -> "Your decision is needed"
+            state.snapshot?.tasks?.any { it.nodeStatus != "online" && it.state in setOf("executing", "awaiting_result", "result_received", "verifying") } == true -> "Executor unavailable"
             state.snapshot?.tasks?.any { it.state == "verifying" } == true -> "Checking the outcome"
             state.snapshot?.tasks?.any { it.state in setOf("executing", "awaiting_result", "result_received") } == true -> "Work is underway"
             state.busy -> "Waiting for Core"
@@ -72,27 +73,6 @@ import androidx.compose.ui.unit.dp
             }
         }
     }, confirmButton = { TextButton(onClick = close) { Text("Back") } })
-}
-@Composable fun ActivityScreen(state: MobileState, inspect: (String) -> Unit, review: (CoreTask, String) -> Unit) {
-    Text("Ongoing work", style = MaterialTheme.typography.titleLarge)
-    if (state.snapshot == null) Text("Connect to Core to inspect activity. No cached task state is presented as current.")
-    else if (state.snapshot.tasks.isEmpty()) Text("Nothing is waiting here.")
-    state.snapshot?.tasks?.forEach { task ->
-        HorizontalDivider()
-        Text(task.description, style = MaterialTheme.typography.titleMedium, modifier = Modifier.testTag("task-description-${task.id}"))
-        Text(task.label, modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite })
-        Text("${task.target} · ${task.nodeStatus}", style = MaterialTheme.typography.bodySmall)
-        task.blocker?.let { Text(it) }
-        task.value?.let { Text("Result: $it") }
-        task.response?.let { Text(it); Text("Response · reported", style = MaterialTheme.typography.bodySmall) }
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-            TextButton(onClick = { inspect(task.id) }, enabled = !state.busy) { Text("Inspect") }
-            task.actions.filter { it != "deny" }.take(2).forEach { action ->
-                TextButton(onClick = { review(task, action) }, enabled = !state.busy) { Text(action.replaceFirstChar { it.uppercase() }) }
-            }
-        }
-        if ("deny" in task.actions) TextButton(onClick = { review(task, "deny") }, enabled = !state.busy) { Text("Deny request") }
-    }
 }
 @Composable fun DevicesScreen(state: MobileState, connect: () -> Unit) {
     Text("Connection Grid", style = MaterialTheme.typography.titleLarge)

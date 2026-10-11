@@ -85,11 +85,17 @@ private val Ink = Color(0xFF1A1B18)
             }
         }
         if (pairing) PairingDialog({ pairing = false }) { json -> pairing = false; session.connect(json) }
+        state.inspected?.let { TaskInspector(it, session::closeInspector) }
         state.approval?.let { approval ->
-            ApprovalDialog(approval, state.busy, session::dismissApproval) {
+            DisposableEffect(state.epoch, approval.id) { onDispose { confirmation.cancel() } }
+            ApprovalDialog(approval, state.busy, approval.current(state, System.currentTimeMillis()), session::dismissApproval, confirm = {
                 val epoch = state.epoch
-                confirmation.confirm(approval, { session.complete(approval, epoch) }, { session.dismissApproval(); session.message("Confirmation denied or unavailable. No action is confirmed.") })
-            }
+                confirmation.confirm(approval, { session.complete(approval, epoch) }, {
+                    if (session.state.value.epoch == epoch && session.state.value.approval == approval) {
+                        session.dismissApproval(); session.message("Android confirmation was denied or unavailable. This phone granted no consent.")
+                    }
+                })
+            }, replyPreview = state.replyPreview, coreNow = state.coreNow(System.currentTimeMillis()))
         }
     }
 }
@@ -111,20 +117,6 @@ private val Ink = Color(0xFF1A1B18)
         TextButton(enabled = listOf(origin, node, id, token).none { it.isBlank() }, onClick = {
             connect(JSONObject().put("url", origin).put("node_id", node).put("session_id", id).put("token", token))
         }) { Text("Connect") }
-    })
-}
-@Composable private fun ApprovalDialog(approval: Approval, busy: Boolean, close: () -> Unit, confirm: () -> Unit) {
-    AlertDialog(onDismissRequest = close, title = { Text("Review ${approval.operation}") }, text = {
-        Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text(approval.description, style = MaterialTheme.typography.titleMedium)
-            Text("Why: ${approval.reason}")
-            Text("Source: OSCAR Core · ${approval.capability}\nTarget: ${approval.target}")
-            Text("Consequence: ${approval.consequence}")
-            Text(approval.policyReason)
-            Text("Confirm with biometric or phone PIN. This approves one current decision and grants no permanent authority.")
-        }
-    }, dismissButton = { TextButton(onClick = close) { Text("Back") } }, confirmButton = {
-        TextButton(onClick = confirm, enabled = !busy) { Text("Confirm securely") }
     })
 }
 @Composable fun OscarOrb(state: MobileState, composing: Boolean = false, size: Dp = 108.dp, reduced: Boolean = false) {

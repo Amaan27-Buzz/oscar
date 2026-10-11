@@ -16,6 +16,7 @@ class MobileExpressionTest {
         val raw = adapter.event(base.copy(snapshot = snapshot), now)
         assertFalse(raw.contains("private"))
         assertEquals(Operation.VERIFYING, Contract.validate(raw, now)!!.operation)
+        assertEquals(Operation.UNKNOWN, Contract.validate(adapter.event(base.copy(snapshot = snapshot.copy(tasks = listOf(task.copy(nodeStatus = "offline")))), now), now)!!.operation)
         assertEquals(Operation.UNKNOWN, Contract.validate(adapter.event(base.copy(epoch = 3), now), now)!!.operation)
         assertEquals(Operation.UNAVAILABLE, Contract.validate(adapter.event(MobileState(epoch = 2), now), now)!!.operation)
     }

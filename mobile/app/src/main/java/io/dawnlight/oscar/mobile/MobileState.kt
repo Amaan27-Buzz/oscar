@@ -12,8 +12,9 @@ data class CoreTask(
     val evidence: List<String>, val value: String?, val blocker: String?,
     val response: String? = null,
     val responseTruncated: Boolean = false,
+    val progress: CoreProgress? = null, val artifacts: List<CoreArtifact> = emptyList(), val ownership: String = "planned",
 ) {
-    val label: String get() = when (state) {
+    val label: String get() = if (state in setOf("executing", "awaiting_result", "result_received", "verifying") && nodeStatus != "online") "Executor unavailable · outcome UNKNOWN" else when (state) {
         "planned" -> "Needs approval"
         "executing" -> "Working"
         "awaiting_result" -> "Waiting for Worker"
@@ -25,35 +26,11 @@ data class CoreTask(
         else -> state.replaceFirstChar { it.uppercase() }
     }
 }
+data class CoreProgress(val fraction: Double, val step: String, val current: Boolean)
+data class CoreArtifact(val id: String, val kind: String, val status: String, val hash: String?)
 data class CoreNode(val id: String, val role: String, val status: String, val paired: Boolean, val capabilities: List<String>)
 data class CoreSnapshot(val tasks: List<CoreTask>, val nodes: List<CoreNode>, val observedAt: Long)
 data class Interaction(val text: String, val response: String, val taskId: String? = null)
-data class Approval(
-    val id: String, val signingPayload: String, val expiresAt: Long, val operation: String,
-    val description: String, val target: String, val capability: String, val reason: String,
-    val consequence: String, val policyReason: String,
-) {
-    fun material(): JSONObject = JSONObject(String(java.util.Base64.getDecoder().decode(signingPayload), Charsets.UTF_8)).getJSONObject("material")
-    fun acceptsPermit(permit: JSONObject): Boolean = operation == "reply" &&
-        listOf("package", "key_hash", "text_hash").all { permit.get(it) is String && permit.getString(it) == material().getString(it) } && permit.getString("id") == id
-    companion object {
-        fun parse(json: JSONObject): Approval {
-            require(json.getString("confirmation") == "biometric_or_device_credential")
-            val payload = json.bounded("signing_payload", 16000)
-            // The Core signs the exact bytes. UI fields are validated, never substituted into them.
-            val claim = JSONObject(String(java.util.Base64.getDecoder().decode(payload), Charsets.UTF_8))
-            require(claim.getInt("version") == 1 && claim.getLong("expires_at_ms") == json.getLong("expires_at_ms"))
-            require(claim.getString("operation") == json.getString("operation"))
-            require(json.getString("operation") in setOf("approve", "deny", "cancel", "retry", "reply"))
-            val material = claim.getJSONObject("material")
-            require((if (json.getString("operation") == "reply") material.getString("package") else material.getString("target")) == json.getString("target"))
-            return Approval(json.bounded("challenge_id", 80), payload, json.getLong("expires_at_ms"),
-                json.bounded("operation", 16), json.bounded("description", 256), json.bounded("target", 256),
-                json.bounded("capability", 80), json.bounded("reason", 256), json.bounded("consequence", 256),
-                json.bounded("policy_reason", 256))
-        }
-    }
-}
 data class MobileState(
     val epoch: Long = 0, val link: Link = Link.DISCONNECTED, val busy: Boolean = false,
     val snapshot: CoreSnapshot? = null, val interactions: List<Interaction> = emptyList(),
@@ -61,7 +38,10 @@ data class MobileState(
     val observedAt: Long = 0,
     val draft: String = "", val inspected: CoreTask? = null, val privateSuppressed: Boolean = false,
     val restoring: Boolean = false,
+    val replyPreview: String? = null,
 ) {
+    fun coreNow(localNow: Long): Long = if (link == Link.CONNECTED && observedAt > 0 && snapshot != null)
+        localNow + snapshot.observedAt - observedAt else localNow
     val presence: Presence get() = when {
         link == Link.DEGRADED -> Presence.ERROR
         link != Link.CONNECTED -> Presence.UNAVAILABLE
@@ -72,7 +52,7 @@ data class MobileState(
     }
     fun fenced(next: MobileState, expectedEpoch: Long): MobileState = if (epoch == expectedEpoch) next else this
     fun unavailable(message: String) = copy(epoch = epoch + 1, link = Link.DEGRADED, busy = false,
-        snapshot = null, approval = null, inspected = null, interactions = emptyList(), observedAt = 0, restoring = false, message = message)
+        snapshot = null, approval = null, replyPreview = null, inspected = null, interactions = emptyList(), observedAt = 0, restoring = false, message = message)
 }
 
 private val taskStates = setOf("planned", "executing", "awaiting_result", "result_received", "verifying", "verified", "partially_verified", "failed", "blocked", "cancelled", "unknown")
@@ -108,11 +88,30 @@ fun parseTask(json: JSONObject): CoreTask {
     } else null
     require(status in setOf("online", "offline", "degraded"))
     require(!json.has("response_truncated") || json.get("response_truncated") is Boolean)
+    val progress = if (json.has("progress") && !json.isNull("progress")) {
+        val item = json.getJSONObject("progress")
+        require(item.get("fraction") is Number && item.getString("status") == "REPORTED")
+        val fraction = item.getDouble("fraction"); require(fraction.isFinite() && fraction in 0.0..1.0)
+        require(item.get("current") is Boolean)
+        CoreProgress(fraction, item.bounded("step", 256), item.getBoolean("current"))
+    } else null
+    val artifacts = if (json.has("artifacts")) {
+        val items = json.getJSONArray("artifacts"); require(items.length() <= 20)
+        (0 until items.length()).map {
+            val item = items.getJSONObject(it); val status = item.bounded("status", 32)
+            require(status in setOf("VERIFIED", "REPORTED", "UNKNOWN"))
+            val hash = if (!item.has("content_hash") || item.isNull("content_hash")) null else item.bounded("content_hash", 64).also { require(it.matches(Regex("[a-f0-9]{64}"))) }
+            CoreArtifact(item.bounded("id", 80), item.bounded("kind", 80), status, hash)
+        }
+    } else emptyList()
+    val ownership = if (json.has("ownership")) json.bounded("ownership", 16) else "planned"
+    require(ownership in setOf("planned", "leased", "none", "expired"))
     return CoreTask(json.bounded("task_id", 80), json.bounded("description", 256), state,
         json.bounded("target", 80), status, generation, if (status == "online") actions else actions.filter { it in setOf("cancel", "deny") },
-        evidence, value, blocker, response, json.optBoolean("response_truncated", false))
+        evidence, value, blocker, response, json.optBoolean("response_truncated", false), progress, artifacts, ownership)
 }
 fun CoreSnapshot.withoutPrivate() = copy(tasks = tasks.map { it.copy(description = "Private request hidden", response = null, value = null,
+    artifacts = emptyList(), progress = it.progress?.copy(step = "Worker checkpoint available"),
     blocker = it.blocker?.let { "Inspect Core before continuing" }, actions = it.actions.filter { action -> action in setOf("deny", "cancel") }) })
 fun parseSnapshot(json: JSONObject): CoreSnapshot {
     val tasks = json.getJSONArray("tasks")

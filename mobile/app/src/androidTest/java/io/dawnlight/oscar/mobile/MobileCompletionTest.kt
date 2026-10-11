@@ -162,6 +162,65 @@ class MobileCompletionTest {
         capture("13-2-long-reported-simulated", "responseDialog")
         compose.onNodeWithText("Back").performClick()
     }
+    @Test fun nativeApprovalInspectionExpiryAndReferenceDenialNeverFabricateConsent() {
+        val arguments = androidx.test.platform.app.InstrumentationRegistry.getArguments()
+        val origin = arguments.getString("group02_origin")
+        org.junit.Assume.assumeTrue("Explicit disposable Core fixture", origin != null)
+        require(origin!!.startsWith("http://127.0.0.1:"))
+        val fixture = org.json.JSONObject().put("url", origin).put("node_id", "reference-mobile-software")
+            .put("session_id", arguments.getString("group02_session")).put("token", arguments.getString("group02_token"))
+        val session = androidx.lifecycle.ViewModelProvider(compose.activity)[CoreSession::class.java]
+        compose.runOnIdle { session.connect(fixture) }
+        compose.waitUntil(10_000) { session.state.value.link == Link.CONNECTED }
+        compose.onNodeWithTag("interactionInput").performTextInput("what is four plus five")
+        compose.onNodeWithText("Send").performScrollTo().performClick()
+        compose.waitUntil(10_000) { session.state.value.interactions.isNotEmpty() && !session.state.value.busy }
+        val id = session.state.value.interactions.last().taskId!!
+        val task = session.state.value.snapshot!!.tasks.single { it.id == id }
+        val decoded = Approval.parse(CoreClient(fixture).call("challenge", org.json.JSONObject().put("operation", "approve").put("task_id", id)), session.state.value.coreNow(System.currentTimeMillis()))
+        assertEquals(task.generation, decoded.generation)
+        compose.runOnIdle { session.review(task, "approve") }
+        compose.waitUntil(10_000) { session.state.value.approval != null || session.state.value.link != Link.CONNECTED }
+        assertNotNull("Review failed: ${session.state.value.message}", session.state.value.approval)
+        val approval = session.state.value.approval!!
+        assertEquals("what is four plus five", approval.exactRequest)
+        compose.onNode(hasText(approval.review) and hasAnyAncestor(hasTestTag("approvalDialog"))).assertExists()
+        compose.onNodeWithText("Confirm securely").assertIsEnabled()
+        capture("13-3-reference-approval", "approvalDialog")
+        assertEquals("planned", parseTask(CoreClient(fixture).call("inspect", org.json.JSONObject().put("task_id", id))).state)
+        compose.waitUntil(35_000) { session.state.value.coreNow(System.currentTimeMillis()) >= approval.expiresAt }
+        compose.runOnIdle { session.refreshNow() }
+        compose.waitUntil(10_000) { session.state.value.observedAt > approval.expiresAt - 30_000 }
+        compose.mainClock.advanceTimeBy(30_500)
+        compose.onNodeWithText("Confirm securely").assertIsNotEnabled()
+        compose.onNodeWithText("Back").performClick()
+        assertNull(session.state.value.approval)
+        compose.runOnIdle { session.inspect(id) }
+        compose.waitUntil(10_000) { session.state.value.inspected != null }
+        compose.onNodeWithTag("taskInspector").assertExists()
+        compose.onNodeWithText("Back").performClick()
+        compose.runOnIdle { session.review(task, "deny") }
+        compose.waitUntil(10_000) { session.state.value.approval != null }
+        // Genuine Android handoff on an uncommissioned emulator must fail closed.
+        assertFalse(compose.activity.getSystemService(android.app.KeyguardManager::class.java).isDeviceSecure)
+        compose.onNodeWithText("Confirm denial").performClick()
+        compose.waitUntil(5000) { session.state.value.approval == null }
+        assertEquals("planned", parseTask(CoreClient(fixture).call("inspect", org.json.JSONObject().put("task_id", id))).state)
+        val connection = java.net.URI(arguments.getString("group02_control")!!).toURL().openConnection() as java.net.HttpURLConnection
+        try {
+            connection.requestMethod = "POST"; connection.doOutput = true; connection.connectTimeout = 5000; connection.readTimeout = 8000
+            connection.setRequestProperty("X-Reference-Token", arguments.getString("group02_control_token"))
+            val data = org.json.JSONObject().put("operation", "deny").put("task_id", id).toString().toByteArray()
+            connection.setFixedLengthStreamingMode(data.size); connection.outputStream.use { it.write(data) }
+            assertEquals(200, connection.responseCode)
+            val denied = parseTask(org.json.JSONObject(connection.inputStream.bufferedReader().use { it.readText() }))
+            assertEquals("cancelled", denied.state)
+        } finally { connection.disconnect() }
+        compose.runOnIdle { session.refreshNow() }
+        compose.waitUntil(10_000) { session.state.value.snapshot?.tasks?.any { it.id == id && it.state == "cancelled" } == true }
+        assertNull(session.state.value.approval)
+        capture("13-3-reference-denied-readback")
+    }
 }
 
 private fun MainActivity.setContentForTest(content: @Composable () -> Unit) = setContent(content = content)

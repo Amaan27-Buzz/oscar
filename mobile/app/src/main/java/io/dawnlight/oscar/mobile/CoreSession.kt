@@ -145,24 +145,30 @@ class CoreSession(application: Application) : AndroidViewModel(application) {
     fun review(task: CoreTask, action: String) {
         if (action !in task.actions) return
         request { epoch ->
-            val approval = Approval.parse(call("challenge", JSONObject().put("operation", action).put("task_id", task.id), epoch))
-            if (mutable.value.epoch == epoch) mutable.value = mutable.value.copy(approval = approval)
+            val approval = Approval.parse(call("challenge", JSONObject().put("operation", action).put("task_id", task.id), epoch), mutable.value.coreNow(System.currentTimeMillis()))
+            require(client?.matches(approval) == true)
+            if (mutable.value.epoch == epoch) { replyText = null; mutable.value = mutable.value.copy(approval = approval, replyPreview = null) }
         }
     }
-    fun dismissApproval() { replyText = null; mutable.value = mutable.value.copy(approval = null) }
+    fun dismissApproval() { replyText = null; mutable.value = mutable.value.copy(approval = null, replyPreview = null) }
     fun reviewReply(source: JSONObject, text: String) {
         if (text.isBlank() || text.length > 500) return
         request { epoch ->
             val proposal = JSONObject().put("operation", "reply").put("package", source.bounded("package", 256))
                 .put("key_hash", source.bounded("key_hash", 64)).put("text_hash", NotificationBoundary.hash(text))
-            val approval = Approval.parse(call("challenge", proposal, epoch))
-            if (mutable.value.epoch == epoch) { replyText = text; mutable.value = mutable.value.copy(approval = approval) }
+            val approval = Approval.parse(call("challenge", proposal, epoch), mutable.value.coreNow(System.currentTimeMillis()))
+            require(client?.matches(approval) == true)
+            require(approval.acceptsReply(text))
+            if (mutable.value.epoch == epoch) { replyText = text; mutable.value = mutable.value.copy(approval = approval, replyPreview = text) }
         }
     }
     fun complete(approval: Approval, expectedEpoch: Long) {
-        if (mutable.value.epoch != expectedEpoch || mutable.value.approval != approval) return
+        if (mutable.value.epoch != expectedEpoch || client?.matches(approval) != true || !approval.current(mutable.value, System.currentTimeMillis())) return
         request { epoch ->
-            val signature = withContext(Dispatchers.IO) { vault.sign(approval.signingPayload) }
+            val signature = wire.withLock {
+                check(mutable.value.epoch == epoch && approval.current(mutable.value, System.currentTimeMillis()))
+                withContext(Dispatchers.IO) { vault.sign(approval.signingPayload) }
+            }
             val started = android.os.SystemClock.elapsedRealtime()
             val result = call("complete", JSONObject().put("challenge_id", approval.id).put("signature", signature), epoch)
             if (mutable.value.epoch != epoch || !active) return@request
@@ -178,7 +184,7 @@ class CoreSession(application: Application) : AndroidViewModel(application) {
                 require(task.id == approval.material().getString("task_id") && task.target == approval.target)
                 "${task.label}${task.value?.let { ": $it" } ?: ""}"
             }
-            mutable.value = mutable.value.copy(approval = null, message = message)
+            mutable.value = mutable.value.copy(approval = null, replyPreview = null, message = message)
             refresh()
         }
     }
@@ -198,7 +204,10 @@ class CoreSession(application: Application) : AndroidViewModel(application) {
                     check(mutable.value.epoch == epoch) { "Obsolete pairing" }
                     withContext(NonCancellable + Dispatchers.IO) { val connection = CoreClient(session); vault.save(session); connection }
                 }
-                if (mutable.value.epoch == epoch) { client = next; mutable.value = MobileState(epoch = epoch); refresh() }
+                if (mutable.value.epoch == epoch) {
+                    client = next; mutable.value = MobileState(epoch = epoch); refresh()
+                    if (active && mutable.value.epoch == epoch) start()
+                }
             } catch (cancelled: CancellationException) { throw cancelled }
             catch (_: Exception) { if (mutable.value.epoch == epoch) mutable.value = mutable.value.unavailable("Connection could not be saved. Check the trusted origin and scoped credentials.") }
         }
@@ -219,7 +228,7 @@ class CoreSession(application: Application) : AndroidViewModel(application) {
         if (mutable.value.link == Link.CONNECTING) { message("Wait for the connection outcome or disconnect locally before clearing Core context."); return }
         operation?.cancel(); client?.cancel(); replyText = null
         mutable.value = mutable.value.copy(epoch = mutable.value.epoch + 1, busy = false, draft = "", interactions = emptyList(),
-            approval = null, inspected = null, snapshot = null, privateSuppressed = true, message = "Clearing encrypted private recovery state…")
+            approval = null, replyPreview = null, inspected = null, snapshot = null, privateSuppressed = true, message = "Clearing encrypted private recovery state…")
         persistDraft("") {
         if (!request { epoch ->
             val result = call("discard", JSONObject(), epoch)

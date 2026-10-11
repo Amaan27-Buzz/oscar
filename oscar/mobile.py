@@ -32,6 +32,16 @@ def fingerprint(value: Any) -> str:
     ).hexdigest()
 
 
+def display_digest(*fields: str) -> str:
+    """Length-framed UTF-8 binds the exact displayed decision to the signed claim."""
+    digest = hashlib.sha256()
+    for field in fields:
+        encoded = field.encode("utf-8")
+        digest.update(len(encoded).to_bytes(4, "big"))
+        digest.update(encoded)
+    return digest.hexdigest()
+
+
 def public_key(encoded: str) -> Any:
     # Optional platform security executor; importing OSCAR never requires it.
     serialization = import_module("cryptography.hazmat.primitives.serialization")
@@ -199,7 +209,66 @@ class Mobile:
             if task.attempts < task.retry_budget + 1 and "control:approve:" + target in grants:
                 actions.append("retry")
         view["actions"] = actions
+        lease = self.store.get("lease", task.lease_id) if task.lease_id else None
+        live_lease = bool(
+            lease
+            and lease["active"]
+            and lease["expires_at"] > self.grid.clock()
+            and node["status"] == "online"
+            and task.state
+            in {
+                TaskState.EXECUTING,
+                TaskState.AWAITING_RESULT,
+                TaskState.RESULT_RECEIVED,
+                TaskState.VERIFYING,
+            }
+        )
+        view["ownership"] = (
+            "leased"
+            if live_lease
+            else "none"
+            if task.state
+            in {
+                TaskState.VERIFIED,
+                TaskState.FAILED,
+                TaskState.CANCELLED,
+                TaskState.PARTIALLY_VERIFIED,
+            }
+            else "expired"
+            if lease
+            else "planned"
+        )
+        view["artifacts"] = []
+        try:
+            checkpoint = self.store.get("worker_checkpoint", task_id)
+            try:
+                action = self.store.get("planned_action", task_id)
+            except KeyError:
+                action = {}
+            view["progress"] = {
+                "fraction": checkpoint["fraction"],
+                "step": checkpoint["step"] if private else "Worker checkpoint available",
+                "status": Epistemic.REPORTED,
+                "current": bool(
+                    live_lease
+                    and checkpoint.get("lease_id") == task.lease_id
+                    and checkpoint.get("action_id") == action.get("id")
+                    and 0 <= self.grid.clock() - checkpoint.get("observed_at", 0) <= 30
+                ),
+            }
+        except KeyError:
+            view["progress"] = None
         result = private.get("result")
+        if result and result.artifact:
+            artifact = result.artifact
+            view["artifacts"] = [
+                {
+                    "id": artifact.id,
+                    "kind": artifact.kind,
+                    "status": artifact.status,
+                    "content_hash": artifact.content_hash,
+                }
+            ]
         if result and result.success and task.state != TaskState.CANCELLED:
             if (
                 task.state == TaskState.VERIFIED
@@ -308,6 +377,14 @@ class Mobile:
                 "nonce": secrets.token_hex(32),
                 "operation": operation,
                 "scope": scope,
+                "generation": descriptor["task"]["attempts"] if operation != "reply" else None,
+                "display_digest": display_digest(
+                    str(operation),
+                    scope,
+                    str(material.get("target", material.get("package", ""))),
+                    review,
+                    exact_request,
+                ),
                 "material": material,
                 "expires_at_ms": expires,
             },
@@ -353,6 +430,7 @@ class Mobile:
             "review": review,
             "exact_request": exact_request,
             "scope": scope,
+            "generation": descriptor["task"]["attempts"] if operation != "reply" else None,
         }
 
     def complete(self, session: SessionHandle, payload: dict[str, Any]) -> dict[str, Any]:

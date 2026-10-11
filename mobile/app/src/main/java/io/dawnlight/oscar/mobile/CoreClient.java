@@ -15,9 +15,10 @@ final class CoreClient {
     void cancel() { HttpURLConnection current = active; if (current != null) current.disconnect(); }
     CoreClient(JSONObject session) throws Exception {
         validateEndpoint(session.getString("url"));
-        this.session = session;
+        this.session = new JSONObject(session.toString());
     }
     String binding() throws Exception { return NotificationBoundary.hash(session.optString("url") + "\n" + session.optString("node_id") + "\n" + session.optString("session_id")); }
+    boolean matches(Approval approval) { return session.optString("node_id").equals(approval.getNodeId()) && session.optString("session_id").equals(approval.getSessionId()); }
     static void validateEndpoint(String endpoint) throws Exception {
         URI uri = new URI(endpoint);
         boolean local = BuildConfig.DEBUG && "http".equals(uri.getScheme()) &&

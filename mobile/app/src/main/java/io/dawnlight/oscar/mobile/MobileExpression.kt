@@ -16,6 +16,7 @@ class MobileExpression(private val epoch: Long) {
             state.link == Link.DEGRADED -> Operation.ERROR
             state.link != Link.CONNECTED -> Operation.UNAVAILABLE
             state.approval != null || state.snapshot?.tasks?.any { "approve" in it.actions } == true -> Operation.WAITING
+            state.snapshot?.tasks?.any { it.nodeStatus != "online" && it.state in setOf("executing", "awaiting_result", "result_received", "verifying") } == true -> Operation.UNKNOWN
             state.snapshot?.tasks?.any { it.state == "verifying" } == true -> Operation.VERIFYING
             state.snapshot?.tasks?.any { it.state in setOf("executing", "awaiting_result", "result_received") } == true -> Operation.EXECUTING
             state.busy -> Operation.PROCESSING

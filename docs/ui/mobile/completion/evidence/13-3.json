@@ -1,0 +1,37 @@
+{
+  "stage": "13.3",
+  "jvm": {
+    "app": 15,
+    "expression": 5,
+    "failures": 0
+  },
+  "full_api35": {
+    "tests": 14,
+    "executed": 13,
+    "optional_skipped": 1,
+    "failures": 0
+  },
+  "core_focused": {
+    "tests": 56,
+    "failures": 0
+  },
+  "independent": {
+    "jvm": 20,
+    "core": 18,
+    "failures": 0
+  },
+  "native_approval": {
+    "result": "PASS",
+    "real_core_expiry": true,
+    "test_clock_dispatch_after_real_expiry": true,
+    "android_confirmation": "UNAVAILABLE_FAIL_CLOSED",
+    "separate_reference_signed_denial": "CANCELLED_NO_EXECUTION",
+    "owner_consent": "NOT_RUN"
+  },
+  "captures": {
+    "13-3-reference-approval.png": "db9b5b58f5adef1fba0f997a1e42f1e9123f7182024423a51ce266b352045bb9",
+    "13-3-reference-denied-readback.png": "a0c9502c9770286650630226328402a8396ec6494a47c12f8e53218e6d42a3ce"
+  },
+  "physical": "HARDWARE_VERIFICATION_DEFERRED",
+  "strong_critical": "BLOCKED"
+}

@@ -15,7 +15,7 @@ from urllib.request import Request, urlopen
 from oscar.contracts import TaskState
 from oscar.grid import Node, NodeRole, SessionHandle
 from oscar.harness import Harness
-from oscar.mobile import Mobile, MobileServer
+from oscar.mobile import Mobile, MobileServer, display_digest
 from oscar.policy import PersonalPolicy, PolicyEffect, PolicyRule
 from oscar.storage import StateConflict
 
@@ -24,6 +24,42 @@ from .support import RouterRig
 
 @unittest.skipUnless(importlib.util.find_spec("cryptography"), "optional Mobile security executor")
 class MobileTests(unittest.TestCase):
+    def test_full_native_review_digest_and_private_progress_metadata(self) -> None:
+        task = self.call("text", {"text": "what is two plus three"}, "native-review")
+        challenge = self.call("challenge", {"operation": "approve", "task_id": task["task_id"]})
+        claim = json.loads(base64.b64decode(challenge["signing_payload"]))
+        self.assertEqual(challenge["exact_request"], "what is two plus three")
+        self.assertEqual(
+            claim["display_digest"],
+            display_digest(
+                challenge["operation"],
+                challenge["scope"],
+                challenge["target"],
+                challenge["review"],
+                challenge["exact_request"],
+            ),
+        )
+        self.assertNotEqual(
+            claim["display_digest"],
+            display_digest(
+                "approve", challenge["scope"], challenge["target"], "{}", challenge["exact_request"]
+            ),
+        )
+        self.h.store.put(
+            "worker_checkpoint",
+            task["task_id"],
+            {"fraction": 0.5, "step": "synthetic-private-step"},
+        )
+        view = self.core.inspect(self.session, task["task_id"])
+        self.assertEqual(view["progress"]["status"], "REPORTED")
+        self.assertEqual(view["progress"]["step"], "synthetic-private-step")
+        self.assertFalse(view["progress"]["current"])
+        replacement = self.h.grid.pair(self.session.node_id, self.scopes)
+        public = self.core.inspect(replacement, task["task_id"])
+        self.assertEqual(public["progress"]["step"], "Worker checkpoint available")
+        self.assertEqual(public["artifacts"], [])
+        self.assertNotIn("approve", public["actions"])
+
     def setUp(self) -> None:
         from cryptography.hazmat.primitives import serialization
         from cryptography.hazmat.primitives.asymmetric import rsa

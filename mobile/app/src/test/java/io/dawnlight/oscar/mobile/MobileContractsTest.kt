@@ -57,16 +57,21 @@ class MobileContractsTest {
     @Test fun approvalDisplayAndDeliveryStayBoundToSignedMaterial() {
         val material = JSONObject().put("package", "example.source").put("key_hash", "a".repeat(64)).put("text_hash", "b".repeat(64))
         val claim = JSONObject().put("version", 1).put("operation", "reply").put("expires_at_ms", 1000L).put("material", material)
+            .put("scope", "notifications:reply").put("node_id", "fixture").put("session_id", "fixture").put("nonce", "c".repeat(64))
+            .put("display_digest", Approval.displayDigest("reply", "notifications:reply", "example.source", "{}", ""))
+            .put("generation", JSONObject.NULL)
         val encoded = java.util.Base64.getEncoder().encodeToString(claim.toString().toByteArray())
         val json = JSONObject().put("challenge_id", "challenge").put("signing_payload", encoded).put("expires_at_ms", 1000L)
             .put("operation", "reply").put("description", "Neutral fixture reply").put("target", "example.source")
             .put("capability", "notification.reply").put("reason", "Owner request").put("consequence", "Source handoff")
             .put("policy_reason", "Policy rechecked").put("confirmation", "biometric_or_device_credential")
-        val approval = Approval.parse(json)
+            .put("scope", "notifications:reply").put("review", "{}").put("exact_request", "")
+            .put("generation", JSONObject.NULL)
+        val approval = Approval.parse(json, 0)
         val permit = JSONObject(material.toString()).put("id", "challenge")
         assertTrue(approval.acceptsPermit(permit))
         assertFalse(approval.acceptsPermit(permit.put("package", "another.source")))
-        rejected { Approval.parse(json.put("target", "another.source")) }
+        rejected { Approval.parse(json.put("target", "another.source"), 0) }
     }
     @Test fun actualCoreSnapshotContractDecodesCapabilitiesAndEvidence() {
         val text = javaClass.getResourceAsStream("/core_snapshot.json")!!.bufferedReader().use { it.readText() }

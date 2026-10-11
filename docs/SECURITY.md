@@ -16,6 +16,14 @@ Reviews exceeding 24,000 combined UTF-8 bytes are rejected before challenge
 creation. Android biometric/PIN success is not Core attestation of strong critical
 confirmation: critical capabilities remain blocked under the current contract.
 
+Group 2's signed claim additionally binds exact displayed review/request/scope/
+target through length-framed UTF-8 SHA-256 and carries the task generation.
+Android validates its current source audience and current action before signing;
+Core still rechecks exact descriptor, permission, policy, nonce and expiry.
+Clock qualification comes from fresh authenticated Core readback; UI timing is
+advisory and never extends server authority. Android unavailable authentication
+does not sign, enroll or authorize. A reference test signer is never owner proof.
+
 ## Desktop private context boundary
 
 Desktop perception, clipboard, microphone and action grants remain separate; no retention grant is inferred. Password/hidden/unregistered content fails closed, private inputs/results are process-local, and restart blocks replay. Signed session/digest/expiry challenges create no permanent grants; critical capabilities await strong owner approval. The fixed UIA source receives bounded private stdin rather than command-line text. See [Desktop foundation](DESKTOP-FOUNDATION.md).

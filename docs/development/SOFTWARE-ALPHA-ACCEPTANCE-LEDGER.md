@@ -85,6 +85,10 @@ Base: `dcfd31bca6fbd8080f4c20bebe3d448e4bd8dc2f`, separate branch
 | M32-02 | Draft encryption, source isolation, recreation and late callbacks | SOFTWARE_VERIFIED | AES-GCM source AAD; epoch/wire serialization; interrupted-save + native crypto/recreation regressions |
 | M32-03 | Privacy-safe discard and foreground recovery | REFERENCE_VERIFIED | Real Core acknowledgement; atomic pending marker and new-ViewModel suppression; no implicit cancel/replay |
 | M32-04 | Abrupt process death | OWNER_VERIFICATION_DEFERRED | Reference process-kill test scheduled13.8; phone recovery remains consolidated acceptance |
+| M33-01 | Task supervision, real ownership, progress and evidence | SOFTWARE_VERIFIED | Current lease/action/time qualification; prior progress explicit; Core56/JVM20; selectable inspector |
+| M33-02 | Complete exact review, scope, audience and generation | REFERENCE_VERIFIED | Native full review; length-framed signed display digest; changed material/generation/expiry regressions |
+| M33-03 | Opening/dismissal/expiry/unavailable confirmation grants nothing | REFERENCE_VERIFIED | API35 actual review/expiry/readback; real Android unavailable handoff; separate reference-signed denial/no execution |
+| M33-04 | Android owner biometric/PIN/signing and critical attestation | HARDWARE_VERIFICATION_DEFERRED | No biometric success fabricated; native owner commissioning deferred; STRONG-APPROVAL remains BLOCKED |
 
 Every Group 1 consolidated obligation above carries forward unchanged, especially
 STRONG-APPROVAL BLOCKED and Windows/Voice/phone/Edge/manual verification.
