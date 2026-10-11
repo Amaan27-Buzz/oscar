@@ -214,7 +214,7 @@ class Mobile:
             view["origin_surface"] = "Desktop"
         except KeyError:
             view["origin_surface"] = "Mobile" if association else "Core"
-        view["origin_node"] = association.get("node_id")
+        view["origin_node"] = association.get("node_id") if association else None
         lease = self.store.get("lease", task.lease_id) if task.lease_id else None
         live_lease = bool(
             lease

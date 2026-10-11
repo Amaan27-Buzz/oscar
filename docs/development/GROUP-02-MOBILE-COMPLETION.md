@@ -234,3 +234,23 @@ four small lifecycle regressions. The initial text assertion used exact matching
 for a substring and failed; corrected exact-message/state waits pass. Actual
 [denied voice capture](../ui/mobile/completion/captures/13-5-voice-denied-reference.png)
 reviewed. Acoustic/audio/phone validation remains deferred, not a voice runtime PASS.
+
+## 13.6 — Privacy and permissions
+
+Separate perceive/retain/act controls use legitimate Android permission/settings
+flows and independent local grants. Source allowlists exclude every unlisted app;
+no raw audio/notification archive is enabled. Sensitive notification content is
+redacted from metadata/UI, with content fingerprints still binding exact source
+reply actions. Foreground grant changes, source epochs and boundary revisions clear
+cached source/reply views. Final reply delivery rechecks actual access and one-use
+Core permit. Local revoke cancels audio epochs immediately; persistence failures
+remain explicitly unverified. Unsupported retention/routing/camera/location remain
+truthful unavailable controls, not decorative switches.
+
+Build/JVM app20+expression5 PASS; native privacy3 PASS and capture rerun1 PASS.
+Synthetic policy inputs are SIMULATED_ONLY; actual denied listener/OS permission
+state is REFERENCE_VERIFIED. Core56 and full Core558/6 optional skips passed.
+Full mypy found a Grid-origin nullable association defect; it is corrected and a
+real leased Core-origin task regression now passes. No permission was granted to
+make tests pass. [Independent review](reviews/group-02/13-6-INDEPENDENT.md) includes
+parent independent inspection of authored privacy changes.

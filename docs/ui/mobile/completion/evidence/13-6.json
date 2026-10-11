@@ -1,0 +1,10 @@
+{
+  "slice": "13.6",
+  "native_tests": 3,
+  "native_failures": 0,
+  "capture_rerun": "PASS",
+  "jvm": 25,
+  "physical": "NOT_RUN",
+  "synthetic_policy": "SIMULATED_ONLY",
+  "denied_permission": "REFERENCE_VERIFIED"
+}

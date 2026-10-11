@@ -15,30 +15,38 @@ import org.json.JSONObject;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 
 /** Transient, source-filtered notification perception. No raw archive or unrestricted app access. */
 public final class NotificationBoundary extends NotificationListenerService {
     private static volatile NotificationBoundary active;
+    private static final AtomicLong revision = new AtomicLong();
     private final Map<String, StatusBarNotification> current = new LinkedHashMap<>();
     private final Set<String> consumed = new HashSet<>();
 
-    @Override public void onListenerConnected() { active = this; }
+    @Override public void onListenerConnected() { active = this; revision.incrementAndGet(); }
     @Override public void onListenerDisconnected() {
         if (active == this) active = null;
         synchronized (current) { current.clear(); consumed.clear(); }
+        revision.incrementAndGet();
     }
     @Override public void onDestroy() { onListenerDisconnected(); super.onDestroy(); }
     static void privacyChanged() {
+        revision.incrementAndGet();
         NotificationBoundary listener = active;
         if (listener == null) return;
         synchronized (listener.current) {
-            listener.current.values().removeIf(value -> !listener.allowed(value.getPackageName()));
+            listener.current.clear();
         }
     }
+    static long revision() { return revision.get(); }
     private boolean allowed(String source) {
-        var prefs = getSharedPreferences("permissions", MODE_PRIVATE);
-        return getSystemService(NotificationManager.class).isNotificationListenerAccessGranted(
-            new ComponentName(this, NotificationBoundary.class)) &&
+        return sourceAllowed(this, source, getSystemService(NotificationManager.class).isNotificationListenerAccessGranted(
+            new ComponentName(this, NotificationBoundary.class)));
+    }
+    static boolean sourceAllowed(android.content.Context context, String source, boolean androidAccess) {
+        var prefs = context.getSharedPreferences("permissions", MODE_PRIVATE);
+        return androidAccess &&
             prefs.getBoolean("notification_context", false) &&
             Arrays.asList(prefs.getString("notification_sources", "").split(",")).contains(source);
     }
@@ -47,10 +55,11 @@ public final class NotificationBoundary extends NotificationListenerService {
         synchronized (current) {
             if (current.size() >= 32) current.remove(current.keySet().iterator().next());
             current.put(notification.getKey(), notification);
+            revision.incrementAndGet();
         }
     }
     @Override public void onNotificationRemoved(StatusBarNotification notification) {
-        synchronized (current) { current.remove(notification.getKey()); }
+        synchronized (current) { current.remove(notification.getKey()); revision.incrementAndGet(); }
     }
     static String hash(String text) throws Exception {
         byte[] digest = MessageDigest.getInstance("SHA-256").digest(text.getBytes(StandardCharsets.UTF_8));
@@ -84,12 +93,20 @@ public final class NotificationBoundary extends NotificationListenerService {
         synchronized (listener.current) {
             for (StatusBarNotification notification : listener.current.values()) {
                 if (!listener.allowed(notification.getPackageName()) || replyAction(notification) == null) continue;
-                String title = String.valueOf(notification.getNotification().extras.getCharSequence(Notification.EXTRA_TITLE, "Notification"));
-                result.add(new JSONObject().put("package", notification.getPackageName())
-                    .put("key_hash", identity(notification)).put("title", title.substring(0, Math.min(120, title.length()))));
+                result.add(metadata(notification));
             }
         }
         return result;
+    }
+    static JSONObject metadata(StatusBarNotification notification) throws Exception {
+        return new JSONObject().put("package", notification.getPackageName()).put("key_hash", identity(notification))
+            .put("title", notification.getPackageName() + " · reply available");
+    }
+    static boolean current(JSONObject source) {
+        try {
+            return exposed().stream().anyMatch(value -> value.optString("package").equals(source.optString("package")) &&
+                value.optString("key_hash").equals(source.optString("key_hash")));
+        } catch (Exception unavailable) { return false; }
     }
     static void send(JSONObject permit, String text, long requestStartedElapsed) throws Exception {
         NotificationBoundary listener = active;

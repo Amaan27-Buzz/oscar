@@ -15,6 +15,7 @@ from urllib.request import Request, urlopen
 from oscar.contracts import TaskState
 from oscar.grid import Node, NodeRole, SessionHandle
 from oscar.harness import Harness
+from oscar.jev import Intent
 from oscar.mobile import Mobile, MobileServer, display_digest
 from oscar.policy import PersonalPolicy, PolicyEffect, PolicyRule
 from oscar.storage import StateConflict
@@ -59,6 +60,13 @@ class MobileTests(unittest.TestCase):
         self.assertEqual(public["progress"]["step"], "Worker checkpoint available")
         self.assertEqual(public["artifacts"], [])
         self.assertNotIn("approve", public["actions"])
+
+    def test_core_origin_task_without_surface_association_is_inspectable(self) -> None:
+        task = self.h.runtime.create(Intent("3+4"))
+        self.h.runtime.run(task.id, {self.h.node_id: (self.h.dispatcher, self.h.session)})
+        view = self.core.inspect(self.session, task.id)
+        self.assertEqual(view["origin_surface"], "Core")
+        self.assertIsNone(view["origin_node"])
 
     def setUp(self) -> None:
         from cryptography.hazmat.primitives import serialization

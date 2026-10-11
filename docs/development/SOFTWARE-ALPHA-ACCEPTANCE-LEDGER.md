@@ -108,3 +108,7 @@ Expression36, Rust12; native/reference receipts linked in the Group 1 report.
 | M35-01 | Explicit voice invocation/cancel/text continuity | REFERENCE_VERIFIED | API35 denied path PASS; no capture/owner permissions; real adapter status and epoch controls |
 | M35-02 | Delayed starts/terminal failures/stale audio callbacks | SOFTWARE_VERIFIED | Four JVM regressions and native denial; independent13.5 review |
 | M35-03 | Voice Core Android commissioning / actual room audio | HARDWARE_VERIFICATION_DEFERRED | Binding uncommissioned; no recognition/playback/enrollment PASS; existing Voice obligations unchanged |
+
+| M36-01 | Independent grants / actual denied permission UI / explicit revoke | REFERENCE_VERIFIED | Native privacy3 + capture rerun; no OS grants; immediate voice epoch invalidation |
+| M36-02 | Source exclusions, sensitive metadata and stale notification protection | SOFTWARE_VERIFIED | Source+fingerprint final reply gate; revision/epoch resets; synthetic metadata regressions |
+| M36-03 | Real ingestion/reply/mic/OEM and person-level Core policy | HARDWARE_VERIFICATION_DEFERRED | Owner/device acceptance; unsupported Core policy authoring remains unavailable |
