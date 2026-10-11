@@ -1,0 +1,10 @@
+{
+  "slice": "13.7",
+  "settings_native": 2,
+  "combined_smoke_executed": 3,
+  "process_helpers_skipped": 2,
+  "jvm": 25,
+  "core": 57,
+  "persona": "SIMULATED_ONLY",
+  "physical": "NOT_RUN"
+}

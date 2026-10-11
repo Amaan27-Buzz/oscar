@@ -112,3 +112,7 @@ Expression36, Rust12; native/reference receipts linked in the Group 1 report.
 | M36-01 | Independent grants / actual denied permission UI / explicit revoke | REFERENCE_VERIFIED | Native privacy3 + capture rerun; no OS grants; immediate voice epoch invalidation |
 | M36-02 | Source exclusions, sensitive metadata and stale notification protection | SOFTWARE_VERIFIED | Source+fingerprint final reply gate; revision/epoch resets; synthetic metadata regressions |
 | M36-03 | Real ingestion/reply/mic/OEM and person-level Core policy | HARDWARE_VERIFICATION_DEFERRED | Owner/device acceptance; unsupported Core policy authoring remains unavailable |
+
+| M37-01 | Settings, appearance/reduced motion, diagnostics / system handoffs | REFERENCE_VERIFIED | JVM25; actual API35 platform and persisted reduced-motion recreation |
+| M37-02 | Bounded Persona preview | SIMULATED_ONLY | Shared fixture expression; unsaved, no Core policy mutation |
+| M37-03 | Overlay/widget / full Presence / mutable routing commissioning | BLOCKED | Absent platform implementation remains explicitly unavailable; owns Slice16 integration, no new runtime |

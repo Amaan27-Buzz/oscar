@@ -254,3 +254,28 @@ Full mypy found a Grid-origin nullable association defect; it is corrected and a
 real leased Core-origin task regression now passes. No permission was granted to
 make tests pass. [Independent review](reviews/group-02/13-6-INDEPENDENT.md) includes
 parent independent inspection of authored privacy changes.
+
+## 13.7 — Settings and system surfaces
+
+Functional local appearance and reduced-motion preferences sit alongside legitimate
+permission, notification, assistant-role and accessibility settings. Bounded Persona
+preview is explicitly SIMULATED and never saved/applied to Core. Voice Identity,
+Match/Map commissioning, model routing and remote policy settings remain Core-owned
+and unavailable through the present API. Inert future preference switches were
+removed. Diagnostics reveal only public build/connection/count state.
+
+Slice09 inspection found assistant invocation opens MainActivity without recording;
+Overlay and widgets are absent, honestly unavailable and owned by Slice16. No full
+cross-device Presence runtime was relocated. Unavailable Android handoffs fail
+with feedback. Dark/System appearance works; system animator disable plus OSCAR
+reduced motion propagate to the existing shared renderer. UTF8 labels and labeled
+TalkBack switch corrected after independent review.
+
+App20+expression5 JVM, native Persona/platform/recreation2 PASS (combined smoke3
+executed/2 optional process-preparation skips), Core57 and mypy64 PASS. Actual
+[Platform](../ui/mobile/completion/captures/13-7-platform-reference.png),
+[Persona SIMULATED](../ui/mobile/completion/captures/13-7-persona-preview-simulated.png),
+[Accessibility](../ui/mobile/completion/captures/13-7-accessibility-reference.png)
+and [independent review](reviews/group-02/13-7-INDEPENDENT.md). Initial preview
+assertion was ambiguous between live and simulated Orbs; corrected count passes.
+Large-font smoke is distinct from actual display matrix testing in13.8.

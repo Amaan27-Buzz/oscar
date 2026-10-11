@@ -33,6 +33,9 @@ import kotlinx.coroutines.withContext
     if (page != "Settings") TextButton(onClick = { navigate("Settings") }) { Text("Back to Settings") }
     when (page) {
         "Voice" -> VoiceSettings()
+        "Persona" -> PersonaPreview()
+        "Accessibility" -> AppearanceSettings()
+        "Diagnostics" -> DiagnosticsSettings(state)
         "Privacy" -> PrivacySettings()
         "Platform" -> PlatformSettings()
         "Notifications" -> NotificationSettings(session, state)
@@ -45,11 +48,11 @@ import kotlinx.coroutines.withContext
         }
         else -> {
             Text("Your OSCAR", style = MaterialTheme.typography.titleLarge)
-            listOf("Voice", "Privacy", "Notifications", "Platform", "About").forEach { item ->
+            listOf("Persona", "Voice", "Privacy", "Notifications", "Platform", "Accessibility", "Diagnostics", "About").forEach { item ->
                 HorizontalDivider(); TextButton(onClick = { navigate(item) }, modifier = Modifier.fillMaxWidth()) { Text(item) }
             }
             Text("Persona and memory are managed by Core. Local switches cannot expand Core policy.")
-            TextButton(onClick = { context.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)) }) { Text("Android accessibility settings") }
+            TextButton(onClick = { try { context.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)) } catch (_: Exception) { session.message("Android accessibility settings are unavailable.") } }) { Text("Android accessibility settings") }
             TextButton(onClick = session::disconnect) { Text("Disconnect locally") }
             Text("Local disconnect deletes this app's credentials. Remote revocation remains a separate Core action.", style = MaterialTheme.typography.bodySmall)
         }
@@ -76,11 +79,13 @@ import kotlinx.coroutines.withContext
     val (context, revision) = observedPermissions()
     val role = context.getSystemService(RoleManager::class.java)
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { }
+    var unavailable by remember { mutableStateOf(false) }
     val selected = remember(revision) { VoiceInteractionService.isActiveService(context, ComponentName(context, AssistantService::class.java)) }
     Text("Android presence", style = MaterialTheme.typography.titleLarge)
     Text("Assistant · ${if (selected) "Selected" else "Not selected"}")
-    TextButton(onClick = { if (role.isRoleAvailable(RoleManager.ROLE_ASSISTANT)) launcher.launch(role.createRequestRoleIntent(RoleManager.ROLE_ASSISTANT)) }, enabled = role.isRoleAvailable(RoleManager.ROLE_ASSISTANT)) { Text("Choose assistant") }
+    TextButton(onClick = { try { if (role.isRoleAvailable(RoleManager.ROLE_ASSISTANT)) launcher.launch(role.createRequestRoleIntent(RoleManager.ROLE_ASSISTANT)) } catch (_: Exception) { unavailable = true } }, enabled = role.isRoleAvailable(RoleManager.ROLE_ASSISTANT)) { Text("Choose assistant") }
+    if (unavailable) Text("Android assistant selection is unavailable; no role change is confirmed.")
     Text("Supported assistant invocation opens this OSCAR surface. Selection does not enable background listening or grant permissions. OEM behavior requires device testing.")
-    Text("Overlay · not implemented\nWidgets · not implemented\nBackground microphone · user-started foreground service only, binding unavailable")
+    Text("Overlay · unavailable (Slice 16 runtime)\nWidgets · unavailable (Slice 16 runtime)\nBackground microphone · user-started foreground service only, binding unavailable")
     Text("Android restricts background foreground-service starts and microphone access. No boot capture or Accessibility automation is used.")
 }

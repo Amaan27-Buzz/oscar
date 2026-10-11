@@ -1,6 +1,8 @@
 package io.dawnlight.oscar.mobile
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
@@ -23,13 +25,32 @@ import androidx.activity.compose.BackHandler
 private val Paper = Color(0xFFF5F1E7)
 private val Ink = Color(0xFF1A1B18)
 @Composable fun OscarTheme(content: @Composable () -> Unit) {
-    MaterialTheme(colorScheme = lightColorScheme(primary = Ink, onPrimary = Color(0xFFFFFDF8),
+    val appearance = appearancePreference("theme", "system")
+    val dark = appearance == "dark" || (appearance == "system" && isSystemInDarkTheme())
+    val owner = androidx.lifecycle.compose.LocalLifecycleOwner.current
+    var systemMotionOff by remember { mutableStateOf(!android.animation.ValueAnimator.areAnimatorsEnabled()) }
+    DisposableEffect(owner) {
+        val observer = androidx.lifecycle.LifecycleEventObserver { _, event ->
+            if (event == androidx.lifecycle.Lifecycle.Event.ON_RESUME) systemMotionOff = !android.animation.ValueAnimator.areAnimatorsEnabled()
+        }
+        owner.lifecycle.addObserver(observer)
+        onDispose { owner.lifecycle.removeObserver(observer) }
+    }
+    val reduced = appearancePreference("motion", "system") == "reduced" || systemMotionOff
+    CompositionLocalProvider(LocalReducedMotion provides reduced) {
+    MaterialTheme(colorScheme = if (dark) darkColorScheme(primary = Color(0xFFF0EEE6), onPrimary = Ink,
+        secondary = Color(0xFF86B8F7), tertiary = Color(0xFFFFCF5A), background = Color(0xFF191B19),
+        surface = Color(0xFF191B19), surfaceContainer = Color(0xFF242723), surfaceContainerHigh = Color(0xFF292C27),
+        surfaceContainerHighest = Color(0xFF30342D), surfaceContainerLow = Color(0xFF20231E), surfaceContainerLowest = Color(0xFF151713),
+        surfaceTint = Color.Transparent, onBackground = Color(0xFFF0EEE6), onSurface = Color(0xFFF0EEE6), onSurfaceVariant = Color(0xFFC2C4B9),
+        outline = Color(0xFF999D8D), outlineVariant = Color(0xFF44493C), error = Color(0xFFFFB4A9)) else lightColorScheme(primary = Ink, onPrimary = Color(0xFFFFFDF8),
         secondary = Color(0xFF1D6FD6), tertiary = Color(0xFFFFC83D), background = Paper,
         surface = Paper, surfaceContainer = Color(0xFFFAF7EF), surfaceContainerHigh = Color(0xFFFAF7EF),
         surfaceContainerHighest = Color(0xFFFFFDF8), surfaceContainerLow = Paper, surfaceContainerLowest = Color(0xFFFFFDF8),
         surfaceTint = Color.Transparent, onBackground = Ink, onSurface = Ink, onSurfaceVariant = Color(0xFF625F57),
         outline = Color(0xFF8B877E), outlineVariant = Color(0xFFDDD7CA), error = Color(0xFFB6322B)),
         shapes = Shapes(small = androidx.compose.foundation.shape.RoundedCornerShape(8.dp), medium = androidx.compose.foundation.shape.RoundedCornerShape(12.dp), large = androidx.compose.foundation.shape.RoundedCornerShape(12.dp)), content = content)
+    }
 }
 @Composable fun OscarApp(session: CoreSession, confirmation: OwnerConfirmation) {
     val state by session.state.collectAsStateWithLifecycle()
@@ -63,7 +84,7 @@ private val Ink = Color(0xFF1A1B18)
                 .verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 Spacer(Modifier.height(8.dp))
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                    Text(if (destination == Destination.OSCAR) "OSCAR" else destination.label, style = MaterialTheme.typography.headlineSmall, modifier = Modifier.weight(1f))
+                    Text(if (destination == Destination.OSCAR) "OSCAR" else destination.label, style = MaterialTheme.typography.headlineSmall, modifier = Modifier.weight(1f).semantics { heading() })
                     TextButton(onClick = session::refreshNow, enabled = !state.busy) { Text("Refresh") }
                 }
                 OscarOrb(state, composing = draft.isNotBlank(), size = if (destination == Destination.OSCAR) 108.dp else 40.dp)
@@ -121,7 +142,7 @@ private val Ink = Color(0xFF1A1B18)
         }) { Text("Connect") }
     })
 }
-@Composable fun OscarOrb(state: MobileState, composing: Boolean = false, size: Dp = 108.dp, reduced: Boolean = false) {
+@Composable fun OscarOrb(state: MobileState, composing: Boolean = false, size: Dp = 108.dp, reduced: Boolean = LocalReducedMotion.current) {
     val voice by VoicePresentation.state.collectAsStateWithLifecycle()
     val adapter = remember(state.epoch) { MobileExpression(state.epoch) }
     val event = remember(state, composing, reduced, voice) { adapter.event(state, System.currentTimeMillis(), composing, reduced, voice.phase) }
