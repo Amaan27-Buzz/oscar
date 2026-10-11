@@ -329,3 +329,9 @@ started, and accepted main/work/default UI are not promoted by this candidate.
 Publication: pushed only `build/slice-12-desktop-completion` to the Buzz repository.
 Draft PR #2 is attached for review. Corrective base/main/work refs were independently
 rechecked unchanged. No merge, default promotion or next group was performed.
+
+Final export prerequisite: the resumed terminal had lost its owned Vite server.
+An additional native receipt-export attempt was stopped before verification,
+then rerun successfully after restarting Vite; its final CNG/UIA receipt is in
+the curated packet. This is a development-harness prerequisite, not a physical
+or production acceptance result. The owned helper was stopped after export.
