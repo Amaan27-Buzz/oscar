@@ -1,5 +1,16 @@
 # AGENTS.md
 
+## Owner software-first scope — 2026-10-11
+
+Group 1 authorizes Desktop Slice 12.2–12.6 on a separate development branch based
+on `da8fddae50112c8859b21247d0cbaa617be8667e`, with autonomous stage tests and
+independent reviews. Pending manual visual/device/physical acceptance is explicitly
+deferred in [the cumulative ledger](docs/development/SOFTWARE-ALPHA-ACCEPTANCE-LEDGER.md)
+and does not stop authorized software continuation. Do not infer physical PASS,
+weaken authority, merge/promote the candidate or begin Slice 13/Group 2. Earlier
+dated sequencing/stop notes below remain historical and are superseded only within
+this explicit scope. See [Group 1](docs/development/GROUP-01-DESKTOP-COMPLETION.md).
+
 Canonical instructions for Codex and other coding agents working on OSCAR.
 
 ## Current authoritative slice plan — 2026-10-09

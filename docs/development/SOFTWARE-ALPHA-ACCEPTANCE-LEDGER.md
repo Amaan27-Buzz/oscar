@@ -1,0 +1,72 @@
+# Software Alpha acceptance ledger
+
+Owner strategy decision: 2026-10-11. Build and autonomously validate the software
+first; consolidate manual visual, real-device and physical acceptance at the end
+of Groups 1–6. Deferred acceptance does not block authorized software development
+and never becomes physical or production PASS. Security and truthful state remain
+mandatory. Group 2 and Slice 13 are not authorized in this assignment.
+
+Allowed classifications: `SOFTWARE_VERIFIED`, `REFERENCE_VERIFIED`,
+`SIMULATED_ONLY`, `OWNER_VERIFICATION_DEFERRED`,
+`HARDWARE_VERIFICATION_DEFERRED`, `BLOCKED`, `FAILED`.
+Update a requirement only from its actual test/evidence boundary. Keep failures
+and later corrections linked; do not erase historical acceptance reports.
+
+## Group 1 — Desktop Slice 12
+
+Base: `da8fddae50112c8859b21247d0cbaa617be8667e`, branch
+`build/slice-12-desktop-completion`. Candidate software work is in progress.
+`BLOCKED` below means proof has not yet been supplied, not permission to stop.
+
+| ID | Requirement | Classification | Evidence / remaining work |
+|---|---|---|---|
+| D22-01 | Natural text input and response; repeated-interaction continuity | BLOCKED | Implement and test |
+| D22-02 | Current/private context and Controller Memory Preflight | BLOCKED | Trace existing Runtime/Memory Fabric; no React memory |
+| D22-03 | Bounded compact results and readable expanded/long response | BLOCKED | Implement and test |
+| D22-04 | Real progress/waiting/completion and evidence distinctions | BLOCKED | Native task readback; no invented token streaming |
+| D22-05 | Keyboard interaction, interruption and authorized cancellation | BLOCKED | Implement and test |
+| D22-06 | Offline/failure recovery; unavailable capability/model | BLOCKED | Extend corrective regressions |
+| D23-01 | Dictation entry/output and authoritative voice state | BLOCKED | Voice Core adapter and reference fixture |
+| D23-02 | Draft recovery and interruption/cancellation | BLOCKED | Implement and test |
+| D23-03 | Focused/selection context where advertised | BLOCKED | Registered disposable UIA target |
+| D23-04 | Exact destination-aware preview and explicit selection | BLOCKED | Implement and test |
+| D23-05 | Authorized apply, expected-value conflict and independent readback | BLOCKED | Existing Runtime/Worker/native signing boundary |
+| D23-06 | Denied mic/app permissions; no editable target | BLOCKED | Negative-path tests |
+| D24-01 | Current window/focus/selection and explicit supported capture | BLOCKED | No unsupported screenshot/tree claim |
+| D24-02 | Live Catalog selection, typed requests and scope/risk disclosure | BLOCKED | Existing Core/Worker contracts |
+| D24-03 | Approval, task progress and cancellation | BLOCKED | Implement and test |
+| D24-04 | Failure/recovery and independently verified outcome | BLOCKED | Disposable file/browser/application paths |
+| D24-05 | Inspectable evidence, context freshness/provenance | BLOCKED | Implement and test |
+| D24-06 | Suggested/planned/executing/blocked/reported/verified distinctions | BLOCKED | Actual authoritative state only |
+| D25-01 | Active/completed/blocked/failed tasks and pending decisions | BLOCKED | Unified progressive disclosure |
+| D25-02 | Progress, ownership, artifacts/results and evidence | BLOCKED | Core task/action readback |
+| D25-03 | Advertised cancel/continuation only | BLOCKED | No private replay or fictional resume |
+| D25-04 | Reconnect, task switching and readback ordering | BLOCKED | Core/native/React regressions |
+| D25-05 | Exact task/action/scope-bound approval and native signing | BLOCKED | Signed reference checks |
+| D25-06 | Denial, expiry, replay rejection and truthful attention | BLOCKED | Negative-path tests |
+| D26-01 | Canonical identity and shared weighted responsive motion | BLOCKED | Shared engine, no second renderer |
+| D26-02 | Spatial continuity, interruption and reduced motion | BLOCKED | Native content captures and regressions |
+| D26-03 | Keyboard/focus and semantic accessibility | BLOCKED | Component/native DOM evidence |
+| D26-04 | Contrast, long text, DPI-aware bounds and layout | BLOCKED | Automated geometry/contrast reference checks |
+| D26-05 | Idle stillness/resource work and coherent error/recovery | BLOCKED | Controller/rendering/runtime checks |
+| D26-06 | Final cross-stage native reference and independent code/UX review | BLOCKED | Required before Group 1 software closure |
+
+## Consolidated manual / device acceptance
+
+| ID | Requirement | Classification | Final acceptance obligation |
+|---|---|---|---|
+| OWNER-DESIGN | Owner visual judgement, natural movement and sustained use | OWNER_VERIFICATION_DEFERRED | Actual desktop distance/playback and real workflows |
+| WIN-FOCUS | OS foreground/hotkey/focus stealing and human tray/exit recovery | OWNER_VERIFICATION_DEFERRED | Test owner Windows session without inferring DOM focus equals OS focus |
+| WIN-DPI | 100%/125%/150%, multiple monitors, taskbar/fullscreen/compositor/hit regions | OWNER_VERIFICATION_DEFERRED | Real configurations; synthetic dimensions are reference only |
+| WIN-ACCESS | Actual screen reader and OS accessibility preferences | OWNER_VERIFICATION_DEFERRED | Human assistive-technology acceptance |
+| VOICE-PHYSICAL | Microphone/output/room AEC/barge-in/self-wake/naturalness | HARDWARE_VERIFICATION_DEFERRED | Existing consolidated Voice acceptance harness |
+| STRONG-APPROVAL | Critical-risk native owner confirmation | OWNER_VERIFICATION_DEFERRED | Remains unavailable until implemented and accepted; ordinary MessageBox is not strong verification |
+| EDGE-PHYSICAL | Edge UART/GPIO/watchdog/interlock/E-stop silicon | HARDWARE_VERIFICATION_DEFERRED | Preserve existing Gate C obligations; no Group 1 physical claim |
+| MOBILE-DEVICE | Phone/OEM enrollment, assistant/overlay/audio/notification and owner controls | HARDWARE_VERIFICATION_DEFERRED | Consolidated real-device checks after software program |
+| DISTRIBUTION | Installer, signing/update and deployed interoperability | OWNER_VERIFICATION_DEFERRED | No development binary equals production acceptance |
+
+## Future group tracking
+
+Groups 2–6 will add their authorized canonical slice scopes, software evidence and
+deferred acceptance here. They are not begun or pre-certified by Group 1. This
+ledger follows the program through its final consolidated acceptance phase.
