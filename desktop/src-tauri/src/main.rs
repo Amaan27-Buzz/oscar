@@ -48,6 +48,7 @@ fn window_mode(app: &tauri::AppHandle, state: &Native, mode: WindowMode) -> Resu
         WindowMode::Activity => (820., 780.),
         WindowMode::Reading => (540., 680.),
         WindowMode::Tools => (540., 720.),
+        WindowMode::Actions => (540., 640.),
     };
     if state.presence {
         presence::resize(&window, (width, height), false)?;
@@ -171,7 +172,7 @@ fn invoke_presence(app: tauri::AppHandle) {
                 .bridge
                 .execute(Command::Capture { source: choice }, |_| false)
         {
-            state.bridge.fail(error);
+            state.bridge.fail_request(error);
         }
         let _ = window_mode(&app, &state, WindowMode::Interaction);
         if let Some(window) = app.get_webview_window("main") {

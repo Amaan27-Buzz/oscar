@@ -10,6 +10,8 @@ import {ResultView} from './ResultView';
 import {TaskStage} from './TaskStage';
 import {TextTools} from './TextTools';
 import type {TextMode} from './TextTools';
+import {ActionSurface} from './ActionSurface';
+import {describeAction,emptyActionDraft} from '../Act';
 import './living.css';
 
 export type PresenceAction='hide'|'pin'|'float'|'edge';
@@ -37,6 +39,7 @@ export function LivingPresence({port=send,events=subscribe,sourceKind='core',win
   const [toolMode,setToolMode]=useState<TextMode>('Dictate');
   const [toolDrafts,setToolDrafts]=useState({Dictate:'',Edit:''});
   const [privateRevision,setPrivateRevision]=useState(0);
+  const [actionDraft,setActionDraft]=useState(emptyActionDraft);
   const discarding=useRef(false),resumeWindow=useRef<WindowMode>('interaction');
   const lastFocused=useRef<HTMLElement|null>(null);
   const orb=useRef<HTMLButtonElement>(null);
@@ -55,8 +58,8 @@ export function LivingPresence({port=send,events=subscribe,sourceKind='core',win
     if(windowChanged){
       clearTimeout(retreatTimer.current);
       if(next.window==='interaction'&&requestedWindow.current==='compact'){windowIntent.current++;requestedWindow.current=null;}
-      setOpen(['interaction','reading','tools'].includes(next.window));setLeaving(false);setError('');
-      if(['interaction','reading','tools'].includes(next.window))resumeWindow.current=next.window;
+      setOpen(['interaction','reading','tools','actions'].includes(next.window));setLeaving(false);setError('');
+      if(['interaction','reading','tools','actions'].includes(next.window))resumeWindow.current=next.window;
     }
     return true;
   }
@@ -98,7 +101,7 @@ export function LivingPresence({port=send,events=subscribe,sourceKind='core',win
   const label=owner?'Review needed':view.link==='online'&&feedback?feedback.kind==='denied'?'Permission denied':feedback.kind==='unknown'?'Check outcome':'Request blocked':available&&operation==='attentive'&&view.voice==='interrupted'?'Interrupted':labels[operation]??'State unknown';
   const workspace=view.window==='activity'||view.window==='approval';
   const answer=!editing&&available&&task&&['verified','partially_verified'].includes(task.state)&&answerDismissed!==task.task_id&&(task.value??task.response);
-  const headline=owner?'Your decision is needed.':view.window==='tools'?(toolMode==='Dictate'?'Shape your words.':'Review an edit.'):editing?'Revise your request.':view.link==='online'&&feedback?feedback.kind==='denied'?'This request isn’t permitted.':feedback.kind==='unknown'?'Let’s check the outcome.':feedback.kind==='blocked'?'This request didn’t start.':'Core rejected this request.':operation==='unknown'?'Let’s check the state.':!available?'Connection paused.':operation==='error'?'Something stopped.':
+  const headline=owner?'Your decision is needed.':view.window==='actions'?'Act within scope.':view.window==='tools'?(toolMode==='Dictate'?'Shape your words.':'Review an edit.'):editing?'Revise your request.':view.link==='online'&&feedback?feedback.kind==='denied'?'This request isn’t permitted.':feedback.kind==='unknown'?'Let’s check the outcome.':feedback.kind==='blocked'?'This request didn’t start.':'Core rejected this request.':operation==='unknown'?'Let’s check the state.':!available?'Connection paused.':operation==='error'?'Something stopped.':
     task?.state==='blocked'?'Work is blocked.':operation==='waiting'?'Waiting.':operation==='processing'?'Processing.':operation==='verifying'?'Checking the result.':operation==='executing'?'I’m on it.':
     operation==='listening'?'Listening.':operation==='speaking'?'Speaking.':answer?'Here’s the result.':'What’s on your mind?';
   useEffect(()=>{const focused=lastFocused.current;
@@ -106,7 +109,7 @@ export function LivingPresence({port=send,events=subscribe,sourceKind='core',win
   },[operation,owner,answer,open,workspace]);
   async function run(command:Command) {
     if(command.kind==='discard'){
-      discarding.current=true;setDraft('');setToolDrafts({Dictate:'',Edit:''});setSubmitted(null);setPrivateRevision(n=>n+1);setView(v=>withoutPrivateContent(v));
+      discarding.current=true;setDraft('');setToolDrafts({Dictate:'',Edit:''});setActionDraft(emptyActionDraft);setSubmitted(null);setPrivateRevision(n=>n+1);setView(v=>withoutPrivateContent(v));
     }else if(['interact','act','capture','voice_start'].includes(command.kind))discarding.current=false;
     const intent=command.kind==='window'?++windowIntent.current:0;
     if(command.kind==='window')requestedWindow.current=command.mode;
@@ -126,10 +129,10 @@ export function LivingPresence({port=send,events=subscribe,sourceKind='core',win
         return false;
       }
       if(accepted&&command.kind==='interact'&&!next.feedback)setRequestError('');
-      if(command.kind==='interact'&&!next.feedback&&next.current&&next.current.task_id===latest.current.current?.task_id&&
+      if((command.kind==='interact'||command.kind==='act')&&!next.feedback&&next.current&&next.current.task_id===latest.current.current?.task_id&&
         next.expression&&latest.current.expression&&next.expression.epoch===latest.current.expression.epoch&&
         next.expression.generation<=latest.current.expression.generation){
-        setSubmitted({taskId:next.current.task_id,text:command.text});
+        setSubmitted({taskId:next.current.task_id,text:command.kind==='interact'?command.text:`${describeAction(command.form)} · ${next.current.target}`});
         if(!next.feedback)setRequestError('');
         return true;
       }
@@ -186,6 +189,7 @@ export function LivingPresence({port=send,events=subscribe,sourceKind='core',win
         {owner?<div className="attention-copy">{submitted?.taskId===pending?.task_id?<><p className="leaf-secondary">Your submitted request</p><p className="review-description submitted-request">{submitted!.text}</p></>:<p className="review-description">{pending?.description??'A task requires your review.'}</p>}<p className="leaf-secondary">Your approval is required before this task can run. Review the full details before deciding; opening review grants nothing.</p>
           <div className="leaf-actions"><button className="leaf-primary" disabled={busy||!pending} onClick={()=>pending&&run({kind:'review',task_id:pending.task_id,operation:'approve'})}>Review decision <Arrow/></button><button onClick={retreat}>Leave pending</button>
           </div></div>:
+        view.window==='actions'?<ActionSurface view={{...view,feedback}} draft={actionDraft} setDraft={setActionDraft} available={available} busy={busy} run={run} discard={()=>void run({kind:'discard'})}/>:
         view.window==='tools'?<TextTools view={{...view,feedback}} available={available} busy={busy} mode={toolMode} setMode={setToolMode}
           draft={toolDrafts[toolMode]} setDraft={text=>setToolDrafts(drafts=>({...drafts,[toolMode]:text}))} run={run} discard={()=>void run({kind:'discard'})}/>:
         view.link==='online'&&feedback&&!editing?<div className="attention-copy request-feedback" role="alert"><p>{feedback.message}</p>
@@ -205,7 +209,8 @@ export function LivingPresence({port=send,events=subscribe,sourceKind='core',win
         {owner&&feedback&&<p className="leaf-error" role="alert">{feedback.message}</p>}
         {!error&&view.context&&<p className="leaf-secondary">Attached: {view.context.source}. Review in workspace.</p>}
         <div className="leaf-bottom"><div><button onClick={()=>run({kind:'window',mode:'activity'})}>Activity <Arrow/></button>
-          <button onClick={()=>run({kind:'window',mode:view.window==='tools'?'interaction':'tools'})}>{view.window==='tools'?'Ask':'Text tools'}</button></div><span>{view.reference?'Reference Core':'No background capture'}</span></div>
+          <button onClick={()=>run({kind:'window',mode:view.window==='tools'?'interaction':'tools'})}>{view.window==='tools'?'Ask':'Text tools'}</button>
+          <button onClick={()=>run({kind:'window',mode:view.window==='actions'?'interaction':'actions'})}>{view.window==='actions'?'Ask':'Act'}</button></div><span>{view.reference?'Reference Core':'No background capture'}</span></div>
       </div>
       <div className="presence-object">
         <button className="character-button" ref={orb} aria-label={`OSCAR: ${label}. ${open?'Return to presence':'Open interaction'}`} aria-expanded={open}

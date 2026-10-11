@@ -44,6 +44,7 @@ def main() -> int:
                 "desktop:text",
                 "math",
                 "models",
+                "files:write",
                 "control:inspect:" + h.node_id,
                 "control:approve:" + h.node_id,
                 "control:deny:" + h.node_id,

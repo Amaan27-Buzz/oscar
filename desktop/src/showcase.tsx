@@ -59,7 +59,7 @@ add('92-capability-withdrawn','Degraded','capability withdrawn',{message:'Previo
 add('93-request-rejected','Degraded','Core rejected request',{message:'Core rejected interact; refresh task/context or permission.'});
 add('94-stale-context','Degraded','stale context rejected',{context:context('focused',{freshness:'stale'}),message:'Context stale; explicit recapture required before transformation.'},'Edit');
 add('95-offline-discard','Degraded','offline local discard',{link:'unavailable',orb:'unavailable',message:'Local content discarded; Core acknowledgement unavailable',tasks:[task('verified')],current:task('verified')});
-export const sizes:Record<WindowMode,[number,number]>={compact:[300,126],interaction:[580,760],approval:[620,780],activity:[820,780],reading:[540,680],tools:[540,720]};
+export const sizes:Record<WindowMode,[number,number]>={compact:[300,126],interaction:[580,760],approval:[620,780],activity:[820,780],reading:[540,680],tools:[540,720],actions:[540,640]};
 export function Showcase({fixture}:{fixture:Fixture}) {
   const port:Send=async command=>{
     if(command.kind==='ready'||command.kind==='refresh')return fixture.view;

@@ -55,3 +55,15 @@ registered focused-field context and expected-value fencing.
 See [development report](../../../development/GROUP-01-DESKTOP-COMPLETION.md),
 [cumulative acceptance ledger](../../../development/SOFTWARE-ALPHA-ACCEPTANCE-LEDGER.md),
 and [independent Ask review](../../../development/reviews/12-2-INDEPENDENT.md).
+
+## Slice 12.4 Act/context
+
+[Scoped action](evidence/12-4-scoped-action.png) ·
+[pending decision](evidence/12-4-pending-decision.png) ·
+[independently verified file](evidence/12-4-verified-file.png) ·
+[clear](evidence/12-4-after-clear.png) ·
+[withdrawn capability](evidence/12-4-withdrawn-capability.png).
+[Seven-assertion native receipt](evidence/12-4-native-receipt.json) and
+[isolated-browser reference](evidence/12-4-browser-reference-receipt.json).
+Run `python -m scripts.desktop_act_acceptance` with the owned development server.
+No owner files, browser profile or applications are mutated.

@@ -39,6 +39,7 @@ def public_capability(cap: Capability, native: dict[str, Any]) -> dict[str, Any]
         "label": cap.name,
         "summary": cap.summary[:200],
         "risk": cap.risk,
+        "permissions": list(cap.permissions),
         "operations": list(OPERATIONS.get(cap.input_kind, ())),
         "programs": [{"id": k, "name": Path(v).name} for k, v in programs(native).items()],
         "applications": [

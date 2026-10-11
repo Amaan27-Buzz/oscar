@@ -1,0 +1,44 @@
+{
+  "platform": "win32",
+  "observed_at": 1791681447.594755,
+  "desktop": "UNVERIFIED",
+  "fixture_id": "3464953fe2ff46c29cc826d82f62f05f",
+  "browser_fixture": {
+    "status": "VERIFIED",
+    "url": "http://127.0.0.1:52148",
+    "verification": "independent HTTP server state GET after browser submit",
+    "artifact_sha256": "d5b20ba0521addd2d754fc47db83c7f7cedfa99c7e2b07c18336fe4a0368cb03"
+  },
+  "browser_public": {
+    "status": "VERIFIED",
+    "url": "https://example.com/",
+    "title": "Example Domain",
+    "verification": "independent HTTPS title/marker read"
+  },
+  "actions": [
+    {
+      "task_id": "055596f671384932bff14ed473cb89fe",
+      "correlation_id": "ad9c49e50b6e4f16bab7d915f9f7f12e",
+      "capability": "machine.browser",
+      "operation": "execute",
+      "result_status": "REPORTED",
+      "result_sha256": "d6ab3e62895dc1db5f29568ba3c511e877d02d5c543844d5e5f1215402b01630",
+      "observed_at": 1791681449.2678058,
+      "verification_status": "VERIFIED",
+      "evidence_id": "d3e9036cb45c4a75b6fbbac528c05a99",
+      "verification_method": "independent server GET after browser submission"
+    },
+    {
+      "task_id": "f7d3f9efb49a4132b4a69985eae75bd3",
+      "correlation_id": "b18292ee0cf448a09b65956c04851207",
+      "capability": "machine.browser",
+      "operation": "execute",
+      "result_status": "REPORTED",
+      "result_sha256": "17354386814061731eab63a8d0d3906c0fe36504cb095a05492de916d71067e2",
+      "observed_at": 1791681453.7901506,
+      "verification_status": "VERIFIED",
+      "evidence_id": "c17bbf24e6a748658429c1f824017c36",
+      "verification_method": "independent HTTPS title and content marker"
+    }
+  ]
+}

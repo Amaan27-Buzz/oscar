@@ -138,3 +138,26 @@ reaching Apply's guard. Corrected with a thrown-port regression; final
 [review](reviews/12-3-INDEPENDENT.md) **ACCEPTS bounded software closure** after
 **33 frontend + 41 Python** independent checks. The successful concurrent-discard
 test also closes its coverage advisory. No manual/device boundary becomes PASS.
+
+## 12.4 — Act/context software checkpoint
+
+A controlled typed action draft shares the writing leaf, current Catalog, scoped
+Worker, explicit context capture and real TaskStage. Catalog permissions/risk and
+worker identity are disclosed. Withdrawal clears the selection and private fields
+without silently switching executors. Required resources must be entered; an
+executing/awaiting/result/verifying task across any mode blocks a competing form.
+The submitted action names the exact resource while owner review remains separate.
+No second executor, client authorization or success inference is introduced.
+
+Local checks: Desktop **49 tests / 9 files**, TypeScript/build PASS; focused
+Desktop/completion/browser-launch **51 tests, 0 failures/skips**; Rust **12 tests**,
+fmt/Clippy/debug build PASS; Ruff and mypy **64 files** PASS. Native **7 assertions**
+passed through real WebView2/IPC, actual disposable file execution and independent
+readback. Separate isolated Chromium local submit/download and public HTTPS marker
+verification passed; its desktop GUI classification remains UNVERIFIED. Native
+fixture progress uses trusted reference execution, not human consent.
+
+The independent review found the cross-mode competing-proposal defect; its fix
+and two component regressions passed. Initial locator failure and a deficient test
+fixture were corrected before closure. The final complete receipt supersedes the
+failed receipt preserved outside Git. See the stage review and curated evidence.

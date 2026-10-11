@@ -24,6 +24,7 @@ pub enum WindowMode {
     Activity,
     Reading,
     Tools,
+    Actions,
 }
 
 #[derive(Clone, Copy, Deserialize, Serialize)]
@@ -249,6 +250,8 @@ pub struct CapabilityView {
     pub label: String,
     pub summary: String,
     pub risk: String,
+    #[serde(default)]
+    pub permissions: Vec<String>,
     pub operations: Vec<String>,
     pub programs: Vec<Choice>,
     pub applications: Vec<Choice>,

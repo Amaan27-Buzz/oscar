@@ -32,12 +32,12 @@ Base: `da8fddae50112c8859b21247d0cbaa617be8667e`, branch
 | D23-04 | Exact destination-aware preview and explicit selection | SOFTWARE_VERIFIED | Full focused append/replacement, expiry/destination/unknown-IPC regressions; native preview/expiry path |
 | D23-05 | Authorized apply, expected-value conflict and independent readback | REFERENCE_VERIFIED | Existing real Tauri CNG/PSS + registered-field independent readback; consumed-preview fencing; no GUI consent claim |
 | D23-06 | Denied mic/app permissions; no editable target | REFERENCE_VERIFIED | Native missing adapter/no target; software microphone denial opens zero capture; stale/foreign/context negatives |
-| D24-01 | Current window/focus/selection and explicit supported capture | BLOCKED | No unsupported screenshot/tree claim |
-| D24-02 | Live Catalog selection, typed requests and scope/risk disclosure | BLOCKED | Existing Core/Worker contracts |
-| D24-03 | Approval, task progress and cancellation | BLOCKED | Implement and test |
-| D24-04 | Failure/recovery and independently verified outcome | BLOCKED | Disposable file/browser/application paths |
-| D24-05 | Inspectable evidence, context freshness/provenance | BLOCKED | Implement and test |
-| D24-06 | Suggested/planned/executing/blocked/reported/verified distinctions | BLOCKED | Actual authoritative state only |
+| D24-01 | Current window/focus/selection and explicit supported capture | REFERENCE_VERIFIED | Registered WPF/UIA; explicit provenance/expiry; screenshot adapter unavailable |
+| D24-02 | Live Catalog selection, typed requests and scope/risk disclosure | REFERENCE_VERIFIED | Native Catalog/form/withdrawal; typed Rust/Core permission regressions |
+| D24-03 | Approval, task progress and cancellation | SOFTWARE_VERIFIED | Exact pending path, real TaskStage, advertised cancellation and cross-mode active guard |
+| D24-04 | Failure/recovery and independently verified outcome | REFERENCE_VERIFIED | Native temporary file readback and separately isolated browser reference |
+| D24-05 | Inspectable evidence, context freshness/provenance | SOFTWARE_VERIFIED | Current task evidence references; explicit captured source/permission/expiry |
+| D24-06 | Suggested/planned/executing/blocked/reported/verified distinctions | REFERENCE_VERIFIED | Actual Core state; Prepare does not execute; Worker testimony stays REPORTED |
 | D25-01 | Active/completed/blocked/failed tasks and pending decisions | BLOCKED | Unified progressive disclosure |
 | D25-02 | Progress, ownership, artifacts/results and evidence | BLOCKED | Core task/action readback |
 | D25-03 | Advertised cancel/continuation only | BLOCKED | No private replay or fictional resume |

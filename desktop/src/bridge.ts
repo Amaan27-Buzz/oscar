@@ -1,6 +1,6 @@
 import { invoke } from '@tauri-apps/api/core';
 import { listen } from '@tauri-apps/api/event';
-export type WindowMode='compact'|'interaction'|'approval'|'activity'|'reading'|'tools';
+export type WindowMode='compact'|'interaction'|'approval'|'activity'|'reading'|'tools'|'actions';
 export type ContextChoice='none'|'selection'|'focused'|'foreground';
 export type Mode='Ask'|'Dictate'|'Edit'|'Act';
 export interface Task { task_id:string; state:string; description:string; target:string; blocker:string|null;
@@ -11,7 +11,7 @@ export interface Context {id:string;source:string;timestamp:number;expires_at?:n
   freshness:string;text:string|null;retained:boolean}
 export interface Choice {id:string;name:string}
 export interface Capability {id:string;node:string;kind:string;label:string;summary:string;risk:string;
-  operations:string[];programs:Choice[];applications:Choice[]}
+  operations:string[];programs:Choice[];applications:Choice[];permissions?:string[]}
 export interface Preview {preview_id:string;before:string|null;after:string;epistemic:string;expires:number;destinations:string[];
   focused_before?:string|null;focused_after?:string|null;mode?:string}
 export interface Review {review_id:string;task_id?:string;operation:string;description:string;target:string;capability:string;reason:string;
