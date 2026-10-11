@@ -78,6 +78,9 @@ Base: `dcfd31bca6fbd8080f4c20bebe3d448e4bd8dc2f`, separate branch
 | M00-01 | Verified Group 1 and accepted Mobile foundation | SOFTWARE_VERIFIED | Exact baseline551/6 optional skips; Android APK/JVM PASS, JVM/Core readback |
 | M00-02 | Session-private discard/readback/approval and exact review | SOFTWARE_VERIFIED | Independent118 tests, regression reproductions and [review](reviews/GROUP-02-BASELINE.md) |
 | M00-03 | API36.1 Compose reference | FAILED | Historical SurfaceFlinger DMA crash reproduced on separate AVD; API35 fallback under preparation |
+| M31-01 | Shared native Orb, state truth, freshness, epoch and reduced motion | SOFTWARE_VERIFIED | App10+Expression5 JVM, expression3 API35 rendering tests; immutable canonical artwork |
+| M31-02 | Native Home, one relevant item and unavailable/accessibility labels | REFERENCE_VERIFIED | App8 Compose/one optional fixture skip; actual Home capture, simulated verifying capture; independent13.1 review |
+| M31-03 | Microphone denial and local revoke boundary | SOFTWARE_VERIFIED | Grant checked before every PCM delivery, service stop on revoke; denied Compose case; in-flight synthetic proof13.5 |
 
 Every Group 1 consolidated obligation above carries forward unchanged, especially
 STRONG-APPROVAL BLOCKED and Windows/Voice/phone/Edge/manual verification.

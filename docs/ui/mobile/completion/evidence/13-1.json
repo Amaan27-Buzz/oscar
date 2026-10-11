@@ -1,0 +1,46 @@
+{
+  "stage": "13.1",
+  "jvm": {
+    "app": {
+      "tests": 10,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "expression": {
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "app_emulator": {
+    "api": 35,
+    "executed": 8,
+    "optional_skipped": 1,
+    "failures": 0
+  },
+  "expression_emulator": {
+    "api": 35,
+    "executed": 3,
+    "failures": 0
+  },
+  "core_security": {
+    "tests": 54,
+    "failures": 0
+  },
+  "jvm_core_readback": "REFERENCE_VERIFIED",
+  "canonical_sha256": "728aeac3c9aa590b67d45c469735e919ede93a8503964e24f0f4af18cda066c5",
+  "captures": {
+    "13-1-home-unavailable.png": {
+      "sha256": "c16f8b70032195c572d1b0263dac641c70f19059a23519466b06c33108cfaad6",
+      "classification": "REFERENCE_VERIFIED"
+    },
+    "13-1-verifying-simulated.png": {
+      "sha256": "bf4384c2953eba2e1c2b84ab9dfb2f342c3a04738602f11ada9e7d4aeac92b6c",
+      "classification": "SIMULATED_ONLY"
+    }
+  },
+  "owner_device": "HARDWARE_VERIFICATION_DEFERRED",
+  "api36_1": "FAILED_PLATFORM_SURFACEFLINGER"
+}

@@ -33,8 +33,12 @@ final class NativeVoice implements AutoCloseable {
         this.context = context.getApplicationContext();
         manager = context.getSystemService(AudioManager.class);
     }
+    static boolean permitted(Context context) {
+        return context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED &&
+            context.getSharedPreferences("permissions", Context.MODE_PRIVATE).getBoolean("microphone_perception", false);
+    }
     void start(Sink sink, boolean perceptionGranted) {
-        if (!perceptionGranted || context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED)
+        if (!perceptionGranted || !permitted(context))
             throw new SecurityException("Separate microphone perception grant required");
         if (sink == null) throw new IllegalStateException("Voice Core binding unavailable");
         close();
@@ -70,6 +74,7 @@ final class NativeVoice implements AutoCloseable {
                     int count = device.read(frame, 0, frame.length, AudioRecord.READ_BLOCKING);
                     if (count != frame.length) throw new IllegalStateException("capture discontinuity");
                     if (generation.get() != turn) break;
+                    if (!permitted(context)) throw new SecurityException("microphone permission revoked");
                     sink.microphone(frame, SystemClock.elapsedRealtimeNanos(), turn,
                         SystemClock.elapsedRealtimeNanos() < outputTail);
                 }

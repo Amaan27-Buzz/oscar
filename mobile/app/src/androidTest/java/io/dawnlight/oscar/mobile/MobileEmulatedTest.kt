@@ -80,6 +80,7 @@ class MobileEmulatedTest {
         compose.waitUntil(5000) { compose.activity.getSharedPreferences("permissions", Context.MODE_PRIVATE).getBoolean("microphone_perception", false) }
         compose.runOnIdle {
             assertNull(MicrophoneService.binding)
+            assertFalse(NativeVoice.permitted(compose.activity))
             assertFalse(compose.activity.getSharedPreferences("permissions", Context.MODE_PRIVATE).getBoolean("notification_reply", false))
             assertEquals(android.content.pm.PackageManager.PERMISSION_DENIED, compose.activity.checkSelfPermission(android.Manifest.permission.RECORD_AUDIO))
         }

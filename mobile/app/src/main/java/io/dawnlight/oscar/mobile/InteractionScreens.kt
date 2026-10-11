@@ -12,16 +12,23 @@ import androidx.compose.ui.unit.dp
 @Composable fun PresenceScreen(state: MobileState, draft: String, write: (String) -> Unit, send: () -> Unit,
     cancel: () -> Unit, activity: () -> Unit, voice: () -> Unit) {
     Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        OscarOrb(state.presence)
-        Text(when (state.presence) { Presence.THINKING -> "Waiting for Core"; Presence.WAITING -> "Your decision is needed"; Presence.ATTENTIVE -> "Here with you"; Presence.ERROR -> "Connection needs attention"; else -> "OSCAR is not connected" },
+        Text(when {
+            state.link == Link.DEGRADED -> "Connection needs attention"
+            state.link != Link.CONNECTED -> "OSCAR is not connected"
+            state.approval != null || state.snapshot?.tasks?.any { "approve" in it.actions } == true -> "Your decision is needed"
+            state.snapshot?.tasks?.any { it.state == "verifying" } == true -> "Checking the outcome"
+            state.snapshot?.tasks?.any { it.state in setOf("executing", "awaiting_result", "result_received") } == true -> "Work is underway"
+            state.busy -> "Waiting for Core"
+            else -> "Here with you"
+        },
             style = MaterialTheme.typography.titleLarge, modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite })
-        Text("One OSCAR relationship. Your Core owns context and task state.")
+        Text("Continue when you need me.", color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
-    state.snapshot?.tasks?.firstOrNull { "approve" in it.actions }?.let { task ->
-        TextButton(onClick = activity) { Text("Review request · ${task.description}") }
+    val relevant = state.snapshot?.tasks?.let { tasks ->
+        tasks.firstOrNull { "approve" in it.actions } ?: tasks.firstOrNull { it.state in setOf("executing", "awaiting_result", "result_received", "verifying") }
     }
-    state.snapshot?.tasks?.firstOrNull { it.state in setOf("executing", "awaiting_result", "result_received", "verifying") }?.let { task ->
-        TextButton(onClick = activity) { Text("Running · ${task.description}") }
+    relevant?.let { task ->
+        TextButton(onClick = activity) { Text("${task.label} · ${task.description}") }
     }
     OutlinedTextField(draft, { write(it.take(1000)) }, modifier = Modifier.fillMaxWidth().testTag("interactionInput"), label = { Text("Write to OSCAR") }, minLines = 2, maxLines = 5,
         keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(imeAction = androidx.compose.ui.text.input.ImeAction.Send),

@@ -1,6 +1,5 @@
 package io.dawnlight.oscar.mobile
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -10,7 +9,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
@@ -18,6 +16,8 @@ import androidx.compose.ui.semantics.*
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.json.JSONObject
+import io.dawnlight.oscar.expression.ExpressionPresence
+import androidx.compose.ui.unit.Dp
 
 private val Paper = Color(0xFFF5F1E7)
 private val Ink = Color(0xFF1A1B18)
@@ -37,7 +37,7 @@ private val Ink = Color(0xFF1A1B18)
     val focus = LocalFocusManager.current
     val keyboard = LocalSoftwareKeyboardController.current
     OscarTheme {
-        Scaffold(modifier = Modifier.imePadding(), containerColor = Paper, bottomBar = {
+        Scaffold(modifier = Modifier.imePadding(), containerColor = MaterialTheme.colorScheme.background, bottomBar = {
             Surface(tonalElevation = 0.dp) {
                 Row(Modifier.fillMaxWidth().navigationBarsPadding(), horizontalArrangement = Arrangement.SpaceEvenly) {
                     Destination.entries.forEach { item ->
@@ -57,6 +57,7 @@ private val Ink = Color(0xFF1A1B18)
                     Text(if (destination == Destination.OSCAR) "OSCAR" else destination.label, style = MaterialTheme.typography.headlineSmall, modifier = Modifier.weight(1f))
                     TextButton(onClick = session::refreshNow, enabled = !state.busy) { Text("Refresh") }
                 }
+                OscarOrb(state, composing = draft.isNotBlank(), size = if (destination == Destination.OSCAR) 108.dp else 40.dp)
                 if (state.link != Link.CONNECTED) {
                     Text(when (state.link) { Link.CONNECTING -> "Connecting to Core"; Link.DEGRADED -> "Core unavailable"; else -> "Connect to your OSCAR Core" }, modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite })
                     TextButton(onClick = { pairing = true }) { Text("Connect Core") }
@@ -115,7 +116,10 @@ private val Ink = Color(0xFF1A1B18)
         TextButton(onClick = confirm, enabled = !busy) { Text("Confirm securely") }
     })
 }
-@Composable fun OscarOrb(presence: Presence) {
-    Image(painterResource(R.drawable.oscar_orb), contentDescription = "OSCAR presence",
-        modifier = Modifier.size(144.dp).testTag("orb").semantics { stateDescription = presence.name.lowercase() })
+@Composable fun OscarOrb(state: MobileState, composing: Boolean = false, size: Dp = 108.dp, reduced: Boolean = false) {
+    val adapter = remember(state.epoch) { MobileExpression(state.epoch) }
+    val event = remember(state, composing, reduced) { adapter.event(state, System.currentTimeMillis(), composing, reduced) }
+    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+        ExpressionPresence(event, adapter.source, size, reduced, Modifier.testTag("orb"))
+    }
 }

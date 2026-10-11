@@ -74,3 +74,35 @@ Independent **118 tests PASS**, Ruff/mypy PASS. See
 reproduced the historical SurfaceFlinger `hasReadColorBufferDma` platform crash;
 its failed activity/Compose runs are FAILED platform evidence. A separate API 35
 reference image is being prepared. No phone acceptance or test PASS inferred.
+
+## 13.1 — Presence / Home
+
+Replaced the static Home image with the existing shared Compose ExpressionPresence.
+An opaque epoch-bound adapter maps admitted local readback to resting, attentive,
+processing, executing, verifying, waiting and unavailable/error presentation.
+Private text/IDs never enter motion events; observations expire, heartbeat updates
+do not replay transitions, OS duration scaling and shared reduced-motion/lifecycle
+behavior remain intact. One approval-prioritized ongoing item is shown on Home.
+The same object persists above secondary screens; no fabricated awareness/voice.
+
+Independent review corrected mismatched decision captions and competing Home
+items. It also found the inherited active-microphone revoke gap: capture now checks
+both OS and local grants before each delivery, and local revocation stops the
+foreground service. Denied-permission Compose regression checks that boundary.
+Full synthetic in-flight Voice adapter exercise belongs to 13.5.
+
+Validation: **10 app + 5 expression JVM tests**, **8 app Compose tests** with one
+unrequested optional fixture skip, **3 expression emulator tests**, **54 focused
+Core/security/Grid tests**, and real JVM/Core readback PASS. A fresh API35 AVD
+uses the preserved earlier reference system image via supported `-sysdir`, with
+its own data directory. No original AVD reset or cached-user state is reused.
+The first API35 install raced initial boot and failed; after boot/unlock readback,
+serial module runs pass. API36.1's compositor crash remains failed evidence.
+
+Actual [native captures](../ui/mobile/completion/captures/13-1-home-unavailable.png),
+[simulated verification render](../ui/mobile/completion/captures/13-1-verifying-simulated.png),
+[receipt](../ui/mobile/completion/evidence/13-1.json) and
+[independent review](reviews/13-1-INDEPENDENT.md). Captures assert production
+FLAG_SECURE and temporarily clear it only inside disposable instrumentation.
+Duplicate disconnected copy and detailed task labeling remain scoped later-stage
+refinements, not privacy or execution defects. Phone/motion quality approval is deferred.

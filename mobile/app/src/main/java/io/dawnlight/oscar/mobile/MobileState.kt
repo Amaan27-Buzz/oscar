@@ -54,6 +54,7 @@ data class MobileState(
     val epoch: Long = 0, val link: Link = Link.DISCONNECTED, val busy: Boolean = false,
     val snapshot: CoreSnapshot? = null, val interactions: List<Interaction> = emptyList(),
     val approval: Approval? = null, val message: String? = null,
+    val observedAt: Long = 0,
 ) {
     val presence: Presence get() = when {
         link == Link.DEGRADED -> Presence.ERROR

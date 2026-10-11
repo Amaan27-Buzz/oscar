@@ -76,6 +76,7 @@ import kotlinx.coroutines.withContext
         Switch(checked, { next -> scope.launch {
             if (withContext(Dispatchers.IO) { prefs.edit().putBoolean(key, next).commit() }) {
                 checked = next; NotificationBoundary.privacyChanged()
+                if (key == "microphone_perception" && !next) context.stopService(Intent(context, MicrophoneService::class.java))
             }
         } }, modifier = Modifier.semantics { contentDescription = label })
     }
