@@ -1,0 +1,12 @@
+{
+  "pr": "https://github.com/Amaan27-Buzz/oscar/pull/3",
+  "draft": true,
+  "base_branch": "build/slice-12-desktop-completion",
+  "base_sha": "dcfd31bca6fbd8080f4c20bebe3d448e4bd8dc2f",
+  "implementation_sha": "fad6a5da023fceea92f1924fe77f5267f7957805",
+  "source_diff": "local/GitHub filename sets matched; rechecked after documentation sealing",
+  "remote_ci": "BLOCKED",
+  "github_actions_enabled": false,
+  "owner_approved": false,
+  "production_ready": false
+}

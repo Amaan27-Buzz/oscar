@@ -373,6 +373,7 @@ sequence or acoustic acceptance is inferred from stills.
 | 13.5 Explicit voice/cancellation | `1ec2eb5` |
 | 13.6 Independent privacy grants | `011b342` |
 | 13.7 Settings/system surfaces | `5b1c3ec` |
+| 13.8 Motion/accessibility/integration | `fad6a5d` |
 
 Final gates: Android APK/JVM/lint PASS (20app+5expression JVM;0lint errors,
 15 dependency/KTX advisories). Lint's new context-cast rule prompted replacement
@@ -392,3 +393,21 @@ Curated still checksum manifest and raw archive receipt accompany final evidence
 The raw archive includes historical intermediate captures, not accepted motion or
 physical evidence. Final implementation checkpoint/draft publication readback are
 recorded after Git sealing below.
+
+## GitHub delivery
+
+Draft [PR3](https://github.com/Amaan27-Buzz/oscar/pull/3) targets
+`build/slice-12-desktop-completion` at exact base
+`dcfd31bca6fbd8080f4c20bebe3d448e4bd8dc2f`. Tested implementation checkpoint:
+`fad6a5da023fceea92f1924fe77f5267f7957805`. Documentation/evidence sealing follows
+that checkpoint; the final publication head is verified through PR metadata and
+reported in the delivery response. The source diff matches local branch paths;
+canonical artwork and prior draft/base remain unchanged. Main/work were not pushed,
+merged or reset. The PR is attached to the task; it remains draft/open.
+
+Remote exact-head CI is **BLOCKED**: live GitHub repository Actions permissions
+readback reports `enabled:false`, with zero check runs. Local software/reference
+checks above pass; empty remote checks are not a green CI claim. Repository Actions
+settings were not changed. A future merge/promotion requires genuine applicable
+remote checks and consolidated acceptance. No paid service, release or Group3 work
+was started.

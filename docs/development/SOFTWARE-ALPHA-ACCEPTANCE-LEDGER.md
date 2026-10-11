@@ -121,3 +121,10 @@ Expression36, Rust12; native/reference receipts linked in the Group 1 report.
 | M38-02 | Lifecycle/source restoration, epoch fences and process replacement | REFERENCE_VERIFIED | Full native app21/4 intentional skips; actual process replacement; no automatic task replay |
 | M38-03 | Contrast, dark bars, TalkBack labels and restrained motion | SOFTWARE_VERIFIED | Independent contrast4.823:1; shared state/held motion contracts; actual renders; sustained assistive technology deferred |
 | M38-04 | Final owner/device/physical/strong confirmation | OWNER_VERIFICATION_DEFERRED | All Group1 obligations preserved; strong critical-risk confirmation still BLOCKED; no production/owner approval |
+
+| M38-05 | Remote exact-head CI | BLOCKED | GitHub Actions repository `enabled:false`; no check runs. Local Android/Core/reference gates PASS; do not treat empty checks as PASS |
+
+Group2 publication: [draft PR3](https://github.com/Amaan27-Buzz/oscar/pull/3), base
+`build/slice-12-desktop-completion` at verified Group1 SHA. Implementation checkpoint
+`fad6a5da023fceea92f1924fe77f5267f7957805`; final documentation sealing is separate.
+Owner/device and runtime blockers above remain open. No merge/release/Group3.
