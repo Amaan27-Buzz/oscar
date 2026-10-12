@@ -1,5 +1,7 @@
 # OSCAR Mobile visual direction
 
+**2026-10-12 redesign candidate:** [cross-platform rebuild](design/CROSS-PLATFORM-REDESIGN.md), [native evidence and regressions](design/cross-platform/README.md), [independent review](design/CROSS-PLATFORM-REVIEW.md). Branch `design/cross-platform-ui-rebuild`; draft into `build/slice-13-mobile-completion`. Current visual system is [DESIGN.md](../DESIGN.md). No merge/Slice14 or owner physical acceptance. Historical slice records below remain provenance.
+
 ## Current Mobile design sequencing
 
 The Mobile functional foundation is **Slice 09**. Final Mobile UX redesign

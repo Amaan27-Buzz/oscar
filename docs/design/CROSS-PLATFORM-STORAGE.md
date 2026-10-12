@@ -26,3 +26,7 @@ Use existing `C:/Users/Amaan/.codex/worktrees/mobile-completion/reference-api35-
 Preserve `.oscar` voice models and the source checkout's Rust outputs. Reuse desktop-completion Cargo target, mobile Gradle cache, installed SDK/JDK and node modules only after checking versions/paths. This worktree is source-only; do not duplicate multi-gigabyte AVDs or models. Curated PNGs and short motion recordings only; raw native regression outputs remain ignored.
 
 Free space at inventory: C about169.4GiB; D about176.7GiB. Sufficient to continue without cleanup.
+
+## Final reuse verification
+
+The existing `oscar_group02_api35` emulator was launched with the explicit reusable image `D:/TheDawnlightGroup/DawnlightLabs/oscar/.tmp/api35-system-image/x86_64`; native SDK readback was35. Final working launch: port5582, `-no-snapshot -no-window -no-audio -gpu software -feature -Vulkan -memory 2048 -cores 4`. No new AVD, snapshot copy, wipe or cleanup deletion. Initial lower-memory runs produced system ANR dialogs and were excluded from visual evidence. Restarts reused the same existing userdata. Compilation reused desktop-completion Cargo outputs and the original mobile Gradle cache.

@@ -1,0 +1,20 @@
+{
+  "checks": [
+    "opening exact review leaves task planned",
+    "native review focuses exact decision",
+    "review material includes exact task input",
+    "dismissal leaves pending task and requests no consent",
+    "task transition retires obsolete review",
+    "verification metadata is inspectable",
+    "expired review cannot be confirmed",
+    "offline task history cannot grant approval",
+    "reconnect exposes a fresh review path, never auto approves"
+  ],
+  "completed": true,
+  "classification": "REFERENCE_VERIFIED",
+  "limits": [
+    "Actual Tauri/WebView2 and authenticated disposable Core",
+    "Trusted reference task execution; no human/native approval accepted",
+    "OS foreground and owner use deferred"
+  ]
+}

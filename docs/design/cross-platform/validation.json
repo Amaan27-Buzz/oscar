@@ -1,0 +1,93 @@
+{
+  "date": "2026-10-12",
+  "baseline": "7773de8b794acf61ab6f035a28ada1fed98a3f77",
+  "branch": "design/cross-platform-ui-rebuild",
+  "physical": "NOT_RUN",
+  "owner_visual_review": "DEFERRED_BY_OWNER",
+  "remote_ci": "NOT_RUN_ACTIONS_DISABLED",
+  "checks": {
+    "core_python": {
+      "tests": 559,
+      "skipped": 7,
+      "failures": 0,
+      "status": "PASS",
+      "scope": "Full suite before final presentation-only corrections; Core unchanged"
+    },
+    "desktop_frontend": {
+      "tests": 58,
+      "failures": 0,
+      "status": "PASS"
+    },
+    "desktop_production_frontend": "PASS_TypeScript_Vite",
+    "shared_expression": {
+      "tests": 36,
+      "failures": 0,
+      "status": "PASS"
+    },
+    "rust_tauri": {
+      "tests": 12,
+      "status": "PASS",
+      "checks": [
+        "native debug build",
+        "fmt",
+        "Clippy"
+      ]
+    },
+    "android_jvm": {
+      "app_tests": 20,
+      "expression_tests": 5,
+      "failures": 0,
+      "status": "PASS"
+    },
+    "android_native": {
+      "tests": 26,
+      "passed": 22,
+      "skipped": 4,
+      "failures": 0,
+      "errors": 0,
+      "status": "PASS",
+      "device": "existing emulator-5582/API35",
+      "skipped_scenarios": [
+        "alternate explicit mobile loopback fixture",
+        "process-death fixture preparation",
+        "process-death fixture cleanup",
+        "system animator scale zero opt-in"
+      ]
+    },
+    "windows_native_authority": "PASS_CNG_PSS_UIA_independent_readback_restart_cancel_reconnect",
+    "repository": "PASS_required_files_markdown_links_secret_safety",
+    "python_lint_types": "PASS_Ruff_format_Mypy_68_sources",
+    "canonical_orb": "UNCHANGED",
+    "canonical_orb_sha256": "728aeac3c9aa590b67d45c469735e919ede93a8503964e24f0f4af18cda066c5"
+  },
+  "desktop_native": {
+    "12-2": {
+      "status": "PASS",
+      "checks": 9
+    },
+    "12-3": {
+      "status": "PASS",
+      "checks": 12
+    },
+    "12-4": {
+      "status": "PASS",
+      "checks": 7
+    },
+    "12-5": {
+      "status": "PASS",
+      "checks": 9
+    },
+    "12-6": {
+      "status": "PASS",
+      "checks": 10
+    }
+  },
+  "limits": [
+    "No owner physical phone/OEM/biometric or real microphone acceptance",
+    "No final visual review after owner waiver",
+    "No new Android motion recording or narrow/landscape/tablet visual matrix",
+    "No Windows DPI/multimonitor/screen-reader or compositor performance acceptance",
+    "No production installer installation or deployment",
+    "No storage deletion; no merge; no Slice14"
+  ]
+}

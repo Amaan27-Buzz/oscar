@@ -1,0 +1,37 @@
+{
+  "checks": [
+    "tools open without microphone activity",
+    "Edit without a fresh target is disabled",
+    "mode drafts remain separate",
+    "tool draft survives native retreat/reinvoke",
+    "absent voice adapter never implies listening",
+    "typed dictation produces a real Core preview",
+    "surface receipt grants no external write",
+    "expiry disables mutation in the actual WebView",
+    "discard clears dictation draft",
+    "discard clears edit instruction",
+    "discard clears Ask draft across surfaces",
+    "preview/surface delivery created no task or action"
+  ],
+  "completed": true,
+  "failure_type": null,
+  "classification": "REFERENCE_VERIFIED",
+  "native": {
+    "evidence": "AUTHENTICATED_DISPOSABLE_CORE",
+    "pid": 31348,
+    "native_debug_port": 55829,
+    "commands": "status block restore deny allow work execute finish reported failure disconnect reconnect cleanup"
+  },
+  "fixture_log": [
+    "{\"evidence\": \"AUTHENTICATED_DISPOSABLE_CORE\", \"pid\": 31348, \"native_debug_port\": 55829, \"commands\": \"status block restore deny allow work execute finish reported failure disconnect reconnect cleanup\"}",
+    "{\"core_response\": {\"state\": null, \"reason\": null, \"message\": null, \"task_id\": null}}",
+    "{\"core_response\": {\"state\": null, \"reason\": null, \"message\": null, \"task_id\": null}}",
+    "{\"process_running\": true, \"tasks\": [], \"actions\": 0}",
+    "\"Owned fixture cleanup; not evidence of UI Quit\""
+  ],
+  "limits": [
+    "actual native DOM/content/IPC, not OS focus or GUI approval",
+    "no microphone or real STT/model inference",
+    "registered field and CNG checked separately by desktop_tauri --self-check"
+  ]
+}

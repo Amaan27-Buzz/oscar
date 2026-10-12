@@ -1,441 +1,301 @@
 ---
 name: OSCAR
-description: Quietly Alive — warm, restrained, tactile software with continuous state-driven motion.
+description: Quietly Alive + Playful Precision across native Desktop and Android surfaces.
 colors:
-  canvas: "#F5F1E7"
-  canvas-raised: "#FAF7EF"
-  surface: "#FFFDF8"
-  ink: "#1A1B18"
-  graphite: "#77766B"
-  hairline: "#DDD7CA"
-  oscar-blue: "#2F8FF5"
-  oscar-blue-deep: "#1D6FD6"
+  desktop-leaf: "#F8F9F6"
+  desktop-surface: "#FFFFFF"
+  desktop-ink: "#202923"
+  mobile-paper: "#F5F1E7"
+  mobile-surface: "#FFFDF8"
+  mobile-ink: "#1A1B18"
+  secondary-text: "#58635B"
+  divider: "#D7DDD6"
+  hover: "#E8EDE6"
+  focus-blue: "#1969BC"
   oscar-yellow: "#FFC83D"
-  expression-red: "#EF4348"
-  warning: "#D98B45"
-  critical: "#D94F45"
+  decision: "#FFF0B7"
+  mobile-container-high: "#EAE5DA"
+  mobile-container-highest: "#E0E7DE"
+  mobile-outline: "#78857A"
+  mobile-error: "#B6322B"
+  desktop-error: "#A1352D"
+  selection: "#FFDD78"
+  dark-leaf: "#1D2622"
+  dark-surface: "#27312B"
+  dark-ink: "#F2F5EE"
+  dark-secondary-text: "#B6C3B9"
+  dark-divider: "#3E4C42"
+  dark-hover: "#303E35"
+  dark-focus-blue: "#91C4FF"
+  dark-yellow: "#FFCF5A"
+  dark-decision: "#453C22"
+  dark-decision-text: "#FFEAB0"
+  dark-mobile-container-highest: "#30342D"
+  dark-mobile-container-low: "#20231E"
+  dark-mobile-container-lowest: "#151713"
+  dark-mobile-outline: "#999D8D"
+  dark-error: "#FFB4A9"
 typography:
-  display:
-    fontFamily: "ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
-    fontSize: "clamp(2.5rem, 6vw, 4.5rem)"
-    fontWeight: 600
-    lineHeight: 0.98
-    letterSpacing: "-0.035em"
-  body:
-    fontFamily: "ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
-    fontSize: "1rem"
-    fontWeight: 400
+  desktop-headline:
+    fontFamily: "'Source Serif 4', Georgia, serif"
+    fontSize: "30px"
+    fontWeight: 450
+    lineHeight: 1.18
+    letterSpacing: "-0.025em"
+  desktop-activity-headline:
+    fontFamily: "'Source Serif 4', Georgia, serif"
+    fontSize: "34px"
+    fontWeight: 450
+    lineHeight: 1.18
+    letterSpacing: "-0.025em"
+  desktop-body:
+    fontFamily: "'Source Sans 3', 'Segoe UI', sans-serif"
+    fontSize: "16px"
     lineHeight: 1.5
-    letterSpacing: "normal"
-  label:
-    fontFamily: "ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
-    fontSize: "0.8125rem"
+  desktop-reading:
+    fontFamily: "'Source Sans 3', 'Segoe UI', sans-serif"
+    fontSize: "17px"
+    lineHeight: 1.6
+  desktop-label:
+    fontFamily: "'Source Sans 3', 'Segoe UI', sans-serif"
+    fontSize: "13px"
     fontWeight: 600
-    lineHeight: 1.2
-    letterSpacing: "0"
-  mono:
-    fontFamily: "ui-monospace, 'SFMono-Regular', Consolas, 'Liberation Mono', monospace"
-    fontSize: "0.8125rem"
-    fontWeight: 500
-    lineHeight: 1.45
+    lineHeight: "18px"
+  mobile-headline-large:
+    fontFamily: "Source Sans 3"
+    fontSize: "26sp"
+    fontWeight: 600
+    lineHeight: "32sp"
+  mobile-headline-medium:
+    fontFamily: "Source Sans 3"
+    fontSize: "24sp"
+    fontWeight: 600
+    lineHeight: "30sp"
+  mobile-title-large:
+    fontFamily: "Source Sans 3"
+    fontSize: "22sp"
+    fontWeight: 600
+    lineHeight: "28sp"
+  mobile-title-medium:
+    fontFamily: "Source Sans 3"
+    fontSize: "18sp"
+    fontWeight: 600
+    lineHeight: "24sp"
+  mobile-body-large:
+    fontFamily: "Source Sans 3"
+    fontSize: "18sp"
+    lineHeight: "28sp"
+  mobile-body:
+    fontFamily: "Source Sans 3"
+    fontSize: "16sp"
+    lineHeight: "24sp"
+  mobile-label:
+    fontFamily: "Source Sans 3"
+    fontSize: "14sp"
+    fontWeight: 600
+    lineHeight: "20sp"
 rounded:
-  sm: "8px"
-  md: "12px"
-  lg: "18px"
-  xl: "24px"
-  round: "999px"
+  desktop-control: "6px"
+  desktop-disclosure: "8px"
+  desktop-leaf: "16px"
+  mobile-small: "6dp"
+  mobile-medium: "12dp"
+  mobile-large: "16dp"
 spacing:
-  xs: "4px"
-  sm: "8px"
-  md: "16px"
-  lg: "24px"
-  xl: "32px"
-  2xl: "48px"
-  3xl: "64px"
-  4xl: "96px"
+  desktop-xs: "4px"
+  desktop-sm: "8px"
+  desktop-md: "12px"
+  desktop-lg: "16px"
+  desktop-xl: "24px"
+  desktop-leaf-inline: "28px"
+  mobile-sm: "8dp"
+  mobile-md: "12dp"
+  mobile-lg: "16dp"
+  mobile-xl: "24dp"
 components:
-  button-primary:
-    backgroundColor: "{colors.ink}"
-    textColor: "{colors.surface}"
-    rounded: "{rounded.md}"
-    padding: "12px 18px"
-  button-secondary:
-    backgroundColor: "{colors.canvas-raised}"
-    textColor: "{colors.ink}"
-    rounded: "{rounded.md}"
-    padding: "12px 18px"
+  desktop-primary:
+    backgroundColor: "{colors.desktop-ink}"
+    textColor: "{colors.desktop-leaf}"
+    rounded: "{rounded.desktop-control}"
+    padding: "8px 14px"
+  desktop-ghost:
+    backgroundColor: "transparent"
+    textColor: "{colors.desktop-ink}"
+    rounded: "{rounded.desktop-control}"
+    padding: "8px 12px"
+  desktop-ghost-hover:
+    backgroundColor: "{colors.hover}"
+    textColor: "{colors.desktop-ink}"
+    rounded: "{rounded.desktop-control}"
+  desktop-input:
+    backgroundColor: "transparent"
+    textColor: "{colors.desktop-ink}"
+    padding: "8px 0"
+  desktop-leaf:
+    backgroundColor: "{colors.desktop-leaf}"
+    textColor: "{colors.desktop-ink}"
+    rounded: "{rounded.desktop-leaf}"
+    padding: "24px 28px 92px"
+  desktop-decision:
+    backgroundColor: "{colors.decision}"
+    textColor: "{colors.desktop-ink}"
+    rounded: "{rounded.desktop-disclosure}"
+    padding: "20px"
+  mobile-primary:
+    backgroundColor: "{colors.mobile-ink}"
+    textColor: "{colors.desktop-surface}"
+    rounded: "{rounded.mobile-small}"
+  mobile-tonal:
+    backgroundColor: "{colors.hover}"
+    textColor: "{colors.mobile-ink}"
+    rounded: "{rounded.mobile-small}"
+  mobile-input:
+    textColor: "{colors.mobile-ink}"
+    typography: "{typography.mobile-body-large}"
+    rounded: "{rounded.mobile-small}"
+  mobile-input-dock:
+    backgroundColor: "{colors.mobile-surface}"
+    textColor: "{colors.mobile-ink}"
+    padding: "12dp 24dp"
+  mobile-consequence:
+    backgroundColor: "{colors.decision}"
+    textColor: "{colors.mobile-ink}"
+    typography: "{typography.mobile-body-large}"
+    rounded: "{rounded.mobile-small}"
+    padding: "16dp"
 ---
 
 # Design System: OSCAR
 
-The [canonical OSCAR Orb](assets/brand/oscar-orb.svg) defines the actual intended
-Orb appearance. Use or derive variants from that source; interface tokens above
-must not recolor it. See the [brand asset contract](assets/brand/README.md).
+## Overview
 
-## North star
+**Creative North Star: "Quietly Alive + Playful Precision"**
 
-**Quietly Alive.**
+OSCAR is a calm, responsive presence with one continuous relationship. Typography, spacing and contextual controls give useful work room to breathe. The blue shell and yellow puck supply character through the existing shared expression engine; surrounding UI stays restrained, practical and easy to inspect.
 
-OSCAR should feel like a calm piece of advanced personal technology that is already present, not an app that waits to be launched and not a chatbot wrapped in a mascot.
+Desktop opens a cool near-white reading folio from a compact presence object. Android uses a warm canvas, operational Sans typography, native rows and a small Orb attached to the unified bottom input dock. The platforms share identity and truthful state while retaining their own interaction conventions.
 
-The durable design blend is:
+This document captures the implemented 2026-10-12 redesign candidate, replacing the earlier general visual specification under the owner's redesign authorization. It is a candidate reference, not owner visual approval, merge authorization or physical acceptance. Native WebView2 and API35 emulator captures are reference evidence; microphone, biometric/OEM behavior and daily-use comfort remain deferred. Gate C remains PARTIAL. No Slice 14, merge or deployment follows from this document.
 
-- **70% restraint and whitespace** — confident hierarchy, typography, calm composition, minimal chrome;
-- **20% tactile industrial precision** — physical cause/effect, material honesty, precise controls, satisfying state changes;
-- **10% approachable personality** — warmth, expression and immediate acknowledgement without becoming childish.
+**Key Characteristics:**
 
-The result should feel premium, warm, sparse, editorial, tactile and professional enough for daily use. Personality comes from state, voice, motion, timing and the OSCAR object — not from decorative AI styling.
+- Small, responsive character connected to useful work.
+- Typography and flat rows carry hierarchy before containers.
+- Voice and text belong to one input surface and context.
+- Consequences, scope and evidence remain inspectable.
+- Platform-native interaction remains complete without motion.
 
-## Character before interface chrome — Slice 11
+## Colors
 
-The owner explicitly rejects a static, identical smiling Orb pasted onto three
-beige rounded widgets. The old desktop A/B/C screenshots are **unapproved
-engineering concepts**, not the final OSCAR character. A useful reference is
-a small expressive desktop companion that can signal attention and respond
-nonverbally while the larger application remains elsewhere. Study the **quality
-of presence and response**, do not reproduce the reference's pixel mascot.
+Desktop's cool leaf and Android's warm paper are deliberate platform interpretations. Frontmatter records literal implementation values; shared names have equal values where the code agrees.
 
-Character work comes **before** final Desktop Slice 12 / Mobile Slice 13
-visual styling. Establish the eyes/mark language, gaze, subtle asymmetry,
-center-of-mass and puck motion, anticipation, thoughtful timing, blink/recovery,
-quiet rest, interruptibility and reduced-motion equivalents in Slice 11.
-A smile that never changes conveys no meaningful state. Animations must reflect
-actual authoritative operational events; a Persona delivery cue must not
-imply a human emotion was detected or a task was verified.
+### Primary
 
-The canonical `assets/brand/oscar-orb.svg` remains unchanged. New reviewed
-expressive variants are separately versioned and must remain recognizably OSCAR;
-changing the brand identity is an explicit owner decision.
+Ink carries main actions and content. Desktop uses `desktop-ink`; Android uses `mobile-ink` as Material `primary`, `onSurface` and `onBackground`. Main actions are restrained ink controls. `focus-blue` is Desktop focus and Android `secondary`.
 
-**Quality requirement for GPT-6.1 Sol / High effort:** inspect assets and real
-interaction references first; write a design hypothesis; design a coherent
-character/movement system; implement a narrow expressive prototype; capture
-and critically evaluate motion, timing and tiny-size legibility; iterate
-substantively before asking the owner to approve. Do not optimize for speed,
-concept count, easy generic cards or automated screenshot PASS.
+The canonical [Orb SVG](assets/brand/oscar-orb.svg) owns the actual blue shell, yellow face, red eye and curved wink, including its painted variations. Preserve it unchanged. Interface tokens do not recolor the asset or replace the shared expression renderer. `oscar-yellow` also supplies Android's Material `tertiary`.
 
-See [Slice 11 Expression Core](docs/EXPRESSION-CORE.md) and
-[canonical slice numbering](docs/SLICE-NUMBERING.md).
+### Secondary
 
-## Playful precision
+Warm `decision` is consequential review material: Desktop's decision sheet and Android's `tertiaryContainer`. It signals a decision to inspect, never granted permission. Dark review material uses `dark-decision`; Android supplies `dark-decision-text` for its foreground.
 
-OSCAR can be playful, but playfulness must come from **response and physicality**, not decoration.
+### Neutral
 
-Good character:
+Desktop uses `desktop-leaf` with `desktop-surface` for the disclosed Presence menu. Android maps `mobile-paper` to `background`, `surface` and `surfaceContainerLow`; `mobile-surface` to `surfaceContainer`; `mobile-container-high` and `mobile-container-highest` to their matching Material roles; white to `surfaceContainerLowest`. `surfaceTint` is transparent.
 
-- a weighted puck shifts toward attention;
-- a compact surface expands from the thing that caused it;
-- a state resolves cleanly after verification;
-- haptics/motion acknowledge input immediately;
-- a quiet interface becomes active only when needed.
+`secondary-text` carries supporting copy, `divider` separates related rows and `hover` identifies hover/selected/tonal surfaces. Android uses `mobile-outline` for controls and `divider` as `outlineVariant`. Error colors stay platform-specific. Desktop uses `selection` for selected text.
 
-Bad character:
+Dark Desktop substitutes leaf, surface, ink, secondary text, divider, hover, focus and decision tokens. Dark Android maps the corresponding shared dark values to background/surface, primary/onSurface/onBackground, onSurfaceVariant, outlineVariant, secondaryContainer/surfaceContainerHigh and secondary. Its extra container low/lowest/highest and outline values are recorded explicitly. Main actions reverse foreground/background; Android system bars follow light/dark appearance. Android offers system/light/dark choices; Desktop follows OS appearance. Unspecified Material roles retain Material3 defaults and must not be represented as OSCAR overrides.
 
-- giant mascot layouts;
-- cartoon-first expressions;
-- decorative bouncing;
-- sparkles, particles or gradients used as shorthand for intelligence;
-- UI that feels like a concept board instead of shipping software.
-
-## Materials and palette
-
-The default world is warm and neutral.
-
-### Neutrals
-
-- **Warm Canvas** `#F5F1E7` — primary app background.
-- **Raised Canvas** `#FAF7EF` — subtle elevated/contained areas.
-- **Surface** `#FFFDF8` — focused sheets or controls where needed.
-- **Ink** `#1A1B18` — primary text and strong controls.
-- **Graphite** `#77766B` — secondary text and metadata.
-- **Hairline** `#DDD7CA` — restrained separation.
-
-### Identity
-
-- **OSCAR Blue** `#2F8FF5` — presence, active focus and the avatar shell.
-- **Deep OSCAR Blue** `#1D6FD6` — pressed/strong presence where required.
-- **Presence Yellow** `#FFC83D` — avatar face/puck and rare acknowledgement.
-- **Expression Red** `#EF4348` — narrow expression marks, not general UI chrome.
-- **Muted Orange** `#D98B45` — warnings/attention where appropriate.
-
-The neutral material system should do most of the work. Blue is OSCAR's presence, not the default color for every button.
-
-### Material rules
-
-Use restrained physical material cues:
-
-- warm paper-like canvas;
-- softly painted polymer/satin plastic;
-- occasional anodized or rubber-like control surfaces where functionally justified;
-- low-contrast contact shadows;
-- tiny elevation changes;
-- minimal borders.
-
-Do not use obvious neumorphism, glassmorphism, giant soft shadows, glossy toy rendering, cyberpunk lighting or floating card stacks.
-
-**Test:** if removing shadows destroys hierarchy, the layout is wrong. Hierarchy must come from typography, spacing, geometry, alignment, grouping and contrast.
+**The Identity Rule.** The canonical Orb's artwork owns its identity colors; surface tokens and theme changes must not repaint it.
 
 ## Typography
 
-Typography should carry more hierarchy than containers.
+**Desktop heading font:** Source Serif 4, with Georgia fallback. **Body and control font:** Source Sans 3, with Segoe UI on Desktop and Android platform glyph fallback. **Technical values:** Desktop uses Consolas/monospace only for exact plan material; ordinary responses remain Sans.
 
-- Use a sophisticated platform-native/system sans.
-- Keep display type sparse and editorial.
-- Operational screens should become tighter and quieter.
-- Body copy should be short.
-- Labels should be direct.
-- Use mono only for genuinely technical values.
-- Avoid futuristic fonts, tracked-out microtext, giant operational headings and marketing-style type inside everyday product surfaces.
+Desktop headings are sparse Serif statements. Android's operational screens use Source Sans 3 throughout: headline roles are compact (22-26sp), body roles are readable (16-18sp). `headlineSmall` shares `mobile-title-large`; `titleSmall` is 15sp/20sp; `bodySmall` is 14sp/20sp; `labelLarge` is 16sp/22sp; `labelSmall` is 12sp/16sp. Android packages Source Serif 4 and declares a family, but no current screen uses it. Do not infer an Android Serif reading system from the bundled asset.
 
-If a compact screen requires many text styles to explain itself, simplify the product hierarchy.
+Desktop leaf headings use `desktop-headline`, Activity uses `desktop-activity-headline`, and narrow windows reduce the leaf heading to 27px. Base body uses `desktop-body`; composer text is 17px at 1.5 line height and response reading uses `desktop-reading`. Controls use 14px; supporting copy spans 12-14px according to role. Preserve selectable, wrapping content rather than fixed content cards.
 
-## Composition
+Font provenance lives in [assets/fonts/README.md](assets/fonts/README.md). Source Sans 3 and Source Serif 4 are Adobe Originals under SIL Open Font License 1.1, with licenses beside the canonical and Desktop files. Canonical variable upright Sans was retrieved from Google Fonts; variable Roman Serif from Adobe's release repository on 2026-10-12. Identical TTF copies are packaged in Desktop `public/fonts` and Android `res/font`; there is no runtime font download. Desktop declares weights 200-900 and `font-display: swap`; Android binds Sans weights 400/500/600 explicitly. Physical variable-weight readability remains an owner review item.
 
-Every surface gets **one dominant idea**.
+**The Operational Type Rule.** Sans carries controls, evidence and Android operational screens; Desktop Serif is reserved for sparse headings.
 
-Examples:
+## Layout
 
-- OSCAR Mobile Home → OSCAR presence + whether anything needs attention.
-- Listening → an active conversational turn.
-- Sentry → current awareness + the one thing worth surfacing.
-- Worker detail → responsibility + current meaningful state.
-- Permission → consequence + decision.
+Desktop is a transparent native presence window. Its compact object is 92px wide, anchored 20px from the right and 25px from the bottom. Invocation reveals one folio inset 12px, with 24px vertical/28px horizontal content padding and room for the bottom margin. The object reduces to a 60px rendered Orb in that margin; Activity retains the same presence object. Activity, Text tools and Act are contextual shortcuts. Presence disclosure contains native hide/pin/float/edge controls and shortcut configuration.
 
-Prefer:
+At widths up to 400px, Desktop horizontal padding becomes 20px and decision definitions stack. Full reading removes the response preview height bound. Tools, Activity and exact material scroll; controls wrap. The native window owns geometry and recovery, while presentation preserves focus and drafts through invocation/retreat.
 
-`state → contextual control → action → detail on demand`
+Android's scrollable content is centered with a 720dp maximum width. Horizontal padding is 24dp, reducing to 16dp below 360dp. The top bar carries OSCAR/connection status, a direct Activity shortcut and navigation disclosure. A native modal drawer reveals OSCAR, Activity, Devices and Settings, with a 320dp maximum width. Secondary destinations return through Android Back; drawer dismissal and voice cancellation respect the active layer.
 
-not:
+The bottom input dock belongs to the OSCAR destination. A 56dp Orb sits inside a 64dp voice target beside the outlined multiline text field and 48dp Send control. The dock adds navigation-bar and IME insets to its padding; one row keeps voice/text close without an oversized character or microphone CTA. Input supports one to four lines and IME Send. Reading and consequential review use complete scrollable views with safe-drawing insets; confirmation actions remain separate from the reading body. Font sizes use sp and follow system scale. Native controls preserve at least 48dp touch targets, and device/preferences rows are 80dp/72dp minimum height.
 
-`sidebar + topbar + cards + metrics + graphs + AI panel`.
+**The Disclosure Rule.** Show the current work and the next useful action first; reveal scope, policy, evidence and settings through explicit inspection.
 
-Whitespace must feel intentional. Large empty areas that exist only because the generator had nothing to place are not restraint.
+## Elevation & Depth
 
-## Progressive disclosure
+Depth is mostly tonal. Desktop uses one contained folio shadow (`0 6px 18px #15211c24`) and a smaller disclosed menu shadow (`0 5px 16px #15211c24`). Activity has no independent shadow inside its parent leaf. Android uses flat canvas/container separation and native Material3 drawer/dialog behavior, with transparent surface tint. The input dock is a tonal boundary.
 
-Normal state should be extremely simple. Complexity exists one layer deeper.
+Desktop invocation uses 220ms `cubic-bezier(.16,1,.3,1)` geometry interpolation from the Orb's corner and a 140ms opacity transition. Retreat uses 180ms; control background response is 120ms ease-out. Reduced motion removes surface interpolation and control transitions; retreat becomes immediate. Android respects OS animator availability plus its Reduce OSCAR motion preference and supplies that state to shared expressions. Native navigation/Back takes precedence over copied Desktop shrinking effects. Motion never owns verification, consent or correctness.
 
-Example:
+**The Continuity Rule.** Motion explains the transition from presence to work; state and controls must remain usable when motion is disabled.
 
-```text
-Everything is quiet.
-  ↓ inspect
-Why OSCAR believes that.
-  ↓ inspect deeper
-Device/source/evidence detail.
-```
+## Shapes
 
-Do not put World Model, evidence, capability and telemetry detail on the first surface simply because the system has those concepts.
+Desktop controls use gently squared 6px corners, disclosed menus/review material use 8px, and the single folio uses 16px. Android explicitly defines Material shapes at 6dp/12dp/16dp; operational buttons, composer and consequence material use the small shape. Native drawer, chip and dialog geometry follows the installed Material3 implementation. The Orb retains its canonical curved silhouette. Divider-led rows replace repeated rounded containers.
 
-## OSCAR object / avatar
+## Components
 
-OSCAR's blue shell + yellow puck is a functional presence object, not a mascot illustration.
+### Buttons
 
-- keep it small-to-medium in everyday surfaces;
-- scale it up only when a dedicated interaction moment justifies it;
-- use position, weighting and motion before facial expression;
-- keep facial marks minimal;
-- preserve the canonical Orb's curved wink; avoid unrelated added expressions;
-- serious work should reduce playful movement, not change the identity.
+Desktop main actions are ink with leaf text, 8px/14px padding and 38px minimum height. Ghost controls use 8px/12px padding, tonal hover, and a 2px focus outline with 3px offset. Disabled controls reduce opacity and remain inert. Android uses native Button, FilledTonalButton, TextButton and IconButton semantics with the explicit small shape where present. Decision confirmation has a 48dp minimum height and disables when busy, expired or no longer current. Platform focus/pressed/disabled states remain native.
 
-The puck behaves like a **weighted magnetic/joystick object** with inertia, slight overshoot and controlled settling.
+### Chips
 
-## Presence, voice and Sentry semantics
+Activity's native FilterChip pair switches Active/Finished. Chips select a view of current readback; they do not invent work, erase cancelled history or promote reported progress into verification.
 
-Do not design OSCAR around a permanent `Talk to OSCAR` / `Type instead` choice. OSCAR may already be locally aware.
+### Cards / Containers
 
-Keep these states distinct:
+The Desktop folio is the main contained surface. A yellow decision sheet groups consequence and exact material, with scope/evidence inspectable beneath. Android consequences use a small yellow native Surface; ordinary device/preferences entries are transparent ListItems. Do not turn every setting, result or capability into a separate card.
 
-### Sentry aware
+### Inputs / Fields
 
-Local low-cost acoustic awareness may be active for wake word, VAD/speech presence, Voice Map events, configured sound events and deterministic hot/reflex commands. This does **not** imply active cloud STT or continuous transcription.
+Desktop's composer is an open Sans writing field with one divider; focus replaces it with a blue underline. Enter sends and Shift+Enter adds a line. Text tools and scoped action forms reuse open field styling. Android uses a native OutlinedTextField with `outlineVariant` unfocused stroke, 18sp body, small corners and IME Send; Send only enables for a valid available interaction. Keep platform labels and semantics accessible.
 
-### Listening
+### Navigation
 
-A conversational turn is active and speech recognition is running. The UI should clearly show this state.
+Desktop Activity, Text tools and Act are immediately available in the folio margin. Presence disclosure holds window/shortcut controls. Android's direct Activity entry and contextual drawer keep secondary destinations available without four permanent equal tabs. Top-bar Back, system Back, keyboard dismissal and drawer dismissal retain their native roles.
 
-### Muted
+### Reading and decisions
 
-Normal conversational listening is disabled. Allowed safety/reflex/hot commands may remain locally available according to policy. Do not imply the microphone is physically dead unless that is truly the selected privacy state.
+Response previews lead to full selectable reading. Android review gives consequence prominent warm material, preserves exact request/plan/reply, and discloses Scope & policy. Readback, reported testimony, partial results, unknown state and expiry keep their meaning. Opening a review grants no consent; genuine native owner confirmation remains the authority boundary. No visual redesign grants recording, retention or action authority.
 
-### Acoustic awareness disabled
+### Shared character and input dock
 
-Local acoustic processing is actually disabled. This should be visually distinct from ordinary mute.
+Use the existing shared React/native Compose expression contract with fenced current source state. The same Orb is compact presence, an invoked margin object on Desktop, and a small voice affordance beside Android text input. A Persona preview is explicitly simulated and cannot change operational truth. Listening, muted, acoustic awareness disabled and typing remain distinct; Android's unavailable voice binding must remain visibly unavailable.
 
-### Text
+Source authority: [Desktop styles](desktop/src/presence/living.css), [Desktop presence](desktop/src/presence/Living.tsx), [Android app/theme](mobile/app/src/main/java/io/dawnlight/oscar/mobile/OscarApp.kt), [interaction/reading](mobile/app/src/main/java/io/dawnlight/oscar/mobile/InteractionScreens.kt), [settings](mobile/app/src/main/java/io/dawnlight/oscar/mobile/SettingsScreen.kt), [devices](mobile/app/src/main/java/io/dawnlight/oscar/mobile/DevicesScreen.kt) and [review](mobile/app/src/main/java/io/dawnlight/oscar/mobile/ApprovalDialog.kt). Desktop native reference captures live in `docs/design/cross-platform/desktop/`; final Android API35 reference captures in `.oscar/redesign/android-native-v2/OSCAR-Rebuild-1791793547555/`. Synthetic fixture content remains reference evidence. The sidecar contains HTML/CSS previews for design tooling; these are not native app acceptance evidence.
 
-Typing is another input modality for the same OSCAR turn/context. Typing does not imply voice/Sentry has been turned off.
+## Do's and Don'ts
 
-The interface should make OSCAR feel **already present** rather than forcing the user through a giant microphone CTA.
+### Do:
 
-## Fluid motion / continuous interface
+- **Do** preserve the canonical Orb and shared expression contract.
+- **Do** keep character small and attached to the useful interaction surface.
+- **Do** retain cool Desktop and warm Android materials with their actual native type roles.
+- **Do** use flat rows, clear headings and contextual disclosure to expose features.
+- **Do** preserve focus, Back, system text scale, input insets and reduced-motion usability.
+- **Do** distinguish reported, verifying, verified, partial, blocked, failed and unknown states.
+- **Do** keep scope, exact material and consequential confirmation inspectable.
+- **Do** distinguish native/reference captures from owner quality and physical device acceptance.
 
-Motion is a first-class design material.
+### Don't:
 
-Core rule:
-
-> **State A should physically become State B where practical.**
-
-Prefer:
-
-- shared-element transitions;
-- geometry morphing;
-- contextual expansion from the source element;
-- weighted spring motion;
-- gesture-linked motion;
-- velocity continuity;
-- content choreography;
-- subtle depth/material response;
-- continuous transitions between listening, working, verifying and resolved states.
-
-Avoid:
-
-- screen-wide fades as the default transition;
-- teleporting elements;
-- random spring/bounce effects;
-- decorative particles;
-- gratuitous parallax;
-- loading theatre that hides real state;
-- animation that delays interaction.
-
-Motion must communicate causality: the user should understand where an element came from and where it went.
-
-### Motion character
-
-- **Idle** — almost still; subtle life only.
-- **Listening** — focused tension/orientation toward input.
-- **Thinking/working** — deliberate movement, not a generic spinner.
-- **Verifying** — tighter, more precise movement.
-- **Waiting** — relaxed/suspended.
-- **Alert** — immediate but controlled.
-- **Blocked** — visibly constrained/stalled, not falsely busy.
-- **Done** — calm resolution only after verification where applicable.
-
-Typical UI transitions should usually begin within **120–220 ms**; avatar/physical transitions may settle over **180–450 ms** depending on distance and meaning.
-
-### Motion performance
-
-Fluid does not mean heavy.
-
-- interaction begins immediately;
-- animation never blocks the underlying action;
-- runtime truth must not depend on animation completion;
-- prefer compositor-friendly transforms/opacity where possible;
-- avoid expensive full-screen blur/filter effects;
-- degrade gracefully on low-power/degraded surfaces;
-- respect OS reduced-motion preferences;
-- the interface must remain fully usable with motion disabled.
-
-## Platform translation
-
-Shared identity does not mean identical layouts.
-
-### OSCAR Mobile / mobile
-
-- feels native and thumb-aware;
-- voice/text are peers, not mutually exclusive modes;
-- use sheets/notifications/native permission patterns when appropriate;
-- avoid generic bottom-tab productivity templates unless the IA truly needs them;
-- keep OSCAR present without dedicating most of the screen to the avatar.
-
-### Desktop
-
-- OSCAR can exist as a compact ambient overlay and a deeper workspace when needed;
-- contextual expansion should preserve spatial continuity;
-- selection/cursor/app context should feel native to the machine;
-- do not stretch the mobile composition into a desktop dashboard.
-
-### Physical / Edge
-
-- simplify the same state language;
-- prefer direct hardware state over ornamental animation;
-- deterministic safety never depends on presentation.
-
-## Reliability as a design property
-
-OSCAR should feel durable under abuse, not merely beautiful in the happy path.
-
-Design every surface for:
-
-- long task names/content;
-- zero tasks and many background tasks;
-- offline/degraded devices;
-- unavailable microphone/network/provider;
-- simultaneous alerts and work;
-- rapid voice/text switching;
-- reduced motion;
-- stale/unknown/partial verification states.
-
-The UI should degrade calmly instead of collapsing into modal/error chaos.
-
-Product principle:
-
-> **Beautiful enough to feel premium. Simple enough to reason about. Robust enough to abuse. Graceful when degraded.**
-
-## Design development workflow
-
-Do not attempt to design dozens of screens up front.
-
-Use a Kaizen loop:
-
-```text
-research real shipping patterns
-→ build one or two real surfaces
-→ inspect on target device/viewport
-→ critique
-→ make a focused improvement
-→ verify again
-→ repeat
-```
-
-For UI work:
-
-- study real shipping applications before drawing when a design-research tool is available;
-- Appllama MCP/App Design Skill may be used as a research aid when connected;
-- Impeccable may be used as a design critic when available;
-- these tools are development aids, not product/runtime dependencies;
-- build real UI in code once a direction is promising;
-- do not mass-generate the whole product as static images;
-- use image generation for original supporting assets/illustrations/hero imagery where valuable, not as the canonical UI system;
-- establish patterns only after they survive actual implementation and visual review.
-
-Motion is developed with layout, not sprinkled on as a final polish pass.
-
-## Anti-slop gate
-
-Reject or redesign if several are true:
-
-- it could be a generic AI SaaS template with the logo swapped;
-- the avatar dominates the product rather than serving it;
-- the composition is a card grid/dashboard wall;
-- the interface relies on purple/blue glow, glass or fake telemetry;
-- there is a giant microphone/chat CTA despite OSCAR already being present;
-- mobile is merely desktop scaled down or vice versa;
-- blue buttons appear everywhere;
-- whitespace feels accidental;
-- the screen looks like a poster/moodboard instead of daily-use software;
-- animation continues with no meaningful state change;
-- the UI says `Working`/`Done` while runtime evidence says blocked/verifying/partial.
-
-## Do
-
-- make the interface quiet until it needs to respond;
-- use typography and composition before containers;
-- let motion explain state and causality;
-- preserve one intelligence across voice, text, mobile, desktop and physical surfaces;
-- progressively reveal complexity;
-- use real system state to drive labels/avatar/motion;
-- test degraded/long-content/low-power states early;
-- visually inspect on real target sizes before calling UI work complete.
-
-## Don't
-
-- build a chatbot shell;
-- build a generic AI dashboard;
-- use a permanent chat sidebar as the main information architecture;
-- fill screens with KPI cards, fake graphs or feature boxes;
-- make Sentry look militaristic or surveillance-heavy;
-- make OSCAR childish because it has a face;
-- use another personal project as placeholder content for OSCAR design exploration;
-- mass-produce static mockups before the visual language has survived implementation;
-- copy reference products literally. Borrow principles and patterns, not surfaces.
+- **Don't** repaint or recreate the canonical Orb, or substitute an oversized mascot.
+- **Don't** promote rejected generated imagery or earlier Android top-shoulder/Serif concepts into final guidance.
+- **Don't** introduce card walls, glass, neon, fake telemetry or permanent chat-sidebar gravity.
+- **Don't** make every action blue or use color as a substitute for readable state.
+- **Don't** let expression, animation or an API success imply consent or verified completion.
+- **Don't** add recording, retention, routing or permission authority in presentation code.
+- **Don't** claim physical/manual acceptance, owner approval, merge or later-slice authorization from this candidate.

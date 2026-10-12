@@ -12,7 +12,7 @@ Seven grounded systems considered: reading folio, compact utility tray, correspo
 | Utility tray | Tight command palette with mode strip / compact action sheet and history list | Fast commands but risks making OSCAR a launcher; current-result reading secondary |
 | Pocket notebook | Hinged leaf and sequential work entries / notebook sections and task index | Spatial continuity strong, but paper metaphor adds navigation ceremony |
 
-Chosen **Open folio** under the owner's explicit instruction to choose the strongest direction. Impeccable seed `6965595c` assigned grounded #5 pocket notebook; the owner's selection delegation and product-clarity assessment govern the final choice. This is a code-led native implementation; generated screen comps are not native evidence.
+Initial exploration chose **Open folio** under the owner's explicit instruction to choose the strongest direction. Impeccable seed `6965595c` assigned grounded #5 pocket notebook; the owner's selection delegation and product-clarity assessment govern the final choice. The owner subsequently rejected its serif-heavy Mobile presentation and the generated large-Orb control-deck concept. The final candidate returns to the stored minimal, warm Quietly Alive language on Android; the passable Desktop folio remains with substantially reduced visible explanation. No further concept generation is part of this frozen finish. Generated screen comps are not native evidence.
 
 Fused challengers were evaluated against identification and clarity: ticket wallet (competitive on traceable state, declined on everyday relationship); character catalog (declined on both, violates single identity); garden map (declined on both, wayfinding overwhelms compact tasks); star atlas (competitive on distinctiveness, weaker clarity); warm card app (declined on both, explicitly rejected incumbent pattern); type specimen (competitive on typographic discipline, weaker task topology). Raises: ticket wallet preserves cancelled/unknown history; atlas distinguishes prominence without card walls; type specimen demands a real licensed type system. No costumes, mascot artwork or brands copied.
 
@@ -20,11 +20,11 @@ Fused challengers were evaluated against identification and clarity: ticket wall
 
 **THESIS:** one coherent presence opens into useful work. Refuse detached mascot-plus-form, transcript-first chat and four equal permanent mobile destinations.
 
-**OWN-WORLD:** near-white folio, ink, cool neutral dividers; Source Sans3 controls/body and Source Serif4 sparse headings; original blue/yellow Orb; yellow decision material, blue focus. Flat rows and one contained composer replace card stacks.
+**OWN-WORLD:** Desktop retains its cool near-white folio, ink and sparse Source Serif4 headings; Source Sans3 carries body and controls. Android uses warm paper #F5F1E7, ink #1A1B18, native Source Sans3 roles and flat Material ListItem rows. Original blue/yellow Orb, yellow consequential review material and blue focus are shared. One contained composer replaces competing voice/text entry surfaces. Complete current tokens and licensed typography are in [DESIGN.md](../../DESIGN.md).
 
 **STORY:** observe current state, speak/type, read a result, inspect work, review consequence, confirm through native authority. Detail stays inspectable; history never implies live capability.
 
-**FIRST VIEWPORT:** Desktop compact Orb anchored at lower right; expanded reading leaf fills the same native object and contains its Orb in the lower margin. Android small Orb at upper shoulder, task/status heading and current result in the body; composer above system/IME insets; Activity direct, secondary destinations in a native drawer.
+**FIRST VIEWPORT:** Desktop compact Orb anchored at lower right; expanded reading leaf fills the same native object and contains its Orb in the lower margin. Android functional 56dp Orb joins the bottom input dock with a microphone affordance, a compact operational heading and actual current work in the body; composer above system/IME insets; Activity direct, secondary destinations in a native drawer.
 
 **FORM:** Open folio, grounded rank1; pocket-notebook continuity retained structurally, seed6965595c. Signature interaction: invocation unfolds from the Orb's anchored corner and retreat returns focus/draft to the same presence. Android uses immediate native Back and drawer dismissal, never a shrinking Desktop panel.
 
@@ -34,7 +34,7 @@ Fused challengers were evaluated against identification and clarity: ticket wall
 
 Desktop: LivingPresence, Activity, AskComposer, ResultView, TaskStage, TextTools, ActionSurface, native window geometry and startup composition. Android: OscarApp/theme, PresenceScreen/composer/reading, Activity, Devices, decisions, Voice and secondary settings presentation; Compose navigation callers/tests. Shared expression semantics/Core/session/signing/audio/permission contracts remain authoritative.
 
-No new runtime dependencies. Licensed fonts are self-hosted under `assets/fonts`, copied to platform resources with OFL licenses. Sans handles controls; serif is never used for technical data. Platform fallback covers missing glyphs. Content remains selectable and large-text capable.
+No new runtime dependencies. Licensed fonts are self-hosted under `assets/fonts`, copied to platform resources with OFL licenses. Sans handles Android screens and both platforms' controls/body; Serif is used only for sparse Desktop headings. Bundled Android Serif is currently unused. Platform fallback covers missing glyphs. Content remains selectable and large-text capable.
 
 ## Research
 

@@ -1,0 +1,9 @@
+API35 emulator / disposable reference Core
+> Task :app:connectedDebugAndroidTest
+
+io.dawnlight.oscar.mobile.SettingsIntegrationTest > androidDisabledAnimationsPropagateToSharedTheme[oscar_group02_api35(AVD) - 15] [33mSKIPPED [0m
+
+Finished 30 tests on oscar_group02_api35(AVD) - 15
+
+BUILD SUCCESSFUL in 7m 53s
+91 actionable tasks: 1 executed, 90 up-to-date

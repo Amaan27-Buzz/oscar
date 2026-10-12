@@ -1,0 +1,241 @@
+{
+  "baseline": "7773de8",
+  "device_acceptance": "NOT_RUN",
+  "final_visual_review": "DEFERRED_BY_OWNER",
+  "files": [
+    {
+      "path": "docs/design/cross-platform/android/activity-reference.png",
+      "bytes": 97242,
+      "sha256": "775df0ac46694d19b152c9650370668db81cf9375a0d46370a64f42805a916a5",
+      "classification": "NATIVE_REFERENCE"
+    },
+    {
+      "path": "docs/design/cross-platform/android/approval-reference.png",
+      "bytes": 139881,
+      "sha256": "aeddbecbddea49af366b582ee3bfb9ca58f144c1bd5bafbe5190118ca8507b0f",
+      "classification": "NATIVE_REFERENCE"
+    },
+    {
+      "path": "docs/design/cross-platform/android/before-after.png",
+      "bytes": 66725,
+      "sha256": "3cfba486d010806cfca06fa35c0fb5a4eb29e908231563196eac6ea7a626da92",
+      "classification": "NATIVE_REFERENCE_COMPOSITE"
+    },
+    {
+      "path": "docs/design/cross-platform/android/dark-large-text-reference.png",
+      "bytes": 216895,
+      "sha256": "4f4085c5d6561513e9bca21ec26d50d70a04da4af65f97daa4378cc25b7725b1",
+      "classification": "NATIVE_REFERENCE"
+    },
+    {
+      "path": "docs/design/cross-platform/android/devices-reference.png",
+      "bytes": 95692,
+      "sha256": "45263c022a2d2dcc46bd5c3e5c53b85350413a0b42a1a3c988ae16ac3ecd915c",
+      "classification": "NATIVE_REFERENCE"
+    },
+    {
+      "path": "docs/design/cross-platform/android/home-reference.png",
+      "bytes": 59575,
+      "sha256": "3001463d10b670f5c91bbfdfb15e7dce9bf857b9dc752bea1a75c1c4b8516df1",
+      "classification": "NATIVE_REFERENCE"
+    },
+    {
+      "path": "docs/design/cross-platform/android/ime-large-text-reference.png",
+      "bytes": 14361,
+      "sha256": "4e14e93a181b59a195bb08f3b8658fd7ee43f21dfcc49bd83fa10bcb13a2688c",
+      "classification": "NATIVE_REFERENCE"
+    },
+    {
+      "path": "docs/design/cross-platform/android/originals.png",
+      "bytes": 164762,
+      "sha256": "c22024a37680f5b17c0bdd7113813c8d3cd51c47b8b2305d358816d599abba61",
+      "classification": "NATIVE_REFERENCE_COMPOSITE"
+    },
+    {
+      "path": "docs/design/cross-platform/android/privacy-reference.png",
+      "bytes": 131445,
+      "sha256": "f6f2278f981a357b05a5f9cc7d3ac280761e1db256cba3707eb0f3cf328d7f3f",
+      "classification": "NATIVE_REFERENCE"
+    },
+    {
+      "path": "docs/design/cross-platform/android/reading-simulated.png",
+      "bytes": 257420,
+      "sha256": "e04a137bcfbfd0040e04c302d826bce797693b7b25c7caa893a107126f6ccf1b",
+      "classification": "NATIVE_REFERENCE"
+    },
+    {
+      "path": "docs/design/cross-platform/android/screen-matrix.png",
+      "bytes": 241473,
+      "sha256": "2012af75bfadb427bfbfe7ddfd43cd7e542a3bdf2e391d458fce3aa9886524ae",
+      "classification": "NATIVE_REFERENCE_COMPOSITE"
+    },
+    {
+      "path": "docs/design/cross-platform/android/settings-reference.png",
+      "bytes": 129152,
+      "sha256": "3719b5fc32c1e217169eda6e4080120a15756be28c8cec41910afced0cdbd494",
+      "classification": "NATIVE_REFERENCE"
+    },
+    {
+      "path": "docs/design/cross-platform/android/text-ime-reference.png",
+      "bytes": 132136,
+      "sha256": "e7627c1e797c53e5dfe21a16fe6efc187ce7617e6db50b2829cea0ffd8befba8",
+      "classification": "NATIVE_REFERENCE"
+    },
+    {
+      "path": "docs/design/cross-platform/android/unavailable.png",
+      "bytes": 88552,
+      "sha256": "5b182a3d35ba63aaffa3c52cddc77c28d218984a7aa79819cb597725005cd7e9",
+      "classification": "NATIVE_REFERENCE"
+    },
+    {
+      "path": "docs/design/cross-platform/android/voice-large-text-reference.png",
+      "bytes": 184038,
+      "sha256": "5f10a11a90a3467fc4e1eed3e02cf651f535f129313eb135956bb0c2381980b9",
+      "classification": "NATIVE_REFERENCE"
+    },
+    {
+      "path": "docs/design/cross-platform/android/voice-reference.png",
+      "bytes": 119555,
+      "sha256": "85fdc4a8739c90b5d45a6177bd1b137e4f89269cbb917caafdb52b8e32e97da4",
+      "classification": "NATIVE_REFERENCE"
+    },
+    {
+      "path": "docs/design/cross-platform/desktop/action-reference.png",
+      "bytes": 56359,
+      "sha256": "ddd78805ababaab50614b477d93be1b4ce2d4e0666957685f143667ef74a4af0",
+      "classification": "NATIVE_REFERENCE"
+    },
+    {
+      "path": "docs/design/cross-platform/desktop/activity-reference.png",
+      "bytes": 49618,
+      "sha256": "987629b248cfbbab4b1f43f0ff03c151424391958952756e4e9ce5bfe5b72174",
+      "classification": "NATIVE_REFERENCE"
+    },
+    {
+      "path": "docs/design/cross-platform/desktop/approval-reference.png",
+      "bytes": 65453,
+      "sha256": "48ecb03caa9c65eaf0e2fc9a6c388872e74abd3a81826dff5d8820cd5f2355b0",
+      "classification": "NATIVE_REFERENCE"
+    },
+    {
+      "path": "docs/design/cross-platform/desktop/before-after.png",
+      "bytes": 83606,
+      "sha256": "d9a383f825868879cd6d7b374758a422238c595e7a4a1770e5541dca822db211",
+      "classification": "NATIVE_REFERENCE_COMPOSITE"
+    },
+    {
+      "path": "docs/design/cross-platform/desktop/compact.png",
+      "bytes": 8733,
+      "sha256": "180aec124d67b12dc053eee2987dcd2e32785712fb348fd695c6325ff88b993a",
+      "classification": "NATIVE_REFERENCE"
+    },
+    {
+      "path": "docs/design/cross-platform/desktop/dark-reduced-motion-reference.png",
+      "bytes": 36361,
+      "sha256": "1f1bb2f9c9ea3927d9e456d00bf40b1b15f92b6ec526e248f71059fea4bad32c",
+      "classification": "NATIVE_REFERENCE"
+    },
+    {
+      "path": "docs/design/cross-platform/desktop/dark-reference.png",
+      "bytes": 36354,
+      "sha256": "010e6a988614986ac675703de7fad61afc0e6ad2b60007ce75e5dd44cf633da0",
+      "classification": "NATIVE_REFERENCE"
+    },
+    {
+      "path": "docs/design/cross-platform/desktop/dictation-unavailable.png",
+      "bytes": 50959,
+      "sha256": "9e8b04311d5fe4dd5f1c4ef628e5c455cd0c9fada3ffa410c089ef5a2a675462",
+      "classification": "NATIVE_REFERENCE"
+    },
+    {
+      "path": "docs/design/cross-platform/desktop/editing-reference.png",
+      "bytes": 52262,
+      "sha256": "8941424bc393f50c9306040ca3699ab1067ad14306fdebfcb76608907ac80b84",
+      "classification": "NATIVE_REFERENCE"
+    },
+    {
+      "path": "docs/design/cross-platform/desktop/forced-colors-reference.png",
+      "bytes": 29803,
+      "sha256": "bf30a012664a29f883008f36542d4c99a1b228abee19679e31c78408bf1dc11f",
+      "classification": "NATIVE_REFERENCE"
+    },
+    {
+      "path": "docs/design/cross-platform/desktop/invoked-reference.png",
+      "bytes": 34750,
+      "sha256": "f7176502cb745ce2c09497935158cbb61939e19f61b6ca095187a56b4ec5c681",
+      "classification": "NATIVE_REFERENCE"
+    },
+    {
+      "path": "docs/design/cross-platform/desktop/motion-frames.png",
+      "bytes": 114916,
+      "sha256": "e8709b806148f9a744a6121e24ea02df4e709ce4f834b7a0f80d2825f724e871",
+      "classification": "NATIVE_REFERENCE_COMPOSITE"
+    },
+    {
+      "path": "docs/design/cross-platform/desktop/motion-reference.gif",
+      "bytes": 297021,
+      "sha256": "efba4c915163ea1ac0c9b2ee7480dc64d5dbb4930fe2e83729ff8c346dae6b76",
+      "classification": "NATIVE_REFERENCE"
+    },
+    {
+      "path": "docs/design/cross-platform/desktop/native-confirmation-unusable-fixture.png",
+      "bytes": 15324,
+      "sha256": "a856d49774fdb8672d2287d94b97d091b89ae451d344dbc85c3502b1974065b1",
+      "classification": "NATIVE_REFERENCE"
+    },
+    {
+      "path": "docs/design/cross-platform/desktop/offline-reference.png",
+      "bytes": 68760,
+      "sha256": "72fd2615095656fb14f8d4a12ae442537e983ed8b1cee56daeee597ed217c94d",
+      "classification": "NATIVE_REFERENCE"
+    },
+    {
+      "path": "docs/design/cross-platform/desktop/originals.png",
+      "bytes": 79134,
+      "sha256": "2cccb16c8cccd2a9582ee5868c7f0f087dca119b61dc224531579ffb26009e74",
+      "classification": "NATIVE_REFERENCE_COMPOSITE"
+    },
+    {
+      "path": "docs/design/cross-platform/desktop/reading-reference.png",
+      "bytes": 99229,
+      "sha256": "73f039ecb023af3c64ec792b0c1cb37afbf2bc7f5d52bcfd4824ee359075de67",
+      "classification": "NATIVE_REFERENCE"
+    },
+    {
+      "path": "docs/design/cross-platform/desktop/reduced-motion-reference.png",
+      "bytes": 29691,
+      "sha256": "0045f72bced757157eefbe4ffedb7e3de4a4c97fc4d4886fce930b284e444a8a",
+      "classification": "NATIVE_REFERENCE"
+    },
+    {
+      "path": "docs/design/cross-platform/desktop/result-reference.png",
+      "bytes": 45141,
+      "sha256": "f8ba10bf2809f63c1dd71f96109cfda6f951502baebdb51d20121a69ae7754d6",
+      "classification": "NATIVE_REFERENCE"
+    },
+    {
+      "path": "docs/design/cross-platform/desktop/screen-matrix.png",
+      "bytes": 331457,
+      "sha256": "30e5b695ebcde6e16d5fb2dabc95f83818bd14cf05f1e9bf6cc7e4057b6a06b1",
+      "classification": "NATIVE_REFERENCE_COMPOSITE"
+    },
+    {
+      "path": "docs/design/cross-platform/desktop/shortcut-reference.png",
+      "bytes": 44474,
+      "sha256": "7b2da6d1a0879290ef779df9c16ff6bd9bc568fcb2f712e68b40674afa0b1332",
+      "classification": "NATIVE_REFERENCE"
+    },
+    {
+      "path": "docs/design/cross-platform/desktop/working-reference.png",
+      "bytes": 27903,
+      "sha256": "bddc64d1ff632a807ed5e11c65a56047a0f994263ae7aa005134f0fe5cec7146",
+      "classification": "NATIVE_REFERENCE"
+    },
+    {
+      "path": "docs/design/cross-platform/desktop/writing-reference.png",
+      "bytes": 36088,
+      "sha256": "d6182b0f68c9e1f531324085685a9fa085104884ba126b7be5f5f19452600a6e",
+      "classification": "NATIVE_REFERENCE"
+    }
+  ]
+}

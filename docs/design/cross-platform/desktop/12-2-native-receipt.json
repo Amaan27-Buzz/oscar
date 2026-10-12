@@ -1,0 +1,42 @@
+{
+  "checks": [
+    "unfinished draft survives reversal",
+    "native editable DOM focus",
+    "real arithmetic verification",
+    "fresh composer after actual result",
+    "bounded compact result",
+    "actual native reading expansion",
+    "long reader preserves reported text and focus",
+    "restoration does not upgrade model testimony",
+    "unavailable capability stays explicit"
+  ],
+  "native": {
+    "evidence": "AUTHENTICATED_DISPOSABLE_CORE",
+    "pid": 33360,
+    "native_debug_port": 61015,
+    "commands": "status block restore deny allow work execute finish reported failure disconnect reconnect cleanup"
+  },
+  "fixture_log": [
+    "{\"evidence\": \"AUTHENTICATED_DISPOSABLE_CORE\", \"pid\": 33360, \"native_debug_port\": 61015, \"commands\": \"status block restore deny allow work execute finish reported failure disconnect reconnect cleanup\"}",
+    "{\"core_response\": {\"state\": \"planned\", \"reason\": null, \"message\": null, \"task_id\": \"a5004e34fb984883b3a350d65c32b54f\"}}",
+    "{\"reference_programmatic_progression\": \"a5004e34fb984883b3a350d65c32b54f\", \"actual_core_state\": \"executing\", \"gui_owner_approval\": false}",
+    "{\"actual_tasks\": [{\"state\": \"verified\"}]}",
+    "{\"scripted_reference_model\": \"long\", \"real_inference\": false}",
+    "{\"core_response\": {\"state\": \"planned\", \"reason\": null, \"message\": null, \"task_id\": \"17667bc529034704810d7365668ca66e\"}}",
+    "{\"reference_programmatic_progression\": \"17667bc529034704810d7365668ca66e\", \"actual_core_state\": \"executing\", \"gui_owner_approval\": false}",
+    "{\"actual_tasks\": [{\"state\": \"verified\"}, {\"state\": \"partially_verified\"}]}",
+    "\"Disposable Core server stopped\"",
+    "\"Disposable Core server restored\"",
+    "\"REFERENCE Worker disconnected; Core remains online\"",
+    "{\"core_response\": {\"state\": \"blocked\", \"reason\": \"capability_unavailable\", \"message\": \"Core/Worker capability unavailable or ambiguous; nothing executed\", \"task_id\": null}}",
+    "\"Owned fixture cleanup; not evidence of UI Quit\""
+  ],
+  "classification": "REFERENCE_VERIFIED",
+  "completed": true,
+  "failure_type": null,
+  "limits": [
+    "actual native WebView2 content/IPC, not OS focus acceptance",
+    "programmatic disposable Runtime progression, not GUI owner approval",
+    "scripted model, not real inference; no microphone"
+  ]
+}

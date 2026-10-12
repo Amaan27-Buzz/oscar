@@ -10,7 +10,7 @@ Baseline7773de8, inspected2026-10-12. Owner rejection is authoritative; previous
 | Desktop12-6-activity | P1 design: giant empty ledger, identity disappears, technical details all equal | Compact hierarchy, linked character margin, selected task/decision as focal content |
 | Desktop12-3-preview / unavailable microphone | P2 design: dense mode controls and explanations compete with text | Native modes on one folio, destination/context details disclosed beside review |
 | Desktop12-2-expanded-response | P2 design: small generic sans, multiple scroll limits compete | Sans prose at readable measure; deliberate reading enlargement |
-| Mobile13-2-reference-home-response | P1 design: 108dp decorative Orb and centered slogan consume the top half; request/task/result entry compete | Interactive48dp shoulder presence; result before anchored composer; contextual task attention |
+| Mobile13-2-reference-home-response | P1 design: 108dp decorative Orb and centered slogan consume the top half; request/task/result entry compete | Functional56dp presence at the unified input dock; actual work before composer; contextual task attention |
 | Mobile13-3-reference-approval | P1 design: full-height boilerplate modal; no distinction between consequence and metadata | Consequence and exact material dominate; technical scope stays inspectable before native confirmation |
 | Mobile13-4-reference-grid | P2 design: line-by-line technical dump instead of device overview | Native device rows, this phone first, capabilities on disclosure |
 | Mobile13-6-reference-privacy | P2 design: concepts read as documentation rather than controls | Current grants first, contract explanations one layer deeper |
@@ -28,4 +28,6 @@ Curated contact sheets retain screenshot pixels and place annotations outside th
 
 ## Rebuild verification
 
-Pending native render matrix and one substantial correction pass. This document does not self-certify visual completion from source or automated tests.
+The owner rejected the first serif-heavy Mobile implementation and generated large-Orb/card concept. A substantial correction replaced that direction with the stored warm, minimal language: compact sans hierarchy, native list rows, small functional Orb at the input dock, icon actions and progressive details. Desktop retains the passable companion composition with reduced status/consent prose.
+
+Native renders, before/after comparisons, screen matrix, regression results and the independent assessment are indexed in [the evidence packet](cross-platform/README.md) and [finish review](CROSS-PLATFORM-REVIEW.md). Remaining owner taste and physical acceptance are explicitly deferred. No numerical self-score or automatic-test result constitutes visual approval.

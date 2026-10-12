@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-12T11:24:03.443574+00:00",
+  "title": "Design System: OSCAR",
+  "extensions": {
+    "colorMeta": {
+      "desktop-leaf": {
+        "role": "neutral",
+        "displayName": "Desktop folio"
+      },
+      "mobile-paper": {
+        "role": "neutral",
+        "displayName": "Warm Android paper"
+      },
+      "decision": {
+        "role": "tertiary",
+        "displayName": "Consequential review"
+      }
+    },
+    "typographyMeta": {
+      "body": {
+        "displayName": "Readable operation text",
+        "purpose": "Source Sans3 controls/body; compact Android hierarchy."
+      }
+    }
+  },
+  "components": [],
+  "narrative": {
+    "northStar": "Quietly Alive. Playful Precision.",
+    "overview": "One continuous, truthful OSCAR presence. Cool Desktop folio and warm native Android rows reveal complete features through contextual disclosure. The canonical small Orb joins interaction rather than becoming a poster.",
+    "keyCharacteristics": [
+      "Minimal native composition",
+      "Progressive complete detail",
+      "Small functional character"
+    ],
+    "rules": [
+      {
+        "name": "The Truthful State Rule",
+        "body": "Expression, voice and task status reflect current operational evidence, never consent.",
+        "section": "components"
+      }
+    ],
+    "dos": [
+      "Preserve exact review and native authority",
+      "Keep input accessible above actual IME"
+    ],
+    "donts": [
+      "No giant mascot/card wall",
+      "No fabricated recording, working or success"
+    ]
+  }
+}

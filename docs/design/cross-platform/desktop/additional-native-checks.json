@@ -1,0 +1,8 @@
+{
+  "checks": [
+    "actual native shortcut registration and status readback",
+    "reduced motion removes surface interpolation in actual native WebView2"
+  ],
+  "classification": "REFERENCE_NATIVE_WEBVIEW2",
+  "appearance": "media preferences emulated in actual native app; OS preference/device acceptance not claimed"
+}

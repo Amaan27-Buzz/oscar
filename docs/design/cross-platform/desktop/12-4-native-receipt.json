@@ -1,0 +1,32 @@
+{
+  "checks": [
+    "empty required path cannot be proposed",
+    "real catalog exposes current required scope",
+    "proposal displays the exact submitted action",
+    "working task prohibits a competing proposal",
+    "Core independent file readback is verified",
+    "cleared action content is not retained in the form",
+    "withdrawn worker never remains an eligible executor"
+  ],
+  "completed": true,
+  "failure_type": null,
+  "classification": "REFERENCE_VERIFIED",
+  "native": {
+    "evidence": "AUTHENTICATED_DISPOSABLE_CORE",
+    "pid": 46312,
+    "native_debug_port": 62041,
+    "commands": "status block restore deny allow work execute finish reported failure disconnect reconnect cleanup"
+  },
+  "fixture_log": [
+    "{\"evidence\": \"AUTHENTICATED_DISPOSABLE_CORE\", \"pid\": 46312, \"native_debug_port\": 62041, \"commands\": \"status block restore deny allow work execute finish reported failure disconnect reconnect cleanup\"}",
+    "{\"reference_programmatic_progression\": \"3cdb8c92dc0944eab2893b3b895bc335\", \"actual_core_state\": \"executing\", \"gui_owner_approval\": false}",
+    "{\"actual_tasks\": [{\"state\": \"verified\"}]}",
+    "\"REFERENCE Worker disconnected; Core remains online\"",
+    "\"Owned fixture cleanup; not evidence of UI Quit\""
+  ],
+  "limits": [
+    "actual native WebView2/IPC and real temporary file/readback",
+    "programmatic trusted Runtime progression, not owner GUI consent",
+    "no destructive owner-machine operation or provider inference"
+  ]
+}

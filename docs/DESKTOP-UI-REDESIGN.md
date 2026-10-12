@@ -1,5 +1,7 @@
 # Slice 12 — OSCAR Desktop Experience / Visual Redesign
 
+**2026-10-12 redesign candidate:** [cross-platform rebuild](design/CROSS-PLATFORM-REDESIGN.md), [native evidence and regressions](design/cross-platform/README.md), [independent review](design/CROSS-PLATFORM-REVIEW.md). Branch `design/cross-platform-ui-rebuild`; draft into `build/slice-13-mobile-completion`. Current visual system is [DESIGN.md](../DESIGN.md). No merge/Slice14 or owner physical acceptance. Historical slice records below remain provenance.
+
 **2026-10-11 current status:** Group 1 implements12.2–12.6 on
 `build/slice-12-desktop-completion` from verified corrective `da8fddae`.
 See [software completion](development/GROUP-01-DESKTOP-COMPLETION.md),
