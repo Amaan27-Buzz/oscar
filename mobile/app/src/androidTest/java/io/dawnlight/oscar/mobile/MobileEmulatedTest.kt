@@ -34,8 +34,8 @@ class MobileEmulatedTest {
     }
     @Test fun disconnectedAndVoiceUnavailableNeverAdvertiseSuccess() {
         compose.onNodeWithTag("interactionInput").performTextInput("2 + 3")
-        compose.onNodeWithText("Send").assertIsNotEnabled()
-        compose.onNodeWithText("Voice").performClick()
+        compose.onNodeWithContentDescription("Send").assertIsNotEnabled()
+        compose.onNodeWithContentDescription("Open voice interaction").performClick()
         compose.onNodeWithTag("voiceStatus").assertTextContains("Microphone off")
         compose.onNodeWithText("Availability & voice identity").performScrollTo().performClick()
         compose.onNodeWithText("Voice Identity is managed by Core. Android playback and enrollment are uncommissioned; Voice Match / Map never authorize an action.").assertExists()
@@ -97,7 +97,7 @@ class MobileEmulatedTest {
         }
         compose.activityRule.scenario.recreate()
         compose.waitUntil(5000) { compose.onAllNodesWithText("Saved connection unavailable. Reconnect from trusted Core.").fetchSemanticsNodes().isNotEmpty() }
-        compose.onNodeWithText("Send").assertIsNotEnabled()
+        compose.onNodeWithContentDescription("Send").assertIsNotEnabled()
         compose.runOnIdle { SessionVault(compose.activity).forget() }
     }
     @Test fun explicitLoopbackFixtureReadback() {

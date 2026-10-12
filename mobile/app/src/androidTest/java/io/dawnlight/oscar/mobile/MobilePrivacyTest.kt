@@ -53,6 +53,7 @@ class MobilePrivacyTest {
     @Test fun invalidSourcesDeniedAccessAndLiveLocalRevocationRemainUsable() {
         compose.openDestination("Settings")
         compose.onNodeWithText("Privacy").performClick()
+        compose.onNodeWithText("Notification sources").performScrollTo().performClick()
         compose.onNodeWithTag("notificationSources").performScrollTo().performTextInput("invalid")
         compose.onNodeWithText("Save sources").performScrollTo().performClick()
         compose.onNodeWithText("Use up to 32 package IDs, such as example.app. Nothing was enabled.").assertExists()

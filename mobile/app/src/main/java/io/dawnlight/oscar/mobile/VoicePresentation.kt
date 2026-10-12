@@ -52,9 +52,9 @@ object VoicePresentation {
 @Composable fun VoiceExperience(close: () -> Unit, privacy: () -> Unit) {
     val context = LocalContext.current
     val status by VoicePresentation.state.collectAsStateWithLifecycle()
-    Text("Speak when you’re ready.", style = MaterialTheme.typography.headlineLarge)
+    Text("Voice", style = MaterialTheme.typography.titleLarge)
     Text(status.detail, modifier = Modifier.testTag("voiceStatus").semantics { liveRegion = LiveRegionMode.Polite; stateDescription = status.phase.name })
-    Text("Opening Voice does not record. Listening starts only after your request and the required grants.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+    Text("Recording starts only on your request.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         Button(onClick = { VoicePresentation.start(context) }, shape = MaterialTheme.shapes.small, enabled = status.phase !in setOf(VoicePhase.STARTING, VoicePhase.LISTENING, VoicePhase.SPEAKING)) { Text("Start listening") }
         TextButton(onClick = { VoicePresentation.cancel(context); close() }) { Text("Cancel voice") }

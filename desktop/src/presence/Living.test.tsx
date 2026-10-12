@@ -5,6 +5,14 @@ import {LivingPresence} from './Living';
 import {initialView} from '../bridge';
 import type {Send,View} from '../bridge';
 afterEach(()=>{cleanup();vi.useRealTimers();});
+it('keeps native shortcut registration reachable in the default presence',async()=>{
+  const h=harness();await screen.findByText('Here');
+  fireEvent.click(screen.getByRole('button',{name:/OSCAR: Here/}));await screen.findByLabelText('Ask OSCAR');
+  fireEvent.click(screen.getByText('Presence',{exact:true}));
+  fireEvent.change(screen.getByLabelText('Global shortcut'),{target:{value:'Ctrl+Alt+Q'}});
+  fireEvent.click(screen.getByRole('button',{name:'Register shortcut'}));
+  await waitFor(()=>expect(h.port).toHaveBeenCalledWith({kind:'shortcut',accelerator:'Ctrl+Alt+Q'}));
+});
 function harness() {
   let generation=0;
   let view:View={...initialView,link:'online',expression:{epoch:'a'.repeat(32),generation:0,observed_at_ms:Date.now(),voice_observed_at_ms:Date.now(),tasks_observed_at_ms:Date.now(),current_observed_at_ms:Date.now()}};

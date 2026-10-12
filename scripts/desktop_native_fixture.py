@@ -12,6 +12,20 @@ from urllib.request import urlopen
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def presence_page(browser):
+    """CDP target discovery may precede Playwright's initial frame navigation event."""
+    deadline = monotonic() + 15
+    session = browser.new_browser_cdp_session()
+    while monotonic() < deadline:
+        for context in browser.contexts:
+            for page in context.pages:
+                if "?living" in page.url:
+                    return page
+        session.send("Target.getTargets")
+        sleep(0.1)
+    raise RuntimeError("Owned native presence page unavailable to CDP")
+
+
 @contextmanager
 def native_fixture():
     process = subprocess.Popen(

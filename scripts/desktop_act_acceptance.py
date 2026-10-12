@@ -5,7 +5,7 @@ from pathlib import Path
 
 from playwright.sync_api import sync_playwright
 
-from scripts.desktop_native_fixture import native_fixture
+from scripts.desktop_native_fixture import native_fixture, presence_page
 
 OUT = Path(__file__).resolve().parents[1] / "docs/ui/desktop/completion/evidence"
 
@@ -16,7 +16,7 @@ def main() -> int:
     try:
         with native_fixture() as (info, lines, command), sync_playwright() as pw:
             browser = pw.chromium.connect_over_cdp(f"http://127.0.0.1:{info['native_debug_port']}")
-            page = next(p for c in browser.contexts for p in c.pages if "?living" in p.url)
+            page = presence_page(browser)
 
             def caption(text):
                 page.locator(".presence-caption").get_by_text(text, exact=True).wait_for(
@@ -65,10 +65,12 @@ def main() -> int:
             )
             command("finish")
             caption("Here")
-            page.get_by_text("Verified ·", exact=False).wait_for()
+            page.locator(".task-stage").get_by_role("status").get_by_text(
+                "Verified", exact=True
+            ).wait_for()
             check(
                 "Core independent file readback is verified",
-                page.get_by_text("Verified ·", exact=False).count() > 0,
+                page.locator(".task-stage").get_by_role("status").inner_text() == "Verified",
             )
             shot("verified-file")
             page.get_by_role("button", name="Clear private drafts and context", exact=True).click()

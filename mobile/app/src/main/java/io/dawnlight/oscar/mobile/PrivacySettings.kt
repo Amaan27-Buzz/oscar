@@ -59,7 +59,7 @@ import androidx.compose.ui.semantics.liveRegion
     LaunchedEffect(revision) { checked = prefs.getBoolean(key, false) }
     val scope = rememberCoroutineScope()
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-        Text(label, modifier = Modifier.weight(1f).padding(top = 12.dp))
+        Text(when(key) { "microphone_perception" -> "Microphone awareness"; "notification_context" -> "Notification access"; "notification_reply" -> "Confirmed replies"; else -> label }, modifier = Modifier.weight(1f).padding(top = 12.dp), style = MaterialTheme.typography.bodyMedium)
         Switch(checked, { next -> saving = true; scope.launch {
             if (withContext(Dispatchers.IO) { prefs.edit().putBoolean(key, next).commit() }) {
                 checked = next; failed = false
@@ -69,7 +69,7 @@ import androidx.compose.ui.semantics.liveRegion
             saving = false
         } }, enabled = !saving, modifier = Modifier.semantics { contentDescription = label })
     }
-    Text(explanation, style = MaterialTheme.typography.bodySmall)
+    Disclosure(when(key) { "microphone_perception" -> "Microphone details"; "notification_context" -> "Notification details"; "notification_reply" -> "Reply details"; else -> "$label details" }) { Text(explanation, style = MaterialTheme.typography.bodySmall) }
     if (failed) Text("Persistence is unverified. Inspect current grants before continuing.", color = MaterialTheme.colorScheme.error)
 }
 @Composable internal fun AndroidGrant(label: String, permission: String) {
@@ -89,25 +89,26 @@ import androidx.compose.ui.semantics.liveRegion
 }
 @Composable fun PrivacySettings() {
     val (context, revision) = observedPermissions()
-    Text("Permissions & privacy", style = MaterialTheme.typography.headlineMedium)
+    Text("Permissions & privacy", style = MaterialTheme.typography.titleMedium)
     Text("Can perceive", style = MaterialTheme.typography.titleMedium)
     AndroidGrant("Microphone", Manifest.permission.RECORD_AUDIO)
     LocalGrant("Allow microphone perception", "microphone_perception", "Separate OSCAR grant. Capture also requires Android permission and a commissioned Voice Core binding.")
     LocalGrant("Selected notification context", "notification_context", "Requires explicit Android listener access and an allowlist. It grants no retention or reply authority.")
     val listener = context.getSystemService(NotificationManager::class.java).isNotificationListenerAccessGranted(ComponentName(context, NotificationBoundary::class.java))
+    val prefs = remember { context.getSharedPreferences("permissions", Context.MODE_PRIVATE) }
+    val scope = rememberCoroutineScope()
+    Disclosure("Notification sources") {
     Text("Android listener access · ${if (listener) "Granted" else "Not granted"}")
     var platformUnavailable by remember { mutableStateOf(false) }
     TextButton(onClick = { try { context.startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)); platformUnavailable = false }
         catch (_: Exception) { platformUnavailable = true } }) { Text("Manage listener access") }
     if (platformUnavailable) Text("Android listener settings are unavailable. Access is unchanged.", color = MaterialTheme.colorScheme.error)
-    val prefs = remember { context.getSharedPreferences("permissions", Context.MODE_PRIVATE) }
     var sources by remember { mutableStateOf(prefs.getString("notification_sources", "") ?: "") }
     var sourceError by remember { mutableStateOf(false) }
     var sourceSaveFailed by remember { mutableStateOf(false) }
     var saved by remember { mutableStateOf(false) }
     val storedSources = remember(revision) { prefs.getString("notification_sources", "") ?: "" }
     LaunchedEffect(storedSources) { sources = storedSources }
-    val scope = rememberCoroutineScope()
     OutlinedTextField(sources, { sources = it.take(1000); saved = false }, label = { Text("Allowed notification package IDs") }, supportingText = { Text("Comma-separated; every unlisted app is excluded. Empty means no sources.") }, isError = sourceError, modifier = Modifier.fillMaxWidth().testTag("notificationSources"))
     TextButton(onClick = {
         val names = sources.split(',').map { it.trim() }.filter { it.isNotEmpty() }
@@ -124,18 +125,21 @@ import androidx.compose.ui.semantics.liveRegion
     if (saved) Text("Source exclusions saved.", modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite })
     Text("Notification content stays hidden in this surface. Only the source app and available reply action are shown; no notification archive is written.", style = MaterialTheme.typography.bodySmall)
     TextButton(onClick = { NotificationBoundary.privacyChanged() }) { Text("Clear transient notification context") }
-    Text("Location · not configured\nCamera · not configured\nSentry awareness · not commissioned\nVoice Match / Map · not enrolled", style = MaterialTheme.typography.bodyMedium)
+    }
+    Disclosure("Unavailable capabilities") { Text("Location · not configured\nCamera · not configured\nSentry awareness · not commissioned\nVoice Match / Map · not enrolled", style = MaterialTheme.typography.bodySmall) }
     HorizontalDivider()
     Text("Can retain", style = MaterialTheme.typography.titleMedium)
-    Text("Raw audio and notification retention are off. Your unsent draft is encrypted for recovery.")
+    Text("Audio / notifications · retention off", style = MaterialTheme.typography.bodyMedium)
     Disclosure("Draft recovery & Core memory") {
-        Text("Discard clears that draft; Core memory retention and source/person exclusions require separate Core policy. Perception never enables retention.")
+        Text("Your unsent draft is encrypted for recovery. Discard clears that draft; Core memory retention and source/person exclusions require separate Core policy. Perception never enables retention.")
     }
     HorizontalDivider()
     Text("Can act", style = MaterialTheme.typography.titleMedium)
     LocalGrant("Allow confirmed notification replies", "notification_reply", "Only exposed source-app reply actions; fresh Core permission, policy and signed confirmation are still required.")
-    Text("Remote task control uses scoped Core pairing and one-decision confirmation. Broader communication, location and camera actions are unavailable.")
-    Text("Overlay · unavailable in this slice\nAssistant role · managed separately in Android presence\nLocal/cloud routing preference · unavailable until Core exposes a supported setting")
+    Disclosure("Action boundaries") {
+        Text("Remote task control uses scoped Core pairing and one-decision confirmation. Broader communication, location and camera actions are unavailable.")
+        Text("Overlay · unavailable in this slice\nAssistant role · managed separately in Android presence\nLocal/cloud routing preference · unavailable until Core exposes a supported setting")
+    }
     var revokeFailed by remember { mutableStateOf(false) }
     TextButton(onClick = { scope.launch {
         val applied = withContext(Dispatchers.IO) { prefs.edit().putBoolean("microphone_perception", false)

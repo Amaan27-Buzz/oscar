@@ -23,14 +23,15 @@ import io.dawnlight.oscar.expression.ExpressionPresence
 import androidx.compose.ui.unit.Dp
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.background
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 
-private val Paper = Color(0xFFF8F9F6)
-private val Ink = Color(0xFF202923)
+private val Paper = Color(0xFFF5F1E7)
+private val Ink = Color(0xFF1A1B18)
 @OptIn(androidx.compose.ui.text.ExperimentalTextApi::class)
 private val OscarSans = FontFamily(
     Font(R.font.source_sans_3, FontWeight.Normal, variationSettings = androidx.compose.ui.text.font.FontVariation.Settings(androidx.compose.ui.text.font.FontVariation.weight(400))),
@@ -40,9 +41,9 @@ private val OscarSans = FontFamily(
 @OptIn(androidx.compose.ui.text.ExperimentalTextApi::class)
 private val OscarSerif = FontFamily(Font(R.font.source_serif_4, variationSettings = androidx.compose.ui.text.font.FontVariation.Settings(androidx.compose.ui.text.font.FontVariation.weight(400))))
 private val OscarType = Typography(
-    headlineLarge = androidx.compose.ui.text.TextStyle(fontFamily = OscarSerif, fontSize = 34.sp, lineHeight = 40.sp),
-    headlineMedium = androidx.compose.ui.text.TextStyle(fontFamily = OscarSerif, fontSize = 30.sp, lineHeight = 36.sp),
-    headlineSmall = androidx.compose.ui.text.TextStyle(fontFamily = OscarSerif, fontSize = 26.sp, lineHeight = 32.sp),
+    headlineLarge = androidx.compose.ui.text.TextStyle(fontFamily = OscarSans, fontWeight = FontWeight.SemiBold, fontSize = 26.sp, lineHeight = 32.sp),
+    headlineMedium = androidx.compose.ui.text.TextStyle(fontFamily = OscarSans, fontWeight = FontWeight.SemiBold, fontSize = 24.sp, lineHeight = 30.sp),
+    headlineSmall = androidx.compose.ui.text.TextStyle(fontFamily = OscarSans, fontWeight = FontWeight.SemiBold, fontSize = 22.sp, lineHeight = 28.sp),
     titleLarge = androidx.compose.ui.text.TextStyle(fontFamily = OscarSans, fontWeight = FontWeight.SemiBold, fontSize = 22.sp, lineHeight = 28.sp),
     titleMedium = androidx.compose.ui.text.TextStyle(fontFamily = OscarSans, fontWeight = FontWeight.SemiBold, fontSize = 18.sp, lineHeight = 24.sp),
     titleSmall = androidx.compose.ui.text.TextStyle(fontFamily = OscarSans, fontWeight = FontWeight.SemiBold, fontSize = 15.sp, lineHeight = 20.sp),
@@ -81,7 +82,7 @@ private val OscarType = Typography(
         outline = Color(0xFF999D8D), outlineVariant = Color(0xFF3E4C42), error = Color(0xFFFFB4A9)) else lightColorScheme(primary = Ink, onPrimary = Color.White,
         secondary = Color(0xFF1969BC), secondaryContainer = Color(0xFFE8EDE6), onSecondaryContainer = Ink,
         tertiary = Color(0xFFFFC83D), tertiaryContainer = Color(0xFFFFF0B7), onTertiaryContainer = Ink, background = Paper,
-        surface = Paper, surfaceContainer = Color.White, surfaceContainerHigh = Color(0xFFE8EDE6),
+        surface = Paper, surfaceContainer = Color(0xFFFFFDF8), surfaceContainerHigh = Color(0xFFEAE5DA),
         surfaceContainerHighest = Color(0xFFE0E7DE), surfaceContainerLow = Paper, surfaceContainerLowest = Color.White,
         surfaceTint = Color.Transparent, onBackground = Ink, onSurface = Ink, onSurfaceVariant = Color(0xFF58635B),
         outline = Color(0xFF78857A), outlineVariant = Color(0xFFD7DDD6), error = Color(0xFFB6322B)),
@@ -108,8 +109,9 @@ private val OscarType = Typography(
         focus.clearFocus(); keyboard?.hide(); selected = item.name; settingsPage = "Settings"
         scope.launch { drawer.close() }
     }
-    BackHandler(voiceOpen || destination != Destination.OSCAR || settingsPage != "Settings") {
-        if (voiceOpen) { VoicePresentation.cancel(session.getApplication()); voiceOpen = false } else if (settingsPage != "Settings") settingsPage = "Settings" else selected = Destination.OSCAR.name
+    BackHandler(drawer.isOpen || drawer.targetValue == DrawerValue.Open || voiceOpen || destination != Destination.OSCAR || settingsPage != "Settings") {
+        if (drawer.isOpen || drawer.targetValue == DrawerValue.Open) scope.launch { drawer.close() }
+        else if (voiceOpen) { VoicePresentation.cancel(session.getApplication()); voiceOpen = false } else if (settingsPage != "Settings") settingsPage = "Settings" else selected = Destination.OSCAR.name
     }
     OscarTheme {
         ModalNavigationDrawer(drawerState = drawer, gesturesEnabled = drawer.isOpen, drawerContent = {
@@ -120,31 +122,35 @@ private val OscarType = Typography(
                         onClick = { navigate(item) }, modifier = Modifier.padding(horizontal = 12.dp).testTag("destination-${item.name}"))
                 }
                 Spacer(Modifier.weight(1f))
-                Text("One continuous relationship.", color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(24.dp))
             }
         }) {
         Scaffold(modifier = Modifier.imePadding(), containerColor = MaterialTheme.colorScheme.background,
             topBar = {
                 Row(Modifier.fillMaxWidth().statusBarsPadding().padding(horizontal = 12.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-                    IconButton(onClick = { if (destination == Destination.OSCAR) { if (voiceOpen) VoicePresentation.cancel(session.getApplication()); voiceOpen = !voiceOpen } else navigate(Destination.OSCAR) }, modifier = Modifier.size(56.dp).testTag("orb").semantics { contentDescription = if (destination == Destination.OSCAR) { if (voiceOpen) "Close voice interaction" else "Open voice interaction" } else "Return to OSCAR" }) {
-                        OscarOrb(state, composing = draft.isNotBlank(), size = 48.dp)
-                    }
+                    if (destination != Destination.OSCAR) IconButton(onClick = { if (settingsPage != "Settings") settingsPage = "Settings" else navigate(Destination.OSCAR) }, modifier = Modifier.semantics { contentDescription = if (settingsPage != "Settings") "Back to Settings" else "Back to OSCAR" }) { OscarIcon("back") }
                     Column(Modifier.weight(1f).padding(start = 8.dp)) {
                         Text(if (destination == Destination.OSCAR) "OSCAR" else if (destination == Destination.SETTINGS && settingsPage != "Settings") settingsPage else destination.label,
                             style = MaterialTheme.typography.titleMedium, modifier = Modifier.semantics { heading() })
-                        Text(when(state.link) { Link.CONNECTED -> "Connected to Core"; Link.CONNECTING -> "Connecting"; else -> "Connection unavailable" }, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        if (destination == Destination.OSCAR) Text(when(state.link) { Link.CONNECTED -> "Connected"; Link.CONNECTING -> "Connecting"; else -> "Not connected" }, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
-                    if (destination == Destination.OSCAR) TextButton(onClick = { navigate(Destination.ACTIVITY) }, modifier = Modifier.testTag("activityShortcut")) { Text("Activity") }
+                    if (destination == Destination.OSCAR) IconButton(onClick = { navigate(Destination.ACTIVITY) }, modifier = Modifier.testTag("activityShortcut").semantics { contentDescription = "Activity" }) { OscarIcon("activity") }
                     IconButton(onClick = { focus.clearFocus(); keyboard?.hide(); scope.launch { drawer.open() } }, modifier = Modifier.testTag("navigation").semantics { contentDescription = "Open navigation" }) { OscarIcon("menu") }
                 }
             }, bottomBar = {
-                if (destination == Destination.OSCAR && !voiceOpen) {
+                if (destination == Destination.OSCAR) {
                     Surface(Modifier.fillMaxWidth(), color = MaterialTheme.colorScheme.surfaceContainer) {
                         Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                         Column(Modifier.widthIn(max = 720.dp).fillMaxWidth().navigationBarsPadding().padding(horizontal = if (widthDp < 360.dp) 16.dp else 24.dp, vertical = 12.dp)) {
-                            InteractionComposer(state, draft, session::writeDraft, { focus.clearFocus(); keyboard?.hide(); session.send(draft) }, session::cancelRequest,
-                                { focus.clearFocus(); keyboard?.hide(); voiceOpen = true })
+                            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                IconButton(onClick = { focus.clearFocus(); keyboard?.hide(); if (voiceOpen) VoicePresentation.cancel(session.getApplication()); voiceOpen = !voiceOpen }, modifier = Modifier.size(64.dp).testTag("orb").semantics { contentDescription = if (voiceOpen) "Close voice interaction" else "Open voice interaction" }) {
+                                    Box(Modifier.size(56.dp)) {
+                                        OscarOrb(state, composing = draft.isNotBlank(), size = 56.dp)
+                                        Box(Modifier.align(Alignment.BottomEnd).size(16.dp).background(MaterialTheme.colorScheme.surfaceContainer, androidx.compose.foundation.shape.CircleShape)) { OscarIcon("voice") }
+                                    }
+                                }
+                                Column(Modifier.weight(1f)) { InteractionComposer(state, draft, session::writeDraft, { focus.clearFocus(); keyboard?.hide(); session.send(draft) }, session::cancelRequest,
+                                    { focus.clearFocus(); keyboard?.hide(); voiceOpen = true }) }
+                            }
                         }
                         }
                     }
@@ -154,13 +160,11 @@ private val OscarType = Typography(
             Column(Modifier.widthIn(max = 720.dp).fillMaxWidth().padding(horizontal = if (widthDp < 360.dp) 16.dp else 24.dp)
                 .verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 Spacer(Modifier.height(16.dp))
-                if (destination != Destination.OSCAR) Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                    TextButton(onClick = { navigate(Destination.OSCAR) }, modifier = Modifier.weight(1f), contentPadding = PaddingValues(0.dp)) { Text("Back to OSCAR") }
-                    TextButton(onClick = session::refreshNow, enabled = !state.busy) { Text("Refresh") }
-                }
                 if (state.link != Link.CONNECTED && destination == Destination.OSCAR && !voiceOpen) {
-                    Text(if (state.link == Link.CONNECTING) "Finding your Core." else "Let’s reconnect.", style = MaterialTheme.typography.headlineLarge)
-                    Text("Your work stays with Core. Connect to see current activity or send a request.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Spacer(Modifier.height(32.dp))
+                    OscarIcon("desktop")
+                    Text(if (state.link == Link.CONNECTING) "Connecting to OSCAR" else "Connect OSCAR", style = MaterialTheme.typography.titleLarge)
+                    Text("Requests are paused.", color = MaterialTheme.colorScheme.onSurfaceVariant)
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         Button(onClick = { pairing = true }, shape = MaterialTheme.shapes.small) { Text("Connect Core") }
                         TextButton(onClick = session::refreshNow, enabled = !state.busy) { Text("Refresh") }
@@ -168,12 +172,15 @@ private val OscarType = Typography(
                 }
                 when (destination) {
                     Destination.OSCAR -> if (voiceOpen) VoiceExperience({ voiceOpen = false }, { VoicePresentation.cancel(session.getApplication()); voiceOpen = false; selected = Destination.SETTINGS.name; settingsPage = "Privacy" }) else PresenceScreen(state, draft, session::writeDraft, { focus.clearFocus(); keyboard?.hide(); session.send(draft) }, session::cancelRequest,
-                        { navigate(Destination.ACTIVITY) }, { focus.clearFocus(); keyboard?.hide(); voiceOpen = true }, showComposer = false)
+                        { navigate(Destination.ACTIVITY) }, { focus.clearFocus(); keyboard?.hide(); voiceOpen = true }, showComposer = false, inspect = session::inspect)
                     Destination.ACTIVITY -> ActivityScreen(state, session::inspect, session::review)
                     Destination.DEVICES -> DevicesScreen(state, { pairing = true }, session::disconnect)
                     Destination.SETTINGS -> SettingsScreen(settingsPage, { settingsPage = it }, session, state)
                 }
-                state.message?.let { Text(it, modifier = Modifier.testTag("message").semantics { liveRegion = LiveRegionMode.Polite }) }
+                state.message?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 2, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis, modifier = Modifier.testTag("message").semantics { liveRegion = LiveRegionMode.Polite })
+                    if (it.length > 120) Disclosure("Message details") { androidx.compose.foundation.text.selection.SelectionContainer { Text(it) } }
+                }
                 if (draft.isNotEmpty() || state.interactions.isNotEmpty() || state.privateSuppressed) {
                     TextButton(onClick = session::discard) { Text(if (state.privateSuppressed) "Clear Core private context" else "Discard private interaction") }
                 }

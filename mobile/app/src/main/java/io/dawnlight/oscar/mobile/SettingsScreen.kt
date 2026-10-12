@@ -14,6 +14,7 @@ import android.service.voice.VoiceInteractionService
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.clickable
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -30,7 +31,6 @@ import kotlinx.coroutines.withContext
 
 @Composable fun SettingsScreen(page: String, navigate: (String) -> Unit, session: CoreSession, state: MobileState) {
     val context = LocalContext.current
-    if (page != "Settings") TextButton(onClick = { navigate("Settings") }) { Text("Back to Settings") }
     when (page) {
         "Voice" -> VoiceSettings()
         "Persona" -> PersonaPreview()
@@ -47,17 +47,20 @@ import kotlinx.coroutines.withContext
             TextButton(onClick = session::publicIdentity) { Text("Show public owner identity") }
         }
         else -> {
-            Text("Make it yours.", style = MaterialTheme.typography.headlineLarge)
+            Text("Preferences", style = MaterialTheme.typography.titleMedium)
             listOf("Persona", "Voice", "Privacy", "Notifications", "Platform", "Accessibility", "Diagnostics", "About").forEach { item ->
-                HorizontalDivider(); TextButton(onClick = { navigate(item) }, contentPadding = PaddingValues(vertical = 16.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)) {
-                    Text(item, style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f), textAlign = androidx.compose.ui.text.style.TextAlign.Start)
-                    OscarIcon("chevron")
-                }
+                ListItem(headlineContent = { Text(item) }, supportingContent = { Text(when(item) {
+                    "Persona" -> "Expression preview"; "Voice" -> "Input and availability"; "Privacy" -> "Permissions and local grants"; "Notifications" -> "Alerts and reply access"
+                    "Platform" -> "Android assistant entry"; "Accessibility" -> "Appearance and motion"; "Diagnostics" -> "Connection details"; else -> "Version and boundaries"
+                }) }, leadingContent = { OscarIcon(when(item) { "Voice" -> "voice"; "Privacy", "Notifications" -> "privacy"; "Platform" -> "phone"; "Diagnostics" -> "desktop"; "Accessibility" -> "type"; "About" -> "info"; else -> "sliders" }) },
+                    trailingContent = { OscarIcon("chevron") }, colors = ListItemDefaults.colors(containerColor = androidx.compose.ui.graphics.Color.Transparent),
+                    modifier = Modifier.fillMaxWidth().clickable { navigate(item) }.heightIn(min = 72.dp))
             }
-            Text("Persona and memory are managed by Core. Local switches cannot expand Core policy.")
-            TextButton(onClick = { try { context.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)) } catch (_: Exception) { session.message("Android accessibility settings are unavailable.") } }) { Text("Android accessibility settings") }
-            TextButton(onClick = session::disconnect) { Text("Disconnect locally") }
-            Text("Local disconnect deletes this app's credentials. Remote revocation remains a separate Core action.", style = MaterialTheme.typography.bodySmall)
+            Disclosure("Connection & Android settings") {
+                TextButton(onClick = { try { context.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)) } catch (_: Exception) { session.message("Android accessibility settings are unavailable.") } }) { Text("Android accessibility settings") }
+                TextButton(onClick = session::disconnect) { Text("Disconnect locally") }
+                Text("Local disconnect removes this app’s credentials; remote revocation is separate.", style = MaterialTheme.typography.bodySmall)
+            }
         }
     }
 }

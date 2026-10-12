@@ -32,6 +32,7 @@ export function LivingPresence({port=send,events=subscribe,sourceKind='core',win
   const [expired,setExpired]=useState(true),[open,setOpen]=useState(false),[leaving,setLeaving]=useState(false);
   const [hover,setHover]=useState(false),[draft,setDraft]=useState(''),[busy,setBusy]=useState(false);
   const [error,setError]=useState(''),[pinned,setPinned]=useState(false);
+  const [shortcut,setShortcut]=useState('Ctrl+Alt+O');
   const [requestError,setRequestError]=useState('');
   const [editingFeedback,setEditingFeedback]=useState('');
   const [submitted,setSubmitted]=useState<{taskId:string;text:string}|null>(null);
@@ -180,10 +181,13 @@ export function LivingPresence({port=send,events=subscribe,sourceKind='core',win
     data-operation={operation} data-attention={owner?'owner':'none'} onFocusCapture={e=>{lastFocused.current=e.target as HTMLElement;}}
     onBlurCapture={e=>{if(e.relatedTarget&&!e.currentTarget.contains(e.relatedTarget as Node))lastFocused.current=null;}}
     onKeyDown={e=>{if(e.key==='Escape'&&workspace){e.preventDefault();void run({kind:'window',mode:'compact'});}}}>
-    {workspace?<><Activity view={{...view,feedback}} available={available} busy={busy} run={run} back={()=>void run({kind:'window',mode:resumeWindow.current})}/><p className="workspace-footnote">{view.reference?'Reference Core':'Current Core readback'} · scope is rechecked</p></>:<>
+    {workspace?<><Activity view={{...view,feedback}} available={available} busy={busy} run={run} back={()=>void run({kind:'window',mode:resumeWindow.current})}/><p className="workspace-footnote">{view.reference?'Reference Core':'Current Core readback'}</p></>:<>
       <div className="writing-leaf" inert={!open||leaving} aria-hidden={!open||leaving}>
         <div className="leaf-top" data-tauri-drag-region><span data-tauri-drag-region>OSCAR</span>
-          <details className="presence-settings"><summary>Presence</summary><div><button aria-pressed={pinned} onClick={()=>native(pinned?'float':'pin')}>{pinned?'Unpin':'Pin on top'}</button><button onClick={()=>native('edge')}>To screen edge</button><button onClick={()=>native('hide')}>Hide to tray</button></div></details>
+          <details className="presence-settings"><summary>Presence</summary><div><button aria-pressed={pinned} onClick={()=>native(pinned?'float':'pin')}>{pinned?'Unpin':'Pin on top'}</button><button onClick={()=>native('edge')}>To screen edge</button><button onClick={()=>native('hide')}>Hide to tray</button>
+            <label>Global shortcut<input value={shortcut} maxLength={10} onChange={e=>setShortcut(e.target.value)}/></label>
+            <button disabled={busy} onClick={()=>run({kind:'shortcut',accelerator:shortcut})}>Register shortcut</button><p className="leaf-secondary" role="status">{view.shortcut}</p>
+          </div></details>
           <button onClick={retreat} aria-label="Return to presence">Close</button></div>
         <h1>{headline}</h1>
         {owner?<div className="attention-copy">{submitted?.taskId===pending?.task_id?<><p className="leaf-secondary">Your submitted request</p><p className="review-description submitted-request">{submitted!.text}</p></>:<p className="review-description">{pending?.description??'A task requires your review.'}</p>}<p className="leaf-secondary">Your approval is required before this task can run. Review the full details before deciding; opening review grants nothing.</p>
@@ -198,7 +202,7 @@ export function LivingPresence({port=send,events=subscribe,sourceKind='core',win
           {['blocked','denied'].includes(feedback.kind)&&<button disabled={busy} onClick={()=>{setEditingFeedback(feedbackKey);requestAnimationFrame(focusInput);}}>Edit request</button>}</div></div>:
         !available?<div className="attention-copy"><p>{operation==='unknown'?(expired?'The last observation expired. Check Core for current activity.':'Core reports an unresolved state. Inspect it before continuing.'):'Core is unavailable. Work status is unknown; new requests are disabled.'}</p>
           <button className="leaf-primary" disabled={busy} onClick={()=>run({kind:'refresh'})}>Check connection <Arrow/></button></div>:
-        task&&(!terminal.includes(task.state)||task.state==='failed')?<TaskStage task={task} busy={busy} run={run}/>:
+        task&&(!terminal.includes(task.state)||task.state==='failed')?<TaskStage task={submitted?.taskId===task.task_id?{...task,description:submitted.text}:task} busy={busy} run={run}/>:
         answer?<ResultView task={task!} expanded={view.window==='reading'}
           read={()=>void run({kind:'window',mode:'reading'})} inspect={()=>void run({kind:'window',mode:'activity'})}
           askAgain={()=>{setAnswerDismissed(task!.task_id);void run({kind:'window',mode:'interaction'}).then(()=>requestAnimationFrame(focusInput));}}/>:

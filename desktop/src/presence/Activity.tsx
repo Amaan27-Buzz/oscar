@@ -32,7 +32,8 @@ export function Activity({view,available,busy,run,back}:{view:View;available:boo
       <p className="review-description">{review.description}</p><p className="decision-consequence">{review.consequence}</p><p className="leaf-secondary">Target: {review.target} · {review.capability}</p>
       <details className="decision-metadata"><summary>Scope, policy and evidence</summary><dl>{[['Task',review.task_id??'Unknown'],['Target / capability',`${review.target} / ${review.capability}`],['Reason',review.reason],['Policy',review.policy_reason],['Evidence state',review.evidence_state]].map(([label,value])=><div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl></details>
       <details open><summary>Exact reviewed material</summary><pre>{review.review}</pre></details>
-      <p className="leaf-secondary">Opening this review grants nothing. Native confirmation and signing follow; Core rechecks task, scope and current plan. No permanent permission is granted.</p>
+      <p className="leaf-secondary">One decision. No permanent permission.</p>
+      <details><summary>Confirmation & authority</summary><p>Opening this review grants nothing. Native confirmation and signing follow; Core rechecks task, scope and current plan.</p></details>
       {!decisionCurrent&&<p role="status" className="leaf-error">This review expired or its task changed. Inspect the task for a fresh decision.</p>}
       <div className="leaf-actions"><button className="leaf-primary" disabled={!available||busy||!decisionCurrent} onClick={()=>run({kind:'confirm',review_id:review.review_id,accept:true})}>Continue to native confirmation</button><button disabled={busy} onClick={()=>run({kind:'confirm',review_id:review.review_id,accept:false})}>Dismiss review</button></div>
     </section>:view.current&&<section aria-label="Selected task" className="selected-task"><h2>{statuses[view.current.state]??'Unknown outcome'}</h2><p>{view.current.description}</p><p className="leaf-secondary">{view.current.mode||'Shared task'} · Worker {view.current.target} · attempt {view.current.generation}</p>
@@ -44,6 +45,6 @@ export function Activity({view,available,busy,run,back}:{view:View;available:boo
     </section>}
     <section aria-label="Active work"><h2>Active and waiting <small>{active.length}</small></h2>{active.length?list(active):<p className="leaf-secondary">No active tasks are visible.</p>}</section>
     <details className="completed-work"><summary>Completed, partial and failed <strong>{completed.length}</strong></summary>{list(completed)}</details>
-    <p className="leaf-secondary">{view.reference?'Disposable reference Core. ':' '}Cancellation and denial also require exact native review. Attention is not consent.</p>
+    <details><summary>Control boundaries</summary><p className="leaf-secondary">{view.reference?'Disposable reference Core. ':' '}Cancellation and denial also require exact native review. Attention is not consent.</p></details>
   </div>;
 }

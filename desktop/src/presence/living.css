@@ -46,6 +46,7 @@ html[data-living],html[data-living] body,html[data-living] #root{background:tran
 .presence-settings{position:relative;margin-left:auto;color:var(--secondary);font-weight:400}
 .presence-settings summary{padding:8px;cursor:pointer;list-style:none}.presence-settings[open] div{position:absolute;right:0;top:38px;z-index:5;background:var(--surface);box-shadow:0 5px 16px #15211c24;padding:6px;border-radius:8px;min-width:170px}
 .presence-settings button{display:block;width:100%;text-align:left}
+.presence-settings label{font-size:13px;margin:10px 8px 6px}.presence-settings input{width:100%;background:var(--leaf);color:var(--text);border:1px solid var(--line);padding:6px;border-radius:4px}.presence-settings p{padding:0 8px;font-size:12px}
 .compact-error{position:absolute;left:4px;right:4px;bottom:3px;font-size:12px;text-align:center;background:var(--leaf)}
 .unconfigured-mark{font-size:13px}.living-workspace{height:100%;overflow:auto;background:var(--leaf)}
 .presence-answer{display:flex;flex:1;min-height:0;flex-direction:column;gap:8px}.presence-answer .response-text{display:block;flex:1;min-height:0;max-height:132px;overflow:auto;scrollbar-width:thin}

@@ -48,6 +48,13 @@ class RedesignRenderingTest {
         compose.runOnIdle { session.connect(fixture) }
         compose.waitUntil(10000) { session.state.value.link == Link.CONNECTED }
         shot("home-reference")
+        val verified = session.state.value.snapshot!!.tasks.firstOrNull { it.state == "verified" && it.value != null }
+        if (verified != null) {
+            compose.onNodeWithText("Inspect verified work").performClick()
+            compose.onNodeWithTag("taskInspector").assertExists()
+            compose.onNodeWithText("Verified result: ${verified.value}").assertExists()
+            compose.onNodeWithText("Back").performClick()
+        } else compose.onAllNodesWithText("Inspect verified work").assertCountEquals(0)
         compose.onNodeWithTag("interactionInput").performClick().performTextInput("A private reference draft")
         compose.waitUntil(10000) { compose.activity.window.decorView.rootWindowInsets.isVisible(android.view.WindowInsets.Type.ime()) }
         shot("text-ime-reference")
@@ -64,6 +71,7 @@ class RedesignRenderingTest {
         compose.openDestination("OSCAR")
         compose.onNodeWithTag("interactionInput").assertTextContains("A private reference draft")
         compose.onNodeWithTag("navigation").performClick()
+        compose.waitUntil(5000) { compose.onAllNodesWithTag("destination-OSCAR").fetchSemanticsNodes().isNotEmpty() }
         InstrumentationRegistry.getInstrumentation().uiAutomation.performGlobalAction(android.accessibilityservice.AccessibilityService.GLOBAL_ACTION_BACK)
         compose.waitForIdle()
         compose.onNodeWithTag("interactionInput").assertTextContains("A private reference draft")

@@ -62,7 +62,7 @@ class MobileCompletionTest {
     }
     @Test fun voiceInvocationCancellationPreservesTextWithoutCapture() {
         compose.onNodeWithTag("interactionInput").performTextInput("Synthetic voice continuation")
-        compose.onNodeWithText("Voice").performClick()
+        compose.onNodeWithContentDescription("Open voice interaction").performClick()
         compose.onNodeWithTag("voiceStatus").assertTextContains("Microphone off")
         assertEquals(null, MicrophoneService.binding)
         compose.onNodeWithText("Start listening").performClick()
@@ -76,8 +76,8 @@ class MobileCompletionTest {
     }
     @Test fun homeUnavailableAndSharedExpressionRender() {
         compose.onNodeWithTag("orb").assertExists()
-        compose.onNodeWithText("Let’s reconnect.").assertExists()
-        compose.onNodeWithText("Send").assertIsNotEnabled()
+        compose.onNodeWithText("Connect OSCAR").assertExists()
+        compose.onNodeWithContentDescription("Send").assertIsNotEnabled()
         capture("13-1-home-unavailable")
     }
     @Test fun verifyingIsDistinctAndDoesNotInventSpeech() {
@@ -157,7 +157,7 @@ class MobileCompletionTest {
         compose.waitUntil(10_000) { session.state.value.link == Link.CONNECTED }
         assertTrue(session.state.value.snapshot!!.tasks.any { it.state == "verified" && it.value == "5" })
         compose.onNodeWithTag("interactionInput").performTextInput("3 + 4")
-        compose.onNodeWithText("Send").performClick()
+        compose.onNodeWithContentDescription("Send").performClick()
         compose.waitUntil(10_000) { session.state.value.interactions.lastOrNull()?.text == "3 + 4" && !session.state.value.busy }
         compose.onNodeWithText("Read response").performScrollTo().performClick()
         compose.onNode(hasText("Needs approval") and hasAnyAncestor(hasTestTag("responseDialog"))).assertExists()
@@ -203,7 +203,7 @@ class MobileCompletionTest {
         compose.runOnIdle { session.connect(fixture) }
         compose.waitUntil(10_000) { session.state.value.link == Link.CONNECTED }
         compose.onNodeWithTag("interactionInput").performTextInput("what is four plus five")
-        compose.onNodeWithText("Send").performClick()
+        compose.onNodeWithContentDescription("Send").performClick()
         compose.waitUntil(10_000) { session.state.value.interactions.isNotEmpty() && !session.state.value.busy }
         val id = session.state.value.interactions.last().taskId!!
         val task = session.state.value.snapshot!!.tasks.single { it.id == id }
