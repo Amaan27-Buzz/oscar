@@ -27,10 +27,10 @@ export function Activity({view,available,busy,run,back}:{view:View;available:boo
     {!available&&<p role="status">Current Core state is unavailable. Displayed history grants no authority; controls are disabled.</p>}
     {view.feedback&&<p className="leaf-error" role="alert">{view.feedback.message}</p>}
     <div className="activity-controls"><button disabled={busy} onClick={()=>run({kind:'refresh'})}>Refresh Core</button><button disabled={busy} onClick={()=>run({kind:'discard'})}>Clear private drafts and context</button></div>
-    <section aria-label="Active work"><h2>Active and waiting <small>{active.length}</small></h2>{active.length?list(active):<p className="leaf-secondary">No active tasks are visible.</p>}</section>
+
     {review?<section ref={reviewFocus} tabIndex={-1} className="decision-sheet" aria-label="Owner decision"><h2>Review {review.operation==='approve'?'approval':review.operation==='deny'?'denial':'cancellation'}</h2>
-      <p>{review.description}</p>
-      <dl>{[['Task',review.task_id??'Unknown'],['Target / capability',`${review.target} / ${review.capability}`],['Reason',review.reason],['Consequence',review.consequence],['Policy',review.policy_reason],['Evidence state',review.evidence_state]].map(([label,value])=><div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl>
+      <p className="review-description">{review.description}</p><p className="decision-consequence">{review.consequence}</p><p className="leaf-secondary">Target: {review.target} · {review.capability}</p>
+      <details className="decision-metadata"><summary>Scope, policy and evidence</summary><dl>{[['Task',review.task_id??'Unknown'],['Target / capability',`${review.target} / ${review.capability}`],['Reason',review.reason],['Policy',review.policy_reason],['Evidence state',review.evidence_state]].map(([label,value])=><div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl></details>
       <details open><summary>Exact reviewed material</summary><pre>{review.review}</pre></details>
       <p className="leaf-secondary">Opening this review grants nothing. Native confirmation and signing follow; Core rechecks task, scope and current plan. No permanent permission is granted.</p>
       {!decisionCurrent&&<p role="status" className="leaf-error">This review expired or its task changed. Inspect the task for a fresh decision.</p>}
@@ -42,6 +42,7 @@ export function Activity({view,available,busy,run,back}:{view:View;available:boo
       <div className="leaf-actions">{(['approve','deny','cancel'] as const).filter(operation=>view.current!.actions.includes(operation)).map(operation=><button key={operation} disabled={!available||busy} onClick={()=>run({kind:'review',task_id:view.current!.task_id,operation})}>Review {operation==='approve'?'approval':operation==='deny'?'denial':'cancellation'}</button>)}</div>
       <details><summary>Evidence and artifacts</summary><ul>{view.current.evidence_ids.map(id=><li key={id}>{id}</li>)}</ul>{!!view.current.source_event_ids?.length&&<><h3>Canonical recall sources</h3><ul>{view.current.source_event_ids.map(id=><li key={id}>{id}</li>)}</ul></>}{view.current.evidence?.map(e=><p key={e.id}>{e.status} · {e.source} · {e.method} · {e.matches===true?'matches':e.matches===false?'does not match':'unknown match'} · {new Date(e.observed_at*1000).toLocaleString()}</p>)}{view.current.artifacts?.map(a=><p key={a.id}>{a.kind} artifact {a.id} · {a.status}{a.content_hash?` · SHA256 ${a.content_hash}`:''}</p>)}<p className="leaf-secondary">References and verification metadata do not grant file access. Private task inputs are not replayable; continuation requires a fresh scoped request.</p></details>
     </section>}
+    <section aria-label="Active work"><h2>Active and waiting <small>{active.length}</small></h2>{active.length?list(active):<p className="leaf-secondary">No active tasks are visible.</p>}</section>
     <details className="completed-work"><summary>Completed, partial and failed <strong>{completed.length}</strong></summary>{list(completed)}</details>
     <p className="leaf-secondary">{view.reference?'Disposable reference Core. ':' '}Cancellation and denial also require exact native review. Attention is not consent.</p>
   </div>;

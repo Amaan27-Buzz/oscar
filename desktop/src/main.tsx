@@ -1,8 +1,11 @@
 import {createRoot} from 'react-dom/client';
 import {App} from './App';
+import {LivingPresence} from './presence/Living';
 import './style.css';
 const root=createRoot(document.getElementById('root')!);
-if(import.meta.env.DEV && new URLSearchParams(location.search).has('living')) {
+if(import.meta.env.DEV && new URLSearchParams(location.search).has('foundation')) {
+  root.render(<App/>);
+} else if(import.meta.env.DEV && new URLSearchParams(location.search).has('living')) {
   document.documentElement.dataset.living='true';
   void import('./presence/Living').then(({Living})=>root.render(<Living/>));
 } else if(import.meta.env.DEV && new URLSearchParams(location.search).has('integration')) {
@@ -21,4 +24,7 @@ if(import.meta.env.DEV && new URLSearchParams(location.search).has('living')) {
     document.documentElement.dataset.showcase=fixture.id;
     root.render(<Showcase fixture={fixture}/>);
   });
-} else root.render(<App/>);
+} else {
+  document.documentElement.dataset.living='true';
+  root.render(<LivingPresence/>);
+}

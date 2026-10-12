@@ -13,7 +13,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable fun ActivityScreen(state: MobileState, inspect: (String) -> Unit, review: (CoreTask, String) -> Unit) {
     var filter by remember(state.epoch) { mutableStateOf("Active") }
-    Text("Ongoing work", style = MaterialTheme.typography.titleLarge)
+    Text("Ongoing work", style = MaterialTheme.typography.headlineLarge, modifier = Modifier.semantics { heading() })
     if (state.snapshot == null) { Text("Connect to Core to inspect activity. No cached task state is presented as current."); return }
     val completed = setOf("verified", "partially_verified", "failed", "cancelled")
     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -27,13 +27,12 @@ import androidx.compose.ui.unit.dp
         HorizontalDivider()
         Text(task.description, style = MaterialTheme.typography.titleMedium, modifier = Modifier.testTag("task-description-${task.id}"))
         Text(task.label, modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite })
-        Text("From ${task.origin}", style = MaterialTheme.typography.bodySmall)
-        Text("${when(task.ownership) { "leased" -> "Executor"; "none" -> "Last target"; "expired" -> "Lease unavailable"; else -> "Planned target" }}: ${task.target} · ${task.nodeStatus}", style = MaterialTheme.typography.bodySmall)
+        Text("From ${task.origin} · ${task.target} · ${task.nodeStatus}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         task.progress?.let { Text("${if (it.current) "Worker checkpoint" else "Previous checkpoint"}: ${(it.fraction * 100).toInt()}% · ${it.step} · REPORTED", style = MaterialTheme.typography.bodyMedium) }
         task.blocker?.let { Text(it) }
         FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
             TextButton(onClick = { inspect(task.id) }, enabled = !state.busy && state.link == Link.CONNECTED) { Text("Inspect") }
-            if ("approve" in task.actions) TextButton(onClick = { review(task, "approve") }, enabled = !state.busy) { Text("Review request") }
+            if ("approve" in task.actions) FilledTonalButton(onClick = { review(task, "approve") }, enabled = !state.busy && state.link == Link.CONNECTED, shape = MaterialTheme.shapes.small) { Text("Review request") }
         }
         FlowRow(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
             task.actions.filter { it != "approve" }.forEach { action ->

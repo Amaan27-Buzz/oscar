@@ -180,11 +180,11 @@ export function LivingPresence({port=send,events=subscribe,sourceKind='core',win
     data-operation={operation} data-attention={owner?'owner':'none'} onFocusCapture={e=>{lastFocused.current=e.target as HTMLElement;}}
     onBlurCapture={e=>{if(e.relatedTarget&&!e.currentTarget.contains(e.relatedTarget as Node))lastFocused.current=null;}}
     onKeyDown={e=>{if(e.key==='Escape'&&workspace){e.preventDefault();void run({kind:'window',mode:'compact'});}}}>
-    {workspace?<Activity view={{...view,feedback}} available={available} busy={busy} run={run} back={()=>void run({kind:'window',mode:resumeWindow.current})}/>:<>
+    {workspace?<><Activity view={{...view,feedback}} available={available} busy={busy} run={run} back={()=>void run({kind:'window',mode:resumeWindow.current})}/><p className="workspace-footnote">{view.reference?'Reference Core':'Current Core readback'} · scope is rechecked</p></>:<>
       <div className="writing-leaf" inert={!open||leaving} aria-hidden={!open||leaving}>
         <div className="leaf-top" data-tauri-drag-region><span data-tauri-drag-region>OSCAR</span>
           <details className="presence-settings"><summary>Presence</summary><div><button aria-pressed={pinned} onClick={()=>native(pinned?'float':'pin')}>{pinned?'Unpin':'Pin on top'}</button><button onClick={()=>native('edge')}>To screen edge</button><button onClick={()=>native('hide')}>Hide to tray</button></div></details>
-          <button onClick={retreat} aria-label="Return to presence">Back</button></div>
+          <button onClick={retreat} aria-label="Return to presence">Close</button></div>
         <h1>{headline}</h1>
         {owner?<div className="attention-copy">{submitted?.taskId===pending?.task_id?<><p className="leaf-secondary">Your submitted request</p><p className="review-description submitted-request">{submitted!.text}</p></>:<p className="review-description">{pending?.description??'A task requires your review.'}</p>}<p className="leaf-secondary">Your approval is required before this task can run. Review the full details before deciding; opening review grants nothing.</p>
           <div className="leaf-actions"><button className="leaf-primary" disabled={busy||!pending} onClick={()=>pending&&run({kind:'review',task_id:pending.task_id,operation:'approve'})}>Review decision <Arrow/></button><button onClick={retreat}>Leave pending</button>
@@ -217,7 +217,7 @@ export function LivingPresence({port=send,events=subscribe,sourceKind='core',win
         <button className="character-button" ref={orb} aria-label={`OSCAR: ${label}. ${open?'Return to presence':'Open interaction'}`} aria-expanded={open}
           onClick={open&&!leaving?retreat:invoke} onPointerEnter={()=>setHover(true)} onPointerMove={track}
           onPointerLeave={()=>{setHover(false);setGaze({x:0,y:0});}}>
-          {presentation?<ExpressionPresence event={presentation} source={presentation.source} size={76} gaze={gaze}/>:<span className="unconfigured-mark">OSCAR</span>}
+          {presentation?<ExpressionPresence event={presentation} source={presentation.source} size={open||workspace?60:76} gaze={gaze}/>:<span className="unconfigured-mark">OSCAR</span>}
         </button>
         <p className="presence-caption" role="status" aria-live="polite">{label}</p>
       </div>

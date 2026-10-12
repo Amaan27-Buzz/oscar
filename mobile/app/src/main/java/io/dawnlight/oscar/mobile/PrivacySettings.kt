@@ -89,7 +89,7 @@ import androidx.compose.ui.semantics.liveRegion
 }
 @Composable fun PrivacySettings() {
     val (context, revision) = observedPermissions()
-    Text("Permissions & privacy", style = MaterialTheme.typography.titleLarge)
+    Text("Permissions & privacy", style = MaterialTheme.typography.headlineMedium)
     Text("Can perceive", style = MaterialTheme.typography.titleMedium)
     AndroidGrant("Microphone", Manifest.permission.RECORD_AUDIO)
     LocalGrant("Allow microphone perception", "microphone_perception", "Separate OSCAR grant. Capture also requires Android permission and a commissioned Voice Core binding.")
@@ -127,7 +127,10 @@ import androidx.compose.ui.semantics.liveRegion
     Text("Location · not configured\nCamera · not configured\nSentry awareness · not commissioned\nVoice Match / Map · not enrolled", style = MaterialTheme.typography.bodyMedium)
     HorizontalDivider()
     Text("Can retain", style = MaterialTheme.typography.titleMedium)
-    Text("Raw audio and notification retention are off. Only an unsent text draft is encrypted for recovery. Discard clears that draft; Core memory retention and source/person exclusions require separate Core policy. Perception never enables retention.")
+    Text("Raw audio and notification retention are off. Your unsent draft is encrypted for recovery.")
+    Disclosure("Draft recovery & Core memory") {
+        Text("Discard clears that draft; Core memory retention and source/person exclusions require separate Core policy. Perception never enables retention.")
+    }
     HorizontalDivider()
     Text("Can act", style = MaterialTheme.typography.titleMedium)
     LocalGrant("Allow confirmed notification replies", "notification_reply", "Only exposed source-app reply actions; fresh Core permission, policy and signed confirmation are still required.")

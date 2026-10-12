@@ -17,6 +17,12 @@ it('a fresh current task appears before the next shared poll without duplication
   expect(screen.getByRole('region',{name:'Active work'}).textContent).toContain('Approval required');
   expect(screen.getByRole('region',{name:'Active work'}).textContent).toContain('1');
 });
+it('consequential review precedes the task list and preserves exact material',()=>{
+  render(<Activity view={{...initialView,tasks:[task],current:task,review}} available busy={false} run={vi.fn()} back={vi.fn()}/>);
+  const decision=screen.getByRole('region',{name:'Owner decision'}),work=screen.getByRole('region',{name:'Active work'});
+  expect(decision.compareDocumentPosition(work)&Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  expect(decision.textContent).toContain('Write scoped file');expect(decision.textContent).toContain('{"path":"proof.txt"}');
+});
 it('expired or changed approval cannot reach native confirmation; dismissal grants nothing',()=>{
   vi.useFakeTimers();const run=vi.fn();const view={...initialView,tasks:[task],current:task,review:{...review,expires_at_ms:Date.now()+1000}};
   const {rerender}=render(<Activity view={view} available busy={false} run={run} back={vi.fn()}/>);

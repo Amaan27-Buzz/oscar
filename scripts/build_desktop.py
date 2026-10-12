@@ -39,9 +39,7 @@ def main() -> int:
             "fixture-context",
             "DEVELOPMENT SHOWCASE",
             "10R.1 synthetic exploration",
-            "presence-object",
             "SIMULATED DESKTOP EVENTS",
-            "living-presence",
             "Synthetic preview · no execution or audio",
         )
     ):

@@ -20,7 +20,7 @@ class SettingsIntegrationTest {
     }
     @After fun cleanup() { if (!isolated) return; compose.activity.getSharedPreferences("appearance", Context.MODE_PRIVATE).edit().clear().commit() }
     private fun page(name: String) {
-        compose.onNodeWithText("Settings").performClick()
+        compose.openDestination("Settings")
         compose.onNodeWithText(name).performScrollTo().performClick()
     }
     private fun capture(name: String) {
@@ -50,7 +50,7 @@ class SettingsIntegrationTest {
     }
     @Test fun prepareProcessDeathRecovery() {
         org.junit.Assume.assumeTrue(androidx.test.platform.app.InstrumentationRegistry.getArguments().getString("group02_process_prepare") == "true")
-        compose.onNodeWithTag("destination-OSCAR").performClick()
+        compose.openDestination("OSCAR")
         compose.onNodeWithTag("interactionInput").performTextClearance()
         compose.onNodeWithTag("interactionInput").performTextInput("Group02 synthetic process recovery")
         compose.waitUntil(5000) { SessionVault(compose.activity).loadDraft("unpaired") == "Group02 synthetic process recovery" }
@@ -76,21 +76,21 @@ class SettingsIntegrationTest {
                 }
             }
         }
-        compose.onNodeWithText("Settings").performClick()
+        compose.openDestination("Settings")
         compose.onNodeWithText("Diagnostics").performScrollTo().performClick()
         compose.onNodeWithText("No tokens, private prompts",substring=true).assertExists()
         capture("13-8-dark-large-text-reference")
-        compose.onNodeWithTag("destination-OSCAR").performClick()
-        compose.onNodeWithTag("interactionInput").performScrollTo().performClick()
+        compose.openDestination("OSCAR")
+        compose.onNodeWithTag("interactionInput").performClick()
         compose.onNodeWithTag("interactionInput").performTextReplacement("Large text draft")
         compose.waitUntil(10000) { compose.activity.window.decorView.rootWindowInsets.isVisible(android.view.WindowInsets.Type.ime()) }
-        compose.onNodeWithTag("interactionInput").performScrollTo()
+        compose.onNodeWithTag("interactionInput")
         val fieldBottom = compose.onNodeWithTag("interactionInput").fetchSemanticsNode().boundsInWindow.bottom
         val imeTop = compose.activity.window.decorView.height - compose.activity.window.decorView.rootWindowInsets.getInsets(android.view.WindowInsets.Type.ime()).bottom
         assertTrue("Input must remain above actual keyboard", fieldBottom <= imeTop)
         compose.onNodeWithTag("interactionInput").assertTextContains("Large text draft")
         capture("13-8-ime-large-text-reference")
-        compose.onNodeWithText("Voice").performScrollTo().performClick()
+        compose.onNodeWithText("Voice").performClick()
         compose.onNodeWithText("Start listening").performScrollTo().performClick()
         compose.waitUntil(5000) { VoicePresentation.state.value.phase == VoicePhase.MUTED }
         compose.onNodeWithText("Cancel voice").performScrollTo().assertIsDisplayed()

@@ -13,16 +13,16 @@ class MobileEmulatedTest {
     @get:Rule val compose = createAndroidComposeRule<MainActivity>()
     @Before fun emulatorOnlyFixture() { org.junit.Assume.assumeTrue(android.os.Build.HARDWARE in setOf("ranchu", "goldfish")) }
     @Test fun navigationAndRestorationKeepOneRelationship() {
-        compose.onNodeWithText("Activity").performClick()
+        compose.openDestination("Activity")
         compose.onNodeWithText("Ongoing work").assertIsDisplayed()
-        compose.onNodeWithText("Devices").performClick()
+        compose.openDestination("Devices")
         compose.onNodeWithText("Connection Grid").assertIsDisplayed()
         compose.activityRule.scenario.recreate()
         compose.onNodeWithText("Connection Grid").assertIsDisplayed()
-        compose.onNodeWithText("Settings").performClick()
+        compose.openDestination("Settings")
         compose.onNodeWithText("Privacy").performClick()
         compose.onNodeWithText("Permissions & privacy").assertIsDisplayed()
-        compose.onNodeWithText("OSCAR").performClick()
+        compose.openDestination("OSCAR")
         compose.onNodeWithTag("orb").assertExists()
         compose.runOnIdle {
             val image = android.graphics.BitmapFactory.decodeResource(compose.activity.resources, R.drawable.oscar_orb)
@@ -35,8 +35,9 @@ class MobileEmulatedTest {
     @Test fun disconnectedAndVoiceUnavailableNeverAdvertiseSuccess() {
         compose.onNodeWithTag("interactionInput").performTextInput("2 + 3")
         compose.onNodeWithText("Send").assertIsNotEnabled()
-        compose.onNodeWithText("Voice").performScrollTo().performClick()
+        compose.onNodeWithText("Voice").performClick()
         compose.onNodeWithTag("voiceStatus").assertTextContains("Microphone off")
+        compose.onNodeWithText("Availability & voice identity").performScrollTo().performClick()
         compose.onNodeWithText("Voice Identity is managed by Core. Android playback and enrollment are uncommissioned; Voice Match / Map never authorize an action.").assertExists()
         val context = compose.activity
         assertFalse(context.getSharedPreferences("permissions", Context.MODE_PRIVATE).getBoolean("microphone_perception", false))
@@ -76,7 +77,7 @@ class MobileEmulatedTest {
         }
     }
     @Test fun privacyGrantDoesNotEnableCaptureOrAction() {
-        compose.onNodeWithText("Settings").performClick()
+        compose.openDestination("Settings")
         compose.onNodeWithText("Privacy").performClick()
         val grant = compose.onNodeWithContentDescription("Allow microphone perception")
         grant.performScrollTo().performClick()

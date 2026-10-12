@@ -6,6 +6,8 @@ import sys
 from contextlib import contextmanager
 from pathlib import Path
 from threading import Event, Thread
+from time import monotonic, sleep
+from urllib.request import urlopen
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -37,6 +39,16 @@ def native_fixture():
     Thread(target=relay, daemon=True).start()
     try:
         assert ready.wait(20), "Owned native fixture did not start"
+        deadline = monotonic() + 15
+        while monotonic() < deadline:
+            endpoint = f"http://127.0.0.1:{info['native_debug_port']}/json/list"
+            with urlopen(endpoint, timeout=3) as response:
+                pages = json.load(response)
+            if any("?living" in page.get("url", "") for page in pages):
+                break
+            sleep(0.1)
+        else:
+            raise RuntimeError("Owned presence WebView did not finish navigation")
         yield info, lines, command
     finally:
         if process.poll() is None:

@@ -47,9 +47,12 @@ import kotlinx.coroutines.withContext
             TextButton(onClick = session::publicIdentity) { Text("Show public owner identity") }
         }
         else -> {
-            Text("Your OSCAR", style = MaterialTheme.typography.titleLarge)
+            Text("Make it yours.", style = MaterialTheme.typography.headlineLarge)
             listOf("Persona", "Voice", "Privacy", "Notifications", "Platform", "Accessibility", "Diagnostics", "About").forEach { item ->
-                HorizontalDivider(); TextButton(onClick = { navigate(item) }, modifier = Modifier.fillMaxWidth()) { Text(item) }
+                HorizontalDivider(); TextButton(onClick = { navigate(item) }, contentPadding = PaddingValues(vertical = 16.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)) {
+                    Text(item, style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f), textAlign = androidx.compose.ui.text.style.TextAlign.Start)
+                    OscarIcon("chevron")
+                }
             }
             Text("Persona and memory are managed by Core. Local switches cannot expand Core policy.")
             TextButton(onClick = { try { context.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)) } catch (_: Exception) { session.message("Android accessibility settings are unavailable.") } }) { Text("Android accessibility settings") }
@@ -60,8 +63,7 @@ import kotlinx.coroutines.withContext
 }
 @Composable fun VoiceSettings() {
     val (context, revision) = observedPermissions()
-    Text("OSCAR Voice", style = MaterialTheme.typography.titleLarge)
-    Text("Voice Identity · OSCAR original reference\nAccepted Core binding: Kokoro neural voice; platform fallbacks stay underneath one identity.")
+    Text("OSCAR Voice", style = MaterialTheme.typography.headlineMedium)
     Text("Android voice binding is not commissioned. Listening, playback, Voice Match and Voice Map are unavailable.")
     AndroidGrant("Microphone", Manifest.permission.RECORD_AUDIO)
     if (Build.VERSION.SDK_INT >= 31) {
@@ -73,7 +75,10 @@ import kotlinx.coroutines.withContext
         }
         Text("Output route · $route")
     }
-    Text("Native AudioRecord, AudioTrack, audio focus and AEC adapters remain behind shared Voice contracts. Effect availability does not establish real-room AEC.")
+    Disclosure("Voice identity & platform details") {
+        Text("Voice Identity · OSCAR original reference\nAccepted Core binding: Kokoro neural voice; platform fallbacks stay underneath one identity.")
+        Text("Native AudioRecord, AudioTrack, audio focus and AEC adapters remain behind shared Voice contracts. Effect availability does not establish real-room AEC.")
+    }
 }
 @Composable fun PlatformSettings() {
     val (context, revision) = observedPermissions()

@@ -77,8 +77,8 @@ fn presence_window(
     state: tauri::State<'_, Native>,
     action: presence::Action,
 ) -> Result<(), String> {
-    if !cfg!(debug_assertions) || !state.presence {
-        return Err("presence prototype is not enabled".into());
+    if !state.presence {
+        return Err("presence window is not enabled".into());
     }
     let window = app
         .get_webview_window("main")
@@ -444,7 +444,7 @@ fn main() {
         None
     };
     let interaction = std::env::args().any(|a| a == "--interaction");
-    let presence = cfg!(debug_assertions) && std::env::args().any(|a| a == "--living-presence");
+    let presence = !check && baseline.is_none();
     let bridge = Arc::new(Bridge::new());
     let native = Native {
         presence,
@@ -460,7 +460,7 @@ fn main() {
         .invoke_handler(tauri::generate_handler![desktop_command, presence_window])
         .setup(move|app| {
             let mut config=app.config().app.windows[0].clone();
-            if presence { config.url=tauri::WebviewUrl::External("http://127.0.0.1:1420/?living".parse()?); }
+            if cfg!(debug_assertions) { config.url=tauri::WebviewUrl::External(if presence {"http://127.0.0.1:1420/?living"} else {"http://127.0.0.1:1420/?foundation"}.parse()?); }
             let mut builder=tauri::WebviewWindowBuilder::from_config(app, &config)?;
             if presence {
                 builder=builder.transparent(true).shadow(false).inner_size(132.,148.).min_inner_size(132.,148.).resizable(false);

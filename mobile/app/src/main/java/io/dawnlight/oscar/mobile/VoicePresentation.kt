@@ -52,17 +52,20 @@ object VoicePresentation {
 @Composable fun VoiceExperience(close: () -> Unit, privacy: () -> Unit) {
     val context = LocalContext.current
     val status by VoicePresentation.state.collectAsStateWithLifecycle()
-    Text("Voice", style = MaterialTheme.typography.titleLarge)
+    Text("Speak when you’re ready.", style = MaterialTheme.typography.headlineLarge)
     Text(status.detail, modifier = Modifier.testTag("voiceStatus").semantics { liveRegion = LiveRegionMode.Polite; stateDescription = status.phase.name })
-    Text("Acoustic awareness is uncommissioned. Opening Voice does not record. Active listening requires both grants and a commissioned Core binding.")
+    Text("Opening Voice does not record. Listening starts only after your request and the required grants.", color = MaterialTheme.colorScheme.onSurfaceVariant)
     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        Button(onClick = { VoicePresentation.start(context) }, enabled = status.phase !in setOf(VoicePhase.STARTING, VoicePhase.LISTENING, VoicePhase.SPEAKING)) { Text("Start listening") }
+        Button(onClick = { VoicePresentation.start(context) }, shape = MaterialTheme.shapes.small, enabled = status.phase !in setOf(VoicePhase.STARTING, VoicePhase.LISTENING, VoicePhase.SPEAKING)) { Text("Start listening") }
         TextButton(onClick = { VoicePresentation.cancel(context); close() }) { Text("Cancel voice") }
     }
     if (status.phase in setOf(VoicePhase.STARTING, VoicePhase.LISTENING, VoicePhase.SPEAKING)) TextButton(onClick = { VoicePresentation.cancel(context) }) { Text("Stop microphone and speech") }
     TextButton(onClick = privacy) { Text("Manage microphone grants") }
     TextButton(onClick = { VoicePresentation.cancel(context); close() }) { Text("Continue with text") }
-    Text("Voice Identity is managed by Core. Android playback and enrollment are uncommissioned; Voice Match / Map never authorize an action.")
+    Disclosure("Availability & voice identity") {
+        Text("Acoustic awareness is uncommissioned. Active listening requires both grants and a commissioned Core binding.")
+        Text("Voice Identity is managed by Core. Android playback and enrollment are uncommissioned; Voice Match / Map never authorize an action.")
+    }
     var enrollment by remember { mutableStateOf(false) }
     TextButton(onClick = { enrollment = !enrollment }) { Text("Voice Identity & enrollment") }
     if (enrollment) Text("Identity configuration, Match and Map enrollment require a commissioned Core adapter. Owner audio calibration belongs to consolidated Slice 15 device acceptance; full runtime expansion belongs to Slice 16.")

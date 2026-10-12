@@ -76,7 +76,7 @@ class MobileCompletionTest {
     }
     @Test fun homeUnavailableAndSharedExpressionRender() {
         compose.onNodeWithTag("orb").assertExists()
-        compose.onNodeWithText("OSCAR is not connected").assertExists()
+        compose.onNodeWithText("Let’s reconnect.").assertExists()
         compose.onNodeWithText("Send").assertIsNotEnabled()
         capture("13-1-home-unavailable")
     }
@@ -109,8 +109,8 @@ class MobileCompletionTest {
         compose.activityRule.scenario.recreate()
         compose.waitUntil(5000) { androidx.lifecycle.ViewModelProvider(compose.activity)[CoreSession::class.java].state.value.draft == text }
         compose.onNodeWithTag("interactionInput").assertTextContains(text)
-        compose.onNodeWithText("Activity").performClick()
-        compose.onNodeWithText("OSCAR").performClick()
+        compose.openDestination("Activity")
+        compose.openDestination("OSCAR")
         compose.onNodeWithTag("interactionInput").assertTextContains(text)
         compose.onNodeWithText("Discard private interaction").performScrollTo().performClick()
         compose.waitUntil(5000) { !compose.activity.getSharedPreferences("session", android.content.Context.MODE_PRIVATE).contains("draft") }
@@ -157,15 +157,15 @@ class MobileCompletionTest {
         compose.waitUntil(10_000) { session.state.value.link == Link.CONNECTED }
         assertTrue(session.state.value.snapshot!!.tasks.any { it.state == "verified" && it.value == "5" })
         compose.onNodeWithTag("interactionInput").performTextInput("3 + 4")
-        compose.onNodeWithText("Send").performScrollTo().performClick()
+        compose.onNodeWithText("Send").performClick()
         compose.waitUntil(10_000) { session.state.value.interactions.lastOrNull()?.text == "3 + 4" && !session.state.value.busy }
         compose.onNodeWithText("Read response").performScrollTo().performClick()
         compose.onNode(hasText("Needs approval") and hasAnyAncestor(hasTestTag("responseDialog"))).assertExists()
         compose.onNodeWithText("Back").performClick()
         capture("13-2-reference-home-response")
-        compose.onNodeWithText("Activity").performClick()
+        compose.openDestination("Activity")
         compose.onNodeWithTag("task-description-${session.state.value.interactions.last().taskId}").assertTextContains("3 + 4")
-        compose.onNodeWithText("OSCAR").performClick()
+        compose.openDestination("OSCAR")
         compose.onNodeWithText("Discard private interaction").performScrollTo().performClick()
         compose.waitUntil(10_000) { !session.state.value.busy && !session.state.value.privateSuppressed }
         assertTrue(session.state.value.snapshot!!.tasks.none { it.description == "3 + 4" })
@@ -203,7 +203,7 @@ class MobileCompletionTest {
         compose.runOnIdle { session.connect(fixture) }
         compose.waitUntil(10_000) { session.state.value.link == Link.CONNECTED }
         compose.onNodeWithTag("interactionInput").performTextInput("what is four plus five")
-        compose.onNodeWithText("Send").performScrollTo().performClick()
+        compose.onNodeWithText("Send").performClick()
         compose.waitUntil(10_000) { session.state.value.interactions.isNotEmpty() && !session.state.value.busy }
         val id = session.state.value.interactions.last().taskId!!
         val task = session.state.value.snapshot!!.tasks.single { it.id == id }
@@ -263,18 +263,18 @@ class MobileCompletionTest {
         val desktop = session.state.value.snapshot!!.tasks.single { it.id == arguments.getString("group02_desktop_task") }
         assertEquals("Desktop", desktop.origin); assertEquals("group02-reference-desktop", desktop.originNode)
         assertFalse(desktop.description.contains("8 + 9")); assertFalse("approve" in desktop.actions)
-        compose.onNodeWithText("Devices").performClick()
+        compose.openDestination("Devices")
         compose.onNodeWithTag("device-group02-reference-desktop").performScrollTo().performClick()
         compose.onNodeWithText("No currently advertised executor capabilities").assertExists()
         capture("13-4-reference-grid")
-        compose.onNodeWithText("Activity").performClick()
+        compose.openDestination("Activity")
         compose.onNodeWithTag("task-description-${desktop.id}").assertExists()
         control("network_off")
         try {
             compose.runOnIdle { session.refreshNow() }
             compose.waitUntil(15_000) { session.state.value.link == Link.DEGRADED }
             assertNull(session.state.value.snapshot); assertNull(session.state.value.approval)
-            compose.onNodeWithText("Devices").performClick()
+            compose.openDestination("Devices")
             compose.onNodeWithText("No current Grid snapshot is available.").assertExists()
         } finally { control("network_on") }
         compose.runOnIdle { session.refreshNow() }
