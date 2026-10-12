@@ -1,5 +1,12 @@
 # Desktop Interaction Runtime — Slice 10
 
+**Active correction — Group 2.5A:** Desktop presentation now uses coordinated
+Companion and Workspace windows in the same Tauri process. The following
+Slice 10 narrative remains historical; its single resizing window no longer
+describes the candidate. Native Core authentication, authority, signing and
+execution contracts remain shared. See [two-surface ownership](design/DESKTOP-COMPANION-WORKSPACE.md)
+and [native candidate evidence](ui/desktop/workspace/README.md).
+
 Starting authority: `main == work == 7043b9663fe6474e3457c7aa578e733f7a5a4c1a`.
 Candidate branch: `club-d2/slice-10-desktop`, draft PR into `work`.
 Status: **SOFTWARE / WINDOWS REFERENCE CANDIDATE; OWNER_ACCEPTANCE_NOT_RUN**.

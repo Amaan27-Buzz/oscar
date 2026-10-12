@@ -2,6 +2,10 @@
 name: OSCAR
 description: Quietly Alive — warm, restrained, tactile software with continuous state-driven motion.
 colors:
+  desktop-workspace: "#F5F1E7"
+  desktop-rail: "#ECE7DD"
+  desktop-foreground: "#1A1B18"
+  desktop-selection: "#DED7C9"
   canvas: "#F5F1E7"
   canvas-raised: "#FAF7EF"
   surface: "#FFFDF8"
@@ -67,6 +71,25 @@ components:
 ---
 
 # Design System: OSCAR
+
+## Active Desktop architecture — Group 2.5A
+
+Desktop now separates a tiny expressive **Companion** from a full **Workspace**.
+The Companion never contains chat, task lists, approvals or settings pages.
+Workspace must use the existing warm-paper canvas (`#F5F1E7`), raised canvas
+(`#FAF7EF`), ink (`#1A1B18`) and surface (`#FFFDF8`). Owner feedback restored
+these canonical values and rejected excess rounded/modal-style components.
+Platform Segoe UI carries the Operate/Read hierarchy. Matching warm graphite
+dark mode is implemented, with canvas `#1C1E1B`, rail `#23251F`, surface
+`#292C25` and paper text `#F3EFE5`. Theme and shortcut choices persist natively. These
+requirements do not recolor the canonical Orb or redesign Mobile. Previous
+presence-expansion layouts and unapproved Workspace treatments are historical evidence.
+
+See [functional ownership and native boundaries](docs/design/DESKTOP-COMPANION-WORKSPACE.md)
+and [actual native review packet](docs/ui/desktop/workspace/README.md).
+The rejected [image references](desktop/design/workspace-screens/README.md)
+remain archived locally; the actual native packet is the current review surface.
+The candidate requires owner visual acceptance before merge.
 
 The [canonical OSCAR Orb](assets/brand/oscar-orb.svg) defines the actual intended
 Orb appearance. Use or derive variants from that source; interface tokens above

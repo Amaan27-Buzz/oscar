@@ -1,0 +1,65 @@
+import {useEffect,useRef,useState} from 'react';
+import {DesktopExpression} from './DesktopExpression';
+import {send,subscribe,statuses} from './bridge';
+import type {Command,Send,Task} from './bridge';
+import {surface,useDesktop} from './surfaces';
+import {Activity} from './presence/Activity';
+import {TextTools} from './presence/TextTools';
+import {ActionSurface} from './presence/ActionSurface';
+import {TaskStage} from './presence/TaskStage';
+import {ResultView} from './presence/ResultView';
+import {emptyActionDraft} from './Act';
+import './workspace.css';
+type Page='Conversation'|'Text tools'|'Act'|'Activity'|'Devices'|'Preferences';
+const pages:Page[]=['Conversation','Text tools','Act','Activity','Devices','Preferences'];
+const marks:Record<Page,string>={Conversation:'M4 4h16v11H9l-5 5V4Z', 'Text tools':'M5 4h14M12 4v16M8 20h8', Act:'m13 3-8 10h6l-1 8 9-12h-6l1-6Z',Activity:'M4 19V9m8 10V4m8 15v-6',Devices:'M3 4h18v12H3V4Zm5 16h8m-4-4v4',Preferences:'M4 7h16M4 17h16M8 4v6m8 4v6'};
+function WorkspaceMark({name}:{name:Page}) {return <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={marks[name]}/></svg>;}
+export function Workspace({port=send,events=subscribe}:{port?:Send;events?:typeof subscribe}) {
+  const {view,busy,error,available,run:bridgeRun,accept,setError,latest}=useDesktop(port,events);
+  const content=useRef<HTMLDivElement>(null);
+  useEffect(()=>{const pane=content.current;if(!pane)return;const align=()=>document.documentElement.style.setProperty('--pane-gutter',`${pane.offsetWidth-pane.clientWidth}px`);const observer=new ResizeObserver(align);observer.observe(pane);align();return()=>observer.disconnect();},[]);
+  const [page,setPage]=useState<Page>('Conversation'),[draft,setDraft]=useState(''),[toolMode,setToolMode]=useState<'Dictate'|'Edit'>('Dictate');
+  const [toolDrafts,setToolDrafts]=useState({Dictate:'',Edit:''}),[actionDraft,setActionDraft]=useState(emptyActionDraft);
+  const [submitted,setSubmitted]=useState<{id:string;text:string}|null>(null),[reading,setReading]=useState(false),[shortcut,setShortcut]=useState('Ctrl+Alt+O');
+  useEffect(()=>{if(view.review||view.window==='activity'||(view.window==='approval'&&view.review))setPage('Activity');},[view.review?.review_id,view.window_revision]);
+  useEffect(()=>{document.documentElement.dataset.theme=view.theme??'light';},[view.theme]);
+  async function local(request:Parameters<typeof surface>[0]) {try{accept(await surface(request));setError('');}catch(e){setError(typeof e==='string'?e:'Native control unavailable.');}}
+  async function run(command:Command){if(command.kind==='window'&&command.mode==='activity')setPage('Activity');if(command.kind==='discard'){setDraft('');setToolDrafts({Dictate:'',Edit:''});setActionDraft(emptyActionDraft);setSubmitted(null);}return bridgeRun(command);}
+  function discard(){void run({kind:'discard'});}
+  const task=view.current;
+  const nodes=[...new Set(view.capabilities.map(c=>c.node))];
+  async function ask(){if(!available||busy||!draft.trim())return;const text=draft;const prior=latest.current.current?.task_id;const ok=await run({kind:'interact',mode:'Ask',text,context_id:view.context?.id??''});const id=latest.current.current?.task_id;if(ok&&id&&id!==prior){setSubmitted({id,text});setDraft('');}}
+  function inspect(t:Task){setPage('Conversation');setReading(false);void run({kind:'inspect',task_id:t.task_id});}
+  return <main className="workspace">
+    <aside className="workspace-rail"><div className="workspace-brand"><strong>OSCAR</strong></div>
+      <nav aria-label="Workspace">{pages.map(item=><button key={item} aria-current={page===item?'page':undefined} onClick={()=>{setPage(item);setReading(false);}}><WorkspaceMark name={item}/><span>{item}</span></button>)}</nav>
+      {!!view.tasks.length&&<div className="rail-history"><h2>Recent work</h2>{view.tasks.slice(0,6).map(t=><button key={t.task_id} disabled={!available||busy} onClick={()=>inspect(t)}><span>{t.description||'Shared task'}</span><small>{statuses[t.state]??'Unknown'}</small></button>)}</div>}
+      <div className="rail-presence"><DesktopExpression view={view} size={48}/><div className="presence-identity"><strong>OSCAR</strong><div className="rail-bottom"><span className={`link-dot ${available?'online':''}`}/><span>{available?'Core connected':'Core unavailable'}</span><button aria-label="Refresh Core" disabled={busy} onClick={()=>run({kind:'refresh'})}><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M20 7v5h-5M20 12a8 8 0 1 0-2 5"/></svg></button></div></div></div>
+    </aside>
+    <div className="workspace-body"><header className="workspace-top"><div className="workspace-top-inner"><span>Workspace</span><div><button onClick={()=>local({kind:'show_companion'})}>Show Companion</button><button onClick={()=>local({kind:'hide_workspace'})}>Return to desktop ↗</button></div></div></header>
+      {view.reference&&<p className="workspace-reference">REFERENCE CORE · disposable tasks · owner acceptance not run</p>}
+      {(error||view.feedback||!available)&&<div className="workspace-notice" role="status">{error||view.feedback?.message||'Core unavailable or observation expired. New work is disabled; inspect before retry.'}<button disabled={busy} onClick={()=>run({kind:'refresh'})}>Check connection</button></div>}
+      <div ref={content} className={`workspace-content ${reading?'reader':''} ${page==='Conversation'?'conversation-page':''}`}>
+        {page==='Conversation'&&<section className={`conversation ${!task?'is-home':''}`} aria-label="Conversation"><div className="conversation-thread"><div className="section-heading"><h1>{reading?'Response':'Conversation'}</h1></div>
+          {submitted&&submitted.id===task?.task_id&&<div className="user-turn"><small>You</small><p>{submitted.text}</p></div>}
+          {task&&<div className="assistant-turn"><h2>OSCAR <small>{statuses[task.state]??'Unknown'}</small></h2>
+            {(task.response||task.value)?<ResultView task={task} expanded={reading} read={()=>setReading(true)} inspect={()=>setPage('Activity')} askAgain={()=>{setReading(false);document.getElementById('workspace-ask')?.focus();}}/>:<><TaskStage task={task} busy={busy} run={run}/>{task.actions.includes('approve')&&<button className="leaf-primary" disabled={!available||busy} onClick={()=>run({kind:'review',task_id:task.task_id,operation:'approve'})}>Review approval</button>}</>}</div>}
+          {!task&&<div className="conversation-empty"><h2>What are we working on?</h2><p>A question, some writing, or a next step.</p><div><button onClick={()=>setPage('Text tools')}>Work with text</button><button onClick={()=>setPage('Act')}>Prepare an action</button></div></div>}
+          </div>
+          <form className="workspace-composer" onSubmit={e=>{e.preventDefault();void ask();}}><label htmlFor="workspace-ask">Ask OSCAR</label><textarea id="workspace-ask" maxLength={4096} placeholder="Message OSCAR…" value={draft} onChange={e=>setDraft(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.nativeEvent.isComposing){e.preventDefault();void ask();}}}/><div><span>{view.context?`${view.context.source} attached`:'No context attached'} · Enter to send</span><button className="leaf-primary send-icon" aria-label="Send" title="Send" disabled={!available||busy||!draft.trim()}><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 19V5m-6 6 6-6 6 6"/></svg></button></div></form>
+          <p className="conversation-footnote">{available?'Connected to your Core.':'Waiting for Core.'} Responses keep their evidence status.</p>
+        </section>}
+        {page==='Text tools'&&<section><div className="section-heading"><h1>Text tools</h1><p className="leaf-secondary">Dictate freely. Edit deliberately. Review before applying.</p></div><TextTools view={view} available={available} busy={busy} mode={toolMode} setMode={setToolMode} draft={toolDrafts[toolMode]} setDraft={text=>setToolDrafts(d=>({...d,[toolMode]:text}))} run={run} discard={discard}/>{task?.mode==='Edit'&&<TaskStage task={task} busy={busy} run={run}/>}</section>}
+        {page==='Act'&&<section><div className="section-heading"><h1>Actions</h1><p className="leaf-secondary">Choose an available capability. Review exactly what will happen.</p></div><ActionSurface view={view} draft={actionDraft} setDraft={setActionDraft} available={available} busy={busy} run={run} discard={discard}/></section>}
+        {page==='Activity'&&<Activity view={view} available={available} busy={busy} run={run} back={()=>setPage('Conversation')}/>}
+        {page==='Devices'&&<section><div className="section-heading"><h1>Devices and executors</h1><p className="leaf-secondary">Core exposes eligible executors through its capability catalog. This is not a complete device inventory.</p></div>{!nodes.length&&<p>No eligible executors are currently advertised.</p>}{nodes.map(node=><section className="device-row" key={node}><h2>{node}</h2>{view.capabilities.filter(c=>c.node===node).map(c=><div key={c.id}><strong>{c.label}</strong><p>{c.summary}</p><small>{c.risk}{c.operations.length>0?` · ${c.operations.join(', ')}`:''}</small></div>)}</section>)}</section>}
+        {page==='Preferences'&&<section><div className="section-heading"><h1>Preferences</h1><p className="leaf-secondary">Presence, invocation, and the boundaries you expect.</p></div>
+          <section className="preference-row"><div><h2>Appearance</h2><p>Paper light or warm graphite.</p></div><div className="theme-controls"><button aria-pressed={(view.theme??'light')==='light'} onClick={()=>local({kind:'theme',theme:'light'})}>Light</button><button aria-pressed={view.theme==='dark'} onClick={()=>local({kind:'theme',theme:'dark'})}>Dark</button></div></section>
+          <section className="preference-row"><div><h2>Global shortcut</h2><p>Works from the tray without Companion focus.</p><p>Configured: {view.shortcut} · {view.shortcut_enabled?'enabled':'disabled'}</p></div><div><label>Shortcut<input value={shortcut} maxLength={10} onChange={e=>setShortcut(e.target.value)}/></label><button disabled={busy} onClick={()=>run({kind:'shortcut',accelerator:shortcut})}>Register shortcut</button><button aria-pressed={!!view.shortcut_enabled} onClick={()=>local({kind:'shortcut_enabled',enabled:!view.shortcut_enabled})}>{view.shortcut_enabled?'Disable':'Enable'} shortcut</button><small>Ctrl+Alt+A through Z. Collision retains the previous registration.</small></div></section>
+          <section className="preference-row"><div><h2>Voice and awareness</h2><p>Voice turn: {available?view.voice:'unknown'}</p></div><div><p>Trigger-only · explicit shortcut or app activation</p><p>Persistent mute · {view.voice_support?.persistent_mute??'unavailable'}</p><p>Sentry / acoustic awareness · {view.voice_support?.sentry??'unavailable'}</p>{available&&['listening','processing','speaking'].includes(view.voice)&&<button onClick={()=>run({kind:'voice_cancel'})}>Cancel voice turn</button>}<p className="leaf-secondary">Start and finish dictation in Text tools. No wake-word or background recording is implied.</p></div></section>
+          <section className="preference-row"><div><h2>Desktop presence</h2><p>Closing the Workspace keeps OSCAR in the tray.</p></div><div><button onClick={()=>local({kind:'show_companion'})}>Show Companion</button><button onClick={()=>local({kind:'hide_companion'})}>Hide Companion</button><button onClick={discard}>Discard private drafts and context</button><button onClick={()=>local({kind:'quit'})}>Quit OSCAR</button></div></section>
+        </section>}
+      </div>
+    </div>
+  </main>;
+}

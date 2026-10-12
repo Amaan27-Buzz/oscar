@@ -27,6 +27,14 @@ def main() -> int:
         "--exe", type=Path, default=ROOT / "desktop/src-tauri/target/debug/oscar-desktop.exe"
     )
     parser.add_argument("--offline", action="store_true")
+    parser.add_argument(
+        "--workspace", action="store_true", help="Run the production two-surface frontend"
+    )
+    parser.add_argument(
+        "--open-workspace",
+        action="store_true",
+        help="Open Workspace for an interactive owner UI review",
+    )
     args = parser.parse_args()
     if not args.exe.is_file():
         raise RuntimeError("Build the isolated debug Tauri candidate first")
@@ -69,7 +77,19 @@ def main() -> int:
                     action.correlation_id,
                     action.capability_id,
                     model_mode[0] != "failure",
-                    value=("A scripted reference answer; no real model inference. " * 140)
+                    value=(
+                        "One OSCAR, two surfaces.\n\n"
+                        "The Companion stays small and expressive. Conversation, reading, text "
+                        "tools and consequential decisions belong in the full Workspace.\n\n"
+                        "Both surfaces receive state from the same native Bridge and Core. "
+                        "Opening the Workspace preserves the current task; closing it leaves "
+                        "the tray runtime available. "
+                        "Native confirmation still governs approval.\n\n"
+                        "This response is scripted for the disposable native review fixture, "
+                        "not actual model inference."
+                    )
+                    if model_mode[0] == "design"
+                    else ("A scripted reference answer; no real model inference. " * 140)
                     if model_mode[0] == "long"
                     else "A scripted reference answer; no real model inference.",
                     error="reference executor failure" if model_mode[0] == "failure" else None,
@@ -130,7 +150,9 @@ def main() -> int:
                 process = subprocess.Popen(
                     [
                         str(args.exe),
-                        "--living-presence",
+                        "--isolated-preferences",
+                        *(["--interaction"] if args.open_workspace else []),
+                        *([] if args.workspace else ["--living-presence"]),
                         *([] if args.offline else ["--bootstrap-stdin"]),
                     ],
                     stdin=subprocess.DEVNULL if args.offline else subprocess.PIPE,
@@ -222,7 +244,7 @@ def main() -> int:
                                 owner_authorized=True,
                             )
                             print(json.dumps({"disposable_policy": command}), flush=True)
-                        elif command in {"reported", "failure", "long"}:
+                        elif command in {"reported", "failure", "long", "design"}:
                             model_mode[0] = command
                             print(
                                 json.dumps(

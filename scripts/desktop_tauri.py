@@ -61,6 +61,7 @@ def run_surface(
         process = subprocess.Popen(
             [
                 str(executable),
+                "--isolated-preferences",
                 "--bootstrap-stdin",
                 *(["--reference-check"] if check else ["--interaction"]),
             ],

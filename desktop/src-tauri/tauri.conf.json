@@ -13,20 +13,38 @@
     "windows": [
       {
         "label": "main",
-        "title": "OSCAR",
-        "width": 300,
-        "height": 126,
-        "minWidth": 280,
-        "minHeight": 112,
-        "visible": true,
+        "title": "OSCAR Workspace",
+        "width": 1180,
+        "height": 820,
+        "minWidth": 780,
+        "minHeight": 560,
+        "visible": false,
         "resizable": true,
+        "decorations": true,
+        "create": false
+      },
+      {
+        "label": "companion",
+        "title": "OSCAR Companion",
+        "url": "index.html?companion",
+        "width": 188,
+        "height": 190,
+        "minWidth": 188,
+        "minHeight": 190,
+        "visible": true,
+        "resizable": false,
         "decorations": false,
+        "transparent": true,
+        "shadow": false,
+        "alwaysOnTop": true,
+        "skipTaskbar": true,
         "create": false
       }
     ],
     "security": {
       "capabilities": [
-        "desktop-ui"
+        "desktop-ui",
+        "companion-ui"
       ],
       "csp": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src ipc: http://ipc.localhost; object-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'",
       "devCsp": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src ipc: http://ipc.localhost ws://127.0.0.1:1420; object-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'"

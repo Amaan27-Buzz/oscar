@@ -27,9 +27,10 @@ pub enum WindowMode {
     Actions,
 }
 
-#[derive(Clone, Copy, Deserialize, Serialize)]
+#[derive(Clone, Copy, Deserialize, Serialize, Default, PartialEq)]
 #[serde(rename_all = "lowercase")]
 pub enum ContextChoice {
+    #[default]
     None,
     Selection,
     Focused,
@@ -330,7 +331,29 @@ pub struct RequestFeedback {
     pub observed_at_ms: u64,
 }
 #[derive(Clone, Serialize, Default, PartialEq)]
+#[serde(rename_all = "snake_case")]
+pub enum AwarenessAvailability {
+    #[default]
+    Unavailable,
+}
+// Future awareness adapters must supply a real contract before extending this projection.
+#[derive(Clone, Serialize, Default, PartialEq)]
+pub struct VoiceSupport {
+    pub persistent_mute: AwarenessAvailability,
+    pub sentry: AwarenessAvailability,
+    pub acoustic_awareness: AwarenessAvailability,
+    pub wake_word: AwarenessAvailability,
+}
+#[derive(Clone, Copy, Deserialize, Serialize, Default, PartialEq)]
+#[serde(rename_all = "lowercase")]
+pub enum ThemeChoice {
+    #[default]
+    Light,
+    Dark,
+}
+#[derive(Clone, Serialize, Default, PartialEq)]
 pub struct View {
+    pub theme: ThemeChoice,
     pub expression: ExpressionReadback,
     pub link: String,
     pub orb: String,
@@ -345,7 +368,10 @@ pub struct View {
     pub message: Option<String>,
     pub feedback: Option<RequestFeedback>,
     pub voice: String,
+    pub voice_support: VoiceSupport,
     pub shortcut: String,
+    pub shortcut_enabled: bool,
+    pub capture_choice: ContextChoice,
     pub observed_at_ms: u64,
     pub reference: bool,
 }

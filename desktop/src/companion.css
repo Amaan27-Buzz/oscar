@@ -1,0 +1,32 @@
+:root[data-surface=companion]{color-scheme:dark;background:#151a20;color:#e4e9ee;font-family:'Segoe UI Variable','Segoe UI',sans-serif;--ink:#e4e9ee;--paper:#151a20;--line:#35414d;--focus:#73b3ef}
+[data-surface=companion] body{margin:0;background:inherit}
+[data-surface=companion] button{border-radius:6px;border-color:transparent;color:inherit;padding:9px 12px;transition:background 140ms ease}
+[data-surface=companion] button:hover:not(:disabled){background:#2b3641}
+[data-surface=companion] button:disabled{opacity:.5}
+[data-surface=companion] button:focus-visible,[data-surface=companion] textarea:focus-visible,[data-surface=companion] input:focus-visible,[data-surface=companion] select:focus-visible,[data-surface=companion] summary:focus-visible{outline:2px solid #82bcf4;outline-offset:3px}
+[data-surface=companion] input,[data-surface=companion] select,[data-surface=companion] textarea{background:#1c242d;border:1px solid #3b4957;color:#e4e9ee;border-radius:6px;padding:10px;font:inherit;width:100%}
+[data-surface=companion] h1{font-size:32px;font-weight:550;line-height:1.22;letter-spacing:-.7px;margin:8px 0 12px}
+[data-surface=companion] h2{font-size:18px;font-weight:600;margin:0 0 12px}
+[data-surface=companion] h3{font-size:15px;font-weight:600}
+[data-surface=companion] p{margin:8px 0 16px}
+[data-surface=companion] pre{font-family:inherit;white-space:pre-wrap;overflow-wrap:anywhere;background:transparent;border:0;border-radius:0;padding:0;color:inherit;line-height:1.75}
+[data-surface=companion] small{color:#aab8c6;font-size:12px}
+[data-surface=companion] label{display:block;font-size:14px;margin:12px 0 6px}
+[data-surface=companion] .leaf-secondary{color:#aab8c6;font-size:14px;line-height:1.65}
+[data-surface=companion] .leaf-error{color:#ffc19e;overflow-wrap:anywhere}
+[data-surface=companion] .leaf-primary{background:#8cbff0;color:#101e2c;font-weight:600}
+[data-surface=companion] .leaf-primary:hover:not(:disabled){background:#add2f5}
+[data-surface=companion] .leaf-actions{display:flex;gap:8px;flex-wrap:wrap;margin:20px 0}
+:root[data-surface=companion],[data-surface=companion] body{background:transparent;overflow:hidden}
+.companion{width:188px;min-height:150px;display:flex;align-items:center;flex-direction:column;padding:2px 8px;color:#dbe7f2}
+.companion-grip{height:18px;width:90px;text-align:center;color:#a3b5c6;cursor:move;font-size:19px;line-height:12px}
+[data-surface=companion] .companion-orb{padding:0;border:0;background:transparent;border-radius:50%;line-height:0}
+[data-surface=companion] .companion-orb:hover{background:transparent;filter:brightness(1.04)}
+.companion-status{margin:1px 0 5px!important;font-size:11px;padding:4px 10px;border-radius:5px;background:#17212bf2;max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.companion-actions{display:flex;gap:4px;background:#17212bf2;border-radius:6px;padding:2px}
+.companion-actions button{font-size:11px;padding:5px 10px}
+.companion-controls{background:#17212bfa;border:1px solid #3a4b5d;border-radius:7px;display:flex;flex-direction:column;width:172px;padding:6px;margin-top:6px}
+.companion-controls button{font-size:11px;padding:5px 7px;text-align:left}.companion-controls span{font-size:10px;color:#aab9c8;padding:3px 7px}.companion-controls button[aria-pressed=true]{color:#b4d8fa}
+.companion-error{font-size:10px;color:#ffd0ad;background:#17212b;padding:5px;line-height:1.4;margin:4px 0!important}
+@media(prefers-reduced-motion:reduce){[data-surface=companion] *,[data-surface=companion] *::before,[data-surface=companion] *::after{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+@media(forced-colors:active){[data-surface=companion] button,[data-surface=companion] textarea,[data-surface=companion] input,[data-surface=companion] select{border:1px solid ButtonText}.companion-status,.companion-controls{border:1px solid CanvasText}}

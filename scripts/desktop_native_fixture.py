@@ -11,9 +11,14 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 @contextmanager
-def native_fixture():
+def native_fixture(*, workspace: bool = False):
     process = subprocess.Popen(
-        [sys.executable, "-m", "scripts.desktop_presence_quality"],
+        [
+            sys.executable,
+            "-m",
+            "scripts.desktop_presence_quality",
+            *(["--workspace"] if workspace else []),
+        ],
         cwd=ROOT,
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,

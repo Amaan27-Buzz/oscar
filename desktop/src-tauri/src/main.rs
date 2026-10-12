@@ -1,5 +1,6 @@
 #![cfg_attr(target_os = "windows", windows_subsystem = "windows")]
 mod core;
+mod preferences;
 mod presence;
 mod protocol;
 mod signing;
@@ -26,19 +27,218 @@ use tauri_plugin_global_shortcut::{GlobalShortcutExt, Shortcut, ShortcutState};
 use windows_sys::Win32::UI::WindowsAndMessaging::{IDYES, MB_ICONQUESTION, MB_YESNO, MessageBoxW};
 
 struct Native {
+    isolated_preferences: bool,
+    preferences_lock: Mutex<()>,
     presence: bool,
     bridge: Arc<Bridge>,
     shortcut: Mutex<Option<Shortcut>>,
     ready: AtomicBool,
     stop: AtomicBool,
 }
+fn save_preferences(app: &tauri::AppHandle, state: &Native) -> Result<(), String> {
+    if state.isolated_preferences || state.bridge.client().is_ok_and(|client| client.reference) {
+        return Ok(());
+    }
+    let _guard = state
+        .preferences_lock
+        .lock()
+        .map_err(|_| "Desktop preferences unavailable")?;
+    let view = state.bridge.view();
+    preferences::Preferences {
+        theme: view.theme,
+        shortcut: view.shortcut,
+        shortcut_enabled: view.shortcut_enabled,
+    }
+    .write(
+        &app.path()
+            .app_config_dir()
+            .map_err(|_| "Desktop preferences directory unavailable")?
+            .join("desktop.json"),
+    )
+}
 fn emit(app: &tauri::AppHandle, state: &Native) {
-    let _ = app.emit("desktop-state", state.bridge.view());
+    let view = state.bridge.view();
+    let _ = app.emit_to("main", "desktop-state", &view);
+}
+// Only operational metadata crosses into the Companion WebView.
+fn companion_view(mut view: View) -> View {
+    fn status(task: TaskView) -> TaskView {
+        TaskView {
+            state: task.state,
+            actions: task.actions,
+            ..Default::default()
+        }
+    }
+    view.tasks = view.tasks.into_iter().map(status).collect();
+    view.current = view.current.map(status);
+    view.capabilities.clear();
+    view.context = None;
+    view.preview = None;
+    view.review = None;
+    view.message = None;
+    view.feedback = None;
+    view
+}
+
+#[derive(serde::Deserialize)]
+#[serde(tag = "kind", rename_all = "snake_case", deny_unknown_fields)]
+enum SurfaceCommand {
+    Ready,
+    OpenWorkspace,
+    OpenActivity,
+    HideWorkspace,
+    ShowCompanion,
+    HideCompanion,
+    CompanionControls { open: bool },
+    ShortcutEnabled { enabled: bool },
+    CancelListening,
+    Theme { theme: ThemeChoice },
+    Quit,
+}
+#[tauri::command]
+async fn surface_command(
+    app: tauri::AppHandle,
+    window: tauri::WebviewWindow,
+    state: tauri::State<'_, Native>,
+    request: SurfaceCommand,
+) -> Result<View, String> {
+    if !matches!(window.label(), "main" | "companion") {
+        return Err("unknown surface".into());
+    }
+    let saves = matches!(
+        request,
+        SurfaceCommand::Theme { .. } | SurfaceCommand::ShortcutEnabled { .. }
+    );
+    match request {
+        SurfaceCommand::Ready => {}
+        SurfaceCommand::OpenWorkspace => {
+            let workspace = app
+                .get_webview_window("main")
+                .ok_or("Workspace unavailable")?;
+            workspace.show().map_err(|_| "Workspace show failed")?;
+            workspace
+                .set_focus()
+                .map_err(|_| "Workspace focus failed")?;
+        }
+        SurfaceCommand::OpenActivity => {
+            window_mode(&app, &state, WindowMode::Activity)?;
+        }
+        SurfaceCommand::HideWorkspace => {
+            app.get_webview_window("main")
+                .ok_or("Workspace unavailable")?
+                .hide()
+                .map_err(|_| "hide failed")?;
+        }
+        SurfaceCommand::ShowCompanion => {
+            app.get_webview_window("companion")
+                .ok_or("Companion unavailable")?
+                .show()
+                .map_err(|_| "show failed")?;
+        }
+        SurfaceCommand::HideCompanion => {
+            app.get_webview_window("companion")
+                .ok_or("Companion unavailable")?
+                .hide()
+                .map_err(|_| "hide failed")?;
+        }
+        SurfaceCommand::CompanionControls { open } => {
+            presence::resize(
+                &app.get_webview_window("companion")
+                    .ok_or("Companion unavailable")?,
+                (188., if open { 350. } else { 190. }),
+                false,
+            )?;
+        }
+        SurfaceCommand::ShortcutEnabled { enabled } => {
+            if enabled {
+                let value = state.bridge.view().shortcut;
+                register_shortcut(
+                    &app,
+                    &state,
+                    if value.starts_with("Ctrl+Alt+") {
+                        &value
+                    } else {
+                        "Ctrl+Alt+O"
+                    },
+                )?;
+            } else {
+                let mut shortcut = state.shortcut.lock().map_err(|_| "shortcut unavailable")?;
+                if let Some(value) = *shortcut {
+                    app.global_shortcut()
+                        .unregister(value)
+                        .map_err(|_| "shortcut unregister failed")?;
+                }
+                *shortcut = None;
+                state
+                    .bridge
+                    .view
+                    .lock()
+                    .map_err(|_| "state unavailable")?
+                    .shortcut_enabled = false;
+            }
+        }
+        SurfaceCommand::CancelListening => {
+            let bridge = state.bridge.clone();
+            tauri::async_runtime::spawn_blocking(move || {
+                bridge.execute(Command::VoiceCancel, |_| false)
+            })
+            .await
+            .map_err(|_| "voice cancellation unavailable")??;
+        }
+        SurfaceCommand::Quit => {
+            if window.label() != "main" {
+                return Err("Quit belongs to Workspace or tray".into());
+            }
+            app.exit(0);
+        }
+        SurfaceCommand::Theme { theme } => {
+            if window.label() != "main" {
+                return Err("Appearance belongs to Workspace".into());
+            }
+            window
+                .set_theme(Some(match theme {
+                    ThemeChoice::Light => tauri::Theme::Light,
+                    ThemeChoice::Dark => tauri::Theme::Dark,
+                }))
+                .map_err(|_| "native appearance unavailable")?;
+            let mut view = state
+                .bridge
+                .view
+                .lock()
+                .map_err(|_| "native state unavailable")?;
+            view.theme = theme;
+            view.expression.generation += 1;
+        }
+    }
+    emit(&app, &state);
+    if saves {
+        save_preferences(&app, &state)?;
+    }
+    Ok(if window.label() == "companion" {
+        companion_view(state.bridge.view())
+    } else {
+        state.bridge.view()
+    })
 }
 fn window_mode(app: &tauri::AppHandle, state: &Native, mode: WindowMode) -> Result<View, String> {
     let window = app
         .get_webview_window("main")
         .ok_or("desktop window unavailable")?;
+    if !state.presence {
+        if mode == WindowMode::Compact {
+            window.hide().map_err(|_| "Workspace hide failed")?;
+        } else {
+            window.show().map_err(|_| "Workspace show failed")?;
+            window.set_focus().map_err(|_| "Workspace focus failed")?;
+        }
+        let mut view = state.bridge.view.lock().map_err(|_| "state unavailable")?;
+        view.window = mode;
+        view.window_revision += 1;
+        view.expression.generation += 1;
+        drop(view);
+        emit(app, state);
+        return Ok(state.bridge.view());
+    }
     let (width, height) = match mode {
         WindowMode::Compact if state.presence => presence::COMPACT,
         WindowMode::Interaction if state.presence => presence::INTERACTION,
@@ -120,6 +320,12 @@ fn register_shortcut(app: &tauri::AppHandle, state: &Native, value: &str) -> Res
         .lock()
         .map_err(|_| "native state unavailable")?
         .shortcut = value.into();
+    state
+        .bridge
+        .view
+        .lock()
+        .map_err(|_| "native state unavailable")?
+        .shortcut_enabled = true;
     Ok(state.bridge.view())
 }
 fn validate_shortcut(value: &str) -> Result<(), String> {
@@ -183,13 +389,46 @@ fn invoke_presence(app: tauri::AppHandle) {
         emit(&app, &state);
     });
 }
+fn tray_action(app: &tauri::AppHandle, action: &str) {
+    match action {
+        "reveal" => invoke_presence(app.clone()),
+        "compact" if app.state::<Native>().presence => {
+            let _ = window_mode(app, &app.state::<Native>(), WindowMode::Compact);
+            if let Some(window) = app.get_webview_window("main") {
+                let _ = window.show();
+            }
+            emit(app, &app.state::<Native>());
+        }
+        "compact" => {
+            if let Some(window) = app.get_webview_window("companion") {
+                let _ = window.show();
+            }
+        }
+        "hide" => {
+            let label = if app.state::<Native>().presence {
+                "main"
+            } else {
+                "companion"
+            };
+            if let Some(window) = app.get_webview_window(label) {
+                let _ = window.hide();
+            }
+        }
+        "quit" => app.exit(0),
+        _ => {}
+    }
+}
 
 #[tauri::command]
 async fn desktop_command(
     app: tauri::AppHandle,
+    window: tauri::WebviewWindow,
     state: tauri::State<'_, Native>,
     request: Command,
 ) -> Result<View, String> {
+    if window.label() != "main" {
+        return Err("Workspace authority required".into());
+    }
     match request {
         Command::Ready => {
             state.ready.store(true, Ordering::Release);
@@ -202,9 +441,23 @@ async fn desktop_command(
                 .capture_choice
                 .lock()
                 .map_err(|_| "native state unavailable")? = source;
+            state
+                .bridge
+                .view
+                .lock()
+                .map_err(|_| "native state unavailable")?
+                .capture_choice = source;
+            emit(&app, &state);
             return Ok(state.bridge.view());
         }
-        Command::Shortcut { accelerator } => return register_shortcut(&app, &state, &accelerator),
+        Command::Shortcut { accelerator } => {
+            let result = register_shortcut(&app, &state, &accelerator);
+            emit(&app, &state);
+            if result.is_ok() {
+                save_preferences(&app, &state)?;
+            }
+            return result;
+        }
         _ => {}
     }
     let bridge = state.bridge.clone();
@@ -447,6 +700,11 @@ fn main() {
     let presence = cfg!(debug_assertions) && std::env::args().any(|a| a == "--living-presence");
     let bridge = Arc::new(Bridge::new());
     let native = Native {
+        isolated_preferences: check
+            || baseline.is_some()
+            || presence
+            || (cfg!(debug_assertions) && std::env::args().any(|a| a == "--isolated-preferences")),
+        preferences_lock: Mutex::new(()),
         presence,
         bridge: bridge.clone(),
         shortcut: Mutex::new(None),
@@ -457,8 +715,14 @@ fn main() {
         .plugin(tauri_plugin_global_shortcut::Builder::new().with_handler(|app,_,event|{
             if event.state==ShortcutState::Pressed{invoke_presence(app.clone());}
         }).build())
-        .invoke_handler(tauri::generate_handler![desktop_command, presence_window])
+        .invoke_handler(tauri::generate_handler![desktop_command, presence_window, surface_command])
         .setup(move|app| {
+            let state=app.state::<Native>();
+            let saved=if state.isolated_preferences {preferences::Preferences::default()} else {
+                let path=app.path().app_config_dir()?.join("desktop.json");
+                match preferences::Preferences::read(&path) {Ok(saved)=>saved,Err(error)=>{state.bridge.fail(error);preferences::Preferences::default()}}
+            };
+            {let mut view=state.bridge.view.lock().map_err(|_| "native state unavailable")?;view.theme=saved.theme;view.shortcut=saved.shortcut.clone();}
             let mut config=app.config().app.windows[0].clone();
             if presence { config.url=tauri::WebviewUrl::External("http://127.0.0.1:1420/?living".parse()?); }
             let mut builder=tauri::WebviewWindowBuilder::from_config(app, &config)?;
@@ -470,19 +734,26 @@ fn main() {
                     (cfg!(debug_assertions)&&url.host_str()==Some("127.0.0.1")&&url.port()==Some(1420)))))
                 .build()?;
             if presence { presence::resize(&window,presence::COMPACT,true)?; }
+            if !presence { window.set_theme(Some(match saved.theme {ThemeChoice::Light=>tauri::Theme::Light,ThemeChoice::Dark=>tauri::Theme::Dark}))?; }
+            if !presence {
+                let companion_config=&app.config().app.windows[1];
+                let companion=tauri::WebviewWindowBuilder::from_config(app,companion_config)?
+                    .on_navigation(|url| url.scheme()=="tauri" || (url.scheme()=="http" && (url.host_str()==Some("tauri.localhost") ||
+                        (cfg!(debug_assertions)&&url.host_str()==Some("127.0.0.1")&&url.port()==Some(1420)))))
+                    .build()?;
+                presence::resize(&companion,(188.,190.),true)?;
+            }
             let reveal=MenuItem::with_id(app,"reveal","Open OSCAR",true,None::<&str>)?;
-            let compact=MenuItem::with_id(app,"compact","Compact presence",true,None::<&str>)?;
-            let hide=MenuItem::with_id(app,"hide","Hide OSCAR",true,None::<&str>)?;
+            let compact=MenuItem::with_id(app,"compact","Show Companion",true,None::<&str>)?;
+            let hide=MenuItem::with_id(app,"hide","Hide Companion",true,None::<&str>)?;
             let quit=MenuItem::with_id(app,"quit","Quit",true,None::<&str>)?;
             let menu=Menu::with_items(app,&[&reveal,&compact,&hide,&quit])?;
             TrayIconBuilder::new().icon(app.default_window_icon().ok_or("canonical tray icon missing")?.clone())
                 .tooltip("OSCAR").menu(&menu).show_menu_on_left_click(false)
                 .on_tray_icon_event(|tray,event|{if matches!(event,TrayIconEvent::Click{button:MouseButton::Left,button_state:MouseButtonState::Up,..}){invoke_presence(tray.app_handle().clone());}})
-                .on_menu_event(|app,event|match event.id.as_ref(){"reveal"=>invoke_presence(app.clone()),
-                    "compact"=>{let _=window_mode(app,&app.state::<Native>(),WindowMode::Compact);emit(app,&app.state::<Native>());},
-                    "hide"=>{if let Some(w)=app.get_webview_window("main"){let _=w.hide();}},"quit"=>app.exit(0),_=>{}}).build(app)?;
+                .on_menu_event(|app,event|tray_action(app,event.id.as_ref())).build(app)?;
             let state=app.state::<Native>();
-            if let Err(error)=register_shortcut(app.handle(),&state,"Ctrl+Alt+O"){state.bridge.fail(error);}
+            if saved.shortcut_enabled && let Err(error)=register_shortcut(app.handle(),&state,&saved.shortcut){state.bridge.fail(error);}
             let handle=app.handle().clone();
             thread::spawn(move|| {
                 if let Some(baseline)=baseline {
@@ -500,8 +771,13 @@ fn main() {
                         assert!(window.is_visible().expect("revealed"));
                         assert!(state.bridge.view().window==WindowMode::Interaction);
                         assert!(state.bridge.client().is_err());
-                        println!("LIFECYCLE_REFERENCE_PASS: uncommissioned, close/hide, reveal, explicit quit");
-                        handle.exit(0);
+                        let companion=handle.get_webview_window("companion").expect("owned Companion");
+                        tray_action(&handle,"hide");
+                        assert!(!companion.is_visible().expect("Companion hidden"));
+                        tray_action(&handle,"compact");
+                        assert!(companion.is_visible().expect("Companion shown"));
+                        println!("LIFECYCLE_REFERENCE_PASS: uncommissioned, close/hide, tray reveal/hide/show, explicit quit");
+                        tray_action(&handle,"quit");
                     }
                     return;
                 }
@@ -545,7 +821,7 @@ fn main() {
                 api.prevent_close();if let Some(window)=app.get_webview_window(&label){let _=window.hide();}
             },
             tauri::RunEvent::ExitRequested{code:None,api,..}=>api.prevent_exit(),
-            tauri::RunEvent::Exit=>app.state::<Native>().stop.store(true,Ordering::Release),
+            tauri::RunEvent::Exit=>{let _=app.global_shortcut().unregister_all();app.state::<Native>().stop.store(true,Ordering::Release);},
             _=>{}
         });
 }
@@ -554,7 +830,47 @@ fn main() {
 mod native_tests {
     use super::*;
     #[test]
+    fn companion_never_receives_private_or_signing_material() {
+        let mut view = View::default();
+        view.current = Some(TaskView {
+            description: "private request".into(),
+            response: Some("private response".into()),
+            value: Some("private value".into()),
+            state: "planned".into(),
+            actions: vec!["approve".into()],
+            ..Default::default()
+        });
+        view.tasks = vec![view.current.clone().unwrap()];
+        view.message = Some("private preview".into());
+        let redacted = companion_view(view);
+        let json = serde_json::to_string(&redacted).unwrap();
+        assert!(!json.contains("private"));
+        assert_eq!(redacted.current.unwrap().actions, vec!["approve"]);
+        let capability = include_str!("../capabilities/companion-ui.json");
+        assert!(!capability.contains("allow-desktop-command"));
+        assert!(!capability.contains("allow-presence-window"));
+        assert!(!capability.contains("core:event:"));
+        assert!(
+            serde_json::from_value::<SurfaceCommand>(
+                serde_json::json!({"kind":"confirm","accept":true})
+            )
+            .is_err()
+        );
+    }
+    #[test]
     fn invocation_and_capabilities_are_bounded() {
+        assert!(
+            serde_json::from_value::<SurfaceCommand>(
+                serde_json::json!({"kind":"theme","theme":"dark"})
+            )
+            .is_ok()
+        );
+        assert!(
+            serde_json::from_value::<SurfaceCommand>(
+                serde_json::json!({"kind":"theme","theme":"execute"})
+            )
+            .is_err()
+        );
         assert!(validate_shortcut("Ctrl+Alt+O").is_ok());
         assert!(validate_shortcut("Ctrl+Alt+keylogger").is_err());
         assert!(validate_shortcut("Alt+F4").is_err());

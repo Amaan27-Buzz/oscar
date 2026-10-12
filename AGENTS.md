@@ -1,5 +1,20 @@
 # AGENTS.md
 
+## Owner Group 2.5A — 2026-10-12
+
+The owner authorizes Desktop architecture correction from consolidated main
+`fd191a2d7ca7f98c456969c74173a0340f789578`: a tiny persistent Companion and a
+separate full Workspace in one Tauri process. The canonical Orb and shared Core,
+voice, permissions and native signing boundaries remain intact. Companion is
+never a miniature chat application and has no approval authority. See
+[the ownership contract](docs/design/DESKTOP-COMPANION-WORKSPACE.md) and
+[native evidence](docs/ui/desktop/workspace/README.md).
+
+Use one focused branch and a draft PR directly against main; stop for owner
+visual review before merge. Preserve local Aperture `42b565c` and all historical
+branches/evidence. No Mobile, Slice 14, production promotion or branch cleanup.
+This explicit scope supersedes older sequencing notes only within Group 2.5A.
+
 ## Owner software-first scope — 2026-10-11
 
 Group 1 authorizes Desktop Slice 12.2–12.6 on a separate development branch based

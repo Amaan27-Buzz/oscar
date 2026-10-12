@@ -3,7 +3,7 @@ import type {Command,ContextChoice,View} from '../bridge';
 
 export type TextMode='Dictate'|'Edit';
 export function TextTools({view,available,busy,mode,setMode,draft,setDraft,run,discard}:{view:View;available:boolean;busy:boolean;mode:TextMode;setMode:(mode:TextMode)=>void;draft:string;setDraft:(text:string)=>void;run:(command:Command)=>Promise<boolean>;discard:()=>void}) {
-  const [source,setSource]=useState<ContextChoice>('none');
+  const source=view.capture_choice??'none';
   const [destination,setDestination]=useState('surface');
   const [clock,setClock]=useState(Date.now());
   const lastPreview=useRef('');const input=useRef<HTMLTextAreaElement>(null);
@@ -35,7 +35,7 @@ export function TextTools({view,available,busy,mode,setMode,draft,setDraft,run,d
     <section role="tabpanel" id={`panel-${mode}`} aria-labelledby={`tool-${mode}`}>
       <details className="context-details"><summary>{context?`${context.source} context · ${fresh?'fresh':'recapture required'}`:'Context · none attached'}</summary>
         {context&&<><p>{context.scope} · {context.provenance}</p><p>{context.permission} · {context.retained?'retained by Core':'not retained'} · observed {new Date(context.timestamp*1000).toLocaleTimeString()}</p><pre>{context.text}</pre></>}
-        <label>Capture on invocation<select value={source} onChange={e=>{const next=e.target.value as ContextChoice;setSource(next);void run({kind:'capture_choice',source:next});}}>
+        <label>Capture on invocation<select value={source} onChange={e=>{const next=e.target.value as ContextChoice;void run({kind:'capture_choice',source:next});}}>
           <option value="none">No capture</option><option value="selection">Selected text</option><option value="focused">Focused field</option><option value="foreground">Window identity</option></select></label>
         <p className="leaf-secondary">Focus the intended application, then invoke OSCAR. Unregistered, password or inaccessible content remains unavailable.</p>
         <button disabled={busy||!available||source==='none'} onClick={()=>run({kind:'capture',source})}>Capture supported context</button>
