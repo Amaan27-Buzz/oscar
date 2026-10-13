@@ -11,15 +11,15 @@ it('reveals icon controls on hover and retracts when the pointer leaves',async()
  render(<Companion/>);await screen.findByText('Ready');const companion=screen.getByRole('main',{name:'OSCAR Companion'});
  expect(companion.classList.contains('is-hovered')).toBe(false);fireEvent.pointerEnter(companion);expect(companion.classList.contains('is-hovered')).toBe(true);
  fireEvent.pointerLeave(companion);expect(companion.classList.contains('is-hovered')).toBe(false);expect(screen.queryByText('Shortcut on')).toBeNull();
- expect((screen.getByRole('button',{name:'Mute unavailable'}) as HTMLButtonElement).disabled).toBe(true);
+ expect((screen.getByRole('button',{name:'Use voice'}) as HTMLButtonElement).disabled).toBe(true);
 });
 it('right click and keyboard controls request the bounded native menu only',async()=>{
  render(<Companion/>);await screen.findByText('Ready');const companion=screen.getByRole('main',{name:'OSCAR Companion'});
  fireEvent.contextMenu(companion);await waitFor(()=>expect(native).toHaveBeenCalledWith({kind:'companion_menu'}));
  fireEvent.keyDown(companion,{key:'F10',shiftKey:true});expect(native.mock.calls.filter(([c])=>c.kind==='companion_menu')).toHaveLength(2);
 });
-it('shortcut icon sends the actual state change and opening never requests approval',async()=>{
- render(<Companion/>);await screen.findByText('Ready');fireEvent.click(screen.getByRole('button',{name:'Shortcut on'}));
- expect(native).toHaveBeenCalledWith({kind:'shortcut_enabled',enabled:false});fireEvent.click(screen.getByRole('button',{name:'Open Workspace'}));expect(native).toHaveBeenCalledWith({kind:'open_workspace'});
- expect(native.mock.calls.every(([c])=>!('review_id' in c))).toBe(true);
+it('moves shortcut management into overflow and opens bounded access/Sentry selectors',async()=>{
+ render(<Companion/>);await screen.findByText('Ready');expect(screen.queryByRole('button',{name:'Shortcut on'})).toBeNull();fireEvent.click(screen.getByRole('button',{name:'Companion controls'}));expect(native).toHaveBeenCalledWith({kind:'companion_menu'});
+ fireEvent.click(screen.getByRole('button',{name:/Access mode/}));expect(native).toHaveBeenCalledWith({kind:'access_menu'});fireEvent.click(screen.getByRole('button',{name:'Sentry'}));expect(native).toHaveBeenCalledWith({kind:'sentry_menu'});
+ fireEvent.click(screen.getByRole('button',{name:'Open Workspace'}));expect(native).toHaveBeenCalledWith({kind:'open_workspace'});expect(native.mock.calls.every(([c])=>!('review_id' in c)&&!('mode' in c))).toBe(true);
 });

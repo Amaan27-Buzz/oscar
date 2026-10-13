@@ -1,9 +1,10 @@
 import {Choice,Disclosure} from '../UIControls';
 import {useEffect,useRef,useState} from 'react';
+import {epistemicLabel} from '../bridge';
 import type {Command,ContextChoice,View} from '../bridge';
 
 export type TextMode='Dictate'|'Edit';
-export function TextTools({view,available,busy,mode,setMode,draft,setDraft,run,discard}:{view:View;available:boolean;busy:boolean;mode:TextMode;setMode:(mode:TextMode)=>void;draft:string;setDraft:(text:string)=>void;run:(command:Command)=>Promise<boolean>;discard:()=>void}) {
+export function TextTools({view,available,busy,mode,setMode,draft,setDraft,run,discard,reviewOnly=false,useInMessage}:{reviewOnly?:boolean;useInMessage?:(text:string)=>Promise<void>;view:View;available:boolean;busy:boolean;mode:TextMode;setMode:(mode:TextMode)=>void;draft:string;setDraft:(text:string)=>void;run:(command:Command)=>Promise<boolean>;discard:()=>void}) {
   const source=view.capture_choice??'none';
   const [destination,setDestination]=useState('surface');
   const [clock,setClock]=useState(Date.now());
@@ -30,11 +31,11 @@ export function TextTools({view,available,busy,mode,setMode,draft,setDraft,run,d
   function submit(){if(available&&!busy&&!activeVoice&&draft.trim()&&(mode==='Dictate'||editable))void run({kind:'interact',mode,text:draft,context_id:context?.id??''});}
   function switchMode(next:TextMode){if(activeVoice)void run({kind:'voice_cancel'});setMode(next);}
   return <div className="text-tools">
-    <div role="tablist" aria-label="Text tools" className="text-mode-tabs">{(['Dictate','Edit'] as const).map(item=><button
+    {!reviewOnly&&<><div role="tablist" aria-label="Text tools" className="text-mode-tabs">{(['Dictate','Edit'] as const).map(item=><button
       key={item} id={`tool-${item}`} role="tab" aria-selected={mode===item} aria-controls={`panel-${item}`} tabIndex={mode===item?0:-1}
       onClick={()=>switchMode(item)} onKeyDown={e=>{if(['ArrowLeft','ArrowRight'].includes(e.key)){e.preventDefault();switchMode(mode==='Dictate'?'Edit':'Dictate');requestAnimationFrame(()=>document.getElementById(`tool-${mode==='Dictate'?'Edit':'Dictate'}`)?.focus());}}}>{item}</button>)}</div>
-    <section role="tabpanel" id={`panel-${mode}`} aria-labelledby={`tool-${mode}`}>
-      <Disclosure className="context-details" title={<>{context?`${context.source} context · ${fresh?'fresh':'recapture required'}`:'Context · none attached'}</>}>
+    </>}<section role={reviewOnly?undefined:"tabpanel"} id={`panel-${mode}`} aria-labelledby={reviewOnly?undefined:`tool-${mode}`}>
+      {!reviewOnly&&<><Disclosure className="context-details" title={<>{context?`${context.source} context · ${fresh?'fresh':'recapture required'}`:'Context · none attached'}</>}>
         {context&&<><p>{context.scope} · {context.provenance}</p><p>{context.permission} · {context.retained?'saved':'not saved'} · observed {new Date(context.timestamp*1000).toLocaleTimeString()}</p><pre>{context.text}</pre></>}
         <label>Capture on invocation<Choice label="Capture on invocation" value={source} onChange={value=>void run({kind:'capture_choice',source:value as ContextChoice})} options={[{value:'none',label:'No capture'},{value:'selection',label:'Selected text'},{value:'focused',label:'Focused field'},{value:'foreground',label:'Window identity'}]}/></label>
         <p className="leaf-secondary">Focus the intended application, then invoke OSCAR. Unregistered, password or inaccessible content remains unavailable.</p>
@@ -49,17 +50,17 @@ export function TextTools({view,available,busy,mode,setMode,draft,setDraft,run,d
         onKeyDown={e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.nativeEvent.isComposing){e.preventDefault();submit();}}}/>
       {mode==='Edit'&&!editable&&<p className="leaf-secondary">Capture fresh selected text or a focused field before requesting an edit.</p>}
       <button className="leaf-primary" disabled={!available||busy||activeVoice||!draft.trim()||(mode==='Edit'&&!editable)} onClick={submit}>{mode==='Dictate'?'Preview text':'Request transformation'}</button>
-      {editTask&&!preview&&<button disabled={!available||busy} onClick={()=>run({kind:'preview',task_id:view.current!.task_id})}>Preview transformation</button>}
+      </>}{editTask&&!preview&&<button disabled={!available||busy} onClick={()=>run({kind:'preview',task_id:view.current!.task_id})}>Review suggested text</button>}
       {preview&&<section className="text-preview" aria-label="Review text preview"><h2>Review before applying</h2>
-        <p className="leaf-secondary">{preview.epistemic} text · {expired?'Preview expired — create a fresh preview.':'Preview is time limited.'}</p>
-        <label>Destination<Choice label="Destination" value={validDestination} onChange={setDestination} options={preview.destinations.map(item=>({value:item,label:item==='surface'?'OSCAR only':item==='focused'?'Captured focused field':'Explicit clipboard'}))}/></label>
-        <h3>{focused?'Captured field before':'Source text'}</h3><pre>{before??'No source text'}</pre>
-        <h3>{focused?'Complete field after':'Reviewed text'}</h3><pre>{after??'Reliable replacement is unavailable'}</pre>
-        <p className="leaf-secondary">{focused?'The captured field is checked again before replacement.':validDestination==='clipboard'?'Clipboard permission and owner review are separate.':'No other application changes.'}</p>
-        <button className="leaf-primary" disabled={!canApply} onClick={()=>run({kind:'apply',preview_id:preview.preview_id,destination:validDestination as 'surface'|'focused'|'clipboard'})}>Apply reviewed text</button>
+        <p className="leaf-secondary">{reviewOnly?epistemicLabel(preview.epistemic):preview.epistemic} text · {expired?'Preview expired — create a fresh preview.':'Preview is time limited.'}</p>
+        <label>Destination<Choice label="Destination" value={validDestination} onChange={setDestination} options={preview.destinations.map(item=>({value:item,label:item==='surface'?'OSCAR only':item==='focused'?'Selected app field':'Clipboard'}))}/></label>
+        <h3>{reviewOnly?'Original text':focused?'Captured field before':'Source text'}</h3><pre>{before??'No source text'}</pre>
+        <h3>{reviewOnly?'Suggested text':focused?'Complete field after':'Reviewed text'}</h3><pre>{after??'Reliable replacement is unavailable'}</pre>
+        <p className="leaf-secondary">{focused?'OSCAR will check that this field has not changed before replacing it.':validDestination==='clipboard'?'You’ll review this before it goes to the clipboard.':'No other application changes.'}</p>
+        <button className="leaf-primary" disabled={!canApply} onClick={()=>useInMessage&&validDestination==='surface'?useInMessage(preview.after):run({kind:'apply',preview_id:preview.preview_id,destination:validDestination as 'surface'|'focused'|'clipboard'})}>{useInMessage&&validDestination==='surface'?'Use in message':'Apply reviewed text'}</button>
       </section>}
-      {view.feedback&&<p className="leaf-error" role="alert">{view.feedback.message} Inspect the outcome before resubmitting.</p>}
-      {view.message&&!view.feedback&&<p className="text-receipt" role="status">{view.message}</p>}
+      {view.feedback&&!reviewOnly&&<p className="leaf-error" role="alert">{view.feedback.message} Inspect the outcome before resubmitting.</p>}
+      {!reviewOnly&&view.message&&!view.feedback&&<p className="text-receipt" role="status">{view.message}</p>}
     </section>
   </div>;
 }

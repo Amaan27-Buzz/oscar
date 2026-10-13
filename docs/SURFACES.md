@@ -327,3 +327,5 @@ See [OSCAR Mobile foundation](MOBILE-FOUNDATION.md) for implementation, limits a
 Slice 09 must not merge in this run. Gate C remains PARTIAL. Slice 10, deployment
 and Home Node are not started. Post-alpha Operating Logs, specialist-model training
 and home-server migration remain documented future work, not implemented.
+
+Desktop Conversation omits storage/permission-debugging messages and tool-launch buttons. Memory/privacy readback belongs in Preferences; evidence belongs in Activity detail. Composer voice controls require Core availability and a microphone grant. Companion's redacted Access menu inspects authority only; Secure/Full Access and all Sentry choices remain unavailable. Native menus fit the work area and do not grant, sign or change authority. See [interaction polish](ui/desktop/interaction-polish/README.md).

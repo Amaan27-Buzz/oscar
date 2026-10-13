@@ -9,11 +9,11 @@ OSCAR is one persistent multimodal intelligence. Core owns conversation, reasoni
 | Feature | Authoritative owner | Desktop interaction | Present capability / next integration |
 |---|---|---|---|
 | Continuous relationship | Core + canonical Event Archive / Memory Fabric | Conversation; chronological turns, older history, related task inspection | Session history; retained history with explicit read/retain grants and installed archive. No frontend storage or chat threads |
-| Text, dictation, app context, immediate operations | Controller + existing typed adapters | Contextual controls inside Conversation | Existing Dictate/Edit/Act, expected-value fencing, clipboard/UIA review. Screenshot understanding requires a real permissioned adapter |
+| Text, dictation, app context, immediate operations | Controller + existing typed adapters | Conversation requests and contextual text review; direct operations behind Preferences | Existing Dictate/Edit/Act, expected-value fencing, clipboard/UIA review. Screenshot understanding requires a real permissioned adapter |
 | Immediate delegated tasks | Controller + Durable Runtime + Grid | Conversation; outcomes in Activity | Existing plan, exact approval, dispatch, cancellation, verification and recovery foundations |
 | Routines, watches, named Workers, continuing Protocols | Controller + Executive + Durable Runtime | Conversation creates/instructs; Automations manages | Lifecycle/schema/scheduler/trigger and signed authority integration still required. No functioning named Worker controls in this candidate |
 | Operational history | Core tasks / Action Ledger / evidence | Activity: attention, running work, outcomes; exact review on demand | Existing authoritative readback/signing, verification and failure states |
-| Devices | Grid / capability catalog / target permission recheck | Devices inspects real advertised capabilities | Existing discovery and immediate action preparation; no invented screen or device capability |
+| Devices | Grid / capability catalog / target permission recheck | Devices inspects real advertised capabilities | Existing discovery and conversation handoff; no invented screen or device capability |
 | Companion | Redacted native projection / shared expression | Tiny presence, tray, shortcut and Workspace opening | Approved appearance preserved; no conversation, Worker UI or signing authority |
 | Preferences | Native appearance settings; Core authority and permission state | Independent access/awareness/autonomy and retention status | Native appearance/shortcut working; no unsupported authority toggles |
 
@@ -45,7 +45,7 @@ The next coherent authorization integration must introduce a distinct signed **o
 4. Owner revocation/downgrade increments the epoch atomically and stops new dispatch immediately. Targets recheck before every side effect, cancel active work where supported and reject expired/old epochs. Disconnected targets fail closed for delegated new mutations. No offline cached unrestricted authority. Already completed or indivisible operations cannot be undone by revocation; cancellation delivery and irreversible effects require honest readback.
 5. Native activation uses a separate reviewed/signable claim. Companion and React possess no key or authority. Persisted grants require verified owner identity and expiry/restart rules; no default promotion from session settings or memory. Local safety remains deterministic. Platform-required confirmations are reported as external constraints, not relabeled OSCAR consent.
 
-**Unresolved implementation decisions:** trusted activation identity strength (current CNG path has no verified Windows Hello attestation), distributed epoch propagation/atomic target fencing, credential/platform coverage, grant expiry/restart policy and in-flight cancellation semantics. Required tests include downgrade/revocation races, target loss, replay, changed scope, credential loss, restart, critical operation under each mode and absence of OSCAR prompts under genuine Full Access. Until all paths implement these together, no Full Access selector or grant endpoint is exposed.
+**Unresolved implementation decisions:** trusted activation identity strength (current CNG path has no verified Windows Hello attestation), distributed epoch propagation/atomic target fencing, credential/platform coverage, grant expiry/restart policy and in-flight cancellation semantics. Required tests include downgrade/revocation races, target loss, replay, changed scope, credential loss, restart, critical operation under each mode and absence of OSCAR prompts under genuine Full Access. Until all paths implement these together, Full Access activation and grant endpoints remain unavailable. The Companion may inspect the three access choices in a native menu; only Core readback marks the current mode and unavailable choices cannot activate authority.
 
 ## Conversation implementation and boundaries
 
@@ -60,3 +60,15 @@ Automations includes one-time delegated jobs, schedules, event triggers, conditi
 ## Acceptance boundary
 
 Software and native reference evidence are recorded separately in the Group 2.5 product-direction packet. Preserve Orb, approved Companion, historical captures, Aperture and all branches. No Mobile redesign, backend framework rewrite, Slices 14–17 implementation, production promotion, merge or branch cleanup.
+
+## Interaction polish — 2026-10-14
+
+Conversation carries messages, attached context and reviewable results. Memory-store terminology, retention readback and utility launch buttons do not appear there. Preferences explains saved-conversation availability and separate app-context choices without changing grants. Task status/evidence remains in Core and Activity disclosures; hiding technical metadata never upgrades an answer to verified truth.
+
+A microphone appears only when Core advertises an installed voice adapter and the session has microphone permission, or during an active turn. Existing start/finish/cancel and private preview paths remain authoritative. Explicit recognized edit requests with authorized selected/focused text use the existing Edit path and expected-value review. A small deterministic parser recognizes explicit file, project and browser requests with supplied arguments, then uses existing typed contracts, capability selection, Personal Policy and exact signed review. It is not a general conversational action planner; missing or ambiguous executors fail closed, and no arguments are invented. Direct forms remain in advanced Preferences for existing capabilities outside that grammar.
+
+The unchanged 148 × 164 Companion has Open, Access, Sentry, voice and overflow icons. Shortcut management and Preferences belong in overflow. Access is a fresh redacted Core readback; Ask is current, Secure and Full Access remain unavailable. Sentry's five choices are unavailable and start no recording. Native menu requests cannot carry a mode, grant, review or signature. Menus reserve the current monitor's work area above the fixed Companion to avoid the taskbar; Windows owns popup keyboard navigation and animation. The Companion stays behind a focused Workspace and returns to desktop presence on Workspace close/hide. It retains no approval authority.
+
+See [native interaction-polish evidence](../ui/desktop/interaction-polish/README.md). Historical evidence is preserved; owner visual acceptance and merge remain pending.
+
+Owner messages align to the right of the conversation column; OSCAR replies align left. Both restored and current turns use the same responsive styles.

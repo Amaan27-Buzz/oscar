@@ -291,3 +291,5 @@ and home-server migration remain documented future work, not implemented.
 ## Slice 10 product shell continuation
 
 OSCAR Desktop uses Tauri 2/Rust/React-TypeScript presence and Ask/Dictate/Edit/Act, with one shared Core relationship. Advertised capabilities drive bounded Act forms. WPF is reference-only. Functional composition precedes the separate [10R redesign](DESKTOP-UI-REDESIGN.md); 10R must integrate before Slice 17 PASS.
+
+Conversation presents the relationship rather than memory plumbing or utility controls. Core-backed context, voice availability and exact action/text review support natural requests. Preferences explains memory/privacy and keeps direct advanced controls recoverable. Companion Access and Sentry menus inspect real availability; unavailable authority or awareness cannot be activated by presentation. See [interaction polish](ui/desktop/interaction-polish/README.md).

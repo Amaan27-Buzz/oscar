@@ -80,6 +80,12 @@ fn companion_view(mut view: View) -> View {
     view.message = None;
     view.feedback = None;
     view.conversation = ConversationView::default();
+    view.access_mode = view
+        .operating
+        .as_ref()
+        .and_then(|o| o["access"].as_str())
+        .filter(|mode| matches!(*mode, "Ask" | "Secure" | "Full Access"))
+        .map(str::to_owned);
     view.operating = None;
     view
 }
@@ -89,6 +95,9 @@ fn companion_view(mut view: View) -> View {
 enum SurfaceCommand {
     Ready,
     CompanionMenu {},
+    AccessMenu {},
+    SentryMenu {},
+    StartListening {},
     OpenWorkspace,
     OpenActivity,
     HideWorkspace,
@@ -121,6 +130,31 @@ async fn surface_command(
             }
             companion_menu(&app, &window, &state)?;
         }
+        SurfaceCommand::AccessMenu {} | SurfaceCommand::SentryMenu {} => {
+            if window.label() != "companion" {
+                return Err("Selector belongs to Companion".into());
+            }
+            companion_selector(
+                &app,
+                &window,
+                &state,
+                matches!(request, SurfaceCommand::AccessMenu {}),
+            )?;
+        }
+        SurfaceCommand::StartListening {} => {
+            show_workspace(&app)?;
+            let bridge = state.bridge.clone();
+            tauri::async_runtime::spawn_blocking(move || {
+                bridge.execute(
+                    Command::VoiceStart {
+                        context_id: String::new(),
+                    },
+                    |_| false,
+                )
+            })
+            .await
+            .map_err(|_| "Voice unavailable")??;
+        }
         SurfaceCommand::OpenWorkspace => show_workspace(&app)?,
         SurfaceCommand::OpenActivity => {
             window_mode(&app, &state, WindowMode::Activity)?;
@@ -130,6 +164,7 @@ async fn surface_command(
                 .ok_or("Workspace unavailable")?
                 .hide()
                 .map_err(|_| "hide failed")?;
+            companion_layer(&app, true);
         }
         SurfaceCommand::ShowCompanion => {
             app.get_webview_window("companion")
@@ -223,9 +258,105 @@ fn show_workspace(app: &tauri::AppHandle) -> Result<(), String> {
         .get_webview_window("main")
         .ok_or("Workspace unavailable")?;
     window.show().map_err(|_| "Workspace show failed")?;
+    companion_layer(app, false);
     window
         .set_focus()
         .map_err(|_| "Workspace focus failed".to_owned())
+}
+fn companion_layer(app: &tauri::AppHandle, above: bool) {
+    if let Some(companion) = app.get_webview_window("companion")
+        && companion
+            .is_always_on_top()
+            .is_ok_and(|current| current != above)
+    {
+        let _ = companion.set_always_on_top(above);
+    }
+}
+fn popup_companion_menu(
+    window: &tauri::WebviewWindow,
+    menu: &Menu<tauri::Wry>,
+) -> Result<(), String> {
+    window.set_focus().map_err(|_| "Menu focus unavailable")?;
+    let monitor = window
+        .current_monitor()
+        .map_err(|_| "Menu position unavailable")?
+        .ok_or("Menu position unavailable")?;
+    let work = monitor.work_area();
+    let origin = window
+        .inner_position()
+        .map_err(|_| "Menu position unavailable")?;
+    let scale = monitor.scale_factor();
+    // Windows fits menus to the display, including the taskbar; reserve usable work area here.
+    let width = (400. * scale).round() as i32;
+    let height = ((menu.items().map_err(|_| "Menu unavailable")?.len() as f64 * 32. + 12.) * scale)
+        .round() as i32;
+    let left = work.position.x + 8;
+    let top = work.position.y + 8;
+    let x = origin.x.clamp(
+        left,
+        (work.position.x + work.size.width as i32 - width).max(left),
+    );
+    let y = (origin.y - height).clamp(
+        top,
+        (work.position.y + work.size.height as i32 - height).max(top),
+    );
+    window
+        .popup_menu_at(
+            menu,
+            tauri::PhysicalPosition::new(x - origin.x, y - origin.y),
+        )
+        .map_err(|_| "Menu unavailable".into())
+}
+fn companion_selector(
+    app: &tauri::AppHandle,
+    window: &tauri::WebviewWindow,
+    state: &Native,
+    access: bool,
+) -> Result<(), String> {
+    let view = state.bridge.view();
+    let fresh = view.link == "online"
+        && view.expression.observed_at_ms <= core::now_ms() + 250
+        && core::now_ms().saturating_sub(view.expression.observed_at_ms) < 8000;
+    let mode = if fresh {
+        view.operating.as_ref().and_then(|o| o["access"].as_str())
+    } else {
+        None
+    };
+    let menu = Menu::new(app).map_err(|_| "Menu unavailable")?;
+    let choices = if access {
+        vec!["Ask", "Secure", "Full Access"]
+    } else {
+        vec!["Passive", "Aware", "Guard", "Away", "Sleep"]
+    };
+    let heading = MenuItem::new(
+        app,
+        if access {
+            "Access mode"
+        } else {
+            "Sentry · not available yet"
+        },
+        false,
+        None::<&str>,
+    )
+    .map_err(|_| "Menu unavailable")?;
+    menu.append(&heading).map_err(|_| "Menu unavailable")?;
+    for choice in choices {
+        let label = if access && choice == mode.unwrap_or("") {
+            format!("{choice} · current")
+        } else {
+            format!("{choice} · not available yet")
+        };
+        let item = CheckMenuItem::new(
+            app,
+            label,
+            false,
+            access && mode == Some(choice),
+            None::<&str>,
+        )
+        .map_err(|_| "Menu unavailable")?;
+        menu.append(&item).map_err(|_| "Menu unavailable")?;
+    }
+    popup_companion_menu(window, &menu)
 }
 fn companion_menu(
     app: &tauri::AppHandle,
@@ -270,6 +401,14 @@ fn companion_menu(
         None::<&str>,
     );
     let hide = MenuItem::with_id(app, "companion_hide", "Hide Companion", true, None::<&str>);
+    let preferences = MenuItem::with_id(
+        app,
+        "companion_preferences",
+        "Preferences",
+        true,
+        None::<&str>,
+    )
+    .map_err(|_| "menu unavailable")?;
     let (open, shortcut, voice, trigger, sentry, hide) = (
         open.map_err(|_| "menu unavailable")?,
         shortcut.map_err(|_| "menu unavailable")?,
@@ -278,16 +417,29 @@ fn companion_menu(
         sentry.map_err(|_| "menu unavailable")?,
         hide.map_err(|_| "menu unavailable")?,
     );
-    let menu = Menu::with_items(app, &[&open, &shortcut, &voice, &trigger, &sentry, &hide])
-        .map_err(|_| "menu unavailable")?;
-    window
-        .popup_menu(&menu)
-        .map_err(|_| "menu unavailable".into())
+    let menu = Menu::with_items(
+        app,
+        &[
+            &open,
+            &preferences,
+            &shortcut,
+            &voice,
+            &trigger,
+            &sentry,
+            &hide,
+        ],
+    )
+    .map_err(|_| "menu unavailable")?;
+    popup_companion_menu(window, &menu)
 }
 fn companion_menu_action(app: &tauri::AppHandle, action: &str) {
     if !matches!(
         action,
-        "companion_open" | "companion_shortcut" | "companion_cancel" | "companion_hide"
+        "companion_open"
+            | "companion_preferences"
+            | "companion_shortcut"
+            | "companion_cancel"
+            | "companion_hide"
     ) {
         return;
     }
@@ -297,6 +449,9 @@ fn companion_menu_action(app: &tauri::AppHandle, action: &str) {
         let state = app.state::<Native>();
         let result = match action.as_str() {
             "companion_open" => show_workspace(&app),
+            "companion_preferences" => {
+                window_mode(&app, &state, WindowMode::Preferences).map(|_| ())
+            }
             "companion_shortcut" => {
                 shortcut_enabled(&app, &state, !state.bridge.view().shortcut_enabled)
                     .and_then(|()| save_preferences(&app, &state))
@@ -338,8 +493,10 @@ fn window_mode(app: &tauri::AppHandle, state: &Native, mode: WindowMode) -> Resu
     if !state.presence {
         if mode == WindowMode::Compact {
             window.hide().map_err(|_| "Workspace hide failed")?;
+            companion_layer(app, true);
         } else {
             window.show().map_err(|_| "Workspace show failed")?;
+            companion_layer(app, false);
             window.set_focus().map_err(|_| "Workspace focus failed")?;
         }
         let mut view = state.bridge.view.lock().map_err(|_| "state unavailable")?;
@@ -358,6 +515,7 @@ fn window_mode(app: &tauri::AppHandle, state: &Native, mode: WindowMode) -> Resu
         WindowMode::Approval => (620., 780.),
         WindowMode::Activity if state.presence => (620., 760.),
         WindowMode::Activity => (820., 780.),
+        WindowMode::Preferences => (820., 780.),
         WindowMode::Reading => (540., 680.),
         WindowMode::Tools => (540., 720.),
         WindowMode::Actions => (540., 640.),
@@ -931,7 +1089,9 @@ fn main() {
         .run(|app,event|match event {
             tauri::RunEvent::WindowEvent{label,event:tauri::WindowEvent::CloseRequested{api,..},..}=>{
                 api.prevent_close();if let Some(window)=app.get_webview_window(&label){let _=window.hide();}
+                if label == "main" {companion_layer(app, true);}
             },
+            tauri::RunEvent::WindowEvent{label,event:tauri::WindowEvent::Focused(focused),..} if label == "main" => companion_layer(app, !focused),
             tauri::RunEvent::ExitRequested{code:None,api,..}=>api.prevent_exit(),
             tauri::RunEvent::Exit=>{let _=app.global_shortcut().unregister_all();app.state::<Native>().stop.store(true,Ordering::Release);},
             _=>{}
@@ -988,6 +1148,34 @@ mod native_tests {
         for field in ["action", "review_id", "signature", "command"] {
             let request = serde_json::json!({"kind":"companion_menu",(field):"approve"});
             assert!(serde_json::from_value::<SurfaceCommand>(request).is_err());
+        }
+    }
+    #[test]
+    fn companion_selectors_only_read_whitelisted_authority() {
+        for mode in ["Ask", "Secure", "Full Access", "forged"] {
+            let view = View {
+                operating: Some(serde_json::json!({"access":mode,"private_scope":"secret"})),
+                ..Default::default()
+            };
+            let projected = companion_view(view);
+            assert!(projected.operating.is_none());
+            assert_eq!(
+                projected.access_mode.as_deref(),
+                if mode == "forged" { None } else { Some(mode) }
+            );
+        }
+        for kind in ["access_menu", "sentry_menu"] {
+            assert!(
+                serde_json::from_value::<SurfaceCommand>(serde_json::json!({"kind":kind})).is_ok()
+            );
+            for field in ["mode", "signature", "review_id", "action"] {
+                assert!(
+                    serde_json::from_value::<SurfaceCommand>(
+                        serde_json::json!({"kind":kind,(field):"Full Access"})
+                    )
+                    .is_err()
+                );
+            }
         }
     }
     #[test]

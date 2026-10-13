@@ -25,6 +25,7 @@ struct CoreSnapshot {
     observed_at: u64,
     conversation: ConversationView,
     operating: Option<Value>,
+    voice_available: bool,
 }
 pub struct CoreClient {
     url: String,
@@ -174,6 +175,7 @@ impl CoreClient {
             observed_at: value["observed_at_ms"].as_u64().unwrap_or(0),
             conversation,
             operating,
+            voice_available: value["voice_available"].as_bool().unwrap_or(false),
         })
     }
     pub fn review(&self, task_id: &str, operation: ControlOperation) -> Result<ReviewView, String> {
@@ -334,6 +336,7 @@ impl Bridge {
             observed_at: at,
             conversation,
             operating,
+            voice_available,
         } = client
             .snapshot()
             .map_err(|error| format!("Core unavailable; {error}"))?;
@@ -395,6 +398,7 @@ impl Bridge {
         }
         view.capabilities = caps;
         view.operating = operating;
+        view.voice_available = voice_available;
         if !self.hide_private.load(Ordering::Acquire) {
             let unchanged = view.conversation.revision == conversation.revision
                 && view.conversation.persistence == conversation.persistence;

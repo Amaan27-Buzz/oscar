@@ -8,7 +8,7 @@ const preview={preview_id:'exact',before:'Before ',after:'spoken',focused_before
 describe('explicit text tools',()=>{
   it('shows the actual complete focused replacement and sends only that offered destination',()=>{
     const run=vi.fn(async()=>true);render(<TextTools view={{...initialView,context,preview}} available busy={false} mode="Dictate" setMode={()=>{}} draft="" setDraft={()=>{}} run={run} discard={()=>{}}/>);
-    fireEvent.keyDown(screen.getByLabelText('Destination'),{key:'ArrowDown'});fireEvent.click(screen.getByRole('radio',{name:'Captured focused field'}));
+    fireEvent.keyDown(screen.getByLabelText('Destination'),{key:'ArrowDown'});fireEvent.click(screen.getByRole('radio',{name:'Selected app field'}));
     expect(screen.getByText('Complete field after')).toBeTruthy();expect(screen.getByText('Before spoken')).toBeTruthy();
     fireEvent.click(screen.getByRole('button',{name:'Apply reviewed text'}));expect(run).toHaveBeenCalledWith({kind:'apply',preview_id:'exact',destination:'focused'});
   });
@@ -26,8 +26,13 @@ describe('explicit text tools',()=>{
   it('a new preview resets a previously selected destination and active voice offers explicit cancel',()=>{
     const run=vi.fn(async()=>true);const props={available:true,busy:false,mode:'Dictate' as const,setMode:()=>{},draft:'spoken',setDraft:()=>{},run,discard:()=>{}};
     const {rerender}=render(<TextTools {...props} view={{...initialView,context,preview}}/>);
-    fireEvent.keyDown(screen.getByLabelText('Destination'),{key:'ArrowDown'});fireEvent.click(screen.getByRole('radio',{name:'Captured focused field'}));
+    fireEvent.keyDown(screen.getByLabelText('Destination'),{key:'ArrowDown'});fireEvent.click(screen.getByRole('radio',{name:'Selected app field'}));
     rerender(<TextTools {...props} view={{...initialView,voice:'processing',preview:{...preview,preview_id:'new',destinations:['surface']}}}/>);
     expect(screen.getByLabelText('Destination').getAttribute('data-value')).toBe('surface');fireEvent.click(screen.getByRole('button',{name:'Cancel dictation'}));expect(run).toHaveBeenCalledWith({kind:'voice_cancel'});
   });
+});
+
+it('contextual review preserves apply checks without exposing a utility tab or instruction form',()=>{
+ const run=vi.fn(async()=>true);render(<TextTools reviewOnly view={{...initialView,context,preview}} available busy={false} mode="Dictate" setMode={()=>{}} draft="" setDraft={()=>{}} run={run} discard={()=>{}}/>);
+ expect(screen.queryByRole('tablist')).toBeNull();expect(screen.queryByLabelText('Dictation draft')).toBeNull();expect(screen.getByRole('button',{name:'Apply reviewed text'})).toBeTruthy();
 });

@@ -2,7 +2,7 @@ import {invoke} from '@tauri-apps/api/core';
 import {useEffect,useRef,useState} from 'react';
 import {initialView,send,subscribe} from './bridge';
 import type {Command,Send,View} from './bridge';
-export type SurfaceRequest={kind:'ready'|'companion_menu'|'open_workspace'|'open_activity'|'hide_workspace'|'show_companion'|'hide_companion'|'cancel_listening'|'quit'}|{kind:'shortcut_enabled';enabled:boolean}|{kind:'theme';theme:'light'|'dark'};
+export type SurfaceRequest={kind:'ready'|'companion_menu'|'access_menu'|'sentry_menu'|'start_listening'|'open_workspace'|'open_activity'|'hide_workspace'|'show_companion'|'hide_companion'|'cancel_listening'|'quit'}|{kind:'shortcut_enabled';enabled:boolean}|{kind:'theme';theme:'light'|'dark'};
 export const surface=(request:SurfaceRequest)=>invoke<View>('surface_command',{request});
 // Companion has no event-listening permission: Tauri's Any listeners can cross target labels.
 export const companionEvents=async(callback:(view:View)=>void)=>{

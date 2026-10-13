@@ -7,7 +7,13 @@ import sqlite3
 from typing import Any
 
 from .contracts import Epistemic, Task, TaskState, new_id
-from .desktop_actions import form_intent, public_capability
+from .desktop_actions import (
+    OPERATIONS,
+    conversation_form,
+    editing_request,
+    form_intent,
+    public_capability,
+)
 from .desktop_context import ContextSource, DesktopContext, WindowsContext
 from .event_archive import MemoryWriter, SourceEvent
 from .grid import NodeRole, SessionHandle
@@ -508,6 +514,15 @@ class Desktop(Mobile):
         if op == "snapshot" and payload == {}:
             view = super().request(session, data)
             view["conversation"] = self.conversation(session)
+            view["voice_available"] = (
+                self.voice is not None
+                and self.policy.evaluate(
+                    "desktop.voice",
+                    ("desktop:microphone",),
+                    self.grants(session),
+                    {"node": session.node_id, "source": self.source},
+                ).allowed
+            )
             view["operating"] = {
                 "access": "Ask",
                 "secure": "unavailable",
@@ -678,6 +693,49 @@ class Desktop(Mobile):
                     if (payload["context_id"])
                     else None
                 )
+                if mode == "Ask":
+                    if context is not None and editing_request(text):
+                        mode = "Edit"
+                    form = conversation_form(text)
+                    if form:
+                        operation, fields = form
+                        from .contracts import Capability
+
+                        candidates = [
+                            Capability.from_dict(c)
+                            for node in self.grid.nodes()
+                            if node["id"] in self.targets
+                            and node["status"] in {"online", "degraded"}
+                            for c in node["capabilities"]
+                            if operation in OPERATIONS.get(c["input_kind"], ())
+                            and c["risk"] != "critical"
+                        ]
+                        if len(candidates) != 1:
+                            return {
+                                "state": "blocked",
+                                "epistemic": "UNKNOWN",
+                                "message": "That action is not available here. "
+                                "Nothing changed.",
+                            }
+                        cap = candidates[0]
+                        typed = form_intent(
+                            cap,
+                            {
+                                "capability_id": cap.node_id + "::" + cap.id,
+                                "operation": operation,
+                                "fields": fields,
+                            },
+                            self.native_catalogs.get(cap.node_id, {}),
+                        )
+                        from dataclasses import replace
+
+                        return self.propose(
+                            session,
+                            replace(typed, text=text),
+                            "Act",
+                            capability_id=cap.id,
+                            target_id=cap.node_id,
+                        )
                 if mode == "Dictate":
                     return self.preview(session, text, context, mode)
                 if mode == "Act":

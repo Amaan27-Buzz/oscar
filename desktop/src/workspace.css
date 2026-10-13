@@ -238,19 +238,39 @@
 @media(forced-colors:active){.workspace .action-editor,.workspace .work-detail,.workspace .capability-inspector,.workspace .settings-group,.workspace .user-turn,.workspace button,.workspace kbd,.workspace .workspace-composer{box-shadow:none;border:1px solid CanvasText}.workspace .setting-symbol,.workspace .action-document-icon,.workspace .decision-symbol{box-shadow:none}}
 
 /* Conversation owns tool use; history and outcomes remain open reading surfaces. */
-.workspace .user-turn{width:auto;max-width:none;margin:24px 0;padding:0;background:transparent;border:0;border-radius:0;box-shadow:none}
-.workspace .user-turn p{font-size:15px;font-weight:550;line-height:1.65}
+.workspace .user-turn{width:fit-content;max-width:78%;margin:20px 0 28px auto;padding:12px 16px;background:var(--material);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow-control)}
+.workspace .user-turn p{font-size:15px;font-weight:450;line-height:1.65;white-space:pre-wrap}
 .retained-turn p{white-space:pre-wrap;overflow-wrap:anywhere;font-size:15px;line-height:1.75}
 .retained-turn{margin:24px 0 40px}.retained-turn>small{color:var(--muted);font-size:11px}
 .workspace .turn-reference{margin-top:4px;border:0;background:transparent;box-shadow:none;color:var(--muted);padding:0;font-size:11px}
 .conversation-tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:30px 0 4px}.conversation-tools>span{font-size:10px;color:var(--muted);margin-left:auto}.conversation-tools>button{font-size:12px}
 .conversation-operation{padding:24px 0 12px}.conversation-tools [aria-expanded=true]{color:var(--accent-text);border-color:var(--accent)}
 .workspace .activity-history{display:block}.activity-timeline{display:grid;gap:24px}.activity-timeline h2{font-size:14px!important}.activity-timeline h2 small{font-size:11px;color:var(--muted);margin-left:6px}
-.activity-timeline .activity-list button{display:flex;align-items:baseline;justify-content:space-between;gap:24px;border:0;background:transparent;box-shadow:none;border-radius:0;padding:12px 0;width:100%;text-align:left}
-.activity-timeline .activity-list button[aria-current=true]{color:var(--accent-text);box-shadow:none;border:0}.activity-timeline .activity-list small{white-space:nowrap}
+.workspace .activity-timeline .activity-list{display:grid;gap:6px;margin:0}
+.workspace .activity-timeline .activity-list button{display:flex;align-items:baseline;justify-content:space-between;gap:20px;border:1px solid transparent;background:transparent;box-shadow:none;border-radius:6px;padding:12px 16px;width:100%;min-height:48px;margin:0;text-align:left}
+.workspace .activity-timeline .activity-list button[aria-current=true]{background:var(--accent-surface);color:var(--accent-text);border-color:var(--line);box-shadow:none}
+.workspace .activity-timeline .activity-list button:hover:not(:disabled){background:var(--hover);border-color:var(--line)}
+.workspace .activity-timeline .activity-list button>span{min-width:0;flex:1;font-size:13px;line-height:1.5}
+.workspace .activity-timeline .activity-list button>small{flex-shrink:0;white-space:nowrap;margin:0;font-size:11px;line-height:1.5}
+.workspace .activity-timeline section>p{margin:0;font-size:12px}
+.workspace .activity-timeline h2{margin:0 0 10px}
+.workspace .activity-controls{justify-content:flex-start}
+
 .workspace .activity-history .work-detail{margin-top:32px;padding:0;background:transparent;border:0;box-shadow:none;border-radius:0}.activity-history .work-detail:has(.activity-empty){display:none}
 .automation-introduction{max-width:580px;padding:25px 0 46px}.workspace .automation-introduction h2{font-size:24px;line-height:1.4}.automation-introduction p,.automation-availability p{font-size:14px;line-height:1.75}.automation-availability{max-width:620px}.automation-availability h2{font-size:15px!important}.automation-introduction button{margin-top:15px}
 .operating-preferences{margin-bottom:36px}.operating-preferences>p{font-size:13px;color:var(--muted);line-height:1.65}.operating-preferences dl{display:grid;gap:14px;font-size:13px;margin:24px 0}.operating-preferences dl>div{display:flex;justify-content:space-between;gap:24px}.operating-preferences dd{margin:0;text-align:right}.operating-preferences dt{color:var(--muted)}
-@media(max-width:760px){.conversation-tools>span{width:100%;margin-left:0}.activity-timeline .activity-list button{flex-direction:column;gap:5px}.operating-preferences dl>div{flex-direction:column;gap:4px}.operating-preferences dd{text-align:left}}
+@media(max-width:760px){.conversation-tools>span{width:100%;margin-left:0}.workspace .activity-timeline .activity-list button{flex-direction:column;align-items:flex-start;gap:5px}.operating-preferences dl>div{flex-direction:column;gap:4px}.operating-preferences dd{text-align:left}}
 
 .retained-turn>small{display:block}
+
+/* A quiet conversation leaves room for the owner's words. */
+.conversation.is-home .conversation-thread-inner{height:100%;display:flex;flex-direction:column;justify-content:center}
+.conversation-empty{flex:1;min-height:160px;padding:40px 0 90px}.workspace .conversation-empty h2{font-size:26px;font-weight:550;letter-spacing:-.65px}.workspace .conversation-empty p{margin-bottom:0;max-width:380px;line-height:1.65}
+.workspace .composer-microphone{display:grid;place-items:center;padding:8px;min-width:36px;border:0;box-shadow:none;background:transparent;color:var(--muted)}.workspace .workspace-composer>div>span{margin-right:auto}.workspace .composer-cancel{border:0;box-shadow:none;font-size:11px;color:var(--muted)}
+.privacy-preferences{margin:30px 0 36px}.privacy-preferences p{font-size:13px;line-height:1.7;color:var(--muted)}.privacy-preferences label{font-size:13px;display:block;max-width:420px}.advanced-controls{margin:32px 0}.conversation .text-preview{margin:28px 0}.conversation .text-tools:empty{display:none}
+
+.workspace .privacy-preferences>p{margin:0 0 12px}.workspace .privacy-preferences>label{margin:20px 0 8px}
+.workspace .operating-preferences .oscar-disclosure-content>p{margin:8px 0 12px}
+.workspace .settings-group>p+p{margin-top:8px}.workspace .advanced-controls>.oscar-disclosure-content{padding-top:12px}
+
+.workspace .user-turn .turn-reference{min-height:24px;margin-top:6px}

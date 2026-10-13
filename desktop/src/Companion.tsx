@@ -6,7 +6,7 @@ import type {Send} from './bridge';
 import {statuses} from './bridge';
 import './companion.css';
 const companionPort:Send=()=>surface({kind:'ready'});
-const icons={open:'M4 5h16v11H9l-5 4V5Z',shortcut:'M3 6h18v12H3V6Zm3 4h1m3 0h1m3 0h1m3 0h1M6 14h12',voice:'M10 4a3 3 0 0 1 4 0v8a3 3 0 0 1-4 0V4ZM6 11a6 6 0 0 0 12 0m-6 6v4m-3 0h6',menu:'M5 12h.01M12 12h.01M19 12h.01'};
+const icons={open:'M4 5h16v11H9l-5 4V5Z',access:'M12 3 4 6v6c0 4 8 9 8 9s8-5 8-9V6l-8-3Zm-4 9 3 3 5-6',sentry:'M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7Zm10-3a3 3 0 1 0 0 6 3 3 0 0 0 0-6',voice:'M10 4a3 3 0 0 1 4 0v8a3 3 0 0 1-4 0V4ZM6 11a6 6 0 0 0 12 0m-6 6v4m-3 0h6',menu:'M5 12h.01M12 12h.01M19 12h.01'};
 function Icon({name}:{name:keyof typeof icons}) {return <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={icons[name]}/></svg>;}
 export function Companion() {
   const {view,available,error,accept,setError}=useDesktop(companionPort,companionEvents);
@@ -28,8 +28,9 @@ export function Companion() {
     <span className="companion-status" role="status">{state}</span>
     <div className="companion-toolbar" aria-label="Immediate controls"><span className="companion-rest-handle" data-tauri-drag-region/><div className="companion-icon-row">
       <button aria-label="Open Workspace" title="Open OSCAR" onClick={()=>control({kind:'open_workspace'})}><Icon name="open"/></button>
-      <button aria-label={view.shortcut_enabled?'Shortcut on':'Shortcut off'} aria-pressed={!!view.shortcut_enabled} title={view.shortcut_enabled?'Disable shortcut':'Enable shortcut'} onClick={()=>control({kind:'shortcut_enabled',enabled:!view.shortcut_enabled})}><Icon name="shortcut"/></button>
-      <span title={activeVoice?'Cancel voice turn':'Mute is unavailable'}><button aria-label={activeVoice?'Cancel voice turn':'Mute unavailable'} disabled={!activeVoice} onClick={()=>control({kind:'cancel_listening'})}><Icon name="voice"/></button></span>
+      <button aria-label={`Access mode: ${available?view.access_mode??'Unknown':'Unknown'}`} title={`Access mode · ${available?view.access_mode==='Ask'?'Ask · inspect and propose; approve changes':view.access_mode??'Check connection':'Check connection'}`} onClick={()=>control({kind:'access_menu'})}><Icon name="access"/></button>
+      <button aria-label="Sentry" title="Sentry · not available yet; no background listening" onClick={()=>control({kind:'sentry_menu'})}><Icon name="sentry"/></button>
+      <span title={activeVoice?'Cancel voice turn':available&&view.voice_available?'Use voice':'Voice is not available on this device'}><button aria-label={activeVoice?'Cancel voice turn':'Use voice'} disabled={!activeVoice&&(!available||!view.voice_available)} onClick={()=>control({kind:activeVoice?'cancel_listening':'start_listening'})}><Icon name="voice"/></button></span>
       <button aria-label="Companion controls" title="More controls · right-click" onClick={()=>control({kind:'companion_menu'})}><Icon name="menu"/></button>
     </div></div>
   </main>;

@@ -102,3 +102,13 @@ See [native hover evidence](../ui/desktop/companion-review/README.md).
 The approved Companion is preserved. Workspace navigation is Conversation / Automations / Activity / Devices / Preferences. Contextual writing and immediate action review belong in Conversation; Automations does not reinterpret file-write forms as persistent Workers. Activity groups owner attention, running work and outcomes, with identifiers/evidence behind disclosure.
 
 See [the ownership and authority decision](../decisions/ADR-DESKTOP-PERSONAL-INTELLIGENCE.md) for the corrected Ask / Secure / Full Access model and current unavailable activation. History uses Core and the canonical archive with separately provisioned read/retain grants; no browser persistence or invented retention authority. New native evidence is recorded separately from historical captures. Owner visual acceptance and merge remain pending.
+
+## Natural interaction and toolbar polish — 2026-10-14
+
+Conversation has no utility launch buttons, redundant large title, raw epistemic/retention labels or session-store notices. The empty state is centered above a stable composer. Voice is offered only with real Core availability and microphone permission; contextual edits and explicit supported operations use existing private review and native signing. Direct controls remain in advanced Preferences. Memory/privacy settings describe saving, reopening and app context in plain language. Activity rows use balanced insets and compact selection styling; task evidence stays accessible through disclosure.
+
+The approved Orb, motion, tray and 148 × 164 window are preserved. Toolbar icons are Open Workspace, Access, Sentry, voice and More. Global shortcut and Preferences live in More. Native Access inspection marks fresh Core authority; Secure and Full Access cannot activate. Sentry's Passive/Aware/Guard/Away/Sleep are unavailable and do not listen. Native popups are positioned inside the monitor's work area rather than clipped by the WebView or taskbar. A focused Workspace lowers Companion's always-on-top layer; hiding/closing Workspace restores it. Exact signing remains exclusive to Workspace/native owner review.
+
+Current captures and validation: [interaction polish](../ui/desktop/interaction-polish/README.md). Older packets remain historical evidence. Broad multimonitor/DPI, physical microphone and owner visual acceptance remain separate.
+
+Owner messages align to the right of the conversation column; OSCAR replies align left. Both restored and current turns use the same responsive styles.

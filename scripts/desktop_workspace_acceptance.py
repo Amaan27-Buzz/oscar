@@ -17,7 +17,7 @@ from scripts.desktop_baseline import capture_owned, windows
 from scripts.desktop_native_fixture import native_fixture
 
 ROOT = Path(__file__).resolve().parents[1]
-OUTPUT = ROOT / "docs/ui/desktop/product-direction/evidence"
+OUTPUT = ROOT / "docs/ui/desktop/interaction-polish/evidence"
 
 
 def main():
@@ -41,8 +41,27 @@ def main():
 
         def shot(page, name, title):
             if title == "OSCAR Workspace":
+                selected = {
+                    "workspace-home": "Conversation",
+                    "conversation": "Conversation",
+                    "reading": "Conversation",
+                    "devices": "Devices",
+                    "actions": "Automations",
+                    "privacy": "Preferences",
+                    "preferences": "Preferences",
+                    "preferences-narrow": "Preferences",
+                    "activity-working": "Activity",
+                    "approval": "Activity",
+                }.get(name)
+                if selected:
+                    page.get_by_role("navigation", name="Workspace").get_by_role(
+                        "button", name=selected, exact=True
+                    ).click()
+            if title == "OSCAR Workspace":
                 invoke(page, "surface_command", {"kind": "theme", "theme": "light"})
                 page.wait_for_function("document.documentElement.dataset.theme==='light'")
+            if title == "OSCAR Workspace":
+                page.locator(".workspace-content").evaluate("el=>el.scrollTop=0")
             page.wait_for_timeout(350)
             result = capture_owned(info["pid"], handle(title), OUTPUT / f"{name}.png")
             if title == "OSCAR Workspace":
@@ -101,8 +120,17 @@ def main():
         )
         shot(companion, "companion-idle", "OSCAR Companion")
         companion.get_by_role("button", name="Open OSCAR Workspace", exact=True).click()
-        workspace.get_by_role("heading", name="Conversation", exact=True).wait_for()
+        workspace.get_by_role("region", name="Conversation scroll area").wait_for()
         shot(workspace, "workspace-home", "OSCAR Workspace")
+        check(
+            "no redundant conversation heading",
+            workspace.get_by_role("heading", name="Conversation", exact=True).count() == 0,
+        )
+        check(
+            "unavailable voice is absent from composer",
+            workspace.get_by_role("button", name="Use voice", exact=True).count() == 0,
+        )
+
         check(
             "product surface has no development banner",
             workspace.locator(".workspace-reference").count() == 0,
@@ -124,6 +152,23 @@ def main():
         companion.get_by_text("Review needed", exact=True).wait_for(timeout=15000)
         shot(companion, "companion-attention", "OSCAR Companion")
         shot(workspace, "conversation", "OSCAR Workspace")
+        for theme in ("light", "dark"):
+            invoke(workspace, "surface_command", {"kind": "theme", "theme": theme})
+            workspace.get_by_role("navigation", name="Workspace").get_by_role(
+                "button", name="Conversation", exact=True
+            ).click()
+            workspace.locator(".conversation-thread-inner").wait_for()
+            check(
+                theme + ": owner messages align right and replies left",
+                workspace.evaluate(
+                    """()=>{const column=document.querySelector('.conversation-thread-inner');
+                const owner=column.querySelector('.user-turn');
+                const reply=column.querySelector('.assistant-turn');
+                const o=owner.getBoundingClientRect(),r=reply.getBoundingClientRect();
+                return o.left>r.left+40&&Math.abs(o.right-r.right)<2&&o.width<=r.width*.8}"""
+                ),
+            )
+
         companion.get_by_role(
             "button", name="Open Workspace — owner attention required", exact=True
         ).click()
@@ -169,8 +214,10 @@ def main():
         workspace.get_by_role("navigation", name="Workspace").get_by_role(
             "button", name="Conversation", exact=True
         ).click()
-        if not workspace.get_by_role("tab", name="Dictate", exact=True).is_visible():
-            workspace.get_by_role("button", name="Dictate or edit", exact=True).click()
+        workspace.get_by_role("navigation", name="Workspace").get_by_role(
+            "button", name="Preferences", exact=True
+        ).click()
+        workspace.get_by_role("button", name="Advanced controls", exact=True).click()
         workspace.get_by_role("tab", name="Dictate", exact=True).focus()
         workspace.keyboard.press("ArrowRight")
         workspace.wait_for_timeout(200)
@@ -198,6 +245,17 @@ def main():
         companion.get_by_text("Running", exact=True).wait_for(timeout=15000)
         shot(companion, "companion-working", "OSCAR Companion")
         shot(workspace, "activity-working", "OSCAR Workspace")
+        check(
+            "Activity row has balanced inset and no oversized strip",
+            workspace.locator(".activity-list button").first.evaluate(
+                """el=>{const s=getComputedStyle(el),r=el.getBoundingClientRect();
+                const a=el.querySelector('span').getBoundingClientRect();
+                const b=el.querySelector('small').getBoundingClientRect();
+                return a.left-r.left>=12&&r.right-b.right>=12
+                    &&r.height<65&&s.boxShadow==='none'}"""
+            ),
+        )
+
         command("finish")
         workspace.get_by_text("Verified", exact=True).first.wait_for(timeout=15000)
         check(
@@ -214,10 +272,23 @@ def main():
         )
         companion.locator(".companion-orb").hover()
         companion.wait_for_timeout(350)
-        shot(companion, "companion-controls", "OSCAR Companion")
+        dimensions = shot(companion, "companion-controls", "OSCAR Companion")
         check(
-            "persistent mute is unavailable",
-            companion.get_by_role("button", name="Mute unavailable").is_disabled(),
+            "Companion retains 148 by 164 logical size",
+            dimensions["logical_width"] == 148 and dimensions["logical_height"] == 164,
+        )
+        check(
+            "five toolbar controls fit the real window",
+            companion.evaluate(
+                """()=>[...document.querySelectorAll('.companion-icon-row button')].every(el=>{
+                const r=el.getBoundingClientRect();
+                return r.left>=0&&r.right<=innerWidth&&r.bottom<=innerHeight})"""
+            ),
+        )
+
+        check(
+            "voice is unavailable without a permissioned adapter",
+            companion.get_by_role("button", name="Use voice", exact=True).is_disabled(),
         )
         check(
             "Sentry is unavailable",
@@ -230,16 +301,18 @@ def main():
             "Workspace cannot open Companion-native menu",
             not invoke(workspace, "surface_command", {"kind": "companion_menu"})["ok"],
         )
-        companion.get_by_role("button", name="Shortcut on").click()
-        companion.get_by_role("button", name="Shortcut off").wait_for()
+        invoke(companion, "surface_command", {"kind": "shortcut_enabled", "enabled": False})
         check(
             "shortcut disable is native",
             not invoke(workspace, "desktop_command", {"kind": "ready"})["value"][
                 "shortcut_enabled"
             ],
         )
-        companion.get_by_role("button", name="Shortcut off").click()
-        companion.get_by_role("button", name="Shortcut on").wait_for()
+        invoke(companion, "surface_command", {"kind": "shortcut_enabled", "enabled": True})
+        check(
+            "shortcut is only in overflow",
+            companion.get_by_role("button", name="Shortcut on").count() == 0,
+        )
         user = ctypes.WinDLL("user32")
         user.PostMessageW.argtypes = [
             wintypes.HWND,
@@ -247,6 +320,106 @@ def main():
             wintypes.WPARAM,
             wintypes.LPARAM,
         ]
+        user.GetWindowRect.argtypes = [wintypes.HWND, ctypes.POINTER(wintypes.RECT)]
+        user.SetWindowPos.argtypes = [
+            wintypes.HWND,
+            wintypes.HWND,
+            ctypes.c_int,
+            ctypes.c_int,
+            ctypes.c_int,
+            ctypes.c_int,
+            wintypes.UINT,
+        ]
+        user.GetDpiForWindow.argtypes = [wintypes.HWND]
+        work = wintypes.RECT()
+        user.SystemParametersInfoW(48, 0, ctypes.byref(work), 0)
+        scale = user.GetDpiForWindow(handle("OSCAR Companion")) / 96
+        user.SetWindowPos(
+            handle("OSCAR Companion"),
+            None,
+            work.right - round(160 * scale),
+            work.bottom - round(170 * scale),
+            0,
+            0,
+            0x0005,
+        )
+        user.GetWindowLongW.argtypes = [wintypes.HWND, ctypes.c_int]
+        user.SetForegroundWindow.argtypes = [wintypes.HWND]
+        invoke(workspace, "surface_command", {"kind": "open_workspace"})
+        workspace.wait_for_timeout(500)
+        user.GetForegroundWindow.restype = wintypes.HWND
+        check(
+            "Workspace receives real native focus",
+            user.GetForegroundWindow() == handle("OSCAR Workspace"),
+        )
+        check(
+            "focused Workspace is not obscured by always-on-top Companion",
+            not user.GetWindowLongW(handle("OSCAR Companion"), -20) & 8,
+        )
+        check(
+            "Companion reads Ask from Core without authority material",
+            state["access_mode"] == "Ask" and state["operating"] is None,
+        )
+        for kind, name in (
+            ("access_menu", "access-selector"),
+            ("sentry_menu", "sentry-selector"),
+            ("companion_menu", "overflow"),
+        ):
+            check(
+                kind + ": Workspace caller denied",
+                not invoke(workspace, "surface_command", {"kind": kind})["ok"],
+            )
+            menus = []
+            for attempt in range(3):
+                user.SetForegroundWindow(handle("OSCAR Companion"))
+                companion.wait_for_timeout(250)
+                companion.evaluate(
+                    "kind=>{void window.__TAURI_INTERNALS__.invoke("
+                    "'surface_command',{request:{kind}})}",
+                    kind,
+                )
+                companion.wait_for_timeout(350)
+                deadline = time.monotonic() + 2
+                while time.monotonic() < deadline:
+                    menus = [h for h, c, _ in windows(info["pid"]) if c == "#32768"]
+                    if menus:
+                        break
+                    time.sleep(0.1)
+                if menus:
+                    break
+            check(kind + ": real native popup exists", bool(menus))
+            if menus:
+                rect = wintypes.RECT()
+                assert user.GetWindowRect(menus[0], ctypes.byref(rect)), (
+                    "Popup closed before inspection"
+                )
+                work = wintypes.RECT()
+                user.SystemParametersInfoW(48, 0, ctypes.byref(work), 0)
+                print(
+                    "POPUP",
+                    kind,
+                    tuple(getattr(rect, k) for k in ("left", "top", "right", "bottom")),
+                    "WORK",
+                    tuple(getattr(work, k) for k in ("left", "top", "right", "bottom")),
+                    flush=True,
+                )
+                check(
+                    kind + ": popup fits work area near taskbar",
+                    rect.right > rect.left
+                    and rect.bottom > rect.top
+                    and rect.left >= work.left
+                    and rect.top >= work.top
+                    and rect.right <= work.right
+                    and rect.bottom <= work.bottom,
+                )
+                capture_owned(info["pid"], menus[0], OUTPUT / (name + ".png"))
+            user.keybd_event(0x1B, 0, 0, 0)
+            user.keybd_event(0x1B, 0, 2, 0)
+            workspace.wait_for_timeout(250)
+            check(
+                kind + ": Escape dismisses native popup",
+                not any(c == "#32768" for _, c, _ in windows(info["pid"])),
+            )
         reserved = user.RegisterHotKey(None, 24131, 0x4003, 0x5A)
         assert reserved, "Disposable collision reservation failed"
         try:
@@ -265,6 +438,10 @@ def main():
         hwnd = handle("OSCAR Workspace")
         user.PostMessageW(hwnd, 0x0010, 0, 0)
         workspace.wait_for_timeout(600)
+        check(
+            "hidden Workspace restores Companion desktop presence",
+            bool(user.GetWindowLongW(handle("OSCAR Companion"), -20) & 8),
+        )
         check(
             "native close hides only Workspace",
             not any(t == "OSCAR Workspace" for _, _, t in windows(info["pid"]))
@@ -296,82 +473,84 @@ def main():
             "Companion returns without replacing tasks",
             any(t == "OSCAR Companion" for _, _, t in windows(info["pid"])),
         )
+        workspace.get_by_role("navigation", name="Workspace").get_by_role(
+            "button", name="Conversation", exact=True
+        ).click()
         check(
             "session conversation preserves the first turn",
             "2 + 3" in workspace.locator(".conversation-thread").inner_text(),
         )
-        # Capture source is native configuration and survives tool remounting.
         workspace.get_by_role("navigation", name="Workspace").get_by_role(
-            "button", name="Conversation", exact=True
+            "button", name="Preferences", exact=True
         ).click()
-        if not workspace.get_by_role("tab", name="Dictate", exact=True).is_visible():
-            workspace.get_by_role("button", name="Dictate or edit", exact=True).click()
-        if (
-            workspace.locator(".context-details .oscar-disclosure-trigger").get_attribute(
-                "aria-expanded"
-            )
-            != "true"
-        ):
-            workspace.locator(".context-details .oscar-disclosure-trigger").click()
-        workspace.get_by_label("Capture on invocation", exact=True).click()
+        workspace.get_by_label("Context from other apps", exact=True).click()
         workspace.get_by_role("radio", name="Selected text", exact=True).click()
         workspace.get_by_role("navigation", name="Workspace").get_by_role(
             "button", name="Conversation", exact=True
         ).click()
+        check(
+            "conversation has no tool or memory implementation UI",
+            all(
+                workspace.get_by_text(label, exact=False).count() == 0
+                for label in (
+                    "Canonical history",
+                    "Private session",
+                    "Saved reply",
+                    "Dictate or edit",
+                    "Prepare an action",
+                )
+            ),
+        )
         workspace.get_by_role("navigation", name="Workspace").get_by_role(
-            "button", name="Conversation", exact=True
+            "button", name="Preferences", exact=True
         ).click()
-        if not workspace.get_by_role("tab", name="Dictate", exact=True).is_visible():
-            workspace.get_by_role("button", name="Dictate or edit", exact=True).click()
-        if (
-            workspace.locator(".context-details .oscar-disclosure-trigger").get_attribute(
-                "aria-expanded"
-            )
-            != "true"
-        ):
-            workspace.locator(".context-details .oscar-disclosure-trigger").click()
         check(
             "capture preference survives navigation",
-            workspace.get_by_label("Capture on invocation", exact=True).get_attribute("data-value")
+            workspace.get_by_label("Context from other apps", exact=True).get_attribute(
+                "data-value"
+            )
             == "selection",
         )
-        workspace.get_by_label("Capture on invocation", exact=True).click()
-        workspace.get_by_role("radio", name="No capture", exact=True).click()
-        shot(workspace, "text-tools", "OSCAR Workspace")
+        workspace.get_by_label("Context from other apps", exact=True).click()
+        workspace.get_by_role("radio", name="Don’t include app context", exact=True).click()
+        shot(workspace, "privacy", "OSCAR Workspace")
         workspace.get_by_role("navigation", name="Workspace").get_by_role(
             "button", name="Devices", exact=True
         ).click()
+        check(
+            "Devices hides provider vocabulary behind details",
+            workspace.get_by_role("button", name="Find information", exact=True).is_visible()
+            and workspace.get_by_text("Provider-native", exact=False).count() == 0,
+        )
         shot(workspace, "devices", "OSCAR Workspace")
+
         workspace.get_by_role("navigation", name="Workspace").get_by_role(
             "button", name="Automations", exact=True
         ).click()
         check(
             "Automations does not fabricate scheduled Workers",
             workspace.get_by_text(
-                "Scheduled routines, event triggers, conditional watches, persistent named Workers "
-                "and stateful Protocol management are not connected to this Workspace yet."
+                "Ongoing routines and watches aren’t available yet.", exact=False
             ).is_visible(),
         )
         shot(workspace, "actions", "OSCAR Workspace")
         workspace.get_by_role("navigation", name="Workspace").get_by_role(
             "button", name="Preferences", exact=True
         ).click()
+        operating = invoke(workspace, "desktop_command", {"kind": "ready"})["value"]["operating"]
         check(
-            "Core reports Ask, Trigger-only and Manual separately",
-            all(
-                workspace.get_by_text(value, exact=True).is_visible()
-                for value in ("Ask", "Trigger-only", "Manual")
-            ),
+            "Core keeps independent dimensions",
+            operating["access"] == "Ask"
+            and operating["awareness"] == "Trigger-only"
+            and operating["worker_autonomy"] == "Manual",
         )
-        workspace.get_by_role("button", name="Access modes and availability").click()
+        workspace.get_by_role("button", name="Access modes", exact=True).click()
         check(
-            "Full Access is truthful about unavailable delegation",
-            workspace.get_by_text("Full Access", exact=True).is_visible()
-            and workspace.get_by_text(
-                "Activation and immediate revocation are unavailable; no delegation is active.",
-                exact=False,
-            ).count()
-            > 0,
+            "Full Access remains unrestricted and unavailable",
+            workspace.get_by_text(
+                "means unrestricted owner-delegated autonomy", exact=False
+            ).is_visible()
+            and workspace.get_by_text("Not available yet.", exact=False).count() >= 2,
         )
         shot(workspace, "preferences", "OSCAR Workspace")
         invoke(workspace, "surface_command", {"kind": "hide_workspace"})
@@ -397,7 +576,13 @@ def main():
         shot(workspace, "reading", "OSCAR Workspace")
         check(
             "reading preserves reported truth",
-            "REPORTED" in workspace.locator(".conversation-thread").inner_text(),
+            any(
+                t["status"] == "REPORTED"
+                for t in invoke(workspace, "desktop_command", {"kind": "ready"})["value"][
+                    "conversation"
+                ]["turns"]
+            )
+            and "REPORTED" not in workspace.locator(".conversation-thread").inner_text(),
         )
         command("disconnect")
         companion.get_by_text("Disconnected", exact=True).wait_for(timeout=15000)

@@ -48,3 +48,5 @@ These are **actual bundled Tauri/WebView2 HWND captures** against an authenticat
 The Event Archive integration surfaced a real HTTP threading defect; per-thread WAL connections plus request cleanup fix it without sharing transactions across request threads. Verbatim retained turns use the established MemoryWriter/FTS path, not a duplicate memory store. Capture context and execution payloads stay transient; restored history cannot replay an old action.
 
 The access decision explicitly preserves present blockers while specifying an owner-authorized Full Access path with no OSCAR per-action prompts. No standing authority is active. Physical voice/device, Windows Hello attestation, owner visual acceptance and installer acceptance are not claimed. Stop for owner review before merge.
+
+The subsequent owner-requested Conversation, toolbar and consistency corrections are recorded in [interaction polish](../interaction-polish/README.md). This packet remains the prior implementation/evidence checkpoint.

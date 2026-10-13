@@ -22,6 +22,7 @@ pub enum WindowMode {
     Interaction,
     Approval,
     Activity,
+    Preferences,
     Reading,
     Tools,
     Actions,
@@ -360,6 +361,8 @@ pub struct View {
     pub conversation: ConversationView,
     #[serde(default)]
     pub operating: Option<serde_json::Value>,
+    pub access_mode: Option<String>,
+    pub voice_available: bool,
     pub theme: ThemeChoice,
     pub expression: ExpressionReadback,
     pub link: String,

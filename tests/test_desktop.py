@@ -408,6 +408,41 @@ class DesktopTests(unittest.TestCase):
         self.assertEqual(self.h.store.transient, {})
         self.assertEqual(self.h.store.task(task["task_id"]).state, TaskState.PLANNED)
 
+    def test_conversation_file_write_uses_existing_plan_signature_and_verification(self):
+        proposal = self.ask("Create notes/review.txt with text Owner review")
+        self.assertEqual(proposal["mode"], "Act")
+        self.assertEqual(proposal["state"], "planned")
+        self.assertFalse((self.root / "workspace/notes/review.txt").exists())
+        result = self.confirm(proposal["task_id"])
+        self.assertEqual(result["state"], "verified")
+        self.assertEqual((self.root / "workspace/notes/review.txt").read_text(), "Owner review")
+
+    def test_conversation_action_rechecks_policy_and_path_safety(self):
+        self.core.policy.save(
+            PolicyRule(
+                "deny-conversation-file",
+                "files.write",
+                PolicyEffect.DENY,
+                "owner",
+                self.now[0],
+                self.now[0],
+                {},
+            ),
+            owner_authorized=True,
+        )
+        self.assertEqual(self.ask("Create notes/no.txt with text denied")["state"], "blocked")
+        with self.assertRaises(ValueError):
+            self.ask("Create ../outside.txt with text forbidden")
+        self.assertEqual(self.h.store.all("action"), [])
+
+    def test_conversation_edit_uses_attached_context_and_existing_private_preview_path(self):
+        context = self.attach(text="Selected text")
+        task = self.ask("Shorten this", context=context)
+        self.assertEqual(task["mode"], "Edit")
+        self.assertEqual(self.core.previews[task["task_id"]]["context"].id, context)
+        self.assertEqual(self.h.store.transient[task["task_id"]]["parameters"]["mode"], "private")
+        self.assertEqual(self.ask("Read file missing.txt")["state"], "blocked")
+
     def test_orb_mapping(self) -> None:
         for state, orb in {
             None: "idle",
@@ -702,3 +737,18 @@ class DesktopTests(unittest.TestCase):
         self.assertEqual(view["after"], "synthetic dictation")
         self.assertEqual(view["epistemic"], "REPORTED")
         self.assertEqual(self.h.store.all("action"), [])
+
+
+class ConversationFormTests(unittest.TestCase):
+    def test_explicit_arguments_and_content_are_preserved(self):
+        from oscar.desktop_actions import conversation_form, editing_request
+
+        self.assertEqual(
+            conversation_form("Could you write notes/a.txt with text hello  "),
+            ("write_file", {"path": "notes/a.txt", "text": "hello  "}),
+        )
+        self.assertEqual(conversation_form("Please show the git status"), ("git_status", {}))
+        for ambiguous in ("write something useful", "delete all files", "maybe create a file"):
+            self.assertIsNone(conversation_form(ambiguous))
+        self.assertTrue(editing_request("Could you make the selected text clearer?"))
+        self.assertFalse(editing_request("What did we edit yesterday?"))

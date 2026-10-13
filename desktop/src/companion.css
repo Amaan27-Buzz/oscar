@@ -12,7 +12,7 @@
 .companion.is-hovered .companion-toolbar,.companion:has(:focus-visible) .companion-toolbar{width:128px;height:36px;border-radius:8px;background:#24282ef5;box-shadow:0 3px 8px #0003}
 .companion.is-hovered .companion-icon-row,.companion:has(:focus-visible) .companion-icon-row{opacity:1;transform:translateY(0) scale(1);pointer-events:auto;transition-delay:45ms}
 .companion.is-hovered .companion-rest-handle,.companion:has(:focus-visible) .companion-rest-handle{opacity:0;pointer-events:none}
-[data-surface=companion] .companion-icon-row button{display:grid;place-items:center;width:28px;height:28px;min-height:28px;padding:0;border:0;border-radius:5px;color:#e3e9ee;background:transparent;cursor:pointer;transition:background 120ms,color 120ms,transform 160ms ease}
+[data-surface=companion] .companion-icon-row button{display:grid;place-items:center;width:22px;height:28px;min-height:28px;padding:0;border:0;border-radius:5px;color:#e3e9ee;background:transparent;cursor:pointer;transition:background 120ms,color 120ms,transform 160ms ease}
 [data-surface=companion] .companion-icon-row button:hover:not(:disabled){background:#ffffff14;color:#ffffff;transform:translateY(-1px)}
 [data-surface=companion] .companion-icon-row button:active:not(:disabled){transform:translateY(0)}
 [data-surface=companion] .companion-icon-row button[aria-pressed=true]{color:#9fc7e2}
