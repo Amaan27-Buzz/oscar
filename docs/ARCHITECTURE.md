@@ -1,5 +1,12 @@
 # System Architecture
 
+## Group 2.5 reconciliation — 2026-10-14
+
+Core owns one continuous multimodal personal intelligence and delegates subordinate responsibilities to Workers/specialists. The approved tiny Companion is expressive presence; the separate Workspace centers Conversation with contextual operations, Automations, operational Activity, Devices and Preferences. [The interaction and authority decision](decisions/ADR-DESKTOP-PERSONAL-INTELLIGENCE.md) records implementation ownership, canonical history composition and the corrected access model.
+
+Ask / Secure / Full Access, awareness, Worker autonomy and capture/retention are independent. Genuine Full Access requires signed standing owner delegation and immediate revocation; it is currently unavailable because exact-action approval/critical blockers remain. No alternate Core, memory store or agent framework is introduced.
+
+
 > **Active slice sequence:** [canonical 00–20](SLICE-NUMBERING.md).
 > Next: **Slice 11 Character/Expression System** (presentation contract, no
 > new Core authority), then Slice 12 Desktop UX, Slice 13 Mobile UX;

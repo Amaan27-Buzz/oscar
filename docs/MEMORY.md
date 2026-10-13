@@ -1,5 +1,14 @@
 # OSCAR Memory Fabric
 
+## Group 2.5 owner correction — 2026-10-14
+
+Conversation uses the existing canonical Event Archive, never browser storage or a second chat store. Explicit relationship history-read and retention grants are independent; no private captured application context is retained by this composition. Authorized owner/OSCAR events preserve task IDs and original epistemic status, survive restart and page chronologically. A restored event is historical evidence, not fresh verification or reusable execution authority.
+
+Desktop active model context automatically compacts to a bounded recent evidence window. Older retained events remain recoverable; no generated summaries or new semantic formation pipeline are claimed. Without configured Memory Fabric/read/retain permissions, history is session-only and labelled accordingly. Revocation/forget invalidates history projection; private runtime payloads still expire on restart.
+
+See [the interaction and authority decision](decisions/ADR-DESKTOP-PERSONAL-INTELLIGENCE.md) for ownership, implemented boundaries and required integrations. Earlier dated checkpoints remain historical.
+
+
 OSCAR should feel like one continuous relationship, not a collection of disconnected chat threads. The user-facing primitive is one persistent interaction point across text, voice, OSCAR Mobile, desktop, communications, Workers and physical surfaces.
 
 Internal segmentation exists only for engineering quality, retrieval, retention and scaling. The user should not have to remember which old chat contains a fact.

@@ -1,0 +1,3 @@
+export function Automations({discuss}:{discuss:()=>void}) {
+  return <section className="automations-page" aria-label="Automations"><div className="section-heading"><h1>Automations</h1><p className="leaf-secondary">The things you want OSCAR to keep an eye on.</p></div><div className="automation-introduction"><h2>Start with what you need.</h2><p>Tell OSCAR what to handle, when it matters, and how you’d like to be involved.</p><button onClick={discuss}>Talk it through</button></div><section className="automation-availability" aria-label="Automation availability"><p>Ongoing routines and watches aren’t available yet. You can still ask OSCAR to help with a task now and follow its progress in Activity.</p></section></section>;
+}

@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-surface-command"
+description = "Enables the surface_command command without any pre-configured scope."
+commands.allow = ["surface_command"]
+
+[[permission]]
+identifier = "deny-surface-command"
+description = "Denies the surface_command command without any pre-configured scope."
+commands.deny = ["surface_command"]

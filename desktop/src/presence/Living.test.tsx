@@ -21,8 +21,8 @@ describe('living Desktop presence',()=>{
     h.update({window:'activity',current,tasks:[current]});
     expect(screen.getByRole('button',{name:/OSCAR: Here/})).toBeTruthy();
     h.port.mockRejectedValueOnce(new Error('Unknown IPC outcome'));
-    fireEvent.click(screen.getByRole('button',{name:'Refresh Core'}));await screen.findByText(/The request outcome is unknown/);
-    fireEvent.click(screen.getByRole('button',{name:/VerifiedRead back task/}));
+    fireEvent.click(screen.getByRole('button',{name:'Refresh work'}));await screen.findByText(/The request outcome is unknown/);
+    fireEvent.click(screen.getByRole('button',{name:/Read back task.*Verified/}));
     await waitFor(()=>expect(screen.queryByText(/The request outcome is unknown/)).toBeNull());
   });
   it('an uncertain Apply IPC outcome keeps the text tools from offering a blind retry',async()=>{

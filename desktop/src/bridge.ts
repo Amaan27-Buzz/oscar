@@ -1,6 +1,6 @@
 import { invoke } from '@tauri-apps/api/core';
 import { listen } from '@tauri-apps/api/event';
-export type WindowMode='compact'|'interaction'|'approval'|'activity'|'reading'|'tools'|'actions';
+export type WindowMode='compact'|'interaction'|'approval'|'activity'|'preferences'|'reading'|'tools'|'actions';
 export type ContextChoice='none'|'selection'|'focused'|'foreground';
 export type Mode='Ask'|'Dictate'|'Edit'|'Act';
 export interface Task { task_id:string; state:string; description:string; target:string; blocker:string|null;
@@ -20,9 +20,13 @@ export interface Review {review_id:string;task_id?:string;operation:string;descr
   consequence:string;policy_reason:string;evidence_state:string;review:string;expires_at_ms:number}
 export interface ExpressionReadback {epoch:string;generation:number;observed_at_ms:number;voice_observed_at_ms:number;tasks_observed_at_ms:number;current_observed_at_ms:number}
 export interface RequestFeedback {kind:'blocked'|'denied'|'unknown'|'rejected';message:string;observed_at_ms:number}
-export interface View {expression:ExpressionReadback|null;link:string;orb:string;window:WindowMode;tasks:Task[];capabilities:Capability[];
+export interface VoiceSupport {persistent_mute:'unavailable';sentry:'unavailable';acoustic_awareness:'unavailable';wake_word:'unavailable'}
+export interface ConversationTurn {id:string;task_id:string;role:'owner'|'oscar';text:string;status:string;occurred_at:number;retained:boolean}
+export interface ConversationHistory {turns:ConversationTurn[];before:number|null;persistence:string;revision:number;retention?:boolean}
+export interface Operating {access:string;secure:string;full_access:string;awareness:string;sentry:string;worker_autonomy:string;automations:string}
+export interface View {access_mode?:string|null;voice_available?:boolean;conversation?:ConversationHistory;operating?:Operating|null;theme?:'light'|'dark';expression:ExpressionReadback|null;link:string;orb:string;window:WindowMode;tasks:Task[];capabilities:Capability[];
   context:Context|null;preview:Preview|null;review:Review|null;current:Task|null;message:string|null;
-  voice:string;shortcut:string;observed_at_ms:number;reference:boolean;window_revision?:number;feedback?:RequestFeedback|null}
+  voice:string;voice_support?:VoiceSupport;shortcut:string;shortcut_enabled?:boolean;capture_choice?:ContextChoice;observed_at_ms:number;reference:boolean;window_revision?:number;feedback?:RequestFeedback|null}
 export const initialView:View={expression:null,link:'unconfigured',orb:'unavailable',window:'compact',tasks:[],capabilities:[],
   context:null,preview:null,review:null,current:null,message:null,voice:'idle',shortcut:'Not registered',observed_at_ms:0,reference:false,window_revision:0,feedback:null};
 export type ActForm=
@@ -33,6 +37,7 @@ export type ActForm=
   |{operation:'launch_app';app_id:string}
   |{operation:'list_files'|'git_status'|'git_diff'|'git_log'|'git_branches'|'ps_environment'|'list_apps'|'worker_tools'};
 export type Command=
+  |{kind:'history';before:number}
   |{kind:'ready'|'refresh'|'discard'|'voice_stop'|'voice_cancel'}|{kind:'window';mode:WindowMode}
   |{kind:'capture_choice'|'capture';source:ContextChoice}
   |{kind:'interact';mode:Exclude<Mode,'Act'>;text:string;context_id:string}
@@ -50,3 +55,5 @@ export const statuses:Record<string,string>={planned:'Approval required',executi
   failed:'Failed',blocked:'Blocked',cancelled:'Cancelled',unknown:'Unknown outcome'};
 export function stateLabel(view:View){return view.link!=='online'?'Core unavailable':view.current?
   statuses[view.current.state]??'Unknown':view.orb==='idle'?'I’m here.':view.orb;}
+
+export const epistemicLabel=(state:string|null|undefined)=>({VERIFIED:'Verified',REPORTED:'Not independently checked',RECALLED:'From earlier conversation',INFERRED:'An interpretation',UNKNOWN:'Not established'}[state??'UNKNOWN']??'Not established');

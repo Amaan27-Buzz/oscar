@@ -1,5 +1,14 @@
 # Voice + Sentry
 
+## Group 2.5 owner correction — 2026-10-14
+
+Access (Ask / Secure / Full Access), awareness (Manual / Trigger-only / Sentry with Passive / Aware / Guard / Away / Sleep) and Worker autonomy (Manual / Supervised / Autonomous) are independent. Capture/retention is another permission domain. Microphone mute, wake detection, active conversational STT, acoustic awareness, background transcription and stored recordings remain distinct.
+
+Desktop currently reports Trigger-only and explicit voice-turn state; persistent mute, wake/acoustic awareness and Sentry remain unavailable. Full Access action authority is not ambient capture/retention consent. Existing sensitive/critical per-action voice requirements describe current Ask/Secure paths; future signed Full Access delegation replaces OSCAR per-action consent, never external mandates or local safety.
+
+See [the interaction and authority decision](decisions/ADR-DESKTOP-PERSONAL-INTELLIGENCE.md) for ownership, implemented boundaries and required integrations. Earlier dated checkpoints remain historical.
+
+
 ## Voice is a primary interface
 
 OSCAR supports voice across OSCAR Mobile, desktop, desk hardware and other connected surfaces. Text remains equally valid and shares the same task/context state.

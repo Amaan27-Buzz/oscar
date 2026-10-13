@@ -7,7 +7,9 @@ import re
 import sqlite3
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
+from threading import RLock, local
 from time import time
+from typing import Any
 from urllib.parse import urlsplit
 
 from .contracts import Epistemic, new_id
@@ -58,10 +60,11 @@ class MemoryRecord:
 class EventArchive:
     def __init__(self, path: Path):
         path.parent.mkdir(parents=True, exist_ok=True)
-        self.db = sqlite3.connect(path, timeout=10)
-        self.db.execute("PRAGMA journal_mode=WAL")
-        self.db.execute("PRAGMA synchronous=FULL")
-        self.db.execute("PRAGMA foreign_keys=ON")
+        self.path = path
+        self._closed = False
+        self._thread = local()
+        self._connections: set[sqlite3.Connection] = set()
+        self._connection_lock = RLock()
         self.db.executescript("""
             CREATE TABLE IF NOT EXISTS archive_events (
                 id TEXT PRIMARY KEY, relationship TEXT NOT NULL, payload TEXT NOT NULL,
@@ -120,8 +123,37 @@ class EventArchive:
             return "OUTDATED"
         return str(row[1])
 
+    @property
+    def db(self) -> sqlite3.Connection:
+        if self._closed:
+            raise sqlite3.ProgrammingError("archive is closed")
+        if not hasattr(self._thread, "connection"):
+            # Each request thread owns its transaction; cross-thread close is shutdown-only.
+            connection = sqlite3.connect(self.path, timeout=10, check_same_thread=False)
+            connection.execute("PRAGMA journal_mode=WAL")
+            connection.execute("PRAGMA synchronous=FULL")
+            connection.execute("PRAGMA foreign_keys=ON")
+            self._thread.connection = connection
+            with self._connection_lock:
+                self._connections.add(connection)
+        current_connection: sqlite3.Connection = self._thread.connection
+        return current_connection
+
+    def close_thread(self) -> None:
+        if hasattr(self._thread, "connection"):
+            with self._connection_lock:
+                self._connections.discard(self._thread.connection)
+                self._thread.connection.close()
+                del self._thread.connection
+
     def close(self) -> None:
-        self.db.close()
+        self._closed = True
+        with self._connection_lock:
+            for connection in self._connections:
+                connection.close()
+            self._connections.clear()
+        if hasattr(self._thread, "connection"):
+            del self._thread.connection
 
     @staticmethod
     def _safe(content: str) -> None:
@@ -190,6 +222,24 @@ class EventArchive:
         return SourceEvent(
             **{**data, "entity_ids": tuple(data["entity_ids"]), "status": Epistemic(data["status"])}
         )
+
+    def conversation(
+        self, relationship: str, *, before: int = 0, limit: int = 40
+    ) -> dict[str, Any]:
+        """Page canonical conversation events; cursors never cross relationship scope."""
+        if not relationship or type(before) is not int or before < 0 or not 1 <= limit <= 40:
+            raise ValueError("bounded conversation page required")
+        rows = self.db.execute(
+            "SELECT rowid,id FROM archive_events WHERE relationship=? AND forgotten=0 "
+            "AND json_extract(payload,'$.kind') IN ('conversation_owner','conversation_oscar') "
+            "AND (json_extract(payload,'$.expires_at') IS NULL "
+            "OR json_extract(payload,'$.expires_at')>?) "
+            "AND (?=0 OR rowid<?) ORDER BY rowid DESC LIMIT ?",
+            (relationship, time(), before, before, limit + 1),
+        ).fetchall()
+        selected = rows[:limit]
+        events = [self.event(identifier) for _, identifier in reversed(selected)]
+        return {"events": events, "before": selected[-1][0] if len(rows) > limit else None}
 
     def memories(
         self,

@@ -1,5 +1,14 @@
 # Personal Policy and Preferences
 
+## Group 2.5 owner correction — 2026-10-14
+
+Ask / Secure / Full Access are action-authority modes, separate from Personal Policy, awareness, Worker autonomy and retention. Secure is broad ordinary autonomy with protected/consequential consent. Full Access means explicitly owner-activated unrestricted delegation over available capabilities with no OSCAR per-action consent. Activation must explicitly resolve existing ASK constraints, preserve external/platform constraints and owner revocation, and record what authority is active. A retained owner restriction narrows scope; do not call that unrestricted Full Access.
+
+The current `PersonalPolicy.evaluate` confirmation enforcement is still active. No standing delegation is implemented or granted by this document. The decision below defines its separate signature, epoch, revocation and execution recheck requirements. Models, inferred memories and Workers never create authority.
+
+See [the interaction and authority decision](decisions/ADR-DESKTOP-PERSONAL-INTELLIGENCE.md) for ownership, implemented boundaries and required integrations. Earlier dated checkpoints remain historical.
+
+
 OSCAR's preferences must be more capable than a settings page full of generic toggles. The user should be able to describe how OSCAR should **behave** in natural language and have those rules become durable, inspectable policy.
 
 ## Product rule

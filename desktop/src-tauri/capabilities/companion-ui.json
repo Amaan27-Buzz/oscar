@@ -1,0 +1,12 @@
+{
+  "identifier": "companion-ui",
+  "description": "Operational projection and bounded surface controls; no task or signing IPC",
+  "windows": [
+    "companion"
+  ],
+  "local": true,
+  "permissions": [
+    "allow-surface-command",
+    "core:window:allow-start-dragging"
+  ]
+}

@@ -76,7 +76,10 @@ def main() -> int:
             check(
                 "cleared action content is not retained in the form",
                 page.get_by_label("Exact content", exact=True).count() == 0
-                and page.get_by_label("Available capability", exact=True).input_value() == "",
+                and page.get_by_label("Available capability", exact=True).get_attribute(
+                    "data-value"
+                )
+                == "",
             )
             command("block")
             page.get_by_role("button", name="Refresh capabilities", exact=True).click()

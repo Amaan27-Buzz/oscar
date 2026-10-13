@@ -1,5 +1,14 @@
 # Workers
 
+## Group 2.5 owner correction — 2026-10-14
+
+OSCAR is the sole personal intelligence and top-level coordinator. Named Workers/specialists carry subordinate responsibilities, never independent conversation identities. Automations is the management view for one-time delegated jobs, schedules, event triggers, watches, persistent Workers, supervised/autonomous Workers and continuing Protocols; conversation is the primary creation/instruction interface. A manually prepared file write remains immediate tool use.
+
+Worker autonomy (Manual / Supervised / Autonomous) is independent of Ask / Secure / Full Access and awareness. Every Worker inherits and rechecks Core authority. Full Access will use owner delegation rather than per-action approvals; Workers cannot activate it themselves. Current runtime/task/cancellation/recovery foundations do not implement the complete persistent named-Worker scheduler or management lifecycle. Unsupported controls are absent.
+
+See [the interaction and authority decision](decisions/ADR-DESKTOP-PERSONAL-INTELLIGENCE.md) for ownership, implemented boundaries and required integrations. Earlier dated checkpoints remain historical.
+
+
 Workers are delegated sub-agents OSCAR creates and manages for specific responsibilities. They provide persistent-teammate capability similar to systems such as Grok Bot, but OSCAR uses the user's actual device/capability mesh rather than assuming every Worker owns a separate cloud computer.
 
 ## Product rule

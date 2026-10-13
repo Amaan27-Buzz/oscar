@@ -54,6 +54,7 @@ def main() -> None:
                     [
                         str(ROOT / "desktop/src-tauri/target/debug/oscar-desktop.exe"),
                         "--bootstrap-stdin",
+                        "--isolated-preferences",
                     ],
                     stdin=subprocess.PIPE,
                     stdout=subprocess.PIPE,

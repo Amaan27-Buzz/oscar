@@ -1,0 +1,10 @@
+{
+  "capture": "actual Tauri/WebView2 HWND PrintWindow",
+  "core": "authenticated disposable reference",
+  "model": "SCRIPTED / REPORTED",
+  "checks": [
+    "light: native theme, exact shared Orb, visible anchored composer",
+    "dark: native theme, exact shared Orb, visible anchored composer"
+  ],
+  "owner_visual_acceptance": "PENDING"
+}

@@ -1,0 +1,14 @@
+{
+  "frontend_tests": 62,
+  "rust_tests": 14,
+  "core_tests": 559,
+  "core_skipped": 6,
+  "expression_lab_tests": 36,
+  "native_checks": 53,
+  "clippy": "PASS - warnings denied",
+  "python_lint_format_types": "PASS",
+  "repository_links_secret_scan": "PASS",
+  "owner_visual_acceptance": "PENDING",
+  "physical_voice_devices": "NOT_RUN",
+  "merge": "NOT_AUTHORIZED"
+}

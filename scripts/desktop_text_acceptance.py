@@ -98,7 +98,7 @@ def main() -> int:
                 not page.get_by_role("button", name="Apply reviewed text", exact=True).is_enabled(),
             )
             shot("expired-preview")
-            page.locator(".context-details summary").click()
+            page.locator(".context-details .oscar-disclosure-trigger").click()
             page.get_by_role(
                 "button", name="Discard private drafts and context", exact=True
             ).click()

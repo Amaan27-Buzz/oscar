@@ -22,14 +22,16 @@ pub enum WindowMode {
     Interaction,
     Approval,
     Activity,
+    Preferences,
     Reading,
     Tools,
     Actions,
 }
 
-#[derive(Clone, Copy, Deserialize, Serialize)]
+#[derive(Clone, Copy, Deserialize, Serialize, Default, PartialEq)]
 #[serde(rename_all = "lowercase")]
 pub enum ContextChoice {
+    #[default]
     None,
     Selection,
     Focused,
@@ -97,6 +99,9 @@ impl ActForm {
 pub enum Command {
     Ready,
     Refresh,
+    History {
+        before: u64,
+    },
     Window {
         mode: WindowMode,
     },
@@ -330,7 +335,35 @@ pub struct RequestFeedback {
     pub observed_at_ms: u64,
 }
 #[derive(Clone, Serialize, Default, PartialEq)]
+#[serde(rename_all = "snake_case")]
+pub enum AwarenessAvailability {
+    #[default]
+    Unavailable,
+}
+// Future awareness adapters must supply a real contract before extending this projection.
+#[derive(Clone, Serialize, Default, PartialEq)]
+pub struct VoiceSupport {
+    pub persistent_mute: AwarenessAvailability,
+    pub sentry: AwarenessAvailability,
+    pub acoustic_awareness: AwarenessAvailability,
+    pub wake_word: AwarenessAvailability,
+}
+#[derive(Clone, Copy, Deserialize, Serialize, Default, PartialEq)]
+#[serde(rename_all = "lowercase")]
+pub enum ThemeChoice {
+    #[default]
+    Light,
+    Dark,
+}
+#[derive(Clone, Serialize, Default, PartialEq)]
 pub struct View {
+    #[serde(default)]
+    pub conversation: ConversationView,
+    #[serde(default)]
+    pub operating: Option<serde_json::Value>,
+    pub access_mode: Option<String>,
+    pub voice_available: bool,
+    pub theme: ThemeChoice,
     pub expression: ExpressionReadback,
     pub link: String,
     pub orb: String,
@@ -345,9 +378,32 @@ pub struct View {
     pub message: Option<String>,
     pub feedback: Option<RequestFeedback>,
     pub voice: String,
+    pub voice_support: VoiceSupport,
     pub shortcut: String,
+    pub shortcut_enabled: bool,
+    pub capture_choice: ContextChoice,
     pub observed_at_ms: u64,
     pub reference: bool,
+}
+#[derive(Clone, Serialize, Deserialize, Default, PartialEq)]
+pub struct ConversationView {
+    pub turns: Vec<ConversationTurn>,
+    pub before: Option<u64>,
+    pub persistence: String,
+    #[serde(default)]
+    pub retention: bool,
+    #[serde(default)]
+    pub revision: u64,
+}
+#[derive(Clone, Serialize, Deserialize, PartialEq)]
+pub struct ConversationTurn {
+    pub id: String,
+    pub task_id: String,
+    pub role: String,
+    pub text: String,
+    pub status: String,
+    pub occurred_at: f64,
+    pub retained: bool,
 }
 pub fn orb(link: &str, task: Option<&TaskView>, voice: &str) -> String {
     if link != "online" {

@@ -74,17 +74,15 @@ def main() -> int:
             page.get_by_role("button", name="Ask", exact=True).click()
             page.get_by_role("button", name="Review decision", exact=False).click()
             page.get_by_role("heading", name="Review approval", exact=True).wait_for()
-            page.get_by_role("button", name="Continue to native confirmation", exact=True).wait_for(
+            page.get_by_role("button", name="Continue to confirmation", exact=True).wait_for(
                 state="visible"
             )
             page.wait_for_timeout(31500)
             check(
                 "expired review cannot be confirmed",
-                not page.get_by_role(
-                    "button", name="Continue to native confirmation", exact=True
-                ).count()
+                not page.get_by_role("button", name="Continue to confirmation", exact=True).count()
                 or not page.get_by_role(
-                    "button", name="Continue to native confirmation", exact=True
+                    "button", name="Continue to confirmation", exact=True
                 ).is_enabled(),
             )
             shot("expired")

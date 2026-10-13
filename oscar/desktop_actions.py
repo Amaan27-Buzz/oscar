@@ -1,6 +1,7 @@
 """Bounded owner forms translated to existing Worker contracts at the authoritative Core."""
 
 import hashlib
+import re
 from pathlib import Path
 from typing import Any
 
@@ -21,6 +22,50 @@ OPERATIONS = {
     "installed_app": ("list_apps", "launch_app"),
     "executable_discovery": ("worker_tools",),
 }
+
+
+def conversation_form(text: str) -> tuple[str, dict[str, str]] | None:
+    """Only explicit bounded operations; inference never supplies an action's arguments."""
+    request = re.sub(
+        r"^(?:please |(?:can|could|would) you )", "", text.lstrip(), count=1, flags=re.IGNORECASE
+    )
+    for pattern, operation, fields in (
+        (
+            r'(?:write|create)(?: a)?(?: file)? ["\']?([^\s"\']+)["\']? '
+            r"(?:with(?: content| text)?|containing)\s+(.+)",
+            "write_file",
+            ("path", "text"),
+        ),
+        (r'(?:read|show)(?: the)? file ["\']?([^\s"\']+)["\']?', "read_file", ("path",)),
+        (r"(?:list|show)(?: the)? files", "list_files", ()),
+        (r"find files (?:matching )?(.+)", "find_files", ("pattern",)),
+        (r"(?:check|show)(?: the)? git status", "git_status", ()),
+        (r"(?:show|check)(?: the)? git diff", "git_diff", ()),
+        (r"(?:create|make)(?: a)? branch (\S+)", "git_branch", ("name",)),
+        (r"(?:inspect|read)(?: the)? page (https?://\S+)", "inspect_page", ("url",)),
+    ):
+        match = re.fullmatch(
+            pattern,
+            request if operation == "write_file" else request.strip(),
+            re.IGNORECASE | re.DOTALL,
+        )
+        if match:
+            return operation, dict(zip(fields, match.groups(), strict=True))
+    return None
+
+
+def editing_request(text: str) -> bool:
+    request = re.sub(
+        r"^(?:please |(?:can|could|would) you )", "", text.strip(), count=1, flags=re.IGNORECASE
+    )
+    return bool(
+        re.match(
+            r"(?:edit|rewrite|rephrase|shorten|polish|translate)\b|fix\b.*\b(?:grammar|spelling)\b"
+            r"|make (?:this|the selected text|the selection) (?:shorter|clearer|more concise)\b",
+            request,
+            re.IGNORECASE,
+        )
+    )
 
 
 def programs(native: dict[str, Any]) -> dict[str, str]:

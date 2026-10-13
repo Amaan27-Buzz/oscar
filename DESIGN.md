@@ -2,6 +2,10 @@
 name: OSCAR
 description: Quietly Alive — warm, restrained, tactile software with continuous state-driven motion.
 colors:
+  desktop-workspace: "#F8F7F3"
+  desktop-rail: "#EFEEE8"
+  desktop-foreground: "#252B2D"
+  desktop-selection: "#E4EDF0"
   canvas: "#F5F1E7"
   canvas-raised: "#FAF7EF"
   surface: "#FFFDF8"
@@ -67,6 +71,34 @@ components:
 ---
 
 # Design System: OSCAR
+
+## Active Desktop architecture — Group 2.5A
+
+The 2026-10-13 material revision applies paired upper-left highlights and
+lower-right shadows to raised Workspace controls and work/settings panes.
+Warm chalk and graphite share the same depth tokens; fields retain clear
+boundaries and focus. The sidebar has no chat-thread/task-history list: Core
+history belongs in Activity. Conversation scrolls at the outer Workspace edge,
+with centered reading content and an anchored composer. See
+[native material review](docs/ui/desktop/workspace/material-review/README.md).
+
+Desktop now separates a tiny expressive **Companion** from a full **Workspace**.
+The Companion never contains chat, task lists, approvals or settings pages.
+The owner refreshed Desktop light mode on 2026-10-13: warm chalk canvas
+(`#F8F7F3`), rail (`#EFEEE8`), ink (`#252B2D`), white fields (`#FFFFFF`) and
+slate-blue primary actions (`#2E667E`). Earlier paper values remain historical
+for Desktop and continue to apply to other surfaces until separately revised.
+Platform Segoe UI carries the Operate/Read hierarchy. Matching warm graphite
+dark mode is implemented, with canvas `#1C1E1B`, rail `#23251F`, surface
+`#292C25` and paper text `#F3EFE5`. Theme and shortcut choices persist natively. These
+requirements do not recolor the canonical Orb or redesign Mobile. Previous
+presence-expansion layouts and unapproved Workspace treatments are historical evidence.
+
+See [functional ownership and native boundaries](docs/design/DESKTOP-COMPANION-WORKSPACE.md)
+and [actual native review packet](docs/ui/desktop/workspace/README.md).
+The rejected [image references](desktop/design/workspace-screens/README.md)
+remain archived locally; the actual native packet is the current review surface.
+The candidate requires owner visual acceptance before merge.
 
 The [canonical OSCAR Orb](assets/brand/oscar-orb.svg) defines the actual intended
 Orb appearance. Use or derive variants from that source; interface tokens above
@@ -439,3 +471,70 @@ Reject or redesign if several are true:
 - use another personal project as placeholder content for OSCAR design exploration;
 - mass-produce static mockups before the visual language has survived implementation;
 - copy reference products literally. Borrow principles and patterns, not surfaces.
+
+### Owner-feedback Workspace rhythm — 2026-10-13
+
+The Workspace toolbar has balanced 24px edge insets; page content shares an
+860px measure with 32px gutters, reducing to 24px on narrow Windows windows.
+Page headings use one scale. Stable scrollbar gutters preserve the content axis
+between Conversation and scrollable tools. Section/control groups use 24/32px
+spacing. Devices is an executor-scoped capability catalog with disclosure rows,
+not a device-health dashboard. Preferences uses visual appearance previews,
+native shortcut state and distinct voice/presence/privacy groups.
+
+Navigation selection glides over 260ms; routes settle over 220ms and capability
+details over 180ms. Motion follows owner interaction, never fabricates activity.
+Reduced motion removes movement and smooth scrolling. Diagonal arrow glyphs
+are not used for local navigation or window controls.
+
+### Current owner material correction — 2026-10-13
+
+The owner explicitly selects restrained neumorphism across the Workspace.
+Raised buttons, recessed fields and pressed selections use paired directional
+soft shadows on the canonical paper/graphite surfaces. Orb blue is an accent:
+light primary `#236891`, dark primary `#A8D3E9`, selected surface `#E2E9E7` /
+`#293B40`. Explicit boundaries and focus outlines remain; low-contrast decorative
+shadows never carry the only state information. This supersedes earlier flat
+control styling. Devices uses executor/capability selection with a focused
+inspector, superseding the rejected full-width capability-row layout.
+
+### Owner correction to control depth and product copy — 2026-10-13
+
+The owner rejected heavy inset controls. The active treatment uses one subtle
+raised button shadow and explicit field boundaries. Selection uses accent color
+and border; button shadows never simulate recessed dents. The composer is a
+content-sized, bounded textarea with no resize handle. Act uses grouped fields
+and inspectable permission details. Activity uses task selection and a focused
+result/approval pane. The prior control-depth descriptions are historical.
+
+Developer session banners/internal labels are not the default product layout.
+Real outcome status and unavailable capabilities remain visible. Exact approval
+material is preserved; identifiers and verification metadata remain inspectable.
+Native reference-session metadata is preserved and disclosed in QA evidence.
+
+### Act composition — owner revision 2026-10-13
+
+Act is a focused operation editor, not a stacked administration form. File
+writing groups destination and exact content into one work surface. Context
+and permission details form a compact support area. Selectors appear only for
+real multiple choices or an explicitly cleared/withdrawn selection. Other
+operation-specific inputs and typed requests remain intact. All prior Act
+layout descriptions are historical; owner visual acceptance remains pending.
+
+### Library controls and light palette — owner revision 2026-10-13
+
+Workspace choices use pinned Radix Themes Popover/RadioGroup components;
+expandable sections use Radix Collapsible. Native select arrows and HTML
+summary triangles are removed from the active Workspace. Closed controls show
+plus and expanded controls show minus. Selection uses actual offered values.
+Escape restores focus; keyboard and reduced-motion behavior remain supported.
+The non-modal picker avoids inline-style injection blocked by native CSP;
+CSP is unchanged and native popup tests record no violations.
+
+Light mode uses the Desktop tokens above, muted text `#60686A`, separators
+`#D9DEDB`, accent text `#24566D` and white primary-button text. Graphite dark
+mode and canonical Orb assets are unchanged.
+
+### Group 2.5 interaction correction — 2026-10-14
+
+Preserve the approved Companion and unchanged shared Orb. Workspace navigation is Conversation, Automations, Activity, Devices, Preferences. Dictate/Edit and immediate tool actions belong in Conversation. Conversation reads chronologically on open paper/graphite surfaces; no separate chat threads or decorative message cards. Activity presents attention, running work and outcomes before exact review/evidence detail. Automations describes real continuing responsibilities and capability gaps without dummy Worker records. Preferences separates access, awareness, Worker autonomy and capture/retention. Warm paper and complementary graphite materials, tactile controls, keyboard/reduced motion and native privacy boundaries remain intact. This supersedes the earlier Act/Text Tools primary-navigation direction.

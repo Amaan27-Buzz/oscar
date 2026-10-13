@@ -1,0 +1,11 @@
+{
+  "capture": "actual Tauri/WebView2 HWND PrintWindow",
+  "checks": [
+    "Native shortcut disable/enable reflected by switch",
+    "light: actual native theme selection and no horizontal overflow",
+    "dark: actual native theme selection and no horizontal overflow",
+    "Reduced motion removes switch movement",
+    "800px native window: both themes without horizontal overflow"
+  ],
+  "owner_visual_acceptance": "PENDING"
+}

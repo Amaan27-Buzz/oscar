@@ -14,13 +14,13 @@ it('opening Activity does not request approval and only uses exact advertised co
 });
 it('a fresh current task appears before the next shared poll without duplication',()=>{
   render(<Activity view={{...initialView,tasks:[],current:task}} available busy={false} run={vi.fn()} back={vi.fn()}/>);
-  expect(screen.getByRole('region',{name:'Active work'}).textContent).toContain('Approval required');
-  expect(screen.getByRole('region',{name:'Active work'}).textContent).toContain('1');
+  expect(screen.getByRole('region',{name:'Needs attention'}).textContent).toContain('Approval required');
+  expect(screen.getByRole('region',{name:'Needs attention'}).textContent).toContain('1');
 });
 it('expired or changed approval cannot reach native confirmation; dismissal grants nothing',()=>{
   vi.useFakeTimers();const run=vi.fn();const view={...initialView,tasks:[task],current:task,review:{...review,expires_at_ms:Date.now()+1000}};
   const {rerender}=render(<Activity view={view} available busy={false} run={run} back={vi.fn()}/>);
-  const button=screen.getByRole('button',{name:'Continue to native confirmation'}) as HTMLButtonElement;
+  const button=screen.getByRole('button',{name:'Continue to confirmation'}) as HTMLButtonElement;
   expect(button.disabled).toBe(false);act(()=>vi.advanceTimersByTime(1001));expect(button.disabled).toBe(true);
   fireEvent.click(button);expect(run).not.toHaveBeenCalled();
   rerender(<Activity view={{...view,review:{...review,task_id:'other'}}} available busy={false} run={run} back={vi.fn()}/>);
@@ -28,9 +28,16 @@ it('expired or changed approval cannot reach native confirmation; dismissal gran
 });
 it('offline history and unadvertised actions never grant control',()=>{
   const run=vi.fn();render(<Activity view={{...initialView,current:{...task,state:'partially_verified',actions:[],response:'reported only',response_status:'REPORTED'},tasks:[{...task,state:'partially_verified',actions:[]}]}} available={false} busy={false} run={run} back={vi.fn()}/>);
-  expect(screen.getByText('REPORTED')).toBeTruthy();expect(screen.getByText(/Displayed history grants no authority/)).toBeTruthy();expect(screen.queryByRole('button',{name:'Review approval'})).toBeNull();
+  expect(screen.getByText('REPORTED')).toBeTruthy();expect(screen.getByText(/Saved work is visible/)).toBeTruthy();expect(screen.queryByRole('button',{name:'Review approval'})).toBeNull();
 });
 it.each(['RECALLED','INFERRED'])('preserves %s recall sources and temporal uncertainty when inspecting a result',status=>{
   render(<Activity view={{...initialView,current:{...task,state:'partially_verified',actions:[],response:'Historical reference',response_status:status,source_event_ids:['canonical-event']}}} available busy={false} run={vi.fn()} back={vi.fn()}/>);
-  expect(screen.getByText(status)).toBeTruthy();expect(screen.getByText(/Earlier retained evidence; current facts may differ/)).toBeTruthy();expect(screen.getByText('canonical-event')).toBeTruthy();
+  expect(screen.getByText(status)).toBeTruthy();expect(screen.getByText(/Earlier retained evidence; current facts may differ/)).toBeTruthy();fireEvent.click(screen.getByRole('button',{name:'Verification details'}));expect(screen.getByText('canonical-event')).toBeTruthy();
+});
+it('only displays measured progress within the supported range',()=>{
+ const props={available:true,busy:false,run:vi.fn(),back:vi.fn()};
+ const {rerender}=render(<Activity {...props} view={{...initialView,current:{...task,progress:{fraction:Number.NaN,step:'Writing',status:'working'}}}}/>);
+ expect(screen.queryByRole('progressbar')).toBeNull();
+ rerender(<Activity {...props} view={{...initialView,current:{...task,progress:{fraction:.5,step:'Writing',status:'working'}}}}/>);
+ expect(screen.getByRole('progressbar').getAttribute('value')).toBe('0.5');
 });

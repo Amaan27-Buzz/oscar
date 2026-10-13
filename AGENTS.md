@@ -1,5 +1,24 @@
 # AGENTS.md
 
+## Owner Group 2.5 product correction — 2026-10-14
+
+Continue `codex/desktop-companion-workspace`, draft PR #5 into main, with no new worktree. Preserve the approved Companion/Orb and all native/Aperture evidence. Conversation is central; navigation is Conversation / Automations / Activity / Devices / Preferences. Dictate/Edit and immediate actions are contextual conversation capabilities. Read [the interaction/authority decision](docs/decisions/ADR-DESKTOP-PERSONAL-INTELLIGENCE.md). Ask / Secure / genuine Full Access, awareness and Worker autonomy are independent. Current Secure/Full Access activation remains unavailable pending a signed owner-delegation/revocation integration; never hide confirmations or forge approvals. Owner authorizes supported Core integration and tests, commit/push to the existing draft, then stop for visual review. No Mobile redesign, Slices 14–17 implementation, merge or cleanup.
+
+## Owner Group 2.5A — 2026-10-12
+
+The owner authorizes Desktop architecture correction from consolidated main
+`fd191a2d7ca7f98c456969c74173a0340f789578`: a tiny persistent Companion and a
+separate full Workspace in one Tauri process. The canonical Orb and shared Core,
+voice, permissions and native signing boundaries remain intact. Companion is
+never a miniature chat application and has no approval authority. See
+[the ownership contract](docs/design/DESKTOP-COMPANION-WORKSPACE.md) and
+[native evidence](docs/ui/desktop/workspace/README.md).
+
+Use one focused branch and a draft PR directly against main; stop for owner
+visual review before merge. Preserve local Aperture `42b565c` and all historical
+branches/evidence. No Mobile, Slice 14, production promotion or branch cleanup.
+This explicit scope supersedes older sequencing notes only within Group 2.5A.
+
 ## Owner software-first scope — 2026-10-11
 
 Group 1 authorizes Desktop Slice 12.2–12.6 on a separate development branch based

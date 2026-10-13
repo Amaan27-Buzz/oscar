@@ -59,7 +59,7 @@ describe('OSCAR surface contract',()=>{
     await screen.findByRole('tab',{name:'Act'});fireEvent.click(screen.getByRole('tab',{name:'Act'}));
     expect(await screen.findByRole('button',{name:'Prepare action'})).toBeDefined();
     emit({link:'unavailable',capabilities:[]});
-    await screen.findByText(/No eligible action capability/);
+    await screen.findByText(/No actions are available/);
     fireEvent.click(screen.getByRole('tab',{name:'Ask'}));
     expect((screen.getByRole('button',{name:'Ask'}) as HTMLButtonElement).disabled).toBe(true);
   });

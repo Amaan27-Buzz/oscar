@@ -154,7 +154,7 @@ def lifecycle() -> None:
     try:
         deadline = time.monotonic() + 20
         while time.monotonic() < deadline:
-            owned = [h for h, _, title in windows(process.pid) if title == "OSCAR"]
+            owned = [h for h, _, title in windows(process.pid) if title == "OSCAR Workspace"]
             if owned:
                 break
             assert process.poll() is None, "ordinary product unexpectedly exited"

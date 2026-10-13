@@ -1,0 +1,22 @@
+:root[data-surface=companion]{color-scheme:dark;font-family:'Segoe UI Variable Text','Segoe UI',sans-serif;color:#eef2f5;background:transparent}
+[data-surface=companion] body{margin:0;background:transparent;overflow:hidden}
+.companion{width:148px;height:164px;padding:8px 6px 4px;display:flex;align-items:center;flex-direction:column;user-select:none;overflow:hidden}
+.companion-orb-area{position:relative;width:104px;height:108px;display:grid;place-items:center}
+.companion-drag-zone{position:absolute;inset:0;cursor:grab;border-radius:50%}.companion-drag-zone:active{cursor:grabbing}
+[data-surface=companion] .companion-orb{position:relative;padding:0;border:0;border-radius:50%;background:transparent;line-height:0;cursor:pointer;z-index:1}
+.companion-state-dot{position:absolute;bottom:7px;right:10px;width:6px;height:6px;border-radius:50%;background:#c5a26c;box-shadow:0 0 0 2px #171b1ff0;pointer-events:none}.companion-state-dot.online{background:#7eab95}.companion-state-dot.attention{background:#edc375;width:8px;height:8px}.companion-state-dot.error{background:#e5a188}
+.companion-status{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
+.companion-toolbar{position:relative;display:flex;align-items:center;justify-content:center;margin-top:4px;width:26px;height:7px;border-radius:5px;background:#30343aeb;overflow:hidden;transform-origin:center;transition:width 260ms cubic-bezier(.16,1,.3,1),height 240ms cubic-bezier(.16,1,.3,1),border-radius 200ms,background 180ms,box-shadow 200ms}
+.companion-rest-handle{position:absolute;width:24px;height:7px;cursor:grab;opacity:1;transition:opacity 100ms}
+.companion-icon-row{display:flex;align-items:center;gap:2px;padding:4px;opacity:0;transform:translateY(5px) scale(.92);transition:opacity 130ms ease,transform 220ms cubic-bezier(.16,1,.3,1);pointer-events:none;flex-shrink:0}
+.companion.is-hovered .companion-toolbar,.companion:has(:focus-visible) .companion-toolbar{width:128px;height:36px;border-radius:8px;background:#24282ef5;box-shadow:0 3px 8px #0003}
+.companion.is-hovered .companion-icon-row,.companion:has(:focus-visible) .companion-icon-row{opacity:1;transform:translateY(0) scale(1);pointer-events:auto;transition-delay:45ms}
+.companion.is-hovered .companion-rest-handle,.companion:has(:focus-visible) .companion-rest-handle{opacity:0;pointer-events:none}
+[data-surface=companion] .companion-icon-row button{display:grid;place-items:center;width:22px;height:28px;min-height:28px;padding:0;border:0;border-radius:5px;color:#e3e9ee;background:transparent;cursor:pointer;transition:background 120ms,color 120ms,transform 160ms ease}
+[data-surface=companion] .companion-icon-row button:hover:not(:disabled){background:#ffffff14;color:#ffffff;transform:translateY(-1px)}
+[data-surface=companion] .companion-icon-row button:active:not(:disabled){transform:translateY(0)}
+[data-surface=companion] .companion-icon-row button[aria-pressed=true]{color:#9fc7e2}
+[data-surface=companion] .companion-icon-row button:disabled{color:#77818a;cursor:default;opacity:.55}
+[data-surface=companion] button:focus-visible{outline:2px solid #8dc3ee;outline-offset:2px}
+@media(prefers-reduced-motion:reduce){.companion *,.companion *::before,.companion *::after{transition:none!important;animation:none!important}}
+@media(forced-colors:active){.companion-toolbar{background:Canvas;border:1px solid ButtonText}.companion-icon-row button{color:ButtonText}.companion-state-dot{background:CanvasText}}

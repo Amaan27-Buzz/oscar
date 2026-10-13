@@ -763,6 +763,9 @@ class MobileServer:
                 except Exception:
                     body = b'{"error":"Core unavailable; outcome unknown; inspect before retry"}'
                     self.send_response(503)
+                finally:
+                    if core.runtime.memory:
+                        core.runtime.memory.archive.close_thread()
                 self.send_header("Content-Type", "application/json")
                 self.send_header("Content-Length", str(len(body)))
                 self.end_headers()

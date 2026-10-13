@@ -1,0 +1,9 @@
+{
+  "checks": [
+    "native sliding navigation 260ms",
+    "Space selects capability with actual scope",
+    "Prepare opens Act and creates no Core task",
+    "reduced motion removes navigation transition"
+  ],
+  "owner_visual_acceptance": "PENDING"
+}
