@@ -124,3 +124,13 @@ replaces it with a destination/content editor and compact context/permission
 support rail. Single-choice selectors are removed; real multiple choices and
 capability-withdrawal recovery remain. Frontend regression: 68 tests; native
 acceptance: 56 checks. Owner visual acceptance remains pending.
+
+## Real library controls and refreshed light mode — 2026-10-13
+
+[The latest native packet](library-controls-review/README.md) replaces native
+browser arrows/triangles with installed Radix components and consistent plus/minus
+markers. Non-modal choice popovers satisfy unchanged native CSP; native keyboard
+selection, Escape focus return and disclosures pass in both themes. Light mode
+uses the owner's new warm-chalk/white/slate-blue direction. Frontend: 70 tests;
+native architecture/layout: 56 checks; additional library/CSP checks pass.
+Owner visual acceptance remains pending.

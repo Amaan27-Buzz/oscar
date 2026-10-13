@@ -36,8 +36,9 @@ contract. It is independent of the actual current `View.voice` turn state.
 
 Operate and Read. Owner feedback rejected generic dark components, excess
 rounded/modal containers and departure from OSCAR's canonical paper palette.
-The current target is a simple professional Workspace with warm paper, graphite
-words, restrained identity/focus color, compact operational headings and open
+The owner refreshed Desktop light mode to warm chalk (`#F8F7F3`), white fields,
+ink (`#252B2D`) and slate-blue accents on 2026-10-13. The Workspace uses compact
+operational headings and open
 reading/review pages. Matching dark mode uses the implemented warm-graphite token set.
 See [individual screen references](../../desktop/design/workspace-screens/README.md).
 Image references remain unapproved history; [the final native packet](../ui/desktop/workspace/README.md)
@@ -66,3 +67,11 @@ or Group 2.5A closure. No physical voice/device or installer acceptance is claim
 
 Implementation base: consolidated main `fd191a2d7ca7f98c456969c74173a0340f789578`.
 Candidate stops at owner visual review; no merge, Mobile or Slice 14 work.
+
+## Library controls — 2026-10-13
+
+Radix Themes supplies non-modal choice popovers and radio groups; Radix
+Collapsible supplies expandable sections. Native browser arrow markers are
+replaced by consistent plus/minus state indicators. Values and authority remain
+in the existing native/Core contracts. The CSP remains unchanged; native tests
+verify keyboard focus return and no popup CSP violations.

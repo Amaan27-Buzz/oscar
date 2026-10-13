@@ -32,7 +32,7 @@ it('offline history and unadvertised actions never grant control',()=>{
 });
 it.each(['RECALLED','INFERRED'])('preserves %s recall sources and temporal uncertainty when inspecting a result',status=>{
   render(<Activity view={{...initialView,current:{...task,state:'partially_verified',actions:[],response:'Historical reference',response_status:status,source_event_ids:['canonical-event']}}} available busy={false} run={vi.fn()} back={vi.fn()}/>);
-  expect(screen.getByText(status)).toBeTruthy();expect(screen.getByText(/Earlier retained evidence; current facts may differ/)).toBeTruthy();expect(screen.getByText('canonical-event')).toBeTruthy();
+  expect(screen.getByText(status)).toBeTruthy();expect(screen.getByText(/Earlier retained evidence; current facts may differ/)).toBeTruthy();fireEvent.click(screen.getByRole('button',{name:'Verification details'}));expect(screen.getByText('canonical-event')).toBeTruthy();
 });
 it('only displays measured progress within the supported range',()=>{
  const props={available:true,busy:false,run:vi.fn(),back:vi.fn()};

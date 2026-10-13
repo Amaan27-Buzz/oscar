@@ -112,3 +112,8 @@ Runtime test provenance remains explicit in the evidence and launch helper.
 the stacked Act form. File writing now uses a destination/content editor with
 context and permission details in a compact support area. Other pages retain
 the preceding revision. Owner visual acceptance is pending.
+
+**Latest controls and palette:** [Radix library controls](library-controls-review/README.md)
+replace browser dropdown arrows and triangle disclosures with plus/minus state
+indicators. Light mode now uses warm chalk, white fields and slate-blue accents.
+Native CSP and owner-review boundaries remain unchanged.

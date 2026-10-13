@@ -152,8 +152,9 @@ def main():
             workspace.wait_for_timeout(200)
             contrast = workspace.evaluate("""()=>{
                 const style=getComputedStyle(document.documentElement);
-                const rgb=name=>style.getPropertyValue(name).trim().slice(1).match(/../g)
-                    .map(x=>parseInt(x,16)/255);
+                const rgb=name=>{let hex=style.getPropertyValue(name).trim().slice(1);
+                    if(hex.length===3)hex=[...hex].map(c=>c+c).join('');
+                    return hex.match(/../g).map(x=>parseInt(x,16)/255)};
                 const lum=name=>rgb(name).map(x=>x<=.04045?x/12.92:((x+.055)/1.055)**2.4)
                     .reduce((s,x,i)=>s+x*[.2126,.7152,.0722][i],0);
                 const ratio=(a,b)=>{a=lum(a);b=lum(b);
@@ -286,20 +287,23 @@ def main():
         workspace.get_by_role("navigation", name="Workspace").get_by_role(
             "button", name="Text tools", exact=True
         ).click()
-        workspace.locator(".context-details summary").click()
-        workspace.get_by_label("Capture on invocation").select_option("selection")
+        workspace.locator(".context-details .oscar-disclosure-trigger").click()
+        workspace.get_by_label("Capture on invocation").click()
+        workspace.get_by_role("radio", name="Selected text", exact=True).click()
         workspace.get_by_role("navigation", name="Workspace").get_by_role(
             "button", name="Conversation", exact=True
         ).click()
         workspace.get_by_role("navigation", name="Workspace").get_by_role(
             "button", name="Text tools", exact=True
         ).click()
-        workspace.locator(".context-details summary").click()
+        workspace.locator(".context-details .oscar-disclosure-trigger").click()
         check(
             "capture preference survives navigation",
-            workspace.get_by_label("Capture on invocation").input_value() == "selection",
+            workspace.get_by_label("Capture on invocation").get_attribute("data-value")
+            == "selection",
         )
-        workspace.get_by_label("Capture on invocation").select_option("none")
+        workspace.get_by_label("Capture on invocation").click()
+        workspace.get_by_role("radio", name="No capture", exact=True).click()
         shot(workspace, "text-tools", "OSCAR Workspace")
         workspace.get_by_role("navigation", name="Workspace").get_by_role(
             "button", name="Devices", exact=True

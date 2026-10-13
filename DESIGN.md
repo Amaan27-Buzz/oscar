@@ -2,10 +2,10 @@
 name: OSCAR
 description: Quietly Alive — warm, restrained, tactile software with continuous state-driven motion.
 colors:
-  desktop-workspace: "#F5F1E7"
-  desktop-rail: "#ECE7DD"
-  desktop-foreground: "#1A1B18"
-  desktop-selection: "#DED7C9"
+  desktop-workspace: "#F8F7F3"
+  desktop-rail: "#EFEEE8"
+  desktop-foreground: "#252B2D"
+  desktop-selection: "#E4EDF0"
   canvas: "#F5F1E7"
   canvas-raised: "#FAF7EF"
   surface: "#FFFDF8"
@@ -76,9 +76,10 @@ components:
 
 Desktop now separates a tiny expressive **Companion** from a full **Workspace**.
 The Companion never contains chat, task lists, approvals or settings pages.
-Workspace must use the existing warm-paper canvas (`#F5F1E7`), raised canvas
-(`#FAF7EF`), ink (`#1A1B18`) and surface (`#FFFDF8`). Owner feedback restored
-these canonical values and rejected excess rounded/modal-style components.
+The owner refreshed Desktop light mode on 2026-10-13: warm chalk canvas
+(`#F8F7F3`), rail (`#EFEEE8`), ink (`#252B2D`), white fields (`#FFFFFF`) and
+slate-blue primary actions (`#2E667E`). Earlier paper values remain historical
+for Desktop and continue to apply to other surfaces until separately revised.
 Platform Segoe UI carries the Operate/Read hierarchy. Matching warm graphite
 dark mode is implemented, with canvas `#1C1E1B`, rail `#23251F`, surface
 `#292C25` and paper text `#F3EFE5`. Theme and shortcut choices persist natively. These
@@ -511,3 +512,17 @@ and permission details form a compact support area. Selectors appear only for
 real multiple choices or an explicitly cleared/withdrawn selection. Other
 operation-specific inputs and typed requests remain intact. All prior Act
 layout descriptions are historical; owner visual acceptance remains pending.
+
+### Library controls and light palette — owner revision 2026-10-13
+
+Workspace choices use pinned Radix Themes Popover/RadioGroup components;
+expandable sections use Radix Collapsible. Native select arrows and HTML
+summary triangles are removed from the active Workspace. Closed controls show
+plus and expanded controls show minus. Selection uses actual offered values.
+Escape restores focus; keyboard and reduced-motion behavior remain supported.
+The non-modal picker avoids inline-style injection blocked by native CSP;
+CSP is unchanged and native popup tests record no violations.
+
+Light mode uses the Desktop tokens above, muted text `#60686A`, separators
+`#D9DEDB`, accent text `#24566D` and white primary-button text. Graphite dark
+mode and canonical Orb assets are unchanged.

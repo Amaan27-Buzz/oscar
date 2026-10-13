@@ -1,3 +1,4 @@
+import {Disclosure} from '../UIControls';
 import {useEffect,useRef} from 'react';
 import type {Task} from '../bridge';
 
@@ -13,7 +14,7 @@ export function ResultView({task,expanded,read,inspect,askAgain}:{task:Task;expa
       <pre>{!expanded&&text.length>600?text.slice(0,600)+'…':text}</pre>
     </div>
     {task.response_truncated&&<p className="leaf-secondary">Only an excerpt is available.</p>}
-    {expanded&&task.source_event_ids?.length?<details><summary>Recall sources</summary><ul>{task.source_event_ids.map(id=><li key={id}>{id}</li>)}</ul></details>:null}
+    {expanded&&task.source_event_ids?.length?<Disclosure title={<>Recall sources</>}><ul>{task.source_event_ids.map(id=><li key={id}>{id}</li>)}</ul></Disclosure>:null}
     <div className="result-actions">{!expanded&&bounded&&<button className="leaf-primary" onClick={read}>Read response</button>}
       <button onClick={inspect}>Inspect result</button><button onClick={askAgain}>Ask again</button></div>
   </div>;

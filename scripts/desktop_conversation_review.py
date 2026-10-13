@@ -47,7 +47,7 @@ def main():
             )
             page.wait_for_function(
                 """theme=>getComputedStyle(document.documentElement)
-                    .getPropertyValue('--desk').trim()===(theme==='dark'?'#1c1e1b':'#f5f1e7')""",
+                    .getPropertyValue('--desk').trim()===(theme==='dark'?'#1c1e1b':'#f8f7f3')""",
                 arg=theme,
             )
             page.get_by_role("heading", name="Conversation", exact=True).click()

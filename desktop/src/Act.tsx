@@ -1,3 +1,4 @@
+import {Choice,Disclosure} from './UIControls';
 import {useEffect,useRef,useState} from 'react';
 import type {ReactNode} from 'react';
 import type {ActForm,Capability,Command} from './bridge';
@@ -44,20 +45,20 @@ export function Act({capabilities,run,disabled,draft,onDraftChange,context}:{cap
   const ready=!!selected&&selected.operations.includes(operation)&&(!needsValue||!!value.trim())&&(!['program_version','launch_app'].includes(operation)||!!value);
   return <section className="action-form" aria-label="Act">
     {(available.length>1||!selected||!!selected&&selected.operations.length>1)&&<div className="action-choice-bar">
-      {(available.length>1||!selected)&&<label>Action<select aria-label="Available capability" value={id} onChange={e=>choose(e.target.value)}><option value="">Choose an action</option>{available.map(c=><option key={c.id} value={c.id}>{c.label}{nodes.length>1?` · Executor ${nodes.indexOf(c.node)+1}`:''}</option>)}</select></label>}
-      {!!selected&&selected.operations.length>1&&<label>Operation<select aria-label="Operation" value={operation} onChange={e=>chooseOperation(e.target.value)}>{selected.operations.map(o=><option key={o} value={o}>{labels[o]??o}</option>)}</select></label>}
+      {(available.length>1||!selected)&&<label>Action<Choice label="Available capability" value={id} onChange={choose} placeholder="Choose an action" options={available.map(c=>({value:c.id,label:`${c.label}${nodes.length>1?` · Executor ${nodes.indexOf(c.node)+1}`:''}`}))}/></label>}
+      {!!selected&&selected.operations.length>1&&<label>Operation<Choice label="Operation" value={operation} onChange={chooseOperation} options={selected.operations.map(o=>({value:o,label:labels[o]??o}))}/></label>}
     </div>}
     <div className="action-composition"><div className="action-main">
       <div className="action-editor"><header className="action-editor-title"><span className="action-document-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h8l4 4v14H6V3Zm8 0v5h4M9 12h6m-6 4h6"/></svg></span><div><h2>{selected?labels[operation]??selected.label:'Choose an action'}</h2><p>{writing?'Create a file with the content you provide.':selected?.summary??'Select an available action to get started.'}</p></div></header>
       {needsValue&&<div className="action-destination"><label>{writing?'File destination':valueLabel}<input aria-label={valueLabel} maxLength={200} placeholder={operation==='inspect_page'?'https://example.com':operation==='find_files'?'*.md':operation==='git_branch'?'feature-name':'notes/summary.txt'} value={value} onChange={e=>update({value:e.target.value})}/></label>{writing&&<small>A path inside the permitted workspace.</small>}</div>}
       {writing&&<div className="file-content-editor"><label>File contents<textarea aria-label="Exact content" rows={9} maxLength={4096} placeholder="Write or paste the file contents…" value={text} onChange={e=>update({text:e.target.value})}/></label><div><span>Exact text</span><span>{text.length} / 4096</span></div></div>}
-      {operation==='program_version'&&<label>Registered program<select aria-label="Registered program" value={value} onChange={e=>update({value:e.target.value})}><option value="">Choose a registered program</option>{selected?.programs.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}</select></label>}
-      {operation==='launch_app'&&<label>Authorized application<select aria-label="Authorized application" value={value} onChange={e=>update({value:e.target.value})}><option value="">Choose a registered application</option>{selected?.applications.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}</select></label>}
+      {operation==='program_version'&&<label>Registered program<Choice label="Registered program" value={value} onChange={value=>update({value})} placeholder="Choose a registered program" options={selected?.programs.map(item=>({value:item.id,label:item.name}))??[]}/></label>}
+      {operation==='launch_app'&&<label>Authorized application<Choice label="Authorized application" value={value} onChange={value=>update({value})} placeholder="Choose a registered application" options={selected?.applications.map(item=>({value:item.id,label:item.name}))??[]}/></label>}
       </div>
       <div className="action-review-bar"><button className="leaf-primary" disabled={disabled||!ready} onClick={submit}>Prepare action</button><span>{disabled?'Action preparation is currently unavailable.':!selected?'Choose an action to continue.':!ready?'Complete the destination to continue.':'Ready for exact review.'}</span></div>
     </div><aside className="action-support"><h2>Before you continue</h2><p>Preparing an action does not run it. You’ll review exactly what will happen.</p>
       {context}
-      {selected&&<details className="action-permissions"><summary>Permissions</summary><dl><div><dt>Executor</dt><dd>{selected.node}</dd></div><div><dt>Risk</dt><dd>{selected.risk}</dd></div><div><dt>Required scopes</dt><dd>{selected.permissions?.join(', ')||'Checked for this request'}</dd></div></dl></details>}
+      {selected&&<Disclosure className="action-permissions" title={<>Permissions</>}><dl><div><dt>Executor</dt><dd>{selected.node}</dd></div><div><dt>Risk</dt><dd>{selected.risk}</dd></div><div><dt>Required scopes</dt><dd>{selected.permissions?.join(', ')||'Checked for this request'}</dd></div></dl></Disclosure>}
     </aside></div>
   </section>;
 }
