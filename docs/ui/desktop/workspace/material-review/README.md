@@ -30,6 +30,16 @@ Reproduce after building the existing Tauri debug candidate:
 `python -m scripts.desktop_workspace_acceptance` (the latter defaults to the
 original evidence directory; direct its OUTPUT here to preserve older packets).
 
+Verification: 74 frontend tests, 15 Rust tests, 36 shared Expression tests,
+TypeScript/Vite/Tauri debug build, Rust fmt/Clippy, repository links/secret checks,
+58 native architecture/layout checks, 22 scrolling/material checks and both-theme
+Radix keyboard/CSP checks pass. Native CNG-PSS/action/restart self-check passes.
+The broader Core run executed 559 tests: 552 passed, six skipped, and one
+browser-navigation timeout case failed to reach its fixture within its three-second
+budget. All three BrowserLifecycleTests pass on isolated rerun, including that
+case. The full-suite failure remains recorded; no Core behavior or timeout was
+changed, and a clean broader integration run is still required before merge.
+
 Owner visual acceptance remains pending. No production enrollment, physical
 voice/device, installer or multimonitor acceptance is claimed. This candidate
 remains a draft PR; Group 2.5A is not closed or merged.

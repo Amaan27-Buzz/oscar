@@ -122,6 +122,11 @@ Companion's bounded icon-toolbar motion passes eight native checks. Direct
 menu/drag Computer Use review was interrupted by owner Escape and remains an
 owner interaction check. No physical, production or owner visual PASS is claimed.
 
+Broader Core regression: 559 tests, 552 passing, six skips and one failure in
+`BrowserLifecycleTests.test_timeout_after_real_navigation`. All three browser
+lifecycle tests pass on isolated rerun. The full-suite timing-sensitive failure
+is retained as an integration-check limitation, not reported as a clean pass.
+
 ## Forms and Activity correction — 2026-10-13
 
 The owner rejected the heavy inset-button effect and raw composer affordance.
