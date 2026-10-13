@@ -49,12 +49,12 @@ def main():
             result = capture_owned(info["pid"], handle(title), OUTPUT / f"{name}.png")
             if title == "OSCAR Workspace":
                 axes = page.evaluate("""()=>{
-                    const header=document.querySelector('.workspace-top-inner>span');
-                    const heading=document.querySelector('.workspace-content h1');
-                    return heading&&Math.abs(header.getBoundingClientRect().left-
-                        heading.getBoundingClientRect().left)<1.5;
+                    const body=document.querySelector('.workspace-body').getBoundingClientRect();
+                    const header=document.querySelector('.workspace-top-inner')
+                        .getBoundingClientRect();
+                    return Math.abs((header.left-body.left)-(body.right-header.right))<1.5;
                 }""")
-                check(f"{name}: header and page heading share their left axis", axes)
+                check(f"{name}: header has balanced edge spacing", axes)
                 for theme in ("dark", "light"):
                     invoke(page, "surface_command", {"kind": "theme", "theme": theme})
                     page.wait_for_function(

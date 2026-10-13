@@ -16,7 +16,7 @@ export function Companion() {
     <div className="companion-grip" data-tauri-drag-region aria-label="Move Companion">···</div>
     <button className="companion-orb" aria-label={attention?'Open Workspace — owner attention required':'Open OSCAR Workspace'} onClick={()=>control({kind:attention?'open_activity':'open_workspace'})}><DesktopExpression view={view} size={92}/></button>
     <p className="companion-status" role="status">{!available?'Core unavailable':attention?'Review needed':stateLabel(view)}</p>
-    <div className="companion-actions"><button onClick={()=>control({kind:'open_workspace'})} aria-label="Open Workspace">Open ↗</button><button aria-expanded={controls} aria-label="Companion controls" onClick={()=>{setControls(!controls);void control({kind:'companion_controls',open:!controls});}}>···</button></div>
+    <div className="companion-actions"><button onClick={()=>control({kind:'open_workspace'})} aria-label="Open Workspace">Open</button><button aria-expanded={controls} aria-label="Companion controls" onClick={()=>{setControls(!controls);void control({kind:'companion_controls',open:!controls});}}>···</button></div>
     {controls&&<div className="companion-controls" aria-label="Immediate controls">
       <button aria-pressed={!!view.shortcut_enabled} onClick={()=>control({kind:'shortcut_enabled',enabled:!view.shortcut_enabled})}>Shortcut {view.shortcut_enabled?'on':'off'}</button>
       {available&&['listening','processing','speaking'].includes(view.voice)&&<button onClick={()=>control({kind:'cancel_listening'})}>Cancel voice turn</button>}

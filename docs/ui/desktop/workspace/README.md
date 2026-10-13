@@ -96,3 +96,9 @@ independently rechecked. Real native tests deny Companion command/event access.
 Owner visual acceptance, physical voice/device calibration, production enrollment,
 installer/distribution acceptance and broad multimonitor interaction are NOT RUN.
 No Mobile or Slice 14 work; no branch deletion or merge. Gate C remains PARTIAL.
+
+**Latest owner-feedback revision:** [tactile Workspace](tactile-review/README.md)
+replaces the earlier Devices/Preferences styling and applies the owner's
+neumorphic button/material direction, Orb blue accents and spacing/motion fixes
+across every Workspace page. Historical native packets above are preserved;
+this revision has 64 frontend tests and 53 native checks passing.

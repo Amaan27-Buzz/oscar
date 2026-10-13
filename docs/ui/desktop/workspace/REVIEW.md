@@ -87,3 +87,22 @@ Preferences captures with visual theme choices, native-state shortcut switch and
 purposeful reduced-motion-aware transitions. Frontend regression: 63 passed;
 TypeScript/Vite and native Tauri debug build passed. Other route designs remain
 at the earlier candidate. Owner visual acceptance remains pending.
+
+## Devices, Preferences and app-wide spacing/motion — 2026-10-13
+
+[Native revision packet](rhythm-review/README.md) records the Devices catalog,
+finished lower Preferences sections, balanced header edges and shared content
+rhythm across all six pages. Sliding navigation selection and bounded route,
+capability and control feedback respect reduced motion. The first narrow-window
+pass caught Companion action-row overflow; its width and inset were corrected.
+Frontend regression: 64 passed. Native receipt and owner review remain distinct.
+
+## Tactile material correction — 2026-10-13
+
+The owner rejected the list-style Devices design and explicitly selected
+neumorphism with more color and redesigned buttons. The current
+[tactile revision](tactile-review/README.md) supersedes that iteration: executor
+selection, a capability inspector, paired soft depth, Orb blue accents,
+recessed inputs, pressed selection states and shared bounded motion. All 64
+frontend tests and 53 native checks passed on the current bundled executable.
+Owner visual acceptance remains pending.

@@ -54,3 +54,12 @@ it('Preferences shows native shortcut state, theme selection and unavailable awa
   expect(screen.getByRole('switch',{name:'Global shortcut'}).getAttribute('aria-checked')).toBe('false');
   expect(screen.getAllByText('unavailable')).toHaveLength(2);
 });
+it('Devices reveals real capability scope and prepares without executing',async()=>{
+  const port=mount({capabilities:[{id:'files',node:'desktop-1',kind:'native',label:'Write exact file',summary:'Scoped file creation',risk:'low',operations:['write_file'],programs:[],applications:[],permissions:['files.write']}]});
+  await waitFor(()=>expect(port).toHaveBeenCalled());
+  fireEvent.click(screen.getByRole('button',{name:'Devices'}));
+  expect(screen.getByText('desktop-1')).toBeTruthy();expect(screen.getByText('files.write')).toBeTruthy();
+  fireEvent.click(screen.getByRole('button',{name:'Prepare an action'}));
+  expect((screen.getByLabelText('Available capability') as HTMLSelectElement).value).toBe('files');
+  expect(port.mock.calls.some(([c])=>c.kind==='act')).toBe(false);
+});

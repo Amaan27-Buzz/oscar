@@ -462,3 +462,29 @@ Reject or redesign if several are true:
 - use another personal project as placeholder content for OSCAR design exploration;
 - mass-produce static mockups before the visual language has survived implementation;
 - copy reference products literally. Borrow principles and patterns, not surfaces.
+
+### Owner-feedback Workspace rhythm — 2026-10-13
+
+The Workspace toolbar has balanced 24px edge insets; page content shares an
+860px measure with 32px gutters, reducing to 24px on narrow Windows windows.
+Page headings use one scale. Stable scrollbar gutters preserve the content axis
+between Conversation and scrollable tools. Section/control groups use 24/32px
+spacing. Devices is an executor-scoped capability catalog with disclosure rows,
+not a device-health dashboard. Preferences uses visual appearance previews,
+native shortcut state and distinct voice/presence/privacy groups.
+
+Navigation selection glides over 260ms; routes settle over 220ms and capability
+details over 180ms. Motion follows owner interaction, never fabricates activity.
+Reduced motion removes movement and smooth scrolling. Diagonal arrow glyphs
+are not used for local navigation or window controls.
+
+### Current owner material correction — 2026-10-13
+
+The owner explicitly selects restrained neumorphism across the Workspace.
+Raised buttons, recessed fields and pressed selections use paired directional
+soft shadows on the canonical paper/graphite surfaces. Orb blue is an accent:
+light primary `#236891`, dark primary `#A8D3E9`, selected surface `#E2E9E7` /
+`#293B40`. Explicit boundaries and focus outlines remain; low-contrast decorative
+shadows never carry the only state information. This supersedes earlier flat
+control styling. Devices uses executor/capability selection with a focused
+inspector, superseding the rejected full-width capability-row layout.
