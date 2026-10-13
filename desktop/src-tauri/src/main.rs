@@ -20,11 +20,13 @@ use std::{
 };
 use tauri::{
     Emitter, Manager,
-    menu::{Menu, MenuItem},
+    menu::{CheckMenuItem, Menu, MenuItem},
     tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
 };
 use tauri_plugin_global_shortcut::{GlobalShortcutExt, Shortcut, ShortcutState};
-use windows_sys::Win32::UI::WindowsAndMessaging::{IDYES, MB_ICONQUESTION, MB_YESNO, MessageBoxW};
+use windows_sys::Win32::UI::WindowsAndMessaging::{
+    IDYES, MB_ICONQUESTION, MB_ICONWARNING, MB_OK, MB_YESNO, MessageBoxW,
+};
 
 struct Native {
     isolated_preferences: bool,
@@ -84,12 +86,12 @@ fn companion_view(mut view: View) -> View {
 #[serde(tag = "kind", rename_all = "snake_case", deny_unknown_fields)]
 enum SurfaceCommand {
     Ready,
+    CompanionMenu {},
     OpenWorkspace,
     OpenActivity,
     HideWorkspace,
     ShowCompanion,
     HideCompanion,
-    CompanionControls { open: bool },
     ShortcutEnabled { enabled: bool },
     CancelListening,
     Theme { theme: ThemeChoice },
@@ -111,15 +113,13 @@ async fn surface_command(
     );
     match request {
         SurfaceCommand::Ready => {}
-        SurfaceCommand::OpenWorkspace => {
-            let workspace = app
-                .get_webview_window("main")
-                .ok_or("Workspace unavailable")?;
-            workspace.show().map_err(|_| "Workspace show failed")?;
-            workspace
-                .set_focus()
-                .map_err(|_| "Workspace focus failed")?;
+        SurfaceCommand::CompanionMenu {} => {
+            if window.label() != "companion" {
+                return Err("Companion menu belongs to Companion".into());
+            }
+            companion_menu(&app, &window, &state)?;
         }
+        SurfaceCommand::OpenWorkspace => show_workspace(&app)?,
         SurfaceCommand::OpenActivity => {
             window_mode(&app, &state, WindowMode::Activity)?;
         }
@@ -141,41 +141,8 @@ async fn surface_command(
                 .hide()
                 .map_err(|_| "hide failed")?;
         }
-        SurfaceCommand::CompanionControls { open } => {
-            presence::resize(
-                &app.get_webview_window("companion")
-                    .ok_or("Companion unavailable")?,
-                (188., if open { 350. } else { 190. }),
-                false,
-            )?;
-        }
         SurfaceCommand::ShortcutEnabled { enabled } => {
-            if enabled {
-                let value = state.bridge.view().shortcut;
-                register_shortcut(
-                    &app,
-                    &state,
-                    if value.starts_with("Ctrl+Alt+") {
-                        &value
-                    } else {
-                        "Ctrl+Alt+O"
-                    },
-                )?;
-            } else {
-                let mut shortcut = state.shortcut.lock().map_err(|_| "shortcut unavailable")?;
-                if let Some(value) = *shortcut {
-                    app.global_shortcut()
-                        .unregister(value)
-                        .map_err(|_| "shortcut unregister failed")?;
-                }
-                *shortcut = None;
-                state
-                    .bridge
-                    .view
-                    .lock()
-                    .map_err(|_| "state unavailable")?
-                    .shortcut_enabled = false;
-            }
+            shortcut_enabled(&app, &state, enabled)?;
         }
         SurfaceCommand::CancelListening => {
             let bridge = state.bridge.clone();
@@ -219,6 +186,148 @@ async fn surface_command(
     } else {
         state.bridge.view()
     })
+}
+fn shortcut_enabled(app: &tauri::AppHandle, state: &Native, enabled: bool) -> Result<(), String> {
+    if enabled {
+        let value = state.bridge.view().shortcut;
+        register_shortcut(
+            app,
+            state,
+            if value.starts_with("Ctrl+Alt+") {
+                &value
+            } else {
+                "Ctrl+Alt+O"
+            },
+        )?;
+    } else {
+        let mut shortcut = state.shortcut.lock().map_err(|_| "shortcut unavailable")?;
+        if let Some(value) = *shortcut {
+            app.global_shortcut()
+                .unregister(value)
+                .map_err(|_| "shortcut unregister failed")?;
+        }
+        *shortcut = None;
+        state
+            .bridge
+            .view
+            .lock()
+            .map_err(|_| "state unavailable")?
+            .shortcut_enabled = false;
+    }
+    Ok(())
+}
+fn show_workspace(app: &tauri::AppHandle) -> Result<(), String> {
+    let window = app
+        .get_webview_window("main")
+        .ok_or("Workspace unavailable")?;
+    window.show().map_err(|_| "Workspace show failed")?;
+    window
+        .set_focus()
+        .map_err(|_| "Workspace focus failed".to_owned())
+}
+fn companion_menu(
+    app: &tauri::AppHandle,
+    window: &tauri::WebviewWindow,
+    state: &Native,
+) -> Result<(), String> {
+    let view = state.bridge.view();
+    let open = MenuItem::with_id(app, "companion_open", "Open OSCAR", true, None::<&str>);
+    let shortcut = CheckMenuItem::with_id(
+        app,
+        "companion_shortcut",
+        "Global shortcut",
+        true,
+        view.shortcut_enabled,
+        None::<&str>,
+    );
+    let active = matches!(view.voice.as_str(), "listening" | "processing" | "speaking");
+    let voice = MenuItem::with_id(
+        app,
+        "companion_cancel",
+        if active {
+            "Cancel voice turn"
+        } else {
+            "Mute — unavailable"
+        },
+        active,
+        None::<&str>,
+    );
+    let trigger = CheckMenuItem::with_id(
+        app,
+        "companion_trigger",
+        "On request",
+        false,
+        true,
+        None::<&str>,
+    );
+    let sentry = MenuItem::with_id(
+        app,
+        "companion_sentry",
+        "Sentry — unavailable",
+        false,
+        None::<&str>,
+    );
+    let hide = MenuItem::with_id(app, "companion_hide", "Hide Companion", true, None::<&str>);
+    let (open, shortcut, voice, trigger, sentry, hide) = (
+        open.map_err(|_| "menu unavailable")?,
+        shortcut.map_err(|_| "menu unavailable")?,
+        voice.map_err(|_| "menu unavailable")?,
+        trigger.map_err(|_| "menu unavailable")?,
+        sentry.map_err(|_| "menu unavailable")?,
+        hide.map_err(|_| "menu unavailable")?,
+    );
+    let menu = Menu::with_items(app, &[&open, &shortcut, &voice, &trigger, &sentry, &hide])
+        .map_err(|_| "menu unavailable")?;
+    window
+        .popup_menu(&menu)
+        .map_err(|_| "menu unavailable".into())
+}
+fn companion_menu_action(app: &tauri::AppHandle, action: &str) {
+    if !matches!(
+        action,
+        "companion_open" | "companion_shortcut" | "companion_cancel" | "companion_hide"
+    ) {
+        return;
+    }
+    let app = app.clone();
+    let action = action.to_owned();
+    thread::spawn(move || {
+        let state = app.state::<Native>();
+        let result = match action.as_str() {
+            "companion_open" => show_workspace(&app),
+            "companion_shortcut" => {
+                shortcut_enabled(&app, &state, !state.bridge.view().shortcut_enabled)
+                    .and_then(|()| save_preferences(&app, &state))
+            }
+            "companion_cancel" => state
+                .bridge
+                .execute(Command::VoiceCancel, |_| false)
+                .map(|_| ()),
+            "companion_hide" => app
+                .get_webview_window("companion")
+                .ok_or("Companion unavailable".to_owned())
+                .and_then(|window| window.hide().map_err(|_| "hide failed".to_owned())),
+            _ => return,
+        };
+        if let Err(error) = result {
+            state.bridge.fail_request(error.clone());
+            let message: Vec<u16> = error.encode_utf16().chain(Some(0)).collect();
+            let title: Vec<u16> = "OSCAR control unavailable"
+                .encode_utf16()
+                .chain(Some(0))
+                .collect();
+            // SAFETY: bounded native control error and NUL-terminated strings; no signing material.
+            unsafe {
+                MessageBoxW(
+                    std::ptr::null_mut(),
+                    message.as_ptr(),
+                    title.as_ptr(),
+                    MB_OK | MB_ICONWARNING,
+                );
+            }
+        }
+        emit(&app, &state);
+    });
 }
 fn window_mode(app: &tauri::AppHandle, state: &Native, mode: WindowMode) -> Result<View, String> {
     let window = app
@@ -741,7 +850,8 @@ fn main() {
                     .on_navigation(|url| url.scheme()=="tauri" || (url.scheme()=="http" && (url.host_str()==Some("tauri.localhost") ||
                         (cfg!(debug_assertions)&&url.host_str()==Some("127.0.0.1")&&url.port()==Some(1420)))))
                     .build()?;
-                presence::resize(&companion,(188.,190.),true)?;
+                presence::resize(&companion,(148.,164.),true)?;
+                companion.on_menu_event(|window,event|{if window.label()=="companion" {companion_menu_action(window.app_handle(),event.id.as_ref());}});
             }
             let reveal=MenuItem::with_id(app,"reveal","Open OSCAR",true,None::<&str>)?;
             let compact=MenuItem::with_id(app,"compact","Show Companion",true,None::<&str>)?;
@@ -856,6 +966,17 @@ mod native_tests {
             )
             .is_err()
         );
+    }
+    #[test]
+    fn companion_menu_request_cannot_supply_actions_or_signing_material() {
+        assert!(
+            serde_json::from_value::<SurfaceCommand>(serde_json::json!({"kind":"companion_menu"}))
+                .is_ok()
+        );
+        for field in ["action", "review_id", "signature", "command"] {
+            let request = serde_json::json!({"kind":"companion_menu",(field):"approve"});
+            assert!(serde_json::from_value::<SurfaceCommand>(request).is_err());
+        }
     }
     #[test]
     fn invocation_and_capabilities_are_bounded() {

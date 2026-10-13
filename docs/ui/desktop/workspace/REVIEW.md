@@ -107,6 +107,21 @@ recessed inputs, pressed selection states and shared bounded motion. All 64
 frontend tests and 53 native checks passed on the current bundled executable.
 Owner visual acceptance remains pending.
 
+## Current material, continuity and scrolling candidate — 2026-10-13
+
+[Native material packet](material-review/README.md): 74 frontend tests, 15 Rust
+tests, TypeScript/Vite/Tauri debug build, Rust fmt/Clippy, 58 native architecture
+and layout checks, 22 long-response/material checks and both-theme Radix
+keyboard/CSP checks pass. Shared expression regression and CNG/PSS self-check
+are run separately. The Orb source hash is unchanged.
+
+The sidebar task list is removed; history remains in Activity. Long responses
+scroll at the Workspace edge without moving the anchored composer. Neumorphic
+material now spans work panes, preferences and controls in both themes.
+Companion's bounded icon-toolbar motion passes eight native checks. Direct
+menu/drag Computer Use review was interrupted by owner Escape and remains an
+owner interaction check. No physical, production or owner visual PASS is claimed.
+
 ## Forms and Activity correction — 2026-10-13
 
 The owner rejected the heavy inset-button effect and raw composer affordance.

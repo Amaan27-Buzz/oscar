@@ -34,9 +34,7 @@ def main():
         pages = [p for c in browser.contexts for p in c.pages]
         companion = next(p for p in pages if "?companion" in p.url)
         workspace = next(p for p in pages if "?companion" not in p.url)
-        companion.get_by_text("Core unavailable", exact=True).wait_for(
-            state="hidden", timeout=20000
-        )
+        companion.get_by_text("Disconnected", exact=True).wait_for(state="hidden", timeout=20000)
 
         def handle(title):
             return next(h for h, _, t in windows(info["pid"]) if t == title)
@@ -210,12 +208,23 @@ def main():
             "actual arithmetic outcome",
             workspace.get_by_role("region", name="OSCAR response").inner_text() == "5",
         )
-        companion.get_by_role("button", name="Companion controls").click()
-        companion.get_by_text("Sentry · unavailable").wait_for()
+        companion.locator(".companion-orb").hover()
+        companion.wait_for_timeout(350)
         shot(companion, "companion-controls", "OSCAR Companion")
         check(
-            "persistent mute and Sentry are unavailable",
-            companion.get_by_text("Mute · unavailable").count() == 1,
+            "persistent mute is unavailable",
+            companion.get_by_role("button", name="Mute unavailable").is_disabled(),
+        )
+        check(
+            "Sentry is unavailable",
+            invoke(companion, "surface_command", {"kind": "ready"})["value"]["voice_support"][
+                "sentry"
+            ]
+            == "unavailable",
+        )
+        check(
+            "Workspace cannot open Companion-native menu",
+            not invoke(workspace, "surface_command", {"kind": "companion_menu"})["ok"],
         )
         companion.get_by_role("button", name="Shortcut on").click()
         companion.get_by_role("button", name="Shortcut off").wait_for()
@@ -318,7 +327,7 @@ def main():
         ).click()
         shot(workspace, "preferences", "OSCAR Workspace")
         invoke(workspace, "surface_command", {"kind": "hide_workspace"})
-        companion.get_by_role("button", name="Open Workspace", exact=True).click()
+        companion.get_by_role("button", name="Open OSCAR Workspace", exact=True).click()
         workspace.get_by_role("heading", name="Preferences", exact=True).wait_for()
         check("ordinary reopen preserves the owner-selected page", True)
         command("long")
@@ -342,7 +351,7 @@ def main():
             workspace.get_by_text("REPORTED", exact=True).count() == 1,
         )
         command("disconnect")
-        companion.get_by_text("Core unavailable", exact=True).wait_for(timeout=15000)
+        companion.get_by_text("Disconnected", exact=True).wait_for(timeout=15000)
         shot(companion, "companion-unavailable", "OSCAR Companion")
         shot(workspace, "workspace-unavailable", "OSCAR Workspace")
         check(
@@ -350,9 +359,7 @@ def main():
             workspace.get_by_role("button", name="Send", exact=False).is_disabled(),
         )
         command("reconnect")
-        companion.get_by_text("Core unavailable", exact=True).wait_for(
-            state="hidden", timeout=15000
-        )
+        companion.get_by_text("Disconnected", exact=True).wait_for(state="hidden", timeout=15000)
         check(
             "Core reconnect restores shared tasks",
             len(invoke(workspace, "desktop_command", {"kind": "ready"})["value"]["tasks"]) >= 2,
@@ -438,7 +445,7 @@ def main():
 
         workspace.get_by_role("button", name="Return to desktop", exact=False).click()
         record(2, "Companion")
-        companion.get_by_role("button", name="Open Workspace", exact=True).click()
+        companion.get_by_role("button", name="Open OSCAR Workspace", exact=True).click()
         record(3, "Workspace opened")
         workspace.get_by_role("button", name="Return to desktop", exact=False).click()
         record(2, "Workspace closed; Companion remains")
@@ -460,7 +467,7 @@ def main():
             ],
             check=True,
         )
-        companion.get_by_role("button", name="Open Workspace", exact=True).click()
+        companion.get_by_role("button", name="Open OSCAR Workspace", exact=True).click()
         kernel = ctypes.WinDLL("kernel32")
         kernel.OpenProcess.restype = wintypes.HANDLE
         kernel.WaitForSingleObject.argtypes = [wintypes.HANDLE, wintypes.DWORD]

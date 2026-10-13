@@ -47,8 +47,8 @@ is the current owner-review candidate.
 Conversation keeps its composer accessible and gives direct access to an
 advertised review. Text tools expose existing capture/preview/destination flows;
 Activity retains Core tasks and evidence. Exact decision/signing still occurs in
-Workspace/native UI. Companion's liked appearance remains unchanged, with
-isolated styles. Reduced motion remains complete. Aperture `42b565c` remains an
+Workspace/native UI. The canonical Orb remains unchanged, with isolated
+Companion styles. Reduced motion remains complete. Aperture `42b565c` remains an
 assessed historical reference; its scripted content and expanding dock
 architecture are not adopted.
 
@@ -75,3 +75,24 @@ Collapsible supplies expandable sections. Native browser arrow markers are
 replaced by consistent plus/minus state indicators. Values and authority remain
 in the existing native/Core contracts. The CSP remains unchanged; native tests
 verify keyboard focus return and no popup CSP violations.
+
+## Workspace material and continuity — 2026-10-13
+
+The sidebar contains navigation and OSCAR presence, never a chat-thread list.
+Core task history and outcomes remain available in Activity. Conversation is
+one interaction point; this presentation change adds no frontend history store.
+Long-response scrolling spans the Workspace width, with its scrollbar at the
+outer edge, a centered reading column and a separately anchored composer.
+
+The owner requested stronger neumorphic material throughout the Workspace.
+Shared paired upper-left highlights and lower-right shadows now give controls,
+work panes, settings and the composer consistent relief in both themes. Inputs
+retain clear white/graphite fields and focus borders. Buttons remain raised,
+with modest corner radii; selected state and unavailable controls remain explicit.
+See [native material and scrolling evidence](../ui/desktop/workspace/material-review/README.md).
+
+Companion uses a fixed 148 × 164 logical-pixel window. Its icon toolbar expands
+on hover or keyboard focus and retracts on pointer leave, without moving the Orb
+or resizing the native window. More/right-click requests a bounded native menu;
+no review/signing payload is accepted. Unsupported mute and Sentry stay disabled.
+See [native hover evidence](../ui/desktop/companion-review/README.md).

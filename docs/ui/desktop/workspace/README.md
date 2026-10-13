@@ -117,3 +117,9 @@ the preceding revision. Owner visual acceptance is pending.
 replace browser dropdown arrows and triangle disclosures with plus/minus state
 indicators. Light mode now uses warm chalk, white fields and slate-blue accents.
 Native CSP and owner-review boundaries remain unchanged.
+
+**Current owner-feedback candidate:** [Workspace material and scrolling](material-review/README.md)
+removes the sidebar task/chat-list treatment, fixes long-response scrolling and
+applies shared neumorphic relief across the Workspace in both themes.
+[Companion interaction evidence](../companion-review/README.md) records the
+separately polished icon toolbar. The canonical Orb remains unchanged.

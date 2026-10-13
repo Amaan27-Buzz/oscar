@@ -74,6 +74,14 @@ components:
 
 ## Active Desktop architecture — Group 2.5A
 
+The 2026-10-13 material revision applies paired upper-left highlights and
+lower-right shadows to raised Workspace controls and work/settings panes.
+Warm chalk and graphite share the same depth tokens; fields retain clear
+boundaries and focus. The sidebar has no chat-thread/task-history list: Core
+history belongs in Activity. Conversation scrolls at the outer Workspace edge,
+with centered reading content and an anchored composer. See
+[native material review](docs/ui/desktop/workspace/material-review/README.md).
+
 Desktop now separates a tiny expressive **Companion** from a full **Workspace**.
 The Companion never contains chat, task lists, approvals or settings pages.
 The owner refreshed Desktop light mode on 2026-10-13: warm chalk canvas

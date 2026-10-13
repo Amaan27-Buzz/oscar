@@ -1,0 +1,30 @@
+{
+  "checks": [
+    "light: sidebar has no chat/task list",
+    "light: long response needs scrolling",
+    "light: scrollbar sits at the Workspace edge",
+    "light: reading scrolls without moving composer",
+    "light: composer fits and has paired relief shadows",
+    "light: Text tools does not overflow horizontally",
+    "light: Act does not overflow horizontally",
+    "light: Activity does not overflow horizontally",
+    "light: Devices does not overflow horizontally",
+    "light: Preferences does not overflow horizontally",
+    "dark: sidebar has no chat/task list",
+    "dark: long response needs scrolling",
+    "dark: scrollbar sits at the Workspace edge",
+    "dark: reading scrolls without moving composer",
+    "dark: composer fits and has paired relief shadows",
+    "dark: Text tools does not overflow horizontally",
+    "dark: Act does not overflow horizontally",
+    "dark: Activity does not overflow horizontally",
+    "dark: Devices does not overflow horizontally",
+    "dark: Preferences does not overflow horizontally",
+    "narrow reading keeps scrollbar at edge",
+    "narrow composer stays visible"
+  ],
+  "capture": "ACTUAL_TAURI_WEBVIEW2_OWNED_HWND",
+  "core": "authenticated disposable reference",
+  "response": "SCRIPTED / REPORTED; no actual inference",
+  "owner_visual_acceptance": "PENDING"
+}

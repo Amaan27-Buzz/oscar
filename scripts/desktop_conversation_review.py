@@ -19,7 +19,7 @@ def main():
         pages = [p for c in browser.contexts for p in c.pages]
         companion = next(p for p in pages if "?companion" in p.url)
         page = next(p for p in pages if "?companion" not in p.url)
-        companion.get_by_text("Core unavailable", exact=True).wait_for(state="hidden")
+        companion.get_by_text("Disconnected", exact=True).wait_for(state="hidden")
         companion.get_by_role("button", name="Open OSCAR Workspace", exact=True).click()
         command("design")
         page.get_by_label("Ask OSCAR").fill("Explain how the Companion and Workspace fit together.")

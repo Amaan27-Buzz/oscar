@@ -4,6 +4,14 @@ import {Workspace} from './Workspace';
 import {initialView} from './bridge';
 import type {Command,View} from './bridge';
 afterEach(cleanup);
+it('keeps Core task history in Activity instead of a chat-list sidebar',async()=>{
+ const task={task_id:'past-work',state:'verified',description:'Earlier work',target:'worker',actions:[],blocker:null,generation:1,evidence_ids:[],response:'An outcome',response_status:'REPORTED',value:null,epistemic:null};
+ const port=mount({tasks:[task]});await waitFor(()=>expect(port).toHaveBeenCalled());
+ expect(screen.queryByText('Recent work')).toBeNull();expect(screen.queryByText('Earlier work')).toBeNull();
+ expect(screen.getByRole('region',{name:'Conversation scroll area'})).toBeTruthy();
+ fireEvent.click(screen.getByRole('button',{name:'Activity'}));
+ expect(screen.getByText('Earlier work')).toBeTruthy();
+});
 function mount(extra:Partial<View>={}) {
   const now=Date.now();let view:View={...initialView,link:'online',window:'interaction',expression:{epoch:'a'.repeat(32),generation:1,observed_at_ms:now,voice_observed_at_ms:now,tasks_observed_at_ms:now,current_observed_at_ms:now},...extra};
   const port=vi.fn(async(c:Command)=>{if(c.kind==='interact')view={...view,current:{task_id:'actual',state:'planned',description:'Core task',target:'worker',actions:['approve'],blocker:null,generation:1,evidence_ids:[],response:null,response_status:null,value:null,epistemic:null}};return view;});

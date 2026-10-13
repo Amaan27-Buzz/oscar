@@ -2,7 +2,7 @@ import {Theme} from '@radix-ui/themes';
 import {useEffect,useState} from 'react';
 import {DesktopExpression} from './DesktopExpression';
 import {send,subscribe,statuses} from './bridge';
-import type {Command,Send,Task} from './bridge';
+import type {Command,Send} from './bridge';
 import {surface,useDesktop} from './surfaces';
 import {Activity} from './presence/Activity';
 import {TextTools} from './presence/TextTools';
@@ -30,22 +30,20 @@ export function Workspace({port=send,events=subscribe}:{port?:Send;events?:typeo
   function discard(){void run({kind:'discard'});}
   const task=view.current;
   async function ask(){if(!available||busy||!draft.trim())return;const text=draft;const prior=latest.current.current?.task_id;const ok=await run({kind:'interact',mode:'Ask',text,context_id:view.context?.id??''});const id=latest.current.current?.task_id;if(ok&&id&&id!==prior){setSubmitted({id,text});setDraft('');}}
-  function inspect(t:Task){setPage('Conversation');setReading(false);void run({kind:'inspect',task_id:t.task_id});}
   return <Theme asChild appearance={view.theme??'light'} accentColor="blue" grayColor="sand" radius="small"><main className="workspace">
     <aside className="workspace-rail"><div className="workspace-brand"><strong>OSCAR</strong></div>
       <nav aria-label="Workspace" style={{'--nav-index':pages.indexOf(page)} as CSSProperties}>{pages.map(item=><button key={item} aria-current={page===item?'page':undefined} onClick={()=>{setPage(item);setReading(false);}}><WorkspaceMark name={item}/><span>{item}</span></button>)}</nav>
-      {!!view.tasks.length&&<div className="rail-history"><h2>Recent work</h2>{view.tasks.slice(0,6).map(t=><button key={t.task_id} disabled={!available||busy} onClick={()=>inspect(t)}><span>{t.description||'Shared task'}</span><small>{statuses[t.state]??'Unknown'}</small></button>)}</div>}
       <div className="rail-presence"><DesktopExpression view={view} size={48}/><div className="presence-identity"><strong>OSCAR</strong><div className="rail-bottom"><span className={`link-dot ${available?'online':''}`}/><span>{available?'Connected':'Disconnected'}</span><button aria-label="Refresh connection" disabled={busy} onClick={()=>run({kind:'refresh'})}><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M20 7v5h-5M20 12a8 8 0 1 0-2 5"/></svg></button></div></div></div>
     </aside>
     <div className="workspace-body"><header className="workspace-top"><div className="workspace-top-inner"><span>{page}</span><div><button onClick={()=>local({kind:'show_companion'})}>Show Companion</button><button onClick={()=>local({kind:'hide_workspace'})}>Return to desktop</button></div></div></header>
       {(error||view.feedback||!available)&&<div className="workspace-notice" role="status">{error||view.feedback?.message||'Connection unavailable. Your work is preserved; reconnect to continue.'}<button disabled={busy} onClick={()=>run({kind:'refresh'})}>Check connection</button></div>}
       <div data-page={page} className={`workspace-content ${reading?'reader':''} ${page==='Conversation'?'conversation-page':''}`}>
-        {page==='Conversation'&&<section className={`conversation ${!task?'is-home':''}`} aria-label="Conversation"><div className="conversation-thread"><div className="section-heading"><h1>{reading?'Response':'Conversation'}</h1></div>
+        {page==='Conversation'&&<section className={`conversation ${!task?'is-home':''}`} aria-label="Conversation"><div className="conversation-thread" role="region" aria-label="Conversation scroll area" tabIndex={0}><div className="conversation-thread-inner"><div className="section-heading"><h1>{reading?'Response':'Conversation'}</h1></div>
           {submitted&&submitted.id===task?.task_id&&<div className="user-turn"><small>You</small><p>{submitted.text}</p></div>}
           {task&&<div className="assistant-turn"><h2>OSCAR <small>{statuses[task.state]??'Unknown'}</small></h2>
             {(task.response||task.value)?<ResultView task={task} expanded={reading} read={()=>setReading(true)} inspect={()=>setPage('Activity')} askAgain={()=>{setReading(false);document.getElementById('workspace-ask')?.focus();}}/>:<><TaskStage task={task} busy={busy} run={run}/>{task.actions.includes('approve')&&<button className="leaf-primary" disabled={!available||busy} onClick={()=>run({kind:'review',task_id:task.task_id,operation:'approve'})}>Review approval</button>}</>}</div>}
           {!task&&<div className="conversation-empty"><h2>What are we working on?</h2><p>A question, some writing, or a next step.</p><div><button onClick={()=>setPage('Text tools')}>Work with text</button><button onClick={()=>setPage('Act')}>Prepare an action</button></div></div>}
-          </div>
+          </div></div>
           <form className="workspace-composer" onSubmit={e=>{e.preventDefault();void ask();}}><label className="visually-hidden" htmlFor="workspace-ask">Ask OSCAR</label><textarea id="workspace-ask" rows={2} maxLength={4096} placeholder="Message OSCAR…" value={draft} onChange={e=>setDraft(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.nativeEvent.isComposing){e.preventDefault();void ask();}}}/><div><span>{view.context?'Context attached · ':''}Enter to send · Shift+Enter for a new line</span><button className="leaf-primary send-icon" aria-label="Send" title="Send" disabled={!available||busy||!draft.trim()}><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 19V5m-6 6 6-6 6 6"/></svg></button></div></form>
         </section>}
         {page==='Text tools'&&<section><div className="section-heading"><h1>Text tools</h1><p className="leaf-secondary">Dictate freely. Edit deliberately. Review before applying.</p></div><TextTools view={view} available={available} busy={busy} mode={toolMode} setMode={setToolMode} draft={toolDrafts[toolMode]} setDraft={text=>setToolDrafts(d=>({...d,[toolMode]:text}))} run={run} discard={discard}/>{task?.mode==='Edit'&&<TaskStage task={task} busy={busy} run={run}/>}</section>}
