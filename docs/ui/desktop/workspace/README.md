@@ -102,3 +102,8 @@ replaces the earlier Devices/Preferences styling and applies the owner's
 neumorphic button/material direction, Orb blue accents and spacing/motion fixes
 across every Workspace page. Historical native packets above are preserved;
 this revision has 64 frontend tests and 53 native checks passing.
+
+**Current revision:** [Forms, Activity and product language](forms-activity-review/README.md)
+supersedes the inset-control treatment above. It includes the corrected composer,
+Act/Activity restructure and removal of developer banners/internal UI copy.
+Runtime test provenance remains explicit in the evidence and launch helper.

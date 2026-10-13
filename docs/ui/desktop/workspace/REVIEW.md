@@ -106,3 +106,13 @@ selection, a capability inspector, paired soft depth, Orb blue accents,
 recessed inputs, pressed selection states and shared bounded motion. All 64
 frontend tests and 53 native checks passed on the current bundled executable.
 Owner visual acceptance remains pending.
+
+## Forms and Activity correction — 2026-10-13
+
+The owner rejected the heavy inset-button effect and raw composer affordance.
+[Current native packet](forms-activity-review/README.md) records a bounded,
+content-sized composer, one raised control treatment, grouped Act forms and a
+focused Activity result/decision pane. Product banners/internal labels are
+removed; exact review content, availability and outcome truth remain. Frontend
+regression: 66 tests. Native acceptance: 56 checks. Final visual review remains
+with the owner; this supersedes the preceding tactile controls.

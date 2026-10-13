@@ -18,6 +18,6 @@ describe('bounded Core response',()=>{
   it('expanded recall stays sourced and announces Core truncation rather than claiming complete output',()=>{
     render(<ResultView task={{...task,response_status:'RECALLED',source_event_ids:['event-1'],response_truncated:true}} expanded read={()=>{}} inspect={()=>{}} askAgain={()=>{}}/>);
     const region=screen.getByRole('region',{name:'OSCAR response'});expect(region.textContent).toBe(task.response);expect(document.activeElement).toBe(region);
-    expect(screen.getByText(/Earlier retained evidence/)).toBeTruthy();expect(screen.getByText(/bounded excerpt/)).toBeTruthy();expect(screen.getByText('event-1')).toBeTruthy();
+    expect(screen.getByText(/Earlier retained evidence/)).toBeTruthy();expect(screen.getByText(/Only an excerpt is available/)).toBeTruthy();expect(screen.getByText('event-1')).toBeTruthy();
   });
 });

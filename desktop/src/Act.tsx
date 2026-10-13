@@ -35,24 +35,23 @@ export function Act({capabilities,run,disabled,draft,onDraftChange}:{capabilitie
     }
     run({kind:'act',capability_id:selected.id,form});
   }
-  if(!available.length)return <p role="status">No eligible action capability is advertised. Nothing will be queued.</p>;
+  if(!available.length)return <p role="status">No actions are available on your connected devices.</p>;
   const needsValue=['write_file','ps_write_utf8','read_file','ps_file_hash','find_files','git_branch','inspect_page'].includes(operation);
-  return <section aria-label="Act"><label>Available capability<select aria-label="Available capability" value={id} onChange={e=>choose(e.target.value)}>
-    <option value="">Choose a current executor</option>
-    {available.map(c=><option key={c.id} value={c.id}>{c.label} · {c.node}</option>)}</select></label>
+  return <section className="action-form" aria-label="Act"><div className="action-fields"><label>Available capability<select aria-label="Available capability" value={id} onChange={e=>choose(e.target.value)}>
+    <option value="">Choose an executor</option>
+    {available.map(c=><option key={c.id} value={c.id}>{c.label}{new Set(available.map(item=>item.node)).size>1?` · Executor ${[...new Set(available.map(item=>item.node))].indexOf(c.node)+1}`:''}</option>)}</select></label>
     <label>Operation<select aria-label="Operation" value={operation} onChange={e=>chooseOperation(e.target.value)}>
-      {selected?.operations.map(o=><option key={o} value={o}>{labels[o]??o}</option>)}</select></label>
+      {selected?.operations.map(o=><option key={o} value={o}>{labels[o]??o}</option>)}</select></label></div>
     {needsValue&&<label>{operation==='inspect_page'?'HTTP(S) page':operation==='find_files'?'Filename pattern':operation==='git_branch'?'Branch name':'Relative workspace path'}
       <input maxLength={200} value={value} onChange={e=>update({value:e.target.value})} /></label>}
-    {['write_file','ps_write_utf8'].includes(operation)&&<label>Exact content<textarea maxLength={4096} value={text} onChange={e=>update({text:e.target.value})}/></label>}
+    {['write_file','ps_write_utf8'].includes(operation)&&<label>Exact content<textarea rows={6} maxLength={4096} value={text} onChange={e=>update({text:e.target.value})}/></label>}
     {operation==='program_version'&&<label>Registered program<select aria-label="Registered program" value={value} onChange={e=>update({value:e.target.value})}>
       <option value="">Choose a registered program</option>
       {selected?.programs.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}</select></label>}
     {operation==='launch_app'&&<label>Authorized application<select aria-label="Authorized application" value={value} onChange={e=>update({value:e.target.value})}>
       <option value="">Choose a registered application</option>
       {selected?.applications.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}</select></label>}
-    <p className="secondary">{selected?.summary} · Core policy and owner review apply.</p>
-    {selected&&<p className="secondary">{selected.node} · {selected.risk} risk · required scopes: {selected.permissions?.join(', ')||'Core checks the registered scope'}</p>}
-    <button disabled={disabled||!selected||!operation||(needsValue&&!value.trim())||(operation==='program_version'&&!value)||(operation==='launch_app'&&!value)} onClick={submit}>Prepare action</button>
+    {selected&&<details className="action-permissions"><summary>Permission and destination</summary><dl><div><dt>Executor</dt><dd>{selected.node}</dd></div><div><dt>Risk</dt><dd>{selected.risk}</dd></div><div><dt>Required scopes</dt><dd>{selected.permissions?.join(', ')||'Checked for this request'}</dd></div></dl><p>{selected.summary}</p></details>}
+    <div className="action-submit">    <button disabled={disabled||!selected||!operation||(needsValue&&!value.trim())||(operation==='program_version'&&!value)||(operation==='launch_app'&&!value)} onClick={submit}>Prepare action</button><span>You’ll review the exact action before it runs.</span></div>
   </section>;
 }

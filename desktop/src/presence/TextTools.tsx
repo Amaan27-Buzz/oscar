@@ -34,13 +34,13 @@ export function TextTools({view,available,busy,mode,setMode,draft,setDraft,run,d
       onClick={()=>switchMode(item)} onKeyDown={e=>{if(['ArrowLeft','ArrowRight'].includes(e.key)){e.preventDefault();switchMode(mode==='Dictate'?'Edit':'Dictate');requestAnimationFrame(()=>document.getElementById(`tool-${mode==='Dictate'?'Edit':'Dictate'}`)?.focus());}}}>{item}</button>)}</div>
     <section role="tabpanel" id={`panel-${mode}`} aria-labelledby={`tool-${mode}`}>
       <details className="context-details"><summary>{context?`${context.source} context · ${fresh?'fresh':'recapture required'}`:'Context · none attached'}</summary>
-        {context&&<><p>{context.scope} · {context.provenance}</p><p>{context.permission} · {context.retained?'retained by Core':'not retained'} · observed {new Date(context.timestamp*1000).toLocaleTimeString()}</p><pre>{context.text}</pre></>}
+        {context&&<><p>{context.scope} · {context.provenance}</p><p>{context.permission} · {context.retained?'saved':'not saved'} · observed {new Date(context.timestamp*1000).toLocaleTimeString()}</p><pre>{context.text}</pre></>}
         <label>Capture on invocation<select value={source} onChange={e=>{const next=e.target.value as ContextChoice;void run({kind:'capture_choice',source:next});}}>
           <option value="none">No capture</option><option value="selection">Selected text</option><option value="focused">Focused field</option><option value="foreground">Window identity</option></select></label>
         <p className="leaf-secondary">Focus the intended application, then invoke OSCAR. Unregistered, password or inaccessible content remains unavailable.</p>
         <button disabled={busy||!available||source==='none'} onClick={()=>run({kind:'capture',source})}>Capture supported context</button>
         <button onClick={discard}>Discard private drafts and context</button>
-        <p className="leaf-secondary">Active tasks require separate cancellation. Their execution state remains in Core.</p>
+        <p className="leaf-secondary">Clearing drafts leaves active tasks running. Review a task in Activity to cancel it.</p>
       </details>
       {mode==='Dictate'&&<div className="voice-controls"><p role="status" aria-live="polite">{view.voice==='listening'?'Listening — explicit capture active.':view.voice==='processing'?'Finalizing dictation.':view.voice==='cancelled'?'Dictation cancelled.':'Dictation capture starts only on your request.'}</p>
         {activeVoice?<><button disabled={busy||view.voice==='processing'} onClick={()=>run({kind:'voice_stop'})}>Finish dictation</button><button onClick={()=>run({kind:'voice_cancel'})}>Cancel dictation</button></>:<button disabled={busy||!available} onClick={()=>run({kind:'voice_start',context_id:context?.id??''})}>Start dictation</button>}</div>}
@@ -52,10 +52,10 @@ export function TextTools({view,available,busy,mode,setMode,draft,setDraft,run,d
       {editTask&&!preview&&<button disabled={!available||busy} onClick={()=>run({kind:'preview',task_id:view.current!.task_id})}>Preview transformation</button>}
       {preview&&<section className="text-preview" aria-label="Review text preview"><h2>Review before applying</h2>
         <p className="leaf-secondary">{preview.epistemic} text · {expired?'Preview expired — create a fresh preview.':'Preview is time limited.'}</p>
-        <label>Destination<select value={validDestination} onChange={e=>setDestination(e.target.value)}>{preview.destinations.map(item=><option key={item} value={item}>{item==='surface'?'OSCAR surface only':item==='focused'?'Captured focused field':'Explicit clipboard'}</option>)}</select></label>
+        <label>Destination<select value={validDestination} onChange={e=>setDestination(e.target.value)}>{preview.destinations.map(item=><option key={item} value={item}>{item==='surface'?'OSCAR only':item==='focused'?'Captured focused field':'Explicit clipboard'}</option>)}</select></label>
         <h3>{focused?'Captured field before':'Source text'}</h3><pre>{before??'No source text'}</pre>
         <h3>{focused?'Complete field after':'Reviewed text'}</h3><pre>{after??'Reliable replacement is unavailable'}</pre>
-        <p className="leaf-secondary">{focused?'Expected-value fencing and independent readback are required.':validDestination==='clipboard'?'Clipboard permission and owner review are separate.':'No other application changes.'}</p>
+        <p className="leaf-secondary">{focused?'The captured field is checked again before replacement.':validDestination==='clipboard'?'Clipboard permission and owner review are separate.':'No other application changes.'}</p>
         <button className="leaf-primary" disabled={!canApply} onClick={()=>run({kind:'apply',preview_id:preview.preview_id,destination:validDestination as 'surface'|'focused'|'clipboard'})}>Apply reviewed text</button>
       </section>}
       {view.feedback&&<p className="leaf-error" role="alert">{view.feedback.message} Inspect the outcome before resubmitting.</p>}

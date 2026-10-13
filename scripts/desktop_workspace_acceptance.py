@@ -103,6 +103,22 @@ def main():
         companion.get_by_role("button", name="Open OSCAR Workspace", exact=True).click()
         workspace.get_by_role("heading", name="Conversation", exact=True).wait_for()
         shot(workspace, "workspace-home", "OSCAR Workspace")
+        check(
+            "product surface has no development banner",
+            workspace.locator(".workspace-reference").count() == 0,
+        )
+        check(
+            "composer has no resize handle",
+            workspace.get_by_label("Ask OSCAR").evaluate(
+                "el=>getComputedStyle(el).resize==='none'"
+            ),
+        )
+        check(
+            "controls use no inset button shadows",
+            workspace.evaluate("""()=>
+            [...document.querySelectorAll('.workspace button')].every(
+                el=>!getComputedStyle(el).boxShadow.includes('inset'))"""),
+        )
         workspace.get_by_label("Ask OSCAR").fill("2 + 3")
         workspace.get_by_role("button", name="Send", exact=False).click()
         companion.get_by_text("Review needed", exact=True).wait_for(timeout=15000)
@@ -111,7 +127,7 @@ def main():
         companion.get_by_role(
             "button", name="Open Workspace — owner attention required", exact=True
         ).click()
-        workspace.get_by_role("heading", name="Work and decisions.", exact=True).wait_for()
+        workspace.get_by_role("heading", name="Activity", exact=True).wait_for()
         attention_state = invoke(workspace, "desktop_command", {"kind": "ready"})["value"]
         check(
             "Companion attention opens work without granting approval",
@@ -171,7 +187,7 @@ def main():
             "desktop_command",
             {"kind": "review", "task_id": task, "operation": "approve"},
         )
-        workspace.get_by_role("button", name="Continue to native confirmation").wait_for()
+        workspace.get_by_role("button", name="Continue to confirmation").wait_for()
         shot(workspace, "approval", "OSCAR Workspace")
         # Programmatic fixture progression is explicitly separate from human native confirmation.
         command("execute")

@@ -488,3 +488,17 @@ light primary `#236891`, dark primary `#A8D3E9`, selected surface `#E2E9E7` /
 shadows never carry the only state information. This supersedes earlier flat
 control styling. Devices uses executor/capability selection with a focused
 inspector, superseding the rejected full-width capability-row layout.
+
+### Owner correction to control depth and product copy — 2026-10-13
+
+The owner rejected heavy inset controls. The active treatment uses one subtle
+raised button shadow and explicit field boundaries. Selection uses accent color
+and border; button shadows never simulate recessed dents. The composer is a
+content-sized, bounded textarea with no resize handle. Act uses grouped fields
+and inspectable permission details. Activity uses task selection and a focused
+result/approval pane. The prior control-depth descriptions are historical.
+
+Developer session banners/internal labels are not the default product layout.
+Real outcome status and unavailable capabilities remain visible. Exact approval
+material is preserved; identifiers and verification metadata remain inspectable.
+Native reference-session metadata is preserved and disclosed in QA evidence.

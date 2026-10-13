@@ -12,7 +12,7 @@ export function ResultView({task,expanded,read,inspect,askAgain}:{task:Task;expa
     <div ref={region} tabIndex={expanded?0:undefined} role="region" aria-label="OSCAR response" className="response-text">
       <pre>{!expanded&&text.length>600?text.slice(0,600)+'…':text}</pre>
     </div>
-    {task.response_truncated&&<p className="leaf-secondary">Core supplied a bounded excerpt. This is not the complete source output.</p>}
+    {task.response_truncated&&<p className="leaf-secondary">Only an excerpt is available.</p>}
     {expanded&&task.source_event_ids?.length?<details><summary>Recall sources</summary><ul>{task.source_event_ids.map(id=><li key={id}>{id}</li>)}</ul></details>:null}
     <div className="result-actions">{!expanded&&bounded&&<button className="leaf-primary" onClick={read}>Read response</button>}
       <button onClick={inspect}>Inspect result</button><button onClick={askAgain}>Ask again</button></div>

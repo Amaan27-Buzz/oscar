@@ -8,7 +8,7 @@ describe('scoped typed action',()=>{
   it('requires a path, exposes scope and proposes only exact typed fields',async()=>{
     const run=vi.fn();render(<Act capabilities={[cap]} run={run} disabled={false}/>);
     const button=await screen.findByRole('button',{name:'Prepare action'});await waitFor(()=>expect(screen.getByLabelText('Relative workspace path')).toBeTruthy());
-    expect((button as HTMLButtonElement).disabled).toBe(true);expect(screen.getByText(/required scopes: files:write/)).toBeTruthy();
+    expect((button as HTMLButtonElement).disabled).toBe(true);expect(screen.getByText('files:write')).toBeTruthy();
     fireEvent.change(screen.getByLabelText('Relative workspace path'),{target:{value:'proof.txt'}});fireEvent.change(screen.getByLabelText('Exact content'),{target:{value:'exact reference'}});
     fireEvent.click(button);expect(run).toHaveBeenCalledWith({kind:'act',capability_id:cap.id,form:{operation:'write_file',path:'proof.txt',text:'exact reference'}});
   });
