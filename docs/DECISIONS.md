@@ -4,6 +4,10 @@ This file contains the **current active architecture decisions** for OSCAR. Reti
 
 When a durable architecture assumption changes, update this file and the affected canonical domain docs in the same change.
 
+## Group 2.5 — continuous interaction and delegated authority
+
+[Decision: one OSCAR, conversation, automations and delegated authority](decisions/ADR-DESKTOP-PERSONAL-INTELLIGENCE.md) records the 2026-10-14 owner correction, three independent operating dimensions, the current critical-approval conflict and the required signed Full Access/revocation design. This supersedes earlier interpretations of Full Access, not the present unimplemented activation boundary.
+
 ## ADR-001 — OSCAR is one distributed personal intelligence
 
 **Decision:** OSCAR spans cloud coordination, phone, computers, communications, memory, tools, environment and Edge hardware as one system.

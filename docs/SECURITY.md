@@ -1,5 +1,16 @@
 # Security + Permissions
 
+## Group 2.5 owner correction — 2026-10-14
+
+The owner corrected Full Access: unrestricted delegated autonomy across technically available capabilities with underlying OS/service access, including consequential supported actions, without OSCAR per-action approval prompts. The old interpretation with protected/consequential consent is Secure. Neither mode grants capture/retention implicitly. Full Access cannot remove deterministic local safety, invent platform permission, suppress evidence/audit or bypass an externally mandated confirmation.
+
+Current critical-risk blockers, exact native CNG action signatures, Personal Policy and executor confirmations remain unchanged. **Secure and Full Access activation are unavailable** because there is no signed standing delegation or distributed epoch/revocation fence. Current mandatory per-action statements in this document describe present enforcement and Ask/Secure; they must not be imposed on a future valid Full Access grant. The decision below specifies separate owner activation, immediate dispatch revocation, target rechecks, expiry/restart handling and honest in-flight limits. No UI can forge an approval or hide these blockers.
+
+Canonical conversation read/retain are separately enrolled scopes and rechecked through Core/Personal Policy. Captured context stays private/transient. Companion receives no conversation/history payload. Archive and relationship identity belong to trusted composition, not client fields.
+
+See [the interaction and authority decision](decisions/ADR-DESKTOP-PERSONAL-INTELLIGENCE.md) for ownership, implemented boundaries and required integrations. Earlier dated checkpoints remain historical.
+
+
 ## Group 2 Mobile private-session boundary
 
 New Mobile text tasks use the existing Runtime transient privacy path; request,

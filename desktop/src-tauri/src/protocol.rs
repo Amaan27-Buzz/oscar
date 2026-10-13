@@ -98,6 +98,9 @@ impl ActForm {
 pub enum Command {
     Ready,
     Refresh,
+    History {
+        before: u64,
+    },
     Window {
         mode: WindowMode,
     },
@@ -353,6 +356,10 @@ pub enum ThemeChoice {
 }
 #[derive(Clone, Serialize, Default, PartialEq)]
 pub struct View {
+    #[serde(default)]
+    pub conversation: ConversationView,
+    #[serde(default)]
+    pub operating: Option<serde_json::Value>,
     pub theme: ThemeChoice,
     pub expression: ExpressionReadback,
     pub link: String,
@@ -374,6 +381,26 @@ pub struct View {
     pub capture_choice: ContextChoice,
     pub observed_at_ms: u64,
     pub reference: bool,
+}
+#[derive(Clone, Serialize, Deserialize, Default, PartialEq)]
+pub struct ConversationView {
+    pub turns: Vec<ConversationTurn>,
+    pub before: Option<u64>,
+    pub persistence: String,
+    #[serde(default)]
+    pub retention: bool,
+    #[serde(default)]
+    pub revision: u64,
+}
+#[derive(Clone, Serialize, Deserialize, PartialEq)]
+pub struct ConversationTurn {
+    pub id: String,
+    pub task_id: String,
+    pub role: String,
+    pub text: String,
+    pub status: String,
+    pub occurred_at: f64,
+    pub retained: bool,
 }
 pub fn orb(link: &str, task: Option<&TaskView>, voice: &str) -> String {
     if link != "online" {

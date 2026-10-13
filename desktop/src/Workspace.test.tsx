@@ -23,8 +23,9 @@ it('preserves Ask and moves text/actions/activity to the full workspace',async()
   const port=mount();await waitFor(()=>expect(port).toHaveBeenCalled());
   fireEvent.change(screen.getByLabelText('Ask OSCAR'),{target:{value:'2 + 3'}});fireEvent.click(screen.getByRole('button',{name:'Send'}));
   await screen.findByText('2 + 3');expect(port).toHaveBeenCalledWith({kind:'interact',mode:'Ask',text:'2 + 3',context_id:''});
-  fireEvent.click(screen.getByRole('button',{name:'Text tools'}));expect(screen.getByRole('tab',{name:'Dictate'})).toBeTruthy();
-  fireEvent.click(screen.getByRole('button',{name:'Act'}));expect(screen.getByText(/No actions are available/)).toBeTruthy();
+  fireEvent.click(screen.getByRole('button',{name:'Dictate or edit'}));expect(screen.getByRole('tab',{name:'Dictate'})).toBeTruthy();
+  fireEvent.click(screen.getByRole('button',{name:'Prepare an action'}));expect(screen.getByText(/No actions are available/)).toBeTruthy();
+  fireEvent.click(screen.getByRole('button',{name:'Automations'}));expect(screen.getByText(/not connected to this Workspace yet/)).toBeTruthy();
 });
 it('an expired review never offers enabled native confirmation',async()=>{
   mount({current:{task_id:'task',state:'planned',description:'Exact task',target:'worker',actions:['approve'],blocker:null,generation:1,evidence_ids:[],response:null,response_status:null,value:null,epistemic:null},review:{review_id:'expired',task_id:'task',operation:'approve',description:'Exact task',target:'worker',capability:'math',reason:'request',consequence:'add',policy_reason:'scope',evidence_state:'planned',review:'2 + 3',expires_at_ms:Date.now()-1}});
@@ -76,4 +77,35 @@ it('keeps review-session metadata out of the product composer',async()=>{
  expect(screen.queryByText(/REFERENCE CORE|owner acceptance|disposable tasks/i)).toBeNull();
  expect(screen.getByLabelText('Ask OSCAR').getAttribute('rows')).toBe('2');
  expect(screen.getByText(/Shift\+Enter for a new line/)).toBeTruthy();
+});
+
+it('loads canonical chronological turns and requests older history without a frontend store',async()=>{
+ const port=mount({conversation:{turns:[{id:'first',task_id:'old',role:'owner',text:'Earlier question',status:'REPORTED',occurred_at:1,retained:true},{id:'second',task_id:'old',role:'oscar',text:'Earlier answer',status:'REPORTED',occurred_at:2,retained:true}],before:12,persistence:'authorized',revision:1,retention:true}});
+ await screen.findByText('Earlier question');expect(screen.getByText('Earlier answer')).toBeTruthy();
+ fireEvent.click(screen.getByRole('button',{name:'Load earlier conversation'}));await waitFor(()=>expect(port).toHaveBeenCalledWith({kind:'history',before:12}));
+ expect(screen.getByText('Canonical history · retention granted')).toBeTruthy();
+ expect(screen.queryByRole('button',{name:'Text tools'})).toBeNull();expect(screen.queryByRole('button',{name:'Act'})).toBeNull();
+});
+it('shows independent Core operating dimensions without claiming unavailable autonomy',async()=>{
+ const port=mount({operating:{access:'Ask',secure:'unavailable',full_access:'unavailable',awareness:'Trigger-only',sentry:'unavailable',worker_autonomy:'Manual',automations:'task_foundation'}});
+ await waitFor(()=>expect(port).toHaveBeenCalled());fireEvent.click(screen.getByRole('button',{name:'Preferences'}));
+ expect(screen.getByText('Ask')).toBeTruthy();expect(screen.getByText('Manual')).toBeTruthy();expect(screen.getByText('Trigger-only')).toBeTruthy();
+ fireEvent.click(screen.getByRole('button',{name:'Access modes and availability'}));expect(screen.getByText(/no delegation is active/)).toBeTruthy();
+ expect(port.mock.calls.some(([c])=>['access','grant','approve'].includes(c.kind))).toBe(false);
+});
+
+it('retiring an old review preserves a manually selected page',async()=>{
+ const port=mount({window:'activity',review:{review_id:'old',task_id:'task',operation:'approve',description:'Task',target:'worker',capability:'math',reason:'request',consequence:'add',policy_reason:'scope',evidence_state:'planned',review:'2 + 3',expires_at_ms:Date.now()+30000}});
+ await screen.findByRole('heading',{name:'Activity'});fireEvent.click(screen.getByRole('button',{name:'Preferences'}));
+ act(()=>port.emit({review:null}));expect(screen.getByRole('heading',{name:'Preferences'})).toBeTruthy();
+});
+
+it('returning to Conversation leaves writing controls contextual',async()=>{
+ const port=mount();await waitFor(()=>expect(port).toHaveBeenCalled());fireEvent.click(screen.getByRole('button',{name:'Dictate or edit'}));
+ expect(screen.getByRole('tab',{name:'Dictate'})).toBeTruthy();fireEvent.click(screen.getByRole('button',{name:'Activity'}));fireEvent.click(screen.getByRole('button',{name:'Conversation'}));
+ expect(screen.queryByRole('tab',{name:'Dictate'})).toBeNull();expect(screen.getByLabelText('Ask OSCAR')).toBeTruthy();
+});
+it('a retention grant never claims that history read was granted',async()=>{
+ const port=mount({conversation:{turns:[],before:null,persistence:'session_only',revision:0,retention:true}});await waitFor(()=>expect(port).toHaveBeenCalled());
+ expect(screen.getByText('Turns retained · history read is not granted')).toBeTruthy();
 });

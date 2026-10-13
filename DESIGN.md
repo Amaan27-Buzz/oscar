@@ -534,3 +534,7 @@ CSP is unchanged and native popup tests record no violations.
 Light mode uses the Desktop tokens above, muted text `#60686A`, separators
 `#D9DEDB`, accent text `#24566D` and white primary-button text. Graphite dark
 mode and canonical Orb assets are unchanged.
+
+### Group 2.5 interaction correction — 2026-10-14
+
+Preserve the approved Companion and unchanged shared Orb. Workspace navigation is Conversation, Automations, Activity, Devices, Preferences. Dictate/Edit and immediate tool actions belong in Conversation. Conversation reads chronologically on open paper/graphite surfaces; no separate chat threads or decorative message cards. Activity presents attention, running work and outcomes before exact review/evidence detail. Automations describes real continuing responsibilities and capability gaps without dummy Worker records. Preferences separates access, awareness, Worker autonomy and capture/retention. Warm paper and complementary graphite materials, tactile controls, keyboard/reduced motion and native privacy boundaries remain intact. This supersedes the earlier Act/Text Tools primary-navigation direction.

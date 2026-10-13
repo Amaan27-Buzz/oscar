@@ -14,8 +14,8 @@ it('opening Activity does not request approval and only uses exact advertised co
 });
 it('a fresh current task appears before the next shared poll without duplication',()=>{
   render(<Activity view={{...initialView,tasks:[],current:task}} available busy={false} run={vi.fn()} back={vi.fn()}/>);
-  expect(screen.getByRole('region',{name:'Active work'}).textContent).toContain('Approval required');
-  expect(screen.getByRole('region',{name:'Active work'}).textContent).toContain('1');
+  expect(screen.getByRole('region',{name:'Needs attention'}).textContent).toContain('Approval required');
+  expect(screen.getByRole('region',{name:'Needs attention'}).textContent).toContain('1');
 });
 it('expired or changed approval cannot reach native confirmation; dismissal grants nothing',()=>{
   vi.useFakeTimers();const run=vi.fn();const view={...initialView,tasks:[task],current:task,review:{...review,expires_at_ms:Date.now()+1000}};

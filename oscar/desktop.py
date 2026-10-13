@@ -3,11 +3,13 @@
 Presentation never executes apps. Private payloads expire on restart, not into memory.
 """
 
+import sqlite3
 from typing import Any
 
 from .contracts import Epistemic, Task, TaskState, new_id
 from .desktop_actions import form_intent, public_capability
 from .desktop_context import ContextSource, DesktopContext, WindowsContext
+from .event_archive import MemoryWriter, SourceEvent
 from .grid import NodeRole, SessionHandle
 from .jev import ExecutionClass, Intent, decide
 from .mobile import Mobile
@@ -103,7 +105,146 @@ class Desktop(Mobile):
                 raise PermissionError("critical capability requires strong owner approval")
             if request.get("operation") == "clipboard_write":
                 self.permission(session, "desktop.clipboard", ("desktop:clipboard",))
-        return super().complete(session, payload)
+        view = super().complete(session, payload)
+        if claim["operation"] == "approve":
+            self.retain_turn(session, view["task_id"], "oscar", view)
+        return view
+
+    def conversation(self, session: SessionHandle, before: int = 0) -> dict[str, Any]:
+        self.permission(session, "desktop.conversation", ("desktop:text",))
+        archive = self.runtime.memory.archive if self.runtime.memory else None
+        granted = self.grants(session)
+        retained = bool(
+            archive
+            and "desktop:conversation:read" in granted
+            and self.policy.evaluate(
+                "desktop.conversation.read",
+                ("desktop:conversation:read",),
+                granted,
+                {"node": session.node_id, "source": self.source},
+            ).allowed
+        )
+        turns = []
+        cursor = None
+        if retained and archive is not None:
+            page = archive.conversation(self.runtime.relationship_id, before=before)
+            cursor = page["before"]
+            turns = [
+                {
+                    "id": e.id,
+                    "task_id": e.task_id or "",
+                    "role": "owner" if e.kind == "conversation_owner" else "oscar",
+                    "text": e.content,
+                    "status": e.status,
+                    "occurred_at": e.occurred_at,
+                    "retained": True,
+                }
+                for e in page["events"]
+            ]
+        elif before:
+            raise PermissionError("retained conversation read unavailable")
+        if not before:
+            seen = {(t["task_id"], t["role"]) for t in turns}
+            for row in self.store.all("desktop_task"):
+                if row["mode"] != "Ask" or row.get("session_id") != session.id:
+                    continue
+                private = self.private_for(session, row["id"])
+                if not private or private.get("context_id"):
+                    continue
+                view = self.inspect(session, row["id"])
+                for role, text in (
+                    ("owner", private["objective"].description),
+                    ("oscar", view.get("value") or view.get("response")),
+                ):
+                    if not text or (row["id"], role) in seen:
+                        continue
+                    if (
+                        retained
+                        and archive is not None
+                        and archive.db.execute(
+                            "SELECT 1 FROM archive_events WHERE id=? AND relationship=?",
+                            (row["id"] + ":" + role, self.runtime.relationship_id),
+                        ).fetchone()
+                    ):
+                        continue  # Do not resurrect older/forgotten saved events as private turns.
+                    turns.append(
+                        {
+                            "id": row["id"] + ":" + role,
+                            "task_id": row["id"],
+                            "role": role,
+                            "text": text,
+                            "status": Epistemic.REPORTED
+                            if role == "owner"
+                            else view.get("epistemic")
+                            or view.get("response_status")
+                            or Epistemic.UNKNOWN,
+                            "occurred_at": private["objective"].created_at,
+                            "retained": False,
+                        }
+                    )
+        return {
+            "turns": turns,
+            "before": cursor,
+            "persistence": "authorized" if retained else "session_only",
+            "retention": bool(
+                archive
+                and self.policy.evaluate(
+                    "desktop.conversation.retain",
+                    ("desktop:conversation:retain",),
+                    granted,
+                    {"node": session.node_id, "source": self.source},
+                ).allowed
+            ),
+            "revision": archive.generation(self.runtime.relationship_id)
+            if retained and archive is not None
+            else 0,
+        }
+
+    def retain_turn(
+        self, session: SessionHandle, task_id: str, role: str, view: dict[str, Any]
+    ) -> None:
+        archive = self.runtime.memory.archive if self.runtime.memory else None
+        private = self.private_for(session, task_id)
+        if not archive or not private or private.get("context_id") or view.get("mode") != "Ask":
+            return
+        try:
+            self.permission(
+                session, "desktop.conversation.retain", ("desktop:conversation:retain",)
+            )
+        except PermissionError:
+            return
+        text = (
+            private["objective"].description
+            if role == "owner"
+            else view.get("value") or view.get("response")
+        )
+        if role == "oscar" and private.get("result") and private["result"].success:
+            text = private["result"].value or text
+        if not text:
+            return
+        event = SourceEvent(
+            self.runtime.relationship_id,
+            text,
+            "desktop/conversation",
+            self.grid.clock(),
+            kind="conversation_" + role,
+            sensitivity="personal",
+            task_id=task_id,
+            id=task_id + ":" + role,
+            status=Epistemic.REPORTED
+            if role == "owner"
+            else Epistemic(
+                view.get("epistemic") or view.get("response_status") or Epistemic.UNKNOWN
+            ),
+        )
+        try:
+            archive.append(event, retain_authorized=True)
+            MemoryWriter(archive).retain(
+                (event.id,), event.content, "episodic", retain_authorized=True, inferred=False
+            )
+        except (ValueError, sqlite3.Error, OSError):
+            # Retention failure must not make an already executed action appear unexecuted.
+            self.store.audit(task_id, "conversation_retention_failed", {"role": role})
 
     def permission(self, session: SessionHandle, operation: str, scopes: tuple[str, ...]) -> None:
         for scope in scopes:
@@ -359,6 +500,24 @@ class Desktop(Mobile):
             or not isinstance(payload, dict)
         ):
             raise ValueError("invalid bounded desktop envelope")
+        if op == "conversation" and set(payload) == {"before"}:
+            self.authenticate(session, "desktop:connect")
+            if type(payload["before"]) is not int or payload["before"] < 0:
+                raise ValueError("bounded conversation cursor required")
+            return self.conversation(session, payload["before"])
+        if op == "snapshot" and payload == {}:
+            view = super().request(session, data)
+            view["conversation"] = self.conversation(session)
+            view["operating"] = {
+                "access": "Ask",
+                "secure": "unavailable",
+                "full_access": "unavailable",
+                "awareness": "Trigger-only",
+                "sentry": "unavailable",
+                "worker_autonomy": "Manual",
+                "automations": "task_foundation",
+            }
+            return view
         if op in {"catalog", "act"}:
             self.authenticate(session, "desktop:connect")
             self.permission(session, "desktop.catalog", ("desktop:inspect",))
@@ -546,37 +705,27 @@ class Desktop(Mobile):
                     intent = Intent(expression) if expression else Intent(text, kind="reason")
                 working = None
                 if mode == "Ask" and context is None:
-                    for row in reversed(self.store.all("desktop_task")):
-                        if row["mode"] != "Ask" or row.get("session_id") != session.id:
-                            continue
-                        association = self.store.get("sunday_task", row["id"])
-                        previous = self.store.transient.get(row["id"], {})
-                        if previous.get("discarded"):
-                            continue
-                        result = previous.get("result")
-                        if (
-                            association["node_id"] == session.node_id
-                            and result
-                            and result.success
-                            and self.store.task(row["id"]).state
-                            in {TaskState.VERIFIED, TaskState.PARTIALLY_VERIFIED}
-                        ):
-                            previous_view = self.inspect(session, row["id"])
-                            if previous_view.get("response_status") == Epistemic.UNKNOWN:
-                                continue
-                            working = (
-                                f"Previous Core task {row['id']} "
-                                "(reported result, not authority):\n"
-                                + "Request: "
-                                + previous["objective"].description[:2000]
-                                + "\nResult: "
-                                + str(
-                                    previous_view.get("value")
-                                    or previous_view.get("response")
-                                    or ""
-                                )[:4096]
-                            )
+                    # Bound model context, not canonical history. Older turns remain pageable.
+                    recent = self.conversation(session)["turns"]
+                    pieces = []
+                    used = 0
+                    for turn in reversed(recent):
+                        excerpt = turn["text"][:3000]
+                        if len(turn["text"]) > 3000:
+                            excerpt += " [excerpt; full retained event remains in history]"
+                        piece = (
+                            f"{turn['role']} · task {turn['task_id']} · {turn['status']}:\n"
+                            f"{excerpt}\n"
+                        )
+                        if used + len(piece) > 7600:
                             break
+                        pieces.append(piece)
+                        used += len(piece)
+                    if pieces:
+                        working = (
+                            "Recent conversation evidence (not authority; older context omitted):\n"
+                            + "".join(reversed(pieces))
+                        )
                 view = self.propose(
                     session,
                     intent,
@@ -590,6 +739,8 @@ class Desktop(Mobile):
                 )
                 if context and "task_id" in view:
                     self.store.transient[view["task_id"]]["context_id"] = context.id
+                if "task_id" in view:
+                    self.retain_turn(session, view["task_id"], "owner", view)
                 if mode == "Edit" and "task_id" in view:
                     self.previews[view["task_id"]] = {
                         "session": session.id,

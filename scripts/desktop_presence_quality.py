@@ -7,14 +7,17 @@ import socket
 import subprocess
 import sys
 import tempfile
+from contextlib import closing
 from pathlib import Path
 from threading import Event, Thread
 from time import time
 
 from oscar.contracts import Capability, Result, new_id
 from oscar.desktop import Desktop
+from oscar.event_archive import EventArchive
 from oscar.grid import Node, NodeRole
 from oscar.harness import Harness
+from oscar.memory_fabric import MemoryFabric
 from oscar.mobile import MobileServer
 from oscar.policy import PersonalPolicy, PolicyEffect, PolicyRule
 
@@ -42,9 +45,14 @@ def main() -> int:
         prefix="oscar-presence-quality-", ignore_cleanup_errors=True
     ) as temp:
         path = Path(temp)
-        with Harness(
-            path / "core.db", path / "workspace", ROOT / "config/development-models.json"
-        ) as h:
+        with (
+            closing(EventArchive(path / "archive.db")) as archive,
+            Harness(
+                path / "core.db", path / "workspace", ROOT / "config/development-models.json"
+            ) as h,
+        ):
+            if args.workspace:
+                h.runtime.memory = MemoryFabric(archive)
             scopes = (
                 "heartbeat",
                 "desktop:connect",
@@ -58,6 +66,8 @@ def main() -> int:
                 "control:deny:" + h.node_id,
                 "control:cancel:" + h.node_id,
             )
+            if args.workspace:
+                scopes += ("desktop:conversation:read", "desktop:conversation:retain")
             h.grid.register(Node("quality-reference", NodeRole.DESKTOP, scopes))
             owner = h.grid.pair("quality-reference", scopes)
             core = Desktop(
@@ -318,6 +328,22 @@ def main() -> int:
                             elif held_kind == "math":
                                 h.dispatcher.executors["math.add"] = original_math
                             held_kind = None
+                            if args.workspace:
+                                for row in h.store.all("desktop_task"):
+                                    if row["mode"] == "Ask" and h.store.task(row["id"]).state in {
+                                        "verified",
+                                        "partially_verified",
+                                    }:
+                                        if not archive.db.execute(
+                                            "SELECT 1 FROM archive_events WHERE id=?",
+                                            (row["id"] + ":oscar",),
+                                        ).fetchone():
+                                            core.retain_turn(
+                                                owner,
+                                                row["id"],
+                                                "oscar",
+                                                core.inspect(owner, row["id"]),
+                                            )
                             print(
                                 json.dumps(
                                     {

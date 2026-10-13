@@ -1,5 +1,14 @@
 # Feature Inventory
 
+## Group 2.5 owner correction — 2026-10-14
+
+Current Desktop navigation: Conversation, Automations, Activity, Devices, Preferences. Dictate/Edit/Act are underlying contextual operations inside Conversation, not primary utility pages. Activity groups attention, running work and outcomes with exact evidence/signing detail. Canonical history is available only with installed Memory Fabric and explicit read/retain grants; otherwise the UI reports session-only history.
+
+Scheduled routines, event triggers, watches, persistent named Workers, supervised/autonomous lifecycle management and stateful Protocol controls are integration requirements, not implemented Desktop features. The existing task/runtime foundation remains usable. Ask is the current supported access state; Secure and genuine Full Access activation are unavailable. Sentry and persistent acoustic controls remain unavailable.
+
+See [the interaction and authority decision](decisions/ADR-DESKTOP-PERSONAL-INTELLIGENCE.md) for ownership, implemented boundaries and required integrations. Earlier dated checkpoints remain historical.
+
+
 This is OSCAR's capability backlog. Listing a feature here does **not** mean it is implemented.
 
 ## Interaction
@@ -13,7 +22,7 @@ This is OSCAR's capability backlog. Listing a feature here does **not** mean it 
 - Fluid state transitions rather than unrelated page swaps.
 - Configurable Persona without sacrificing truth or speed.
 
-## Interaction Runtime — Dictate / Edit / Ask / Act
+## Contextual operations inside Conversation — Dictate / Edit / Ask / Act
 
 - `Dictate`: literal/cleaned speech into focused target.
 - `Edit`: transform selected/recent text.

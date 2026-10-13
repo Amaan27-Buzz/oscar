@@ -1,5 +1,14 @@
 # Orchestration, Learning, Skills, Workers and Protocols
 
+## Group 2.5 owner correction — 2026-10-14
+
+Conversation is the one owner interaction point. Controller, Memory Fabric, Executive, Durable Runtime and Grid retain their established ownership. Tools, Skills, Routines, Workers and Protocols remain different internal concepts; Automations offers concise responsibility/lifecycle inspection instead of a second agent framework.
+
+Future automation records must link trigger/schedule, responsibility, Worker/Protocol, task, authority grant/epoch, checkpoint and verification evidence. Creation, pause/resume, changes and removal require real Core commands and readback. Existing exact-action execution works; persistent responsibility management and the full Executive remain future integrations. Access mode, Worker autonomy, awareness and retention must travel as distinct contracts.
+
+See [the interaction and authority decision](decisions/ADR-DESKTOP-PERSONAL-INTELLIGENCE.md) for ownership, implemented boundaries and required integrations. Earlier dated checkpoints remain historical.
+
+
 OSCAR should not become a mediocre implementation of every specialist tool. Its job is to understand the objective, choose the best available capability, coordinate it, verify the result and learn from successful execution.
 
 ## Capability Catalog + Dynamic Tool Search

@@ -79,6 +79,8 @@ fn companion_view(mut view: View) -> View {
     view.review = None;
     view.message = None;
     view.feedback = None;
+    view.conversation = ConversationView::default();
+    view.operating = None;
     view
 }
 
@@ -952,6 +954,16 @@ mod native_tests {
         });
         view.tasks = vec![view.current.clone().unwrap()];
         view.message = Some("private preview".into());
+        view.conversation.turns.push(ConversationTurn {
+            id: "private-event".into(),
+            task_id: "private-task".into(),
+            role: "owner".into(),
+            text: "private history".into(),
+            status: "REPORTED".into(),
+            occurred_at: 1.,
+            retained: true,
+        });
+        view.operating = Some(serde_json::json!({"scope":"private authority"}));
         let redacted = companion_view(view);
         let json = serde_json::to_string(&redacted).unwrap();
         assert!(!json.contains("private"));

@@ -1,5 +1,9 @@
 # AGENTS.md
 
+## Owner Group 2.5 product correction — 2026-10-14
+
+Continue `codex/desktop-companion-workspace`, draft PR #5 into main, with no new worktree. Preserve the approved Companion/Orb and all native/Aperture evidence. Conversation is central; navigation is Conversation / Automations / Activity / Devices / Preferences. Dictate/Edit and immediate actions are contextual conversation capabilities. Read [the interaction/authority decision](docs/decisions/ADR-DESKTOP-PERSONAL-INTELLIGENCE.md). Ask / Secure / genuine Full Access, awareness and Worker autonomy are independent. Current Secure/Full Access activation remains unavailable pending a signed owner-delegation/revocation integration; never hide confirmations or forge approvals. Owner authorizes supported Core integration and tests, commit/push to the existing draft, then stop for visual review. No Mobile redesign, Slices 14–17 implementation, merge or cleanup.
+
 ## Owner Group 2.5A — 2026-10-12
 
 The owner authorizes Desktop architecture correction from consolidated main

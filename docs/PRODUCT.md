@@ -1,5 +1,14 @@
 # Product Vision
 
+## Group 2.5 owner correction — 2026-10-14
+
+OSCAR owns one chronological, persistent multimodal relationship, reasoning, memory, awareness, policy, task orchestration and executive decisions. The tiny Companion is expressive presence; Conversation is the main application interaction. Workers/specialists are subordinate executors. Immediate actions live in Conversation; Automations manages delegated jobs and continuing responsibilities when implemented. Desktop navigation is Conversation / Automations / Activity / Devices / Preferences.
+
+Access is Ask / Secure / Full Access, independent of awareness and Worker autonomy. Secure permits ordinary autonomous work but requires consequential consent. Full Access is genuinely unrestricted owner-delegated operation over available capabilities without OSCAR per-action prompts. Activation is currently unavailable; it must use a real signed delegation/revocation model. This supersedes earlier product interpretations, not historical evidence.
+
+See [the interaction and authority decision](decisions/ADR-DESKTOP-PERSONAL-INTELLIGENCE.md) for ownership, implemented boundaries and required integrations. Earlier dated checkpoints remain historical.
+
+
 > **Current plan (2026-10-09):** [Slices 00–20](SLICE-NUMBERING.md);
 > **11 Expression/Character → 12 Desktop UX → 13 Mobile UX → 14–20
 > awareness/commissioning/Presence/Executive/physical/hardening/Unified
@@ -11,7 +20,7 @@
 
 ## Current desktop software boundary
 
-OSCAR has a compact native Windows presence with Ask, Dictate, Edit and Act interaction modes. Explicit context and preview/apply are scoped Core operations, not separate agents or chat identities. The software/reference candidate awaits owner desktop acceptance; Gate C remains PARTIAL. See [Desktop foundation](DESKTOP-FOUNDATION.md).
+OSCAR Desktop has an approved small Companion and a separate Workspace in one native Tauri process. Conversation owns contextual Ask/Dictate/Edit and immediate action workflows; Automations shows truthful continuing-responsibility availability, Activity shows operational outcomes, and Devices/Preferences inspect real capability and operating state. The new Group 2.5 candidate awaits owner visual review. Gate C remains PARTIAL; see [the ownership contract](design/DESKTOP-COMPANION-WORKSPACE.md).
 
 ## North star
 

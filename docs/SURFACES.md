@@ -1,5 +1,14 @@
 # OSCAR Surfaces and Embodiments
 
+## Group 2.5 owner correction — 2026-10-14
+
+Desktop uses the approved small Companion and separate full Workspace in one Tauri process. Companion remains a redacted expressive presence with tray/shortcut/open controls and no chat, task-list, automation or approval authority. Workspace navigation is Conversation / Automations / Activity / Devices / Preferences.
+
+Dictate/Edit, selected/focused-field context and exact immediate action preparation are contextual parts of Conversation. Accessibility perception and taking actions remain separately permissioned; screenshot-based understanding requires an actual adapter and is not advertised here. Preferences reports real Core access, awareness, Worker autonomy and retention independently.
+
+See [the interaction and authority decision](decisions/ADR-DESKTOP-PERSONAL-INTELLIGENCE.md) for ownership, implemented boundaries and required integrations. Earlier dated checkpoints remain historical.
+
+
 ## Shared expression foundation — Slice 11.3
 
 Desktop and Mobile can consume the same [versioned presentation contract](../expression/README.md)

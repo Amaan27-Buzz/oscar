@@ -21,7 +21,10 @@ export interface Review {review_id:string;task_id?:string;operation:string;descr
 export interface ExpressionReadback {epoch:string;generation:number;observed_at_ms:number;voice_observed_at_ms:number;tasks_observed_at_ms:number;current_observed_at_ms:number}
 export interface RequestFeedback {kind:'blocked'|'denied'|'unknown'|'rejected';message:string;observed_at_ms:number}
 export interface VoiceSupport {persistent_mute:'unavailable';sentry:'unavailable';acoustic_awareness:'unavailable';wake_word:'unavailable'}
-export interface View {theme?:'light'|'dark';expression:ExpressionReadback|null;link:string;orb:string;window:WindowMode;tasks:Task[];capabilities:Capability[];
+export interface ConversationTurn {id:string;task_id:string;role:'owner'|'oscar';text:string;status:string;occurred_at:number;retained:boolean}
+export interface ConversationHistory {turns:ConversationTurn[];before:number|null;persistence:string;revision:number;retention?:boolean}
+export interface Operating {access:string;secure:string;full_access:string;awareness:string;sentry:string;worker_autonomy:string;automations:string}
+export interface View {conversation?:ConversationHistory;operating?:Operating|null;theme?:'light'|'dark';expression:ExpressionReadback|null;link:string;orb:string;window:WindowMode;tasks:Task[];capabilities:Capability[];
   context:Context|null;preview:Preview|null;review:Review|null;current:Task|null;message:string|null;
   voice:string;voice_support?:VoiceSupport;shortcut:string;shortcut_enabled?:boolean;capture_choice?:ContextChoice;observed_at_ms:number;reference:boolean;window_revision?:number;feedback?:RequestFeedback|null}
 export const initialView:View={expression:null,link:'unconfigured',orb:'unavailable',window:'compact',tasks:[],capabilities:[],
@@ -34,6 +37,7 @@ export type ActForm=
   |{operation:'launch_app';app_id:string}
   |{operation:'list_files'|'git_status'|'git_diff'|'git_log'|'git_branches'|'ps_environment'|'list_apps'|'worker_tools'};
 export type Command=
+  |{kind:'history';before:number}
   |{kind:'ready'|'refresh'|'discard'|'voice_stop'|'voice_cancel'}|{kind:'window';mode:WindowMode}
   |{kind:'capture_choice'|'capture';source:ContextChoice}
   |{kind:'interact';mode:Exclude<Mode,'Act'>;text:string;context_id:string}

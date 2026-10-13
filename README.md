@@ -13,6 +13,8 @@
 
 ## Current development and milestones
 
+**2026-10-14:** [Group 2.5 product direction](docs/decisions/ADR-DESKTOP-PERSONAL-INTELLIGENCE.md) continues draft PR #5 on `codex/desktop-companion-workspace`. The approved Companion is preserved; Conversation is central, tools are contextual, Automations is honest about remaining lifecycle integrations, and Activity shows outcomes/attention. Canonical history requires separately granted read/retention permissions. Secure and genuine Full Access activation remain unavailable pending signed standing delegation and revocation. [Current native review packet](docs/ui/desktop/product-direction/README.md); no merge or physical PASS.
+
 **2026-10-11:** [Group 1 Desktop software completion](docs/development/GROUP-01-DESKTOP-COMPLETION.md)
 implements Slice12.2–12.6 on a separate draft candidate based on verified12.1
 corrections. [Native reference evidence](docs/ui/desktop/completion/README.md)

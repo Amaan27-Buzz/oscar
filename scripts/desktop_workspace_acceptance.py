@@ -17,7 +17,7 @@ from scripts.desktop_baseline import capture_owned, windows
 from scripts.desktop_native_fixture import native_fixture
 
 ROOT = Path(__file__).resolve().parents[1]
-OUTPUT = ROOT / "docs/ui/desktop/workspace/evidence"
+OUTPUT = ROOT / "docs/ui/desktop/product-direction/evidence"
 
 
 def main():
@@ -95,7 +95,9 @@ def main():
             state["context"] is None
             and state["review"] is None
             and state["preview"] is None
-            and not state["capabilities"],
+            and not state["capabilities"]
+            and not state["conversation"]["turns"]
+            and state["operating"] is None,
         )
         shot(companion, "companion-idle", "OSCAR Companion")
         companion.get_by_role("button", name="Open OSCAR Workspace", exact=True).click()
@@ -165,8 +167,10 @@ def main():
                 all(value >= 4.5 for value in contrast.values()),
             )
         workspace.get_by_role("navigation", name="Workspace").get_by_role(
-            "button", name="Text tools", exact=True
+            "button", name="Conversation", exact=True
         ).click()
+        if not workspace.get_by_role("tab", name="Dictate", exact=True).is_visible():
+            workspace.get_by_role("button", name="Dictate or edit", exact=True).click()
         workspace.get_by_role("tab", name="Dictate", exact=True).focus()
         workspace.keyboard.press("ArrowRight")
         workspace.wait_for_timeout(200)
@@ -206,7 +210,7 @@ def main():
         ).click()
         check(
             "actual arithmetic outcome",
-            workspace.get_by_role("region", name="OSCAR response").inner_text() == "5",
+            workspace.locator(".assistant-turn").filter(has_text="5").count() > 0,
         )
         companion.locator(".companion-orb").hover()
         companion.wait_for_timeout(350)
@@ -292,26 +296,46 @@ def main():
             "Companion returns without replacing tasks",
             any(t == "OSCAR Companion" for _, _, t in windows(info["pid"])),
         )
+        check(
+            "session conversation preserves the first turn",
+            "2 + 3" in workspace.locator(".conversation-thread").inner_text(),
+        )
         # Capture source is native configuration and survives tool remounting.
         workspace.get_by_role("navigation", name="Workspace").get_by_role(
-            "button", name="Text tools", exact=True
+            "button", name="Conversation", exact=True
         ).click()
-        workspace.locator(".context-details .oscar-disclosure-trigger").click()
-        workspace.get_by_label("Capture on invocation").click()
+        if not workspace.get_by_role("tab", name="Dictate", exact=True).is_visible():
+            workspace.get_by_role("button", name="Dictate or edit", exact=True).click()
+        if (
+            workspace.locator(".context-details .oscar-disclosure-trigger").get_attribute(
+                "aria-expanded"
+            )
+            != "true"
+        ):
+            workspace.locator(".context-details .oscar-disclosure-trigger").click()
+        workspace.get_by_label("Capture on invocation", exact=True).click()
         workspace.get_by_role("radio", name="Selected text", exact=True).click()
         workspace.get_by_role("navigation", name="Workspace").get_by_role(
             "button", name="Conversation", exact=True
         ).click()
         workspace.get_by_role("navigation", name="Workspace").get_by_role(
-            "button", name="Text tools", exact=True
+            "button", name="Conversation", exact=True
         ).click()
-        workspace.locator(".context-details .oscar-disclosure-trigger").click()
+        if not workspace.get_by_role("tab", name="Dictate", exact=True).is_visible():
+            workspace.get_by_role("button", name="Dictate or edit", exact=True).click()
+        if (
+            workspace.locator(".context-details .oscar-disclosure-trigger").get_attribute(
+                "aria-expanded"
+            )
+            != "true"
+        ):
+            workspace.locator(".context-details .oscar-disclosure-trigger").click()
         check(
             "capture preference survives navigation",
-            workspace.get_by_label("Capture on invocation").get_attribute("data-value")
+            workspace.get_by_label("Capture on invocation", exact=True).get_attribute("data-value")
             == "selection",
         )
-        workspace.get_by_label("Capture on invocation").click()
+        workspace.get_by_label("Capture on invocation", exact=True).click()
         workspace.get_by_role("radio", name="No capture", exact=True).click()
         shot(workspace, "text-tools", "OSCAR Workspace")
         workspace.get_by_role("navigation", name="Workspace").get_by_role(
@@ -319,12 +343,36 @@ def main():
         ).click()
         shot(workspace, "devices", "OSCAR Workspace")
         workspace.get_by_role("navigation", name="Workspace").get_by_role(
-            "button", name="Act", exact=True
+            "button", name="Automations", exact=True
         ).click()
+        check(
+            "Automations does not fabricate scheduled Workers",
+            workspace.get_by_text(
+                "Scheduled routines, event triggers, conditional watches, persistent named Workers "
+                "and stateful Protocol management are not connected to this Workspace yet."
+            ).is_visible(),
+        )
         shot(workspace, "actions", "OSCAR Workspace")
         workspace.get_by_role("navigation", name="Workspace").get_by_role(
             "button", name="Preferences", exact=True
         ).click()
+        check(
+            "Core reports Ask, Trigger-only and Manual separately",
+            all(
+                workspace.get_by_text(value, exact=True).is_visible()
+                for value in ("Ask", "Trigger-only", "Manual")
+            ),
+        )
+        workspace.get_by_role("button", name="Access modes and availability").click()
+        check(
+            "Full Access is truthful about unavailable delegation",
+            workspace.get_by_text("Full Access", exact=True).is_visible()
+            and workspace.get_by_text(
+                "Activation and immediate revocation are unavailable; no delegation is active.",
+                exact=False,
+            ).count()
+            > 0,
+        )
         shot(workspace, "preferences", "OSCAR Workspace")
         invoke(workspace, "surface_command", {"kind": "hide_workspace"})
         companion.get_by_role("button", name="Open OSCAR Workspace", exact=True).click()
@@ -343,12 +391,13 @@ def main():
         workspace.get_by_role("navigation", name="Workspace").get_by_role(
             "button", name="Conversation", exact=True
         ).click()
-        workspace.get_by_role("button", name="Read response").wait_for(timeout=15000)
-        workspace.get_by_role("button", name="Read response").click()
+        workspace.locator(".retained-turn").filter(has_text="A scripted reference answer").wait_for(
+            timeout=15000
+        )
         shot(workspace, "reading", "OSCAR Workspace")
         check(
             "reading preserves reported truth",
-            workspace.get_by_text("REPORTED", exact=True).count() == 1,
+            "REPORTED" in workspace.locator(".conversation-thread").inner_text(),
         )
         command("disconnect")
         companion.get_by_text("Disconnected", exact=True).wait_for(timeout=15000)
@@ -391,7 +440,7 @@ def main():
             0x0006,
         )
         workspace.wait_for_timeout(400)
-        for item in ("Conversation", "Text tools", "Act", "Activity", "Devices", "Preferences"):
+        for item in ("Conversation", "Automations", "Activity", "Devices", "Preferences"):
             workspace.get_by_role("navigation", name="Workspace").get_by_role(
                 "button", name=item, exact=True
             ).click()

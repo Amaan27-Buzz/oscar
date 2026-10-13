@@ -19,6 +19,13 @@ pub fn now_ms() -> u64 {
         .unwrap_or_default()
         .as_millis() as u64
 }
+struct CoreSnapshot {
+    tasks: Vec<TaskView>,
+    capabilities: Vec<CapabilityView>,
+    observed_at: u64,
+    conversation: ConversationView,
+    operating: Option<Value>,
+}
 pub struct CoreClient {
     url: String,
     node: String,
@@ -104,12 +111,17 @@ impl CoreClient {
                 }
             })?;
         let status = response.status();
+        let limit = if matches!(operation, "snapshot" | "conversation") {
+            4_194_304
+        } else {
+            65_536
+        };
         let mut bytes = Vec::new();
         response
-            .take(65537)
+            .take(limit + 1)
             .read_to_end(&mut bytes)
             .map_err(|_| "Core response unavailable")?;
-        if bytes.len() > 65536 {
+        if bytes.len() as u64 > limit {
             return Err("Core response exceeds boundary".into());
         }
         let value: Value = serde_json::from_slice(&bytes).map_err(|_| "invalid Core response")?;
@@ -142,14 +154,27 @@ impl CoreClient {
         }
         Ok(value)
     }
-    pub fn snapshot(&self) -> Result<(Vec<TaskView>, Vec<CapabilityView>, u64), String> {
+    fn snapshot(&self) -> Result<CoreSnapshot, String> {
         let value = self.request("snapshot", json!({}))?;
         let tasks =
             serde_json::from_value(value["tasks"].clone()).map_err(|_| "invalid Core task view")?;
         let catalog = self.request("catalog", json!({}))?;
         let caps = serde_json::from_value(catalog["capabilities"].clone())
             .map_err(|_| "invalid Core capability view")?;
-        Ok((tasks, caps, value["observed_at_ms"].as_u64().unwrap_or(0)))
+        let conversation = if value["conversation"].is_null() {
+            ConversationView::default()
+        } else {
+            serde_json::from_value(value["conversation"].clone())
+                .map_err(|_| "invalid Core conversation")?
+        };
+        let operating = value.get("operating").cloned();
+        Ok(CoreSnapshot {
+            tasks,
+            capabilities: caps,
+            observed_at: value["observed_at_ms"].as_u64().unwrap_or(0),
+            conversation,
+            operating,
+        })
     }
     pub fn review(&self, task_id: &str, operation: ControlOperation) -> Result<ReviewView, String> {
         bound(task_id, 80)?;
@@ -303,7 +328,13 @@ impl Bridge {
         ) {
             self.voice_request(json!({"operation":"inspect"}))?;
         }
-        let (mut tasks, caps, at) = client
+        let CoreSnapshot {
+            mut tasks,
+            capabilities: caps,
+            observed_at: at,
+            conversation,
+            operating,
+        } = client
             .snapshot()
             .map_err(|error| format!("Core unavailable; {error}"))?;
         let mut view = self.view.lock().map_err(|_| "native state unavailable")?;
@@ -363,6 +394,36 @@ impl Bridge {
             view.review = None;
         }
         view.capabilities = caps;
+        view.operating = operating;
+        if !self.hide_private.load(Ordering::Acquire) {
+            let unchanged = view.conversation.revision == conversation.revision
+                && view.conversation.persistence == conversation.persistence;
+            let mut turns = if unchanged {
+                view.conversation
+                    .turns
+                    .iter()
+                    .filter(|t| t.retained)
+                    .cloned()
+                    .collect()
+            } else {
+                Vec::new()
+            };
+            let before = if unchanged && !turns.is_empty() {
+                view.conversation.before
+            } else {
+                conversation.before
+            };
+            for turn in conversation.turns.iter().cloned() {
+                turns.retain(|prior| prior.task_id != turn.task_id || prior.role != turn.role);
+                turns.push(turn);
+            }
+            turns.sort_by(|a, b| a.occurred_at.total_cmp(&b.occurred_at));
+            view.conversation = ConversationView {
+                turns,
+                before,
+                ..conversation
+            };
+        }
         view.observed_at_ms = at;
         view.link = "online".into();
         view.reference = client.reference;
@@ -549,6 +610,7 @@ impl Bridge {
             view.context = None;
             view.preview = None;
             view.review = None;
+            view.conversation = ConversationView::default();
             for task in &mut view.tasks {
                 task.response = None;
                 task.value = None;
@@ -591,6 +653,35 @@ impl Bridge {
         let client = self.client()?;
         let value = match cmd {
             Command::Refresh => return self.refresh(),
+            Command::History { before } => {
+                let page: ConversationView = serde_json::from_value(
+                    client.request("conversation", json!({"before":before}))?,
+                )
+                .map_err(|_| "invalid Core conversation page")?;
+                let mut view = self.view.lock().map_err(|_| "native state unavailable")?;
+                if revision != Some(self.content_revision.load(Ordering::SeqCst))
+                    || self.hide_private.load(Ordering::Acquire)
+                {
+                    return Ok(view.clone());
+                }
+                for turn in page.turns {
+                    if !view
+                        .conversation
+                        .turns
+                        .iter()
+                        .any(|prior| prior.id == turn.id)
+                    {
+                        view.conversation.turns.push(turn);
+                    }
+                }
+                view.conversation
+                    .turns
+                    .sort_by(|a, b| a.occurred_at.total_cmp(&b.occurred_at));
+                view.conversation.before = page.before;
+                view.conversation.persistence = page.persistence;
+                view.conversation.revision = page.revision;
+                return Ok(view.clone());
+            }
             Command::Interact {
                 mode,
                 text,

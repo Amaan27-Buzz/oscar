@@ -6,7 +6,7 @@ is the place to converse, read, prepare work, inspect evidence and make decision
 | Owner | Responsibilities |
 |---|---|
 | Companion (`companion`) | Unchanged shared Orb, bounded operational status, owner-attention signal, open Workspace, shortcut toggle, hide, cancel explicit voice capture |
-| Workspace (`main`) | Ask conversation, reading, Dictate/Edit previews and destinations, advertised Act forms, Core activity/evidence, exact approvals, context, available executors, preferences |
+| Workspace (`main`) | Continuous Conversation with contextual Dictate/Edit and immediate actions; Automations availability/management; Activity outcomes, exact review/evidence; Devices; Preferences |
 | Rust process | One authenticated Bridge/CoreClient, Core polling, private Workspace events, redacted Companion snapshots, native window/tray/shortcut lifecycle and CNG confirmation/signing |
 | Core | Tasks, memory, routing, policy, authority, voice and verification |
 
@@ -45,7 +45,7 @@ Image references remain unapproved history; [the final native packet](../ui/desk
 is the current owner-review candidate.
 
 Conversation keeps its composer accessible and gives direct access to an
-advertised review. Text tools expose existing capture/preview/destination flows;
+advertised review. Conversation exposes existing capture/preview/destination flows;
 Activity retains Core tasks and evidence. Exact decision/signing still occurs in
 Workspace/native UI. The canonical Orb remains unchanged, with isolated
 Companion styles. Reduced motion remains complete. Aperture `42b565c` remains an
@@ -80,7 +80,7 @@ verify keyboard focus return and no popup CSP violations.
 
 The sidebar contains navigation and OSCAR presence, never a chat-thread list.
 Core task history and outcomes remain available in Activity. Conversation is
-one interaction point; this presentation change adds no frontend history store.
+one interaction point; Core projects authorized canonical Event Archive history or explicitly session-only history. There is no frontend history store.
 Long-response scrolling spans the Workspace width, with its scrollbar at the
 outer edge, a centered reading column and a separately anchored composer.
 
@@ -96,3 +96,9 @@ on hover or keyboard focus and retracts on pointer leave, without moving the Orb
 or resizing the native window. More/right-click requests a bounded native menu;
 no review/signing payload is accepted. Unsupported mute and Sentry stay disabled.
 See [native hover evidence](../ui/desktop/companion-review/README.md).
+
+## Product direction correction — 2026-10-14
+
+The approved Companion is preserved. Workspace navigation is Conversation / Automations / Activity / Devices / Preferences. Contextual writing and immediate action review belong in Conversation; Automations does not reinterpret file-write forms as persistent Workers. Activity groups owner attention, running work and outcomes, with identifiers/evidence behind disclosure.
+
+See [the ownership and authority decision](../decisions/ADR-DESKTOP-PERSONAL-INTELLIGENCE.md) for the corrected Ask / Secure / Full Access model and current unavailable activation. History uses Core and the canonical archive with separately provisioned read/retain grants; no browser persistence or invented retention authority. New native evidence is recorded separately from historical captures. Owner visual acceptance and merge remain pending.

@@ -17,7 +17,7 @@ export function useDesktop(port:Send=send,events=subscribe) {
     const prior=latest.current.expression,read=next.expression;
     if(read&&prior&&(retired.current.has(read.epoch)||(read.epoch===prior.epoch&&read.generation<prior.generation)))return;
     if(read&&prior&&read.epoch!==prior.epoch)retired.current.add(prior.epoch);
-    if(privateHidden.current)next={...next,context:null,preview:null,review:null,message:null,current:next.current?{...next.current,response:null,value:null}:null,tasks:next.tasks.map(t=>({...t,response:null,value:null}))};
+    if(privateHidden.current)next={...next,conversation:undefined,context:null,preview:null,review:null,message:null,current:next.current?{...next.current,response:null,value:null}:null,tasks:next.tasks.map(t=>({...t,response:null,value:null}))};
     latest.current=next;setView(next);setNow(Date.now());
   }
   useEffect(()=>{let alive=true,stop:(()=>void)|undefined;
