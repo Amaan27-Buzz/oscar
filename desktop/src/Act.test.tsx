@@ -24,3 +24,16 @@ describe('scoped typed action',()=>{
     fireEvent.click(screen.getByRole('button',{name:'Prepare action'}));expect(run).not.toHaveBeenCalled();
   });
 });
+it('a single action opens its editor without duplicate selectors',async()=>{
+ render(<Act capabilities={[cap]} run={()=>{}} disabled={false}/>);
+ await screen.findByRole('heading',{name:'Write exact file'});
+ expect(screen.queryByLabelText('Available capability')).toBeNull();expect(screen.queryByLabelText('Operation')).toBeNull();
+ expect(screen.getByLabelText('Exact content')).toBeTruthy();
+});
+it('real operation choices preserve their typed request and clear the previous content',async()=>{
+ const run=vi.fn();render(<Act capabilities={[{...cap,operations:['write_file','read_file']}]} run={run} disabled={false}/>);
+ await screen.findByLabelText('Exact content');fireEvent.change(screen.getByLabelText('Exact content'),{target:{value:'private draft'}});
+ fireEvent.change(screen.getByLabelText('Operation'),{target:{value:'read_file'}});
+ expect(screen.queryByLabelText('Exact content')).toBeNull();fireEvent.change(screen.getByLabelText('Relative workspace path'),{target:{value:'notes.txt'}});
+ fireEvent.click(screen.getByRole('button',{name:'Prepare action'}));expect(run).toHaveBeenCalledWith({kind:'act',capability_id:cap.id,form:{operation:'read_file',path:'notes.txt'}});
+});

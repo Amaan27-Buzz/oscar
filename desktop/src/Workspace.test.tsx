@@ -60,7 +60,7 @@ it('Devices reveals real capability scope and prepares without executing',async(
   fireEvent.click(screen.getByRole('button',{name:'Devices'}));
   expect(screen.getByText('desktop-1')).toBeTruthy();expect(screen.getByText('files.write')).toBeTruthy();
   fireEvent.click(screen.getByRole('button',{name:'Prepare an action'}));
-  expect((screen.getByLabelText('Available capability') as HTMLSelectElement).value).toBe('files');
+  expect(screen.getByRole('heading',{name:'Write exact file'})).toBeTruthy();expect(screen.queryByLabelText('Operation')).toBeNull();
   expect(port.mock.calls.some(([c])=>c.kind==='act')).toBe(false);
 });
 it('keeps review-session metadata out of the product composer',async()=>{

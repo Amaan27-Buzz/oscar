@@ -107,3 +107,8 @@ this revision has 64 frontend tests and 53 native checks passing.
 supersedes the inset-control treatment above. It includes the corrected composer,
 Act/Activity restructure and removal of developer banners/internal UI copy.
 Runtime test provenance remains explicit in the evidence and launch helper.
+
+**Latest Act revision:** [action editor](action-editor-review/README.md) replaces
+the stacked Act form. File writing now uses a destination/content editor with
+context and permission details in a compact support area. Other pages retain
+the preceding revision. Owner visual acceptance is pending.

@@ -116,3 +116,11 @@ focused Activity result/decision pane. Product banners/internal labels are
 removed; exact review content, availability and outcome truth remain. Frontend
 regression: 66 tests. Native acceptance: 56 checks. Final visual review remains
 with the owner; this supersedes the preceding tactile controls.
+
+## Act editor replacement — 2026-10-13
+
+The owner rejected the stacked Act form. The current [action editor packet](action-editor-review/README.md)
+replaces it with a destination/content editor and compact context/permission
+support rail. Single-choice selectors are removed; real multiple choices and
+capability-withdrawal recovery remain. Frontend regression: 68 tests; native
+acceptance: 56 checks. Owner visual acceptance remains pending.

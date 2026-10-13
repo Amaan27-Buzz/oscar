@@ -502,3 +502,12 @@ Developer session banners/internal labels are not the default product layout.
 Real outcome status and unavailable capabilities remain visible. Exact approval
 material is preserved; identifiers and verification metadata remain inspectable.
 Native reference-session metadata is preserved and disclosed in QA evidence.
+
+### Act composition — owner revision 2026-10-13
+
+Act is a focused operation editor, not a stacked administration form. File
+writing groups destination and exact content into one work surface. Context
+and permission details form a compact support area. Selectors appear only for
+real multiple choices or an explicitly cleared/withdrawn selection. Other
+operation-specific inputs and typed requests remain intact. All prior Act
+layout descriptions are historical; owner visual acceptance remains pending.
