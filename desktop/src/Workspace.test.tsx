@@ -26,7 +26,7 @@ it('stale observations disable submission and never claim monitoring or persiste
   mount({expression:{epoch:'b'.repeat(32),generation:1,observed_at_ms:Date.now()-10000,voice_observed_at_ms:0,tasks_observed_at_ms:0,current_observed_at_ms:0}});
   await screen.findByText(/Core unavailable or observation expired/);fireEvent.change(screen.getByLabelText('Ask OSCAR'),{target:{value:'hello'}});
   expect((screen.getByRole('button',{name:'Send'}) as HTMLButtonElement).disabled).toBe(true);
-  fireEvent.click(screen.getByRole('button',{name:'Preferences'}));expect(screen.getByText('Persistent mute · unavailable')).toBeTruthy();expect(screen.getByText('Sentry / acoustic awareness · unavailable')).toBeTruthy();
+  fireEvent.click(screen.getByRole('button',{name:'Preferences'}));expect(screen.getByText('Persistent mute')).toBeTruthy();expect(screen.getByText('Sentry / acoustic awareness')).toBeTruthy();expect(screen.getAllByText('unavailable')).toHaveLength(2);
 });
 it('Activity discard clears unsent private drafts across navigation',async()=>{
   const port=mount();await waitFor(()=>expect(port).toHaveBeenCalled());
@@ -42,4 +42,15 @@ it('a delayed open readback preserves the page selected by the owner',async()=>{
   fireEvent.click(screen.getByRole('button',{name:'Preferences'}));
   act(()=>port.emit({window:'interaction',window_revision:1}));
   expect(screen.getByRole('button',{name:'Quit OSCAR'})).toBeTruthy();
+});
+it('Preferences shows native shortcut state, theme selection and unavailable awareness',async()=>{
+  const port=mount({theme:'dark',shortcut:'Ctrl+Alt+K',shortcut_enabled:true});
+  await waitFor(()=>expect(port).toHaveBeenCalled());
+  fireEvent.click(screen.getByRole('button',{name:'Preferences'}));
+  expect(screen.getByRole('switch',{name:'Global shortcut'}).getAttribute('aria-checked')).toBe('true');
+  expect(screen.getByRole('button',{name:'Dark'}).getAttribute('aria-pressed')).toBe('true');
+  expect(screen.getByLabelText('Configured shortcut: Ctrl+Alt+K')).toBeTruthy();
+  act(()=>port.emit({shortcut_enabled:false}));
+  expect(screen.getByRole('switch',{name:'Global shortcut'}).getAttribute('aria-checked')).toBe('false');
+  expect(screen.getAllByText('unavailable')).toHaveLength(2);
 });

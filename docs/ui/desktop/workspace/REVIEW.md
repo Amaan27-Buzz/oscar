@@ -79,3 +79,11 @@ restarting re-registers the default shortcut. Uncommissioned launch stays
 unavailable. Installer/distribution and production enrollment remain separate.
 
 No Mobile builds, Slice 14, merge or branch cleanup were performed.
+
+## Preferences owner-feedback revision — 2026-10-13
+
+[Preferences revision](preferences-review/README.md) supersedes the original
+Preferences captures with visual theme choices, native-state shortcut switch and
+purposeful reduced-motion-aware transitions. Frontend regression: 63 passed;
+TypeScript/Vite and native Tauri debug build passed. Other route designs remain
+at the earlier candidate. Owner visual acceptance remains pending.
