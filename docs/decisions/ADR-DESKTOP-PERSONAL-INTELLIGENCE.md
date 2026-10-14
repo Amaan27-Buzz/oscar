@@ -1,6 +1,6 @@
 # Decision — one OSCAR, conversation, automations and delegated authority
 
-Owner direction: 2026-10-14, Group 2.5. Candidate on `codex/desktop-companion-workspace`, draft PR #5 into main. No merge authorization.
+Owner direction: 2026-10-14, Group 2.5. **Desktop PR #5 merged** into main (`43c15d37a6421d438b8101d5e322489ae452b20d`) with **interim owner UI approval**, not final integrated/device acceptance. The development branch was `codex/desktop-companion-workspace`. Original staged implementation and current unimplemented security/Worker/Sentry boundaries remain authoritative. See [active direction](../PRODUCT-DIRECTION.md).
 
 ## Interaction and ownership
 
