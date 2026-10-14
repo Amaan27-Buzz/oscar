@@ -19,7 +19,7 @@ The standalone lab and isolated Android module are software/reference foundation
 neither replaces the current app layout or proves device acceptance. Adoption is
 Slice 12 Desktop / Slice 13 Mobile; full Presence remains Slice 16.
 
-## Current Slice 10 Windows candidate
+## Historical Slice 10 Windows candidate (superseded by merged Group 2.5A)
 
 Tauri compact/expanded presence, canonical Orb, tray/global invocation, shared Core tasks, signed contextual approvals and explicit context are implemented as a software/reference candidate. Reliable insertion uses registered UIA ValuePattern with expected-value fencing and independent readback. Mac/Linux, normal owner use and real voice/device acceptance are not claimed. See [Desktop foundation](DESKTOP-FOUNDATION.md).
 
