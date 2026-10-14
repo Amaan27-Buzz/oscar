@@ -1,5 +1,7 @@
 # OSCAR Taste
 
+**Owner update, 2026-10-14:** The merged Desktop's **restrained neumorphic direction is the approved interim material language**, not an anti-pattern. Mobile should add thoughtful original illustrations and distinct editorial compositions with a coherent brand palette and reusable Compose components. Reject inaccessible shadow-only controls, inflated pillow surfaces and generic AI screens, not tactile relief itself. The original Orb is unchanged. See [product direction](docs/PRODUCT-DIRECTION.md).
+
 ## Current character-first quality bar (2026-10-09)
 
 A warm minimalist UI with the same pasted static smile, status labels and
@@ -214,11 +216,12 @@ Good:
 - painted/satin surfaces;
 - tiny contact shadows;
 - restrained hardware-like controls where appropriate;
-- subtle tonal depth.
+- subtle tonal depth;
+- **restrained neumorphism** with crisp text, consistent light direction, perceivable raised/inset controls and non-shadow focus states.
 
 Bad:
 
-- obvious neumorphism;
+- exaggerated pillow-like neumorphism that obscures contrast or affordances;
 - glossy toy rendering;
 - giant shadows;
 - glass-card stacks;
