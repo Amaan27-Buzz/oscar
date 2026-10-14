@@ -1,5 +1,13 @@
 # OSCAR Mobile visual direction
 
+## Current Group 2.5B direction — 2026-10-14
+
+**Status: design exploration, not final production Mobile UI approval.** [Desktop Group 2.5A](../docs/PRODUCT-DIRECTION.md) received interim owner approval and merged into `main`. OSCAR Mobile should use the shared character and a coherent **restrained neumorphic** material language, but remain a genuinely native Compose experience rather than a narrow Desktop replica.
+
+The owner is exploring **15 independent key screens, one palette/typography/illustration design board and five reusable component boards**, alongside a **separate complete UI-only Kotlin/Jetpack Compose prototype** in `oscar-ui-test` outside this repository. The broader 56-experience inventory is an information architecture, not 56 new production destinations or verified capabilities. Original feature-specific illustrations, expressive typography, varied compositions, warm cream/graphite, blue/yellow Orb identity, restrained raised/inset tactile controls, coherent dark mode and legibility/accessibility take priority over card walls or generic chat layouts. Keep `assets/brand/oscar-orb.svg` unchanged. Static designs/standalone prototype remain concept/demo material until approved and deliberately integrated into `mobile/` with real Core-bound behavior.
+
+Mobile and Desktop offer the same OSCAR Core capabilities with platform-specific emphases: mobile prioritizes portable presence, permissions, notifications, remote decisions, Sentry and Chief-of-Staff presentation; Desktop prioritizes deep work and computer execution. Conversation is continuous; Text Tools/Act are contextual abilities, not app destinations. Automations, Activity, Devices and Preferences are logical areas, with native navigation decided by usability. Secure/Full Access, real Sentry and persistent Worker runtime are unavailable pending backend slices; prototype controls must not imply activation. **Adaptive UI is later Slice 16/17/19/20 work**, not a requirement for this visual mockup; see [AIE](ADAPTIVE-INTERFACE.md) and [active product direction](PRODUCT-DIRECTION.md).
+
 ## Current Mobile design sequencing
 
 The Mobile functional foundation is **Slice 09**. Final Mobile UX redesign
@@ -29,7 +37,7 @@ See `CHIEF-OF-STAFF.md`.
 
 ## Direction contract
 
-**THESIS — Quietly Alive.** OSCAR Mobile is sparse, warm and responsive. Its character comes from OSCAR's weighted physical presence, fluid state transitions and immediate response. It refuses transcript-first chat, giant microphone CTAs, card walls and generic AI ornament.
+**THESIS — Quietly Alive.** OSCAR Mobile is expressive, warm and responsive. Its character comes from OSCAR's weighted physical presence, original illustration-led composition, restrained neumorphic depth, fluid state transitions and immediate response. It refuses chat-thread management, giant microphone CTAs, card walls and generic AI ornament.
 
 **PLAYFUL PRECISION.** Use broad whitespace, editorial hierarchy and minimal chrome, with precise tactile controls and state-driven motion. Personality is approachable but never cute-first.
 
