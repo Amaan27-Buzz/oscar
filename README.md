@@ -13,48 +13,13 @@
 
 ## Current development and milestones
 
-**2026-10-14:** [Group 2.5 product direction](docs/decisions/ADR-DESKTOP-PERSONAL-INTELLIGENCE.md) continues draft PR #5 on `codex/desktop-companion-workspace`. The approved Companion is preserved; Conversation is central, tools are contextual, Automations is honest about remaining lifecycle integrations, and Activity shows outcomes/attention. Canonical history requires separately granted read/retention permissions. Secure and genuine Full Access activation remain unavailable pending signed standing delegation and revocation. [Current native review packet](docs/ui/desktop/product-direction/README.md); no merge or physical PASS.
+**Current status — 2026-10-14:** OSCAR Desktop Group 2.5A was **provisionally approved by the owner** (restrained neumorphic Companion + Workspace) and [PR #5](https://github.com/Amaan27-Buzz/oscar/pull/5) merged to `main` at `43c15d37a6421d438b8101d5e322489ae452b20d`. Earlier stacked software Groups 1–2 are likewise incorporated into `main`. The tiny Companion preserves the unchanged Orb and stays separate from the full Workspace. The current Workspace includes Conversation, Automations, Activity, Devices and Preferences. Automations does **not** yet mean persistent Workers/schedules are running.
 
-**2026-10-11:** [Group 1 Desktop software completion](docs/development/GROUP-01-DESKTOP-COMPLETION.md)
-implements Slice12.2–12.6 on a separate draft candidate based on verified12.1
-corrections. [Native reference evidence](docs/ui/desktop/completion/README.md)
-and the [cumulative acceptance ledger](docs/development/SOFTWARE-ALPHA-ACCEPTANCE-LEDGER.md)
-separate software proof from consolidated owner/manual/device acceptance.
-Repository: private `Amaan27-Buzz/oscar`. No default UI promotion or merge.
-The following integration/milestone notes are historical snapshots.
+**Current focus — Group 2.5B / Slice 13:** OSCAR Mobile design exploration before production UI changes: 15 individual concept screens + 1 design board + 5 component boards, alongside a separate, reusable Kotlin/Jetpack Compose UI-only prototype (`oscar-ui-test`, **outside** the repository). These are proposals/demonstrations, not an integrated Android product or passed physical acceptance.
 
-Owner-authorized **Slice 12.1 Living Desktop Presence** is a separate local
-[visual-review candidate](docs/ui/desktop/presence/README.md) based on the integration
-below. It uses the existing Core and shared expression engine. Default Desktop,
-foundation PRs and later Slice 12.2 remain unchanged; owner/CI boundaries stay open.
+**Future:** [Adaptive Interface Engine](docs/ADAPTIVE-INTERFACE.md) is planned for typed, interactive responses in the *same conversation* (Slice 16 presentation protocol, 17 composition, 19 hardening, 20 integrated validation); not built. Sentry remains Slice 14. Full Access authority and persistent Workers require their actual Core security/execution integrations. See [active product direction](docs/PRODUCT-DIRECTION.md) and [canonical slices 00–20](docs/SLICE-NUMBERING.md).
 
-Owner-authorized local Desktop/Expression integration now has a
-[candidate report](docs/DESKTOP-EXPRESSION-INTEGRATION.md). Both foundation PRs
-remain unmerged; GitHub access is HTTP 403/account suspended. This prepares Slice 12
-without approving or starting its comprehensive visual redesign.
-
-The [canonical sequential roadmap](docs/SLICE-NUMBERING.md) has **21
-top-level slices (00–20)**. Current priority is **Slice 11 —
-OSCAR Expression/Character System**, followed by **Slice 12 Desktop
-experience** and **Slice 13 Mobile experience**. The original Orb identity
-remains canonical; new expressions must be versioned, visibly reviewed and
-grounded in real state rather than generic smiley widgets. See the
-[Expression Core](docs/EXPRESSION-CORE.md) and [design brief](DESIGN.md).
-
-Slice 10 Tauri Desktop remains in unmerged [draft PR #16](https://github.com/amaansyed27/oscar/pull/16).
-Prior compact A/B/C screenshots are unapproved concepts. Gate C remains
-PARTIAL; physical Edge/Voice/Mobile/Desktop acceptance and GitHub remote CI
-are not replaced by local or screenshot checks. GitHub Actions is blocked by
-account billing limits. Historical sections below document earlier snapshots,
-not current implementation instructions.
-
-
-## Slice 10 desktop candidate
-
-The accepted Slice 09 baseline is `7043b9663fe6474e3457c7aa578e733f7a5a4c1a`. Slice 10 adds a Tauri 2 / Rust / React-TypeScript presence and scoped Ask/Dictate/Edit/Act Core boundary on `club-d2/slice-10-desktop`; it remains an unmerged draft with **OWNER_ACCEPTANCE_NOT_RUN**. Gate C stays **PARTIAL**. See [Desktop foundation](docs/DESKTOP-FOUNDATION.md).
-See [deployment architecture](docs/DEPLOYMENT.md) for the free-first persistent Core
-and separate web/API host candidates and the deferred Home Node. These are future
-deployment choices, not Gate B completion claims.
+**Acceptance:** Gate A and local-alpha Gate B are accepted for documented scope. Gate C physical/owner tests and remote CI are not silently passed. The Desktop design pass is interim; final integrated Desktop/Mobile visual, device, voice and security acceptance is deferred. Older reference screenshots, candidate PRs and historical reports remain in Git history and the dated evidence folders.
 
 ## What OSCAR is
 
@@ -322,30 +287,30 @@ See [`docs/CLUB-A-CHECKPOINT.md`](docs/CLUB-A-CHECKPOINT.md), [`docs/CLUB-B-CHEC
 
 ## Roadmap
 
-| Slice | Deliverable | Status |
+Canonical numbering has **21 slices (00–20)**. The table is current planning, not a declaration of device/production readiness.
+
+| Slice | Deliverable | Current status |
 |---:|---|---|
-| 00 | Repository/architecture foundation | ✅ Complete |
-| 01 | OSCAR Core Loop | ✅ Verified foundation |
-| 02 | OSCAR Decision / Epistemic Controller | ✅ Verified foundation |
-| 03 | Native Transport + Catalog + Grid foundation | ✅ Accepted reference foundation; deployment evolves |
-| 04 | Native Model Router + cloud intelligence | ✅ Gate A accepted |
-| 05 | Real machine Worker + remote continuation | ✅ COMPLETE, accepted local-alpha scope |
-| 06 | Memory Fabric + Personal Policy + live context | ✅ COMPLETE, accepted local-alpha scope |
-| 07 | OSCAR Edge + reflexes | COMPLETE FOR SOFTWARE / SIMULATED EDGE FOUNDATION; physical DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED |
-| 08 | Voice Core + Identity + Match/Map + Persona runtime | COMPLETE FOR SOFTWARE / REFERENCE VOICE FOUNDATION; physical acceptance owner-deferred |
-| 09 | OSCAR Mobile + communication + Grid owner controls | Accepted software foundation at `7043b96`; physical owner acceptance deferred |
-| 10 | Desktop Interaction Runtime | Draft software/Windows reference candidate; OWNER_ACCEPTANCE_NOT_RUN |
-| 11 | World Model + Perception + Sentry + Daily Journal | Planned |
-| 12 | Commissioning/setup | Planned |
-| 13 | Avatar/presence UI | Planned |
-| 14 | Executive Planner + durable Workers + learning | Planned |
-| 15 | Physical/device expansion + specialist engineering | Planned |
-| 16 | Reliability/security/truthfulness hardening | Planned |
-| 17 | Unified alpha | Planned |
+| 00–04 | Repo, Core, Controller, Grid/Transport, Model Router | Accepted for documented foundation scope |
+| 05–06 | Machine Workers, memory, policy, live federation | Gate B accepted local-alpha scope |
+| 07–08 | Edge/reflexes and Voice/Identity/Persona | Software/reference foundations; physical acceptance deferred |
+| 09–10 | Android foundation and Windows runtime | Integrated software foundations; owner/device acceptance deferred |
+| 11 | Shared Expression/Character System | Software foundation integrated; full Presence later |
+| 12 | Desktop visual/interaction system | **Group 2.5A provisionally approved and merged**; final integration acceptance deferred |
+| 13 | Mobile visual/interaction system | Group 2.5B design exploration; production redesign not accepted |
+| 14 | World Model, Perception, Sentry, optional Journal | Planned |
+| 15 | Commissioning and setup | Planned |
+| 16 | Full cross-device Presence + initial typed adaptive presentation | Planned |
+| 17 | Executive Planner, named Workers, autonomy + adaptive view composition | Planned |
+| 18 | Physical/device expansion | Planned |
+| 19 | Reliability/security/truthfulness + adaptive UI hardening | Planned |
+| 20 | Unified Alpha and integrated adaptive interaction validation | Planned |
+
+For stage-specific gates and remaining blockers, see [canonical numbering](docs/SLICE-NUMBERING.md) and [roadmap](docs/ROADMAP.md).
 
 ## Design language
 
-OSCAR uses **Quietly Alive + Playful Precision**: restrained warm materials, graphite typography, blue/yellow identity accents, weighted physical motion, progressive disclosure and no generic AI-dashboard/card-wall/neon slop.
+OSCAR uses **Quietly Alive + Playful Precision**: restrained **accessible neumorphism**, warm paper and graphite, blue/yellow Orb identity, original contextual Mobile illustrations, weighted motion, progressive disclosure and no generic AI-dashboard/card-wall/neon slop. The canonical Orb artwork does not change.
 
 Simplicity must never become lack of craftsmanship.
 
@@ -368,6 +333,8 @@ A slice is not complete because an agent says it is complete. Implementation, te
 
 ## Canonical documentation
 
+- [**Current product direction (start here)**](docs/PRODUCT-DIRECTION.md)
+- [Adaptive Interface Engine (planned)](docs/ADAPTIVE-INTERFACE.md)
 - [Product](docs/PRODUCT.md)
 - [Ambient Chief of Staff](docs/CHIEF-OF-STAFF.md)
 - [Architecture](docs/ARCHITECTURE.md)
