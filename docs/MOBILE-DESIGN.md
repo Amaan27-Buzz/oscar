@@ -2,7 +2,7 @@
 
 ## Current Group 2.5B direction — 2026-10-14
 
-**Status: design exploration, not final production Mobile UI approval.** [Desktop Group 2.5A](../docs/PRODUCT-DIRECTION.md) received interim owner approval and merged into `main`. OSCAR Mobile should use the shared character and a coherent **restrained neumorphic** material language, but remain a genuinely native Compose experience rather than a narrow Desktop replica.
+**Status: design exploration, not final production Mobile UI approval.** [Desktop Group 2.5A](PRODUCT-DIRECTION.md) received interim owner approval and merged into `main`. OSCAR Mobile should use the shared character and a coherent **restrained neumorphic** material language, but remain a genuinely native Compose experience rather than a narrow Desktop replica.
 
 The owner is exploring **15 independent key screens, one palette/typography/illustration design board and five reusable component boards**, alongside a **separate complete UI-only Kotlin/Jetpack Compose prototype** in `oscar-ui-test` outside this repository. The broader 56-experience inventory is an information architecture, not 56 new production destinations or verified capabilities. Original feature-specific illustrations, expressive typography, varied compositions, warm cream/graphite, blue/yellow Orb identity, restrained raised/inset tactile controls, coherent dark mode and legibility/accessibility take priority over card walls or generic chat layouts. Keep `assets/brand/oscar-orb.svg` unchanged. Static designs/standalone prototype remain concept/demo material until approved and deliberately integrated into `mobile/` with real Core-bound behavior.
 
