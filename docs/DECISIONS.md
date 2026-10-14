@@ -4,9 +4,13 @@ This file contains the **current active architecture decisions** for OSCAR. Reti
 
 When a durable architecture assumption changes, update this file and the affected canonical domain docs in the same change.
 
-## Group 2.5 — continuous interaction and delegated authority
+## Current 2026-10-14 owner decisions
 
-[Decision: one OSCAR, conversation, automations and delegated authority](decisions/ADR-DESKTOP-PERSONAL-INTELLIGENCE.md) records the 2026-10-14 owner correction, three independent operating dimensions, the current critical-approval conflict and the required signed Full Access/revocation design. This supersedes earlier interpretations of Full Access, not the present unimplemented activation boundary.
+[Active product direction](PRODUCT-DIRECTION.md) is the entry point for current Desktop/Mobile roles, the one-conversation product, the planned Automations/Workers experience, the approved **restrained neumorphic** Desktop direction and the upcoming native Compose Mobile exploration. Desktop [PR #5](https://github.com/Amaan27-Buzz/oscar/pull/5) is **merged with provisional owner UI acceptance**; full product/device acceptance remains open.
+
+[Decision: one OSCAR, conversation, automations and delegated authority](decisions/ADR-DESKTOP-PERSONAL-INTELLIGENCE.md) records the three independent operating dimensions, the critical-approval conflict and the required signed Full Access/revocation design. This supersedes earlier interpretations of Full Access, not the present unimplemented activation boundary.
+
+[Future Adaptive Interface Engine](ADAPTIVE-INTERFACE.md) records an **unimplemented** typed, trusted, context-composed interactive presentation layer inside the same conversation: Slice 16 shared component envelope; Slice 17 Executive composition; Slice 19 hardening; Slice 20 validation. It is not separate Core authority, model-generated executable frontend code, or a requirement for Group 2.5.
 
 ## ADR-001 — OSCAR is one distributed personal intelligence
 
