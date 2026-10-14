@@ -7,14 +7,7 @@ Core owns one continuous multimodal personal intelligence and delegates subordin
 Ask / Secure / Full Access, awareness, Worker autonomy and capture/retention are independent. Genuine Full Access requires signed standing owner delegation and immediate revocation; it is currently unavailable because exact-action approval/critical blockers remain. No alternate Core, memory store or agent framework is introduced.
 
 
-> **Active slice sequence:** [canonical 00–20](SLICE-NUMBERING.md).
-> Next: **Slice 11 Character/Expression System** (presentation contract, no
-> new Core authority), then Slice 12 Desktop UX, Slice 13 Mobile UX;
-> Slice 14 World Model, 15 commissioning, 16 full Presence integration,
-> 17 Executive, 18 physical expansion, 19 hardening, 20 Unified Alpha.
-> Preserve dated pre-renumbering decisions and acceptance receipts as history.
-> The Desktop draft PR #16 is unmerged and cannot claim physical/CI PASS.
-
+> **Current — 2026-10-14:** The 00–20 [canonical roadmap](SLICE-NUMBERING.md) is authoritative. Desktop Groups 1–2 and Group 2.5A Companion/Workspace are merged into `main`; the owner accepted the neumorphic Desktop UI **provisionally**. Mobile Group 2.5B explores independent visual boards and a standalone Compose mockup before implementing/accepting a production redesign. Slice 14 Sentry and Slice 17 persistent Workers remain planned. Future [Adaptive Interface Engine](ADAPTIVE-INTERFACE.md) spans 16/17/19/20; **not implemented**. Earlier candidate PR references are historical evidence. Gate C physical and final integrated design acceptance remain open.
 
 ## Desktop foundation — current Slice 10
 
@@ -511,6 +504,12 @@ Act     → operate current app/device/task
 ```
 
 Desktop context may include app/window, focused control, selection, accessibility tree, screenshots, clipboard fallback and active task state.
+
+## Future Adaptive Interface Engine — planned presentation composition
+
+The [Adaptive Interface Engine](ADAPTIVE-INTERFACE.md) will let the Controller/Executive choose a **typed, bounded, versioned interactive UI description** rendered through trusted Desktop React/Tauri and native Android Compose components. It can adapt comparisons, schedules, diagrams, charts, task/Worker displays and device controls **inside the one ongoing conversation**, with accessible textual fallback.
+
+AIE is a **presentation projection**, not a second planner, memory system, security principal or tool executor. Component actions always resolve to typed Core intents; target capabilities and Personal Policy retain authority, signing, readback, epoch/revocation and verification. Generated layout/data is untrusted; no arbitrary executable code. Scheduled for Slice 16 shared presentation foundation, 17 intent-driven composition, 19 hardening, 20 integrated validation. No current implementation claim.
 
 ## 24. Edge
 
