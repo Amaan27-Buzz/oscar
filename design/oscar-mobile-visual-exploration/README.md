@@ -1,5 +1,8 @@
 # OSCAR Mobile visual exploration
 
+**Selected production baseline — owner decision 2026-10-14:** these original images are the visual authority for production `mobile/` Group 2.5B. The external Gemini Argon experiment was rejected. Originals remain unchanged; see [native implementation and comparisons](../../docs/ui/mobile/group25b/README.md). The exploration notes below record how these assets were generated.
+
+
 21 separate images generated with ChatGPT's built-in `image_gen`: one design-system board, 15 Android screens and five component boards. Image-only concepts for a later Kotlin/Jetpack Compose mockup; not implementation or runtime evidence.
 
 ## Direction
@@ -56,4 +59,3 @@ The canonical [Orb source](../../assets/brand/oscar-orb.svg) remains unchanged: 
 Product inputs: [Product](../../docs/PRODUCT.md), [Mobile design](../../docs/MOBILE-DESIGN.md), [Surfaces](../../docs/SURFACES.md), [authority decision](../../docs/decisions/ADR-DESKTOP-PERSONAL-INTELLIGENCE.md), [Expression](../../docs/EXPRESSION-CORE.md), [global design](../../DESIGN.md), and the existing [Desktop material captures](../../docs/ui/desktop/workspace/material-review/README.md).
 
 Generation prompt set: established palette/material/type → supplied canonical Orb + owner-selected Worker-detail reference → individual feature composition with concise copy → targeted correction passes. Exact prompts and original-generation paths are preserved in the local [generation record](C:/Users/Amaan/.codex/generated_images/01a139ab-152f-78b1-a4c4-265a5107b644/oscar-mobile-generation-record.json).
-

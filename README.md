@@ -15,7 +15,7 @@
 
 **Current status — 2026-10-14:** OSCAR Desktop Group 2.5A was **provisionally approved by the owner** (restrained neumorphic Companion + Workspace) and [PR #5](https://github.com/Amaan27-Buzz/oscar/pull/5) merged to `main` at `43c15d37a6421d438b8101d5e322489ae452b20d`. Earlier stacked software Groups 1–2 are likewise incorporated into `main`. The tiny Companion preserves the unchanged Orb and stays separate from the full Workspace. The current Workspace includes Conversation, Automations, Activity, Devices and Preferences. Automations does **not** yet mean persistent Workers/schedules are running.
 
-**Current focus — Group 2.5B / Slice 13:** OSCAR Mobile design exploration before production UI changes: 15 individual concept screens + 1 design board + 5 component boards, alongside a separate, reusable Kotlin/Jetpack Compose UI-only prototype (`oscar-ui-test`, **outside** the repository). These are proposals/demonstrations, not an integrated Android product or passed physical acceptance.
+**Current focus — Group 2.5B / Slice 13:** implement the selected Codex ImageGen/Figma visual baseline directly in production `mobile/`. The external Gemini Argon `oscar-ui-test` prototype was rejected and is not an integration source. Native Compose presentation preserves real Core, Grid, signing, voice and Expression boundaries. Review/verification status is recorded in [the Group 2.5B ledger](docs/ui/mobile/group25b/README.md); implementation is not physical acceptance.
 
 **Future:** [Adaptive Interface Engine](docs/ADAPTIVE-INTERFACE.md) is planned for typed, interactive responses in the *same conversation* (Slice 16 presentation protocol, 17 composition, 19 hardening, 20 integrated validation); not built. Sentry remains Slice 14. Full Access authority and persistent Workers require their actual Core security/execution integrations. See [active product direction](docs/PRODUCT-DIRECTION.md) and [canonical slices 00–20](docs/SLICE-NUMBERING.md).
 
@@ -297,7 +297,7 @@ Canonical numbering has **21 slices (00–20)**. The table is current planning, 
 | 09–10 | Android foundation and Windows runtime | Integrated software foundations; owner/device acceptance deferred |
 | 11 | Shared Expression/Character System | Software foundation integrated; full Presence later |
 | 12 | Desktop visual/interaction system | **Group 2.5A provisionally approved and merged**; final integration acceptance deferred |
-| 13 | Mobile visual/interaction system | Group 2.5B design exploration; production redesign not accepted |
+| 13 | Mobile visual/interaction system | Group 2.5B production candidate; owner visual/capability review pending |
 | 14 | World Model, Perception, Sentry, optional Journal | Planned |
 | 15 | Commissioning and setup | Planned |
 | 16 | Full cross-device Presence + initial typed adaptive presentation | Planned |

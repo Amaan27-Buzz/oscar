@@ -2,30 +2,17 @@
 
 ## Current Group 2.5B direction — 2026-10-14
 
-**Status: design exploration, not final production Mobile UI approval.** [Desktop Group 2.5A](PRODUCT-DIRECTION.md) received interim owner approval and merged into `main`. OSCAR Mobile should use the shared character and a coherent **restrained neumorphic** material language, but remain a genuinely native Compose experience rather than a narrow Desktop replica.
+**Status: production implementation candidate; owner visual approval pending.** [Desktop Group 2.5A](PRODUCT-DIRECTION.md) received interim owner approval and merged into `main`. OSCAR Mobile should use the shared character and a coherent **restrained neumorphic** material language, but remain a genuinely native Compose experience rather than a narrow Desktop replica.
 
-The owner is exploring **15 independent key screens, one palette/typography/illustration design board and five reusable component boards**, alongside a **separate complete UI-only Kotlin/Jetpack Compose prototype** in `oscar-ui-test` outside this repository. The broader 56-experience inventory is an information architecture, not 56 new production destinations or verified capabilities. Original feature-specific illustrations, expressive typography, varied compositions, warm cream/graphite, blue/yellow Orb identity, restrained raised/inset tactile controls, coherent dark mode and legibility/accessibility take priority over card walls or generic chat layouts. Keep `assets/brand/oscar-orb.svg` unchanged. Static designs/standalone prototype remain concept/demo material until approved and deliberately integrated into `mobile/` with real Core-bound behavior.
+The owner selected the Codex ImageGen/Figma 15-screen direction for **production Kotlin/Compose implementation**, with one design board and five component boards. Preserve the originals in `design/oscar-mobile-visual-exploration/`. The external Gemini Argon prototype is rejected and must not supply code, layout or design tokens. Warm cream/graphite, Manrope UI/Fraunces accents, original feature artwork and restrained tactile surfaces remain the target. Use native text, controls and semantics; no screenshot-backed UI. Canonical Orb/shared Expression remain unchanged. See [Group 2.5B implementation and evidence](ui/mobile/group25b/README.md).
 
-Mobile and Desktop offer the same OSCAR Core capabilities with platform-specific emphases: mobile prioritizes portable presence, permissions, notifications, remote decisions, Sentry and Chief-of-Staff presentation; Desktop prioritizes deep work and computer execution. Conversation is continuous; Text Tools/Act are contextual abilities, not app destinations. Automations, Activity, Devices and Preferences are logical areas, with native navigation decided by usability. Secure/Full Access, real Sentry and persistent Worker runtime are unavailable pending backend slices; prototype controls must not imply activation. **Adaptive UI is later Slice 16/17/19/20 work**, not a requirement for this visual mockup; see [AIE](ADAPTIVE-INTERFACE.md) and [active product direction](PRODUCT-DIRECTION.md).
+Mobile and Desktop offer the same OSCAR Core capabilities with platform-specific emphases: mobile prioritizes portable presence, permissions, notifications, remote decisions, Sentry and Chief-of-Staff presentation; Desktop prioritizes deep work and computer execution. Conversation is continuous; Text Tools/Act are contextual abilities, not app destinations. Automations, Activity, Devices and Preferences are logical areas, with native navigation decided by usability. Secure/Full Access, real Sentry and persistent Worker runtime are unavailable pending backend slices; production controls must not imply activation. **Adaptive UI is later Slice 16/17/19/20 work**, not a requirement for Group 2.5B; see [AIE](ADAPTIVE-INTERFACE.md) and [active product direction](PRODUCT-DIRECTION.md).
 
 ## Current Mobile design sequencing
 
-The Mobile functional foundation is **Slice 09**. Final Mobile UX redesign
-is **Slice 13**, after reviewed **Slice 11 Expression/Character System**,
-using a shared operational-state vocabulary with Desktop Slice 12.
-Full cross-device Presence is Slice 16. Historical `09R` identifiers are
-retained only in earlier artifacts; see [slice numbering](SLICE-NUMBERING.md).
+The approved ImageGen/Figma baseline is implemented directly in `mobile/` for Group 2.5B. Earlier exploration and reference acceptance remain historical. Production Core, Grid, Keystore/signing, voice/notification and shared Expression are preserved. Native captures now use the owner-authorized Samsung review install because the owner stopped the emulator for laptop RAM. Owner visual approval and real voice/biometric commissioning remain distinct.
 
-The previous static smiling Orb on beige card experiments are not the design
-target. OSCAR should have nonverbal reactions, expressive timing, attention
-and meaningful gestures while remaining technically restrained. On Android,
-build a dedicated native Compose renderer rather than importing desktop UI
-frames. Do not copy the small reference companion mascot or infer task truth,
-human emotion, microphone availability or permissions from expression.
-
-
-
-OSCAR Mobile is OSCAR on the phone. This document captures the durable mobile interaction direction; `DESIGN.md` is the global design system and `TASTE.md` is the qualitative quality bar.
+Navigation and experience coverage: [Group 2.5B](ui/mobile/group25b/README.md). Fluid Compose motion is part of this presentation scope; it does not enable Sentry, Full Access, persistent Workers or Adaptive Interface Engine.
 
 ## Surface mode
 

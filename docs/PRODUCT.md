@@ -1,6 +1,6 @@
 # Product Vision
 
-**Current owner-approved direction:** [product direction](PRODUCT-DIRECTION.md), [future Adaptive Interface Engine](ADAPTIVE-INTERFACE.md), [canonical slices](SLICE-NUMBERING.md). Group 2.5A Desktop was provisionally accepted and merged 2026-10-14; Mobile Group 2.5B design exploration is active, without final production UI acceptance.
+**Current owner-approved direction:** [product direction](PRODUCT-DIRECTION.md), [future Adaptive Interface Engine](ADAPTIVE-INTERFACE.md), [canonical slices](SLICE-NUMBERING.md). Group 2.5A Desktop was provisionally accepted and merged 2026-10-14; Mobile Group 2.5B production implementation is authorized against the selected ImageGen/Figma baseline, with owner/device acceptance still pending.
 
 ## Group 2.5 owner correction — 2026-10-14
 
@@ -11,7 +11,7 @@ Access is Ask / Secure / Full Access, independent of awareness and Worker autono
 See [the interaction and authority decision](decisions/ADR-DESKTOP-PERSONAL-INTELLIGENCE.md) for ownership, implemented boundaries and required integrations. Earlier dated checkpoints remain historical.
 
 
-> **Current canonical plan:** 00–20. Desktop Companion/Workspace UI is merged with interim owner approval; Mobile exploration precedes production redesign; Sentry 14, commissioning 15, Presence/typed AIE 16, Executive/adaptive composition 17, physical 18, hardening 19, Unified Alpha 20. Historical numbering and pre-merge statuses are archival. See [roadmap](ROADMAP.md).
+> **Current canonical plan:** 00–20. Desktop Companion/Workspace UI is merged with interim owner approval; Mobile Group 2.5B implements the selected visual baseline; Sentry 14, commissioning 15, Presence/typed AIE 16, Executive/adaptive composition 17, physical 18, hardening 19, Unified Alpha 20. Historical numbering and pre-merge statuses are archival. See [roadmap](ROADMAP.md).
 
 ## Current desktop software boundary
 
@@ -223,7 +223,7 @@ Raw audio, transcripts, summaries and derived memory are separate retention deci
 
 ## Current build direction
 
-Gate A/B are PASS within their documented scope. Slices 07–10 provide integrated Edge/Voice/Android/Desktop **software/reference foundations**; physical Edge and voice, real-phone/OEM and broader Windows acceptance remain deferred under **Gate C PARTIAL**. Slice 11 shared Expression is implemented as a reference foundation; Slice 12 Desktop Group 2.5A is **merged, with interim owner UI approval only**. Slice 13 Mobile visual design remains under Group 2.5B exploration. Sentry/World Model 14, commissioning 15, Presence/AIE 16, Executive/Workers 17, physical expansion 18 and hardening 19 lead to **Slice 20 Unified Alpha**, which cannot pass until applicable real physical/integrated gates are exercised. Older PR and prior-numbering status claims belong to dated evidence.
+Gate A/B are PASS within their documented scope. Slices 07–10 provide integrated Edge/Voice/Android/Desktop **software/reference foundations**; physical Edge and voice, real-phone/OEM and broader Windows acceptance remain deferred under **Gate C PARTIAL**. Slice 11 shared Expression is implemented as a reference foundation; Slice 12 Desktop Group 2.5A is **merged, with interim owner UI approval only**. Slice 13 Mobile Group 2.5B is a production implementation candidate with native phone UI evidence; owner visual and capability acceptance remain pending. Sentry/World Model 14, commissioning 15, Presence/AIE 16, Executive/Workers 17, physical expansion 18 and hardening 19 lead to **Slice 20 Unified Alpha**, which cannot pass until applicable real physical/integrated gates are exercised. Older PR and prior-numbering status claims belong to dated evidence.
 
 Gate B completion includes real machine/browser/computer-use/installed-app/remote-control paths plus the full OSCAR Memory Fabric, open-ended Personal Policy, real private OAuth/connector acceptance, secure credential storage and live-authority-vs-memory federation.
 

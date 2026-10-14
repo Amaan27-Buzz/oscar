@@ -1,6 +1,6 @@
 # Feature Inventory
 
-**Current reading:** [Product direction](PRODUCT-DIRECTION.md) specifies accepted UI ownership; [Adaptive Interface Engine](ADAPTIVE-INTERFACE.md) describes **planned** adaptive interactive answers. This inventory is a **backlog**, not a list of shipped features. Desktop interim design is merged; Mobile Group 2.5B is still exploring an owner-approved production design.
+**Current reading:** [Product direction](PRODUCT-DIRECTION.md) specifies accepted UI ownership; [Adaptive Interface Engine](ADAPTIVE-INTERFACE.md) describes **planned** adaptive interactive answers. This inventory is a **backlog**, not a list of shipped features. Desktop interim design is merged; Mobile Group 2.5B implements the selected Codex ImageGen/Figma baseline; the Gemini Argon prototype is rejected. See [Group 2.5B implementation and evidence](ui/mobile/group25b/README.md).
 
 ## Group 2.5 owner correction — 2026-10-14
 

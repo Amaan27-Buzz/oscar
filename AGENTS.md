@@ -1,5 +1,20 @@
 # AGENTS.md
 
+## Owner Group 2.5B production Android scope — 2026-10-14
+
+Implement the selected ImageGen/Figma Mobile visual language in `mobile/` on
+`codex/mobile-group-2.5b`, based on current integrated main `b941357`. Preserve
+all original `design/oscar-mobile-visual-exploration/` images and native/Core
+authority, signing, voice and shared Expression contracts. The external
+`oscar-ui-test` Gemini Argon prototype is rejected, not an integration source.
+Represent all 15 hero experiences natively with functioning or honestly
+unavailable controls; reconcile broader information architecture. Build, test,
+compare native emulator evidence, commit/push and prepare a draft PR into main
+when connectivity permits. Stop for owner visual review; no merge, physical
+PASS, new Full Access authority, Sentry/Executive/AIE backend or Slice 14–17.
+This explicit scope supersedes earlier Mobile prohibitions only within Group 2.5B.
+See [implementation/evidence](docs/ui/mobile/group25b/README.md).
+
 ## Owner Group 2.5 product correction — 2026-10-14
 
 Continue `codex/desktop-companion-workspace`, draft PR #5 into main, with no new worktree. Preserve the approved Companion/Orb and all native/Aperture evidence. Conversation is central; navigation is Conversation / Automations / Activity / Devices / Preferences. Dictate/Edit and immediate actions are contextual conversation capabilities. Read [the interaction/authority decision](docs/decisions/ADR-DESKTOP-PERSONAL-INTELLIGENCE.md). Ask / Secure / genuine Full Access, awareness and Worker autonomy are independent. Current Secure/Full Access activation remains unavailable pending a signed owner-delegation/revocation integration; never hide confirmations or forge approvals. Owner authorizes supported Core integration and tests, commit/push to the existing draft, then stop for visual review. No Mobile redesign, Slices 14–17 implementation, merge or cleanup.
