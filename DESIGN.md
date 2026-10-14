@@ -79,8 +79,9 @@ components:
 The 2026-10-13 material revision applies paired upper-left highlights and
 lower-right shadows to raised Workspace controls and work/settings panes.
 Warm chalk and graphite share the same depth tokens; fields retain clear
-boundaries and focus. The sidebar has no chat-thread/task-history list: Core
-history belongs in Activity. Conversation scrolls at the outer Workspace edge,
+boundaries and focus. The sidebar has no chat-thread/task-history list: chronological conversation
+history is restored within Conversation; operational tasks/outcomes live in Activity.
+Conversation scrolls at the outer Workspace edge,
 with centered reading content and an anchored composer. See
 [native material review](docs/ui/desktop/workspace/material-review/README.md).
 
@@ -205,7 +206,7 @@ Use restrained physical material cues:
 - tiny elevation changes;
 - minimal borders.
 
-Do not use obvious neumorphism, glassmorphism, giant soft shadows, glossy toy rendering, cyberpunk lighting or floating card stacks.
+Use the **owner-approved restrained neumorphic direction** on Desktop: consistent, low-amplitude raised/inset relief, readable fields, crisp content hierarchy, and focus/disabled states understandable without shadows. Avoid exaggerated pillow-like neumorphism, glassmorphism, giant soft shadows, glossy toy rendering, cyberpunk lighting and floating card stacks.
 
 **Test:** if removing shadows destroys hierarchy, the layout is wrong. Hierarchy must come from typography, spacing, geometry, alignment, grouping and contrast.
 
