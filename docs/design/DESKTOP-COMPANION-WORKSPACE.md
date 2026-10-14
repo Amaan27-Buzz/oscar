@@ -43,8 +43,7 @@ ink (`#252B2D`) and slate-blue accents on 2026-10-13. The Workspace uses compact
 operational headings and open
 reading/review pages. Matching dark mode uses the implemented warm-graphite token set.
 See [individual screen references](../../desktop/design/workspace-screens/README.md).
-Image references remain unapproved history; [the final native packet](../ui/desktop/workspace/README.md)
-is the current owner-review candidate.
+Earlier image references remain unapproved historical experiments; the [merged Group 2.5A interaction-polish native packet](../ui/desktop/interaction-polish/README.md) supports the owner's **interim visual pass**, not final integrated acceptance.
 
 Conversation keeps its composer accessible and gives direct access to an
 advertised review. Conversation exposes existing capture/preview/destination flows;
