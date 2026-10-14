@@ -9,7 +9,7 @@ Ask / Secure / Full Access, awareness, Worker autonomy and capture/retention are
 
 > **Current — 2026-10-14:** The 00–20 [canonical roadmap](SLICE-NUMBERING.md) is authoritative. Desktop Groups 1–2 and Group 2.5A Companion/Workspace are merged into `main`; the owner accepted the neumorphic Desktop UI **provisionally**. Mobile Group 2.5B explores independent visual boards and a standalone Compose mockup before implementing/accepting a production redesign. Slice 14 Sentry and Slice 17 persistent Workers remain planned. Future [Adaptive Interface Engine](ADAPTIVE-INTERFACE.md) spans 16/17/19/20; **not implemented**. Earlier candidate PR references are historical evidence. Gate C physical and final integrated design acceptance remain open.
 
-## Desktop foundation — current Slice 10
+## Desktop foundation — Slice 10 integrated software reference
 
 Tauri/Rust/React-TypeScript presentation and explicit OS context adapters connect to the existing OSCAR Core. Core owns Controller, memory, tasks, policy, permission, routing and evidence; Runtime/Dispatcher resolve bounded process-local private inputs only after durable authorization. Desktop does not duplicate Worker/browser/UIA execution. See [Desktop foundation](DESKTOP-FOUNDATION.md).
 
