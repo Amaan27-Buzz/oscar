@@ -1,11 +1,13 @@
 # Desktop Companion and Workspace — Group 2.5A
 
+**Current status (2026-10-14):** [PR #5](https://github.com/Amaan27-Buzz/oscar/pull/5) is **merged into main**; owner accepted the restrained neumorphic appearance provisionally. The final integrated design, actual physical voice/device, security and full product acceptance remain deferred. The original implementation-base SHA and earlier candidate notes below describe historical evidence, not an open PR. See [current product direction](../PRODUCT-DIRECTION.md).
+
 The Companion is a presence object, never a miniature application. The Workspace
 is the place to converse, read, prepare work, inspect evidence and make decisions.
 
 | Owner | Responsibilities |
 |---|---|
-| Companion (`companion`) | Unchanged shared Orb, bounded operational status, owner-attention signal, open Workspace, shortcut toggle, hide, cancel explicit voice capture |
+| Companion (`companion`) | Unchanged shared Orb, bounded operational status, attention, open Workspace, quick read-only Access/Sentry status and voice; shortcut management/secondary controls in overflow, hide, cancel explicit listening |
 | Workspace (`main`) | Continuous Conversation with contextual Dictate/Edit and immediate actions; Automations availability/management; Activity outcomes, exact review/evidence; Devices; Preferences |
 | Rust process | One authenticated Bridge/CoreClient, Core polling, private Workspace events, redacted Companion snapshots, native window/tray/shortcut lifecycle and CNG confirmation/signing |
 | Core | Tasks, memory, routing, policy, authority, voice and verification |
@@ -61,12 +63,10 @@ outside preferences. Ordinary reopen preserves the owner-selected page; the
 Companion attention action opens Activity without retrieving or granting an
 approval. Actual signed decisions remain in Workspace/native review.
 
-Software, source checks and native evidence are complete for the candidate.
-The owner inspects the live app and supplies visual/copy feedback before merge
-or Group 2.5A closure. No physical voice/device or installer acceptance is claimed.
+Software/source/native reference checks were completed for the candidate, and the owner supplied an **interim UI pass**. [PR #5](https://github.com/Amaan27-Buzz/oscar/pull/5) has been merged, with final integrated visual and physical voice/device/installer acceptance still outstanding.
 
-Implementation base: consolidated main `fd191a2d7ca7f98c456969c74173a0340f789578`.
-Candidate stops at owner visual review; no merge, Mobile or Slice 14 work.
+Historical implementation base: `fd191a2d7ca7f98c456969c74173a0340f789578`.
+Desktop merge: `43c15d37a6421d438b8101d5e322489ae452b20d`. Mobile Group 2.5B visual design exploration is separate; Slice 14 is still planned.
 
 ## Library controls — 2026-10-13
 
