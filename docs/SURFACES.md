@@ -1,12 +1,12 @@
 # OSCAR Surfaces and Embodiments
 
-## Group 2.5 owner correction — 2026-10-14
+## Current surfaces — owner direction, 2026-10-14
 
-Desktop uses the approved small Companion and separate full Workspace in one Tauri process. Companion remains a redacted expressive presence with tray/shortcut/open controls and no chat, task-list, automation or approval authority. Workspace navigation is Conversation / Automations / Activity / Devices / Preferences.
+**Desktop Group 2.5A is provisionally owner-approved and merged to `main`** ([PR #5](https://github.com/Amaan27-Buzz/oscar/pull/5)); final integrated and physical acceptance remain open. One Tauri process has a small expressive **Companion** and a full **Workspace**. The unchanged Orb Companion owns only truthful glanceable state, tray/hotkey, quick Access/Sentry availability and opening the app; shortcut settings live in overflow. It has no chat, task list, automation manager or approval/signing authority. Workspace destinations are **Conversation / Automations / Activity / Devices / Preferences**.
 
-Dictate/Edit, selected/focused-field context and exact immediate action preparation are contextual parts of Conversation. Accessibility perception and taking actions remain separately permissioned; screenshot-based understanding requires an actual adapter and is not advertised here. Preferences reports real Core access, awareness, Worker autonomy and retention independently.
+Dictate/Edit, selected/focused-field context and exact immediate actions are **contextual Conversation capabilities**, not Text Tools/Act pages. Context reading, retention and action authorization are independent; screenshot understanding requires a real permissioned adapter. Automations does not yet imply working schedules, named persistent Workers or Protocols. Access (Ask / Secure / Full Access), awareness (Manual / Trigger-only / Sentry), Worker autonomy and retention are separate Core-authoritative dimensions; only Ask-style control is presently supported.
 
-See [the interaction and authority decision](decisions/ADR-DESKTOP-PERSONAL-INTELLIGENCE.md) for ownership, implemented boundaries and required integrations. Earlier dated checkpoints remain historical.
+**Mobile Group 2.5B is visual exploration, not a completed production redesign:** 15 key-screen images, one design board, five component boards and a standalone full-feature UI-only Compose mockup outside this repo. Both apps share Core features, but native compositions differ. **Future Adaptive Interface Engine** renders typed, trusted interactive responses within the same conversation, with React/Compose presentation starting in Slice 16 and Core-driven composition in Slice 17. This is planned, not implemented. See [current direction](PRODUCT-DIRECTION.md), [AIE](ADAPTIVE-INTERFACE.md), and [Desktop authority decision](decisions/ADR-DESKTOP-PERSONAL-INTELLIGENCE.md). Earlier dated checkpoints remain history.
 
 
 ## Shared expression foundation — Slice 11.3
