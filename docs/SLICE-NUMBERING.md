@@ -66,7 +66,7 @@ Early design/prototype work may occur despite deferred Gate C physical acceptanc
 
 ## Owner quality bar for future model instructions
 
-For Slice 11 (and subsequent 12/13), the user will run **GPT-6.1 Sol with High thinking effort** where available. Prompts must ask for deep, considered design work rather than rushing to three superficial alternatives or optimizing for screenshot count.
+Use the model and thinking effort appropriate to the actual work; the owner has used **GPT-6.1 Sol at Medium** for focused Group 2.5 engineering, alongside separate image-design and Kotlin/Compose experiments. No single model/effort setting is a canonical product requirement. Prompts must ask for careful design and inspected native results rather than rushing superficial alternatives or optimizing for screenshot count.
 
 1. Study actual screenshots, canonical artwork, existing DESIGN/TASTE guidance and interaction states **before** sketching.
 2. Articulate how OSCAR should *behave* and what character it expresses before picking shapes, shadows, colors or library components. The reference images of a small expressive desktop companion demonstrate persistent personality, glanceable reactions and nonverbal communication; they are **inspiration for responsiveness and presence, not artwork to copy**.
