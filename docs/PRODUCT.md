@@ -223,12 +223,7 @@ Raw audio, transcripts, summaries and derived memory are separate retention deci
 
 ## Current build direction
 
-Gate A/B are PASS for their documented scope. Slice 07 is COMPLETE FOR SOFTWARE /
-SIMULATED EDGE FOUNDATION; physical Edge acceptance is DEFERRED_BY_OWNER /
-NOT_PHYSICALLY_VERIFIED. Gate C remains PARTIAL. Slice 07 PR #13 is merged;
-Slice 08 software/reference quality candidate is on draft PR #14; physical acceptance is owner-deferred.
-Physical verification returns during Slice 15/16 and is
-mandatory before Slice 17 Unified Alpha PASS.
+Gate A/B are PASS within their documented scope. Slices 07–10 provide integrated Edge/Voice/Android/Desktop **software/reference foundations**; physical Edge and voice, real-phone/OEM and broader Windows acceptance remain deferred under **Gate C PARTIAL**. Slice 11 shared Expression is implemented as a reference foundation; Slice 12 Desktop Group 2.5A is **merged, with interim owner UI approval only**. Slice 13 Mobile visual design remains under Group 2.5B exploration. Sentry/World Model 14, commissioning 15, Presence/AIE 16, Executive/Workers 17, physical expansion 18 and hardening 19 lead to **Slice 20 Unified Alpha**, which cannot pass until applicable real physical/integrated gates are exercised. Older PR and prior-numbering status claims belong to dated evidence.
 
 Gate B completion includes real machine/browser/computer-use/installed-app/remote-control paths plus the full OSCAR Memory Fabric, open-ended Personal Policy, real private OAuth/connector acceptance, secure credential storage and live-authority-vs-memory federation.
 
