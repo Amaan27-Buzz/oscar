@@ -18,17 +18,17 @@ The owner rejected mixing numbered slices with 09R, 10R, 13A/13B and prematurely
 | 07 | Edge + reflexes | Software simulated foundation accepted; physical deferred |
 | 08 | Voice Core / Identity / Persona | Reference software accepted; physical deferred |
 | 09 | OSCAR Mobile foundation | Software merged; device acceptance deferred |
-| 10 | OSCAR Desktop runtime foundation | **Draft PR #16, unmerged**; local-reference foundation and screenshot experiments |
-| **11** | **OSCAR Expression / Character System** | **v3 approved for engineering; 11.3 shared foundation candidate; owner/device/CI boundaries retained** |
-| **12** | OSCAR Desktop visual/interaction design | Group 1 software/reference candidate12.2–12.6; manual/owner/device acceptance deferred; no promotion/merge |
-| **13** | OSCAR Mobile visual/interaction design | Group2 software/reference candidate13.1–13.8; owner/phone/OEM/audio acceptance deferred; no promotion/merge |
+| 10 | OSCAR Desktop runtime foundation | Integrated software foundation; physical acceptance deferred; old PR #16 archival |
+| **11** | **OSCAR Expression / Character System** | Shared renderer foundation integrated into reference apps; final character/device acceptance deferred |
+| **12** | OSCAR Desktop visual/interaction design | **Group 2.5A interim owner pass; merged PR #5**; final owner/physical acceptance deferred |
+| **13** | OSCAR Mobile visual/interaction design | Software/reference baseline integrated; **Group 2.5B visual exploration**; final redesign and phone acceptance pending |
 | 14 | World Model, Perception, Sentry, optional Journal | Planned |
 | 15 | Commissioning and setup | Planned |
-| 16 | Full cross-device Avatar/Presence integration | Planned; extends 11 |
-| 17 | Executive Planner / durable Workers / learning | Planned |
+| 16 | Full cross-device Avatar/Presence + typed adaptive presentation | Planned; extends 11; initial AIE contract |
+| 17 | Executive Planner / durable Workers / learning / adaptive UI composition | Planned |
 | 18 | Physical expansion and Edge acceptance | Planned |
-| 19 | Reliability / security / truthfulness hardening | Planned |
-| **20** | **Unified Alpha** | **Planned; cannot PASS until every mandatory acceptance is genuine** |
+| 19 | Reliability / security / truthfulness / adaptive UI hardening | Planned |
+| **20** | **Unified Alpha + adaptive interaction validation** | **Planned; cannot PASS until every mandatory acceptance is genuine** |
 
 **Total:** 00–20 inclusive, 21 canonical top-level slices. Future work uses `11.1`, `11.2`, etc. for **stages inside a slice**, not new numbered slices. Historical 09R/10R and 13A/B designations are **aliases**, not additional slices.
 
@@ -57,7 +57,7 @@ Preserve raw image paths such as `docs/ui/desktop/explorations/10R.1/`, screensh
 
 - **Gate A 01–04:** existing PASS unchanged.
 - **Gate B 05–06:** existing PASS unchanged.
-- **Gate C 07–10:** **PARTIAL**; physical Edge/Voice/Mobile/Desktop acceptance and desktop PR #16 integration are pending.
+- **Gate C 07–10:** **PARTIAL**; software merged, physical Edge/Voice/Mobile/Desktop owner acceptance and broad native/CI evidence remain pending.
 - **Design acceptance 11–13:** character/visual interactions and cross-surface consistency, with owner review; this is a design checkpoint, **not** a substitute for any physical/software Build Gate.
 - **Gate D 14–17:** World Model/Sentry, commissioning, full Presence integration and Executive Planner.
 - **Gate E 18–20:** physical expansion, integrated hardening and **Slice 20 Unified Alpha**.
@@ -78,18 +78,13 @@ For Slice 11 (and subsequent 12/13), the user will run **GPT-6.1 Sol with High t
 8. Use only legitimate free/open design references where practical; do not copy third-party art or ship paid animation dependencies by accident.
 9. No unapproved backend/Core/security/permission changes to make presentation easier. Stage work for visual owner review before production integration.
 
-## Current workflow and Git hygiene
+## Current workflow and Git hygiene — 2026-10-14
 
-`main` and `work` hold the accepted plan; PR #16 still holds the unmerged Tauri runtime and exploration artifacts. **Reconcile its base against `origin/work` before implementation, but preserve its tests, reference assets and history.** Do not bypass blocked GitHub Actions with fabricated green checks. No automatic PR #16 merge.
+The consolidated software foundations and Desktop Group 2.5A [PR #5](https://github.com/Amaan27-Buzz/oscar/pull/5) are on `main`. Old branch names, PRs, screenshots and earlier acceptance statements are retained **as history**, never current operating instructions. The owner has accepted the **neumorphic Desktop direction provisionally**; final cross-device UI and physical/production acceptance remain open.
 
-Current activity is **Group 1 Desktop software completion**, authorized2026-10-11,
-on `build/slice-12-desktop-completion` from verified12.1 corrective commit.
-See the [Group 1 report](development/GROUP-01-DESKTOP-COMPLETION.md) and
-[cumulative acceptance ledger](development/SOFTWARE-ALPHA-ACCEPTANCE-LEDGER.md).
-The prior11.3 engineering record and draft histories are retained; their older
-workflow statements are historical. Final owner/device and remote CI remain
-separate. No production promotion, accepted-baseline merge or Group2 begins here.
-No Slice 14 World Model, Elocution or other post-alpha work is authorized by this renumbering.
+Group 2.5B Mobile UI exploration proceeds against the current production foundation, using 15 individual visual screen references, one system board, five component boards and a **separate** UI-only native Compose prototype before production integration. Build/test with existing emulator/SDK and avoid redundant AVDs, worktrees and huge caches. All prototypes must clearly distinguish simulated controls from operational Sentry, Workers or Full Access.
+
+AIE is **future** work integrated into Slices 16/17/19/20, not an extra canonical numbered slice. See [product direction](PRODUCT-DIRECTION.md) and [AIE plan](ADAPTIVE-INTERFACE.md).
 
 ## Maintainer verification
 
