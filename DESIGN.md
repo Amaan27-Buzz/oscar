@@ -72,6 +72,8 @@ components:
 
 # Design System: OSCAR
 
+**Current design authority — 2026-10-14:** The owner has **provisionally approved the restrained neumorphic Desktop Companion/Workspace UI**, merged in PR #5. This is the current Desktop baseline, with final integrated visual acceptance deferred. The canonical Orb remains immutable. Mobile Group 2.5B explores **original illustration-led, typography-forward, accessible neumorphic Compose UI**, first through separate images and a standalone UI-only app; production Android design is not yet accepted. See [active product direction](docs/PRODUCT-DIRECTION.md) and [Mobile](docs/MOBILE-DESIGN.md). Future adaptive interactive views are described in [AIE](docs/ADAPTIVE-INTERFACE.md), not implemented here.
+
 ## Active Desktop architecture — Group 2.5A
 
 The 2026-10-13 material revision applies paired upper-left highlights and
@@ -98,7 +100,7 @@ See [functional ownership and native boundaries](docs/design/DESKTOP-COMPANION-W
 and [actual native review packet](docs/ui/desktop/workspace/README.md).
 The rejected [image references](desktop/design/workspace-screens/README.md)
 remain archived locally; the actual native packet is the current review surface.
-The candidate requires owner visual acceptance before merge.
+The current candidate **passed the owner's interim visual review and merged via PR #5**. Do not infer final integrated/device production acceptance from this pass.
 
 The [canonical OSCAR Orb](assets/brand/oscar-orb.svg) defines the actual intended
 Orb appearance. Use or derive variants from that source; interface tokens above
