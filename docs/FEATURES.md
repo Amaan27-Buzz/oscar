@@ -1,5 +1,7 @@
 # Feature Inventory
 
+**Current reading:** [Product direction](PRODUCT-DIRECTION.md) specifies accepted UI ownership; [Adaptive Interface Engine](ADAPTIVE-INTERFACE.md) describes **planned** adaptive interactive answers. This inventory is a **backlog**, not a list of shipped features. Desktop interim design is merged; Mobile Group 2.5B is still exploring an owner-approved production design.
+
 ## Group 2.5 owner correction — 2026-10-14
 
 Current Desktop navigation: Conversation, Automations, Activity, Devices, Preferences. Dictate/Edit/Act are underlying contextual operations inside Conversation, not primary utility pages. Activity groups attention, running work and outcomes with exact evidence/signing detail. Canonical history is available only with installed Memory Fabric and explicit read/retain grants; otherwise the UI reports session-only history.
@@ -357,9 +359,11 @@ Unsupported capture remains unsupported. Capture is never designed as covert rec
 
 ## Desktop
 
-- Native/lightweight Windows/macOS presence.
-- Compact ambient presence + contextual expansion.
-- Dictate/Edit/Ask/Act.
+- Native Windows Tauri software/reference foundation (macOS not yet accepted).
+- **Small standalone Companion + full Workspace**, not an expanding mini-chat widget.
+- Conversation embeds contextual Dictate/Edit/Ask/Act; no primary Text Tools/Act navigation.
+- Current Workspace navigation: Conversation / Automations / Activity / Devices / Preferences.
+- Group 2.5A restrained neumorphic direction provisionally owner-approved and merged; final hardware/visual acceptance deferred.
 - Screen/cursor/selection/accessibility context.
 - Machine capability/health state.
 - Remote continuation and Grid visibility/control.
@@ -386,10 +390,17 @@ Unsupported capture remains unsupported. Capture is never designed as covert rec
 - Detect expired auth, provider degradation, broken adapters, disappearing Grid capabilities, Edge disconnects, task leases, storage/state health, Memory Fabric index drift and update failures.
 - Safe bounded repair/rebuild/rollback where authorized.
 
+## Adaptive Interface Engine — future (not implemented)
+
+- OSCAR can eventually assemble and update **trusted interactive views inside its same conversation**: comparisons, calendars/timelines, diagrams/simulations, charts, task/Worker progress, contextual device controls and structured reviews.
+- Shared versioned **typed presentation description**, native React/Tauri and Jetpack Compose renderers, Core-authorized actions and accessible text fallback. Never treat generated markup/code as authority.
+- **Planned milestones:** 16 shared presentation protocol, 17 intent-driven composition and Worker/task interactions, 19 isolation/privacy/accessibility hardening, 20 cross-device validation. No Group 2.5 obligation to ship AIE.
+- [Full proposed architecture](ADAPTIVE-INTERFACE.md).
+
 ## Design / product behavior
 
 - Quietly Alive + Playful Precision.
-- Restraint, tactile industrial precision and approachable personality.
+- Restrained **accessible neumorphism**, tactile industrial precision, original contextual Mobile illustrations and approachable personality.
 - Warm cream/off-white materials + graphite typography.
 - Blue/yellow reserved for OSCAR identity/presence/state.
 - Weighted blue-shell/yellow-puck presence object.
