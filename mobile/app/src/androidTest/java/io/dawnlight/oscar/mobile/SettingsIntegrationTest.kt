@@ -15,6 +15,8 @@ class SettingsIntegrationTest {
     @Before fun isolate() {
         org.junit.Assume.assumeTrue(allowDisposableReview())
         isolated = true
+        val session = androidx.lifecycle.ViewModelProvider(compose.activity)[CoreSession::class.java]
+        compose.waitUntil(5000) { !session.state.value.restoring }
         compose.runOnIdle { androidx.lifecycle.ViewModelProvider(compose.activity)[CoreSession::class.java].disconnect() }
         compose.waitUntil(5000) { SessionVault(compose.activity).load() == null }
     }
@@ -39,7 +41,7 @@ class SettingsIntegrationTest {
         org.junit.Assume.assumeTrue(androidx.test.platform.app.InstrumentationRegistry.getArguments().getString("group02_process_prepare") == "true")
         compose.onNodeWithTag("destination-OSCAR").performClick()
         compose.onNodeWithTag("interactionInput").performTextClearance()
-        compose.onNodeWithTag("interactionInput").performTextInput("Group02 synthetic process recovery")
+        compose.onNodeWithTag("interactionInput").performTextReplacement("Group02 synthetic process recovery")
         compose.waitUntil(5000) { SessionVault(compose.activity).loadDraft("unpaired") == "Group02 synthetic process recovery" }
     }
     @Test fun personaIsBoundedAndDoesNotChangeCorePolicy() {

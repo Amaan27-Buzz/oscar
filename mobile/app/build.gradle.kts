@@ -3,6 +3,12 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.compose")
 }
+val mobileAssets by tasks.registering(Copy::class) {
+    from("../../assets/brand") { include("oscar-orb.svg") }
+    from("../third-party-licenses") { into("licenses") }
+    from("../font-licenses") { into("licenses") }
+    into(layout.buildDirectory.dir("generated/mobile-assets"))
+}
 android {
     namespace = "io.dawnlight.oscar.mobile"
     compileSdk = 36
@@ -27,9 +33,10 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    sourceSets["main"].assets.srcDir("../../assets/brand")
+    sourceSets["main"].assets.srcDir(layout.buildDirectory.dir("generated/mobile-assets"))
     sourceSets["review"].res.srcDir("src/debug/res")
 }
+tasks.named("preBuild") { dependsOn(mobileAssets) }
 kotlin { compilerOptions { jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17) } }
 dependencies {
     implementation(project(":expression"))
