@@ -115,10 +115,10 @@ val OscarTypography = Typography(
         modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite })
 }
 
-@Composable fun SupportingDetails(title: String, content: @Composable ColumnScope.() -> Unit) {
+@Composable fun SupportingDetails(title: String, onOpen: () -> Unit = {}, content: @Composable ColumnScope.() -> Unit) {
     var open by remember { mutableStateOf(false) }
     Column(Modifier.fillMaxWidth().animateContentSize(tween(if (LocalReducedMotion.current) 0 else 180))) {
-        TextButton(onClick = { open = !open }, modifier = Modifier.semantics { stateDescription = if (open) "Expanded" else "Collapsed" }) {
+        TextButton(onClick = { open = !open; if (open) onOpen() }, modifier = Modifier.semantics { stateDescription = if (open) "Expanded" else "Collapsed" }) {
             Text(title); Text(if (open) " −" else " +")
         }
         if (open) Column(verticalArrangement = Arrangement.spacedBy(8.dp), content = content)

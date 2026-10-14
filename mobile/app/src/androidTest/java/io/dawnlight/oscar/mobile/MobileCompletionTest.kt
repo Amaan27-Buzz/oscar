@@ -174,7 +174,7 @@ class MobileCompletionTest {
             OscarTheme { Column(Modifier.fillMaxSize().verticalScroll(androidx.compose.foundation.rememberScrollState()).padding(24.dp)) { PresenceScreen(state, "", {}, {}, {}, {}, {}) } }
         } }
         compose.onNodeWithText("Read response").performScrollTo().performClick()
-        compose.onNodeWithText(response).assertExists()
+        compose.onNode(hasText(response) and hasAnyAncestor(hasTestTag("responseDialog"))).assertExists()
         compose.onNodeWithText("REPORTED · a response is testimony, not independent verification.").assertExists()
         capture("13-2-long-reported-simulated", "responseDialog")
         compose.onNodeWithText("Back").performScrollTo().performClick()
@@ -201,6 +201,9 @@ class MobileCompletionTest {
         assertNotNull("Review failed: ${session.state.value.message}", session.state.value.approval)
         val approval = session.state.value.approval!!
         assertEquals("what is four plus five", approval.exactRequest)
+        compose.onNodeWithText("Confirm securely").assertIsNotEnabled()
+        capture("decision-collapsed-reference", "approvalDialog")
+        compose.onNodeWithText("Plan & permission details").performScrollTo().performClick()
         compose.onNodeWithText("Exact source material").performScrollTo().performClick()
         compose.onNode(hasText(approval.review) and hasAnyAncestor(hasTestTag("approvalDialog"))).assertExists()
         compose.onNodeWithText("Confirm securely").assertIsEnabled()

@@ -53,6 +53,8 @@ internal fun formattedResponse(source: String): AnnotatedString {
             tokens.nextValue().takeIf { (it is JSONObject || it is JSONArray) && tokens.nextClean() == '\u0000' }
         } else null
     } catch (_: Exception) { null }
+    if (structured is JSONObject && structured.length() == 0) return AnnotatedString("Empty object")
+    if (structured is JSONArray && structured.length() == 0) return AnnotatedString("No items")
     if (structured != null) return buildAnnotatedString {
         fun field(value: Any?, depth: Int) {
             if (depth > 16) { append(value.toString()); return }

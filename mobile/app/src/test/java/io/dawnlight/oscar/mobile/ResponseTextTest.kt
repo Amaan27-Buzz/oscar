@@ -22,6 +22,8 @@ class ResponseTextTest {
         assertTrue(fields.contains("status: reported"))
         assertTrue(fields.contains("1. One"))
         assertFalse(fields.contains("{"))
+        assertEquals("Empty object", formattedResponse("{}").text)
+        assertEquals("No items", formattedResponse("[]").text)
         assertTrue(formattedResponse("{\"status\":\"reported\"}\nDo not omit this").text.contains("Do not omit this"))
     }
     @Test fun untrustedMarkupAndDeepInputsNeverExecuteOrDisappear() {
