@@ -1,5 +1,7 @@
 # Product Vision
 
+**Current owner-approved direction:** [product direction](PRODUCT-DIRECTION.md), [future Adaptive Interface Engine](ADAPTIVE-INTERFACE.md), [canonical slices](SLICE-NUMBERING.md). Group 2.5A Desktop was provisionally accepted and merged 2026-10-14; Mobile Group 2.5B design exploration is active, without final production UI acceptance.
+
 ## Group 2.5 owner correction — 2026-10-14
 
 OSCAR owns one chronological, persistent multimodal relationship, reasoning, memory, awareness, policy, task orchestration and executive decisions. The tiny Companion is expressive presence; Conversation is the main application interaction. Workers/specialists are subordinate executors. Immediate actions live in Conversation; Automations manages delegated jobs and continuing responsibilities when implemented. Desktop navigation is Conversation / Automations / Activity / Devices / Preferences.
@@ -9,18 +11,11 @@ Access is Ask / Secure / Full Access, independent of awareness and Worker autono
 See [the interaction and authority decision](decisions/ADR-DESKTOP-PERSONAL-INTELLIGENCE.md) for ownership, implemented boundaries and required integrations. Earlier dated checkpoints remain historical.
 
 
-> **Current plan (2026-10-09):** [Slices 00–20](SLICE-NUMBERING.md);
-> **11 Expression/Character → 12 Desktop UX → 13 Mobile UX → 14–20
-> awareness/commissioning/Presence/Executive/physical/hardening/Unified
-> Alpha**. The old 09R/10R/13A/13B naming is archival. Slice 10 remains
-> a draft candidate, not a visually accepted desktop product. The owner
-> rejected generic static Orb widgets; see [Expression Core](EXPRESSION-CORE.md)
-> and [Design](../DESIGN.md).
-
+> **Current canonical plan:** 00–20. Desktop Companion/Workspace UI is merged with interim owner approval; Mobile exploration precedes production redesign; Sentry 14, commissioning 15, Presence/typed AIE 16, Executive/adaptive composition 17, physical 18, hardening 19, Unified Alpha 20. Historical numbering and pre-merge statuses are archival. See [roadmap](ROADMAP.md).
 
 ## Current desktop software boundary
 
-OSCAR Desktop has an approved small Companion and a separate Workspace in one native Tauri process. Conversation owns contextual Ask/Dictate/Edit and immediate action workflows; Automations shows truthful continuing-responsibility availability, Activity shows operational outcomes, and Devices/Preferences inspect real capability and operating state. The new Group 2.5 candidate awaits owner visual review. Gate C remains PARTIAL; see [the ownership contract](design/DESKTOP-COMPANION-WORKSPACE.md).
+OSCAR Desktop has an approved small Companion and a separate Workspace in one native Tauri process. Conversation owns contextual Ask/Dictate/Edit and immediate action workflows; Automations shows truthful continuing-responsibility availability, Activity shows operational outcomes, and Devices/Preferences inspect real capability and operating state. The Group 2.5A candidate is **merged with provisional owner visual acceptance**, not final integrated or physical acceptance. Gate C remains PARTIAL; see [the ownership contract](design/DESKTOP-COMPANION-WORKSPACE.md).
 
 ## North star
 
@@ -237,7 +232,7 @@ mandatory before Slice 17 Unified Alpha PASS.
 
 Gate B completion includes real machine/browser/computer-use/installed-app/remote-control paths plus the full OSCAR Memory Fabric, open-ended Personal Policy, real private OAuth/connector acceptance, secure credential storage and live-authority-vs-memory federation.
 
-See `docs/ROADMAP.md` and `docs/BUILD-GATES.md`.
+See `docs/ROADMAP.md`, `docs/SLICE-NUMBERING.md` and `docs/BUILD-GATES.md`. Older dated slice/PR statements below are historical, not live build instructions.
 
 ## Non-goals
 
@@ -288,8 +283,8 @@ Slice 09 must not merge in this run. Gate C remains PARTIAL. Slice 10, deploymen
 and Home Node are not started. Post-alpha Operating Logs, specialist-model training
 and home-server migration remain documented future work, not implemented.
 
-## Slice 10 product shell continuation
+## Historical Slice 10 product shell continuation (superseded)
 
-OSCAR Desktop uses Tauri 2/Rust/React-TypeScript presence and Ask/Dictate/Edit/Act, with one shared Core relationship. Advertised capabilities drive bounded Act forms. WPF is reference-only. Functional composition precedes the separate [10R redesign](DESKTOP-UI-REDESIGN.md); 10R must integrate before Slice 17 PASS.
+Earlier Tauri/Ask/Dictate/Edit/Act form-shell and 10R integration requirements were pre-Group-2.5 design instructions. The approved current model instead uses the merged separate Companion and Workspace, with contextual operations inside Conversation. See [current direction](PRODUCT-DIRECTION.md).
 
 Conversation presents the relationship rather than memory plumbing or utility controls. Core-backed context, voice availability and exact action/text review support natural requests. Preferences explains memory/privacy and keeps direct advanced controls recoverable. Companion Access and Sentry menus inspect real availability; unavailable authority or awareness cannot be activated by presentation. See [interaction polish](ui/desktop/interaction-polish/README.md).
