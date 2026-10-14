@@ -1,6 +1,7 @@
 package io.dawnlight.oscar.mobile
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asAndroidBitmap
@@ -20,10 +21,12 @@ class MobileCompletionTest {
     @get:Rule val compose = createAndroidComposeRule<MainActivity>()
     private var isolated = false
     @Before fun isolateLocalFixture() {
-        org.junit.Assume.assumeTrue(android.os.Build.HARDWARE in setOf("ranchu", "goldfish"))
+        org.junit.Assume.assumeTrue(allowDisposableReview())
         isolated = true
+        compose.runOnIdle { compose.activity.window.addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON) }
         compose.runOnIdle { androidx.lifecycle.ViewModelProvider(compose.activity)[CoreSession::class.java].disconnect() }
         compose.waitUntil(5000) { SessionVault(compose.activity).load() == null }
+        compose.runOnIdle { compose.activity.getSharedPreferences("permissions", android.content.Context.MODE_PRIVATE).edit().putBoolean("microphone_perception", false).putBoolean("notification_reply", false).commit() }
     }
     @After fun removeLocalFixture() {
         if (!isolated) return
@@ -42,30 +45,15 @@ class MobileCompletionTest {
             connection.inputStream.close()
         } finally { connection.disconnect() }
     }
-    private fun capture(name: String, tag: String? = null) {
-        compose.runOnIdle {
-            assertTrue(compose.activity.window.attributes.flags and android.view.WindowManager.LayoutParams.FLAG_SECURE != 0)
-            // Only disposable instrumentation content may be captured; production keeps FLAG_SECURE.
-            compose.activity.window.clearFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE)
-        }
-        val bitmap = (if (tag == null) compose.onRoot() else compose.onNodeWithTag(tag)).captureToImage().asAndroidBitmap()
-        val resolver = compose.activity.contentResolver
-        val uri = resolver.insert(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI, android.content.ContentValues().apply {
-            put(android.provider.MediaStore.Images.Media.DISPLAY_NAME, "$name.png")
-            put(android.provider.MediaStore.Images.Media.MIME_TYPE, "image/png")
-            put(android.provider.MediaStore.Images.Media.RELATIVE_PATH, "Pictures/OSCAR-Group02")
-        })!!
-        resolver.openOutputStream(uri)!!.use { bitmap.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, it) }
-        compose.runOnIdle {
-            compose.activity.window.addFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE)
-        }
-    }
+    private fun capture(name: String, tag: String? = null) = captureReview(compose, name, tag)
     @Test fun voiceInvocationCancellationPreservesTextWithoutCapture() {
         compose.onNodeWithTag("interactionInput").performTextInput("Synthetic voice continuation")
+        androidx.test.espresso.Espresso.closeSoftKeyboard()
+        compose.waitUntil(5000) { !compose.activity.window.decorView.rootWindowInsets.isVisible(android.view.WindowInsets.Type.ime()) }
         compose.onNodeWithText("Voice").performClick()
         compose.onNodeWithTag("voiceStatus").assertTextContains("Microphone off")
         assertEquals(null, MicrophoneService.binding)
-        compose.onNodeWithText("Start listening").performClick()
+        compose.onNodeWithText("Start listening").performScrollTo().performClick()
         compose.waitUntil(5000) { VoicePresentation.state.value.phase == VoicePhase.MUTED }
         compose.waitUntil(5000) { compose.onAllNodesWithText("Microphone permission or OSCAR perception grant is off").fetchSemanticsNodes().isNotEmpty() }
         compose.onNodeWithTag("voiceStatus").assertTextEquals("Microphone permission or OSCAR perception grant is off")
@@ -87,7 +75,6 @@ class MobileCompletionTest {
             compose.activity.setContentForTest {
                 OscarTheme {
                     Column(Modifier.fillMaxSize().padding(24.dp)) {
-                        OscarOrb(state, reduced = true)
                         PresenceScreen(state, "", {}, {}, {}, {}, {})
                     }
                 }
@@ -109,8 +96,8 @@ class MobileCompletionTest {
         compose.activityRule.scenario.recreate()
         compose.waitUntil(5000) { androidx.lifecycle.ViewModelProvider(compose.activity)[CoreSession::class.java].state.value.draft == text }
         compose.onNodeWithTag("interactionInput").assertTextContains(text)
-        compose.onNodeWithText("Activity").performClick()
-        compose.onNodeWithText("OSCAR").performClick()
+        compose.onNodeWithTag("destination-ACTIVITY").performClick()
+        compose.onNodeWithTag("destination-OSCAR").performClick()
         compose.onNodeWithTag("interactionInput").assertTextContains(text)
         compose.onNodeWithText("Discard private interaction").performScrollTo().performClick()
         compose.waitUntil(5000) { !compose.activity.getSharedPreferences("session", android.content.Context.MODE_PRIVATE).contains("draft") }
@@ -157,15 +144,15 @@ class MobileCompletionTest {
         compose.waitUntil(10_000) { session.state.value.link == Link.CONNECTED }
         assertTrue(session.state.value.snapshot!!.tasks.any { it.state == "verified" && it.value == "5" })
         compose.onNodeWithTag("interactionInput").performTextInput("3 + 4")
-        compose.onNodeWithText("Send").performScrollTo().performClick()
+        compose.onNodeWithText("Send").performClick()
         compose.waitUntil(10_000) { session.state.value.interactions.lastOrNull()?.text == "3 + 4" && !session.state.value.busy }
         compose.onNodeWithText("Read response").performScrollTo().performClick()
         compose.onNode(hasText("Needs approval") and hasAnyAncestor(hasTestTag("responseDialog"))).assertExists()
-        compose.onNodeWithText("Back").performClick()
+        compose.onNodeWithText("Back").performScrollTo().performClick()
         capture("13-2-reference-home-response")
-        compose.onNodeWithText("Activity").performClick()
+        compose.onNodeWithTag("destination-ACTIVITY").performClick()
         compose.onNodeWithTag("task-description-${session.state.value.interactions.last().taskId}").assertTextContains("3 + 4")
-        compose.onNodeWithText("OSCAR").performClick()
+        compose.onNodeWithTag("destination-OSCAR").performClick()
         compose.onNodeWithText("Discard private interaction").performScrollTo().performClick()
         compose.waitUntil(10_000) { !session.state.value.busy && !session.state.value.privateSuppressed }
         assertTrue(session.state.value.snapshot!!.tasks.none { it.description == "3 + 4" })
@@ -184,13 +171,13 @@ class MobileCompletionTest {
             snapshot = CoreSnapshot(listOf(task), emptyList(), System.currentTimeMillis()),
             interactions = listOf(Interaction("Synthetic reading request", "REPORTED", task.id)))
         compose.activity.runOnUiThread { compose.activity.setContentForTest {
-            OscarTheme { Column(Modifier.fillMaxSize().padding(24.dp)) { PresenceScreen(state, "", {}, {}, {}, {}, {}) } }
+            OscarTheme { Column(Modifier.fillMaxSize().verticalScroll(androidx.compose.foundation.rememberScrollState()).padding(24.dp)) { PresenceScreen(state, "", {}, {}, {}, {}, {}) } }
         } }
-        compose.onNodeWithText("Read response").performClick()
+        compose.onNodeWithText("Read response").performScrollTo().performClick()
         compose.onNodeWithText(response).assertExists()
         compose.onNodeWithText("REPORTED · a response is testimony, not independent verification.").assertExists()
         capture("13-2-long-reported-simulated", "responseDialog")
-        compose.onNodeWithText("Back").performClick()
+        compose.onNodeWithText("Back").performScrollTo().performClick()
     }
     @Test fun nativeApprovalInspectionExpiryAndReferenceDenialNeverFabricateConsent() {
         val arguments = androidx.test.platform.app.InstrumentationRegistry.getArguments()
@@ -203,7 +190,7 @@ class MobileCompletionTest {
         compose.runOnIdle { session.connect(fixture) }
         compose.waitUntil(10_000) { session.state.value.link == Link.CONNECTED }
         compose.onNodeWithTag("interactionInput").performTextInput("what is four plus five")
-        compose.onNodeWithText("Send").performScrollTo().performClick()
+        compose.onNodeWithText("Send").performClick()
         compose.waitUntil(10_000) { session.state.value.interactions.isNotEmpty() && !session.state.value.busy }
         val id = session.state.value.interactions.last().taskId!!
         val task = session.state.value.snapshot!!.tasks.single { it.id == id }
@@ -214,6 +201,7 @@ class MobileCompletionTest {
         assertNotNull("Review failed: ${session.state.value.message}", session.state.value.approval)
         val approval = session.state.value.approval!!
         assertEquals("what is four plus five", approval.exactRequest)
+        compose.onNodeWithText("Exact source material").performScrollTo().performClick()
         compose.onNode(hasText(approval.review) and hasAnyAncestor(hasTestTag("approvalDialog"))).assertExists()
         compose.onNodeWithText("Confirm securely").assertIsEnabled()
         capture("13-3-reference-approval", "approvalDialog")
@@ -221,20 +209,25 @@ class MobileCompletionTest {
         compose.waitUntil(35_000) { session.state.value.coreNow(System.currentTimeMillis()) >= approval.expiresAt }
         compose.runOnIdle { session.refreshNow() }
         compose.waitUntil(10_000) { session.state.value.observedAt > approval.expiresAt - 30_000 }
-        compose.mainClock.advanceTimeBy(30_500)
+        compose.waitForIdle()
+        assertNotNull("Expiry review lost: ${session.state.value.link}; ${session.state.value.message}", session.state.value.approval)
         compose.onNodeWithText("Confirm securely").assertIsNotEnabled()
-        compose.onNodeWithText("Back").performClick()
+        compose.onNodeWithText("Back").performScrollTo().performClick()
         assertNull(session.state.value.approval)
         compose.runOnIdle { session.inspect(id) }
         compose.waitUntil(10_000) { session.state.value.inspected != null }
         compose.onNodeWithTag("taskInspector").assertExists()
-        compose.onNodeWithText("Back").performClick()
+        compose.onNodeWithText("Back").performScrollTo().performClick()
         compose.runOnIdle { session.review(task, "deny") }
         compose.waitUntil(10_000) { session.state.value.approval != null }
-        // Genuine Android handoff on an uncommissioned emulator must fail closed.
-        assertFalse(compose.activity.getSystemService(android.app.KeyguardManager::class.java).isDeviceSecure)
-        compose.onNodeWithText("Confirm denial").performClick()
-        compose.waitUntil(5000) { session.state.value.approval == null }
+        // A secured owner phone is inspection-only here; genuine owner confirmation is separate acceptance.
+        if (compose.activity.getSystemService(android.app.KeyguardManager::class.java).isDeviceSecure) {
+            compose.onNodeWithText("Confirm denial").assertIsEnabled()
+            compose.runOnIdle { session.dismissApproval() }
+        } else {
+            compose.onNodeWithText("Confirm denial").performClick()
+            compose.waitUntil(5000) { session.state.value.approval == null }
+        }
         assertEquals("planned", parseTask(CoreClient(fixture).call("inspect", org.json.JSONObject().put("task_id", id))).state)
         val connection = java.net.URI(arguments.getString("group02_control")!!).toURL().openConnection() as java.net.HttpURLConnection
         try {
@@ -263,18 +256,18 @@ class MobileCompletionTest {
         val desktop = session.state.value.snapshot!!.tasks.single { it.id == arguments.getString("group02_desktop_task") }
         assertEquals("Desktop", desktop.origin); assertEquals("group02-reference-desktop", desktop.originNode)
         assertFalse(desktop.description.contains("8 + 9")); assertFalse("approve" in desktop.actions)
-        compose.onNodeWithText("Devices").performClick()
+        compose.onNodeWithTag("destination-DEVICES").performClick()
         compose.onNodeWithTag("device-group02-reference-desktop").performScrollTo().performClick()
         compose.onNodeWithText("No currently advertised executor capabilities").assertExists()
         capture("13-4-reference-grid")
-        compose.onNodeWithText("Activity").performClick()
+        compose.onNodeWithTag("destination-ACTIVITY").performClick()
         compose.onNodeWithTag("task-description-${desktop.id}").assertExists()
         control("network_off")
         try {
             compose.runOnIdle { session.refreshNow() }
             compose.waitUntil(15_000) { session.state.value.link == Link.DEGRADED }
             assertNull(session.state.value.snapshot); assertNull(session.state.value.approval)
-            compose.onNodeWithText("Devices").performClick()
+            compose.onNodeWithTag("destination-DEVICES").performClick()
             compose.onNodeWithText("No current Grid snapshot is available.").assertExists()
         } finally { control("network_on") }
         compose.runOnIdle { session.refreshNow() }

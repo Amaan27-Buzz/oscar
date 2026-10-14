@@ -6,9 +6,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.tween
 
 @Composable fun DevicesScreen(state: MobileState, connect: () -> Unit, disconnect: () -> Unit) {
-    Text("Connection Grid", style = MaterialTheme.typography.titleLarge)
+    Illustration(R.drawable.illustration_devices, height = 170.dp)
+    EditorialHeading("Where OSCAR is.", "Same intelligence.")
+    Text("Connection Grid", style = MaterialTheme.typography.bodySmall)
     Text("This Android surface", style = MaterialTheme.typography.titleMedium)
     Text(if (state.link == Link.CONNECTED) "Here · scoped Core session connected" else "App open · Core connection unavailable")
     Text("Opening OSCAR does not imply background listening or continuous availability.", style = MaterialTheme.typography.bodySmall)
@@ -23,11 +27,13 @@ import androidx.compose.ui.unit.dp
                 Text("${node.status} · ${if (node.paired) "Paired" else "Not paired"}${if (active.isNotEmpty()) " · ${active.size} associated active tasks" else ""}")
             }
         }
+        Column(Modifier.fillMaxWidth().animateContentSize(tween(if (LocalReducedMotion.current) 0 else 200))) {
         if (expanded) {
             Text(node.id, style = MaterialTheme.typography.bodySmall)
             Text(if (node.capabilities.isEmpty()) "No currently advertised executor capabilities" else node.capabilities.distinct().joinToString("\n"))
             active.forEach { Text("${it.label} · ${it.description}") }
             Text("Supervise authorized tasks in Activity. No power or wake command is exposed by this Mobile contract.", style = MaterialTheme.typography.bodySmall)
+        }
         }
     }
     HorizontalDivider()

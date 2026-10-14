@@ -49,20 +49,24 @@ object VoicePresentation {
         } catch (_: Exception) { report(token, VoicePhase.FAILED, "Android could not start capture. Continue with text.") }
     }
 }
-@Composable fun VoiceExperience(close: () -> Unit, privacy: () -> Unit) {
+@Composable fun VoiceExperience(state: MobileState, close: () -> Unit, privacy: () -> Unit) {
     val context = LocalContext.current
     val status by VoicePresentation.state.collectAsStateWithLifecycle()
-    Text("Voice", style = MaterialTheme.typography.titleLarge)
-    Text(status.detail, modifier = Modifier.testTag("voiceStatus").semantics { liveRegion = LiveRegionMode.Polite; stateDescription = status.phase.name })
-    Text("Acoustic awareness is uncommissioned. Opening Voice does not record. Active listening requires both grants and a commissioned Core binding.")
+    Column(Modifier.fillMaxWidth().padding(top = 32.dp, bottom = 24.dp), horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(24.dp)) {
+        Text(status.detail, style = MaterialTheme.typography.bodySmall, modifier = Modifier.testTag("voiceStatus").semantics { liveRegion = LiveRegionMode.Polite; stateDescription = status.phase.name })
+        OscarOrb(state, size = 176.dp)
+        Text("A little more present.", style = MaterialTheme.typography.headlineLarge)
+        Text("Opening Voice does not record.", style = MaterialTheme.typography.bodySmall)
+    }
     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        Button(onClick = { VoicePresentation.start(context) }, enabled = status.phase !in setOf(VoicePhase.STARTING, VoicePhase.LISTENING, VoicePhase.SPEAKING)) { Text("Start listening") }
+        Button(shape = MaterialTheme.shapes.medium, onClick = { VoicePresentation.start(context) }, enabled = status.phase !in setOf(VoicePhase.STARTING, VoicePhase.LISTENING, VoicePhase.SPEAKING)) { Text("Start listening") }
         TextButton(onClick = { VoicePresentation.cancel(context); close() }) { Text("Cancel voice") }
     }
     if (status.phase in setOf(VoicePhase.STARTING, VoicePhase.LISTENING, VoicePhase.SPEAKING)) TextButton(onClick = { VoicePresentation.cancel(context) }) { Text("Stop microphone and speech") }
     TextButton(onClick = privacy) { Text("Manage microphone grants") }
     TextButton(onClick = { VoicePresentation.cancel(context); close() }) { Text("Continue with text") }
-    Text("Voice Identity is managed by Core. Android playback and enrollment are uncommissioned; Voice Match / Map never authorize an action.")
+    SupportingDetails("Voice details") { Text("Voice Identity is managed by Core. Android playback and enrollment are uncommissioned; Voice Match / Map never authorize an action."); Text("Active listening requires both Android and OSCAR grants and a commissioned Core binding.") }
     var enrollment by remember { mutableStateOf(false) }
     TextButton(onClick = { enrollment = !enrollment }) { Text("Voice Identity & enrollment") }
     if (enrollment) Text("Identity configuration, Match and Map enrollment require a commissioned Core adapter. Owner audio calibration belongs to consolidated Slice 15 device acceptance; full runtime expansion belongs to Slice 16.")

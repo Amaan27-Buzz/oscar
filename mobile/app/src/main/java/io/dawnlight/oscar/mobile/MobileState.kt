@@ -2,7 +2,7 @@ package io.dawnlight.oscar.mobile
 
 import org.json.JSONObject
 
-enum class Destination(val label: String) { OSCAR("OSCAR"), ACTIVITY("Activity"), DEVICES("Devices"), SETTINGS("Settings") }
+enum class Destination(val label: String) { OSCAR("Conversation"), AUTOMATIONS("Automations"), ACTIVITY("Activity"), DEVICES("Devices"), SETTINGS("Preferences") }
 enum class Presence { IDLE, ATTENTIVE, LISTENING, THINKING, SPEAKING, WAITING, MUTED, UNAVAILABLE, ERROR }
 enum class Link { DISCONNECTED, CONNECTING, CONNECTED, DEGRADED }
 

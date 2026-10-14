@@ -30,13 +30,21 @@ import kotlinx.coroutines.withContext
 
 @Composable fun SettingsScreen(page: String, navigate: (String) -> Unit, session: CoreSession, state: MobileState) {
     val context = LocalContext.current
-    if (page != "Settings") TextButton(onClick = { navigate("Settings") }) { Text("Back to Settings") }
+    if (page != "Settings") TextButton(onClick = { navigate("Settings") }) { Glyph("Back"); Text("Back to Preferences") }
     when (page) {
         "Voice" -> VoiceSettings()
         "Persona" -> PersonaPreview()
         "Accessibility" -> AppearanceSettings()
         "Diagnostics" -> DiagnosticsSettings(state)
         "Privacy" -> PrivacySettings()
+        "Awareness" -> AwarenessScreen { navigate("Privacy") }
+        "Access" -> AccessScreen(state)
+        "Memory" -> {
+            EditorialHeading("Memory", "One continuing relationship.")
+            FeatureRow("History & recall", "Managed by your OSCAR Core", "Conversation")
+            Text("Memory inspection, forgetting and retention policy are not exposed by this Mobile API. No recalled history is fabricated or stored in a separate phone archive.")
+            Text("Your unsent draft is encrypted for recovery. Discard private interaction clears it; it does not delete Core memory.", style = MaterialTheme.typography.bodySmall)
+        }
         "Platform" -> PlatformSettings()
         "Notifications" -> NotificationSettings(session, state)
         "About" -> {
@@ -47,9 +55,26 @@ import kotlinx.coroutines.withContext
             TextButton(onClick = session::publicIdentity) { Text("Show public owner identity") }
         }
         else -> {
-            Text("Your OSCAR", style = MaterialTheme.typography.titleLarge)
-            listOf("Persona", "Voice", "Privacy", "Notifications", "Platform", "Accessibility", "Diagnostics", "About").forEach { item ->
-                HorizontalDivider(); TextButton(onClick = { navigate(item) }, modifier = Modifier.fillMaxWidth()) { Text(item) }
+            Row(Modifier.fillMaxWidth(), verticalAlignment = androidx.compose.ui.Alignment.Bottom) {
+                Column(Modifier.weight(1f)) { EditorialHeading("Make OSCAR", "yours.") }
+                Illustration(R.drawable.illustration_preferences, Modifier.width(136.dp), height = 160.dp)
+            }
+            val areas = listOf(
+                Triple("Persona", "Expression preview · Core settings unavailable", "Preferences"),
+                Triple("Voice", "Voice & input", "Voice"),
+                Triple("Privacy", "Permissions & capture", "Preferences"),
+                Triple("Awareness", "Manual · Sentry unavailable", "Activity"),
+                Triple("Memory", "History & forgetting", "Conversation"),
+                Triple("Access", "Ask · delegation unavailable", "Automations"),
+                Triple("Platform", "Android assistant & permissions", "Devices"),
+                Triple("Notifications", "Alerts & confirmed replies", "Conversation"),
+                Triple("Accessibility", "Appearance & motion", "Preferences"),
+                Triple("Diagnostics", "Devices & technical details", "Devices"),
+                Triple("About", "OSCAR · Dawnlight Labs", "Preferences"))
+            areas.forEachIndexed { index, (item, subtitle, icon) ->
+                FeatureRow(if (item == "Platform") "Android permissions" else if (item == "Accessibility") "Appearance" else item,
+                    subtitle, icon, listOf(Sage, Clay, Sage, Clay, Sage)[index % 5], action = { navigate(item) })
+                HorizontalDivider()
             }
             Text("Persona and memory are managed by Core. Local switches cannot expand Core policy.")
             TextButton(onClick = { try { context.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)) } catch (_: Exception) { session.message("Android accessibility settings are unavailable.") } }) { Text("Android accessibility settings") }

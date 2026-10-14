@@ -6,6 +6,10 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.background
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -25,10 +29,10 @@ import androidx.activity.compose.BackHandler
 
 private val Paper = Color(0xFFF5F1E7)
 private val Ink = Color(0xFF1A1B18)
-@Composable fun OscarTheme(content: @Composable () -> Unit) {
+@Composable fun OscarTheme(forceDark: Boolean = false, content: @Composable () -> Unit) {
     val activity = androidx.activity.compose.LocalActivity.current
     val appearance = appearancePreference("theme", "system")
-    val dark = appearance == "dark" || (appearance == "system" && isSystemInDarkTheme())
+    val dark = forceDark || appearance == "dark" || (appearance == "system" && isSystemInDarkTheme())
     SideEffect {
         val mask = android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS or android.view.WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS
         activity?.window?.insetsController?.setSystemBarsAppearance(if (dark) 0 else mask, mask)
@@ -45,17 +49,17 @@ private val Ink = Color(0xFF1A1B18)
     val reduced = appearancePreference("motion", "system") == "reduced" || systemMotionOff
     CompositionLocalProvider(LocalReducedMotion provides reduced) {
     MaterialTheme(colorScheme = if (dark) darkColorScheme(primary = Color(0xFFF0EEE6), onPrimary = Ink,
-        secondary = Color(0xFF86B8F7), tertiary = Color(0xFFFFCF5A), background = Color(0xFF191B19),
+        secondary = Color(0xFF86B8F7), secondaryContainer = Color(0xFF384B3C), onSecondaryContainer = Color(0xFFF0EEE6), tertiary = Color(0xFFFFCF5A), background = Color(0xFF191B19),
         surface = Color(0xFF191B19), surfaceContainer = Color(0xFF242723), surfaceContainerHigh = Color(0xFF292C27),
         surfaceContainerHighest = Color(0xFF30342D), surfaceContainerLow = Color(0xFF20231E), surfaceContainerLowest = Color(0xFF151713),
         surfaceTint = Color.Transparent, onBackground = Color(0xFFF0EEE6), onSurface = Color(0xFFF0EEE6), onSurfaceVariant = Color(0xFFC2C4B9),
         outline = Color(0xFF999D8D), outlineVariant = Color(0xFF44493C), error = Color(0xFFFFB4A9)) else lightColorScheme(primary = Ink, onPrimary = Color(0xFFFFFDF8),
-        secondary = Color(0xFF1B68C8), tertiary = Color(0xFFFFC83D), background = Paper,
+        secondary = Color(0xFF1769C4), secondaryContainer = Powder, onSecondaryContainer = Ink, tertiary = Color(0xFFFFC83D), background = Paper,
         surface = Paper, surfaceContainer = Color(0xFFFAF7EF), surfaceContainerHigh = Color(0xFFFAF7EF),
         surfaceContainerHighest = Color(0xFFFFFDF8), surfaceContainerLow = Paper, surfaceContainerLowest = Color(0xFFFFFDF8),
         surfaceTint = Color.Transparent, onBackground = Ink, onSurface = Ink, onSurfaceVariant = Color(0xFF625F57),
         outline = Color(0xFF8B877E), outlineVariant = Color(0xFFDDD7CA), error = Color(0xFFB6322B)),
-        shapes = Shapes(small = androidx.compose.foundation.shape.RoundedCornerShape(8.dp), medium = androidx.compose.foundation.shape.RoundedCornerShape(12.dp), large = androidx.compose.foundation.shape.RoundedCornerShape(12.dp)), content = content)
+        typography = OscarTypography, shapes = Shapes(small = androidx.compose.foundation.shape.RoundedCornerShape(8.dp), medium = androidx.compose.foundation.shape.RoundedCornerShape(12.dp), large = androidx.compose.foundation.shape.RoundedCornerShape(12.dp)), content = content)
     }
 }
 @Composable fun OscarApp(session: CoreSession, confirmation: OwnerConfirmation) {
@@ -67,60 +71,88 @@ private val Ink = Color(0xFF1A1B18)
     var pairing by remember { mutableStateOf(false) }
     val draft = state.draft
     val destination = Destination.entries.firstOrNull { it.name == selected } ?: Destination.OSCAR
-    val window = LocalWindowInfo.current.containerSize
-    val widthDp = with(LocalDensity.current) { window.width.toDp() }
-    val heightDp = with(LocalDensity.current) { window.height.toDp() }
+    var conversationPage by rememberSaveable { mutableStateOf("Conversation") }
+    var automationPage by remember(state.epoch) { mutableStateOf("Overview") }
+    val pageScroll = remember(destination, settingsPage, conversationPage, automationPage) { androidx.compose.foundation.ScrollState(0) }
     val focus = LocalFocusManager.current
     val keyboard = LocalSoftwareKeyboardController.current
-    BackHandler(voiceOpen || destination != Destination.OSCAR || settingsPage != "Settings") {
-        if (voiceOpen) { VoicePresentation.cancel(session.getApplication()); voiceOpen = false } else if (settingsPage != "Settings") settingsPage = "Settings" else selected = Destination.OSCAR.name
+    fun navigate(item: Destination) {
+        VoicePresentation.cancel(session.getApplication()); voiceOpen = false
+        focus.clearFocus(); keyboard?.hide(); selected = item.name; settingsPage = "Settings"; conversationPage = "Conversation"; automationPage = "Overview"
     }
-    OscarTheme {
+    BackHandler(voiceOpen || destination != Destination.OSCAR || settingsPage != "Settings" || conversationPage != "Conversation") {
+        if (voiceOpen) { VoicePresentation.cancel(session.getApplication()); voiceOpen = false }
+        else if (settingsPage != "Settings") settingsPage = "Settings"
+        else if (conversationPage != "Conversation") conversationPage = "Conversation"
+        else navigate(Destination.OSCAR)
+    }
+    val send = { focus.clearFocus(); keyboard?.hide(); session.send(draft); Unit }
+    OscarTheme(forceDark = destination == Destination.ACTIVITY || voiceOpen || (destination == Destination.SETTINGS && settingsPage == "Awareness")) {
         Scaffold(modifier = Modifier.imePadding(), containerColor = MaterialTheme.colorScheme.background, bottomBar = {
-            Surface(tonalElevation = 0.dp) {
-                BoxWithConstraints(Modifier.fillMaxWidth().navigationBarsPadding()) {
-                val columns = if (LocalDensity.current.fontScale > 1.3f && maxWidth < 600.dp) 2 else 4
-                FlowRow(Modifier.fillMaxWidth(), maxItemsInEachRow = columns, horizontalArrangement = Arrangement.SpaceEvenly) {
-                    Destination.entries.forEach { item ->
-                        TextButton(onClick = { VoicePresentation.cancel(session.getApplication()); voiceOpen = false; focus.clearFocus(); keyboard?.hide(); selected = item.name; settingsPage = "Settings" }, modifier = Modifier.fillMaxWidth(1f / columns).heightIn(min = 56.dp).testTag("destination-${item.name}")
-                            .semantics { this.selected = item == destination }) { Text(item.label,
-                                color = if (item == destination) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onSurface,
-                                fontWeight = if (item == destination) androidx.compose.ui.text.font.FontWeight.SemiBold else androidx.compose.ui.text.font.FontWeight.Normal) }
+            if (!voiceOpen) Surface(color = MaterialTheme.colorScheme.background) {
+                Row(Modifier.fillMaxWidth().navigationBarsPadding().padding(horizontal = 16.dp)) {
+                    listOf(Destination.OSCAR, Destination.AUTOMATIONS, Destination.ACTIVITY).forEach { item ->
+                        val navColor by animateColorAsState(if (item == destination) MaterialTheme.colorScheme.secondaryContainer else Color.Transparent,
+                            tween(if (LocalReducedMotion.current) 0 else 180), label = "navigationSelection")
+                        TextButton(onClick = { navigate(item) }, modifier = Modifier.weight(1f).heightIn(min = 64.dp)
+                            .testTag("destination-${item.name}").semantics { this.selected = item == destination }) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                                Box(Modifier.size(width = 56.dp, height = 30.dp).background(navColor, CircleShape), contentAlignment = Alignment.Center) {
+                                    Glyph(item.label, color = if (item == destination) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onSurfaceVariant)
+                                }
+                                Text(item.label, style = MaterialTheme.typography.labelSmall,
+                                    color = if (item == destination) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant)
+                            }
+                        }
                     }
-                }
                 }
             }
         }) { insets ->
-            Box(Modifier.fillMaxSize().padding(insets), contentAlignment = Alignment.TopCenter) {
-            Column(Modifier.widthIn(max = 720.dp).fillMaxWidth().padding(horizontal = if (widthDp < 360.dp) 16.dp else 24.dp)
-                .verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                Spacer(Modifier.height(8.dp))
-                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                    Text(if (destination == Destination.OSCAR) "OSCAR" else destination.label, style = MaterialTheme.typography.headlineSmall, modifier = Modifier.weight(1f).semantics { heading() })
-                    TextButton(onClick = session::refreshNow, enabled = !state.busy) { Text("Refresh") }
+            Column(Modifier.fillMaxSize().padding(insets).widthIn(max = 720.dp)) {
+                Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
+                    if (destination in setOf(Destination.DEVICES, Destination.SETTINGS) || conversationPage != "Conversation") {
+                        IconButton(onClick = { navigate(Destination.OSCAR) }, modifier = Modifier.semantics { contentDescription = "Back to conversation" }) { Glyph("Back") }
+                    }
+                    Text(if (voiceOpen) "Voice" else if (destination == Destination.OSCAR) "OSCAR" else destination.label, style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
+                    IconButton(onClick = { navigate(Destination.DEVICES) }, modifier = Modifier.testTag("destination-DEVICES").semantics { contentDescription = "Devices" }) { Glyph("Devices") }
+                    IconButton(onClick = { navigate(Destination.SETTINGS) }, modifier = Modifier.testTag("destination-SETTINGS").semantics { contentDescription = "Preferences" }) { Glyph("Preferences") }
                 }
-                OscarOrb(state, composing = draft.isNotBlank(), size = if (destination == Destination.OSCAR) { if (heightDp < 420.dp) 72.dp else 108.dp } else 40.dp)
-                if (state.link != Link.CONNECTED) {
-                    Text(when (state.link) { Link.CONNECTING -> "Connecting to Core"; Link.DEGRADED -> "Core unavailable"; else -> "Connect to your OSCAR Core" }, modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite })
-                    TextButton(onClick = { pairing = true }) { Text("Connect Core") }
+                Column(Modifier.weight(1f).fillMaxWidth().then(pageEntrance("$selected/$settingsPage/$conversationPage/$automationPage/$voiceOpen/${state.epoch}")).verticalScroll(pageScroll)
+                    .padding(horizontal = 24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Spacer(Modifier.height(4.dp))
+                    if (destination == Destination.OSCAR && conversationPage == "Conversation" && !voiceOpen && state.interactions.isNotEmpty()) {
+                        OscarOrb(state, composing = draft.isNotBlank(), size = 36.dp)
+                    }
+                    when (destination) {
+                        Destination.OSCAR -> if (voiceOpen) VoiceExperience(state, { voiceOpen = false }, {
+                            navigate(Destination.SETTINGS); settingsPage = "Privacy"
+                        }) else if (conversationPage == "Today") TodayScreen(state, { conversationPage = "Conversation" }, { navigate(Destination.ACTIVITY) })
+                        else PresenceScreen(state, draft, session::writeDraft, send, session::cancelRequest,
+                            { navigate(Destination.ACTIVITY) }, { focus.clearFocus(); keyboard?.hide(); voiceOpen = true }, false, { conversationPage = "Today" })
+                        Destination.AUTOMATIONS -> AutomationsScreen(state, automationPage, { automationPage = it }) { text -> session.writeDraft(text); navigate(Destination.OSCAR) }
+                        Destination.ACTIVITY -> ActivityScreen(state, session::inspect, session::review)
+                        Destination.DEVICES -> DevicesScreen(state, { pairing = true }, session::disconnect)
+                        Destination.SETTINGS -> SettingsScreen(settingsPage, { settingsPage = it }, session, state)
+                    }
+                    if (state.link != Link.CONNECTED && destination in setOf(Destination.OSCAR, Destination.ACTIVITY) && !voiceOpen && conversationPage == "Conversation") {
+                        if (state.link == Link.CONNECTING) StatusLabel("Connecting to Core")
+                        TextButton(onClick = { pairing = true }) { Text("Connect Core") }
+                    }
+                    state.message?.let { Text(it, style = MaterialTheme.typography.bodySmall, modifier = Modifier.testTag("message").semantics { liveRegion = LiveRegionMode.Polite }) }
+                    if (draft.isNotEmpty() || state.interactions.isNotEmpty() || state.privateSuppressed) {
+                        TextButton(onClick = session::discard) { Text(if (state.privateSuppressed) "Clear Core private context" else "Discard private interaction") }
+                    }
+                    Spacer(Modifier.height(12.dp))
                 }
-                when (destination) {
-                    Destination.OSCAR -> if (voiceOpen) VoiceExperience({ voiceOpen = false }, { VoicePresentation.cancel(session.getApplication()); voiceOpen = false; selected = Destination.SETTINGS.name; settingsPage = "Privacy" }) else PresenceScreen(state, draft, session::writeDraft, { focus.clearFocus(); keyboard?.hide(); session.send(draft) }, session::cancelRequest,
-                        { focus.clearFocus(); keyboard?.hide(); selected = Destination.ACTIVITY.name }, { focus.clearFocus(); keyboard?.hide(); voiceOpen = true })
-                    Destination.ACTIVITY -> ActivityScreen(state, session::inspect, session::review)
-                    Destination.DEVICES -> DevicesScreen(state, { pairing = true }, session::disconnect)
-                    Destination.SETTINGS -> SettingsScreen(settingsPage, { settingsPage = it }, session, state)
+                if (destination == Destination.OSCAR && !voiceOpen && conversationPage == "Conversation") {
+                    Box(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 8.dp)) {
+                        ConversationComposer(state, draft, session::writeDraft, send) { focus.clearFocus(); keyboard?.hide(); voiceOpen = true }
+                    }
                 }
-                state.message?.let { Text(it, modifier = Modifier.testTag("message").semantics { liveRegion = LiveRegionMode.Polite }) }
-                if (draft.isNotEmpty() || state.interactions.isNotEmpty() || state.privateSuppressed) {
-                    TextButton(onClick = session::discard) { Text(if (state.privateSuppressed) "Clear Core private context" else "Discard private interaction") }
-                }
-                Spacer(Modifier.height(16.dp))
-            }
             }
         }
         if (pairing) PairingDialog({ pairing = false }) { json -> pairing = false; session.connect(json) }
-        state.inspected?.let { TaskInspector(it, session::closeInspector) }
+        state.inspected?.let { TaskInspector(it, session::closeInspector, { task, action -> session.closeInspector(); session.review(task, action) }, state.link == Link.CONNECTED && !state.busy) }
         state.approval?.let { approval ->
             DisposableEffect(state.epoch, approval.id) { onDispose { confirmation.cancel() } }
             ApprovalDialog(approval, state.busy, approval.current(state, System.currentTimeMillis()), session::dismissApproval, confirm = {
@@ -130,7 +162,9 @@ private val Ink = Color(0xFF1A1B18)
                         session.dismissApproval(); session.message("Android confirmation was denied or unavailable. This phone granted no consent.")
                     }
                 })
-            }, replyPreview = state.replyPreview, coreNow = state.coreNow(System.currentTimeMillis()))
+            }, replyPreview = state.replyPreview, coreNow = state.coreNow(System.currentTimeMillis()), decline =
+                state.snapshot?.tasks?.firstOrNull { task -> approval.operation == "approve" && task.id == approval.material().getString("task_id") && "deny" in task.actions }
+                    ?.let { task -> { session.dismissApproval(); session.review(task, "deny") } })
         }
     }
 }

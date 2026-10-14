@@ -13,27 +13,26 @@ import androidx.compose.ui.unit.dp
 
 @Composable fun ActivityScreen(state: MobileState, inspect: (String) -> Unit, review: (CoreTask, String) -> Unit) {
     var filter by remember(state.epoch) { mutableStateOf("Active") }
-    Text("Ongoing work", style = MaterialTheme.typography.titleLarge)
+    EditorialHeading("Activity")
+    Text("Ongoing work", style = MaterialTheme.typography.bodySmall)
     if (state.snapshot == null) { Text("Connect to Core to inspect activity. No cached task state is presented as current."); return }
     val completed = setOf("verified", "partially_verified", "failed", "cancelled")
     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         listOf("Active", "Finished").forEach { name ->
-            FilterChip(selected = filter == name, onClick = { filter = name }, label = { Text(name) })
+            FilterChip(selected = filter == name, onClick = { filter = name }, colors = FilterChipDefaults.filterChipColors(selectedContainerColor = Sage, selectedLabelColor = androidx.compose.ui.graphics.Color.White), label = { Text(name) })
         }
     }
     val tasks = state.snapshot.tasks.filter { (it.state in completed) == (filter == "Finished") }
     if (tasks.isEmpty()) Text(if (filter == "Active") "Nothing is waiting here." else "No finished tasks in current readback.")
     tasks.forEach { task ->
-        HorizontalDivider()
-        Text(task.description, style = MaterialTheme.typography.titleMedium, modifier = Modifier.testTag("task-description-${task.id}"))
-        Text(task.label, modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite })
-        Text("From ${task.origin}", style = MaterialTheme.typography.bodySmall)
-        Text("${when(task.ownership) { "leased" -> "Executor"; "none" -> "Last target"; "expired" -> "Lease unavailable"; else -> "Planned target" }}: ${task.target} · ${task.nodeStatus}", style = MaterialTheme.typography.bodySmall)
+        TactileSurface(Modifier.fillMaxWidth()) {
+        FeatureRow(task.description, "${task.label} · ${task.target}", "Activity", action = { if (!state.busy && state.link == Link.CONNECTED) inspect(task.id) },
+            modifier = Modifier.testTag("task-description-${task.id}").semantics { liveRegion = LiveRegionMode.Polite })
         task.progress?.let { Text("${if (it.current) "Worker checkpoint" else "Previous checkpoint"}: ${(it.fraction * 100).toInt()}% · ${it.step} · REPORTED", style = MaterialTheme.typography.bodyMedium) }
         task.blocker?.let { Text(it) }
         FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
             TextButton(onClick = { inspect(task.id) }, enabled = !state.busy && state.link == Link.CONNECTED) { Text("Inspect") }
-            if ("approve" in task.actions) TextButton(onClick = { review(task, "approve") }, enabled = !state.busy) { Text("Review request") }
+            if ("approve" in task.actions) TextButton(onClick = { review(task, "approve") }, enabled = !state.busy && state.link == Link.CONNECTED) { Text("Review request") }
         }
         FlowRow(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
             task.actions.filter { it != "approve" }.forEach { action ->
@@ -42,26 +41,37 @@ import androidx.compose.ui.unit.dp
                 }
             }
         }
+        }
     }
 }
 
-@Composable fun TaskInspector(task: CoreTask, close: () -> Unit) {
-    AlertDialog(onDismissRequest = close, modifier = Modifier.testTag("taskInspector"), title = { Text("Task & evidence") }, text = {
+@Composable fun TaskInspector(task: CoreTask, close: () -> Unit, review: ((CoreTask, String) -> Unit)? = null, controlsAvailable: Boolean = false) {
+    DetailPage("Activity", close, "taskInspector") {
+        Illustration(R.drawable.illustration_task, height = 180.dp)
+        EditorialHeading(task.description)
+        StatusLabel(task.label)
+        if (controlsAvailable && review != null) FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            task.actions.forEach { action -> TextButton(onClick = { review(task, action) }) {
+                Text(when (action) { "approve" -> "Review request"; "cancel" -> "Review cancellation"; "deny" -> "Deny request"; else -> "Review continuation" })
+            } }
+        }
         SelectionContainer {
-            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Text(task.description, style = MaterialTheme.typography.titleMedium)
-                Text(task.label)
-                Text("Target: ${task.target}\nConnection: ${task.nodeStatus}\nOwnership: ${task.ownership}\nGeneration: ${task.generation}")
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text("${task.target} · ${task.nodeStatus}", style = MaterialTheme.typography.bodySmall)
                 task.progress?.let { Text("${if (it.current) "Worker checkpoint" else "Previous checkpoint"}: ${(it.fraction * 100).toInt()}% · ${it.step}\nREPORTED; progress is not verification.") }
                 task.blocker?.let { Text(it) }
                 task.value?.let { Text("Verified result: $it") }
-                task.response?.let { Text("Response REPORTED; task verification does not establish every response claim."); Text(it) }
+                task.response?.let { StatusLabel("Reported response"); ResponseText(it) }
                 if (task.responseTruncated) Text("Core supplied a bounded excerpt.")
-                Text(if (task.evidence.isEmpty()) "No independent evidence references are available." else "Evidence references: ${task.evidence.joinToString(", ")}")
-                task.artifacts.forEach { Text("Artifact ${it.id}\n${it.kind} · ${it.status}\n${it.hash ?: "Hash unavailable"}") }
-                if (task.artifacts.isEmpty()) Text("No artifact summary available to this session.")
-                Text("Only currently advertised actions are offered. Continuation restores a plan; fresh approval is still required to execute.")
+                SupportingDetails("Evidence & task details") {
+                    Text("Ownership: ${task.ownership}\nGeneration: ${task.generation}")
+                    Text(if (task.evidence.isEmpty()) "No independent evidence references are available." else "Evidence references: ${task.evidence.joinToString(", ")}")
+                    task.artifacts.forEach { Text("Artifact ${it.id}\n${it.kind} · ${it.status}\n${it.hash ?: "Hash unavailable"}") }
+                    if (task.artifacts.isEmpty()) Text("No artifact summary available to this session.")
+                    Text("Reported text is not independent verification. Continuation requires fresh approval.")
+                }
             }
         }
-    }, confirmButton = { TextButton(onClick = close) { Text("Back") } })
+        TextButton(onClick = close) { Text("Back") }
+    }
 }
