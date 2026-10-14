@@ -349,11 +349,9 @@ Physical Android owner/device acceptance remains deferred as part of consolidate
 
 The Android product foundation is Slice 09; its **visual redesign is now Slice 13**, not a 09R suffix. The Desktop software/runtime foundation is **Slice 10**, and its **visual redesign is now Slice 12**. Historical screenshot and PR paths retain the old identifiers as provenance. See the [canonical numbering map](SLICE-NUMBERING.md).
 
-## Slice 10 — OSCAR Desktop runtime foundation 🚧
+## Slice 10 — OSCAR Desktop runtime foundation — integrated software
 
-Tauri 2 / Rust / React-TypeScript Desktop, native tray/hotkey/window lifecycle, typed Ask/Dictate/Edit/Act through the authoritative Core, privacy-bounded context, signed approvals, Worker reuse and local reference tests. **Draft PR #16 is unmerged.** Owner/device acceptance remains unrun, and exact-head CI is billing-blocked rather than passed.
-
-The 52-screenshot baseline and A/B/C compact design explorations in PR #16 are archival reference outputs (historical 10R.0 and 10R.1). None of those concepts is approved for production. Do not mistake baseline capture or synthetic screenshots for owner-facing finished UI.
+The Tauri/Rust/React Windows foundation, tray/hotkey, scoped Core contracts, exact native confirmation, context tools and Worker reuse are integrated through the consolidated software baseline and Group 2.5A merge. Historical draft PR #16 and its screenshots remain archival evidence, **not** an active integration blocker. Physical Windows/voice/owner acceptance remains deferred. See [current product direction](PRODUCT-DIRECTION.md) and [Desktop boundary](design/DESKTOP-COMPANION-WORKSPACE.md).
 
 ## Slice 11 — OSCAR Expression / Character System — engineering candidate
 
@@ -361,8 +359,7 @@ The 52-screenshot baseline and A/B/C compact design explorations in PR #16 are a
 [reusable expression foundation](../expression/README.md), React/SVG and isolated
 native Compose rendering with shared fixture validation. See [engineering packet](design/expression/ENGINE.md).
 Final cross-device visual/device quality and exact-head CI remain review boundaries.
-Production Desktop/Mobile adoption is not promoted. Slice 12 software work is
-authorized separately under the Group 1 status below.
+The shared expression foundation is consumed by the merged Desktop and existing Android software foundation. Final cross-device character/presence acceptance is still future work. Previous acceptance snapshots remain historical.
 Design character **before** choosing the surrounding widget/window styling. The provided desktop-companion references demonstrate presence, independent character, micro-reactions and nonverbal expression; do not copy their pixel-art character or replace the canonical Orb with a different mascot.
 
 - **11.1 — Character language:** facial marks, eyes/gaze, orientation, tempo, anticipation, nuanced microexpressions, idle/resting/reactive behavior, state priority and interruption; separate real Core operational status from safe expressive Persona delivery.
@@ -371,48 +368,23 @@ Design character **before** choosing the surrounding widget/window styling. The 
 
 Keep `assets/brand/oscar-orb.svg` unmodified. Proposed derivatives are separate, versioned and owner-approved. Real activity/privacy/permission/truth must never be synthesized from a visual animation. See [Expression Core](EXPRESSION-CORE.md) and [design quality bar](SLICE-NUMBERING.md).
 
-## Slice 12 — OSCAR Desktop experience and visual system ◻️
+## Slice 12 — OSCAR Desktop experience and visual system — provisionally approved and merged
 
-**2026-10-11:** the owner authorized the software-first Group 1 program.
-Slice 12.2–12.6 software/reference completion is on a separate candidate from
-verified 12.1 corrective `da8fddae`, with autonomous regression and independent
-review. See [the Group 1 report](development/GROUP-01-DESKTOP-COMPLETION.md)
-and [cumulative acceptance ledger](development/SOFTWARE-ALPHA-ACCEPTANCE-LEDGER.md).
-Consolidated manual/physical/owner acceptance remains deferred, not PASS.
-No default promotion, accepted-baseline merge or Group 2 begins in this assignment.
-The dated 12.1 statement below preserves its earlier review boundary.
+Software/reference work from Groups 1–2 is integrated in `main`. The owner has **provisionally passed** the 2026-10-14 Group 2.5A neumorphic Desktop UI, and [PR #5](https://github.com/Amaan27-Buzz/oscar/pull/5) was merged at `43c15d37a6421d438b8101d5e322489ae452b20d`. This is **not** final integrated visual, real-device, security or production acceptance.
 
-**2026-10-10:** owner-authorized 12.1 has an isolated local
-[Living Desktop Presence candidate](ui/desktop/presence/README.md), based on
-`b9d3e049`. It stops at visual review. Default UI is not promoted; foundation
-merges, exact-head CI, wider native/owner acceptance and 12.2 are not completed here.
+Two distinct surfaces in one Tauri process: **small Companion** (canonical Orb, quick status/control, tray/shortcut; no chat or signing) and **full Workspace** (Conversation, Automations, Activity, Devices, Preferences). Contextual Dictate/Edit/Ask/Act is in Conversation rather than an exposed Text Tools/Act tab. Automations presents actual capability availability; durable named Workers, triggers, schedules and Full Access/Sentry activation are planned Core work.
 
-The **entire former 10R track**, as a single formal top-level slice after 11:
+Previous 12.1–12.6 experiments and captures are preserved as historical implementation/evaluation evidence; **do not follow their unmerged PR/visual acceptance instructions**. See [active product direction](PRODUCT-DIRECTION.md), [Desktop interaction decision](decisions/ADR-DESKTOP-PERSONAL-INTELLIGENCE.md) and [current native evidence](ui/desktop/interaction-polish/README.md).
 
-- **12.0 — Baseline:** 52 PNGs, manifest, lifecycle fix already produced in PR #16 (historical 10R.0).
-- **12.1 — Compact Presence / Orb:** revisit the three previous A/B/C experiments with the approved *expressive* character; do not rubber-stamp an AI-generated widget.
-- **12.2 — Ask + interaction composition.**
-- **12.3 — Dictate + Edit.**
-- **12.4 — Act + context.**
-- **12.5 — Activity + approvals.**
-- **12.6 — Motion + accessibility + coherent final polish.**
+## Slice 13 — OSCAR Mobile experience and visual system — design exploration active
 
-Build mature UI behavior, thoughtful interaction narratives, real motion and platform constraints, staged owner review. Preserve the Tauri/Core/security contract. See current-branch `docs/DESKTOP-UI-REDESIGN.md` (historical identifiers and prototype evidence); canonical IDs here supersede it.
+The Slice 09 Android Core-connected software foundation and Slice 13 reference software work are in `main`, but the **new owner-approved Mobile visual design is not implemented or accepted**. Group 2.5B is intentionally exploring alternatives before another production revamp.
 
-## Slice 13 — OSCAR Mobile experience and visual system ◻️
+Owner design exploration: **15 individually composed key screens + 1 design-system board + 5 reusable component boards**, and an independent **full Kotlin/Jetpack Compose UI-only prototype** covering the broader planned Mobile experience inventory. `oscar-ui-test` is an external temporary project, not a second production OSCAR app. Render and evaluate actual emulator screens before selectively porting approved components into `mobile/`.
 
-The **entire former 09R track**, implemented section by section in Kotlin/Compose after 11's character system:
+Target language: restraint + accessible neumorphic controls, original illustrations, distinctive compositions, warm paper/graphite and OSCAR identity, light/dark, reusable native components. The Orb SVG stays unchanged. Logical experiences include Conversation, Automations, Activity, Devices, Preferences, Sentry, Chief of Staff, onboarding and system integrations; they are **not** all implemented destinations.
 
-- **13.1 — Home / Presence + expressive Orb.**
-- **13.2 — Conversation and interaction.**
-- **13.3 — Activity + approvals.**
-- **13.4 — Devices / Connection Grid.**
-- **13.5 — Voice interaction.**
-- **13.6 — Privacy / permissions.**
-- **13.7 — Settings / system surfaces.**
-- **13.8 — Motion / accessibility / owner-polished convergence.**
-
-Use the same character/expression contract as Desktop with native Android composition. No separate assistant identity, duplicated Core authority or framework-style generic UI. See [Mobile UX plan](MOBILE-UI-REDESIGN.md).
+Preserve Android CoreSession, policy/confirmation, Grid, voice/notification boundaries and shared Expression. Physical phone/OEM/mic/biometric acceptance remains deferred. See [Mobile design](MOBILE-DESIGN.md), [active product direction](PRODUCT-DIRECTION.md) and [Mobile foundation](MOBILE-FOUNDATION.md).
 
 ## Slice 14 — World Model + Perception Fabric + Sentry + optional Daily Journal ◻️
 
@@ -424,11 +396,11 @@ Identity, Persona/Personal Policy starter rules, Voice Identity/Match/Map, Conne
 
 ## Slice 16 — Full Avatar / Presence integration ◻️
 
-Finish the **runtime/device-facing** Presence work after World Model/commissioning: genuine state projection, small/expanded/overlay/widget variants, focus retreat, cross-device behavior, real audio/perception context, accessibility, latency and real-device owner acceptance. Uses Slice 11's reviewed Expression System; this is former 13B.
+Finish the **runtime/device-facing** Presence work after World Model/commissioning: genuine state projection, small/expanded/overlay/widget variants, focus retreat, cross-device behavior, real audio/perception context, accessibility, latency and real-device owner acceptance. Uses Slice 11's reviewed Expression System; this is former 13B. **Adaptive Interface Engine foundation:** define a typed/versioned, capability-negotiated interactive-view envelope, initial trusted React/Compose components and accessible fallback; no arbitrary generated code. See [AIE](ADAPTIVE-INTERFACE.md).
 
 ## Slice 17 — Executive Planner + durable Workers + learning ◻️
 
-Priority/deadline/dependency planning, explicit commitments, scheduling conflicts, focus/travel/weather aware planning, policy-bounded replanning, proactive brief, interruption policy, Worker lifecycle/recovery and evaluated learning. Former Slice 14.
+Priority/deadline/dependency planning, explicit commitments, scheduling conflicts, focus/travel/weather aware planning, policy-bounded replanning, proactive brief, interruption policy, Worker lifecycle/recovery and evaluated learning. Former Slice 14. **Adaptive UI:** intent-driven choice/composition of trusted interactive views and authorized Core action round trips, without a separate agent or memory store.
 
 ## Slice 18 — Physical/device expansion + specialist engineering ◻️
 
@@ -436,11 +408,11 @@ Widen Edge/device onboarding, real ESP32/Pico acceptance, smart-home/environment
 
 ## Slice 19 — Reliability/security/truthfulness hardening ◻️
 
-Provider/auth/Node/Worker/memory/capture/persona/voice/privacy failures, replay/revocation, degraded state, retention, physical faults and required real-device acceptance. Former Slice 16.
+Provider/auth/Node/Worker/memory/capture/persona/voice/privacy failures, replay/revocation, degraded state, retention, physical faults and required real-device acceptance. Former Slice 16. **Adaptive UI:** schema bounds, untrusted content isolation, privacy, authorization, accessibility, performance and failure/recovery validation.
 
 ## Slice 20 — Unified Alpha ◻️
 
-Run the full integrated perception/communication → World Model/Controller/Memory → Personal Policy/Persona → Executive Runtime → Grid/Worker/device → Action Ledger/evidence → verification → Mobile/Desktop/Voice report scenario. **Gate C, Design, Gate D and Gate E evidence must be complete for the claimed scope.** Former Slice 17. Do not mislabel simulator/remote-CI-blocked work as PASS.
+Run the full integrated perception/communication → World Model/Controller/Memory → Personal Policy/Persona → Executive Runtime → Grid/Worker/device → Action Ledger/evidence → verification → Mobile/Desktop/Voice report scenario. **Gate C, Design, Gate D and Gate E evidence must be complete for the claimed scope.** Former Slice 17. Validate at least one cross-device adaptive conversation with actual Core-backed data, trusted components and verified action outcomes. Do not mislabel simulator/remote-CI-blocked work as PASS.
 
 ## Review clubs / checkpoints
 
@@ -448,29 +420,22 @@ Run the full integrated perception/communication → World Model/Controller/Memo
 |---|---|---|
 | A — Brain | 01–04 | PASS |
 | B — Can Do Work | 05–06 | PASS for local-alpha scope |
-| C — Embodied foundations | 07–10 | PARTIAL; physical acceptance deferred and PR #16 pending |
-| Design / Character | 11–13 | Slice 11 shared candidate; Group 1 Slice 12 software/reference candidate; owner/device acceptance deferred; Slice 13 not begun |
+| C — Embodied foundations | 07–10 | PARTIAL; software integrated, physical/owner acceptance deferred |
+| Design / Character | 11–13 | Expression software built, Desktop provisionally approved/merged; Mobile 2.5B visual exploration; final owner/device acceptance deferred |
 | D — Awareness / Chief-of-Staff | 14–17 | Planned |
 | E — Physical and Unified Alpha | 18–20 | Planned |
 
 Manual integration checkpoints remain in [BUILD-GATES.md](BUILD-GATES.md).
 
-## Current next step
+## Current next step — 2026-10-14
 
-2026-10-09 owner scope: prepare Desktop/Expression integration only. The
-[isolated local candidate](DESKTOP-EXPRESSION-INTEGRATION.md) consumes the shared
-renderer through trusted native readback; it does not merge PR #16/#17 or approve
-Slice 12.1 visuals. Account recovery, exact-head CI and owner reviews remain boundaries.
+- **Now:** Group 2.5B Mobile visual exploration and independent UI-only Compose prototype with real emulator review before implementing an approved production Android design.
+- **Already merged:** Group 2.5A Desktop Companion/Workspace, owner **provisional visual pass** only. Do not reopen legacy PR #16/#17 steps.
+- **Later:** complete Mobile UI acceptance, verify integrated design and remaining Gate C manual/physical criteria, then continue to Slice 14 World Model/Perception/Sentry per owner sequencing.
+- **Future AIE:** Slice 16 typed cross-platform presentation contract, 17 intent-driven interactive composition, 19 hardening, 20 acceptance. **Not Group 2.5 scope.**
+- **Unfinished:** Secure/Full Access authority activation, background Sentry, persistent Worker scheduling, physical Android/Windows/voice/Edge acceptance, remote CI and production hardening all remain appropriately blocked or deferred.
 
-**Current authoritative numbering:** [00–20 sequential plan](SLICE-NUMBERING.md). The prior 09R/10R/13A/13B nomenclature is now archival only. Historical screenshots, branch names and acceptance records are not rewritten.
-
-**Current review: Slice 11.3 reusable expression foundation.** The owner approved
-v3 for engineering; [shared contract/renderers](../expression/README.md) now preserve
-that movement without inventing Core/audio authority. Resolve remaining owner
-cross-device quality questions and exact-head CI before merging draft PR #17.
-Do not start Slice 12 without its separate owner scope.
-
-Desktop Slice 10 remains unmerged draft PR #16. Before subsequent branch work, reconcile the draft against updated `origin/work`; preserve existing work and evidence. GitHub Actions billing block is **not green CI**; no automatic merge. Gate C remains PARTIAL with physical Edge/Voice/Mobile/Desktop owner acceptance deferred. Remaining World Model, commissioning, executive work and full Presence integration follow Slices 14–17; physical/hardening/Unified Alpha now 18–20. Elocution/Operating Logs/specialists/home server remain **after stable Slice 20**.
+Read [active product direction](PRODUCT-DIRECTION.md), [canonical numbering](SLICE-NUMBERING.md), [adaptive UI plan](ADAPTIVE-INTERFACE.md) and the evidence ledger. Historical acceptance sequences and reports below this paragraph are **archives**, not current work orders.
 
 The original historical Gate B acceptance sequence below remains an archival contract, not the current work order. The 2026-10-09 owner-approved early-13A sequencing above supersedes only visual-expression scheduling:
 
