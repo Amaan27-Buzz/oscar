@@ -47,6 +47,5 @@ import kotlinx.coroutines.delay
         if (!reviewed) StatusLabel("Open the plan details before confirming.")
         Button(shape = MaterialTheme.shapes.medium, onClick = confirm, enabled = !busy && current && !expired && reviewed, colors = ButtonDefaults.buttonColors(containerColor = Sage), modifier = Modifier.fillMaxWidth()) { Text(if (approval.operation == "deny") "Confirm denial" else "Confirm securely") }
         decline?.let { TextButton(onClick = it, enabled = !busy && current && !expired) { Text("Review denial") } }
-        TextButton(onClick = close) { Text("Back") }
     } }
 }

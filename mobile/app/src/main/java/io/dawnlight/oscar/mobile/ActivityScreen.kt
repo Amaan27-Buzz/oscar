@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
     var filter by remember(state.epoch) { mutableStateOf("Active") }
     EditorialHeading("Activity")
     Text("Ongoing work", style = MaterialTheme.typography.bodySmall)
-    if (state.snapshot == null) { Text("Connect to Core to inspect activity. No cached task state is presented as current."); return }
+    if (state.snapshot == null) { Text("Connect Core to see your activity."); return }
     val completed = setOf("verified", "partially_verified", "failed", "cancelled")
     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         listOf("Active", "Finished").forEach { name ->
@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.dp
         }
     }
     val tasks = state.snapshot.tasks.filter { (it.state in completed) == (filter == "Finished") }
-    if (tasks.isEmpty()) Text(if (filter == "Active") "Nothing is waiting here." else "No finished tasks in current readback.")
+    if (tasks.isEmpty()) Text(if (filter == "Active") "Nothing is waiting here." else "No finished tasks in this connection.")
     tasks.forEach { task ->
         TactileSurface(Modifier.fillMaxWidth()) {
         FeatureRow(task.description, "${task.label} · ${task.target}", "Activity", action = { if (!state.busy && state.link == Link.CONNECTED) inspect(task.id) },
@@ -31,7 +31,6 @@ import androidx.compose.ui.unit.dp
         task.progress?.let { Text("${if (it.current) "Worker checkpoint" else "Previous checkpoint"}: ${(it.fraction * 100).toInt()}% · ${it.step} · REPORTED", style = MaterialTheme.typography.bodyMedium) }
         task.blocker?.let { Text(it) }
         FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-            TextButton(onClick = { inspect(task.id) }, enabled = !state.busy && state.link == Link.CONNECTED) { Text("Inspect") }
             if ("approve" in task.actions) TextButton(onClick = { review(task, "approve") }, enabled = !state.busy && state.link == Link.CONNECTED) { Text("Review request") }
         }
         FlowRow(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -46,9 +45,11 @@ import androidx.compose.ui.unit.dp
 }
 
 @Composable fun TaskInspector(task: CoreTask, close: () -> Unit, review: ((CoreTask, String) -> Unit)? = null, controlsAvailable: Boolean = false) {
-    DetailPage("Activity", close, "taskInspector") {
-        Illustration(R.drawable.illustration_task, height = 180.dp)
-        EditorialHeading(task.description)
+    DetailPage("Task", close, "taskInspector") {
+        Row(Modifier.fillMaxWidth(), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+            Text(task.description, style = MaterialTheme.typography.headlineSmall, modifier = Modifier.weight(1f))
+            Illustration(R.drawable.illustration_task, Modifier.width(96.dp), height = 96.dp)
+        }
         StatusLabel(task.label)
         if (controlsAvailable && review != null) FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             task.actions.forEach { action -> TextButton(onClick = { review(task, action) }) {
@@ -72,6 +73,5 @@ import androidx.compose.ui.unit.dp
                 }
             }
         }
-        TextButton(onClick = close) { Text("Back") }
     }
 }

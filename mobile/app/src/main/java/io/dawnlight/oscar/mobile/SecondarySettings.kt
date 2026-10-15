@@ -27,7 +27,7 @@ val LocalReducedMotion = compositionLocalOf { false }
 @Composable fun AppearanceSettings() {
     val context = LocalContext.current
     val reduced = appearancePreference("motion", "system") == "reduced"
-    Text("Appearance & accessibility", style = MaterialTheme.typography.titleLarge)
+    Text("Theme", style = MaterialTheme.typography.titleMedium)
     val theme = appearancePreference("theme", "system")
     listOf("system", "light", "dark").forEach { option ->
         TextButton(onClick = { context.getSharedPreferences("appearance", Context.MODE_PRIVATE).edit().putString("theme",option).apply() }) {
@@ -38,7 +38,7 @@ val LocalReducedMotion = compositionLocalOf { false }
         Text("Reduce OSCAR motion", Modifier.weight(1f))
         Switch(reduced, { context.getSharedPreferences("appearance", Context.MODE_PRIVATE).edit().putString("motion", if (it) "reduced" else "system").apply() }, modifier = Modifier.semantics { contentDescription = "Reduce OSCAR motion" })
     }
-    Text("Uses held expressions and immediate state changes. Android's animation scale remains respected. Text follows your Android font size.")
+    Text("Reduces movement and transitions. Text follows your Android font size.")
 }
 @Composable fun PersonaPreview() {
     var delivery by remember { mutableStateOf("composed") }
@@ -50,20 +50,21 @@ val LocalReducedMotion = compositionLocalOf { false }
             .put("kind","state").put("priority","normal").put("operation","idle").put("delivery",delivery)
             .put("availability","available").put("muted",false).put("attention","none").put("reducedMotion",true).toString()
     }
-    Text("Persona preview", style = MaterialTheme.typography.titleLarge)
-    Text("SIMULATED · bounded expression preview. Core persona settings are unavailable through this Mobile API; this selection is not saved or applied to OSCAR.")
+    StatusLabel("Preview only · not applied to OSCAR")
     Box(Modifier.fillMaxWidth(), contentAlignment = androidx.compose.ui.Alignment.Center) { ExpressionPresence(event,source,80.dp,true) }
-    listOf("composed","curious","amused","subdued").forEach { cue -> TextButton(onClick = { delivery = cue }) { Text(cue.replaceFirstChar { it.uppercase() }) } }
-    Text("Persona changes delivery, never evidence, safety or permission.")
+    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        listOf("composed","curious","amused","subdued").forEach { cue -> FilterChip(selected = delivery == cue, onClick = { delivery = cue }, label = { Text(cue.replaceFirstChar { it.uppercase() }) }) }
+    }
+    SupportingDetails("About this preview") { Text("These expressions are temporary. Persona settings are managed by Core and cannot change facts, safety or permissions.", style = MaterialTheme.typography.bodySmall) }
 }
 @Composable fun DiagnosticsSettings(state: MobileState) {
-    Text("Diagnostics", style = MaterialTheme.typography.titleLarge)
     Text("Core connection · ${state.link}")
     Text("Observation · ${if (state.observedAt > 0) "Foreground readback" else "Unavailable"}")
-    Text("Task count · ${state.snapshot?.tasks?.size ?: 0}")
+    Text("Task count · ${state.snapshot?.tasks?.size?.toString() ?: "Unavailable"}")
     Text("Android ${android.os.Build.VERSION.RELEASE} / API ${android.os.Build.VERSION.SDK_INT}")
     Text("OSCAR Mobile ${BuildConfig.VERSION_NAME}")
     Text("No tokens, private prompts, notification content or voice profiles are displayed or exported.")
-    Text("Model routing and local/cloud execution preferences are controlled by Core. This API does not expose mutable routing policy.")
-    Text("Grid preferences: only current advertised nodes/capabilities are shown; local disconnect is in Devices. Background push and full presence runtime belong to Slice 16.")
+    SupportingDetails("Runtime information") {
+        Text("Model routing is managed by Core. Device capabilities reflect the current connection. Background push is unavailable.", style = MaterialTheme.typography.bodySmall)
+    }
 }

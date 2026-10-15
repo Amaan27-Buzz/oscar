@@ -22,7 +22,7 @@ class SettingsIntegrationTest {
     }
     @After fun cleanup() { if (!isolated) return; compose.activity.getSharedPreferences("appearance", Context.MODE_PRIVATE).edit().clear().commit() }
     private fun page(name: String) {
-        compose.onNodeWithTag("destination-SETTINGS").performClick()
+        navigateReview(compose, "SETTINGS")
         compose.onNodeWithText(name).performScrollTo().performClick()
     }
     private fun capture(name: String) = captureReview(compose, name)
@@ -39,20 +39,21 @@ class SettingsIntegrationTest {
     }
     @Test fun prepareProcessDeathRecovery() {
         org.junit.Assume.assumeTrue(androidx.test.platform.app.InstrumentationRegistry.getArguments().getString("group02_process_prepare") == "true")
-        compose.onNodeWithTag("destination-OSCAR").performClick()
+        navigateReview(compose, "OSCAR")
         compose.onNodeWithTag("interactionInput").performTextClearance()
         compose.onNodeWithTag("interactionInput").performTextReplacement("Group02 synthetic process recovery")
         compose.waitUntil(5000) { SessionVault(compose.activity).loadDraft("unpaired") == "Group02 synthetic process recovery" }
     }
     @Test fun personaIsBoundedAndDoesNotChangeCorePolicy() {
         page("Persona")
-        compose.onNodeWithText("SIMULATED · bounded expression preview.", substring=true).assertExists()
+        compose.onNodeWithText("Preview only · not applied to OSCAR").assertExists()
         compose.onNodeWithText("Amused").performScrollTo().performClick()
         compose.onAllNodesWithContentDescription("OSCAR expression").assertCountEquals(1)
         assertFalse(compose.activity.getSharedPreferences("appearance",Context.MODE_PRIVATE).contains("persona"))
         capture("13-7-persona-preview-simulated")
-        compose.onNodeWithText("Back to Preferences").performScrollTo().performClick()
+        compose.onNodeWithTag("page-back").performClick()
         compose.onNodeWithText("Android permissions").performScrollTo().performClick()
+        compose.onNodeWithText("Other Android features").performScrollTo().performClick()
         compose.onNodeWithText("Overlay · unavailable",substring=true).assertExists()
         capture("13-7-platform-reference")
     }
@@ -65,11 +66,21 @@ class SettingsIntegrationTest {
                 }
             }
         }
-        compose.onNodeWithTag("destination-SETTINGS").performClick()
+        navigateReview(compose, "SETTINGS")
         compose.onNodeWithText("Diagnostics").performScrollTo().performClick()
-        compose.onNodeWithText("No tokens, private prompts",substring=true).assertExists()
+        compose.onNodeWithText("No tokens, private prompts",substring=true).performScrollTo().assertIsDisplayed()
         capture("13-8-dark-large-text-reference")
-        compose.onNodeWithTag("destination-OSCAR").performClick()
+        navigateReview(compose, "OSCAR")
+        capture("13-8-large-text-navigation-reference")
+        for (label in listOf("Conversation", "Automations", "Activity")) {
+            val layouts = mutableListOf<androidx.compose.ui.text.TextLayoutResult>()
+            compose.onNodeWithText(label, useUnmergedTree = true).performSemanticsAction(androidx.compose.ui.semantics.SemanticsActions.GetTextLayoutResult) { it(layouts) }
+            val layout = layouts.single()
+            assertEquals("Navigation label must stay on one line", 1, layout.lineCount)
+            assertFalse("$label must remain complete at 1.8x text: ${layout.layoutInput.constraints}", layout.isLineEllipsized(0))
+            assertEquals("Every navigation character must be visible", label.length, layout.getLineEnd(0))
+            assertTrue("$label glyphs must fit the pixel bounds", layout.getBoundingBox(label.lastIndex).right <= layout.size.width + 1f)
+        }
         compose.onNodeWithTag("interactionInput").performClick()
         compose.onNodeWithTag("interactionInput").performTextReplacement("Large text draft")
         compose.waitUntil(10000) { compose.activity.window.decorView.rootWindowInsets.isVisible(android.view.WindowInsets.Type.ime()) }
@@ -86,9 +97,9 @@ class SettingsIntegrationTest {
         compose.onNodeWithText("Voice").performClick()
         compose.onNodeWithText("Start listening").performScrollTo().performClick()
         compose.waitUntil(5000) { VoicePresentation.state.value.phase == VoicePhase.MUTED }
-        compose.onNodeWithText("Cancel voice").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithTag("page-back").assertIsDisplayed()
         capture("13-8-voice-large-text-reference")
-        compose.onNodeWithText("Cancel voice").performClick()
+        compose.onNodeWithTag("page-back").performClick()
         compose.onNodeWithTag("interactionInput").assertTextContains("Large text draft")
     }
     @Test fun landscapeKeepsComposerAndPreferencesReachable() {

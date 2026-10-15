@@ -58,7 +58,7 @@ class MobileCompletionTest {
         compose.waitUntil(5000) { compose.onAllNodesWithText("Microphone permission or OSCAR perception grant is off").fetchSemanticsNodes().isNotEmpty() }
         compose.onNodeWithTag("voiceStatus").assertTextEquals("Microphone permission or OSCAR perception grant is off")
         capture("13-5-voice-denied-reference")
-        compose.onNodeWithText("Cancel voice").performClick()
+        compose.onNodeWithTag("page-back").performClick()
         compose.onNodeWithTag("interactionInput").assertTextContains("Synthetic voice continuation")
         assertEquals(VoicePhase.IDLE, VoicePresentation.state.value.phase)
     }
@@ -96,8 +96,8 @@ class MobileCompletionTest {
         compose.activityRule.scenario.recreate()
         compose.waitUntil(5000) { androidx.lifecycle.ViewModelProvider(compose.activity)[CoreSession::class.java].state.value.draft == text }
         compose.onNodeWithTag("interactionInput").assertTextContains(text)
-        compose.onNodeWithTag("destination-ACTIVITY").performClick()
-        compose.onNodeWithTag("destination-OSCAR").performClick()
+        navigateReview(compose, "ACTIVITY")
+        navigateReview(compose, "OSCAR")
         compose.onNodeWithTag("interactionInput").assertTextContains(text)
         compose.onNodeWithText("Discard private interaction").performScrollTo().performClick()
         compose.waitUntil(5000) { !compose.activity.getSharedPreferences("session", android.content.Context.MODE_PRIVATE).contains("draft") }
@@ -148,11 +148,11 @@ class MobileCompletionTest {
         compose.waitUntil(10_000) { session.state.value.interactions.lastOrNull()?.text == "3 + 4" && !session.state.value.busy }
         compose.onNodeWithText("Read response").performScrollTo().performClick()
         compose.onNode(hasText("Needs approval") and hasAnyAncestor(hasTestTag("responseDialog"))).assertExists()
-        compose.onNodeWithText("Back").performScrollTo().performClick()
+        closeReviewDetail(compose, "responseDialog")
         capture("13-2-reference-home-response")
-        compose.onNodeWithTag("destination-ACTIVITY").performClick()
+        navigateReview(compose, "ACTIVITY")
         compose.onNodeWithTag("task-description-${session.state.value.interactions.last().taskId}").assertTextContains("3 + 4")
-        compose.onNodeWithTag("destination-OSCAR").performClick()
+        navigateReview(compose, "OSCAR")
         compose.onNodeWithText("Discard private interaction").performScrollTo().performClick()
         compose.waitUntil(10_000) { !session.state.value.busy && !session.state.value.privateSuppressed }
         assertTrue(session.state.value.snapshot!!.tasks.none { it.description == "3 + 4" })
@@ -175,9 +175,9 @@ class MobileCompletionTest {
         } }
         compose.onNodeWithText("Read response").performScrollTo().performClick()
         compose.onNode(hasText(response) and hasAnyAncestor(hasTestTag("responseDialog"))).assertExists()
-        compose.onNodeWithText("REPORTED · a response is testimony, not independent verification.").assertExists()
+        compose.onNode(hasText("Reported response") and hasAnyAncestor(hasTestTag("responseDialog"))).assertExists()
         capture("13-2-long-reported-simulated", "responseDialog")
-        compose.onNodeWithText("Back").performScrollTo().performClick()
+        closeReviewDetail(compose, "responseDialog")
     }
     @Test fun nativeApprovalInspectionExpiryAndReferenceDenialNeverFabricateConsent() {
         val arguments = androidx.test.platform.app.InstrumentationRegistry.getArguments()
@@ -215,12 +215,12 @@ class MobileCompletionTest {
         compose.waitForIdle()
         assertNotNull("Expiry review lost: ${session.state.value.link}; ${session.state.value.message}", session.state.value.approval)
         compose.onNodeWithText("Confirm securely").assertIsNotEnabled()
-        compose.onNodeWithText("Back").performScrollTo().performClick()
+        closeReviewDetail(compose, "approvalDialog")
         assertNull(session.state.value.approval)
         compose.runOnIdle { session.inspect(id) }
         compose.waitUntil(10_000) { session.state.value.inspected != null }
         compose.onNodeWithTag("taskInspector").assertExists()
-        compose.onNodeWithText("Back").performScrollTo().performClick()
+        closeReviewDetail(compose, "taskInspector")
         compose.runOnIdle { session.review(task, "deny") }
         compose.waitUntil(10_000) { session.state.value.approval != null }
         // A secured owner phone is inspection-only here; genuine owner confirmation is separate acceptance.
@@ -259,20 +259,20 @@ class MobileCompletionTest {
         val desktop = session.state.value.snapshot!!.tasks.single { it.id == arguments.getString("group02_desktop_task") }
         assertEquals("Desktop", desktop.origin); assertEquals("group02-reference-desktop", desktop.originNode)
         assertFalse(desktop.description.contains("8 + 9")); assertFalse("approve" in desktop.actions)
-        compose.onNodeWithTag("destination-DEVICES").performClick()
+        navigateReview(compose, "DEVICES")
         compose.onNodeWithTag("device-group02-reference-desktop").assertTextContains("Online · 1 work item")
         capture("devices-connected-compact")
         compose.onNodeWithTag("device-group02-reference-desktop").performScrollTo().performClick()
         compose.onNodeWithText("No currently advertised executor capabilities").assertExists()
         capture("13-4-reference-grid")
-        compose.onNodeWithTag("destination-ACTIVITY").performClick()
+        navigateReview(compose, "ACTIVITY")
         compose.onNodeWithTag("task-description-${desktop.id}").assertExists()
         control("network_off")
         try {
             compose.runOnIdle { session.refreshNow() }
             compose.waitUntil(15_000) { session.state.value.link == Link.DEGRADED }
             assertNull(session.state.value.snapshot); assertNull(session.state.value.approval)
-            compose.onNodeWithTag("destination-DEVICES").performClick()
+            navigateReview(compose, "DEVICES")
             compose.onNodeWithText("Connect Core to see your other devices.").assertExists()
         } finally { control("network_on") }
         compose.runOnIdle { session.refreshNow() }

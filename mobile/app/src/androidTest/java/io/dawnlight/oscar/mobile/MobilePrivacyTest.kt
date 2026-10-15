@@ -51,8 +51,9 @@ class MobilePrivacyTest {
     }
 
     @Test fun invalidSourcesDeniedAccessAndLiveLocalRevocationRemainUsable() {
-        compose.onNodeWithTag("destination-SETTINGS").performClick()
+        navigateReview(compose, "SETTINGS")
         compose.onNodeWithText("Privacy").performClick()
+        compose.onNodeWithText("Choose notification sources").performScrollTo().performClick()
         compose.onNodeWithTag("notificationSources").performScrollTo().performTextInput("invalid")
         compose.onNodeWithText("Save sources").performScrollTo().performClick()
         compose.onNodeWithText("Use up to 32 package IDs, such as example.app. Nothing was enabled.").assertExists()
@@ -71,13 +72,13 @@ class MobilePrivacyTest {
         prefs.edit().putBoolean("notification_context", false).commit()
         contextGrant.assertIsOff()
         val voiceEpoch = VoicePresentation.begin()
-        compose.onNodeWithText("Revoke local perception and reply grants").performScrollTo().performClick()
+        compose.onNodeWithText("Revoke OSCAR grants").performScrollTo().performClick()
         compose.waitUntil(5000) { prefs.getString("notification_sources", "") == "" }
         compose.waitUntil(5000) { !VoicePresentation.current(voiceEpoch) }
         assertFalse(prefs.getBoolean("microphone_perception", false)); assertFalse(prefs.getBoolean("notification_reply", false))
         assertFalse(NativeVoice.permitted(compose.activity))
         assertFalse(VoicePresentation.current(voiceEpoch))
-        compose.onNodeWithText("Can perceive").performScrollTo()
+        compose.onNodeWithText("Perception").performScrollTo()
         capture()
     }
 

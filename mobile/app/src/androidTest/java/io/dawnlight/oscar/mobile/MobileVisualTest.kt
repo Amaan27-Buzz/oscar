@@ -22,8 +22,12 @@ class MobileVisualTest {
     @get:Rule val compose = createAndroidComposeRule<MainActivity>()
     @Before fun isolatedEmulator() {
         org.junit.Assume.assumeTrue(allowDisposableReview())
-        compose.runOnIdle { androidx.lifecycle.ViewModelProvider(compose.activity)[CoreSession::class.java].disconnect() }
+        val session = androidx.lifecycle.ViewModelProvider(compose.activity)[CoreSession::class.java]
+        compose.waitUntil(5000) { !session.state.value.restoring }
+        compose.runOnIdle { session.disconnect() }
         compose.waitUntil(5000) { SessionVault(compose.activity).load() == null }
+        compose.waitUntil(5000) { session.state.value.message != null }
+        compose.runOnIdle { session.message("") }
         compose.runOnIdle { compose.activity.getSharedPreferences("appearance", android.content.Context.MODE_PRIVATE).edit().putString("theme", "light").putString("motion", "reduced").commit() }
     }
     private fun capture(name: String, tag: String? = null) = captureReview(compose, name, tag)
@@ -41,39 +45,39 @@ class MobileVisualTest {
     }
     @Test fun productionNavigationAndUnavailableControls() {
         capture("01-oscar-home")
-        compose.onNodeWithTag("destination-AUTOMATIONS").performClick()
-        compose.onNodeWithText("Persistent scheduling is unavailable").assertExists()
+        navigateReview(compose, "AUTOMATIONS")
+        compose.onNodeWithText("Scheduling unavailable").assertExists()
         capture("05-automations-overview")
         compose.onNodeWithText("Workers").performClick()
         compose.onNodeWithText("Run Worker · unavailable").assertIsNotEnabled()
         capture("06-worker-detail")
-        compose.onNodeWithTag("automation-back").performClick()
+        compose.onNodeWithTag("page-back").performClick()
         compose.onNodeWithText("New responsibility").performScrollTo().performClick()
         compose.onNodeWithTag("automationDraft").performTextInput("Prepare a brief")
         androidx.test.espresso.Espresso.closeSoftKeyboard()
         compose.waitUntil(5000) { !compose.activity.window.decorView.rootWindowInsets.isVisible(android.view.WindowInsets.Type.ime()) }
         compose.onNodeWithText("Create automation · unavailable").assertIsNotEnabled()
         capture("07-create-automation")
-        compose.onNodeWithTag("destination-OSCAR").performClick()
+        navigateReview(compose, "OSCAR")
         compose.onNodeWithText("Today").performScrollTo().performClick()
-        compose.onNodeWithText("Not connected · no commitments retrieved").assertExists()
+        compose.onAllNodesWithText("Not connected").assertCountEquals(2)
         capture("13-today-chief-of-staff")
-        compose.onNodeWithTag("destination-DEVICES").performClick()
+        navigateReview(compose, "DEVICES")
         compose.onNodeWithText("Connect Core to see your other devices.").assertExists()
         capture("11-devices")
-        compose.onNodeWithTag("destination-SETTINGS").performClick()
-        compose.onNodeWithText("Make OSCAR").assertIsDisplayed()
+        navigateReview(compose, "SETTINGS")
+        compose.onNodeWithText("Privacy").assertIsDisplayed()
         capture("15-preferences")
         compose.onNodeWithText("Access").performScrollTo().performClick()
         compose.onNodeWithTag("delegationUnavailable").assertIsNotEnabled()
         capture("14-access-modes")
-        compose.onNodeWithText("Back to Preferences").performScrollTo().performClick()
+        compose.onNodeWithTag("page-back").performClick()
         compose.onNodeWithText("Awareness").performScrollTo().performClick()
         compose.onNodeWithText("Sentry").assertIsNotEnabled()
         capture("12-sentry-awareness")
-        compose.onNodeWithTag("destination-ACTIVITY").performClick()
+        navigateReview(compose, "ACTIVITY")
         capture("08-activity-feed")
-        compose.onNodeWithTag("destination-OSCAR").performClick()
+        navigateReview(compose, "OSCAR")
         compose.onNodeWithText("Voice").performClick()
         compose.onNodeWithTag("voiceStatus").assertTextContains("Microphone off")
         capture("04-voice-interaction")
@@ -90,12 +94,12 @@ class MobileVisualTest {
         }
         compose.onNodeWithText("Help me plan.").assertExists()
         compose.onNodeWithText("Core acknowledged.").assertExists()
-        compose.onAllNodesWithText("Review the proposal", substring = true).assertCountEquals(2)
+        compose.onAllNodesWithText("Review the proposal", substring = true).assertCountEquals(1)
         capture("02-continuous-conversation")
         compose.onAllNodesWithText("Read response")[1].performScrollTo().performClick()
         compose.onNode(hasText(task.response!!) and hasAnyAncestor(hasTestTag("responseDialog"))).assertExists()
         capture("03-expanded-reading", "responseDialog")
-        compose.onNodeWithText("Back").performScrollTo().performClick()
+        closeReviewDetail(compose, "responseDialog")
         surface { TaskInspector(task, {}) }
         compose.onNodeWithText("Review cancellation").assertDoesNotExist()
         capture("09-active-task", "taskInspector")

@@ -20,16 +20,16 @@ class MobileEmulatedTest {
         compose.runOnIdle { compose.activity.getSharedPreferences("permissions", Context.MODE_PRIVATE).edit().putBoolean("microphone_perception", false).commit() }
     }
     @Test fun navigationAndRestorationKeepOneRelationship() {
-        compose.onNodeWithTag("destination-ACTIVITY").performClick()
+        navigateReview(compose, "ACTIVITY")
         compose.onNodeWithText("Ongoing work").assertIsDisplayed()
-        compose.onNodeWithTag("destination-DEVICES").performClick()
+        navigateReview(compose, "DEVICES")
         compose.onNodeWithText("Your devices").assertIsDisplayed()
         compose.activityRule.scenario.recreate()
         compose.onNodeWithText("Your devices").assertIsDisplayed()
-        compose.onNodeWithTag("destination-SETTINGS").performClick()
+        navigateReview(compose, "SETTINGS")
         compose.onNodeWithText("Privacy").performClick()
-        compose.onNodeWithText("Permissions & privacy").assertIsDisplayed()
-        compose.onNodeWithTag("destination-OSCAR").performClick()
+        compose.onNodeWithText("Perception").assertIsDisplayed()
+        navigateReview(compose, "OSCAR")
         compose.onNodeWithTag("orb").assertExists()
         compose.runOnIdle {
             val image = android.graphics.BitmapFactory.decodeResource(compose.activity.resources, R.drawable.oscar_orb)
@@ -46,8 +46,8 @@ class MobileEmulatedTest {
         compose.waitUntil(5000) { !compose.activity.window.decorView.rootWindowInsets.isVisible(android.view.WindowInsets.Type.ime()) }
         compose.onNodeWithText("Voice").performClick()
         compose.onNodeWithTag("voiceStatus").assertTextContains("Microphone off")
-        compose.onNodeWithText("Voice details").performScrollTo().performClick()
-        compose.onNodeWithText("Voice Identity is managed by Core. Android playback and enrollment are uncommissioned; Voice Match / Map never authorize an action.").assertExists()
+        compose.onNodeWithText("Voice & enrollment details").performScrollTo().performClick()
+        compose.onNodeWithText("Playback and enrollment are unavailable. Voice recognition never authorizes an action.").assertExists()
         val context = compose.activity
         assertFalse(context.getSharedPreferences("permissions", Context.MODE_PRIVATE).getBoolean("microphone_perception", false))
         assertNull(MicrophoneService.binding)
@@ -86,7 +86,7 @@ class MobileEmulatedTest {
         }
     }
     @Test fun privacyGrantDoesNotEnableCaptureOrAction() {
-        compose.onNodeWithTag("destination-SETTINGS").performClick()
+        navigateReview(compose, "SETTINGS")
         compose.onNodeWithText("Privacy").performClick()
         val grant = compose.onNodeWithContentDescription("Allow microphone perception")
         grant.performScrollTo().performClick()

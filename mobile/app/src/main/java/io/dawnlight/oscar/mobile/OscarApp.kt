@@ -66,6 +66,8 @@ private val Ink = Color(0xFF1A1B18)
     val state by session.state.collectAsStateWithLifecycle()
     var selected by rememberSaveable { mutableStateOf(Destination.OSCAR.name) }
     var settingsPage by rememberSaveable { mutableStateOf("Settings") }
+    var settingsParent by rememberSaveable { mutableStateOf("Settings") }
+    var primaryDestination by rememberSaveable { mutableStateOf(Destination.OSCAR.name) }
     var voiceOpen by remember(state.epoch) { mutableStateOf(false) }
     DisposableEffect(state.epoch) { onDispose { VoicePresentation.cancel(session.getApplication()) } }
     var pairing by remember { mutableStateOf(false) }
@@ -73,34 +75,52 @@ private val Ink = Color(0xFF1A1B18)
     val destination = Destination.entries.firstOrNull { it.name == selected } ?: Destination.OSCAR
     var conversationPage by rememberSaveable { mutableStateOf("Conversation") }
     var automationPage by remember(state.epoch) { mutableStateOf("Overview") }
-    val pageScroll = remember(destination, settingsPage, conversationPage, automationPage) { androidx.compose.foundation.ScrollState(0) }
+    val pageScroll = remember(destination, settingsPage, conversationPage, automationPage, voiceOpen) { androidx.compose.foundation.ScrollState(0) }
     val focus = LocalFocusManager.current
     val keyboard = LocalSoftwareKeyboardController.current
     fun navigate(item: Destination) {
         VoicePresentation.cancel(session.getApplication()); voiceOpen = false
-        focus.clearFocus(); keyboard?.hide(); selected = item.name; settingsPage = "Settings"; conversationPage = "Conversation"; automationPage = "Overview"
+        focus.clearFocus(); keyboard?.hide(); selected = item.name; settingsPage = "Settings"; settingsParent = "Settings"; conversationPage = "Conversation"; automationPage = "Overview"
+        if (item in setOf(Destination.OSCAR, Destination.AUTOMATIONS, Destination.ACTIVITY)) primaryDestination = item.name
     }
-    BackHandler(voiceOpen || destination != Destination.OSCAR || settingsPage != "Settings" || conversationPage != "Conversation") {
-        if (voiceOpen) { VoicePresentation.cancel(session.getApplication()); voiceOpen = false }
-        else if (settingsPage != "Settings") settingsPage = "Settings"
-        else if (conversationPage != "Conversation") conversationPage = "Conversation"
-        else navigate(Destination.OSCAR)
+    val primaryPage = !voiceOpen && when (destination) {
+        Destination.OSCAR -> conversationPage == "Conversation"
+        Destination.AUTOMATIONS -> automationPage == "Overview"
+        Destination.ACTIVITY -> true
+        else -> false
+    }
+    fun back() {
+        focus.clearFocus(); keyboard?.hide()
+        when {
+            voiceOpen -> { VoicePresentation.cancel(session.getApplication()); voiceOpen = false }
+            destination == Destination.SETTINGS && settingsPage != "Settings" -> { settingsPage = settingsParent; settingsParent = "Settings" }
+            destination == Destination.AUTOMATIONS && automationPage != "Overview" -> automationPage = "Overview"
+            destination == Destination.OSCAR && conversationPage != "Conversation" -> conversationPage = "Conversation"
+            else -> navigate(Destination.entries.firstOrNull { it.name == primaryDestination } ?: Destination.OSCAR)
+        }
+    }
+    BackHandler(!primaryPage || destination != Destination.OSCAR) { if (primaryPage) navigate(Destination.OSCAR) else back() }
+    val notices = remember(state.epoch) { SnackbarHostState() }
+    LaunchedEffect(state.epoch, state.message) {
+        state.message?.takeIf { it.isNotBlank() }?.let { notices.showSnackbar(it, withDismissAction = true, duration = SnackbarDuration.Long) }
     }
     val send = { focus.clearFocus(); keyboard?.hide(); session.send(draft); Unit }
+    val largeNavigationText = LocalDensity.current.fontScale > 1.3f
     OscarTheme(forceDark = destination == Destination.ACTIVITY || voiceOpen || (destination == Destination.SETTINGS && settingsPage == "Awareness")) {
-        Scaffold(modifier = Modifier.imePadding(), containerColor = MaterialTheme.colorScheme.background, bottomBar = {
-            if (!voiceOpen) Surface(color = MaterialTheme.colorScheme.background) {
-                Row(Modifier.fillMaxWidth().navigationBarsPadding().padding(horizontal = 16.dp)) {
+        Scaffold(modifier = Modifier.imePadding(), containerColor = MaterialTheme.colorScheme.background,
+            bottomBar = {
+            if (primaryPage) Surface(color = MaterialTheme.colorScheme.background) {
+                Row(Modifier.fillMaxWidth().testTag("primary-navigation").navigationBarsPadding().padding(horizontal = if (largeNavigationText) 0.dp else 16.dp)) {
                     listOf(Destination.OSCAR, Destination.AUTOMATIONS, Destination.ACTIVITY).forEach { item ->
                         val navColor by animateColorAsState(if (item == destination) MaterialTheme.colorScheme.secondaryContainer else Color.Transparent,
                             tween(if (LocalReducedMotion.current) 0 else 180), label = "navigationSelection")
-                        TextButton(onClick = { navigate(item) }, modifier = Modifier.weight(1f).heightIn(min = 64.dp)
+                        TextButton(onClick = { navigate(item) }, contentPadding = PaddingValues(horizontal = 0.dp, vertical = 8.dp), modifier = Modifier.weight(if (largeNavigationText) item.label.length.toFloat() else 1f).heightIn(min = 64.dp)
                             .testTag("destination-${item.name}").semantics { this.selected = item == destination }) {
                             Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
                                 Box(Modifier.size(width = 56.dp, height = 30.dp).background(navColor, CircleShape), contentAlignment = Alignment.Center) {
                                     Glyph(item.label, color = if (item == destination) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onSurfaceVariant)
                                 }
-                                Text(item.label, style = MaterialTheme.typography.labelSmall,
+                                Text(item.label, style = MaterialTheme.typography.labelSmall, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
                                     color = if (item == destination) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant)
                             }
                         }
@@ -109,13 +129,21 @@ private val Ink = Color(0xFF1A1B18)
             }
         }) { insets ->
             Column(Modifier.fillMaxSize().padding(insets).widthIn(max = 720.dp)) {
-                Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
-                    if (destination in setOf(Destination.DEVICES, Destination.SETTINGS) || conversationPage != "Conversation") {
-                        IconButton(onClick = { navigate(Destination.OSCAR) }, modifier = Modifier.semantics { contentDescription = "Back to conversation" }) { Glyph("Back") }
+                Row(Modifier.fillMaxWidth().testTag("app-toolbar").padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
+                    if (!primaryPage) IconButton(onClick = ::back, modifier = Modifier.testTag("page-back").semantics { contentDescription = "Back" }) { Glyph("Back") }
+                    val pageTitle = when {
+                        primaryPage -> "OSCAR"
+                        voiceOpen -> "Voice"
+                        destination == Destination.SETTINGS -> when (settingsPage) { "Settings" -> "Preferences"; "Platform" -> "Android permissions"; "Accessibility" -> "Appearance"; else -> settingsPage }
+                        destination == Destination.AUTOMATIONS -> if (automationPage == "Create") "New responsibility" else "Worker"
+                        destination == Destination.OSCAR -> "Today"
+                        else -> destination.label
                     }
-                    Text(if (voiceOpen) "Voice" else if (destination == Destination.OSCAR) "OSCAR" else destination.label, style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
-                    IconButton(onClick = { navigate(Destination.DEVICES) }, modifier = Modifier.testTag("destination-DEVICES").semantics { contentDescription = "Devices" }) { Glyph("Devices") }
-                    IconButton(onClick = { navigate(Destination.SETTINGS) }, modifier = Modifier.testTag("destination-SETTINGS").semantics { contentDescription = "Preferences" }) { Glyph("Preferences") }
+                    Text(pageTitle, style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
+                    if (primaryPage) {
+                        IconButton(onClick = { navigate(Destination.DEVICES) }, modifier = Modifier.testTag("destination-DEVICES").semantics { contentDescription = "Devices" }) { Glyph("Devices") }
+                        IconButton(onClick = { navigate(Destination.SETTINGS) }, modifier = Modifier.testTag("destination-SETTINGS").semantics { contentDescription = "Preferences" }) { Glyph("Preferences") }
+                    }
                 }
                 Column(Modifier.weight(1f).fillMaxWidth().then(pageEntrance("$selected/$settingsPage/$conversationPage/$automationPage/$voiceOpen/${state.epoch}")).verticalScroll(pageScroll)
                     .padding(horizontal = 24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -124,7 +152,7 @@ private val Ink = Color(0xFF1A1B18)
                         OscarOrb(state, composing = draft.isNotBlank(), size = 36.dp)
                     }
                     when (destination) {
-                        Destination.OSCAR -> if (voiceOpen) VoiceExperience(state, { voiceOpen = false }, {
+                        Destination.OSCAR -> if (voiceOpen) VoiceExperience(state, {
                             navigate(Destination.SETTINGS); settingsPage = "Privacy"
                         }) else if (conversationPage == "Today") TodayScreen(state, { conversationPage = "Conversation" }, { navigate(Destination.ACTIVITY) })
                         else PresenceScreen(state, draft, session::writeDraft, send, session::cancelRequest,
@@ -132,18 +160,18 @@ private val Ink = Color(0xFF1A1B18)
                         Destination.AUTOMATIONS -> AutomationsScreen(state, automationPage, { automationPage = it }) { text -> session.writeDraft(text); navigate(Destination.OSCAR) }
                         Destination.ACTIVITY -> ActivityScreen(state, session::inspect, session::review)
                         Destination.DEVICES -> DevicesScreen(state, { pairing = true }, session::disconnect)
-                        Destination.SETTINGS -> SettingsScreen(settingsPage, { settingsPage = it }, session, state)
+                        Destination.SETTINGS -> SettingsScreen(settingsPage, { settingsParent = settingsPage; settingsPage = it }, session, state)
                     }
                     if (state.link != Link.CONNECTED && destination in setOf(Destination.OSCAR, Destination.ACTIVITY) && !voiceOpen && conversationPage == "Conversation") {
                         if (state.link == Link.CONNECTING) StatusLabel("Connecting to Core")
                         TextButton(onClick = { pairing = true }) { Text("Connect Core") }
                     }
-                    state.message?.let { Text(it, style = MaterialTheme.typography.bodySmall, modifier = Modifier.testTag("message").semantics { liveRegion = LiveRegionMode.Polite }) }
-                    if (draft.isNotEmpty() || state.interactions.isNotEmpty() || state.privateSuppressed) {
+                    if (primaryPage && destination == Destination.OSCAR && (draft.isNotEmpty() || state.interactions.isNotEmpty() || state.privateSuppressed)) {
                         TextButton(onClick = session::discard) { Text(if (state.privateSuppressed) "Clear Core private context" else "Discard private interaction") }
                     }
                     Spacer(Modifier.height(12.dp))
                 }
+                SnackbarHost(notices) { notice -> Snackbar(dismissAction = { IconButton(onClick = notice::dismiss) { Text("×", modifier = Modifier.semantics { contentDescription = "Dismiss status" }) } }) { Text(notice.visuals.message, modifier = Modifier.testTag("message")) } }
                 if (destination == Destination.OSCAR && !voiceOpen && conversationPage == "Conversation") {
                     Box(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 8.dp)) {
                         ConversationComposer(state, draft, session::writeDraft, send) { focus.clearFocus(); keyboard?.hide(); voiceOpen = true }
@@ -173,12 +201,12 @@ private val Ink = Color(0xFF1A1B18)
     var id by remember { mutableStateOf("") }; var token by remember { mutableStateOf("") }
     AlertDialog(onDismissRequest = close, title = { Text("Connect this phone") }, text = {
         Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("Use a scoped session issued by your trusted Core. This does not grant phone permissions or enroll owner signing authority.")
+            Text("Enter the connection details issued by your trusted Core.")
             Text("Connecting a different source clears the previous private draft and readback.")
-            OutlinedTextField(origin, { origin = it.take(256) }, label = { Text("Trusted HTTPS Core origin") }, singleLine = true)
-            OutlinedTextField(node, { node = it.take(80) }, label = { Text("Paired node ID") }, singleLine = true)
+            OutlinedTextField(origin, { origin = it.take(256) }, label = { Text("Core address (HTTPS)") }, singleLine = true)
+            OutlinedTextField(node, { node = it.take(80) }, label = { Text("Device ID") }, singleLine = true)
             OutlinedTextField(id, { id = it.take(80) }, label = { Text("Session ID") }, singleLine = true)
-            OutlinedTextField(token, { token = it.take(200) }, label = { Text("Scoped session token") }, singleLine = true,
+            OutlinedTextField(token, { token = it.take(200) }, label = { Text("Connection token") }, singleLine = true,
                 visualTransformation = androidx.compose.ui.text.input.PasswordVisualTransformation(),
                 keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Password))
         }

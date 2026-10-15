@@ -39,7 +39,7 @@ import androidx.compose.animation.core.tween
         }, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite })
         today?.let { FeatureRow("Today", "Plan your day with OSCAR", "Activity", action = it) }
     }
-    state.snapshot?.tasks?.firstOrNull { "approve" in it.actions || it.state in setOf("executing", "awaiting_result", "result_received", "verifying") }?.let { task ->
+    state.snapshot?.tasks?.firstOrNull { "approve" in it.actions || it.state in setOf("executing", "awaiting_result", "result_received", "verifying") }?.takeIf { task -> state.interactions.none { it.taskId == task.id } }?.let { task ->
         TactileSurface { FeatureRow(task.description, task.label, "Activity", action = activity) }
     }
     state.interactions.forEach { interaction ->
@@ -57,14 +57,14 @@ import androidx.compose.animation.core.tween
                 maxLines = 12
             )
         }
-        if (task?.response != null) StatusLabel("Reported response · facts need supporting evidence") else task?.let { StatusLabel(it.label) }
+        if (task?.response != null) StatusLabel("Reported response") else task?.let { StatusLabel(it.label) }
         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             TextButton(onClick = { reading = interaction }) { Text("Read response") }
-            if (interaction.taskId != null) TextButton(onClick = activity) { Text("Inspect task") }
+            if (interaction.taskId != null) TextButton(onClick = activity) { Text("Task details") }
         }
     }
     if (state.busy) {
-        LinearProgressIndicator(Modifier.fillMaxWidth().semantics { contentDescription = "Awaiting authoritative Core response" })
+        LinearProgressIndicator(Modifier.fillMaxWidth().semantics { contentDescription = "Waiting for OSCAR" })
         TextButton(onClick = cancel) { Text("Stop waiting") }
     }
     if (showComposer) ConversationComposer(state, draft, write, send, voice)
@@ -73,7 +73,7 @@ import androidx.compose.animation.core.tween
 
 @Composable fun ConversationComposer(state: MobileState, draft: String, write: (String) -> Unit, send: () -> Unit, voice: () -> Unit) {
     val canSend = state.link == Link.CONNECTED && !state.busy && !state.privateSuppressed && draft.isNotBlank()
-    if (state.restoring) StatusLabel("Restoring encrypted draft…")
+    if (state.restoring) StatusLabel("Restoring draft…")
     TactileSurface(Modifier.fillMaxWidth()) {
         OutlinedTextField(draft, { write(it.take(1000)) }, enabled = !state.restoring && state.link != Link.CONNECTING,
             modifier = Modifier.fillMaxWidth().testTag("interactionInput"), label = { Text("Write to OSCAR") }, minLines = 1, maxLines = 4,
@@ -88,18 +88,21 @@ import androidx.compose.animation.core.tween
 }
 
 @Composable internal fun ResponseDialog(interaction: Interaction, task: CoreTask?, close: () -> Unit) {
-    DetailPage("Conversation", close, "responseDialog") {
-        Illustration(R.drawable.illustration_reading, height = 100.dp)
-        Text("OSCAR", style = MaterialTheme.typography.titleMedium)
-        Text(interaction.text, style = MaterialTheme.typography.headlineLarge, modifier = Modifier.semantics { heading() })
-        StatusLabel(task?.label ?: if (interaction.taskId == null) "Core response" else "Outcome unknown")
-        if (task?.response != null) Text("REPORTED · a response is testimony, not independent verification.", style = MaterialTheme.typography.bodySmall)
+    DetailPage("Reading", close, "responseDialog") {
+        Text(interaction.text, style = MaterialTheme.typography.titleLarge, maxLines = 3, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis, modifier = Modifier.semantics { heading() })
+        if (interaction.text.length > 140) SupportingDetails("Original request") { Text(interaction.text) }
+        StatusLabel(if (task?.response != null) "Reported response" else task?.label ?: if (interaction.taskId == null) "Core response" else "Outcome unknown")
         if (task?.responseTruncated == true) StatusLabel("Bounded excerpt. Core returned only part of this response.")
         SelectionContainer {
             ResponseText(task?.response ?: task?.value ?: task?.blocker ?: if (task != null) "No response yet. Inspect Activity for the current task." else interaction.response)
         }
-        task?.takeIf { it.evidence.isNotEmpty() }?.let { Text("Supporting evidence", style = MaterialTheme.typography.titleMedium); Text(it.evidence.joinToString("\n"), style = MaterialTheme.typography.bodySmall) }
+        task?.let {
+            SupportingDetails("Source & verification") {
+                Text(it.label, style = MaterialTheme.typography.bodySmall)
+                Text("Reported text is not independent verification.", style = MaterialTheme.typography.bodySmall)
+                if (it.evidence.isNotEmpty()) Text(it.evidence.joinToString("\n"), style = MaterialTheme.typography.bodySmall)
+            }
+        }
         Button(shape = MaterialTheme.shapes.medium, onClick = close, modifier = Modifier.fillMaxWidth()) { Text("Follow up in conversation") }
-        TextButton(onClick = close) { Text("Back") }
     }
 }

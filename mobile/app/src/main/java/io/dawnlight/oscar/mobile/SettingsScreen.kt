@@ -30,7 +30,6 @@ import kotlinx.coroutines.withContext
 
 @Composable fun SettingsScreen(page: String, navigate: (String) -> Unit, session: CoreSession, state: MobileState) {
     val context = LocalContext.current
-    if (page != "Settings") TextButton(onClick = { navigate("Settings") }) { Glyph("Back"); Text("Back to Preferences") }
     when (page) {
         "Voice" -> VoiceSettings()
         "Persona" -> PersonaPreview()
@@ -40,54 +39,51 @@ import kotlinx.coroutines.withContext
         "Awareness" -> AwarenessScreen { navigate("Privacy") }
         "Access" -> AccessScreen(state)
         "Memory" -> {
-            EditorialHeading("Memory", "One continuing relationship.")
             FeatureRow("History & recall", "Managed by your OSCAR Core", "Conversation")
-            Text("Memory inspection, forgetting and retention policy are not exposed by this Mobile API. No recalled history is fabricated or stored in a separate phone archive.")
-            Text("Your unsent draft is encrypted for recovery. Discard private interaction clears it; it does not delete Core memory.", style = MaterialTheme.typography.bodySmall)
+            StatusLabel("Memory tools are unavailable on this phone.")
+            SupportingDetails("Drafts & memory") { Text("Unsent drafts use encrypted recovery. Discard clears the draft, not Core memory. History, forgetting and retention controls are managed by Core.", style = MaterialTheme.typography.bodySmall) }
         }
         "Platform" -> PlatformSettings()
         "Notifications" -> NotificationSettings(session, state)
         "About" -> {
-            Text("OSCAR Mobile · ${BuildConfig.VERSION_NAME}", style = MaterialTheme.typography.titleLarge)
-            Text("Core owns identity, memory, policy, tasks, routing and evidence. This phone is its Android embodiment.")
-            Text("Gate C PARTIAL · OWNER_DEVICE_ACCEPTANCE_NOT_RUN. Voice, biometric, assistant-role, notification replies, AEC and Bluetooth require consolidated acceptance.")
-            Text("No conversation archive is stored by the app. Only your unsent draft is encrypted locally for recovery; responses and decisions are cleared when leaving the foreground. A different source or discard clears the draft.")
-            TextButton(onClick = session::publicIdentity) { Text("Show public owner identity") }
+            Text("OSCAR", style = MaterialTheme.typography.headlineLarge)
+            Text("Dawnlight Labs · ${BuildConfig.VERSION_NAME}", style = MaterialTheme.typography.bodyMedium)
+            SupportingDetails("Privacy & device setup") {
+                Text("Unsent drafts use encrypted recovery. Responses and decisions clear when leaving the foreground. Changing Core or discarding clears the draft.", style = MaterialTheme.typography.bodySmall)
+                Text("Voice, biometric, assistant-role and notification integration need separate device acceptance.", style = MaterialTheme.typography.bodySmall)
+                TextButton(onClick = session::publicIdentity) { Text("Show public owner identity") }
+            }
         }
         else -> {
-            Row(Modifier.fillMaxWidth(), verticalAlignment = androidx.compose.ui.Alignment.Bottom) {
-                Column(Modifier.weight(1f)) { EditorialHeading("Make OSCAR", "yours.") }
-                Illustration(R.drawable.illustration_preferences, Modifier.width(136.dp), height = 160.dp)
-            }
             val areas = listOf(
-                Triple("Persona", "Expression preview · Core settings unavailable", "Preferences"),
+                Triple("Persona", "Preview expressions", "Preferences"),
                 Triple("Voice", "Voice & input", "Voice"),
                 Triple("Privacy", "Permissions & capture", "Preferences"),
-                Triple("Awareness", "Manual · Sentry unavailable", "Activity"),
-                Triple("Memory", "History & forgetting", "Conversation"),
-                Triple("Access", "Ask · delegation unavailable", "Automations"),
+                Triple("Awareness", "Off", "Activity"),
+                Triple("Memory", "History tools unavailable", "Conversation"),
+                Triple("Access", "Ask", "Automations"),
                 Triple("Platform", "Android assistant & permissions", "Devices"),
                 Triple("Notifications", "Alerts & confirmed replies", "Conversation"),
                 Triple("Accessibility", "Appearance & motion", "Preferences"),
-                Triple("Diagnostics", "Devices & technical details", "Devices"),
+                Triple("Diagnostics", "Connection & app information", "Devices"),
                 Triple("About", "OSCAR · Dawnlight Labs", "Preferences"))
             areas.forEachIndexed { index, (item, subtitle, icon) ->
                 FeatureRow(if (item == "Platform") "Android permissions" else if (item == "Accessibility") "Appearance" else item,
                     subtitle, icon, listOf(Sage, Clay, Sage, Clay, Sage)[index % 5], action = { navigate(item) })
                 HorizontalDivider()
             }
-            Text("Persona and memory are managed by Core. Local switches cannot expand Core policy.")
             TextButton(onClick = { try { context.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)) } catch (_: Exception) { session.message("Android accessibility settings are unavailable.") } }) { Text("Android accessibility settings") }
-            TextButton(onClick = session::disconnect) { Text("Disconnect locally") }
-            Text("Local disconnect deletes this app's credentials. Remote revocation remains a separate Core action.", style = MaterialTheme.typography.bodySmall)
+            SupportingDetails("Connection") {
+                TextButton(onClick = session::disconnect) { Text("Disconnect locally") }
+                Text("Removes this app's credentials. Remote revocation is a separate Core action.", style = MaterialTheme.typography.bodySmall)
+            }
         }
     }
 }
 @Composable fun VoiceSettings() {
     val (context, revision) = observedPermissions()
-    Text("OSCAR Voice", style = MaterialTheme.typography.titleLarge)
-    Text("Voice Identity · OSCAR original reference\nAccepted Core binding: Kokoro neural voice; platform fallbacks stay underneath one identity.")
-    Text("Android voice binding is not commissioned. Listening, playback, Voice Match and Voice Map are unavailable.")
+    StatusLabel("Voice setup incomplete")
+    Text("Listening, playback and voice enrollment are unavailable.", style = MaterialTheme.typography.bodyMedium)
     AndroidGrant("Microphone", Manifest.permission.RECORD_AUDIO)
     if (Build.VERSION.SDK_INT >= 31) {
         AndroidGrant("Headset routing", Manifest.permission.BLUETOOTH_CONNECT)
@@ -98,7 +94,7 @@ import kotlinx.coroutines.withContext
         }
         Text("Output route · $route")
     }
-    Text("Native AudioRecord, AudioTrack, audio focus and AEC adapters remain behind shared Voice contracts. Effect availability does not establish real-room AEC.")
+    SupportingDetails("Voice identity & audio") { Text("Voice identity is managed by OSCAR Core. Microphone permission alone does not enable listening. Audio processing and real-room playback need device commissioning.", style = MaterialTheme.typography.bodySmall) }
 }
 @Composable fun PlatformSettings() {
     val (context, revision) = observedPermissions()
@@ -106,11 +102,12 @@ import kotlinx.coroutines.withContext
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { }
     var unavailable by remember { mutableStateOf(false) }
     val selected = remember(revision) { VoiceInteractionService.isActiveService(context, ComponentName(context, AssistantService::class.java)) }
-    Text("Android presence", style = MaterialTheme.typography.titleLarge)
     Text("Assistant · ${if (selected) "Selected" else "Not selected"}")
     TextButton(onClick = { try { if (role.isRoleAvailable(RoleManager.ROLE_ASSISTANT)) launcher.launch(role.createRequestRoleIntent(RoleManager.ROLE_ASSISTANT)) } catch (_: Exception) { unavailable = true } }, enabled = role.isRoleAvailable(RoleManager.ROLE_ASSISTANT)) { Text("Choose assistant") }
     if (unavailable) Text("Android assistant selection is unavailable; no role change is confirmed.")
-    Text("Supported assistant invocation opens this OSCAR surface. Selection does not enable background listening or grant permissions. OEM behavior requires device testing.")
-    Text("Overlay · unavailable (Slice 16 runtime)\nWidgets · unavailable (Slice 16 runtime)\nBackground microphone · user-started foreground service only, binding unavailable")
-    Text("Android restricts background foreground-service starts and microphone access. No boot capture or Accessibility automation is used.")
+    Text("Assistant selection opens OSCAR. It does not enable background listening or grant other permissions.")
+    SupportingDetails("Other Android features") {
+        Text("Overlay · unavailable\nWidgets · unavailable", style = MaterialTheme.typography.bodySmall)
+        Text("Background microphone access is unavailable until voice setup is complete. OSCAR does not start capture at boot or use Accessibility automation.", style = MaterialTheme.typography.bodySmall)
+    }
 }
