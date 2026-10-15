@@ -143,6 +143,13 @@ val OscarTypography = Typography(
             "Add" -> { line(12f,4f,12f,20f); line(4f,12f,20f,12f) }
             "Devices" -> { drawRoundRect(color,androidx.compose.ui.geometry.Offset(2*s,4*s),androidx.compose.ui.geometry.Size(20*s,13*s),androidx.compose.ui.geometry.CornerRadius(2*s),style=stroke); line(12f,17f,12f,21f); line(7f,21f,17f,21f) }
             "Phone" -> { drawRoundRect(color,androidx.compose.ui.geometry.Offset(6*s,2*s),androidx.compose.ui.geometry.Size(12*s,20*s),androidx.compose.ui.geometry.CornerRadius(2*s),style=stroke); line(10f,18f,14f,18f) }
+            "Privacy", "Access" -> { path(12f to 2f,21f to 6f,20f to 15f,12f to 22f,4f to 15f,3f to 6f,12f to 2f); path(8f to 12f,11f to 15f,16f to 9f) }
+            "Memory" -> { drawRoundRect(color,androidx.compose.ui.geometry.Offset(4*s,3*s),androidx.compose.ui.geometry.Size(16*s,18*s),androidx.compose.ui.geometry.CornerRadius(2*s),style=stroke); line(8f,3f,8f,21f); line(11f,8f,17f,8f); line(11f,12f,17f,12f) }
+            "Notifications" -> { path(4f to 17f,6f to 14f,6f to 8f,9f to 4f,15f to 4f,18f to 8f,18f to 14f,20f to 17f,4f to 17f); path(9f to 20f,12f to 22f,15f to 20f) }
+            "Appearance" -> { drawCircle(color,9*s,style=stroke); drawArc(color, -90f, 180f, true, androidx.compose.ui.geometry.Offset(3*s,3*s), androidx.compose.ui.geometry.Size(18*s,18*s)) }
+            "Persona" -> { path(12f to 2f,15f to 9f,22f to 12f,15f to 15f,12f to 22f,9f to 15f,2f to 12f,9f to 9f,12f to 2f) }
+            "Awareness" -> { path(2f to 12f,7f to 6f,17f to 6f,22f to 12f,17f to 18f,7f to 18f,2f to 12f); drawCircle(color,3*s,style=stroke) }
+            "About" -> { drawCircle(color,9*s,style=stroke); line(12f,11f,12f,17f); drawCircle(color,1*s,androidx.compose.ui.geometry.Offset(12*s,7*s)) }
             else -> { for (y in listOf(6f,12f,18f)) { line(3f,y,21f,y); drawCircle(color,2.5f*s,androidx.compose.ui.geometry.Offset((if(y==12f) 16f else 8f)*s,y*s)) } }
         }
     }

@@ -70,32 +70,38 @@ import androidx.activity.compose.BackHandler
     SupportingDetails("Planning capabilities") { Text("Calendar changes and a persistent Chief-of-Staff runtime are not available through this Mobile contract.", style = MaterialTheme.typography.bodySmall) }
 }
 
-@Composable fun AccessScreen(state: MobileState) {
-    Row(Modifier.fillMaxWidth(), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
-        Column(Modifier.weight(1f)) { EditorialHeading("Ask is active") }
-        Box(Modifier.width(88.dp)) { OscarOrb(state, size = 88.dp) }
+@Composable fun AccessScreen() {
+    PreferenceGroup("Current mode") {
+        FeatureRow("Ask is active", "Inspect, reason and propose. Ask before state changes.", "Access")
     }
-    FeatureRow("Ask", "Inspect, reason and propose. Ask before state changes.", "Conversation")
-    HorizontalDivider()
-    FeatureRow("Secure", "Ordinary autonomous work; protected and consequential operations retain consent.", "Preferences", Lilac)
-    HorizontalDivider()
-    FeatureRow("Full Access", "Autonomous control over all available capabilities after your explicit delegation.", "Automations", Clay)
+    PreferenceGroup("Unavailable modes") {
+        FeatureRow("Secure", "Ordinary autonomy; protected or consequential work still needs consent.", "Access", Lilac)
+        HorizontalDivider()
+        FeatureRow("Full Access", "Owner-delegated autonomy over technically available capabilities.", "Access", Clay)
+        Button(onClick = {}, enabled = false, modifier = Modifier.fillMaxWidth().testTag("delegationUnavailable")) { Text("Activation unavailable") }
+    }
     SupportingDetails("How Full Access works") { Text("After explicit activation, no additional OSCAR per-action prompts. Android and external platform controls still apply.", style = MaterialTheme.typography.bodySmall) }
-    Button(shape = MaterialTheme.shapes.medium, onClick = {}, enabled = false, modifier = Modifier.fillMaxWidth().testTag("delegationUnavailable")) { Text("Activation unavailable") }
     SupportingDetails("Why activation is unavailable") { Text("Secure and Full Access require signed owner delegation and revocation support. Ask remains active; this screen cannot change your permissions.", style = MaterialTheme.typography.bodySmall) }
 }
 
 @Composable fun AwarenessScreen(privacy: () -> Unit) {
-    EditorialHeading("Awareness is off")
-    Illustration(R.drawable.illustration_awareness, height = 96.dp)
-    StatusLabel("Sentry is not active")
-    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+    PreferenceGroup("Awareness mode") {
+        FeatureRow("Awareness is off", "Sentry is not active", "Awareness")
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         FilterChip(selected = true, onClick = {}, colors = FilterChipDefaults.filterChipColors(selectedContainerColor = Sage, selectedLabelColor = androidx.compose.ui.graphics.Color.White), label = { Text("Manual") })
         FilterChip(selected = false, onClick = {}, enabled = false, label = { Text("Trigger-only") })
         FilterChip(selected = false, onClick = {}, enabled = false, label = { Text("Sentry") })
+        }
     }
-    FeatureRow("Microphone", "Manage voice permissions", "Voice", action = privacy)
-    FeatureRow("Capture", "Unavailable", "Devices", Clay)
-    FeatureRow("Retention", "Raw audio and observation retention off", "Preferences", Lilac)
+    PreferenceGroup("Capture & permissions") {
+        FeatureRow("Microphone", "Manage voice permissions", "Voice", action = privacy)
+        HorizontalDivider()
+        PreferenceValue("Background capture", "Unavailable")
+    }
+    PreferenceGroup("Retention") {
+        PreferenceValue("Raw audio", "Off")
+        HorizontalDivider()
+        PreferenceValue("Observations", "Not retained")
+    }
     SupportingDetails("Awareness & privacy") { Text("Passive · Aware · Guard · Away · Sleep are planned Sentry modes. Perceiving, retaining and acting require separate grants.", style = MaterialTheme.typography.bodySmall) }
 }

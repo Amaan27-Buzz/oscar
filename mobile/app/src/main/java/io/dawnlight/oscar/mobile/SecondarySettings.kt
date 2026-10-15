@@ -8,6 +8,16 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.selected
 import io.dawnlight.oscar.expression.ExpressionPresence
 import io.dawnlight.oscar.expression.Source
 import io.dawnlight.oscar.expression.SourceKind
@@ -27,18 +37,39 @@ val LocalReducedMotion = compositionLocalOf { false }
 @Composable fun AppearanceSettings() {
     val context = LocalContext.current
     val reduced = appearancePreference("motion", "system") == "reduced"
-    Text("Theme", style = MaterialTheme.typography.titleMedium)
     val theme = appearancePreference("theme", "system")
-    listOf("system", "light", "dark").forEach { option ->
-        TextButton(onClick = { context.getSharedPreferences("appearance", Context.MODE_PRIVATE).edit().putString("theme",option).apply() }) {
-            Text("${option.replaceFirstChar { it.uppercase() }}${if (theme == option) " · selected" else ""}")
+    PreferenceGroup("Theme") {
+        BoxWithConstraints(Modifier.fillMaxWidth()) {
+            val tileWidth = if (LocalDensity.current.fontScale > 1.3f) maxWidth else (maxWidth - 20.dp) / 3
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                listOf("system", "light", "dark").forEach { option ->
+                    Surface(onClick = { context.getSharedPreferences("appearance", Context.MODE_PRIVATE).edit().putString("theme",option).apply() },
+                        modifier = Modifier.width(tileWidth).testTag("theme-$option").semantics { selected = theme == option; role = Role.RadioButton },
+                        shape = MaterialTheme.shapes.medium, color = MaterialTheme.colorScheme.surface,
+                        border = BorderStroke(if (theme == option) 2.dp else 1.dp, if (theme == option) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.outlineVariant)) {
+                        Column(Modifier.padding(10.dp), horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                            Canvas(Modifier.fillMaxWidth().height(58.dp).clip(MaterialTheme.shapes.small)) {
+                                val paper = Color(0xFFF5F1E7); val graphite = Color(0xFF242723)
+                                drawRoundRect(if (option == "dark") graphite else paper, cornerRadius = androidx.compose.ui.geometry.CornerRadius(8.dp.toPx()))
+                                if (option == "system") drawRect(graphite, topLeft = androidx.compose.ui.geometry.Offset(size.width / 2, 0f), size = androidx.compose.ui.geometry.Size(size.width / 2, size.height))
+                                val stroke = if (option == "dark") paper else Color(0xFF526C56)
+                                drawLine(stroke, androidx.compose.ui.geometry.Offset(8.dp.toPx(), size.height * 0.3f), androidx.compose.ui.geometry.Offset(size.width * 0.65f, size.height * 0.3f), 4.dp.toPx())
+                                drawLine(stroke, androidx.compose.ui.geometry.Offset(8.dp.toPx(), size.height * 0.55f), androidx.compose.ui.geometry.Offset(size.width * 0.8f, size.height * 0.55f), 2.dp.toPx())
+                            }
+                            Text(option.replaceFirstChar { it.uppercase() }, style = MaterialTheme.typography.labelLarge)
+                        }
+                    }
+                }
+            }
         }
     }
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-        Text("Reduce OSCAR motion", Modifier.weight(1f))
-        Switch(reduced, { context.getSharedPreferences("appearance", Context.MODE_PRIVATE).edit().putString("motion", if (it) "reduced" else "system").apply() }, modifier = Modifier.semantics { contentDescription = "Reduce OSCAR motion" })
+    PreferenceGroup("Comfort") {
+        PreferenceControl("Reduce OSCAR motion", "Calmer movement and transitions.") {
+            Switch(reduced, { context.getSharedPreferences("appearance", Context.MODE_PRIVATE).edit().putString("motion", if (it) "reduced" else "system").apply() }, modifier = Modifier.semantics { contentDescription = "Reduce OSCAR motion" })
+        }
+        HorizontalDivider()
+        PreferenceValue("Text size", "Follows Android")
     }
-    Text("Reduces movement and transitions. Text follows your Android font size.")
 }
 @Composable fun PersonaPreview() {
     var delivery by remember { mutableStateOf("composed") }
@@ -50,21 +81,36 @@ val LocalReducedMotion = compositionLocalOf { false }
             .put("kind","state").put("priority","normal").put("operation","idle").put("delivery",delivery)
             .put("availability","available").put("muted",false).put("attention","none").put("reducedMotion",true).toString()
     }
-    StatusLabel("Preview only · not applied to OSCAR")
-    Box(Modifier.fillMaxWidth(), contentAlignment = androidx.compose.ui.Alignment.Center) { ExpressionPresence(event,source,80.dp,true) }
-    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        listOf("composed","curious","amused","subdued").forEach { cue -> FilterChip(selected = delivery == cue, onClick = { delivery = cue }, label = { Text(cue.replaceFirstChar { it.uppercase() }) }) }
+    PreferenceGroup("Expression preview") {
+        Box(Modifier.fillMaxWidth().height(164.dp), contentAlignment = androidx.compose.ui.Alignment.Center) { ExpressionPresence(event,source,120.dp,true) }
+        StatusLabel("Preview only · not applied to OSCAR")
+    }
+    PreferenceGroup("Delivery") {
+        listOf("composed" to "Steady and considered", "curious" to "Attentive and interested", "amused" to "A lighter touch", "subdued" to "Quiet and reserved").forEachIndexed { index, (cue, detail) ->
+            if (index > 0) HorizontalDivider()
+            Row(Modifier.fillMaxWidth().heightIn(min = 64.dp).selectable(selected = delivery == cue, role = Role.RadioButton, onClick = { delivery = cue }), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                RadioButton(selected = delivery == cue, onClick = null)
+                Column(Modifier.weight(1f)) { Text(cue.replaceFirstChar { it.uppercase() }, style = MaterialTheme.typography.titleMedium); Text(detail, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
+            }
+        }
     }
     SupportingDetails("About this preview") { Text("These expressions are temporary. Persona settings are managed by Core and cannot change facts, safety or permissions.", style = MaterialTheme.typography.bodySmall) }
 }
 @Composable fun DiagnosticsSettings(state: MobileState) {
-    Text("Core connection · ${state.link}")
-    Text("Observation · ${if (state.observedAt > 0) "Foreground readback" else "Unavailable"}")
-    Text("Task count · ${state.snapshot?.tasks?.size?.toString() ?: "Unavailable"}")
-    Text("Android ${android.os.Build.VERSION.RELEASE} / API ${android.os.Build.VERSION.SDK_INT}")
-    Text("OSCAR Mobile ${BuildConfig.VERSION_NAME}")
-    Text("No tokens, private prompts, notification content or voice profiles are displayed or exported.")
+    PreferenceGroup("Connection") {
+        PreferenceValue("Core", state.link.name.lowercase().replaceFirstChar { it.uppercase() })
+        HorizontalDivider()
+        PreferenceValue("Observation", if (state.observedAt > 0) "Foreground readback" else "Unavailable")
+        HorizontalDivider()
+        PreferenceValue("Tasks", state.snapshot?.tasks?.size?.toString() ?: "Unavailable")
+    }
+    PreferenceGroup("App & device") {
+        PreferenceValue("OSCAR", BuildConfig.VERSION_NAME)
+        HorizontalDivider()
+        PreferenceValue("Android", "${android.os.Build.VERSION.RELEASE} · API ${android.os.Build.VERSION.SDK_INT}")
+    }
     SupportingDetails("Runtime information") {
         Text("Model routing is managed by Core. Device capabilities reflect the current connection. Background push is unavailable.", style = MaterialTheme.typography.bodySmall)
+        Text("No tokens, private prompts, notification content or voice profiles are displayed or exported.", style = MaterialTheme.typography.bodySmall)
     }
 }

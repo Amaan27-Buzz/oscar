@@ -68,6 +68,7 @@ class SettingsIntegrationTest {
         }
         navigateReview(compose, "SETTINGS")
         compose.onNodeWithText("Diagnostics").performScrollTo().performClick()
+        compose.onNodeWithText("Runtime information").performScrollTo().performClick()
         compose.onNodeWithText("No tokens, private prompts",substring=true).performScrollTo().assertIsDisplayed()
         capture("13-8-dark-large-text-reference")
         navigateReview(compose, "OSCAR")
@@ -118,7 +119,7 @@ class SettingsIntegrationTest {
     }
     @Test fun reducedMotionPersistsThroughActivityRecreation() {
         page("Appearance")
-        compose.onNodeWithContentDescription("Reduce OSCAR motion").performClick()
+        compose.onNodeWithContentDescription("Reduce OSCAR motion").performScrollTo().performClick()
         compose.waitUntil(5000) { compose.activity.getSharedPreferences("appearance",Context.MODE_PRIVATE).getString("motion","") == "reduced" }
         compose.activityRule.scenario.recreate()
         compose.onNodeWithContentDescription("Reduce OSCAR motion").assertIsOn()
