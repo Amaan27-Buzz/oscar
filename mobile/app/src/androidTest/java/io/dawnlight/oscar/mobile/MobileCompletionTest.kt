@@ -209,11 +209,16 @@ class MobileCompletionTest {
         compose.onNodeWithText("Confirm securely").assertIsEnabled()
         capture("13-3-reference-approval", "approvalDialog")
         assertEquals("planned", parseTask(CoreClient(fixture).call("inspect", org.json.JSONObject().put("task_id", id))).state)
+        val expiryEpoch = session.state.value.epoch
+        val lifecycleEvents = mutableListOf<String>()
+        val lifecycleObserver = androidx.lifecycle.LifecycleEventObserver { _, event -> lifecycleEvents.add(event.name) }
+        compose.runOnIdle { compose.activity.lifecycle.addObserver(lifecycleObserver) }
         compose.waitUntil(35_000) { session.state.value.coreNow(System.currentTimeMillis()) >= approval.expiresAt }
         compose.runOnIdle { session.refreshNow() }
         compose.waitUntil(10_000) { session.state.value.observedAt > approval.expiresAt - 30_000 }
         compose.waitForIdle()
-        assertNotNull("Expiry review lost: ${session.state.value.link}; ${session.state.value.message}", session.state.value.approval)
+        compose.runOnIdle { compose.activity.lifecycle.removeObserver(lifecycleObserver) }
+        assertNotNull("Expiry review lost: ${session.state.value.link}; ${session.state.value.message}; epoch $expiryEpoch -> ${session.state.value.epoch}; lifecycle $lifecycleEvents; interactive ${compose.activity.getSystemService(android.os.PowerManager::class.java).isInteractive}", session.state.value.approval)
         compose.onNodeWithText("Confirm securely").assertIsNotEnabled()
         closeReviewDetail(compose, "approvalDialog")
         assertNull(session.state.value.approval)
