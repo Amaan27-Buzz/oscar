@@ -139,5 +139,77 @@
     ],
     "excluded_ui_rectangles": [],
     "output_sha256": "9e4eb99ba5ce458c36b645187920780c4cd520ce7549b70d4f23c92d0fd41905"
+  },
+  "worker_brief": {
+    "source": "design/oscar-mobile-visual-exploration/components/C-workers-and-automations.png",
+    "source_sha256": "a0384ab969a59d497a1bbee45b25f0a03b63b4f3ed1bbfed177620d2c3caf1c5",
+    "bounds": [
+      38,
+      236,
+      190,
+      364
+    ],
+    "excluded_ui_rectangles": [],
+    "output_sha256": "1627bb178d672e52dbd586e05673bc737bf4fc926bd06ee0f3c359ddd6d7cb5f"
+  },
+  "worker_watch": {
+    "source": "design/oscar-mobile-visual-exploration/components/C-workers-and-automations.png",
+    "source_sha256": "a0384ab969a59d497a1bbee45b25f0a03b63b4f3ed1bbfed177620d2c3caf1c5",
+    "bounds": [
+      250,
+      239,
+      382,
+      355
+    ],
+    "excluded_ui_rectangles": [],
+    "output_sha256": "44d66b6dacf2502526691882776efea059d9c4d8c1fa440c33507f4956da2479"
+  },
+  "worker_reset": {
+    "source": "design/oscar-mobile-visual-exploration/components/C-workers-and-automations.png",
+    "source_sha256": "a0384ab969a59d497a1bbee45b25f0a03b63b4f3ed1bbfed177620d2c3caf1c5",
+    "bounds": [
+      468,
+      238,
+      590,
+      359
+    ],
+    "excluded_ui_rectangles": [],
+    "output_sha256": "8c321d1c46ee8519a82a63b023299caddce3b1545970d6b96ce56a0c4948708a"
+  },
+  "empty": {
+    "source": "design/oscar-mobile-visual-exploration/components/E-devices-activity-and-system-patterns.png",
+    "source_sha256": "680e002e878a06da5ee7c5778758c291e55563f10f0c4a875af21f7441a91b2b",
+    "bounds": [
+      965,
+      596,
+      1088,
+      686
+    ],
+    "excluded_ui_rectangles": [],
+    "output_sha256": "97a1c3ec6e75f8b9207bcc6e58b1f41c0b630a9623aa9df13d498c9533f9668d"
+  },
+  "book_green": {
+    "source": "design/oscar-mobile-visual-exploration/screens/03-expanded-reading.png",
+    "source_sha256": "aae84335eef4ce608f2a9ae0d696d29ff00e917454369ec46ce08d184bd3cc03",
+    "bounds": [
+      65,
+      1356,
+      162,
+      1465
+    ],
+    "excluded_ui_rectangles": [],
+    "output_sha256": "98b5b4bba58724df88ce060e8008f026ecbac0028c66214b6999714d4009e87b"
+  },
+  "book_orange": {
+    "source": "design/oscar-mobile-visual-exploration/screens/03-expanded-reading.png",
+    "source_sha256": "aae84335eef4ce608f2a9ae0d696d29ff00e917454369ec46ce08d184bd3cc03",
+    "bounds": [
+      65,
+      1483,
+      163,
+      1591
+    ],
+    "excluded_ui_rectangles": [],
+    "output_sha256": "764bc76a1ced43813e650300a9cd98d05b73a9f3825bf070c3f08dc8d87ccb7a"
   }
 }

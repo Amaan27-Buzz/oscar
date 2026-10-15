@@ -58,8 +58,10 @@ import androidx.compose.ui.semantics.liveRegion
     var saving by remember { mutableStateOf(false) }
     LaunchedEffect(revision) { checked = prefs.getBoolean(key, false) }
     val scope = rememberCoroutineScope()
-    PreferenceControl(label, explanation) {
-        Switch(checked, { next -> saving = true; scope.launch {
+    PreferenceControl(label, explanation, when (key) {
+        "microphone_perception" -> "Voice"; "notification_reply" -> "Send"; "task_alerts" -> "Notifications"; else -> "Awareness"
+    }, if (key == "microphone_perception") Clay else Sage) {
+        OscarSwitch(checked, { next -> saving = true; scope.launch {
             if (withContext(Dispatchers.IO) { prefs.edit().putBoolean(key, next).commit() }) {
                 checked = next; failed = false
             } else failed = true
@@ -76,7 +78,8 @@ import androidx.compose.ui.semantics.liveRegion
     var unavailable by remember { mutableStateOf(false) }
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { result++ }
     val granted = remember(resumed, result) { context.checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED }
-    PreferenceControl(label, if (granted) "Granted in Android" else "Not granted in Android") {
+    PreferenceControl(label, if (granted) "Granted in Android" else "Not granted in Android",
+        if (permission == Manifest.permission.POST_NOTIFICATIONS) "Notifications" else "Voice", Clay) {
         TextButton(onClick = { try {
             if (granted) context.startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, android.net.Uri.parse("package:${context.packageName}"))) else launcher.launch(permission)
             unavailable = false
@@ -104,13 +107,13 @@ import androidx.compose.ui.semantics.liveRegion
     PreferenceGroup("Notification context") {
     LocalGrant("Selected notification context", "notification_context", "Selected apps only. Does not retain content or allow replies.")
     HorizontalDivider()
-    PreferenceControl("Android access", if (listener) "Granted" else "Not granted") {
+    PreferenceControl("Android access", if (listener) "Granted" else "Not granted", "Android") {
         TextButton(onClick = { try { context.startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)); platformUnavailable = false }
             catch (_: Exception) { platformUnavailable = true } }) { Text("Manage listener access") }
     }
     if (platformUnavailable) Text("Android listener settings are unavailable. Access is unchanged.", color = MaterialTheme.colorScheme.error)
     SupportingDetails("Choose notification sources") {
-    OutlinedTextField(sources, { sources = it.take(1000); saved = false }, label = { Text("Allowed notification package IDs") }, supportingText = { Text("Comma-separated; every unlisted app is excluded. Empty means no sources.") }, isError = sourceError, modifier = Modifier.fillMaxWidth().testTag("notificationSources"))
+    OscarField(sources, { sources = it.take(1000); saved = false }, label = "Allowed notification package IDs", supportingText = "Comma-separated; every unlisted app is excluded. Empty means no sources.", isError = sourceError, modifier = Modifier.fillMaxWidth().testTag("notificationSources"))
     TextButton(onClick = {
         val names = sources.split(',').map { it.trim() }.filter { it.isNotEmpty() }
         sourceError = names.size > 32 || names.any { !it.matches(Regex("[A-Za-z0-9_]+(?:\\.[A-Za-z0-9_]+)+")) }
@@ -138,12 +141,12 @@ import androidx.compose.ui.semantics.liveRegion
     LocalGrant("Allow confirmed notification replies", "notification_reply", "Each reply requires a fresh Core review and Android confirmation.")
     SupportingDetails("Action permissions") { Text("Remote task actions require Core pairing and confirmation. Other communication, location, camera and overlay actions are unavailable.", style = MaterialTheme.typography.bodySmall) }
     var revokeFailed by remember { mutableStateOf(false) }
-    OutlinedButton(onClick = { scope.launch {
+    OscarButton(onClick = { scope.launch {
         val applied = withContext(Dispatchers.IO) { prefs.edit().putBoolean("microphone_perception", false)
             .putBoolean("notification_context", false).putBoolean("notification_reply", false).putString("notification_sources", "").commit() }
         revokeFailed = !applied
         NotificationBoundary.privacyChanged(); VoicePresentation.cancel(context)
-    } }, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error)) { Text("Revoke OSCAR grants") }
+    } }, modifier = Modifier.fillMaxWidth(), outlined = true, color = Clay) { Text("Revoke OSCAR grants") }
     if (revokeFailed) Text("Revocation persistence is unverified. Inspect current permissions before continuing.", color = MaterialTheme.colorScheme.error)
     Text("Android permissions and remote Core grants stay unchanged; revoke them separately.", style = MaterialTheme.typography.bodySmall)
     }
@@ -176,11 +179,11 @@ import androidx.compose.ui.semantics.liveRegion
         if (state.approval?.operation == "reply") session.dismissApproval()
     }
     PreferenceGroup("Available replies") {
-    OutlinedButton(onClick = { try { replies = NotificationBoundary.exposed() } catch (_: Exception) { session.message("Notification access unavailable.") } }, modifier = Modifier.fillMaxWidth()) { Text("Check available replies") }
+    OscarButton(onClick = { try { replies = NotificationBoundary.exposed() } catch (_: Exception) { session.message("Notification access unavailable.") } }, modifier = Modifier.fillMaxWidth(), outlined = true) { Text("Check available replies") }
     if (replies.isEmpty()) StatusLabel("Only replies exposed by selected apps appear here.")
     replies.forEach { source -> TextButton(onClick = { selected = source }) { Text(source.getString("title")) } }
     selected?.let { source ->
-        OutlinedTextField(draft, { draft = it.take(500) }, label = { Text("Reply") }, modifier = Modifier.fillMaxWidth())
+        OscarField(draft, { draft = it.take(500) }, label = "Reply", modifier = Modifier.fillMaxWidth())
         val replyGrant = context.getSharedPreferences("permissions", Context.MODE_PRIVATE).getBoolean("notification_reply", false)
         TextButton(onClick = { if (NotificationBoundary.current(source)) session.reviewReply(source, draft); draft = ""; selected = null }, enabled = replyGrant && draft.isNotBlank() && state.link == Link.CONNECTED && !state.busy && !state.privateSuppressed && NotificationBoundary.current(source)) { Text("Review reply") }
         if (!replyGrant) Text("Enable confirmed replies in Privacy before sending.")

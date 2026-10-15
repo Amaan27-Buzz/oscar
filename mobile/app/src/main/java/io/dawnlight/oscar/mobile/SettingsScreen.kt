@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -39,8 +40,9 @@ import kotlinx.coroutines.withContext
         "Awareness" -> AwarenessScreen { navigate("Privacy") }
         "Access" -> AccessScreen()
         "Memory" -> {
+            IllustratedIntro("Memory", artwork = R.drawable.illustration_book_green, height = 112.dp)
             PreferenceGroup("History & recall") {
-                FeatureRow("OSCAR memory", "Managed by your Core", "Memory")
+                FeatureRow("OSCAR memory", "Managed by your Core", "Book", Lilac)
                 HorizontalDivider()
                 PreferenceValue("History tools", "Unavailable on this phone")
             }
@@ -66,17 +68,23 @@ import kotlinx.coroutines.withContext
             }
         }
         else -> {
+            IllustratedIntro("Make OSCAR\nyours.", artwork = R.drawable.illustration_preferences, height = 144.dp)
             val groups = listOf(
                 "Personal" to listOf(Triple("Persona", "Expression preview", "Persona"), Triple("Voice", "Audio & input", "Voice"), Triple("Accessibility", "Theme & motion", "Appearance")),
                 "Your context" to listOf(Triple("Privacy", "Permissions & capture", "Privacy"), Triple("Awareness", "Off", "Awareness"), Triple("Memory", "History & drafts", "Memory"), Triple("Notifications", "Alerts & replies", "Notifications")),
-                "Control" to listOf(Triple("Access", "Ask mode", "Access"), Triple("Platform", "Assistant & system access", "Phone")),
+                "Control" to listOf(Triple("Access", "Ask mode", "Conversation"), Triple("Platform", "Assistant & system access", "Android")),
                 "Application" to listOf(Triple("Diagnostics", "Connection & device", "Activity"), Triple("About", "OSCAR · Dawnlight Labs", "About")))
             groups.forEach { (title, areas) ->
-                PreferenceGroup(title) {
+                PreferenceGroup(title, flat = true) {
                     areas.forEachIndexed { index, (item, subtitle, icon) ->
                         if (index > 0) HorizontalDivider()
                         FeatureRow(if (item == "Platform") "Android permissions" else if (item == "Accessibility") "Appearance" else item,
-                            subtitle, icon, action = { navigate(item) })
+                            subtitle, icon, color = when (item) {
+                                "Voice", "Accessibility" -> Clay
+                                "Privacy", "Access" -> Color(0xFFE7AD3B)
+                                "Memory", "Notifications" -> Lilac
+                                else -> Sage
+                            }, action = { navigate(item) })
                     }
                 }
             }
@@ -90,22 +98,22 @@ import kotlinx.coroutines.withContext
 }
 @Composable fun VoiceSettings() {
     val (context, revision) = observedPermissions()
-    PreferenceGroup("Voice setup") {
-        FeatureRow("Voice setup incomplete", "Listening, playback and enrollment unavailable", "Voice", Clay)
-    }
+    IllustratedIntro("Voice & input", artwork = R.drawable.illustration_preferences, height = 112.dp)
+    StatusLabel("Voice setup incomplete")
+    StatusLabel("Listening, playback and enrollment unavailable")
     PreferenceGroup("Audio permissions") {
-    AndroidGrant("Microphone", Manifest.permission.RECORD_AUDIO)
-    if (Build.VERSION.SDK_INT >= 31) {
-        HorizontalDivider()
-        AndroidGrant("Headset routing", Manifest.permission.BLUETOOTH_CONNECT)
-        val route = remember(revision) {
-            if (context.checkSelfPermission(Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED)
-                context.getSystemService(AudioManager::class.java).communicationDevice?.productName?.toString() ?: "No active communication route"
-            else "Routing permission not granted"
+        AndroidGrant("Microphone", Manifest.permission.RECORD_AUDIO)
+        if (Build.VERSION.SDK_INT >= 31) {
+            HorizontalDivider()
+            AndroidGrant("Headset routing", Manifest.permission.BLUETOOTH_CONNECT)
+            val route = remember(revision) {
+                if (context.checkSelfPermission(Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED)
+                    context.getSystemService(AudioManager::class.java).communicationDevice?.productName?.toString() ?: "No active communication route"
+                else "Routing permission not granted"
+            }
+            HorizontalDivider()
+            PreferenceValue("Output route", route)
         }
-        HorizontalDivider()
-        PreferenceValue("Output route", route)
-    }
     }
     SupportingDetails("Voice identity & audio") { Text("Voice identity is managed by OSCAR Core. Microphone permission alone does not enable listening. Audio processing and real-room playback need device commissioning.", style = MaterialTheme.typography.bodySmall) }
 }
@@ -116,8 +124,8 @@ import kotlinx.coroutines.withContext
     var unavailable by remember { mutableStateOf(false) }
     val selected = remember(revision) { VoiceInteractionService.isActiveService(context, ComponentName(context, AssistantService::class.java)) }
     PreferenceGroup("Android assistant") {
-        FeatureRow("OSCAR as your assistant", if (selected) "Selected" else "Not selected", "Phone")
-        Button(onClick = { try { if (role.isRoleAvailable(RoleManager.ROLE_ASSISTANT)) launcher.launch(role.createRequestRoleIntent(RoleManager.ROLE_ASSISTANT)) } catch (_: Exception) { unavailable = true } }, enabled = role.isRoleAvailable(RoleManager.ROLE_ASSISTANT), modifier = Modifier.fillMaxWidth()) { Text("Choose assistant") }
+        FeatureRow("OSCAR as your assistant", if (selected) "Selected" else "Not selected", "Android")
+        OscarButton(onClick = { try { if (role.isRoleAvailable(RoleManager.ROLE_ASSISTANT)) launcher.launch(role.createRequestRoleIntent(RoleManager.ROLE_ASSISTANT)) } catch (_: Exception) { unavailable = true } }, enabled = role.isRoleAvailable(RoleManager.ROLE_ASSISTANT), modifier = Modifier.fillMaxWidth()) { Text("Choose assistant") }
         if (unavailable) Text("Android assistant selection is unavailable; no role change is confirmed.", color = MaterialTheme.colorScheme.error)
         Text("Opens OSCAR when invoked. Listening and permissions stay separate.", style = MaterialTheme.typography.bodySmall)
     }

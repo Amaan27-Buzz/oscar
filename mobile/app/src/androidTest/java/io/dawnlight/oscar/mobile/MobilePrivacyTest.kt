@@ -55,6 +55,9 @@ class MobilePrivacyTest {
         compose.onNodeWithText("Privacy").performClick()
         compose.onNodeWithText("Choose notification sources").performScrollTo().performClick()
         compose.onNodeWithTag("notificationSources").performScrollTo().performTextInput("invalid")
+        compose.onNodeWithTag("notificationSources").assertTextContains("invalid")
+        androidx.test.espresso.Espresso.closeSoftKeyboard()
+        compose.waitUntil(5000) { !compose.activity.window.decorView.rootWindowInsets.isVisible(android.view.WindowInsets.Type.ime()) }
         compose.onNodeWithText("Save sources").performScrollTo().performClick()
         compose.onNodeWithText("Use up to 32 package IDs, such as example.app. Nothing was enabled.").assertExists()
         assertEquals("", prefs.getString("notification_sources", ""))

@@ -14,6 +14,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.Before
 import org.junit.After
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import java.io.File
 
 /** Disposable native Compose/reference evidence. No owner data or permission commissioning. */
@@ -144,6 +146,8 @@ class MobileCompletionTest {
         compose.waitUntil(10_000) { session.state.value.link == Link.CONNECTED }
         assertTrue(session.state.value.snapshot!!.tasks.any { it.state == "verified" && it.value == "5" })
         compose.onNodeWithTag("interactionInput").performTextInput("3 + 4")
+        androidx.test.espresso.Espresso.closeSoftKeyboard()
+        compose.waitUntil(5000) { !compose.activity.window.decorView.rootWindowInsets.isVisible(android.view.WindowInsets.Type.ime()) }
         compose.onNodeWithText("Send").performClick()
         compose.waitUntil(10_000) { session.state.value.interactions.lastOrNull()?.text == "3 + 4" && !session.state.value.busy }
         compose.onNodeWithText("Read response").performScrollTo().performClick()
@@ -211,14 +215,21 @@ class MobileCompletionTest {
         assertEquals("planned", parseTask(CoreClient(fixture).call("inspect", org.json.JSONObject().put("task_id", id))).state)
         val expiryEpoch = session.state.value.epoch
         val lifecycleEvents = mutableListOf<String>()
+        val boundaryEvents = mutableListOf<String>()
+        var boundaryWatch: kotlinx.coroutines.Job? = null
         val lifecycleObserver = androidx.lifecycle.LifecycleEventObserver { _, event -> lifecycleEvents.add(event.name) }
-        compose.runOnIdle { compose.activity.lifecycle.addObserver(lifecycleObserver) }
+        compose.runOnIdle {
+            compose.activity.lifecycle.addObserver(lifecycleObserver)
+            boundaryWatch = compose.activity.lifecycleScope.launch {
+                session.state.collect { boundaryEvents.add("${it.epoch}/${it.link}/${it.message}") }
+            }
+        }
         compose.waitUntil(35_000) { session.state.value.coreNow(System.currentTimeMillis()) >= approval.expiresAt }
         compose.runOnIdle { session.refreshNow() }
         compose.waitUntil(10_000) { session.state.value.observedAt > approval.expiresAt - 30_000 }
         compose.waitForIdle()
-        compose.runOnIdle { compose.activity.lifecycle.removeObserver(lifecycleObserver) }
-        assertNotNull("Expiry review lost: ${session.state.value.link}; ${session.state.value.message}; epoch $expiryEpoch -> ${session.state.value.epoch}; lifecycle $lifecycleEvents; interactive ${compose.activity.getSystemService(android.os.PowerManager::class.java).isInteractive}", session.state.value.approval)
+        compose.runOnIdle { compose.activity.lifecycle.removeObserver(lifecycleObserver); boundaryWatch?.cancel() }
+        assertNotNull("Expiry review lost: ${session.state.value.link}; ${session.state.value.message}; epoch $expiryEpoch -> ${session.state.value.epoch}; lifecycle $lifecycleEvents; boundary $boundaryEvents; interactive ${compose.activity.getSystemService(android.os.PowerManager::class.java).isInteractive}", session.state.value.approval)
         compose.onNodeWithText("Confirm securely").assertIsNotEnabled()
         closeReviewDetail(compose, "approvalDialog")
         assertNull(session.state.value.approval)

@@ -16,22 +16,20 @@ import kotlinx.coroutines.delay
     var reviewed by remember(approval.id) { mutableStateOf(approval.review == "{}") }
     LaunchedEffect(approval.id) { delay((approval.expiresAt - coreNow).coerceAtLeast(0)); expired = true }
     key(approval.id) { DetailPage("Decision", close, "approvalDialog") {
-        Row(Modifier.fillMaxWidth(), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
-            Column(Modifier.weight(1f)) {
-                EditorialHeading(when (approval.operation) {
-                    "approve" -> "Go ahead?"; "deny" -> "Decline this?"; "cancel" -> "Stop this task?"; "retry" -> "Continue?"; else -> "Send this reply?"
-                })
-            }
-            Illustration(R.drawable.illustration_decision, Modifier.width(112.dp), height = 128.dp)
-        }
+        IllustratedIntro(when (approval.operation) {
+            "approve" -> "Go ahead?"; "deny" -> "Decline this?"; "cancel" -> "Stop this task?"; "retry" -> "Continue?"; else -> "Send this reply?"
+        }, artwork = R.drawable.illustration_decision, height = 144.dp)
         SelectionContainer {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 TactileSurface(Modifier.fillMaxWidth()) {
-                    Text(if (approval.operation == "reply") "EXACT REPLY" else "REQUEST", style = MaterialTheme.typography.labelSmall)
+                    Row(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                        IconBadge(if (approval.operation == "reply") "Conversation" else "Document", Powder, 40.dp)
+                        Text(if (approval.operation == "reply") "EXACT REPLY" else "REQUEST", style = MaterialTheme.typography.labelLarge)
+                    }
                     Text(if (approval.operation == "reply" && replyPreview != null) replyPreview else approval.exactRequest.ifEmpty { approval.description }, style = MaterialTheme.typography.titleLarge)
                 }
                 Text(approval.consequence, style = MaterialTheme.typography.bodyMedium)
-                FeatureRow("Target", approval.target, "Devices")
+                FeatureRow("Target", approval.target, "Devices", Lilac)
                 SupportingDetails("Plan & permission details", onOpen = { reviewed = true }) {
                     if (approval.review != "{}") {
                         Text("Reviewed plan", style = MaterialTheme.typography.titleMedium)
@@ -45,7 +43,11 @@ import kotlinx.coroutines.delay
         }
         StatusLabel(if (expired || !current) "Decision expired or unavailable. Request a fresh review." else "One decision · Android confirmation required")
         if (!reviewed) StatusLabel("Open the plan details before confirming.")
-        Button(shape = MaterialTheme.shapes.medium, onClick = confirm, enabled = !busy && current && !expired && reviewed, colors = ButtonDefaults.buttonColors(containerColor = Sage), modifier = Modifier.fillMaxWidth()) { Text(if (approval.operation == "deny") "Confirm denial" else "Confirm securely") }
-        decline?.let { TextButton(onClick = it, enabled = !busy && current && !expired) { Text("Review denial") } }
+        OscarButton(onClick = confirm, enabled = !busy && current && !expired && reviewed, modifier = Modifier.fillMaxWidth()) {
+            Glyph("Check"); Text(if (approval.operation == "deny") "Confirm denial" else "Confirm securely")
+        }
+        decline?.let { OscarButton(onClick = it, enabled = !busy && current && !expired, outlined = true, modifier = Modifier.fillMaxWidth()) {
+            Glyph("Close"); Text("Review denial")
+        } }
     } }
 }

@@ -107,6 +107,7 @@ private val Ink = Color(0xFF1A1B18)
             Column(Modifier.fillMaxSize().padding(insets).widthIn(max = 720.dp)) {
                 Row(Modifier.fillMaxWidth().testTag("app-toolbar").padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
                     if (!primaryPage) IconButton(onClick = ::back, modifier = Modifier.testTag("page-back").semantics { contentDescription = "Back" }) { Glyph("Back") }
+                    if (primaryPage) { Box(Modifier.width(32.dp)) { OscarOrb(state, size = 28.dp, tag = "toolbar-orb") }; Spacer(Modifier.width(8.dp)) }
                     val pageTitle = when {
                         primaryPage -> "OSCAR"
                         voiceOpen -> "Voice"
@@ -124,9 +125,6 @@ private val Ink = Color(0xFF1A1B18)
                 Column(Modifier.weight(1f).fillMaxWidth().then(pageEntrance("$selected/$settingsPage/$conversationPage/$automationPage/$voiceOpen/${state.epoch}")).verticalScroll(pageScroll)
                     .padding(horizontal = 24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     Spacer(Modifier.height(4.dp))
-                    if (destination == Destination.OSCAR && conversationPage == "Conversation" && !voiceOpen && state.interactions.isNotEmpty()) {
-                        OscarOrb(state, composing = draft.isNotBlank(), size = 36.dp)
-                    }
                     when (destination) {
                         Destination.OSCAR -> if (voiceOpen) VoiceExperience(state, {
                             navigate(Destination.SETTINGS); settingsPage = "Privacy"
@@ -179,10 +177,10 @@ private val Ink = Color(0xFF1A1B18)
         Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text("Enter the connection details issued by your trusted Core.")
             Text("Connecting a different source clears the previous private draft and readback.")
-            OutlinedTextField(origin, { origin = it.take(256) }, label = { Text("Core address (HTTPS)") }, singleLine = true)
-            OutlinedTextField(node, { node = it.take(80) }, label = { Text("Device ID") }, singleLine = true)
-            OutlinedTextField(id, { id = it.take(80) }, label = { Text("Session ID") }, singleLine = true)
-            OutlinedTextField(token, { token = it.take(200) }, label = { Text("Connection token") }, singleLine = true,
+            OscarField(origin, { origin = it.take(256) }, label = "Core address (HTTPS)", singleLine = true)
+            OscarField(node, { node = it.take(80) }, label = "Device ID", singleLine = true)
+            OscarField(id, { id = it.take(80) }, label = "Session ID", singleLine = true)
+            OscarField(token, { token = it.take(200) }, label = "Connection token", singleLine = true,
                 visualTransformation = androidx.compose.ui.text.input.PasswordVisualTransformation(),
                 keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Password))
         }
@@ -192,11 +190,11 @@ private val Ink = Color(0xFF1A1B18)
         }) { Text("Connect") }
     })
 }
-@Composable fun OscarOrb(state: MobileState, composing: Boolean = false, size: Dp = 108.dp, reduced: Boolean = LocalReducedMotion.current) {
+@Composable fun OscarOrb(state: MobileState, composing: Boolean = false, size: Dp = 108.dp, reduced: Boolean = LocalReducedMotion.current, tag: String = "orb") {
     val voice by VoicePresentation.state.collectAsStateWithLifecycle()
     val adapter = remember(state.epoch) { MobileExpression(state.epoch) }
     val event = remember(state, composing, reduced, voice) { adapter.event(state, System.currentTimeMillis(), composing, reduced, voice.phase) }
     Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-        ExpressionPresence(event, adapter.source, size, reduced, Modifier.testTag("orb"))
+        ExpressionPresence(event, adapter.source, size, reduced, Modifier.testTag(tag))
     }
 }
