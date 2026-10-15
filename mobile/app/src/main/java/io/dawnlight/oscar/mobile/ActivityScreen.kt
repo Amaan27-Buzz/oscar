@@ -17,11 +17,7 @@ import androidx.compose.ui.unit.dp
     Text("Ongoing work", style = MaterialTheme.typography.bodySmall)
     if (state.snapshot == null) { Text("Connect Core to see your activity."); return }
     val completed = setOf("verified", "partially_verified", "failed", "cancelled")
-    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        listOf("Active", "Finished").forEach { name ->
-            FilterChip(selected = filter == name, onClick = { filter = name }, colors = FilterChipDefaults.filterChipColors(selectedContainerColor = Sage, selectedLabelColor = androidx.compose.ui.graphics.Color.White), label = { Text(name) })
-        }
-    }
+    ActivityFilters(filter) { filter = it }
     val tasks = state.snapshot.tasks.filter { (it.state in completed) == (filter == "Finished") }
     if (tasks.isEmpty()) Text(if (filter == "Active") "Nothing is waiting here." else "No finished tasks in this connection.")
     tasks.forEach { task ->

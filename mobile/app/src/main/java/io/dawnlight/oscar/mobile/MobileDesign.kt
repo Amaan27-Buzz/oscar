@@ -86,7 +86,7 @@ val OscarTypography = Typography(
         .dropShadow(shape, Shadow(5.dp, Color.White.copy(alpha = 0.14f), offset = DpOffset((-2).dp, (-2).dp))),
         shape = shape, color = MaterialTheme.colorScheme.surfaceContainer,
         border = androidx.compose.foundation.BorderStroke(0.5.dp, MaterialTheme.colorScheme.outlineVariant)) {
-        Column(Modifier.animateContentSize(tween(if (LocalReducedMotion.current) 0 else 180)).padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp), content = content)
+        Column(Modifier.animateContentSize(if (LocalReducedMotion.current) snap() else spring(dampingRatio = 0.9f, stiffness = 500f)).padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp), content = content)
     }
 }
 
@@ -94,7 +94,7 @@ val OscarTypography = Typography(
     val interaction = remember { MutableInteractionSource() }
     val pressed by interaction.collectIsPressedAsState()
     val reduced = LocalReducedMotion.current
-    val scale by animateFloatAsState(if (pressed && !reduced) 0.985f else 1f, tween(if (reduced) 0 else 120), label = "rowPress")
+    val scale by animateFloatAsState(if (pressed && !reduced) 0.985f else 1f, if (reduced) snap() else spring(dampingRatio = 0.8f, stiffness = 700f), label = "rowPress")
     Row(modifier.fillMaxWidth().heightIn(min = 64.dp)
         .graphicsLayer { scaleX = scale; scaleY = scale }
         .then(if (action != null) Modifier.clickable(interactionSource = interaction, indication = androidx.compose.material3.ripple(), onClick = action, role = Role.Button) else Modifier)
@@ -117,7 +117,7 @@ val OscarTypography = Typography(
 
 @Composable fun SupportingDetails(title: String, onOpen: () -> Unit = {}, content: @Composable ColumnScope.() -> Unit) {
     var open by remember { mutableStateOf(false) }
-    Column(Modifier.fillMaxWidth().animateContentSize(tween(if (LocalReducedMotion.current) 0 else 180))) {
+    Column(Modifier.fillMaxWidth().animateContentSize(if (LocalReducedMotion.current) snap() else spring(dampingRatio = 0.9f, stiffness = 500f))) {
         TextButton(onClick = { open = !open; if (open) onOpen() }, modifier = Modifier.semantics { stateDescription = if (open) "Expanded" else "Collapsed" }) {
             Text(title); Text(if (open) " −" else " +")
         }

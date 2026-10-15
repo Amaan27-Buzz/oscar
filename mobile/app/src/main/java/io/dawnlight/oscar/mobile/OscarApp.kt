@@ -2,14 +2,8 @@ package io.dawnlight.oscar.mobile
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.foundation.background
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -105,28 +99,10 @@ private val Ink = Color(0xFF1A1B18)
         state.message?.takeIf { it.isNotBlank() }?.let { notices.showSnackbar(it, withDismissAction = true, duration = SnackbarDuration.Long) }
     }
     val send = { focus.clearFocus(); keyboard?.hide(); session.send(draft); Unit }
-    val largeNavigationText = LocalDensity.current.fontScale > 1.3f
     OscarTheme(forceDark = destination == Destination.ACTIVITY || voiceOpen || (destination == Destination.SETTINGS && settingsPage == "Awareness")) {
         Scaffold(modifier = Modifier.imePadding(), containerColor = MaterialTheme.colorScheme.background,
             bottomBar = {
-            if (primaryPage) Surface(color = MaterialTheme.colorScheme.background) {
-                Row(Modifier.fillMaxWidth().testTag("primary-navigation").navigationBarsPadding().padding(horizontal = if (largeNavigationText) 0.dp else 16.dp)) {
-                    listOf(Destination.OSCAR, Destination.AUTOMATIONS, Destination.ACTIVITY).forEach { item ->
-                        val navColor by animateColorAsState(if (item == destination) MaterialTheme.colorScheme.secondaryContainer else Color.Transparent,
-                            tween(if (LocalReducedMotion.current) 0 else 180), label = "navigationSelection")
-                        TextButton(onClick = { navigate(item) }, contentPadding = PaddingValues(horizontal = 0.dp, vertical = 8.dp), modifier = Modifier.weight(if (largeNavigationText) item.label.length.toFloat() else 1f).heightIn(min = 64.dp)
-                            .testTag("destination-${item.name}").semantics { this.selected = item == destination }) {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                                Box(Modifier.size(width = 56.dp, height = 30.dp).background(navColor, CircleShape), contentAlignment = Alignment.Center) {
-                                    Glyph(item.label, color = if (item == destination) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onSurfaceVariant)
-                                }
-                                Text(item.label, style = MaterialTheme.typography.labelSmall, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
-                                    color = if (item == destination) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant)
-                            }
-                        }
-                    }
-                }
-            }
+            if (primaryPage) PrimaryNavigation(destination, ::navigate)
         }) { insets ->
             Column(Modifier.fillMaxSize().padding(insets).widthIn(max = 720.dp)) {
                 Row(Modifier.fillMaxWidth().testTag("app-toolbar").padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
