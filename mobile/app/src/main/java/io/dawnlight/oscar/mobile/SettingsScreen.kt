@@ -40,7 +40,7 @@ import kotlinx.coroutines.withContext
         "Awareness" -> AwarenessScreen { navigate("Privacy") }
         "Access" -> AccessScreen()
         "Memory" -> {
-            IllustratedIntro("Memory", artwork = R.drawable.illustration_book_green, height = 112.dp)
+            IllustratedIntro("Memory", artwork = R.drawable.illustration_reading, height = 112.dp)
             PreferenceGroup("History & recall") {
                 FeatureRow("OSCAR memory", "Managed by your Core", "Book", Lilac)
                 HorizontalDivider()
@@ -68,7 +68,7 @@ import kotlinx.coroutines.withContext
             }
         }
         else -> {
-            IllustratedIntro("Make OSCAR\nyours.", artwork = R.drawable.illustration_preferences, height = 144.dp)
+            IllustratedIntro("Make OSCAR", "yours.", artwork = R.drawable.illustration_preferences, height = 144.dp)
             val groups = listOf(
                 "Personal" to listOf(Triple("Persona", "Expression preview", "Persona"), Triple("Voice", "Audio & input", "Voice"), Triple("Accessibility", "Theme & motion", "Appearance")),
                 "Your context" to listOf(Triple("Privacy", "Permissions & capture", "Privacy"), Triple("Awareness", "Off", "Awareness"), Triple("Memory", "History & drafts", "Memory"), Triple("Notifications", "Alerts & replies", "Notifications")),

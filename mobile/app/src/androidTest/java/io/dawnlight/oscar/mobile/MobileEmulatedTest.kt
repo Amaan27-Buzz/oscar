@@ -27,7 +27,7 @@ class MobileEmulatedTest {
         compose.activityRule.scenario.recreate()
         compose.onNodeWithText("Your devices").assertIsDisplayed()
         navigateReview(compose, "SETTINGS")
-        compose.onNodeWithText("Privacy").performClick()
+        compose.onNodeWithText("Privacy").performScrollTo().performClick()
         compose.onNodeWithText("Perception").assertIsDisplayed()
         navigateReview(compose, "OSCAR")
         compose.onNodeWithTag("orb").assertExists()
@@ -87,7 +87,7 @@ class MobileEmulatedTest {
     }
     @Test fun privacyGrantDoesNotEnableCaptureOrAction() {
         navigateReview(compose, "SETTINGS")
-        compose.onNodeWithText("Privacy").performClick()
+        compose.onNodeWithText("Privacy").performScrollTo().performClick()
         val grant = compose.onNodeWithContentDescription("Allow microphone perception")
         grant.performScrollTo().performClick()
         compose.waitUntil(5000) { compose.activity.getSharedPreferences("permissions", Context.MODE_PRIVATE).getBoolean("microphone_perception", false) }

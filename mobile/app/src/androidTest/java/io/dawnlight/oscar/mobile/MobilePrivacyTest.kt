@@ -52,7 +52,7 @@ class MobilePrivacyTest {
 
     @Test fun invalidSourcesDeniedAccessAndLiveLocalRevocationRemainUsable() {
         navigateReview(compose, "SETTINGS")
-        compose.onNodeWithText("Privacy").performClick()
+        compose.onNodeWithText("Privacy").performScrollTo().performClick()
         compose.onNodeWithText("Choose notification sources").performScrollTo().performClick()
         compose.onNodeWithTag("notificationSources").performScrollTo().performTextInput("invalid")
         compose.onNodeWithTag("notificationSources").assertTextContains("invalid")

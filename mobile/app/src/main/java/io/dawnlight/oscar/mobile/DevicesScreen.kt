@@ -44,8 +44,8 @@ import androidx.compose.animation.core.tween
             val (icon, color) = when (node.role) {
                 "OSCAR Mobile" -> "Phone" to Sage
                 "Desktop" -> "Devices" to Powder
-                "Cloud", "Core" -> "Goal" to Clay
-                "Edge" -> "Retain" to Lilac
+                "Cloud", "Core" -> "Cloud" to Clay
+                "Edge" -> "Edge" to Lilac
                 else -> "Devices" to Sage
             }
             TactileSurface(Modifier.fillMaxWidth()) {

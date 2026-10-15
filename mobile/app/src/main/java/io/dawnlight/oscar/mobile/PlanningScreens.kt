@@ -16,7 +16,7 @@ import androidx.activity.compose.BackHandler
     var timing by remember(state.epoch) { mutableStateOf("") }
     when (page) {
         "Worker" -> {
-            IllustratedIntro("No Worker assigned", artwork = R.drawable.illustration_worker_brief, height = 136.dp)
+            IllustratedIntro("No Worker assigned", artwork = R.drawable.illustration_worker, height = 136.dp)
             Text("Continuing responsibilities aren't available yet.", style = MaterialTheme.typography.bodyMedium)
             OscarButton(onClick = {}, enabled = false, modifier = Modifier.fillMaxWidth()) { Text("Run Worker · unavailable") }
             SupportingDetails("Responsibility & scope") {
@@ -28,9 +28,12 @@ import androidx.activity.compose.BackHandler
             }
         }
         "Create" -> {
+            if (LocalPageArtwork.current == R.drawable.oscar_orb) IllustratedIntro("What should\nOSCAR do?", artwork = R.drawable.oscar_orb)
+            else {
             Row(Modifier.fillMaxWidth(), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) { EditorialHeading("What should\nOSCAR do?") }
                 Box(Modifier.width(80.dp)) { OscarOrb(state, size = 80.dp) }
+            }
             }
             StatusLabel("Draft only · scheduling unavailable")
             OscarField(responsibility, { responsibility = it.take(1000) }, modifier = Modifier.fillMaxWidth().testTag("automationDraft"),
@@ -80,6 +83,7 @@ import androidx.activity.compose.BackHandler
 }
 
 @Composable fun AccessScreen() {
+    IllustratedIntro("Access", "On your terms.", R.drawable.oscar_orb)
     PreferenceGroup("Current mode", flat = true) {
         TactileSurface(Modifier.fillMaxWidth().border(1.dp, Sage, RoundedCornerShape(18.dp))) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,

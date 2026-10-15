@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable fun ActivityScreen(state: MobileState, inspect: (String) -> Unit, review: (CoreTask, String) -> Unit) {
     var filter by remember(state.epoch) { mutableStateOf("Active") }
-    IllustratedIntro("Activity", "Ongoing work", R.drawable.illustration_task, height = 104.dp)
+    EditorialHeading("Activity", "Ongoing work")
     if (state.snapshot == null) { Text("Connect Core to see your activity."); return }
     val completed = setOf("verified", "partially_verified", "failed", "cancelled")
     ActivityFilters(filter) { filter = it }

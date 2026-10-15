@@ -94,6 +94,8 @@ val OscarTypography = Typography(
         R.drawable.illustration_task -> R.drawable.illustration_task_cutout
         R.drawable.illustration_today -> R.drawable.illustration_today_cutout
         R.drawable.illustration_awareness -> R.drawable.illustration_awareness_cutout
+        R.drawable.illustration_worker -> R.drawable.illustration_worker_cutout
+        R.drawable.illustration_reading -> R.drawable.illustration_reading_cutout
         else -> resource
     }
     val light = MaterialTheme.colorScheme.background == Color(0xFFF5F1E7)
@@ -110,7 +112,29 @@ val OscarTypography = Typography(
         }, contentScale = ContentScale.Fit)
 }
 
-@Composable fun IllustratedIntro(title: String, subtitle: String? = null, artwork: Int, height: Dp = 124.dp) {
+@Composable fun IllustratedIntro(title: String, subtitle: String? = null, artwork: Int, height: Dp = 124.dp, maxLines: Int = Int.MAX_VALUE) {
+    if (LocalPageArtwork.current == artwork) {
+        val wide = artwork == R.drawable.illustration_automations
+        val clearance = when (artwork) {
+            R.drawable.illustration_reading -> 130.dp
+            R.drawable.illustration_preferences -> 174.dp
+            R.drawable.illustration_awareness -> 240.dp
+            R.drawable.illustration_today -> 226.dp
+            R.drawable.oscar_orb -> 162.dp
+            else -> 194.dp
+        }
+        Column(Modifier.fillMaxWidth().padding(bottom = 10.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            if (!wide) Spacer(Modifier.height(clearance))
+            Box(Modifier.fillMaxWidth().then(if (wide) Modifier.heightIn(min = 244.dp) else Modifier)) {
+            Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(title, style = MaterialTheme.typography.displaySmall, maxLines = maxLines,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis, modifier = Modifier.semantics { heading() })
+                subtitle?.let { Text(it, style = MaterialTheme.typography.headlineLarge.copy(fontStyle = FontStyle.Italic), color = MaterialTheme.colorScheme.onSurfaceVariant) }
+            }
+            }
+        }
+        return
+    }
     val artWidth = if (androidx.compose.ui.platform.LocalDensity.current.fontScale > 1.3f) 80.dp else height * 1.15f
     Row(Modifier.fillMaxWidth().heightIn(min = height), verticalAlignment = Alignment.CenterVertically) {
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -142,7 +166,7 @@ val OscarTypography = Typography(
 @Composable fun TactileSurface(modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
     val shape = RoundedCornerShape(18.dp)
     Surface(modifier.dropShadow(shape, Shadow(8.dp, Color.Black.copy(alpha = 0.07f), offset = DpOffset(3.dp, 4.dp)))
-        .dropShadow(shape, Shadow(5.dp, Color.White.copy(alpha = 0.14f), offset = DpOffset((-2).dp, (-2).dp))),
+        .dropShadow(shape, Shadow(5.dp, Color.White.copy(alpha = if (MaterialTheme.colorScheme.background.luminance() < 0.2f) 0.025f else 0.14f), offset = DpOffset((-2).dp, (-2).dp))),
         shape = shape, color = MaterialTheme.colorScheme.surfaceContainer,
         border = androidx.compose.foundation.BorderStroke(0.5.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.65f))) {
         Column(Modifier.animateContentSize(if (LocalReducedMotion.current) snap() else spring(dampingRatio = 0.9f, stiffness = 500f)).padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp), content = content)
@@ -204,6 +228,8 @@ val OscarTypography = Typography(
             "Add" -> { line(12f,4f,12f,20f); line(4f,12f,20f,12f) }
             "Devices" -> { drawRoundRect(color,androidx.compose.ui.geometry.Offset(2*s,4*s),androidx.compose.ui.geometry.Size(20*s,13*s),androidx.compose.ui.geometry.CornerRadius(2*s),style=stroke); line(12f,17f,12f,21f); line(7f,21f,17f,21f) }
             "Phone" -> { drawRoundRect(color,androidx.compose.ui.geometry.Offset(6*s,2*s),androidx.compose.ui.geometry.Size(12*s,20*s),androidx.compose.ui.geometry.CornerRadius(2*s),style=stroke); line(10f,18f,14f,18f) }
+            "Cloud" -> drawPath(Path().apply { moveTo(6*s,19*s); cubicTo(-1*s,19*s,0*s,9*s,7*s,10*s); cubicTo(6*s,1*s,20*s,1*s,20*s,11*s); cubicTo(26*s,12*s,24*s,19*s,19*s,19*s); close() }, color, style = stroke)
+            "Edge" -> { drawOval(color,androidx.compose.ui.geometry.Offset(3*s,6*s),androidx.compose.ui.geometry.Size(18*s,6*s),style=stroke); line(3f,9f,3f,16f); line(21f,9f,21f,16f); drawArc(color,0f,180f,false,androidx.compose.ui.geometry.Offset(3*s,13*s),androidx.compose.ui.geometry.Size(18*s,6*s),style=stroke); line(10f,15f,14f,15f) }
             "Privacy", "Shield" -> path(12f to 2f,21f to 6f,20f to 15f,12f to 22f,4f to 15f,3f to 6f,12f to 2f)
             "Access" -> { drawRoundRect(color, androidx.compose.ui.geometry.Offset(3*s,3*s), androidx.compose.ui.geometry.Size(18*s,14*s), androidx.compose.ui.geometry.CornerRadius(5*s), style=stroke); path(5f to 16f,4f to 22f,11f to 17f) }
             "Memory", "Book" -> { drawRoundRect(color,androidx.compose.ui.geometry.Offset(4*s,3*s),androidx.compose.ui.geometry.Size(16*s,18*s),androidx.compose.ui.geometry.CornerRadius(2*s),style=stroke); line(8f,3f,8f,21f); line(11f,8f,17f,8f); line(11f,12f,17f,12f) }
@@ -234,7 +260,16 @@ val OscarTypography = Typography(
             "Close" -> { line(5f,5f,19f,19f); line(5f,19f,19f,5f) }
             "More" -> listOf(5f,12f,19f).forEach { drawCircle(color,1.5f*s,androidx.compose.ui.geometry.Offset(12*s,it*s)) }
             "Android" -> { drawRoundRect(color,androidx.compose.ui.geometry.Offset(5*s,7*s),androidx.compose.ui.geometry.Size(14*s,11*s),androidx.compose.ui.geometry.CornerRadius(3*s),style=stroke); line(7f,3f,9f,7f); line(17f,3f,15f,7f); line(8f,18f,8f,22f); line(16f,18f,16f,22f); line(2f,9f,2f,16f); line(22f,9f,22f,16f); drawCircle(color,0.9f*s,androidx.compose.ui.geometry.Offset(9*s,11*s)); drawCircle(color,0.9f*s,androidx.compose.ui.geometry.Offset(15*s,11*s)) }
-            "Preferences" -> { drawCircle(color,4*s,style=stroke); for (angle in 0..7) { val radians=angle*Math.PI/4; val x=kotlin.math.cos(radians).toFloat(); val y=kotlin.math.sin(radians).toFloat(); line(12+7*x,12+7*y,12+10*x,12+10*y) } }
+            "Preferences" -> {
+                drawPath(Path().apply { for (i in 0..31) {
+                    val angle = i * Math.PI / 16 - Math.PI / 2
+                    val radius = if (i % 4 in 1..2) 10.5f else 8f
+                    val x = (12 + radius * kotlin.math.cos(angle).toFloat()) * s
+                    val y = (12 + radius * kotlin.math.sin(angle).toFloat()) * s
+                    if (i == 0) moveTo(x,y) else lineTo(x,y)
+                }; close() }, color, style = stroke)
+                drawCircle(color,3.2f*s,style=stroke)
+            }
             else -> { for (y in listOf(6f,12f,18f)) { line(3f,y,21f,y); drawCircle(color,2.5f*s,androidx.compose.ui.geometry.Offset((if(y==12f) 16f else 8f)*s,y*s)) } }
         }
     }
@@ -243,13 +278,25 @@ val OscarTypography = Typography(
 @Composable fun DetailPage(title: String, close: () -> Unit, tag: String, content: @Composable ColumnScope.() -> Unit) {
     Dialog(onDismissRequest = close, properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false)) {
         Surface(Modifier.fillMaxSize().testTagCompat(tag), color = MaterialTheme.colorScheme.background) {
+            val scroll = rememberScrollState()
+            val artwork = when (tag) {
+                "taskInspector" -> R.drawable.illustration_task
+                "approvalDialog" -> R.drawable.illustration_decision
+                "responseDialog" -> R.drawable.illustration_reading
+                else -> null
+            }
+            CompositionLocalProvider(LocalPageArtwork provides artwork) {
+            Box(Modifier.fillMaxSize()) {
+            PageArtwork(artwork, scroll)
             Column(Modifier.safeDrawingPadding().imePadding()) {
                 Row(Modifier.fillMaxWidth().padding(horizontal = 12.dp), verticalAlignment = Alignment.CenterVertically) {
                     IconButton(onClick = close, modifier = Modifier.semantics { contentDescription = "Back" }) { Glyph("Back") }
                     Text(title, style = MaterialTheme.typography.bodyMedium)
                 }
                 Column(Modifier.weight(1f).widthIn(max = 720.dp).fillMaxWidth().align(Alignment.CenterHorizontally).then(pageEntrance(tag))
-                    .verticalScroll(rememberScrollState()).padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp), content = content)
+                    .verticalScroll(scroll).padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp), content = content)
+            }
+            }
             }
         }
     }

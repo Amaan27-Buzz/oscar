@@ -124,6 +124,36 @@
         255
       ],
       "prompt": "Use case: background-extraction. Edit only supplied OSCAR quiet evening papercut illustration. Preserve the dark green closed notebook with gold pause emblem, coffee mug, potted leafy plant and warm amber-lit window with foliage shadows, original texture/palette/arrangement/proportions/cropping. Remove the rectangular dark room canvas and the stray white UI dot at top-right plus all clipped UI row fragments at the bottom. Keep an organic wooden desktop grounding shape directly beneath notebook/mug, window frame and plant, with genuinely transparent alpha surrounding the scene. Soft edges/contact shadows, no enclosing rectangle. No added subjects, no text/UI/Orb, no redesign. Transparent PNG."
+    },
+    "worker": {
+      "source": "mobile/app/src/main/res/drawable-nodpi/illustration_worker.png",
+      "source_sha256": "5206da200462fa4ad0c49ab5c447e374e88bfc5e81f39079b3ef76aee714378e",
+      "output": "mobile/app/src/main/res/drawable-nodpi/illustration_worker_cutout.png",
+      "output_sha256": "891065572d6704dddd00d4d378d8b21d188396f226818ec9428579b3a5fd8945",
+      "dimensions": [
+        1373,
+        1145
+      ],
+      "alpha_range": [
+        0,
+        255
+      ],
+      "prompt": "Use case: background-extraction and high-resolution asset refinement. Edit target is the supplied OSCAR Worker papercut art. Create a crisp high resolution transparent cutout preserving its exact folded-paper identity, arrangement and palette: green folded outer ribbon, ivory strip and paper backing, ochre-yellow folded band and backing, clay-red lower panel, and three small yellow/clay/green accent strokes. Preserve proportions, existing edge crops, tactile paper grain and soft contact shadows. Remove the surrounding cream canvas, pale sage backdrop blob, and unnatural transparent rectangular notch at lower left; exterior around the existing subject must be real alpha transparency. Do not add or reconstruct off-canvas subjects. No Orb, lettering, UI, watermark or scene redesign. Sharpen the actual paper detail for use as large native artwork; avoid blurry upscaled pixels. Transparent PNG."
+    },
+    "reading": {
+      "source": "mobile/app/src/main/res/drawable-nodpi/illustration_reading.png",
+      "source_sha256": "692c30eb9b1f567b9085f1c93ba9f49371d53d046c8082fd105e1ab65a11be6a",
+      "output": "mobile/app/src/main/res/drawable-nodpi/illustration_reading_cutout.png",
+      "output_sha256": "d4d10d1269f4e1761b620b5161b14f1f57df4f6b04f33614c509e57d1502466c",
+      "dimensions": [
+        1272,
+        1236
+      ],
+      "alpha_range": [
+        0,
+        255
+      ],
+      "prompt": "Use case: background-extraction and high-resolution asset refinement. Edit target is supplied OSCAR reading papercut illustration. Preserve exactly the ivory spiral notebook with faint ruled paper, green-and-gold pen and green leafy sprig, their layout, proportions, cropping, tactile paper textures, ivory/green/gold palette and soft contact shadows. Make a crisp high resolution transparent PNG cutout with fine paper detail suitable as large native artwork. Remove surrounding cream rectangular canvas and remove the unnatural rectangular notch at lower left by leaving real alpha around the existing subject; keep all interior white notebook paper. Retain a small organic pale paper grounding shape directly beneath subjects. No text, UI, Orb, new objects or scene redesign, and do not reconstruct off-canvas objects."
     }
   }
 }

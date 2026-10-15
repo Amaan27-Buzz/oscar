@@ -1,6 +1,7 @@
 package io.dawnlight.oscar.mobile
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -100,7 +101,29 @@ private val Ink = Color(0xFF1A1B18)
     }
     val send = { focus.clearFocus(); keyboard?.hide(); session.send(draft); Unit }
     OscarTheme(forceDark = destination == Destination.ACTIVITY || voiceOpen || (destination == Destination.SETTINGS && settingsPage == "Awareness")) {
-        Scaffold(modifier = Modifier.imePadding(), containerColor = MaterialTheme.colorScheme.background,
+        val pageArtwork = when {
+            voiceOpen -> null
+            destination == Destination.OSCAR && conversationPage == "Today" -> R.drawable.illustration_today
+            destination == Destination.OSCAR && state.interactions.isEmpty() && draft.isBlank() -> R.drawable.illustration_home
+            destination == Destination.DEVICES -> R.drawable.illustration_devices
+            destination == Destination.AUTOMATIONS -> when (automationPage) {
+                "Worker" -> R.drawable.illustration_worker
+                "Create" -> R.drawable.oscar_orb
+                else -> R.drawable.illustration_automations
+            }
+            destination == Destination.SETTINGS -> when (settingsPage) {
+                "Settings", "Voice" -> R.drawable.illustration_preferences
+                "Awareness" -> R.drawable.illustration_awareness
+                "Access" -> R.drawable.oscar_orb
+                "Memory" -> R.drawable.illustration_reading
+                else -> null
+            }
+            else -> null
+        }
+        CompositionLocalProvider(LocalPageArtwork provides pageArtwork) {
+        Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+        PageArtwork(pageArtwork, pageScroll, state)
+        Scaffold(modifier = Modifier.imePadding(), containerColor = Color.Transparent, contentColor = MaterialTheme.colorScheme.onBackground,
             bottomBar = {
             if (primaryPage) PrimaryNavigation(destination, ::navigate)
         }) { insets ->
@@ -152,6 +175,8 @@ private val Ink = Color(0xFF1A1B18)
                     }
                 }
             }
+        }
+        }
         }
         if (pairing) PairingDialog({ pairing = false }) { json -> pairing = false; session.connect(json) }
         state.inspected?.let { TaskInspector(it, session::closeInspector, { task, action -> session.closeInspector(); session.review(task, action) }, state.link == Link.CONNECTED && !state.busy) }

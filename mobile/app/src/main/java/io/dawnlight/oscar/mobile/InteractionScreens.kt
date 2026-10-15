@@ -33,7 +33,10 @@ import androidx.compose.ui.unit.DpOffset
             Box(Modifier.width(80.dp)) { OscarOrb(state, composing = draft.isNotBlank(), size = 80.dp) }
         }
         Column(Modifier.fillMaxWidth().animateContentSize(tween(if (LocalReducedMotion.current) 0 else 220))) {
-            if (draft.isBlank()) Illustration(R.drawable.illustration_home, height = 180.dp)
+            if (draft.isBlank()) {
+                if (LocalPageArtwork.current == R.drawable.illustration_home) Spacer(Modifier.height(200.dp))
+                else Illustration(R.drawable.illustration_home, height = 180.dp)
+            }
         }
         Text(when {
             state.link == Link.DEGRADED -> "Connection needs attention"
@@ -110,13 +113,7 @@ import androidx.compose.ui.unit.DpOffset
 
 @Composable internal fun ResponseDialog(interaction: Interaction, task: CoreTask?, close: () -> Unit) {
     DetailPage("Reading", close, "responseDialog") {
-        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text("OSCAR", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Text(interaction.text, style = MaterialTheme.typography.titleLarge, maxLines = 3, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis, modifier = Modifier.semantics { heading() })
-            }
-            Illustration(R.drawable.illustration_book_green, Modifier.width(72.dp), height = 86.dp)
-        }
+        IllustratedIntro(interaction.text, artwork = R.drawable.illustration_reading, maxLines = 3)
         if (interaction.text.length > 140) SupportingDetails("Original request") { Text(interaction.text) }
         StatusLabel(if (task?.response != null) "Reported response" else task?.label ?: if (interaction.taskId == null) "Core response" else "Outcome unknown")
         if (task?.responseTruncated == true) StatusLabel("Bounded excerpt. Core returned only part of this response.")
