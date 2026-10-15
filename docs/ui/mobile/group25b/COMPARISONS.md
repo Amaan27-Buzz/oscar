@@ -16,10 +16,10 @@ are deliberately not copied from the concepts.
 |---|---|---|---|
 | 01 | [Home](comparisons/01-oscar-home.jpg) | Matched warm palette, editorial greeting/side Orb and original notebook. Replaced heavy accent font with Fraunces 400 italic; pinned composer, tactile material and compacting motion | No fabricated owner greeting/calendar appointment; offline connection state |
 | 02 | [Conversation](comparisons/02-continuous-conversation.jpg) | Chronological native text, powder user messages, selectable responses, pinned composer, task references | Bounded current-session Core readback; archived history and attachments not exposed |
-| 03 | [Reading](comparisons/03-expanded-reading.jpg) | Native full-screen reading/selection/scroll; original notebook artwork; actual complete bounded response and follow-up | Content supplied by Core or explicit test fixture, no hardcoded article; independent evidence distinctions |
+| 03 | [Reading](comparisons/03-expanded-reading.jpg) | Content-first native reading/selection/scroll; compact request, complete bounded response and follow-up; source details on demand | Owner density correction removes decorative reading artwork; no hardcoded article or implied independent verification |
 | 04 | [Voice](comparisons/04-voice-interaction.jpg) | Graphite immersive composition, centred canonical Orb/status, lighter editorial accent and actual start/cancel/grant controls | Microphone off/uncommissioned adapter; no fabricated waveform, playback or active-listening indicator |
 | 05 | [Automations](comparisons/05-automations-overview.jpg) | Original checklist artwork, restrained sage button, responsibility navigation; removed irrelevant repeated connection footer | Persistent scheduling unavailable; no fake active example schedules |
-| 06 | [Worker](comparisons/06-worker-detail.jpg) | Woven original identity artwork, editorial side composition, responsibility/scope/devices/autonomy/link rows | Worker unconfigured, Run unavailable; does not invent Morning Brief or a chatbot personality |
+| 06 | [Worker](comparisons/06-worker-detail.jpg) | Owner correction removes the promotional hero; compact assignment status, unavailable Run and scope disclosure | Worker unconfigured; does not invent Morning Brief or a chatbot personality |
 | 07 | [Create](comparisons/07-create-automation.jpg) | Native responsibility/timing draft, canonical side Orb, scope/autonomy/access review; keyboard-aware scrolling | Creation unavailable; temporary draft can be discussed with Core, never deployed as a schedule |
 | 08 | [Activity](comparisons/08-activity-feed.jpg) | Graphite theme/sage filters and tactile timeline rows; removed duplicated descriptions and primary debugger metadata | Current Core work or honest disconnected feed, no invented sample events |
 | 09 | [Task](comparisons/09-active-task.jpg) | Original laptop artwork, full-screen task/status/result/evidence; fresh Core-advertised actions | No invented pause/progress; target/verification detail reflects actual readback |
@@ -28,7 +28,7 @@ are deliberately not copied from the concepts.
 | 12 | [Awareness](comparisons/12-sentry-awareness.jpg) | Original evening-room artwork, graphite surface, sage Manual selection and independent privacy rows | Sentry/trigger/capture uncommissioned; no false activation or observation |
 | 13 | [Today](comparisons/13-today-chief-of-staff.jpg) | Illustrated day path, editorial date/heading and native planning entry; fixed inherited scroll clipping | Provider/calendar/weather/communications unavailable, no invented commitments |
 | 14 | [Access](comparisons/14-access-modes.jpg) | Canonical Orb, Ask/Secure/genuine Full Access semantics, clear unavailable activation | Signed delegation/revocation not integrated; controls cannot bypass confirmation |
-| 15 | [Preferences](comparisons/15-preferences.jpg) | Original stationery artwork beside editorial heading; coherent semantic list and appearance/privacy/system access; fixed inherited scroll clipping | Core-only persona/memory settings remain unavailable; Android integrations retain native boundaries |
+| 15 | [Preferences](comparisons/15-preferences.jpg) | Owner correction removes the promotional artwork/heading; coherent settings list, one Back bar and compact subtitles | Core-only persona/memory settings remain unavailable; Android integrations retain native boundaries |
 
 Native images and comparison panels are indexed by `capture-manifest.json` after
 the final device run. Initial captures exposed stale page scroll positions,
@@ -42,14 +42,18 @@ transitions (180ms), responsive row presses (120ms), tactile/expansion sizing
 is retained across an authority/source epoch. Reduced-motion mode renders
 immediately. Native frame sampling verifies intermediate and settled frames.
 
-Review-visible differences: Devices and Preferences retain the three-tab bar
-for immediate return to primary work; concepts show fewer controls on those
-secondary views. Native rows use compact vector glyphs, and illustration crops,
+Owner's whole-app correction: secondary pages now use one titled Back bar,
+without the three-tab bar or repeated body Back buttons. Native rows use
+compact vector glyphs, and illustration crops,
 spacing and text lengths differ where real unavailable states replace reference
 examples. These are review candidates, not pixel-perfect or owner-approved
 claims. Conversation/Reading/Task/Decision hero fixtures exercise production
 composables with labelled synthetic inputs; the separate Core-flow captures
 exercise the full app scaffold against a real disposable Core/Grid HTTP runtime.
+
+The subsequent comprehensive review includes all settings routes and the
+connection dialog. See [the complete screen ledger](SCREEN-REVIEW.md), current
+secondary captures in `screens/`, and the supplemental `app-review.json` receipt.
 
 The owner's phone review identified overly dense supporting copy and raw
 Markdown/JSON presentation. Responses now use native rich text, twelve-line

@@ -185,3 +185,31 @@ readback; no sample devices, background awareness or power controls are invented
 The supplemental `devices-review.json` records this focused follow-up separately
 from the earlier full-suite receipt. Current disconnected/connected captures and
 the refreshed comparison are provided for owner visual review.
+
+## Whole-app owner correction — 2026-10-15
+
+The owner expanded the review to every screen, citing dense copy, duplicated
+navigation and a developer-facing feel. [SCREEN-REVIEW.md](SCREEN-REVIEW.md)
+records all 15 hero experiences, nine additional settings pages and the
+connection dialog. Secondary routes now have one Back bar, no bottom tabs and
+no repeated body Back controls. Preferences, Worker and Reading lose decorative
+headers that competed with their purpose; technical explanations remain behind
+details. Conversation no longer repeats its active task summary. Voice has one
+contextual start/stop control. Grant scope, unavailable capabilities, exact
+decisions, freshness, expiry and native confirmation remain intact.
+
+Transient status notices reserve layout space and cannot cover the composer or
+settings rows. Their state resets on privacy/source epochs. The updated native
+route review checks nested Back paths, the invoking tab, every settings page,
+the connection dialog and Voice return to the preserved composer. Current
+screens and tests are recorded separately in `app-review.json`; earlier receipts
+remain historical evidence for their named implementation and APK hashes.
+
+Current follow-up results: 28 unique native checks pass after the full run and
+focused reruns; four intentional skips retain their stated opt-in/system-setting
+boundaries. The final five checks pass the complete screen tour, three native
+hero/render tests and the strengthened 1.8× text/keyboard flow. Both APKs build,
+28 JVM tests pass and lint reports zero errors / 12 warnings (four are preserved
+unused illustration resources). The final normal APK was updated without a
+data reset, its installed SHA-256 matches the build, and its Activity is verified
+in the foreground. The temporary Core fixture and emulator are stopped.
