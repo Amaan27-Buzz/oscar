@@ -3,6 +3,16 @@
 Status: **IMPLEMENTATION COMPLETE / OWNER REVIEW PENDING**.
 Owner visual and physical phone acceptance are pending. Gate C remains PARTIAL.
 
+**Fluid motion follow-up — 2026-10-15:** bottom navigation remains full-width
+and attached to the bottom, with a travelling marker that stretches and settles.
+Activity filters share that motion; tactile sections and disclosures now use
+damped expansion and press springs. [Motion review and native frame preview](MOTION-REVIEW.md).
+The final installed build has its own [motion receipt](motion-review.json);
+earlier Preferences and prompt-audit APK receipts remain historical.
+Final verification: 31 native tests passed, four intentional conditions skipped,
+zero failures; 28 JVM and 24 Python checks passed. Assembly/lint passed with zero
+errors and 13 warnings. The updated normal app is installed on the phone.
+
 **Preferences follow-up — 2026-10-15:** the root and all 11 subpages now use
 grouped controls, concise status rows and distinct page layouts. See the
 [current Preferences review](PREFERENCES-REVIEW.md), including normal-text and

@@ -1,5 +1,9 @@
 # Preferences redesign — 2026-10-15
 
+The later [fluid motion follow-up](MOTION-REVIEW.md) updates bottom navigation,
+Activity filters and shared expansion/press behavior. This page retains the
+Preferences layout captures and APK receipt from its own review.
+
 The owner requested a redesign of the Preferences subpages after the whole-app
 review. This follow-up replaces loose text and links with grouped native controls,
 short status rows and page-specific layouts. It preserves the original reference

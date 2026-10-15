@@ -9,6 +9,8 @@ owner biometric/voice/provider acceptance. Owner visual approval is pending.
 The owner's later [Preferences redesign](PREFERENCES-REVIEW.md) supersedes the
 Awareness, Access and Preferences compositions in this comparison set. Those
 original comparisons remain preserved alongside their historical receipts.
+The subsequent [motion follow-up](MOTION-REVIEW.md) also supersedes the static
+selection style in primary-screen captures with an anchored travelling marker.
 
 Source originals are 841×1870. Comparison panels preserve aspect ratio and use
 equal display widths; no production screenshot was stretched or painted over.

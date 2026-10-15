@@ -11,6 +11,10 @@ compositions below. Its current screenshots cover the root and all 11 subpages
 at normal size and dark 1.8× text. Older captures remain tied to their original
 verification receipts.
 
+The subsequent [motion review](MOTION-REVIEW.md) replaces the static navigation
+selection with an anchored travelling marker and adds fluid filter/expansion
+behavior. Its receipt supersedes earlier installed-APK hashes.
+
 Primary Conversation, Automations and Activity retain one shared three-tab bar.
 Secondary pages have one titled Back bar and no bottom tabs or duplicate body
 Back buttons. Back returns to the invoking primary tab; Privacy reached from
