@@ -138,13 +138,14 @@
       "reference": "design/oscar-mobile-visual-exploration/screens/11-devices.png",
       "reference_sha256": "0a6b02476d1e7a1492f95a632a9e3eb2a89265374df878d77959959b19ad5710",
       "native": "native/11-devices.png",
-      "native_sha256": "79b5234fb6b20eadabc2b02506abea14a2e71792d61800203551c03e6ec87439",
+      "native_sha256": "6dbff755c97333fd6bf56cda134781e2cd14a21ac5f865fd39a7e06422450950",
       "comparison": "comparisons/11-devices.jpg",
       "native_pixels": [
         1080,
         2340
       ],
-      "evidence_class": "REAL_DEVICE_RENDERING_DISPOSABLE_REFERENCE"
+      "evidence_class": "REAL_DEVICE_RENDERING_DISPOSABLE_REFERENCE",
+      "revision_verification": "devices-review.json"
     },
     {
       "experience": "12-sentry-awareness",

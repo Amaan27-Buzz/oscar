@@ -142,6 +142,7 @@ val OscarTypography = Typography(
             "Voice" -> { drawRoundRect(color,androidx.compose.ui.geometry.Offset(9*s,3*s),androidx.compose.ui.geometry.Size(6*s,12*s),androidx.compose.ui.geometry.CornerRadius(3*s),style=stroke); path(5f to 11f,5f to 16f,12f to 19f,19f to 16f,19f to 11f); line(12f,19f,12f,23f) }
             "Add" -> { line(12f,4f,12f,20f); line(4f,12f,20f,12f) }
             "Devices" -> { drawRoundRect(color,androidx.compose.ui.geometry.Offset(2*s,4*s),androidx.compose.ui.geometry.Size(20*s,13*s),androidx.compose.ui.geometry.CornerRadius(2*s),style=stroke); line(12f,17f,12f,21f); line(7f,21f,17f,21f) }
+            "Phone" -> { drawRoundRect(color,androidx.compose.ui.geometry.Offset(6*s,2*s),androidx.compose.ui.geometry.Size(12*s,20*s),androidx.compose.ui.geometry.CornerRadius(2*s),style=stroke); line(10f,18f,14f,18f) }
             else -> { for (y in listOf(6f,12f,18f)) { line(3f,y,21f,y); drawCircle(color,2.5f*s,androidx.compose.ui.geometry.Offset((if(y==12f) 16f else 8f)*s,y*s)) } }
         }
     }

@@ -171,3 +171,17 @@ Physical review-package process replacement is verified: a synthetic encrypted
 draft was prepared, the app PID was replaced with scoped force-stop/relaunch,
 and Android's resulting UI contained the recovered draft. The fixture was then
 cleared. This is recovery evidence, not owner microphone or biometric acceptance.
+
+## Devices owner correction — 2026-10-15
+
+The owner rejected the illustration-led Devices page as promotional and too
+text-heavy. Devices now starts with a compact local-phone connection row and
+actual Core-reported device rows. The hero artwork and slogan are removed from
+this page; the original source image remains preserved. Capabilities, work items
+and IDs expand within each device. Connection/privacy explanation and local
+disconnect are under an explicit disclosure. Offline/degraded state hides Grid
+readback; no sample devices, background awareness or power controls are invented.
+
+The supplemental `devices-review.json` records this focused follow-up separately
+from the earlier full-suite receipt. Current disconnected/connected captures and
+the refreshed comparison are provided for owner visual review.

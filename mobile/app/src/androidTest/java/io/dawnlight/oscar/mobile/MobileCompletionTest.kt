@@ -260,6 +260,8 @@ class MobileCompletionTest {
         assertEquals("Desktop", desktop.origin); assertEquals("group02-reference-desktop", desktop.originNode)
         assertFalse(desktop.description.contains("8 + 9")); assertFalse("approve" in desktop.actions)
         compose.onNodeWithTag("destination-DEVICES").performClick()
+        compose.onNodeWithTag("device-group02-reference-desktop").assertTextContains("Online · 1 work item")
+        capture("devices-connected-compact")
         compose.onNodeWithTag("device-group02-reference-desktop").performScrollTo().performClick()
         compose.onNodeWithText("No currently advertised executor capabilities").assertExists()
         capture("13-4-reference-grid")
@@ -271,11 +273,12 @@ class MobileCompletionTest {
             compose.waitUntil(15_000) { session.state.value.link == Link.DEGRADED }
             assertNull(session.state.value.snapshot); assertNull(session.state.value.approval)
             compose.onNodeWithTag("destination-DEVICES").performClick()
-            compose.onNodeWithText("No current Grid snapshot is available.").assertExists()
+            compose.onNodeWithText("Connect Core to see your other devices.").assertExists()
         } finally { control("network_on") }
         compose.runOnIdle { session.refreshNow() }
         compose.waitUntil(10_000) { session.state.value.link == Link.CONNECTED }
         assertTrue(session.state.value.snapshot!!.tasks.any { it.id == desktop.id })
+        compose.onNodeWithText("Connection & privacy").performScrollTo().performClick()
         compose.onNodeWithText("Disconnect and remove local credentials").performScrollTo().performClick()
         compose.waitUntil(5000) { SessionVault(compose.activity).load() == null }
         assertNull(session.state.value.snapshot)

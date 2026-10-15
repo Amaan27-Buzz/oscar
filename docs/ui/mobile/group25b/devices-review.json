@@ -1,0 +1,22 @@
+{
+  "date": "2026-10-15",
+  "base_commit": "a79a1cb88affbff98c898a667602be881fbb5599",
+  "native_focus": {
+    "passed": 3,
+    "failures": 0,
+    "duration_seconds": 18.933,
+    "coverage": [
+      "native navigation and disconnected view",
+      "navigation restoration",
+      "Core Grid readback, expanded capabilities, real reference-network loss/recovery and local disconnect"
+    ]
+  },
+  "evidence_class": "REAL_DEVICE_DISPOSABLE_REVIEW",
+  "owner_visual_acceptance": "PENDING",
+  "build": "PASS",
+  "lint": "ZERO_ERRORS",
+  "apk_sha256": {
+    "debug": "167e0b243dcd8063d3d84bd0765e3209b06deae8967e6992ef68887b4b01340b",
+    "review": "87e88c33a3aeed88c95e677d39def464e8d1410099cf5c1c5176d2e1ae26fae2"
+  }
+}

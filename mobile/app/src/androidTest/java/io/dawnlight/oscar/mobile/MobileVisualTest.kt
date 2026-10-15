@@ -59,7 +59,7 @@ class MobileVisualTest {
         compose.onNodeWithText("Not connected · no commitments retrieved").assertExists()
         capture("13-today-chief-of-staff")
         compose.onNodeWithTag("destination-DEVICES").performClick()
-        compose.onNodeWithText("No current Grid snapshot is available.").assertExists()
+        compose.onNodeWithText("Connect Core to see your other devices.").assertExists()
         capture("11-devices")
         compose.onNodeWithTag("destination-SETTINGS").performClick()
         compose.onNodeWithText("Make OSCAR").assertIsDisplayed()
