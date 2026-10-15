@@ -62,4 +62,4 @@ Test component-schema rejection, cross-device version mismatch, privacy isolatio
 | **19 — Hardening** | Security, privacy, isolation, performance, accessibility, failure, versioning and abuse-resistance validation | No generated view bypasses policy or native security |
 | **20 — Unified Alpha** | End-to-end adaptive conversation on actual supported Desktop/Mobile scenarios | Demonstrated and owner-reviewed within genuine capability scope |
 
-Do not alter Slice 14 Sentry/World Model commitments or rush AIE into Group 2.5, the current ImageGen boards or the standalone Argon Compose mockup. These may be **future reusable component references** only.
+Do not alter Slice 14 Sentry/World Model commitments or rush AIE into Group 2.5B. The selected ImageGen/Figma baseline and OSCAR-owned production Compose primitives may inform later trusted component design; they do not implement AIE. The separate Gemini Argon prototype is rejected and must not supply code, layouts, tokens or reusable component references.

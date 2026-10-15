@@ -3,6 +3,14 @@
 Status: **IMPLEMENTATION COMPLETE / OWNER REVIEW PENDING**.
 Owner visual and physical phone acceptance are pending. Gate C remains PARTIAL.
 
+**Original-prompt audit — 2026-10-15:** [all 18 sections are reconciled](PROMPT-AUDIT.md),
+including later owner instructions and explicit source/capability limits. The
+fresh full native run is **28 PASS / 4 SKIPPED / 0 FAIL** (117.685 seconds), with
+24 Python checks passing and Gradle build/JVM/lint verification successful.
+See [the current audit receipt](prompt-audit.json). Active design/architecture
+references to the rejected prototype were corrected; native app code and the
+verified installed APKs are unchanged by this documentation/evidence audit.
+
 Starting integration: `b941357d6e0b88d61170f4895e6dbb1936202ed8` on main.
 Branch: `codex/mobile-group-2.5b`, same Windows checkout, no new worktree.
 Remote main was fetched and matched the starting commit. No merge is authorized.
@@ -81,7 +89,7 @@ Warm paper/graphite, sage/clay/powder accents, short directional shadows,
 | 08 | Activity | Graphite current-state task feed, active/finished filtering, current readback/evidence/progress distinctions and supported reviews |
 | 09 | Active Task | Full-screen illustrated task/result/evidence detail with only Core-advertised controls; no invented pause or percentages |
 | 10 | Approval | Illustrated exact request/material/target/consequence review, expiry/current-state checks, native signed confirmation and fresh denial review |
-| 11 | Devices | Original hardware illustration, actual Grid nodes/availability/trust/capabilities, scoped pairing/local disconnect |
+| 11 | Devices | Owner-refined compact phone/Grid rows, real availability/trust/capabilities, scoped pairing/local disconnect; original artwork preserved separately |
 | 12 | Awareness | Original evening artwork, Manual presentation; Trigger-only/Sentry/capture unavailable, independent actual privacy grants |
 | 13 | Today | Illustrated planning entry, device-local date and actual Core tasks; calendar/weather/communication briefs explicitly unavailable |
 | 14 | Access | Ask/Secure/genuine Full Access semantics; signed standing delegation unavailable; no UI-only activation |
@@ -107,7 +115,7 @@ and eight warnings: six existing KTX suggestions and two Compose conventions).
 Python Mobile/Core/reference and canonical-doc subset: 24 passed. Original image and Orb
 checks passed. Build also packages the unchanged canonical SVG.
 
-Final native suite: **27 PASS / 4 SKIPPED / 0 FAIL**, 132.05 seconds on the
+Earlier hero-baseline native suite (`verification.json`): **27 PASS / 4 SKIPPED / 0 FAIL**, 132.05 seconds on the
 Samsung phone. Four conditions were not enabled: the older extra loopback
 fixture, two separate process prepare/clear harness methods, and globally
 disabled Android animations. The prepare/clear harness was exercised separately

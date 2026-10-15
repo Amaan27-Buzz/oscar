@@ -72,7 +72,7 @@ components:
 
 # Design System: OSCAR
 
-**Current design authority — 2026-10-14:** The owner has **provisionally approved the restrained neumorphic Desktop Companion/Workspace UI**, merged in PR #5. This is the current Desktop baseline, with final integrated visual acceptance deferred. The canonical Orb remains immutable. Mobile Group 2.5B explores **original illustration-led, typography-forward, accessible neumorphic Compose UI**, first through separate images and a standalone UI-only app; production Android design is not yet accepted. See [active product direction](docs/PRODUCT-DIRECTION.md) and [Mobile](docs/MOBILE-DESIGN.md). Future adaptive interactive views are described in [AIE](docs/ADAPTIVE-INTERFACE.md), not implemented here.
+**Current design authority — 2026-10-15:** The owner has **provisionally approved the restrained neumorphic Desktop Companion/Workspace UI**, merged in PR #5. This is the current Desktop baseline, with final integrated visual acceptance deferred. The canonical Orb remains immutable. Mobile Group 2.5B implements the selected **Codex ImageGen/Figma visual baseline in production Kotlin/Compose**, with native phone evidence and owner visual approval pending. The owner's later density/navigation corrections favor compact functional pages and expandable technical detail. The external Gemini Argon prototype is rejected and supplies no code, layouts or tokens. See [active product direction](docs/PRODUCT-DIRECTION.md), [Mobile](docs/MOBILE-DESIGN.md) and [the implementation/evidence ledger](docs/ui/mobile/group25b/README.md). Future adaptive interactive views are described in [AIE](docs/ADAPTIVE-INTERFACE.md), not implemented here.
 
 ## Active Desktop architecture — Group 2.5A
 
