@@ -1,5 +1,9 @@
 # Whole-app screen review — 2026-10-15
 
+The later [integrated craft review](CRAFT-REVIEW.md) supersedes the screenshots
+below with current native components, blended illustrations and full route
+captures. The earlier density/navigation corrections remain part of the design.
+
 The owner requested a comprehensive correction for text-heavy developer-facing
 screens and duplicated navigation. This review covers all 15 hero experiences,
 all nine additional settings pages and the connection dialog. The original

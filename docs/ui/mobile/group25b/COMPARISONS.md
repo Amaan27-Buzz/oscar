@@ -1,5 +1,8 @@
 # Hero comparison ledger
 
+The later [integrated visual craft review](CRAFT-REVIEW.md) provides a fresh
+15-panel comparison set. This set remains historical evidence of its own build.
+
 References are the approved original ImageGen/Figma screens. Native captures
 come from the owner's Samsung SM-S721B, Android 16 / API36, 1080×2340, using
 the isolated `io.dawnlight.oscar.mobile.review` package and production Compose

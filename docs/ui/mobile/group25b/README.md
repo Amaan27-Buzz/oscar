@@ -3,6 +3,19 @@
 Status: **IMPLEMENTATION COMPLETE / OWNER REVIEW PENDING**.
 Owner visual and physical phone acceptance are pending. Gate C remains PARTIAL.
 
+**Integrated visual craft — 2026-10-16:** artwork now blends into the page through
+transparent paper derivatives across the screen edges and behind app bars;
+native glyphs, medallions, raised actions, fields,
+timeline rows and Preferences compositions share OSCAR's material language.
+The approved navbar and fluid motion are preserved. See the
+[current visual review and all 15 comparisons](CRAFT-REVIEW.md) and
+[exact build/device receipt](craft-review.json). This follow-up supersedes the
+screenshots and installed APK hashes in earlier receipts below.
+Final verification: 33 native tests passed, four intentional conditions skipped,
+zero failures (147.949 seconds). All 28 JVM and 24 Python checks passed;
+assembly/lint passed with zero errors and 11 warnings. Earlier failed attempts
+and their limits remain recorded in the current receipt.
+
 **Fluid motion follow-up — 2026-10-15:** bottom navigation remains full-width
 and attached to the bottom, with a travelling marker that stretches and settles.
 Activity filters share that motion; tactile sections and disclosures now use
@@ -44,10 +57,12 @@ do not provide editable component trees.
 
 All 21 original PNGs in [the source collection](../../../../design/oscar-mobile-visual-exploration/README.md)
 are preserved byte-for-byte and admitted to Git. `scripts/mobile_visual_assets.py`
-reproducibly extracts ten illustration-only assets; its recorded bounds and UI
+reproducibly extracts sixteen illustration-only assets; its recorded bounds and UI
 exclusions remove generated lettering, controls and noncanonical Orbs. Production
 does not display entire reference screens. Source/output SHA-256 provenance is
 recorded in [the asset manifest](../../../../mobile/illustration-assets.json).
+Ten additional transparent derivatives preserve the originals and have
+[separate edit provenance](../../../../mobile/illustration-cutouts.json).
 
 The external Gemini Argon `oscar-ui-test` experiment is **REJECTED**, not a source
 for code, layouts, design tokens or architecture. Historical records are retained.
