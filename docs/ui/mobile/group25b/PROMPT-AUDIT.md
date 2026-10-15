@@ -4,6 +4,10 @@
 substitutions and capability/source limits below.** This is not a claim that
 every literal emulator requirement or physical capability has passed.
 
+The later [Preferences redesign](PREFERENCES-REVIEW.md) supersedes settings-page
+screenshots and provides a fresh build/device receipt in `preferences-review.json`.
+The original audit receipt below remains historical evidence of its own APKs.
+
 The owner supplied the original 18-section prompt again after the whole-app
 review. This audit compares it with production source, preserved assets,
 verification receipts and the subsequent owner instructions in the same chat.

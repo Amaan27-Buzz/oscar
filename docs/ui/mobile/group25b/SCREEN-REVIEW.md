@@ -6,6 +6,11 @@ all nine additional settings pages and the connection dialog. The original
 ImageGen/Figma artwork remains preserved; the owner's later direction supersedes
 promotional compositions and unnecessary copy in the production app.
 
+The [Preferences follow-up](PREFERENCES-REVIEW.md) supersedes the settings-page
+compositions below. Its current screenshots cover the root and all 11 subpages
+at normal size and dark 1.8× text. Older captures remain tied to their original
+verification receipts.
+
 Primary Conversation, Automations and Activity retain one shared three-tab bar.
 Secondary pages have one titled Back bar and no bottom tabs or duplicate body
 Back buttons. Back returns to the invoking primary tab; Privacy reached from

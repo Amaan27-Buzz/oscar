@@ -6,6 +6,10 @@ the isolated `io.dawnlight.oscar.mobile.review` package and production Compose
 code. They are **real-device UI evidence with disposable/synthetic data**, not
 owner biometric/voice/provider acceptance. Owner visual approval is pending.
 
+The owner's later [Preferences redesign](PREFERENCES-REVIEW.md) supersedes the
+Awareness, Access and Preferences compositions in this comparison set. Those
+original comparisons remain preserved alongside their historical receipts.
+
 Source originals are 841×1870. Comparison panels preserve aspect ratio and use
 equal display widths; no production screenshot was stretched or painted over.
 The status-bar/inset and aspect-ratio differences remain visible. The canonical

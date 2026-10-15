@@ -3,13 +3,22 @@
 Status: **IMPLEMENTATION COMPLETE / OWNER REVIEW PENDING**.
 Owner visual and physical phone acceptance are pending. Gate C remains PARTIAL.
 
+**Preferences follow-up — 2026-10-15:** the root and all 11 subpages now use
+grouped controls, concise status rows and distinct page layouts. See the
+[current Preferences review](PREFERENCES-REVIEW.md), including normal-text and
+dark 1.8× text phone captures. Earlier screenshot/test receipts remain historical.
+The fresh final run passed 29 native tests, skipped four intentional conditions
+and had zero failures. Builds, 28 JVM and 24 Python checks pass; lint reports
+zero errors and 13 warnings. The normal app is updated on the phone.
+
 **Original-prompt audit — 2026-10-15:** [all 18 sections are reconciled](PROMPT-AUDIT.md),
 including later owner instructions and explicit source/capability limits. The
-fresh full native run is **28 PASS / 4 SKIPPED / 0 FAIL** (117.685 seconds), with
+audit's full native run was **28 PASS / 4 SKIPPED / 0 FAIL** (117.685 seconds), with
 24 Python checks passing and Gradle build/JVM/lint verification successful.
-See [the current audit receipt](prompt-audit.json). Active design/architecture
+See [the original audit receipt](prompt-audit.json). Active design/architecture
 references to the rejected prototype were corrected; native app code and the
-verified installed APKs are unchanged by this documentation/evidence audit.
+verified APKs were unchanged by that documentation/evidence audit; the later
+Preferences follow-up above has its own current build and device receipt.
 
 Starting integration: `b941357d6e0b88d61170f4895e6dbb1936202ed8` on main.
 Branch: `codex/mobile-group-2.5b`, same Windows checkout, no new worktree.
@@ -90,7 +99,7 @@ Warm paper/graphite, sage/clay/powder accents, short directional shadows,
 | 09 | Active Task | Full-screen illustrated task/result/evidence detail with only Core-advertised controls; no invented pause or percentages |
 | 10 | Approval | Illustrated exact request/material/target/consequence review, expiry/current-state checks, native signed confirmation and fresh denial review |
 | 11 | Devices | Owner-refined compact phone/Grid rows, real availability/trust/capabilities, scoped pairing/local disconnect; original artwork preserved separately |
-| 12 | Awareness | Original evening artwork, Manual presentation; Trigger-only/Sentry/capture unavailable, independent actual privacy grants |
+| 12 | Awareness | Compact mode, permission and retention groups; Trigger-only/Sentry/capture unavailable, independent actual privacy grants; original evening artwork preserved |
 | 13 | Today | Illustrated planning entry, device-local date and actual Core tasks; calendar/weather/communication briefs explicitly unavailable |
 | 14 | Access | Ask/Secure/genuine Full Access semantics; signed standing delegation unavailable; no UI-only activation |
 | 15 | Preferences | Persona, Voice, Privacy, Awareness, Memory, Access, Android permissions, notifications, Appearance, diagnostics/about; existing native functionality preserved |
