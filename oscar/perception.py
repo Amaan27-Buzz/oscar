@@ -2,6 +2,7 @@
 
 import hashlib
 import json
+from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any
 
@@ -92,10 +93,19 @@ class PerceptionFabric:
         self._forget_volatile(source.id, epoch)
         return epoch
 
-    def connect(self, source_id: str, epoch: int, *, lease_seconds: int = 60) -> None:
+    def connect(
+        self,
+        source_id: str,
+        epoch: int,
+        *,
+        lease_seconds: int = 60,
+        guard: Callable[[], None] | None = None,
+    ) -> None:
         if type(lease_seconds) is not int or not 1 <= lease_seconds <= 300:
             raise ValueError("bounded source lease required")
         with self.store.transaction():
+            if guard:
+                guard()
             source = self.world.source(source_id)
             if source["epoch"] != epoch or not source["perceive"]:
                 raise PermissionError("source generation revoked or perception denied")
@@ -108,8 +118,12 @@ class PerceptionFabric:
                 },
             )
 
-    def disconnect(self, source_id: str, epoch: int) -> None:
+    def disconnect(
+        self, source_id: str, epoch: int, *, guard: Callable[[], None] | None = None
+    ) -> None:
         with self.store.transaction():
+            if guard:
+                guard()
             source = self.world.source(source_id)
             if source["epoch"] != epoch:
                 raise PermissionError("stale source cannot disconnect a new generation")
@@ -182,13 +196,19 @@ class PerceptionFabric:
             return int(self._admit(source_id)["epoch"])
 
     def ingest(
-        self, observation: Observation, *, sentry_generation: int | None = None
+        self,
+        observation: Observation,
+        *,
+        sentry_generation: int | None = None,
+        guard: Callable[[], None] | None = None,
     ) -> tuple[str, WorldState]:
         # Reparse at the trust boundary, including dataclasses altered by untrusted code.
         payload = json.dumps(record(observation), sort_keys=True)
         observation = Observation.parse(payload)
         fingerprint = hashlib.sha256(payload.encode()).hexdigest()
         with self.store.transaction():
+            if guard:
+                guard()
             source = self._admit(observation.source_id, observation.epoch)
             now = self.world.clock()
             if sentry_generation is not None:

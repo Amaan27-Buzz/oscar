@@ -2,7 +2,7 @@
 
 import json
 import sqlite3
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 from contextlib import contextmanager
 from pathlib import Path
 from threading import RLock
@@ -29,6 +29,8 @@ class Store:
         self.db = sqlite3.connect(path, check_same_thread=False, isolation_level=None, timeout=5)
         path.chmod(0o600)
         self.lock = RLock()
+        self.close_callbacks: list[Callable[[], None]] = []
+        self._closed = False
         self.task_resources: WeakSet[TaskResources] = WeakSet()
         # Process-local private payloads. Durable plans carry only a digest; restart fails closed.
         self.transient: dict[str, dict[str, Any]] = {}
@@ -70,8 +72,16 @@ class Store:
                 self.db.execute("COMMIT")
 
     def close(self) -> None:
+        if self._closed:
+            return
+        # Stop resource owners before closing the database they use; never join under its lock.
+        for callback in list(self.close_callbacks):
+            callback()
+        self.close_callbacks.clear()
         self.transient.clear()
-        self.db.close()
+        with self.lock:
+            self.db.close()
+            self._closed = True
 
     def put(self, kind: str, identifier: str, data: dict[str, Any]) -> None:
         with self.lock:

@@ -1,6 +1,7 @@
 """Headless Sentry decisions. No capture, notification delivery or action authority."""
 
 import math
+from collections.abc import Callable
 from dataclasses import dataclass
 from enum import StrEnum
 from typing import Any
@@ -126,7 +127,13 @@ class SentryRuntime:
             }
         ), generation
 
-    def observe(self, observation: Observation, *, urgent: bool = False) -> SentryDecision:
+    def observe(
+        self,
+        observation: Observation,
+        *,
+        urgent: bool = False,
+        guard: Callable[[], None] | None = None,
+    ) -> SentryDecision:
         if type(urgent) is not bool:
             raise ValueError("typed urgency required")
         with self.world.store.lock:
@@ -147,10 +154,12 @@ class SentryRuntime:
                 and observation.key not in settings.trigger_keys
             ):
                 return result("ignored", "outside selected triggers")
-            disposition, _ = self.fabric.ingest(observation, sentry_generation=generation)
+            disposition, _ = self.fabric.ingest(
+                observation, sentry_generation=generation, guard=guard
+            )
             if disposition == "duplicate":
                 return result("ignored", "duplicate event")
-            return self._evaluate(observation, settings, generation, simulated, urgent)
+            return self._evaluate(observation, settings, generation, simulated, urgent, guard)
 
     def _evaluate(
         self,
@@ -159,12 +168,15 @@ class SentryRuntime:
         generation: int,
         simulated: bool,
         urgent: bool,
+        guard: Callable[[], None] | None = None,
     ) -> SentryDecision:
         def result(outcome: str, reason: str, ids: tuple[str, ...] = ()) -> SentryDecision:
             return SentryDecision(outcome, reason, observation.id, simulated, ids)
 
         # Serialize the final grant/configuration check with revocation and cooldown admission.
         with self.world.store.transaction():
+            if guard:
+                guard()
             current = self.world.store.get("sentry_settings", self.world.relationship)
             source = self.world.source(observation.source_id)
             if (

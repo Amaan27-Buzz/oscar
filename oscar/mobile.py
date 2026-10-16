@@ -590,7 +590,18 @@ class Mobile:
             return self.complete(session, payload)
         response: dict[str, Any]
         with self.lock:
-            if operation == "discard" and not payload:
+            if operation == "world" and set(payload) == {"entity_id", "key"}:
+                self.authenticate(session, "mobile:inspect")
+                permission = self.policy.evaluate(
+                    "core.world.read",
+                    ("world:read",),
+                    self.grants(session),
+                    {"node": session.node_id, "source": self.source},
+                )
+                if not permission.allowed:
+                    raise PermissionError(permission.reason)
+                response = self.runtime.current(payload["entity_id"], payload["key"])
+            elif operation == "discard" and not payload:
                 for task_id in list(self.store.transient):
                     if not self.private_for(session, task_id):
                         continue

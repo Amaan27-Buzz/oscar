@@ -7,14 +7,12 @@ import socket
 import subprocess
 import sys
 import tempfile
-from contextlib import closing
 from pathlib import Path
 from threading import Event, Thread
 from time import time
 
 from oscar.contracts import Capability, Result, new_id
 from oscar.desktop import Desktop
-from oscar.event_archive import EventArchive
 from oscar.grid import Node, NodeRole
 from oscar.harness import Harness
 from oscar.memory_fabric import MemoryFabric
@@ -46,13 +44,13 @@ def main() -> int:
     ) as temp:
         path = Path(temp)
         with (
-            closing(EventArchive(path / "archive.db")) as archive,
             Harness(
                 path / "core.db", path / "workspace", ROOT / "config/development-models.json"
             ) as h,
         ):
+            archive = h.archive
             if args.workspace:
-                h.runtime.memory = MemoryFabric(archive)
+                h.runtime.memory = MemoryFabric(h.archive)
             scopes = (
                 "heartbeat",
                 "desktop:connect",

@@ -7,7 +7,7 @@ from time import time
 from oscar.contracts import Capability, Epistemic, Result, new_id
 from oscar.desktop_context import ContextSource
 from oscar.desktop_voice import DesktopVoice
-from oscar.event_archive import EventArchive, MemoryWriter, SourceEvent
+from oscar.event_archive import MemoryWriter, SourceEvent
 from oscar.grid import Node, NodeRole
 from oscar.memory_executor import MemoryExecutor
 from oscar.memory_fabric import MemoryFabric
@@ -184,8 +184,7 @@ class AskCompletionTests(unittest.TestCase):
         self.assertTrue(view["response_truncated"])
 
     def test_sourced_memory_uses_existing_fabric_and_forget_withdraws_recall(self):
-        archive = EventArchive(self.base.root / "archive.db")
-        self.addCleanup(archive.close)
+        archive = self.h.archive
         memory = MemoryFabric(archive)
         event = SourceEvent(
             "owner",

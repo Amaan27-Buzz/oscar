@@ -16,8 +16,16 @@ from .retrieval import RetrievalProvider, RetrievalRequest
 class FileContextSource:
     id = "native-current-files"
 
-    def __init__(self, files: ScopedFiles, allowed_scope: str, selected_paths: dict[str, str]):
+    def __init__(
+        self,
+        files: ScopedFiles,
+        allowed_scope: str,
+        selected_paths: dict[str, str],
+        *,
+        clock: Callable[[], float] = time,
+    ):
         self.files, self.allowed_scope, self.selected_paths = files, allowed_scope, selected_paths
+        self.clock = clock
         if len(selected_paths) > 16:
             raise ValueError("too many active files")
 
@@ -33,7 +41,7 @@ class FileContextSource:
                 "local://selected-files/" + path,
                 Authority.LIVE_API,
                 "local",
-                time(),
+                self.clock(),
                 5,
                 evidence_id=hashlib.sha256(content).hexdigest(),
             )

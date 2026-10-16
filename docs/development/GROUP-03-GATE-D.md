@@ -15,6 +15,25 @@ fetch and merged PR #6 readback. Branch: `codex/group-03-gate-d`. No merge/relea
 Approved Mobile/Desktop UI, artwork and Orb are preserved. No device, emulator,
 microphone/camera, owner account, host configuration or paid infrastructure work.
 
+## Runtime continuation — 2026-10-16
+
+Slice 14 now composes into the normal `Harness`: one canonical Event Archive,
+Controller current-state reads, scoped Desktop/Mobile reads and a bounded background
+runner. Explicitly enrolled Core/Grid/task and selected-file subscriptions recover
+after restart, disconnect on shutdown/revocation, fence stale runners/acquisitions,
+and maintain retention expiry. Manual/Trigger-only modes prevent ambient file reads
+before acquisition. No environmental permission is inferred from setup.
+
+`python -m oscar watch-core grid --retain`, `sources`, `world --entity core --key
+grid.state` and `serve --seconds 60` exercise the local path. No daemon is installed.
+Full regression: 632 ran, 626 passed, 6 skipped, no failures (131.057 s).
+Ruff, format, mypy and repository checks passed. See
+[runtime receipt](../evidence/group03/slice14-runtime.json).
+
+The current continuation additionally authorizes software setup, shared Presence/AIE,
+an explicit opt-in Android Companion overlay implementation/build and Executive.
+Physical/OEM/environmental acceptance remains separate; no merge or Group 4.
+
 ## Implementation and acceptance
 
 | Slice | Implemented | Verified | Remaining |

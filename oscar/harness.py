@@ -8,7 +8,9 @@ from .capabilities import Cancellation, FileExecutor, ScopedFiles, Verifier, add
 from .contracts import Action, Capability, Result, new_id
 from .credentials import CredentialPool
 from .discovery import HTTPDiscovery
+from .event_archive import EventArchive
 from .grid import Grid, Node, NodeRole
+from .memory_fabric import MemoryFabric
 from .models import Mode, ModelRequest, ProviderError, RoutingPolicy
 from .providers import HTTPAdapter
 from .registry import Registry
@@ -18,6 +20,7 @@ from .runtime import Runtime
 from .search import TavilySource
 from .storage import Store
 from .transport import Dispatcher
+from .world_runtime import WorldRuntime
 
 
 class ModelExecutor:
@@ -69,7 +72,10 @@ class Harness:
         self.store = Store(state)
         self.grid = Grid(self.store)
         self.files = ScopedFiles(workspace)
-        self.runtime = Runtime(self.store, self.grid, Verifier(self.files))
+        self.archive = EventArchive(state.with_suffix(".archive.sqlite"))
+        self.runtime = Runtime(
+            self.store, self.grid, Verifier(self.files), memory=MemoryFabric(self.archive)
+        )
         self.registry = Registry.load(manifest, self.store)
         self.pool = CredentialPool(list(self.registry.providers.values()), store=self.store)
         self.adapters = {kind: HTTPAdapter(kind) for kind in {"openai", "google", "ollama"}}
@@ -142,6 +148,14 @@ class Harness:
                 ),
             },
         )
+        self.world = WorldRuntime(self.runtime, self.files)
+        self.runtime.world = self.world
+        self.store.close_callbacks.append(self.close_services)
+        self.world.start()
+
+    def close_services(self) -> None:
+        self.world.close()
+        self.archive.close()
 
     def close(self) -> None:
         self.store.close()

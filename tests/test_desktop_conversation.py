@@ -2,11 +2,13 @@
 
 import unittest
 from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
 
 from oscar.contracts import Epistemic
 from oscar.desktop import Desktop
-from oscar.event_archive import EventArchive, SourceEvent
+from oscar.event_archive import SourceEvent
 from oscar.grid import Node, NodeRole
+from oscar.harness import Harness
 from oscar.memory_fabric import MemoryFabric
 from oscar.policy import PersonalPolicy, PolicyEffect, PolicyRule
 from tests import test_desktop
@@ -22,7 +24,7 @@ class ConversationTests(unittest.TestCase):
 
     def setUp(self):
         test_desktop.DesktopTests.setUp(self)
-        self.archive = EventArchive(self.root / "archive.db")
+        self.archive = self.h.archive
         self.h.runtime.memory = MemoryFabric(self.archive)
         self.scopes += ("desktop:conversation:read", "desktop:conversation:retain")
         self.h.grid.register(Node("history-fixture", NodeRole.DESKTOP, self.scopes))
@@ -30,17 +32,25 @@ class ConversationTests(unittest.TestCase):
         self.core.register_owner_key(self.session, self.encoded, owner_authorized=True)
 
     def tearDown(self):
-        self.archive.close()
         test_desktop.DesktopTests.tearDown(self)
 
     def test_retained_turns_reopen_from_canonical_archive_without_private_replay(self):
         task = self.ask("2 + 3")
         self.confirm(task["task_id"])
         self.h.store.transient.clear()
-        self.archive.close()
-        self.archive = EventArchive(self.root / "archive.db")
+        self.h.close()
+        self.h = Harness(
+            self.root / "core.db",
+            self.root / "workspace",
+            Path("config/development-models.json"),
+        )
+        self.archive = self.h.archive
         self.h.runtime.memory = MemoryFabric(self.archive)
-        self.core = Desktop(self.h.runtime, PersonalPolicy(self.h.store), self.core.targets)
+        self.core = Desktop(
+            self.h.runtime,
+            PersonalPolicy(self.h.store),
+            {self.h.node_id: (self.h.dispatcher, self.h.session)},
+        )
         self.session = self.h.grid.pair("history-fixture", self.scopes)
         history = self.call("conversation", {"before": 0})
         self.assertEqual([t["text"] for t in history["turns"]], ["2 + 3", "5"])

@@ -16,7 +16,7 @@
     "16": {"status": "NOT_STARTED"},
     "17": {"status": "NOT_STARTED"}
   },
-  "next_action": "Continue Slice 15 provider/Vault, Persona, explicit policy and Sentry setup composition before advancing to Slice 16. Keep voice/device acceptance deferred. Do not merge or claim Gate D PASS.",
+  "next_action": "Continuation: verify normal Slice 14 lifecycle, source acquisition/runner fencing and maintenance, then complete setup composition, Presence/AIE/opt-in overlay and Executive in dependency order. No merge or Group 4.",
   "owner_acceptance": "DEFERRED_OWNER_ACCEPTANCE",
   "baseline": {"ran": 569, "passed": 563, "failed": 0, "skipped": 6, "seconds": 218.479},
   "final_verification": {"receipt": "verification.json", "ran": 618, "passed": 612, "failed": 0, "skipped": 6, "seconds": 124.393}

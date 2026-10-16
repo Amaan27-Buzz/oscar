@@ -2,6 +2,13 @@
 
 ## Owner Group 3 unattended engineering — 2026-10-16
 
+Continuation explicitly authorizes completing normal runtime integration and
+software Slices 14–17, including approved-surface compatibility and an opt-in
+Android Companion overlay implementation. Preserve the visual design. Build/JVM/
+headless checks are permitted; do not claim owner/OEM/device acceptance from them.
+Continue the existing branch/PR #7; do not stop at another small foundation if
+software implementation is feasible. No merge, Group 4 or Codex Cloud.
+
 The owner authorizes local backend implementation of canonical Slices 14–17 on
 `codex/group-03-gate-d`, based on fetched main `257349f`. Work in dependency order,
 verify and commit checkpoints, push and create a draft PR into main; no merge or

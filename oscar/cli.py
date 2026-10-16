@@ -12,9 +12,11 @@ from .contracts import Action, Result, TaskState, new_id, record
 from .harness import Harness
 from .jev import Intent
 from .models import Mode, ModelRequest, ProviderError, RoutingPolicy
+from .perception import PerceptionSource
 from .router import RouteUnavailable
 from .storage import StateConflict
 from .transport import HTTPTransport, ReferenceServer
+from .world_model import ObservationKind
 
 
 def print_json(value: object) -> None:
@@ -203,6 +205,15 @@ def parser() -> argparse.ArgumentParser:
     commands.add_parser("proof")
     commands.add_parser("grid-proof")
     commands.add_parser("history")
+    commands.add_parser("sources")
+    world = commands.add_parser("world")
+    world.add_argument("--entity", required=True)
+    world.add_argument("--key", required=True)
+    watch = commands.add_parser("watch-core")
+    watch.add_argument("source", choices=("grid", "tasks"))
+    watch.add_argument("--retain", action="store_true")
+    serve = commands.add_parser("serve")
+    serve.add_argument("--seconds", type=int, default=3600)
     write = commands.add_parser("write")
     write.add_argument("--path", required=True)
     write.add_argument("--content", required=True)
@@ -245,7 +256,60 @@ def main() -> int:
             )
         with Harness(args.state, args.workspace, args.manifest, template) as harness:
             transports = {harness.node_id: (harness.dispatcher, harness.session)}
-            if args.command == "credentials":
+            if args.command == "serve":
+                from threading import Event
+
+                from .desktop import Desktop
+                from .mobile import Mobile, MobileServer
+                from .policy import PersonalPolicy
+
+                if not 1 <= args.seconds <= 86400:
+                    raise ValueError("bounded local serving lifetime required")
+                with (
+                    MobileServer(
+                        Mobile(harness.runtime, PersonalPolicy(harness.store), transports)
+                    ) as mobile,
+                    MobileServer(
+                        Desktop(harness.runtime, PersonalPolicy(harness.store), transports)
+                    ) as desktop,
+                ):
+                    print_json(
+                        {
+                            "mobile_url": mobile.url,
+                            "desktop_url": desktop.url,
+                            "scope": "authenticated loopback Core; no device enrollment inferred",
+                        }
+                    )
+                    try:
+                        Event().wait(args.seconds)
+                    except KeyboardInterrupt:
+                        pass
+            elif args.command in {"sources", "world", "watch-core"}:
+                if harness.runtime.world is None:
+                    raise StateConflict("current-state runtime unavailable")
+                if args.command == "watch-core":
+                    grid_source = args.source == "grid"
+                    harness.runtime.world.configure_source(
+                        PerceptionSource(
+                            "core-" + args.source,
+                            ("core",),
+                            (args.source + ".state",),
+                            (ObservationKind.DEVICE if grid_source else ObservationKind.TASK,),
+                            simulated=False,
+                            perceive=True,
+                            retain=args.retain,
+                        ),
+                        args.source,
+                        "core",
+                        owner_authorized=True,
+                    )
+                    harness.runtime.world.tick()
+                print_json(
+                    harness.runtime.current(args.entity, args.key)
+                    if args.command == "world"
+                    else harness.runtime.world.snapshot()
+                )
+            elif args.command == "credentials":
                 for line in harness.pool.safe_presence_lines():
                     print(line)
             elif args.command == "proof":

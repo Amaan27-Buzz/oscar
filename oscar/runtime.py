@@ -5,7 +5,7 @@ import json
 from collections.abc import Callable, Mapping
 from dataclasses import replace
 from time import time
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from .capabilities import Cancelled, Verifier
 from .contracts import (
@@ -26,6 +26,9 @@ from .memory_fabric import MemoryFabric
 from .storage import StateConflict, Store
 from .transport import Transport, action_envelope, parse_result
 
+if TYPE_CHECKING:
+    from .world_runtime import WorldRuntime
+
 
 class Runtime:
     def __init__(
@@ -39,9 +42,22 @@ class Runtime:
     ):
         self.store, self.grid, self.verifier = store, grid, verifier
         self.on_verification = on_verification
-        self.memory, self.relationship_id = memory, relationship_id
+        self._memory, self.relationship_id = memory, relationship_id
         self.active_context: dict[str, dict[str, Any]] = {}
+        self.world: WorldRuntime | None = None
         self.store.task_resources.add(self)
+
+    @property
+    def memory(self) -> MemoryFabric | None:
+        return self._memory
+
+    @memory.setter
+    def memory(self, memory: MemoryFabric | None) -> None:
+        if self.world is not None:
+            if memory is None or memory.archive is not self.world.world.archive:
+                raise StateConflict("canonical archive replacement requires Core lifecycle restart")
+            self.world.sentry.memory = memory
+        self._memory = memory
 
     def task_transitioned(self, task: Task) -> None:
         if task.state not in {
@@ -141,6 +157,9 @@ class Runtime:
         with self.store.transaction():
             self.store.put("objective", objective.id, record(objective))
             self.store.put("task", task.id, record(task))
+            self.store.put(
+                "task_relationship", task.id, {"id": task.id, "relationship": self.relationship_id}
+            )
             self.store.put("plan", task.id, {"kind": kind, "parameters": parameters})
             self.store.audit(task.id, "jev_decision", record(decision))
             self.store.audit(
@@ -183,6 +202,12 @@ class Runtime:
                 ),
             )
         return task
+
+    def current(self, entity_id: str, key: str) -> dict[str, Any]:
+        if self.world is None:
+            raise StateConflict("current-state runtime is unavailable")
+        self.world.tick()
+        return self.world.sentry.context(entity_id, key)
 
     def run(self, task_id: str, transports: Mapping[str, tuple[Transport, SessionHandle]]) -> Task:
         task = self.store.task(task_id)

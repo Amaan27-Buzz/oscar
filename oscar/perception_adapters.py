@@ -1,6 +1,8 @@
 """Bridge existing authorized live-context sources into the current-state projection."""
 
 import hashlib
+from collections.abc import Callable
+from typing import Any
 
 from .continuity import LiveContextSource
 from .contracts import Epistemic
@@ -22,13 +24,19 @@ class ContextPerceptionAdapter:
         reference(entity_id)
         self.fabric, self.source = fabric, source
         self.source_id, self.entity_id, self.kind = source_id, entity_id, kind
+        self.observer: Callable[[Observation], Any] | None = None
+        self.acquisition_guard: Callable[[], None] | None = None
 
     def poll(self, query: str = "current status") -> tuple[WorldState, ...]:
         if not isinstance(query, str) or not 1 <= len(query) <= 1000:
             raise ValueError("bounded context query required")
         world = self.fabric.world
         epoch = self.fabric.acquisition_epoch(self.source_id)
+        if self.acquisition_guard:
+            self.acquisition_guard()
         context = self.source.retrieve(query, world.relationship)
+        if self.acquisition_guard:
+            self.acquisition_guard()
         # Includes empty replies: revocation during retrieval cannot adopt a new grant.
         if self.fabric.acquisition_epoch(self.source_id) != epoch:
             raise PermissionError("source changed during acquisition")
@@ -66,5 +74,9 @@ class ContextPerceptionAdapter:
                     0.5 if item.state == Epistemic.REPORTED else 1.0,
                     evidence_id=item.source.evidence_id,
                 )
-                states.append(self.fabric.ingest(observation)[1])
+                if self.observer is not None:
+                    self.observer(observation)
+                    states.append(world.resolve(self.entity_id, item.key))
+                else:
+                    states.append(self.fabric.ingest(observation, guard=self.acquisition_guard)[1])
         return tuple(states)

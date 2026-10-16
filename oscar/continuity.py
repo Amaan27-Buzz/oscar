@@ -251,14 +251,22 @@ class StateContextSource:
     id = "native-grid-worker-state"
 
     def __init__(
-        self, store: Store, grid_snapshot: Callable[[], list[dict[str, Any]]], allowed_scope: str
+        self,
+        store: Store,
+        grid_snapshot: Callable[[], list[dict[str, Any]]],
+        allowed_scope: str,
+        *,
+        clock: Callable[[], float] = time,
     ):
         self.store, self.grid_snapshot, self.allowed_scope = store, grid_snapshot, allowed_scope
+        self.clock = clock
 
     def retrieve(self, query: str, scope: str) -> tuple[ContextObservation, ...]:
         if scope != self.allowed_scope:
             raise PermissionError("state context scope denied")
-        source = SourceRef("local://grid-worker-state", Authority.LIVE_API, "local", time(), 5)
+        source = SourceRef(
+            "local://grid-worker-state", Authority.LIVE_API, "local", self.clock(), 5
+        )
         snapshots = [
             {
                 "node_id": n["id"],
