@@ -714,8 +714,7 @@ class Desktop(Mobile):
                             return {
                                 "state": "blocked",
                                 "epistemic": "UNKNOWN",
-                                "message": "That action is not available here. "
-                                "Nothing changed.",
+                                "message": "That action is not available here. Nothing changed.",
                             }
                         cap = candidates[0]
                         typed = form_intent(

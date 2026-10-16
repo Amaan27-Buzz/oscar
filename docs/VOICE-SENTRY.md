@@ -1,5 +1,15 @@
 # Voice + Sentry
 
+## Group 3 backend candidate — 2026-10-16
+
+`oscar.sentry.SentryRuntime` now provides local headless mode configuration,
+permission/policy-gated observation ingestion and interruption proposals, using
+`PerceptionFabric` and the current World Model. Configuration persists; source
+leases, freshness, revocation and generation checks remain authoritative. No real
+capture, notification/speech delivery, microphone/camera activation or product UI
+availability is added. Simulated evidence remains simulated. See
+[implementation, tests and limits](development/GROUP-03-GATE-D.md).
+
 ## Group 2.5 owner correction — 2026-10-14
 
 Access (Ask / Secure / Full Access), awareness (Manual / Trigger-only / Sentry with Passive / Aware / Guard / Away / Sleep) and Worker autonomy (Manual / Supervised / Autonomous) are independent. Capture/retention is another permission domain. Microphone mute, wake detection, active conversational STT, acoustic awareness, background transcription and stored recordings remain distinct.

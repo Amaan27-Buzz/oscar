@@ -1,5 +1,15 @@
 # OSCAR Memory Fabric
 
+## Group 3 current-state boundary — 2026-10-16
+
+The Slice 14 World Model candidate holds bounded current pointers, not another
+historical store. Retained observation payloads live in this Event Archive;
+unretained values remain process-local and are unavailable after restart. Sentry
+context returns current state and historical/RECALLED evidence separately, with
+no current-state fallback to stale memory. Expiry maintenance tombstones expired
+canonical payloads and dependent memory copies and invalidates derived generations.
+See [implementation and limitations](development/GROUP-03-GATE-D.md).
+
 ## Group 2.5 owner correction — 2026-10-14
 
 Conversation uses the existing canonical Event Archive, never browser storage or a second chat store. Explicit relationship history-read and retention grants are independent; no private captured application context is retained by this composition. Authorized owner/OSCAR events preserve task IDs and original epistemic status, survive restart and page chronologically. A restored event is historical evidence, not fresh verification or reusable execution authority.

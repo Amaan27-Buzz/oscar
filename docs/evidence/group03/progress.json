@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "date": "2026-10-16",
+  "branch": "codex/group-03-gate-d",
+  "base_sha": "257349f82a96293c3737d446dca18ce46f098b04",
+  "gate_c": "PARTIAL",
+  "gate_d": "PARTIAL",
+  "stages": {
+    "14": {"status": "VERIFIED_SCOPED_CHECKPOINT", "tests": "tests.test_world_model", "focused_passed": 36, "classification": "VERIFIED_REFERENCE", "whole_slice": "PARTIAL"},
+    "15": {"status": "NOT_STARTED"},
+    "16": {"status": "NOT_STARTED"},
+    "17": {"status": "NOT_STARTED"}
+  },
+  "next_action": "Commit Slice 14 scoped checkpoint, then implement recoverable commissioning with existing Grid and Vault authority; do not claim full Slice 14 or Gate D PASS.",
+  "owner_acceptance": "DEFERRED_OWNER_ACCEPTANCE",
+  "baseline": {"ran": 569, "passed": 563, "failed": 0, "skipped": 6, "seconds": 218.479}
+}

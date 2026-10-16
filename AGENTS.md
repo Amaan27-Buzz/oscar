@@ -1,5 +1,17 @@
 # AGENTS.md
 
+## Owner Group 3 unattended engineering — 2026-10-16
+
+The owner authorizes local backend implementation of canonical Slices 14–17 on
+`codex/group-03-gate-d`, based on fetched main `257349f`. Work in dependency order,
+verify and commit checkpoints, push and create a draft PR into main; no merge or
+release. This supersedes older dated Slice 14–17 stop notes only within Group 3.
+Preserve approved UI/artwork/Orb and Core authority. No phone/emulator, physical
+hardware/audio/camera, new permissions/credentials, paid/cloud development hosts,
+host reconfiguration or unrelated personal files. Gate C remains PARTIAL; report
+reference/simulated evidence separately from owner/device/production acceptance.
+See [Group 3 run and continuation](docs/development/GROUP-03-GATE-D.md).
+
 ## Owner Group 2.5B final closure — 2026-10-16
 
 The owner explicitly APPROVED the Mobile UI/UX, including all 15 heroes, artwork,

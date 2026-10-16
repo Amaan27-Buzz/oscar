@@ -1,5 +1,17 @@
 # Architecture Decisions
 
+## Group 3 decision — Current-state projections reuse canonical history
+
+2026-10-16: World Model stores bounded current identity/expiry/provenance pointers.
+Only separately authorized retained observations enter Event Archive. Without
+retention, content remains transient and cannot survive restart as remembered
+truth. Canonical append is idempotent and precedes projection commit; partial
+writes leave historical evidence, never an invented current claim. Configuration,
+source admission, final Sentry proposals and revocation are generation-fenced.
+These are trusted local composition APIs, with no new remote admission or capture
+authority. Native live-context adapters are reused; no new service/framework or
+dependency is required. See [tradeoffs and evidence](development/GROUP-03-GATE-D.md).
+
 This file contains the **current active architecture decisions** for OSCAR. Retired/superseded decisions remain available in Git history and historical Gate/checkpoint evidence; they are not kept as active instructions merely for archival convenience.
 
 When a durable architecture assumption changes, update this file and the affected canonical domain docs in the same change.

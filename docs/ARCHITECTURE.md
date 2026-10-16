@@ -1,5 +1,14 @@
 # System Architecture
 
+## Group 3 current-state backend candidate — 2026-10-16
+
+The scoped Slice 14 candidate adds `world_model.py`, `perception.py`,
+`perception_adapters.py` and `sentry.py`. Current pointers reference the canonical
+Event Archive when retention is granted; otherwise values remain transient.
+Sentry produces policy-bounded proposals, with no independent action authority.
+Existing Python Core, Controller, Memory Fabric, Grid and UI contracts remain
+authoritative. See [implementation and acceptance boundary](development/GROUP-03-GATE-D.md).
+
 **Mobile acceptance update — 2026-10-16:** Group 2.5B UI/UX is explicitly
 **APPROVED / PASS**. [Final closure](ui/mobile/group25b/FINAL-CLOSURE.md) records
 the theme correction and lifecycle investigation. This supersedes earlier

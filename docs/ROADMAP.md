@@ -388,6 +388,10 @@ Implementation, emulator verification and owner review are separate from physica
 
 ## Slice 14 — World Model + Perception Fabric + Sentry + optional Daily Journal ◻️
 
+**2026-10-16 Group 3 candidate:** headless current-state/Perception/Sentry backend
+is implemented for scoped local/reference verification. Full Slice 14/Gate D
+acceptance remains partial. See [implementation and evidence](development/GROUP-03-GATE-D.md).
+
 Coherent freshness-/provenance-qualified current truth across people/places/devices/apps/projects/tasks/commitments; optional explicitly permitted screen/device/sensor/location/communication/acoustic inputs, time/weather/calendar/notifications/media state, persistent Sentry modes and retention-controlled Journal/Capture. This is former Slice 11; no earlier World Model implementation claim is made.
 
 ## Slice 15 — Commissioning / setup ◻️

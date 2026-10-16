@@ -210,6 +210,47 @@ class EventArchive:
                 )
         return event.id
 
+    def purge_expired_events(self, relationship: str, *, limit: int = 1000) -> int:
+        """Expire canonical payloads and dependent memories; no secure-erasure claim."""
+        if not relationship or type(limit) is not int or not 1 <= limit <= 1000:
+            raise ValueError("bounded scoped expiry required")
+        with self.db:
+            targets = {
+                row[0]
+                for row in self.db.execute(
+                    "SELECT id FROM archive_events WHERE relationship=? AND forgotten=0 "
+                    "AND json_extract(payload,'$.expires_at')<=? LIMIT ?",
+                    (relationship, time(), limit),
+                )
+            }
+            if not targets:
+                return 0
+            # Admission already rejects expired support; remove its retained copies as well.
+            for identifier, payload in self.db.execute(
+                "SELECT id,payload FROM archive_memories WHERE relationship=? AND forgotten=0",
+                (relationship,),
+            ).fetchall():
+                if targets.intersection(json.loads(payload)["event_ids"]):
+                    self.db.execute(
+                        "UPDATE archive_memories SET forgotten=1,payload='{}' WHERE id=?",
+                        (identifier,),
+                    )
+                    self.db.execute("DELETE FROM archive_fts WHERE memory_id=?", (identifier,))
+                    self.db.execute(
+                        "INSERT OR IGNORE INTO archive_tombstones VALUES(?,?)", (identifier, time())
+                    )
+            for identifier in targets:
+                self.db.execute(
+                    "UPDATE archive_events SET forgotten=1,payload='{}' WHERE id=?", (identifier,)
+                )
+                self.db.execute("DELETE FROM archive_aliases WHERE source_event=?", (identifier,))
+                for (entity,) in self.db.execute(
+                    "SELECT id FROM archive_entities WHERE source_event=?", (identifier,)
+                ).fetchall():
+                    self.db.execute("DELETE FROM archive_aliases WHERE entity_id=?", (entity,))
+                self.db.execute("DELETE FROM archive_entities WHERE source_event=?", (identifier,))
+        return len(targets)
+
     def event(self, event_id: str) -> SourceEvent:
         row = self.db.execute(
             "SELECT payload FROM archive_events WHERE id=? AND forgotten=0", (event_id,)
