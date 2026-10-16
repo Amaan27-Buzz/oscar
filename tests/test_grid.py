@@ -115,6 +115,21 @@ class GridTests(unittest.TestCase):
         self.assertEqual(self.r.grid.nodes()[0]["status"], "offline")
         self.assertEqual(self.r.store.task(task.id).state, TaskState.BLOCKED)
 
+    def test_reaper_fences_task_before_releasing_expired_ownership(self):
+        r = self.r
+        task, _, _ = r.leased_action()
+        r.clock.now += 21
+        original = r.grid.release
+        observed = []
+
+        def release(lease_id):
+            observed.append(r.store.task(task.id).state)
+            original(lease_id)
+
+        r.grid.release = release
+        r.grid.reap()
+        self.assertEqual([TaskState.BLOCKED], observed)
+
     def test_reconnect_requires_readvertisement(self):
         r = self.r
         r.grid.disconnect("test-node")

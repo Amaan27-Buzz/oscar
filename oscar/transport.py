@@ -12,7 +12,7 @@ from typing import Any, Protocol
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, build_opener
 
-from .capabilities import Cancellation, Executor
+from .capabilities import Cancellation, Cancelled, Executor
 from .contracts import Action, ArtifactRef, Envelope, Epistemic, Result, TaskState, record
 from .grid import Grid, SessionHandle
 from .http_client import NoRedirects
@@ -74,18 +74,18 @@ class Dispatcher:
         # A successfully advertised node necessarily has heartbeat scope. Authenticated
         # target-side activity is fresh liveness evidence, so continuous real work must
         # not expire solely because a separate timer heartbeat was not scheduled.
-        self.grid.heartbeat(session)
+        self.grid.heartbeat(session, lease_id=envelope.lease_id)
         self.grid.accept(envelope, session.token, "execute")
         for permission in candidates[0]["permissions"]:
-            self.grid.authenticate(session, permission)
+            self.grid.authenticate(session, permission, lease_id=envelope.lease_id)
 
         def authorize_execution() -> None:
             latest = self.store.get("node", self.node_id)
             if [c for c in latest["capabilities"] if c["id"] == action.capability_id] != candidates:
                 raise PermissionError("target capability withdrawn or changed")
-            self.grid.authenticate(session, "execute")
+            self.grid.authenticate(session, "execute", lease_id=envelope.lease_id)
             for permission in candidates[0]["permissions"]:
-                self.grid.authenticate(session, permission)
+                self.grid.authenticate(session, permission, lease_id=envelope.lease_id)
             current = self.store.task(action.task_id)
             lease = self.store.get("lease", envelope.lease_id)
             if (
@@ -154,7 +154,12 @@ class Dispatcher:
                     raise StateConflict("interaction fence expired")
                 lease["expires"] = self.grid.clock() + 120
                 self.store.put("interaction_lease", ownership["resource"], lease)
-        result = self.executors[action.capability_id](execution, cancellation)
+        try:
+            result = self.executors[action.capability_id](execution, cancellation)
+        except Cancelled:
+            raise
+        except Exception:
+            raise OSError("executor failed; outcome requires independent inspection") from None
         if (
             result.action_id != action.id
             or result.task_id != action.task_id

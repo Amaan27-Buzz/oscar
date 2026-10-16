@@ -48,6 +48,11 @@ class Store:
                 sequence INTEGER PRIMARY KEY AUTOINCREMENT,
                 task_id TEXT NOT NULL, event TEXT NOT NULL, data TEXT NOT NULL
             );
+            CREATE INDEX IF NOT EXISTS tasks_by_state
+                ON records(json_extract(data,'$.state')) WHERE kind='task';
+            CREATE INDEX IF NOT EXISTS live_leases_by_expiry
+                ON records(json_extract(data,'$.expires_at'))
+                WHERE kind='lease' AND json_extract(data,'$.active')=1;
             CREATE TABLE IF NOT EXISTS dedup (
                 key TEXT PRIMARY KEY, fingerprint TEXT NOT NULL,
                 action_id TEXT NOT NULL, state TEXT NOT NULL, result TEXT
@@ -60,9 +65,9 @@ class Store:
         """)
 
     @contextmanager
-    def transaction(self) -> Iterator[None]:
+    def transaction(self, *, write: bool = True) -> Iterator[None]:
         with self.lock:
-            self.db.execute("BEGIN IMMEDIATE")
+            self.db.execute("BEGIN IMMEDIATE" if write else "BEGIN")
             try:
                 yield
             except BaseException:

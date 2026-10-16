@@ -234,6 +234,11 @@ def parser() -> argparse.ArgumentParser:
     watch.add_argument("--retain", action="store_true")
     serve = commands.add_parser("serve")
     serve.add_argument("--seconds", type=int, default=3600)
+    serve.add_argument(
+        "--reenroll-execution",
+        action="store_true",
+        help="Explicit trusted-local execution enrollment after credential expiry/revocation",
+    )
     write = commands.add_parser("write")
     write.add_argument("--path", required=True)
     write.add_argument("--content", required=True)
@@ -274,7 +279,13 @@ def main() -> int:
                 pinned_model=args.model,
                 pinned_slot=args.slot,
             )
-        with Harness(args.state, args.workspace, args.manifest, template) as harness:
+        with Harness(
+            args.state,
+            args.workspace,
+            args.manifest,
+            template,
+            execution_enrollment_authorized=getattr(args, "reenroll_execution", False),
+        ) as harness:
             transports = {harness.node_id: (harness.dispatcher, harness.session)}
             if args.command == "executive":
                 executive = harness.runtime.executive

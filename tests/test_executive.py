@@ -177,6 +177,54 @@ class ExecutiveTests(unittest.TestCase):
         self.e.tick()
         self.assertFalse(self.r.files.exists("proof.txt"))
 
+    def test_unexpected_executor_failure_preserves_ambiguity_and_other_work(self):
+        self.goal([self.step("proof", file=True)])
+        calls = []
+        original = self.r.dispatcher.executors["file"]
+
+        def crash(action, cancellation):
+            original(action, cancellation)
+            calls.append(action.id)
+            raise RuntimeError("synthetic executor defect; do not persist details")
+
+        self.r.dispatcher.executors["file"] = crash
+        self.e.tick()
+        task = self.r.store.all("task")[0]
+        self.assertEqual("blocked", task["state"])
+        self.assertEqual(b"verified bytes", self.r.files.read("proof.txt"))
+        self.e.retry(task["id"], owner_authorized=True)
+        self.e.tick()
+        self.assertEqual(1, len(calls))
+        other = self.e.decompose(self.worker, "2 + 2")
+        self.e.accept(other["id"], other["review_digest"], owner_authorized=True)
+        self.e.tick()
+        self.assertEqual("completed", self.r.store.get("executive_goal", other["id"])["state"])
+        self.assertFalse(self.r.store.all("executive_slot"))
+
+    def test_worker_scope_revision_and_session_expiry_during_execution(self):
+        goal = self.goal([self.step("proof", file=True)])
+        worker = self.r.store.get("executive_worker", self.worker)
+        self.r.store.put(
+            "executive_worker",
+            self.worker,
+            {**worker, "revision": worker["revision"] + 1, "grants": []},
+        )
+        self.e.tick()
+        self.assertFalse(self.r.store.all("action"))
+        self.assertNotEqual("completed", self.r.store.get("executive_goal", goal["id"])["state"])
+        self.r.store.put("executive_worker", self.worker, worker)
+        original = self.r.dispatcher.executors["file"]
+
+        def expire(action, cancellation):
+            session = self.r.store.get("session", self.r.session.id)
+            self.r.clock.now = session["expires_at"]
+            return original(action, cancellation)
+
+        self.r.dispatcher.executors["file"] = expire
+        self.e.tick()
+        self.assertFalse(self.r.files.exists("proof.txt"))
+        self.assertEqual("cancelled", self.r.store.all("task")[0]["state"])
+
     def test_renewed_task_lease_keeps_worker_reserved_after_slot_timer(self):
         self.goal()
         self.goal()

@@ -2,11 +2,14 @@
 
 import hashlib
 import hmac
+import json
 import math
 import secrets
+import sqlite3
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from enum import StrEnum
+from threading import Event, Thread
 from time import time
 from typing import Any
 
@@ -79,10 +82,14 @@ class Grid:
         ttl: float = 3600,
         *,
         session_id: str | None = None,
+        internal: bool = False,
+        reenroll: bool = False,
     ) -> SessionHandle:
         """Trusted coordinator API: approved scope; inaccessible to remote peers."""
         if not 0 < ttl <= 86400:
             raise ValueError("invalid session lifetime")
+        if internal and ttl > 3600:
+            raise ValueError("internal credentials last at most one hour")
         if session_id is not None and (
             not isinstance(session_id, str)
             or len(session_id) != 32
@@ -93,6 +100,20 @@ class Grid:
             node = self.store.get("node", node_id)
             if node["revoked"] or not set(approved_scopes) <= set(node["scopes"]):
                 raise PermissionError("pairing scope denied")
+            if internal:
+                try:
+                    previous_id = self.store.get("core_execution", node_id)["session_id"]
+                    previous = self.store.get("session", previous_id)
+                except KeyError:
+                    previous = None
+                if previous:
+                    if previous["node_id"] != node_id or not previous.get("internal"):
+                        raise PermissionError("internal enrollment identity mismatch")
+                    if not reenroll and (
+                        previous["revoked"] or previous["expires_at"] <= self.clock()
+                    ):
+                        raise PermissionError("internal execution requires explicit new enrollment")
+                    self.store.put("session", previous["id"], {**previous, "revoked": True})
             identifier, token = session_id or new_id(), secrets.token_urlsafe(32)
             try:
                 self.store.get("session", identifier)
@@ -110,34 +131,121 @@ class Grid:
                     "scopes": list(approved_scopes),
                     "expires_at": self.clock() + ttl,
                     "revoked": False,
+                    **(
+                        {"internal": True, "generation": 0, "renew_until": self.clock() + 7 * 86400}
+                        if internal
+                        else {}
+                    ),
                 },
             )
+            if internal:
+                self.store.put("core_execution", node_id, {"session_id": identifier})
             node["paired"] = True
             self.store.put("node", node_id, node)
             self.store.audit("", "paired", {"node_id": node_id, "session_id": identifier})
         return SessionHandle(identifier, node_id, token)
 
-    def authenticate(self, session: SessionHandle, scope: str) -> None:
+    def authenticate(
+        self, session: SessionHandle, scope: str, *, lease_id: str | None = None
+    ) -> None:
+        with self.store.lock:
+            self._authenticate(session, scope, lease_id=lease_id)
+
+    def _authenticate(self, session: SessionHandle, scope: str, *, lease_id: str | None) -> None:
         data = self.store.get("session", session.id)
         node = self.store.get("node", session.node_id)
         digest = hashlib.sha256(session.token.encode()).hexdigest()
+        current = hmac.compare_digest(data["token_digest"], digest)
+        draining = data.get("previous", {})
+        previous = (
+            lease_id is not None
+            and lease_id in draining.get("leases", [])
+            and draining.get("expires_at", 0) > self.clock()
+            and hmac.compare_digest(draining.get("token_digest", ""), digest)
+        )
+        if previous:
+            lease = self.store.get("lease", lease_id or "")
+            previous = bool(lease["active"] and lease["expires_at"] > self.clock())
         if (
             data["node_id"] != session.node_id
             or data["revoked"]
             or node["revoked"]
             or not node["paired"]
             or data["expires_at"] <= self.clock()
-            or not hmac.compare_digest(data["token_digest"], digest)
+            or not (current or previous)
             or scope not in data["scopes"]
             or scope not in node["scopes"]
         ):
             raise PermissionError("session/scope denied")
 
-    def heartbeat(self, session: SessionHandle, *, health: str = "healthy") -> None:
+    def maintain_internal(self, session: SessionHandle) -> None:
+        """Trusted local lifecycle only: rotate live credentials, never repair revoked authority."""
+        with self.store.lock:
+            with self.store.transaction():
+                self.authenticate(session, "heartbeat")
+                row = self.store.get("session", session.id)
+                if not row.get("internal") or not hmac.compare_digest(
+                    row["token_digest"], hashlib.sha256(session.token.encode()).hexdigest()
+                ):
+                    raise PermissionError("current internal credential required")
+                now = self.clock()
+                if row["renew_until"] <= now:
+                    raise PermissionError("internal enrollment expired; new enrollment required")
+                token = None
+                if row["expires_at"] < row["renew_until"] and row["expires_at"] - now <= 900:
+                    leases = [
+                        r[0]
+                        for r in self.store.db.execute(
+                            "SELECT id FROM records WHERE kind='lease' "
+                            "AND json_extract(data,'$.active')=1 "
+                            "AND json_extract(data,'$.expires_at')>? "
+                            "AND json_extract(data,'$.node_id')=? LIMIT 257",
+                            (now, session.node_id),
+                        )
+                    ]
+                    if len(leases) > 256:
+                        raise StateConflict("internal credential drain capacity exceeded")
+                    token = secrets.token_urlsafe(32)
+                    row.update(
+                        previous={
+                            "token_digest": row["token_digest"],
+                            "expires_at": row["expires_at"],
+                            "leases": leases,
+                        },
+                        token_digest=hashlib.sha256(token.encode()).hexdigest(),
+                        expires_at=min(now + 3600, row["renew_until"]),
+                        generation=row["generation"] + 1,
+                    )
+                    self.store.put("session", session.id, row)
+                    self.store.audit(
+                        "",
+                        "internal_credential_rotated",
+                        {"session_id": session.id, "generation": row["generation"]},
+                    )
+                node = self.store.get("node", session.node_id)
+                if node["last_seen"] is None or now - node["last_seen"] >= 10:
+                    node.update(status="online", health="healthy", last_seen=now)
+                    self.store.put("node", session.node_id, node)
+            if token is not None:
+                session.token = token
+
+    def heartbeat(
+        self, session: SessionHandle, *, health: str = "healthy", lease_id: str | None = None
+    ) -> None:
         if health not in {"healthy", "degraded"}:
             raise ValueError("invalid health")
+        with self.store.lock:
+            self.authenticate(session, "heartbeat", lease_id=lease_id)
+            node = self.store.get("node", session.node_id)
+            if (
+                node["status"] == ("online" if health == "healthy" else "degraded")
+                and node["health"] == health
+                and node["last_seen"] is not None
+                and 0 <= self.clock() - node["last_seen"] < min(10, self.heartbeat_ttl / 3)
+            ):
+                return
         with self.store.transaction():
-            self.authenticate(session, "heartbeat")
+            self.authenticate(session, "heartbeat", lease_id=lease_id)
             node = self.store.get("node", session.node_id)
             node.update(
                 status="online" if health == "healthy" else "degraded",
@@ -170,6 +278,16 @@ class Grid:
 
     def nodes(self) -> list[dict[str, Any]]:
         result: list[dict[str, Any]] = []
+        with self.store.lock:
+            leases = [
+                json.loads(row[0])
+                for row in self.store.db.execute(
+                    "SELECT data FROM records INDEXED BY live_leases_by_expiry WHERE kind='lease' "
+                    "AND json_extract(data,'$.active')=1 "
+                    "AND json_extract(data,'$.expires_at')>?",
+                    (self.clock(),),
+                )
+            ]
         for data in self.store.all("node"):
             fresh = (
                 data["last_seen"] is not None
@@ -179,7 +297,7 @@ class Grid:
                 data.update(status="offline", health="unknown", capabilities=[])
             data["active_leases"] = [
                 lease["id"]
-                for lease in self.store.all("lease")
+                for lease in leases
                 if lease["node_id"] == data["id"]
                 and lease["active"]
                 and lease["expires_at"] > self.clock()
@@ -293,7 +411,7 @@ class Grid:
     def accept(self, envelope: Envelope, token: str, scope: str) -> None:
         session = SessionHandle(envelope.session_id, envelope.node_id, token)
         with self.store.transaction():
-            self.authenticate(session, scope)
+            self.authenticate(session, scope, lease_id=envelope.lease_id)
             if not math.isfinite(envelope.sent_at) or abs(self.clock() - envelope.sent_at) > 60:
                 raise PermissionError("message expired")
             task = self.store.task(envelope.task_id)
@@ -340,7 +458,7 @@ class Grid:
         if not math.isfinite(ttl) or not 0 < ttl <= 300:
             raise ValueError("invalid lease lifetime")
         with self.store.transaction():
-            self.authenticate(session, "execute")
+            self.authenticate(session, "execute", lease_id=lease_id)
             lease = self.store.get("lease", lease_id)
             task = self.store.task(lease["task_id"])
             if (
@@ -393,12 +511,18 @@ class Grid:
         expired = []
         for lease in self.store.all("lease"):
             if lease["active"] and lease["expires_at"] <= self.clock():
-                self.release(lease["id"])
                 task = self.store.task(lease["task_id"])
                 if task.state in {TaskState.EXECUTING, TaskState.AWAITING_RESULT}:
-                    self.store.transition(
-                        task.id, TaskState.BLOCKED, blocker="executor lease expired"
-                    )
+                    try:
+                        self.store.transition(
+                            task.id,
+                            TaskState.BLOCKED,
+                            blocker="executor lease expired",
+                            expected_lease=lease["id"],
+                        )
+                    except StateConflict:
+                        pass
+                self.release(lease["id"])
                 self.store.audit(
                     task.id, "lease_expired", {"lease_id": lease["id"], "reclaimable": True}
                 )
@@ -422,3 +546,28 @@ def reconnect_delay(attempt: int, maximum: float = 30) -> float:
     if not 0 <= attempt <= 20:
         raise ValueError("reconnect retry budget exhausted")
     return float(min(maximum, 0.25 * 2**attempt))
+
+
+class InternalSessionRuntime:
+    """Heartbeat/rotation must not wait for Executive executor I/O."""
+
+    def __init__(self, grid: Grid, session: SessionHandle):
+        self.grid, self.session = grid, session
+        self.stop = Event()
+        self.thread = Thread(target=self._run, name="oscar-execution-session", daemon=True)
+
+    def _run(self) -> None:
+        while not self.stop.is_set():
+            try:
+                self.grid.maintain_internal(self.session)
+            except (PermissionError, KeyError):
+                return
+            except (OSError, StateConflict, sqlite3.Error):
+                pass
+            self.stop.wait(10)
+
+    def close(self) -> None:
+        self.stop.set()
+        self.thread.join(timeout=6)
+        if self.thread.is_alive():
+            raise StateConflict("execution-session maintenance has not stopped")

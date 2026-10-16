@@ -1,10 +1,12 @@
 """Real laptop-local Core composition; the enrolled phone is a logical reference fixture."""
 
+import subprocess
+import sys
 import unittest
 from dataclasses import asdict
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from time import monotonic, sleep
+from time import monotonic, sleep, time
 
 from oscar.commissioning import CommissioningPlan
 from oscar.contracts import new_id
@@ -15,9 +17,75 @@ from oscar.mobile import Mobile
 from oscar.perception import PerceptionSource
 from oscar.policy import PersonalPolicy
 from oscar.world_model import ObservationKind
+from tests.support import Clock
 
 
 class Group03RuntimeTests(unittest.TestCase):
+    def test_day_of_core_world_presence_and_workers_with_source_loss(self):
+        with TemporaryDirectory(prefix="oscar-day-integration-") as folder:
+            root = Path(folder)
+            clock = Clock()
+            with Harness(
+                root / "core.sqlite",
+                root / "files",
+                Path("config/development-models.json"),
+                clock=clock,
+            ) as h:
+
+                def enroll_source():
+                    h.world.configure_source(
+                        PerceptionSource(
+                            "uptime-tasks",
+                            ("core",),
+                            ("tasks.state",),
+                            (ObservationKind.TASK,),
+                            perceive=True,
+                            simulated=False,
+                        ),
+                        "tasks",
+                        "core",
+                        owner_authorized=True,
+                    )
+
+                enroll_source()
+                executive = h.executive
+                worker = executive.worker(
+                    "Hourly local work", [(h.node_id, "math.add")], ("math",), owner_authorized=True
+                )
+                goal = executive.decompose(worker, "2 + 2", interval_seconds=3600, max_runs=25)
+                executive.accept(goal["id"], goal["review_digest"], owner_authorized=True)
+                start = clock()
+                for minute in range(0, 1441, 5):
+                    clock.now = start + minute * 60
+                    h.grid.maintain_internal(h.session)
+                    if minute == 480:
+                        h.world.fabric.revoke("uptime-tasks", owner_authorized=True)
+                    if minute == 600:
+                        enroll_source()
+                    h.world.tick()
+                    executive.tick()
+                    if minute in {60, 120, 480, 1440}:
+                        expected = minute // 60 + 1
+                        deadline = monotonic() + 5
+                        while (
+                            h.store.get("executive_goal", goal["id"])["run_index"] < expected
+                            and monotonic() < deadline
+                        ):
+                            executive.tick()
+                            sleep(0.002)
+                        self.assertEqual(
+                            expected, h.store.get("executive_goal", goal["id"])["run_index"]
+                        )
+                        h.world.tick()
+                        current = h.world.world.resolve("core", "tasks.state")
+                        self.assertEqual(minute != 480, current.state == "current")
+                        self.assertEqual(
+                            "idle", h.runtime.presence.snapshot()["expression"]["operation"]
+                        )
+                self.assertEqual(25, len(h.store.all("action")))
+                self.assertTrue(all(t["state"] == "verified" for t in h.store.all("task")))
+                self.assertIs(h.archive, h.runtime.memory.archive)
+
     def test_normal_core_setup_world_presence_executive_surface_and_restart(self):
         with TemporaryDirectory(prefix="oscar-group03-integration-") as folder:
             root = Path(folder)
@@ -173,3 +241,75 @@ class Group03RuntimeTests(unittest.TestCase):
                 )
                 self.assertEqual(2, len(restarted.store.all("task")))
                 self.assertEqual(b"Core-owned exact bytes", restarted.files.read("proof.txt"))
+
+    def test_process_crash_after_file_mutation_does_not_replay_on_restart(self):
+        script = """
+import sys
+from dataclasses import asdict
+from pathlib import Path
+from threading import Event
+from oscar.harness import Harness
+from oscar.jev import Intent
+root = Path(sys.argv[1])
+with Harness(root/'core.sqlite', root/'files', Path('config/development-models.json')) as h:
+    original = h.dispatcher.executors['files.write']
+    def interrupted(action, cancellation):
+        original(action, cancellation)
+        (root/'ready').write_text('mutation completed', encoding='utf-8')
+        Event().wait(30)
+        raise OSError('result lost')
+    h.dispatcher.executors['files.write'] = interrupted
+    e = h.executive
+    w = e.worker('Crash proof', [(h.node_id,'files.write')],
+                 ('files:write',), owner_authorized=True)
+    step = {'id':'proof', 'intent':asdict(Intent('Write','file_write','proof.txt','once')),
+            'depends_on':[], 'node_id':h.node_id, 'capability_id':'files.write'}
+    g = e.propose(w, 'Exact mutation', [step])
+    e.accept(g['id'], g['review_digest'], owner_authorized=True)
+    e.tick()
+"""
+        with TemporaryDirectory(prefix="oscar-active-crash-") as folder:
+            root = Path(folder)
+            process = subprocess.Popen(
+                [sys.executable, "-c", script, str(root)],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
+            try:
+                deadline = monotonic() + 10
+                while (
+                    not (root / "ready").exists()
+                    and process.poll() is None
+                    and monotonic() < deadline
+                ):
+                    sleep(0.02)
+                self.assertTrue((root / "ready").exists(), "Child did not reach the real mutation")
+                stamp = (root / "files/proof.txt").stat().st_mtime_ns
+            finally:
+                if process.poll() is None:
+                    process.kill()
+                process.communicate(timeout=5)
+            with Harness(
+                root / "core.sqlite",
+                root / "files",
+                Path("config/development-models.json"),
+                clock=lambda: time() + 121,
+            ) as h:
+                calls = []
+                original = h.dispatcher.executors["files.write"]
+
+                def count(action, cancellation):
+                    calls.append(action.id)
+                    return original(action, cancellation)
+
+                h.dispatcher.executors["files.write"] = count
+                h.grid.reap()
+                task = h.store.all("task")[0]
+                self.assertEqual("blocked", task["state"])
+                h.executive.retry(task["id"], owner_authorized=True)
+                h.executive.tick()
+                self.assertFalse(calls)
+                self.assertEqual(stamp, (root / "files/proof.txt").stat().st_mtime_ns)
+                self.assertEqual(b"once", h.files.read("proof.txt"))
+                self.assertEqual(1, len(h.store.all("action")))
+                self.assertNotEqual("verified", h.store.task(task["id"]).state)
