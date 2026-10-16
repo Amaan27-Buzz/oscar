@@ -13,6 +13,10 @@ export class DesktopExpressionAdapter {
   private transition=0;
   constructor(private kind:Source['kind']='core') {}
   receive(view:View,now:number):ExpressionEvent|null {
+    if(view.presence&&view.link==='online'&&view.voice==='idle') {
+      const canonical=parseEvent(view.presence.expression);
+      if(canonical&&canonical.source.kind==='core'&&canonical.source.id.startsWith('presence:')&&canonical.eventTime<=now+250&&canonical.expiresAt>now)return canonical;
+    }
     const r=view.expression;
     if(!r||!/^[a-f0-9]{32}$/.test(r.epoch)||!Number.isSafeInteger(r.generation)||r.generation<0||
       !Number.isSafeInteger(r.observed_at_ms)||r.observed_at_ms<0||

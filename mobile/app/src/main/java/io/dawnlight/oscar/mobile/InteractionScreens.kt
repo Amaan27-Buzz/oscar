@@ -23,7 +23,7 @@ import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.unit.DpOffset
 
 @Composable fun PresenceScreen(state: MobileState, draft: String, write: (String) -> Unit, send: () -> Unit,
-    cancel: () -> Unit, activity: () -> Unit, voice: () -> Unit, showComposer: Boolean = true, today: (() -> Unit)? = null) {
+    cancel: () -> Unit, activity: () -> Unit, voice: () -> Unit, showComposer: Boolean = true, today: (() -> Unit)? = null, inspect: ((String) -> Unit)? = null) {
     var reading by remember(state.epoch) { mutableStateOf<Interaction?>(null) }
     if (state.interactions.isEmpty()) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
@@ -71,6 +71,7 @@ import androidx.compose.ui.unit.DpOffset
                 ?: if (interaction.taskId != null) "Task unavailable in current readback · outcome unknown" else interaction.response, maxLines = 12)
         }
         if (task?.response != null) StatusLabel("Reported response") else task?.let { StatusLabel(it.label) }
+        state.snapshot?.adaptive?.firstOrNull { it.taskId == interaction.taskId }?.let { view -> inspect?.let { callback -> AdaptiveTask(view) { callback(view.taskId) } } }
         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             TextButton(onClick = { reading = interaction }) { Glyph("Book"); Spacer(Modifier.width(8.dp)); Text("Read response") }
             if (interaction.taskId != null) TextButton(onClick = activity) { Glyph("Document"); Spacer(Modifier.width(8.dp)); Text("Task details") }

@@ -202,6 +202,7 @@ class CoreSession(application: Application) : AndroidViewModel(application) {
         mutable.value = mutable.value.unavailable("Stopped waiting locally. Core execution may continue; reconnect and inspect before another action.")
     }
     fun connect(session: JSONObject) {
+        CompanionOverlay.hide(getApplication())
         VoicePresentation.cancel(getApplication())
         operation?.cancel(); client?.cancel()
         client = null
@@ -222,6 +223,7 @@ class CoreSession(application: Application) : AndroidViewModel(application) {
         }
     }
     fun disconnect() {
+        CompanionOverlay.hide(getApplication(), disable = true)
         VoicePresentation.cancel(getApplication())
         stop(); client = null; alerts.clear()
         val epoch = mutable.value.epoch

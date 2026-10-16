@@ -1,6 +1,14 @@
-# OSCAR Adaptive Interface Engine (AIE) — future architecture
+# OSCAR Adaptive Interface Engine (AIE)
 
-**Status: PLANNED (2026-10-14 owner direction).** This is a design/architecture requirement, **not running software** and **not Group 2.5 implementation scope**. Related: [active product direction](PRODUCT-DIRECTION.md), [surfaces](SURFACES.md), [Core architecture](ARCHITECTURE.md), [permissions](SECURITY.md), [canonical roadmap](SLICE-NUMBERING.md).
+**Status: bounded software contract implemented in Group 3 (2026-10-16).**
+`oscar/adaptive.py` validates versioned, expiring task views and negotiates three
+trusted primitives: `prose`, `task_progress`, `result_evidence`. Core derives state
+and evidence references from authorized canonical tasks. React and Compose render
+these as accessible text with typed task inspection, freshness fallback and no
+arbitrary code, WebView, signing or execution authority. The richer examples below
+remain future expansion. No Group 2.5 visual redesign. Related: [surfaces](SURFACES.md),
+[Core architecture](ARCHITECTURE.md), [permissions](SECURITY.md),
+[canonical roadmap](SLICE-NUMBERING.md).
 
 ## User outcome
 

@@ -30,7 +30,8 @@ data class CoreTask(
 data class CoreProgress(val fraction: Double, val step: String, val current: Boolean)
 data class CoreArtifact(val id: String, val kind: String, val status: String, val hash: String?)
 data class CoreNode(val id: String, val role: String, val status: String, val paired: Boolean, val capabilities: List<String>)
-data class CoreSnapshot(val tasks: List<CoreTask>, val nodes: List<CoreNode>, val observedAt: Long)
+data class CoreSnapshot(val tasks: List<CoreTask>, val nodes: List<CoreNode>, val observedAt: Long,
+    val presence: String? = null, val setup: Map<String, String> = emptyMap(), val adaptive: List<AdaptiveDescriptor> = emptyList())
 data class Interaction(val text: String, val response: String, val taskId: String? = null)
 data class MobileState(
     val epoch: Long = 0, val link: Link = Link.DISCONNECTED, val busy: Boolean = false,
@@ -115,7 +116,7 @@ fun parseTask(json: JSONObject): CoreTask {
         json.bounded("target", 80), status, generation, if (status == "online") actions else actions.filter { it in setOf("cancel", "deny") },
         evidence, value, blocker, response, json.optBoolean("response_truncated", false), progress, artifacts, ownership, origin, originNode)
 }
-fun CoreSnapshot.withoutPrivate() = copy(tasks = tasks.map { it.copy(description = "Private request hidden", response = null, value = null,
+fun CoreSnapshot.withoutPrivate() = copy(adaptive = emptyList(), tasks = tasks.map { it.copy(description = "Private request hidden", response = null, value = null,
     artifacts = emptyList(), progress = it.progress?.copy(step = "Worker checkpoint available"),
     blocker = it.blocker?.let { "Inspect Core before continuing" }, actions = it.actions.filter { action -> action in setOf("deny", "cancel") }) })
 fun parseSnapshot(json: JSONObject): CoreSnapshot {
@@ -142,5 +143,15 @@ fun parseSnapshot(json: JSONObject): CoreSnapshot {
     require(parsedTasks.map { it.id }.distinct().size == parsedTasks.size && parsedNodes.map { it.id }.distinct().size == parsedNodes.size)
     val observed = json.get("observed_at_ms")
     require(observed is Number && observed.toLong() > 0)
-    return CoreSnapshot(parsedTasks, parsedNodes, observed.toLong())
+    val presence = json.optJSONObject("presence")?.getJSONObject("expression")?.toString()?.also {
+        val event = io.dawnlight.oscar.expression.Contract.parse(it)
+        require(event != null && event.source.kind == io.dawnlight.oscar.expression.SourceKind.CORE && event.source.id.startsWith("presence:"))
+    }
+    val setup = json.optJSONObject("setup")?.let { root -> listOf("identity", "pairing", "provider", "persona", "preferences", "policy", "sentry", "voice").associateWith { section ->
+        val item = root.getJSONObject(section)
+        require(item.get("configured") is Boolean)
+        when { item.optBoolean("operational", false) -> "Operational"; item.optBoolean("connected", false) -> "Connected"; item.getBoolean("configured") -> "Configured"; else -> "Setup needed" }
+    } } ?: emptyMap()
+    val adaptive = json.optJSONArray("adaptive_views")?.let { views -> require(views.length() <= 3); (0 until views.length()).mapNotNull { parseAdaptive(views.getJSONObject(it)) } } ?: emptyList()
+    return CoreSnapshot(parsedTasks, parsedNodes, observed.toLong(), presence, setup, adaptive)
 }

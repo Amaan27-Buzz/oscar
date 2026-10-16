@@ -12,6 +12,7 @@ from .event_archive import EventArchive
 from .grid import Grid, Node, NodeRole
 from .memory_fabric import MemoryFabric
 from .models import Mode, ModelRequest, ProviderError, RoutingPolicy
+from .presence import PresenceRuntime
 from .providers import HTTPAdapter
 from .registry import Registry
 from .retrieval import ProviderInventorySource, RetrievalExecutor
@@ -152,6 +153,7 @@ class Harness:
         self.world = WorldRuntime(self.runtime, self.files)
         self.runtime.world = self.world
         self.runtime.setup = SetupRuntime(self.runtime, self.pool)
+        self.runtime.presence = PresenceRuntime(self.runtime)
         self.store.close_callbacks.append(self.close_services)
         self.world.start()
 
