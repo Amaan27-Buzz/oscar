@@ -3,11 +3,16 @@
   "date": "2026-10-16",
   "branch": "codex/group-03-gate-d",
   "base_sha": "257349f82a96293c3737d446dca18ce46f098b04",
+  "implementation_sha": "3fd7cc90e538ca6fad71894c604a99e6b1fc308e",
+  "pull_request": "https://github.com/Amaan27-Buzz/oscar/pull/7",
+  "pull_request_state": "OPEN_DRAFT_NOT_MERGED",
+  "remote_head_verified": "3fd7cc90e538ca6fad71894c604a99e6b1fc308e",
+  "remote_ci": "UNKNOWN_REVIEW_CONNECTOR_ACCESS_DENIED",
   "gate_c": "PARTIAL",
   "gate_d": "PARTIAL",
   "stages": {
     "14": {"status": "VERIFIED_SCOPED_CHECKPOINT", "tests": "tests.test_world_model", "focused_passed": 38, "classification": "VERIFIED_REFERENCE", "whole_slice": "PARTIAL", "checkpoint_sha": "e34e665238e613e7b483644b12fc9e8c377f2a7f"},
-    "15": {"status": "VERIFIED_SCOPED_CHECKPOINT", "tests": "tests.test_commissioning", "focused_passed": 11, "classification": "VERIFIED_REFERENCE", "whole_slice": "PARTIAL"},
+    "15": {"status": "VERIFIED_SCOPED_CHECKPOINT", "tests": "tests.test_commissioning", "focused_passed": 11, "classification": "VERIFIED_REFERENCE", "whole_slice": "PARTIAL", "checkpoint_sha": "3fd7cc90e538ca6fad71894c604a99e6b1fc308e"},
     "16": {"status": "NOT_STARTED"},
     "17": {"status": "NOT_STARTED"}
   },

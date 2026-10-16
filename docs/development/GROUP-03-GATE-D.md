@@ -1,5 +1,13 @@
 # Group 3 — Gate D engineering run
 
+Published as [draft PR #7](https://github.com/Amaan27-Buzz/oscar/pull/7), targeting
+main; **not merged**. Verified remote implementation head:
+`3fd7cc90e538ca6fad71894c604a99e6b1fc308e` (Slice 15), following
+`e34e665238e613e7b483644b12fc9e8c377f2a7f` (Slice 14). The Code Review connector
+denied GitHub access for this workspace, so remote CI is **UNKNOWN**, not PASS.
+Git push and PR state/head readback succeeded through the existing repository
+workflow. Later documentation-only commits may advance the branch head.
+
 Owner authorization: 2026-10-16 unattended local backend work through canonical
 Slices 14–17, in dependency order. This supersedes older dated prohibitions only
 within this scope. Base: `257349f82a96293c3737d446dca18ce46f098b04`, verified by
