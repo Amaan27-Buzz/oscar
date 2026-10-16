@@ -1,95 +1,145 @@
-# Gate D integrated software report - 2026-10-16
+# Gate D final engineering closure - 2026-10-17
 
-**Gate D: PARTIAL. Gate C: PARTIAL.** Canonical Slices 14-17 now have integrated,
-locally verified software. Owner/live/device/production acceptance remains open.
-Branch `codex/group-03-gate-d`; [draft PR7](https://github.com/Amaan27-Buzz/oscar/pull/7) remains unmerged.
-Implementation commit: `c23dc4a64e45311104d7ba0798f20f4a763ffd9b`. Later evidence-only commits can advance the PR.
+**Gate C PARTIAL; Gate D PARTIAL.** The Group 3 software closure is locally
+verified. [PR7](https://github.com/Amaan27-Buzz/oscar/pull/7) remains draft/unmerged
+on `codex/group-03-gate-d`. Software implementation SHA: `4a72cb351a93d444405e55b1fc64d5cb2dedf035`.
+Subsequent documentation-only commits advance the delivery head recorded in PR7.
+Fetched main/merged PR6: `257349f82a96293c3737d446dca18ce46f098b04`.
+Group 2.5B Mobile UI/UX is owner APPROVED; physical/device acceptance is separate.
 
-| Slice | Implemented and locally verified | Remaining |
-|---|---|---|
-| 14 | Normal Core/Controller, authorized bounded source lifecycle, quiet Sentry and canonical retention | Owner environmental enrollment, capture/delivery and production acceptance |
-| 15 | Resumable setup, identity/pairing, provider/native Vault, Persona/preferences/policy/logical voice | Owner providers, physical pairing, Voice Match/Map and audio calibration |
-| 16 | Shared leased Presence, validated typed AIE/native renderers, opt-in Android overlay | Device/OEM/visual/power/accessibility acceptance; home widgets unavailable |
-| 17 | Reviewed bounded DAG/Worker execution, schedules, recovery, context gates, replanning and verified workflow reuse | Native authoring unavailable; owner/live-model/environment/production acceptance |
+| Area | Fix | Verification | Remaining |
+|---|---|---|---|
+| Internal execution sessions | Independent live scoped rotation; one-hour tokens, seven-day enrollment, bounded old-token drain | 1/2/8/24 simulated hours; real restart and no-repeat mutation; revoked/expired authority denied | Explicit local reenrollment after expiry/long sleep; cooperative in-flight limits |
+| Presence polling | Persist transitions; reserve publication generations; indexed reads and stable transition identity | Concurrent read/write-count, publisher replacement, TS/Kotlin freshness/replay tests | Owner/device/power acceptance; one reservation write per 1,024 unchanged publications |
+| Android Companion | Attach only after authorized fresh Core/local admission; request fencing, watchdog, dismissal and cleanup | 31 app + 6 Expression JVM tests; APK assembly/lint; no device connected | Actual FGS, permission/lock/network/notification/OEM behavior deferred |
+| Performance | Reduce World/heartbeat writes and indexed live-lease lookup, retaining verification/auth/dedup | Alternating normal/quiet fresh processes; p50/p95, SQL writes, CPU and Windows working set | Instrumented laptop limits; no battery/device/provider/inference or speed-parity claim |
+| Cross-slice integration | Fence expired task before lease release; contain executor defects and preserve ambiguity | Full suite, real process kill/restart, source revoke/recovery, cancellation and independent readback | External indivisible actions cannot be undone; ambiguous outcomes need inspection |
 
-## Verification
+## Verification and evidence classification
 
-- Final Python regression: **665 passed, 6 skipped, 0 failed** (671 ran, 159.648s).
-- Final Grid/Executive/cross-slice focused rerun: 44 passed, 0 failed.
-- Desktop: 85 frontend tests, TypeScript/Vite build, Rust format/Clippy and 16 Rust tests passed; Windows debug executable built.
-- Android: 30 JVM tests passed; debug and instrumentation APK assembly and lint passed. No emulator/device execution. Existing old instrumentation results were not counted.
-- Ruff lint/format (175 files), strict mypy (74 modules), repository/link/secret checks and diff checks passed.
-- Git integrity passed; existing dangling recoverable objects were preserved. Installed Desktop/expression npm audit reported no vulnerabilities.
-- Remote exact-head CI is **UNKNOWN**: Code Review connector denied workspace GitHub access. No CI PASS or diagnostic CLI fallback is claimed.
+Final Python: **678 passed, 0 failed, 6 skipped** (684 tests,
+166.202s). Focused closure suite: **76 passed**. Desktop: **86 frontend and
+16 Rust tests**, TypeScript/build, format/Clippy and Windows debug executable
+passed. Android: **37 JVM tests**, debug/AndroidTest APK assembly and lint passed.
+No connected ADB device was present; no emulator/device test was run.
+Ruff lint/format (177 files), strict mypy (74 modules), repository/link/secret
+checks and Git integrity passed. Existing recoverable dangling objects retained.
+Native npm audit reported zero installed package vulnerabilities. Canonical
+SVG/native PNG hashes and approved artwork/style files are unchanged.
 
-The [continuation receipt](verification-continuation.json) lists exact skips,
-commands, local log hashes, artifact hashes, warnings and security/failure coverage.
-The six skips are optional local/prepared voice executor checks, outside the
-authorized no-audio/model-preparation run. Existing Python HTTP fault fixtures
-emitted ResourceWarnings for HTTPError cleanup; no tests failed.
+The [machine-readable receipt](closure-verification.json) gives exact commands,
+six optional voice skips, hashes, classifications and limits. Earlier failing
+checks drove corrections; final checks pass without disabling tests or assertions.
+Existing HTTP fault fixtures still emit HTTPError cleanup ResourceWarnings.
+This is not a warning-free or exhaustive vulnerability-audit claim.
 
-## Runtime evidence
+Multi-hour tests advance clocks deterministically while using actual SQLite,
+Core/World/Presence/Workers and verified local execution. They are not a real-day
+soak. A separate real process was killed after an actual file mutation; restart
+and explicit retry preserved the original action/dedup identity and file timestamp
+without another executor invocation. Actual local file/HTTP/browser/credential
+execution is distinct from injected faults, phone/model fixtures and JVM overlay
+contracts. No owner provider, physical capture, OEM or production PASS is claimed.
 
-Real execution includes disposable SQLite/WAL and one canonical Event Archive,
-exact file writes/readback, arithmetic, authenticated loopback HTTP, separate
-Core/Worker processes and restart. The cross-slice test composes real identity,
-setup, local Grid/task perception, scoped surface reads, Presence/AIE, a reviewed
-file/math DAG, revocation and durable restart with no duplicate work.
+## Performance
 
-Provider fault responses, injected context, model planner JSON and phone enrollment
-are labeled synthetic/reference fixtures. Headless Chromium uses local fixture
-pages. Native Windows credential tests use disposable credentials; no owner account
-was enrolled. No real camera, microphone, OEM feed, phone or Edge acceptance is
-implied. Software tests cover stale/offline state, source revocation during
-acquisition, permission changes, Worker/capability withdrawal, cancellation,
-concurrent admission and ambiguous-mutation fencing.
+Baseline is reviewed head `d2e686c7d8c2f67dea13d1551d52b5759831d279`, measured
+with this same script and environment. Four repetitions, alternating revision
+order, fresh processes and three warm-ups per operation. Normal mode includes
+an authorized actual local Grid source and background services; quiet mode stops
+those services. SQL trace instrumentation is identical; tracemalloc is disabled.
+The older 13.70 -> 18.85ms arithmetic receipt remains historical and used different
+instrumentation, so it is not directly compared to these absolute timings.
 
-Final review corrected pairing lost updates, stale reaper disconnects and a
-disconnect/reconnect race that could block newly admitted work. These have
-deterministic regression tests. Memory remains historical; fresh context and
-relationship/session grants remain independently checked.
+Reproduce: `python -m scripts.benchmark_group03_closure --repeats 4`.
+[Raw measurements, profiles and resource samples](closure-benchmark.json).
 
-## Reproducible local measurements
-
-Baseline `5899798a3200173547ee3493689e20222fe3d1b1` versus implementation above, Python 3.14.2,
-3 warm-ups and 30 samples per operation. Timings include real local task creation,
-execution and independent verification. Run `python -m scripts.benchmark_group03`.
-The [raw report](end-to-end-benchmark.json) records source hashes and both p95s.
-
-| Operation | Baseline median ms | Candidate median ms | Candidate p95 ms |
+| Mode / operation | Baseline p50 / p95 ms | Closure p50 / p95 ms | Samples / errors |
 |---|---:|---:|---:|
-| arithmetic_local | 13.702 | 18.854 | 21.018 |
-| file_local | 32.488 | 27.378 | 31.635 |
-| arithmetic_loopback_http | 93.473 | 90.297 | 95.61 |
-| presence_and_typed_view | Unavailable | 2.888 | 4.196 |
-| reviewed_executive_goal | Unavailable | 33.864 | 44.582 |
+| normal: arithmetic | 15.706 / 22.928 | 11.749 / 17.980 | 160 / 0 |
+| normal: file | 23.704 / 30.557 | 22.204 / 30.197 | 160 / 0 |
+| normal: loopback_http | 97.693 / 126.052 | 97.366 / 121.336 | 160 / 0 |
+| normal: reviewed_executive_goal | 25.579 / 33.295 | 17.750 / 23.710 | 160 / 0 |
+| normal: presence_unchanged | 1.601 / 3.307 | 0.025 / 0.042 | 800 / 0 |
+| normal: presence_eight_subscribers | 15.045 / 24.552 | 0.037 / 1.383 | 800 / 0 |
+| normal: presence_transition_projection | 1.568 / 2.958 | 0.535 / 0.853 | 40 / 0 |
+| quiet: arithmetic | 12.182 / 15.388 | 11.251 / 17.068 | 160 / 0 |
+| quiet: file | 21.414 / 33.157 | 20.930 / 28.325 | 160 / 0 |
+| quiet: loopback_http | 94.802 / 124.967 | 97.425 / 129.284 | 160 / 0 |
+| quiet: reviewed_executive_goal | 18.907 / 26.757 | 17.410 / 23.613 | 160 / 0 |
+| quiet: presence_unchanged | 1.617 / 3.251 | 0.039 / 0.139 | 800 / 0 |
+| quiet: presence_eight_subscribers | 15.224 / 27.771 | 0.062 / 2.000 | 800 / 0 |
+| quiet: presence_transition_projection | 1.903 / 4.332 | 0.563 / 0.986 | 40 / 0 |
 
-Common-workload CPU: 3.344 -> 3.328 seconds;
-peak traced Python allocation: 2,702,946 -> 2,318,527 bytes.
-Candidate idle CPU: 0.0 seconds over 2.1 seconds.
-Local arithmetic shows added task-path overhead; other timing variations are not
-evidence of a general speed improvement. New Presence/Executive operations have no prior
-implementation comparison. CPU includes common workload/startup; candidate-only
-operations have separate totals in the raw report. Imports precede tracemalloc.
-Process order, warm caches and concurrent laptop load are uncontrolled. Allocation
-is not total RSS or battery; this is not a device/inference/production benchmark.
-The short idle sample and coarse CPU counter cannot establish sustained idle or
-power consumption.
+| Revision / mode | Cold startup / first task ms | Common CPU s | Common SQL writes | Warm RSS / final peak working set MiB | Idle writes per 3s sample | Writes per 200 unchanged Presence reads |
+|---|---:|---:|---:|---:|---|---|
+| baseline normal | 296.27 / 16.00 | 4.3906 | 5162.5 | 117.69 / 118.88 | 9, 9, 9, 9 | 200, 200, 200, 200 |
+| baseline quiet | 286.13 / 11.62 | 4.1641 | 4472 | 117.63 / 118.84 | 0, 0, 0, 0 | 200, 200, 200, 200 |
+| candidate normal | 288.01 / 13.18 | 4.2578 | 4347 | 117.84 / 118.90 | 0, 0, 0, 0 | 0, 0, 0, 0 |
+| candidate quiet | 290.67 / 10.65 | 4.1250 | 4343 | 117.46 / 118.51 | 0, 0, 0, 0 | 0, 0, 0, 0 |
 
-## Open acceptance and product limits
+Initial profiling exposed repeated World runner writes and historical lease JSON
+deserialization. The correction preserves authorization, independent verification,
+canonical evidence and idempotency. SQLite query plans confirm indexed active-task
+and live-lease searches. Presence now performs zero writes in each measured batch
+of 200 unchanged reads; reserving each next block of 1,024 publications still
+requires a durable write. Meaningful transitions persist immediately.
 
-- Gate C and Gate D remain PARTIAL; owner/device/live/production acceptance is separate.
-- Native schedule creation/editing and home widgets remain unavailable; trusted-local reviewed CLI is the working Executive control path.
-- No live model inference, owner provider enrollment, physical camera/audio/Edge or phone/emulator execution in this continuation.
-- Cooperative cancellation cannot undo an indivisible external action; ambiguous mutations require inspection.
-- Local interval scheduling runs only while this Core is running; no hosted service or laptop wake was installed.
-- Benchmark is instrumented local latency and Python allocations, not RSS, battery, device, inference or production performance.
+Cold samples are Harness construction and the first task, not an OS cache flush.
+RSS is the actual process working set including imports/runtime, excluding executor child processes; peak is Windows
+peak working set, not total machine memory or retained application allocation.
+SQL write counts are traced Core Store statements, not physical WAL/page writes.
+CPU counters and the short three-second idle samples are coarse. Laptop caches/load/thermal
+state remain uncontrolled. Compare p95 and quiet-mode variations as well as p50;
+no general speed parity, zero idle cost, battery or leak-free day-long soak is
+claimed. These are deterministic local operations, with no inference/provider or
+physical-device performance claim.
 
-Owner acceptance still requires genuine source/provider enrollment, physical
-pairing, Android overlay permissions and show/hide/dismiss/disable behavior, OEM
-foreground/background/power/accessibility checks, approved-surface visual review,
-Voice Match/Map/audio/biometric and physical Edge checks. No new OS grants or owner
-credentials were created. Gate D cannot PASS from these software checks alone.
-Native schedule authoring is a software product limitation; trusted-local reviewed
-CLI operations work today. See [Executive workflow](../../EXECUTIVE-RUNTIME.md)
-and [run history](../../development/GROUP-03-GATE-D.md). No merge or Group 4.
+
+## Measurement variance and full-cadence idle
+
+The [initial two-repeat run](closure-benchmark-initial.json) is preserved. Its
+pooled normal arithmetic median regressed 15.949 -> 23.360ms, while its paired
+per-repeat medians improved (45.081 -> 36.141 and 13.608 -> 11.232ms). Profiles
+showed large variation in SQLite time for essentially the same statement counts.
+That suggests storage/load interference, without proving its external cause.
+The four-repeat confirmation above isolates baseline extraction to runtime/config
+and retains all confirmation samples. Quiet-mode HTTP and arithmetic p95 still
+regress in the confirmation; the table reports them instead of claiming universal gains.
+
+A separate [35-second idle measurement](closure-idle-benchmark.json) covers the
+10-second session, 20-second World runner and 30-second maintenance cadences with
+the same authorized local Grid source. One sample per revision, no device or
+model calls. Reproduce with `python -m scripts.benchmark_group03_closure --iterations
+10 --repeats 1 --idle-seconds 35 --mode normal --output
+docs/evidence/group03/closure-idle-benchmark.json` (one command).
+
+| Revision | Idle wall s | CPU s | Core Store SQL writes | RSS MiB |
+|---|---:|---:|---:|---:|
+| baseline | 35.000 | 0.1406 | 127 | 50.02 |
+| candidate | 35.001 | 0.1094 | 28 | 48.64 |
+
+These longer samples still do not establish day-long power, memory-leak or production acceptance.
+
+## Delivery, remaining acceptance and recommendation
+
+Remote exact-head CI remains **UNKNOWN** until genuinely returned for the final
+head. The Code Review connector is used for diagnostics; no CLI fallback or
+unverified CI PASS. The PR delivery records the actual final-head result.
+
+Software is ready for owner merge review after final-head CI is verified or
+explicitly waived and the listed deferrals are accepted. **Do not merge
+automatically.** Gate C and Gate D remain PARTIAL.
+
+Internal tokens remain finite (one hour); renewal needs current live authority
+within the seven-day enrollment, and expired/revoked authority or long downtime
+requires explicit local reenrollment. Old tokens cannot create new actions and
+cannot outlive their original expiry. Cancellation is cooperative; ambiguous
+external effects require independent inspection. Android service/permission/lock/
+network/notification/OEM, physical audio/biometric/Edge, live environmental/provider
+and production acceptance remain pending. Native schedule authoring/widgets and
+standing Full Access remain unavailable. No Group 4 or Codex Cloud.
+
+See [closure handoff](../../development/GROUP-03-ENGINEERING-CLOSURE.md),
+[run history](../../development/GROUP-03-GATE-D.md) and
+[preserved 2026-10-16 report](GATE-D-REPORT-2026-10-16.md).

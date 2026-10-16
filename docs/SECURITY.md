@@ -1,5 +1,17 @@
 # Security + Permissions
 
+## Group 3 internal execution credentials — 2026-10-17
+
+Only trusted local Core enrollment can enable renewable internal execution
+credentials. Ordinary Mobile/Grid sessions retain their finite, nonrenewable
+behavior. Rotation requires current live authority, preserves scope restrictions
+and stable session/nonce identity, and does not grant standing Full Access.
+Tokens last at most one hour; the enrollment lasts at most seven days. Old tokens
+drain only captured active leases, never beyond their original expiry. Revoked or
+expired managed authority requires explicit new trusted-local enrollment; a revoked
+node remains denied. Only token digests persist, never credentials in Workers or
+evidence. See [the closure contract](development/GROUP-03-ENGINEERING-CLOSURE.md).
+
 ## Group 2.5 owner correction — 2026-10-14
 
 The owner corrected Full Access: unrestricted delegated autonomy across technically available capabilities with underlying OS/service access, including consequential supported actions, without OSCAR per-action approval prompts. The old interpretation with protected/consequential consent is Secure. Neither mode grants capture/retention implicitly. Full Access cannot remove deterministic local safety, invent platform permission, suppress evidence/audit or bypass an externally mandated confirmation.

@@ -275,8 +275,8 @@ Required scenarios include provider/auth failure, coordinator/node/Edge loss, Gr
 |---|---|---|
 | Gate A — Brain | 01–04 | **PASS** |
 | Gate B — Can Do Work | 05–06 | **PASS for documented local-alpha acceptance** |
-| Gate C — Embodied OSCAR | 07–10 | **PARTIAL:** software foundations reference-accepted; Edge/Voice/Mobile/Desktop device acceptance deferred; Desktop PR #16 not merged |
-| Design / Character checkpoint | 11–13 | **NEXT:** Slice 11 visual design/lab, then Desktop and Mobile owner-reviewed experience |
+| Gate C — Embodied OSCAR | 07–10 | **PARTIAL:** software foundations integrated; Edge/Voice/Mobile/Desktop physical acceptance deferred; legacy PR #16 is archival |
+| Design / Character checkpoint | 11–13 | Expression software integrated; Desktop provisionally approved/merged; **Mobile Group 2.5B UI/UX owner APPROVED and PR #6 merged**; physical acceptance remains separate |
 | Gate D — JARVIS Layer | 14–17 | **PARTIAL:** integrated software locally verified; live/owner/device acceptance pending |
 | Gate E — Unified Alpha | 18–20 | Planned |
 

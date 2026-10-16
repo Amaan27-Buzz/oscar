@@ -372,17 +372,17 @@ Keep `assets/brand/oscar-orb.svg` unmodified. Proposed derivatives are separate,
 
 Software/reference work from Groups 1–2 is integrated in `main`. The owner has **provisionally passed** the 2026-10-14 Group 2.5A neumorphic Desktop UI, and [PR #5](https://github.com/Amaan27-Buzz/oscar/pull/5) was merged at `43c15d37a6421d438b8101d5e322489ae452b20d`. This is **not** final integrated visual, real-device, security or production acceptance.
 
-Two distinct surfaces in one Tauri process: **small Companion** (canonical Orb, quick status/control, tray/shortcut; no chat or signing) and **full Workspace** (Conversation, Automations, Activity, Devices, Preferences). Contextual Dictate/Edit/Ask/Act is in Conversation rather than an exposed Text Tools/Act tab. Automations presents actual capability availability; durable named Workers, triggers, schedules and Full Access/Sentry activation are planned Core work.
+Two distinct surfaces in one Tauri process: **small Companion** (canonical Orb, quick status/control, tray/shortcut; no chat or signing) and **full Workspace** (Conversation, Automations, Activity, Devices, Preferences). Contextual Dictate/Edit/Ask/Act is in Conversation rather than an exposed Text Tools/Act tab. Automations presents truthful capability/responsibility readback. Group 3 supplies reviewed Core Workers and schedules; native creation/editing and standing Full Access remain unavailable.
 
 Previous 12.1–12.6 experiments and captures are preserved as historical implementation/evaluation evidence; **do not follow their unmerged PR/visual acceptance instructions**. See [active product direction](PRODUCT-DIRECTION.md), [Desktop interaction decision](decisions/ADR-DESKTOP-PERSONAL-INTELLIGENCE.md) and [current native evidence](ui/desktop/interaction-polish/README.md).
 
 ## Slice 13 — OSCAR Mobile experience and visual system — Group 2.5B implementation
 
-**2026-10-16 owner decision:** Group 2.5B UI/UX **APPROVED / PASS**. [Engineering closure](ui/mobile/group25b/FINAL-CLOSURE.md) preserves the approved design; this does not pass physical commissioning or Gate C, authorize merge, or begin Slice 14.
+**2026-10-16 owner decision:** Group 2.5B UI/UX **APPROVED / PASS**; PR #6 subsequently merged at `257349f82a96293c3737d446dca18ce46f098b04`. [Engineering closure](ui/mobile/group25b/FINAL-CLOSURE.md) preserves the approved design. Physical commissioning and Gate C remain PARTIAL. Separately authorized Group 3 now covers Slices 14–17.
 
 The native Core-connected foundation is integrated into main. Owner authorization on 2026-10-14 selects the Codex ImageGen/Figma artwork for production Compose implementation of all 15 hero experiences and coherent broader information architecture. The Gemini Argon external `oscar-ui-test` experiment is rejected and must not be imported.
 
-Use warm paper/graphite, editorial typography, original illustration-only assets, accessible tactile controls and three primary destinations (Conversation / Automations / Activity). Devices and Preferences remain one tap away. Preserve CoreSession, signed exact-action reviews, Grid, native permissions/voice and shared Expression. Secure/Full Access, Sentry, persistent automation execution and unavailable provider briefs stay unavailable.
+Use warm paper/graphite, editorial typography, original illustration-only assets, accessible tactile controls and three primary destinations (Conversation / Automations / Activity). Devices and Preferences remain one tap away. Preserve CoreSession, signed exact-action reviews, Grid, native permissions/voice and shared Expression. Secure/Full Access and unavailable provider briefs stay unavailable. Group 3 adds bounded quiet Core Sentry and scheduling with truthful native readback; environmental capture/delivery and native schedule authoring remain unavailable.
 
 Implementation, emulator verification and owner review are separate from physical phone/OEM/mic/biometric acceptance. See [Group 2.5B implementation and evidence](ui/mobile/group25b/README.md) and [Mobile design](MOBILE-DESIGN.md). Canonical numbering and historical reference evidence are preserved.
 
@@ -444,19 +444,19 @@ Run the full integrated perception/communication → World Model/Controller/Memo
 | A — Brain | 01–04 | PASS |
 | B — Can Do Work | 05–06 | PASS for local-alpha scope |
 | C — Embodied foundations | 07–10 | PARTIAL; software integrated, physical/owner acceptance deferred |
-| Design / Character | 11–13 | Expression software built, Desktop provisionally approved/merged; Mobile 2.5B visual exploration; final owner/device acceptance deferred |
-| D — Awareness / Chief-of-Staff | 14–17 | Planned |
+| Design / Character | 11–13 | Expression software integrated; Desktop provisionally approved/merged; Mobile 2.5B UI/UX owner APPROVED and PR #6 merged; physical/device acceptance deferred |
+| D — Awareness / Chief-of-Staff | 14–17 | PARTIAL; integrated software and engineering closure candidate; live/owner/device acceptance pending |
 | E — Physical and Unified Alpha | 18–20 | Planned |
 
 Manual integration checkpoints remain in [BUILD-GATES.md](BUILD-GATES.md).
 
-## Current next step — 2026-10-14
+## Current next step — 2026-10-17
 
-- **Now:** Group 2.5B production Mobile implementation and native phone evidence against the selected ImageGen/Figma baseline; owner visual review pending. Emulator stopped at the owner's RAM request.
-- **Already merged:** Group 2.5A Desktop Companion/Workspace, owner **provisional visual pass** only. Do not reopen legacy PR #16/#17 steps.
-- **Later:** complete Mobile UI acceptance, verify integrated design and remaining Gate C manual/physical criteria, then continue to Slice 14 World Model/Perception/Sentry per owner sequencing.
-- **Future AIE:** Slice 16 typed cross-platform presentation contract, 17 intent-driven interactive composition, 19 hardening, 20 acceptance. **Not Group 2.5 scope.**
-- **Unfinished:** Secure/Full Access authority activation, background Sentry, persistent Worker scheduling, physical Android/Windows/voice/Edge acceptance, remote CI and production hardening all remain appropriately blocked or deferred.
+- **Now:** final engineering closure of Group 3 on existing draft PR #7; reviewed internal credential rotation, Presence write reduction, overlay admission and cross-slice reliability. No merge or Group 4.
+- **Already merged:** Desktop Group 2.5A (provisional visual pass) and owner-approved Mobile Group 2.5B / PR #6. Legacy PR #16/#17 are archival.
+- **Next acceptance:** review the Group 3 software candidate and genuinely complete the remaining live/owner/device scenarios; Gate C and Gate D remain PARTIAL.
+- **AIE:** bounded typed Slice 16/17 software is implemented; richer components and later hardening/acceptance remain future work.
+- **Unfinished:** native schedule authoring/widgets, signed Secure/Full Access authority, real environmental capture/delivery, physical Android/Windows/voice/Edge, remote CI and production acceptance. Existing trusted-local scheduling and quiet Sentry software are implemented.
 
 Read [active product direction](PRODUCT-DIRECTION.md), [canonical numbering](SLICE-NUMBERING.md), [adaptive UI plan](ADAPTIVE-INTERFACE.md) and the evidence ledger. Historical acceptance sequences and reports below this paragraph are **archives**, not current work orders.
 

@@ -6,6 +6,18 @@ schedules; canonical Tasks/Actions/Results/Evidence remain the execution truth.
 It does not install a scheduler service or introduce another agent framework.
 
 The normal `Harness` starts bounded World and Executive lifecycle services.
+It also owns independent internal-session maintenance: credential expiry/rotation
+does not wait for a long-running Executive executor. Credentials last at most one
+hour and rotate while valid within the final 15 minutes, under a seven-day maximum
+enrollment. Old tokens can drain only leases active at rotation, no later than
+their original expiry. The current handle retains its session identity so real
+leases, nonce fences and canonical task/action deduplication remain unchanged.
+No credential enters Worker records or evidence. Revocation remains authoritative.
+Normal trusted-local restart creates a new scoped enrollment and invalidates the
+previous one. Expired/revoked managed enrollment requires explicit
+`serve --reenroll-execution`; a revoked node cannot be repaired by this flag.
+Long sleep/downtime can therefore require renewed local authorization.
+
 `python -m oscar serve --seconds 60` keeps this laptop-local Core available;
 shutdown closes its background services and canonical archive. Future schedules
 persist and resume when this Core runs again. A sleeping/offline laptop does not
@@ -115,8 +127,15 @@ one-time times are supported; missed intervals are skipped rather than replayed
 as an unbounded catch-up queue. Deadlines are checked at dispatch and cooperative
 execution checkpoints. Worker/task leases fence stale ownership.
 
-The runner polls once per second. Native Presence leases last at most 30 seconds;
-the optional Android overlay polls every five seconds and rechecks its local
+The runner polls once per second. Native Presence leases last at most 30 seconds.
+Presence publication generations are reserved in blocks of 1,024 to fence crash
+replay. Read-only polls advance the publication generation and freshness without
+changing the transition ID or persisted state generation. A meaningful state
+change writes immediately; unchanged polls write only to reserve the next block.
+Restart skips unused publication numbers and fences the retired publisher. The
+existing Expression version 1 contract and renderers continue to admit refreshes.
+
+The optional Android overlay polls every five seconds and rechecks its local
 permissions, lock and pairing after acquisition. Cancellation is cooperative;
 an indivisible external action cannot be undone. Shutdown lets admitted work
 finish for up to ten seconds, then requests cancellation and waits again; an

@@ -1,5 +1,9 @@
 # Group 3 — Gate D engineering run
 
+**2026-10-17 engineering closure:** see the [closure handoff](GROUP-03-ENGINEERING-CLOSURE.md)
+and current [Gate D report](../evidence/group03/GATE-D-REPORT.md). The 2026-10-16
+measurements and receipts below remain historical checkpoints.
+
 Published as [draft PR #7](https://github.com/Amaan27-Buzz/oscar/pull/7), targeting
 main; **not merged**. Runtime continuation checkpoints include `e3fb826` (14),
 `c7f1a8b` (15), `993a38c` (16), and the Executive delivery recorded in

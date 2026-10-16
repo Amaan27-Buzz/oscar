@@ -17,6 +17,11 @@ one leased, relationship-scoped Core projection; React/Compose consume the share
 Expression contract and bounded typed task views. Android's explicit opt-in
 overlay uses a separate read-only projection connection and no audio.
 
+Independent internal-session maintenance keeps heartbeat/credential rotation
+outside Executive executor I/O, using the existing Grid identity/session model.
+Finite credentials, scoped old-token drain and explicit reenrollment boundaries
+are recorded in the [engineering closure](development/GROUP-03-ENGINEERING-CLOSURE.md).
+
 The Executive coordinates reviewed DAGs and fixed UTC schedules over canonical
 Runtime Tasks/Actions/Evidence. Atomic admission/dedup, exact capability pins,
 Worker reservations, current policy/permissions and cooperative lease checks own

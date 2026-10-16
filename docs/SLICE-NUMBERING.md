@@ -21,7 +21,7 @@ The owner rejected mixing numbered slices with 09R, 10R, 13A/13B and prematurely
 | 10 | OSCAR Desktop runtime foundation | Integrated software foundation; physical acceptance deferred; old PR #16 archival |
 | **11** | **OSCAR Expression / Character System** | Shared renderer foundation integrated into reference apps; final character/device acceptance deferred |
 | **12** | OSCAR Desktop visual/interaction design | **Group 2.5A interim owner pass; merged PR #5**; final owner/physical acceptance deferred |
-| **13** | OSCAR Mobile visual/interaction design | Software/reference baseline integrated; **Group 2.5B selected visual baseline implementation**; implementation candidate; owner visual and capability acceptance pending |
+| **13** | OSCAR Mobile visual/interaction design | **Group 2.5B UI/UX owner APPROVED; PR #6 merged** at `257349f`; physical/audio/biometric/OEM acceptance remains deferred |
 | 14 | World Model, Perception, Sentry, optional Journal | Normal Core lifecycle locally verified; live/owner acceptance pending |
 | 15 | Commissioning and setup | Software composition locally verified; owner accounts/audio/devices pending |
 | 16 | Full cross-device Avatar/Presence + typed adaptive presentation | Shared software/native builds verified; opt-in overlay device acceptance and widgets pending |
