@@ -124,6 +124,7 @@ export function LivingPresence({port=send,events=subscribe,sourceKind='core',win
           next.expression?.epoch===current.expression?.epoch&&current.expression!==null&&next.expression!==null&&
           current.expression.generation>=next.expression.generation;
         if(confirmed){setError('');return true;}
+        setLeaving(false);
         if(accepted)setError('The window did not reach the requested size. Open it again or use the tray.');
         return false;
       }
@@ -143,6 +144,7 @@ export function LivingPresence({port=send,events=subscribe,sourceKind='core',win
     catch {
       if(command.kind==='window'){
         if(intent!==windowIntent.current)return true;
+        setLeaving(false);
         setError('The window could not change size. Open it again or use the tray.');
       }else setRequestError('The request outcome is unknown. Inspect Activity before sending it again.');
       return false;
