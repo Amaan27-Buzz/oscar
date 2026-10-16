@@ -1,4 +1,6 @@
 import json
+import subprocess
+import sys
 import unittest
 from contextlib import contextmanager
 from dataclasses import replace
@@ -95,6 +97,31 @@ class WorldModelTests(unittest.TestCase):
         self.archive = EventArchive(self.root / "archive.sqlite")
         self.reopen()
         self.assertEqual("online", self.current().value)
+
+    def test_canonical_current_projection_survives_fresh_process(self):
+        self.fabric.ingest(self.event())
+        code = (
+            "import json,sys; from pathlib import Path; "
+            "from oscar.storage import Store; from oscar.event_archive import EventArchive; "
+            "from oscar.world_model import WorldModel; "
+            "s=Store(sys.argv[1]); a=EventArchive(Path(sys.argv[2])); "
+            "w=WorldModel(s,a,'owner'); r=w.resolve('device:one','status'); "
+            "print(json.dumps({'value':r.value,'simulated':r.simulated})); a.close(); s.close()"
+        )
+        completed = subprocess.run(
+            [
+                sys.executable,
+                "-c",
+                code,
+                str(self.root / "state.sqlite"),
+                str(self.root / "archive.sqlite"),
+            ],
+            check=True,
+            capture_output=True,
+            text=True,
+            timeout=20,
+        )
+        self.assertEqual({"value": "online", "simulated": True}, json.loads(completed.stdout))
 
     def test_perceive_without_retain_never_persists_content(self):
         self.epoch = self.fabric.register(replace(self.source, retain=False), owner_authorized=True)
@@ -381,6 +408,17 @@ class WorldModelTests(unittest.TestCase):
         decision = self.sentry.observe(self.event(4))
         self.assertEqual("context", decision.outcome)
         self.assertEqual(("quiet",), decision.policy_ids)
+
+    def test_sentry_cannot_escalate_a_fixture_displaced_by_real_source(self):
+        self.epoch = self.fabric.register(replace(self.source, act=True), owner_authorized=True)
+        self.fabric.connect("fixture", self.epoch)
+        epoch = self.fabric.register(
+            replace(self.source, id="native", simulated=False), owner_authorized=True
+        )
+        self.fabric.connect("native", epoch)
+        self.fabric.ingest(self.event(source_id="native", epoch=epoch, value="safe"))
+        self.configure(allow_interrupt=True)
+        self.assertEqual("context", self.sentry.observe(self.event(value="alarm")).outcome)
 
     def test_sentry_sleep_low_confidence_unavailable_and_revocation(self):
         self.configure(state=SentryState.SLEEP, allow_interrupt=True)

@@ -9,6 +9,11 @@ Sentry produces policy-bounded proposals, with no independent action authority.
 Existing Python Core, Controller, Memory Fabric, Grid and UI contracts remain
 authoritative. See [implementation and acceptance boundary](development/GROUP-03-GATE-D.md).
 
+The first Slice 15 commissioning checkpoint adds Core instance identity, exact
+reviewed scoped Grid enrollment, restart/revocation and capability readback. This
+does not implement a new account system, provider/voice setup or owner identity.
+Dispatcher propagates session revocation through cooperative executor checks.
+
 **Mobile acceptance update — 2026-10-16:** Group 2.5B UI/UX is explicitly
 **APPROVED / PASS**. [Final closure](ui/mobile/group25b/FINAL-CLOSURE.md) records
 the theme correction and lifecycle investigation. This supersedes earlier

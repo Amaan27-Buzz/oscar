@@ -73,16 +73,33 @@ class Grid:
             raise StateConflict("node identity already registered")
 
     def pair(
-        self, node_id: str, approved_scopes: tuple[str, ...], ttl: float = 3600
+        self,
+        node_id: str,
+        approved_scopes: tuple[str, ...],
+        ttl: float = 3600,
+        *,
+        session_id: str | None = None,
     ) -> SessionHandle:
         """Trusted coordinator API: approved scope; inaccessible to remote peers."""
         if not 0 < ttl <= 86400:
             raise ValueError("invalid session lifetime")
+        if session_id is not None and (
+            not isinstance(session_id, str)
+            or len(session_id) != 32
+            or any(c not in "0123456789abcdef" for c in session_id)
+        ):
+            raise ValueError("opaque session identity required")
         with self.store.transaction():
             node = self.store.get("node", node_id)
             if node["revoked"] or not set(approved_scopes) <= set(node["scopes"]):
                 raise PermissionError("pairing scope denied")
-            identifier, token = new_id(), secrets.token_urlsafe(32)
+            identifier, token = session_id or new_id(), secrets.token_urlsafe(32)
+            try:
+                self.store.get("session", identifier)
+            except KeyError:
+                pass
+            else:
+                raise StateConflict("session identity already used; credentials cannot be replayed")
             self.store.put(
                 "session",
                 identifier,

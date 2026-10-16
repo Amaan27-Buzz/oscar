@@ -6,12 +6,13 @@
   "gate_c": "PARTIAL",
   "gate_d": "PARTIAL",
   "stages": {
-    "14": {"status": "VERIFIED_SCOPED_CHECKPOINT", "tests": "tests.test_world_model", "focused_passed": 36, "classification": "VERIFIED_REFERENCE", "whole_slice": "PARTIAL"},
-    "15": {"status": "NOT_STARTED"},
+    "14": {"status": "VERIFIED_SCOPED_CHECKPOINT", "tests": "tests.test_world_model", "focused_passed": 38, "classification": "VERIFIED_REFERENCE", "whole_slice": "PARTIAL", "checkpoint_sha": "e34e665238e613e7b483644b12fc9e8c377f2a7f"},
+    "15": {"status": "VERIFIED_SCOPED_CHECKPOINT", "tests": "tests.test_commissioning", "focused_passed": 11, "classification": "VERIFIED_REFERENCE", "whole_slice": "PARTIAL"},
     "16": {"status": "NOT_STARTED"},
     "17": {"status": "NOT_STARTED"}
   },
-  "next_action": "Commit Slice 14 scoped checkpoint, then implement recoverable commissioning with existing Grid and Vault authority; do not claim full Slice 14 or Gate D PASS.",
+  "next_action": "Continue Slice 15 provider/Vault, Persona, explicit policy and Sentry setup composition before advancing to Slice 16. Keep voice/device acceptance deferred. Do not merge or claim Gate D PASS.",
   "owner_acceptance": "DEFERRED_OWNER_ACCEPTANCE",
-  "baseline": {"ran": 569, "passed": 563, "failed": 0, "skipped": 6, "seconds": 218.479}
+  "baseline": {"ran": 569, "passed": 563, "failed": 0, "skipped": 6, "seconds": 218.479},
+  "final_verification": {"receipt": "verification.json", "ran": 618, "passed": 612, "failed": 0, "skipped": 6, "seconds": 124.393}
 }

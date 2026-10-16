@@ -396,6 +396,10 @@ Coherent freshness-/provenance-qualified current truth across people/places/devi
 
 ## Slice 15 — Commissioning / setup ◻️
 
+**2026-10-16 Group 3 candidate:** first trusted-local identity/enrollment/Grid
+pairing/restart/revocation vertical slice is implemented; broader setup and actual
+owner/device acceptance remain incomplete. See [evidence](development/GROUP-03-GATE-D.md).
+
 Identity, Persona/Personal Policy starter rules, Voice Identity/Match/Map, Connection Grid and surface pairing, model/cloud setup, Sentry/capture setup and human-readable perceive/retain/act permissions. This is former Slice 12.
 
 ## Slice 16 — Full Avatar / Presence integration ◻️

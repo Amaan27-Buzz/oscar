@@ -1,0 +1,39 @@
+{
+  "classification": "VERIFIED_REAL_LOCAL",
+  "source_data": "SIMULATED",
+  "executor": "existing oscar.browser_worker.run / isolated headless Chromium",
+  "samples_per_mode": 5,
+  "pages_per_task": 2,
+  "model_invocations": 0,
+  "results": {
+    "separate_plans": {
+      "p50_ms": 1086.2676999995529,
+      "p95_ms": 3625.7222999993246,
+      "success_rate": 1.0,
+      "state_assertion_accuracy": 1.0,
+      "tool_invocations_per_task": 2,
+      "samples_ms": [
+        3625.7222999993246,
+        1068.4225999993942,
+        1086.2676999995529,
+        1025.4351000003226,
+        1098.2968000007531
+      ]
+    },
+    "batched_plan": {
+      "p50_ms": 539.3419000001813,
+      "p95_ms": 548.8912999999229,
+      "success_rate": 1.0,
+      "state_assertion_accuracy": 1.0,
+      "tool_invocations_per_task": 1,
+      "samples_ms": [
+        523.21369999936,
+        524.7204999996029,
+        548.8912999999229,
+        540.3045000002749,
+        539.3419000001813
+      ]
+    }
+  },
+  "limits": "Five samples; p95 uses maximum. Read-only anonymous fixture, no mutation/auth parity claim; memory and reconnect not measured."
+}

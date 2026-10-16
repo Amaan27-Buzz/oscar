@@ -175,7 +175,11 @@ class SentryRuntime:
             ):
                 return result("ignored", "source or Sentry configuration changed during ingestion")
             state = self.world.resolve(observation.entity_id, observation.key)
-            if state.state != "current" or observation.unavailable:
+            if (
+                state.state != "current"
+                or observation.unavailable
+                or observation not in state.observations
+            ):
                 return result("context", "conflicting, unavailable or stale state cannot escalate")
             if observation.confidence < settings.min_confidence:
                 return result("context", "insufficient confidence for escalation")

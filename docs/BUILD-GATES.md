@@ -238,8 +238,8 @@ Required scenarios include:
 
 ## Gate D — JARVIS Layer
 
-**2026-10-16:** Group 3 backend engineering is owner-authorized. Slice 14 has a
-scoped headless/reference candidate; Gate D is **PARTIAL**, with mandatory live,
+**2026-10-16:** Group 3 backend engineering is owner-authorized. Slices 14–15 have
+scoped headless/reference checkpoints; Gate D is **PARTIAL**, with mandatory live,
 commissioning, Presence, Executive and owner acceptance still outstanding. See
 [Group 3 evidence](development/GROUP-03-GATE-D.md). Gate C remains PARTIAL.
 

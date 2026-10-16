@@ -1,5 +1,14 @@
 # First-Time Setup / Commissioning
 
+## Group 3 backend candidate — 2026-10-16
+
+`oscar.commissioning.Commissioning` now supplies trusted-local Core instance
+identity, exact reviewed enrollment, scoped Grid pairing, partial setup recovery
+and session revocation/readback. Requested perceive/retain/act settings remain
+configuration, not activation. Provider/Vault, Persona, starter policy, voice and
+Sentry setup composition are still outstanding. No device-owner authentication or
+physical pairing is claimed. See [evidence and limits](development/GROUP-03-GATE-D.md).
+
 OSCAR's first-run experience should feel like commissioning a personal system, not clicking through generic app permissions.
 
 Setup establishes identity, Persona, Voice Identity, Voice Match/Map, Connection Grid, devices, model/search providers, Personal Policy, OSCAR Mobile/Android capabilities, Sentry/capture behavior and safety before proactive/autonomous behavior is trusted.

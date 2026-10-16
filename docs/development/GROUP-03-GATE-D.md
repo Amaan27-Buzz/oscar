@@ -12,7 +12,7 @@ microphone/camera, owner account, host configuration or paid infrastructure work
 | Slice | Implemented | Verified | Remaining |
 |---|---|---|---|
 | 14 | Bounded typed World Model, permission-aware Perception, headless Sentry, existing live-context adapter | Local SQLite and synthetic source failure scenarios; see receipts | Full service integration, real multi-source acceptance, capture/journal, production admission |
-| 15 | Not started | Not run | Recoverable commissioning using existing Grid/Vault boundaries |
+| 15 | Core instance identity, exact reviewed enrollment, scoped Grid pairing/recovery/revocation | Disposable local Core/task pairing and restart tests; SIMULATED device | Provider/Vault, Persona, policy, voice and Sentry setup composition; real device authentication |
 | 16 | Not started | Not run | Shared subscriptions, Presence and typed AIE descriptors |
 | 17 | Not started | Not run | Executive responsibilities/schedules using existing Runtime |
 
@@ -88,7 +88,7 @@ python -m scripts.check_repository
 ```
 
 Machine-readable continuation: [progress.json](../evidence/group03/progress.json).
-Slice 14 checkpoint: full offline regression ran **602 tests in 124.948 s**, with
+Slice 14 checkpoint `e34e665`: full offline regression ran **602 tests in 124.948 s**, with
 596 passes, 6 skips, no failures. Subsequent review corrections and additional
 cases passed the focused **36-test** suite. Ruff lint/format, strict mypy across
 68 modules, repository/link/secret checks and diff checks passed. Existing baseline
@@ -103,6 +103,12 @@ including empty replies. An in-progress synchronous external callback is not
 forcibly interrupted; revoked/changed output is rejected. Real capture cancellation
 and authenticated remote source admission remain unimplemented.
 
+Final focused coverage has **38 World Model/Sentry tests** plus **11 commissioning
+tests**. Additional checks prove retained state from a fresh Python process,
+reject escalation of a fixture displaced by a real source report, and keep
+unverified adapter testimony at a conservative confidence. The commissioning
+review also found and verified the in-flight cancellation correction below.
+
 Measured 100 comparable synthetic samples with 512 current rows and real SQLite:
 [before](../evidence/group03/world-before.json) p50 4.708 ms / p95 5.713 ms;
 [after](../evidence/group03/world-after.json) p50 0.404 ms / p95 0.474 ms.
@@ -115,3 +121,65 @@ No browser or Codex speed-parity claim is made. Benchmark fixtures are SIMULATED
 Transaction design follows [SQLite transaction semantics](https://www.sqlite.org/lang_transaction.html)
 and Python's sqlite3 documentation; the existing Store owns explicit transactions.
 Full Slice 14 and Gate D acceptance remain distinct from this scoped checkpoint.
+
+Final regression: **618 ran / 612 passed / 6 skipped / 0 failed**, 124.393 s on
+Windows Python 3.14.2 / SQLite 3.50.4. The final scope-removal readback change also
+passed its 11-test commissioning rerun. Lint/format, strict mypy (69 modules),
+repository/link/secret and diff checks pass. Detailed machine-readable
+[verification receipt](../evidence/group03/verification.json) records commands and
+boundaries. Final benchmark [recheck](../evidence/group03/world-final.json):
+p50 **0.400 ms**, p95 **0.466 ms**, versus original **4.708 / 5.713 ms** at 512 rows.
+
+## Slice 15 first vertical slice
+
+`commissioning.py` adds a bounded trusted-local state machine: review_pending →
+pairing → paired, with expired/blocked/revoked outcomes. One immutable Core
+**instance identifier** binds one relationship; this is not a signing key, owner
+authentication or replacement account system. Exact review digests bind node,
+scopes, independent requested grants, simulation label, Core identity, expiry and
+preallocated session identity. Existing Grid node registration and capability
+advertisement remain authoritative. Configuration-only grants do not activate
+perception, retention, action policy or Full Access.
+
+`Grid.pair(session_id=...)` is backward-compatible and rejects reuse rather than
+overwriting credentials. Pairing intent is durable before token creation. After
+an interrupted pairing, explicit `recover()` waits out the 30-second in-flight
+fence, revokes that exact session and blocks the setup for renewed owner review.
+It never reconstructs or serializes a token. Pending reviews resume across actual
+Store close/reopen; expired/altered/replayed/cross-device reviews fail closed.
+Readback distinguishes configured from operational, authenticates a supplied
+opaque handle and filters capabilities to its reviewed scopes. Missing handles,
+offline devices and remaining setup work cannot become an operational claim.
+
+Revocation transactionally fences the owned session and enrollment, preserving
+unrelated sessions. Existing Dispatcher cancellation now rechecks current execute
+and capability grants at cooperative executor checkpoints. Tests revoke after
+admission and independently verify the file was never created. A callback already
+inside an indivisible external action cannot be retroactively undone; no claim of
+instant rollback is made. Ambiguous mutations keep existing durable dedup fences.
+Provider/native Vault lifecycle, Persona, starter policy, Sentry setup and voice
+enrollment composition are **not implemented** by this first commissioning slice.
+
+## Browser execution measurement
+
+[Browser receipt](../evidence/group03/browser-plans.json) compares two anonymous
+local fixture reads as separate existing browser plans versus one existing batched
+plan. Real headless Chromium and OSCAR's actual bounded browser executor were used;
+all DOM values and origins were asserted. Five samples per mode, alternated order:
+p50 **1,086.268 → 539.342 ms**, tool invocations **2 → 1**, no model calls, 100%
+fixture success. p95 is the maximum of this small sample: **3,625.722 → 548.891 ms**;
+the first separate-plan run includes cold-start overhead. This demonstrates reuse
+of existing batching, not a new browser runtime, production mutation benchmark or
+Codex parity. Browser memory/reconnect were not measured. All test browsers and
+the disposable fixture server close at the end.
+
+## Remaining executable work
+
+Continue Slice 15 by composing existing provider/Vault enrollment, explicit policy,
+Persona and Sentry source setup without turning persisted configuration into
+authorization. Add interrupted/revoked setup tests for each real adapter. Voice
+and physical owner authentication stay deferred. Then advance to Slice 16 shared
+Presence subscriptions/AIE validation, followed by Slice 17 Executive/schedules.
+Neither later stage has been started. Slice 14 live multi-source/background
+service integration and capture remain explicit acceptance gaps, not whole-slice
+PASS. Preserve current UI availability until genuine supported integration exists.

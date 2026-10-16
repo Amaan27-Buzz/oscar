@@ -63,7 +63,7 @@ class ContextPerceptionAdapter:
                         item.source.observed_at + item.source.ttl_seconds,
                         item.source.observed_at + 3600,
                     ),
-                    1.0,
+                    0.5 if item.state == Epistemic.REPORTED else 1.0,
                     evidence_id=item.source.evidence_id,
                 )
                 states.append(self.fabric.ingest(observation)[1])

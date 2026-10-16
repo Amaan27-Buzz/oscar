@@ -78,7 +78,13 @@ class Dispatcher:
         self.grid.accept(envelope, session.token, "execute")
         for permission in candidates[0]["permissions"]:
             self.grid.authenticate(session, permission)
-        cancellation = Cancellation(self.store, action.task_id)
+
+        def authorize_execution() -> None:
+            self.grid.authenticate(session, "execute")
+            for permission in candidates[0]["permissions"]:
+                self.grid.authenticate(session, permission)
+
+        cancellation = Cancellation(self.store, action.task_id, authorize_execution)
         cancellation.check()
         fingerprint = hashlib.sha256(
             json.dumps(record(action), sort_keys=True).encode()
