@@ -51,7 +51,7 @@ def metrics(values: list[float]) -> dict:
     }
 
 
-def sample(root: Path, iterations: int, quiet: bool) -> dict:
+def sample(root: Path, iterations: int, quiet: bool, idle_seconds: float = 3) -> dict:
     sys.path.insert(0, str(root))
     from oscar.harness import Harness
     from oscar.jev import Intent
@@ -114,7 +114,7 @@ def sample(root: Path, iterations: int, quiet: bool) -> dict:
             cold_task_ms = (perf_counter() - start) * 1000
             idle_counts = dict(counts)
             cpu, wall = process_time(), perf_counter()
-            sleep(3)
+            sleep(idle_seconds)
             idle = {
                 "cpu_seconds": process_time() - cpu,
                 "wall_seconds": perf_counter() - wall,
@@ -234,6 +234,8 @@ def main() -> None:
     parser.add_argument("--quiet", action="store_true")
     parser.add_argument("--iterations", type=int, default=40)
     parser.add_argument("--repeats", type=int, default=2)
+    parser.add_argument("--idle-seconds", type=float, default=3)
+    parser.add_argument("--mode", choices=("both", "normal", "quiet"), default="both")
     parser.add_argument("--baseline", default="d2e686c7d8c2f67dea13d1551d52b5759831d279")
     parser.add_argument(
         "--output", type=Path, default=Path("docs/evidence/group03/closure-benchmark.json")
@@ -241,8 +243,14 @@ def main() -> None:
     args = parser.parse_args()
     if not 10 <= args.iterations <= 100 or not 1 <= args.repeats <= 4:
         parser.error("bounded sample/repetition counts required")
+    if not 3 <= args.idle_seconds <= 60:
+        parser.error("idle measurement must last 3-60 seconds")
     if args.sample_root:
-        print(json.dumps(sample(args.sample_root.resolve(), args.iterations, args.quiet)))
+        print(
+            json.dumps(
+                sample(args.sample_root.resolve(), args.iterations, args.quiet, args.idle_seconds)
+            )
+        )
         return
     root = Path(__file__).resolve().parents[1]
     baseline = subprocess.check_output(
@@ -271,6 +279,8 @@ def main() -> None:
                 order.reverse()
             for label, source in order:
                 for quiet in (False, True):
+                    if args.mode != "both" and args.mode != ("quiet" if quiet else "normal"):
+                        continue
                     command = [
                         sys.executable,
                         str(Path(__file__).resolve()),
@@ -278,6 +288,8 @@ def main() -> None:
                         str(source),
                         "--iterations",
                         str(args.iterations),
+                        "--idle-seconds",
+                        str(args.idle_seconds),
                     ]
                     if quiet:
                         command.append("--quiet")
@@ -294,6 +306,7 @@ def main() -> None:
                     for operation in samples[0]["operations"]
                 }
                 for mode, samples in modes.items()
+                if samples
             }
             for label, modes in runs.items()
         }
@@ -305,6 +318,8 @@ def main() -> None:
             ).strip(),
             "python": platform.python_version(),
             "platform": platform.platform(),
+            "idle_seconds": args.idle_seconds,
+            "mode": args.mode,
             "summary": summary,
             "runs": runs,
             "limits": (
