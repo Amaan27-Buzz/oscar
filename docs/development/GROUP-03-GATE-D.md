@@ -1,9 +1,10 @@
 # Group 3 — Gate D engineering run
 
 Published as [draft PR #7](https://github.com/Amaan27-Buzz/oscar/pull/7), targeting
-main; **not merged**. Verified remote implementation head:
-`3fd7cc90e538ca6fad71894c604a99e6b1fc308e` (Slice 15), following
-`e34e665238e613e7b483644b12fc9e8c377f2a7f` (Slice 14). The Code Review connector
+main; **not merged**. Runtime continuation checkpoints include `e3fb826` (14),
+`c7f1a8b` (15), `993a38c` (16), and the Executive delivery recorded in
+[the continuation receipt](../evidence/group03/verification-continuation.json).
+The Code Review connector
 denied GitHub access for this workspace, so remote CI is **UNKNOWN**, not PASS.
 Git push and PR state/head readback succeeded through the existing repository
 workflow. Later documentation-only commits may advance the branch head.
@@ -16,6 +17,10 @@ Approved Mobile/Desktop UI, artwork and Orb are preserved. No device, emulator,
 microphone/camera, owner account, host configuration or paid infrastructure work.
 
 ## Runtime continuation — 2026-10-16
+
+The consolidated [Gate D report](../evidence/group03/GATE-D-REPORT.md) and
+[continuation receipt](../evidence/group03/verification-continuation.json) record
+the final integrated verification. Earlier counts below remain checkpoint history.
 
 Slice 14 now composes into the normal `Harness`: one canonical Event Archive,
 Controller current-state reads, scoped Desktop/Mobile reads and a bounded background
@@ -38,10 +43,10 @@ Physical/OEM/environmental acceptance remains separate; no merge or Group 4.
 
 | Slice | Implemented | Verified | Remaining |
 |---|---|---|---|
-| 14 | Bounded typed World Model, permission-aware Perception, headless Sentry, existing live-context adapter | Local SQLite and synthetic source failure scenarios; see receipts | Full service integration, real multi-source acceptance, capture/journal, production admission |
-| 15 | Core instance identity, exact reviewed enrollment, scoped Grid pairing/recovery/revocation | Disposable local Core/task pairing and restart tests; SIMULATED device | Provider/Vault, Persona, policy, voice and Sentry setup composition; real device authentication |
-| 16 | Not started | Not run | Shared subscriptions, Presence and typed AIE descriptors |
-| 17 | Not started | Not run | Executive responsibilities/schedules using existing Runtime |
+| 14 | Normal Core/Controller lifecycle, bounded authorized source subscriptions, recovery, retention expiry, quiet Sentry proposals | Real local Core/Grid/tasks/files/SQLite; synthetic fault injection and scoped surface reads | Owner live environmental enrollment, capture/optional Journal acceptance and production admission |
+| 15 | Recoverable identity/pairing, provider/native Vault composition, Persona/preferences, policy, logical voice and explicit Sentry setup | Setup/revocation tests, disposable native credential regression and simulated device enrollment | Owner account/provider probes, physical pairing, Voice Match/Map and audio calibration |
+| 16 | Shared leased Presence, typed AIE, native renderers and explicit opt-in Android Companion overlay | React/Compose contract tests, Windows/Rust and Android build/JVM/lint checks | Overlay/OEM/power/accessibility/visual acceptance on devices; home widgets remain unavailable |
+| 17 | Reviewed DAGs, bounded deterministic/model-assisted planning, real Worker assignment, schedules, cancellation/recovery, context gates, replanning, brief and evaluated workflow reuse | Actual local file/arithmetic executors, canonical verification, restart, concurrent DB runners, authority/failure tests; model output fixture only | Owner/native authoring acceptance, live model/environment/provider scenarios and production operation |
 
 Gate D is **PARTIAL**; Gate C remains **PARTIAL**. Headless software/reference
 evidence does not establish physical, owner, live environmental or production PASS.
@@ -74,9 +79,10 @@ Bounds: 64 registered sources, 512 current pointers, 128 recent receipts/source,
 1–600 events/source/minute, 2 KiB values, 1 hour maximum freshness, 5 minute maximum
 connection lease, 2,048 retained observation payloads/relationship and 7 day maximum
 retention. Ingestion is synchronous: capacity returns explicit backpressure rather
-than building an unbounded queue. Renewals are caller-driven; no daemon is installed.
+than building an unbounded queue. The normal bounded runner renews authorized
+subscriptions; no daemon is installed.
 `EventArchive.purge_expired_events()` removes expired event/dependent-memory payloads
-and invalidates derived generations. Call it during explicit maintenance; stale
+and invalidates derived generations. The normal runner invokes maintenance; stale
 derived indexes cannot bypass canonical admission. Tombstones/WAL/backups are not
 securely erased. Revocation drops current access immediately; separately authorized
 historical retention expires or can be forgotten through existing Memory Fabric.
@@ -94,7 +100,7 @@ source act grant and current Personal Policy gate interruption proposals. Final
 admission rechecks configuration and source grants in one SQLite transaction.
 These settings do not activate real environmental monitoring or delivery.
 
-## Verification and continuation
+## Historical foundation verification and continuation
 
 Baseline: `python -m unittest discover -s tests -t .` ran 569 tests in 218.479 s;
 563 passed, 6 skipped, 0 failed. Log: ignored `.oscar/group03-baseline-tests.log`.
@@ -184,8 +190,9 @@ and capability grants at cooperative executor checkpoints. Tests revoke after
 admission and independently verify the file was never created. A callback already
 inside an indivisible external action cannot be retroactively undone; no claim of
 instant rollback is made. Ambiguous mutations keep existing durable dedup fences.
-Provider/native Vault lifecycle, Persona, starter policy, Sentry setup and voice
-enrollment composition are **not implemented** by this first commissioning slice.
+This paragraph describes the historical first commissioning checkpoint. Normal
+provider/Vault, Persona, policy, logical voice and Sentry composition is now
+implemented by `SetupRuntime`; physical voice enrollment remains pending.
 
 ## Browser execution measurement
 
@@ -200,13 +207,21 @@ of existing batching, not a new browser runtime, production mutation benchmark o
 Codex parity. Browser memory/reconnect were not measured. All test browsers and
 the disposable fixture server close at the end.
 
-## Remaining executable work
+## Integrated continuation and remaining acceptance
 
-Continue Slice 15 by composing existing provider/Vault enrollment, explicit policy,
-Persona and Sentry source setup without turning persisted configuration into
-authorization. Add interrupted/revoked setup tests for each real adapter. Voice
-and physical owner authentication stay deferred. Then advance to Slice 16 shared
-Presence subscriptions/AIE validation, followed by Slice 17 Executive/schedules.
-Neither later stage has been started. Slice 14 live multi-source/background
-service integration and capture remain explicit acceptance gaps, not whole-slice
-PASS. Preserve current UI availability until genuine supported integration exists.
+[Executive runtime](../EXECUTIVE-RUNTIME.md) records the runnable local workflow,
+exact review commands, bounds, current-context admission, retained workflow
+candidates, independently verified replay and remaining product limitations.
+[Presence evidence](../evidence/group03/slice16-presence.md) separates native
+builds from device execution. [End-to-end measurements](../evidence/group03/end-to-end-benchmark.json)
+compare the same local tasks against reviewed head `5899798`; CPU/Python allocation
+and measurement limits are included. New Presence/Executive timings have no prior
+implementation baseline. No production latency or inference claim is made.
+
+Native surfaces expose truthful readback. Native schedule creation/editing remains
+unavailable; trusted-local exact reviewed commands provide the working control
+path. No standing Full Access, environmental capture, owner credential enrollment,
+physical/OEM acceptance, hosted operation or Gate D PASS is inferred. The
+continuation's cross-slice test exercises real Core identity/setup, actual local
+Grid/task sources, one archive, scoped phone-reference readback, Presence/AIE,
+verified file/math DAG execution, revocation and durable restart.

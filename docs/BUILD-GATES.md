@@ -238,9 +238,10 @@ Required scenarios include:
 
 ## Gate D — JARVIS Layer
 
-**2026-10-16:** Group 3 backend engineering is owner-authorized. Slices 14–15 have
-scoped headless/reference checkpoints; Gate D is **PARTIAL**, with mandatory live,
-commissioning, Presence, Executive and owner acceptance still outstanding. See
+**2026-10-16:** Group 3 Slices 14–17 now have integrated local software paths,
+native build/contract checks and real local execution/restart evidence. Gate D
+is **PARTIAL**: live environmental/provider, owner commissioning, physical/OEM,
+native authoring and production acceptance remain distinct outstanding checks. See
 [Group 3 evidence](development/GROUP-03-GATE-D.md). Gate C remains PARTIAL.
 
 **Slices:** 14–17 (World Model, commissioning, full Presence integration and Executive Planner)
@@ -276,7 +277,7 @@ Required scenarios include provider/auth failure, coordinator/node/Edge loss, Gr
 | Gate B — Can Do Work | 05–06 | **PASS for documented local-alpha acceptance** |
 | Gate C — Embodied OSCAR | 07–10 | **PARTIAL:** software foundations reference-accepted; Edge/Voice/Mobile/Desktop device acceptance deferred; Desktop PR #16 not merged |
 | Design / Character checkpoint | 11–13 | **NEXT:** Slice 11 visual design/lab, then Desktop and Mobile owner-reviewed experience |
-| Gate D — JARVIS Layer | 14–17 | Planned |
+| Gate D — JARVIS Layer | 14–17 | **PARTIAL:** integrated software locally verified; live/owner/device acceptance pending |
 | Gate E — Unified Alpha | 18–20 | Planned |
 
 No approved visual prototype proves that OSCAR can execute, perceive, verify,

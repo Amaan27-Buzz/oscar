@@ -388,25 +388,40 @@ Implementation, emulator verification and owner review are separate from physica
 
 ## Slice 14 — World Model + Perception Fabric + Sentry + optional Daily Journal ◻️
 
-**2026-10-16 Group 3 candidate:** headless current-state/Perception/Sentry backend
-is implemented for scoped local/reference verification. Full Slice 14/Gate D
+**2026-10-16 Group 3 candidate:** normal Core current-state/Perception/Sentry
+lifecycle, authorized local subscriptions, recovery and retention maintenance
+are implemented and locally verified. Full Slice 14/Gate D
 acceptance remains partial. See [implementation and evidence](development/GROUP-03-GATE-D.md).
 
 Coherent freshness-/provenance-qualified current truth across people/places/devices/apps/projects/tasks/commitments; optional explicitly permitted screen/device/sensor/location/communication/acoustic inputs, time/weather/calendar/notifications/media state, persistent Sentry modes and retention-controlled Journal/Capture. This is former Slice 11; no earlier World Model implementation claim is made.
 
 ## Slice 15 — Commissioning / setup ◻️
 
-**2026-10-16 Group 3 candidate:** first trusted-local identity/enrollment/Grid
-pairing/restart/revocation vertical slice is implemented; broader setup and actual
-owner/device acceptance remain incomplete. See [evidence](development/GROUP-03-GATE-D.md).
+**2026-10-16 Group 3 candidate:** trusted-local identity/pairing, provider/native
+Vault, Persona/preferences, policy, logical voice and Sentry setup compose into
+normal Core. Actual owner accounts, audio and device acceptance remain pending.
+See [evidence](development/GROUP-03-GATE-D.md).
 
 Identity, Persona/Personal Policy starter rules, Voice Identity/Match/Map, Connection Grid and surface pairing, model/cloud setup, Sentry/capture setup and human-readable perceive/retain/act permissions. This is former Slice 12.
 
 ## Slice 16 — Full Avatar / Presence integration ◻️
 
+**Group 3 software:** shared leased Presence, scoped subscriptions, typed AIE,
+trusted React/Compose task views and an explicit opt-in Android Orb overlay are
+implemented and build/JVM verified. Device/owner/OEM and widget expansion remain
+separate; this is not physical or whole-slice PASS.
+
 Finish the **runtime/device-facing** Presence work after World Model/commissioning: genuine state projection, small/expanded/overlay/widget variants, focus retreat, cross-device behavior, real audio/perception context, accessibility, latency and real-device owner acceptance. Uses Slice 11's reviewed Expression System; this is former 13B. **Adaptive Interface Engine foundation:** define a typed/versioned, capability-negotiated interactive-view envelope, initial trusted React/Compose components and accessible fallback; no arbitrary generated code. See [AIE](ADAPTIVE-INTERFACE.md).
 
 ## Slice 17 — Executive Planner + durable Workers + learning ◻️
+
+**Group 3 software:** reviewed bounded planning/DAGs, Worker scope/reservations,
+one-time/recurring schedules, canonical task recovery, context predicates,
+reviewed replanning, quiet brief and retained/evaluated workflow reuse are
+implemented. Real local executors and separate-process restart are verified;
+model planner output is fixture-tested and remains untrusted. Native authoring,
+live provider/environment and owner acceptance remain separate. See
+[Executive runtime](EXECUTIVE-RUNTIME.md).
 
 Priority/deadline/dependency planning, explicit commitments, scheduling conflicts, focus/travel/weather aware planning, policy-bounded replanning, proactive brief, interruption policy, Worker lifecycle/recovery and evaluated learning. Former Slice 14. **Adaptive UI:** intent-driven choice/composition of trusted interactive views and authorized Core action round trips, without a separate agent or memory store.
 

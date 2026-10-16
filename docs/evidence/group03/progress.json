@@ -1,23 +1,59 @@
 {
-  "version": 1,
+  "version": 2,
   "date": "2026-10-16",
   "branch": "codex/group-03-gate-d",
   "base_sha": "257349f82a96293c3737d446dca18ce46f098b04",
-  "implementation_sha": "3fd7cc90e538ca6fad71894c604a99e6b1fc308e",
+  "implementation_sha": "c23dc4a64e45311104d7ba0798f20f4a763ffd9b",
   "pull_request": "https://github.com/Amaan27-Buzz/oscar/pull/7",
   "pull_request_state": "OPEN_DRAFT_NOT_MERGED",
-  "remote_head_verified": "3fd7cc90e538ca6fad71894c604a99e6b1fc308e",
   "remote_ci": "UNKNOWN_REVIEW_CONNECTOR_ACCESS_DENIED",
   "gate_c": "PARTIAL",
   "gate_d": "PARTIAL",
   "stages": {
-    "14": {"status": "VERIFIED_SCOPED_CHECKPOINT", "tests": "tests.test_world_model", "focused_passed": 38, "classification": "VERIFIED_REFERENCE", "whole_slice": "PARTIAL", "checkpoint_sha": "e34e665238e613e7b483644b12fc9e8c377f2a7f"},
-    "15": {"status": "VERIFIED_SCOPED_CHECKPOINT", "tests": "tests.test_commissioning", "focused_passed": 11, "classification": "VERIFIED_REFERENCE", "whole_slice": "PARTIAL", "checkpoint_sha": "3fd7cc90e538ca6fad71894c604a99e6b1fc308e"},
-    "16": {"status": "NOT_STARTED"},
-    "17": {"status": "NOT_STARTED"}
+    "14": {
+      "status": "SOFTWARE_IMPLEMENTED_LOCAL_VERIFIED",
+      "whole_slice": "PARTIAL_PENDING_REMAINING_ACCEPTANCE",
+      "checkpoint_sha": "e3fb826",
+      "implemented": "Normal Core/Controller, authorized bounded source lifecycle, quiet Sentry and canonical retention",
+      "remaining": "Owner environmental enrollment, capture/delivery and production acceptance"
+    },
+    "15": {
+      "status": "SOFTWARE_IMPLEMENTED_LOCAL_VERIFIED",
+      "whole_slice": "PARTIAL_PENDING_REMAINING_ACCEPTANCE",
+      "checkpoint_sha": "c7f1a8b",
+      "implemented": "Resumable setup, identity/pairing, provider/native Vault, Persona/preferences/policy/logical voice",
+      "remaining": "Owner providers, physical pairing, Voice Match/Map and audio calibration"
+    },
+    "16": {
+      "status": "SOFTWARE_IMPLEMENTED_LOCAL_VERIFIED",
+      "whole_slice": "PARTIAL_PENDING_REMAINING_ACCEPTANCE",
+      "checkpoint_sha": "993a38c",
+      "implemented": "Shared leased Presence, validated typed AIE/native renderers, opt-in Android overlay",
+      "remaining": "Device/OEM/visual/power/accessibility acceptance; home widgets unavailable"
+    },
+    "17": {
+      "status": "SOFTWARE_IMPLEMENTED_LOCAL_VERIFIED",
+      "whole_slice": "PARTIAL_PENDING_REMAINING_ACCEPTANCE",
+      "checkpoint_sha": "c23dc4a64e45311104d7ba0798f20f4a763ffd9b",
+      "implemented": "Reviewed bounded DAG/Worker execution, schedules, recovery, context gates, replanning and verified workflow reuse",
+      "remaining": "Native authoring unavailable; owner/live-model/environment/production acceptance"
+    }
   },
-  "next_action": "Continuation: verify normal Slice 14 lifecycle, source acquisition/runner fencing and maintenance, then complete setup composition, Presence/AIE/opt-in overlay and Executive in dependency order. No merge or Group 4.",
-  "owner_acceptance": "DEFERRED_OWNER_ACCEPTANCE",
-  "baseline": {"ran": 569, "passed": 563, "failed": 0, "skipped": 6, "seconds": 218.479},
-  "final_verification": {"receipt": "verification.json", "ran": 618, "passed": 612, "failed": 0, "skipped": 6, "seconds": 124.393}
+  "final_verification": {
+    "receipt": "verification-continuation.json",
+    "ran": 671,
+    "passed": 665,
+    "failed": 0,
+    "skipped": 6,
+    "seconds": 159.648
+  },
+  "next_action": "Owner review of draft PR7 and separate live/device acceptance. No merge, Group 4 or Cloud.",
+  "known_limits": [
+    "Gate C and Gate D remain PARTIAL; owner/device/live/production acceptance is separate.",
+    "Native schedule creation/editing and home widgets remain unavailable; trusted-local reviewed CLI is the working Executive control path.",
+    "No live model inference, owner provider enrollment, physical camera/audio/Edge or phone/emulator execution in this continuation.",
+    "Cooperative cancellation cannot undo an indivisible external action; ambiguous mutations require inspection.",
+    "Local interval scheduling runs only while this Core is running; no hosted service or laptop wake was installed.",
+    "Benchmark is instrumented local latency and Python allocations, not RSS, battery, device, inference or production performance."
+  ]
 }

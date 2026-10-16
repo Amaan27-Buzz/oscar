@@ -1,5 +1,17 @@
 # Orchestration, Learning, Skills, Workers and Protocols
 
+## Group 3 software — 2026-10-16
+
+The [Executive runtime](EXECUTIVE-RUNTIME.md) now supplies reviewed commitments,
+typed/model-assisted plan candidates, scoped Worker assignment/reservations,
+durable one-time/recurring scheduling, exact-task retries, cancellation and
+recovery through existing Runtime/Dispatcher. Current context predicates, reviewed
+replanning and read-only briefs preserve freshness/authority. Workflow learning
+requires separate retention and independently verified replay; its canonical
+events remain distinct from current state. Native surfaces expose readback;
+native activation/editing controls remain unavailable. This supersedes the dated
+future-integration wording below only for this implemented bounded scope.
+
 ## Group 2.5 owner correction — 2026-10-14
 
 Conversation is the one owner interaction point. Controller, Memory Fabric, Executive, Durable Runtime and Grid retain their established ownership. Tools, Skills, Routines, Workers and Protocols remain different internal concepts; Automations offers concise responsibility/lifecycle inspection instead of a second agent framework.

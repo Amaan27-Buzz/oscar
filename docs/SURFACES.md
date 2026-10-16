@@ -1,5 +1,16 @@
 # OSCAR Surfaces and Embodiments
 
+## Group 3 integrated software — 2026-10-16
+
+Core now publishes scoped leased Presence and typed adaptive task views consumed
+by React and Compose. Native Preferences/Automations expose setup and Executive
+readback; unavailable authoring stays unavailable. The Android Companion overlay
+is explicit opt-in software with a separate read-only lifecycle, permissions,
+foreground notification and hide/disable controls. No owner/device/OEM acceptance
+is inferred from build/JVM evidence. See [Group 3](development/GROUP-03-GATE-D.md)
+and [AIE](ADAPTIVE-INTERFACE.md). This supersedes earlier planned/not-implemented
+wording below only for the bounded implemented contracts.
+
 ## Current surfaces — owner direction, 2026-10-14
 
 **Desktop Group 2.5A is provisionally owner-approved and merged to `main`** ([PR #5](https://github.com/Amaan27-Buzz/oscar/pull/5)); final integrated and physical acceptance remain open. One Tauri process has a small expressive **Companion** and a full **Workspace**. The unchanged Orb Companion owns only truthful glanceable state, tray/hotkey, quick Access/Sentry availability and opening the app; shortcut settings live in overflow. It has no chat, task list, automation manager or approval/signing authority. Workspace destinations are **Conversation / Automations / Activity / Devices / Preferences**.
