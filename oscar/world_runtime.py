@@ -174,11 +174,12 @@ class WorldRuntime:
                     lease = {}
                 if lease.get("until", 0) > now and lease.get("owner") != self.instance:
                     return {"polled": 0, "failed": 0, "expired": 0}
-                self.store.put(
-                    "world_runner",
-                    self.world.relationship,
-                    {"owner": self.instance, "until": now + 30},
-                )
+                if lease.get("owner") != self.instance or lease.get("until", 0) - now <= 10:
+                    self.store.put(
+                        "world_runner",
+                        self.world.relationship,
+                        {"owner": self.instance, "until": now + 30},
+                    )
             counts = {"polled": 0, "failed": 0, "expired": 0}
             tasks_changed = self.tasks_changed.is_set()
             self.tasks_changed.clear()

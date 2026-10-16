@@ -7,6 +7,19 @@ const now=100000;
 const task=(state:string,actions:string[]=[]):Task=>({task_id:'private-task-id',state,actions,description:'PRIVATE description',target:'private-target',generation:1,evidence_ids:[],blocker:null,response:'PRIVATE response',response_status:null,value:null,epistemic:null});
 const view=(patch:Partial<View>={}):View=>({...initialView,link:'online',voice:'idle',expression:{epoch:'a'.repeat(32),generation:1,observed_at_ms:now,voice_observed_at_ms:now,tasks_observed_at_ms:now,current_observed_at_ms:now},...patch});
 describe('native Desktop expression adapter',()=>{
+  it('admits reserved Core publications without replaying a stable transition',()=>{
+    const adapter=new DesktopExpressionAdapter();
+    const frame={version:1,source:{kind:'core',id:'presence:canonical'},generation:1,transitionId:'unchanged',eventTime:now,expiresAt:now+30000,kind:'state',priority:'normal',operation:'idle',delivery:'composed',availability:'available',muted:false,attention:'none',reducedMotion:true};
+    const first=adapter.receive(view({presence:{version:1,visible:true,expression:frame}}),now)!;
+    const engine=new ExpressionController(first.source);expect(engine.receive(first,now)).toBe('accepted');
+    engine.snapshot(now+1000);engine.takeAnimationRecords();
+    const fresh=adapter.receive(view({presence:{version:1,visible:true,expression:{...frame,generation:1025,eventTime:now+5000,expiresAt:now+35000}}}),now+5000)!;
+    expect(engine.receive(fresh,now+5000)).toBe('accepted');
+    expect(engine.snapshot(now+31000).resolved.operation).toBe('idle');
+    expect(engine.takeAnimationRecords()).toEqual([]);
+    expect(engine.receive(first,now+6000)).toBe('stale');
+    expect(engine.snapshot(now+35000).resolved.operation).toBe('unknown');
+  });
   it('maps actual task truth, attention and unknown without forwarding private content',()=>{
     for(const [state,operation] of [['executing','executing'],['verifying','verifying'],['awaiting_result','waiting'],['result_received','processing'],['verified','attentive'],['partially_verified','attentive'],['failed','error'],['unknown','unknown'],['unexpected','unknown']]) {
       const e=new DesktopExpressionAdapter().receive(view({current:task(state)}),now)!;

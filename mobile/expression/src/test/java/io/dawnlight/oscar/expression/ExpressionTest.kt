@@ -5,6 +5,21 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class ExpressionTest {
+    @Test fun reservedCorePublicationsRenewFreshnessWithoutReplayingTransitions() {
+        val raw = JSONObject(fixtures.getJSONArray("traces").getJSONObject(0).getJSONArray("steps").getJSONObject(0).getJSONObject("event").toString())
+        raw.put("source", JSONObject().put("kind", "core").put("id", "presence:canonical"))
+            .put("generation", 1).put("kind", "state").put("operation", "idle").put("delivery", "composed")
+            .put("eventTime", 1000000).put("expiresAt", 1030000).put("reducedMotion", true)
+        val controller = ExpressionController(Source(SourceKind.CORE, "presence:canonical"), data)
+        assertEquals("accepted", controller.receive(raw.toString(), 1000000))
+        controller.snapshot(1001000); controller.takeAnimationRecords()
+        val fresh = JSONObject(raw.toString()).put("generation", 1025).put("eventTime", 1005000).put("expiresAt", 1035000)
+        assertEquals("accepted", controller.receive(fresh.toString(), 1005000))
+        assertEquals("idle", controller.snapshot(1031000).resolved.operation)
+        assertTrue(controller.takeAnimationRecords().isEmpty())
+        assertEquals("stale", controller.receive(raw.toString(), 1006000))
+        assertEquals("unknown", controller.snapshot(1035000).resolved.operation)
+    }
     private fun resource(name: String) = javaClass.classLoader!!.getResourceAsStream(name)!!.bufferedReader().use { it.readText() }
     private val data = MotionData(resource("motion-v1.json"))
     private val fixtures = JSONObject(resource("fixtures/reference-v1.json"))

@@ -1,14 +1,18 @@
 import copy
 import unittest
+from concurrent.futures import ThreadPoolExecutor
+from contextlib import closing
 
 from oscar.adaptive import task_view, validate_view
 from oscar.contracts import TaskState, new_id
 from oscar.credentials import CredentialPool
-from oscar.grid import Node, NodeRole
+from oscar.grid import Grid, Node, NodeRole
 from oscar.mobile import Mobile
 from oscar.policy import PersonalPolicy, PolicyEffect, PolicyRule
 from oscar.presence import PresenceRuntime
+from oscar.runtime import Runtime
 from oscar.setup_runtime import SetupRuntime
+from oscar.storage import StateConflict, Store
 from tests.support import Rig
 
 
@@ -36,7 +40,8 @@ class PresenceTests(unittest.TestCase):
         self.assertEqual("waiting", first["operation"])
         self.r.store.transition(task.id, TaskState.EXECUTING)
         self.r.grid.lease(task.id, "test-node")
-        other = PresenceRuntime(self.r.runtime).snapshot()["expression"]
+        self.r.runtime.presence = PresenceRuntime(self.r.runtime)
+        other = self.r.runtime.presence.snapshot()["expression"]
         self.assertEqual(first["source"], other["source"])
         self.assertGreater(other["generation"], first["generation"])
         self.assertEqual("executing", other["operation"])
@@ -102,3 +107,45 @@ class PresenceTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             validate_view(invalid)
         self.assertEqual([], self.r.store.all("task"))
+
+    def test_concurrent_unchanged_reads_renew_freshness_without_sqlite_writes(self):
+        presence = self.r.runtime.presence
+        first = presence.snapshot()["expression"]
+        before = self.r.store.db.total_changes
+        self.r.clock.now += 5
+        with ThreadPoolExecutor(max_workers=8) as pool:
+            events = list(pool.map(lambda _: presence.snapshot()["expression"], range(100)))
+        self.assertEqual(100, len({e["generation"] for e in events}))
+        self.assertEqual(before, self.r.store.db.total_changes)
+        self.assertTrue(all(e["transitionId"] == first["transitionId"] for e in events))
+        self.assertTrue(
+            all(
+                e["eventTime"] > first["eventTime"] and e["expiresAt"] > first["expiresAt"]
+                for e in events
+            )
+        )
+        state = self.r.store.get("core_presence", self.r.runtime.relationship_id)
+        self.assertEqual(1, state["state_generation"])
+        for _ in range(1000):
+            presence.snapshot()
+        self.assertEqual(before + 1, self.r.store.db.total_changes)
+        self.assertEqual(
+            1, self.r.store.get("core_presence", self.r.runtime.relationship_id)["state_generation"]
+        )
+
+    def test_new_publisher_fences_old_publications_and_preserves_transition_identity(self):
+        original = self.r.runtime.presence
+        first = original.snapshot()["expression"]
+        for _ in range(20):
+            original.snapshot()
+        with closing(Store(self.r.root / "state.sqlite")) as second_store:
+            runtime = Runtime(
+                second_store, Grid(second_store, self.r.clock), self.r.runtime.verifier
+            )
+            replacement = PresenceRuntime(runtime)
+            current = replacement.snapshot()["expression"]
+            self.assertEqual(first["source"], current["source"])
+            self.assertEqual(first["transitionId"], current["transitionId"])
+            self.assertGreater(current["generation"], first["generation"] + 20)
+            with self.assertRaises(StateConflict):
+                original.snapshot()
