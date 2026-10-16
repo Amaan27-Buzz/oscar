@@ -254,7 +254,9 @@ def main() -> None:
         archive = extracted / "source.zip"
         with archive.open("wb") as destination:
             subprocess.run(
-                ["git", "archive", "--format=zip", baseline], stdout=destination, check=True
+                ["git", "archive", "--format=zip", baseline, "oscar", "config"],
+                stdout=destination,
+                check=True,
             )
         with zipfile.ZipFile(archive) as bundle:
             assert all(
@@ -313,6 +315,7 @@ def main() -> None:
                 "Cold samples are Harness startup/first task, not OS cold cache. "
                 "RSS is Windows working set, not all-system memory/battery. "
                 "Laptop cache/load and thermal state uncontrolled. "
+                "Baseline extraction includes only runtime/config to reduce unrelated asset I/O. "
                 "No model/provider/device performance claim."
             ),
         }
