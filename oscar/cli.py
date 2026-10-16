@@ -206,6 +206,24 @@ def parser() -> argparse.ArgumentParser:
     commands.add_parser("grid-proof")
     commands.add_parser("history")
     commands.add_parser("sources")
+    setup = commands.add_parser("setup")
+    setup.add_argument(
+        "--section",
+        choices=(
+            "identity",
+            "persona",
+            "preferences",
+            "voice",
+            "policy",
+            "sentry",
+            "source",
+            "recover",
+        ),
+    )
+    setup.add_argument("--config", type=Path)
+    provider = commands.add_parser("setup-provider")
+    provider.add_argument("slot")
+    provider.add_argument("--revoke", action="store_true")
     world = commands.add_parser("world")
     world.add_argument("--entity", required=True)
     world.add_argument("--key", required=True)
@@ -256,7 +274,69 @@ def main() -> int:
             )
         with Harness(args.state, args.workspace, args.manifest, template) as harness:
             transports = {harness.node_id: (harness.dispatcher, harness.session)}
-            if args.command == "serve":
+            if args.command in {"setup", "setup-provider"}:
+                setup = harness.runtime.setup
+                assert setup is not None
+                if args.command == "setup-provider":
+                    if args.revoke:
+                        setup.revoke_provider(args.slot, owner_authorized=True)
+                    else:
+                        from getpass import getpass
+
+                        setup.provider(
+                            args.slot,
+                            getpass("Provider credential (native Vault only): "),
+                            owner_authorized=True,
+                        )
+                elif args.section in {"identity", "recover"}:
+                    if args.section == "identity":
+                        setup.commissioning.initialize(owner_authorized=True)
+                    else:
+                        setup.recover()
+                elif args.section:
+                    if args.config is None or args.config.stat().st_size > 8192:
+                        raise ValueError("bounded selected setup configuration required")
+                    config = json.loads(args.config.read_text(encoding="utf-8"))
+                    if args.section == "policy":
+                        from .policy import PolicyEffect, PolicyRule
+
+                        setup.policy(
+                            PolicyRule(**{**config, "effect": PolicyEffect(config["effect"])}),
+                            owner_authorized=True,
+                        )
+                    elif args.section == "sentry":
+                        from .sentry import AwarenessMode, SentrySettings, SentryState
+
+                        harness.world.sentry.configure(
+                            SentrySettings(
+                                **{
+                                    **config,
+                                    "mode": AwarenessMode(config["mode"]),
+                                    "state": SentryState(config["state"]),
+                                    "source_ids": tuple(config.get("source_ids", ())),
+                                    "trigger_keys": tuple(config.get("trigger_keys", ())),
+                                }
+                            ),
+                            owner_authorized=True,
+                        )
+                    elif args.section == "source":
+                        source = config.pop("source")
+                        harness.world.configure_source(
+                            PerceptionSource(
+                                **{
+                                    **source,
+                                    "entities": tuple(source["entities"]),
+                                    "keys": tuple(source["keys"]),
+                                    "kinds": tuple(ObservationKind(k) for k in source["kinds"]),
+                                }
+                            ),
+                            **config,
+                            owner_authorized=True,
+                        )
+                    else:
+                        setup.configure(args.section, config, owner_authorized=True)
+                print_json(setup.snapshot())
+            elif args.command == "serve":
                 from threading import Event
 
                 from .desktop import Desktop

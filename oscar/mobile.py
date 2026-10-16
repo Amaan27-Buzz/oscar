@@ -629,6 +629,8 @@ class Mobile:
                     "tasks": tasks,
                     "observed_at_ms": round(self.grid.clock() * 1000),
                 }
+                if self.runtime.setup is not None:
+                    response["setup"] = self.runtime.setup.snapshot()
             elif operation == "text" and set(payload) == {"text"}:
                 self.authenticate(session, "mobile:text")
                 text = payload["text"]

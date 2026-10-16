@@ -18,6 +18,7 @@ from .retrieval import ProviderInventorySource, RetrievalExecutor
 from .router import Router, RouteUnavailable
 from .runtime import Runtime
 from .search import TavilySource
+from .setup_runtime import SetupRuntime
 from .storage import Store
 from .transport import Dispatcher
 from .world_runtime import WorldRuntime
@@ -150,6 +151,7 @@ class Harness:
         )
         self.world = WorldRuntime(self.runtime, self.files)
         self.runtime.world = self.world
+        self.runtime.setup = SetupRuntime(self.runtime, self.pool)
         self.store.close_callbacks.append(self.close_services)
         self.world.start()
 

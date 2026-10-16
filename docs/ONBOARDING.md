@@ -5,8 +5,18 @@
 `oscar.commissioning.Commissioning` now supplies trusted-local Core instance
 identity, exact reviewed enrollment, scoped Grid pairing, partial setup recovery
 and session revocation/readback. Requested perceive/retain/act settings remain
-configuration, not activation. Provider/Vault, Persona, starter policy, voice and
-Sentry setup composition are still outstanding. No device-owner authentication or
+configuration, not activation. `SetupRuntime` composes Persona/preferences,
+existing typed Personal Policy, logical Voice Identity preferences, explicit Sentry
+source/mode setup and native provider Vault bindings into the normal Core.
+`python -m oscar setup` reads status; `setup --section identity` initializes Core;
+`setup --section persona --config selected.json` applies validated non-secret
+settings. `setup-provider MASKED_SLOT` prompts without echo and persists only an
+opaque native Vault reference; `--revoke` deletes that owned credential. Interrupted
+writes remain unusable until `setup --section recover` removes the incomplete
+credential. No environment file is read or rewritten. Restart rebinds only owned
+references, and deletion/revocation is rechecked before use. Configured, connected,
+recently operational and unavailable states remain distinct on surface readback.
+No device-owner authentication or
 physical pairing is claimed. See [evidence and limits](development/GROUP-03-GATE-D.md).
 
 OSCAR's first-run experience should feel like commissioning a personal system, not clicking through generic app permissions.

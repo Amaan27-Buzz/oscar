@@ -27,6 +27,7 @@ from .storage import StateConflict, Store
 from .transport import Transport, action_envelope, parse_result
 
 if TYPE_CHECKING:
+    from .setup_runtime import SetupRuntime
     from .world_runtime import WorldRuntime
 
 
@@ -45,6 +46,7 @@ class Runtime:
         self._memory, self.relationship_id = memory, relationship_id
         self.active_context: dict[str, dict[str, Any]] = {}
         self.world: WorldRuntime | None = None
+        self.setup: SetupRuntime | None = None
         self.store.task_resources.add(self)
 
     @property
