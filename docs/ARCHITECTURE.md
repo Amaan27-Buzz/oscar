@@ -1,5 +1,11 @@
 # System Architecture
 
+**Mobile acceptance update — 2026-10-16:** Group 2.5B UI/UX is explicitly
+**APPROVED / PASS**. [Final closure](ui/mobile/group25b/FINAL-CLOSURE.md) records
+the theme correction and lifecycle investigation. This supersedes earlier
+visual-review-pending statements; physical commissioning, remote CI and Gate C
+remain separate.
+
 ## Group 2.5 reconciliation — 2026-10-14
 
 Core owns one continuous multimodal personal intelligence and delegates subordinate responsibilities to Workers/specialists. The approved tiny Companion is expressive presence; the separate Workspace centers Conversation with contextual operations, Automations, operational Activity, Devices and Preferences. [The interaction and authority decision](decisions/ADR-DESKTOP-PERSONAL-INTELLIGENCE.md) records implementation ownership, canonical history composition and the corrected access model.
@@ -7,7 +13,7 @@ Core owns one continuous multimodal personal intelligence and delegates subordin
 Ask / Secure / Full Access, awareness, Worker autonomy and capture/retention are independent. Genuine Full Access requires signed standing owner delegation and immediate revocation; it is currently unavailable because exact-action approval/critical blockers remain. No alternate Core, memory store or agent framework is introduced.
 
 
-> **Current — 2026-10-14:** The 00–20 [canonical roadmap](SLICE-NUMBERING.md) is authoritative. Desktop Groups 1–2 and Group 2.5A Companion/Workspace are merged into `main`; the owner accepted the neumorphic Desktop UI **provisionally**. Mobile Group 2.5B explores independent visual boards and a standalone Compose mockup before implementing/accepting a production redesign. Slice 14 Sentry and Slice 17 persistent Workers remain planned. Future [Adaptive Interface Engine](ADAPTIVE-INTERFACE.md) spans 16/17/19/20; **not implemented**. Earlier candidate PR references are historical evidence. Gate C physical and final integrated design acceptance remain open.
+> **Current — 2026-10-15:** The 00–20 [canonical roadmap](SLICE-NUMBERING.md) is authoritative. Desktop Groups 1–2 and Group 2.5A Companion/Workspace are merged into `main`; the owner accepted the neumorphic Desktop UI **provisionally**. Mobile Group 2.5B is a production Kotlin/Compose implementation candidate using the selected Codex ImageGen/Figma baseline, with native phone evidence and owner visual review pending. The Gemini Argon prototype is rejected, not an architectural or reusable component source. Mobile preserves the existing Core, Grid, signed decisions, native capabilities and shared Expression boundary; see [the implementation ledger](ui/mobile/group25b/README.md). Slice 14 Sentry and Slice 17 persistent Workers remain planned. Future [Adaptive Interface Engine](ADAPTIVE-INTERFACE.md) spans 16/17/19/20; **not implemented**. Earlier candidate PR references are historical evidence. Gate C physical and final integrated design acceptance remain open.
 
 ## Desktop foundation — Slice 10 integrated software reference
 

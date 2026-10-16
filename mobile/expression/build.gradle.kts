@@ -3,16 +3,21 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.compose")
 }
+val expressionAssets by tasks.registering(Copy::class) {
+    from("../../expression") { include("motion-v1.json") }
+    into(layout.buildDirectory.dir("generated/expression-assets"))
+}
 android {
     namespace = "io.dawnlight.oscar.expression"
     compileSdk = 36
     defaultConfig { minSdk = 30; testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner" }
     buildFeatures { compose = true }
     compileOptions { sourceCompatibility = JavaVersion.VERSION_17; targetCompatibility = JavaVersion.VERSION_17 }
-    sourceSets["main"].assets.apply { srcDir("../../expression"); include("motion-v1.json") }
+    sourceSets["main"].assets.srcDir(layout.buildDirectory.dir("generated/expression-assets"))
     sourceSets["test"].resources.apply { srcDir("../../expression"); include("motion-v1.json", "fixtures/**") }
     sourceSets["androidTest"].assets.srcDir("../../expression/fixtures")
 }
+tasks.named("preBuild") { dependsOn(expressionAssets) }
 kotlin { compilerOptions { jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17) } }
 dependencies {
     implementation(platform("androidx.compose:compose-bom:2026.03.00"))

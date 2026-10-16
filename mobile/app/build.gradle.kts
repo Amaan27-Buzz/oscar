@@ -3,6 +3,12 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.compose")
 }
+val mobileAssets by tasks.registering(Copy::class) {
+    from("../../assets/brand") { include("oscar-orb.svg") }
+    from("../third-party-licenses") { into("licenses") }
+    from("../font-licenses") { into("licenses") }
+    into(layout.buildDirectory.dir("generated/mobile-assets"))
+}
 android {
     namespace = "io.dawnlight.oscar.mobile"
     compileSdk = 36
@@ -15,12 +21,22 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     buildFeatures { buildConfig = true; compose = true }
+    buildTypes {
+        create("review") {
+            initWith(getByName("debug"))
+            applicationIdSuffix = ".review"
+            matchingFallbacks += "debug"
+        }
+    }
+    testBuildType = providers.gradleProperty("oscarTestBuildType").getOrElse("debug")
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    sourceSets["main"].assets.srcDir("../../assets/brand")
+    sourceSets["main"].assets.srcDir(layout.buildDirectory.dir("generated/mobile-assets"))
+    sourceSets["review"].res.srcDir("src/debug/res")
 }
+tasks.named("preBuild") { dependsOn(mobileAssets) }
 kotlin { compilerOptions { jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17) } }
 dependencies {
     implementation(project(":expression"))
@@ -32,6 +48,9 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.10.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.10.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
+    implementation("org.commonmark:commonmark:0.30.1")
+    implementation("org.commonmark:commonmark-ext-gfm-tables:0.30.1")
+    implementation("org.commonmark:commonmark-ext-gfm-strikethrough:0.30.1")
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.json:json:20251224")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
@@ -41,4 +60,5 @@ dependencies {
     // Android 16 removed the reflective InputManager entry point used by older Espresso.
     androidTestImplementation("androidx.test.espresso:espresso-core:3.7.0")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
+    add("reviewImplementation", "androidx.compose.ui:ui-test-manifest")
 }

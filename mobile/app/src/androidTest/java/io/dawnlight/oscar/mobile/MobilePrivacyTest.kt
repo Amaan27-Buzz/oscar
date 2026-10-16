@@ -13,7 +13,7 @@ class MobilePrivacyTest {
     private var isolated = false
     private val prefs get() = compose.activity.getSharedPreferences("permissions", Context.MODE_PRIVATE)
     @Before fun isolate() {
-        Assume.assumeTrue("Disposable emulator only", android.os.Build.PRODUCT.startsWith("sdk"))
+        Assume.assumeTrue("Disposable emulator only", allowDisposableReview())
         isolated = true
         prefs.edit().clear().commit()
         NotificationBoundary.privacyChanged()
@@ -51,14 +51,20 @@ class MobilePrivacyTest {
     }
 
     @Test fun invalidSourcesDeniedAccessAndLiveLocalRevocationRemainUsable() {
-        compose.onNodeWithText("Settings").performClick()
-        compose.onNodeWithText("Privacy").performClick()
+        navigateReview(compose, "SETTINGS")
+        compose.onNodeWithText("Privacy").performScrollTo().performClick()
+        compose.onNodeWithText("Choose notification sources").performScrollTo().performClick()
         compose.onNodeWithTag("notificationSources").performScrollTo().performTextInput("invalid")
+        compose.onNodeWithTag("notificationSources").assertTextContains("invalid")
+        androidx.test.espresso.Espresso.closeSoftKeyboard()
+        compose.waitUntil(5000) { !compose.activity.window.decorView.rootWindowInsets.isVisible(android.view.WindowInsets.Type.ime()) }
         compose.onNodeWithText("Save sources").performScrollTo().performClick()
         compose.onNodeWithText("Use up to 32 package IDs, such as example.app. Nothing was enabled.").assertExists()
         assertEquals("", prefs.getString("notification_sources", ""))
         compose.onNodeWithTag("notificationSources").performTextReplacement("example.allowed")
-        compose.onNodeWithText("Save sources").performClick()
+        androidx.test.espresso.Espresso.closeSoftKeyboard()
+        compose.waitUntil(5000) { !compose.activity.window.decorView.rootWindowInsets.isVisible(android.view.WindowInsets.Type.ime()) }
+        compose.onNodeWithText("Save sources").performScrollTo().performClick()
         compose.waitUntil(5000) { prefs.getString("notification_sources", "") == "example.allowed" }
         val contextGrant = compose.onNodeWithContentDescription("Selected notification context")
         contextGrant.performScrollTo().performClick()
@@ -69,29 +75,15 @@ class MobilePrivacyTest {
         prefs.edit().putBoolean("notification_context", false).commit()
         contextGrant.assertIsOff()
         val voiceEpoch = VoicePresentation.begin()
-        compose.onNodeWithText("Revoke local perception and reply grants").performScrollTo().performClick()
+        compose.onNodeWithText("Revoke OSCAR grants").performScrollTo().performClick()
         compose.waitUntil(5000) { prefs.getString("notification_sources", "") == "" }
+        compose.waitUntil(5000) { !VoicePresentation.current(voiceEpoch) }
         assertFalse(prefs.getBoolean("microphone_perception", false)); assertFalse(prefs.getBoolean("notification_reply", false))
         assertFalse(NativeVoice.permitted(compose.activity))
         assertFalse(VoicePresentation.current(voiceEpoch))
-        compose.onNodeWithText("Can perceive").performScrollTo()
+        compose.onNodeWithText("Perception").performScrollTo()
         capture()
     }
 
-    private fun capture() {
-        val flag = android.view.WindowManager.LayoutParams.FLAG_SECURE
-        compose.runOnIdle { compose.activity.window.insetsController?.hide(android.view.WindowInsets.Type.ime()) }
-        compose.waitUntil(5000) { !compose.activity.window.decorView.rootWindowInsets.isVisible(android.view.WindowInsets.Type.ime()) }
-        compose.runOnIdle { assertTrue(compose.activity.window.attributes.flags and flag != 0); compose.activity.window.clearFlags(flag) }
-        try {
-            val bitmap = compose.onRoot().captureToImage().asAndroidBitmap()
-            val resolver = compose.activity.contentResolver
-            val uri = resolver.insert(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI, android.content.ContentValues().apply {
-                put(android.provider.MediaStore.Images.Media.DISPLAY_NAME, "13-6-reference-privacy.png")
-                put(android.provider.MediaStore.Images.Media.MIME_TYPE, "image/png")
-                put(android.provider.MediaStore.Images.Media.RELATIVE_PATH, "Pictures/OSCAR-Group02")
-            })!!
-            resolver.openOutputStream(uri)!!.use { assertTrue(bitmap.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, it)) }
-        } finally { compose.runOnIdle { compose.activity.window.addFlags(flag) } }
-    }
+    private fun capture() = captureReview(compose, "13-6-privacy-reference")
 }

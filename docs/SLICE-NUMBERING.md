@@ -21,7 +21,7 @@ The owner rejected mixing numbered slices with 09R, 10R, 13A/13B and prematurely
 | 10 | OSCAR Desktop runtime foundation | Integrated software foundation; physical acceptance deferred; old PR #16 archival |
 | **11** | **OSCAR Expression / Character System** | Shared renderer foundation integrated into reference apps; final character/device acceptance deferred |
 | **12** | OSCAR Desktop visual/interaction design | **Group 2.5A interim owner pass; merged PR #5**; final owner/physical acceptance deferred |
-| **13** | OSCAR Mobile visual/interaction design | Software/reference baseline integrated; **Group 2.5B visual exploration**; final redesign and phone acceptance pending |
+| **13** | OSCAR Mobile visual/interaction design | Software/reference baseline integrated; **Group 2.5B selected visual baseline implementation**; implementation candidate; owner visual and capability acceptance pending |
 | 14 | World Model, Perception, Sentry, optional Journal | Planned |
 | 15 | Commissioning and setup | Planned |
 | 16 | Full cross-device Avatar/Presence + typed adaptive presentation | Planned; extends 11; initial AIE contract |
@@ -82,7 +82,7 @@ Use the model and thinking effort appropriate to the actual work; the owner has 
 
 The consolidated software foundations and Desktop Group 2.5A [PR #5](https://github.com/Amaan27-Buzz/oscar/pull/5) are on `main`. Old branch names, PRs, screenshots and earlier acceptance statements are retained **as history**, never current operating instructions. The owner has accepted the **neumorphic Desktop direction provisionally**; final cross-device UI and physical/production acceptance remain open.
 
-Group 2.5B Mobile UI exploration proceeds against the current production foundation, using 15 individual visual screen references, one system board, five component boards and a **separate** UI-only native Compose prototype before production integration. Build/test with existing emulator/SDK and avoid redundant AVDs, worktrees and huge caches. All prototypes must clearly distinguish simulated controls from operational Sentry, Workers or Full Access.
+Group 2.5B implements the selected ImageGen/Figma 15 heroes directly in production Compose. The separate Gemini Argon prototype is rejected. Existing SDK/cache and the owner-authorized isolated Samsung review install provide native verification; the emulator is stopped at the owner's RAM request. Owner visual approval remains pending, and Sentry, persistent Workers and Secure/Full Access remain unavailable. See [the implementation ledger](ui/mobile/group25b/README.md).
 
 AIE is **future** work integrated into Slices 16/17/19/20, not an extra canonical numbered slice. See [product direction](PRODUCT-DIRECTION.md) and [AIE plan](ADAPTIVE-INTERFACE.md).
 

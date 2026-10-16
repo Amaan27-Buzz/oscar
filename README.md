@@ -15,11 +15,11 @@
 
 **Current status — 2026-10-14:** OSCAR Desktop Group 2.5A was **provisionally approved by the owner** (restrained neumorphic Companion + Workspace) and [PR #5](https://github.com/Amaan27-Buzz/oscar/pull/5) merged to `main` at `43c15d37a6421d438b8101d5e322489ae452b20d`. Earlier stacked software Groups 1–2 are likewise incorporated into `main`. The tiny Companion preserves the unchanged Orb and stays separate from the full Workspace. The current Workspace includes Conversation, Automations, Activity, Devices and Preferences. Automations does **not** yet mean persistent Workers/schedules are running.
 
-**Current focus — Group 2.5B / Slice 13:** OSCAR Mobile design exploration before production UI changes: 15 individual concept screens + 1 design board + 5 component boards, alongside a separate, reusable Kotlin/Jetpack Compose UI-only prototype (`oscar-ui-test`, **outside** the repository). These are proposals/demonstrations, not an integrated Android product or passed physical acceptance.
+**Current focus — Group 2.5B / Slice 13:** the owner **APPROVED Mobile UI/UX on 2026-10-16**, including all 15 heroes, integrated artwork, native controls, Preferences, navigation, motion and the canonical Orb. [Final engineering closure](docs/ui/mobile/group25b/FINAL-CLOSURE.md) preserves that design and the Core, Grid, signing, voice and Expression boundaries. The external Gemini Argon `oscar-ui-test` prototype remains rejected. UI approval is separate from physical commissioning and remote CI.
 
 **Future:** [Adaptive Interface Engine](docs/ADAPTIVE-INTERFACE.md) is planned for typed, interactive responses in the *same conversation* (Slice 16 presentation protocol, 17 composition, 19 hardening, 20 integrated validation); not built. Sentry remains Slice 14. Full Access authority and persistent Workers require their actual Core security/execution integrations. See [active product direction](docs/PRODUCT-DIRECTION.md) and [canonical slices 00–20](docs/SLICE-NUMBERING.md).
 
-**Acceptance:** Gate A and local-alpha Gate B are accepted for documented scope. Gate C physical/owner tests and remote CI are not silently passed. The Desktop design pass is interim; final integrated Desktop/Mobile visual, device, voice and security acceptance is deferred. Older reference screenshots, candidate PRs and historical reports remain in Git history and the dated evidence folders.
+**Acceptance:** Gate A and local-alpha Gate B are accepted for documented scope. Mobile Group 2.5B UI/UX is owner-approved; the Desktop design pass remains interim. Gate C, physical commissioning, voice, biometric/security acceptance and remote CI are separate and are not silently passed. Older reference screenshots, candidate PRs and historical reports remain in Git history and the dated evidence folders.
 
 ## What OSCAR is
 
@@ -297,7 +297,7 @@ Canonical numbering has **21 slices (00–20)**. The table is current planning, 
 | 09–10 | Android foundation and Windows runtime | Integrated software foundations; owner/device acceptance deferred |
 | 11 | Shared Expression/Character System | Software foundation integrated; full Presence later |
 | 12 | Desktop visual/interaction system | **Group 2.5A provisionally approved and merged**; final integration acceptance deferred |
-| 13 | Mobile visual/interaction system | Group 2.5B design exploration; production redesign not accepted |
+| 13 | Mobile visual/interaction system | Group 2.5B production candidate; owner visual/capability review pending |
 | 14 | World Model, Perception, Sentry, optional Journal | Planned |
 | 15 | Commissioning and setup | Planned |
 | 16 | Full cross-device Presence + initial typed adaptive presentation | Planned |

@@ -1,0 +1,30 @@
+[
+  {
+    "url": "https://repo.maven.apache.org/maven2/org/commonmark/commonmark-parent/0.30.1/commonmark-parent-0.30.1.pom",
+    "sha256": "81bb87a77a844e12122edaa112e78431221fbfc0faa54d654927c625096775bb"
+  },
+  {
+    "url": "https://repo.maven.apache.org/maven2/org/commonmark/commonmark/0.30.1/commonmark-0.30.1.pom",
+    "sha256": "20dbec2242756951cef55472989f1eaef9ccfd7377b24c5bcc7e63b2273be7fd"
+  },
+  {
+    "url": "https://repo.maven.apache.org/maven2/org/commonmark/commonmark/0.30.1/commonmark-0.30.1.jar",
+    "sha256": "9b0d20064975a17e876fcb4b599c6b3667f46a7739ed61e2f06c96f44b50629f"
+  },
+  {
+    "url": "https://repo.maven.apache.org/maven2/org/commonmark/commonmark-ext-gfm-tables/0.30.1/commonmark-ext-gfm-tables-0.30.1.pom",
+    "sha256": "fdeda438f20d49ee8535557b077a192fc821adae7bbaf60f147b4e6615f3565d"
+  },
+  {
+    "url": "https://repo.maven.apache.org/maven2/org/commonmark/commonmark-ext-gfm-tables/0.30.1/commonmark-ext-gfm-tables-0.30.1.jar",
+    "sha256": "c375b6d5b71efe179e5763a6d83fcf10e303c0bf82031310a46769727ac90da0"
+  },
+  {
+    "url": "https://repo.maven.apache.org/maven2/org/commonmark/commonmark-ext-gfm-strikethrough/0.30.1/commonmark-ext-gfm-strikethrough-0.30.1.pom",
+    "sha256": "503eccdc1504a34eb31c3f6d32f86790d5f38f410fff187065adc6aa6665c742"
+  },
+  {
+    "url": "https://repo.maven.apache.org/maven2/org/commonmark/commonmark-ext-gfm-strikethrough/0.30.1/commonmark-ext-gfm-strikethrough-0.30.1.jar",
+    "sha256": "825a45a1b196f8e0351baf8eb140d657cbf3fd3e17ab34155aa99056db82f099"
+  }
+]

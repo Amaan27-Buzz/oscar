@@ -3,36 +3,78 @@ package io.dawnlight.oscar.mobile
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.*
 import androidx.compose.ui.unit.dp
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.tween
 
 @Composable fun DevicesScreen(state: MobileState, connect: () -> Unit, disconnect: () -> Unit) {
-    Text("Connection Grid", style = MaterialTheme.typography.titleLarge)
-    Text("This Android surface", style = MaterialTheme.typography.titleMedium)
-    Text(if (state.link == Link.CONNECTED) "Here · scoped Core session connected" else "App open · Core connection unavailable")
-    Text("Opening OSCAR does not imply background listening or continuous availability.", style = MaterialTheme.typography.bodySmall)
-    if (state.snapshot == null) Text("No current Grid snapshot is available.")
-    state.snapshot?.nodes?.sortedBy { if (it.id == state.connectedNode) 0 else 1 }?.forEach { node ->
-        var expanded by remember(node.id, state.epoch) { mutableStateOf(false) }
-        val active = state.snapshot.tasks.filter { (it.target == node.id || it.originNode == node.id) && it.state !in setOf("verified", "partially_verified", "failed", "cancelled") }
-        HorizontalDivider()
-        TextButton(onClick = { expanded = !expanded }, modifier = Modifier.fillMaxWidth().testTag("device-${node.id}")) {
-            Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(if (node.id == state.connectedNode && node.role == "OSCAR Mobile") "This phone" else node.role, style = MaterialTheme.typography.titleMedium)
-                Text("${node.status} · ${if (node.paired) "Paired" else "Not paired"}${if (active.isNotEmpty()) " · ${active.size} associated active tasks" else ""}")
+    IllustratedIntro("Your devices", artwork = R.drawable.illustration_devices, height = 132.dp)
+    TactileSurface(Modifier.fillMaxWidth()) {
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(14.dp)) {
+            IconBadge("Phone")
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text("This phone", style = MaterialTheme.typography.titleLarge)
+                StatusPill(when (state.link) {
+                    Link.CONNECTED -> "Connected to Core"
+                    Link.CONNECTING -> "Connecting to Core…"
+                    Link.DEGRADED -> "Core connection lost"
+                    Link.DISCONNECTED -> "Not connected to Core"
+                }, when (state.link) { Link.CONNECTED -> Sage; Link.CONNECTING -> Amber; else -> Clay })
             }
         }
-        if (expanded) {
-            Text(node.id, style = MaterialTheme.typography.bodySmall)
-            Text(if (node.capabilities.isEmpty()) "No currently advertised executor capabilities" else node.capabilities.distinct().joinToString("\n"))
-            active.forEach { Text("${it.label} · ${it.description}") }
-            Text("Supervise authorized tasks in Activity. No power or wake command is exposed by this Mobile contract.", style = MaterialTheme.typography.bodySmall)
+    }
+    val snapshot = state.snapshot.takeIf { state.link == Link.CONNECTED }
+    val nodes = snapshot?.nodes?.filterNot { it.id == state.connectedNode && it.role == "OSCAR Mobile" }
+    if (nodes.isNullOrEmpty()) {
+        StatusLabel(if (snapshot == null) "Connect Core to see your other devices." else "No other devices listed.")
+    } else {
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Text("Other devices", style = MaterialTheme.typography.labelLarge, modifier = Modifier.semantics { heading() })
+            HorizontalDivider(Modifier.weight(1f))
+        }
+        nodes.forEach { node ->
+            var expanded by remember(node.id, state.epoch) { mutableStateOf(false) }
+            val active = snapshot?.tasks.orEmpty().filter { (it.target == node.id || it.originNode == node.id) && it.state !in setOf("verified", "partially_verified", "failed", "cancelled") }
+            val (icon, color) = when (node.role) {
+                "OSCAR Mobile" -> "Phone" to Sage
+                "Desktop" -> "Devices" to Powder
+                "Cloud", "Core" -> "Cloud" to Clay
+                "Edge" -> "Edge" to Lilac
+                else -> "Devices" to Sage
+            }
+            TactileSurface(Modifier.fillMaxWidth()) {
+                FeatureRow(node.role, node.status.replaceFirstChar { it.uppercase() } +
+                    (if (!node.paired) " · Not paired" else "") +
+                    (if (active.isNotEmpty()) " · ${active.size} ${if (active.size == 1) "work item" else "work items"}" else ""),
+                    icon, color, action = { expanded = !expanded },
+                    modifier = Modifier.testTag("device-${node.id}").semantics { stateDescription = if (expanded) "Expanded" else "Collapsed" })
+                Column(Modifier.fillMaxWidth().animateContentSize(tween(if (LocalReducedMotion.current) 0 else 200))) {
+                    if (expanded) {
+                        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                            HorizontalDivider()
+                            Text("Capabilities", style = MaterialTheme.typography.titleMedium)
+                            Text(if (node.capabilities.isEmpty()) "No currently advertised executor capabilities" else node.capabilities.distinct().joinToString("\n"), style = MaterialTheme.typography.bodySmall)
+                            active.forEach { Text("${it.label} · ${it.description}", style = MaterialTheme.typography.bodyMedium) }
+                            Text("Device ID: ${node.id} · ${if (node.paired) "Paired" else "Not paired"}", style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
+                    }
+                }
+            }
         }
     }
-    HorizontalDivider()
-    TextButton(onClick = connect) { Text("Connect this phone") }
-    TextButton(onClick = disconnect) { Text("Disconnect and remove local credentials") }
-    Text("Remote node revocation requires trusted Core administration; this Mobile API does not expose it. Local removal is not remote revocation.", style = MaterialTheme.typography.bodySmall)
-    Text("Home Node · unsupported until commissioned. Cloud and Edge appear only when actually configured.", style = MaterialTheme.typography.bodySmall)
+    if (state.link != Link.CONNECTED) OscarButton(onClick = connect, enabled = state.link != Link.CONNECTING && !state.restoring,
+        modifier = Modifier.fillMaxWidth()) { Text("Connect Core") }
+    SupportingDetails("Connection & privacy") {
+        if (state.link == Link.CONNECTED) TextButton(onClick = connect) { Text("Change Core connection") }
+        TextButton(onClick = disconnect) { Text("Disconnect and remove local credentials") }
+        Text("Local disconnect removes this app’s credentials. Remote revocation is a separate Core action.", style = MaterialTheme.typography.bodySmall)
+        Text("Background listening, power and wake controls are not enabled here. Cloud, Edge and Home Node appear only when commissioned.", style = MaterialTheme.typography.bodySmall)
+    }
 }

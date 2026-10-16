@@ -1,5 +1,8 @@
 # OSCAR — Documentation reconciliation (2026-10-14)
 
+**Later owner correction — Group 2.5B:** the Codex ImageGen/Figma baseline is selected for production Android; the Gemini Argon external prototype is rejected. Native implementation and phone evidence are recorded in [Group 2.5B](ui/mobile/group25b/README.md). The earlier documentation-only snapshot below is retained as historical context and does not describe the current implementation candidate.
+
+
 **Status:** Active-direction documentation update on `main`. No application source, credentials, Git history, screenshot evidence, or acceptance receipts are changed by this pass.
 
 ## What supersedes what

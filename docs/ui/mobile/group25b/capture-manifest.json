@@ -1,0 +1,218 @@
+{
+  "device": "Samsung SM-S721B",
+  "android_api": 36,
+  "owner_visual_acceptance": "PENDING",
+  "captures": [
+    {
+      "experience": "01-oscar-home",
+      "reference": "design/oscar-mobile-visual-exploration/screens/01-oscar-home.png",
+      "reference_sha256": "fefd05cbb57ddf5db022826e942efe6948b6a9ee2a222fcf32051ec5f8dfd4ee",
+      "native": "native/01-oscar-home.png",
+      "native_sha256": "c7d99873453d9b5f36ae0c1a140cbe67644bffb9d16a00cda2635da85f4c8442",
+      "comparison": "comparisons/01-oscar-home.jpg",
+      "native_pixels": [
+        1080,
+        2340
+      ],
+      "evidence_class": "REAL_DEVICE_RENDERING_DISPOSABLE_REFERENCE",
+      "revision_verification": "app-review.json"
+    },
+    {
+      "experience": "02-continuous-conversation",
+      "reference": "design/oscar-mobile-visual-exploration/screens/02-continuous-conversation.png",
+      "reference_sha256": "93c08ea27adf7925f16242625238b449cda40110f2234ea12f3b8717516a3601",
+      "native": "native/02-continuous-conversation.png",
+      "native_sha256": "74a08c3a318f06317b06f8735b9db8f3f59aba261bc95315fd38568125dd1705",
+      "comparison": "comparisons/02-continuous-conversation.jpg",
+      "native_pixels": [
+        1080,
+        2340
+      ],
+      "evidence_class": "REAL_DEVICE_RENDERING_DISPOSABLE_REFERENCE",
+      "revision_verification": "app-review.json"
+    },
+    {
+      "experience": "03-expanded-reading",
+      "reference": "design/oscar-mobile-visual-exploration/screens/03-expanded-reading.png",
+      "reference_sha256": "aae84335eef4ce608f2a9ae0d696d29ff00e917454369ec46ce08d184bd3cc03",
+      "native": "native/03-expanded-reading.png",
+      "native_sha256": "4e9d083e7c5999e026a7f4feda1eb8e017e7204de6688d040ec68164e6b62568",
+      "comparison": "comparisons/03-expanded-reading.jpg",
+      "native_pixels": [
+        1080,
+        2340
+      ],
+      "evidence_class": "REAL_DEVICE_RENDERING_DISPOSABLE_REFERENCE",
+      "revision_verification": "app-review.json"
+    },
+    {
+      "experience": "04-voice-interaction",
+      "reference": "design/oscar-mobile-visual-exploration/screens/04-voice-interaction.png",
+      "reference_sha256": "879a40ee5ed2339315b1687aab3b0ea2c50a3d07117dd65aefa076eb1f87a094",
+      "native": "native/04-voice-interaction.png",
+      "native_sha256": "98edf4896fda7453865ee4c0f733169e6f6659c8197240da14e29f6e92e8ee91",
+      "comparison": "comparisons/04-voice-interaction.jpg",
+      "native_pixels": [
+        1080,
+        2340
+      ],
+      "evidence_class": "REAL_DEVICE_RENDERING_DISPOSABLE_REFERENCE",
+      "revision_verification": "app-review.json"
+    },
+    {
+      "experience": "05-automations-overview",
+      "reference": "design/oscar-mobile-visual-exploration/screens/05-automations-overview.png",
+      "reference_sha256": "dfcfb92770341fb0169997319727f16c67a0cd04ec40fd9c053172e1135fbd1c",
+      "native": "native/05-automations-overview.png",
+      "native_sha256": "ac44b12ed053b255a472b23423854b9a4dbadd790e543f3fbff4264a924982fe",
+      "comparison": "comparisons/05-automations-overview.jpg",
+      "native_pixels": [
+        1080,
+        2340
+      ],
+      "evidence_class": "REAL_DEVICE_RENDERING_DISPOSABLE_REFERENCE",
+      "revision_verification": "app-review.json"
+    },
+    {
+      "experience": "06-worker-detail",
+      "reference": "design/oscar-mobile-visual-exploration/screens/06-worker-detail.png",
+      "reference_sha256": "2a2ef750c63ba576532336435dabecac252cb0a6cd4a7d13893b6e8fee333818",
+      "native": "native/06-worker-detail.png",
+      "native_sha256": "d8fcaa99b8a10ddf4a6cfb028f44721bb91d9fde3d9cb5da02c80b02be91a58d",
+      "comparison": "comparisons/06-worker-detail.jpg",
+      "native_pixels": [
+        1080,
+        2340
+      ],
+      "evidence_class": "REAL_DEVICE_RENDERING_DISPOSABLE_REFERENCE",
+      "revision_verification": "app-review.json"
+    },
+    {
+      "experience": "07-create-automation",
+      "reference": "design/oscar-mobile-visual-exploration/screens/07-create-automation.png",
+      "reference_sha256": "c616dd20f8a63b797bf248a212c738177b2b90f88bfc63bf15c5c014797f7acf",
+      "native": "native/07-create-automation.png",
+      "native_sha256": "3febbfae1bc3608ccee8880780b6dd7fdada4defef4e96f80ec9b5207fb981ba",
+      "comparison": "comparisons/07-create-automation.jpg",
+      "native_pixels": [
+        1080,
+        2340
+      ],
+      "evidence_class": "REAL_DEVICE_RENDERING_DISPOSABLE_REFERENCE",
+      "revision_verification": "app-review.json"
+    },
+    {
+      "experience": "08-activity-feed",
+      "reference": "design/oscar-mobile-visual-exploration/screens/08-activity-feed.png",
+      "reference_sha256": "0aae44af9753e5bc2db3b9913cf18e4f9bf7fc45aee0568dfc15d5f66ff197b9",
+      "native": "native/08-activity-feed.png",
+      "native_sha256": "2348db3706c0208bb91b45310989861bf78cc20ef876b614b4527f3e8cc099bc",
+      "comparison": "comparisons/08-activity-feed.jpg",
+      "native_pixels": [
+        1080,
+        2340
+      ],
+      "evidence_class": "REAL_DEVICE_RENDERING_DISPOSABLE_REFERENCE",
+      "revision_verification": "app-review.json"
+    },
+    {
+      "experience": "09-active-task",
+      "reference": "design/oscar-mobile-visual-exploration/screens/09-active-task.png",
+      "reference_sha256": "2f641bcf80e5aa8ea6b5234dc204eff5d00bb796d879c2525cb5e4d09bc3cf81",
+      "native": "native/09-active-task.png",
+      "native_sha256": "21d59844ed2a068a6867c2463564a3e1197ce53ab3556c52ccccbaf3d932cbb3",
+      "comparison": "comparisons/09-active-task.jpg",
+      "native_pixels": [
+        1080,
+        2340
+      ],
+      "evidence_class": "REAL_DEVICE_RENDERING_DISPOSABLE_REFERENCE",
+      "revision_verification": "app-review.json"
+    },
+    {
+      "experience": "10-approval-decision",
+      "reference": "design/oscar-mobile-visual-exploration/screens/10-approval-decision.png",
+      "reference_sha256": "c378a9a775026a4eb2564cde1525e2465f357be1c0ec12de0288e7b0bcd5695a",
+      "native": "native/10-approval-decision.png",
+      "native_sha256": "28dca56c6863f215c2828c0343ae073e6a21645dc3f9957fb268d39159a08948",
+      "comparison": "comparisons/10-approval-decision.jpg",
+      "native_pixels": [
+        1080,
+        2340
+      ],
+      "evidence_class": "REAL_DEVICE_RENDERING_DISPOSABLE_REFERENCE",
+      "revision_verification": "app-review.json"
+    },
+    {
+      "experience": "11-devices",
+      "reference": "design/oscar-mobile-visual-exploration/screens/11-devices.png",
+      "reference_sha256": "0a6b02476d1e7a1492f95a632a9e3eb2a89265374df878d77959959b19ad5710",
+      "native": "native/11-devices.png",
+      "native_sha256": "2a328c935f70ef17fa706db06a6a569dca4b900bb1130a5250ff27f68d6b8695",
+      "comparison": "comparisons/11-devices.jpg",
+      "native_pixels": [
+        1080,
+        2340
+      ],
+      "evidence_class": "REAL_DEVICE_RENDERING_DISPOSABLE_REFERENCE",
+      "revision_verification": "app-review.json"
+    },
+    {
+      "experience": "12-sentry-awareness",
+      "reference": "design/oscar-mobile-visual-exploration/screens/12-sentry-awareness.png",
+      "reference_sha256": "29cc8c313890cdcb7edc09be2d648937565181709743ba63c1eaad6d2d60255a",
+      "native": "native/12-sentry-awareness.png",
+      "native_sha256": "8e223f301fd0c6c2f22ee10623f3446ea374d835004931eabfe87a07a13054bf",
+      "comparison": "comparisons/12-sentry-awareness.jpg",
+      "native_pixels": [
+        1080,
+        2340
+      ],
+      "evidence_class": "REAL_DEVICE_RENDERING_DISPOSABLE_REFERENCE",
+      "revision_verification": "app-review.json"
+    },
+    {
+      "experience": "13-today-chief-of-staff",
+      "reference": "design/oscar-mobile-visual-exploration/screens/13-today-chief-of-staff.png",
+      "reference_sha256": "3e51470d202dd2518b9f38f75a6488a17574b6cc47a1ee866d5fb85c3c766fb4",
+      "native": "native/13-today-chief-of-staff.png",
+      "native_sha256": "04b1d5b1cd3525a4114747422b785085d8c6b9d2388c69aef7a249b3b7445ed6",
+      "comparison": "comparisons/13-today-chief-of-staff.jpg",
+      "native_pixels": [
+        1080,
+        2340
+      ],
+      "evidence_class": "REAL_DEVICE_RENDERING_DISPOSABLE_REFERENCE",
+      "revision_verification": "app-review.json"
+    },
+    {
+      "experience": "14-access-modes",
+      "reference": "design/oscar-mobile-visual-exploration/screens/14-access-modes.png",
+      "reference_sha256": "6e949babb969c508f734016bb85e540f1699905034283baae723046cc26ea037",
+      "native": "native/14-access-modes.png",
+      "native_sha256": "a7e16e474a0e6ec5453e9e1f85e9a607d7f84c77f65b2aec5c7151cd3b275db7",
+      "comparison": "comparisons/14-access-modes.jpg",
+      "native_pixels": [
+        1080,
+        2340
+      ],
+      "evidence_class": "REAL_DEVICE_RENDERING_DISPOSABLE_REFERENCE",
+      "revision_verification": "app-review.json"
+    },
+    {
+      "experience": "15-preferences",
+      "reference": "design/oscar-mobile-visual-exploration/screens/15-preferences.png",
+      "reference_sha256": "e59f7c1e6c752915b0f2f31ebcc7d534bfb865009c67e8ea18a63623a83e4a9a",
+      "native": "native/15-preferences.png",
+      "native_sha256": "ac0b5b52ef03182003b07e06a17fba82e7a6d4fcba3ef1b2a741ced634d450bf",
+      "comparison": "comparisons/15-preferences.jpg",
+      "native_pixels": [
+        1080,
+        2340
+      ],
+      "evidence_class": "REAL_DEVICE_RENDERING_DISPOSABLE_REFERENCE",
+      "revision_verification": "app-review.json"
+    }
+  ],
+  "implementation_commit": "f38b69b9a1d56c447d8225d7c608eaf48a57cab8"
+}

@@ -1,6 +1,6 @@
 # OSCAR — Active product direction
 
-**Owner decision: 2026-10-14.** This is the current user-facing product brief. It reconciles the approved Desktop design, the ongoing Mobile design exploration, and later runtime ambitions. It is **not** an implementation/acceptance receipt. Read it with [canonical slice numbering](SLICE-NUMBERING.md), the [roadmap](ROADMAP.md), [feature backlog](FEATURES.md), and [current engineering evidence](development/SOFTWARE-ALPHA-ACCEPTANCE-LEDGER.md).
+**Owner decision: 2026-10-14.** This is the current user-facing product brief. It reconciles the approved Desktop design, the selected Mobile design baseline, and later runtime ambitions. It is **not** an implementation/acceptance receipt. Read it with [canonical slice numbering](SLICE-NUMBERING.md), the [roadmap](ROADMAP.md), [feature backlog](FEATURES.md), and [current engineering evidence](development/SOFTWARE-ALPHA-ACCEPTANCE-LEDGER.md).
 
 ## North star
 
@@ -24,9 +24,13 @@ OSCAR is **one persistent multimodal personal intelligence**, not a collection o
 
 **Design status:** Desktop Group 2.5A was owner-approved **provisionally** and merged in [PR #5](https://github.com/Amaan27-Buzz/oscar/pull/5) at merge commit `43c15d37a6421d438b8101d5e322489ae452b20d`. Final integrated visual and physical acceptance is **deferred**, not PASS. The canonical Orb SVG is unchanged.
 
-**Mobile Group 2.5B:** active exploration uses **15 individual key-screen concepts, 1 design-system board, 5 component boards** plus an independent **full-featured Kotlin/Jetpack Compose UI-only prototype** (`oscar-ui-test` outside this repository). The broader 56-experience inventory is an **information architecture**, not 56 mandatory standalone pages or evidence of implementation. Reusable composables, illustrated editorial screens, restrained accessible neumorphism, light/dark and honest mock/demo states are the direction. Review mockups and emulator evidence before porting approved components into production Android; never confuse the external prototype with OSCAR Mobile's real Core-connected app.
+**Mobile Group 2.5B:** the owner selected the Codex ImageGen/Figma direction (15 hero screens, one design-system board, five component boards) for native production Android implementation. The separate Gemini Argon `oscar-ui-test` experiment was rejected; do not port its code, tokens or layouts. The 56-experience planning scope is information architecture, not 56 pages. Three bottom destinations are Conversation / Automations / Activity; Devices and Preferences stay one tap away in the app bar, with Today in Conversation and Awareness/Access in Preferences. Software, emulator, owner visual and physical acceptance remain separate. See [Group 2.5B implementation and evidence](ui/mobile/group25b/README.md).
 
 ## Independent operating dimensions
+
+**Mobile owner acceptance — 2026-10-16:** Group 2.5B UI/UX is **APPROVED / PASS**.
+The approved composition is preserved during [engineering closure](ui/mobile/group25b/FINAL-CLOSURE.md).
+Real audio, biometric/PIN, OEM commissioning and remote CI remain separate.
 
 | Domain | Choices | Meaning |
 |---|---|---|
@@ -48,7 +52,7 @@ OSCAR is **one persistent multimodal personal intelligence**, not a collection o
 
 OSCAR should not be limited to responding in static prose. Within the **same conversation**, it can eventually choose and compose trusted interactive views: comparison tables, editable plans, timelines/calendars, diagrams, simple simulations, charts, device controls or live Worker views. The interface can update as work advances and the user interacts; Desktop and Android render the same **typed, versioned and capability-negotiated UI description** through their own trusted native components. No unrestricted model-generated HTML/JS or bypass of existing Core action authorization.
 
-This is **planned**, not part of the current Group 2.5 artwork/standalone mockup. Delivery boundaries: Slice 16 shared typed presentation foundation; Slice 17 intent-driven selection and composition; Slice 19 isolation, authorization/accessibility/security hardening; Slice 20 integrated cross-device validation. See [Adaptive Interface Engine](ADAPTIVE-INTERFACE.md).
+This is **planned**, not part of the current Group 2.5B production presentation. Delivery boundaries: Slice 16 shared typed presentation foundation; Slice 17 intent-driven selection and composition; Slice 19 isolation, authorization/accessibility/security hardening; Slice 20 integrated cross-device validation. See [Adaptive Interface Engine](ADAPTIVE-INTERFACE.md).
 
 ## Acceptance discipline
 

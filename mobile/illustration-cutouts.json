@@ -1,0 +1,159 @@
+{
+  "purpose": "Transparent papercut derivatives for native UI composition without pasted-on rectangular backgrounds. Original approved source crops remain unchanged.",
+  "tool": "image_gen.imagegen",
+  "mode": "built-in background-extraction edit",
+  "transparent_background": true,
+  "pixel_postprocessing": "None; generated PNGs copied without conversion or alpha modification.",
+  "assets": {
+    "home": {
+      "source": "mobile/app/src/main/res/drawable-nodpi/illustration_home.png",
+      "source_sha256": "cbe5148afd7c0aaf2843ccc1941ac9d9c2fe6ab5a69416182f29ad5c97c990c7",
+      "output": "mobile/app/src/main/res/drawable-nodpi/illustration_home_cutout.png",
+      "output_sha256": "e7d28568631ee92ad3f6f346c552d02c7aa5144a16b85848f48527ad7c0eabbb",
+      "dimensions": [
+        1734,
+        907
+      ],
+      "alpha_range": [
+        0,
+        255
+      ],
+      "prompt": "Use case: background-extraction. Edit target: the supplied OSCAR papercut desk illustration. Create a true transparent PNG cutout of exactly the existing illustration. Remove only the surrounding cream rectangular canvas/background. Preserve the blue bound notebook, green pen, ivory coffee mug with dark coffee, folded white-and-ivory schedule papers, yellow paper sun and rays, their exact colors, tactile paper textures, angles, composition and soft contact shadows. Preserve interior white paper and the pale papercut grounding shape immediately beneath the objects; the exterior beyond the scene must have actual alpha transparency, with no rectangular cream field or halo. Keep all objects in their original arrangement and proportions, including their existing edge cropping. No scene redesign, no new objects, no Orb, no typography, UI, watermark or text."
+    },
+    "automations": {
+      "source": "mobile/app/src/main/res/drawable-nodpi/illustration_automations.png",
+      "source_sha256": "39e1add999fb46175803c6bbf5850fb86427ab9358fa7e4da8b49de95b8cdcbd",
+      "output": "mobile/app/src/main/res/drawable-nodpi/illustration_automations_cutout.png",
+      "output_sha256": "d01f1ba37d4a36092146f91c4058e2cd9f733deeb6049aa9f135c9b67faca045",
+      "dimensions": [
+        1879,
+        837
+      ],
+      "alpha_range": [
+        0,
+        255
+      ],
+      "prompt": "Use case: background-extraction. Edit target: the supplied OSCAR papercut automation illustration. Make a genuine transparent PNG cutout of exactly this existing art. Remove only the surrounding cream rectangular canvas/background and the tiny unrelated rounded UI-label fragment clipped along the extreme top-left edge. Preserve the folded ivory-and-blue checklist, green checkmarks and blank checkbox, blue bookmark ribbon, green paper leaves, ivory stopwatch, yellow sun and rays, green accent strokes, tactile paper grain, exact palette, arrangement, proportions and soft contact shadows. Preserve all interior white/ivory paper and a restrained pale papercut ground directly beneath the depicted objects; outside that scene must have real alpha transparency without a cream rectangle or halo. No scene redesign or added objects, no text, UI, Orb or watermark."
+    },
+    "preferences": {
+      "source": "mobile/app/src/main/res/drawable-nodpi/illustration_preferences.png",
+      "source_sha256": "dee95bd048b3506bd3c64ec72bc65fc77e79bff722713244a5d5f3c00f44fe73",
+      "output": "mobile/app/src/main/res/drawable-nodpi/illustration_preferences_cutout.png",
+      "output_sha256": "cfa3e1c446d7cdba371fc52b2f7bcf52e5e12c5c3f480f78be66108d90acbdf8",
+      "dimensions": [
+        1265,
+        1244
+      ],
+      "alpha_range": [
+        0,
+        255
+      ],
+      "prompt": "Use case: background-extraction. Edit target: the supplied OSCAR preferences papercut illustration. Produce a genuine transparent PNG cutout. Change only the backdrop: remove the surrounding cream rectangular field AND the pale sage background blob AND the stray thin horizontal UI divider at lower-left. Keep exactly the existing tactile papercut subjects: the cropped green folded paper at top-left, ivory square card with clay-red speaker and two gold sound waves, clay-red notebook with brown elastic and green ribbon bookmarks, and the small gold, clay and green accent strokes near top-right. Preserve their current arrangement, edge cropping, angles, paper textures, palette and contact shadows between objects; preserve all interior ivory/white paper. Exterior empty spaces must be true alpha transparency, with no rectangular cream background, no pale green blob and no divider. Do not reconstruct missing off-canvas content, redesign the scene, add anything, or add text, UI, Orb or watermark."
+    },
+    "devices": {
+      "source": "mobile/app/src/main/res/drawable-nodpi/illustration_devices.png",
+      "source_sha256": "1ec34820698d95a174dcbe516111c4ded89f6d4ea187355d888e34f56f71b47c",
+      "output": "mobile/app/src/main/res/drawable-nodpi/illustration_devices_cutout.png",
+      "output_sha256": "bdefbb1afc71f0d8f394754afdbc46b8795cbceb107b95198af6e221de8f3905",
+      "dimensions": [
+        1370,
+        1148
+      ],
+      "alpha_range": [
+        0,
+        255
+      ],
+      "prompt": "Use case: background-extraction. Edit target: the supplied OSCAR papercut device illustration. Create a true transparent PNG cutout of exactly its existing depicted objects. Remove the surrounding rectangular cream field, large pale blue backdrop/blob, and the stray tiny black camera-dot UI fragment clipped at the top. Preserve the existing green laptop with abstract cream-and-blue screen, dark phone with abstract shapes on its screen, ivory desk Edge puck, terracotta pot and green paper plant, gold/clay/green accent strokes, and a restrained pale grounding-paper shape directly beneath them with soft natural contact shadows. Preserve all interior cream/white screen and paper areas, material texture, colors, arrangement, relative proportions and existing right-edge cropping. The outside must be actual alpha transparency, without a cream/blue rectangular field or halo. No scene redesign or reconstructed off-canvas content; no new objects, no Orb, no additional text or UI, no watermark."
+    },
+    "decision": {
+      "source": "mobile/app/src/main/res/drawable-nodpi/illustration_decision.png",
+      "source_sha256": "9e4eb99ba5ce458c36b645187920780c4cd520ce7549b70d4f23c92d0fd41905",
+      "output": "mobile/app/src/main/res/drawable-nodpi/illustration_decision_cutout.png",
+      "output_sha256": "3eaa4d4dacebcc86983c09e41a6b88bcf24a9b3e04454a5b2dc588551d9d4cdb",
+      "dimensions": [
+        1128,
+        1394
+      ],
+      "alpha_range": [
+        0,
+        255
+      ],
+      "prompt": "Use case: background-extraction. Edit target: the supplied OSCAR papercut decision illustration. Produce a true transparent PNG cutout of exactly the existing calendar illustration. Remove the surrounding cream rectangular field, pale sage background blob, and the tiny clipped blue/yellow Orb sliver along the extreme left edge below the blue calendar block. Preserve the ivory calendar page, its subtle square grid, three rounded dark-sage binding tabs, blue and clay paper event blocks, curved sage arrow pointing from the upper blue block toward the lower clay block, and the two small gold/clay accent strokes on the right. Preserve composition, existing left-edge cropping, tactile paper texture, palette, soft natural contact shadows, and all interior ivory/white paper. Exterior space must be genuine alpha transparency with no pale rectangular backdrop. No scene redesign, reconstruction of off-canvas areas, added objects, Orb, text, controls or watermark."
+    },
+    "task": {
+      "source": "mobile/app/src/main/res/drawable-nodpi/illustration_task.png",
+      "source_sha256": "7264eb1f8576e026dfa924bd01609b0e553a906c2413702c4195490cde99a3da",
+      "output": "mobile/app/src/main/res/drawable-nodpi/illustration_task_cutout.png",
+      "output_sha256": "2d77cc658eb3a74d201d3511fb1bc54ed92123616c5b1d5891f2ab5ebf334898",
+      "dimensions": [
+        1247,
+        1261
+      ],
+      "alpha_range": [
+        0,
+        255
+      ],
+      "prompt": "Use case: background-extraction. Edit only the supplied OSCAR task papercut illustration. Preserve exactly the existing tactile laptop with ivory document and blue screen, green-leaf plant in ivory pot, clay notebook, original colors, paper textures, composition, proportions, existing cropped edges and soft contact shadows. Remove the cream rectangular canvas and sage backdrop blob. Keep only a narrow organic papercut grounding shape immediately under subjects, with the exterior genuinely transparent alpha. No added objects, no new text/UI/Orb, no redesign. Transparent PNG."
+    },
+    "today": {
+      "source": "mobile/app/src/main/res/drawable-nodpi/illustration_today.png",
+      "source_sha256": "b787992e7b837845363809629aade20fe7bf198924f2497571d686b086ec3aa4",
+      "output": "mobile/app/src/main/res/drawable-nodpi/illustration_today_cutout.png",
+      "output_sha256": "a42472c6dc66f0235a1c5895f9ffa723189f5bf424e5ab0d873315e07f6fb085",
+      "dimensions": [
+        1174,
+        1339
+      ],
+      "alpha_range": [
+        0,
+        255
+      ],
+      "prompt": "Use case: background-extraction. Edit only supplied OSCAR Today papercut illustration. Preserve the yellow sun, ivory winding path/arch, blue notebook, green leaves, lilac rain cloud with blue drops and clay umbrella, original cropped arrangement, proportions, paper texture/colors and contact shadows. Remove cream/sage rectangular backdrop and repair only the unnatural rectangular transparent notch at lower-left by removing surrounding backdrop around the existing subjects, without reconstructing off-canvas subjects. Exterior spaces must be real alpha transparency; keep interior white paper. No UI, no typography, no Orb, no added objects. Transparent PNG."
+    },
+    "awareness": {
+      "source": "mobile/app/src/main/res/drawable-nodpi/illustration_awareness.png",
+      "source_sha256": "3332e4b9d2eb78e16db8316f5460b05fde3a5c3612c403fef2e49a6d665ab8c9",
+      "output": "mobile/app/src/main/res/drawable-nodpi/illustration_awareness_cutout.png",
+      "output_sha256": "e9ff27feab330c2972cbb05ecefbc508717b9a4b5ebeef7d6582f8a0a1dc68b0",
+      "dimensions": [
+        984,
+        1599
+      ],
+      "alpha_range": [
+        0,
+        255
+      ],
+      "prompt": "Use case: background-extraction. Edit only supplied OSCAR quiet evening papercut illustration. Preserve the dark green closed notebook with gold pause emblem, coffee mug, potted leafy plant and warm amber-lit window with foliage shadows, original texture/palette/arrangement/proportions/cropping. Remove the rectangular dark room canvas and the stray white UI dot at top-right plus all clipped UI row fragments at the bottom. Keep an organic wooden desktop grounding shape directly beneath notebook/mug, window frame and plant, with genuinely transparent alpha surrounding the scene. Soft edges/contact shadows, no enclosing rectangle. No added subjects, no text/UI/Orb, no redesign. Transparent PNG."
+    },
+    "worker": {
+      "source": "mobile/app/src/main/res/drawable-nodpi/illustration_worker.png",
+      "source_sha256": "5206da200462fa4ad0c49ab5c447e374e88bfc5e81f39079b3ef76aee714378e",
+      "output": "mobile/app/src/main/res/drawable-nodpi/illustration_worker_cutout.png",
+      "output_sha256": "891065572d6704dddd00d4d378d8b21d188396f226818ec9428579b3a5fd8945",
+      "dimensions": [
+        1373,
+        1145
+      ],
+      "alpha_range": [
+        0,
+        255
+      ],
+      "prompt": "Use case: background-extraction and high-resolution asset refinement. Edit target is the supplied OSCAR Worker papercut art. Create a crisp high resolution transparent cutout preserving its exact folded-paper identity, arrangement and palette: green folded outer ribbon, ivory strip and paper backing, ochre-yellow folded band and backing, clay-red lower panel, and three small yellow/clay/green accent strokes. Preserve proportions, existing edge crops, tactile paper grain and soft contact shadows. Remove the surrounding cream canvas, pale sage backdrop blob, and unnatural transparent rectangular notch at lower left; exterior around the existing subject must be real alpha transparency. Do not add or reconstruct off-canvas subjects. No Orb, lettering, UI, watermark or scene redesign. Sharpen the actual paper detail for use as large native artwork; avoid blurry upscaled pixels. Transparent PNG."
+    },
+    "reading": {
+      "source": "mobile/app/src/main/res/drawable-nodpi/illustration_reading.png",
+      "source_sha256": "692c30eb9b1f567b9085f1c93ba9f49371d53d046c8082fd105e1ab65a11be6a",
+      "output": "mobile/app/src/main/res/drawable-nodpi/illustration_reading_cutout.png",
+      "output_sha256": "d4d10d1269f4e1761b620b5161b14f1f57df4f6b04f33614c509e57d1502466c",
+      "dimensions": [
+        1272,
+        1236
+      ],
+      "alpha_range": [
+        0,
+        255
+      ],
+      "prompt": "Use case: background-extraction and high-resolution asset refinement. Edit target is supplied OSCAR reading papercut illustration. Preserve exactly the ivory spiral notebook with faint ruled paper, green-and-gold pen and green leafy sprig, their layout, proportions, cropping, tactile paper textures, ivory/green/gold palette and soft contact shadows. Make a crisp high resolution transparent PNG cutout with fine paper detail suitable as large native artwork. Remove surrounding cream rectangular canvas and remove the unnatural rectangular notch at lower left by leaving real alpha around the existing subject; keep all interior white notebook paper. Retain a small organic pale paper grounding shape directly beneath subjects. No text, UI, Orb, new objects or scene redesign, and do not reconstruct off-canvas objects."
+    }
+  }
+}

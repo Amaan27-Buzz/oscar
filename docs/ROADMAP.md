@@ -376,15 +376,15 @@ Two distinct surfaces in one Tauri process: **small Companion** (canonical Orb, 
 
 Previous 12.1–12.6 experiments and captures are preserved as historical implementation/evaluation evidence; **do not follow their unmerged PR/visual acceptance instructions**. See [active product direction](PRODUCT-DIRECTION.md), [Desktop interaction decision](decisions/ADR-DESKTOP-PERSONAL-INTELLIGENCE.md) and [current native evidence](ui/desktop/interaction-polish/README.md).
 
-## Slice 13 — OSCAR Mobile experience and visual system — design exploration active
+## Slice 13 — OSCAR Mobile experience and visual system — Group 2.5B implementation
 
-The Slice 09 Android Core-connected software foundation and Slice 13 reference software work are in `main`, but the **new owner-approved Mobile visual design is not implemented or accepted**. Group 2.5B is intentionally exploring alternatives before another production revamp.
+**2026-10-16 owner decision:** Group 2.5B UI/UX **APPROVED / PASS**. [Engineering closure](ui/mobile/group25b/FINAL-CLOSURE.md) preserves the approved design; this does not pass physical commissioning or Gate C, authorize merge, or begin Slice 14.
 
-Owner design exploration: **15 individually composed key screens + 1 design-system board + 5 reusable component boards**, and an independent **full Kotlin/Jetpack Compose UI-only prototype** covering the broader planned Mobile experience inventory. `oscar-ui-test` is an external temporary project, not a second production OSCAR app. Render and evaluate actual emulator screens before selectively porting approved components into `mobile/`.
+The native Core-connected foundation is integrated into main. Owner authorization on 2026-10-14 selects the Codex ImageGen/Figma artwork for production Compose implementation of all 15 hero experiences and coherent broader information architecture. The Gemini Argon external `oscar-ui-test` experiment is rejected and must not be imported.
 
-Target language: restraint + accessible neumorphic controls, original illustrations, distinctive compositions, warm paper/graphite and OSCAR identity, light/dark, reusable native components. The Orb SVG stays unchanged. Logical experiences include Conversation, Automations, Activity, Devices, Preferences, Sentry, Chief of Staff, onboarding and system integrations; they are **not** all implemented destinations.
+Use warm paper/graphite, editorial typography, original illustration-only assets, accessible tactile controls and three primary destinations (Conversation / Automations / Activity). Devices and Preferences remain one tap away. Preserve CoreSession, signed exact-action reviews, Grid, native permissions/voice and shared Expression. Secure/Full Access, Sentry, persistent automation execution and unavailable provider briefs stay unavailable.
 
-Preserve Android CoreSession, policy/confirmation, Grid, voice/notification boundaries and shared Expression. Physical phone/OEM/mic/biometric acceptance remains deferred. See [Mobile design](MOBILE-DESIGN.md), [active product direction](PRODUCT-DIRECTION.md) and [Mobile foundation](MOBILE-FOUNDATION.md).
+Implementation, emulator verification and owner review are separate from physical phone/OEM/mic/biometric acceptance. See [Group 2.5B implementation and evidence](ui/mobile/group25b/README.md) and [Mobile design](MOBILE-DESIGN.md). Canonical numbering and historical reference evidence are preserved.
 
 ## Slice 14 — World Model + Perception Fabric + Sentry + optional Daily Journal ◻️
 
@@ -429,7 +429,7 @@ Manual integration checkpoints remain in [BUILD-GATES.md](BUILD-GATES.md).
 
 ## Current next step — 2026-10-14
 
-- **Now:** Group 2.5B Mobile visual exploration and independent UI-only Compose prototype with real emulator review before implementing an approved production Android design.
+- **Now:** Group 2.5B production Mobile implementation and native phone evidence against the selected ImageGen/Figma baseline; owner visual review pending. Emulator stopped at the owner's RAM request.
 - **Already merged:** Group 2.5A Desktop Companion/Workspace, owner **provisional visual pass** only. Do not reopen legacy PR #16/#17 steps.
 - **Later:** complete Mobile UI acceptance, verify integrated design and remaining Gate C manual/physical criteria, then continue to Slice 14 World Model/Perception/Sentry per owner sequencing.
 - **Future AIE:** Slice 16 typed cross-platform presentation contract, 17 intent-driven interactive composition, 19 hardening, 20 acceptance. **Not Group 2.5 scope.**

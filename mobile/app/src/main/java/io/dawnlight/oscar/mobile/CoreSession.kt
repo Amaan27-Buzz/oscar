@@ -50,6 +50,7 @@ class CoreSession(application: Application) : AndroidViewModel(application) {
         }
     }
     fun stop() {
+        if (BuildConfig.DEBUG) android.util.Log.d("OscarSession", "stop; epoch=${mutable.value.epoch}")
         VoicePresentation.cancel(getApplication())
         val loaded = !mutable.value.restoring
         active = false
@@ -79,8 +80,11 @@ class CoreSession(application: Application) : AndroidViewModel(application) {
             mutable.value = next
             alerts.changed(old.snapshot, snapshot)
         } catch (cancelled: CancellationException) { throw cancelled }
-        catch (_: Exception) {
-            if (mutable.value.epoch == epoch) mutable.value = mutable.value.unavailable("Core is unavailable or returned invalid state. No action is confirmed; refresh before retrying.")
+        catch (failure: Exception) {
+            if (mutable.value.epoch == epoch) {
+                if (BuildConfig.DEBUG) android.util.Log.w("OscarSession", "snapshot failed (${failure.javaClass.simpleName}); epoch=$epoch")
+                mutable.value = mutable.value.unavailable("Core is unavailable or returned invalid state. No action is confirmed; refresh before retrying.")
+            }
         }
     }
     fun refreshNow() { viewModelScope.launch { refresh() } }
@@ -91,8 +95,11 @@ class CoreSession(application: Application) : AndroidViewModel(application) {
         operation = viewModelScope.launch {
             try { work(epoch) }
             catch (cancelled: CancellationException) { throw cancelled }
-            catch (_: Exception) {
-                if (mutable.value.epoch == epoch) mutable.value = mutable.value.unavailable("Request could not be confirmed. Inspect current Core state before retrying.")
+            catch (failure: Exception) {
+                if (mutable.value.epoch == epoch) {
+                    if (BuildConfig.DEBUG) android.util.Log.w("OscarSession", "request failed (${failure.javaClass.simpleName}); epoch=$epoch")
+                    mutable.value = mutable.value.unavailable("Request could not be confirmed. Inspect current Core state before retrying.")
+                }
             } finally {
                 if (mutable.value.epoch == epoch) mutable.value = mutable.value.copy(busy = false)
             }

@@ -1,5 +1,7 @@
 # Slice 13 — OSCAR Mobile Visual / Interaction Design
 
+**Current Group 2.5B scope — 2026-10-14:** production Compose implementation of the selected Codex ImageGen/Figma 15 hero experiences. Gemini Argon is rejected. See [Group 2.5B implementation and evidence](ui/mobile/group25b/README.md). The dated Group 2 results below remain historical foundation evidence.
+
 Status: **GROUP 2 SOFTWARE / REFERENCE CANDIDATE / OWNER VISUAL AND DEVICE ACCEPTANCE DEFERRED / REQUIRED BEFORE SLICE 20 UNIFIED ALPHA PASS**.
 
 Owner authorization 2026-10-11 covers autonomous 13.1–13.8 software/reference

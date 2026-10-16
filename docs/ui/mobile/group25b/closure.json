@@ -1,0 +1,981 @@
+{
+  "date": "2026-10-16",
+  "starting_head": "bf1bef17c0ef1fff557b8c0799da110a55909b74",
+  "status": "OWNER_UI_UX_APPROVED_ENGINEERING_REFERENCE_VERIFIED",
+  "owner_ui_ux": "APPROVED_PASS_EXPLICIT_OWNER_HANDOFF_2026_10_16",
+  "device": "Samsung SM-S721B",
+  "android_api": 36,
+  "evidence_class": "REAL_PHONE_ISOLATED_REVIEW_SYNTHETIC_CORE_DATA",
+  "native": {
+    "counts": {
+      "PASS": 37,
+      "SKIPPED": 4
+    },
+    "duration_seconds": 169.14,
+    "tests": [
+      {
+        "class": "io.dawnlight.oscar.mobile.AppReviewTest",
+        "test": "allSettingsAndSecondaryRoutesHaveOneNavigationBar",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.CraftControlsTest",
+        "test": "designedControlsRetainNativeEditingAndDisabledButtonSemantics",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.CraftControlsTest",
+        "test": "artworkUsesScreenEdgesScrollsWithContentAndKeepsDarkHeadingsReadable",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobileCompletionTest",
+        "test": "verifyingIsDistinctAndDoesNotInventSpeech",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobileCompletionTest",
+        "test": "homeUnavailableAndSharedExpressionRender",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobileCompletionTest",
+        "test": "replacementPairingAndDisconnectCannotRestoreOldSecrets",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobileCompletionTest",
+        "test": "referenceGridShowsDesktopOriginAndRecoversActualNetworkLoss",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobileCompletionTest",
+        "test": "nativeReferenceHomeTextTaskAndPrivacyDiscardReadBack",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobileCompletionTest",
+        "test": "nativeApprovalInspectionExpiryAndReferenceDenialNeverFabricateConsent",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobileCompletionTest",
+        "test": "longReportedResponseHasCompleteReadingSurface",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobileCompletionTest",
+        "test": "draftRecreationAndEncryptedRecoveryKeepPrivateDataOutOfBundles",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobileCompletionTest",
+        "test": "lifecycleAndCancellationInvalidateApprovalWithoutReplayingConsent",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobileCompletionTest",
+        "test": "voiceInvocationCancellationPreservesTextWithoutCapture",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobileEmulatedTest",
+        "test": "privateCredentialsAreSealedAndReloaded",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobileEmulatedTest",
+        "test": "disconnectedAndVoiceUnavailableNeverAdvertiseSuccess",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobileEmulatedTest",
+        "test": "privacyGrantDoesNotEnableCaptureOrAction",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobileEmulatedTest",
+        "test": "corruptedSessionRestartFailsClosed",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobileEmulatedTest",
+        "test": "explicitLoopbackFixtureReadback",
+        "status": "SKIPPED"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobileEmulatedTest",
+        "test": "notificationAndBiometricBoundariesFailClosed",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobileEmulatedTest",
+        "test": "navigationAndRestorationKeepOneRelationship",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobilePrivacyTest",
+        "test": "notificationMetadataHidesSensitiveContentAndIdentityRejectsChanges",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobilePrivacyTest",
+        "test": "sourceExclusionsAndRevocationKeepPerceiveRetainActIndependent",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobilePrivacyTest",
+        "test": "invalidSourcesDeniedAccessAndLiveLocalRevocationRemainUsable",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobileVisualTest",
+        "test": "expiredDecisionCannotGrantConsent",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobileVisualTest",
+        "test": "chronologicalConversationReadingAndTaskControls",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobileVisualTest",
+        "test": "productionNavigationAndUnavailableControls",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MotionProofTest",
+        "test": "entryFramesProgressAndReducedMotionIsImmediate",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.NavigationMotionTest",
+        "test": "activityFilterMovesWithoutRetainingPreviousTaskContent",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.NavigationMotionTest",
+        "test": "anchoredMarkerTravelsRetargetsAndSnapsForReducedMotion",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.PreferencesReviewTest",
+        "test": "themePersistsAndEveryPageSupportsLargeText",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.ResponseRenderingTest",
+        "test": "nativeMarkdownAndStructuredResponsesAreReadable",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.SettingsIntegrationTest",
+        "test": "darkLargeTextAndImeRemainUsable",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.SettingsIntegrationTest",
+        "test": "personaIsBoundedAndDoesNotChangeCorePolicy",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.SettingsIntegrationTest",
+        "test": "clearProcessDeathFixture",
+        "status": "SKIPPED"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.SettingsIntegrationTest",
+        "test": "prepareProcessDeathRecovery",
+        "status": "SKIPPED"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.SettingsIntegrationTest",
+        "test": "landscapeKeepsComposerAndPreferencesReachable",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.SettingsIntegrationTest",
+        "test": "reducedMotionPersistsThroughActivityRecreation",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.SettingsIntegrationTest",
+        "test": "androidDisabledAnimationsPropagateToSharedTheme",
+        "status": "SKIPPED"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.ThemeBehaviorTest",
+        "test": "explicitThemesReachImmersiveRoutesAndSurviveRecreation",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.ThemeBehaviorTest",
+        "test": "systemRetainsApprovedImmersiveCompositionsAndPersists",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.ThemeBehaviorTest",
+        "test": "systemFollowsBothConfigurationsWithDocumentedImmersiveException",
+        "status": "PASS"
+      }
+    ],
+    "log_sha256": "d0d6b134f41fcd683beebf3fc49472166a0058533e6b0ddefe88bec834901045"
+  },
+  "focused_expiry": {
+    "expiry-verified-1": {
+      "counts": {
+        "PASS": 1
+      },
+      "duration_seconds": 35.597,
+      "tests": [
+        {
+          "class": "io.dawnlight.oscar.mobile.MobileCompletionTest",
+          "test": "nativeApprovalInspectionExpiryAndReferenceDenialNeverFabricateConsent",
+          "status": "PASS"
+        }
+      ],
+      "log_sha256": "4e58c01e3fe28a9b7d3366b1c6228ad13e226e10e8674c05e1b33f76eb4f4ea8"
+    },
+    "expiry-verified-2": {
+      "counts": {
+        "PASS": 1
+      },
+      "duration_seconds": 35.425,
+      "tests": [
+        {
+          "class": "io.dawnlight.oscar.mobile.MobileCompletionTest",
+          "test": "nativeApprovalInspectionExpiryAndReferenceDenialNeverFabricateConsent",
+          "status": "PASS"
+        }
+      ],
+      "log_sha256": "5815ae938a629a54bdf929b4adecfc3108cb8bd7cf1715401e54a4e2abde0517"
+    }
+  },
+  "baseline_expiry": {
+    "baseline-expiry": {
+      "counts": {
+        "PASS": 1
+      },
+      "duration_seconds": 37.359,
+      "tests": [
+        {
+          "class": "io.dawnlight.oscar.mobile.MobileCompletionTest",
+          "test": "nativeApprovalInspectionExpiryAndReferenceDenialNeverFabricateConsent",
+          "status": "PASS"
+        }
+      ],
+      "log_sha256": "5f0c72a562c435c93af3eb964db19db416fcbddd32bab4ba041f744b1751915d"
+    },
+    "baseline-expiry-2": {
+      "counts": {
+        "PASS": 1
+      },
+      "duration_seconds": 37.797,
+      "tests": [
+        {
+          "class": "io.dawnlight.oscar.mobile.MobileCompletionTest",
+          "test": "nativeApprovalInspectionExpiryAndReferenceDenialNeverFabricateConsent",
+          "status": "PASS"
+        }
+      ],
+      "log_sha256": "435f827d08f123af0c1d3bdf525a98402fba2db5a2c44ca062e1cd9d88e703d5"
+    }
+  },
+  "before_fix_theme_regression": {
+    "counts": {
+      "FAIL": 1
+    },
+    "duration_seconds": 3.167,
+    "tests": [
+      {
+        "class": "io.dawnlight.oscar.mobile.ThemeBehaviorTest",
+        "test": "explicitThemesReachImmersiveRoutesAndSurviveRecreation",
+        "status": "FAIL"
+      }
+    ],
+    "log_sha256": "58b1c6652270e27db00ff67a4510c153003ed6626438f24f5330e2e227daa45f"
+  },
+  "interrupted_run": {
+    "counts": {
+      "PASS": 35,
+      "FAIL": 2,
+      "SKIPPED": 4
+    },
+    "duration_seconds": 195.328,
+    "tests": [
+      {
+        "class": "io.dawnlight.oscar.mobile.AppReviewTest",
+        "test": "allSettingsAndSecondaryRoutesHaveOneNavigationBar",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.CraftControlsTest",
+        "test": "designedControlsRetainNativeEditingAndDisabledButtonSemantics",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.CraftControlsTest",
+        "test": "artworkUsesScreenEdgesScrollsWithContentAndKeepsDarkHeadingsReadable",
+        "status": "FAIL"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobileCompletionTest",
+        "test": "verifyingIsDistinctAndDoesNotInventSpeech",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobileCompletionTest",
+        "test": "homeUnavailableAndSharedExpressionRender",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobileCompletionTest",
+        "test": "replacementPairingAndDisconnectCannotRestoreOldSecrets",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobileCompletionTest",
+        "test": "referenceGridShowsDesktopOriginAndRecoversActualNetworkLoss",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobileCompletionTest",
+        "test": "nativeReferenceHomeTextTaskAndPrivacyDiscardReadBack",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobileCompletionTest",
+        "test": "nativeApprovalInspectionExpiryAndReferenceDenialNeverFabricateConsent",
+        "status": "FAIL"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobileCompletionTest",
+        "test": "longReportedResponseHasCompleteReadingSurface",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobileCompletionTest",
+        "test": "draftRecreationAndEncryptedRecoveryKeepPrivateDataOutOfBundles",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobileCompletionTest",
+        "test": "lifecycleAndCancellationInvalidateApprovalWithoutReplayingConsent",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobileCompletionTest",
+        "test": "voiceInvocationCancellationPreservesTextWithoutCapture",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobileEmulatedTest",
+        "test": "privateCredentialsAreSealedAndReloaded",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobileEmulatedTest",
+        "test": "disconnectedAndVoiceUnavailableNeverAdvertiseSuccess",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobileEmulatedTest",
+        "test": "privacyGrantDoesNotEnableCaptureOrAction",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobileEmulatedTest",
+        "test": "corruptedSessionRestartFailsClosed",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobileEmulatedTest",
+        "test": "explicitLoopbackFixtureReadback",
+        "status": "SKIPPED"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobileEmulatedTest",
+        "test": "notificationAndBiometricBoundariesFailClosed",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobileEmulatedTest",
+        "test": "navigationAndRestorationKeepOneRelationship",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobilePrivacyTest",
+        "test": "notificationMetadataHidesSensitiveContentAndIdentityRejectsChanges",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobilePrivacyTest",
+        "test": "sourceExclusionsAndRevocationKeepPerceiveRetainActIndependent",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobilePrivacyTest",
+        "test": "invalidSourcesDeniedAccessAndLiveLocalRevocationRemainUsable",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobileVisualTest",
+        "test": "expiredDecisionCannotGrantConsent",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobileVisualTest",
+        "test": "chronologicalConversationReadingAndTaskControls",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobileVisualTest",
+        "test": "productionNavigationAndUnavailableControls",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MotionProofTest",
+        "test": "entryFramesProgressAndReducedMotionIsImmediate",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.NavigationMotionTest",
+        "test": "activityFilterMovesWithoutRetainingPreviousTaskContent",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.NavigationMotionTest",
+        "test": "anchoredMarkerTravelsRetargetsAndSnapsForReducedMotion",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.PreferencesReviewTest",
+        "test": "themePersistsAndEveryPageSupportsLargeText",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.ResponseRenderingTest",
+        "test": "nativeMarkdownAndStructuredResponsesAreReadable",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.SettingsIntegrationTest",
+        "test": "darkLargeTextAndImeRemainUsable",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.SettingsIntegrationTest",
+        "test": "personaIsBoundedAndDoesNotChangeCorePolicy",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.SettingsIntegrationTest",
+        "test": "clearProcessDeathFixture",
+        "status": "SKIPPED"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.SettingsIntegrationTest",
+        "test": "prepareProcessDeathRecovery",
+        "status": "SKIPPED"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.SettingsIntegrationTest",
+        "test": "landscapeKeepsComposerAndPreferencesReachable",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.SettingsIntegrationTest",
+        "test": "reducedMotionPersistsThroughActivityRecreation",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.SettingsIntegrationTest",
+        "test": "androidDisabledAnimationsPropagateToSharedTheme",
+        "status": "SKIPPED"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.ThemeBehaviorTest",
+        "test": "explicitThemesReachImmersiveRoutesAndSurviveRecreation",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.ThemeBehaviorTest",
+        "test": "systemRetainsApprovedImmersiveCompositionsAndPersists",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.ThemeBehaviorTest",
+        "test": "systemFollowsBothConfigurationsWithDocumentedImmersiveException",
+        "status": "PASS"
+      }
+    ],
+    "log_sha256": "be6784860ea2f1964aa7890a5a6747e0b666ce9ff804e0ef1bbf0e62e056d271"
+  },
+  "interrupted_run_findings": [
+    "Awareness craft fixture expected forced dark under explicit Light; corrected to assert both light and dark heading contrast",
+    "Expiry wait timed out after phone call foreground interruption and observed Activity STOP; historical initiating causes remain unknown"
+  ],
+  "jvm": {
+    "app": {
+      "tests": 23,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "expression": {
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "lint": {
+    "debug": {
+      "Warning": 11
+    },
+    "review": {
+      "Warning": 11
+    }
+  },
+  "python": {
+    "passed": 24,
+    "log_sha256": "430202eb7eeeb03be12ab39714070bd195c4567213dea3a656a06f017e98f7ce"
+  },
+  "build_logs": {
+    "final-build.log": "646504160f219c7c54d4006e4e433202929cef0deaa4a83ee1628cca0dfa4994",
+    "sealed-test-build.log": "3131ea77fd69578e388e95521e67aecc9c1f5039f52561deb259bfbf1719fa31"
+  },
+  "repository_checks": {
+    "result": "PASS",
+    "log_sha256": "64116ee34d6ca8c3cc9f8d873ba155dc42d9f593a12499c5ac4ba99589c83151"
+  },
+  "apk": {
+    "debug": {
+      "sha256": "68df8dc7533ee978249c52298ace535abf00701c00284e10b6e61654f7c0c8f2",
+      "bytes": 67416455,
+      "installed_hash_matches": true
+    },
+    "review": {
+      "sha256": "7bd4823d57ad689eb46b7a332518a25d7a19a287d9ec4470fd17406fc3eecc58",
+      "bytes": 56618387,
+      "installed_hash_matches": true
+    },
+    "test": {
+      "sha256": "a1a35d9a263bc575f2f3eb239e78d2ee11db8ef7b5c41ed3f7248a5edb1772b6",
+      "bytes": 2641935,
+      "installed_hash_matches": true
+    }
+  },
+  "captures": [
+    {
+      "path": "closure/closure-dark-activity.png",
+      "sha256": "45a66b3222e14ecd95af566fb2b9b66dd9add6538c19ae369d38f66264be52de",
+      "pixels": [
+        1080,
+        2340
+      ]
+    },
+    {
+      "path": "closure/closure-dark-awareness.png",
+      "sha256": "70092359417c16a0ee5c05d1ded987d869d4a2c51a9f68224cfd9e10a9139817",
+      "pixels": [
+        1080,
+        2340
+      ]
+    },
+    {
+      "path": "closure/closure-dark-voice.png",
+      "sha256": "138d40e39fd9f69faf2771bf388fe79944492b917ac38c624ed2e9a2c478dd0c",
+      "pixels": [
+        1080,
+        2340
+      ]
+    },
+    {
+      "path": "closure/closure-light-activity.png",
+      "sha256": "a5a23ac40b47cc706200fa480fd0e2494cd271d67218b026bf9054cc8b93061f",
+      "pixels": [
+        1080,
+        2340
+      ]
+    },
+    {
+      "path": "closure/closure-light-awareness.png",
+      "sha256": "422e14d552718031f852e2cd099c1f0d91bfedc03199e741110fd0aaf539f97a",
+      "pixels": [
+        1080,
+        2340
+      ]
+    },
+    {
+      "path": "closure/closure-light-voice.png",
+      "sha256": "01f1b4d6bd4d9d5a3da4aea40ed0b6c29dc99971985f55603b6bb8c744b4eeec",
+      "pixels": [
+        1080,
+        2340
+      ]
+    }
+  ],
+  "original_png_count_verified": 21,
+  "canonical_orb_sha256": "728aeac3c9aa590b67d45c469735e919ede93a8503964e24f0f4af18cda066c5",
+  "process_recovery": {
+    "classification": "REAL_PHONE_REVIEW_SYNTHETIC_ENCRYPTED_RECOVERY",
+    "automatic_task_replay": false,
+    "before_pid": "15339",
+    "after_pid": "15479",
+    "draft_recovered": true,
+    "cleanup_verified": true
+  },
+  "tested_mobile_source_sha256": {
+    "mobile/app/src/test/java/io/dawnlight/oscar/mobile/ApprovalSecurityTest.kt": "71094d92a432e039fd537da6e8eb9fbae6da0ff9e37f9f66b219d4b0470aa1d5",
+    "mobile/app/src/test/java/io/dawnlight/oscar/mobile/CoreTransportTest.kt": "5055cc9e661f70dcffae5417f4803e36ea571664bc2bd7caddf654f6176021bc",
+    "mobile/app/src/test/java/io/dawnlight/oscar/mobile/GridPresentationTest.kt": "c6e911517602663aa9836c3b1b6d6955db7148391b9e4ca418bc640b1a7b8e86",
+    "mobile/app/src/test/java/io/dawnlight/oscar/mobile/MobileContractsTest.kt": "ef43d68852fdef8f2c90f7eca8485c1f8ea913fd327229a1f3f2738b08428fc8",
+    "mobile/app/src/test/java/io/dawnlight/oscar/mobile/MobileExpressionTest.kt": "be79f01cde346df9cb4f51a462480860edeb84645a74c033b2c5f27b34376dc9",
+    "mobile/app/src/test/java/io/dawnlight/oscar/mobile/MobileRecoveryTest.kt": "057988e1fd035b37a937e24c64fbeda7dbb52a8c74391898373ebd4374afe0b0",
+    "mobile/app/src/test/java/io/dawnlight/oscar/mobile/ResponseTextTest.kt": "e54945f9888c58cd0049d63f601bf0ce3fec74b070dd85e7abb1b77680f38c66",
+    "mobile/app/src/test/java/io/dawnlight/oscar/mobile/VoicePresentationTest.kt": "b57a37f3972aa5e0914d575b17404e5de9ad160402e36b68d0622ff2cc3a471b",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/ActivityScreen.kt": "76c8c2ee7efac6cc868db0ff62606b4e21c219bec95aa7af346be3e443eafeec",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/Approval.kt": "2f01bfaf622079561a400c3b77838aa96de33398a8023280b795a1cb860446a8",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/ApprovalDialog.kt": "a45e0a7a6c2348a0facb52b31eda48e4c50a46689d5e8038394e8c3a5beeea79",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/AssistantService.java": "8c0626e63f183624862b8bfeb6fa12012a62113bedb91513077cf9ba7cb34cec",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/AssistantSessionService.java": "aad9522e30ead6adefa8cddea562f086cdf048a4a99b2ed020589d11c535e748",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/CoreClient.java": "440ea96ea3a576092920e5e30922ca6ab6f2973d20534da4feb9e80365a2846c",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/CoreSession.kt": "261704088a40d1b5d899b1d212e3c9dad085b46dd5ce7da34fa343ff60e37af2",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/DevicesScreen.kt": "94ed6e09dcae236d942e6f0e40e183c3bff76bc4522bd14da4438230f8b0e4c3",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/InteractionScreens.kt": "957d564ee05b70d58f027282e8ae734c40ab258e34ea4fad144a8a0d3d312e5a",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/MainActivity.kt": "85b36b27ff3d6e20f100a13f20c11ca77ec074f5eb4f5f7306b5e2a74dcda871",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/MicrophoneService.java": "0963196c01021ba0c0e4d3ece44ab8bb9ed89b6dfcfc294250eea6811957759a",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/MobileDesign.kt": "391a0967ac0a10429e3fd772ca5f53eae203fe2cd5595974d98133602771ccb0",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/MobileExpression.kt": "41a2a3e78105953eae34a3637ec5961136ab48f6787eecf8fdb8f2b6056db2ad",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/MobileState.kt": "486fd53a88f4ad0fbafce96abe0a99fb4ca588f781840b876f7283d8f67ee0e1",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/NativeVoice.java": "2b3d6440587a7e60fdcc9cde9530805aefd0d1aa9b928ff4f2dc8756c918477e",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/NavigationMotion.kt": "bcf86dd16654351fa69d22e5ca2a2a87fd283f9a6621b2c0b63474704882c359",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/NotificationBoundary.java": "09eedfbdd108920db5c4557ee8f4eee595e18ac0ffa6aa681de4c34151c2007d",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/OscarApp.kt": "d2c18f4373de4a72115e9c83d05300ac10517b56a6e1c17c972b84678fda4eff",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/OscarControls.kt": "50e9c3f67d50820860a4f31c88aa1fbeb3537cc4d567e9a3fcfc1a554ccd16df",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/OwnerConfirmation.kt": "2664b01a2a28bc648dd29252bab4339452c044aa8f3cca43a9023c4eab9dde2a",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/OwnerWire.java": "8a309f88698d89fd6df6a7ab221e62580fa168c0d25949fa7ff0cec26beb40db",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/PageArtwork.kt": "3d5704664fb58c427abffaba4b9770851103147c4c2bf84039405baff4753d5d",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/PlanningScreens.kt": "c461d2db29cf4df546536e78fbef13bcdaf3da87d3fd093f4b6ce6ee29fc2aad",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/PreferenceComponents.kt": "54f29e681084f655ce88a118321095cad4d51dca4dd35317a05b1866c04795d1",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/PrivacySettings.kt": "6d25db1348bb03e8e52ac5277a60f8d1d48e97b3def8a4a01ba7fd96abed11dd",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/ResponseText.kt": "a7c395047fd95e309061449d916fcf9c1de7f70be694cd610ec085596e7c07f3",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/SecondarySettings.kt": "c7c73ccdb67380e264667f18a3bb34a73dfb68e575acf7bc7c4ff692e773dcb3",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/SessionVault.java": "4c6e49376285bdba69f83e38918fd2476c56585e07b3eb3a3b641a19997d30d7",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/SettingsScreen.kt": "ca58a67b7a5908b62e951b34464abb8da3f118c141efa7d2b98772915e581c93",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/TaskNotifications.kt": "caa31526ad702a181031e185c4825e4bb653d4a86ea37aea512ee4cdbb91ce00",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/UnavailableRecognitionService.java": "ef024a6dc0350624d4851239419cc185da42220c3089e5bfc50c90be424a0206",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/VoicePresentation.kt": "f99ef8c5381f3f5fe1e7f011edb6f556ea5dc01121fcfd5303140d59b0ddcc90",
+    "mobile/app/src/androidTest/java/io/dawnlight/oscar/mobile/AppReviewTest.kt": "cfc52d0cea65f2d044afedcede5281252f193011f743df2b5d2f9b7c5b823aa1",
+    "mobile/app/src/androidTest/java/io/dawnlight/oscar/mobile/CraftControlsTest.kt": "5402eedf7f824466d70033d8037f04bcad7739f2628da05694baeb1ee666b984",
+    "mobile/app/src/androidTest/java/io/dawnlight/oscar/mobile/MobileCompletionTest.kt": "b76218e5586b124320020f170d84ee5441a465943b02588a7aa59c1193483c1a",
+    "mobile/app/src/androidTest/java/io/dawnlight/oscar/mobile/MobileEmulatedTest.kt": "c4c395232a32763edc3866ae4569739162f5a5f99419b353a62ff67e6f5e3a3b",
+    "mobile/app/src/androidTest/java/io/dawnlight/oscar/mobile/MobilePrivacyTest.kt": "de63dfb5cd904c7b0ca5a912c159a223f37fa593970c4b2f8cb77f381a961cd8",
+    "mobile/app/src/androidTest/java/io/dawnlight/oscar/mobile/MobileVisualTest.kt": "1098bba35cd10a6e21e076ee86bb17cdf1adebbf33350af628864d1229f80807",
+    "mobile/app/src/androidTest/java/io/dawnlight/oscar/mobile/MotionProofTest.kt": "9b7cc3ca827e0ad22b9f577d1750e647e59cfc18e17e356f436bb20317eae8f1",
+    "mobile/app/src/androidTest/java/io/dawnlight/oscar/mobile/NavigationMotionTest.kt": "76be432b4dd280fda78618bd822555dddcddf77e65969bbc07a83cc27695654f",
+    "mobile/app/src/androidTest/java/io/dawnlight/oscar/mobile/PreferencesReviewTest.kt": "83d2765eba98bbf2f58df2fd5f86f0ecd9ba111b940889a70c9fdd6c1c93ef4c",
+    "mobile/app/src/androidTest/java/io/dawnlight/oscar/mobile/ResponseRenderingTest.kt": "9bb1fb66f81374cf9d84a8352397dcd8f867a8d558816933c09c3c0fe205a77d",
+    "mobile/app/src/androidTest/java/io/dawnlight/oscar/mobile/ReviewDevice.kt": "4d84b54dec6e32e08f676f8855c1e7b1a51aef24f6ec1812b9ae62ee1122659e",
+    "mobile/app/src/androidTest/java/io/dawnlight/oscar/mobile/SettingsIntegrationTest.kt": "4db85b40e77faa586160e3c0cf30e553b8494321816374ae7be9b2d19943ab27",
+    "mobile/app/src/androidTest/java/io/dawnlight/oscar/mobile/ThemeBehaviorTest.kt": "673afc268a47f6890374788b0ee09cdbea0d45329aa255dbceba1060848b8ce8"
+  },
+  "historical_lifecycle_initiating_causes": "UNCONFIRMED_NOT_CLAIMED_FIXED",
+  "remote_ci": "BLOCKED_ACTIONS_DISABLED_FRESH_API_READ",
+  "real_audio_biometric_oem_commissioning": "NOT_RUN",
+  "gate_c": "PARTIAL",
+  "emulator": "OFF",
+  "merge": "NOT_PERFORMED",
+  "future_backends": "UNCHANGED_UNAVAILABLE",
+  "reused_fixture_run": {
+    "counts": {
+      "PASS": 36,
+      "FAIL": 1,
+      "SKIPPED": 4
+    },
+    "duration_seconds": 166.746,
+    "tests": [
+      {
+        "class": "io.dawnlight.oscar.mobile.AppReviewTest",
+        "test": "allSettingsAndSecondaryRoutesHaveOneNavigationBar",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.CraftControlsTest",
+        "test": "designedControlsRetainNativeEditingAndDisabledButtonSemantics",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.CraftControlsTest",
+        "test": "artworkUsesScreenEdgesScrollsWithContentAndKeepsDarkHeadingsReadable",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobileCompletionTest",
+        "test": "verifyingIsDistinctAndDoesNotInventSpeech",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobileCompletionTest",
+        "test": "homeUnavailableAndSharedExpressionRender",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobileCompletionTest",
+        "test": "replacementPairingAndDisconnectCannotRestoreOldSecrets",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobileCompletionTest",
+        "test": "referenceGridShowsDesktopOriginAndRecoversActualNetworkLoss",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobileCompletionTest",
+        "test": "nativeReferenceHomeTextTaskAndPrivacyDiscardReadBack",
+        "status": "FAIL"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobileCompletionTest",
+        "test": "nativeApprovalInspectionExpiryAndReferenceDenialNeverFabricateConsent",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobileCompletionTest",
+        "test": "longReportedResponseHasCompleteReadingSurface",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobileCompletionTest",
+        "test": "draftRecreationAndEncryptedRecoveryKeepPrivateDataOutOfBundles",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobileCompletionTest",
+        "test": "lifecycleAndCancellationInvalidateApprovalWithoutReplayingConsent",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobileCompletionTest",
+        "test": "voiceInvocationCancellationPreservesTextWithoutCapture",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobileEmulatedTest",
+        "test": "privateCredentialsAreSealedAndReloaded",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobileEmulatedTest",
+        "test": "disconnectedAndVoiceUnavailableNeverAdvertiseSuccess",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobileEmulatedTest",
+        "test": "privacyGrantDoesNotEnableCaptureOrAction",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobileEmulatedTest",
+        "test": "corruptedSessionRestartFailsClosed",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobileEmulatedTest",
+        "test": "explicitLoopbackFixtureReadback",
+        "status": "SKIPPED"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobileEmulatedTest",
+        "test": "notificationAndBiometricBoundariesFailClosed",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobileEmulatedTest",
+        "test": "navigationAndRestorationKeepOneRelationship",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobilePrivacyTest",
+        "test": "notificationMetadataHidesSensitiveContentAndIdentityRejectsChanges",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobilePrivacyTest",
+        "test": "sourceExclusionsAndRevocationKeepPerceiveRetainActIndependent",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobilePrivacyTest",
+        "test": "invalidSourcesDeniedAccessAndLiveLocalRevocationRemainUsable",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobileVisualTest",
+        "test": "expiredDecisionCannotGrantConsent",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobileVisualTest",
+        "test": "chronologicalConversationReadingAndTaskControls",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MobileVisualTest",
+        "test": "productionNavigationAndUnavailableControls",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.MotionProofTest",
+        "test": "entryFramesProgressAndReducedMotionIsImmediate",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.NavigationMotionTest",
+        "test": "activityFilterMovesWithoutRetainingPreviousTaskContent",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.NavigationMotionTest",
+        "test": "anchoredMarkerTravelsRetargetsAndSnapsForReducedMotion",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.PreferencesReviewTest",
+        "test": "themePersistsAndEveryPageSupportsLargeText",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.ResponseRenderingTest",
+        "test": "nativeMarkdownAndStructuredResponsesAreReadable",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.SettingsIntegrationTest",
+        "test": "darkLargeTextAndImeRemainUsable",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.SettingsIntegrationTest",
+        "test": "personaIsBoundedAndDoesNotChangeCorePolicy",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.SettingsIntegrationTest",
+        "test": "clearProcessDeathFixture",
+        "status": "SKIPPED"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.SettingsIntegrationTest",
+        "test": "prepareProcessDeathRecovery",
+        "status": "SKIPPED"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.SettingsIntegrationTest",
+        "test": "landscapeKeepsComposerAndPreferencesReachable",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.SettingsIntegrationTest",
+        "test": "reducedMotionPersistsThroughActivityRecreation",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.SettingsIntegrationTest",
+        "test": "androidDisabledAnimationsPropagateToSharedTheme",
+        "status": "SKIPPED"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.ThemeBehaviorTest",
+        "test": "explicitThemesReachImmersiveRoutesAndSurviveRecreation",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.ThemeBehaviorTest",
+        "test": "systemRetainsApprovedImmersiveCompositionsAndPersists",
+        "status": "PASS"
+      },
+      {
+        "class": "io.dawnlight.oscar.mobile.ThemeBehaviorTest",
+        "test": "systemFollowsBothConfigurationsWithDocumentedImmersiveException",
+        "status": "PASS"
+      }
+    ],
+    "log_sha256": "c9a1714daa0a113b5057d673f396a4eb563bca4d7c107fb7a079dca4e6666389"
+  },
+  "reused_fixture_run_finding": "Seed task was intentionally removed by previous suite discard; use a fresh Core per complete suite",
+  "authority_contract_sources_unchanged": [
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/Approval.kt",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/OwnerConfirmation.kt",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/OwnerWire.java",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/SessionVault.java",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/CoreClient.java",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/NotificationBoundary.java",
+    "oscar/mobile.py"
+  ],
+  "process_recovery_hooks": {
+    "process-prepare-verified": {
+      "counts": {
+        "PASS": 1
+      },
+      "duration_seconds": 2.949,
+      "tests": [
+        {
+          "class": "io.dawnlight.oscar.mobile.SettingsIntegrationTest",
+          "test": "prepareProcessDeathRecovery",
+          "status": "PASS"
+        }
+      ],
+      "log_sha256": "20879305460cab018ce50c8f02f436afa093f890aebc1a7a7a0faf2e5759fd47"
+    },
+    "process-clear-verified": {
+      "counts": {
+        "PASS": 1
+      },
+      "duration_seconds": 2.087,
+      "tests": [
+        {
+          "class": "io.dawnlight.oscar.mobile.SettingsIntegrationTest",
+          "test": "clearProcessDeathFixture",
+          "status": "PASS"
+        }
+      ],
+      "log_sha256": "1706c86092893ef9593b5f11f64301f37e09110090f552616f183019bea82e22"
+    }
+  },
+  "initial_process_harness_attempt": {
+    "finding": "Review suffix is the application ID, not the MainActivity class package; shorthand component launch rejected before replacement; cleanup passed",
+    "preparation": {
+      "counts": {
+        "PASS": 1
+      },
+      "duration_seconds": 2.942,
+      "tests": [
+        {
+          "class": "io.dawnlight.oscar.mobile.SettingsIntegrationTest",
+          "test": "prepareProcessDeathRecovery",
+          "status": "PASS"
+        }
+      ],
+      "log_sha256": "06b8086197de503e35a01d5315c12a6f82c8d75635ab350d5b54b67d073127b1"
+    },
+    "cleanup": {
+      "counts": {
+        "PASS": 1
+      },
+      "duration_seconds": 2.145,
+      "tests": [
+        {
+          "class": "io.dawnlight.oscar.mobile.SettingsIntegrationTest",
+          "test": "clearProcessDeathFixture",
+          "status": "PASS"
+        }
+      ],
+      "log_sha256": "25bbbdc0a323da68bf5ef628cc539cd28047f654733ed8cdf747a053990d398f"
+    }
+  },
+  "temporary_reference_core": "STOPPED_AFTER_VERIFICATION",
+  "current_fixture_adb_forwards": "REMOVED",
+  "normal_app_update": "ADB_INSTALL_R_NO_DATA_RESET"
+}
