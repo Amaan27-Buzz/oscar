@@ -80,9 +80,25 @@ class Dispatcher:
             self.grid.authenticate(session, permission)
 
         def authorize_execution() -> None:
+            latest = self.store.get("node", self.node_id)
+            if [c for c in latest["capabilities"] if c["id"] == action.capability_id] != candidates:
+                raise PermissionError("target capability withdrawn or changed")
             self.grid.authenticate(session, "execute")
             for permission in candidates[0]["permissions"]:
                 self.grid.authenticate(session, permission)
+            current = self.store.task(action.task_id)
+            lease = self.store.get("lease", envelope.lease_id)
+            if (
+                current.lease_id != envelope.lease_id
+                or not lease["active"]
+                or lease["expires_at"] <= self.grid.clock()
+            ):
+                raise PermissionError("execution lease expired or superseded")
+            plan = self.store.get("plan", action.task_id)
+            if plan.get("executive"):
+                from .executive import authorize_step
+
+                authorize_step(self.store, self.grid, action.task_id, candidates[0])
 
         cancellation = Cancellation(self.store, action.task_id, authorize_execution)
         cancellation.check()

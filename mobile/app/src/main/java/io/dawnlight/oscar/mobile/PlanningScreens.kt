@@ -16,8 +16,8 @@ import androidx.activity.compose.BackHandler
     var timing by remember(state.epoch) { mutableStateOf("") }
     when (page) {
         "Worker" -> {
-            IllustratedIntro("No Worker assigned", artwork = R.drawable.illustration_worker, height = 136.dp)
-            Text("Continuing responsibilities aren't available yet.", style = MaterialTheme.typography.bodyMedium)
+            IllustratedIntro(if (state.snapshot?.executive.isNullOrEmpty()) "No Worker in readback" else "Core responsibilities", artwork = R.drawable.illustration_worker, height = 136.dp)
+            Text("Worker scope and activation are managed by your trusted Core. Changes aren't available on this phone yet.", style = MaterialTheme.typography.bodyMedium)
             OscarButton(onClick = {}, enabled = false, modifier = Modifier.fillMaxWidth()) { Text("Run Worker · unavailable") }
             SupportingDetails("Responsibility & scope") {
                 FeatureRow("Responsibility", "Not assigned", "Automations")
@@ -50,14 +50,15 @@ import androidx.activity.compose.BackHandler
         }
         else -> {
             IllustratedIntro("Automations", artwork = R.drawable.illustration_automations, height = 152.dp)
-            StatusLabel("Scheduling unavailable")
+            StatusLabel(if (state.snapshot?.executive != null) "Core responsibilities" else "Automation readback unavailable")
+            state.snapshot?.executive?.forEach { goal -> TactileSurface(Modifier.fillMaxWidth()) { FeatureRow(goal.goal, "${goal.state} · ${goal.runs} of ${goal.maxRuns} runs verified", "Activity") } }
             TactileSurface(Modifier.fillMaxWidth()) {
-                FeatureRow("Workers", "No responsibilities assigned", "Automations", action = { navigate("Worker") }, artwork = R.drawable.illustration_worker_brief)
+                FeatureRow("Workers", if (state.snapshot?.executive.isNullOrEmpty()) "No responsibilities in this readback" else "Managed by your Core", "Automations", action = { navigate("Worker") }, artwork = R.drawable.illustration_worker_brief)
             }
             TactileSurface(Modifier.fillMaxWidth()) {
-                FeatureRow("Schedules & watches", "Not available yet", "Clock", Clay, artwork = R.drawable.illustration_worker_watch)
+                FeatureRow("Schedules & watches", if (state.snapshot?.executive != null) "Review and activate with Core" else "Not available on this connection", "Clock", Clay, artwork = R.drawable.illustration_worker_watch)
             }
-            SupportingDetails("What is available") { Text("One-time Core work is available in Activity. Persistent schedules are not commissioned.", style = MaterialTheme.typography.bodySmall) }
+            SupportingDetails("What is available") { Text("Authorized task progress is available in Activity. Review and activate persistent schedules with Core; discussing a draft here does not activate it.", style = MaterialTheme.typography.bodySmall) }
             OscarButton(onClick = { navigate("Create") }, modifier = Modifier.fillMaxWidth()) { Glyph("Add", color = Color.White); Spacer(Modifier.width(8.dp)); Text("New responsibility") }
         }
     }

@@ -136,30 +136,37 @@ class Grid:
     def heartbeat(self, session: SessionHandle, *, health: str = "healthy") -> None:
         if health not in {"healthy", "degraded"}:
             raise ValueError("invalid health")
-        self.authenticate(session, "heartbeat")
-        node = self.store.get("node", session.node_id)
-        node.update(
-            status="online" if health == "healthy" else "degraded",
-            health=health,
-            last_seen=self.clock(),
-        )
-        self.store.put("node", session.node_id, node)
+        with self.store.transaction():
+            self.authenticate(session, "heartbeat")
+            node = self.store.get("node", session.node_id)
+            node.update(
+                status="online" if health == "healthy" else "degraded",
+                health=health,
+                last_seen=self.clock(),
+            )
+            self.store.put("node", session.node_id, node)
 
     def advertise(self, session: SessionHandle, capabilities: list[Capability]) -> None:
-        self.authenticate(session, "advertise")
-        node = self.store.get("node", session.node_id)
-        for capability in capabilities:
-            if (
-                capability.node_id != session.node_id
-                or capability.version != PROTOCOL_VERSION
-                or not set(capability.permissions) <= set(node["scopes"])
-            ):
-                raise PermissionError("capability advertisement denied")
-        if len({c.id for c in capabilities}) != len(capabilities):
-            raise ValueError("duplicate capability identifier")
-        node["capabilities"] = [record(c) for c in capabilities]
-        self.store.put("node", session.node_id, node)
-        self.heartbeat(session)
+        with self.store.transaction():
+            self.authenticate(session, "advertise")
+            self.authenticate(session, "heartbeat")
+            node = self.store.get("node", session.node_id)
+            for capability in capabilities:
+                if (
+                    capability.node_id != session.node_id
+                    or capability.version != PROTOCOL_VERSION
+                    or not set(capability.permissions) <= set(node["scopes"])
+                ):
+                    raise PermissionError("capability advertisement denied")
+            if len({c.id for c in capabilities}) != len(capabilities):
+                raise ValueError("duplicate capability identifier")
+            node.update(
+                capabilities=[record(c) for c in capabilities],
+                status="online",
+                health="healthy",
+                last_seen=self.clock(),
+            )
+            self.store.put("node", session.node_id, node)
 
     def nodes(self) -> list[dict[str, Any]]:
         result: list[dict[str, Any]] = []
@@ -352,22 +359,37 @@ class Grid:
         lease["active"] = False
         self.store.put("lease", lease_id, lease)
 
-    def disconnect(self, node_id: str) -> None:
-        node = self.store.get("node", node_id)
-        node.update(status="offline", health="unknown", capabilities=[])
-        self.store.put("node", node_id, node)
-        for lease in self.store.all("lease"):
+    def disconnect(self, node_id: str, *, only_if_stale: bool = False) -> None:
+        with self.store.transaction():
+            node = self.store.get("node", node_id)
+            if (
+                only_if_stale
+                and not node["revoked"]
+                and node["last_seen"] is not None
+                and self.clock() - node["last_seen"] <= self.heartbeat_ttl
+            ):
+                return
+            node.update(status="offline", health="unknown", capabilities=[])
+            self.store.put("node", node_id, node)
+            leases = self.store.all("lease")
+        for lease in leases:
             if lease["node_id"] == node_id and lease["active"]:
                 task = self.store.task(lease["task_id"])
                 if task.state in {TaskState.EXECUTING, TaskState.AWAITING_RESULT}:
-                    self.store.transition(
-                        task.id, TaskState.BLOCKED, blocker="executor disconnected"
-                    )
+                    try:
+                        self.store.transition(
+                            task.id,
+                            TaskState.BLOCKED,
+                            blocker="executor disconnected",
+                            expected_lease=lease["id"],
+                        )
+                    except StateConflict:
+                        continue
 
     def reap(self) -> list[str]:
         for node in self.nodes():
             if node["status"] == "offline":
-                self.disconnect(str(node["id"]))
+                self.disconnect(str(node["id"]), only_if_stale=True)
         expired = []
         for lease in self.store.all("lease"):
             if lease["active"] and lease["expires_at"] <= self.clock():

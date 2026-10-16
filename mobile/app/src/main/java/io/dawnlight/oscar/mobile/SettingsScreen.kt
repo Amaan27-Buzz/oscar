@@ -133,7 +133,7 @@ import kotlinx.coroutines.withContext
     SupportingDetails("Other Android features") {
         Text(if (remember(revision) { Settings.canDrawOverlays(context) }) "Overlay permission granted" else "Overlay permission not granted", style = MaterialTheme.typography.bodySmall)
         TextButton(onClick = { try { launcher.launch(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, android.net.Uri.parse("package:${context.packageName}"))) } catch (_: Exception) { unavailable = true } }) { Text("Allow display over other apps") }
-        AndroidGrant("Companion notification", Manifest.permission.POST_NOTIFICATIONS)
+        if (Build.VERSION.SDK_INT >= 33) AndroidGrant("Companion notification", Manifest.permission.POST_NOTIFICATIONS)
         TextButton(enabled = CompanionOverlay.permitted(context), onClick = { try { CompanionOverlay.show(context) } catch (_: Exception) { unavailable = true } }) { Text("Show Companion Orb") }
         TextButton(onClick = { CompanionOverlay.hide(context) }) { Text("Hide Companion") }
         TextButton(onClick = { CompanionOverlay.hide(context, disable = true) }) { Text("Disable Companion overlay") }

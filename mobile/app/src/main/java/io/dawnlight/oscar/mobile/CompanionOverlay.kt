@@ -90,6 +90,9 @@ class CompanionOverlayService : Service() {
                         if (binding != null && binding != nextBinding) error("Pairing changed")
                         binding = nextBinding; wire = connection
                         val response = withContext(Dispatchers.IO) { connection.call("presence", JSONObject()) }
+                        check(CompanionOverlay.permitted(this@CompanionOverlayService) && !getSystemService(KeyguardManager::class.java).isKeyguardLocked)
+                        val current = withContext(Dispatchers.IO) { SessionVault(this@CompanionOverlayService).load() } ?: error("Pairing removed")
+                        require(CoreClient(current).binding() == binding)
                         require(response.get("visible") is Boolean)
                         if (!response.getBoolean("visible")) { stopSelf(); return@launch }
                         val raw = response.getJSONObject("expression").toString()

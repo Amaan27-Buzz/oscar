@@ -599,7 +599,19 @@ class Mobile:
             return self.complete(session, payload)
         response: dict[str, Any]
         with self.lock:
-            if operation == "presence" and not payload:
+            if operation == "executive" and not payload:
+                if (
+                    self.runtime.executive is None
+                    or not self.policy.evaluate(
+                        "core.executive.read",
+                        ("executive:read",),
+                        self.grants(session),
+                        {"node": session.node_id, "source": self.source},
+                    ).allowed
+                ):
+                    raise PermissionError("Executive read is not authorized or available")
+                response = self.runtime.executive.snapshot()
+            elif operation == "presence" and not payload:
                 permission = self.policy.evaluate(
                     "core.presence.read",
                     ("presence:read",),
@@ -678,6 +690,16 @@ class Mobile:
                     )
                     for t in tasks[-3:]
                 ]
+                if (
+                    self.runtime.executive is not None
+                    and self.policy.evaluate(
+                        "core.executive.read",
+                        ("executive:read",),
+                        self.grants(session),
+                        {"node": session.node_id, "source": self.source},
+                    ).allowed
+                ):
+                    response["executive"] = self.runtime.executive.snapshot()
             elif operation == "text" and set(payload) == {"text"}:
                 self.authenticate(session, "mobile:text")
                 text = payload["text"]

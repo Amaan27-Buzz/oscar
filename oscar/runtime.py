@@ -27,6 +27,7 @@ from .storage import StateConflict, Store
 from .transport import Transport, action_envelope, parse_result
 
 if TYPE_CHECKING:
+    from .executive import Executive
     from .presence import PresenceRuntime
     from .setup_runtime import SetupRuntime
     from .world_runtime import WorldRuntime
@@ -49,6 +50,7 @@ class Runtime:
         self.world: WorldRuntime | None = None
         self.setup: SetupRuntime | None = None
         self.presence: PresenceRuntime | None = None
+        self.executive: Executive | None = None
         self.store.task_resources.add(self)
 
     @property
@@ -83,9 +85,15 @@ class Runtime:
         *,
         transient: bool = False,
         context_text: str | None = None,
+        creation_key: str | None = None,
+        execution_binding: dict[str, Any] | None = None,
     ) -> Task:
         if not 0 <= retry_budget <= 5:
             raise ValueError("retry budget must be between zero and five")
+        if creation_key is not None and (
+            transient or not isinstance(creation_key, str) or not 1 <= len(creation_key) <= 200
+        ):
+            raise ValueError("bounded durable creation key required")
         if context_text is not None and (
             not transient or not isinstance(context_text, str) or len(context_text) > 8192
         ):
@@ -136,6 +144,25 @@ class Runtime:
         )
         if redact_runtime_secrets(material) != material:
             raise ValueError("credential material cannot enter durable objectives/plans")
+        admission = hashlib.sha256(
+            json.dumps(
+                [
+                    self.relationship_id,
+                    material,
+                    kind,
+                    initiator,
+                    retry_budget,
+                    mode,
+                    execution_binding,
+                ],
+                sort_keys=True,
+            ).encode()
+        ).hexdigest()
+        admission_key = json.dumps([self.relationship_id, creation_key])
+        if redact_runtime_secrets(json.dumps([admission_key, execution_binding])) != json.dumps(
+            [admission_key, execution_binding]
+        ):
+            raise ValueError("credential material cannot enter durable admission metadata")
         objective = Objective(new_id(), intent.text, initiator, criterion, time())
         task = Task(
             new_id(),
@@ -159,12 +186,44 @@ class Runtime:
                 criterion={"kind": "unavailable"},
             )
         with self.store.transaction():
+            if creation_key is not None:
+                try:
+                    previous = self.store.get("task_admission", admission_key)
+                except KeyError:
+                    previous = None
+                if previous:
+                    if previous["fingerprint"] != admission:
+                        raise StateConflict("creation key already binds a different objective")
+                    return self.store.task(previous["task_id"])
+                self.store.put(
+                    "task_admission", admission_key, {"task_id": task.id, "fingerprint": admission}
+                )
             self.store.put("objective", objective.id, record(objective))
+            if execution_binding:
+                commitment = self.store.get("executive_goal", execution_binding["goal_id"])
+                worker = self.store.get("executive_worker", execution_binding["worker_id"])
+                if (
+                    commitment["state"] != "enabled"
+                    or not worker["enabled"]
+                    or commitment["worker_revision"] != worker["revision"]
+                    or commitment["review_digest"] != execution_binding["review_digest"]
+                    or commitment["run_index"] != execution_binding["occurrence"]
+                ):
+                    raise StateConflict("commitment changed before atomic task admission")
+                self.store.put("executive_task", task.id, {"task_id": task.id, **execution_binding})
             self.store.put("task", task.id, record(task))
             self.store.put(
                 "task_relationship", task.id, {"id": task.id, "relationship": self.relationship_id}
             )
-            self.store.put("plan", task.id, {"kind": kind, "parameters": parameters})
+            self.store.put(
+                "plan",
+                task.id,
+                {
+                    "kind": kind,
+                    "parameters": parameters,
+                    **({"executive": execution_binding} if execution_binding else {}),
+                },
+            )
             self.store.audit(task.id, "jev_decision", record(decision))
             self.store.audit(
                 task.id,
@@ -225,6 +284,13 @@ class Runtime:
                 blocker="private context expired; create a fresh request",
             )
         candidates = [c for c in self.grid.search(plan["kind"]) if c.node_id in transports]
+        if plan.get("executive"):
+            binding = plan["executive"]
+            candidates = [
+                c
+                for c in candidates
+                if c.id == binding["capability_id"] and c.node_id == binding["node_id"]
+            ]
         if not candidates:
             return self.store.transition(
                 task.id, TaskState.BLOCKED, blocker="no reachable executor"
@@ -261,7 +327,11 @@ class Runtime:
                 task.id, TaskState.AWAITING_RESULT, expected_lease=lease_id
             )
             result = parse_result(
-                record(transport.invoke(action_envelope(action, session, lease_id), session))
+                record(
+                    transport.invoke(
+                        action_envelope(action, session, lease_id, self.grid.clock), session
+                    )
+                )
             )
             if (
                 result.action_id != action.id

@@ -206,6 +206,8 @@ def parser() -> argparse.ArgumentParser:
     commands.add_parser("grid-proof")
     commands.add_parser("history")
     commands.add_parser("sources")
+    executive = commands.add_parser("executive")
+    executive.add_argument("--config", type=Path)
     setup = commands.add_parser("setup")
     setup.add_argument(
         "--section",
@@ -274,7 +276,54 @@ def main() -> int:
             )
         with Harness(args.state, args.workspace, args.manifest, template) as harness:
             transports = {harness.node_id: (harness.dispatcher, harness.session)}
-            if args.command in {"setup", "setup-provider"}:
+            if args.command == "executive":
+                executive = harness.runtime.executive
+                assert executive is not None
+                result: object = None
+                if args.config is not None:
+                    if args.config.stat().st_size > 32768:
+                        raise ValueError("bounded selected Executive command required")
+                    config = json.loads(args.config.read_text(encoding="utf-8"))
+                    operation = config.pop("operation")
+                    if operation == "worker":
+                        config["capabilities"] = [tuple(c) for c in config["capabilities"]]
+                        config["grants"] = tuple(config["grants"])
+                        result = executive.worker(**config, owner_authorized=True)
+                    elif operation == "propose":
+                        result = executive.propose(**config)
+                    elif operation == "decompose":
+                        result = executive.decompose(**config)
+                    elif operation == "draft_plan":
+                        result = executive.draft_plan(**config)
+                    elif operation == "propose_from_result":
+                        result = executive.propose_from_result(**config)
+                    elif operation == "accept":
+                        executive.accept(**config, owner_authorized=True)
+                    elif operation in {"pause", "resume", "cancel"}:
+                        executive.control(**config, operation=operation, owner_authorized=True)
+                    elif operation == "retry":
+                        executive.retry(**config, owner_authorized=True)
+                    elif operation == "review_task":
+                        result = executive.review_task(**config)
+                    elif operation == "confirm_task":
+                        executive.confirm_task(**config, owner_authorized=True)
+                    elif operation == "revoke_worker":
+                        executive.revoke_worker(**config, owner_authorized=True)
+                    elif operation == "replan":
+                        result = executive.replan(**config, owner_authorized=True)
+                    elif operation == "learn":
+                        result = executive.learn(**config, owner_authorized=True)
+                    elif operation == "reuse":
+                        result = executive.reuse(**config, owner_authorized=True)
+                    elif operation == "evaluate_workflow":
+                        result = executive.evaluate_workflow(**config, owner_authorized=True)
+                    elif operation == "rebuild_workflows":
+                        result = executive.rebuild_workflows(owner_authorized=True)
+                    else:
+                        raise ValueError("unsupported Executive operation")
+                executive.tick()
+                print_json({"result": result, "executive": executive.snapshot()})
+            elif args.command in {"setup", "setup-provider"}:
                 setup = harness.runtime.setup
                 assert setup is not None
                 if args.command == "setup-provider":

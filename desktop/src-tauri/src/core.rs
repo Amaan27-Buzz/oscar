@@ -22,6 +22,7 @@ pub fn now_ms() -> u64 {
 struct CoreSnapshot {
     presence: Option<Value>,
     setup: Option<Value>,
+    executive: Option<Value>,
     adaptive_views: Vec<Value>,
     tasks: Vec<TaskView>,
     capabilities: Vec<CapabilityView>,
@@ -175,6 +176,7 @@ impl CoreClient {
         Ok(CoreSnapshot {
             presence: value.get("presence").cloned(),
             setup: value.get("setup").cloned(),
+            executive: value.get("executive").cloned(),
             adaptive_views: value["adaptive_views"]
                 .as_array()
                 .cloned()
@@ -342,6 +344,7 @@ impl Bridge {
         let CoreSnapshot {
             presence,
             setup,
+            executive,
             adaptive_views,
             mut tasks,
             capabilities: caps,
@@ -412,6 +415,11 @@ impl Bridge {
         view.operating = operating;
         view.presence = presence;
         view.setup = setup;
+        view.executive = if self.hide_private.load(Ordering::Acquire) {
+            None
+        } else {
+            executive
+        };
         view.adaptive_views = if self.hide_private.load(Ordering::Acquire) {
             Vec::new()
         } else {
@@ -471,6 +479,7 @@ impl Bridge {
             view.link = "unavailable".into();
             view.presence = None;
             view.adaptive_views.clear();
+            view.executive = None;
             view.setup = None;
             view.capabilities.clear();
         }
@@ -638,6 +647,7 @@ impl Bridge {
             view.review = None;
             view.conversation = ConversationView::default();
             view.adaptive_views.clear();
+            view.executive = None;
             for task in &mut view.tasks {
                 task.response = None;
                 task.value = None;

@@ -9,6 +9,7 @@ from .contracts import Action, Capability, Result, new_id
 from .credentials import CredentialPool
 from .discovery import HTTPDiscovery
 from .event_archive import EventArchive
+from .executive import Executive
 from .grid import Grid, Node, NodeRole
 from .memory_fabric import MemoryFabric
 from .models import Mode, ModelRequest, ProviderError, RoutingPolicy
@@ -154,10 +155,14 @@ class Harness:
         self.runtime.world = self.world
         self.runtime.setup = SetupRuntime(self.runtime, self.pool)
         self.runtime.presence = PresenceRuntime(self.runtime)
+        self.executive = Executive(self.runtime, {self.node_id: (self.dispatcher, self.session)})
+        self.runtime.executive = self.executive
         self.store.close_callbacks.append(self.close_services)
         self.world.start()
+        self.executive.start()
 
     def close_services(self) -> None:
+        self.executive.close()
         self.world.close()
         self.archive.close()
 

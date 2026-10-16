@@ -88,6 +88,7 @@ fn companion_view(mut view: View) -> View {
         .map(str::to_owned);
     view.operating = None;
     view.setup = None;
+    view.executive = None;
     view.adaptive_views.clear();
     view
 }

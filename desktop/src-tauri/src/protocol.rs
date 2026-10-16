@@ -359,6 +359,7 @@ pub enum ThemeChoice {
 pub struct View {
     pub presence: Option<serde_json::Value>,
     pub setup: Option<serde_json::Value>,
+    pub executive: Option<serde_json::Value>,
     pub adaptive_views: Vec<serde_json::Value>,
     #[serde(default)]
     pub conversation: ConversationView,
