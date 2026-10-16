@@ -1,7 +1,15 @@
 # Group 2.5B — production OSCAR Mobile
 
-Status: **IMPLEMENTATION COMPLETE / OWNER REVIEW PENDING**.
-Owner visual and physical phone acceptance are pending. Gate C remains PARTIAL.
+Status: **UI/UX APPROVED BY OWNER / SOFTWARE CLOSURE VERIFIED — 2026-10-16**.
+The owner explicitly passed all 15 heroes, artwork, controls, navigation, motion,
+Preferences and the canonical Orb in the final-closure handoff. Engineering
+closure is tracked in [the current closure record](FINAL-CLOSURE.md). Real audio,
+biometric/PIN and OEM commissioning remain separate; Gate C remains PARTIAL.
+
+Fresh closure: **37 native PASS / 4 intentional SKIPS / 0 FAIL**, two additional
+expiry repeats, actual process replacement/recovery/cleanup, 28 JVM and 24 Python
+checks. Build/lint pass with zero errors and 11 warnings per app variant.
+Historical intermittent causes remain unconfirmed; see [the closure receipt](closure.json).
 
 **Integrated visual craft — 2026-10-16:** artwork now blends into the page through
 transparent paper derivatives across the screen edges and behind app bars;
@@ -190,7 +198,7 @@ remains enabled; fixture capture temporarily relaxes it only under opted-in
 instrumentation and restores it in `finally`. No owner account was paired, no
 owner signing prompt was approved, and no global phone settings were changed.
 
-Owner decisions: review visual fidelity and motion, approve any remaining
+Historical pre-approval owner decisions: review visual fidelity and motion, approve any remaining
 composition differences, and authorize merge only after review. Real audio,
 biometric/PIN, assistant-role and notification commissioning remains a separate
 acceptance boundary. No merge, release, later slice or cleanup was performed.

@@ -24,10 +24,11 @@ import androidx.activity.compose.BackHandler
 
 private val Paper = Color(0xFFF5F1E7)
 private val Ink = Color(0xFF1A1B18)
-@Composable fun OscarTheme(forceDark: Boolean = false, content: @Composable () -> Unit) {
+@Composable fun OscarTheme(preferDark: Boolean = false, content: @Composable () -> Unit) {
     val activity = androidx.activity.compose.LocalActivity.current
     val appearance = appearancePreference("theme", "system")
-    val dark = forceDark || appearance == "dark" || (appearance == "system" && isSystemInDarkTheme())
+    // Explicit choices win; System retains the approved immersive graphite compositions.
+    val dark = when (appearance) { "light" -> false; "dark" -> true; else -> preferDark || isSystemInDarkTheme() }
     SideEffect {
         val mask = android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS or android.view.WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS
         activity?.window?.insetsController?.setSystemBarsAppearance(if (dark) 0 else mask, mask)
@@ -100,7 +101,7 @@ private val Ink = Color(0xFF1A1B18)
         state.message?.takeIf { it.isNotBlank() }?.let { notices.showSnackbar(it, withDismissAction = true, duration = SnackbarDuration.Long) }
     }
     val send = { focus.clearFocus(); keyboard?.hide(); session.send(draft); Unit }
-    OscarTheme(forceDark = destination == Destination.ACTIVITY || voiceOpen || (destination == Destination.SETTINGS && settingsPage == "Awareness")) {
+    OscarTheme(preferDark = destination == Destination.ACTIVITY || voiceOpen || (destination == Destination.SETTINGS && settingsPage == "Awareness")) {
         val pageArtwork = when {
             voiceOpen -> null
             destination == Destination.OSCAR && conversationPage == "Today" -> R.drawable.illustration_today

@@ -12,7 +12,7 @@ Mobile and Desktop offer the same OSCAR Core capabilities with platform-specific
 
 The approved ImageGen/Figma baseline is implemented directly in `mobile/` for Group 2.5B. Earlier exploration and reference acceptance remain historical. Production Core, Grid, Keystore/signing, voice/notification and shared Expression are preserved. Native captures now use the owner-authorized Samsung review install because the owner stopped the emulator for laptop RAM. Owner visual approval and real voice/biometric commissioning remain distinct.
 
-Navigation and experience coverage: [Group 2.5B](ui/mobile/group25b/README.md). Fluid Compose motion is part of this presentation scope; it does not enable Sentry, Full Access, persistent Workers or Adaptive Interface Engine.
+**Owner decision — 2026-10-16:** Group 2.5B UI/UX is **APPROVED / PASS**, including all 15 heroes, integrated artwork, native controls, Preferences, navigation, motion and the canonical Orb. Engineering closure and real audio/biometric/OEM commissioning remain separate. Navigation, experience coverage and current evidence: [Group 2.5B](ui/mobile/group25b/README.md). Fluid Compose motion does not enable Sentry, Full Access, persistent Workers or Adaptive Interface Engine.
 
 ## Surface mode
 

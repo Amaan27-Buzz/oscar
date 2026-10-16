@@ -28,6 +28,10 @@ OSCAR is **one persistent multimodal personal intelligence**, not a collection o
 
 ## Independent operating dimensions
 
+**Mobile owner acceptance — 2026-10-16:** Group 2.5B UI/UX is **APPROVED / PASS**.
+The approved composition is preserved during [engineering closure](ui/mobile/group25b/FINAL-CLOSURE.md).
+Real audio, biometric/PIN, OEM commissioning and remote CI remain separate.
+
 | Domain | Choices | Meaning |
 |---|---|---|
 | **Access authority** | Ask / Secure / Full Access | Ask: consent before state changes. Secure: ordinary autonomous operation, protected/consequential action consent. **Full Access: genuine unrestricted owner-delegated autonomy over technically available capabilities, without OSCAR per-action prompts after explicit activation.** |

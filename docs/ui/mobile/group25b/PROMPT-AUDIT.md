@@ -1,5 +1,9 @@
 # Original Group 2.5B prompt audit — 2026-10-15
 
+**Current acceptance — 2026-10-16:** the owner subsequently **APPROVED UI/UX**.
+The dated audit below remains historical. See [final closure](FINAL-CLOSURE.md)
+for current engineering evidence and the separate physical/CI limitations.
+
 **Result: IMPLEMENTATION COMPLETE / OWNER REVIEW PENDING, with the explicit
 substitutions and capability/source limits below.** This is not a claim that
 every literal emulator requirement or physical capability has passed.

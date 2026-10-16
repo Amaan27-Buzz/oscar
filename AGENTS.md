@@ -1,5 +1,14 @@
 # AGENTS.md
 
+## Owner Group 2.5B final closure — 2026-10-16
+
+The owner explicitly APPROVED the Mobile UI/UX, including all 15 heroes, artwork,
+controls, Preferences, navigation, motion and the canonical Orb. Preserve this
+design. Finish theme/lifecycle investigation and verification on the existing
+branch and PR #6; commit/push for merge review. No merge or Slice 14. Physical
+audio/biometric/OEM acceptance and Gate C remain separate. See
+[final closure](docs/ui/mobile/group25b/FINAL-CLOSURE.md).
+
 ## Owner Group 2.5B production Android scope — 2026-10-14
 
 Implement the selected ImageGen/Figma Mobile visual language in `mobile/` on

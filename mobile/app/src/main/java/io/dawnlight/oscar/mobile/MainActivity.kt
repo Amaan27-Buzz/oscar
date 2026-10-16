@@ -20,6 +20,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         session = ViewModelProvider(this)[CoreSession::class.java]
         confirmation = OwnerConfirmation(this)
+        if (BuildConfig.DEBUG) lifecycle.addObserver(androidx.lifecycle.LifecycleEventObserver { _, event ->
+            android.util.Log.d("OscarLifecycle", "$event; changingConfigurations=$isChangingConfigurations; finishing=$isFinishing")
+        })
         setContent { OscarApp(session, confirmation) }
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {

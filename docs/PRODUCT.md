@@ -1,6 +1,6 @@
 # Product Vision
 
-**Current owner-approved direction:** [product direction](PRODUCT-DIRECTION.md), [future Adaptive Interface Engine](ADAPTIVE-INTERFACE.md), [canonical slices](SLICE-NUMBERING.md). Group 2.5A Desktop was provisionally accepted and merged 2026-10-14; Mobile Group 2.5B production implementation is authorized against the selected ImageGen/Figma baseline, with owner/device acceptance still pending.
+**Current owner-approved direction:** [product direction](PRODUCT-DIRECTION.md), [future Adaptive Interface Engine](ADAPTIVE-INTERFACE.md), [canonical slices](SLICE-NUMBERING.md). Group 2.5A Desktop was provisionally accepted and merged 2026-10-14; Mobile Group 2.5B UI/UX was explicitly approved on 2026-10-16. [Engineering closure](ui/mobile/group25b/FINAL-CLOSURE.md), real audio, biometric/PIN and OEM commissioning remain separate.
 
 ## Group 2.5 owner correction — 2026-10-14
 

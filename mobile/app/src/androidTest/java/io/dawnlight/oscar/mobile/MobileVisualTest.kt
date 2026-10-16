@@ -32,8 +32,9 @@ class MobileVisualTest {
     }
     private fun capture(name: String, tag: String? = null) = captureReview(compose, name, tag)
     private fun surface(dark: Boolean = false, content: @Composable () -> Unit) {
+        compose.runOnIdle { compose.activity.getSharedPreferences("appearance", android.content.Context.MODE_PRIVATE).edit().putString("theme", if (dark) "dark" else "light").commit() }
         compose.runOnIdle { compose.activity.setContent {
-            OscarTheme(forceDark = dark) {
+            OscarTheme {
                 androidx.compose.material3.Surface {
                     Column(Modifier.fillMaxSize().safeDrawingPadding().verticalScroll(rememberScrollState()).padding(24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                         Text("NATIVE REVIEW · disposable reference")

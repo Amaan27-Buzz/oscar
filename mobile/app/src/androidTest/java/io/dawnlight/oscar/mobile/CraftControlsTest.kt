@@ -72,6 +72,10 @@ class CraftControlsTest {
         compose.onNodeWithText("Awareness").performScrollTo().performClick()
         val layouts = mutableListOf<androidx.compose.ui.text.TextLayoutResult>()
         compose.onNodeWithText("Awareness is off").performSemanticsAction(androidx.compose.ui.semantics.SemanticsActions.GetTextLayoutResult) { it(layouts) }
+        assertTrue("Explicit Light keeps dark heading ink", layouts.single().layoutInput.style.color.luminance() < 0.5f)
+        compose.runOnIdle { compose.activity.getSharedPreferences("appearance", android.content.Context.MODE_PRIVATE).edit().putString("theme", "dark").commit() }
+        layouts.clear()
+        compose.onNodeWithText("Awareness is off").performSemanticsAction(androidx.compose.ui.semantics.SemanticsActions.GetTextLayoutResult) { it(layouts) }
         assertTrue("Dark canvas keeps light heading ink", layouts.single().layoutInput.style.color.luminance() > 0.5f)
         compose.onAllNodesWithTag("app-toolbar").assertCountEquals(1)
         compose.onNodeWithTag("primary-navigation").assertDoesNotExist()

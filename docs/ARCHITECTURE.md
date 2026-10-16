@@ -1,5 +1,11 @@
 # System Architecture
 
+**Mobile acceptance update — 2026-10-16:** Group 2.5B UI/UX is explicitly
+**APPROVED / PASS**. [Final closure](ui/mobile/group25b/FINAL-CLOSURE.md) records
+the theme correction and lifecycle investigation. This supersedes earlier
+visual-review-pending statements; physical commissioning, remote CI and Gate C
+remain separate.
+
 ## Group 2.5 reconciliation — 2026-10-14
 
 Core owns one continuous multimodal personal intelligence and delegates subordinate responsibilities to Workers/specialists. The approved tiny Companion is expressive presence; the separate Workspace centers Conversation with contextual operations, Automations, operational Activity, Devices and Preferences. [The interaction and authority decision](decisions/ADR-DESKTOP-PERSONAL-INTELLIGENCE.md) records implementation ownership, canonical history composition and the corrected access model.

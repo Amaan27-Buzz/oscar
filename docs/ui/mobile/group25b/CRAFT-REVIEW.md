@@ -1,5 +1,11 @@
 # Integrated visual craft review — 2026-10-16
 
+**Subsequent owner decision — 2026-10-16:** UI/UX **APPROVED / PASS**, including
+this integrated artwork, all 15 heroes, Preferences and motion. The pending-review
+statements and test receipts below describe the earlier capture run. Current
+theme/lifecycle verification is in [FINAL-CLOSURE.md](FINAL-CLOSURE.md); this
+historical receipt and its failed attempts are preserved.
+
 The owner accepted the anchored navigation and motion, then requested a coherent
 OSCAR identity across the actual app. The owner then clarified that transparency
 alone was insufficient: artwork must bleed through the page edges and behind

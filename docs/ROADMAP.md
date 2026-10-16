@@ -378,6 +378,8 @@ Previous 12.1–12.6 experiments and captures are preserved as historical implem
 
 ## Slice 13 — OSCAR Mobile experience and visual system — Group 2.5B implementation
 
+**2026-10-16 owner decision:** Group 2.5B UI/UX **APPROVED / PASS**. [Engineering closure](ui/mobile/group25b/FINAL-CLOSURE.md) preserves the approved design; this does not pass physical commissioning or Gate C, authorize merge, or begin Slice 14.
+
 The native Core-connected foundation is integrated into main. Owner authorization on 2026-10-14 selects the Codex ImageGen/Figma artwork for production Compose implementation of all 15 hero experiences and coherent broader information architecture. The Gemini Argon external `oscar-ui-test` experiment is rejected and must not be imported.
 
 Use warm paper/graphite, editorial typography, original illustration-only assets, accessible tactile controls and three primary destinations (Conversation / Automations / Activity). Devices and Preferences remain one tap away. Preserve CoreSession, signed exact-action reviews, Grid, native permissions/voice and shared Expression. Secure/Full Access, Sentry, persistent automation execution and unavailable provider briefs stay unavailable.

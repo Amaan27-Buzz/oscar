@@ -48,6 +48,56 @@ class MobileCompletionTest {
         } finally { connection.disconnect() }
     }
     private fun capture(name: String, tag: String? = null) = captureReview(compose, name, tag)
+    @Test fun lifecycleAndCancellationInvalidateApprovalWithoutReplayingConsent() {
+        val arguments = androidx.test.platform.app.InstrumentationRegistry.getArguments()
+        val origin = arguments.getString("group02_origin")
+        org.junit.Assume.assumeTrue("Explicit disposable Core fixture", origin != null)
+        require(origin!!.startsWith("http://127.0.0.1:"))
+        val fixture = org.json.JSONObject().put("url", origin).put("node_id", "reference-mobile-software")
+            .put("session_id", arguments.getString("group02_session")).put("token", arguments.getString("group02_token"))
+        val session = androidx.lifecycle.ViewModelProvider(compose.activity)[CoreSession::class.java]
+        compose.runOnIdle { session.connect(fixture) }
+        compose.waitUntil(10_000) { session.state.value.link == Link.CONNECTED }
+        compose.runOnIdle { assertTrue(session.send("6 + 7")) }
+        compose.waitUntil(10_000) { session.state.value.interactions.isNotEmpty() && !session.state.value.busy }
+        val id = session.state.value.interactions.last().taskId!!
+        val task = session.state.value.snapshot!!.tasks.single { it.id == id }
+        fun review(): Approval {
+            compose.runOnIdle { session.review(task, "approve") }
+            compose.waitUntil(10_000) { session.state.value.approval != null && !session.state.value.busy }
+            return session.state.value.approval!!
+        }
+        var approval = review()
+        var epoch = session.state.value.epoch
+        compose.activityRule.scenario.moveToState(androidx.lifecycle.Lifecycle.State.CREATED)
+        assertTrue(session.state.value.epoch > epoch)
+        assertNull(session.state.value.approval)
+        assertNull(session.state.value.snapshot)
+        compose.activityRule.scenario.moveToState(androidx.lifecycle.Lifecycle.State.RESUMED)
+        compose.waitUntil(10_000) { session.state.value.link == Link.CONNECTED }
+        compose.runOnIdle { session.complete(approval, epoch) }
+        assertFalse(session.state.value.busy)
+        assertNull(session.state.value.approval)
+        val fresh = review()
+        assertNotEquals(approval.id, fresh.id)
+        approval = fresh; epoch = session.state.value.epoch
+        compose.activityRule.scenario.recreate()
+        compose.waitUntil(10_000) { session.state.value.link == Link.CONNECTED }
+        compose.runOnIdle { session.complete(approval, epoch) }
+        assertNull(session.state.value.approval)
+        assertFalse(session.state.value.busy)
+        assertSame(session, androidx.lifecycle.ViewModelProvider(compose.activity)[CoreSession::class.java])
+        approval = review(); epoch = session.state.value.epoch
+        compose.runOnIdle { session.cancelRequest(); session.complete(approval, epoch) }
+        assertEquals(Link.DEGRADED, session.state.value.link)
+        assertNull(session.state.value.approval)
+        compose.runOnIdle { session.refreshNow() }
+        compose.waitUntil(10_000) { session.state.value.link == Link.CONNECTED }
+        assertNull(session.state.value.approval)
+        assertEquals("planned", parseTask(CoreClient(fixture).call("inspect", org.json.JSONObject().put("task_id", id))).state)
+        review()
+        compose.onNodeWithText("Confirm securely").assertIsNotEnabled()
+    }
     @Test fun voiceInvocationCancellationPreservesTextWithoutCapture() {
         compose.onNodeWithTag("interactionInput").performTextInput("Synthetic voice continuation")
         androidx.test.espresso.Espresso.closeSoftKeyboard()

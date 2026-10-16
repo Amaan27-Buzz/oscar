@@ -100,7 +100,7 @@ class NavigationMotionTest {
             CoreTask("active-motion", "Synthetic active request", "planned", "Core", "online", 1, emptyList(), emptyList(), null, null),
             CoreTask("finished-motion", "Synthetic finished request", "verified", "Core", "online", 1, emptyList(), listOf("fixture"), "5", null))
         compose.runOnIdle { compose.activity.setContent {
-            OscarTheme(forceDark = true) {
+            OscarTheme(preferDark = true) {
                 CompositionLocalProvider(LocalReducedMotion provides reduced.value) {
                     Surface { Column(Modifier.fillMaxSize().padding(24.dp)) {
                         ActivityScreen(MobileState(link = Link.CONNECTED, snapshot = CoreSnapshot(tasks, emptyList(), System.currentTimeMillis())), {}, { _, _ -> })
@@ -115,8 +115,8 @@ class NavigationMotionTest {
             compose.onNodeWithTag("activity-filter-Finished").performClick()
             compose.mainClock.advanceTimeBy(80)
             compose.onNodeWithTag("activity-filter-Finished").assertIsSelected()
-            compose.onNodeWithTag("task-description-active-motion").assertDoesNotExist()
-            compose.onNodeWithTag("task-description-finished-motion").assertExists()
+            compose.onNodeWithTag("task-description-${tasks[0].id}").assertDoesNotExist()
+            compose.onNodeWithTag("task-description-${tasks[1].id}").assertExists()
             val end = compose.onNodeWithTag("activity-filter-Finished").fetchSemanticsNode().boundsInRoot.center.x
             assertTrue("Filter marker has intermediate frames", x() > start && x() < end)
             captureReview(compose, "activity-filter-travel")
@@ -127,7 +127,7 @@ class NavigationMotionTest {
             compose.onNodeWithTag("activity-filter-Active").performClick()
             compose.mainClock.advanceTimeByFrame()
             assertEquals(start, x(), 1f)
-            compose.onNodeWithTag("task-description-finished-motion").assertDoesNotExist()
+            compose.onNodeWithTag("task-description-${tasks[1].id}").assertDoesNotExist()
         } finally { compose.mainClock.autoAdvance = true }
     }
 }
