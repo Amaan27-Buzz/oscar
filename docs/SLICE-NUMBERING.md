@@ -1,36 +1,50 @@
-# OSCAR Slice Numbering — canonical plan from 2026-10-09
+# OSCAR Slice Numbering — canonical plan (updated 2026-10-18)
 
-**Status:** CURRENT NUMBERING AUTHORITY.
+**CURRENT NUMBERING AUTHORITY.** There are **21 slices, 00–20**, with exactly one top-level ID each. The owner reorganized the **delivery groups and execution order**, not the existing slice identifiers. New **D1–D4** and **C1–C4** are checklist stages, **not numbered slices**. Do not revive old 09R/10R/13A/13B names in current plans; retain their historical provenance.
 
-The owner rejected mixing numbered slices with 09R, 10R, 13A/13B and prematurely generated design explorations. **One sequential set of top-level slice numbers** is now authoritative. Preserve historical PRs, evidence, commit messages, branch names and captured assets verbatim; do not rewrite history or rename a working PR merely to match new identifiers.
+Read [active delivery plan](DELIVERY-PLAN.md), [checked status](CURRENT-STATUS.md), [roadmap](ROADMAP.md) and [build gates](BUILD-GATES.md).
 
 ## Canonical sequence
 
-| Slice | Focus | Current state |
-|---|---|---|
-| 00 | Repository and architecture | Accepted |
+| Slice | Focus | Current accepted scope / outstanding |
+| --- | --- | --- |
+| 00 | Repository / architecture | Accepted |
 | 01 | Core Loop | Accepted |
-| 02 | Decision/Epistemic Controller | Accepted |
-| 03 | Native Transport, Capability Catalog, Grid | Accepted |
-| 04 | Model Router | Gate A accepted scope |
-| 05 | Machine Worker and continuation | Gate B accepted |
-| 06 | Memory Fabric, policy and federation | Gate B accepted |
-| 07 | Edge + reflexes | Software simulated foundation accepted; physical deferred |
-| 08 | Voice Core / Identity / Persona | Reference software accepted; physical deferred |
-| 09 | OSCAR Mobile foundation | Software merged; device acceptance deferred |
-| 10 | OSCAR Desktop runtime foundation | Integrated software foundation; physical acceptance deferred; old PR #16 archival |
-| **11** | **OSCAR Expression / Character System** | Shared renderer foundation integrated into reference apps; final character/device acceptance deferred |
-| **12** | OSCAR Desktop visual/interaction design | **Group 2.5A interim owner pass; merged PR #5**; final owner/physical acceptance deferred |
-| **13** | OSCAR Mobile visual/interaction design | **Group 2.5B UI/UX owner APPROVED; PR #6 merged** at `257349f`; physical/audio/biometric/OEM acceptance remains deferred |
-| 14 | World Model, Perception, Sentry, optional Journal | Normal Core lifecycle locally verified; live/owner acceptance pending |
-| 15 | Commissioning and setup | Software composition locally verified; owner accounts/audio/devices pending |
-| 16 | Full cross-device Avatar/Presence + typed adaptive presentation | Shared software/native builds verified; opt-in overlay device acceptance and widgets pending |
-| 17 | Executive Planner / durable Workers / learning / adaptive UI composition | Bounded reviewed runtime locally verified; live/owner/native authoring acceptance pending |
-| 18 | Physical expansion and Edge acceptance | Planned |
-| 19 | Reliability / security / truthfulness / adaptive UI hardening | Planned |
-| **20** | **Unified Alpha + adaptive interaction validation** | **Planned; cannot PASS until every mandatory acceptance is genuine** |
+| 02 | Epistemic Controller | Accepted |
+| 03 | Native Transport/Catalog/Grid | Local accepted; Internet remote Group 4 |
+| 04 | Model Router | Gate A accepted |
+| 05 | Windows machine Worker/continuation | Gate B local accepted; broad remote computer use Group 5 |
+| 06 | Memory Fabric/Policy/federation | Gate B local accepted; cloud/provider work pending |
+| 07 | Edge/reflex | Simulated software accepted; real hardware Group 8 |
+| 08 | Voice Core/Identity/Persona | Reference accepted; owner real audio Group 5 |
+| 09 | Mobile | Software merged; real owner phone Group 5 |
+| 10 | Desktop | Software merged; real remote PC Group 5 |
+| 11 | Expression/Character | Shared software integrated; device review outstanding |
+| 12 | Desktop design | Group 2.5A PR #5 merged; provisional approval |
+| 13 | Mobile design | Group 2.5B PR #6 merged; owner-approved UI/UX |
+| 14 | World Model/Perception/Sentry | Single Group 3 PR #7 software merged; live sources pending |
+| 15 | Setup/commissioning | Single Group 3 software merged; owner remote setup pending |
+| 16 | Presence/typed adaptive UI | Single Group 3 software merged; real device/widgets pending |
+| 17 | Executive/Workers/learning | Single Group 3 software merged; native controls/live acceptance pending |
+| 18 | Physical expansion/Edge | **DEFERRED to Group 8** |
+| 19 | Reliability/security/truth/AIE | Applied throughout Groups 4–8, NOT PASS |
+| 20 | Unified Alpha | Formal Gate E NOT PASSED; scoped Cloud/Desktop/Phone alpha in Group 6 |
 
-**Total:** 00–20 inclusive, 21 canonical top-level slices. Future work uses `11.1`, `11.2`, etc. for **stages inside a slice**, not new numbered slices. Historical 09R/10R and 13A/B designations are **aliases**, not additional slices.
+Gate A 01–04 and Gate B 05–06: PASS for documented scope. Gate C 07–10: PARTIAL. Design 11–13: software/incremental owner approval. Gate D 14–17: **PARTIAL although Group 3 PR #7 is merged with green CI**. Gate E 18–20: NOT PASSED.
+
+## Updated delivery groups
+
+| Group | Scope | Sequence |
+| --- | --- | --- |
+| Earlier foundation / Groups 1–2 / Group 2.5A/B | Slices 00–13 software/UI | Integrated per evidence |
+| **Group 3** | **One batch of Slices 14–17** | MERGED; Gate D PARTIAL |
+| **Group 4** | D1 Cloud persistent Core; D2 authenticated remote Grid | **NEXT** |
+| **Group 5** | D3/D4 real Desktop/Android and commissioning; C1 computer use; C2 MCP/plugins; C3 Secure/Full Access; C4 voice/Workers/Sentry/Chief of Staff/AIE | After Cloud/Grid |
+| **Group 6** | Real scoped Cloud–Desktop–Phone operational alpha | Does not mean full Gate E PASS |
+| **Group 7** | Home-server laptop as future local/hybrid node | When hardware available |
+| **Group 8** | Physical ESP32/Pico Slice 18 and remaining Slice 19/20 acceptance | After operational alpha |
+
+A currently unfinished task from Slice 05–17 remains part of its canonical slice even if its **deployment/acceptance** is scheduled in Groups 4–6. Earlier historical naming and evidence retain original meaning.
 
 ## Historical alias map
 
@@ -64,6 +78,7 @@ Preserve raw image paths such as `docs/ui/desktop/explorations/10R.1/`, screensh
 
 Early design/prototype work may occur despite deferred Gate C physical acceptance by prior owner decision. This does not silently turn Gate C into PASS.
 
+
 ## Owner quality bar for future model instructions
 
 Use the model and thinking effort appropriate to the actual work; the owner has used **GPT-6.1 Sol at Medium** for focused Group 2.5 engineering, alongside separate image-design and Kotlin/Compose experiments. No single model/effort setting is a canonical product requirement. Prompts must ask for careful design and inspected native results rather than rushing superficial alternatives or optimizing for screenshot count.
@@ -78,19 +93,11 @@ Use the model and thinking effort appropriate to the actual work; the owner has 
 8. Use only legitimate free/open design references where practical; do not copy third-party art or ship paid animation dependencies by accident.
 9. No unapproved backend/Core/security/permission changes to make presentation easier. Stage work for visual owner review before production integration.
 
-## Current workflow and Git hygiene — 2026-10-14
 
-The consolidated software foundations and Desktop Group 2.5A [PR #5](https://github.com/Amaan27-Buzz/oscar/pull/5) are on `main`. Old branch names, PRs, screenshots and earlier acceptance statements are retained **as history**, never current operating instructions. The owner has accepted the **neumorphic Desktop direction provisionally**; final cross-device UI and physical/production acceptance remain open.
+## Active working rule
 
-Group 2.5B implements the selected ImageGen/Figma 15 heroes directly in production Compose. The separate Gemini Argon prototype is rejected. Existing SDK/cache and the owner-authorized isolated Samsung review install provide native verification; the emulator is stopped at the owner's RAM request. Owner visual approval remains pending, and Sentry, persistent Workers and Secure/Full Access remain unavailable. See [the implementation ledger](ui/mobile/group25b/README.md).
-
-AIE is **future** work integrated into Slices 16/17/19/20, not an extra canonical numbered slice. See [product direction](PRODUCT-DIRECTION.md) and [AIE plan](ADAPTIVE-INTERFACE.md).
+The old 2026-10-14 "Mobile approval pending, Group 3 not started" workflow notes were superseded by the 2026-10-17 merger and 2026-10-18 owner sequencing decision. The latest authoritative tasks are [current status](CURRENT-STATUS.md) and [delivery plan](DELIVERY-PLAN.md). Preserve `assets/brand/oscar-orb.svg`, approved visual direction and all historical receipts.
 
 ## Maintainer verification
 
-The lightweight repository test `tests/test_canonical_slice_docs.py`
-guards unique current roadmap headings, character/UI dependencies and key
-entrypoint links. Dated past-acceptance records are **not** globally
-search-and-replaced because their original slice numbers and status
-claims document the historical event. Future wording must use the new
-numbering and explicitly mark any historical snapshot.
+`tests/test_canonical_slice_docs.py` verifies one roadmap heading for each 00–20, UI dependencies and canonical entrypoint references. Do not rewrite dated evidence or Git history.
