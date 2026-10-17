@@ -1,6 +1,8 @@
 # Orchestration, Learning, Skills, Workers and Protocols
 
-## Group 3 software — 2026-10-16
+**Current delivery (2026-10-18):** [checked status](CURRENT-STATUS.md) and [delivery groups](DELIVERY-PLAN.md). The existing local Worker/Executive is **software integrated**, but remote Workers, native schedule authoring, real provider-connected automation and Secure/Full Access are not accepted. Group 5 completes them after Group 4 remote Grid.
+
+## Group 3 software — 2026-10-16 (PR #7 merged 2026-10-17)
 
 The [Executive runtime](EXECUTIVE-RUNTIME.md) now supplies reviewed commitments,
 typed/model-assisted plan candidates, scoped Worker assignment/reservations,
@@ -12,11 +14,11 @@ events remain distinct from current state. Native surfaces expose readback;
 native activation/editing controls remain unavailable. This supersedes the dated
 future-integration wording below only for this implemented bounded scope.
 
-## Group 2.5 owner correction — 2026-10-14
+## Group 2.5 owner correction — 2026-10-14 (historical planning context)
 
 Conversation is the one owner interaction point. Controller, Memory Fabric, Executive, Durable Runtime and Grid retain their established ownership. Tools, Skills, Routines, Workers and Protocols remain different internal concepts; Automations offers concise responsibility/lifecycle inspection instead of a second agent framework.
 
-Future automation records must link trigger/schedule, responsibility, Worker/Protocol, task, authority grant/epoch, checkpoint and verification evidence. Creation, pause/resume, changes and removal require real Core commands and readback. Existing exact-action execution works; persistent responsibility management and the full Executive remain future integrations. Access mode, Worker autonomy, awareness and retention must travel as distinct contracts.
+Future automation records must link trigger/schedule, responsibility, Worker/Protocol, task, authority grant/epoch, checkpoint and verification evidence. Creation, pause/resume, changes and removal require real Core commands and readback. Existing exact-action execution plus Group 3 **bounded durable Executive planning, Worker scopes/schedules and recovery** are integrated; native responsibility creation/editing, live contextual integrations and generalized autonomous lifecycle remain future work. Access mode, Worker autonomy, awareness and retention must travel as distinct contracts.
 
 See [the interaction and authority decision](decisions/ADR-DESKTOP-PERSONAL-INTELLIGENCE.md) for ownership, implemented boundaries and required integrations. Earlier dated checkpoints remain historical.
 
