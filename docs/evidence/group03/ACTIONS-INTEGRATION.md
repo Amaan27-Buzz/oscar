@@ -52,6 +52,7 @@ cancelled or skipped job is never recorded as a pass.
 | Historical PR/run links under the retired original repository returned 404 | Documentation provenance | Retain the original URLs verbatim as labeled historical identifiers; do not replace them with unrelated current run IDs or claim they are live evidence. |
 | Local preview URL was checked without a local development server | Documentation example | Show the local address as a command/example and explicitly require starting its server. |
 | Google Little Signals research URL had invalid TLS hostname | External reference | Use the authoritative `experiments.withgoogle.com/little-signals` page; HTTP 200 verified without disabling TLS validation. |
+| Emulated Expression atlas capture timed out in AndroidX's two-second frame-commit wait | Instrumentation readiness / runner environment | Compile APKs before emulator startup, require the fixture window to have focus before capture, retain all rendering/contract assertions and upload instrumentation reports. Logs do not establish a production renderer defect; the actual rerun must verify the correction. |
 
 Local verification of the initial corrections: three Group 3 composition/crash
 tests passed; the simulated-day test also retained all 25 occurrences at four
@@ -60,6 +61,9 @@ repository/secret checks passed.
 The same Lychee v0.24.2 version as CI checked all affected documents: **76 links,
 zero errors**. Its isolated Windows binary was checked against the release asset
 SHA-256; no runtime dependency or host installation was introduced.
+The instrumentation readiness correction also passed local Android JVM tests,
+APK/AndroidTest assembly and lint; the application APK and canonical Orb hashes
+remain identical. Actual emulator success still requires the hosted rerun.
 
 No production Core, native UI/artwork, authorization, replay/expiry checks,
 verification or idempotency behavior changed in these corrections. Earlier
