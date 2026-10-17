@@ -1,624 +1,111 @@
-# Roadmap
+# OSCAR — Canonical Roadmap
 
-This roadmap is slice-based. Each slice must leave OSCAR coherent/testable and update affected canonical docs in the same change.
+**Current roadmap — 2026-10-18.** Exactly 21 top-level slices (00–20), preserved for historical compatibility. **Groups 4–8 now determine execution order**, not the old numerical "physical hardware next" sequence. Read [active delivery plan](DELIVERY-PLAN.md), [checked capability status](CURRENT-STATUS.md), [canonical numbering](SLICE-NUMBERING.md) and [build gates](BUILD-GATES.md). Historic detailed slices/PR instructions remain available in Git history and dated evidence, not active here.
 
-All implementation follows `ENGINEERING.md` and `docs/EPISTEMIC-INTEGRITY.md`.
-
-Related contracts:
-
-- `docs/BUILD-GATES.md`
-- `docs/PRODUCT.md`
-- `docs/CHIEF-OF-STAFF.md`
-- `docs/ARCHITECTURE.md`
-- `docs/MEMORY.md`
-- `docs/NATIVE-INFRASTRUCTURE.md`
-- `docs/CONNECTION-GRID.md`
-- `docs/MODEL-ROUTING.md`
-- `docs/SEARCH-FRESHNESS.md`
-- `docs/VOICE-SENTRY.md`
-- `docs/PERSONA.md`
-- `docs/RUNTIME-FOUNDATIONS.md`
+**Truth:** software integrated ≠ owner/device verified ≠ remote deployed. Gate A/B scoped PASS, Gate C/D PARTIAL, Gate E NOT PASSED.
 
 ## Development principle
 
-Build OSCAR's nervous system first, finish each planned gate end-to-end, then attach the next embodiment.
+One OSCAR identity and continuous relationship → Controller/Personal Policy → canonical Event Archive and Memory Fabric → authorized Grid and Worker/Executive → evidence and independent verification → native Desktop and Android Presence. Perception ≠ retention ≠ action. No fake success; no alternative Core.
 
-```text
-objective / event
-→ current context + Controller
-→ memory/live retrieval/capability/model decision
-→ permission + Personal Policy
-→ execute
-→ receive result
-→ collect evidence
-→ verify
-→ update World Model / Memory Fabric / commitments
-→ report only what evidence supports
-```
+## Slice 00 — Repository / architecture foundation
 
-A partial gate is not skipped merely because it is demoable. Mandatory planned work is completed, verified and integrated before the next Club begins unless the owner explicitly changes scope.
+**SOFTWARE ACCEPTED.** Product, security, evidence and modular runtime contracts.
 
-Early development may run on a development PC for convenience. The PC is never OSCAR's permanent host.
+## Slice 01 — OSCAR Core Loop
 
-## Status legend
+**SOFTWARE ACCEPTED / Gate A.** Objective → bounded action → result → independent verification.
 
-- ✅ accepted/verified for stated scope
-- 🚧 implemented foundation, broader slice still incomplete
-- ⏭️ current next work
-- ◻️ planned
+## Slice 02 — OSCAR Decision / Epistemic Controller
 
-## Slice 00 — Repository / architecture foundation ✅
+**SOFTWARE ACCEPTED / Gate A.** Deterministic epistemic routing, evidence and freshness.
 
-Established product/architecture/engineering/design rules, Epistemic Integrity, World Model/Perception direction, Personal Policy, Workers/Protocols, Durable Execution Runtime, Capability Catalog, Action Ledger, Artifact Model, native transport/model-routing direction, Connection Grid, Persona and build gates.
+## Slice 03 — Native Transport + Capability Catalog + Connection Grid foundation
 
-## Slice 01 — OSCAR Core Loop ✅
+**LOCAL SOFTWARE ACCEPTED / Gate A.** TLS-authenticated Internet transport and separate hosts are **Group 4 D2**, not yet verified.
 
-Verified evidence-backed objective → action → result → independent verification loop. Fake executor success cannot become verified completion.
+## Slice 04 — Native Model Router
 
-See [Club A checkpoint](CLUB-A-CHECKPOINT.md).
+**SOFTWARE ACCEPTED / Gate A.** Model/provider selection and fallback, not proof of hosted production models.
 
-## Slice 02 — OSCAR Decision / Epistemic Controller ✅
+## Slice 05 — Real machine Worker + remote continuation
 
-Verified typed deterministic/epistemic routing for known/world/recall/verify/reason/reported/specialist/worker/unknown paths, with conservative handling of missing capability and freshness-sensitive retrieval.
+**LOCAL-ALPHA SOFTWARE ACCEPTED / Gate B.** Files/Git, PowerShell, UIA, isolated browser and durable continuation verified within bounded scope; broad computer use and remote Worker **Group 5 C1**.
 
-Controller is now also the architectural owner of Memory Preflight/retrieval escalation requirements defined in [MEMORY.md](MEMORY.md); the production Memory Fabric implementation is Slice 06 work.
+## Slice 06 — OSCAR Memory Fabric + Personal Policy + live context
 
-## Slice 03 — Native Transport + Capability Catalog + Connection Grid foundation ✅
+**LOCAL-ALPHA SOFTWARE ACCEPTED / Gate B.** SQLite WAL/FTS5 canonical archive, Qdrant/Graphiti/Neo4j derived indexes, personal policy and accepted GitHub OAuth/federation. Hosted memory and broad live providers **Groups 4–5**.
 
-Slice 03 is accepted and complete for its planned reference foundation. Public deployment remains later deployment scope.
+## Slice 07 — OSCAR Edge + reflexes
 
-Verified behavior includes scoped pairing/auth, capability advertisement/search, replay protection, correlation, cancellation, progress, heartbeats, durable leases, disconnect/expiry/reclaim and explicit availability states.
+**SIMULATED SOFTWARE ACCEPTED / physical DEFERRED.** No real ESP32/Pico GPIO/UART/watchdog/E-stop evidence. Resume in **Group 8 / Slice 18**.
 
-Later deployment work still includes public TLS/outbound rendezvous, independent network-node stores and real OSCAR Mobile/Desktop/Edge deployment.
+## Slice 08 — Voice Core + Voice Identity + Voice Match/Map + Persona runtime
 
-## Slice 04 — Native Model Router + cloud intelligence ✅/🚧
+**REFERENCE SOFTWARE ACCEPTED / owner audio PARTIAL.** Real Android/Windows voice wake, STT/TTS, AEC/barge-in and Match/Map **Group 5 C4**.
 
-**Gate A accepted for the current foundation.**
+## Slice 09 — OSCAR Mobile + communication + Connection Grid owner controls
 
-Implemented/verified scope includes:
+**SOFTWARE MERGED / physical device PARTIAL.** Native Compose and scoped owner control; hosted-Core/phone pairing **Group 5 D3/D4**.
 
-- provider/model/credential registry and multi-key pools;
-- account-product/shared-quota semantics;
-- Auto/Fast/Balanced/Heavy Duty/Free First/Cheap/Local/Private/Manual/Specialist modes;
-- bounded fallback and real provider evidence;
-- dynamic/fresh inventory rather than stale model seeds;
-- Tavily behind a replaceable search-provider boundary;
-- source/time/provenance-qualified current search;
-- UNKNOWN rather than stale model-prior fabrication.
+## Slice 10 — OSCAR Desktop runtime foundation
 
-**Gate A — PASS.**
+**SOFTWARE MERGED / everyday remote use PARTIAL.** Tauri/Rust/React Companion/Workspace; real installed remote Worker and broad native capability acceptance **Group 5**.
 
-## Slice 05 — Real machine Worker + remote continuation ✅
+## Slice 11 — OSCAR Expression / Character System
 
-**COMPLETE for Windows local-alpha acceptance in this candidate.** Typed PowerShell, registered Notepad/UIA, browser fixture/public-page work and separate owner-control continuation have now been exercised. See [completion ledger](GATE-B-COMPLETION.md). Trusted-host execution is not a sandbox; independent network stores, phone/power and hostile-host isolation remain unverified.
+**SHARED SOFTWARE INTEGRATED, final character/device review OPEN.** Keep canonical Orb immutable and state truthful.
 
-Already verified in the local Windows pass:
+## Slice 12 — OSCAR Desktop experience and visual system
 
-- reparse-aware filesystem operations;
-- native Job Object process-tree control;
-- Git work;
-- useful Codex bug repair independently tested;
-- cancellation;
-- coordinator/Worker OS-process restart and recovery;
-- no duplicate accepted mutation on lost-result recovery;
-- ambiguous post-mutation Worker loss blocks replay;
-- explicit trusted-host boundary rather than fake sandbox claims.
+**Group 2.5A [PR #5](https://github.com/Amaan27-Buzz/oscar/pull/5) MERGED, provisional owner visual PASS.** Full physical/use acceptance open.
 
-### Slice 05 acceptance contract — exercised for stated local scope
+## Slice 13 — OSCAR Mobile experience and visual system
 
-#### 05A — Typed terminal / PowerShell
+**Group 2.5B [PR #6](https://github.com/Amaan27-Buzz/oscar/pull/6) MERGED, owner UI/UX APPROVED.** Real phone/OEM/voice/biometric acceptance pending.
 
-- discover legitimate installed PowerShell executable;
-- expose as typed/allowlisted terminal capability;
-- bounded harmless real execution;
-- cwd/environment/output/timeout/cancel verification;
-- no OSCAR provider credentials inherited.
+## Slice 14 — World Model + Perception Fabric + Sentry + optional Journal
 
-#### 05B — Installed application catalog
+**Group 3 [PR #7](https://github.com/Amaan27-Buzz/oscar/pull/7) SOFTWARE INTEGRATED, Gate D PARTIAL.** Local authorized perception and Sentry state/recovery. Live external environmental source and owner capture acceptance **Group 5 C4**.
 
-- discover real installed apps from legitimate Windows sources;
-- stable app IDs and provenance;
-- launch/availability metadata;
-- do not infer capabilities merely from executable presence;
-- real harmless app acceptance such as Notepad if present.
+## Slice 15 — Commissioning / setup
 
-#### 05C — Windows computer use
+**Group 3 SOFTWARE INTEGRATED, Gate D PARTIAL.** Trusted-local enrollment, Vault, Persona, policy and logical Voice composition. Hosted remote pairing, actual accounts/owner hardware **Groups 4–5 D2–D4**.
 
-- structured Windows UI Automation first;
-- bounded top-level window/element inspection;
-- focus/read/invoke/set-value where legitimate;
-- keyboard/mouse fallback only when structured automation is unavailable;
-- independent UI state verification;
-- no polished Slice 10 UI work yet.
+## Slice 16 — Full Avatar / Presence integration
 
-#### 05D — Typed browser runtime
+**Group 3 SOFTWARE INTEGRATED, Gate D PARTIAL.** Shared leased Presence, typed AIE/native presentation and guarded optional Android overlay. Real multi-device/OEM/widgets/accessible AIE **Group 5**.
 
-- isolated browser context;
-- navigate/inspect URL/title/DOM/text;
-- click/fill/submit/wait/screenshot/close;
-- cancellation/timeouts/output bounds;
-- deterministic local-fixture acceptance;
-- bounded public-page acceptance;
-- independent post-action DOM/state verification;
-- browser capability stays distinct from OSCAR Search.
+## Slice 17 — Executive Planner + durable Workers + learning
 
-#### 05E — Owner-control / long-running continuation
+**Group 3 SOFTWARE INTEGRATED, Gate D PARTIAL.** Bounded reviewed DAGs, persistent scheduling, scopes, idempotent recovery and typed Worker/task views. Remote Workers, native creation/editing, live providers and evaluated learning **Group 5**.
 
-Using existing Grid contracts and a separate control process:
+## Slice 18 — Physical/device expansion + specialist engineering
 
-```text
-start bounded long-running task
-→ control client observes task/progress/node state
-→ control client disconnects
-→ permitted Worker continues
-→ control client/coordinator reconnects
-→ same task recovered
-→ pause/resume where genuinely supported or cancel
-→ no duplicate execution
-→ independently verified final state
-```
+**DEFERRED TO GROUP 8.** ESP32/Pico physical/safety acceptance and optional additional devices when available. **Not a prerequisite for narrower Group 6 operational alpha**, but still required for unamended full physical Gate C/E claims.
 
-This proves OSCAR is conceptually independent of the computer executing the task.
+## Slice 19 — Reliability/security/truthfulness hardening
 
-#### 05F — Power-control contract
+**IN PROGRESS THROUGHOUT GROUPS 4–8; NOT PASSED.** TLS/secret/revocation/remote privacy for Group 4; OS controls, Full Access, plugin isolation, voice and AIE for Group 5; recovery/soak for Group 6; local/cloud migration and physical safety for Groups 7–8. Internet-facing hardening cannot wait until the end.
 
-Sleep/shutdown/restart may be modeled only if real OS capability exists. These are high-risk and require explicit owner confirmation. Do not shut down the development machine merely to satisfy automated Gate B acceptance.
+## Slice 20 — Unified Alpha + adaptive interaction validation
 
-## Slice 06 — OSCAR Memory Fabric + Personal Policy + live context ✅
-
-The previous planned managed-memory backend has been retired. OSCAR now owns a free/self-hosted Memory Fabric.
-
-Verified acceptance includes native Windows/Codex work, typed PowerShell, registered Notepad/UIA, isolated browser, separate owner control, native credentials, canonical WAL/FTS5, real Qdrant/Graphiti/Neo4j, local embedding/reranking, memory evaluation and owner-reviewed policy candidates. The owner completed physical machine acceptance and registered GitHub device OAuth with exactly `user:email`, real private reads, new-process restart, controlled private/public federation and local credential deletion/absence checks. Slice 05 and Slice 06 are COMPLETE for the documented local-alpha scope; Gate B is PASS. Remote provider revocation remains `UNKNOWN_OWNER_ACTION_REQUIRED`; private writes were not authorized and are optional. General conversational recall integration remains a composition boundary, not a proven autonomous product. See [Gate B completion ledger](GATE-B-COMPLETION.md).
-
-### 06A — Canonical Event Archive
-
-Implement/verify:
-
-- SQLite WAL canonical event history;
-- FTS5 exact/full-text recall;
-- stable event/turn/episode/entity/memory/source IDs;
-- provenance and epistemic state;
-- retention metadata;
-- correction/supersession relationships;
-- archive remains recoverable independent of derived indexes.
-
-### 06B — Qdrant OSS semantic index
-
-Implement as derived/rebuildable state:
-
-- dense semantic retrieval;
-- sparse/lexical component where useful;
-- hybrid retrieval;
-- project/entity/time/type filters;
-- canonical archive IDs on every indexed record;
-- index rebuild and drift detection.
-
-### 06C — Graphiti + Neo4j Community temporal/entity index
-
-Implement as derived/rebuildable state:
-
-- canonical entities/aliases;
-- relationships;
-- temporal validity;
-- current-vs-historical facts;
-- correction/supersession propagation;
-- source-event provenance;
-- ambiguous/same-name entities remain separate until evidence supports linking.
-
-### 06D — Local embeddings + reranker boundary
-
-- replaceable embedding interface;
-- replaceable reranker interface;
-- local/self-hosted default where practical;
-- optional Model Router/provider paths without architectural dependence;
-- no provider-specific memory truth.
-
-### 06E — Controller Memory Preflight + Retrieval Planner
-
-Every interaction gets a cheap memory-dependency classification.
-
-Mandatory recall path when personal/history/project/entity/artifact/preference context may matter:
-
-```text
-active context
-→ structured OSCAR state/entities/tasks/policy
-→ Event Archive exact/FTS5
-→ Qdrant hybrid
-→ Graphiti temporal/entity
-→ alias/entity/time-range expansion
-→ bounded deeper archive reconstruction
-→ UNKNOWN
-```
-
-An empty first retrieval is not proof of absent memory.
-
-### 06F — Evidence-bound recalled claims
-
-- no `I remember X` unless X was actually retrieved/active with provenance;
-- historical/personal claims bind to source event/memory IDs;
-- recalled evidence remains RECALLED in the current answer;
-- model reasoning cannot promote recall/inference to verified fact;
-- current authoritative live state outranks stale memory.
-
-### 06G — Memory Writer + consolidation
-
-- source events generate scoped candidates, not automatic truth;
-- entity resolution before generalization;
-- contradiction detection;
-- temporal supersession rather than history rewriting;
-- background dedup/evidence merge/summary/index maintenance;
-- source events remain canonical.
-
-### 06H — Forget / rebuild / resilience
-
-- remove/tombstone live OSCAR memory according to retention policy;
-- remove relevant vector/graph index entries;
-- no false secure-erasure claim;
-- rebuild Qdrant and temporal graph from canonical archive;
-- fail closed to FTS/archive/UNKNOWN when a derived index is unavailable.
-
-### 06I — Memory evaluation suite
-
-Benchmark with synthetic/non-sensitive histories:
-
-- exact recall;
-- paraphrased semantic recall;
-- temporal current-vs-history;
-- preference supersession;
-- entity aliases/same-name disambiguation;
-- project switching;
-- false-memory claims;
-- expected-memory miss escalation;
-- stale-memory-vs-live;
-- correction;
-- forget;
-- index rebuild/drift;
-- cross-process continuity.
-
-### 06J — Open-ended Personal Policy
-
-Complete the safe interpretation path:
-
-```text
-natural-language rule
-→ bounded structured candidate
-→ show exact interpretation
-→ explicit owner confirmation
-→ active rule
-```
-
-Support scoped conditions/effects, ambiguity rejection, equal-authority conflict blocking and expiry where stated. A policy cannot grant permission, bypass strong confirmation or weaken hard safety.
-
-### 06K — Real private connector + OAuth lifecycle
-
-Complete at least one genuinely useful private service end-to-end using current official auth flows:
-
-- proper OAuth/PKCE/device/system-browser flow as appropriate;
-- minimal scopes;
-- state/nonce validation;
-- refresh/expiry/revoke lifecycle where supported;
-- platform secure-credential boundary;
-- no raw token in model prompts, memory, ledger, logs or repository;
-- harmless bounded private read acceptance;
-- one reversible write/readback/cleanup only with explicit owner approval.
-
-### 06L — Live context federation
-
-Demonstrate authoritative current evidence defeating stale recall while preserving historical provenance.
-
-At minimum combine current local project/file/task state, one authenticated private source when available and public/search evidence where appropriate.
-
-This is the Gate B continuity foundation, not the full Slice 11 World Model.
-
-## Gate B completion condition
-
-Gate B becomes PASS only when required Slice 05 and Slice 06 acceptance is genuinely exercised and evidence-backed.
-
-A green unit suite alone is insufficient.
-
-Once Gate B passes, merge/review/freeze its accepted baseline before Slice 07 begins.
-
-## Slice 07 — OSCAR Edge + reflexes — software foundation accepted
-
-Starts only after Gate B PASS.
-
-Deliverables:
-
-- ESP32 gateway/client;
-- Pico deterministic controller where used;
-- typed ESP32↔Pico events;
-- health/capability advertisement;
-- GPIO/sensor/display test capabilities;
-- watchdog/safe defaults;
-- reflex/emergency-stop path;
-- reconnect/offline behavior;
-- optional LAN helper/Wake-on-LAN only when real;
-- simulator verification accepted; physical-device verification owner-deferred to Slice 15/16.
-
-## Slice 08 — Voice Core + Voice Identity + Voice Match/Map + Persona runtime — software/reference closure scope
-
-Deliverables include wake/VAD/STT, barge-in/echo cancellation, stable VoiceProfile, speaking modes/fallback, Voice Match, Voice Map, self-voice suppression, multi-device arbitration and Persona runtime/context triggers.
-
-## Slice 09 — OSCAR Mobile + communication + Connection Grid owner controls ✅/🚧
-
-Software/runtime foundation accepted and merged in PR #15. OSCAR Mobile now has the Kotlin/Compose app structure, scoped Grid/session security, owner approvals, notification boundaries, assistant-service integration, Android audio adapters, Orb state hooks, task supervision and truthful degraded states.
-
-Physical Android owner/device acceptance remains deferred as part of consolidated Gate C: real enrollment, biometric/PIN, assistant selection, notification reply delivery, microphone/playback, Bluetooth, room AEC/barge-in/self-wake, Voice Match/Map and naturalness are not yet physically verified.
-
-### Desktop/Mobile design scheduling
-
-The Android product foundation is Slice 09; its **visual redesign is now Slice 13**, not a 09R suffix. The Desktop software/runtime foundation is **Slice 10**, and its **visual redesign is now Slice 12**. Historical screenshot and PR paths retain the old identifiers as provenance. See the [canonical numbering map](SLICE-NUMBERING.md).
-
-## Slice 10 — OSCAR Desktop runtime foundation — integrated software
-
-The Tauri/Rust/React Windows foundation, tray/hotkey, scoped Core contracts, exact native confirmation, context tools and Worker reuse are integrated through the consolidated software baseline and Group 2.5A merge. Historical draft PR #16 and its screenshots remain archival evidence, **not** an active integration blocker. Physical Windows/voice/owner acceptance remains deferred. See [current product direction](PRODUCT-DIRECTION.md) and [Desktop boundary](design/DESKTOP-COMPANION-WORKSPACE.md).
-
-## Slice 11 — OSCAR Expression / Character System — engineering candidate
-
-**11.1–11.2 v3 direction approved for engineering; 11.3 implemented:**
-[reusable expression foundation](../expression/README.md), React/SVG and isolated
-native Compose rendering with shared fixture validation. See [engineering packet](design/expression/ENGINE.md).
-Final cross-device visual/device quality and exact-head CI remain review boundaries.
-The shared expression foundation is consumed by the merged Desktop and existing Android software foundation. Final cross-device character/presence acceptance is still future work. Previous acceptance snapshots remain historical.
-Design character **before** choosing the surrounding widget/window styling. The provided desktop-companion references demonstrate presence, independent character, micro-reactions and nonverbal expression; do not copy their pixel-art character or replace the canonical Orb with a different mascot.
-
-- **11.1 — Character language:** facial marks, eyes/gaze, orientation, tempo, anticipation, nuanced microexpressions, idle/resting/reactive behavior, state priority and interruption; separate real Core operational status from safe expressive Persona delivery.
-- **11.2 — Interactive Expression Lab:** development-only, non-executing high-fidelity Orb expression/motion prototypes with fine controls, transition playback/scrubbing, small-scale tests and explicit owner visual review. No superficial AI-looking alternatives accepted merely because they compile.
-- **11.3 — Shared renderer contract:** after owner feedback, platform-neutral typed expression semantics with Desktop React/SVG and Android Compose rendering adapters.
-
-Keep `assets/brand/oscar-orb.svg` unmodified. Proposed derivatives are separate, versioned and owner-approved. Real activity/privacy/permission/truth must never be synthesized from a visual animation. See [Expression Core](EXPRESSION-CORE.md) and [design quality bar](SLICE-NUMBERING.md).
-
-## Slice 12 — OSCAR Desktop experience and visual system — provisionally approved and merged
-
-Software/reference work from Groups 1–2 is integrated in `main`. The owner has **provisionally passed** the 2026-10-14 Group 2.5A neumorphic Desktop UI, and [PR #5](https://github.com/Amaan27-Buzz/oscar/pull/5) was merged at `43c15d37a6421d438b8101d5e322489ae452b20d`. This is **not** final integrated visual, real-device, security or production acceptance.
-
-Two distinct surfaces in one Tauri process: **small Companion** (canonical Orb, quick status/control, tray/shortcut; no chat or signing) and **full Workspace** (Conversation, Automations, Activity, Devices, Preferences). Contextual Dictate/Edit/Ask/Act is in Conversation rather than an exposed Text Tools/Act tab. Automations presents truthful capability/responsibility readback. Group 3 supplies reviewed Core Workers and schedules; native creation/editing and standing Full Access remain unavailable.
-
-Previous 12.1–12.6 experiments and captures are preserved as historical implementation/evaluation evidence; **do not follow their unmerged PR/visual acceptance instructions**. See [active product direction](PRODUCT-DIRECTION.md), [Desktop interaction decision](decisions/ADR-DESKTOP-PERSONAL-INTELLIGENCE.md) and [current native evidence](ui/desktop/interaction-polish/README.md).
-
-## Slice 13 — OSCAR Mobile experience and visual system — Group 2.5B implementation
-
-**2026-10-16 owner decision:** Group 2.5B UI/UX **APPROVED / PASS**; PR #6 subsequently merged at `257349f82a96293c3737d446dca18ce46f098b04`. [Engineering closure](ui/mobile/group25b/FINAL-CLOSURE.md) preserves the approved design. Physical commissioning and Gate C remain PARTIAL. Separately authorized Group 3 now covers Slices 14–17.
-
-The native Core-connected foundation is integrated into main. Owner authorization on 2026-10-14 selects the Codex ImageGen/Figma artwork for production Compose implementation of all 15 hero experiences and coherent broader information architecture. The Gemini Argon external `oscar-ui-test` experiment is rejected and must not be imported.
-
-Use warm paper/graphite, editorial typography, original illustration-only assets, accessible tactile controls and three primary destinations (Conversation / Automations / Activity). Devices and Preferences remain one tap away. Preserve CoreSession, signed exact-action reviews, Grid, native permissions/voice and shared Expression. Secure/Full Access and unavailable provider briefs stay unavailable. Group 3 adds bounded quiet Core Sentry and scheduling with truthful native readback; environmental capture/delivery and native schedule authoring remain unavailable.
-
-Implementation, emulator verification and owner review are separate from physical phone/OEM/mic/biometric acceptance. See [Group 2.5B implementation and evidence](ui/mobile/group25b/README.md) and [Mobile design](MOBILE-DESIGN.md). Canonical numbering and historical reference evidence are preserved.
-
-## Slice 14 — World Model + Perception Fabric + Sentry + optional Daily Journal ◻️
-
-**2026-10-16 Group 3 candidate:** normal Core current-state/Perception/Sentry
-lifecycle, authorized local subscriptions, recovery and retention maintenance
-are implemented and locally verified. Full Slice 14/Gate D
-acceptance remains partial. See [implementation and evidence](development/GROUP-03-GATE-D.md).
-
-Coherent freshness-/provenance-qualified current truth across people/places/devices/apps/projects/tasks/commitments; optional explicitly permitted screen/device/sensor/location/communication/acoustic inputs, time/weather/calendar/notifications/media state, persistent Sentry modes and retention-controlled Journal/Capture. This is former Slice 11; no earlier World Model implementation claim is made.
-
-## Slice 15 — Commissioning / setup ◻️
-
-**2026-10-16 Group 3 candidate:** trusted-local identity/pairing, provider/native
-Vault, Persona/preferences, policy, logical voice and Sentry setup compose into
-normal Core. Actual owner accounts, audio and device acceptance remain pending.
-See [evidence](development/GROUP-03-GATE-D.md).
-
-Identity, Persona/Personal Policy starter rules, Voice Identity/Match/Map, Connection Grid and surface pairing, model/cloud setup, Sentry/capture setup and human-readable perceive/retain/act permissions. This is former Slice 12.
-
-## Slice 16 — Full Avatar / Presence integration ◻️
-
-**Group 3 software:** shared leased Presence, scoped subscriptions, typed AIE,
-trusted React/Compose task views and an explicit opt-in Android Orb overlay are
-implemented and build/JVM verified. Device/owner/OEM and widget expansion remain
-separate; this is not physical or whole-slice PASS.
-
-Finish the **runtime/device-facing** Presence work after World Model/commissioning: genuine state projection, small/expanded/overlay/widget variants, focus retreat, cross-device behavior, real audio/perception context, accessibility, latency and real-device owner acceptance. Uses Slice 11's reviewed Expression System; this is former 13B. **Adaptive Interface Engine foundation:** define a typed/versioned, capability-negotiated interactive-view envelope, initial trusted React/Compose components and accessible fallback; no arbitrary generated code. See [AIE](ADAPTIVE-INTERFACE.md).
-
-## Slice 17 — Executive Planner + durable Workers + learning ◻️
-
-**Group 3 software:** reviewed bounded planning/DAGs, Worker scope/reservations,
-one-time/recurring schedules, canonical task recovery, context predicates,
-reviewed replanning, quiet brief and retained/evaluated workflow reuse are
-implemented. Real local executors and separate-process restart are verified;
-model planner output is fixture-tested and remains untrusted. Native authoring,
-live provider/environment and owner acceptance remain separate. See
-[Executive runtime](EXECUTIVE-RUNTIME.md).
-
-Priority/deadline/dependency planning, explicit commitments, scheduling conflicts, focus/travel/weather aware planning, policy-bounded replanning, proactive brief, interruption policy, Worker lifecycle/recovery and evaluated learning. Former Slice 14. **Adaptive UI:** intent-driven choice/composition of trusted interactive views and authorized Core action round trips, without a separate agent or memory store.
-
-## Slice 18 — Physical/device expansion + specialist engineering ◻️
-
-Widen Edge/device onboarding, real ESP32/Pico acceptance, smart-home/environment adapters, cameras/sensors/actuators, and specialist CAD/circuit/simulation/3D/numerical/diagnostic routing. Former Slice 15; no physical PASS until exercised.
-
-## Slice 19 — Reliability/security/truthfulness hardening ◻️
-
-Provider/auth/Node/Worker/memory/capture/persona/voice/privacy failures, replay/revocation, degraded state, retention, physical faults and required real-device acceptance. Former Slice 16. **Adaptive UI:** schema bounds, untrusted content isolation, privacy, authorization, accessibility, performance and failure/recovery validation.
-
-## Slice 20 — Unified Alpha ◻️
-
-Run the full integrated perception/communication → World Model/Controller/Memory → Personal Policy/Persona → Executive Runtime → Grid/Worker/device → Action Ledger/evidence → verification → Mobile/Desktop/Voice report scenario. **Gate C, Design, Gate D and Gate E evidence must be complete for the claimed scope.** Former Slice 17. Validate at least one cross-device adaptive conversation with actual Core-backed data, trusted components and verified action outcomes. Do not mislabel simulator/remote-CI-blocked work as PASS.
+**FORMAL PASS NOT EARNED.** Group 6 can verify an explicitly **scoped Cloud–Desktop–Phone operational alpha** with real devices, memory, authorized action, verification, voice and continuity. Formal Slice 20/Gate E PASS must not omit still-mandatory physical Edge and other Gate C/D/E requirements absent a separate explicit gate revision.
 
 ## Review clubs / checkpoints
 
-| Area | Canonical slices | Status |
-|---|---|---|
-| A — Brain | 01–04 | PASS |
-| B — Can Do Work | 05–06 | PASS for local-alpha scope |
-| C — Embodied foundations | 07–10 | PARTIAL; software integrated, physical/owner acceptance deferred |
-| Design / Character | 11–13 | Expression software integrated; Desktop provisionally approved/merged; Mobile 2.5B UI/UX owner APPROVED and PR #6 merged; physical/device acceptance deferred |
-| D — Awareness / Chief-of-Staff | 14–17 | PARTIAL; integrated software and engineering closure candidate; live/owner/device acceptance pending |
-| E — Physical and Unified Alpha | 18–20 | Planned |
+| Group / gate | Coverage | Current state |
+| --- | --- | --- |
+| Gate A / foundation | Slices 01–04 | Scoped **PASS** |
+| Gate B / foundation | Slices 05–06 | Local-alpha **PASS** |
+| Gate C | Slices 07–10 | **PARTIAL**; physical/owner acceptance outstanding |
+| Character/Design | Slices 11–13 | Software/UI merged; Desktop provisional, Mobile owner approved |
+| **Group 3 / Gate D** | **All Slices 14–17** | PR #7 **MERGED**, Gate D **PARTIAL** |
+| Gate E | Slices 18–20 | **NOT PASSED** |
+| **Group 4** | Delivery D1/D2; existing slices' remote obligations | **NEXT** Cloud Core and Grid |
+| **Group 5** | Delivery D3/D4/C1–C4; existing slices' live obligations | Connected/native/computer use/plugins/access/voice |
+| **Group 6** | Narrow Slice 20 operational-alpha evidence | Daily owner acceptance; **not** full gate PASS |
+| **Group 7** | Dedicated home-server laptop | Later, hardware-dependent |
+| **Group 8** | Slice 18 and residual Slices 19/20 | Later, physical/full gate evidence |
 
-Manual integration checkpoints remain in [BUILD-GATES.md](BUILD-GATES.md).
-
-## Current next step — 2026-10-17
-
-- **Now:** final engineering closure of Group 3 on existing draft PR #7; reviewed internal credential rotation, Presence write reduction, overlay admission and cross-slice reliability. No merge or Group 4.
-- **Already merged:** Desktop Group 2.5A (provisional visual pass) and owner-approved Mobile Group 2.5B / PR #6. Legacy PR #16/#17 are archival.
-- **Next acceptance:** review the Group 3 software candidate and genuinely complete the remaining live/owner/device scenarios; Gate C and Gate D remain PARTIAL.
-- **AIE:** bounded typed Slice 16/17 software is implemented; richer components and later hardening/acceptance remain future work.
-- **Unfinished:** native schedule authoring/widgets, signed Secure/Full Access authority, real environmental capture/delivery, physical Android/Windows/voice/Edge, remote CI and production acceptance. Existing trusted-local scheduling and quiet Sentry software are implemented.
-
-Read [active product direction](PRODUCT-DIRECTION.md), [canonical numbering](SLICE-NUMBERING.md), [adaptive UI plan](ADAPTIVE-INTERFACE.md) and the evidence ledger. Historical acceptance sequences and reports below this paragraph are **archives**, not current work orders.
-
-The original historical Gate B acceptance sequence below remains an archival contract, not the current work order. The 2026-10-09 owner-approved early-13A sequencing above supersedes only visual-expression scheduling:
-
-```text
-05 machine gaps
-→ PowerShell
-→ installed apps
-→ Windows UI Automation
-→ browser
-→ owner-control continuation
-
-06 Memory Fabric
-→ Event Archive/WAL/FTS5
-→ Qdrant
-→ Graphiti + Neo4j
-→ local embeddings/reranker
-→ Controller Memory Preflight/retrieval escalation
-→ evidence-bound claims
-→ Memory Writer/consolidation
-→ correction/forget/rebuild/evals
-
-06 policy/private context
-→ open-ended Personal Policy
-→ real OAuth/private connector
-→ secure credential boundary
-→ live-authority-vs-memory federation
-
-→ full Gate B manual acceptance
-→ review/merge
-→ Gate B PASS
-→ only then Club C / Slice 07
-```
-
-The [pre-manual Gate B hardening pass](GATE-B-HARDENING.md) improves BM25/ONNX retrieval,
-generation integrity, scoped graph rebuilds, credential recovery and evidence-bound claims.
-It adds no later-slice capability. Slice 05 remains COMPLETE for its documented local scope;
-Slice 06 is COMPLETE and Gate B PASS after the owner OAuth/federation run.
-The later physical/manual machine PASS is recorded below.
-
-
-## Reconciliation boundary — 2026-10-04
-
-The OSCAR-owned Decision / Epistemic Controller applies hard deterministic authority
-rules; `oscar/jev.py` is a historical/internal module name, not a TypeSafe Jev
-dependency. Separate deterministic/Laya/hybrid evaluation starts only after Gate B
-PASS. GitHub is the first intended private authentication proof; the shared Auth
-Broker/provider architecture does not require independent OAuth per plugin.
-
-[Deployment architecture](DEPLOYMENT.md) selects free-first Oracle persistent Core
-and Vercel bounded Python/web/API/relay candidates. Deployment, the future Galaxy
-Tab S6 Lite Home Node, decision-model evaluation and full Auth Broker expansion are
-not additional Gate B requirements. Build the Tab node only after OSCAR is fully
-deployed and its main Core architecture is operational.
-
-Slice 05 and Slice 06 are COMPLETE for the documented local-alpha scope; Gate B
-is PASS. Owner physical/manual machine acceptance passed in run
-`manual-gate-b-20261004-200734`; OAuth/private federation passed in run
-`oauth-gate-b-20261004-234817`. Remote revocation remains unknown; no private write
-was authorized. Slice 07 software is accepted; physical acceptance is deferred by owner and PR 12 MERGED; Gate B frozen PASS. The harness repair at
-`c9cb7d2d20fb444cce98e2749eeea5425d4a0ee1` is independently reviewed with 25 focused
-regressions passing and exact-head CI green; it is not a physical acceptance PASS.
-The prior owner focus failure and its evidence remain unchanged.
-
-See [owner OAuth acceptance preparation](GATE-B-OAUTH-ACCEPTANCE.md) and
-[physical machine PASS evidence](evidence/gate-b-owner-machine-pass-2026-10-04.json).
-The reported prior stale OSCAR fixture was not mutated; it does not invalidate the PASS.
-
-## Accepted Club C / Slice 07 — 2026-10-05
-
-Historical Slice 07 branch `club-c/slice-07-edge`, PR #13 (now merged), started at
-`9fde9385af6b34c4f76991e2d871ab0909296af5`. PR #12 merged; main/work baseline
-`97c0622507df3f724ecf0c8b74aa7f4ae7784b08`; Gate A/B PASS; 05/06 COMPLETE.
-The software/simulator foundation is accepted for continuation. Mandatory owner
-wiring, flash and real acceptance return during Slice 15/16. See [checkpoint](CLUB-C-CHECKPOINT.md).
-Slice 07 is COMPLETE FOR SOFTWARE / SIMULATED EDGE FOUNDATION. Gate C PARTIAL; Slice 08 quality candidate is current work; Slice 09 software follows integration; Slice 10 remains unbuilt.
-Capability Evolution is deferred, as recorded in [architecture](ARCHITECTURE.md).
-
-## Owner scope decision — 2026-10-05
-
-Slice 07: **COMPLETE FOR SOFTWARE / SIMULATED EDGE FOUNDATION**.
-**PHYSICAL EDGE ACCEPTANCE DEFERRED BY OWNER** — `DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED`.
-Protocol, firmware, Grid integration, ESP32/Pico cross-builds and deterministic
-safety contracts in simulation are accepted for continuation. Historical
-simulator evidence remains **SIMULATED**. No physical GPIO, watchdog, UART,
-E-stop or ESP32/Pico silicon PASS is claimed. Gate C remains **PARTIAL**.
-
-Return to real ESP32/Pico acceptance during Slice 15 physical/device expansion
-and/or Slice 16 reliability/security hardening. Physical failure, loss/recovery,
-watchdog and safety/reflex verification remain mandatory before Slice 17
-Unified Alpha can PASS. The hardware acceptance guide is preserved.
-The 2026-10-05 scope authorized Slice 08. The 2026-10-06 owner decision additionally
-authorizes Slice 09 software after Slice 08 integration; Slice 10, deployment and
-Galaxy Tab Home Node remain outside this work.
-
-## Accepted implementation sequence
-
-07 Edge software foundation → 08 Voice → 09 OSCAR Mobile → 10 Desktop →
-11–14 Awareness / Presence / Executive → 15 Physical/device expansion →
-16 reliability/security hardening → 17 Unified Alpha.
-
-Slice 15 returns to real ESP32/Pico acceptance and broadens physical integrations.
-Slice 16 exercises physical failure, Edge loss/recovery, watchdog and safety/reflex
-contracts. Slice 17 cannot PASS without genuine deferred physical Edge acceptance.
-
-Capability Evolution is future backlog; see the authorization and lifecycle
-contract in [architecture](ARCHITECTURE.md). No self-modification is implemented.
-
-## Slice 08 owner closure scope — 2026-10-06
-
-Owner-authorized closure scope: **COMPLETE FOR SOFTWARE / REFERENCE VOICE FOUNDATION**.
-Physical status: `DEFERRED_BY_OWNER / CONSOLIDATED_GATE_C_ACCEPTANCE_REQUIRED`.
-This is not a physical PASS. Gate C remains **PARTIAL**.
-Slice 08 PR #14 integrated after green exact-head CI. Accepted main/work:
-`92a11aa05083f1983186976ba64bd30aa9f1f2a0`. Historical reference research baseline:
-`e8ac8f8bca1cb0cb7909523ac6af906ee289366f`.
-Existing owner harnesses remain mandatory inputs to later consolidated acceptance.
-Microphone, real-room AEC/barge-in/self-wake, owner Match/Map calibration, playback,
-Android voice and naturalness remain NOT RUN. Windows reference evidence never
-implies Android acceptance. See [Voice Core](VOICE-CORE.md) and
-[consolidated Gate C acceptance](GATE-C-CONSOLIDATED-ACCEPTANCE.md).
-Slice 09 OSCAR Mobile software may begin after clean Slice 08 integration; Slice 09 must
-remain a draft and stop before owner/device acceptance. Slice 10, deployment and
-Galaxy Tab Home Node are not authorized. Physical Edge remains
-`DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED`, mandatory before Slice 17 PASS.
-
-
-## Post-alpha evolution direction
-
-After Slice 20 Unified Alpha is stable in sustained owner use, continue with a
-post-alpha evolution track rather than renumbering the current mandatory slices:
-
-1. **P1 — Operating Intelligence:** local owner-controlled operating telemetry for
-   model/tool/plugin/Worker routing, latency, failures, retries, outcomes,
-   verification and capability gaps. This is separate from conversation capture.
-2. **P2 — Voice Evolution:** apply measured Elocution findings to a natural,
-   expressive, original OSCAR Voice Identity across Windows, Android/OSCAR Mobile and
-   Home Node hardware.
-3. **P3 — Specialist Model Fabric:** use recurring real task clusters and evals to
-   build smaller task-optimized models where they beat general models for quality,
-   latency or local operability.
-4. **P4 — Home-server independence:** move persistent Core, Memory Fabric, voice,
-   specialist models and increasing orchestration to the owner's dedicated home
-   server laptop; keep cloud models for intentional major-work escalation.
-
-Cross-platform Voice portability is already an architectural rule: Windows may be
-the reference implementation, but Android/OSCAR Mobile must reuse the same Voice Core
-contracts rather than force a redesign.
-
-See [Post-Alpha Evolution](POST-ALPHA-EVOLUTION.md).
-
-## Current Slice 09 — 2026-10-06
-
-Slice 08 PR #14 merged; accepted main/work baseline
-`92a11aa05083f1983186976ba64bd30aa9f1f2a0`. Slice 08 is
-**COMPLETE FOR SOFTWARE / REFERENCE VOICE FOUNDATION**; physical voice is
-`DEFERRED_BY_OWNER / CONSOLIDATED_GATE_C_ACCEPTANCE_REQUIRED`, never physical PASS.
-OSCAR Mobile Kotlin/Compose rebuild is on `club-c/slice-09-sunday`, draft PR #15
-into `work`, **PARTIAL / OWNER_DEVICE_ACCEPTANCE_NOT_RUN**. Core/loopback,
-Gradle/JVM/emulated evidence is separate from actual phone/OEM acceptance.
-See [OSCAR Mobile foundation](MOBILE-FOUNDATION.md) for implementation, limits and the next owner boundary.
-Slice 09 must not merge in this run. Gate C remains PARTIAL. Slice 10, deployment
-and Home Node are not started. Post-alpha Operating Logs, specialist-model training
-and home-server migration remain documented future work, not implemented.
+**Next checkpoint:** Group 4 D1, cloud deployment readiness on verified `main`. Do not reopen merged PR #7 or begin ESP32/Pico work. [Delivery groups, checklist and suggested dates](DELIVERY-PLAN.md).
