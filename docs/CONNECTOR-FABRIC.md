@@ -1,5 +1,7 @@
 # Native Connector Fabric
 
+**Current delivery, 2026-10-18:** [verified checklist](CURRENT-STATUS.md), [Group 5 C2 plugin/MCP plan](DELIVERY-PLAN.md). The Connector Fabric, manifests, bounded HTTP/MCP adapters and a narrow owner-verified GitHub OAuth/federation path are **software foundations**, not a deployable general plugin marketplace/client. Real provider/MCP commissioning, easy discovery/install and independent verification remain active capability work after Group 4 authenticated Grid.
+
 OSCAR prefers official structured authenticated APIs, then official connectors,
 reviewed MCP sessions, authorized app automation and computer-use fallback.
 `ConnectorFabric` is a capability source for the existing Grid catalog, not another
@@ -127,9 +129,7 @@ MCP maps only owner-reviewed tools into manifests; untrusted annotations cannot
 lower risk or grant scope. An authenticated external SDK session is required.
 The current MCP boundary is manifest/session plumbing, not a deployed MCP client.
 
-**Private Google/Microsoft/GitHub/Slack/Notion/MCP account access: UNVERIFIED.**
-Fixture tests are synthetic. A separate opt-in public GitHub acceptance does not
-verify private authenticated GitHub operations.
+**Broader live Google/Microsoft/Slack/Notion/MCP account integration: NOT ACCEPTED.** Fixture testing does not establish live private provider access. The separate narrow owner-authorized **GitHub device OAuth/private-read** flow *was* verified for Gate B, with scope `user:email`; it does not imply a deployed general GitHub MCP service, write access, complete Auth Broker or remote provider revocation.
 
 ## Official research provenance
 
