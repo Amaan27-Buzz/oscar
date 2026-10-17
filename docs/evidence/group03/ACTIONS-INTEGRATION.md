@@ -55,6 +55,7 @@ cancelled or skipped job is never recorded as a pass.
 | Emulated Expression atlas capture timed out in AndroidX's two-second frame-commit wait | Instrumentation readiness / runner environment | Compile APKs before emulator startup, require the fixture window to have focus before capture, retain all rendering/contract assertions and upload instrumentation reports. Logs do not establish a production renderer defect; the actual rerun must verify the correction. |
 | Desktop native build passed but the disposable WPF field did not emit `ContentRendered` within 60 seconds | Native fixture / hosted rendering environment | Select process-local software rendering for this fixture, retain its stderr and report non-secret session/render diagnostics. Keep `ContentRendered`, independent UIA readback and native signing requirements intact. A hosted rerun must establish whether this resolves readiness. |
 | Second-round Linux Python 3.12 full regression passed (684 tests, 36 platform/optional skips), then repository validation rejected an owner-local Windows generation record | Documentation portability | Preserve the exact provenance path as an explicitly local identifier, not a portable repository hyperlink. Validate relative links against the case-sensitive tracked Git tree as well as the Windows filesystem. The repository checker and test assertions remain unchanged. |
+| Second-round emulator exited before instrumentation: `Available: 6789.79 MB`, `need 7372.80 MB` for its default userdata partition | Hosted runner disk capacity | Bound the disposable AVD userdata partition to 2,048 MiB, sufficient for the application and isolated fixtures, rather than deleting host SDKs or buying a larger runner. Bound boot wait to 300 seconds; actual instrumentation must still run and pass. This failure did not test the atlas correction. |
 
 Local verification of the initial corrections: three Group 3 composition/crash
 tests passed; the simulated-day test also retained all 25 occurrences at four
@@ -70,6 +71,9 @@ The revised WPF fixture passed the actual local Tauri self-check, including CNG
 signing, registered-application readback, cancellation, reconnect and native
 restart with shared Core tasks. This is Windows reference evidence; hosted
 readiness and owner/physical acceptance remain separate.
+The second hosted Desktop workflow subsequently passed all stages, including 86
+frontend and 16 Rust tests, Tauri CNG/signing/readback/restart and standalone
+Windows UIA verification. Emulator boot failure remains distinct from test failure.
 
 No production Core, native UI/artwork, authorization, replay/expiry checks,
 verification or idempotency behavior changed in these corrections. Earlier

@@ -66,6 +66,8 @@ jobs:
           api-level: 35
           arch: x86_64
           target: google_apis
+          disk-size: 2048M
+          emulator-boot-timeout: 300
           working-directory: mobile
           script: sh gradlew --no-daemon connectedDebugAndroidTest
       - name: Preserve instrumentation results
