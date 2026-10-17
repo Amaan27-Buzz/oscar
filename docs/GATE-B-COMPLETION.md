@@ -1,5 +1,8 @@
 # Gate B completion ledger
 
+> Original-repository PR/run URLs below are historical identifiers retained verbatim.
+> They are no longer accessible after repository migration and are not current CI evidence.
+
 > Current status reconciliation, 2026-10-05: PR #12 is merged at `97c0622507df3f724ecf0c8b74aa7f4ae7784b08`; Gate B is frozen PASS. Slice 05/06 COMPLETE. Slice 07 software is accepted for continuation; physical Edge acceptance is DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED. Slice 08 is authorized after integration. The dated evidence below retains its historical status wording.
 
 Working branch: `gate-b/completion`. Baseline fetched on 2026-10-04:
@@ -128,7 +131,7 @@ manual review; never close the owner window or unrelated document to clean them 
 The real laptop full suite passed **372 tests in 86.558 seconds**. Ruff and formatting
 pass; mypy passes for 48 source files. Required repository files, local Markdown
 links, value-silent secret scan and Git diff checks pass. Cross-platform CI and
-external links are authoritative at [draft PR 12](https://github.com/amaansyed27/oscar/pull/12).
+external links are authoritative at draft PR 12 (historical reference: `https://github.com/amaansyed27/oscar/pull/12`).
 Its checks must match the latest branch SHA; local Windows results do not prove Ubuntu.
 The initial Ubuntu job caught platform-specific native handle stubs; the adapter now
 loads its Windows-only module at the native boundary and keeps the public API typed.
@@ -139,11 +142,11 @@ and its synthetic automated evidence. It does not repeat physical/manual desktop
 acceptance, authorize OAuth, merge this PR or change Gate B to PASS.
 
 CI snapshot on implementation commit `449aefc90ca6ae6d85bcb5181c892747d8a46ce6`:
-[Brain contracts run](https://github.com/amaansyed27/oscar/actions/runs/37190449095)
+Brain contracts run (historical reference: `https://github.com/amaansyed27/oscar/actions/runs/37190449095`)
 passed Windows (372 tests, two optional browser skips) and Ubuntu (372 tests, 23
 platform skips), lint/format/types and repository/secret checks. The optional browser
-cases passed on the real laptop. [External links](https://github.com/amaansyed27/oscar/actions/runs/37190449046)
-and [repository contracts](https://github.com/amaansyed27/oscar/actions/runs/37190449068)
+cases passed on the real laptop. External links (historical reference: `https://github.com/amaansyed27/oscar/actions/runs/37190449046`)
+and repository contracts (historical reference: `https://github.com/amaansyed27/oscar/actions/runs/37190449068`)
 also passed. This records an observed commit; PR checks remain the authority for later commits.
 
 

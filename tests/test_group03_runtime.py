@@ -64,7 +64,8 @@ class Group03RuntimeTests(unittest.TestCase):
                         enroll_source()
                     h.world.tick()
                     executive.tick()
-                    if minute in {60, 120, 480, 1440}:
+                    # Settle every due occurrence before advancing the simulated clock.
+                    if minute % 60 == 0:
                         expected = minute // 60 + 1
                         deadline = monotonic() + 5
                         while (
@@ -76,6 +77,7 @@ class Group03RuntimeTests(unittest.TestCase):
                         self.assertEqual(
                             expected, h.store.get("executive_goal", goal["id"])["run_index"]
                         )
+                    if minute in {60, 120, 480, 1440}:
                         h.world.tick()
                         current = h.world.world.resolve("core", "tasks.state")
                         self.assertEqual(minute != 480, current.state == "current")

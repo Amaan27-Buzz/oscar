@@ -123,9 +123,12 @@ These longer samples still do not establish day-long power, memory-leak or produ
 
 ## Delivery, remaining acceptance and recommendation
 
-Remote exact-head CI remains **UNKNOWN** until genuinely returned for the final
-head. The Code Review connector is used for diagnostics; no CLI fallback or
-unverified CI PASS. The PR delivery records the actual final-head result.
+The owner subsequently authorized repository Actions and genuine CI integration.
+The [Actions integration record](ACTIONS-INTEGRATION.md) records settings,
+trigger and corrections from the first actual runs. The separate Code Review
+connector remains unavailable; this later authorization permits authenticated
+GitHub CLI/API diagnostics. PR #7 records terminal final-head job results and the
+integration decision. No queued/skipped job or empty checks response implies PASS.
 
 Software is ready for owner merge review after final-head CI is verified or
 explicitly waived and the listed deferrals are accepted. **Do not merge

@@ -1,9 +1,12 @@
 # Slice 11 validation record
 
+> Original-repository PR/run URLs below are historical identifiers retained verbatim.
+> They are no longer accessible after repository migration and are not current CI evidence.
+
 ## Current 11.3 engineering validation — 2026-10-09
 
 Starting reviewed head: `d992795af3508778a38498f1f9e05d85091c2806`.
-Branch: `design/slice-11-expression`; [draft PR #17](https://github.com/amaansyed27/oscar/pull/17) into `work`.
+Branch: `design/slice-11-expression`; draft PR #17 (historical reference: `https://github.com/amaansyed27/oscar/pull/17`) into `work`.
 V3 direction is owner-approved for engineering continuation, not blanket visual
 acceptance. Slice 11.3 is a reusable presentation foundation, not actual Core,
 voice, Desktop bridge or Mobile screen integration. Gate C remains PARTIAL.
@@ -46,8 +49,8 @@ test counts, source/fixture hashes and actual rendered atlas hash.
 
 **LOCAL VALIDATION PASS / REMOTE CI NOT EXECUTED**. At implementation head
 `5cd3255220f2b92a5352f87e4142965791550ea3`, both
-[synthetic-lab](https://github.com/amaansyed27/oscar/actions/runs/37933229447/job/113828820305)
-and [native-expression](https://github.com/amaansyed27/oscar/actions/runs/37933229447/job/113828820794)
+synthetic-lab (historical reference: `https://github.com/amaansyed27/oscar/actions/runs/37933229447/job/113828820305`)
+and native-expression (historical reference: `https://github.com/amaansyed27/oscar/actions/runs/37933229447/job/113828820794`)
 have empty step lists. Their failure annotations state that recent account
 payments failed or the spending limit needs increasing; the jobs were not started.
 This is not a test-run failure. No exact-head CI green or merge approval is claimed.
@@ -65,7 +68,7 @@ Design status: **OWNER VISUAL APPROVAL REQUIRED**, not final character acceptanc
 Baseline: `45bb1459f61308291fec6e4e5885b6c77b707478`.
 Initial v2 implementation: `71b999ca605e968b81a9efc7e3ef8ddd47447a24`.
 Branch: `design/slice-11-expression`.
-[Draft PR #17 into work](https://github.com/amaansyed27/oscar/pull/17).
+Draft PR #17 into work (historical reference: `https://github.com/amaansyed27/oscar/pull/17`).
 Historical documentation-only follow-up did not change v2. The subsequent owner
 motion revision changes the lab and is captured separately below.
 
@@ -114,8 +117,8 @@ See [capture receipt](evidence/candidate-v2/receipt.json),
 
 GitHub created failure check records, but the jobs did **not execute**. On the
 implementation SHA, both the
-[Expression lab job](https://github.com/amaansyed27/oscar/actions/runs/37904526461/job/113734670320)
-and [repository job](https://github.com/amaansyed27/oscar/actions/runs/37904526381/job/113734669684)
+Expression lab job (historical reference: `https://github.com/amaansyed27/oscar/actions/runs/37904526461/job/113734670320`)
+and repository job (historical reference: `https://github.com/amaansyed27/oscar/actions/runs/37904526381/job/113734669684`)
 had empty step lists. Their annotations identify failed account payments or the
 spending limit as the cause. This is not a test failure or an exact-head green CI.
 The PR must not merge automatically.

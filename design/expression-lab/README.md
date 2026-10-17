@@ -19,7 +19,7 @@ npm test
 npm run dev
 ```
 
-Open <http://127.0.0.1:1511>. `dev` deliberately builds and serves a static preview:
+Open `http://127.0.0.1:1511` after starting the local server. `dev` deliberately builds and serves a static preview:
 no HMR connection, no inline script exception, no Core connection. Re-run after
 source edits. `npm run build` typechecks; `npm run preview` serves an existing build.
 

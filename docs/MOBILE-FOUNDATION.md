@@ -1,5 +1,8 @@
 # OSCAR Mobile — Slice 09
 
+> Original-repository PR/run URLs below are historical identifiers retained verbatim.
+> They are no longer accessible after repository migration and are not current CI evidence.
+
 > **Historical implementation report, recorded during PR #15 review
 > (2026-10-07).** PR #15 subsequently merged. SHA/branch/status language
 > below describes the original candidate, not today's branch state.
@@ -207,5 +210,5 @@ PR #15 remains draft and unmerged; main/work remain the accepted Slice 08 baseli
   crash (`hasReadColorBufferDma`); five cases completed before abort. This remains
   INCOMPLETE_PLATFORM_FAILURE, not API 36.1 or real-device PASS.
 
-Exact final-head checks are authoritative in [PR #15](https://github.com/amaansyed27/oscar/pull/15).
+Exact final-head checks are authoritative in PR #15 (historical reference: `https://github.com/amaansyed27/oscar/pull/15`).
 Emulator/software/reference results never satisfy the deferred physical owner gate.

@@ -43,7 +43,7 @@ status decoration. This slice evaluates the character without those widgets.
   inference: attention can lead posture and hold deliberately. Do not import
   sensing, human tracking, salience inference or lifelike anatomy. OSCAR's gaze
   target in this lab is explicitly chosen by the reviewer.
-- [Google Seed Studio / Map — Little Signals](https://fornax.experiments.withgoogle.com/little-signals):
+- [Google Seed Studio / Map — Little Signals](https://experiments.withgoogle.com/little-signals):
   published description of ambient objects communicating with restrained sensory
   cues. Transfer: attention has a budget and information can remain peripheral.
   The page itself failed live opening; the indexed official description was
