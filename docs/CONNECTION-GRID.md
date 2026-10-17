@@ -357,68 +357,11 @@ Edge offline
 7. OSCAR never claims remote power/control capability that is not currently available.
 8. Availability degrades explicitly rather than silently disappearing.
 
-## Gate B local completion candidate — 2026-10-04
+## Implementation and delivery status (2026-10-18)
 
-Separate local owner-control/core/Worker processes now demonstrate continued execution across control disconnect/Core termination, natural lease expiry, reconnect and independently verified exactly-once recovery. Authority still shares SQLite plus loopback HTTP; independent stores/public remote deployment/phone control remain unverified. Verified acceptance includes native Windows/Codex work, typed PowerShell, registered Notepad/UIA, isolated browser, separate owner control, native credentials, canonical WAL/FTS5, real Qdrant/Graphiti/Neo4j, local embedding/reranking, memory evaluation and owner-reviewed policy candidates. The owner completed physical machine acceptance and registered GitHub device OAuth with exactly `user:email`, real private reads, new-process restart, controlled private/public federation and local credential deletion/absence checks. Slice 05 and Slice 06 are COMPLETE for the documented local-alpha scope; Gate B is PASS. Remote provider revocation remains `UNKNOWN_OWNER_ACTION_REQUIRED`; private writes were not authorized and are optional. General conversational recall integration remains a composition boundary, not a proven autonomous product. See [Gate B completion ledger](GATE-B-COMPLETION.md).
+Existing local Grid/pairing, heartbeat, typed Capability Catalog, Durable Runtime and reference HTTP are **software integrated**; the remote, persistent Internet topology above remains a **target**. [Group 3 PR #7](https://github.com/Amaan27-Buzz/oscar/pull/7) merged with CI. Gate C/D remain **PARTIAL**.
 
-## Slice 07 Edge integration
-
-The native [Edge adapter](EDGE.md) uses NodeRole.EDGE, existing opaque Grid
-pairing/session scopes, heartbeat and Capability contracts. Healthy Desk Edge
-exposes only the configured harmless test profile. Controller loss withdraws
-capabilities; heartbeat expiry removes a dead gateway. Reconnect never restores
-an old HIGH output. ACKs remain REPORTED; simulator evidence remains SIMULATED.
-Independent physical readback/owner observation is mandatory. No deployment or
-phone implementation is implied by this local acceptance composition.
-
-## Owner scope decision — 2026-10-05
-
-Slice 07: **COMPLETE FOR SOFTWARE / SIMULATED EDGE FOUNDATION**.
-**PHYSICAL EDGE ACCEPTANCE DEFERRED BY OWNER** — `DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED`.
-Protocol, firmware, Grid integration, ESP32/Pico cross-builds and deterministic
-safety contracts in simulation are accepted for continuation. Historical
-simulator evidence remains **SIMULATED**. No physical GPIO, watchdog, UART,
-E-stop or ESP32/Pico silicon PASS is claimed. Gate C remains **PARTIAL**.
-
-Return to real ESP32/Pico acceptance during Slice 15 physical/device expansion
-and/or Slice 16 reliability/security hardening. Physical failure, loss/recovery,
-watchdog and safety/reflex verification remain mandatory before Slice 17
-Unified Alpha can PASS. The hardware acceptance guide is preserved.
-The 2026-10-05 scope authorized Slice 08. The 2026-10-06 owner decision additionally
-authorizes Slice 09 software after Slice 08 integration; Slice 10, deployment and
-Galaxy Tab Home Node remain outside this work.
-
-## Slice 08 owner closure scope — 2026-10-06
-
-Owner-authorized closure scope: **COMPLETE FOR SOFTWARE / REFERENCE VOICE FOUNDATION**.
-Physical status: `DEFERRED_BY_OWNER / CONSOLIDATED_GATE_C_ACCEPTANCE_REQUIRED`.
-This is not a physical PASS. Gate C remains **PARTIAL**.
-Slice 08 PR #14 integrated after green exact-head CI. Accepted main/work:
-`92a11aa05083f1983186976ba64bd30aa9f1f2a0`. Historical reference research baseline:
-`e8ac8f8bca1cb0cb7909523ac6af906ee289366f`.
-Existing owner harnesses remain mandatory inputs to later consolidated acceptance.
-Microphone, real-room AEC/barge-in/self-wake, owner Match/Map calibration, playback,
-Android voice and naturalness remain NOT RUN. Windows reference evidence never
-implies Android acceptance. See [Voice Core](VOICE-CORE.md) and
-[consolidated Gate C acceptance](GATE-C-CONSOLIDATED-ACCEPTANCE.md).
-Slice 09 OSCAR Mobile software may begin after clean Slice 08 integration; Slice 09 must
-remain a draft and stop before owner/device acceptance. Slice 10, deployment and
-Galaxy Tab Home Node are not authorized. Physical Edge remains
-`DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED`, mandatory before Slice 17 PASS.
-
-## Historical Slice 09 checkpoint — 2026-10-06 (superseded)
-
-Slice 08 PR #14 merged; accepted main/work baseline
-`92a11aa05083f1983186976ba64bd30aa9f1f2a0`. Slice 08 is
-**COMPLETE FOR SOFTWARE / REFERENCE VOICE FOUNDATION**; physical voice is
-`DEFERRED_BY_OWNER / CONSOLIDATED_GATE_C_ACCEPTANCE_REQUIRED`, never physical PASS.
-OSCAR Mobile Kotlin/Compose rebuild is on `club-c/slice-09-sunday`, draft PR #15
-into `work`, **PARTIAL / OWNER_DEVICE_ACCEPTANCE_NOT_RUN**. Core/loopback,
-Gradle/JVM/emulated evidence is separate from actual phone/OEM acceptance.
-See [OSCAR Mobile foundation](MOBILE-FOUNDATION.md) for implementation, limits and the next owner boundary.
-Slice 09 must not merge in this run. Gate C remains PARTIAL. Slice 10, deployment
-and Home Node are not started. Post-alpha Operating Logs, specialist-model training
-and home-server migration remain documented future work, not implemented.
+**Next:** [Group 4 D1/D2](DELIVERY-PLAN.md) implements secure persistent Cloud Core and authenticated remote Grid/outbound Worker connections; **Group 5** validates real Desktop/Android pairing, computer use, plugins, revocation and owner controls. Oracle Always Free is a hosting candidate, not deployed. Later dedicated home-server laptop is distinct from optional Galaxy Tab. Physical Slice 07/18 Edge is **COMPLETE FOR SOFTWARE / SIMULATED EDGE FOUNDATION** with real hardware **DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED**. Historic scopes are retained in Git history and [consolidated Gate C contract](GATE-C-CONSOLIDATED-ACCEPTANCE.md).
 
 ## Tauri surface continuity
 
