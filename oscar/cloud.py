@@ -302,15 +302,24 @@ class CloudCore:
             raise StateConflict(
                 "probe archive admission incomplete; retry the exact request"
             ) from None
+        value = None
+        if task.state == TaskState.VERIFIED:
+            with h.store.lock:
+                result = h.store.db.execute(
+                    "SELECT data FROM records WHERE kind='result' "
+                    "AND json_extract(data,'$.task_id')=? ORDER BY rowid DESC LIMIT 1",
+                    (task.id,),
+                ).fetchone()
+            if result is None:
+                raise StateConflict("verified probe result is unavailable")
+            value = int(json.loads(result[0])["value"])
         return {
             "request_id": request_id,
             "task_id": task.id,
             "state": task.state,
             "event_id": event.id,
             "expression": event.content,
-            "value": sum(int(v.strip()) for v in event.content.split("+"))
-            if task.state == TaskState.VERIFIED
-            else None,
+            "value": value,
         }
 
     def probe(self, session: SessionHandle, data: dict[str, Any]) -> dict[str, Any]:

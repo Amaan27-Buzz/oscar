@@ -101,18 +101,28 @@ network acceptance, not independently hosted Cloud/Desktop operation.
 
 ## Verification ledger
 
-Implementation-time Windows Python 3.12, Linux x86_64 constrained-container and
-actual private TLS tests passed their exercised scope. Native ARM64 and exact
-final-head repository CI results are recorded below when available. Base images
-publish genuine ARM64 manifests; optional memory dependency resolution verifies
-wheel availability only, not inference or service resource fit.
+Windows Python 3.12.10 full regression: **715 tests, PASS, 13 platform/optional
+skips**, using the documented `.[dev,mobile]` dependencies in an isolated ignored
+environment. Ruff, format, strict mypy and repository/secret checks passed.
+Linux x86_64 constrained-container Cloud acceptance: **31 tests PASS**, plus actual
+private trusted-CA TLS, independent readback and container restart. Native ARM64
+also passed all 31 Cloud tests and actual TLS on `ubuntu-24.04-arm` (`aarch64`),
+not emulation. Optional memory dependency resolution found 52 compatible ARM64
+binary wheels; this is availability evidence, not inference, index service runtime
+or workload-fit acceptance.
 
 Starting-main CI: repository, Markdown, Brain, voice, Edge and Mobile succeeded.
 Desktop failed waiting 60 seconds for the disposable WPF fixture readiness before
 Harness construction (`39068366433`); exact underlying startup cause is UNKNOWN.
 This starting-main failure is not attributed to the D1 change.
 
-Final-head CI: pending the draft PR workflow runs. This line is not a green CI claim.
+Initial native CI receipt: [x86_64 and ARM64 Cloud jobs](https://github.com/Amaan27-Buzz/oscar/actions/runs/39070203322)
+passed on `700f1dff3c5ca74ff09b658c1bb618c3cbfa419a`; ARM64 executed 31 tests in
+21.405 seconds and the verified local TLS round-trip. Subsequent changes read probe
+values from actual persisted executor results and strengthen deployment resource
+assertions; focused regression passed. [Draft PR #8 checks](https://github.com/Amaan27-Buzz/oscar/pull/8/checks)
+are authoritative for its latest head. No earlier-head receipt substitutes for
+green final-head checks, and no CI result constitutes Oracle deployment acceptance.
 
 ## External D1 acceptance and D2 handoff
 

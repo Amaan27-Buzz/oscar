@@ -127,13 +127,11 @@ def verify(core_image: str, ingress_image: str) -> None:
         "no-new-privileges:true",
         "--pids-limit",
         "128",
-        "--memory",
-        "1g",
-        "--cpus",
-        "1",
         "--tmpfs",
         "/tmp:rw,size=64m,mode=1777",
     ]
+    core_options = [*common, "--memory", "1g", "--cpus", "1"]
+    ingress_options = [*common, "--memory", "256m", "--cpus", "0.5"]
     try:
         with TemporaryDirectory(prefix=prefix) as temporary:
             fixtures = Path(temporary)
@@ -178,7 +176,7 @@ def verify(core_image: str, ingress_image: str) -> None:
                 "--rm",
                 "--network",
                 "none",
-                *common,
+                *core_options,
                 *mount,
                 *storage,
                 core_image,
@@ -190,7 +188,7 @@ def verify(core_image: str, ingress_image: str) -> None:
                 "--rm",
                 "--network",
                 "none",
-                *common,
+                *core_options,
                 *mount,
                 *storage,
                 core_image,
@@ -212,7 +210,7 @@ def verify(core_image: str, ingress_image: str) -> None:
                 network,
                 "--network-alias",
                 "core",
-                *common,
+                *core_options,
                 *mount,
                 *storage,
                 core_image,
@@ -236,7 +234,7 @@ def verify(core_image: str, ingress_image: str) -> None:
                 network,
                 "--network-alias",
                 DOMAIN,
-                *common,
+                *ingress_options,
                 *mount,
                 "--env",
                 "OSCAR_DOMAIN=" + DOMAIN,
@@ -273,13 +271,16 @@ def verify(core_image: str, ingress_image: str) -> None:
             for name in (core_name, proxy_name):
                 info = json.loads(docker("inspect", name).stdout)[0]
                 assert not info["HostConfig"]["PortBindings"], "unexpected published port"
+                assert info["Config"]["User"] == "10001:10001", "unexpected service identity"
+                assert info["HostConfig"]["ReadonlyRootfs"], "writable container image"
+                assert "ALL" in info["HostConfig"]["CapDrop"], "unexpected process capabilities"
             check = [
                 "run",
                 "--rm",
                 "--interactive",
                 "--network",
                 network,
-                *common,
+                *core_options,
                 *mount,
                 core_image,
                 "python",
@@ -291,6 +292,19 @@ def verify(core_image: str, ingress_image: str) -> None:
             wait_for_core(core_name)
             second = json.loads(docker(*check, stdin=credential).stdout)
             assert first == second, "restart duplicated the same request's Core task"
+            snapshots = docker(
+                "stats",
+                "--no-stream",
+                "--format",
+                "{{json .}}",
+                core_name,
+                proxy_name,
+            ).stdout.splitlines()
+            memory = {}
+            for line in snapshots:
+                item = json.loads(line)
+                role = "core" if item["Name"] == core_name else "ingress"
+                memory[role] = item["MemUsage"]
     finally:
         docker("rm", "--force", core_name, proxy_name, check=False)
         docker("volume", "rm", volume, check=False)
@@ -302,6 +316,7 @@ def verify(core_image: str, ingress_image: str) -> None:
                 "tls": "trusted-local-ca",
                 "network": "private-no-published-ports",
                 "restart_readback": True,
+                "container_memory_snapshot": memory,
             }
         )
     )

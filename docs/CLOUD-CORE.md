@@ -272,6 +272,12 @@ the current NumPy candidates, and Windows cross-resolution incorrectly applied
 Windows-only dependency markers; neither result establishes Linux incompatibility.
 The Core image itself was not changed to install these optional packages or pip.
 
+To repeat that bounded metadata-only audit in a disposable Linux container:
+
+```sh
+docker run --rm oscar-cloud:local sh -c 'python -m pip install --target /tmp/audit-pip pip==26.2.1 && PYTHONPATH=/tmp/audit-pip python -m pip install --dry-run --ignore-installed --only-binary=:all: --platform manylinux_2_28_aarch64 --platform manylinux_2_27_aarch64 --platform manylinux_2_17_aarch64 --platform manylinux2014_aarch64 --platform any --python-version 3.12 --implementation cp --abi cp312 --abi abi3 --abi none qdrant-client==1.19.1 graphiti-core==0.30.2 fastembed==0.8.1'
+```
+
 ## Reproduce software acceptance
 
 ```sh
@@ -299,3 +305,12 @@ in the final engineering report. D2 must add independent outbound Worker session
 real device enrollment, distributed revocation/fencing, reconnect/continuation and
 authoritative remote readback without broadening the diagnostic API into arbitrary
 public Worker control.
+
+Local Linux x86_64 software verification on 2026-10-18 passed all **31 Cloud
+tests** in the Python 3.12.15 acceptance image under UID 10001, read-only filesystem,
+dropped capabilities, no new privileges, 1 GiB RAM and one CPU. The actual private
+Core/Caddy TLS check also passed. After the small synthetic request and restart,
+Docker reported Core **27.14 MiB / 1 GiB** and ingress **14.11 MiB / 256 MiB**.
+These are container memory snapshots, not peak/RSS benchmarks or production sizing.
+The inspected amd64 image `Size` fields were 47,782,283 bytes (Core) and 43,104,770
+bytes (ingress). Native ARM64 CI and Oracle commissioning evidence are separate.
