@@ -44,17 +44,14 @@
 - **After stable alpha:** deep Jarvis-like latency/power/quality campaign, telemetry-driven specialist models and learning, larger interactive AIE surface and broader integrations. Do not use premature optimization as an excuse to defer a usable product.
 - **Every phase:** one OSCAR Core identity, immutable canonical history, separate capture/retention/action grants, approved Orb and native UI, source-backed truth, independent verification and fail-closed permissions.
 
-## Indicative timeline, not promised deadlines
+## Execution pace — capability and acceptance driven
 
-Assumes regular development, usable Oracle/alternate account, phone access and time for real acceptance. Stages may overlap, and an unavailable host/credential changes estimates.
+No estimated weeks, calendar deadlines or artificial waiting periods. Progress as quickly as possible through verified work, parallelizing independent implementation and testing where safe:
 
-| Time from project restart | Stage | Key prerequisite |
-| --- | --- | --- |
-| Weeks **1–3** | Group 4 D1 Cloud Core | Host account/capacity, ARM64 compatibility |
-| Weeks **3–6** | Group 4 D2 remote Grid | TLS/auth, separate host test |
-| Weeks **6–9** | Group 5 D3/D4 real Windows/Android | Owner phone, credential enrollment |
-| Weeks **9–16+** | Group 5 C1–C4 core capabilities | Providers, OS permissions, safety validation |
-| Weeks **16–20+** | Group 6 operational-alpha evidence | Normal owner use and recovery |
-| **Hardware-dependent** | Group 7 home-server, Group 8 physical Edge and complete Gate E | Laptop and boards physically available |
+1. **Start immediately** on the highest-value unblocked stage. Keep implementation, CI, evidence and documentation in the same cohesive delivery.
+2. **Parallelize independent work** (e.g., ARM64 packaging, remote transport threat-model/tests, native client compatibility) when interfaces and ownership are clear; do not fork OSCAR's authoritative Core or duplicate a planned slice.
+3. **Integrate after genuine checks** of the current head and observable acceptance, not after elapsed time. Do not delay a complete stage merely to match an estimate.
+4. **Expose blockers early** (Oracle quota/capacity, unavailable real phone, permissions, account commissioning, network failures); choose an evidence-backed fallback rather than assume success or spend money silently.
+5. **Keep safety and correctness non-negotiable**. Fast delivery does not justify insecure public endpoints, weakening authority/CI, skipping necessary owner approvals or relabeling simulated evidence as physical PASS.
 
-Use checkpoints rather than chasing these dates at the expense of functionality or safety.
+The project is tracked by **completed checklists and acceptance evidence**, not dates or predicted durations.
