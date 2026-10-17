@@ -65,6 +65,9 @@ class EventArchive:
         self._thread = local()
         self._connections: set[sqlite3.Connection] = set()
         self._connection_lock = RLock()
+        if self.db.execute("PRAGMA user_version").fetchone()[0] not in {0, 1}:
+            self.close()
+            raise ValueError("unsupported archive schema; explicit migration required")
         self.db.executescript("""
             CREATE TABLE IF NOT EXISTS archive_events (
                 id TEXT PRIMARY KEY, relationship TEXT NOT NULL, payload TEXT NOT NULL,
@@ -106,6 +109,7 @@ class EventArchive:
             INSERT OR IGNORE INTO archive_generations
             SELECT DISTINCT relationship,1 FROM archive_events
         """)
+        self.db.execute("PRAGMA user_version=1")
         self.db.commit()
 
     def generation(self, relationship: str) -> int:

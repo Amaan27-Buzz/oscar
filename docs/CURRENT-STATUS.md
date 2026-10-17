@@ -17,7 +17,7 @@
 
 ## Still to deliver or actually verify
 
-- [ ] **Cloud Core:** durable, secure, monitored hosted service with TLS, verified ARM64/runtime compatibility, backup/recovery; Oracle Always Free remains a preferred *candidate*, not a deployed service.
+- [ ] **Cloud Core hosted acceptance:** D1 now has an implemented deployment candidate composing the existing Core, private authenticated diagnostics, persistent WAL/FTS5 identity/history, conservative recovery, independent backup/restore and constrained Linux packaging. See [D1 evidence](development/GROUP-04-D1.md) and [operations](CLOUD-CORE.md) for exact software/CI evidence. **Oracle remains unprovisioned; hosted acceptance is outstanding.** Optional derived indexes remain explicitly unavailable in this minimal deployment.
 - [ ] **Remote Grid:** independent Cloud/Desktop/phone authentication, outbound Worker connections, scoped routing, replay/fencing/revocation, offline/partition recovery and independent readback. Existing reference HTTP is loopback-only.
 - [ ] **Real owner Desktop and Android:** install/commission, same persistent conversation/memory/Presence/tasks and remote phone approvals/cancellation.
 - [ ] **Broad computer use:** verified real app/browser/visual interaction and full authorized PC control from conversation, beyond bounded reference operations.
@@ -43,4 +43,4 @@
 
 Evidence terms: SOFTWARE_VERIFIED / CI_VERIFIED / SIMULATED / OWNER_VERIFIED / PHYSICAL_VERIFIED / UNKNOWN / BLOCKED / NOT_RUN. Never promote simulator or reported executor success into physical/independently verified completion.
 
-**Next:** Group 4 / D1 secure persistent Cloud Core candidate and Group 4 / D2 real remote Grid, not hardware Slice 18. See [delivery plan](DELIVERY-PLAN.md).
+**Next:** review the Group 4/D1 software candidate and complete separately authorized host commissioning; Group 4/D2 then supplies real authenticated remote Grid. Hardware Slice 18 remains later. See [delivery plan](DELIVERY-PLAN.md).

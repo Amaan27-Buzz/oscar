@@ -1,0 +1,45 @@
+# Opt-in only after owner authorizes domain, TLS and host/cloud firewall changes.
+services:
+  ingress:
+    image: ${OSCAR_INGRESS_IMAGE:-oscar-cloud-ingress:local}
+    build:
+      context: ../..
+      dockerfile: deploy/cloud/Dockerfile
+      target: ingress
+    user: "10001:10001"
+    read_only: true
+    restart: unless-stopped
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    pids_limit: 64
+    mem_limit: 256m
+    cpus: 0.5
+    environment:
+      OSCAR_DOMAIN: ${OSCAR_DOMAIN:?Set OSCAR_DOMAIN to the owner-approved DNS hostname}
+    ports:
+      - "80:8080"
+      - "443:8443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - type: bind
+        source: ${OSCAR_TLS_DATA:?Set OSCAR_TLS_DATA to the private persistent certificate directory}
+        target: /data
+        bind:
+          create_host_path: false
+      - type: bind
+        source: ${OSCAR_TLS_CONFIG:?Set OSCAR_TLS_CONFIG to the private Caddy configuration directory}
+        target: /config
+        bind:
+          create_host_path: false
+    tmpfs:
+      - /tmp:size=16m,mode=1777,noexec,nosuid,nodev
+    networks: [core]
+    depends_on:
+      core:
+        condition: service_healthy
+    logging:
+      driver: local
+      options:
+        max-size: 10m
+        max-file: "3"
+

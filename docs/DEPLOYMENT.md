@@ -2,6 +2,8 @@
 
 **Owner priority (2026-10-18):** bring up one OSCAR on a persistent cloud host, then make Windows Desktop and the owner's Android phone connect to that same Core. When the owner returns home, add the dedicated home-server laptop; integrate ESP32/Pico physical hardware later. **No Oracle/Vercel/Internet deployment is currently accepted.** [Live checklist](CURRENT-STATUS.md) · [New delivery groups](DELIVERY-PLAN.md).
 
+**D1 software candidate:** `python -m oscar.cloud --config /etc/oscar/cloud.json` composes the existing Harness, Controller, Grid, Router, Event Archive/Memory and Executive. Production configuration and explicit initialization are mandatory. One local volume holds both canonical databases, identity and artifacts under an exclusive lifecycle lock. The new listener exposes only bounded diagnostic status/arithmetic probes with existing Grid session/scope/revocation checks and durable replay fences. The legacy loopback servers remain private. [Operations and Oracle commissioning](CLOUD-CORE.md) · [Implementation/verification ledger](development/GROUP-04-D1.md).
+
 ## Target topology
 
 ```text
@@ -38,7 +40,7 @@ The prior free-tier research was collected **2026-10-04**. Provider capacity and
 
 ## Group 4 — deploy safely (D1/D2)
 
-**D1: secure persistent Core.** Establish reproducible Linux/ARM64 package and service lifecycle, least-privileged process, canonical state on durable volume, non-exported secrets, authenticated TLS ingress/reverse proxy, health and degraded-state readback, bounded logs and cost, backup *and independent restore*, crash/restart verification. No broad public endpoint, paid account upgrade or owner secret handling is authorized by the documentation change itself.
+**D1: secure persistent Core.** Implemented candidate provides a digest-pinned multiarchitecture Linux package, nonroot constrained service, canonical durable volume, read-only injected secrets, opt-in TLS ingress, authenticated diagnostics, health/degraded readback, bounded logs and independent backup/restore with crash/restart tests. This authorizes software verification only. Actual Oracle account capacity, host storage, public domain/certificate/firewall, off-host backups and owner commissioning require separate acceptance. See the evidence ledger for native ARM64 CI results; image manifests and dependency metadata alone are not runtime acceptance.
 
 **D2: genuine remote Connection Grid.** Separate stable node identity from bearer tokens; owner pairing and scope binding, authenticated outbound Desktop Worker connection, revocation/credential rotation/replay fences, target rechecks, durable task/lease continuation and explicit offline/UNKNOWN reporting. Network failure or silent Core restart must not create double mutations or impersonate approval. Remote cancellation and "success" require authoritative readback.
 
