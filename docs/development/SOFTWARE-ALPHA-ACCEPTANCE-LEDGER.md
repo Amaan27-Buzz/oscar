@@ -1,4 +1,6 @@
-# Software Alpha acceptance ledger
+# Software Alpha acceptance ledger — historical Groups 1–2
+
+> **Archival evidence, not the current project status.** The 2026-10-11 to 2026-10-16 statements and then-true GitHub Actions `enabled:false` entries below remain as contemporaneous findings. On 2026-10-17, Group 3 Slices 14–17 [PR #7](https://github.com/Amaan27-Buzz/oscar/pull/7) was merged after genuine successful GitHub Actions runs. **Gate C/D remain PARTIAL.** Current project truth: [checked status](../CURRENT-STATUS.md), [delivery plan](../DELIVERY-PLAN.md), and [integration receipt](../evidence/group03/ACTIONS-INTEGRATION.md). Do not execute historical "Slice 14 not authorized" or blocked-CI restrictions as current instructions.
 
 Owner strategy decision: 2026-10-11. Build and autonomously validate the software
 first; consolidate manual visual, real-device and physical acceptance at the end
