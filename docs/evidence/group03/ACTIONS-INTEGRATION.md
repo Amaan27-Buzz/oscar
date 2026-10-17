@@ -53,6 +53,7 @@ cancelled or skipped job is never recorded as a pass.
 | Local preview URL was checked without a local development server | Documentation example | Show the local address as a command/example and explicitly require starting its server. |
 | Google Little Signals research URL had invalid TLS hostname | External reference | Use the authoritative `experiments.withgoogle.com/little-signals` page; HTTP 200 verified without disabling TLS validation. |
 | Emulated Expression atlas capture timed out in AndroidX's two-second frame-commit wait | Instrumentation readiness / runner environment | Compile APKs before emulator startup, require the fixture window to have focus before capture, retain all rendering/contract assertions and upload instrumentation reports. Logs do not establish a production renderer defect; the actual rerun must verify the correction. |
+| Desktop native build passed but the disposable WPF field did not emit `ContentRendered` within 60 seconds | Native fixture / hosted rendering environment | Select process-local software rendering for this fixture, retain its stderr and report non-secret session/render diagnostics. Keep `ContentRendered`, independent UIA readback and native signing requirements intact. A hosted rerun must establish whether this resolves readiness. |
 
 Local verification of the initial corrections: three Group 3 composition/crash
 tests passed; the simulated-day test also retained all 25 occurrences at four
@@ -64,6 +65,10 @@ SHA-256; no runtime dependency or host installation was introduced.
 The instrumentation readiness correction also passed local Android JVM tests,
 APK/AndroidTest assembly and lint; the application APK and canonical Orb hashes
 remain identical. Actual emulator success still requires the hosted rerun.
+The revised WPF fixture passed the actual local Tauri self-check, including CNG
+signing, registered-application readback, cancellation, reconnect and native
+restart with shared Core tasks. This is Windows reference evidence; hosted
+readiness and owner/physical acceptance remain separate.
 
 No production Core, native UI/artwork, authorization, replay/expiry checks,
 verification or idempotency behavior changed in these corrections. Earlier

@@ -146,7 +146,7 @@ def main() -> int:
         field_process = subprocess.Popen(
             [str(shell), "-NoProfile", "-STA", "-File", str(fixture), "-StopFile", str(stop_file)],
             stdout=subprocess.PIPE,
-            stderr=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
             text=True,
             creationflags=subprocess.CREATE_NO_WINDOW,
             env={
@@ -318,6 +318,11 @@ def main() -> int:
                 field_process.wait(timeout=5)
             if field_process.stdout:
                 field_process.stdout.close()
+            if field_process.stderr:
+                diagnostic = field_process.stderr.read()
+                field_process.stderr.close()
+                if diagnostic:
+                    print("Disposable WPF fixture diagnostics: " + diagnostic[-2000:])
     return 0
 
 
