@@ -1,119 +1,18 @@
-# AGENTS.md
+# AGENTS.md — active development instructions (2026-10-18)
 
-## Owner Group 3 unattended engineering — 2026-10-16
+**Read before any OSCAR work:** [Current status](docs/CURRENT-STATUS.md), [new delivery groups](docs/DELIVERY-PLAN.md), [canonical slices](docs/SLICE-NUMBERING.md), [roadmap](docs/ROADMAP.md), [build gates](docs/BUILD-GATES.md) and [deployment](docs/DEPLOYMENT.md).
 
-Continuation explicitly authorizes completing normal runtime integration and
-software Slices 14–17, including approved-surface compatibility and an opt-in
-Android Companion overlay implementation. Preserve the visual design. Build/JVM/
-headless checks are permitted; do not claim owner/OEM/device acceptance from them.
-Continue the existing branch/PR #7; do not stop at another small foundation if
-software implementation is feasible. No merge, Group 4 or Codex Cloud.
+## Current owner sequencing and authorization
 
-The owner authorizes local backend implementation of canonical Slices 14–17 on
-`codex/group-03-gate-d`, based on fetched main `257349f`. Work in dependency order,
-verify and commit checkpoints, push and create a draft PR into main; no merge or
-release. This supersedes older dated Slice 14–17 stop notes only within Group 3.
-Preserve approved UI/artwork/Orb and Core authority. No phone/emulator, physical
-hardware/audio/camera, new permissions/credentials, paid/cloud development hosts,
-host reconfiguration or unrelated personal files. Gate C remains PARTIAL; report
-reference/simulated evidence separately from owner/device/production acceptance.
-See [Group 3 run and continuation](docs/development/GROUP-03-GATE-D.md).
+- Software foundations Slices **00–17 are integrated**. Single **Group 3 Slices 14–17, PR #7 is MERGED**, not a draft requiring completion. GitHub Actions was enabled; final-head and main CI passed. **Gate C/D PARTIAL**, Gate E NOT PASSED.
+- Next **Group 4 D1** persistent secure Cloud Core (Oracle Always Free preferred **candidate**, not deployed), then **D2** authenticated remote Grid. **Group 5** real Desktop/Android and owner onboarding, full computer use, plugins/MCP, Secure/Full Access, real voice, Sentry, automation and Chief of Staff. **Group 6** scoped operational alpha. **Group 7** dedicated home-server laptop *when available*. **Group 8** ESP32/Pico physical acceptance and remaining formal gates.
+- **Keep canonical slices 00–20**. Delivery stages D1–D4/C1–C4 and Groups 4–8 are not renumbered slices. Physical **Slice 18 is deferred, not cancelled**; remote-facing Slice 19 hardening is mandatory in Group 4. A scoped alpha must not claim full Slice 20 / Gate E PASS while mandatory physical acceptance remains incomplete.
+- Preserve **one authoritative OSCAR** identity/Core, Controller, Event Archive/Memory, Grid, Policy, Executive, native app designs and canonical Orb. Any capability claiming full PC control, connector authorization or Full Access requires actual enforcement and independent verification.
+- Existing Ask is current. **Full Access** is owner-authorized autonomy over technically available capabilities **without OSCAR per-action prompts** once properly activated; it cannot bypass OS/provider constraints, external mandatory approval, provenance, revocation or deterministic physical safety. Perception, retention and action grants are separate.
+- The current user's authorization in this request is **documentation-only work directly on main**, not paid cloud procurement, public Core exposure, credential/provider enrollment, firmware flashing, real audio capture, feature development or release.
+- **All obsolete PR-specific and dated run prohibitions from 2026-10-04 through 2026-10-17 are superseded**; read historical implementation/evidence receipts for provenance, not as current instructions. Preserve that history in Git. Don't add another Group 3 or resurrect PR #7.
 
-## Owner Group 2.5B final closure — 2026-10-16
-
-The owner explicitly APPROVED the Mobile UI/UX, including all 15 heroes, artwork,
-controls, Preferences, navigation, motion and the canonical Orb. Preserve this
-design. Finish theme/lifecycle investigation and verification on the existing
-branch and PR #6; commit/push for merge review. No merge or Slice 14. Physical
-audio/biometric/OEM acceptance and Gate C remain separate. See
-[final closure](docs/ui/mobile/group25b/FINAL-CLOSURE.md).
-
-## Owner Group 2.5B production Android scope — 2026-10-14
-
-Implement the selected ImageGen/Figma Mobile visual language in `mobile/` on
-`codex/mobile-group-2.5b`, based on current integrated main `b941357`. Preserve
-all original `design/oscar-mobile-visual-exploration/` images and native/Core
-authority, signing, voice and shared Expression contracts. The external
-`oscar-ui-test` Gemini Argon prototype is rejected, not an integration source.
-Represent all 15 hero experiences natively with functioning or honestly
-unavailable controls; reconcile broader information architecture. Build, test,
-compare native emulator evidence, commit/push and prepare a draft PR into main
-when connectivity permits. Stop for owner visual review; no merge, physical
-PASS, new Full Access authority, Sentry/Executive/AIE backend or Slice 14–17.
-This explicit scope supersedes earlier Mobile prohibitions only within Group 2.5B.
-See [implementation/evidence](docs/ui/mobile/group25b/README.md).
-
-## Owner Group 2.5 product correction — 2026-10-14
-
-Continue `codex/desktop-companion-workspace`, draft PR #5 into main, with no new worktree. Preserve the approved Companion/Orb and all native/Aperture evidence. Conversation is central; navigation is Conversation / Automations / Activity / Devices / Preferences. Dictate/Edit and immediate actions are contextual conversation capabilities. Read [the interaction/authority decision](docs/decisions/ADR-DESKTOP-PERSONAL-INTELLIGENCE.md). Ask / Secure / genuine Full Access, awareness and Worker autonomy are independent. Current Secure/Full Access activation remains unavailable pending a signed owner-delegation/revocation integration; never hide confirmations or forge approvals. Owner authorizes supported Core integration and tests, commit/push to the existing draft, then stop for visual review. No Mobile redesign, Slices 14–17 implementation, merge or cleanup.
-
-## Owner Group 2.5A — 2026-10-12
-
-The owner authorizes Desktop architecture correction from consolidated main
-`fd191a2d7ca7f98c456969c74173a0340f789578`: a tiny persistent Companion and a
-separate full Workspace in one Tauri process. The canonical Orb and shared Core,
-voice, permissions and native signing boundaries remain intact. Companion is
-never a miniature chat application and has no approval authority. See
-[the ownership contract](docs/design/DESKTOP-COMPANION-WORKSPACE.md) and
-[native evidence](docs/ui/desktop/workspace/README.md).
-
-Use one focused branch and a draft PR directly against main; stop for owner
-visual review before merge. Preserve local Aperture `42b565c` and all historical
-branches/evidence. No Mobile, Slice 14, production promotion or branch cleanup.
-This explicit scope supersedes older sequencing notes only within Group 2.5A.
-
-## Owner software-first scope — 2026-10-11
-
-Group 1 authorizes Desktop Slice 12.2–12.6 on a separate development branch based
-on `da8fddae50112c8859b21247d0cbaa617be8667e`, with autonomous stage tests and
-independent reviews. Pending manual visual/device/physical acceptance is explicitly
-deferred in [the cumulative ledger](docs/development/SOFTWARE-ALPHA-ACCEPTANCE-LEDGER.md)
-and does not stop authorized software continuation. Do not infer physical PASS,
-weaken authority, merge/promote the candidate or begin Slice 13/Group 2. Earlier
-dated sequencing/stop notes below remain historical and are superseded only within
-this explicit scope. See [Group 1](docs/development/GROUP-01-DESKTOP-COMPLETION.md).
-
-Canonical instructions for Codex and other coding agents working on OSCAR.
-
-## Current authoritative slice plan — 2026-10-09
-
-**Owner authorization — 2026-10-10:** Slice **12.1 Living Desktop Presence** is a
-separate local owner-review candidate based on integration `b9d3e049`. See
-`docs/ui/desktop/presence/README.md`. Preserve both unmerged foundation histories;
-work locally under the owner-reported GitHub access restriction. The prototype
-uses a DEV route/debug launch flag, not the default UI. Stop at visual review;
-12.2, Mobile redesign, Core authority changes and foundation merges are not authorized.
-
-**Canonical numbered roadmap: Slices 00–20.** Read `docs/SLICE-NUMBERING.md`,
-`docs/ROADMAP.md` and `docs/EXPRESSION-CORE.md` before proposing a slice.
-Current candidate: **11.1 Character/Expression Language + 11.2 Interactive
-Expression Lab + 11.3 shared render contract**. The owner approved broader v3
-movement for engineering continuation. Local shared-engine/React/native Compose
-validation is recorded in `docs/design/expression/VALIDATION.md`; final owner
-quality/device review and remote exact-head CI remain distinct merge boundaries.
-Do not begin 12 Desktop UX or 13 Mobile UX without separate authorization.
-Later sequence: 12 → 13 → 14–20 remaining roadmap.
-Old `09R/10R/13A/13B` labels and original Slice 17 Alpha are historical
-aliases only; do not use them in new plans or claim them as current.
-
-**Design quality bar:** The previous static smiling Orb on beige cards was
-rejected. The companion screenshots are references for responsive character,
-gaze, microexpressions, believable timing and ambient desktop presence—not
-artwork to copy. The owner expects GPT-6.1 Sol / High effort: thoughtful design
-research, careful iteration, independently critiqued motion, tiny-scale
-legibility and owner visual approval. Do not optimize for quick mockups.
-Preserve `assets/brand/oscar-orb.svg` as an immutable canonical source;
-reviewed expressive derivatives live separately. Real operational state and
-Persona delivery must be strictly separated.
-
-**Git:** PR #16 is an unmerged Desktop runtime candidate and its old 10R.1
-A/B/C screenshots are exploratory. Reconcile the draft branch against
-`origin/work` before continuing; protect unmerged code/evidence, respect
-GitHub billing-blocked remote CI, and never mark owner-device checks PASS.
-Gate C remains PARTIAL. See `docs/BUILD-GATES.md`.
-
-
-Detailed truth lives in the linked domain docs. Do not duplicate the whole architecture into tool-specific prompts.
+## Durable engineering standards
 
 ## Read first
 
@@ -188,7 +87,7 @@ finish planned slice/gate
 → later expand/harden
 ```
 
-Do **not** advance to a later Club merely because the current partial implementation is demoable. Planned mandatory work remains current work until completed or explicitly re-scoped by the owner.
+The owner explicitly re-scoped the post-Group-3 execution order: Groups 4–6 deliver a *scoped* Cloud–Desktop–Phone alpha before Group 7 home-server and Group 8 physical Edge. Unfinished original Gate C/D/E obligations remain PARTIAL and cannot be silently treated as passed.
 
 ## Working style
 
@@ -225,8 +124,7 @@ Laya/Jev decision providers are replaceable implementations beneath this boundar
 System-1 evaluation starts only after Gate B PASS.
 
 See [deployment](docs/DEPLOYMENT.md) and [shared auth](docs/CONNECTOR-FABRIC.md).
-Oracle/Vercel deployment, the Galaxy Tab Home Node and full Auth Broker expansion
-are later work, not added Gate B requirements. Do not implement the Tab node before
+Oracle persistent Core deployment and authenticated remote Grid are now the Group 4 priority; Vercel remains complementary. Galaxy Tab, Home Node and physical Edge are later work and not retroactive Gate B requirements. Do not implement the Tab node before
 OSCAR is fully deployed and its main Core architecture is operational.
 
 ## Three routing decisions remain separate
@@ -469,90 +367,6 @@ Never commit or casually log API/provider keys, OAuth/device credentials, privat
 
 Use ignored local fixtures or synthetic test data.
 
-## Current Gate B boundary
+## Historical evidence, not instructions
 
-Verified scoped foundations include native Windows file/process/Git work, useful Codex delegation with independent verification, cancellation, coordinator/Worker restart/recovery, ambiguous mutation blocking, local selected memory continuity and bounded owner-reviewed policy authoring.
-
-Verified acceptance includes native Windows/Codex work, typed PowerShell, registered Notepad/UIA, isolated browser, separate owner control, native credentials, canonical WAL/FTS5, real Qdrant/Graphiti/Neo4j, local embedding/reranking, memory evaluation and owner-reviewed policy candidates. The owner completed physical machine acceptance and registered GitHub device OAuth with exactly `user:email`, real private reads, new-process restart, controlled private/public federation and local credential deletion/absence checks. Slice 05 and Slice 06 are COMPLETE for the documented local-alpha scope; Gate B is PASS. Remote provider revocation remains `UNKNOWN_OWNER_ACTION_REQUIRED`; private writes were not authorized and are optional. General conversational recall integration remains a composition boundary, not a proven autonomous product. See [Gate B completion ledger](docs/GATE-B-COMPLETION.md). Slice 07 software foundation is accepted for continuation under the owner scope decision below.
-
-
-Final physical/manual machine acceptance PASSED in owner run
-`manual-gate-b-20261004-200734` (desktop/local/public browser VERIFIED; prior stale
-fixture untouched). Slice 05 is COMPLETE for its documented local-alpha scope;
-Slice 06 is COMPLETE and Gate B PASS after owner OAuth run `oauth-gate-b-20261004-234817`.
-The dedicated [owner OAuth harness](docs/GATE-B-OAUTH-ACCEPTANCE.md) has passed real owner acceptance with
-exactly `user:email`, restart, federation and local disconnect. Never borrow credentials or authorize autonomously: the owner
-must supply a registered Client ID and interact with GitHub. This acceptance recording itself grants no later work. Separate owner authorization
-now permits Slice 07 closure/PR 13 integration and Slice 08 on a separate draft PR; deployment and OSCAR Mobile/Android remain out of scope.
-
-## Owner scope decision — 2026-10-05
-
-Slice 07: **COMPLETE FOR SOFTWARE / SIMULATED EDGE FOUNDATION**.
-**PHYSICAL EDGE ACCEPTANCE DEFERRED BY OWNER** — `DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED`.
-Protocol, firmware, Grid integration, ESP32/Pico cross-builds and deterministic
-safety contracts in simulation are accepted for continuation. Historical
-simulator evidence remains **SIMULATED**. No physical GPIO, watchdog, UART,
-E-stop or ESP32/Pico silicon PASS is claimed. Gate C remains **PARTIAL**.
-
-Return to real ESP32/Pico acceptance during Slice 15 physical/device expansion
-and/or Slice 16 reliability/security hardening. Physical failure, loss/recovery,
-watchdog and safety/reflex verification remain mandatory before Slice 17
-Unified Alpha can PASS. The hardware acceptance guide is preserved.
-The 2026-10-05 scope authorized Slice 08. The 2026-10-06 owner decision additionally
-authorizes Slice 09 software after Slice 08 integration; Slice 10, deployment and
-Galaxy Tab Home Node remain outside this work.
-
-## Slice 08 owner closure scope — 2026-10-06
-
-Owner-authorized closure scope: **COMPLETE FOR SOFTWARE / REFERENCE VOICE FOUNDATION**.
-Physical status: `DEFERRED_BY_OWNER / CONSOLIDATED_GATE_C_ACCEPTANCE_REQUIRED`.
-This is not a physical PASS. Gate C remains **PARTIAL**.
-Slice 08 PR #14 integrated after green exact-head CI. Accepted main/work:
-`92a11aa05083f1983186976ba64bd30aa9f1f2a0`. Historical reference research baseline:
-`e8ac8f8bca1cb0cb7909523ac6af906ee289366f`.
-Existing owner harnesses remain mandatory inputs to later consolidated acceptance.
-Microphone, real-room AEC/barge-in/self-wake, owner Match/Map calibration, playback,
-Android voice and naturalness remain NOT RUN. Windows reference evidence never
-implies Android acceptance. See [Voice Core](docs/VOICE-CORE.md) and
-[consolidated Gate C acceptance](docs/GATE-C-CONSOLIDATED-ACCEPTANCE.md).
-Slice 09 OSCAR Mobile software may begin after clean Slice 08 integration; Slice 09 must
-remain a draft and stop before owner/device acceptance. Slice 10, deployment and
-Galaxy Tab Home Node are not authorized. Physical Edge remains
-`DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED`, mandatory before Slice 17 PASS.
-
-## Historical Slice 09 checkpoint — 2026-10-06 (not current guidance)
-
-Slice 08 PR #14 merged; accepted main/work baseline
-`92a11aa05083f1983186976ba64bd30aa9f1f2a0`. Slice 08 is
-**COMPLETE FOR SOFTWARE / REFERENCE VOICE FOUNDATION**; physical voice is
-`DEFERRED_BY_OWNER / CONSOLIDATED_GATE_C_ACCEPTANCE_REQUIRED`, never physical PASS.
-OSCAR Mobile Kotlin/Compose rebuild is on `club-c/slice-09-sunday`, draft PR #15
-into `work`, **PARTIAL / OWNER_DEVICE_ACCEPTANCE_NOT_RUN**. Core/loopback,
-Gradle/JVM/emulated evidence is separate from actual phone/OEM acceptance.
-See [OSCAR Mobile foundation](docs/MOBILE-FOUNDATION.md) for implementation, limits and the next owner boundary.
-Slice 09 must not merge in this run. Gate C remains PARTIAL. Slice 10, deployment
-and Home Node are not started. Post-alpha Operating Logs, specialist-model training
-and home-server migration remain documented future work, not implemented.
-
-## OSCAR Mobile rebuild owner direction — 2026-10-06
-
-OSCAR is the app/product; OSCAR Mobile is the technical surface name. Sunday is
-retired from active product direction; preserve historical evidence and legacy wire
-compatibility. Continue PR #15 with native Kotlin/Compose software, salvage sound
-security/platform contracts, and keep screens independently redesignable. Do not
-polish the retired UI, redraw the canonical Orb, create an Android brain or require
-owner/device interaction. Gate C PARTIAL; OWNER_DEVICE_ACCEPTANCE_NOT_RUN.
-No Elocution inspection/work, model training, Operating Logs, home-server migration
-or Slice 10. See [Mobile foundation](docs/MOBILE-FOUNDATION.md).
-
-## Current Slice 10 owner scope — 2026-10-07
-
-Owner accepted `main == work == 7043b9663fe6474e3457c7aa578e733f7a5a4c1a`; Slice 09 software is merged. The current authorized work is Slice 10 Desktop Interaction Runtime on `club-d2/slice-10-desktop`, draft PR into `work`, **OWNER_ACCEPTANCE_NOT_RUN**. Do not merge in this run or start Slice 11. This explicit authorization supersedes older Slice 10 prohibitions; it does not authorize 09R, deployment, Home Node or post-alpha work. Core stays authoritative and Windows UIA/browser/Worker remain the execution backend. Physical Edge, Voice and Mobile acceptance remain owner-deferred; Gate C PARTIAL. See [Desktop foundation](docs/DESKTOP-FOUNDATION.md).
-
-## Slice 10 Tauri owner continuation — 2026-10-08
-
-PR #16 remains draft and unmerged. The owner selected Tauri 2/Rust/React-TypeScript
-as the product shell; WPF is reference-only in `desktop/reference/wpf/`. Preserve
-the accepted Core architecture and authority. Native credentials/signing never
-enter React. 10R is documented future design work; do not implement final redesign,
-09R, Slice 11 or post-alpha work here. OWNER_ACCEPTANCE_NOT_RUN; Gate C PARTIAL.
+Prior task-specific owners' stop boundaries, previous PR SHAs, Group 2.5 iteration notes, and the old “Slice 17 Unified Alpha” number are preserved in repository Git history and dated reports. The canonical Alpha milestone is **Slice 20**; a smaller Group 6 Cloud–Desktop–Phone **operational alpha** can be accepted without pretending to have physically verified Slice 18. Review [delivery plan](docs/DELIVERY-PLAN.md) for exact outstanding checklists.
