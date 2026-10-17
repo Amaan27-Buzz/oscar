@@ -29,6 +29,11 @@ FIXTURE = r"""
 param([string]$StopFile)
 $ErrorActionPreference='Stop'
 Add-Type -AssemblyName PresentationFramework,UIAutomationClient,UIAutomationTypes
+# The disposable fixture must not depend on a hosted runner's virtual GPU.
+[Windows.Media.RenderOptions]::ProcessRenderMode=[Windows.Interop.RenderMode]::SoftwareOnly
+$fixtureSession=[Diagnostics.Process]::GetCurrentProcess().SessionId
+[Console]::Error.WriteLine("fixture: interactive=$([Environment]::UserInteractive)")
+[Console]::Error.WriteLine("fixture: session=$fixtureSession; rendering=software")
 $w=[Windows.Window]::new();$w.Title='OSCAR disposable UIA reference';$w.Width=420;$w.Height=170
 $field=[Windows.Controls.TextBox]::new();$field.Text='Desktop reference before'
 $field.Margin=[Windows.Thickness]::new(20);$w.Content=$field
@@ -75,7 +80,7 @@ def main() -> int:
         process = subprocess.Popen(
             [str(shell), "-NoProfile", "-STA", "-File", str(script), "-StopFile", str(stop)],
             stdout=subprocess.PIPE,
-            stderr=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
             text=True,
             creationflags=subprocess.CREATE_NO_WINDOW,
             env={
@@ -292,6 +297,11 @@ def main() -> int:
                 process.wait(timeout=5)
             if process.stdout:
                 process.stdout.close()
+            if process.stderr:
+                diagnostic = process.stderr.read()
+                process.stderr.close()
+                if diagnostic:
+                    print("Disposable WPF fixture diagnostics: " + diagnostic[-2000:])
     return 0
 
 

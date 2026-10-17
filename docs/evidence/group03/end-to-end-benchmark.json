@@ -1,0 +1,78 @@
+{
+  "version": 1,
+  "baseline_sha": "5899798a3200173547ee3493689e20222fe3d1b1",
+  "candidate_head": "c23dc4a64e45311104d7ba0798f20f4a763ffd9b",
+  "python": "3.14.2",
+  "platform": "Windows-11-10.0.26300-SP0",
+  "evidence": "REAL_LOCAL_SQLITE_FILES_AND_AUTHENTICATED_LOOPBACK_HTTP",
+  "limitations": "One instrumented process per revision on this laptop; warm-up3, tracemalloc enabled, warm caches and concurrent machine load uncontrolled. Python allocations, not total RSS or battery. No physical device, network provider, camera/audio or production load measurement. Candidate source hash includes current uncommitted Python files.",
+  "baseline": {
+    "startup_ms": 303.438,
+    "idle_cpu_seconds": 0.0,
+    "idle_wall_seconds": 2.1,
+    "common_cpu_seconds": 3.344,
+    "common_elapsed_seconds": 7.238,
+    "common_peak_python_allocated_bytes": 2702946,
+    "cpu_seconds": 3.359,
+    "elapsed_seconds": 7.247,
+    "peak_python_allocated_bytes": 2702946,
+    "operations": {
+      "arithmetic_local": {
+        "samples": 30,
+        "median_ms": 13.702,
+        "p95_ms": 17.782
+      },
+      "file_local": {
+        "samples": 30,
+        "median_ms": 32.488,
+        "p95_ms": 48.41
+      },
+      "arithmetic_loopback_http": {
+        "samples": 30,
+        "median_ms": 93.473,
+        "p95_ms": 120.199
+      }
+    },
+    "source_sha256": "84a4697d861e5412dfcc882137f78c137574ddb4f0b08ed4f1c2469450b7360b"
+  },
+  "candidate": {
+    "startup_ms": 357.28,
+    "idle_cpu_seconds": 0.0,
+    "idle_wall_seconds": 2.1,
+    "common_cpu_seconds": 3.328,
+    "common_elapsed_seconds": 6.984,
+    "common_peak_python_allocated_bytes": 2318527,
+    "cpu_seconds": 4.141,
+    "elapsed_seconds": 8.151,
+    "peak_python_allocated_bytes": 2318527,
+    "operations": {
+      "arithmetic_local": {
+        "samples": 30,
+        "median_ms": 18.854,
+        "p95_ms": 21.018
+      },
+      "file_local": {
+        "samples": 30,
+        "median_ms": 27.378,
+        "p95_ms": 31.635
+      },
+      "arithmetic_loopback_http": {
+        "samples": 30,
+        "median_ms": 90.297,
+        "p95_ms": 95.61
+      },
+      "presence_and_typed_view": {
+        "samples": 30,
+        "median_ms": 2.888,
+        "p95_ms": 4.196
+      },
+      "reviewed_executive_goal": {
+        "samples": 30,
+        "median_ms": 33.864,
+        "p95_ms": 44.582
+      }
+    },
+    "source_sha256": "1a0dfa98fe037b4a2b693fece8d3400d6aae9b6229fa8dc6064abaadc93e0f04"
+  },
+  "candidate_source_state": "All oscar source committed at candidate_head; source_sha256 hashes the tested working-file bytes."
+}

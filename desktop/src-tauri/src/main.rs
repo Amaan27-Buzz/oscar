@@ -87,6 +87,9 @@ fn companion_view(mut view: View) -> View {
         .filter(|mode| matches!(*mode, "Ask" | "Secure" | "Full Access"))
         .map(str::to_owned);
     view.operating = None;
+    view.setup = None;
+    view.executive = None;
+    view.adaptive_views.clear();
     view
 }
 

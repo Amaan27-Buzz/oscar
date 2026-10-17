@@ -52,6 +52,8 @@ class ExpressionRenderingTest {
             }
         }
         compose.onAllNodesWithContentDescription("OSCAR expression").assertCountEquals(20)
+        compose.waitUntil(timeoutMillis=10_000) { compose.activity.hasWindowFocus() }
+        compose.waitForIdle()
         val image=compose.onNodeWithTag("atlas").captureToImage().asAndroidBitmap()
         val file=File(compose.activity.getExternalFilesDir(null),"expression-native-atlas.png")
         file.outputStream().use { assertTrue(image.compress(Bitmap.CompressFormat.PNG,100,it)) }

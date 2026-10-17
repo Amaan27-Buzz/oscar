@@ -1,0 +1,14 @@
+{
+  "classification": "SIMULATED",
+  "storage": "real local SQLite/WAL",
+  "samples": 100,
+  "current_rows": 512,
+  "success_rate": 1.0,
+  "state_assertion_accuracy": 1.0,
+  "model_invocations": 0,
+  "external_tool_invocations": 0,
+  "p50_ms": 4.708150000169553,
+  "p95_ms": 5.712999999559543,
+  "peak_traced_bytes": 4272744,
+  "disconnect_reconnect_ms": 6.8266999996922095
+}

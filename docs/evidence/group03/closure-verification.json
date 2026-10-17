@@ -1,0 +1,194 @@
+{
+  "version": 1,
+  "date": "2026-10-17",
+  "starting_head": "d2e686c7d8c2f67dea13d1551d52b5759831d279",
+  "base_main": "257349f82a96293c3737d446dca18ce46f098b04",
+  "implementation_sha": "4a72cb351a93d444405e55b1fc64d5cb2dedf035",
+  "measured_runtime_head": "e9c2eb0bda7df197f16c83e35ad711b08cdcebbc",
+  "idle_measurement_head": "4a72cb351a93d444405e55b1fc64d5cb2dedf035",
+  "tested_python_source_sha256": "cea855bdc0b8f0b1d7e5d46de1970a65d7f0d0c6f4776cfe3f7295cb1466c774",
+  "remote_source_head_verified": "4a72cb351a93d444405e55b1fc64d5cb2dedf035",
+  "branch": "codex/group-03-gate-d",
+  "pull_request": "https://github.com/Amaan27-Buzz/oscar/pull/7",
+  "pr_status": "OPEN_DRAFT_NOT_MERGED",
+  "gate_c": "PARTIAL",
+  "gate_d": "PARTIAL",
+  "remote_ci": {
+    "status": "UNKNOWN",
+    "reason": "Final-head check recorded separately in PR delivery; no remote PASS unless genuinely returned."
+  },
+  "environment": {
+    "python": "3.14.2",
+    "sqlite": "3.50.4",
+    "platform": "Windows-11-10.0.26300-SP0"
+  },
+  "regression": {
+    "ran": 684,
+    "passed": 678,
+    "failed": 0,
+    "skipped": 6,
+    "seconds": 166.202
+  },
+  "skipped_tests": [
+    "test_real_embedding_self_output_denial (tests.test_voice_models.LocalVoiceModelTests.test_real_embedding_self_output_denial) ... skipped 'optional Windows/local-model reference executor not requested'",
+    "test_real_local_stt_and_cancellation (tests.test_voice_models.LocalVoiceModelTests.test_real_local_stt_and_cancellation) ... skipped 'optional Windows/local-model reference executor not requested'",
+    "test_real_local_wake_vad_and_no_wake_silence (tests.test_voice_models.LocalVoiceModelTests.test_real_local_wake_vad_and_no_wake_silence) ... skipped 'optional Windows/local-model reference executor not requested'",
+    "test_wasapi_shared_format_without_opening_audio (tests.test_voice_models.LocalVoiceModelTests.test_wasapi_shared_format_without_opening_audio) ... skipped 'optional Windows/local-model reference executor not requested'",
+    "test_windows_synthesis_interrupted_at_chunk_boundary (tests.test_voice_models.LocalVoiceModelTests.test_windows_synthesis_interrupted_at_chunk_boundary) ... skipped 'optional Windows/local-model reference executor not requested'",
+    "test_prepared_neural_response_and_cancel (tests.test_voice_models.NeuralReferenceTests.test_prepared_neural_response_and_cancel) ... skipped 'optional prepared neural reference executor not requested'"
+  ],
+  "commands": [
+    {
+      "command": "python -m unittest discover -s tests -t . -v",
+      "ran": 684,
+      "passed": 678,
+      "failed": 0,
+      "skipped": 6,
+      "seconds": 166.202
+    },
+    {
+      "command": "python -m unittest tests.test_internal_sessions tests.test_presence tests.test_world_runtime tests.test_grid tests.test_executive tests.test_group03_runtime -q",
+      "passed": 76,
+      "failed": 0
+    },
+    {
+      "command": "python -m ruff check oscar tests scripts",
+      "status": "PASS"
+    },
+    {
+      "command": "python -m ruff format --check oscar tests scripts",
+      "status": "PASS",
+      "files": 177
+    },
+    {
+      "command": "python -m mypy oscar",
+      "status": "PASS",
+      "modules": 74
+    },
+    {
+      "command": "python -m scripts.build_desktop --checks",
+      "status": "PASS",
+      "frontend_tests": 86,
+      "rust_tests": 16,
+      "includes": "TypeScript/Vite; Rust format/Clippy -D warnings; Windows debug Tauri executable; npm audit zero vulnerabilities"
+    },
+    {
+      "command": "python -m scripts.build_mobile",
+      "status": "PASS",
+      "app_jvm_tests": 31,
+      "expression_jvm_tests": 6,
+      "includes": "debug and AndroidTest APK assembly; lint; canonical Orb packaging hashes"
+    },
+    {
+      "command": "python -m scripts.check_repository",
+      "status": "PASS",
+      "includes": "required files, links, removed references, tracked/nonignored secret scan"
+    },
+    {
+      "command": "git diff --check",
+      "status": "PASS"
+    },
+    {
+      "command": "git fsck --full --strict",
+      "status": "PASS",
+      "note": "Existing dangling recoverable objects retained; no corruption"
+    },
+    {
+      "command": "adb devices -l",
+      "status": "NO_CONNECTED_DEVICE",
+      "note": "No emulator launched or device permissions granted"
+    },
+    {
+      "command": "python -m scripts.benchmark_group03_closure --repeats 4",
+      "status": "PASS",
+      "receipt": "closure-benchmark.json"
+    },
+    {
+      "command": "python -m scripts.benchmark_group03_closure --iterations 10 --repeats 1 --idle-seconds 35 --mode normal --output docs/evidence/group03/closure-idle-benchmark.json",
+      "status": "PASS",
+      "receipt": "closure-idle-benchmark.json"
+    }
+  ],
+  "logs_sha256": {
+    ".oscar\\group03-closure-final-regression.log": "f9327211e99ce1741272e37b540c95868189cfe2f148072d9bc55f6ca07b3f4f",
+    ".oscar\\group03-closure-desktop-accepted.log": "17e3a7da59529cc836790ea40a5c29e189302fe361b9ba12f624cda539963c98",
+    ".oscar\\group03-closure-mobile-verified.log": "3ae486247e094efd52774dbb641846036dd795e89fb80b601ee9395f8b7b9bdb",
+    ".oscar\\group03-closure-integrity.log": "df2d10db2e702acc4b9945377f194cb211222d03059924c4582228d4577584bb"
+  },
+  "native_build": {
+    "evidence_class": "REFERENCE",
+    "apk_sha256": "7cb205e7c671865c22ac266d1e98e7ddfffd638218f60d8cbff591dad658e889",
+    "orb_sha256": "728aeac3c9aa590b67d45c469735e919ede93a8503964e24f0f4af18cda066c5",
+    "native_orb_render_sha256": "ff39a1c8abe1b2e46849cadb58ff93d6fa41d8344eea7e496f659d984c813ea1",
+    "package": "io.dawnlight.oscar.mobile",
+    "build": "Kotlin/Compose Gradle debug reference, not production signing",
+    "owner_device_acceptance": "OWNER_DEVICE_ACCEPTANCE_NOT_RUN",
+    "desktop_debug_exe_sha256": "0d2c55ce726796cec22d03f6ad37f29677573b5343356b77fc485c408ae2a581"
+  },
+  "unchanged_artwork_and_layouts": {
+    "canonical_svg": "728aeac3c9aa590b67d45c469735e919ede93a8503964e24f0f4af18cda066c5",
+    "canonical_native_png": "ff39a1c8abe1b2e46849cadb58ff93d6fa41d8344eea7e496f659d984c813ea1",
+    "protected_asset_diff": "EMPTY",
+    "intentional_native_behavior_changes": [
+      "Companion service startup/admission",
+      "Desktop development presence resize-failure state reset; no style/design changes"
+    ]
+  },
+  "native_source_note": "Native builds used the same working files before code commits; no native source changed afterward.",
+  "session_policy": {
+    "credential_max_seconds": 3600,
+    "rotate_before_expiry_seconds": 900,
+    "maintenance_interval_seconds": 10,
+    "enrollment_max_seconds": 604800,
+    "max_draining_leases": 256,
+    "expired_or_revoked_reenrollment": "Explicit trusted-local serve --reenroll-execution; node revocation still denies",
+    "old_token": "Only already-active captured lease, while live and before original credential expiry; never renews itself"
+  },
+  "presence_policy": {
+    "publication_reservation": 1024,
+    "freshness_lease_ms": 30000,
+    "unchanged_transition_identity": true,
+    "state_generation_persisted_separately": true,
+    "expression_wire_version_unchanged": 1,
+    "retired_publisher_fenced": true
+  },
+  "query_plans": {
+    "presence": [
+      "SEARCH t USING INDEX tasks_by_state (<expr>=?)",
+      "SEARCH r USING INDEX sqlite_autoindex_records_1 (kind=? AND id=?)"
+    ],
+    "live_leases": [
+      "SEARCH records USING INDEX live_leases_by_expiry (<expr>>?)"
+    ]
+  },
+  "actual_execution": [
+    "Disposable actual SQLite/WAL/files and independent exact readback",
+    "Authenticated loopback HTTP and headless local browser fixtures",
+    "Real Core process kill after mutation and fresh process restart; dedup retained, write not repeated",
+    "Disposable native Windows credentials in regression, no owner provider accounts"
+  ],
+  "simulated_or_mocked": [
+    "1/2/8/24-hour uptime uses deterministic advanced clocks, not a real 24-hour soak",
+    "Source loss, scopes, policy changes, lock timing, provider faults and executor failure use injected fixtures",
+    "Overlay permission/request/admission/recreation/rejection behavior is JVM contract coverage, not actual Android service acceptance"
+  ],
+  "deferred": [
+    "Owner physical audio/biometric/Edge/OEM/device acceptance",
+    "Android FGS/window behavior, real screen lock/notification dismissal/network loss/permission changes",
+    "Live providers/environment/model inference and production operation",
+    "Native schedule authoring/widgets and genuine standing Full Access remain unavailable"
+  ],
+  "warnings": "Python HTTP fault fixtures emit HTTPError cleanup ResourceWarnings; assertions pass. No warning-free or exhaustive vulnerability-scan claim.",
+  "known_limits": [
+    "Core must remain running for schedules",
+    "Expired/revoked/maximum-age enrollment and long sleep can require explicit reenrollment",
+    "Old remote in-flight token cannot outlive its original expiry",
+    "Cooperative cancellation cannot undo an indivisible external action",
+    "Benchmark covers local samples and 35-second full-cadence idle; not battery, production, device or real-day memory-soak acceptance"
+  ],
+  "benchmark": "closure-benchmark.json",
+  "initial_benchmark": "closure-benchmark-initial.json",
+  "idle_benchmark": "closure-idle-benchmark.json",
+  "closure_handoff": "../../development/GROUP-03-ENGINEERING-CLOSURE.md",
+  "merge_recommendation": "Ready for owner software merge review once final-head CI is verified or explicitly waived; accept listed device/live/product deferrals explicitly. Do not merge automatically or mark Gate C/D PASS."
+}

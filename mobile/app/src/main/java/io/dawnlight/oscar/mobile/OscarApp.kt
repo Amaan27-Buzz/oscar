@@ -154,7 +154,7 @@ private val Ink = Color(0xFF1A1B18)
                             navigate(Destination.SETTINGS); settingsPage = "Privacy"
                         }) else if (conversationPage == "Today") TodayScreen(state, { conversationPage = "Conversation" }, { navigate(Destination.ACTIVITY) })
                         else PresenceScreen(state, draft, session::writeDraft, send, session::cancelRequest,
-                            { navigate(Destination.ACTIVITY) }, { focus.clearFocus(); keyboard?.hide(); voiceOpen = true }, false, { conversationPage = "Today" })
+                            { navigate(Destination.ACTIVITY) }, { focus.clearFocus(); keyboard?.hide(); voiceOpen = true }, false, { conversationPage = "Today" }, { id -> session.inspect(id); navigate(Destination.ACTIVITY) })
                         Destination.AUTOMATIONS -> AutomationsScreen(state, automationPage, { automationPage = it }) { text -> session.writeDraft(text); navigate(Destination.OSCAR) }
                         Destination.ACTIVITY -> ActivityScreen(state, session::inspect, session::review)
                         Destination.DEVICES -> DevicesScreen(state, { pairing = true }, session::disconnect)
@@ -219,8 +219,10 @@ private val Ink = Color(0xFF1A1B18)
 @Composable fun OscarOrb(state: MobileState, composing: Boolean = false, size: Dp = 108.dp, reduced: Boolean = LocalReducedMotion.current, tag: String = "orb") {
     val voice by VoicePresentation.state.collectAsStateWithLifecycle()
     val adapter = remember(state.epoch) { MobileExpression(state.epoch) }
-    val event = remember(state, composing, reduced, voice) { adapter.event(state, System.currentTimeMillis(), composing, reduced, voice.phase) }
+    val canonical = state.snapshot?.presence?.takeIf { state.link == Link.CONNECTED && !state.busy && !composing && voice.phase == VoicePhase.IDLE }
+    val event = canonical ?: remember(state, composing, reduced, voice) { adapter.event(state, System.currentTimeMillis(), composing, reduced, voice.phase) }
+    val source = io.dawnlight.oscar.expression.Contract.parse(event)?.source ?: adapter.source
     Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-        ExpressionPresence(event, adapter.source, size, reduced, Modifier.testTag(tag))
+        ExpressionPresence(event, source, size, reduced, Modifier.testTag(tag))
     }
 }

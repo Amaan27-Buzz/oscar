@@ -12,9 +12,11 @@ from .contracts import Action, Result, TaskState, new_id, record
 from .harness import Harness
 from .jev import Intent
 from .models import Mode, ModelRequest, ProviderError, RoutingPolicy
+from .perception import PerceptionSource
 from .router import RouteUnavailable
 from .storage import StateConflict
 from .transport import HTTPTransport, ReferenceServer
+from .world_model import ObservationKind
 
 
 def print_json(value: object) -> None:
@@ -203,6 +205,40 @@ def parser() -> argparse.ArgumentParser:
     commands.add_parser("proof")
     commands.add_parser("grid-proof")
     commands.add_parser("history")
+    commands.add_parser("sources")
+    executive = commands.add_parser("executive")
+    executive.add_argument("--config", type=Path)
+    setup = commands.add_parser("setup")
+    setup.add_argument(
+        "--section",
+        choices=(
+            "identity",
+            "persona",
+            "preferences",
+            "voice",
+            "policy",
+            "sentry",
+            "source",
+            "recover",
+        ),
+    )
+    setup.add_argument("--config", type=Path)
+    provider = commands.add_parser("setup-provider")
+    provider.add_argument("slot")
+    provider.add_argument("--revoke", action="store_true")
+    world = commands.add_parser("world")
+    world.add_argument("--entity", required=True)
+    world.add_argument("--key", required=True)
+    watch = commands.add_parser("watch-core")
+    watch.add_argument("source", choices=("grid", "tasks"))
+    watch.add_argument("--retain", action="store_true")
+    serve = commands.add_parser("serve")
+    serve.add_argument("--seconds", type=int, default=3600)
+    serve.add_argument(
+        "--reenroll-execution",
+        action="store_true",
+        help="Explicit trusted-local execution enrollment after credential expiry/revocation",
+    )
     write = commands.add_parser("write")
     write.add_argument("--path", required=True)
     write.add_argument("--content", required=True)
@@ -243,9 +279,177 @@ def main() -> int:
                 pinned_model=args.model,
                 pinned_slot=args.slot,
             )
-        with Harness(args.state, args.workspace, args.manifest, template) as harness:
+        with Harness(
+            args.state,
+            args.workspace,
+            args.manifest,
+            template,
+            execution_enrollment_authorized=getattr(args, "reenroll_execution", False),
+        ) as harness:
             transports = {harness.node_id: (harness.dispatcher, harness.session)}
-            if args.command == "credentials":
+            if args.command == "executive":
+                executive = harness.runtime.executive
+                assert executive is not None
+                result: object = None
+                if args.config is not None:
+                    if args.config.stat().st_size > 32768:
+                        raise ValueError("bounded selected Executive command required")
+                    config = json.loads(args.config.read_text(encoding="utf-8"))
+                    operation = config.pop("operation")
+                    if operation == "worker":
+                        config["capabilities"] = [tuple(c) for c in config["capabilities"]]
+                        config["grants"] = tuple(config["grants"])
+                        result = executive.worker(**config, owner_authorized=True)
+                    elif operation == "propose":
+                        result = executive.propose(**config)
+                    elif operation == "decompose":
+                        result = executive.decompose(**config)
+                    elif operation == "draft_plan":
+                        result = executive.draft_plan(**config)
+                    elif operation == "propose_from_result":
+                        result = executive.propose_from_result(**config)
+                    elif operation == "accept":
+                        executive.accept(**config, owner_authorized=True)
+                    elif operation in {"pause", "resume", "cancel"}:
+                        executive.control(**config, operation=operation, owner_authorized=True)
+                    elif operation == "retry":
+                        executive.retry(**config, owner_authorized=True)
+                    elif operation == "review_task":
+                        result = executive.review_task(**config)
+                    elif operation == "confirm_task":
+                        executive.confirm_task(**config, owner_authorized=True)
+                    elif operation == "revoke_worker":
+                        executive.revoke_worker(**config, owner_authorized=True)
+                    elif operation == "replan":
+                        result = executive.replan(**config, owner_authorized=True)
+                    elif operation == "learn":
+                        result = executive.learn(**config, owner_authorized=True)
+                    elif operation == "reuse":
+                        result = executive.reuse(**config, owner_authorized=True)
+                    elif operation == "evaluate_workflow":
+                        result = executive.evaluate_workflow(**config, owner_authorized=True)
+                    elif operation == "rebuild_workflows":
+                        result = executive.rebuild_workflows(owner_authorized=True)
+                    else:
+                        raise ValueError("unsupported Executive operation")
+                executive.tick()
+                print_json({"result": result, "executive": executive.snapshot()})
+            elif args.command in {"setup", "setup-provider"}:
+                setup = harness.runtime.setup
+                assert setup is not None
+                if args.command == "setup-provider":
+                    if args.revoke:
+                        setup.revoke_provider(args.slot, owner_authorized=True)
+                    else:
+                        from getpass import getpass
+
+                        setup.provider(
+                            args.slot,
+                            getpass("Provider credential (native Vault only): "),
+                            owner_authorized=True,
+                        )
+                elif args.section in {"identity", "recover"}:
+                    if args.section == "identity":
+                        setup.commissioning.initialize(owner_authorized=True)
+                    else:
+                        setup.recover()
+                elif args.section:
+                    if args.config is None or args.config.stat().st_size > 8192:
+                        raise ValueError("bounded selected setup configuration required")
+                    config = json.loads(args.config.read_text(encoding="utf-8"))
+                    if args.section == "policy":
+                        from .policy import PolicyEffect, PolicyRule
+
+                        setup.policy(
+                            PolicyRule(**{**config, "effect": PolicyEffect(config["effect"])}),
+                            owner_authorized=True,
+                        )
+                    elif args.section == "sentry":
+                        from .sentry import AwarenessMode, SentrySettings, SentryState
+
+                        harness.world.sentry.configure(
+                            SentrySettings(
+                                **{
+                                    **config,
+                                    "mode": AwarenessMode(config["mode"]),
+                                    "state": SentryState(config["state"]),
+                                    "source_ids": tuple(config.get("source_ids", ())),
+                                    "trigger_keys": tuple(config.get("trigger_keys", ())),
+                                }
+                            ),
+                            owner_authorized=True,
+                        )
+                    elif args.section == "source":
+                        source = config.pop("source")
+                        harness.world.configure_source(
+                            PerceptionSource(
+                                **{
+                                    **source,
+                                    "entities": tuple(source["entities"]),
+                                    "keys": tuple(source["keys"]),
+                                    "kinds": tuple(ObservationKind(k) for k in source["kinds"]),
+                                }
+                            ),
+                            **config,
+                            owner_authorized=True,
+                        )
+                    else:
+                        setup.configure(args.section, config, owner_authorized=True)
+                print_json(setup.snapshot())
+            elif args.command == "serve":
+                from threading import Event
+
+                from .desktop import Desktop
+                from .mobile import Mobile, MobileServer
+                from .policy import PersonalPolicy
+
+                if not 1 <= args.seconds <= 86400:
+                    raise ValueError("bounded local serving lifetime required")
+                with (
+                    MobileServer(
+                        Mobile(harness.runtime, PersonalPolicy(harness.store), transports)
+                    ) as mobile,
+                    MobileServer(
+                        Desktop(harness.runtime, PersonalPolicy(harness.store), transports)
+                    ) as desktop,
+                ):
+                    print_json(
+                        {
+                            "mobile_url": mobile.url,
+                            "desktop_url": desktop.url,
+                            "scope": "authenticated loopback Core; no device enrollment inferred",
+                        }
+                    )
+                    try:
+                        Event().wait(args.seconds)
+                    except KeyboardInterrupt:
+                        pass
+            elif args.command in {"sources", "world", "watch-core"}:
+                if harness.runtime.world is None:
+                    raise StateConflict("current-state runtime unavailable")
+                if args.command == "watch-core":
+                    grid_source = args.source == "grid"
+                    harness.runtime.world.configure_source(
+                        PerceptionSource(
+                            "core-" + args.source,
+                            ("core",),
+                            (args.source + ".state",),
+                            (ObservationKind.DEVICE if grid_source else ObservationKind.TASK,),
+                            simulated=False,
+                            perceive=True,
+                            retain=args.retain,
+                        ),
+                        args.source,
+                        "core",
+                        owner_authorized=True,
+                    )
+                    harness.runtime.world.tick()
+                print_json(
+                    harness.runtime.current(args.entity, args.key)
+                    if args.command == "world"
+                    else harness.runtime.world.snapshot()
+                )
+            elif args.command == "credentials":
                 for line in harness.pool.safe_presence_lines():
                     print(line)
             elif args.command == "proof":

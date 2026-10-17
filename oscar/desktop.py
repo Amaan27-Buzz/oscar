@@ -527,8 +527,12 @@ class Desktop(Mobile):
                 "access": "Ask",
                 "secure": "unavailable",
                 "full_access": "unavailable",
-                "awareness": "Trigger-only",
-                "sentry": "unavailable",
+                "awareness": self.runtime.world.sentry.settings().mode.value
+                if self.runtime.world
+                else "unavailable",
+                "sentry": "configured_sources_only"
+                if self.runtime.world and self.runtime.world.sentry.settings().source_ids
+                else "unavailable",
                 "worker_autonomy": "Manual",
                 "automations": "task_foundation",
             }
@@ -714,8 +718,7 @@ class Desktop(Mobile):
                             return {
                                 "state": "blocked",
                                 "epistemic": "UNKNOWN",
-                                "message": "That action is not available here. "
-                                "Nothing changed.",
+                                "message": "That action is not available here. Nothing changed.",
                             }
                         cap = candidates[0]
                         typed = form_intent(

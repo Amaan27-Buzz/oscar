@@ -25,7 +25,7 @@ it('preserves Ask and moves text/actions/activity to the full workspace',async()
   fireEvent.change(screen.getByLabelText('Ask OSCAR'),{target:{value:'2 + 3'}});fireEvent.click(screen.getByRole('button',{name:'Send'}));
   await screen.findByText('2 + 3');expect(port).toHaveBeenCalledWith({kind:'interact',mode:'Ask',text:'2 + 3',context_id:''});
   expect(screen.queryByRole('button',{name:'Dictate or edit'})).toBeNull();expect(screen.queryByRole('button',{name:'Discuss with OSCAR'})).toBeNull();
-  fireEvent.click(screen.getByRole('button',{name:'Automations'}));expect(screen.getByText(/Ongoing routines and watches aren’t available yet/)).toBeTruthy();
+  fireEvent.click(screen.getByRole('button',{name:'Automations'}));expect(screen.getByText(/Automation readback.+available on this connection/)).toBeTruthy();
 });
 it('an expired review never offers enabled native confirmation',async()=>{
   mount({current:{task_id:'task',state:'planned',description:'Exact task',target:'worker',actions:['approve'],blocker:null,generation:1,evidence_ids:[],response:null,response_status:null,value:null,epistemic:null},review:{review_id:'expired',task_id:'task',operation:'approve',description:'Exact task',target:'worker',capability:'math',reason:'request',consequence:'add',policy_reason:'scope',evidence_state:'planned',review:'2 + 3',expires_at_ms:Date.now()-1}});

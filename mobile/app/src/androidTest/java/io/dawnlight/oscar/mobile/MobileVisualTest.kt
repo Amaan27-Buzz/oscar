@@ -47,7 +47,9 @@ class MobileVisualTest {
     @Test fun productionNavigationAndUnavailableControls() {
         capture("01-oscar-home")
         navigateReview(compose, "AUTOMATIONS")
-        compose.onNodeWithText("Scheduling unavailable").assertExists()
+        compose.onNodeWithText("Automation readback unavailable").assertExists()
+        compose.onNodeWithText("Not available on this connection").assertExists()
+        compose.onAllNodesWithText("runs verified", substring = true).assertCountEquals(0)
         capture("05-automations-overview")
         compose.onNodeWithText("Workers").performClick()
         compose.onNodeWithText("Run Worker · unavailable").assertIsNotEnabled()
@@ -55,6 +57,7 @@ class MobileVisualTest {
         compose.onNodeWithTag("page-back").performClick()
         compose.onNodeWithText("New responsibility").performScrollTo().performClick()
         compose.onNodeWithTag("automationDraft").performTextInput("Prepare a brief")
+        compose.onNodeWithText("Draft only · scheduling unavailable").assertExists()
         androidx.test.espresso.Espresso.closeSoftKeyboard()
         compose.waitUntil(5000) { !compose.activity.window.decorView.rootWindowInsets.isVisible(android.view.WindowInsets.Type.ime()) }
         compose.onNodeWithText("Create automation · unavailable").assertIsNotEnabled()

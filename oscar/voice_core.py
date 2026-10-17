@@ -52,6 +52,28 @@ class VoiceCore:
         require_match: bool = False,
         speaker: SpeakerEvidence | None = None,
     ) -> VoiceResponse:
+        response = self._handle(
+            transcript, stop, granted=granted, require_match=require_match, speaker=speaker
+        )
+        if self.runtime.setup is not None:
+            from .voice_identity import PersonaProfile
+
+            try:
+                persona = PersonaProfile(**self.runtime.setup.profile("persona"))
+            except KeyError:
+                persona = PersonaProfile()
+            response, _ = persona.express(response, self.runtime.setup.voice_profile())
+        return response
+
+    def _handle(
+        self,
+        transcript: Transcript,
+        stop: StopToken,
+        *,
+        granted: frozenset[str],
+        require_match: bool = False,
+        speaker: SpeakerEvidence | None = None,
+    ) -> VoiceResponse:
         stop.check()
         if not transcript.final:
             raise ValueError("provisional STT cannot execute a task")

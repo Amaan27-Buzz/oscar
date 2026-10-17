@@ -28,12 +28,18 @@ class Cancelled(Exception):
 
 
 class Cancellation:
-    def __init__(self, store: Store, task_id: str):
+    def __init__(self, store: Store, task_id: str, authorize: Callable[[], None] | None = None):
         self.store, self.task_id = store, task_id
+        self.authorize = authorize
 
     def check(self) -> None:
         if self.store.task(self.task_id).cancelled:
             raise Cancelled("task cancelled")
+        if self.authorize is not None:
+            try:
+                self.authorize()
+            except (PermissionError, KeyError):
+                raise Cancelled("execution authorization revoked or expired") from None
 
 
 class Executor(Protocol):

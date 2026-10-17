@@ -13,6 +13,14 @@
 
 ## Current development and milestones
 
+**Group 3 — 2026-10-16:** the owner authorizes unattended backend engineering
+through Slices 14–17 from merged Mobile main `257349f`. Normal World/Sentry
+lifecycle, setup composition, shared Presence/AIE/opt-in overlay software and
+reviewed Executive/Workers/schedules are implemented as a locally verified
+candidate. Gate D and separate Gate C acceptance remain **PARTIAL** pending
+live/owner/device acceptance. Approved UI is preserved.
+See [implementation, measurements and continuation](docs/development/GROUP-03-GATE-D.md).
+
 **Current status — 2026-10-14:** OSCAR Desktop Group 2.5A was **provisionally approved by the owner** (restrained neumorphic Companion + Workspace) and [PR #5](https://github.com/Amaan27-Buzz/oscar/pull/5) merged to `main` at `43c15d37a6421d438b8101d5e322489ae452b20d`. Earlier stacked software Groups 1–2 are likewise incorporated into `main`. The tiny Companion preserves the unchanged Orb and stays separate from the full Workspace. The current Workspace includes Conversation, Automations, Activity, Devices and Preferences. Automations does **not** yet mean persistent Workers/schedules are running.
 
 **Current focus — Group 2.5B / Slice 13:** the owner **APPROVED Mobile UI/UX on 2026-10-16**, including all 15 heroes, integrated artwork, native controls, Preferences, navigation, motion and the canonical Orb. [Final engineering closure](docs/ui/mobile/group25b/FINAL-CLOSURE.md) preserves that design and the Core, Grid, signing, voice and Expression boundaries. The external Gemini Argon `oscar-ui-test` prototype remains rejected. UI approval is separate from physical commissioning and remote CI.

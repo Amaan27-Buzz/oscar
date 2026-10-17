@@ -1,23 +1,31 @@
 """Developer composition root; reference roles are not physical-device availability claims."""
 
+from collections.abc import Callable
 from dataclasses import replace
 from pathlib import Path
+from time import time
 from typing import Any
 
 from .capabilities import Cancellation, FileExecutor, ScopedFiles, Verifier, addition_executor
 from .contracts import Action, Capability, Result, new_id
 from .credentials import CredentialPool
 from .discovery import HTTPDiscovery
-from .grid import Grid, Node, NodeRole
+from .event_archive import EventArchive
+from .executive import Executive
+from .grid import Grid, InternalSessionRuntime, Node, NodeRole
+from .memory_fabric import MemoryFabric
 from .models import Mode, ModelRequest, ProviderError, RoutingPolicy
+from .presence import PresenceRuntime
 from .providers import HTTPAdapter
 from .registry import Registry
 from .retrieval import ProviderInventorySource, RetrievalExecutor
 from .router import Router, RouteUnavailable
 from .runtime import Runtime
 from .search import TavilySource
+from .setup_runtime import SetupRuntime
 from .storage import Store
 from .transport import Dispatcher
+from .world_runtime import WorldRuntime
 
 
 class ModelExecutor:
@@ -65,11 +73,17 @@ class Harness:
         workspace: Path,
         manifest: Path,
         model_request: ModelRequest | None = None,
+        *,
+        clock: Callable[[], float] = time,
+        execution_enrollment_authorized: bool = False,
     ):
         self.store = Store(state)
-        self.grid = Grid(self.store)
+        self.grid = Grid(self.store, clock)
         self.files = ScopedFiles(workspace)
-        self.runtime = Runtime(self.store, self.grid, Verifier(self.files))
+        self.archive = EventArchive(state.with_suffix(".archive.sqlite"))
+        self.runtime = Runtime(
+            self.store, self.grid, Verifier(self.files), memory=MemoryFabric(self.archive)
+        )
         self.registry = Registry.load(manifest, self.store)
         self.pool = CredentialPool(list(self.registry.providers.values()), store=self.store)
         self.adapters = {kind: HTTPAdapter(kind) for kind in {"openai", "google", "ollama"}}
@@ -84,7 +98,15 @@ class Harness:
             self.store.get("node", self.node_id)
         except KeyError:
             self.grid.register(Node(self.node_id, NodeRole.CLOUD, scopes))
-        self.session = self.grid.pair(self.node_id, scopes)
+        try:
+            self.session = self.grid.pair(
+                self.node_id, scopes, internal=True, reenroll=execution_enrollment_authorized
+            )
+        except BaseException:
+            self.archive.close()
+            self.store.close()
+            raise
+        self.execution_session = InternalSessionRuntime(self.grid, self.session)
         capabilities = [
             Capability(
                 "sources.retrieve",
@@ -142,6 +164,22 @@ class Harness:
                 ),
             },
         )
+        self.world = WorldRuntime(self.runtime, self.files)
+        self.runtime.world = self.world
+        self.runtime.setup = SetupRuntime(self.runtime, self.pool)
+        self.runtime.presence = PresenceRuntime(self.runtime)
+        self.executive = Executive(self.runtime, {self.node_id: (self.dispatcher, self.session)})
+        self.runtime.executive = self.executive
+        self.store.close_callbacks.append(self.close_services)
+        self.execution_session.thread.start()
+        self.world.start()
+        self.executive.start()
+
+    def close_services(self) -> None:
+        self.executive.close()
+        self.execution_session.close()
+        self.world.close()
+        self.archive.close()
 
     def close(self) -> None:
         self.store.close()

@@ -1,5 +1,15 @@
 # Workers
 
+## Group 3 runtime — 2026-10-16
+
+Named Worker scope and lifecycle now compose through the existing Core, Grid,
+Dispatcher and canonical Tasks. Exact capability contracts, independent grants,
+current policy and one live reservation per Worker constrain execution. Real
+local files/arithmetic, concurrent admission, revocation, loss/restart and
+ambiguous-result blocking are tested. Schedules run only while Core is active;
+no fake cloud Worker or standing Full Access is created. See
+[Executive commands, evidence and limitations](EXECUTIVE-RUNTIME.md).
+
 ## Group 2.5 owner correction — 2026-10-14
 
 OSCAR is the sole personal intelligence and top-level coordinator. Named Workers/specialists carry subordinate responsibilities, never independent conversation identities. Automations is the management view for one-time delegated jobs, schedules, event triggers, watches, persistent Workers, supervised/autonomous Workers and continuing Protocols; conversation is the primary creation/instruction interface. A manually prepared file write remains immediate tool use.

@@ -54,7 +54,14 @@ class SettingsIntegrationTest {
         compose.onNodeWithTag("page-back").performClick()
         compose.onNodeWithText("Android permissions").performScrollTo().performClick()
         compose.onNodeWithText("Other Android features").performScrollTo().performClick()
-        compose.onNodeWithText("Overlay · unavailable",substring=true).assertExists()
+        val overlayGranted = android.provider.Settings.canDrawOverlays(compose.activity)
+        compose.onNodeWithText(if (overlayGranted) "Overlay permission granted" else "Overlay permission not granted").assertExists()
+        val show = compose.onNodeWithText("Show Companion Orb").performScrollTo()
+        if (CompanionOverlay.permitted(compose.activity)) show.assertIsEnabled() else show.assertIsNotEnabled()
+        compose.onNodeWithText("Requires separately authorized Core presence.", substring = true).assertExists()
+        compose.onNodeWithText("Disable Companion overlay").performScrollTo().performClick()
+        assertFalse(CompanionOverlay.enabled(compose.activity))
+        assertNull(SessionVault(compose.activity).load())
         capture("13-7-platform-reference")
     }
     @Test fun darkLargeTextAndImeRemainUsable() {

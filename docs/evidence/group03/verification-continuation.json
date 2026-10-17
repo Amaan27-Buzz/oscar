@@ -1,0 +1,168 @@
+{
+  "version": 1,
+  "date": "2026-10-16",
+  "status": "SOFTWARE_INTEGRATED_LOCAL_VERIFIED_WITH_REMAINING_ACCEPTANCE",
+  "implementation_sha": "c23dc4a64e45311104d7ba0798f20f4a763ffd9b",
+  "tested_python_source_sha256": "1a0dfa98fe037b4a2b693fece8d3400d6aae9b6229fa8dc6064abaadc93e0f04",
+  "branch": "codex/group-03-gate-d",
+  "pull_request": "https://github.com/Amaan27-Buzz/oscar/pull/7",
+  "pull_request_state": "OPEN_DRAFT_NOT_MERGED",
+  "remote_ci": {
+    "status": "UNKNOWN",
+    "reason": "Code Review connector: GitHub access is denied for this workspace. No CLI fallback used for CI diagnostics."
+  },
+  "gate_c": "PARTIAL",
+  "gate_d": "PARTIAL",
+  "environment": {
+    "os": "Windows 11",
+    "python": "3.14.2",
+    "sqlite": "3.50.4"
+  },
+  "regression": {
+    "ran": 671,
+    "passed": 665,
+    "failed": 0,
+    "skipped": 6,
+    "seconds": 159.648
+  },
+  "focused_coverage_in_final_full_suite": {
+    "tests.test_world_model": 38,
+    "tests.test_world_runtime": 14,
+    "tests.test_commissioning": 11,
+    "tests.test_setup_runtime": 9,
+    "tests.test_presence": 5,
+    "tests.test_executive": 21,
+    "tests.test_group03_runtime": 1,
+    "tests.test_grid": 22
+  },
+  "skipped_tests": [
+    "test_real_embedding_self_output_denial (tests.test_voice_models.LocalVoiceModelTests.test_real_embedding_self_output_denial) ... skipped 'optional Windows/local-model reference executor not requested'",
+    "test_real_local_stt_and_cancellation (tests.test_voice_models.LocalVoiceModelTests.test_real_local_stt_and_cancellation) ... skipped 'optional Windows/local-model reference executor not requested'",
+    "test_real_local_wake_vad_and_no_wake_silence (tests.test_voice_models.LocalVoiceModelTests.test_real_local_wake_vad_and_no_wake_silence) ... skipped 'optional Windows/local-model reference executor not requested'",
+    "test_wasapi_shared_format_without_opening_audio (tests.test_voice_models.LocalVoiceModelTests.test_wasapi_shared_format_without_opening_audio) ... skipped 'optional Windows/local-model reference executor not requested'",
+    "test_windows_synthesis_interrupted_at_chunk_boundary (tests.test_voice_models.LocalVoiceModelTests.test_windows_synthesis_interrupted_at_chunk_boundary) ... skipped 'optional Windows/local-model reference executor not requested'",
+    "test_prepared_neural_response_and_cancel (tests.test_voice_models.NeuralReferenceTests.test_prepared_neural_response_and_cancel) ... skipped 'optional prepared neural reference executor not requested'"
+  ],
+  "commands": [
+    {
+      "command": "python -m unittest discover -s tests -t . -v",
+      "ran": 671,
+      "passed": 665,
+      "failed": 0,
+      "skipped": 6,
+      "seconds": 159.648
+    },
+    {
+      "command": "python -m unittest tests.test_grid tests.test_executive tests.test_group03_runtime -q",
+      "passed": 44,
+      "failed": 0
+    },
+    {
+      "command": "python -m ruff check oscar tests scripts",
+      "status": "PASS"
+    },
+    {
+      "command": "python -m ruff format --check oscar tests scripts",
+      "status": "PASS",
+      "files": 175
+    },
+    {
+      "command": "python -m mypy oscar",
+      "status": "PASS",
+      "modules": 74
+    },
+    {
+      "command": "python -m scripts.build_desktop --checks",
+      "status": "PASS",
+      "frontend_tests": 85,
+      "rust_tests": 16,
+      "npm_audit": "0 vulnerabilities in installed expression/Desktop packages"
+    },
+    {
+      "command": "python -m scripts.build_mobile",
+      "status": "PASS",
+      "jvm_tests": 30,
+      "tasks": [
+        "testDebugUnitTest",
+        "assembleDebug",
+        "assembleDebugAndroidTest",
+        "lintDebug"
+      ]
+    },
+    {
+      "command": "python -m scripts.check_repository",
+      "status": "PASS",
+      "coverage": "required files, Markdown links, tracked/nonignored secret scan"
+    },
+    {
+      "command": "git diff --check",
+      "status": "PASS"
+    },
+    {
+      "command": "git fsck --full --strict",
+      "status": "PASS",
+      "note": "Existing dangling recoverable objects retained; no corruption reported"
+    },
+    {
+      "command": "python -m scripts.benchmark_group03",
+      "status": "PASS",
+      "receipt": "end-to-end-benchmark.json"
+    }
+  ],
+  "logs": {
+    ".oscar/group03-delivery-final.log": "d6895a5d539b8eb0a42e6fb824bf1076e761fb1c3f0ddadbbb6c87e5f2cd8405",
+    ".oscar/group03-desktop-verified.log": "e6322f40dc6a5da03c41ae7edab09d768ef49796c23060456d9a2a5e29acb42e",
+    ".oscar/group03-mobile-verified.log": "aea7fb331dc3e9c3505ce1aacdd0ab62511ff68ba22a05d34739293189234282"
+  },
+  "native_build": {
+    "evidence_class": "REFERENCE",
+    "apk_sha256": "7b64eb109637ebd990e2f6ee70b089f362d8756f6bf4454a42b441c3f8d69753",
+    "orb_sha256": "728aeac3c9aa590b67d45c469735e919ede93a8503964e24f0f4af18cda066c5",
+    "native_orb_render_sha256": "ff39a1c8abe1b2e46849cadb58ff93d6fa41d8344eea7e496f659d984c813ea1",
+    "package": "io.dawnlight.oscar.mobile",
+    "build": "Kotlin/Compose Gradle debug reference, not production signing",
+    "owner_device_acceptance": "OWNER_DEVICE_ACCEPTANCE_NOT_RUN",
+    "desktop_debug_exe_sha256": "47fcd982485244c4feb10ac39839f3cb549a9d6133c72d212252bfd7df893056"
+  },
+  "actual_execution": [
+    "Disposable real SQLite/WAL/Event Archive and exact filesystem mutation/readback",
+    "Real local arithmetic and independently verified task evidence",
+    "Authenticated loopback HTTP and separate local Core/Worker process restart",
+    "Real headless Chromium against synthetic local fixture pages in regression",
+    "Disposable native Windows credential regression; no owner provider/account enrollment",
+    "Normal Harness lifecycle, local Grid/task perception, retained/volatile separation, Presence/AIE and reviewed Executive DAG end-to-end"
+  ],
+  "fixtures": [
+    "Phone enrollment is a simulated logical Grid node, not a physical device",
+    "Model planning uses synthetic reported executor output, not live inference",
+    "Provider/source faults, permission/revocation timing and context observations use synthetic fixtures/mocks",
+    "Android JVM/Compose contracts and APK builds; instrumentation APK built but not executed"
+  ],
+  "security_checks": [
+    "Personal Policy ASK/DENY and exact approval binding",
+    "Lease/capability/source/Worker/session revocation during execution",
+    "Cross-relationship/device isolation and privacy discard",
+    "Credential rotation/redaction and native Vault recovery",
+    "Typed native/AIE boundary rejection, path traversal/replay and secret scan"
+  ],
+  "review_corrections": [
+    "Source acquisition and stale-runner fencing",
+    "Provider rotation and stale revoker CAS",
+    "Atomic task admission and same-task recovery after crash",
+    "Grid node read/modify/write pairing race and stale reaper fencing",
+    "Disconnect snapshots only preexisting leases, preserving newly recovered work",
+    "Long-task Worker reservation follows the live canonical task lease"
+  ],
+  "warnings": "Python 3.14 ResourceWarnings for cleanup of HTTPError objects occurred in existing HTTP fault fixtures; assertions passed. No warning-free claim.",
+  "benchmark": "end-to-end-benchmark.json",
+  "limits": [
+    "Gate C and Gate D remain PARTIAL; owner/device/live/production acceptance is separate.",
+    "Native schedule creation/editing and home widgets remain unavailable; trusted-local reviewed CLI is the working Executive control path.",
+    "No live model inference, owner provider enrollment, physical camera/audio/Edge or phone/emulator execution in this continuation.",
+    "Cooperative cancellation cannot undo an indivisible external action; ambiguous mutations require inspection.",
+    "Local interval scheduling runs only while this Core is running; no hosted service or laptop wake was installed.",
+    "Benchmark is instrumented local latency and Python allocations, not RSS, battery, device, inference or production performance."
+  ],
+  "remote_source_head_verified": "c23dc4a64e45311104d7ba0798f20f4a763ffd9b",
+  "git_delivery": "Implementation pushed and verified by git ls-remote; later evidence-only commits advance the final PR head."
+}

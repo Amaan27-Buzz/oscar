@@ -63,5 +63,17 @@ jobs:
           api-level: 35
           arch: x86_64
           target: google_apis
+          emulator-boot-timeout: 300
           working-directory: mobile
-          script: sh gradlew --no-daemon connectedDebugAndroidTest
+          script: |
+            sh gradlew --no-daemon assembleDebug assembleDebugAndroidTest
+            sh gradlew --no-daemon connectedDebugAndroidTest
+      - name: Preserve instrumentation results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-instrumentation-results
+          retention-days: 7
+          path: |
+            mobile/**/build/reports/androidTests/**
+            mobile/**/build/outputs/androidTest-results/**

@@ -29,10 +29,12 @@ class DesktopTests(unittest.TestCase):
         from cryptography.hazmat.primitives.asymmetric import rsa
 
         self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
         self.h = Harness(
             self.root / "core.db", self.root / "workspace", Path("config/development-models.json")
         )
+        self.addCleanup(self.h.close)
         self.now = [time()]
         self.h.grid.clock = lambda: self.now[0]
         target = self.h.node_id

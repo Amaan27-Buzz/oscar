@@ -1,8 +1,11 @@
 import unittest
+from concurrent.futures import ThreadPoolExecutor
+from contextlib import contextmanager
 from dataclasses import replace
+from threading import Event, current_thread
 
 from oscar.contracts import Envelope, TaskState, new_id, record
-from oscar.grid import Availability, Node, NodeRole, SessionHandle, reconnect_delay
+from oscar.grid import Availability, Grid, Node, NodeRole, SessionHandle, reconnect_delay
 from oscar.storage import StateConflict, Store
 
 from .support import Rig
@@ -22,6 +25,55 @@ class GridTests(unittest.TestCase):
         self.assertEqual(node["protocol_version"], 1)
         self.assertIsNotNone(node["last_seen"])
 
+    def test_background_disconnect_cannot_overwrite_concurrent_pairing(self):
+        self.r.grid.register(Node("pairing", NodeRole.DESKTOP, ("heartbeat",)))
+        other = Store(self.r.root / "state.sqlite")
+        self.addCleanup(other.close)
+        entered, release, paired = Event(), Event(), Event()
+        original = self.r.store.get
+        intercepted = []
+
+        def hold(kind, identifier):
+            row = original(kind, identifier)
+            if (
+                kind == "node"
+                and identifier == "pairing"
+                and current_thread().name.startswith("disconnect")
+                and not intercepted
+            ):
+                intercepted.append(True)
+                entered.set()
+                if not release.wait(2):
+                    raise OSError("test synchronization expired")
+            return row
+
+        self.r.store.get = hold
+
+        def pair():
+            Grid(other, self.r.clock).pair("pairing", ("heartbeat",))
+            paired.set()
+
+        with (
+            ThreadPoolExecutor(max_workers=1, thread_name_prefix="disconnect") as disconnecting,
+            ThreadPoolExecutor(max_workers=1) as pairing,
+        ):
+            first = disconnecting.submit(self.r.grid.disconnect, "pairing")
+            self.assertTrue(entered.wait(1))
+            second = pairing.submit(pair)
+            paired.wait(0.2)
+            release.set()
+            first.result(timeout=3)
+            second.result(timeout=3)
+        self.assertTrue(self.r.store.get("node", "pairing")["paired"])
+
+    def test_stale_reaper_snapshot_does_not_disconnect_a_recovered_node(self):
+        self.r.clock.now += 31
+        stale = self.r.grid.nodes()
+        self.r.grid.heartbeat(self.r.session)
+        self.r.grid.advertise(self.r.session, self.r.caps)
+        self.r.grid.disconnect(stale[0]["id"], only_if_stale=True)
+        self.assertEqual(3, len(self.r.grid.nodes()[0]["capabilities"]))
+
     def test_disconnect_preserves_task_and_expires_lease(self):
         r = self.r
         task, _, envelope = r.leased_action()
@@ -37,12 +89,46 @@ class GridTests(unittest.TestCase):
         self.assertEqual(r.store.task(task.id).state, TaskState.BLOCKED)
         self.assertEqual(r.runtime.reclaim(task.id).state, TaskState.PLANNED)
 
+    def test_disconnect_does_not_block_a_new_lease_after_reconnect(self):
+        r = self.r
+        old_task, _, _ = r.leased_action()
+        original = r.store.transaction
+        recovered = []
+
+        @contextmanager
+        def reconnect_after_commit():
+            with original():
+                yield
+            r.store.transaction = original
+            r.grid.advertise(r.session, r.caps)
+            recovered.append(r.leased_action()[0])
+
+        r.store.transaction = reconnect_after_commit
+        r.grid.disconnect("test-node")
+        self.assertEqual(TaskState.BLOCKED, r.store.task(old_task.id).state)
+        self.assertEqual(TaskState.AWAITING_RESULT, r.store.task(recovered[0].id).state)
+
     def test_missing_heartbeat_makes_node_offline_and_task_blocked(self):
         task, _, _ = self.r.leased_action()
         self.r.clock.now += 31
         self.r.grid.reap()
         self.assertEqual(self.r.grid.nodes()[0]["status"], "offline")
         self.assertEqual(self.r.store.task(task.id).state, TaskState.BLOCKED)
+
+    def test_reaper_fences_task_before_releasing_expired_ownership(self):
+        r = self.r
+        task, _, _ = r.leased_action()
+        r.clock.now += 21
+        original = r.grid.release
+        observed = []
+
+        def release(lease_id):
+            observed.append(r.store.task(task.id).state)
+            original(lease_id)
+
+        r.grid.release = release
+        r.grid.reap()
+        self.assertEqual([TaskState.BLOCKED], observed)
 
     def test_reconnect_requires_readvertisement(self):
         r = self.r

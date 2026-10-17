@@ -128,7 +128,9 @@ class Mobile:
             raise PermissionError("Mobile role required")
 
     def grants(self, session: SessionHandle) -> frozenset[str]:
-        return frozenset(str(x) for x in self.store.get("session", session.id)["scopes"])
+        return frozenset(self.store.get("session", session.id)["scopes"]) & frozenset(
+            self.store.get("node", session.node_id)["scopes"]
+        )
 
     def admit(self, session: SessionHandle, data: dict[str, Any]) -> bool:
         """Hash-only at-most-once admission. A crash requires inspection, never blind replay."""
@@ -159,6 +161,13 @@ class Mobile:
         return target
 
     def inspect(self, session: SessionHandle, task_id: str) -> dict[str, Any]:
+        try:
+            relationship = self.store.get("task_relationship", task_id)
+            if relationship["relationship"] != self.runtime.relationship_id:
+                raise PermissionError("task belongs to another relationship")
+        except KeyError:
+            if self.runtime.relationship_id != "owner":
+                raise PermissionError("legacy task relationship is not established") from None
         target = self.target(session, task_id)
         self.authenticate(session, "control:inspect:" + target)
         task = self.store.task(task_id)
@@ -590,7 +599,50 @@ class Mobile:
             return self.complete(session, payload)
         response: dict[str, Any]
         with self.lock:
-            if operation == "discard" and not payload:
+            if operation == "executive" and not payload:
+                if (
+                    self.runtime.executive is None
+                    or not self.policy.evaluate(
+                        "core.executive.read",
+                        ("executive:read",),
+                        self.grants(session),
+                        {"node": session.node_id, "source": self.source},
+                    ).allowed
+                ):
+                    raise PermissionError("Executive read is not authorized or available")
+                response = self.runtime.executive.snapshot()
+            elif operation == "presence" and not payload:
+                permission = self.policy.evaluate(
+                    "core.presence.read",
+                    ("presence:read",),
+                    self.grants(session),
+                    {"node": session.node_id, "source": self.source},
+                )
+                if not permission.allowed or self.runtime.presence is None:
+                    raise PermissionError("Presence is not authorized or available")
+                self.grid.heartbeat(session)
+                response = self.runtime.presence.snapshot()
+            elif operation == "adaptive" and set(payload) == {"task_id", "supported"}:
+                self.authenticate(session, "mobile:inspect")
+                from .adaptive import task_view
+
+                response = task_view(
+                    self.inspect(session, payload["task_id"]),
+                    round(self.grid.clock() * 1000),
+                    payload["supported"],
+                )
+            elif operation == "world" and set(payload) == {"entity_id", "key"}:
+                self.authenticate(session, "mobile:inspect")
+                permission = self.policy.evaluate(
+                    "core.world.read",
+                    ("world:read",),
+                    self.grants(session),
+                    {"node": session.node_id, "source": self.source},
+                )
+                if not permission.allowed:
+                    raise PermissionError(permission.reason)
+                response = self.runtime.current(payload["entity_id"], payload["key"])
+            elif operation == "discard" and not payload:
                 for task_id in list(self.store.transient):
                     if not self.private_for(session, task_id):
                         continue
@@ -618,6 +670,36 @@ class Mobile:
                     "tasks": tasks,
                     "observed_at_ms": round(self.grid.clock() * 1000),
                 }
+                if self.runtime.setup is not None:
+                    response["setup"] = self.runtime.setup.snapshot()
+                if (
+                    self.runtime.presence is not None
+                    and self.policy.evaluate(
+                        "core.presence.read",
+                        ("presence:read",),
+                        self.grants(session),
+                        {"node": session.node_id, "source": self.source},
+                    ).allowed
+                ):
+                    response["presence"] = self.runtime.presence.snapshot()
+                from .adaptive import task_view
+
+                response["adaptive_views"] = [
+                    task_view(
+                        t, round(self.grid.clock() * 1000), ["task_progress", "result_evidence"]
+                    )
+                    for t in tasks[-3:]
+                ]
+                if (
+                    self.runtime.executive is not None
+                    and self.policy.evaluate(
+                        "core.executive.read",
+                        ("executive:read",),
+                        self.grants(session),
+                        {"node": session.node_id, "source": self.source},
+                    ).allowed
+                ):
+                    response["executive"] = self.runtime.executive.snapshot()
             elif operation == "text" and set(payload) == {"text"}:
                 self.authenticate(session, "mobile:text")
                 text = payload["text"]

@@ -1,5 +1,8 @@
 # Club C checkpoint
 
+> Original-repository PR/run URLs below are historical identifiers retained verbatim.
+> They are no longer accessible after repository migration and are not current CI evidence.
+
 ## Latest continuation — 2026-10-07
 
 Slice 09 software is accepted at `7043b9663fe6474e3457c7aa578e733f7a5a4c1a`. Slice 10 now has a Windows software/reference candidate with Tauri/CNG and registered Worker/UIA evidence; WPF is reference-only, not owner desktop acceptance. Edge, Voice and Mobile physical acceptance remain owner-deferred and Gate C is PARTIAL. This continuation supersedes older next-slice restrictions only for the explicitly authorized Slice 10 draft. See [Desktop foundation](DESKTOP-FOUNDATION.md).
@@ -66,7 +69,7 @@ the historical status and scope restrictions, not the recorded evidence.
 - Existing OSCAR full regression suite: 447 tests PASS, local Python 3.14.
 - ESP-IDF 6.1 and Pico SDK 2.3.1 cross-builds PASS at source revision
   `2ed47351ccf20d680cae73ff43666c7db9a37bbf` in
-  [firmware CI run](https://github.com/amaansyed27/oscar/actions/runs/37228712560).
+  firmware CI run (historical reference: `https://github.com/amaansyed27/oscar/actions/runs/37228712560`).
   Pico normal and watchdog variants compiled. Final PR-head checks are authoritative
   in draft PR #13; normal ESP32 artifacts are distinct from watchdog diagnostics.
 - Ruff lint/format, strict mypy (51 modules), repository links/secret safety PASS.

@@ -493,13 +493,16 @@ class Router:
             )
             slot.requests += 1
             started, emitted = monotonic(), False
+            credential = self.pool.secret_for_adapter(route.slot)
             safe_stream = self.pool.safe_stream(sink)
 
             try:
+                if not credential and provider.credential_envs:
+                    raise ProviderError(Failure.CREDENTIAL)
                 response = self.adapters[provider.adapter].generate(
                     provider,
                     route.model,
-                    self.pool.secret_for_adapter(route.slot),
+                    credential,
                     request,
                     policy.timeout_seconds,
                     check_cancel,

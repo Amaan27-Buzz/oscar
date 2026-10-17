@@ -1,0 +1,60 @@
+{
+  "version": 3,
+  "date": "2026-10-17",
+  "branch": "codex/group-03-gate-d",
+  "base_sha": "257349f82a96293c3737d446dca18ce46f098b04",
+  "implementation_sha": "4a72cb351a93d444405e55b1fc64d5cb2dedf035",
+  "pull_request": "https://github.com/Amaan27-Buzz/oscar/pull/7",
+  "pull_request_state": "OPEN_DRAFT_NOT_MERGED",
+  "remote_ci": "UNKNOWN_UNTIL_GENUINE_FINAL_HEAD_CHECK",
+  "gate_c": "PARTIAL",
+  "gate_d": "PARTIAL",
+  "stages": {
+    "14": {
+      "status": "SOFTWARE_IMPLEMENTED_LOCAL_VERIFIED",
+      "whole_slice": "PARTIAL_PENDING_REMAINING_ACCEPTANCE",
+      "checkpoint_sha": "e3fb826",
+      "implemented": "Normal Core/Controller, authorized bounded source lifecycle, quiet Sentry and canonical retention",
+      "remaining": "Owner environmental enrollment, capture/delivery and production acceptance"
+    },
+    "15": {
+      "status": "SOFTWARE_IMPLEMENTED_LOCAL_VERIFIED",
+      "whole_slice": "PARTIAL_PENDING_REMAINING_ACCEPTANCE",
+      "checkpoint_sha": "c7f1a8b",
+      "implemented": "Resumable setup, identity/pairing, provider/native Vault, Persona/preferences/policy/logical voice",
+      "remaining": "Owner providers, physical pairing, Voice Match/Map and audio calibration"
+    },
+    "16": {
+      "status": "SOFTWARE_IMPLEMENTED_LOCAL_VERIFIED",
+      "whole_slice": "PARTIAL_PENDING_REMAINING_ACCEPTANCE",
+      "checkpoint_sha": "993a38c",
+      "implemented": "Shared leased Presence, validated typed AIE/native renderers, opt-in Android overlay",
+      "remaining": "Device/OEM/visual/power/accessibility acceptance; home widgets unavailable"
+    },
+    "17": {
+      "status": "SOFTWARE_IMPLEMENTED_LOCAL_VERIFIED",
+      "whole_slice": "PARTIAL_PENDING_REMAINING_ACCEPTANCE",
+      "checkpoint_sha": "c23dc4a64e45311104d7ba0798f20f4a763ffd9b",
+      "implemented": "Reviewed bounded DAG/Worker execution, schedules, recovery, context gates, replanning and verified workflow reuse",
+      "remaining": "Native authoring unavailable; owner/live-model/environment/production acceptance"
+    }
+  },
+  "final_verification": {
+    "receipt": "closure-verification.json",
+    "ran": 684,
+    "passed": 678,
+    "failed": 0,
+    "skipped": 6,
+    "seconds": 166.202
+  },
+  "next_action": "Owner software merge review plus genuine deferred acceptance. No automatic merge or Group 4.",
+  "known_limits": [
+    "Gate C and Gate D remain PARTIAL; owner/device/live/production acceptance is separate.",
+    "Native schedule creation/editing and home widgets remain unavailable; trusted-local reviewed CLI is the working Executive control path.",
+    "No live model inference, owner provider enrollment, physical camera/audio/Edge or phone/emulator execution in this continuation.",
+    "Cooperative cancellation cannot undo an indivisible external action; ambiguous mutations require inspection.",
+    "Local interval scheduling runs only while this Core is running; no hosted service or laptop wake was installed.",
+    "Benchmark is instrumented local latency and Python allocations, not RSS, battery, device, inference or production performance."
+  ],
+  "closure_receipt": "closure-verification.json"
+}

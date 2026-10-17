@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "date": "2026-10-16",
+  "classification": "VERIFIED_REFERENCE",
+  "implementation_sha": "3fd7cc90e538ca6fad71894c604a99e6b1fc308e",
+  "pull_request": "https://github.com/Amaan27-Buzz/oscar/pull/7",
+  "remote_ci": {"status": "UNKNOWN", "reason": "Code Review connector returned GitHub access is denied for this workspace. No remote PASS claimed."},
+  "environment": {"os": "Windows", "python": "3.14.2", "sqlite": "3.50.4", "ruff": "0.12.12", "mypy": "1.18.2"},
+  "commands": [
+    {"command": "python -m unittest discover -s tests -t .", "ran": 618, "passed": 612, "skipped": 6, "failed": 0, "seconds": 124.393, "log": ".oscar/group03-final-receipt.log"},
+    {"command": "python -m unittest tests.test_world_model tests.test_commissioning -q", "passed": 49, "failed": 0},
+    {"command": "python -m unittest tests.test_commissioning -q", "passed": 11, "failed": 0, "note": "Final scope-revocation readback assertion rerun after the full-suite process started."},
+    {"command": "python -m ruff check oscar tests scripts", "status": "PASS"},
+    {"command": "python -m ruff format --check oscar tests scripts", "status": "PASS", "files": 164},
+    {"command": "python -m mypy oscar", "status": "PASS", "source_files": 69},
+    {"command": "python -m scripts.check_repository", "status": "PASS"},
+    {"command": "git diff --check", "status": "PASS"}
+  ],
+  "benchmarks": ["world-before.json", "world-after.json", "world-final.json", "browser-plans.json"],
+  "independent_review": "Read-only agent reproduced and reviewed acquisition, revocation, rollback, corrupt-pointer and partial-pairing boundaries; final three commissioning regressions independently passed.",
+  "not_verified": ["physical devices", "owner commissioning", "production", "real environmental sources", "native Presence/AIE renderers", "remote exact-head CI"],
+  "known_limits": ["trusted-local composition APIs only", "cooperative cancellation", "broader commissioning composition incomplete", "Slices 16 and 17 not started", "Gate C and Gate D PARTIAL"]
+}

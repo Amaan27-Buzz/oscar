@@ -1,5 +1,38 @@
 # System Architecture
 
+## Group 3 integrated software candidate — 2026-10-16
+
+The scoped Slice 14 candidate adds `world_model.py`, `perception.py`,
+`perception_adapters.py` and `sentry.py`. Current pointers reference the canonical
+Event Archive when retention is granted; otherwise values remain transient.
+Sentry produces policy-bounded proposals, with no independent action authority.
+Existing Python Core, Controller, Memory Fabric, Grid and UI contracts remain
+authoritative. See [implementation and acceptance boundary](development/GROUP-03-GATE-D.md).
+
+The normal `Harness` owns one canonical archive plus bounded `WorldRuntime` and
+`Executive` lifecycle services. `SetupRuntime` composes the existing commissioning,
+native Vault/provider, Persona/preferences, policy, logical voice and Sentry
+contracts. Configuration never supplies action or capture authority. Presence is
+one leased, relationship-scoped Core projection; React/Compose consume the shared
+Expression contract and bounded typed task views. Android's explicit opt-in
+overlay uses a separate read-only projection connection and no audio.
+
+Independent internal-session maintenance keeps heartbeat/credential rotation
+outside Executive executor I/O, using the existing Grid identity/session model.
+Finite credentials, scoped old-token drain and explicit reenrollment boundaries
+are recorded in the [engineering closure](development/GROUP-03-ENGINEERING-CLOSURE.md).
+
+The Executive coordinates reviewed DAGs and fixed UTC schedules over canonical
+Runtime Tasks/Actions/Evidence. Atomic admission/dedup, exact capability pins,
+Worker reservations, current policy/permissions and cooperative lease checks own
+execution. Fresh World predicates defer unknown context; replanning needs another
+review and cannot replace ambiguous dispatched work. Model plans stay reported
+candidates. Workflow candidates and exact replay evaluations use canonical
+archive events with separate retention; derived workflow refs are rebuildable.
+See [runtime contracts and limits](EXECUTIVE-RUNTIME.md). No parallel Core or
+required third-party agent framework is introduced. Owner/live/device/production
+acceptance and Gate C/D remain separate from local software evidence.
+
 **Mobile acceptance update — 2026-10-16:** Group 2.5B UI/UX is explicitly
 **APPROVED / PASS**. [Final closure](ui/mobile/group25b/FINAL-CLOSURE.md) records
 the theme correction and lifecycle investigation. This supersedes earlier
@@ -13,7 +46,7 @@ Core owns one continuous multimodal personal intelligence and delegates subordin
 Ask / Secure / Full Access, awareness, Worker autonomy and capture/retention are independent. Genuine Full Access requires signed standing owner delegation and immediate revocation; it is currently unavailable because exact-action approval/critical blockers remain. No alternate Core, memory store or agent framework is introduced.
 
 
-> **Current — 2026-10-15:** The 00–20 [canonical roadmap](SLICE-NUMBERING.md) is authoritative. Desktop Groups 1–2 and Group 2.5A Companion/Workspace are merged into `main`; the owner accepted the neumorphic Desktop UI **provisionally**. Mobile Group 2.5B is a production Kotlin/Compose implementation candidate using the selected Codex ImageGen/Figma baseline, with native phone evidence and owner visual review pending. The Gemini Argon prototype is rejected, not an architectural or reusable component source. Mobile preserves the existing Core, Grid, signed decisions, native capabilities and shared Expression boundary; see [the implementation ledger](ui/mobile/group25b/README.md). Slice 14 Sentry and Slice 17 persistent Workers remain planned. Future [Adaptive Interface Engine](ADAPTIVE-INTERFACE.md) spans 16/17/19/20; **not implemented**. Earlier candidate PR references are historical evidence. Gate C physical and final integrated design acceptance remain open.
+> **Historical baseline — 2026-10-15:** The 00–20 [canonical roadmap](SLICE-NUMBERING.md) is authoritative. Desktop Groups 1–2 and Group 2.5A Companion/Workspace are merged into `main`; the owner accepted the neumorphic Desktop UI **provisionally**. Mobile Group 2.5B is a production Kotlin/Compose implementation candidate using the selected Codex ImageGen/Figma baseline, with native phone evidence and owner visual review pending. The Gemini Argon prototype is rejected, not an architectural or reusable component source. Mobile preserves the existing Core, Grid, signed decisions, native capabilities and shared Expression boundary; see [the implementation ledger](ui/mobile/group25b/README.md). Slice 14 Sentry and Slice 17 persistent Workers remain planned. Future [Adaptive Interface Engine](ADAPTIVE-INTERFACE.md) spans 16/17/19/20; **not implemented**. Earlier candidate PR references are historical evidence. Gate C physical and final integrated design acceptance remain open.
 
 ## Desktop foundation — Slice 10 integrated software reference
 

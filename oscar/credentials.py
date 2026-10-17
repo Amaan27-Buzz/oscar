@@ -94,6 +94,8 @@ class CredentialPool:
     ):
         source = os.environ if environ is None else environ
         self._values: dict[str, str] = {}
+        self._resolvers: dict[str, Callable[[], str]] = {}
+        self.material = SecretMaterial()
         self.slots: dict[str, Slot] = {}
         self.store, self.clock, self.lock = store, clock, RLock()
         self.presence: dict[str, bool] = {}
@@ -162,6 +164,8 @@ class CredentialPool:
         return capacity
 
     def eligible(self, identifier: str, tokens: int = 0, model: str = "") -> bool:
+        if identifier in self._resolvers:
+            self.secret_for_adapter(identifier)
         slot = self.slots[identifier]
         quota_pool = self.quota_pools.get(slot.quota_pool)
         capacity = self.capacity(identifier, model)
@@ -258,16 +262,40 @@ class CredentialPool:
 
     def secret_for_adapter(self, slot_id: str) -> str:
         """Adapter-only boundary; callers must never log or serialize this value."""
+        if slot_id in self._resolvers:
+            with self.lock:
+                try:
+                    value = self._resolvers[slot_id]()
+                except (KeyError, PermissionError, OSError):
+                    value = ""
+                if value:
+                    self.material.remember(value)
+                self.slots[slot_id].present = bool(value)
+                return value
         return self._values.get(slot_id, "")
 
+    def bind_resolver(self, slot_id: str, resolver: Callable[[], str]) -> None:
+        """Native Vault reads stay live; deletion cannot fall back to an environment copy."""
+        with self.lock:
+            self.slots[slot_id].validity = "unknown"
+            self._resolvers[slot_id] = resolver
+            previous = self._values.pop(slot_id, "")
+            if previous:
+                self.material.remember(previous)
+            self.secret_for_adapter(slot_id)
+
     def redact(self, text: str) -> str:
-        for value in self._values.values():
+        for value in (*self._values.values(), *self.material.values):
             if value:
                 text = text.replace(value, "<redacted>")
         return text
 
     def safe_stream(self, sink: StreamSink | None) -> "SafeStream":
-        hold = max((len(value) for value in self._values.values()), default=1)
+        def hold() -> int:
+            return max(
+                (len(value) for value in (*self._values.values(), *self.material.values)), default=1
+            )
+
         return SafeStream(sink, self.redact, hold)
 
     def reserve(self, identifier: str, tokens: int, model: str = "") -> bool:
@@ -332,7 +360,9 @@ class CredentialPool:
 
 
 class SafeStream:
-    def __init__(self, sink: StreamSink | None, redact: Callable[[str], str], hold: int):
+    def __init__(
+        self, sink: StreamSink | None, redact: Callable[[str], str], hold: Callable[[], int]
+    ):
         self.sink, self.redact, self.hold = sink, redact, hold
         self.pending = ""
         self.emitted = False
@@ -342,9 +372,10 @@ class SafeStream:
             return
         self.emitted = self.emitted or bool(chunk.strip())
         self.pending = self.redact(self.pending + chunk)
-        if len(self.pending) > self.hold:
-            self.sink(self.pending[: -self.hold])
-            self.pending = self.pending[-self.hold :]
+        hold = self.hold()
+        if len(self.pending) > hold:
+            self.sink(self.pending[:-hold])
+            self.pending = self.pending[-hold:]
 
     def finish(self) -> None:
         if self.sink and self.pending:

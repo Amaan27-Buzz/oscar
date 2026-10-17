@@ -370,7 +370,7 @@ def main():
                 not invoke(workspace, "surface_command", {"kind": kind})["ok"],
             )
             menus = []
-            for attempt in range(3):
+            for _attempt in range(3):
                 user.SetForegroundWindow(handle("OSCAR Companion"))
                 companion.wait_for_timeout(250)
                 companion.evaluate(

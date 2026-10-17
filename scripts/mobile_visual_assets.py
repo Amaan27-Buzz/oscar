@@ -41,7 +41,10 @@ def main():
         target = output / f"illustration_{name}.png"
         with Image.open(original) as image:
             assert image.size == ((841, 1870) if file.startswith("screens/") else (1672, 941))
-            assert 0 <= bounds[0] < bounds[2] <= image.width and 0 <= bounds[1] < bounds[3] <= image.height
+            assert (
+                0 <= bounds[0] < bounds[2] <= image.width
+                and 0 <= bounds[1] < bounds[3] <= image.height
+            )
             crop = image.crop(bounds).convert("RGBA")
             mask = ImageDraw.Draw(crop)
             for left, top, right, bottom in exclusions.get(name, []):

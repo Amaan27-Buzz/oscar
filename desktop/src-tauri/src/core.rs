@@ -20,6 +20,10 @@ pub fn now_ms() -> u64 {
         .as_millis() as u64
 }
 struct CoreSnapshot {
+    presence: Option<Value>,
+    setup: Option<Value>,
+    executive: Option<Value>,
+    adaptive_views: Vec<Value>,
     tasks: Vec<TaskView>,
     capabilities: Vec<CapabilityView>,
     observed_at: u64,
@@ -170,6 +174,13 @@ impl CoreClient {
         };
         let operating = value.get("operating").cloned();
         Ok(CoreSnapshot {
+            presence: value.get("presence").cloned(),
+            setup: value.get("setup").cloned(),
+            executive: value.get("executive").cloned(),
+            adaptive_views: value["adaptive_views"]
+                .as_array()
+                .cloned()
+                .unwrap_or_default(),
             tasks,
             capabilities: caps,
             observed_at: value["observed_at_ms"].as_u64().unwrap_or(0),
@@ -331,6 +342,10 @@ impl Bridge {
             self.voice_request(json!({"operation":"inspect"}))?;
         }
         let CoreSnapshot {
+            presence,
+            setup,
+            executive,
+            adaptive_views,
             mut tasks,
             capabilities: caps,
             observed_at: at,
@@ -398,6 +413,18 @@ impl Bridge {
         }
         view.capabilities = caps;
         view.operating = operating;
+        view.presence = presence;
+        view.setup = setup;
+        view.executive = if self.hide_private.load(Ordering::Acquire) {
+            None
+        } else {
+            executive
+        };
+        view.adaptive_views = if self.hide_private.load(Ordering::Acquire) {
+            Vec::new()
+        } else {
+            adaptive_views
+        };
         view.voice_available = voice_available;
         if !self.hide_private.load(Ordering::Acquire) {
             let unchanged = view.conversation.revision == conversation.revision
@@ -450,6 +477,10 @@ impl Bridge {
             }
             view.expression.voice_observed_at_ms = 0;
             view.link = "unavailable".into();
+            view.presence = None;
+            view.adaptive_views.clear();
+            view.executive = None;
+            view.setup = None;
             view.capabilities.clear();
         }
         view.message = Some(message);
@@ -615,6 +646,8 @@ impl Bridge {
             view.preview = None;
             view.review = None;
             view.conversation = ConversationView::default();
+            view.adaptive_views.clear();
+            view.executive = None;
             for task in &mut view.tasks {
                 task.response = None;
                 task.value = None;
