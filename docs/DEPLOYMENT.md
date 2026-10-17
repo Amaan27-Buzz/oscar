@@ -1,183 +1,60 @@
-# Deployment architecture
+# OSCAR — Deployment Architecture and Hosting Decision
 
-OSCAR is one intelligence across replaceable hosts and nodes. OSCAR Core owns
-identity/state/memory/task coordination; no particular cloud account or ordinary
-desktop defines its identity. This is target architecture, not deployed acceptance.
+**Owner priority (2026-10-18):** bring up one OSCAR on a persistent cloud host, then make Windows Desktop and the owner's Android phone connect to that same Core. When the owner returns home, add the dedicated home-server laptop; integrate ESP32/Pico physical hardware later. **No Oracle/Vercel/Internet deployment is currently accepted.** [Live checklist](CURRENT-STATUS.md) · [New delivery groups](DELIVERY-PLAN.md).
+
+## Target topology
 
 ```text
-                  OSCAR Core
-            persistent coordination
-                      |
-               Connection Grid
-          +-----------+-----------+
-          |           |           |
-        OSCAR Mobile      Desktop     Home Node (future)
-      main phone     Worker     spare Android
-                                  |
-                             ESP32 / Pico
+              Persistent OSCAR Core (cloud host)
+    Controller / Policy / Event Archive / Memory / Executive
+                           |
+              authenticated Connection Grid
+                /                       \
+       Windows Desktop Worker       OSCAR Android
+         tools / apps / GPU        owner control / voice
+                \                       /
+                 one identity / one task truth
+
+    Later: dedicated home-server laptop (local/hybrid Core)
+    Later: ESP32 and Pico (deterministic Edge safety/reflexes)
+    Optional later: Galaxy Tab home-presence node
 ```
 
-## Free-first host selection
+The current Python reference HTTP adapter `oscar/transport.py` and `oscar/mobile.py` bind `127.0.0.1`, not a production public endpoint. **Do not forward these reference ports to the Internet.** Remote operation requires a designed TLS ingress, per-node authentication/enrollment, a safe server-side credentials store, replay-resistant authorization, revocation and actual remote readback/recovery tests.
 
-Official sources checked on **2026-10-04**. Recheck the actual account, region and
-current limits before deployment. Free-first means working within verified free
-allowances, not treating trial credits or paid tiers as the baseline.
+## Hosts (replaceable; free-first where actually available)
 
-| Host | Intended OSCAR role | Current selection status |
+| Host | Intended role | Selection / limit |
 | --- | --- | --- |
-| Oracle Cloud Always Free VM | persistent/stateful Core candidate | preferred first candidate, subject to capacity, eligibility and ARM64 acceptance |
-| Vercel Hobby Python/Fluid Functions | bounded web/API/callback/webhook/relay surface | strong complementary candidate within personal-use eligibility and free usage limits |
+| **Oracle Cloud Always Free VM** | First candidate for long-running stateful Core: tasks, Event Archive, coordination and Grid | **Preferred but not deployed.** Verify own tenancy/region, A1 ARM64 instance capacity, monthly compute/storage allowances, reclamation and Python/native/index compatibility. |
+| **Vercel Hobby** | Optional bounded API/web/frontend/OAuth callback/webhook/relay surface | Not the persistent Core; functions cannot assume long-running Coordinator, filesystem persistence or always-on Worker scheduling. Check personal/non-commercial eligibility, current quotas and terms. |
+| Alternative Linux VM / approved BYOC | Fallback persistent Core if Oracle unavailable or unsuitable | Explicit cost, storage, transport, ARM/x86 and backup compatibility review first. |
+| Dedicated owner home-server laptop | Later hosting and local inference/voice/model Worker pool | **Group 7**, physically available only when owner returns home; migration/hybrid must preserve one authority/identity. |
+| ESP32/Pico | Deterministic hardware reflexes/sensors and safety interlocks | **Group 8**; never full Core, no physical test yet. |
 
-Both remain replaceable. Neither deployment is performed or accepted in Gate B.
+The prior free-tier research was collected **2026-10-04**. Provider capacity and quota are not constants: check current official data and real account state, not old plan numbers. [Oracle Always Free resources](https://docs.oracle.com/en-us/iaas/Content/FreeTier/freetier_topic-Always_Free_Resources.htm), [Vercel Hobby](https://vercel.com/docs/plans/hobby), [Vercel Python functions](https://vercel.com/docs/functions/runtimes/python), [Vercel function limitations](https://vercel.com/docs/functions/limitations).
 
-## Persistent Core: Oracle Cloud Always Free
+**Oracle ARM64 risk:** verify all actual OSCAR dependencies (Python runtime, OS wheels, SQLite FTS5, embeddings/ONNX, Qdrant, Graphiti/Neo4j, memory/resource footprint) and any container images on the selected VM before suggesting "the full stack fits." Prefer canonical durable SQLite/archive plus rebuildable derived indexes over moving identity/history into ephemeral Functions. Oracle Always Free can reclaim underutilized capacity; backups and recoverability matter. Never manufacture artificial load to defeat provider rules.
 
-Oracle is the strongest current candidate for OSCAR's first persistent stateful
-Core because it provides VM compute and durable block storage. This is OSCAR's
-selection judgment, not a provider availability or workload-fit guarantee.
+## Group 4 — deploy safely (D1/D2)
 
-For Always Free A1 tenancies, Oracle documents 1,500 OCPU-hours and 9,000 GB-hours
-monthly, equivalent to **2 OCPUs and 12 GB RAM total**, across the tenancy's A1
-instances. It also documents **200 GB combined boot/block storage** in the home
-region. [Oracle Always Free resources](https://docs.oracle.com/en-us/iaas/Content/FreeTier/freetier_topic-Always_Free_Resources.htm)
+**D1: secure persistent Core.** Establish reproducible Linux/ARM64 package and service lifecycle, least-privileged process, canonical state on durable volume, non-exported secrets, authenticated TLS ingress/reverse proxy, health and degraded-state readback, bounded logs and cost, backup *and independent restore*, crash/restart verification. No broad public endpoint, paid account upgrade or owner secret handling is authorized by the documentation change itself.
 
-Selection depends on regional capacity and account eligibility. A1 is ARM-based:
-verify OSCAR's Python runtime, Qdrant, Neo4j/Graphiti, ONNX/local ML packages,
-images and representative workloads on ARM64 before claiming compatibility or
-that the full memory stack fits this allowance. Core coordination can be separated
-from derived retrieval/ML services without moving canonical ownership.
+**D2: genuine remote Connection Grid.** Separate stable node identity from bearer tokens; owner pairing and scope binding, authenticated outbound Desktop Worker connection, revocation/credential rotation/replay fences, target rechecks, durable task/lease continuation and explicit offline/UNKNOWN reporting. Network failure or silent Core restart must not create double mutations or impersonate approval. Remote cancellation and "success" require authoritative readback.
 
-Oracle can reclaim idle Always Free compute. Its documented seven-day criteria
-are CPU 95th-percentile utilization below 20%, network below 20%, and, for A1,
-memory below 20%. Plan durable backups, restore, coordinator replacement and
-explicit unavailable states; an Always Free VM is not an uptime guarantee.
-Do not manufacture load to evade reclamation.
-[Oracle idle-instance rules](https://docs.oracle.com/en-us/iaas/Content/FreeTier/freetier_topic-Always_Free_Resources.htm)
+**D3/D4 follow in Group 5:** only after D1/D2, install and pair the real Tauri/Windows and Compose/Android apps; test the same conversation, memory, Presence, tasks, approved actions and revocation on actual independent devices, including OEM/background conditions.
 
-## Bounded API/web surface: Vercel
+## Later owner home server and physical Edge
 
-Vercel supports Python ASGI/WSGI applications as Functions. Hobby is free for
-personal, non-commercial use. It is a strong candidate for the public frontend,
-web/API surface, OAuth callbacks where the provider flow needs them, lightweight
-relay/rendezvous endpoints, webhooks, stateless connector endpoints and bounded
-event/function workloads.
-[Python runtime](https://vercel.com/docs/functions/runtimes/python),
-[Hobby plan](https://vercel.com/docs/plans/hobby).
+The intended mature target is an **owner-controlled dedicated home-server laptop**, not permanent dependence on today's development laptop. When hardware permits, it can host the Core, memory derived services, a local Model Router/model pool, voice services, durable Workers and local device coordination. Cloud models stay available as explicit optional escalation for major work. Design an observable, reversible migration with **one canonical Core writer**; never run two independent OSCAR archives or conflicting executives as equals. See [post-alpha evolution](POST-ALPHA-EVOLUTION.md).
 
-Current Fluid Hobby allowances include 4 active CPU-hours, 360 GB-hours of
-provisioned memory and one million invocations per month. Python Fluid Functions
-have a 300-second Hobby maximum invocation duration and 2 GB memory limit.
-Exceeding free usage can pause service. Keep budgets and explicit degradation;
-do not silently require a paid plan.
-[Fluid usage](https://vercel.com/docs/functions/usage-and-pricing),
-[Function limits](https://vercel.com/docs/functions/limitations),
-[Hobby limits](https://vercel.com/docs/plans/hobby).
+The previously discussed **Samsung Galaxy Tab S6 Lite (2021)** is an *optional distinct future Home Node*, not a substitute for the dedicated home-server laptop and not a Group 4–6 dependency. ESP32/Pico physical onboarding, serial GPIO/Watchdog/E-stop/sensor checks and smart-home actuators stay in **Group 8**. Physical safety must work locally during cloud/Grid loss.
 
-Functions alone are not the sole canonical persistent OSCAR Core. Durable archive,
-task/lease state, idempotency, recovery, scheduling and node/session lifecycles need
-separately demonstrated persistence and lifecycle contracts. Function instance
-memory or a temporary filesystem is not canonical durable history. A later design
-can use durable external state/services if it proves the whole contract; Python
-deployment support alone does not prove it. Callback endpoints never supply owner
-authorization or turn local disconnect into remote revocation evidence.
+## Acceptance boundary
 
-```text
-Oracle VM -> persistent/stateful Core candidate
-Vercel    -> stateless/bounded API + web + relay surface
-```
+- Gate A/B existing software PASS is not hosted acceptance.
+- Gate C/D remain PARTIAL, irrespective of successful GitHub Actions.
+- Group 6 may earn **only** a clearly scoped Cloud–Desktop–Phone operational-alpha milestone.
+- Original full Slice 20/Gate E requires the separately deferred physical and live acceptance unless the owner explicitly revises that gate.
 
-## Embodiments and future Home Node
-
-| Node | Role and boundary |
-| --- | --- |
-| OSCAR Core | identity/state/memory/task coordination on replaceable hosts |
-| OSCAR Mobile | owner's everyday main-phone embodiment/control surface |
-| Desktop | powerful execution Worker; optional to Core availability |
-| Samsung Galaxy Tab S6 Lite (2021), owner-described device | future always-on local Home Node |
-| ESP32 / Pico | Edge nerves/reflexes/sensors/actuators; deterministic local hardware safety |
-
-**Owner sequencing decision:** build the Tab/Home Node only after OSCAR is fully
-deployed and the main Core architecture is operational. Do not start Android or
-Termux implementation now, and do not make the tablet a Gate B requirement.
-
-Future candidate roles, each subject to Android capability and owner permission:
-
-- always-on local Grid presence and LAN/Bluetooth connectivity;
-- ESP32/Pico bridge and sensors/peripherals where Android permits;
-- notification/local-control surface with separately granted permissions;
-- lightweight cache/checkpoint/survival state if later justified;
-- optional local services only after practical device tests.
-
-Do not assume the tablet hosts the full canonical Qdrant + Neo4j + ML stack.
-Background longevity, OEM behavior, battery/thermal management and local service
-feasibility remain untested on the actual device. Home Node presence, perception,
-retention and action are separate grants. ESP32/Pico do not host the full Core;
-physical safety remains local and deterministic during Core/Grid/network loss.
-
-## Gate and deployment boundary
-
-Slice 05/06 COMPLETE for the documented local-alpha scope; Gate B PASS after
-owner physical machine and GitHub OAuth/federation acceptance. Remote revocation
-remains unknown. Slice 07 software is accepted; physical acceptance is deferred by owner; PR 12 is MERGED; Gate B frozen PASS.
-
-Oracle deployment, Vercel deployment, Galaxy Tab expansion, post-Gate-B System-1
-evaluation and full Auth Broker expansion are later work, not Gate B completion
-requirements. Current local control shares SQLite/loopback; these docs do not
-claim remote Core deployment or phone control. The bounded GitHub private
-read/restart/federation path has been accepted; broader connectors remain unverified.
-
-See [architecture](ARCHITECTURE.md), [Grid](CONNECTION-GRID.md),
-[authentication boundary](CONNECTOR-FABRIC.md), [security](SECURITY.md) and
-[current gates](BUILD-GATES.md).
-
-## Owner scope decision — 2026-10-05
-
-Slice 07: **COMPLETE FOR SOFTWARE / SIMULATED EDGE FOUNDATION**.
-**PHYSICAL EDGE ACCEPTANCE DEFERRED BY OWNER** — `DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED`.
-Protocol, firmware, Grid integration, ESP32/Pico cross-builds and deterministic
-safety contracts in simulation are accepted for continuation. Historical
-simulator evidence remains **SIMULATED**. No physical GPIO, watchdog, UART,
-E-stop or ESP32/Pico silicon PASS is claimed. Gate C remains **PARTIAL**.
-
-Return to real ESP32/Pico acceptance during Slice 15 physical/device expansion
-and/or Slice 16 reliability/security hardening. Physical failure, loss/recovery,
-watchdog and safety/reflex verification remain mandatory before Slice 17
-Unified Alpha can PASS. The hardware acceptance guide is preserved.
-The 2026-10-05 scope authorized Slice 08. The 2026-10-06 owner decision additionally
-authorizes Slice 09 software after Slice 08 integration; Slice 10, deployment and
-Galaxy Tab Home Node remain outside this work.
-
-## Post-alpha evolution direction
-
-### Dedicated home-server target
-
-The intended mature deployment is an owner-controlled dedicated home-server
-laptop, not the current development machine.
-
-Where hardware permits it should eventually host the persistent Core, Memory
-Fabric, local Model Router, Operating Logs, specialist model pool, local voice
-services, durable Workers/queues and home/device coordination.
-
-The baseline daily experience should progressively become cloud-independent.
-Cloud models remain available as explicit replaceable escalation for major work,
-frontier capability, recovery and temporary orchestration while local
-orchestration matures.
-
-This migration happens after measured stable-alpha use; it does not change current
-Gate/Cloud deployment claims.
-
-See [Post-Alpha Evolution](POST-ALPHA-EVOLUTION.md).
-
-## Historical Slice 09 checkpoint — 2026-10-06 (superseded)
-
-Slice 08 PR #14 merged; accepted main/work baseline
-`92a11aa05083f1983186976ba64bd30aa9f1f2a0`. Slice 08 is
-**COMPLETE FOR SOFTWARE / REFERENCE VOICE FOUNDATION**; physical voice is
-`DEFERRED_BY_OWNER / CONSOLIDATED_GATE_C_ACCEPTANCE_REQUIRED`, never physical PASS.
-OSCAR Mobile Kotlin/Compose rebuild is on `club-c/slice-09-sunday`, draft PR #15
-into `work`, **PARTIAL / OWNER_DEVICE_ACCEPTANCE_NOT_RUN**. Core/loopback,
-Gradle/JVM/emulated evidence is separate from actual phone/OEM acceptance.
-See [OSCAR Mobile foundation](MOBILE-FOUNDATION.md) for implementation, limits and the next owner boundary.
-Slice 09 must not merge in this run. Gate C remains PARTIAL. Slice 10, deployment
-and Home Node are not started. Post-alpha Operating Logs, specialist-model training
-and home-server migration remain documented future work, not implemented.
+See [security](SECURITY.md), [Grid](CONNECTION-GRID.md), [onboarding](ONBOARDING.md), [gates](BUILD-GATES.md) and the [active delivery plan](DELIVERY-PLAN.md).
