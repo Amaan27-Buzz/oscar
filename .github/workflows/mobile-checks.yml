@@ -58,18 +58,16 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
       - run: sdkmanager 'platforms;android-36' 'build-tools;36.0.0'
-      - name: Build instrumentation before starting emulator
-        working-directory: mobile
-        run: sh gradlew --no-daemon assembleDebug assembleDebugAndroidTest
       - uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 35
           arch: x86_64
           target: google_apis
-          disk-size: 2048M
           emulator-boot-timeout: 300
           working-directory: mobile
-          script: sh gradlew --no-daemon connectedDebugAndroidTest
+          script: |
+            sh gradlew --no-daemon assembleDebug assembleDebugAndroidTest
+            sh gradlew --no-daemon connectedDebugAndroidTest
       - name: Preserve instrumentation results
         if: always()
         uses: actions/upload-artifact@v4
