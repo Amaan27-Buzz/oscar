@@ -1,6 +1,6 @@
 # Post-Alpha Evolution
 
-Status: **FUTURE / AFTER STABLE UNIFIED ALPHA**.
+Status: **FUTURE / AFTER STABLE OPERATIONAL ALPHA**, not active model training or performance optimization. Owner priority 2026-10-18: [Cloud–Desktop–Phone first](DELIVERY-PLAN.md), then dedicated home-server laptop, then physical Edge. The dedicated laptop may be connected in Group 7 after an operational alpha; ongoing post-alpha learning/optimization still requires measured stability.
 
 This document records the owner-approved direction for what OSCAR becomes after
 Slice 20 Unified Alpha is genuinely stable in everyday use. It is not a claim
@@ -254,21 +254,6 @@ celebrity identity. This does not implement Operating Logs, specialist-model
 training or home-server migration. Those remain future after stable Unified Alpha.
 Physical voice acceptance is owner-deferred to the
 [consolidated Gate C run](GATE-C-CONSOLIDATED-ACCEPTANCE.md); Gate C remains PARTIAL.
-
-## Historical Slice 09 checkpoint — 2026-10-06 (superseded)
-
-Slice 08 PR #14 merged; accepted main/work baseline
-`92a11aa05083f1983186976ba64bd30aa9f1f2a0`. Slice 08 is
-**COMPLETE FOR SOFTWARE / REFERENCE VOICE FOUNDATION**; physical voice is
-`DEFERRED_BY_OWNER / CONSOLIDATED_GATE_C_ACCEPTANCE_REQUIRED`, never physical PASS.
-OSCAR Mobile Kotlin/Compose rebuild is on `club-c/slice-09-sunday`, draft PR #15
-into `work`, **PARTIAL / OWNER_DEVICE_ACCEPTANCE_NOT_RUN**. Core/loopback,
-Gradle/JVM/emulated evidence is separate from actual phone/OEM acceptance.
-See [OSCAR Mobile foundation](MOBILE-FOUNDATION.md) for implementation, limits and the next owner boundary.
-Slice 09 must not merge in this run. Gate C remains PARTIAL. Slice 10, deployment
-and Home Node are not started. Post-alpha Operating Logs, specialist-model training
-and home-server migration remain documented future work, not implemented.
-
 
 ## Numbering note — 2026-10-09
 
