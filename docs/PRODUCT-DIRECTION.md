@@ -1,6 +1,10 @@
 # OSCAR — Active product direction
 
-**Owner decision: 2026-10-14.** This is the current user-facing product brief. It reconciles the approved Desktop design, the selected Mobile design baseline, and later runtime ambitions. It is **not** an implementation/acceptance receipt. Read it with [canonical slice numbering](SLICE-NUMBERING.md), the [roadmap](ROADMAP.md), [feature backlog](FEATURES.md), and [current engineering evidence](development/SOFTWARE-ALPHA-ACCEPTANCE-LEDGER.md).
+**Owner direction updated 2026-10-18.** This is the current user-facing product brief. It reconciles the approved Desktop design, the selected Mobile design baseline, and later runtime ambitions. It is **not** an implementation/acceptance receipt. Read it with [canonical slice numbering](SLICE-NUMBERING.md), the [roadmap](ROADMAP.md), [feature backlog](FEATURES.md), [current checked status](CURRENT-STATUS.md) and [active groups](DELIVERY-PLAN.md).
+
+## Active delivery priority
+
+One Core on a secure replaceable cloud host (Oracle Always Free **candidate**, not deployed) → one authenticated remote Grid → the approved Windows/Android apps connected to the **same OSCAR** → complete real computer use, MCP/plugins, Secure/Full Access, voice, native automations and Chief of Staff → scoped operational alpha. Dedicated home-server laptop comes when available, then physical ESP32/Pico (deferred, not cancelled). Gate C/D remain PARTIAL and Gate E not passed. See [delivery plan](DELIVERY-PLAN.md).
 
 ## North star
 
@@ -39,7 +43,7 @@ Real audio, biometric/PIN, OEM commissioning and remote CI remain separate.
 | **Worker autonomy** | Manual / Supervised / Autonomous | Degree of independent delegated execution; never independently raises Core authority |
 | **Perception, capture, retention** | Source-specific independent grants | Permission to observe does not grant retention; neither grants mutation. Mic mute, active listening, wake/VAD, ambient acoustic analysis, recording, transcription and memory are different |
 
-**Important implementation boundary:** Secure/Full Access activation, signed standing delegation and distributed revocation are **not built**. Only current Ask-style enforcement is reported by Desktop; exact-action signing and critical-risk blockers remain. Full Access does not invent OS/platform access or defeat external mandatory controls; future activation must preserve provenance, revocation and local physical safety. Sentry, persistent Worker scheduling and many communication/Chief-of-Staff integrations are planned, not running.
+**Important implementation boundary:** Secure/Full Access activation, signed standing delegation and distributed revocation are **not built**. Only current Ask-style enforcement is reported by Desktop; exact-action signing and critical-risk blockers remain. Full Access does not invent OS/platform access or defeat external mandatory controls; future activation must preserve provenance, revocation and local physical safety. A bounded local Sentry lifecycle and durable Executive/Worker scheduling are integrated as Group 3 software; real environmental delivery, native authoring, broad communications and Chief-of-Staff integrations are not accepted.
 
 ## Visual direction and interaction
 
@@ -52,7 +56,7 @@ Real audio, biometric/PIN, OEM commissioning and remote CI remain separate.
 
 OSCAR should not be limited to responding in static prose. Within the **same conversation**, it can eventually choose and compose trusted interactive views: comparison tables, editable plans, timelines/calendars, diagrams, simple simulations, charts, device controls or live Worker views. The interface can update as work advances and the user interacts; Desktop and Android render the same **typed, versioned and capability-negotiated UI description** through their own trusted native components. No unrestricted model-generated HTML/JS or bypass of existing Core action authorization.
 
-This is **planned**, not part of the current Group 2.5B production presentation. Delivery boundaries: Slice 16 shared typed presentation foundation; Slice 17 intent-driven selection and composition; Slice 19 isolation, authorization/accessibility/security hardening; Slice 20 integrated cross-device validation. See [Adaptive Interface Engine](ADAPTIVE-INTERFACE.md).
+Group 3 integrated **bounded typed foundations** for Slices 16–17, not the full interactive AIE. Broader components, Slice 19 security/accessibility hardening and Slice 20 real cross-device validation remain pending. See [Adaptive Interface Engine](ADAPTIVE-INTERFACE.md).
 
 ## Acceptance discipline
 
