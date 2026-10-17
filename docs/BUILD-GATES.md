@@ -1,8 +1,20 @@
-# Build Gates
+# OSCAR — Build Gates (current truth 2026-10-18)
 
-## Slice 10 software/reference boundary
+See [current checklist](CURRENT-STATUS.md), [delivery groups](DELIVERY-PLAN.md), [canonical slices](SLICE-NUMBERING.md) and [roadmap](ROADMAP.md). Gates are **acceptance**; groups are **delivery order**. Green CI only verifies the exercised software environment, not a physical device or deployment.
 
-Desktop candidate checks cover typed context, permission/freshness denial, signed approval/replay, preview/apply fencing, shared tasks, ownership, cancellation, private restart and typed Tauri IPC/frontend/native builds plus real Tauri and independent WPF/UIA/CNG reference execution. OWNER_ACCEPTANCE_NOT_RUN: everyday desktop contexts, prepared microphone/output routes and real Mobile continuity still require owner acceptance. Gate C remains PARTIAL; reference/CI success is not a physical PASS. See [Desktop foundation](DESKTOP-FOUNDATION.md).
+| Checkpoint | State |
+| --- | --- |
+| Gate A, Slices 01–04 | **PASS**, documented scope |
+| Gate B, Slices 05–06 | **PASS**, local-alpha scope |
+| Gate C, Slices 07–10 | **PARTIAL**, physical Edge/voice/owner phone and desktop tests outstanding |
+| Design, Slices 11–13 | Character renderer merged; Desktop provisional owner pass, Android UI/UX owner approved |
+| Gate D, Slices 14–17 | **PARTIAL**, single Group 3 PR #7 software **MERGED with green CI**; live/owner/remote acceptance pending |
+| Gate E, Slices 18–20 | **NOT PASSED**: physical Edge deferred; hardening and full Unified Alpha incomplete |
+| Group 6 operational alpha | **NOT VERIFIED**, deliberately narrower Cloud–Desktop–Phone milestone; no Gate C/D/E automatic PASS |
+
+**Owner re-sequencing:** Group 4 Cloud and remote Grid; Group 5 real Desktop/Android + computer use, MCP/plugins, Secure/Full Access, voice, Worker/automation/Chief of Staff; Group 6 scoped alpha; Group 7 dedicated home-server laptop; Group 8 ESP32/Pico and remaining formal acceptance. Critical Internet-facing Slice 19 TLS, auth, privacy and revocation **must be verified in Group 4**, not postponed until Group 8. Physical Slice 18 is **DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED**, software reference **COMPLETE FOR SOFTWARE / SIMULATED EDGE FOUNDATION**. Historical former Slice 17 Unified Alpha is now Slice 20.
+
+---
 
 Build Gates group detailed roadmap slices into larger manual verification checkpoints. They do not replace slice exit conditions.
 
@@ -238,11 +250,7 @@ Required scenarios include:
 
 ## Gate D — JARVIS Layer
 
-**2026-10-16:** Group 3 Slices 14–17 now have integrated local software paths,
-native build/contract checks and real local execution/restart evidence. Gate D
-is **PARTIAL**: live environmental/provider, owner commissioning, physical/OEM,
-native authoring and production acceptance remain distinct outstanding checks. See
-[Group 3 evidence](development/GROUP-03-GATE-D.md). Gate C remains PARTIAL.
+**2026-10-18:** Group 3 PR #7 merged successfully with green final-head and main CI. Gate D remains **PARTIAL** because live environmental/provider, owner commissioning, physical/OEM, native authoring and production acceptance remain outstanding. See [Group 3 evidence](development/GROUP-03-GATE-D.md). Gate C remains PARTIAL.
 
 **Slices:** 14–17 (World Model, commissioning, full Presence integration and Executive Planner)
 
@@ -278,7 +286,7 @@ Required scenarios include provider/auth failure, coordinator/node/Edge loss, Gr
 | Gate C — Embodied OSCAR | 07–10 | **PARTIAL:** software foundations integrated; Edge/Voice/Mobile/Desktop physical acceptance deferred; legacy PR #16 is archival |
 | Design / Character checkpoint | 11–13 | Expression software integrated; Desktop provisionally approved/merged; **Mobile Group 2.5B UI/UX owner APPROVED and PR #6 merged**; physical acceptance remains separate |
 | Gate D — JARVIS Layer | 14–17 | **PARTIAL:** integrated software locally verified; live/owner/device acceptance pending |
-| Gate E — Unified Alpha | 18–20 | Planned |
+| Gate E — Unified Alpha | 18–20 | **NOT PASSED**, hardware deferred and acceptance outstanding |
 
 No approved visual prototype proves that OSCAR can execute, perceive, verify,
 listen or hold physical safety authority. Conversely, deferring Gate C physical
@@ -286,84 +294,7 @@ testing does not prohibit the owner-prioritized Slice 11 design laboratory.
 Old gate/slice references in historical evidence preserve their original labels.
 
 
-## Reconciliation boundary — 2026-10-04
 
-The OSCAR-owned Decision / Epistemic Controller applies hard deterministic authority
-rules; `oscar/jev.py` is a historical/internal module name, not a TypeSafe Jev
-dependency. Separate deterministic/Laya/hybrid evaluation starts only after Gate B
-PASS. GitHub is the first intended private authentication proof; the shared Auth
-Broker/provider architecture does not require independent OAuth per plugin.
+## Archived checkpoint history
 
-[Deployment architecture](DEPLOYMENT.md) selects free-first Oracle persistent Core
-and Vercel bounded Python/web/API/relay candidates. Deployment, the future Galaxy
-Tab S6 Lite Home Node, decision-model evaluation and full Auth Broker expansion are
-not additional Gate B requirements. Build the Tab node only after OSCAR is fully
-deployed and its main Core architecture is operational.
-
-Slice 05/06 COMPLETE; Gate B PASS for the documented local-alpha scope. Owner
-physical machine run `manual-gate-b-20261004-200734` and OAuth/federation run
-`oauth-gate-b-20261004-234817` passed. Remote revocation remains unknown, optional
-private writes were not authorized, Slice 07 software is accepted; physical acceptance is deferred by owner and PR 12 MERGED; Gate B frozen PASS. The harness repair at
-`c9cb7d2d20fb444cce98e2749eeea5425d4a0ee1` is independently reviewed with 25 focused
-regressions passing and exact-head CI green; it is not a physical acceptance PASS.
-The prior owner focus failure and its evidence remain unchanged.
-
-See [owner OAuth acceptance](GATE-B-OAUTH-ACCEPTANCE.md) and
-[physical machine PASS evidence](evidence/gate-b-owner-machine-pass-2026-10-04.json).
-The reported prior stale OSCAR fixture was not mutated; it does not invalidate the PASS.
-
-## Club C current boundary — 2026-10-05
-
-Gate C PARTIAL; Slice 07 closure/integration and Slice 08 authorized after frozen Gate B PASS. Edge host
-simulation and firmware compilation are separate evidence classes; neither
-grants physical PASS. Owner ESP32/Pico acceptance is mandatory: [exact hardware
-sequence](EDGE-HARDWARE-ACCEPTANCE.md). Slice 08 software/reference closure has owner scope; physical voice acceptance is consolidated and deferred. Slice 09 software is authorized after Slice 08 integration; Slice 10 is not started. See [checkpoint](CLUB-C-CHECKPOINT.md).
-
-## Owner scope decision — 2026-10-05
-
-Slice 07: **COMPLETE FOR SOFTWARE / SIMULATED EDGE FOUNDATION**.
-**PHYSICAL EDGE ACCEPTANCE DEFERRED BY OWNER** — `DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED`.
-Protocol, firmware, Grid integration, ESP32/Pico cross-builds and deterministic
-safety contracts in simulation are accepted for continuation. Historical
-simulator evidence remains **SIMULATED**. No physical GPIO, watchdog, UART,
-E-stop or ESP32/Pico silicon PASS is claimed. Gate C remains **PARTIAL**.
-
-Return to real ESP32/Pico acceptance during Slice 15 physical/device expansion
-and/or Slice 16 reliability/security hardening. Physical failure, loss/recovery,
-watchdog and safety/reflex verification remain mandatory before Slice 17
-Unified Alpha can PASS. The hardware acceptance guide is preserved.
-The 2026-10-05 scope authorized Slice 08. The 2026-10-06 owner decision additionally
-authorizes Slice 09 software after Slice 08 integration; Slice 10, deployment and
-Galaxy Tab Home Node remain outside this work.
-
-## Slice 08 owner closure scope — 2026-10-06
-
-Owner-authorized closure scope: **COMPLETE FOR SOFTWARE / REFERENCE VOICE FOUNDATION**.
-Physical status: `DEFERRED_BY_OWNER / CONSOLIDATED_GATE_C_ACCEPTANCE_REQUIRED`.
-This is not a physical PASS. Gate C remains **PARTIAL**.
-Slice 08 PR #14 integrated after green exact-head CI. Accepted main/work:
-`92a11aa05083f1983186976ba64bd30aa9f1f2a0`. Historical reference research baseline:
-`e8ac8f8bca1cb0cb7909523ac6af906ee289366f`.
-Existing owner harnesses remain mandatory inputs to later consolidated acceptance.
-Microphone, real-room AEC/barge-in/self-wake, owner Match/Map calibration, playback,
-Android voice and naturalness remain NOT RUN. Windows reference evidence never
-implies Android acceptance. See [Voice Core](VOICE-CORE.md) and
-[consolidated Gate C acceptance](GATE-C-CONSOLIDATED-ACCEPTANCE.md).
-Slice 09 OSCAR Mobile software may begin after clean Slice 08 integration; Slice 09 must
-remain a draft and stop before owner/device acceptance. Slice 10, deployment and
-Galaxy Tab Home Node are not authorized. Physical Edge remains
-`DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED`, mandatory before Slice 17 PASS.
-
-## Historical Slice 09 checkpoint — 2026-10-06 (superseded)
-
-Slice 08 PR #14 merged; accepted main/work baseline
-`92a11aa05083f1983186976ba64bd30aa9f1f2a0`. Slice 08 is
-**COMPLETE FOR SOFTWARE / REFERENCE VOICE FOUNDATION**; physical voice is
-`DEFERRED_BY_OWNER / CONSOLIDATED_GATE_C_ACCEPTANCE_REQUIRED`, never physical PASS.
-OSCAR Mobile Kotlin/Compose rebuild is on `club-c/slice-09-sunday`, draft PR #15
-into `work`, **PARTIAL / OWNER_DEVICE_ACCEPTANCE_NOT_RUN**. Core/loopback,
-Gradle/JVM/emulated evidence is separate from actual phone/OEM acceptance.
-See [OSCAR Mobile foundation](MOBILE-FOUNDATION.md) for implementation, limits and the next owner boundary.
-Slice 09 must not merge in this run. Gate C remains PARTIAL. Slice 10, deployment
-and Home Node are not started. Post-alpha Operating Logs, specialist-model training
-and home-server migration remain documented future work, not implemented.
+Dated Gate B/C reports, old owner scope boundaries and former slice names survive in Git history and their specific evidence files. They are **not current execution orders**; the active sequence is in [DELIVERY-PLAN.md](DELIVERY-PLAN.md).
