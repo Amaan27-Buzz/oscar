@@ -1,12 +1,12 @@
 # Feature Inventory
 
-**Current reading:** [Product direction](PRODUCT-DIRECTION.md) specifies accepted UI ownership; [Adaptive Interface Engine](ADAPTIVE-INTERFACE.md) describes **planned** adaptive interactive answers. This inventory is a **backlog**, not a list of shipped features. Desktop interim design is merged; Mobile Group 2.5B implements the selected Codex ImageGen/Figma baseline; the Gemini Argon prototype is rejected. See [Group 2.5B implementation and evidence](ui/mobile/group25b/README.md).
+**Current reading:** [Product direction](PRODUCT-DIRECTION.md) specifies accepted UI ownership; [Adaptive Interface Engine](ADAPTIVE-INTERFACE.md) describes **planned** adaptive interactive answers. This inventory is a **backlog**, not a list of shipped features. Read [checked status](CURRENT-STATUS.md) and [delivery plan](DELIVERY-PLAN.md) for accepted foundations and new delivery order. Desktop interim design is merged; Mobile Group 2.5B implements the selected Codex ImageGen/Figma baseline; the Gemini Argon prototype is rejected. See [Group 2.5B implementation and evidence](ui/mobile/group25b/README.md).
 
 ## Group 2.5 owner correction — 2026-10-14
 
 Current Desktop navigation: Conversation, Automations, Activity, Devices, Preferences. Dictate/Edit/Act are underlying contextual operations inside Conversation, not primary utility pages. Activity groups attention, running work and outcomes with exact evidence/signing detail. Canonical history is available only with installed Memory Fabric and explicit read/retain grants; otherwise the UI reports session-only history.
 
-Scheduled routines, event triggers, watches, persistent named Workers, supervised/autonomous lifecycle management and stateful Protocol controls are integration requirements, not implemented Desktop features. The existing task/runtime foundation remains usable. Ask is the current supported access state; Secure and genuine Full Access activation are unavailable. Sentry and persistent acoustic controls remain unavailable.
+Group 3 integrated **bounded Core durable Workers, one-time/recurring schedules and recovery**. Native creation/editing, broad real trigger delivery and fully autonomous cross-device management remain **unavailable Desktop features**, not rejected product requirements. The existing task/runtime foundation remains usable. Ask is the current supported access state; Secure and genuine Full Access activation are unavailable. A bounded Core Sentry software lifecycle exists; owner-commissioned environmental/acoustic delivery remains unavailable.
 
 See [the interaction and authority decision](decisions/ADR-DESKTOP-PERSONAL-INTELLIGENCE.md) for ownership, implemented boundaries and required integrations. Earlier dated checkpoints remain historical.
 
@@ -390,11 +390,11 @@ Unsupported capture remains unsupported. Capture is never designed as covert rec
 - Detect expired auth, provider degradation, broken adapters, disappearing Grid capabilities, Edge disconnects, task leases, storage/state health, Memory Fabric index drift and update failures.
 - Safe bounded repair/rebuild/rollback where authorized.
 
-## Adaptive Interface Engine — future (not implemented)
+## Adaptive Interface Engine — typed software foundation integrated, full product future
 
 - OSCAR can eventually assemble and update **trusted interactive views inside its same conversation**: comparisons, calendars/timelines, diagrams/simulations, charts, task/Worker progress, contextual device controls and structured reviews.
 - Shared versioned **typed presentation description**, native React/Tauri and Jetpack Compose renderers, Core-authorized actions and accessible text fallback. Never treat generated markup/code as authority.
-- **Planned milestones:** 16 shared presentation protocol, 17 intent-driven composition and Worker/task interactions, 19 isolation/privacy/accessibility hardening, 20 cross-device validation. No Group 2.5 obligation to ship AIE.
+- **Integrated foundations:** Slices 16–17 typed shared presentation/Worker views. **Remaining:** richer views, Slice 19 authorization/accessibility/privacy hardening, Slice 20 native cross-device verification. No Group 2.5 native-product acceptance was retroactively established.
 - [Full proposed architecture](ADAPTIVE-INTERFACE.md).
 
 ## Design / product behavior
