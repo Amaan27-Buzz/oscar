@@ -109,3 +109,7 @@ One OSCAR identity and continuous relationship → Controller/Personal Policy �
 | **Group 8** | Slice 18 and residual Slices 19/20 | Later, physical/full gate evidence |
 
 **Next checkpoint:** Group 4 D1, cloud deployment readiness on verified `main`. Do not reopen merged PR #7 or begin ESP32/Pico work. [Delivery groups, checklist and suggested dates](DELIVERY-PLAN.md).
+
+## Historical scope codes (preserved for acceptance tooling)
+
+Slice 07 was recorded as **COMPLETE FOR SOFTWARE / SIMULATED EDGE FOUNDATION**, with real firmware/silicon status **DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED**. The original plan's former Slice 17 “Unified Alpha” is canonical **Slice 20** today; the new Group 6 scoped alpha does not erase these deferred physical obligations. See [Group 8 plan](DELIVERY-PLAN.md).
