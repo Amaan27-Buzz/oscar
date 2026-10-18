@@ -97,6 +97,16 @@ impl ActForm {
 #[derive(Deserialize)]
 #[serde(tag = "kind", rename_all = "snake_case", deny_unknown_fields)]
 pub enum Command {
+    ConnectionPrepare {
+        url: String,
+    },
+    ConnectionEnroll {
+        invitation: String,
+    },
+    ConnectionLogout,
+    CancelRemote {
+        task_id: String,
+    },
     Ready,
     Refresh,
     History {
@@ -194,6 +204,8 @@ pub fn relative_path(value: &str) -> Result<(), String> {
 pub struct TaskView {
     pub task_id: String,
     pub state: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub retained_available: Option<bool>,
     #[serde(default)]
     pub description: String,
     pub target: String,
@@ -357,6 +369,8 @@ pub enum ThemeChoice {
 }
 #[derive(Clone, Serialize, Default, PartialEq)]
 pub struct View {
+    pub connection: Option<ConnectionView>,
+    pub nodes: Vec<Value>,
     pub presence: Option<serde_json::Value>,
     pub setup: Option<serde_json::Value>,
     pub executive: Option<serde_json::Value>,
@@ -388,6 +402,15 @@ pub struct View {
     pub capture_choice: ContextChoice,
     pub observed_at_ms: u64,
     pub reference: bool,
+}
+#[derive(Clone, Serialize, Default, PartialEq)]
+pub struct ConnectionView {
+    pub endpoint: String,
+    pub installation_id: String,
+    pub node_id: Option<String>,
+    pub public_key: String,
+    pub owner_public_key: String,
+    pub status: String,
 }
 #[derive(Clone, Serialize, Deserialize, Default, PartialEq)]
 pub struct ConversationView {

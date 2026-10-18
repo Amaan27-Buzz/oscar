@@ -20,6 +20,7 @@ pub fn now_ms() -> u64 {
         .as_millis() as u64
 }
 struct CoreSnapshot {
+    nodes: Vec<Value>,
     presence: Option<Value>,
     setup: Option<Value>,
     executive: Option<Value>,
@@ -32,6 +33,7 @@ struct CoreSnapshot {
     voice_available: bool,
 }
 pub struct CoreClient {
+    remote: Option<crate::remote::RemoteClient>,
     url: String,
     node: String,
     session: String,
@@ -79,6 +81,7 @@ impl CoreClient {
             .build()
             .map_err(|_| "native Core client unavailable")?;
         Ok(Self {
+            remote: None,
             url: bootstrap.url.trim_end_matches('/').into(),
             node: bootstrap.node,
             session: bootstrap.session,
@@ -90,7 +93,44 @@ impl CoreClient {
             reference_target: bootstrap.reference_target,
         })
     }
+    pub fn from_remote(connection: &crate::remote::Connection) -> Result<Self, String> {
+        let remote = crate::remote::RemoteClient::new(connection)?;
+        Self::from_remote_transport(connection, remote)
+    }
+    pub fn from_remote_transport(
+        connection: &crate::remote::Connection,
+        remote: crate::remote::RemoteClient,
+    ) -> Result<Self, String> {
+        let session = &remote.session;
+        Ok(Self {
+            url: remote.endpoint.clone(),
+            node: session.node_id.clone(),
+            session: session.session_id.clone(),
+            token: Zeroizing::new(session.token.clone()),
+            client: Client::new(),
+            signer: Arc::new(Signer::persistent(&format!(
+                "{}-owner",
+                connection.installation_id
+            ))?),
+            pending: Mutex::new(HashMap::new()),
+            reference: false,
+            reference_target: None,
+            remote: Some(remote),
+        })
+    }
+    pub fn is_remote(&self) -> bool {
+        self.remote.is_some()
+    }
+    pub fn remote_request(&self, operation: &str, payload: Value) -> Result<Value, String> {
+        self.remote
+            .as_ref()
+            .ok_or("remote connection required")?
+            .request(operation, payload)
+    }
     pub fn request(&self, operation: &str, payload: Value) -> Result<Value, String> {
+        if let Some(remote) = &self.remote {
+            return remote.compatible(operation, payload);
+        }
         let request = json!({"version":1,"request_id":uuid::Uuid::new_v4().simple().to_string(),
             "operation":operation,"payload":payload});
         let response = self
@@ -174,6 +214,7 @@ impl CoreClient {
         };
         let operating = value.get("operating").cloned();
         Ok(CoreSnapshot {
+            nodes: value["nodes"].as_array().cloned().unwrap_or_default(),
             presence: value.get("presence").cloned(),
             setup: value.get("setup").cloned(),
             executive: value.get("executive").cloned(),
@@ -221,6 +262,25 @@ impl CoreClient {
         if claim["expires_at_ms"] != expires || claim["material"]["target"] != value["target"] {
             return Err("review presentation is not bound to signed target/expiry".into());
         }
+        if self.is_remote() {
+            use sha2::{Digest, Sha256};
+            let mut digest = Sha256::new();
+            for field in ["operation", "scope", "target", "review", "exact_request"] {
+                let bytes = value[field]
+                    .as_str()
+                    .ok_or("invalid remote review")?
+                    .as_bytes();
+                digest.update((bytes.len() as u32).to_be_bytes());
+                digest.update(bytes);
+            }
+            if claim["version"] != 2
+                || claim["scope"] != "grid:approve"
+                || claim["generation"] != value["generation"]
+                || claim["display_digest"] != format!("{:x}", digest.finalize())
+            {
+                return Err("exact displayed remote review binding rejected".into());
+            }
+        }
         let text = |name: &str| -> Result<String, String> {
             let text = value[name].as_str().ok_or("invalid Core review")?;
             bound(text, if name == "review" { 24000 } else { 12000 })?;
@@ -237,7 +297,11 @@ impl CoreClient {
             reason: text("reason")?,
             consequence: text("consequence")?,
             policy_reason: text("policy_reason")?,
-            evidence_state: text("evidence_state")?,
+            evidence_state: if self.is_remote() {
+                "PLANNED".into()
+            } else {
+                text("evidence_state")?
+            },
             review: text("review")?,
             expires_at_ms: expires,
         };
@@ -333,6 +397,21 @@ impl Bridge {
     pub fn view(&self) -> View {
         self.view.lock().unwrap_or_else(|p| p.into_inner()).clone()
     }
+    pub fn replace_client(
+        &self,
+        client: Option<Arc<CoreClient>>,
+    ) -> Result<Option<Arc<CoreClient>>, String> {
+        let mut active = self
+            .client
+            .lock()
+            .map_err(|_| "native connection unavailable")?;
+        self.content_revision.fetch_add(1, Ordering::SeqCst);
+        self.voice_revision.fetch_add(1, Ordering::SeqCst);
+        if let Some(previous) = active.as_ref() {
+            previous.invalidate_reviews();
+        }
+        Ok(std::mem::replace(&mut *active, client))
+    }
     pub fn refresh(&self) -> Result<View, String> {
         let client = self.client()?;
         if matches!(
@@ -342,6 +421,7 @@ impl Bridge {
             self.voice_request(json!({"operation":"inspect"}))?;
         }
         let CoreSnapshot {
+            nodes,
             presence,
             setup,
             executive,
@@ -352,9 +432,24 @@ impl Bridge {
             conversation,
             operating,
             voice_available,
-        } = client
-            .snapshot()
-            .map_err(|error| format!("Core unavailable; {error}"))?;
+        } = client.snapshot().map_err(|error| {
+            if error.starts_with("Permission denied") {
+                error
+            } else {
+                format!("Core unavailable; {error}")
+            }
+        })?;
+        // Connection replacement or logout fences snapshots already in flight.
+        let active = self
+            .client
+            .lock()
+            .map_err(|_| "native connection unavailable")?;
+        if !active
+            .as_ref()
+            .is_some_and(|value| Arc::ptr_eq(value, &client))
+        {
+            return Ok(self.view());
+        }
         let mut view = self.view.lock().map_err(|_| "native state unavailable")?;
         if at < view.observed_at_ms {
             return Ok(view.clone());
@@ -412,6 +507,10 @@ impl Bridge {
             view.review = None;
         }
         view.capabilities = caps;
+        view.nodes = nodes;
+        if let Some(connection) = &mut view.connection {
+            connection.status = "online".into();
+        }
         view.operating = operating;
         view.presence = presence;
         view.setup = setup;
@@ -427,33 +526,37 @@ impl Bridge {
         };
         view.voice_available = voice_available;
         if !self.hide_private.load(Ordering::Acquire) {
-            let unchanged = view.conversation.revision == conversation.revision
-                && view.conversation.persistence == conversation.persistence;
-            let mut turns = if unchanged {
-                view.conversation
-                    .turns
-                    .iter()
-                    .filter(|t| t.retained)
-                    .cloned()
-                    .collect()
+            if client.is_remote() {
+                view.conversation = conversation;
             } else {
-                Vec::new()
-            };
-            let before = if unchanged && !turns.is_empty() {
-                view.conversation.before
-            } else {
-                conversation.before
-            };
-            for turn in conversation.turns.iter().cloned() {
-                turns.retain(|prior| prior.task_id != turn.task_id || prior.role != turn.role);
-                turns.push(turn);
+                let unchanged = view.conversation.revision == conversation.revision
+                    && view.conversation.persistence == conversation.persistence;
+                let mut turns = if unchanged {
+                    view.conversation
+                        .turns
+                        .iter()
+                        .filter(|t| t.retained)
+                        .cloned()
+                        .collect()
+                } else {
+                    Vec::new()
+                };
+                let before = if unchanged && !turns.is_empty() {
+                    view.conversation.before
+                } else {
+                    conversation.before
+                };
+                for turn in conversation.turns.iter().cloned() {
+                    turns.retain(|prior| prior.task_id != turn.task_id || prior.role != turn.role);
+                    turns.push(turn);
+                }
+                turns.sort_by(|a, b| a.occurred_at.total_cmp(&b.occurred_at));
+                view.conversation = ConversationView {
+                    turns,
+                    before,
+                    ..conversation
+                };
             }
-            turns.sort_by(|a, b| a.occurred_at.total_cmp(&b.occurred_at));
-            view.conversation = ConversationView {
-                turns,
-                before,
-                ..conversation
-            };
         }
         view.observed_at_ms = at;
         view.link = "online".into();
@@ -468,7 +571,7 @@ impl Bridge {
     }
     pub fn fail(&self, message: String) -> View {
         let mut view = self.view.lock().unwrap_or_else(|p| p.into_inner());
-        if message.starts_with("Core unavailable") {
+        if message.starts_with("Core unavailable") || message.starts_with("Permission denied") {
             if view.link == "online" {
                 view.expression.epoch = uuid::Uuid::new_v4().simple().to_string();
             }
@@ -482,6 +585,15 @@ impl Bridge {
             view.executive = None;
             view.setup = None;
             view.capabilities.clear();
+            view.nodes.clear();
+            if let Some(connection) = &mut view.connection {
+                connection.status = if message.starts_with("Permission denied") {
+                    "revoked_or_expired"
+                } else {
+                    "reconnecting"
+                }
+                .into();
+            }
         }
         view.message = Some(message);
         view.expression.generation += 1;
@@ -689,6 +801,10 @@ impl Bridge {
         }
         let client = self.client()?;
         let value = match cmd {
+            Command::CancelRemote { task_id } => {
+                let value = client.remote_request("cancel", json!({"task_id":task_id}))?;
+                crate::remote::task(&value)?
+            }
             Command::Refresh => return self.refresh(),
             Command::History { before } => {
                 let page: ConversationView = serde_json::from_value(
@@ -840,6 +956,19 @@ mod tests {
         assert!(task.value.is_none());
         let preview = bridge.response_fenced(json!({"preview_id":"late","before":"private sentinel","after":"private sentinel","epistemic":"REPORTED","expires":99,"destinations":["surface"]}), None, Some(2)).unwrap();
         assert!(preview.preview.is_none());
+    }
+    #[test]
+    fn connection_replacement_fences_old_content() {
+        let bridge = Bridge::new();
+        let revision = bridge.content_revision.load(Ordering::SeqCst);
+        assert!(bridge.replace_client(None).unwrap().is_none());
+        let late = bridge.response_fenced(
+            json!({"task_id":"old-core","state":"reported","response":"prior connection content"}),
+            None,
+            Some(revision),
+        ).unwrap();
+        assert!(late.current.is_none());
+        assert!(late.tasks.is_empty());
     }
     #[test]
     fn connection_and_public_state_cannot_export_secrets() {

@@ -8,21 +8,70 @@ pub struct Signer {
 }
 impl Signer {
     pub fn new() -> Result<Self, String> {
-        let mut provider = ptr::null_mut();
-        let mut key = ptr::null_mut();
+        Self::open(None)
+    }
+    pub fn persistent(installation: &str) -> Result<Self, String> {
+        if installation.is_empty()
+            || installation.len() > 80
+            || !installation
+                .chars()
+                .all(|c| c.is_ascii_alphanumeric() || c == '-')
+        {
+            return Err("invalid native installation identity".into());
+        }
+        let name: Vec<u16> = format!("Dawnlight.OSCAR.{installation}")
+            .encode_utf16()
+            .chain(Some(0))
+            .collect();
+        Self::open(Some(&name))
+    }
+    pub fn remove_persistent(installation: &str) -> Result<(), String> {
+        let signer = Self::persistent(installation)?;
+        let mut guard = signer
+            .handles
+            .lock()
+            .map_err(|_| "native key unavailable")?;
+        // SAFETY: only the exact OSCAR installation key is deleted; zero fences Drop.
+        if unsafe { NCryptDeleteKey(guard.1, NCRYPT_SILENT_FLAG) } != 0 {
+            return Err("native connection key could not be removed".into());
+        }
+        guard.1 = 0;
+        Ok(())
+    }
+    fn open(name: Option<&[u16]>) -> Result<Self, String> {
+        let mut provider = 0;
+        let mut key = 0;
         // SAFETY: valid writable handles; CNG owns storage until Drop.
         unsafe {
-            if BCryptOpenAlgorithmProvider(&mut provider, BCRYPT_RSA_ALGORITHM, ptr::null(), 0) != 0
-            {
+            if NCryptOpenStorageProvider(&mut provider, MS_KEY_STORAGE_PROVIDER, 0) != 0 {
                 return Err("native signing provider unavailable".into());
             }
-            if BCryptGenerateKeyPair(provider, &mut key, 2048, 0) != 0
-                || BCryptFinalizeKeyPair(key, 0) != 0
+            let key_name = name.map_or(ptr::null(), |value| value.as_ptr());
+            let opened = name.is_some()
+                && NCryptOpenKey(provider, &mut key, key_name, 0, NCRYPT_SILENT_FLAG) == 0;
+            // No overwrite flag: an inaccessible existing key cannot silently rotate identity.
+            if !opened
+                && (NCryptCreatePersistedKey(
+                    provider,
+                    &mut key,
+                    BCRYPT_RSA_ALGORITHM,
+                    key_name,
+                    0,
+                    NCRYPT_SILENT_FLAG,
+                ) != 0
+                    || NCryptSetProperty(
+                        key,
+                        NCRYPT_LENGTH_PROPERTY,
+                        2048u32.to_le_bytes().as_ptr(),
+                        4,
+                        0,
+                    ) != 0
+                    || NCryptFinalizeKey(key, NCRYPT_SILENT_FLAG) != 0)
             {
-                if !key.is_null() {
-                    BCryptDestroyKey(key);
+                if key != 0 {
+                    NCryptFreeObject(key);
                 }
-                BCryptCloseAlgorithmProvider(provider, 0);
+                NCryptFreeObject(provider);
                 return Err("native owner key unavailable".into());
             }
         }
@@ -35,10 +84,11 @@ impl Signer {
         let mut length = 0;
         // SAFETY: public export only, output buffer is sized by CNG first.
         unsafe {
-            if BCryptExportKey(
-                guard.1 as _,
-                ptr::null_mut(),
+            if NCryptExportKey(
+                guard.1,
+                0,
                 BCRYPT_RSAPUBLIC_BLOB,
+                ptr::null(),
                 ptr::null_mut(),
                 0,
                 &mut length,
@@ -48,10 +98,11 @@ impl Signer {
                 return Err("public owner key unavailable".into());
             }
             let mut blob = vec![0; length as usize];
-            if BCryptExportKey(
-                guard.1 as _,
-                ptr::null_mut(),
+            if NCryptExportKey(
+                guard.1,
+                0,
                 BCRYPT_RSAPUBLIC_BLOB,
+                ptr::null(),
                 blob.as_mut_ptr(),
                 length,
                 &mut length,
@@ -76,29 +127,29 @@ impl Signer {
         let mut size = 0;
         // SAFETY: immutable digest/padding and CNG-owned key, under the key lifetime mutex.
         unsafe {
-            if BCryptSignHash(
-                guard.1 as _,
+            if NCryptSignHash(
+                guard.1,
                 &padding as *const _ as _,
                 hash.as_ptr(),
                 32,
                 ptr::null_mut(),
                 0,
                 &mut size,
-                BCRYPT_PAD_PSS,
+                NCRYPT_PAD_PSS_FLAG | NCRYPT_SILENT_FLAG,
             ) != 0
             {
                 return Err("native signing unavailable".into());
             }
             let mut signature = vec![0; size as usize];
-            if BCryptSignHash(
-                guard.1 as _,
+            if NCryptSignHash(
+                guard.1,
                 &padding as *const _ as _,
                 hash.as_ptr(),
                 32,
                 signature.as_mut_ptr(),
                 size,
                 &mut size,
-                BCRYPT_PAD_PSS,
+                NCRYPT_PAD_PSS_FLAG | NCRYPT_SILENT_FLAG,
             ) != 0
             {
                 return Err("native signing unavailable".into());
@@ -112,8 +163,8 @@ impl Drop for Signer {
         if let Ok(guard) = self.handles.lock() {
             // SAFETY: each owned CNG handle is released exactly once after users have dropped the Arc.
             unsafe {
-                BCryptDestroyKey(guard.1 as _);
-                BCryptCloseAlgorithmProvider(guard.0 as _, 0);
+                NCryptFreeObject(guard.1);
+                NCryptFreeObject(guard.0);
             }
         }
     }
@@ -179,5 +230,20 @@ mod tests {
                 .len(),
             256
         );
+    }
+    #[test]
+    fn persistent_key_reopens_without_exporting_private_material() {
+        let installation = uuid::Uuid::new_v4().to_string();
+        let first = Signer::persistent(&installation).unwrap();
+        let public = first.public_der().unwrap();
+        drop(first);
+        let reopened = Signer::persistent(&installation).unwrap();
+        assert_eq!(public, reopened.public_der().unwrap());
+        assert_eq!(reopened.sign(b"restart proof").unwrap().len(), 256);
+        let mut guard = reopened.handles.lock().unwrap();
+        // SAFETY: remove this test's unique key only; zero prevents a second free.
+        assert_eq!(unsafe { NCryptDeleteKey(guard.1, NCRYPT_SILENT_FLAG) }, 0);
+        guard.1 = 0;
+        assert!(Signer::persistent("../invalid").is_err());
     }
 }

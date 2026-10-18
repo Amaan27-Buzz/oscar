@@ -3,6 +3,8 @@ mod core;
 mod preferences;
 mod presence;
 mod protocol;
+mod remote;
+mod secure_connection;
 mod signing;
 use crate::{
     core::{Bridge, CoreClient},
@@ -67,6 +69,7 @@ fn companion_view(mut view: View) -> View {
     fn status(task: TaskView) -> TaskView {
         TaskView {
             state: task.state,
+            retained_available: task.retained_available,
             actions: task.actions,
             ..Default::default()
         }
@@ -74,6 +77,8 @@ fn companion_view(mut view: View) -> View {
     view.tasks = view.tasks.into_iter().map(status).collect();
     view.current = view.current.map(status);
     view.capabilities.clear();
+    view.nodes.clear();
+    view.connection = None;
     view.context = None;
     view.preview = None;
     view.review = None;
@@ -702,6 +707,97 @@ async fn desktop_command(
         return Err("Workspace authority required".into());
     }
     match request {
+        Command::ConnectionPrepare { url } => {
+            let path = app
+                .path()
+                .app_config_dir()
+                .map_err(|_| "native connection directory unavailable")?
+                .join("connection.dat");
+            let view = tauri::async_runtime::spawn_blocking(move || {
+                remote::Connection::prepare(url, &path)
+            })
+            .await
+            .map_err(|_| "connection preparation failed")??;
+            state
+                .bridge
+                .view
+                .lock()
+                .map_err(|_| "native state unavailable")?
+                .connection = Some(view);
+            emit(&app, &state);
+            return Ok(state.bridge.view());
+        }
+        Command::ConnectionEnroll { invitation } => {
+            let path = app
+                .path()
+                .app_config_dir()
+                .map_err(|_| "native connection directory unavailable")?
+                .join("connection.dat");
+            let handle = app.clone();
+            let (client, connection) = tauri::async_runtime::spawn_blocking(move || -> Result<_, String> {
+                let mut connection = remote::Connection::load(&path)?.ok_or("Prepare this device first")?;
+                let review = ReviewView { review_id: "enrollment".into(), task_id: "enrollment".into(), operation: "enroll".into(),
+                    description: "Connect this Desktop to your OSCAR Core".into(), target: connection.url.clone(), capability: "Grid connection".into(),
+                    reason: "Trusted operator invitation".into(), consequence: "Share authorized conversation and device state with this Core".into(),
+                    policy_reason: "Only enrolled scopes apply; changes still need exact review".into(), evidence_state: "Owner enrollment required".into(),
+                    review: format!("Core: {}\nInstallation: {}\nReview the trusted invitation before connecting.", connection.url, connection.installation_id), expires_at_ms: 0 };
+                if !owner_review(&handle, &review) { return Err("Connection review dismissed".into()); }
+                connection.enroll(&invitation)?;
+                connection.save(&path)?;
+                let client = Arc::new(CoreClient::from_remote(&connection)?);
+                Ok((client, connection.view("connecting")?))
+            }).await.map_err(|_| "native enrollment failed; inspect before retry")??;
+            state.bridge.replace_client(Some(client))?;
+            state
+                .bridge
+                .view
+                .lock()
+                .map_err(|_| "native state unavailable")?
+                .connection = Some(connection);
+            emit(&app, &state);
+            return Ok(state.bridge.view());
+        }
+        Command::ConnectionLogout => {
+            let path = app
+                .path()
+                .app_config_dir()
+                .map_err(|_| "native connection directory unavailable")?
+                .join("connection.dat");
+            let client = state.bridge.replace_client(None)?;
+            let revoked = tauri::async_runtime::spawn_blocking(move || {
+                let revoked = client.is_some_and(|client| {
+                    client
+                        .remote_request("revoke", serde_json::json!({}))
+                        .is_ok()
+                });
+                if let Some(connection) = remote::Connection::load(&path)? {
+                    signing::Signer::remove_persistent(&format!(
+                        "{}-transport",
+                        connection.installation_id
+                    ))?;
+                    signing::Signer::remove_persistent(&format!(
+                        "{}-owner",
+                        connection.installation_id
+                    ))?;
+                }
+                secure_connection::remove(&path).map(|()| revoked)
+            })
+            .await
+            .map_err(|_| "native disconnect failed")??;
+            let mut view = state
+                .bridge
+                .view
+                .lock()
+                .map_err(|_| "native state unavailable")?;
+            let theme = view.theme;
+            let shortcut = view.shortcut.clone();
+            let shortcut_enabled = view.shortcut_enabled;
+            *view = View { theme, shortcut, shortcut_enabled, link: "unconfigured".into(), orb: "unavailable".into(), window: WindowMode::Preferences,
+                message: Some(if revoked {"Device revoked and saved connection removed"} else {"Local connection removed; remote revocation UNKNOWN. Ask the trusted Core operator to revoke this device."}.into()), ..Default::default() };
+            drop(view);
+            emit(&app, &state);
+            return Ok(state.bridge.view());
+        }
         Command::Ready => {
             state.ready.store(true, Ordering::Release);
             return Ok(state.bridge.view());
@@ -956,6 +1052,15 @@ fn reference_check(app: tauri::AppHandle, client: Arc<CoreClient>) -> Result<(),
 }
 
 fn main() {
+    #[cfg(debug_assertions)]
+    match remote::fixture_cli(&std::env::args().collect::<Vec<_>>()) {
+        Ok(true) => return,
+        Ok(false) => {}
+        Err(error) => {
+            eprintln!("native fixture failed: {error}");
+            std::process::exit(1);
+        }
+    }
     let check = cfg!(debug_assertions) && std::env::args().any(|a| a == "--reference-check");
     let bootstrap_stdin = std::env::args().any(|a| a == "--bootstrap-stdin");
     let baseline = if cfg!(debug_assertions) {
@@ -1064,10 +1169,19 @@ fn main() {
                     Ok(Arc::new(CoreClient::new(bootstrap,signer)?))
                 };
                 let state=handle.state::<Native>();
-                let client=if bootstrap_stdin {match start(){Ok(c)=>Some(c),Err(e)=>{state.bridge.fail(e);emit(&handle,&state);None}}}else{None};
+                let client=if bootstrap_stdin {match start(){Ok(c)=>Some(c),Err(e)=>{state.bridge.fail(e);emit(&handle,&state);None}}}else if !state.isolated_preferences {
+                    let resume=||->Result<Option<Arc<CoreClient>>,String>{
+                        let path=handle.path().app_config_dir().map_err(|_|"native connection directory unavailable")?.join("connection.dat");
+                        let Some(connection)=remote::Connection::load(&path)? else{return Ok(None)};
+                        state.bridge.view.lock().map_err(|_|"native state unavailable")?.connection=Some(connection.view(if connection.session.is_some(){"connecting"}else{"awaiting_enrollment"})?);
+                        connection.session.as_ref().map(|_|CoreClient::from_remote(&connection).map(Arc::new)).transpose()
+                    };
+                    match resume(){Ok(c)=>c,Err(e)=>{state.bridge.fail(e);None}}
+                }else{None};
                 *state.bridge.client.lock().unwrap_or_else(|p|p.into_inner())=client.clone();
                 let mut emitted=View::default();
                 let mut shown=false;
+                let mut retry_ms=5000u64;
                 while !state.stop.load(Ordering::Acquire) {
                     if interaction && !shown && state.ready.load(Ordering::Acquire) {
                         let _=window_mode(&handle,&state,WindowMode::Interaction);shown=true;
@@ -1078,12 +1192,18 @@ fn main() {
                         if let Err(error)=reference_check(handle.clone(),client.clone()){eprintln!("reference failed: {error}");handle.exit(1);}
                         return;
                     }
-                    let view=if client.is_some(){match state.bridge.refresh(){Ok(v)=>v,Err(e)=>state.bridge.fail(e)}}else{
+                    let active_client=state.bridge.client().ok();
+                    let revoked=state.bridge.view().connection.is_some_and(|c|c.status=="revoked_or_expired");
+                    let view=if active_client.is_some()&&!revoked{match state.bridge.refresh(){Ok(v)=>{retry_ms=5000;v},Err(e)=>{retry_ms=(retry_ms*2).min(60000);state.bridge.fail(e)}}}else{
                         if state.presence { let mut view=state.bridge.view.lock().unwrap_or_else(|p|p.into_inner());view.expression.generation+=1;view.expression.observed_at_ms=core::now_ms(); }
                         state.bridge.view()
                     };
                     if view!=emitted {emit(&handle,&state);emitted=view;}
-                    thread::sleep(Duration::from_secs(2));
+                    let sleep_ms=if active_client.is_some_and(|c|c.is_remote()){
+                        let jitter=(uuid::Uuid::new_v4().as_u128()%1000) as u64;
+                        retry_ms+jitter
+                    }else{2000};
+                    for _ in 0..sleep_ms/100 {if state.stop.load(Ordering::Acquire){break;}thread::sleep(Duration::from_millis(100));}
                 }
             });
             Ok(())

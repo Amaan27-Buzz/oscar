@@ -30,7 +30,12 @@ def main() -> int:
     if adb is None:
         parser.error("ADB must be available through --adb, PATH or ANDROID_HOME")
     inventory = subprocess.run(
-        [str(adb), "devices", "-l"], capture_output=True, text=True, check=True, timeout=20
+        [str(adb), "devices", "-l"],
+        capture_output=True,
+        encoding="utf-8",
+        errors="replace",
+        check=True,
+        timeout=20,
     ).stdout
     if not re.search(r"^" + re.escape(arguments.serial) + r"\s+device\b", inventory, re.MULTILINE):
         raise RuntimeError("explicit emulator is absent from the ADB device inventory")
@@ -39,7 +44,8 @@ def main() -> int:
         process = subprocess.run(
             [str(adb), "-s", arguments.serial, *command],
             capture_output=True,
-            text=True,
+            encoding="utf-8",
+            errors="replace",
             timeout=timeout,
             check=False,
         )
@@ -69,7 +75,8 @@ def main() -> int:
         # Retain assertion stacks privately without printing invitation material.
         invitation = values.get("grid_invitation")
         log.write_text(
-            result.replace(invitation, "[invitation redacted]") if invitation else result
+            result.replace(invitation, "[invitation redacted]") if invitation else result,
+            encoding="utf-8",
         )
         log.chmod(0o600)
         # JUnit assumptions/skips or a zero-test invocation cannot establish acceptance.
@@ -113,7 +120,10 @@ def main() -> int:
                 grid_ca=details["grid_ca"],
             )
         finally:
-            invoke("reverse", "--remove", "tcp:" + port)
+            try:
+                invoke("reverse", "--remove", "tcp:" + port)
+            except RuntimeError:
+                pass  # Emulator loss must not prevent Core/Worker fixture cleanup.
     print(
         json.dumps(
             {

@@ -6,6 +6,11 @@ import {Activity} from './Activity';
 afterEach(()=>{cleanup();vi.useRealTimers();});
 const task:Task={task_id:'one',state:'planned',description:'Scoped file task',target:'worker',blocker:null,actions:['approve','deny'],generation:1,evidence_ids:[],response:null,response_status:null,value:null,epistemic:null};
 const review:Review={review_id:'exact',task_id:'one',operation:'approve',description:'Scoped file task',target:'worker',capability:'file_write',reason:'Owner request',consequence:'Write scoped file',policy_reason:'Current grant',evidence_state:'planned',review:'{"path":"proof.txt"}',expires_at_ms:Date.now()+30000};
+it('redacted canonical completion does not claim visible verification',()=>{
+  render(<Activity view={{...initialView,current:{...task,state:'verified',retained_available:false,actions:[]}}} available busy={false} run={vi.fn()} back={vi.fn()}/>);
+  expect(screen.getAllByText('Evidence unavailable')).toHaveLength(2);
+  expect(screen.queryByText('Verified')).toBeNull();
+});
 it('opening Activity does not request approval and only uses exact advertised controls',()=>{
   const run=vi.fn();render(<Activity view={{...initialView,tasks:[task],current:task}} available busy={false} run={run} back={vi.fn()}/>);
   expect(run).not.toHaveBeenCalled();fireEvent.click(screen.getByRole('button',{name:'Review denial'}));

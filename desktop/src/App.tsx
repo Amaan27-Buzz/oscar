@@ -2,7 +2,7 @@ import {useEffect,useRef,useState} from 'react';
 import {DesktopExpression} from './DesktopExpression';
 import type {Source} from '@oscar/expression';
 import {Act} from './Act';
-import {initialView,send,subscribe,stateLabel,statuses} from './bridge';
+import {initialView,send,subscribe,stateLabel,taskStatus} from './bridge';
 import type {Command,Mode,Send,View,ContextChoice} from './bridge';
 export function App({port=send,events=subscribe,expressionKind='core',focusReview=false}:{port?:Send;events?:typeof subscribe;expressionKind?:Source['kind'];focusReview?:boolean}) {
   const [view,setView]=useState<View>(initialView);const [mode,setMode]=useState<Mode>('Ask');
@@ -37,7 +37,7 @@ export function App({port=send,events=subscribe,expressionKind='core',focusRevie
       {view.window==='activity'?<section aria-label="Shared Core activity"><h2>Activity</h2>
         {!view.tasks.length&&<p>No shared tasks are currently visible.</p>}
         <ul className="tasks">{view.tasks.map(t=><li key={t.task_id}><button disabled={!online} onClick={()=>run({kind:'inspect',task_id:t.task_id})}>
-          <strong>{statuses[t.state]??'Unknown'}</strong><span>{t.description}</span><small>{t.target}</small></button></li>)}</ul>
+          <strong>{taskStatus(t)}</strong><span>{t.description}</span><small>{t.target}</small></button></li>)}</ul>
       </section>:<>
         <div className="modes" role="tablist" aria-label="Interaction mode">{(['Ask','Dictate','Edit','Act'] as Mode[]).map(m=><button
           key={m} role="tab" tabIndex={mode===m?0:-1} aria-selected={mode===m} onClick={()=>setMode(m)} onKeyDown={e=>{if(['ArrowLeft','ArrowRight','Home','End'].includes(e.key)){e.preventDefault();const modes:Mode[]=['Ask','Dictate','Edit','Act'];const i=e.key==='Home'?0:e.key==='End'?3:(modes.indexOf(m)+(e.key==='ArrowRight'?1:3))%4;setMode(modes[i]);(e.currentTarget.parentElement?.children[i] as HTMLElement)?.focus();}}}>{m}</button>)}</div>
@@ -58,7 +58,7 @@ export function App({port=send,events=subscribe,expressionKind='core',focusRevie
           </div><p className="secondary">{mode==='Edit'?'Core transforms; you review before any destination changes.':mode==='Dictate'?'Only a final transcript can become a preview. Microphone availability is reported by Core.':'One OSCAR relationship. Replies keep their evidence status.'}</p>
         </section>}
       </>}
-      {task&&<section aria-label="Current Core task" className="result"><h2>{statuses[task.state]??'Unknown outcome'}</h2>
+      {task&&<section aria-label="Current Core task" className="result"><h2>{taskStatus(task)}</h2>
         {task.blocker&&<p>{task.blocker}</p>}{(task.response||task.value)&&<><p>{task.epistemic??task.response_status??'REPORTED'}</p><pre>{task.value??task.response}</pre></>}
         <small>{task.evidence_ids.length} evidence references · {task.target}</small>
         {task.progress&&<p className="secondary">{task.progress.status} Worker progress · {Math.round(task.progress.fraction*100)}% · {task.progress.step}</p>}

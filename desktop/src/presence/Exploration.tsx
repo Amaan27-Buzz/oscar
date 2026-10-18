@@ -3,7 +3,7 @@ import {useEffect,useRef,useState} from 'react';
 import {flushSync} from 'react-dom';
 import orb from '../../../assets/brand/oscar-orb.svg';
 import {App} from '../App';
-import {statuses} from '../bridge';
+import {taskStatus} from '../bridge';
 import type {Send,View} from '../bridge';
 import {fixtures} from '../showcase';
 import './presence.css';
@@ -24,7 +24,7 @@ export function presentation(view:View) {
   const attention=online?view.tasks.filter(t=>t.actions.includes('approve')).length:0;
   const waiting=online&&!working&&view.tasks.some(t=>t.state==='awaiting_result');
   const state=!online?'offline':working?'active':waiting?'waiting':'idle';
-  const label=!online?'Core unavailable':view.current?statuses[view.current.state]??'Unknown outcome':'Available';
+  const label=!online?'Core unavailable':view.current?taskStatus(view.current):'Available';
   return {state,label,working,attention,online};
 }
 export function dimensions(concept:Concept,state:string,attention=0):[number,number] {

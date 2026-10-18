@@ -1,6 +1,6 @@
 import {Disclosure} from '../UIControls';
 import {useEffect,useRef,useState} from 'react';
-import {epistemicLabel,statuses} from '../bridge';
+import {epistemicLabel,taskStatus} from '../bridge';
 import type {Command,View} from '../bridge';
 
 const terminal=['verified','partially_verified','failed','cancelled'];
@@ -26,7 +26,7 @@ export function Activity({view,available,busy,run,back,human=false}:{human?:bool
   const attention=tasks.filter(t=>t.actions.includes('approve')||['blocked','unknown','failed'].includes(t.state));
   const active=tasks.filter(t=>!terminal.includes(t.state)&&!attention.includes(t));
   const completed=tasks.filter(t=>terminal.includes(t.state)&&!attention.includes(t));
-  function list(items:View['tasks']) {return <ul className="activity-list">{items.map(t=><li key={t.task_id}><button disabled={!available||busy} aria-current={view.current?.task_id===t.task_id?'true':undefined} onClick={()=>run({kind:'inspect',task_id:t.task_id})}><span>{human?taskDescription(t.description):t.description}</span><small>{statuses[t.state]??'Unknown outcome'}</small></button></li>)}</ul>;}
+  function list(items:View['tasks']) {return <ul className="activity-list">{items.map(t=><li key={t.task_id}><button disabled={!available||busy} aria-current={view.current?.task_id===t.task_id?'true':undefined} onClick={()=>run({kind:'inspect',task_id:t.task_id})}><span>{human?taskDescription(t.description):t.description}</span><small>{taskStatus(t)}</small></button></li>)}</ul>;}
   return <div className="activity-surface">
     <header data-tauri-drag-region><span data-tauri-drag-region>OSCAR / Activity</span><button onClick={back}>Back to Conversation</button></header>
     <div className="section-heading"><h1 ref={title} tabIndex={-1}>Activity</h1><p className="leaf-secondary">What OSCAR did, what is running, and what needs you.</p></div>
@@ -42,7 +42,7 @@ export function Activity({view,available,busy,run,back,human=false}:{human?:bool
       <p className="decision-guidance">You’ll confirm in a Windows dialog. Permission applies to this request; it does not create a permanent grant.</p>
       {!decisionCurrent&&<p role="status" className="leaf-error">This review is no longer current. Open this item again to review it.</p>}
       <div className="leaf-actions"><button className="leaf-primary" disabled={!available||busy||!decisionCurrent} onClick={()=>run({kind:'confirm',review_id:review.review_id,accept:true})}>Continue to confirmation</button><button disabled={busy} onClick={()=>run({kind:'confirm',review_id:review.review_id,accept:false})}>Dismiss review</button></div>
-    </section>:view.current?<section aria-label="Selected task" className="selected-task"><div className="task-detail-heading"><span className={`task-status state-${view.current.state}`}>{statuses[view.current.state]??'Unknown outcome'}</span><h2>{human?taskDescription(view.current.description):view.current.description}</h2></div>
+    </section>:view.current?<section aria-label="Selected task" className="selected-task"><div className="task-detail-heading"><span className={`task-status state-${view.current.state}`}>{taskStatus(view.current)}</span><h2>{human?taskDescription(view.current.description):view.current.description}</h2></div>
       {view.current.blocker&&<p role="status" className="leaf-error">{human?"This work needs attention before it can continue.":view.current.blocker}</p>}
       {view.current.progress&&Number.isFinite(view.current.progress.fraction)&&view.current.progress.fraction>=0&&view.current.progress.fraction<=1&&<div className="task-progress"><label>{human?'Progress':view.current.progress.step}<span>{Math.round(view.current.progress.fraction*100)}%</span></label><progress max="1" value={view.current.progress.fraction}/><small>{human?epistemicLabel(view.current.progress.status):view.current.progress.status}</small></div>}
       {(view.current.response||view.current.value)&&<div className="activity-result"><p className="leaf-secondary">{human?epistemicLabel(view.current.epistemic??view.current.response_status):view.current.epistemic??view.current.response_status??'REPORTED'}</p>{!!view.current.source_event_ids?.length&&<p className="leaf-secondary">{human?'From an earlier conversation. Things may have changed since then.':'Earlier retained evidence; current facts may differ. Inferred material remains inference.'}</p>}<pre tabIndex={0} aria-label="Task result">{view.current.value??view.current.response}</pre>{view.current.response_truncated&&<p className="leaf-secondary">Only an excerpt is available.</p>}</div>}

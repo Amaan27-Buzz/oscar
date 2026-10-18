@@ -1,7 +1,7 @@
 import {Theme} from '@radix-ui/themes';
 import {useEffect,useState} from 'react';
 import {DesktopExpression} from './DesktopExpression';
-import {send,subscribe,statuses} from './bridge';
+import {send,subscribe,taskStatus} from './bridge';
 import type {Command,ContextChoice,Send} from './bridge';
 import {surface,useDesktop} from './surfaces';
 import {Activity} from './presence/Activity';
@@ -13,6 +13,7 @@ import {Automations} from './Automations';
 import {AdaptiveView} from './AdaptiveView';
 import {emptyActionDraft} from './Act';
 import {Devices} from './Devices';
+import {ConnectionSettings} from './ConnectionSettings';
 import type {CSSProperties} from 'react';
 import './workspace.css';
 type Page='Conversation'|'Automations'|'Activity'|'Devices'|'Preferences';
@@ -29,7 +30,7 @@ export function Workspace({port=send,events=subscribe}:{port?:Send;events?:typeo
   useEffect(()=>{document.documentElement.dataset.theme=view.theme??'light';},[view.theme]);
   useEffect(()=>{if(/^Ctrl\+Alt\+[A-Z]$/.test(view.shortcut))setShortcut(view.shortcut);},[view.shortcut]);
   async function local(request:Parameters<typeof surface>[0]) {try{accept(await surface(request));setError('');}catch(e){setError(typeof e==='string'?e:'Native control unavailable.');}}
-  async function run(command:Command){if(command.kind==='window'&&command.mode==='activity')setPage('Activity');if(command.kind==='discard'){setDraft('');setToolDrafts({Dictate:'',Edit:''});setActionDraft(emptyActionDraft);setSubmitted(null);}return bridgeRun(command);}
+  async function run(command:Command){if(command.kind==='window'&&command.mode==='activity')setPage('Activity');if(command.kind==='discard'){setDraft('');setToolDrafts({Dictate:'',Edit:''});setActionDraft(emptyActionDraft);setSubmitted(null);}if(view.connection&&command.kind==='review'&&command.operation==='cancel')return bridgeRun({kind:'cancel_remote',task_id:command.task_id});return bridgeRun(command);}
   function discard(){void run({kind:'discard'});}
   const task=view.current;
   const history=view.conversation?.turns??[];
@@ -45,10 +46,10 @@ export function Workspace({port=send,events=subscribe}:{port?:Send;events?:typeo
       <div data-page={page} className={`workspace-content ${reading?'reader':''} ${page==='Conversation'?'conversation-page':''}`}>
         {page==='Conversation'&&<section className={`conversation ${!task?'is-home':''}`} aria-label="Conversation"><div className="conversation-thread" role="region" aria-label="Conversation scroll area" tabIndex={0}><div className="conversation-thread-inner">
           {view.conversation?.before!=null&&<button disabled={!available||busy} onClick={()=>run({kind:'history',before:view.conversation!.before!})}>Load earlier conversation</button>}
-          {history.map(turn=><article className={turn.role==='owner'?'user-turn':'assistant-turn retained-turn'} key={turn.id}><small>{turn.role==='owner'?'You':'OSCAR'}</small><p>{turn.text}</p><button className="turn-reference" disabled={!available||busy} onClick={()=>{setPage('Activity');void run({kind:'inspect',task_id:turn.task_id});}}>Details</button></article>)}
+          {history.map(turn=><article className={turn.role==='owner'?'user-turn':'assistant-turn retained-turn'} key={turn.id}><small>{turn.role==='owner'?'You':'OSCAR'}</small><p>{turn.text}</p>{turn.task_id&&<button className="turn-reference" disabled={!available||busy} onClick={()=>{setPage('Activity');void run({kind:'inspect',task_id:turn.task_id});}}>Details</button>}</article>)}
           {submitted&&submitted.id===task?.task_id&&!history.some(t=>t.task_id===submitted.id&&t.role==='owner')&&<div className="user-turn"><small>You</small><p>{submitted.text}</p></div>}
-          {task&&!hasCurrentReply&&<div className="assistant-turn"><h2>OSCAR <small>{statuses[task.state]??'Unknown'}</small></h2>
-            {(task.response||task.value)?<ResultView human task={task} expanded={reading} read={()=>setReading(true)} inspect={()=>setPage('Activity')} askAgain={()=>{setReading(false);requestAnimationFrame(()=>document.getElementById('workspace-ask')?.focus());}}/>:<><p>{task.blocker?"I couldn’t continue with this request. Open Activity for the details.":task.state==='planned'?"I need your review before continuing.":"I’m working on it."}</p>{task.actions.includes('approve')&&<button className="leaf-primary" disabled={!available||busy} onClick={()=>run({kind:'review',task_id:task.task_id,operation:'approve'})}>Review request</button>}</>}</div>}
+          {task&&!hasCurrentReply&&<div className="assistant-turn"><h2>OSCAR <small>{taskStatus(task)}</small></h2>
+            {(task.response||task.value)?<ResultView human task={task} expanded={reading} read={()=>setReading(true)} inspect={()=>setPage('Activity')} askAgain={()=>{setReading(false);requestAnimationFrame(()=>document.getElementById('workspace-ask')?.focus());}}/>:<><p>{task.retained_available===false?"The retained result and evidence are unavailable.":task.blocker?"I couldn’t continue with this request. Open Activity for the details.":task.state==='planned'?"I need your review before continuing.":"I’m working on it."}</p>{task.actions.includes('approve')&&<button className="leaf-primary" disabled={!available||busy} onClick={()=>run({kind:'review',task_id:task.task_id,operation:'approve'})}>Review request</button>}</>}</div>}
           {(view.adaptive_views??[]).slice(-3).map((descriptor,index)=><AdaptiveView key={index} descriptor={descriptor} inspect={id=>{setPage('Activity');void run({kind:'inspect',task_id:id});}}/>)}
           {!task&&!history.length&&<div className="conversation-empty"><h2>What’s on your mind?</h2><p>Ask me something, or tell me what you need.</p></div>}
           {(view.preview||task?.mode==='Edit'&&!!task.response)&&<TextTools reviewOnly view={view} available={available} busy={busy} mode={view.preview?.mode==='Dictate'?'Dictate':'Edit'} setMode={setToolMode} draft="" setDraft={()=>{}} run={run} discard={discard} useInMessage={async text=>{if(view.preview&&await run({kind:'apply',preview_id:view.preview.preview_id,destination:'surface'})){setDraft(text);document.getElementById('workspace-ask')?.focus();}}}/>}
@@ -60,6 +61,7 @@ export function Workspace({port=send,events=subscribe}:{port?:Send;events?:typeo
         {page==='Devices'&&<Devices view={view} available={available} busy={busy} refresh={()=>void run({kind:'refresh'})} prepare={capability=>{setPage('Conversation');setDraft(`Help me ${capability.label.toLowerCase()}. `);requestAnimationFrame(()=>document.getElementById('workspace-ask')?.focus());}}/>}
         {page==='Preferences'&&<section className="preferences-page" aria-label="Preferences">
           <div className="section-heading"><h1>Preferences</h1><p className="leaf-secondary">Make OSCAR feel at home on your desktop.</p></div>
+          <ConnectionSettings view={view} busy={busy} run={run}/>
           <section className="operating-preferences" aria-label="Operating choices"><h2>How OSCAR works with you</h2><dl><div><dt>Access mode</dt><dd>{available?view.operating?.access??'Check connection':'Check connection'}</dd></div><div><dt>Listening</dt><dd>Only when you start it</dd></div><div><dt>Delegated work</dt><dd>Waits for your review</dd></div></dl><Disclosure title={<>Access modes</>}><p><strong>Ask</strong> can inspect what you allow, think things through and suggest actions. Changes need your approval.</p><p><strong>Secure</strong> handles ordinary work on its own, while protected or consequential actions still need your consent. Not available yet.</p><p><strong>Full Access</strong> means unrestricted owner-delegated autonomy over every available capability, including consequential operations, without OSCAR asking for approval on each action. Not available yet.</p><p>Full Access requires your explicit activation and the necessary app and system access. External confirmation requirements and physical safety limits still apply.</p></Disclosure></section>
           {view.setup&&<Disclosure title={<>Core setup</>}>{['identity','pairing','provider','persona','preferences','policy','sentry','voice'].map(section=>{const item=view.setup?.[section];return <p key={section}>{section.charAt(0).toUpperCase()+section.slice(1)}: {item?.operational===true?'Operational':item?.configured===true?'Configured':'Setup needed'}</p>;})}</Disclosure>}
           <section className="privacy-preferences" aria-label="Memory and privacy"><h2>Memory and privacy</h2><p>{view.conversation?.retention?'OSCAR may save this conversation so you can return to it.':'New messages aren’t currently saved for reopening.'}</p><p>{view.conversation?.persistence==='authorized'?'You can read your previously saved conversation.':'Previously saved conversation is not available on this connection.'}</p><p>Text from other apps is used only for the request you attach it to. It is not saved with conversation history.</p><label>Context from other apps<Choice label="Context from other apps" value={view.capture_choice??'none'} onChange={value=>void run({kind:'capture_choice',source:value as ContextChoice})} options={[{value:'none',label:'Don’t include app context'},{value:'selection',label:'Selected text'},{value:'focused',label:'Focused app field'},{value:'foreground',label:'App window name'}]}/></label><p className="leaf-secondary">Choose what to include, focus that app, then use your shortcut to open OSCAR. Private or unsupported fields stay protected.</p></section>

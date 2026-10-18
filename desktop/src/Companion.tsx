@@ -3,7 +3,7 @@ import {useEffect,useRef,useState} from 'react';
 import {DesktopExpression} from './DesktopExpression';
 import {companionEvents,surface,useDesktop} from './surfaces';
 import type {Send} from './bridge';
-import {statuses} from './bridge';
+import {taskStatus} from './bridge';
 import './companion.css';
 const companionPort:Send=()=>surface({kind:'ready'});
 const icons={open:'M4 5h16v11H9l-5 4V5Z',access:'M12 3 4 6v6c0 4 8 9 8 9s8-5 8-9V6l-8-3Zm-4 9 3 3 5-6',sentry:'M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7Zm10-3a3 3 0 1 0 0 6 3 3 0 0 0 0-6',voice:'M10 4a3 3 0 0 1 4 0v8a3 3 0 0 1-4 0V4ZM6 11a6 6 0 0 0 12 0m-6 6v4m-3 0h6',menu:'M5 12h.01M12 12h.01M19 12h.01'};
@@ -20,7 +20,7 @@ export function Companion() {
   const activeVoice=available&&['listening','processing','speaking'].includes(view.voice);
   const working=(fresh(view.expression?.tasks_observed_at_ms)?view.tasks:[]).find(t=>['executing','awaiting_result','result_received','verifying'].includes(t.state));
   const visibleTask=working??(fresh(view.expression?.current_observed_at_ms)?view.current:null);
-  const state=error?'Control needs attention':!available?'Disconnected':attention?'Review needed':visibleTask?statuses[visibleTask.state]??'Outcome unknown':'Ready';
+  const state=error?'Control needs attention':!available?'Disconnected':attention?'Review needed':visibleTask?taskStatus(visibleTask):'Ready';
   async function control(request:Parameters<typeof surface>[0]) {try{accept(await surface(request));setError('');}catch(e){setError(typeof e==='string'?e:'Control unavailable. Open OSCAR to inspect.');}}
   function pointer(x:number,y:number){target.current={x:Math.max(-4,Math.min(4,x)),y:Math.max(-3,Math.min(3,y))};if(gazeFrame.current===undefined)gazeFrame.current=requestAnimationFrame(()=>{gazeFrame.current=undefined;setGaze(target.current);});}
   return <main className={`companion ${hover?'is-hovered':''}`} aria-label="OSCAR Companion" onPointerEnter={()=>setHover(true)} onPointerLeave={()=>{setHover(false);pointer(0,0);}} onContextMenu={e=>{e.preventDefault();void control({kind:'companion_menu'});}} onKeyDown={e=>{if(e.key==='ContextMenu'||(e.shiftKey&&e.key==='F10')){e.preventDefault();void control({kind:'companion_menu'});}}}>

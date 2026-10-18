@@ -274,3 +274,4 @@
 .workspace .settings-group>p+p{margin-top:8px}.workspace .advanced-controls>.oscar-disclosure-content{padding-top:12px}
 
 .workspace .user-turn .turn-reference{min-height:24px;margin-top:6px}
+.connection-setting form{display:grid;gap:12px;margin:16px 0}.connection-setting input,.connection-setting textarea{width:100%;box-sizing:border-box}.connection-setting textarea{resize:none}.connection-setting dl{overflow-wrap:anywhere}.connection-setting button{justify-self:start}
