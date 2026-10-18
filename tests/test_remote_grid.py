@@ -636,6 +636,19 @@ class RemoteGridTests(unittest.TestCase):
         archive = self.core.harness.archive
         self.assertIn('"evidence"', archive.event(result["event_id"]).content)
 
+    def test_withdrawn_approval_scope_blocks_already_reviewed_write(self):
+        task = self.submit("file_write", parameters={"path": "withdrawn.txt", "content": "never"})
+        self.approve(task)
+        delivery = self.delivery()
+        store = self.core.harness.store
+        row = store.get("node", self.mobile.handle.node_id)
+        store.put(
+            "node", row["id"], {**row, "scopes": [s for s in row["scopes"] if s != "grid:approve"]}
+        )
+        with self.assertRaises(PermissionError):
+            self.worker.execute(delivery)
+        self.assertFalse((self.workspace / "withdrawn.txt").exists())
+
 
 if __name__ == "__main__":
     unittest.main()

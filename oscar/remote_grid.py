@@ -1089,6 +1089,8 @@ class RemoteGrid:
                 or approver["revoked"]
                 or approver_node["revoked"]
                 or approver["expires_at"] <= time()
+                or "grid:approve" not in approver["scopes"]
+                or "grid:approve" not in approver_node["scopes"]
                 or (row["kind"] == "action" and binding["approval_expires_ms"] <= time() * 1000)
             ):
                 raise PermissionError("approval expired or revoked")
@@ -1242,9 +1244,9 @@ class RemoteGrid:
             "observed_at_ms": int(time() * 1000),
         }
         while len(json.dumps(snapshot).encode()) > 245760:
-            if events:
+            if len(events) > 1:
                 events.pop()
-                snapshot["cursor"] = events[-1]["sequence"] if events else cursor
+                snapshot["cursor"] = events[-1]["sequence"]
             elif len(tasks) > 1:
                 tasks.pop(0)
             else:
