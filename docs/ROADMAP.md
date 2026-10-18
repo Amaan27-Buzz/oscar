@@ -22,7 +22,7 @@ One OSCAR identity and continuous relationship → Controller/Personal Policy �
 
 ## Slice 03 — Native Transport + Capability Catalog + Connection Grid foundation
 
-**LOCAL SOFTWARE ACCEPTED / Gate A.** TLS-authenticated Internet transport and separate hosts are **Group 4 D2**, not yet verified.
+**LOCAL SOFTWARE ACCEPTED / Gate A.** Group 4/D2 now implements authenticated TLS transport and independent Core/Worker processes in the current draft candidate. Independent hosted Internet acceptance remains NOT_RUN; see the [connected evidence ledger](development/GROUP-04-D2.md).
 
 ## Slice 04 — Native Model Router
 
@@ -102,13 +102,13 @@ One OSCAR identity and continuous relationship → Controller/Personal Policy �
 | Character/Design | Slices 11–13 | Software/UI merged; Desktop provisional, Mobile owner approved |
 | **Group 3 / Gate D** | **All Slices 14–17** | PR #7 **MERGED**, Gate D **PARTIAL** |
 | Gate E | Slices 18–20 | **NOT PASSED** |
-| **Group 4** | Delivery D1/D2; existing slices' remote obligations | **NEXT** Cloud Core and Grid |
+| **Group 4** | Delivery D1/D2; existing slices' remote obligations | D1 PR #8 merged; connected D2 software candidate under verification |
 | **Group 5** | Delivery D3/D4/C1–C4; existing slices' live obligations | Connected/native/computer use/plugins/access/voice |
 | **Group 6** | Narrow Slice 20 operational-alpha evidence | Daily owner acceptance; **not** full gate PASS |
 | **Group 7** | Dedicated home-server laptop | Later, hardware-dependent |
 | **Group 8** | Slice 18 and residual Slices 19/20 | Later, physical/full gate evidence |
 
-**Next checkpoint:** Group 4 D1, cloud deployment readiness on verified `main`. Do not reopen merged PR #7 or begin ESP32/Pico work. [Delivery groups, checklist and suggested dates](DELIVERY-PLAN.md).
+**Current checkpoint:** Group 4/D2 + Group 5/D3–D4 connected software, with a bounded C1 scoped-file vertical slice, in one draft PR. Oracle hosting and owner-device commissioning remain separately authorized. Do not reopen merged PR #7 or begin ESP32/Pico work. [Delivery groups and checklist](DELIVERY-PLAN.md).
 
 ## Historical scope codes (preserved for acceptance tooling)
 

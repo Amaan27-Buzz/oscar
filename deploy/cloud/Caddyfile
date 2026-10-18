@@ -23,7 +23,7 @@
 
 {$OSCAR_DOMAIN} {
 	# No access log: request URLs and authentication headers can be private.
-	@api path /v1/*
+	@api path /v1/* /v2/grid/*
 	handle @api {
 		request_body {
 			max_size 64KB

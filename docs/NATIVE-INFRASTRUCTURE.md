@@ -300,7 +300,15 @@ Gate A should prove native transport/model routing. Gate B should prove useful m
 
 The native foundation now lives in `oscar/contracts.py`, `storage.py`, `runtime.py`, `capabilities.py`, `grid.py` and `transport.py`. SQLite is the durable task/ledger/lease authority. Transport targets authenticate per-node sessions, recheck capability scope and bind commands to task/correlation/lease IDs. Replay nonces and action idempotency are durable. Started actions with uncertain outcomes block replay.
 
-`python -m oscar proof` uses a real loopback HTTP reference server. `python -m oscar grid-proof` disconnects a reference node and observes actual lease expiry while preserving the objective. These are reference-node proofs; OSCAR Mobile/Desktop/Edge hardware, public TLS/outbound rendezvous, state replication and a vendor deployment have not been implemented or verified. The reference target shares the coordinator SQLite store and binds only to loopback. Session handles cannot be serialized; stored session token digests are distinct from provider credentials, which are never persisted.
+`python -m oscar proof` uses a real loopback HTTP reference server.
+`python -m oscar grid-proof` exercises reference-node lease expiry; these historical
+proofs share the coordinator SQLite store and do not establish remote operation.
+The [connected candidate](development/GROUP-04-D2.md) separately implements scoped
+HTTPS device sessions and independent outbound Worker processes using the same
+authoritative Grid/Runtime. [Protocol 2](development/GROUP-04-D2-PROTOCOL.md)
+defines native synchronization and execution fencing. Stored token digests remain
+separate from provider credentials. Public-host and physical-device acceptance
+are still outstanding; the legacy reference listener remains loopback-only.
 
 `Transport` is the adapter boundary for future network deployments. This does not establish a production secure Internet transport. See [the Club A checkpoint](CLUB-A-CHECKPOINT.md). No Latch/SwitchRoute service dependency was added.
 

@@ -1,5 +1,15 @@
 # OSCAR Mobile — Slice 09
 
+**Connected software candidate — 2026-10-18:** the approved native Kotlin/Compose
+application now adds device Keystore Grid proof, trusted HTTPS enrollment,
+encrypted sessions/history cache, foreground synchronization with Core cursors,
+task/device state, exact owner-review binding, revoke and logout. See the
+[connected guide](../mobile/CONNECTED-GRID.md), [shared protocol](development/GROUP-04-D2-PROTOCOL.md)
+and [current evidence ledger](development/GROUP-04-D2.md). Tests may target only an
+explicitly identified disposable emulator. Owner physical phone, biometric,
+hardware-backed key and OEM acceptance remain NOT_RUN; physical phone access is
+prohibited in the current run. Historical Slice 09 reports below remain intact.
+
 > Original-repository PR/run URLs below are historical identifiers retained verbatim.
 > They are no longer accessible after repository migration and are not current CI evidence.
 

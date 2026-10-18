@@ -16,6 +16,12 @@ See [current checklist](CURRENT-STATUS.md), [delivery groups](DELIVERY-PLAN.md),
 
 ---
 
+The current D2/D3–D4 candidate adds authenticated connected software and a scoped
+file-execution vertical slice. Its [evidence ledger](development/GROUP-04-D2.md)
+separates actual Windows, Linux-container, native ARM64, emulator, hosted and
+physical results. A software or emulator result does not close the remaining
+owner/device gates. Secure and Full Access remain unavailable.
+
 Build Gates group detailed roadmap slices into larger manual verification checkpoints. They do not replace slice exit conditions.
 
 At each Gate:

@@ -3,6 +3,7 @@
 import argparse
 import http.client
 import json
+import re
 import shutil
 import ssl
 import subprocess
@@ -10,6 +11,7 @@ import sys
 import time
 import urllib.error
 import urllib.request
+from collections.abc import Callable
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Any
@@ -29,13 +31,21 @@ def docker(
     )
     if check and result.returncode:
         # Commands/output may contain fixture credentials; report only safe categories.
-        raise RuntimeError(f"Docker {arguments[0]} failed with exit {result.returncode}")
+        lines = re.findall(r'File "/fixtures/verify.py", line ([0-9]+)', result.stderr)
+        rejected = re.findall(r"Grid request rejected \(([0-9]{3})\)", result.stderr)
+        detail = f"fixture line {lines[-1]}" if lines else "operation failed"
+        if rejected:
+            detail += f", Grid HTTP {rejected[-1]}"
+        raise RuntimeError(f"Docker {arguments[0]} failed with exit {result.returncode}: {detail}")
     return result
 
 
 def client() -> None:
+    from oscar.remote_client import GridClient
+
     fixtures = Path("/fixtures")
-    credential = json.load(sys.stdin)
+    credentials = json.load(sys.stdin)
+    credential = credentials["diagnostic"]
     identifier = (fixtures / "request-id").read_text()
     context = ssl.create_default_context(cafile=str(fixtures / "ca.crt"))
 
@@ -93,7 +103,70 @@ def client() -> None:
     assert code == 200 and created["value"] == 42, "real Core probe failed"
     code, readback = request("/v1/probes/" + identifier, authenticated=True)
     assert code == 200 and readback == created, "independent TLS readback disagreed"
-    print(json.dumps({"tls_verified": True, "task_id": created["task_id"]}))
+    grid = GridClient(
+        f"https://{DOMAIN}:8443",
+        credentials["remote"],
+        fixture_signer(fixtures),
+        ssl_context=context,
+    )
+    snapshot = grid.request("snapshot", {"cursor": 0})
+    assert snapshot["core_id"] == CORE_ID
+    remote = grid.request(
+        "submit",
+        {
+            "text": "synthetic TLS arithmetic acceptance",
+            "kind": "addition",
+            "target": CORE_ID,
+            "parameters": {"expression": "19 + 23"},
+            "retain": True,
+        },
+        request_id=identifier,
+    )
+    deadline = time.monotonic() + 20
+    while True:
+        inspected = grid.request("inspect", {"task_id": remote["task_id"]})
+        if inspected["state"] in {"verified", "blocked", "failed", "unknown"}:
+            break
+        assert time.monotonic() < deadline, "bounded Grid task did not finish"
+        time.sleep(1)
+    assert inspected["state"] == "verified" and inspected["evidence"]
+    assert inspected["result"]["value"] == "42", "Grid result did not match real arithmetic"
+    print(
+        json.dumps(
+            {
+                "tls_verified": True,
+                "task_id": created["task_id"],
+                "remote_task_id": remote["task_id"],
+            }
+        )
+    )
+
+
+def remote_enroll() -> None:
+    """Private pipe IPC for generated test credentials; never production diagnostics."""
+    from oscar.remote_client import GridClient
+
+    fixtures = Path("/fixtures")
+    client = GridClient(
+        f"https://{DOMAIN}:8443",
+        {},
+        fixture_signer(fixtures),
+        ssl_context=ssl.create_default_context(cafile=str(fixtures / "ca.crt")),
+    )
+    print(json.dumps(client.enroll(json.load(sys.stdin))))
+
+
+def fixture_signer(fixtures: Path) -> Callable[[bytes], bytes]:
+    from cryptography.hazmat.primitives import hashes, serialization
+    from cryptography.hazmat.primitives.asymmetric import padding, rsa
+
+    key = serialization.load_pem_private_key((fixtures / "grid-key.pem").read_bytes(), None)
+    assert isinstance(key, rsa.RSAPrivateKey)
+    return lambda payload: key.sign(
+        payload,
+        padding.PSS(mgf=padding.MGF1(hashes.SHA256()), salt_length=32),
+        hashes.SHA256(),
+    )
 
 
 def wait_for_core(name: str) -> None:
@@ -113,6 +186,11 @@ def wait_for_core(name: str) -> None:
 
 
 def verify(core_image: str, ingress_image: str) -> None:
+    import base64
+
+    from cryptography.hazmat.primitives import serialization
+    from cryptography.hazmat.primitives.asymmetric import rsa
+
     if not shutil.which("docker"):
         raise RuntimeError("Docker CLI and a running Linux daemon are required")
     repository = Path(__file__).resolve().parents[1]
@@ -158,6 +236,23 @@ def verify(core_image: str, ingress_image: str) -> None:
                 encoding="utf-8",
             )
             (fixtures / "request-id").write_text(uuid4().hex)
+            key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+            (fixtures / "grid-key.pem").write_bytes(
+                key.private_bytes(
+                    serialization.Encoding.PEM,
+                    serialization.PrivateFormat.PKCS8,
+                    serialization.NoEncryption(),
+                )
+            )
+            (fixtures / "grid-public.txt").write_text(
+                base64.b64encode(
+                    key.public_key().public_bytes(
+                        serialization.Encoding.DER,
+                        serialization.PublicFormat.SubjectPublicKeyInfo,
+                    )
+                ).decode(),
+                encoding="ascii",
+            )
             shutil.copyfile(__file__, fixtures / "verify.py")
             for path in fixtures.iterdir():
                 path.chmod(0o644)
@@ -200,6 +295,27 @@ def verify(core_image: str, ingress_image: str) -> None:
                 "/var/lib/oscar/fixture-client.json",
                 "--ttl",
                 "3600",
+            )
+            docker(
+                "run",
+                "--rm",
+                "--network",
+                "none",
+                *core_options,
+                *mount,
+                *storage,
+                core_image,
+                "python",
+                "-c",
+                "import json; from pathlib import Path; "
+                "from oscar.cloud import CloudConfig,CloudCore; "
+                "from oscar.remote_grid import create_invitation; "
+                "config=CloudConfig.load(Path('/fixtures/cloud.json')); "
+                "core=CloudCore(config,start_services=False); "
+                "invite=create_invitation(core,'ingress-grid-mobile','mobile','ingress-install',"
+                "Path('/fixtures/grid-public.txt').read_text(),retain=True); "
+                "Path('/var/lib/oscar/fixture-invitation.json').write_text(json.dumps(invite)); "
+                "core.close()",
             )
             docker(
                 "run",
@@ -287,10 +403,25 @@ def verify(core_image: str, ingress_image: str) -> None:
                 "/fixtures/verify.py",
                 "--client",
             ]
-            first = json.loads(docker(*check, stdin=credential).stdout)
+            invitation = docker(
+                "exec",
+                core_name,
+                "python",
+                "-c",
+                "from pathlib import Path; "
+                "print(Path('/var/lib/oscar/fixture-invitation.json').read_text())",
+            ).stdout
+            remote_session = docker(*[*check[:-1], "--remote-enroll"], stdin=invitation).stdout
+            credentials = json.dumps(
+                {
+                    "diagnostic": json.loads(credential),
+                    "remote": json.loads(remote_session),
+                }
+            )
+            first = json.loads(docker(*check, stdin=credentials).stdout)
             docker("restart", "--time", "10", core_name)
             wait_for_core(core_name)
-            second = json.loads(docker(*check, stdin=credential).stdout)
+            second = json.loads(docker(*check, stdin=credentials).stdout)
             assert first == second, "restart duplicated the same request's Core task"
             snapshots = docker(
                 "stats",
@@ -316,6 +447,7 @@ def verify(core_image: str, ingress_image: str) -> None:
                 "tls": "trusted-local-ca",
                 "network": "private-no-published-ports",
                 "restart_readback": True,
+                "grid_protocol": 2,
                 "container_memory_snapshot": memory,
             }
         )
@@ -327,8 +459,11 @@ def main() -> None:
     parser.add_argument("--core-image", default="oscar-cloud:local")
     parser.add_argument("--ingress-image", default="oscar-cloud-ingress:local")
     parser.add_argument("--client", action="store_true", help=argparse.SUPPRESS)
+    parser.add_argument("--remote-enroll", action="store_true", help=argparse.SUPPRESS)
     args = parser.parse_args()
-    if args.client:
+    if args.remote_enroll:
+        remote_enroll()
+    elif args.client:
         client()
     else:
         verify(args.core_image, args.ingress_image)

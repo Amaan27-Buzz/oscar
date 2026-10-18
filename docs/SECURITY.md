@@ -1,5 +1,37 @@
 # Security + Permissions
 
+## Connected Grid candidate — 2026-10-18
+
+The [Grid 2 contract](development/GROUP-04-D2-PROTOCOL.md) extends the canonical
+Core/Grid/Policy/Runtime boundary through two exact HTTPS POST routes. Trusted
+offline enrollment binds the device-generated key, installation, role, workspace
+and explicit sharing scopes to a single-use five-minute invitation. Proof of
+possession does not create owner authority by itself. D1 diagnostic credentials
+cannot enroll owner devices.
+
+Each request binds the exact body, method, path, node, session, nonce and time to
+RSA-PSS proof plus the scoped session. Nonces, bounded per-device admission,
+atomic rotation, immediate session fences and trusted recovery are independently
+enforced. Invalid proofs cannot exhaust another valid device's request allowance.
+Restore invalidates remote sessions and invitations. Windows CNG/DPAPI and Android
+Keystore keep transport credentials separate from owner approval keys.
+
+The remote Worker advertises only enrolled bounded file reads/writes, checks
+local scope independently and rechecks current Core policy, exact task/action,
+session, target, lease, deadline and approval before replacement. Core requires
+independent filesystem readback for verified state. Durable local execution claims
+and Core lease fences prevent automatic replay of an ambiguous mutation.
+
+Archive access and retention remain explicit independent grants. Without sharing,
+status may be available while task content/results and history are redacted.
+Forgotten source events reset the client archive generation and withdraw related
+results. Credentials are absent from URL/query fields and application diagnostics.
+
+These are software claims supported by the [security and acceptance ledger](development/GROUP-04-D2.md).
+Actual Internet commissioning, owner enrollment, biometrics and physical key
+backing remain separate acceptance. The current run prohibits physical Android
+access. Ask remains enforced; Secure and Full Access are unavailable.
+
 ## Group 3 internal execution credentials — 2026-10-17
 
 Only trusted local Core enrollment can enable renewable internal execution

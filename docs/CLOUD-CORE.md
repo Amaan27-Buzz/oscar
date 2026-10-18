@@ -1,9 +1,11 @@
-# D1 persistent Cloud Core: deployment and commissioning
+# Persistent Cloud Core and connected Grid: deployment and commissioning
 
-This candidate composes the existing Python OSCAR Core. It is not a second backend,
-a remote Desktop Worker, owner enrollment acceptance, or an Oracle deployment.
+This candidate composes the existing Python OSCAR Core, with D2's bounded outbound
+Grid transport and scoped file Worker. It is not a second backend, owner enrollment
+acceptance, or an Oracle deployment.
 Current implementation and evidence are tracked in [status](CURRENT-STATUS.md) and
-[delivery plan](DELIVERY-PLAN.md). D2 owns independent authenticated node transport.
+[delivery plan](DELIVERY-PLAN.md). [Connected software evidence](development/GROUP-04-D2.md)
+separates actual process/TLS/native/emulator runs from later commissioning.
 
 ## Runtime boundary and dependencies
 
@@ -17,11 +19,12 @@ Current implementation and evidence are tracked in [status](CURRENT-STATUS.md) a
 | Windows machine/browser/UIA/capture | Unavailable on Linux; D2 must attach an authenticated real Windows Worker |
 | Qdrant/Graphiti/Neo4j/embedding/reranking | Optional derived services; absent services leave explicit canonical-only retrieval |
 
-The runtime image contains only the existing OSCAR Python source and public model
-configuration, on digest-pinned Python 3.12.15 / Debian Bookworm slim. The Core has
-no third-party runtime requirements. Native UI, audio and ML extras are deliberately
-excluded. Docker builds do not download Python packages or models. The acceptance
-target adds repository tests, not another Core implementation.
+The runtime uses existing OSCAR source and public model configuration on
+digest-pinned Python 3.12.15 / Debian Bookworm slim. D2 reuses the existing pinned
+`mobile` cryptography extra for RSA proof-of-possession and approval verification;
+the image constrains its CFFI/parser transitive versions and requires binary wheels.
+Builds download those small runtime dependencies, with no models or audio/ML/UI
+stack. The acceptance target adds repository tests, not another Core implementation.
 
 `deploy/cloud/compose.yaml` runs UID/GID 10001, drops capabilities, disallows
 privilege escalation, makes the image read-only, bounds temporary storage, process
@@ -37,9 +40,10 @@ budgets, not a measured production minimum or a promise that every future worklo
 fits. Canonical archive capacity grows with retained history; choose storage and
 retention from actual usage and restore requirements.
 
-The optional `compose.tls.yaml` adds digest-pinned Caddy 2.11.7 with only ports 80/443. Only `/v1/*`
-reaches the Core; private health, old loopback adapters and unknown paths return
-404. Core authentication, scope, session expiry/revocation and replay checks still
+The optional `compose.tls.yaml` adds digest-pinned Caddy 2.11.7 with only ports 80/443.
+Only `/v1/*` and `/v2/grid/*` reach the Core; Core permits exactly Grid's two POST
+routes and named D1 diagnostic routes. Private health, old loopback adapters and
+unknown paths return 404. Authentication, scope, expiry/revocation and replay checks
 apply behind TLS. Forwarded HTTPS is only meaningful on this isolated backend
 network; never publish port 8080 or run the Core directly on a public interface.
 The proxy adds header/body/time bounds. Core adds its own strict parsing, body,
@@ -149,7 +153,9 @@ the same eligible diagnostic node and a **new output filename**; existing files 
 never overwritten or automatically deleted. Content-free attempt/failure/delivery
 audit records distinguish completed transactions; an attempt without delivery is
 incomplete. Revoked or unrelated node identities require an explicit new identity.
-No remote enrollment endpoint is exposed.
+That D1 workflow does not grant remote device authority. The separate D2 enrollment
+endpoint accepts only a trusted operator's short-lived invitation and proof from
+its exact pinned device key; it cannot initiate owner trust by itself.
 
 Existing local Core execution enrollment expires after seven days. Startup and
 restart **do not renew** expired/revoked execution authority. The service reports
@@ -166,6 +172,41 @@ This offline local reenrollment is an operational requirement of the current D1
 candidate, not standing owner delegation or D2 distributed credential renewal.
 Do not hide it behind an unattended renewal timer. Inspect readiness and a scoped
 authenticated request after renewal.
+
+## Connected device invitations (separate owner commissioning)
+
+Use [protocol 2](development/GROUP-04-D2-PROTOCOL.md) and the native connection UI
+to export a device-generated transport public key and installation identity.
+Independently review the fingerprint, exact role, workspace and requested retention.
+Transport proof and native owner-confirmation keys are separate; add an owner key
+only when its actual native confirmation boundary is acceptable. Synthetic PEM
+fixture keys never establish real owner or hardware-backed acceptance.
+
+With the Core stopped, create a new private output in the existing UID/GID-10001
+commissioning directory. Example for an explicitly approved Desktop enrollment:
+
+```sh
+docker compose -f deploy/cloud/compose.yaml stop core
+docker compose -f deploy/cloud/compose.yaml run --rm --no-deps --volume /srv/oscar/commissioning:/commissioning core python -m oscar.remote_grid invite --config /etc/oscar/cloud.json --node OWNER_CHOSEN_NODE --role desktop --installation DEVICE_INSTALLATION_ID --public-key-file /commissioning/device-public.txt --workspace OWNER_CHOSEN_WORKSPACE_ID --retain --output /commissioning/new-device-invitation.json
+docker compose -f deploy/cloud/compose.yaml up -d --wait
+```
+
+Replace placeholders with the reviewed bounded identities; the Desktop's absolute
+workspace remains local, and the Core knows only its opaque workspace ID. The
+public-key file contains base64 DER. `--retain` is explicit relationship history
+sharing/retention consent, not authority inferred from a connection. For Android
+choose `--role mobile` and omit `--workspace`; do not perform this on the owner's
+phone during the software integration run. Transfer the invitation privately to
+the exact device and complete its key-signed enrollment within five minutes.
+Invitation replay, expiry, wrong key or mismatched identity fails closed.
+
+Sessions have bounded expiry and rotation fences their predecessors. A lost
+rotation response or revoked enrollment requires explicit trusted recovery; do
+not copy another device's session or weaken TLS. Use `--recover` only after the
+operator reviews replacement key/identity and revocation. Backup restoration
+invalidates remote sessions and invitations; recover deliberately without running
+the original and restored writers together. D1 diagnostic credentials do not
+authorize these device operations. Secure/Full Access stays inactive.
 
 ## TLS and network commissioning (separate owner authorization)
 
@@ -310,32 +351,35 @@ docker run --rm oscar-cloud:local sh -c 'python -m pip install --target /tmp/aud
 ## Reproduce software acceptance
 
 ```sh
+python -m pip install '.[dev,mobile]'
 docker build --target runtime -f deploy/cloud/Dockerfile -t oscar-cloud:local .
 docker build --target acceptance -f deploy/cloud/Dockerfile -t oscar-cloud-acceptance:local .
 docker build --target ingress -f deploy/cloud/Dockerfile -t oscar-cloud-ingress:local .
 docker run --rm --read-only --cap-drop ALL --security-opt no-new-privileges:true --pids-limit 128 --memory 1g --cpus 1 --tmpfs /tmp:rw,size=128m,mode=1777 oscar-cloud-acceptance:local
 python -m scripts.verify_cloud_ingress --core-image oscar-cloud:local --ingress-image oscar-cloud-ingress:local
-python -m unittest tests.test_cloud tests.test_cloud_acceptance tests.test_cloud_state tests.test_cloud_platform tests.test_cloud_recovery tests.test_cloud_enrollment tests.test_cloud_admission -v
+python -m scripts.verify_connected_grid
+python -m unittest tests.test_cloud tests.test_cloud_acceptance tests.test_cloud_state tests.test_cloud_platform tests.test_cloud_recovery tests.test_cloud_enrollment tests.test_cloud_admission tests.test_remote_grid tests.test_remote_worker -v
 ```
 
 The ingress check starts actual Core and Caddy containers on an internal Docker
 network with **no published ports**, trusts the generated local CA properly, tests
 canonical public-443 redirects with an untrusted Host, authentication rejection,
-private/legacy-path rejection, real runtime arithmetic/archive write and separate
-TLS readback, then restarts Core and confirms the same task remains. It removes
+private/legacy-path rejection, D1 diagnostics, actual Grid device proof/enrollment,
+runtime arithmetic/archive writes and separate TLS readback. It restarts Core and
+confirms the same D1 and D2 tasks remain. It removes
 only its generated containers, volume and network, including on failure. It uses
 synthetic credentials and does not contact an owner provider or public CA.
 
 The Cloud workflow builds and runs these contracts on native Ubuntu x86_64 and
 ARM64 runners. Successful CI proves that runner/runtime and the tested local
-boundary. It does not prove an independent Oracle host, Android/Desktop remote
-Grid, a public certificate or owner commissioning. Preserve exact-head CI evidence
-in the final engineering report. D2 must add independent outbound Worker sessions,
-real device enrollment, distributed revocation/fencing, reconnect/continuation and
-authoritative remote readback without broadening the diagnostic API into arbitrary
-public Worker control.
+boundary. The separate-process suite additionally executes the real scoped Worker
+and independent filesystem readback over trusted TLS, including process death
+after a mutation and no replay after Core/Worker restart. These local environments
+do not prove an independent Oracle host, public certificate, native UI acceptance
+or owner commissioning. Preserve exact-head CI and each native platform's evidence
+in the [connected ledger](development/GROUP-04-D2.md).
 
-Initial candidate Linux x86_64 software verification on 2026-10-18 passed all **31 Cloud
+Historical D1 initial Linux x86_64 verification on 2026-10-18 passed all **31 Cloud
 tests** in the Python 3.12.15 acceptance image under UID 10001, read-only filesystem,
 dropped capabilities, no new privileges, 1 GiB RAM and one CPU. The actual private
 Core/Caddy TLS check also passed. After the small synthetic request and restart,

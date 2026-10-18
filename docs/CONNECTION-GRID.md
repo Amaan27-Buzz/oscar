@@ -359,9 +359,20 @@ Edge offline
 
 ## Implementation and delivery status (2026-10-18)
 
-Existing local Grid/pairing, heartbeat, typed Capability Catalog, Durable Runtime and reference HTTP are **software integrated**; the remote, persistent Internet topology above remains a **target**. [Group 3 PR #7](https://github.com/Amaan27-Buzz/oscar/pull/7) merged with CI. Gate C/D remain **PARTIAL**.
+Existing local Grid, Capability Catalog and Durable Runtime remain authoritative.
+The [D2 connected candidate](development/GROUP-04-D2.md) adds HTTPS proof of
+possession, trusted single-use device invitations, bounded outbound polling,
+scoped task admission, separate file readback, canonical archive cursors and
+conservative process-loss recovery. [Protocol 2](development/GROUP-04-D2-PROTOCOL.md)
+defines the shared native contract. Independent Internet-host and owner-device
+acceptance remain outstanding. Gate C/D remain **PARTIAL**.
 
-**Next:** [Group 4 D1/D2](DELIVERY-PLAN.md) implements secure persistent Cloud Core and authenticated remote Grid/outbound Worker connections; **Group 5** validates real Desktop/Android pairing, computer use, plugins, revocation and owner controls. Oracle Always Free is a hosting candidate, not deployed. Later dedicated home-server laptop is distinct from optional Galaxy Tab. Physical Slice 07/18 Edge is **COMPLETE FOR SOFTWARE / SIMULATED EDGE FOUNDATION** with real hardware **DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED**. Historic scopes are retained in Git history and [consolidated Gate C contract](GATE-C-CONSOLIDATED-ACCEPTANCE.md).
+**Current:** review the D2/D3–D4 software draft and its platform-specific evidence;
+separately commission approved hosts and real owner devices. Oracle remains a
+candidate, not deployed. The later dedicated home-server laptop is distinct from
+optional Galaxy Tab. Physical Slice 07/18 Edge is **COMPLETE FOR SOFTWARE / SIMULATED EDGE FOUNDATION**
+with hardware **DEFERRED_BY_OWNER / NOT_PHYSICALLY_VERIFIED**. Historical evidence
+remains in Git and the [consolidated Gate C contract](GATE-C-CONSOLIDATED-ACCEPTANCE.md).
 
 ## Tauri surface continuity
 

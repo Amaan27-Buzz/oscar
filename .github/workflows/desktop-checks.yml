@@ -29,6 +29,10 @@ jobs:
       - run: python -m unittest tests.test_desktop -v
       - run: python -m scripts.desktop_reference --self-check
       - run: python -m scripts.desktop_windows_reference
+      - name: Actual separate Windows Core and scoped Worker over trusted local TLS
+        run: python -m scripts.verify_connected_grid
+      - name: Actual native CNG and DPAPI Grid enrollment, approval and Worker
+        run: python -m scripts.verify_desktop_grid
       - run: python -m mypy oscar scripts/desktop_reference.py scripts/desktop_windows_reference.py scripts/desktop_tauri.py scripts/build_desktop.py
       - uses: actions/upload-artifact@v4
         with:

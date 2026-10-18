@@ -1,9 +1,10 @@
 # OSCAR
 
-Group 4/D1 now provides a persistent Linux Cloud Core software candidate using the
-existing runtime. [Deployment commands and Oracle commissioning](docs/CLOUD-CORE.md)
-and the [D1 verification ledger](docs/development/GROUP-04-D1.md) distinguish local/CI
-evidence from hosted acceptance. Real remote Grid and native device enrollment remain D2.
+Group 4/D1 provides the persistent Linux Cloud Core. The D2/D3–D4 integration
+candidate adds authenticated outbound Grid transport, scoped file execution and
+native connection support using that same Core. [Connected integration evidence](docs/development/GROUP-04-D2.md)
+separates actual local TLS/process tests, native/emulator checks and remaining
+hosted/owner acceptance. [Deployment and commissioning](docs/CLOUD-CORE.md).
 
 **One intelligence. One continuing relationship. Many devices.**
 
@@ -30,15 +31,19 @@ OSCAR is Dawnlight Labs' persistent multimodal personal assistant: one authorita
       Later: ESP32 + Pico / optional home devices
 ```
 
-**Target architecture, not a claim of current remote operation.** Reference servers currently bind loopback; Internet-ready TLS, enrollment, remote Grid and durable cloud hosting remain next work. Oracle Always Free is the preferred replaceable **candidate** for the stateful Core; Vercel can complement it with bounded web/API/callback functions, not replace durable coordination.
+**Hosted/owner acceptance remains outstanding.** The connected candidate uses
+versioned HTTPS, device proof of possession, explicit trusted enrollment and
+outbound Worker polling. Legacy reference servers remain private loopback APIs.
+Oracle Always Free is the preferred replaceable **candidate**, not deployed;
+Vercel can complement it with bounded web/API/callback functions.
 
 ## What's implemented versus still missing
 
 | Subsystem | Integrated reference/software | Outstanding |
 | --- | --- | --- |
-| Core / model routing / Grid | Evidence-backed decision loop, model routing and local transport | Secure hosted Internet Core and independent devices |
+| Core / model routing / Grid | Evidence-backed decision loop, model routing, persistent Core and authenticated outbound Grid candidate | Hosted Internet and owner-device commissioning |
 | Memory / Personal Policy | Canonical SQLite WAL/FTS5 archive and derived retrieval, policy | Hosted restore and real multi-device memory |
-| Windows | Tauri Companion + Workspace; typed PowerShell, registered UIA, isolated browser/files/Git | Broad real computer use and remote Worker |
+| Windows | Tauri Companion + Workspace; existing machine tools plus bounded outbound file Worker candidate | Broad real computer use and owner deployment |
 | Android | Owner-approved native Compose UI, scoped sessions, shared Presence | Actual phone pairing, OEM/audio/notification acceptance |
 | Voice | Portable core/identity reference | Real microphone, wake/barge-in, Match/Map and owner testing |
 | World/Executive | Local Sentry lifecycle, durable bounded Workers and schedules | Real source delivery, distributed execution, native authoring |

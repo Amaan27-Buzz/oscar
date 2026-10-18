@@ -2,7 +2,7 @@
 
 **Owner priority (2026-10-18):** bring up one OSCAR on a persistent cloud host, then make Windows Desktop and the owner's Android phone connect to that same Core. When the owner returns home, add the dedicated home-server laptop; integrate ESP32/Pico physical hardware later. **No Oracle/Vercel/Internet deployment is currently accepted.** [Live checklist](CURRENT-STATUS.md) · [New delivery groups](DELIVERY-PLAN.md).
 
-**D1 software candidate:** `python -m oscar.cloud --config /etc/oscar/cloud.json` composes the existing Harness, Controller, Grid, Router, Event Archive/Memory and Executive. Production configuration and explicit initialization are mandatory. One local volume holds both canonical databases, identity and artifacts under an exclusive lifecycle lock. The new listener exposes only bounded diagnostic status/arithmetic probes with existing Grid session/scope/revocation checks and durable replay fences. The legacy loopback servers remain private. [Operations and Oracle commissioning](CLOUD-CORE.md) · [Implementation/verification ledger](development/GROUP-04-D1.md).
+**Persistent Core and connected candidate:** `python -m oscar.cloud --config /etc/oscar/cloud.json` composes the existing Harness, Controller, Grid, Router, Event Archive/Memory and Executive. Production configuration and explicit initialization are mandatory. One local volume holds both canonical databases, identity and artifacts under an exclusive lifecycle lock. D1 bounded diagnostics and D2's two versioned Grid POST interfaces use explicit authentication and durable replay fences. Legacy privileged reference APIs remain private. [Operations and commissioning](CLOUD-CORE.md) · [D1 evidence](development/GROUP-04-D1.md) · [Connected software evidence](development/GROUP-04-D2.md).
 
 ## Target topology
 
@@ -42,9 +42,20 @@ The prior free-tier research was collected **2026-10-04**. Provider capacity and
 
 **D1: secure persistent Core.** Implemented candidate provides a digest-pinned multiarchitecture Linux package, nonroot constrained service, canonical durable volume, read-only injected secrets, opt-in TLS ingress, authenticated diagnostics, health/degraded readback, bounded logs and independent backup/restore with crash/restart tests. This authorizes software verification only. Actual Oracle account capacity, host storage, public domain/certificate/firewall, off-host backups and owner commissioning require separate acceptance. See the evidence ledger for native ARM64 CI results; image manifests and dependency metadata alone are not runtime acceptance.
 
-**D2: genuine remote Connection Grid.** Separate stable node identity from bearer tokens; owner pairing and scope binding, authenticated outbound Desktop Worker connection, revocation/credential rotation/replay fences, target rechecks, durable task/lease continuation and explicit offline/UNKNOWN reporting. Network failure or silent Core restart must not create double mutations or impersonate approval. Remote cancellation and "success" require authoritative readback.
+**D2: authenticated Connection Grid software candidate.** Bounded outbound HTTPS
+polling works through standard TLS on Linux, Windows and Android without inbound
+device ports or another broker. Stable device keys prove possession independently
+of expiring bearer sessions; trusted offline invitations bind role, installation,
+workspace and scopes. Worker acceptance and pre-effect checks revalidate authority.
+Separate readback verifies scoped file results; uncertain mutations remain blocked
+after process loss. [Protocol 2](development/GROUP-04-D2-PROTOCOL.md) defines exact
+messages and recovery. Local process/container TLS evidence is not independent
+Internet-host acceptance.
 
-**D3/D4 follow in Group 5:** only after D1/D2, install and pair the real Tauri/Windows and Compose/Android apps; test the same conversation, memory, Presence, tasks, approved actions and revocation on actual independent devices, including OEM/background conditions.
+**D3/D4 software is integrated in the current candidate.** Real owner installation,
+host pairing and OEM/background commissioning still require separate acceptance.
+Only disposable Android emulators may be tested in this run; the owner phone is
+explicitly prohibited. Native/physical evidence stays separate in the ledger.
 
 ## Later owner home server and physical Edge
 

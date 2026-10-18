@@ -1,5 +1,15 @@
 # Desktop Interaction Runtime — Slice 10
 
+**Connected software candidate — 2026-10-18:** the existing Tauri application now
+adds trusted HTTPS Grid enrollment, current-user CNG transport/owner keys,
+DPAPI-protected sessions, canonical history/task/device projections and the
+outbound scoped Windows Worker. See the [operating guide](../desktop/CONNECTED-GRID.md),
+[shared protocol](development/GROUP-04-D2-PROTOCOL.md) and
+[current evidence ledger](development/GROUP-04-D2.md). Only bounded file reads and
+Ask-approved file edits are remotely advertised. General computer use, installed
+release, owner biometrics and Internet hosting are separate acceptance. Historical
+Slice 10 branch and run language below is provenance, not current authorization.
+
 **Active correction — Group 2.5A:** Desktop presentation now uses coordinated
 Companion and Workspace windows in the same Tauri process. The following
 Slice 10 narrative remains historical; its single resizing window no longer

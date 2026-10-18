@@ -17,14 +17,21 @@
 
 **Slice 19 hardening is continuous**, starting with Group 4 TLS, identity, secrets and revocation; do not defer network security until Group 8. Outstanding Slices 05–10 and 14–17 requirements are carried forward into Groups 4–6 rather than falsely reaccepted. Physical Slice 18 is deferred, **not removed from the original comprehensive gates**.
 
-## Group 4 (next): make one persistent, secure OSCAR
+## Group 4: make one persistent, secure OSCAR
 
 - [x] **D1 software engineering closure:** existing Core deployment composition, explicit production configuration, private Grid-authenticated diagnostic API, injected secrets, canonical volume identity/locking, WAL/FTS5, task/Worker/schedule recovery, backup/independent restore and nonroot Linux/TLS packaging are implemented. Independent review corrections add transactional offline credential delivery, fixed production port and authenticated admission fairness, with 44 Cloud regression tests. [Evidence and CI](development/GROUP-04-D1.md) and the existing [PR #8 closure receipt](https://github.com/Amaan27-Buzz/oscar/pull/8) distinguish software, exact-head integration/main checks and commissioning; [operations guide](CLOUD-CORE.md) includes exact commands and current Oracle constraints. This does not mark hosted D1 accepted.
 - [ ] **D1 host commissioning:** authenticate actual Oracle tenancy/Always Free A1 region/capacity and eligibility; approve/provision host and persistent storage, execute candidate on that host, commission approved domain/TLS/firewall, independent network verification and off-host backup restore. **Oracle is not deployed.** Optional derived Memory services need separate capacity/runtime acceptance; no full-stack free-tier fit claim. Vercel remains complementary, never the canonical in-memory Core.
-- [ ] **D2 Remote Grid:** authenticated independent node enrollment, scoped capability routing, persistent *outbound* Worker connectivity, rotation/revocation/replay fencing, offline/resume and independent result readback. Current local HTTP adapters on `127.0.0.1` are **not** Internet-ready.
+- [ ] **D2 Remote Grid candidate and acceptance:** [current connected software draft](development/GROUP-04-D2.md) extends the canonical Core with authenticated independent node enrollment, scoped outbound Worker connectivity, rotation/revocation/replay fencing, durable history and independent readback. Genuine same-host TLS/process verification is separate from independent hosted commissioning. Legacy local adapters on `127.0.0.1` remain private.
 - [ ] Verify cross-host actual transport, shutdown/restart and uncertain side effects; never expose Core before security evidence. No paid charges or cloud credentials provisioned without separate permission.
 
 ## Group 5: make OSCAR capable and pleasant to use
+
+The current owner brief authorizes **D3/D4 software integration alongside D2**:
+existing Tauri and Kotlin/Compose connectivity, synthetic credentials, builds,
+unit tests and explicitly selected disposable emulators. It prohibits physical
+phone access, real owner/provider commissioning and standing Secure/Full Access.
+The [connected ledger](development/GROUP-04-D2.md) records actual evidence; these
+software checks do not complete the real-device checklist below.
 
 - [ ] **D3/D4 Real devices and commissioning:** native Desktop and Android installs, pairing to the same hosted Core, shared chronological conversation, real Memory Fabric, Presence, Activity, task inspection, approval/cancel from phone, honest offline state, actual provider/voice setup and OEM verification.
 - [ ] **C1 Real computer use / full PC control:** extend tested typed PowerShell/files/Git, registered UIA, isolated browser into reliable observed natural-language computer/app/browser execution, optional authorized visual fallback and independent verification. The real PC Worker acts; cloud services do not imply a magic omnipotent host.

@@ -1,0 +1,3 @@
+# Transitive RSA-verifier dependencies observed in the constrained D2 Linux build.
+cffi==2.1.1
+pycparser==3.11

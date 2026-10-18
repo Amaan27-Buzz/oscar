@@ -1,4 +1,5 @@
 **
+!pyproject.toml
 !oscar/
 !oscar/*.py
 !oscar/*.ps1
@@ -13,5 +14,6 @@
 !deploy/
 !deploy/cloud/
 !deploy/cloud/Dockerfile
+!deploy/cloud/constraints.txt
 **/__pycache__/
 **/*.pyc
