@@ -574,6 +574,7 @@ class RemoteGridTests(unittest.TestCase):
 
     def test_no_archive_grant_allows_status_but_redacts_history_and_results(self):
         task = self.finish(self.submit())
+        previous = self.mobile.request("snapshot", {})
         store = self.core.harness.store
         for kind, identity in (
             ("session", self.mobile.handle.id),
@@ -582,7 +583,12 @@ class RemoteGridTests(unittest.TestCase):
             row = store.get(kind, identity)
             row["scopes"] = [s for s in row["scopes"] if not s.startswith("archive:")]
             store.put(kind, identity, row)
-        view = self.mobile.request("snapshot", {})
+        view = self.mobile.request(
+            "snapshot",
+            {"cursor": previous["cursor"], "archive_generation": previous["archive_generation"]},
+        )
+        self.assertTrue(view["reset"])
+        self.assertEqual(view["cursor"], 0)
         self.assertTrue(view["nodes"])
         self.assertFalse(view["events"])
         self.assertIsNone(view["tasks"][0]["result"])

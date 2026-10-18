@@ -1174,9 +1174,14 @@ class RemoteGrid:
             ):
                 self.retain(row, result=True)
         epoch = fingerprint(
-            list(archive.db.execute("SELECT id,forgotten_at FROM archive_tombstones ORDER BY id"))
+            {
+                "archive_read": can_read,
+                "tombstones": list(
+                    archive.db.execute("SELECT id,forgotten_at FROM archive_tombstones ORDER BY id")
+                ),
+            }
         )
-        reset = payload.get("archive_generation", epoch) != epoch
+        reset = not can_read or payload.get("archive_generation", epoch) != epoch
         cursor = 0 if reset else payload.get("cursor", 0)
         candidates = (
             archive.db.execute(
