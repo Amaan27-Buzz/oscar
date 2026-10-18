@@ -76,7 +76,7 @@ impl Signer {
             }
         }
         Ok(Self {
-            handles: Mutex::new((provider as usize, key as usize)),
+            handles: Mutex::new((provider, key)),
         })
     }
     pub fn public_der(&self) -> Result<Vec<u8>, String> {

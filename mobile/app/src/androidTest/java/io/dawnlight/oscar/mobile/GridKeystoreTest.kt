@@ -22,7 +22,7 @@ class GridKeystoreTest {
         assertEquals(identity.toString(), vault.deviceIdentity().toString())
         val payload = "emulated-grid-proof".toByteArray()
         val public = KeyFactory.getInstance("RSA").generatePublic(X509EncodedKeySpec(Base64.getDecoder().decode(identity.getString("public_key"))))
-        val verifier = Signature.getInstance("RSASSA-PSS").apply {
+        val verifier = Signature.getInstance("SHA256withRSA/PSS").apply {
             initVerify(public); setParameter(PSSParameterSpec("SHA-256", "MGF1", MGF1ParameterSpec.SHA256, 32, 1)); update(payload)
         }
         assertTrue(verifier.verify(Base64.getDecoder().decode(vault.signDevice(payload))))

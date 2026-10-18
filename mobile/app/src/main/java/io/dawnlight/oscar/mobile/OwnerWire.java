@@ -8,9 +8,15 @@ import java.util.Base64;
 /** Same PSS wire contract for Android Keystore and the local JVM interoperability check. */
 final class OwnerWire {
     static byte[] sign(PrivateKey key, byte[] payload) throws Exception {
-        Signature signer = Signature.getInstance("RSASSA-PSS");
+        Signature signer;
+        try { signer = Signature.getInstance("SHA256withRSA/PSS"); }
+        catch (NoSuchAlgorithmException unavailable) { signer = Signature.getInstance("RSASSA-PSS"); }
         signer.initSign(key);
-        signer.setParameter(new PSSParameterSpec("SHA-256", "MGF1", MGF1ParameterSpec.SHA256, 32, 1));
+        // Android Keystore's digest-specific PSS operation fixes MGF1 and salt to
+        // the SHA-256 digest length; its SignatureSpi does not accept parameters.
+        // Configurable JVM/Conscrypt providers receive the exact same wire spec.
+        if (!signer.getProvider().getName().startsWith("AndroidKeyStore"))
+            signer.setParameter(new PSSParameterSpec("SHA-256", "MGF1", MGF1ParameterSpec.SHA256, 32, 1));
         signer.update(payload);
         return signer.sign();
     }

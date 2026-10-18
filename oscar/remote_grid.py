@@ -956,7 +956,9 @@ class RemoteGrid:
             try:
                 transport = self.h.dispatcher if target == self.h.node_id else self.transport
                 self.h.runtime.run(task_id, {target: (transport, session)})
-                self.retain(row, result=True)
+                # Snapshot repair and completion must retain one event and memory together.
+                with self.lock:
+                    self.retain(row, result=True)
             except Exception:
                 from .cloud import diagnostic
 

@@ -1,6 +1,7 @@
 import base64
 import json
 import unittest
+from concurrent.futures import ThreadPoolExecutor
 from email.message import Message
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -350,6 +351,35 @@ class RemoteGridTests(unittest.TestCase):
         self.assertEqual(resumed["events"], [])
         self.assertEqual(first["events"], sorted(first["events"], key=lambda e: e["sequence"]))
 
+    def test_completion_and_snapshot_repair_retain_one_result_memory(self):
+        archive = self.core.harness.archive
+        append = archive.append
+
+        def slow_result(event, **kwargs):
+            if event.kind == "remote_result":
+                sleep(0.05)
+            return append(event, **kwargs)
+
+        def snapshot(_):
+            try:
+                return self.mobile.request("snapshot", {})
+            finally:
+                archive.close_thread()
+
+        with patch.object(archive, "append", side_effect=slow_result):
+            task = self.finish(self.submit())
+            with ThreadPoolExecutor(max_workers=8) as readers:
+                views = list(readers.map(snapshot, range(8)))
+        self.assertTrue(all(len(view["events"]) == 2 for view in views))
+        self.assertEqual(
+            archive.db.execute(
+                "SELECT count(*) FROM archive_memories WHERE forgotten=0 "
+                "AND json_extract(payload,'$.event_ids[1]') IS NOT NULL"
+            ).fetchone()[0],
+            1,
+        )
+        self.assertEqual(views[0]["tasks"][0]["task_id"], task["task_id"])
+
     def test_core_restart_after_effect_does_not_replay(self):
         task = self.submit("file_write", parameters={"path": "once.txt", "content": "write once"})
         self.approve(task)
@@ -524,6 +554,23 @@ class RemoteGridTests(unittest.TestCase):
             }
             status, _ = request(self.config, "/v2/grid/request", body=body, headers=headers)
             self.assertEqual(status, 200)
+            missing = {**body, "operation": "inspect", "payload": {"task_id": new_id()}}
+            nonce = new_id()
+            headers["X-Oscar-Nonce"] = nonce
+            headers["X-Oscar-Signature"] = signature(
+                self.key,
+                request_proof(
+                    session["node_id"],
+                    session["session_id"],
+                    nonce,
+                    instant,
+                    json.dumps(missing).encode(),
+                ),
+            )
+            self.assertEqual(
+                request(self.config, "/v2/grid/request", body=missing, headers=headers)[0], 403
+            )
+            self.assertTrue(self.mobile.request("snapshot", {})["nodes"])
             for invalid in ({**body, "version": 7}, {**body, "payload": []}):
                 self.assertEqual(
                     request(

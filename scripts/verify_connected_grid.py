@@ -20,8 +20,8 @@ def android_core_fixture(identity: dict):
     from tests.test_connected_acceptance import ConnectedAcceptanceTests
 
     fixture = ConnectedAcceptanceTests()
-    fixture.setUp()
     try:
+        fixture.setUp()
         core_process = fixture.start_core()
         fixture.enroll()
         worker = fixture.start_worker()

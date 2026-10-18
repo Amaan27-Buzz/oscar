@@ -236,7 +236,7 @@ class CloudHandler(BaseHTTPRequestHandler):
                     session = core.remote.authenticate(self.headers, body, self.server.admit_grid)
                     try:
                         result = core.remote.request(session, data)
-                    except PermissionError:
+                    except (PermissionError, KeyError):
                         self.reply(403, {"error": "permission_denied"})
                         return
                     self.reply(200, result)
