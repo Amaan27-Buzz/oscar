@@ -9,6 +9,14 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 class CoreTransportTest {
+    @Test fun expiredRemoteCredentialAndIncompatibleProtocolFailBeforeNetworking() {
+        val expired = JSONObject().put("url", "http://127.0.0.1:1").put("version", 2).put("expires_at_ms", 1)
+        var signed = false
+        val client = CoreClient(expired) { signed = true; "unused" }
+        try { client.call("snapshot", JSONObject()); fail("Expired session accepted") } catch (_: CoreClient.SessionRejected) { }
+        assertFalse(signed)
+        try { CoreClient(JSONObject(expired.toString()).put("version", 3)); fail("Incompatible protocol accepted") } catch (_: SecurityException) { }
+    }
     @Test fun transportBoundsAndCancellationAreReal() {
         val entered = CountDownLatch(1)
         val release = CountDownLatch(1)

@@ -17,7 +17,7 @@ import javax.crypto.spec.GCMParameterSpec;
 
 /** Android owns secret storage; Core owns pairing, scopes, expiry and revocation. */
 final class SessionVault {
-    private static final String VAULT = "oscar-session-v1", OWNER = "oscar-owner-v1";
+    private static final String VAULT = "oscar-session-v1", OWNER = "oscar-owner-v1", DEVICE = "oscar-device-v2";
     private final Context context;
     SessionVault(Context context) { this.context = context.getApplicationContext(); }
 
@@ -44,12 +44,16 @@ final class SessionVault {
             !session.getString("session_id").matches("[A-Za-z0-9_-]{1,80}") ||
             !session.getString("token").matches("[A-Za-z0-9_-]{20,200}"))
             throw new SecurityException("Invalid scoped session");
+        if (session.optInt("version", 1) == 2 &&
+            (!session.getString("core_id").matches("[A-Za-z0-9_-]{1,80}") ||
+             session.getLong("expires_at_ms") <= System.currentTimeMillis() || session.getJSONArray("scopes").length() > 64))
+            throw new SecurityException("Invalid Grid session");
         Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
         cipher.init(Cipher.ENCRYPT_MODE, secretKey());
         JSONObject sealed = new JSONObject().put("iv", Base64.encodeToString(cipher.getIV(), Base64.NO_WRAP))
             .put("body", Base64.encodeToString(cipher.doFinal(session.toString().getBytes(StandardCharsets.UTF_8)), Base64.NO_WRAP));
         if (!context.getSharedPreferences("session", Context.MODE_PRIVATE).edit()
-            .putString("sealed", sealed.toString()).remove("draft").remove("privacy_pending").commit())
+            .putString("sealed", sealed.toString()).remove("draft").remove("history").remove("privacy_pending").commit())
             throw new SecurityException("Session persistence unverified");
     }
     synchronized JSONObject load() throws Exception {
@@ -91,6 +95,32 @@ final class SessionVault {
     synchronized boolean suppressed(String binding) {
         return binding.equals(context.getSharedPreferences("session", Context.MODE_PRIVATE).getString("privacy_pending", null));
     }
+    synchronized void saveHistory(JSONObject history, String binding) throws Exception {
+        byte[] bytes = history.toString().getBytes(StandardCharsets.UTF_8);
+        if (bytes.length > 262144) throw new SecurityException("History cache exceeds boundary");
+        JSONObject current = load();
+        if (current == null || !new CoreClient(current).binding().equals(binding)) throw new SecurityException("History source changed");
+        Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey()); cipher.updateAAD(binding.getBytes(StandardCharsets.UTF_8));
+        JSONObject sealed = new JSONObject().put("iv", Base64.encodeToString(cipher.getIV(), Base64.NO_WRAP))
+            .put("body", Base64.encodeToString(cipher.doFinal(bytes), Base64.NO_WRAP));
+        if (!context.getSharedPreferences("session", Context.MODE_PRIVATE).edit().putString("history", sealed.toString()).commit())
+            throw new SecurityException("History persistence unverified");
+    }
+    synchronized JSONObject loadHistory(String binding) throws Exception {
+        String saved = context.getSharedPreferences("session", Context.MODE_PRIVATE).getString("history", null);
+        if (saved == null) return null;
+        JSONObject sealed = new JSONObject(saved);
+        Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+        cipher.init(Cipher.DECRYPT_MODE, (SecretKey) keys().getKey(VAULT, null),
+            new GCMParameterSpec(128, Base64.decode(sealed.getString("iv"), Base64.NO_WRAP)));
+        cipher.updateAAD(binding.getBytes(StandardCharsets.UTF_8));
+        return new JSONObject(new String(cipher.doFinal(Base64.decode(sealed.getString("body"), Base64.NO_WRAP)), StandardCharsets.UTF_8));
+    }
+    synchronized void clearHistory() throws Exception {
+        if (!context.getSharedPreferences("session", Context.MODE_PRIVATE).edit().remove("history").commit())
+            throw new SecurityException("History cache removal unverified");
+    }
     synchronized String publicIdentity() throws Exception {
         if (!context.getSystemService(KeyguardManager.class).isDeviceSecure())
             throw new SecurityException("Configure a device lock before owner enrollment");
@@ -108,6 +138,29 @@ final class SessionVault {
         }
         return Base64.encodeToString(keys().getCertificate(OWNER).getPublicKey().getEncoded(), Base64.NO_WRAP);
     }
+    synchronized JSONObject deviceIdentity() throws Exception {
+        if (!keys().containsAlias(DEVICE)) {
+            KeyPairGenerator generator = KeyPairGenerator.getInstance(KeyProperties.KEY_ALGORITHM_RSA, "AndroidKeyStore");
+            KeyGenParameterSpec.Builder specification = new KeyGenParameterSpec.Builder(DEVICE, KeyProperties.PURPOSE_SIGN)
+                .setKeySize(2048).setDigests(KeyProperties.DIGEST_SHA256)
+                .setSignaturePaddings(KeyProperties.SIGNATURE_PADDING_RSA_PSS);
+            if (android.os.Build.VERSION.SDK_INT >= 35) specification.setMgf1Digests(KeyProperties.DIGEST_SHA256);
+            generator.initialize(specification.build());
+            generator.generateKeyPair();
+        }
+        var preferences = context.getSharedPreferences("session", Context.MODE_PRIVATE);
+        String installation = preferences.getString("installation_id", null);
+        if (installation == null) {
+            installation = java.util.UUID.randomUUID().toString();
+            if (!preferences.edit().putString("installation_id", installation).commit())
+                throw new SecurityException("Installation persistence unverified");
+        }
+        return new JSONObject().put("installation_id", installation)
+            .put("public_key", Base64.encodeToString(keys().getCertificate(DEVICE).getPublicKey().getEncoded(), Base64.NO_WRAP));
+    }
+    synchronized String signDevice(byte[] payload) throws Exception {
+        return Base64.encodeToString(OwnerWire.sign((PrivateKey) keys().getKey(DEVICE, null), payload), Base64.NO_WRAP);
+    }
     synchronized String sign(String encoded) throws Exception {
         byte[] signature = OwnerWire.sign((PrivateKey) keys().getKey(OWNER, null),
             Base64.decode(encoded, Base64.NO_WRAP));
@@ -119,6 +172,7 @@ final class SessionVault {
         KeyStore store = keys();
         store.deleteEntry(VAULT);
         store.deleteEntry(OWNER);
+        store.deleteEntry(DEVICE);
         // Local deletion is not remote revocation or a secure-erasure claim.
     }
 }

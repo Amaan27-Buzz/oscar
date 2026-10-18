@@ -39,6 +39,20 @@ class ApprovalSecurityTest {
         session.put("node_id", "foreign").put("session_id", "replacement")
         assertEquals(binding, client.binding()); assertTrue(client.matches(Approval.parse(challenge(), now)))
     }
+    @Test fun remoteReviewBindsCapabilityAndCurrentPlanDigest() {
+        val json = challenge().put("scope", "grid:approve")
+        val claim = JSONObject(String(java.util.Base64.getDecoder().decode(json.getString("signing_payload"))))
+            .put("version", 2).put("scope", "grid:approve").put("nonce", "a".repeat(32))
+            .put("display_digest", Approval.displayDigest("approve", "grid:approve", "desktop", json.getString("review"), json.getString("exact_request")))
+        json.put("signing_payload", java.util.Base64.getEncoder().encodeToString(claim.toString().toByteArray()))
+        val approval = Approval.parse(json, now)
+        val task = CoreTask("task", "Exact decision", "planned", "desktop", "online", 0, listOf("approve"), emptyList(), null, null,
+            reviewDigest = "b".repeat(64), capability = "addition")
+        val state = MobileState(link = Link.CONNECTED, approval = approval, snapshot = CoreSnapshot(listOf(task), emptyList(), now))
+        assertTrue(approval.current(state, now))
+        assertFalse(approval.current(state.copy(snapshot = state.snapshot!!.copy(tasks = listOf(task.copy(reviewDigest = "c".repeat(64))))), now))
+        assertFalse(approval.current(state.copy(snapshot = state.snapshot!!.copy(tasks = listOf(task.copy(capability = "files.write")))), now))
+    }
     @Test fun freshCoreObservationQualifiesClockSkewWithoutExtendingAuthority() {
         val local = now - 1000
         val approval = Approval.parse(challenge(), now)

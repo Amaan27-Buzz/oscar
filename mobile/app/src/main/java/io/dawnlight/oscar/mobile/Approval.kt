@@ -15,7 +15,8 @@ data class Approval(
     fun current(state: MobileState, now: Long): Boolean = state.link == Link.CONNECTED && state.approval == this && state.coreNow(now) < expiresAt &&
         (operation !in setOf("approve", "retry", "reply") || !state.privateSuppressed) &&
         (if (operation == "reply") state.replyPreview?.let { acceptsReply(it) } == true
-        else state.snapshot?.tasks?.any { it.id == material().getString("task_id") && it.target == target && it.generation == generation && operation in it.actions } == true)
+        else state.snapshot?.tasks?.any { it.id == material().getString("task_id") && it.target == target && it.generation == generation && operation in it.actions &&
+            (scope != "grid:approve" || it.reviewDigest == material().getString("digest") && it.capability == capability) } == true)
     fun acceptsReply(text: String): Boolean = operation == "reply" && text.length in 1..500 && NotificationBoundary.hash(text) == material().getString("text_hash")
     fun acceptsPermit(permit: JSONObject): Boolean = operation == "reply" &&
         listOf("package", "key_hash", "text_hash").all { permit.get(it) is String && permit.getString(it) == material().getString(it) } && permit.getString("id") == id
@@ -29,7 +30,7 @@ data class Approval(
             require(json.getString("confirmation") == "biometric_or_device_credential")
             val payload = json.bounded("signing_payload", 16000)
             val claim = JSONObject(String(java.util.Base64.getDecoder().decode(payload), Charsets.UTF_8))
-            require(claim.get("version") == 1)
+            val version = claim.get("version"); require(version == 1 || version == 2)
             val expires = json.get("expires_at_ms")
             val signedExpires = claim.get("expires_at_ms")
             require((expires is Long || expires is Int) && (signedExpires is Long || signedExpires is Int) && (expires as Number).toLong() == (signedExpires as Number).toLong())
@@ -44,16 +45,17 @@ data class Approval(
             val material = claim.getJSONObject("material")
             val target = json.bounded("target", 256)
             require((if (operation == "reply") material.getString("package") else material.getString("target")) == target)
-            require(scope == if (operation == "reply") "notifications:reply" else "control:${if (operation == "cancel") "cancel" else "approve"}:$target")
+            require(if (version == 2) operation == "approve" && scope == "grid:approve" && material.bounded("digest", 64).matches(Regex("[a-f0-9]{64}"))
+                else scope == if (operation == "reply") "notifications:reply" else "control:${if (operation == "cancel") "cancel" else "approve"}:$target")
             val review = json.get("review"); val exact = json.get("exact_request")
             require(review is String && exact is String && (review + exact).toByteArray(Charsets.UTF_8).size <= 24_000)
             require(claim.getString("display_digest") == displayDigest(operation, scope, target, review, exact))
             val node = claim.bounded("node_id", 80); val session = claim.bounded("session_id", 80)
             require(listOf(node, session).all { it.matches(Regex("[A-Za-z0-9_-]{1,80}")) })
-            require(claim.getString("nonce").matches(Regex("[a-f0-9]{64}")))
+            require(claim.getString("nonce").matches(Regex(if (version == 2) "[a-f0-9]{32}" else "[a-f0-9]{64}")))
             if (operation != "reply") require(material.bounded("task_id", 80).matches(Regex("[A-Za-z0-9_-]{1,80}")))
             return Approval(json.bounded("challenge_id", 80), payload, deadline, operation,
-                json.bounded("description", 256), target, json.bounded("capability", 80), json.bounded("reason", 256),
+                json.bounded("description", if (version == 2) 8192 else 256).take(256), target, json.bounded("capability", 80), json.bounded("reason", 256),
                 json.bounded("consequence", 256), json.bounded("policy_reason", 256), review, exact, scope, node, session, generation)
         }
     }

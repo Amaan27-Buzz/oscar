@@ -157,7 +157,10 @@ private val Ink = Color(0xFF1A1B18)
                             { navigate(Destination.ACTIVITY) }, { focus.clearFocus(); keyboard?.hide(); voiceOpen = true }, false, { conversationPage = "Today" }, { id -> session.inspect(id); navigate(Destination.ACTIVITY) })
                         Destination.AUTOMATIONS -> AutomationsScreen(state, automationPage, { automationPage = it }) { text -> session.writeDraft(text); navigate(Destination.OSCAR) }
                         Destination.ACTIVITY -> ActivityScreen(state, session::inspect, session::review)
-                        Destination.DEVICES -> DevicesScreen(state, { pairing = true }, session::disconnect)
+                        Destination.DEVICES -> DevicesScreen(state, { pairing = true }, session::disconnect, session::revoke, session::rotateConnection) { target, kind, parameters ->
+                            session.submitRemote("${if (kind == "file_write") "Write" else "Read"} workspace file ${parameters.getString("path")}", kind, target, parameters)
+                            navigate(Destination.ACTIVITY)
+                        }
                         Destination.SETTINGS -> SettingsScreen(settingsPage, { settingsParent = settingsPage; settingsPage = it }, session, state)
                     }
                     if (state.link != Link.CONNECTED && destination in setOf(Destination.OSCAR, Destination.ACTIVITY) && !voiceOpen && conversationPage == "Conversation") {
@@ -165,7 +168,7 @@ private val Ink = Color(0xFF1A1B18)
                         TextButton(onClick = { pairing = true }) { Text("Connect Core") }
                     }
                     if (primaryPage && destination == Destination.OSCAR && (draft.isNotEmpty() || state.interactions.isNotEmpty() || state.privateSuppressed)) {
-                        TextButton(onClick = session::discard) { Text(if (state.privateSuppressed) "Clear Core private context" else "Discard private interaction") }
+                        TextButton(onClick = session::discard) { Text(if (state.remote) "Clear local private cache" else if (state.privateSuppressed) "Clear Core private context" else "Discard private interaction") }
                     }
                     Spacer(Modifier.height(12.dp))
                 }
@@ -179,7 +182,7 @@ private val Ink = Color(0xFF1A1B18)
         }
         }
         }
-        if (pairing) PairingDialog({ pairing = false }) { json -> pairing = false; session.connect(json) }
+        if (pairing) PairingDialog(state, session, { pairing = false })
         state.inspected?.let { TaskInspector(it, session::closeInspector, { task, action -> session.closeInspector(); session.review(task, action) }, state.link == Link.CONNECTED && !state.busy) }
         state.approval?.let { approval ->
             DisposableEffect(state.epoch, approval.id) { onDispose { confirmation.cancel() } }
@@ -196,23 +199,46 @@ private val Ink = Color(0xFF1A1B18)
         }
     }
 }
-@Composable private fun PairingDialog(close: () -> Unit, connect: (JSONObject) -> Unit) {
+@Composable private fun PairingDialog(state: MobileState, session: CoreSession, close: () -> Unit) {
     var origin by remember { mutableStateOf("") }; var node by remember { mutableStateOf("") }
     var id by remember { mutableStateOf("") }; var token by remember { mutableStateOf("") }
+    var invitation by remember { mutableStateOf("") }; var retain by remember { mutableStateOf(false) }
+    var legacy by remember { mutableStateOf(false) }; var error by remember { mutableStateOf<String?>(null) }
     AlertDialog(onDismissRequest = close, title = { Text("Connect this phone") }, text = {
         Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("Enter the connection details issued by your trusted Core.")
+            Text("Use an invitation issued by your trusted Core for this device’s public identity.")
             Text("Connecting a different source clears the previous private draft and readback.")
             OscarField(origin, { origin = it.take(256) }, label = "Core address (HTTPS)", singleLine = true)
+            if (!legacy) {
+                TextButton(onClick = session::deviceIdentity) { Text("Show this device’s public identity") }
+                state.enrollmentIdentity?.let { identity ->
+                    androidx.compose.foundation.text.selection.SelectionContainer { Text(identity, style = MaterialTheme.typography.bodySmall) }
+                    Text("Share this public identity with your trusted Core operator. It contains no private key.", style = MaterialTheme.typography.bodySmall)
+                }
+                OscarField(invitation, { invitation = it.take(24000) }, label = "Core invitation", minLines = 3, maxLines = 5)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Checkbox(checked = retain, onCheckedChange = { retain = it })
+                    Text("Share and retain this connection’s conversation with my authorized OSCAR clients.", style = MaterialTheme.typography.bodySmall)
+                }
+                Text("Enrollment grants connection scopes only. Actions still require Core policy and exact owner approval.", style = MaterialTheme.typography.bodySmall)
+            } else {
             OscarField(node, { node = it.take(80) }, label = "Device ID", singleLine = true)
             OscarField(id, { id = it.take(80) }, label = "Session ID", singleLine = true)
             OscarField(token, { token = it.take(200) }, label = "Connection token", singleLine = true,
                 visualTransformation = androidx.compose.ui.text.input.PasswordVisualTransformation(),
                 keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Password))
+            }
+            if (BuildConfig.DEBUG) TextButton(onClick = { legacy = !legacy }) { Text(if (legacy) "Use trusted device invitation" else "Local reference connection") }
+            error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
         }
     }, dismissButton = { TextButton(onClick = close) { Text("Cancel") } }, confirmButton = {
-        TextButton(enabled = listOf(origin, node, id, token).none { it.isBlank() }, onClick = {
-            connect(JSONObject().put("url", origin).put("node_id", node).put("session_id", id).put("token", token))
+        TextButton(enabled = origin.isNotBlank() && (if (legacy) listOf(node, id, token).none { it.isBlank() } else invitation.isNotBlank()), onClick = {
+            try {
+                CoreClient.validateEndpoint(origin)
+                if (legacy) session.connect(JSONObject().put("url", origin).put("node_id", node).put("session_id", id).put("token", token))
+                else session.enroll(origin, JSONObject(invitation), retain)
+                close()
+            } catch (_: Exception) { error = "Check the trusted HTTPS address and invitation format." }
         }) { Text("Connect") }
     })
 }

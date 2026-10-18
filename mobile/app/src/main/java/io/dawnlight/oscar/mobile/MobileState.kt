@@ -14,6 +14,7 @@ data class CoreTask(
     val responseTruncated: Boolean = false,
     val progress: CoreProgress? = null, val artifacts: List<CoreArtifact> = emptyList(), val ownership: String = "planned",
     val origin: String = "Core", val originNode: String? = null,
+    val reviewDigest: String? = null, val capability: String? = null,
 ) {
     val label: String get() = if (state in setOf("executing", "awaiting_result", "result_received", "verifying") && nodeStatus != "online") "Executor unavailable · outcome UNKNOWN" else when (state) {
         "planned" -> "Needs approval"
@@ -29,7 +30,7 @@ data class CoreTask(
 }
 data class CoreProgress(val fraction: Double, val step: String, val current: Boolean)
 data class CoreArtifact(val id: String, val kind: String, val status: String, val hash: String?)
-data class CoreNode(val id: String, val role: String, val status: String, val paired: Boolean, val capabilities: List<String>)
+data class CoreNode(val id: String, val role: String, val status: String, val paired: Boolean, val capabilities: List<String>, val inputKinds: Set<String> = emptySet())
 data class CoreSnapshot(val tasks: List<CoreTask>, val nodes: List<CoreNode>, val observedAt: Long,
     val presence: String? = null, val setup: Map<String, String> = emptyMap(), val adaptive: List<AdaptiveDescriptor> = emptyList(), val executive: List<ExecutiveGoal>? = null)
 data class ExecutiveGoal(val id: String, val goal: String, val state: String, val runs: Int, val maxRuns: Int)
@@ -43,6 +44,8 @@ data class MobileState(
     val restoring: Boolean = false,
     val replyPreview: String? = null,
     val connectedNode: String? = null,
+    val remote: Boolean = false,
+    val enrollmentIdentity: String? = null,
 ) {
     fun coreNow(localNow: Long): Long = if (link == Link.CONNECTED && observedAt > 0 && snapshot != null)
         localNow + snapshot.observedAt - observedAt else localNow
@@ -66,6 +69,9 @@ internal fun JSONObject.bounded(key: String, max: Int): String {
     require(value is String && value.isNotEmpty() && value.length <= max) { "Invalid Core field" }
     return value
 }
+internal fun JSONObject.boundedText(key: String, max: Int): String = get(key).also {
+    require(it is String && it.length <= max) { "Invalid Core text" }
+} as String
 private fun JSONObject.strings(key: String, max: Int): List<String> {
     val array = getJSONArray(key)
     require(array.length() <= max)
@@ -81,14 +87,14 @@ fun parseTask(json: JSONObject): CoreTask {
     require(state in taskStates && actions.all { it in taskActions })
     val generation = json.get("generation")
     require(generation is Int && generation >= 0)
-    val value = if (json.has("value")) json.bounded("value", 4096) else null
+    val value = if (json.has("value")) json.boundedText("value", 8192) else null
     val evidence = json.strings("evidence_ids", 100)
     require(value == null || (state == "verified" && evidence.isNotEmpty()))
     val blocker = if (json.has("blocker") && !json.isNull("blocker") && json.getString("blocker").isNotEmpty()) json.bounded("blocker", 1000) else null
     val status = json.bounded("node_status", 32)
     val response = if (json.has("response")) {
         require(json.bounded("response_status", 32) == "REPORTED")
-        json.bounded("response", 8192)
+        json.boundedText("response", 8192)
     } else null
     require(status in setOf("online", "offline", "degraded"))
     require(!json.has("response_truncated") || json.get("response_truncated") is Boolean)
@@ -139,7 +145,7 @@ fun parseSnapshot(json: JSONObject): CoreSnapshot {
                 capability.bounded("id", 128)
                 capability.bounded("input_kind", 128)
                 capability.bounded("name", 256)
-            })
+            }, if (status == "offline") emptySet() else (0 until capabilities.length()).map { capabilities.getJSONObject(it).bounded("input_kind", 128) }.toSet())
     }
     require(parsedTasks.map { it.id }.distinct().size == parsedTasks.size && parsedNodes.map { it.id }.distinct().size == parsedNodes.size)
     val observed = json.get("observed_at_ms")
