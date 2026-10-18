@@ -1,0 +1,41 @@
+name: Persistent Cloud Core
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  linux-runtime:
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [ubuntu-24.04, ubuntu-24.04-arm]
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Record genuine runner architecture
+        run: uname -m
+      - name: Build deployment candidate and acceptance image
+        run: |
+          docker build --target runtime -f deploy/cloud/Dockerfile -t oscar-cloud:ci .
+          docker build --target acceptance -f deploy/cloud/Dockerfile -t oscar-cloud-acceptance:ci .
+          docker build --target ingress -f deploy/cloud/Dockerfile -t oscar-cloud-ingress:ci .
+      - name: Exercise real service, SQLite, restart, auth and recovery
+        run: |
+          docker run --rm --read-only --cap-drop ALL --security-opt no-new-privileges:true --pids-limit 128 --memory 1g --cpus 1 --tmpfs /tmp:rw,size=128m,mode=1777 oscar-cloud-acceptance:ci
+      - name: Reject unconfigured production candidate
+        run: |
+          if docker run --rm --read-only --cap-drop ALL --network none oscar-cloud:ci; then
+            echo 'Core incorrectly accepted absent production configuration'
+            exit 1
+          fi
+      - name: Validate opt-in TLS ingress configuration
+        run: |
+          docker run --rm --read-only --cap-drop ALL --user 10001:10001 --env OSCAR_DOMAIN=acceptance.invalid --volume "$PWD/deploy/cloud/Caddyfile:/etc/caddy/Caddyfile:ro" --tmpfs /data:uid=10001,gid=10001 --tmpfs /config:uid=10001,gid=10001 oscar-cloud-ingress:ci caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile
+      - name: Real private Core and ingress TLS round-trip with restart
+        run: python -m scripts.verify_cloud_ingress --core-image oscar-cloud:ci --ingress-image oscar-cloud-ingress:ci

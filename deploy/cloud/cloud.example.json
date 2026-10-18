@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "environment": "production",
+  "core_id": "OWNER-MUST-SUPPLY-ID",
+  "data_dir": "/var/lib/oscar",
+  "manifest": "/etc/oscar/models.json",
+  "secret_dir": "/run/secrets/oscar",
+  "listen_host": "0.0.0.0",
+  "listen_port": 8080,
+  "ingress": "tls-proxy",
+  "allowed_hosts": ["OWNER-MUST-SUPPLY-DOMAIN", "core", "127.0.0.1"],
+  "provider_secrets": {}
+}

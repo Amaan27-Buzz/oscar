@@ -1,5 +1,10 @@
 # OSCAR
 
+Group 4/D1 now provides a persistent Linux Cloud Core software candidate using the
+existing runtime. [Deployment commands and Oracle commissioning](docs/CLOUD-CORE.md)
+and the [D1 verification ledger](docs/development/GROUP-04-D1.md) distinguish local/CI
+evidence from hosted acceptance. Real remote Grid and native device enrollment remain D2.
+
 **One intelligence. One continuing relationship. Many devices.**
 
 OSCAR is Dawnlight Labs' persistent multimodal personal assistant: one authoritative Core, durable memory, a Controller and verified execution runtime, with native Windows and Android embodiments. Its intended capabilities include natural conversation, full authorized computer use, plugins/MCP, owner-controlled delegation, durable Workers, voice, awareness and eventually physical Edge.

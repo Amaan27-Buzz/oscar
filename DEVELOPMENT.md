@@ -89,6 +89,11 @@ Runtime state, secrets, memory exports, recordings and device credentials must r
 
 ## Build commands
 
+The Group 4/D1 persistent service and its exact Linux/TLS, restart, authentication
+and backup verification commands are documented in [Cloud Core operations](docs/CLOUD-CORE.md).
+It composes the existing runtime; the diagnostic API is deliberately narrower than
+the future D2 remote Grid. See [D1 evidence](docs/development/GROUP-04-D1.md).
+
 Run from the repository root using Python 3.12+ on a POSIX host. The current file capability uses directory file descriptors and rejects symlink traversal; Windows machine execution is not yet verified.
 
 ```sh

@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10-18 — Group 4/D1 persistent Cloud Core candidate
+
+- Composed the existing Core as a configurable persistent Linux service with explicit initialization, canonical volume identity, single-writer locking and conservative crash recovery.
+- Added Grid-authenticated bounded diagnostics, replay protection, separate retention grants, private health, read-only injected credentials and opt-in TLS ingress; no public Worker/owner enrollment API.
+- Added constrained multiarchitecture packaging, stopped-service backup/independent restore, actual process/HTTP/TLS acceptance and native Linux/ARM64 CI. Host commissioning and optional Memory service capacity remain separate acceptance.
+- Preserved native UI, canonical Orb and Gate C/D/E evidence boundaries; no Oracle provisioning or automatic merge.
+
 ## 2026-10-09 — Local Desktop/Expression integration candidate
 
 - Preserved both unmerged foundation histories in an isolated local worktree.

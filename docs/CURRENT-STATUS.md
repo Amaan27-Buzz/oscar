@@ -14,10 +14,11 @@
 - [x] Slice 13: [Group 2.5B Mobile PR #6](https://github.com/Amaan27-Buzz/oscar/pull/6) merged; **owner-approved UI/UX**.
 - [x] **Single Group 3, Slices 14–17:** [PR #7](https://github.com/Amaan27-Buzz/oscar/pull/7) merged into `main` on 2026-10-17. World Model and bounded local Sentry, setup composition, shared Presence/typed AIE, Executive/Workers/durable scheduling/recovery have software verification.
 - [x] GitHub Actions enabled. Real PR-head and post-merge CI ran successfully on supported runner environments, including Android emulator instrumentation. **Emulator != physical phone.**
+- [x] **Group 4/D1 software engineering closure:** persistent Core candidate plus failure-safe offline credential delivery, fixed packaged production port and authenticated admission fairness. The [closure ledger](development/GROUP-04-D1.md) and [PR #8 integration receipt](https://github.com/Amaan27-Buzz/oscar/pull/8) record actual tests, exact-head CI and merge/main verification. Software verification does not satisfy hosted commissioning.
 
 ## Still to deliver or actually verify
 
-- [ ] **Cloud Core:** durable, secure, monitored hosted service with TLS, verified ARM64/runtime compatibility, backup/recovery; Oracle Always Free remains a preferred *candidate*, not a deployed service.
+- [ ] **Cloud Core hosted acceptance:** D1 now has an implemented deployment candidate composing the existing Core, private authenticated diagnostics, persistent WAL/FTS5 identity/history, conservative recovery, independent backup/restore and constrained Linux packaging. See [D1 evidence](development/GROUP-04-D1.md) and [operations](CLOUD-CORE.md) for exact software/CI evidence. **Oracle remains unprovisioned; hosted acceptance is outstanding.** Optional derived indexes remain explicitly unavailable in this minimal deployment.
 - [ ] **Remote Grid:** independent Cloud/Desktop/phone authentication, outbound Worker connections, scoped routing, replay/fencing/revocation, offline/partition recovery and independent readback. Existing reference HTTP is loopback-only.
 - [ ] **Real owner Desktop and Android:** install/commission, same persistent conversation/memory/Presence/tasks and remote phone approvals/cancellation.
 - [ ] **Broad computer use:** verified real app/browser/visual interaction and full authorized PC control from conversation, beyond bounded reference operations.
@@ -43,4 +44,4 @@
 
 Evidence terms: SOFTWARE_VERIFIED / CI_VERIFIED / SIMULATED / OWNER_VERIFIED / PHYSICAL_VERIFIED / UNKNOWN / BLOCKED / NOT_RUN. Never promote simulator or reported executor success into physical/independently verified completion.
 
-**Next:** Group 4 / D1 secure persistent Cloud Core candidate and Group 4 / D2 real remote Grid, not hardware Slice 18. See [delivery plan](DELIVERY-PLAN.md).
+**Next:** complete separately authorized D1 host commissioning; Group 4/D2 supplies real authenticated remote Grid in its own implementation run. Hardware Slice 18 remains later. See [delivery plan](DELIVERY-PLAN.md).

@@ -1,0 +1,17 @@
+**
+!oscar/
+!oscar/*.py
+!oscar/*.ps1
+!config/
+!config/development-models.json
+!config/google-connectors.json
+!config/local-template.json
+!tests/
+!tests/**/*.py
+!scripts/
+!scripts/**/*.py
+!deploy/
+!deploy/cloud/
+!deploy/cloud/Dockerfile
+**/__pycache__/
+**/*.pyc

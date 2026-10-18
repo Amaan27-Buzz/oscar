@@ -1,10 +1,16 @@
-"""Windows Credential Manager. Durable OSCAR records carry opaque references only."""
+"""Native and deployment-injected credentials; durable records hold opaque references."""
 
 import ctypes
 import json
+import math
 import os
+import re
+import stat
+import sys
+from collections.abc import Callable
 from ctypes import wintypes
 from dataclasses import dataclass
+from pathlib import Path
 from time import time
 from typing import Any
 from uuid import uuid4
@@ -38,6 +44,88 @@ class SecretValue:
 
     def __str__(self) -> str:
         return "<redacted>"
+
+
+class InjectedCredentialStore:
+    """Read-only private JSON secret mounts, administered outside the Core API.
+
+    Each opaque reference names a file containing secret and expires_at fields.
+    Reads reopen the mount so replacement, expiry and removal take effect immediately.
+    This is a server injection adapter, not an enrollment or writable Linux keychain.
+    """
+
+    def __init__(self, root: Path, *, clock: Callable[[], float] = time):
+        self.root, self.clock = root, clock
+        self.material = SecretMaterial()
+        self._check(root, directory=True)
+
+    @staticmethod
+    def _check(path: Path, *, directory: bool = False) -> None:
+        metadata = path.lstat()
+        expected = stat.S_ISDIR if directory else stat.S_ISREG
+        if not expected(metadata.st_mode):
+            raise PermissionError("private regular credential mount required")
+        if sys.platform != "win32" and (
+            metadata.st_uid not in {0, os.geteuid()} or metadata.st_mode & 0o077
+        ):
+            raise PermissionError("credential mount must be private to root or service owner")
+
+    def read(self, reference: str, *, allow_expired: bool = False) -> SecretValue:
+        if not isinstance(reference, str) or not re.fullmatch(r"[A-Za-z0-9_-]{1,128}", reference):
+            raise ValueError("opaque credential reference required")
+        self._check(self.root, directory=True)
+        path = self.root / reference
+        try:
+            self._check(path)
+            descriptor = os.open(
+                path, os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_NONBLOCK", 0)
+            )
+        except FileNotFoundError:
+            raise KeyError("OSCAR credential unavailable") from None
+        with os.fdopen(descriptor, "rb") as stream:
+            metadata = os.fstat(stream.fileno())
+            if (
+                not stat.S_ISREG(metadata.st_mode)
+                or sys.platform != "win32"
+                and (metadata.st_uid not in {0, os.geteuid()} or metadata.st_mode & 0o077)
+            ):
+                raise PermissionError("private regular credential mount required")
+            raw = stream.read(4097)
+        if len(raw) > 4096:
+            raise ValueError("bounded credential payload required")
+        try:
+            data = json.loads(raw)
+        except (ValueError, UnicodeError):
+            raise ValueError("invalid credential payload") from None
+        if not isinstance(data, dict) or set(data) != {"secret", "expires_at"}:
+            raise ValueError("explicit credential payload fields required")
+        secret, expiry = data["secret"], data["expires_at"]
+        if (
+            not isinstance(secret, str)
+            or not secret
+            or len(secret.encode()) > 2000
+            or "\x00" in secret
+            or expiry is not None
+            and (
+                type(expiry) not in {int, float}
+                or expiry < 0
+                or expiry > 10**12
+                or not math.isfinite(expiry)
+            )
+        ):
+            raise ValueError("bounded credential payload required")
+        if not allow_expired and expiry is not None and expiry <= self.clock():
+            raise PermissionError("credential expired")
+        self.material.remember(secret)
+        return SecretValue(secret)
+
+    def put(
+        self, secret: str, *, expires_at: float | None = None, reference: str | None = None
+    ) -> str:
+        raise PermissionError("credential injection is administered outside the Core")
+
+    def delete(self, reference: str) -> None:
+        raise PermissionError("credential revocation requires removing the administered mount")
 
 
 class WindowsCredentialStore:

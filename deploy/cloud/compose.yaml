@@ -1,0 +1,55 @@
+name: oscar-cloud
+services:
+  core:
+    image: ${OSCAR_IMAGE:-oscar-cloud:local}
+    build:
+      context: ../..
+      dockerfile: deploy/cloud/Dockerfile
+      target: runtime
+    user: "10001:10001"
+    init: true
+    read_only: true
+    restart: unless-stopped
+    stop_grace_period: 30s
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    pids_limit: 128
+    mem_limit: 1g
+    cpus: 1.0
+    tmpfs:
+      - /tmp:size=64m,mode=1777,noexec,nosuid,nodev
+    volumes:
+      - type: bind
+        source: ${OSCAR_CONFIG:?Set OSCAR_CONFIG to the absolute production configuration path}
+        target: /etc/oscar/cloud.json
+        read_only: true
+        bind:
+          create_host_path: false
+      - type: bind
+        source: ${OSCAR_MODELS:?Set OSCAR_MODELS to the absolute reviewed model manifest path}
+        target: /etc/oscar/models.json
+        read_only: true
+        bind:
+          create_host_path: false
+      - type: bind
+        source: ${OSCAR_SECRETS:?Set OSCAR_SECRETS to the absolute owner-provisioned secrets directory}
+        target: /run/secrets/oscar
+        read_only: true
+        bind:
+          create_host_path: false
+      - type: bind
+        source: ${OSCAR_DATA:?Set OSCAR_DATA to the absolute persistent data directory}
+        target: /var/lib/oscar
+        bind:
+          create_host_path: false
+    networks: [core]
+    logging:
+      driver: local
+      options:
+        max-size: 10m
+        max-file: "3"
+
+# An unpublished bridge permits provider egress, but creates no host listener.
+# Only explicitly authorized proxy containers should join this network.
+networks:
+  core:
