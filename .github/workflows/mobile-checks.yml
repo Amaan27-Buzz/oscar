@@ -83,3 +83,4 @@ jobs:
           path: |
             mobile/**/build/reports/androidTests/**
             mobile/**/build/outputs/androidTest-results/**
+            .oscar/d2-android/*.log
