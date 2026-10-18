@@ -1,4 +1,4 @@
-"""Persistent deployment composition of OSCAR's existing Core; no remote Worker API."""
+"""Persistent deployment composition of OSCAR's existing authoritative Core."""
 
 import argparse
 import json
@@ -173,6 +173,7 @@ class CloudCore:
         self.directory_lock = DataDirectoryLock(config.data_dir)
         self.directory_lock.__enter__()
         self.core: Harness | None = None
+        self.remote: Any = None
         self.closed = False
         try:
             initialize_identity(config.data_dir, config.core_id, initialize=initialize)
@@ -210,6 +211,9 @@ class CloudCore:
                             pool.bind_resolver(slot, resolve)
             # A restarted process cannot own its predecessor's in-flight local lease.
             self._recover()
+            from .remote_grid import RemoteGrid
+
+            self.remote = RemoteGrid(self)
             if start_services:
                 self.core.start()
                 if not self.ready():
@@ -292,7 +296,12 @@ class CloudCore:
                 "windows_uia": "unavailable",
                 "powershell": "unavailable",
                 "desktop_capture": "unavailable",
-                "remote_workers": "unavailable",
+                "remote_workers": "available"
+                if any(
+                    n["role"] == NodeRole.DESKTOP and n["status"] == "online"
+                    for n in h.grid.nodes()
+                )
+                else "unavailable",
             },
             "providers": "configured"
             if any(s.present for s in h.pool.slots.values())
@@ -405,6 +414,8 @@ class CloudCore:
 
     def close(self) -> None:
         if not self.closed:
+            if self.remote is not None:
+                self.remote.close()
             if self.core is not None:
                 self.core.close()
             self.closed = True

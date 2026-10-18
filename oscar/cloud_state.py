@@ -322,6 +322,18 @@ def restore_state(snapshot: Path, destination: Path) -> None:
             if _hash(target) != expected:
                 raise ValueError("backup changed during restore")
         validate_state(staging)
+        # A backup cannot restore old device authority or reusable enrollment proofs.
+        recovered = Store(staging / STATE_NAME)
+        try:
+            with recovered.transaction():
+                devices = {r["node_id"] for r in recovered.all("remote_device")}
+                for session in recovered.all("session"):
+                    if session["node_id"] in devices:
+                        recovered.put("session", session["id"], {**session, "revoked": True})
+                for invitation in recovered.all("remote_invitation"):
+                    recovered.delete("remote_invitation", invitation["id"])
+        finally:
+            recovered.close()
         _publish(staging, destination)
     finally:
         if staging.exists():

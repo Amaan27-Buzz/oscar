@@ -380,7 +380,6 @@ class Runtime:
                 session.token,
                 "execute",
             )
-            self.grid.release(lease_id)
             if self.store.task(task.id).cancelled:
                 return self.store.task(task.id)
             self.store.transition(task.id, TaskState.RESULT_RECEIVED, expected_lease=lease_id)

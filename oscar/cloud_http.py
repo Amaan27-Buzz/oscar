@@ -34,13 +34,14 @@ class CloudHTTPServer(ThreadingHTTPServer):
         self.rate_lock = Lock()
         self.arrivals: deque[float] = deque()
         self.client_arrivals: dict[str, deque[float]] = {}
+        self.grid_arrivals: dict[str, deque[float]] = {}
         super().__init__((core.config.listen_host, core.config.listen_port), CloudHandler)
         self.thread = Thread(target=self.serve_forever, name="oscar-cloud-http", daemon=True)
 
     def start(self) -> None:
         self.thread.start()
 
-    def allowed(self, node: str) -> bool:
+    def allowed(self, node: str, client_limit: int = 60) -> bool:
         with self.rate_lock:
             now = monotonic()
             while self.arrivals and self.arrivals[0] <= now - 60:
@@ -52,7 +53,7 @@ class CloudHTTPServer(ThreadingHTTPServer):
                     del self.client_arrivals[client]
             client_arrivals = self.client_arrivals.get(node)
             if len(self.arrivals) >= 120 or (
-                client_arrivals is not None and len(client_arrivals) >= 60
+                client_arrivals is not None and len(client_arrivals) >= client_limit
             ):
                 return False
             self.arrivals.append(now)
@@ -63,6 +64,20 @@ class CloudHTTPServer(ThreadingHTTPServer):
         connection, address = super().get_request()
         connection.settimeout(3)
         return connection, address
+
+    def admit_grid(self, node: str) -> None:
+        # Only verified device identities reach this bucket; bad proofs cannot starve peers.
+        with self.rate_lock:
+            now = monotonic()
+            for identity, arrivals in tuple(self.grid_arrivals.items()):
+                while arrivals and arrivals[0] <= now - 60:
+                    arrivals.popleft()
+                if not arrivals:
+                    del self.grid_arrivals[identity]
+            arrivals = self.grid_arrivals.setdefault(node, deque())
+            if len(arrivals) >= 120:
+                raise RateLimited
+            arrivals.append(now)
 
     def process_request(self, request: Any, client_address: Any) -> None:
         if not self.slots.acquire(blocking=False):
@@ -199,6 +214,33 @@ class CloudHandler(BaseHTTPRequestHandler):
                 return
             if config.ingress == "tls-proxy" and self.headers.get("X-Forwarded-Proto") != "https":
                 raise PermissionError("TLS ingress required")
+            if self.command == "POST" and self.path in {"/v2/grid/enroll", "/v2/grid/request"}:
+                from .cloud import strict_object
+
+                length = self.headers.get("Content-Length", "")
+                if not re.fullmatch(r"[0-9]{1,5}", length) or not 1 <= int(length) <= 32768:
+                    self.reply(413, {"error": "body_limit"})
+                    return
+                if self.headers.get("Content-Type") != "application/json":
+                    raise ValueError("JSON content type required")
+                body = self.rfile.read(int(length))
+                if len(body) != int(length):
+                    raise ValueError("incomplete body")
+                data = json.loads(body, object_pairs_hook=strict_object)
+                if not isinstance(data, dict):
+                    raise ValueError("JSON object required")
+                if self.path == "/v2/grid/enroll":
+                    self.server.admit_grid("enrollment")
+                    self.reply(200, core.remote.enroll(data))
+                else:
+                    session = core.remote.authenticate(self.headers, body, self.server.admit_grid)
+                    try:
+                        result = core.remote.request(session, data)
+                    except PermissionError:
+                        self.reply(403, {"error": "permission_denied"})
+                        return
+                    self.reply(200, result)
+                return
             # Match exact endpoint/method pairs; reference APIs never share this listener.
             probe = re.fullmatch(r"/v1/probes/([a-f0-9]{32})", self.path)
             scope = (
