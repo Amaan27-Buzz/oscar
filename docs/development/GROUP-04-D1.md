@@ -2,7 +2,7 @@
 
 Starting main: `94ce220509a15b3930630f8bbc96700fad882c44`, fetched from
 `Amaan27-Buzz/oscar` on 2026-10-18. Branch: `codex/group-04-d1-cloud-core`.
-This is a software candidate for review; Oracle is not provisioned, and D2/Group 5
+The engineering closure below supersedes the initial candidate review. Oracle is not provisioned, and D2/Group 5
 are not implemented by this change. Gate C/D remain PARTIAL and Gate E NOT PASSED.
 
 ## Actual implementation and dependency map
@@ -86,7 +86,7 @@ python -m ruff format --check oscar tests scripts
 python -m mypy oscar
 python -m scripts.check_repository
 python -m unittest discover -s tests -t . -v
-python -m unittest tests.test_cloud tests.test_cloud_acceptance tests.test_cloud_state tests.test_cloud_platform tests.test_cloud_recovery -v
+python -m unittest tests.test_cloud tests.test_cloud_acceptance tests.test_cloud_state tests.test_cloud_platform tests.test_cloud_recovery tests.test_cloud_enrollment tests.test_cloud_admission -v
 docker build --target runtime -f deploy/cloud/Dockerfile -t oscar-cloud:local .
 docker build --target acceptance -f deploy/cloud/Dockerfile -t oscar-cloud-acceptance:local .
 docker build --target ingress -f deploy/cloud/Dockerfile -t oscar-cloud-ingress:local .
@@ -123,6 +123,61 @@ values from actual persisted executor results and strengthen deployment resource
 assertions; focused regression passed. [Draft PR #8 checks](https://github.com/Amaan27-Buzz/oscar/pull/8/checks)
 are authoritative for its latest head. No earlier-head receipt substitutes for
 green final-head checks, and no CI result constitutes Oracle deployment acceptance.
+
+## Final independent engineering closure — 2026-10-18
+
+Fresh starting main was `94ce220509a15b3930630f8bbc96700fad882c44`; PR #8 started
+at `ea24e639a71b742d8ad9040bfe1cda1b5d497419`, draft and mergeable, with no GitHub
+review comments. All eight workflows had passed on that starting head. The owner
+then authorized reviewed, CI-gated integration of this existing PR, superseding
+the draft-only stop. The initial 31-test/715-test receipts above remain historical.
+
+Three defects were confirmed and corrected:
+
+1. Offline enrollment committed authority before credential delivery. Output now
+   reserves a new private file in an owned 0700 Linux directory before client
+   authorization changes, using descriptor traversal, no-follow and exclusive
+   creation. The existing Grid pairing transaction invokes delivery before commit:
+   file/directory fsync and path/inode validation precede session/binding commit.
+   Delivery errors and process death roll back new authorization, preserving prior
+   valid sessions. An unpaired node and invalid partial/complete output may remain;
+   explicit retries use a new filename. Attempt/failure/delivery audit records have
+   no token or file content. There is no new remote enrollment authority or API.
+2. Configurable production ports disagreed with the packaged health/proxy port.
+   `tls-proxy` now requires 8080 before initialization; separate private loopback
+   verification retains explicit alternative unprivileged ports.
+3. Unauthenticated traffic exhausted the shared request allowance. Cheap malformed
+   rejection precedes DB access, and only authenticated/bound clients consume the
+   existing 120/minute total allowance, with 60/node/minute fairness. Rate rejection
+   precedes durable nonce insertion. Eight connections/three-second timeouts remain.
+
+New coverage includes existing/unwritable output, partial writes, sync failure,
+session creation failure, explicit retry, subprocess interruption/restart,
+preservation of prior sessions, symlink/path replacement, production port rejection
+and 363 unauthenticated requests followed by healthy authorized access. The Cloud
+suite now contains **44 tests**, exercising actual Core/SQLite/process/socket
+components. The Linux constrained-container run passed all 44 without skips, plus
+real trusted-CA Core/Caddy TLS, independent readback and restart. Windows focused
+execution ran 44 with three POSIX-only skips; skipped checks are not Windows evidence.
+The complete Windows Python 3.12.10 regression ran **728 tests, OK, 15
+platform/optional skips** in 331.035 seconds. Strengthened enrollment failure-point
+checks also passed separately, and the final Linux suite passed 44 in 42.310
+seconds. Ruff, formatting (188 files), strict mypy and repository/local-link/secret
+checks passed. Approved Desktop, Android, expression and Orb files are unchanged.
+
+Focused adjacent review covered lifecycle/draining, identity/locking, mounted-key
+revocation, execution renewal, partial initialization, backup/restore integrity,
+SQLite and cross-database admission, Docker isolation, proxy/header trust and
+readiness/resource bounds. No additional reproducible critical/high D1 defect was
+found. Local locks still do not fence independently cloned volumes, and optional
+memory services still require separate runtime/capacity acceptance.
+
+The [existing PR #8](https://github.com/Amaan27-Buzz/oscar/pull/8) closure receipt
+records the exact corrected final head, full regression counts, native ARM64/x86_64
+workflow links, resulting merge SHA and post-merge main checks. Integration requires
+all applicable final-head checks successful, no unresolved critical/high issue,
+reconciliation with current main and unchanged design/authority/data contracts.
+No waiver, physical acceptance or hosted Oracle PASS is implied by software PASS.
 
 ## External D1 acceptance and D2 handoff
 

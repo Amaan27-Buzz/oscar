@@ -7,12 +7,14 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest.mock import patch
 
+from oscar.cloud import CloudConfig
 from oscar.credentials import redact_runtime_secrets
 from oscar.grid import NodeRole
 from oscar.harness import Harness
 from oscar.jev import Intent
 from oscar.secure_credentials import InjectedCredentialStore
 from oscar.storage import StateConflict
+from tests.test_cloud import configuration
 
 
 class CloudPlatformTests(unittest.TestCase):
@@ -23,6 +25,29 @@ class CloudPlatformTests(unittest.TestCase):
         self.secrets = self.root / "secrets"
         self.secrets.mkdir(mode=0o700)
         self.vault = InjectedCredentialStore(self.secrets, clock=lambda: 100)
+
+    def test_proxy_configuration_requires_packaged_core_port_before_initialization(self):
+        for host in ("127.0.0.1", "0.0.0.0"):
+            with self.subTest(host=host):
+                path = configuration(
+                    self.root, listen_host=host, listen_port=8081, ingress="tls-proxy"
+                )
+                with self.assertRaisesRegex(ValueError, "listen_port 8080"):
+                    CloudConfig.load(path)
+                self.assertFalse((self.root / "data").exists())
+                path = configuration(
+                    self.root, listen_host=host, listen_port=8080, ingress="tls-proxy"
+                )
+                self.assertEqual(8080, CloudConfig.load(path).listen_port)
+
+    def test_separate_loopback_configuration_supports_explicit_alternative_port(self):
+        path = configuration(self.root, listen_port=8081, ingress="loopback")
+        config = CloudConfig.load(path)
+        self.assertEqual("127.0.0.1", config.listen_host)
+        self.assertEqual(8081, config.listen_port)
+        path = configuration(self.root, listen_host="0.0.0.0", ingress="loopback")
+        with self.assertRaisesRegex(ValueError, "non-loopback Core"):
+            CloudConfig.load(path)
 
     def secret(self, reference="provider", value="synthetic-private-value", expiry=None):
         path = self.secrets / reference

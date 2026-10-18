@@ -46,6 +46,20 @@ The proxy adds header/body/time bounds. Core adds its own strict parsing, body,
 concurrency and rate bounds. Access logs are disabled; categorical Core diagnostics
 do not contain request bodies, credentials or private exception text.
 
+The supplied `tls-proxy` production mode requires port **8080**, matching the image
+health check, Compose and Caddy upstream; another port fails configuration before
+state initialization. The separate `loopback` mode supports explicitly configured
+unprivileged ports for private host/reference verification. It is not supported by
+the supplied Compose/TLS package and must never become a public direct-Core listener.
+
+Missing/malformed authentication is rejected before any database lookup. Invalid,
+expired or revoked clients do not consume authenticated allowances or write nonces.
+After successful Grid and deployment-binding validation, admission permits at most
+60 requests per node per minute and 120 in total; rate rejection precedes nonce
+insertion. Eight concurrent connections and three-second socket timeouts still
+bound unauthenticated work. These controls preserve commissioning availability under
+the tested request pressure; they are not an Internet denial-of-service guarantee.
+
 ## Prepare a Linux host (owner commissioning)
 
 Use an approved 64-bit Linux VM, preferably the current Ubuntu 24.04 LTS ARM64 image
@@ -120,7 +134,22 @@ bounded arithmetic probes and their explicit diagnostic retention. Do not print
 or commit it. To revoke it, stop the service, run the same offline command with
 `--revoke-client --node-id OWNER_CHOSEN_LOWERCASE_NODE_ID`, then start and verify
 that the old credential is rejected. Client expiry is at most 24 hours; default
-TTL is one hour. New credential-output files must not already exist.
+TTL is one hour. New credential-output files must not already exist. On Linux the
+parent must be owned by the service UID with mode 0700. Directory descriptors and
+no-follow/exclusive creation protect traversal and output replacement; the private
+file and directory are synced before the existing Grid session transaction commits.
+The deployment binding commits in that same transaction. Host administrators and
+the service UID remain trusted; Windows reference tests rely on private directory ACLs.
+
+Delivery failure or process interruption rolls back the new session and binding;
+previous valid credentials are preserved. A failed/interrupted attempt may leave a
+private partial file or a complete **unusable** credential, and an unpaired node
+record. Never infer enrollment success from file existence. Retry explicitly with
+the same eligible diagnostic node and a **new output filename**; existing files are
+never overwritten or automatically deleted. Content-free attempt/failure/delivery
+audit records distinguish completed transactions; an attempt without delivery is
+incomplete. Revoked or unrelated node identities require an explicit new identity.
+No remote enrollment endpoint is exposed.
 
 Existing local Core execution enrollment expires after seven days. Startup and
 restart **do not renew** expired/revoked execution authority. The service reports
@@ -286,7 +315,7 @@ docker build --target acceptance -f deploy/cloud/Dockerfile -t oscar-cloud-accep
 docker build --target ingress -f deploy/cloud/Dockerfile -t oscar-cloud-ingress:local .
 docker run --rm --read-only --cap-drop ALL --security-opt no-new-privileges:true --pids-limit 128 --memory 1g --cpus 1 --tmpfs /tmp:rw,size=128m,mode=1777 oscar-cloud-acceptance:local
 python -m scripts.verify_cloud_ingress --core-image oscar-cloud:local --ingress-image oscar-cloud-ingress:local
-python -m unittest tests.test_cloud tests.test_cloud_acceptance tests.test_cloud_state tests.test_cloud_platform tests.test_cloud_recovery -v
+python -m unittest tests.test_cloud tests.test_cloud_acceptance tests.test_cloud_state tests.test_cloud_platform tests.test_cloud_recovery tests.test_cloud_enrollment tests.test_cloud_admission -v
 ```
 
 The ingress check starts actual Core and Caddy containers on an internal Docker
@@ -306,7 +335,7 @@ real device enrollment, distributed revocation/fencing, reconnect/continuation a
 authoritative remote readback without broadening the diagnostic API into arbitrary
 public Worker control.
 
-Local Linux x86_64 software verification on 2026-10-18 passed all **31 Cloud
+Initial candidate Linux x86_64 software verification on 2026-10-18 passed all **31 Cloud
 tests** in the Python 3.12.15 acceptance image under UID 10001, read-only filesystem,
 dropped capabilities, no new privileges, 1 GiB RAM and one CPU. The actual private
 Core/Caddy TLS check also passed. After the small synthetic request and restart,
@@ -314,3 +343,8 @@ Docker reported Core **27.14 MiB / 1 GiB** and ingress **14.11 MiB / 256 MiB**.
 These are container memory snapshots, not peak/RSS benchmarks or production sizing.
 The inspected amd64 image `Size` fields were 47,782,283 bytes (Core) and 43,104,770
 bytes (ingress). Native ARM64 CI and Oracle commissioning evidence are separate.
+The corrected engineering closure expands acceptance to **44 Cloud tests**;
+all 44 passed locally on constrained Linux without skips, and Windows full
+regression ran 728 tests with 15 platform/optional skips. See the [closure ledger](development/GROUP-04-D1.md)
+and [PR #8 receipt](https://github.com/Amaan27-Buzz/oscar/pull/8) for final-head and
+post-merge native CI; these supersede the initial candidate counts.

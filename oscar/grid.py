@@ -84,6 +84,7 @@ class Grid:
         session_id: str | None = None,
         internal: bool = False,
         reenroll: bool = False,
+        deliver: Callable[[SessionHandle], None] | None = None,
     ) -> SessionHandle:
         """Trusted coordinator API: approved scope; inaccessible to remote peers."""
         if not 0 < ttl <= 86400:
@@ -143,7 +144,11 @@ class Grid:
             node["paired"] = True
             self.store.put("node", node_id, node)
             self.store.audit("", "paired", {"node_id": node_id, "session_id": identifier})
-        return SessionHandle(identifier, node_id, token)
+            handle = SessionHandle(identifier, node_id, token)
+            # Offline delivery must be durable before authorization commits.
+            if deliver is not None:
+                deliver(handle)
+        return handle
 
     def authenticate(
         self, session: SessionHandle, scope: str, *, lease_id: str | None = None

@@ -17,7 +17,7 @@ CMD ["python", "-m", "oscar.cloud", "--config", "/etc/oscar/cloud.json"]
 FROM runtime AS acceptance
 COPY --chown=root:root tests /app/tests
 COPY --chown=root:root scripts /app/scripts
-CMD ["python", "-m", "unittest", "tests.test_cloud", "tests.test_cloud_acceptance", "tests.test_cloud_state", "tests.test_cloud_platform", "tests.test_cloud_recovery", "-v"]
+CMD ["python", "-m", "unittest", "tests.test_cloud", "tests.test_cloud_acceptance", "tests.test_cloud_state", "tests.test_cloud_platform", "tests.test_cloud_recovery", "tests.test_cloud_enrollment", "tests.test_cloud_admission", "-v"]
 
 FROM caddy:2.11.7-alpine@sha256:d8542f48d34a9cf4e4c11a478865229840e87e4c96ea3f439101f31a5d35f75f AS ingress
 # The stock binary's bind-service file capability prevents exec with cap_drop: ALL.

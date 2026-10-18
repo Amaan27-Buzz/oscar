@@ -243,7 +243,15 @@ class CloudTests(unittest.TestCase):
             )[0],
         )
         self.server.arrivals.extend([time()] * 120)
-        self.assertEqual(429, request(self.config, "/v1/status", session=self.session)[0])
+        self.assertEqual(
+            429,
+            request(
+                self.config,
+                "/v1/status",
+                session=self.session,
+                headers={"X-Forwarded-Proto": "https"},
+            )[0],
+        )
 
     def test_shutdown_releases_resources_and_directory_lock(self):
         core = CloudCore(self.config, initialize=True)

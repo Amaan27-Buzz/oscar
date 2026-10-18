@@ -6,12 +6,15 @@ import os
 import re
 import signal
 import sqlite3
+import stat
 import sys
+from collections.abc import Iterator
+from contextlib import contextmanager
 from dataclasses import dataclass, field
 from pathlib import Path
 from threading import Event, RLock
 from time import time
-from typing import Any
+from typing import Any, TextIO
 
 from .cloud_state import DataDirectoryLock, initialize_identity
 from .contracts import TaskState, new_id
@@ -108,6 +111,11 @@ class CloudConfig:
             or (data["listen_host"] != "127.0.0.1" and data["ingress"] != "tls-proxy")
         ):
             raise ValueError("non-loopback Core requires isolated TLS proxy ingress")
+        if data["ingress"] == "tls-proxy" and data["listen_port"] != 8080:
+            raise ValueError(
+                "TLS proxy deployment requires Core listen_port 8080 for ingress/health checks; "
+                "alternative ports require isolated loopback ingress"
+            )
         hosts = data["allowed_hosts"]
         if (
             not isinstance(hosts, list)
@@ -403,6 +411,97 @@ class CloudCore:
             self.directory_lock.__exit__(None, None, None)
 
 
+@contextmanager
+def credential_output(path: Path) -> Iterator[tuple[TextIO, int | None]]:
+    """Reserve a private output before authority changes; failed files are never reused."""
+    if not path.is_absolute() or any(p.is_symlink() for p in (path, *path.parents)):
+        raise ValueError("absolute nonsymlink credential destination required")
+    parent_fd = None
+    try:
+        if os.name == "posix":
+            posix: Any = os
+            directory_flag, nofollow = posix.O_DIRECTORY, posix.O_NOFOLLOW
+            parent_fd = os.open(path.anchor, os.O_RDONLY | directory_flag)
+            for part in path.parent.parts[1:]:
+                next_fd = os.open(part, os.O_RDONLY | directory_flag | nofollow, dir_fd=parent_fd)
+                os.close(parent_fd)
+                parent_fd = next_fd
+            parent = os.fstat(parent_fd)
+            if parent.st_uid != posix.geteuid() or stat.S_IMODE(parent.st_mode) != 0o700:
+                raise PermissionError("credential parent must be owned and private (0700)")
+            descriptor = os.open(
+                path.name,
+                os.O_WRONLY | os.O_CREAT | os.O_EXCL | nofollow,
+                0o600,
+                dir_fd=parent_fd,
+            )
+        else:
+            # Windows reference verification trusts the operator's private directory ACL.
+            descriptor = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+        with os.fdopen(descriptor, "w", encoding="utf-8") as output:
+            yield output, parent_fd
+    finally:
+        if parent_fd is not None:
+            os.close(parent_fd)
+
+
+def enroll_client(core: CloudCore, node_id: str, path: Path, ttl: int) -> None:
+    if (
+        not re.fullmatch(r"[a-z0-9][a-z0-9-]{7,63}", node_id)
+        or node_id == core.config.core_id
+        or not 60 <= ttl <= 86400
+    ):
+        raise ValueError("explicit diagnostic client identity and bounded TTL required")
+    h = core.harness
+    scopes = ("cloud:inspect", "cloud:probe", "math", "archive:retain")
+    with credential_output(path) as (output, parent_fd):
+        try:
+            node = h.store.get("node", node_id)
+        except KeyError:
+            h.grid.register(Node(node_id, NodeRole.CLOUD, scopes))
+        else:
+            try:
+                bound = h.store.get("cloud_client", node_id) == {"core_id": core.config.core_id}
+            except KeyError:
+                bound = False
+            if node["revoked"] or not (
+                bound
+                or (
+                    not node["paired"]
+                    and node["role"] == NodeRole.CLOUD
+                    and set(node["scopes"]) == set(scopes)
+                )
+            ):
+                raise StateConflict("client identity unavailable; choose an explicit new identity")
+        h.store.audit("", "cloud_enrollment_attempt", {"node_id": node_id})
+
+        def deliver(handle: SessionHandle) -> None:
+            json.dump(
+                {"node_id": handle.node_id, "session_id": handle.id, "token": handle.token},
+                output,
+            )
+            output.flush()
+            os.fsync(output.fileno())
+            if parent_fd is not None:
+                os.fsync(parent_fd)
+            if any(p.is_symlink() for p in (path, *path.parents)):
+                raise PermissionError("credential destination changed during delivery")
+            current, opened = path.lstat(), os.fstat(output.fileno())
+            if (
+                current.st_dev,
+                current.st_ino,
+            ) != (opened.st_dev, opened.st_ino):
+                raise PermissionError("credential destination changed during delivery")
+            h.store.put("cloud_client", node_id, {"core_id": core.config.core_id})
+            h.store.audit("", "cloud_enrollment_delivered", {"node_id": node_id})
+
+        try:
+            h.grid.pair(node_id, scopes, ttl=ttl, deliver=deliver)
+        except BaseException:
+            h.store.audit("", "cloud_enrollment_failed", {"node_id": node_id})
+            raise
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--config", required=True, type=Path)
@@ -444,19 +543,7 @@ def main() -> int:
         )
         try:
             if args.enroll_client:
-                if not re.fullmatch(r"[a-z0-9][a-z0-9-]{7,63}", args.node_id):
-                    raise ValueError("explicit diagnostic client identity required")
-                scopes = ("cloud:inspect", "cloud:probe", "math", "archive:retain")
-                core.harness.grid.register(Node(args.node_id, NodeRole.CLOUD, scopes))
-                handle = core.harness.grid.pair(args.node_id, scopes, ttl=args.ttl)
-                core.harness.store.put("cloud_client", args.node_id, {"core_id": config.core_id})
-                # Exclusive creation; secret material goes only to an owner-selected file.
-                with args.credential_output.open("x", encoding="utf-8") as output:
-                    json.dump(
-                        {"node_id": handle.node_id, "session_id": handle.id, "token": handle.token},
-                        output,
-                    )
-                args.credential_output.chmod(0o600)
+                enroll_client(core, args.node_id, args.credential_output, args.ttl)
                 diagnostic("client_enrolled")
             elif args.revoke_client:
                 if not args.node_id or args.node_id == config.core_id:

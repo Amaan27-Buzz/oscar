@@ -19,6 +19,10 @@ if TYPE_CHECKING:
     from .cloud import CloudCore
 
 
+class RateLimited(Exception):
+    pass
+
+
 class CloudHTTPServer(ThreadingHTTPServer):
     daemon_threads = False
     block_on_close = True
@@ -29,20 +33,30 @@ class CloudHTTPServer(ThreadingHTTPServer):
         self.slots = BoundedSemaphore(8)
         self.rate_lock = Lock()
         self.arrivals: deque[float] = deque()
+        self.client_arrivals: dict[str, deque[float]] = {}
         super().__init__((core.config.listen_host, core.config.listen_port), CloudHandler)
         self.thread = Thread(target=self.serve_forever, name="oscar-cloud-http", daemon=True)
 
     def start(self) -> None:
         self.thread.start()
 
-    def allowed(self) -> bool:
+    def allowed(self, node: str) -> bool:
         with self.rate_lock:
             now = monotonic()
             while self.arrivals and self.arrivals[0] <= now - 60:
                 self.arrivals.popleft()
-            if len(self.arrivals) >= 120:
+            for client, arrivals in tuple(self.client_arrivals.items()):
+                while arrivals and arrivals[0] <= now - 60:
+                    arrivals.popleft()
+                if not arrivals:
+                    del self.client_arrivals[client]
+            client_arrivals = self.client_arrivals.get(node)
+            if len(self.arrivals) >= 120 or (
+                client_arrivals is not None and len(client_arrivals) >= 60
+            ):
                 return False
             self.arrivals.append(now)
+            self.client_arrivals.setdefault(node, deque()).append(now)
             return True
 
     def get_request(self) -> tuple["socket", Any]:
@@ -144,6 +158,9 @@ class CloudHandler(BaseHTTPRequestHandler):
             binding = h.store.get("cloud_client", node)
             if binding != {"core_id": self.server.core.config.core_id}:
                 raise PermissionError("deployment client binding denied")
+            # Bound durable nonce writes too; invalid clients never consume this allowance.
+            if not self.server.allowed(node):
+                raise RateLimited
             h.store.consume_nonce(identifier, nonce)
         # Keep parsing helper import out of initialization to avoid a composition cycle.
         self.parse_json = strict_object
@@ -180,21 +197,27 @@ class CloudHandler(BaseHTTPRequestHandler):
                 healthy = self.path == "/healthz" or core.ready()
                 self.reply(200 if healthy else 503, {"status": "ok" if healthy else "unavailable"})
                 return
-            if not self.server.allowed():
-                self.reply(429, {"error": "rate_limited"})
-                return
             if config.ingress == "tls-proxy" and self.headers.get("X-Forwarded-Proto") != "https":
                 raise PermissionError("TLS ingress required")
             # Match exact endpoint/method pairs; reference APIs never share this listener.
             probe = re.fullmatch(r"/v1/probes/([a-f0-9]{32})", self.path)
+            scope = (
+                "cloud:probe"
+                if self.command == "POST" and self.path == "/v1/probes"
+                else "cloud:inspect"
+            )
+            if not (
+                (self.command == "GET" and (self.path == "/v1/status" or probe))
+                or (self.command == "POST" and self.path == "/v1/probes")
+            ):
+                self.reply(404, {"error": "not_found"})
+                return
+            session = self.authenticate(scope)
             if self.command == "GET" and self.path == "/v1/status":
-                self.authenticate("cloud:inspect")
                 self.reply(200, core.status())
             elif self.command == "GET" and probe:
-                session = self.authenticate("cloud:inspect")
                 self.reply(200, core.inspect_probe(session, probe[1]))
             elif self.command == "POST" and self.path == "/v1/probes":
-                session = self.authenticate("cloud:probe")
                 length = self.headers.get("Content-Length", "")
                 if not re.fullmatch(r"[0-9]{1,5}", length) or not 1 <= int(length) <= 4096:
                     self.reply(413, {"error": "body_limit"})
@@ -210,6 +233,8 @@ class CloudHandler(BaseHTTPRequestHandler):
                 self.reply(200, core.probe(session, data))
             else:
                 self.reply(404, {"error": "not_found"})
+        except RateLimited:
+            self.reply(429, {"error": "rate_limited"})
         except (PermissionError, KeyError):
             self.reply(401, {"error": "authentication_or_scope_denied"})
         except StateConflict:
