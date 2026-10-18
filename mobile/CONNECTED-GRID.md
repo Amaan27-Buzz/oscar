@@ -28,6 +28,11 @@ a presentation/control client of the same Core, Grid, Runtime and Event Archive.
   cursors and archive generations deduplicate history and clear forgotten cache.
   A fresh Core observation is required before cached conversation appears.
   Offline views withdraw private readback and never queue approvals or actions.
+- Authorized `presence:read` carries the existing canonical Core expression into
+  the approved Orb. Stale or non-Core expressions fail closed. Companion's
+  separate presence-only connection uses the same signed device proof and still
+  requires independent Android overlay/notification permissions and an unlocked
+  device; connection enrollment does not activate an overlay.
 - Expanded real Worker devices offer scoped file reads and preparation of exact
   file edits. Core validates, routes and verifies operations. Mutations require
   exact digest/capability/target/session/generation-bound owner review and the

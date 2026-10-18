@@ -59,6 +59,17 @@ class GridSyncTest {
         assertFalse(valid(CoreClient.signingMaterial("phone", "old-session", "ab".repeat(16), "123", body)))
         assertFalse(valid(CoreClient.signingMaterial("phone", "session", "ab".repeat(16), "123", body + 32)))
     }
+    @Test fun gridPreservesOnlyFreshCanonicalPresence() {
+        val presence = JSONObject("""{"version":1,"visible":true,"expression":{"version":1,"source":{"kind":"core","id":"presence:canonical"},"generation":1,"transitionId":"state","eventTime":100000,"expiresAt":130000,"kind":"state","priority":"normal","operation":"idle","delivery":"composed","availability":"available","muted":false,"attention":"none","reducedMotion":true}}""")
+        val snapshot = JSONObject().put("version", 2).put("core_id", "core").put("node_id", "phone").put("relationship_id", "relationship")
+            .put("observed_at_ms", 100000).put("nodes", JSONArray()).put("tasks", JSONArray()).put("presence", presence)
+        assertEquals(presence.getJSONObject("expression").toString(), parseGridSnapshot(snapshot, "core", "phone").presence)
+        snapshot.put("observed_at_ms", 130000)
+        try { parseGridSnapshot(snapshot, "core", "phone"); fail("Stale canonical presence accepted") } catch (_: IllegalArgumentException) { }
+        snapshot.put("observed_at_ms", 100000)
+        presence.getJSONObject("expression").getJSONObject("source").put("kind", "fixture")
+        try { parseGridSnapshot(snapshot, "core", "phone"); fail("Non-Core presence accepted") } catch (_: IllegalArgumentException) { }
+    }
     @Test fun retryBackoffIsBoundedAndHasJitter() {
         assertEquals(5000, reconnectDelay(0, 0))
         assertEquals(61000, reconnectDelay(100, 5000))

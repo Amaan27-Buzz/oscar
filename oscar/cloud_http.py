@@ -23,6 +23,20 @@ class RateLimited(Exception):
     pass
 
 
+FAILURE_CATEGORIES = {
+    400: "invalid_request",
+    401: "authentication_denied",
+    403: "permission_denied",
+    404: "route_unavailable",
+    409: "state_conflict",
+    413: "body_limit",
+    429: "rate_limited",
+    500: "internal_error",
+    501: "method_unavailable",
+    503: "temporarily_unavailable",
+}
+
+
 class CloudHTTPServer(ThreadingHTTPServer):
     daemon_threads = False
     block_on_close = True
@@ -35,6 +49,8 @@ class CloudHTTPServer(ThreadingHTTPServer):
         self.arrivals: deque[float] = deque()
         self.client_arrivals: dict[str, deque[float]] = {}
         self.grid_arrivals: dict[str, deque[float]] = {}
+        self.failure_counts: dict[str, int] = {}
+        self.failure_reported: dict[str, float] = {}
         super().__init__((core.config.listen_host, core.config.listen_port), CloudHandler)
         self.thread = Thread(target=self.serve_forever, name="oscar-cloud-http", daemon=True)
 
@@ -98,9 +114,22 @@ class CloudHTTPServer(ThreadingHTTPServer):
 
     def handle_error(self, request: Any, client_address: Any) -> None:
         # Default traceback logging can include private exception/request material.
+        self.observe_failure(500)
+
+    def observe_failure(self, code: int) -> None:
+        """Bounded process diagnostics, never attacker-controlled durable audit rows."""
         from .cloud import diagnostic
 
-        diagnostic("http_request_failed", category="internal_error")
+        category = FAILURE_CATEGORIES.get(code, "request_rejected")
+        with self.rate_lock:
+            count = min(self.failure_counts.get(category, 0) + 1, 2**31 - 1)
+            self.failure_counts[category] = count
+            now = monotonic()
+            previous = self.failure_reported.get(category)
+            if previous is not None and now - previous < 60:
+                return
+            self.failure_reported[category] = now
+        diagnostic("http_request_failed", category=category, count=count)
 
     def close(self) -> None:
         self.shutdown()
@@ -121,6 +150,8 @@ class CloudHandler(BaseHTTPRequestHandler):
         self.reply(code, {"error": "request_rejected"})
 
     def reply(self, code: int, payload: dict[str, Any]) -> None:
+        if code >= 400:
+            self.server.observe_failure(code)
         body = json.dumps(payload, allow_nan=False, separators=(",", ":")).encode()
         self.send_response(code)
         self.send_header("Content-Type", "application/json")

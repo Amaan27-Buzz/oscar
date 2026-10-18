@@ -62,13 +62,23 @@ sessions immediately; a lost response requires re-enrollment, never fallback.
 ## Client operations
 
 - `snapshot {cursor:0,archive_generation:PREVIOUS_GENERATION}`: `version,core_id,node_id,relationship_id,nodes,tasks,
-  events,cursor,reset,archive_generation,providers,observed_at_ms`. Cursor is monotonically ordered
+  events,cursor,reset,archive_generation,providers,observed_at_ms` and optional
+  `presence`. Cursor is monotonically ordered
   archive sequence; reset instructs cache replacement after forget/generation
   changes. Clients always replace current task/node projections. No cache grants
   authority. Only explicitly enrolled relationship-sharing/retention grants read
   archive. Without archive sharing, nodes/status remain available but events and
   retained task details/results are redacted. Snapshot foreground polling every 5 seconds; bounded exponential
   backoff with jitter on failure, stop on revoked/expired credentials.
+- `presence {}` returns the existing canonical Core Presence snapshot
+  `{version:1,visible,expression}`. This operation and the optional snapshot field
+  independently require live `presence:read` scope and Personal Policy approval.
+  Denied presence is omitted from snapshot; the dedicated operation returns an
+  authority denial. The existing expression source ID, publication generation,
+  transition ID, event time and 30-second expiry pass through unchanged. Native
+  clients validate freshness/generation and withdraw stale or missing expression;
+  they do not invent an operational state. This grant enables no overlay,
+  microphone, capture, retention or action permission.
 - `inspect {task_id}`: task projection described below.
 - `submit {text,kind,target,parameters,retain}`: kind is `file_read`, `file_write`,
   `addition` or `text`; target is exact Desktop node for file tasks, Core ID for
@@ -132,3 +142,14 @@ not replayed after process death. Core restart fences remote in-flight leases
 and blocks ambiguous tasks; queued approval requires a fresh task/review. Backup
 restore invalidates remote sessions and invitations. No automatic reclamation
 of uncertain mutations. Missing independent readback leaves UNKNOWN/BLOCKED.
+
+## Failure diagnostics
+
+HTTP failures produce fixed category/count diagnostics, without request bodies,
+paths, headers, credentials, node identities or exception text. Process-local
+counters saturate at 2^31−1, use a fixed category set and emit at most one log per
+category in 60 seconds. They reset on process restart; deployment log rotation
+bounds retained diagnostics. Rejected unauthenticated traffic creates no durable
+audit/nonce rows or verified-device admission entries. Trusted enrollment,
+successful pairing and signed owner confirmation retain their existing canonical
+audit records; sanitized HTTP diagnostics do not replace them.

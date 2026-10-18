@@ -50,6 +50,12 @@ class GridConnectedTest {
             val vault = SessionVault(compose.activity)
             val saved = vault.load()!!
             assertEquals(2, saved.getInt("version"))
+            val canonical = io.dawnlight.oscar.expression.Contract.validate(model.state.value.snapshot!!.presence!!, System.currentTimeMillis())!!
+            assertEquals(io.dawnlight.oscar.expression.SourceKind.CORE, canonical.source.kind)
+            assertTrue(canonical.source.id.startsWith("presence:"))
+            val presence = CoreClient(saved, vault::signDevice).call("presence", JSONObject())
+            val admitted = OverlayAdmission().admit(presence, System.currentTimeMillis(), CoreClient(saved).binding(), true, true, true, true)
+            assertNotNull(io.dawnlight.oscar.expression.Contract.validate(admitted, System.currentTimeMillis()))
             val sealed = compose.activity.getSharedPreferences("session", 0).all.values.joinToString()
             assertFalse(sealed.contains(saved.getString("token")))
             assertNotNull(vault.loadHistory(CoreClient(saved).binding()))

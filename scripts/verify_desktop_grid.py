@@ -117,6 +117,16 @@ def verify(binary: Path) -> dict[str, object]:
             for task in projection["tasks"]
         )
         assert projection["conversation"]["turns"]
+        presence = projection["presence"]
+        canonical = fixture.mobile.request("snapshot", {"cursor": 0})["presence"]
+        assert presence["version"] == 1 and isinstance(presence["visible"], bool)
+        expression = presence["expression"]
+        assert expression["source"]["kind"] == "core"
+        assert expression["source"]["id"].startswith("presence:")
+        assert expression["source"] == canonical["expression"]["source"]
+        assert expression["transitionId"] == canonical["expression"]["transitionId"]
+        assert expression["generation"] < canonical["expression"]["generation"]
+        assert expression["expiresAt"] > expression["eventTime"]
         assert b"token" not in state.read_bytes()
         fixture.stop(worker)
         return {
@@ -127,6 +137,10 @@ def verify(binary: Path) -> dict[str, object]:
             "execution": "independent Python Worker opens the same nonexportable CNG key",
             "effects": "actual scoped file read + exact approved write + independent Core readback",
             "projection": "native snapshot sees verified task and canonical conversation",
+            "presence": (
+                "same canonical Core source and transition on native and owner clients; "
+                "generation advances"
+            ),
             "owner_confirmation": "synthetic fixture; physical owner confirmation NOT_RUN",
             "hosted_internet": "NOT_RUN",
             "physical_android": "NOT_RUN",

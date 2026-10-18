@@ -24,25 +24,37 @@ components rather than introducing another database, broker or relationship stor
 
 ## Evidence boundaries
 
-Results below must be updated from actual final-source runs. A running socket,
-executor report, build, old-head CI result or emulator result cannot establish a
-stronger acceptance class.
+Receipts below identify the exercised source/environment. Final-head checks remain
+pending after the local fixes and canonical Presence integration. A
+running socket, executor report, build, earlier-head CI result or emulator result
+cannot establish a stronger acceptance class.
 
 | Environment / acceptance | Status |
 | --- | --- |
-| Current D2 unit and protocol tests | SOFTWARE_VERIFIED: 22 focused Core tests passed in 40.060 seconds; final-head regression/CI receipts pending |
-| Separate Core / Worker / client process acceptance | SOFTWARE_VERIFIED: two actual trusted-CA TLS process tests passed on Windows in 25.632 seconds |
+| Local Python 3.12 regression | SOFTWARE_VERIFIED: 760 tests passed in 399.431 seconds, 15 explicit optional-platform/dependency skips; final-head CI pending |
+| Current D2 unit and protocol tests | SOFTWARE_VERIFIED: latest 25 Core tests passed in 17.490 seconds; 15 existing Presence/Worker tests passed; final-head CI pending |
+| Separate Core / Worker / client process acceptance | SOFTWARE_VERIFIED: latest two actual trusted-CA TLS process tests passed on Windows in 24.927 seconds |
 | Windows Worker actual scoped file read/write and independent readback | SOFTWARE_VERIFIED: actual disposable files, synthetic scoped signed approval and independent readback; unknown mutation is not replayed |
-| Linux x86_64 constrained-container Core and actual private TLS | SOFTWARE_VERIFIED: 46 tests passed in 72.276 seconds under UID 10001, read-only image, one CPU / 1 GiB; Caddy trusted-CA Grid enrollment/task/restart readback passed (Core 29.56 MiB, ingress 13.51 MiB observed); final-source rerun pending |
-| Native Linux ARM64 runtime and private TLS | NOT_RUN for D2; requires native runner receipt |
-| Native Windows CNG / DPAPI process interoperability | SOFTWARE_VERIFIED: actual native key enrollment, signing, protected session reopen, production Worker, read/write/readback and native history inspection; see commands below |
-| Tauri/Rust and TypeScript checks | Native checks tracked separately; final-source receipt pending |
-| Android compile, JVM and lint | SOFTWARE_VERIFIED: 38 JVM tests, lint, debug APK and instrumentation APK passed; final-head CI pending |
-| Disposable Android emulator / Keystore / recreation | NOT_RUN for D2 |
+| Linux x86_64 constrained-container Core and actual private TLS | CI_VERIFIED at `ed38df1`: 77 tests passed in 63.087 seconds on actual x86_64, UID 10001/read-only/one CPU/1 GiB; packaged Caddy Grid TLS and restart readback passed ([job](https://github.com/Amaan27-Buzz/oscar/actions/runs/39143491095/job/117722501390)) |
+| Native Linux ARM64 runtime and private TLS | CI_VERIFIED at `ed38df1`: 77 tests passed in 56.780 seconds on actual aarch64, same constraints; packaged Caddy Grid TLS and restart readback passed ([job](https://github.com/Amaan27-Buzz/oscar/actions/runs/39143491095/job/117722501221)); no QEMU claim |
+| Native Windows CNG / DPAPI process interoperability | SOFTWARE_VERIFIED: actual native key enrollment, signing, protected session reopen, production Worker, read/write/readback, canonical history and same Core Presence source/transition/generation/expiry inspection; latest native fixture passed |
+| Tauri/Rust and TypeScript checks | SOFTWARE_VERIFIED: Rust 22 tests, exact all-target Clippy/rustfmt, Vite build/typecheck and 88 frontend tests passed; final-head CI pending |
+| Android compile, JVM and lint | SOFTWARE_VERIFIED: latest 40 JVM tests, lint, debug APK and instrumentation APK passed; final-head CI pending |
+| Disposable Android emulator / Keystore / recreation | IN_PROGRESS: API 36.1 emulator crashed in SurfaceFlinger before app execution; API 35 PSS source correction is implemented and actual TLS fixture verification remains pending. No connected emulator PASS claimed |
+| Canonical network Presence | SOFTWARE_VERIFIED: existing Core Presence passes unchanged through scoped/Policy-checked snapshot and signed operation; actual Windows fixture validates same Core source/transition, increasing generation and expiry; Android runtime receipt pending |
+| Privacy-safe failure diagnostics | SOFTWARE_VERIFIED: fixed categories, capped volatile counters and per-category log suppression; Cloud/admission/diagnostics 13 tests passed in 12.789 seconds, including no unauthenticated canonical writes or private content in logs |
 | General provider-backed natural-language generation | NOT_VERIFIED; no owner credentials commissioned |
 | Independent hosted Internet topology / Oracle | NOT_RUN; not provisioned |
 | Owner physical phone / biometrics / hardware-backed keys / OEM | NOT_RUN; prohibited in this run |
 | Full PC control, Secure / Full Access, real audio, physical Edge | NOT_RUN; outside this bounded integration |
+
+The [native Linux run](https://github.com/Amaan27-Buzz/oscar/actions/runs/39143491095)
+records exact source [ed38df1d0ecfc8a0a583fcbdfe7cfdbea38b31fb](https://github.com/Amaan27-Buzz/oscar/commit/ed38df1d0ecfc8a0a583fcbdfe7cfdbea38b31fb).
+Observed Caddy snapshots were Core 29.52 MiB / ingress 16.55 MiB on x86_64 and
+Core 30.07 MiB / ingress 13.13 MiB on ARM64. These are bounded observed samples,
+not a sustained-production capacity claim. Earlier local Linux acceptance passed
+46 tests in 72.276 seconds and the private Caddy fixture passed; the expanded
+native CI suite is the more complete Linux receipt.
 
 ## Reproduce process and native verification
 
@@ -103,6 +115,8 @@ the exercised software boundary, not independent penetration-test certification.
 | Independent verification | Actual filesystem readback detects changed results; native and process fixtures verify both read-only and approved reversible operations |
 | Replay / crash | Duplicate submission/delivery is idempotent; durable execution claims and separate-process crash/restart preserve an independently changed file marker |
 | Canonical history / privacy | Cross-client cursor resume, no-archive-grant redaction, forgotten-source generation reset, readable result provenance and oversized-event cursor tests preserve one archive |
+| Canonical Presence | Existing source, transition ID, generation and expiry pass through; live `presence:read` and Personal Policy are separate from archive/retention/action scopes; native renderers validate freshness and withdraw missing state |
+| Failure diagnostics | Fixed category/count logs suppress repeats for 60 seconds; counters saturate and use bounded keys; malformed pressure leaves canonical records/audit/nonces and verified admission unchanged |
 | Runtime boundary | Exact routes, bounded bodies/responses/concurrency, protocol mismatch and unconfigured-production rejection remain fail closed; no inbound Worker listener |
 
 No unresolved vulnerability is asserted fixed merely by a successful connection.
@@ -112,10 +126,18 @@ acceptance. The only connected executable capabilities are bounded file reads an
 Ask-approved writes; arbitrary shell, general computer control and standing
 Secure/Full Access remain unavailable.
 
+Initial candidate CI exposed a concurrent result-retention/snapshot repair race,
+a strict Rust Windows-size cast lint failure, and Android's platform-specific RSA
+PSS algorithm naming mismatch. The source corrections are implemented and local
+checks above passed; these failures remain part of the receipt and require
+successful final-head platform reruns, including actual Android interoperability.
+Authenticated references to unavailable objects fail as authorization denial
+rather than exposing internal key errors.
+
 ## Final engineering report
 
-1. **Starting main:** `36c3883377cc0e29b25e095bf53caa6a09f902ae` (merged D1 PR #8). Final PR head is recorded with the exact-head CI receipt after commit.
-2. **Branch / draft:** `codex/group-04-d2-connected-grid`; draft PR URL pending publication by the integration owner. No automatic merge.
+1. **Starting main:** `36c3883377cc0e29b25e095bf53caa6a09f902ae` (merged D1 PR #8). Obtain the final review head from the [PR commit log](https://github.com/Amaan27-Buzz/oscar/pull/9/commits) and match it to each CI receipt; this ledger names the exact revision exercised by linked completed runs.
+2. **Branch / draft:** `codex/group-04-d2-connected-grid`; [draft PR #9](https://github.com/Amaan27-Buzz/oscar/pull/9), initially published at `ed38df1`. No automatic merge. Final review head and matching CI remain separately recorded.
 3. **Reuse:** existing `CloudCore` composition, Grid, Store, Runtime, Controller, Policy and Event Archive remain authoritative. New components adapt authenticated remote transport and native projections; no second Core/archive/scheduler.
 4. **Transport:** [Grid protocol 2](GROUP-04-D2-PROTOCOL.md), exact HTTPS POST endpoints, bounded outbound polling, durable IDs/cursors and authenticated target checks. Windows/Android need no inbound port.
 5. **Enrollment:** trusted offline short-lived single-use invitations, device proof of possession, role/workspace/scopes, independent owner key, expiry, rotation, revocation and recovery fences.
@@ -123,14 +145,14 @@ Secure/Full Access remain unavailable.
 7. **Android:** existing approved Compose surfaces, native Keystore proof, encrypted state, canonical cursor synchronization and separate exact owner-review binding. Emulator results are recorded separately above.
 8. **Execution:** actual separate-process read and approved file mutation, durable task/result and independent network/host readback; native Windows acceptance uses its production credential path.
 9. **Conversation / memory:** same Core relationship and ordered canonical source/result events observed by clients; reconnect/cursor deduplication, retention redaction and forget-generation replacement tested.
-10. **Presence / task state:** current node and task projections replace local views; leased online/offline/degraded state and verified/blocked/unknown outcomes come from Core. Client caches grant no authority.
+10. **Presence / task state:** current node/task views and the existing canonical Presence contract now cross the authenticated boundary. Presence has separate scope/Policy checks and retains Core source, transition, generation and expiry; actual native Windows validates this same projection. Leased liveness and verified/blocked/unknown task states come from Core; caches grant no authority. Android runtime validation is pending.
 11. **Approval / cancel / revoke:** exact action/session/target/generation/digest review, expiry and current policy rechecks; cancellation and revocation stop future dispatch but cannot undo an already performed effect.
 12. **Recovery:** actual Worker crash after effect, before delivery, followed by Core/Worker restart blocks ambiguity and preserves the independently changed marker; no automatic mutation replay.
-13. **Linux / ARM64:** constrained local x86_64 Docker and private Caddy TLS receipts above; native ARM64 requires the dedicated CI runner receipt and remains NOT_RUN until obtained.
-14. **Windows native:** CNG/DPAPI real-process HTTPS receipt above; Rust/Tauri/TypeScript final-source checks and exact-head CI recorded separately when complete. Synthetic native signing is not owner biometric acceptance.
+13. **Linux / ARM64:** actual native x86_64 and aarch64 jobs each passed 77 tests and packaged Caddy TLS/restart acceptance at `ed38df1`; exact links above. Final-source CI after subsequent fixes remains required.
+14. **Windows native:** CNG/DPAPI real-process HTTPS and latest canonical Presence fixture passed; Rust 22, frontend 88, build/typecheck/Clippy/rustfmt passed locally. Final-head CI remains separate. Synthetic native signing is not owner biometric acceptance.
 15. **Android verification:** Gradle/JVM/lint/APK receipts above; emulator external-fixture tests reject skipped prerequisites. Hardware/OEM and owner-phone tests are forbidden in this run.
-16. **Final-head CI:** pending committed head and linked runs. Older merged D1/Group 3 CI cannot establish this candidate's result.
-17. **Defects / limits:** no claim of general provider inference without a configured provider; unavailable routes remain blocked. Final CI and the explicit external commissioning boundary remain open until matching receipts exist.
+16. **Final-head CI:** pending after local source corrections and Presence/diagnostics checks. The linked `ed38df1` native Linux run verifies only that revision. The [draft PR checks](https://github.com/Amaan27-Buzz/oscar/pull/9/checks) and commit log identify the latest head; older merged D1/Group 3 CI cannot establish this candidate's result.
+17. **Defects / limits:** initial Windows/Python/Android CI failures and their source corrections are recorded above; final platform reruns and actual Android Core interoperability remain open. No general provider inference is claimed without a configured provider; unavailable routes remain blocked. The explicit external commissioning boundary is unchanged.
 18. **Oracle boundary:** no account/VM credentials, provisioning, public ingress, DNS or independent hosted topology was commissioned. Isolated containers establish software compatibility only.
 19. **Physical Android boundary:** owner phone was not accessed, paired, installed, enrolled or used for biometrics/data. Emulator software acceptance cannot replace owner/device acceptance.
 20. **Next commissioning:** review/merge separately; authorize hosted installation, restore-safe one-writer commissioning, trusted owner/device enrollment and independent-network verification, then execute the later physical checklist below. Full Group 5 and formal Gates C/D/E remain open.

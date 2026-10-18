@@ -117,7 +117,8 @@ class CompanionOverlayService : Service() {
                         val saved = withContext(Dispatchers.IO) { SessionVault(this@CompanionOverlayService).load() } ?: error("No pairing")
                         val nextBinding = CompanionOverlay.pairing(saved)
                         require(binding == null || binding == nextBinding)
-                        val connection = if (binding == nextBinding) wire ?: CoreClient(saved) else CoreClient(saved)
+                        val vault = SessionVault(this@CompanionOverlayService)
+                        val connection = if (binding == nextBinding) wire ?: CoreClient(saved, vault::signDevice) else CoreClient(saved, vault::signDevice)
                         binding = nextBinding; wire = connection
                         val response = withContext(Dispatchers.IO) { connection.call("presence", JSONObject()) }
                         val current = withContext(Dispatchers.IO) { SessionVault(this@CompanionOverlayService).load() } ?: error("Pairing removed")

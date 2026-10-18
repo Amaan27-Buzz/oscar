@@ -101,6 +101,7 @@ def create_invitation(
         "grid:connect",
         "heartbeat",
         "grid:inspect",
+        "presence:read",
         "grid:submit",
         "grid:cancel",
         "files:read",
@@ -442,6 +443,11 @@ class RemoteGrid:
             self.grid.heartbeat(session)
             if operation in {"snapshot", "conversation"}:
                 return self.snapshot(session, payload)
+            if operation == "presence" and not payload:
+                presence = self.presence(session)
+                if presence is None:
+                    raise PermissionError("Presence is not authorized or available")
+                return presence
             if operation == "inspect" and set(payload) == {"task_id"}:
                 self.require(session, "grid:inspect")
                 return self.inspect(
@@ -1139,6 +1145,21 @@ class RemoteGrid:
         )
         return {"accepted": True}
 
+    def presence(self, session: SessionHandle) -> dict[str, Any] | None:
+        try:
+            self.require(session, "presence:read")
+        except PermissionError:
+            return None
+        permission = PersonalPolicy(self.store).evaluate(
+            "core.presence.read",
+            ("presence:read",),
+            frozenset(self.store.get("session", session.id)["scopes"]),
+            {"node": session.node_id, "source": "remote-grid"},
+        )
+        if not permission.allowed or self.h.runtime.presence is None:
+            return None
+        return self.h.runtime.presence.snapshot()
+
     def snapshot(self, session: SessionHandle, payload: dict[str, Any]) -> dict[str, Any]:
         self.require(session, "grid:inspect")
         can_read = self.can_read(session)
@@ -1250,6 +1271,9 @@ class RemoteGrid:
             "providers": self.core.status()["providers"],
             "observed_at_ms": int(time() * 1000),
         }
+        presence = self.presence(session)
+        if presence is not None:
+            snapshot["presence"] = presence
         while len(json.dumps(snapshot).encode()) > 245760:
             if len(events) > 1:
                 events.pop()

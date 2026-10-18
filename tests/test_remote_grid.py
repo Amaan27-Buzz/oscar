@@ -380,6 +380,30 @@ class RemoteGridTests(unittest.TestCase):
         )
         self.assertEqual(views[0]["tasks"][0]["task_id"], task["task_id"])
 
+    def test_canonical_presence_progress_cancel_and_withdrawn_permission(self):
+        before = self.mobile.request("snapshot", {})["presence"]["expression"]
+        self.assertEqual(before["operation"], "idle")
+        self.assertEqual(before["source"]["kind"], "core")
+        self.assertTrue(before["source"]["id"].startswith("presence:"))
+        task = self.submit("file_write", parameters={"path": "pending.txt", "content": "no"})
+        pending = self.desktop.request("presence", {})["expression"]
+        self.assertEqual(pending["operation"], "waiting")
+        self.assertEqual(pending["source"], before["source"])
+        self.assertGreater(pending["generation"], before["generation"])
+        self.assertGreater(pending["expiresAt"], int(time() * 1000))
+        self.mobile.request("cancel", {"task_id": task["task_id"]})
+        self.assertEqual(self.mobile.request("presence", {})["expression"]["operation"], "idle")
+        store = self.core.harness.store
+        node = store.get("node", self.mobile.handle.node_id)
+        store.put(
+            "node",
+            node["id"],
+            {**node, "scopes": [s for s in node["scopes"] if s != "presence:read"]},
+        )
+        self.assertNotIn("presence", self.mobile.request("snapshot", {}))
+        with self.assertRaises(PermissionError):
+            self.mobile.request("presence", {})
+
     def test_core_restart_after_effect_does_not_replay(self):
         task = self.submit("file_write", parameters={"path": "once.txt", "content": "write once"})
         self.approve(task)

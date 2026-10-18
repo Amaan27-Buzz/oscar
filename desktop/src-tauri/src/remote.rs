@@ -413,6 +413,7 @@ impl RemoteClient {
                 projection.nodes = nodes;
                 Ok(
                     json!({"tasks":tasks,"nodes":projection.nodes,"conversation":projection.conversation,
+                    "presence":snapshot["presence"],
                     "observed_at_ms":snapshot["observed_at_ms"],"voice_available":false,
                     "operating":{"access":"Ask","secure":"unavailable","full_access":"unavailable"}}),
                 )
