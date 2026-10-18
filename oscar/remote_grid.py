@@ -803,7 +803,7 @@ class RemoteGrid:
             "deadline_ms": row["deadline_ms"],
             "result": results[-1] if results and not forgotten else None,
             "evidence": evidence if not forgotten else [],
-            "blocker": task.blocker,
+            "blocker": "Retained interaction unavailable" if forgotten else task.blocker,
             "generation": task.attempts,
             "correlation_id": task.correlation_id,
         }
@@ -1195,6 +1195,13 @@ class RemoteGrid:
         events = []
         for sequence, raw in rows:
             event = json.loads(raw)
+            if event["kind"] not in {
+                "owner_turn",
+                "remote_result",
+                "conversation_owner",
+                "conversation_oscar",
+            }:
+                continue
             text = event["content"]
             if event["kind"] == "remote_result":
                 try:
@@ -1211,7 +1218,9 @@ class RemoteGrid:
                     "sequence": sequence,
                     "turn_id": event["turn_id"],
                     "task_id": event["task_id"],
-                    "speaker": "oscar" if event["kind"] == "remote_result" else "owner",
+                    "speaker": "oscar"
+                    if event["kind"] in {"remote_result", "conversation_oscar"}
+                    else "owner",
                     "text": text,
                     "status": event["status"],
                     "occurred_at": event["occurred_at"],
