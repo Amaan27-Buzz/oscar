@@ -32,6 +32,26 @@ five-minute expiry, single use. Response session JSON:
 `{version:2,core_id,node_id,session_id,token,expires_at_ms,scopes}`.
 Native client adds `url` locally, validates expected core_id and stores securely.
 
+Enrollment has two deliberate durable boundaries. A valid proof changes an
+invitation from **ISSUED** to **CONSUMED** before attempting new authority. Invalid
+proofs cannot consume it. Then one existing Store/Grid transaction registers or
+replaces the node, fences previous sessions, creates the new session and persists
+the exact remote-device binding. There is no trusted intermediate node/session.
+An interrupted or failed authority transaction rolls back all four changes,
+preserving a previous valid identity, but never unconsumes the invitation.
+The client needs a fresh trusted operator invitation after such a failure.
+
+A crash after the authority commit, including a lost HTTP response, leaves one
+complete binding and a hashed session credential. The token cannot be retrieved
+or the proof replayed. Explicit operator recovery issues a new invitation and
+atomically fences every prior session. No automatic enrollment recovery grants
+authority. Existing partial legacy records fail independent Grid and remote
+binding checks; operator recovery is required. Revocation atomically marks the
+node and its sessions revoked and deletes pending invitations for that node
+before lease/task cleanup, so a cleanup failure cannot restore authorization.
+Network enrollment, rotation and revocation serialize under the same Grid adapter
+lock. The canonical Store remains the only authority database.
+
 ## Authenticated requests
 
 POST `/v2/grid/request` body UTF8 JSON, <=32768 bytes:
@@ -84,6 +104,12 @@ sessions immediately; a lost response requires re-enrollment, never fallback.
   synchronized device wall clocks. This mapping does not rewrite expression
   timestamps, renew expiry, or relax the canonical 250 ms future tolerance;
   connection loss and missing/stale observations withdraw private Presence.
+  Successive observations in one live client cannot move mapped Core time
+  backwards, including after a bounded wall-clock correction or an older
+  observation. Lifecycle restoration obtains a new authenticated observation;
+  it never persists a process-local monotonic anchor. Snapshot tombstones,
+  canonical history and retained-detail reads share one archive read transaction;
+  concurrent forget/indexing cannot mix archive generations within that response.
   Clients do not invent an operational state. This grant enables no overlay,
   microphone, capture, retention or action permission.
 - `inspect {task_id}`: task projection described below.

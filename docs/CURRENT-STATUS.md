@@ -31,6 +31,10 @@ Actual Windows CNG/DPAPI execution and all five disposable Android API 35
 Core/Worker lifecycle checks passed locally, including canonical history/Presence,
 process restoration, Core-loss privacy withdrawal and verified device revocation.
 This candidate is not merged or accepted on an Internet host or owner phone.
+The [independent local closure](development/GROUP-04-D2-CLOSURE.md) adds atomic
+device/session/binding recovery, crash/failure injection, consistent archive
+snapshots and nondecreasing native Core clock observations. Its current local
+receipts supersede earlier counts; final-head CI is still NOT_RUN.
 
 - [ ] **Cloud Core hosted acceptance:** D1 now has an implemented deployment candidate composing the existing Core, private authenticated diagnostics, persistent WAL/FTS5 identity/history, conservative recovery, independent backup/restore and constrained Linux packaging. See [D1 evidence](development/GROUP-04-D1.md) and [operations](CLOUD-CORE.md) for exact software/CI evidence. **Oracle remains unprovisioned; hosted acceptance is outstanding.** Optional derived indexes remain explicitly unavailable in this minimal deployment.
 - [ ] **Remote Grid hosted acceptance:** the connected software candidate implements scoped enrollment, outbound Worker requests and recovery; actual independent Internet hosts, owner credentials and deployment remain unverified. Legacy reference HTTP stays loopback-only.

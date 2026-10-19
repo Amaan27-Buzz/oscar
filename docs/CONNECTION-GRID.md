@@ -367,6 +367,13 @@ conservative process-loss recovery. [Protocol 2](development/GROUP-04-D2-PROTOCO
 defines the shared native contract. Independent Internet-host and owner-device
 acceptance remain outstanding. Gate C/D remain **PARTIAL**.
 
+The [independent local closure](development/GROUP-04-D2-CLOSURE.md) verifies
+single-attempt invitation consumption followed by atomic node/session/binding
+authority, old-identity preservation on failure, explicit recovery after lost
+responses, and revocation that invalidates pending recovery invitations. Archive
+generation/history reads use one committed snapshot. Native clock observations
+advance monotonically without extending canonical Presence leases.
+
 **Current:** review the D2/D3–D4 software draft and its platform-specific evidence;
 separately commission approved hosts and real owner devices. Oracle remains a
 candidate, not deployed. The later dedicated home-server laptop is distinct from

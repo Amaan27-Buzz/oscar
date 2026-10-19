@@ -25,6 +25,11 @@ transport and IPC age against the original lease, bounds initial clock skew to
 30 seconds and transport to 15 seconds, and preserves the strict 250 ms future
 tolerance and original expiry. Missing, stale or invalid observations withdraw
 remote Presence; local wall-clock changes cannot renew it.
+Successive authenticated observations retain a nondecreasing Core-time floor;
+an older observation or bounded Core clock correction cannot revive an expired
+publication. A fresh observation permits recovery after suspension while keeping
+the old publication expired. See the [local closure](../docs/development/GROUP-04-D2-CLOSURE.md)
+for current native tests and the publication/CI boundary.
 
 The outbound Worker must be started separately with the same Windows account and
 an explicitly chosen existing disposable or authorized workspace. It does not

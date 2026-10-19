@@ -2,6 +2,13 @@
 
 ## Connected Grid candidate — 2026-10-18
 
+The [2026-10-19 independent closure](development/GROUP-04-D2-CLOSURE.md) corrects
+enrollment authority atomicity, pending-recovery invalidation on revocation,
+commit-failure rollback, archive read consistency and native clock rollback.
+Valid invitations are consumed once before an atomic authority replacement;
+failure preserves the prior identity and requires a fresh operator invitation.
+No new standing authority or executable capability is granted.
+
 The [Grid 2 contract](development/GROUP-04-D2-PROTOCOL.md) extends the canonical
 Core/Grid/Policy/Runtime boundary through two exact HTTPS POST routes. Trusted
 offline enrollment binds the device-generated key, installation, role, workspace

@@ -24,6 +24,13 @@
 - [ ] **D2 Remote Grid candidate and acceptance:** [current connected software draft](development/GROUP-04-D2.md) extends the canonical Core with authenticated independent node enrollment, scoped outbound Worker connectivity, rotation/revocation/replay fencing, durable history and independent readback. Genuine same-host TLS/process verification is separate from independent hosted commissioning. Legacy local adapters on `127.0.0.1` remain private.
 - [ ] Verify cross-host actual transport, shutdown/restart and uncertain side effects; never expose Core before security evidence. No paid charges or cloud credentials provisioned without separate permission.
 
+The [independent D2 local closure](development/GROUP-04-D2-CLOSURE.md) records the
+software candidate and exact evidence boundaries. Publication/CI resumption
+requires owner authorization. The next separate run is Cloud commissioning and
+connected-client operation: verify Oracle account/capacity, approve provisioning,
+establish one persistent writer, TLS/DNS, encrypted off-host restore and actual
+independent-network Windows operation. Physical Android stays separately gated.
+
 ## Group 5: make OSCAR capable and pleasant to use
 
 The current owner brief authorizes **D3/D4 software integration alongside D2**:

@@ -5,6 +5,16 @@ The owner authorized this software integration on 2026-10-18 after merged D1
 PR, with no automatic merge. The [D1 ledger](GROUP-04-D1.md) remains historical
 evidence. Canonical slices 00–20, Gate C/D PARTIAL and Gate E NOT PASSED remain.
 
+## Independent local closure — 2026-10-19
+
+The [final local closure report and commissioning checklist](GROUP-04-D2-CLOSURE.md)
+supersedes the earlier local counts below. It records enrollment failure/crash
+atomicity, fail-closed revocation, Store commit-failure rollback, consistent
+archive snapshots and nondecreasing native Core clocks. Earlier receipts and
+failed/cancelled attempts below remain historical evidence. Publication and
+final-head CI remain withheld at the owner's direction; no push or Actions run
+was used for this closure.
+
 ## Architecture and dependency audit
 
 | Boundary | Existing implementation to extend | Constraint |
@@ -187,7 +197,7 @@ listed above.
 
 Required Ruff checks and formatting for `oscar tests scripts` passed across 199 files; an extra repository-wide audit reported 60 pre-existing style errors and two formatting failures in unchanged `design/expression-lab/tools/capture.py` and `capture-engine.py`, outside the required runtime/CI scope, and those files were left unchanged.
 
-## Final engineering report
+## Previous implementation-run engineering report
 
 1. **Starting main:** `36c3883377cc0e29b25e095bf53caa6a09f902ae` (merged D1 PR #8). Last published source is `676a0b16cb3be46f151ec9b998a79c2c503c134e`; local continuation changes are unpublished. The [PR commit log](https://github.com/Amaan27-Buzz/oscar/pull/9/commits) and linked receipts identify the exercised source.
 2. **Branch / draft:** `codex/group-04-d2-connected-grid`; [draft PR #9](https://github.com/Amaan27-Buzz/oscar/pull/9), initially published at `ed38df1`, last pushed at `676a0b1`. No automatic merge or further push; remaining work stays local at the owner's direction.

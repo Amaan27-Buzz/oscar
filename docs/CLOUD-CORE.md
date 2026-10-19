@@ -208,6 +208,13 @@ invalidates remote sessions and invitations; recover deliberately without runnin
 the original and restored writers together. D1 diagnostic credentials do not
 authorize these device operations. Secure/Full Access stays inactive.
 
+Enrollment consumes a valid invitation before one atomic node/session/device
+binding commit. A failed commit preserves previous credentials but the consumed
+invitation cannot be retried. Lost replies require a fresh operator-issued
+invitation (and explicit `--recover` when the identity exists). Never infer a
+successful connection from a consumed invitation or a partial legacy node row.
+See [failure/restart evidence](development/GROUP-04-D2-CLOSURE.md).
+
 ## TLS and network commissioning (separate owner authorization)
 
 First verify the private service, backup/restore and credential rejection on the

@@ -36,6 +36,10 @@ a presentation/control client of the same Core, Grid, Runtime and Event Archive.
   observation time advances with local monotonic time for freshness and expiry;
   the full transport round trip is charged against the lease. Canonical events
   and the strict future/expiry limits remain unchanged despite local clock skew.
+  Successive observations cannot move mapped Core time backwards; process
+  restoration obtains a new observation rather than restoring an elapsed-time
+  anchor. Current [local closure receipts](../docs/development/GROUP-04-D2-CLOSURE.md)
+  distinguish JVM, actual emulator and unrun owner-device acceptance.
 - Expanded real Worker devices offer scoped file reads and preparation of exact
   file edits. Core validates, routes and verifies operations. Mutations require
   exact digest/capability/target/session/generation-bound owner review and the
