@@ -15,6 +15,18 @@ const remoteView=(local:number,patch:Partial<View>={}):View=>({...initialView,li
 afterEach(()=>{cleanup();vi.useRealTimers();});
 
 describe('authenticated remote Core clock',()=>{
+  it('does not move Core time backwards when an older snapshot follows a wall-clock rollback',()=>{
+    let elapsed=1000;
+    const observation={observed_at_ms:server,received_at_ms:server,transport_ms:0};
+    const first=CoreClock.observe(observation,server,()=>elapsed)!;
+    elapsed+=30000;
+    const replay=CoreClock.observe({...observation,transport_ms:1},server,()=>elapsed,first)!;
+    expect(replay.now()).toBe(server+30000);
+    expect(validateEvent(frame,replay.now())).toBeNull();
+    elapsed+=10000;
+    const resumed=CoreClock.observe({...observation,observed_at_ms:server+40000,received_at_ms:server+40000},server+40000,()=>elapsed,first)!;
+    expect(resumed.now()).toBe(server+40000);
+  });
   it.each([-5000,5000])('preserves canonical state with device clock offset %d and charges transport and IPC age',offset=>{
     let elapsed=1000;
     const local=server+offset,adapter=new DesktopExpressionAdapter('core',()=>elapsed);

@@ -70,11 +70,11 @@ class Store:
             self.db.execute("BEGIN IMMEDIATE" if write else "BEGIN")
             try:
                 yield
-            except BaseException:
-                self.db.execute("ROLLBACK")
-                raise
-            else:
                 self.db.execute("COMMIT")
+            except BaseException:
+                if self.db.in_transaction:
+                    self.db.execute("ROLLBACK")
+                raise
 
     def close(self) -> None:
         if self._closed:

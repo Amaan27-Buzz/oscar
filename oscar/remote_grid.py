@@ -306,6 +306,9 @@ class RemoteGrid:
             )
             with self.store.transaction():
                 self.store.delete("remote_invitation", row["id"])
+
+            # Burn a valid proof before attempting authority changes; failure needs owner recovery.
+            def prepare() -> None:
                 node_id = binding["node_id"]
                 try:
                     node = self.store.get("node", node_id)
@@ -336,9 +339,15 @@ class RemoteGrid:
                             tuple(binding["scopes"]),
                         )
                     )
-            # Grid.pair owns its own transaction; the invitation is consumed even on failure.
-            session = self.grid.pair(binding["node_id"], tuple(binding["scopes"]))
-            self.store.put("remote_device", session.node_id, {**binding, "session_id": session.id})
+
+            def deliver(session: SessionHandle) -> None:
+                self.store.put(
+                    "remote_device", session.node_id, {**binding, "session_id": session.id}
+                )
+
+            session = self.grid.pair(
+                binding["node_id"], tuple(binding["scopes"]), prepare=prepare, deliver=deliver
+            )
             self.sessions[session.node_id] = session
             return self.session_view(session)
 
@@ -503,10 +512,18 @@ class RemoteGrid:
                 self.sessions[session.node_id] = new
                 return self.session_view(new)
             if operation in {"disconnect", "revoke"} and not payload:
-                self.grid.disconnect(session.node_id)
                 if operation == "revoke":
+                    # Commit the denial before best-effort lease/task cleanup.
+                    with self.store.transaction():
+                        node = self.store.get("node", session.node_id)
+                        self.store.put("node", session.node_id, {**node, "revoked": True})
+                        self._fence_sessions(session.node_id)
+                        for invitation in self.store.all("remote_invitation"):
+                            if invitation["binding"]["node_id"] == session.node_id:
+                                self.store.delete("remote_invitation", invitation["id"])
                     self.grid.revoke(session.node_id)
-                    self._fence_sessions(session.node_id)
+                else:
+                    self.grid.disconnect(session.node_id)
                 self.sessions.pop(session.node_id, None)
                 return {"state": "revoked" if operation == "revoke" else "offline"}
         raise ValueError("unsupported Grid operation or payload")
@@ -1196,6 +1213,19 @@ class RemoteGrid:
                 is None
             ):
                 self.retain(row, result=True)
+        # Tombstones, events and retained task detail come from one committed archive view.
+        with archive.db:
+            archive.db.execute("BEGIN")
+            return self._snapshot_projection(session, payload, recent, can_read)
+
+    def _snapshot_projection(
+        self,
+        session: SessionHandle,
+        payload: dict[str, Any],
+        recent: list[dict[str, Any]],
+        can_read: bool,
+    ) -> dict[str, Any]:
+        archive = self.h.archive
         epoch = fingerprint(
             {
                 "archive_read": can_read,

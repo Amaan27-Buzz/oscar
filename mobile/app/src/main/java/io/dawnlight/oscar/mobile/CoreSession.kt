@@ -87,7 +87,7 @@ class CoreSession(application: Application) : AndroidViewModel(application) {
             val received = if (remote) parseGridSnapshot(response, client!!.coreId(), client!!.nodeId()).let { current ->
                 if (client!!.canApprove()) current else current.copy(tasks = current.tasks.map { it.copy(actions = it.actions.filterNot { action -> action == "approve" }) })
             } else parseSnapshot(response)
-            val clock = CoreClock.observe(received.observedAt, System.currentTimeMillis(), started, android.os.SystemClock.elapsedRealtime())
+            val clock = CoreClock.observe(received.observedAt, System.currentTimeMillis(), started, android.os.SystemClock.elapsedRealtime(), mutable.value.clock)
             received.presence?.let { require(io.dawnlight.oscar.expression.Contract.validate(it, clock.now(android.os.SystemClock.elapsedRealtime())) != null) }
             val snapshot = if (mutable.value.privateSuppressed) received.withoutPrivate() else received
             if (!active) return

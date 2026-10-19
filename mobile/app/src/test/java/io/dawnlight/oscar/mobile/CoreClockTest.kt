@@ -6,6 +6,14 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class CoreClockTest {
+    @Test fun newerObservationCannotReviveExpiredStateAfterClockRollback() {
+        val first = CoreClock.observe(100000, 100000, 1000, 1000)
+        val replay = CoreClock.observe(100000, 100000, 30999, 31000, first)
+        assertEquals(130000, replay.now(31000))
+        assertNull(Contract.validate(event(100000), replay.now(31000)))
+        val ahead = CoreClock.observe(100000, 105000, 1000, 1200)
+        assertNotNull(Contract.validate(event(100000), ahead.now(1200)))
+    }
     private fun event(time: Long) = JSONObject("""{"version":1,"source":{"kind":"core","id":"presence:canonical"},"generation":1,"transitionId":"state","eventTime":$time,"expiresAt":${time+30000},"kind":"state","priority":"normal","operation":"idle","delivery":"composed","availability":"available","muted":false,"attention":"none","reducedMotion":true}""").toString()
     @Test fun authenticatedObservationHandlesClockSkewAndChargesTransportWithoutChangingEvent() {
         val raw = event(100000)

@@ -24,7 +24,7 @@ export class DesktopExpressionAdapter {
       if(remote) {
         const observation=view.core_clock;
         const key=observation?`${view.expression?.epoch}:${observation.observed_at_ms}:${observation.received_at_ms}:${observation.transport_ms}`:'';
-        const observed=observation?(this.coreClock?.key===key?this.coreClock.value:CoreClock.observe(observation,now,this.monotonic)):null;
+        const observed=observation?(this.coreClock?.key===key?this.coreClock.value:CoreClock.observe(observation,now,this.monotonic,this.coreClock?.value)):null;
         if(observed){this.coreClock={key,value:observed};clock=observed.now;at=clock();}
         else at=Number.MAX_SAFE_INTEGER;
       }

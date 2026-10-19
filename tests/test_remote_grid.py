@@ -1,10 +1,12 @@
 import base64
 import json
+import sqlite3
 import unittest
 from concurrent.futures import ThreadPoolExecutor
 from email.message import Message
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from threading import Event
 from time import sleep, time
 from unittest.mock import patch
 
@@ -486,6 +488,54 @@ class RemoteGridTests(unittest.TestCase):
             ).fetchone()[0],
             0,
         )
+
+    def test_snapshot_and_concurrent_forget_use_one_committed_archive_generation(self):
+        task = self.finish(self.submit())
+        before = self.mobile.request("snapshot", {})
+        archive = self.core.harness.archive
+        source = self.core.harness.store.get("remote_task", task["task_id"])["event_id"]
+        memory = archive.db.execute(
+            "SELECT id FROM archive_memories WHERE forgotten=0 "
+            "AND json_extract(payload,'$.event_ids[0]')=?",
+            (source,),
+        ).fetchone()[0]
+        start, finished = Event(), Event()
+        armed = False
+
+        def forget():
+            try:
+                self.assertTrue(start.wait(5))
+                archive.forget(memory, owner_authorized=True, forget_sources=True)
+            finally:
+                archive.close_thread()
+                finished.set()
+
+        def interleave(operation, table, *_):
+            nonlocal armed
+            if operation == sqlite3.SQLITE_READ and table == "archive_tombstones":
+                armed = True
+            if armed and operation == sqlite3.SQLITE_READ and table == "archive_events":
+                start.set()
+                if not finished.wait(5):
+                    return sqlite3.SQLITE_DENY
+            return sqlite3.SQLITE_OK
+
+        with ThreadPoolExecutor(1) as executor:
+            writer = executor.submit(forget)
+            archive.db.set_authorizer(interleave)
+            try:
+                during = self.mobile.request("snapshot", {})
+            finally:
+                archive.db.set_authorizer(None)
+                start.set()
+            writer.result()
+        self.assertEqual(during["archive_generation"], before["archive_generation"])
+        self.assertEqual(during["events"], before["events"])
+        after = self.mobile.request(
+            "snapshot", {"archive_generation": before["archive_generation"]}
+        )
+        self.assertTrue(after["reset"])
+        self.assertEqual(after["events"], [])
 
     def test_large_archive_event_does_not_stall_cursor(self):
         archive = self.core.harness.archive

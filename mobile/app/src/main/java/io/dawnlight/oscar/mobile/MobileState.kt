@@ -39,12 +39,12 @@ data class Interaction(val text: String, val response: String, val taskId: Strin
 data class CoreClock(val coreAt: Long, val elapsedAt: Long) {
     fun now(elapsed: Long): Long { require(elapsed >= elapsedAt); return coreAt + elapsed - elapsedAt }
     companion object {
-        fun observe(observed: Long, localWall: Long, startedElapsed: Long, receivedElapsed: Long): CoreClock {
+        fun observe(observed: Long, localWall: Long, startedElapsed: Long, receivedElapsed: Long, previous: CoreClock? = null): CoreClock {
             val transport = receivedElapsed - startedElapsed
             require(observed in 1..9007199254740991L && localWall in 0..9007199254740991L &&
                 kotlin.math.abs(observed - localWall) <= 30_000 && startedElapsed >= 0 && transport in 0..15_000)
             // Charge the whole round trip, so transport cannot extend an expression's lease.
-            return CoreClock(observed + transport, receivedElapsed)
+            return CoreClock(maxOf(observed + transport, previous?.now(receivedElapsed) ?: 0), receivedElapsed)
         }
     }
 }

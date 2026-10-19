@@ -124,7 +124,7 @@ class CompanionOverlayService : Service() {
                         val started = SystemClock.elapsedRealtime()
                         val response = withContext(Dispatchers.IO) { connection.call("presence", JSONObject()) }
                         val received = SystemClock.elapsedRealtime()
-                        val anchor = if (connection.remote()) CoreClock.observe(response.getLong("observed_at_ms"), System.currentTimeMillis(), started, received)
+                        val anchor = if (connection.remote()) CoreClock.observe(response.getLong("observed_at_ms"), System.currentTimeMillis(), started, received, clock)
                             else CoreClock(System.currentTimeMillis(), received)
                         val current = withContext(Dispatchers.IO) { SessionVault(this@CompanionOverlayService).load() } ?: error("Pairing removed")
                         ensureActive()

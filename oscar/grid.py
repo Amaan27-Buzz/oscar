@@ -84,6 +84,7 @@ class Grid:
         session_id: str | None = None,
         internal: bool = False,
         reenroll: bool = False,
+        prepare: Callable[[], None] | None = None,
         deliver: Callable[[SessionHandle], None] | None = None,
     ) -> SessionHandle:
         """Trusted coordinator API: approved scope; inaccessible to remote peers."""
@@ -98,6 +99,9 @@ class Grid:
         ):
             raise ValueError("opaque session identity required")
         with self.store.transaction():
+            # Trusted enrollment preparation shares the session/binding commit.
+            if prepare is not None:
+                prepare()
             node = self.store.get("node", node_id)
             if node["revoked"] or not set(approved_scopes) <= set(node["scopes"]):
                 raise PermissionError("pairing scope denied")
