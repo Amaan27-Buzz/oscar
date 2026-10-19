@@ -9,7 +9,7 @@ use std::{
     io::Read,
     path::Path,
     sync::{Arc, Mutex},
-    time::Duration,
+    time::{Duration, Instant},
 };
 use zeroize::{Zeroize, Zeroizing};
 
@@ -334,6 +334,22 @@ pub struct RemoteClient {
     client: Client,
     projection: Mutex<Projection>,
 }
+// The HTTPS response authenticates Core time. Its round trip is charged in full;
+// device wall time is used only to bound the initial observation, never as Core time.
+fn clock_observation(
+    observed: &Value,
+    received_at: u64,
+    transport_ms: u64,
+) -> Result<Value, String> {
+    let observed = observed
+        .as_u64()
+        .filter(|at| *at > 0)
+        .ok_or("invalid Core clock")?;
+    if observed.abs_diff(received_at) > 30_000 || transport_ms > 15_000 {
+        return Err("stale Core clock observation".into());
+    }
+    Ok(json!({"observed_at_ms":observed,"received_at_ms":received_at,"transport_ms":transport_ms}))
+}
 impl RemoteClient {
     pub fn new(connection: &Connection) -> Result<Self, String> {
         endpoint(&connection.url)?;
@@ -382,7 +398,14 @@ impl RemoteClient {
                 if let Some(generation) = &projection.archive_generation {
                     payload["archive_generation"] = json!(generation);
                 }
+                let started = Instant::now();
                 let snapshot = self.request("snapshot", payload)?;
+                let received_at = now_ms();
+                let clock = clock_observation(
+                    &snapshot["observed_at_ms"],
+                    received_at,
+                    started.elapsed().as_millis() as u64,
+                )?;
                 if snapshot["version"] != 2
                     || snapshot["core_id"] != self.session.core_id
                     || snapshot["node_id"] != self.session.node_id
@@ -414,7 +437,7 @@ impl RemoteClient {
                 Ok(
                     json!({"tasks":tasks,"nodes":projection.nodes,"conversation":projection.conversation,
                     "presence":snapshot["presence"],
-                    "observed_at_ms":snapshot["observed_at_ms"],"voice_available":false,
+                    "core_clock":clock,"observed_at_ms":received_at,"voice_available":false,
                     "operating":{"access":"Ask","secure":"unavailable","full_access":"unavailable"}}),
                 )
             }
@@ -633,6 +656,18 @@ pub fn fixture_cli(arguments: &[String]) -> Result<bool, String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn authenticated_clock_bounds_skew_and_transport_without_rewriting_core_time() {
+        for local in [99_000, 101_000] {
+            let clock = clock_observation(&json!(100_000), local, 200).unwrap();
+            assert_eq!(clock["observed_at_ms"], 100_000);
+            assert_eq!(clock["received_at_ms"], local);
+            assert_eq!(clock["transport_ms"], 200);
+        }
+        assert!(clock_observation(&json!(130_001), 100_000, 0).is_err());
+        assert!(clock_observation(&json!(100_000), 100_000, 15_001).is_err());
+        assert!(clock_observation(&json!(0), 100_000, 0).is_err());
+    }
     #[test]
     fn production_origin_and_reported_task_boundary() {
         for value in [

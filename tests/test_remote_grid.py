@@ -386,7 +386,11 @@ class RemoteGridTests(unittest.TestCase):
         self.assertEqual(before["source"]["kind"], "core")
         self.assertTrue(before["source"]["id"].startswith("presence:"))
         task = self.submit("file_write", parameters={"path": "pending.txt", "content": "no"})
-        pending = self.desktop.request("presence", {})["expression"]
+        requested_at = int(time() * 1000)
+        response = self.desktop.request("presence", {})
+        self.assertGreaterEqual(response["observed_at_ms"], requested_at)
+        self.assertLessEqual(response["observed_at_ms"], int(time() * 1000))
+        pending = response["expression"]
         self.assertEqual(pending["operation"], "waiting")
         self.assertEqual(pending["source"], before["source"])
         self.assertGreater(pending["generation"], before["generation"])

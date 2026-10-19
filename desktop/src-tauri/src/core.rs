@@ -22,6 +22,7 @@ pub fn now_ms() -> u64 {
 struct CoreSnapshot {
     nodes: Vec<Value>,
     presence: Option<Value>,
+    core_clock: Option<Value>,
     setup: Option<Value>,
     executive: Option<Value>,
     adaptive_views: Vec<Value>,
@@ -216,6 +217,7 @@ impl CoreClient {
         Ok(CoreSnapshot {
             nodes: value["nodes"].as_array().cloned().unwrap_or_default(),
             presence: value.get("presence").cloned(),
+            core_clock: value.get("core_clock").cloned(),
             setup: value.get("setup").cloned(),
             executive: value.get("executive").cloned(),
             adaptive_views: value["adaptive_views"]
@@ -423,6 +425,7 @@ impl Bridge {
         let CoreSnapshot {
             nodes,
             presence,
+            core_clock,
             setup,
             executive,
             adaptive_views,
@@ -513,6 +516,7 @@ impl Bridge {
         }
         view.operating = operating;
         view.presence = presence;
+        view.core_clock = core_clock;
         view.setup = setup;
         view.executive = if self.hide_private.load(Ordering::Acquire) {
             None
@@ -581,6 +585,7 @@ impl Bridge {
             view.expression.voice_observed_at_ms = 0;
             view.link = "unavailable".into();
             view.presence = None;
+            view.core_clock = None;
             view.adaptive_views.clear();
             view.executive = None;
             view.setup = None;

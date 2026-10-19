@@ -35,6 +35,19 @@ data class CoreSnapshot(val tasks: List<CoreTask>, val nodes: List<CoreNode>, va
     val presence: String? = null, val setup: Map<String, String> = emptyMap(), val adaptive: List<AdaptiveDescriptor> = emptyList(), val executive: List<ExecutiveGoal>? = null)
 data class ExecutiveGoal(val id: String, val goal: String, val state: String, val runs: Int, val maxRuns: Int)
 data class Interaction(val text: String, val response: String, val taskId: String? = null)
+/** An authenticated observation advances only with this process's monotonic clock. */
+data class CoreClock(val coreAt: Long, val elapsedAt: Long) {
+    fun now(elapsed: Long): Long { require(elapsed >= elapsedAt); return coreAt + elapsed - elapsedAt }
+    companion object {
+        fun observe(observed: Long, localWall: Long, startedElapsed: Long, receivedElapsed: Long): CoreClock {
+            val transport = receivedElapsed - startedElapsed
+            require(observed in 1..9007199254740991L && localWall in 0..9007199254740991L &&
+                kotlin.math.abs(observed - localWall) <= 30_000 && startedElapsed >= 0 && transport in 0..15_000)
+            // Charge the whole round trip, so transport cannot extend an expression's lease.
+            return CoreClock(observed + transport, receivedElapsed)
+        }
+    }
+}
 data class MobileState(
     val epoch: Long = 0, val link: Link = Link.DISCONNECTED, val busy: Boolean = false,
     val snapshot: CoreSnapshot? = null, val interactions: List<Interaction> = emptyList(),
@@ -46,9 +59,10 @@ data class MobileState(
     val connectedNode: String? = null,
     val remote: Boolean = false,
     val enrollmentIdentity: String? = null,
+    val clock: CoreClock? = null,
 ) {
-    fun coreNow(localNow: Long): Long = if (link == Link.CONNECTED && observedAt > 0 && snapshot != null)
-        localNow + snapshot.observedAt - observedAt else localNow
+    fun coreNow(localNow: Long, elapsedNow: Long? = null): Long = if (link == Link.CONNECTED && observedAt > 0 && snapshot != null)
+        if (clock != null && elapsedNow != null) clock.now(elapsedNow) else localNow + snapshot.observedAt - observedAt else localNow
     val presence: Presence get() = when {
         link == Link.DEGRADED -> Presence.ERROR
         link != Link.CONNECTED -> Presence.UNAVAILABLE
@@ -59,7 +73,7 @@ data class MobileState(
     }
     fun fenced(next: MobileState, expectedEpoch: Long): MobileState = if (epoch == expectedEpoch) next else this
     fun unavailable(message: String) = copy(epoch = epoch + 1, link = Link.DEGRADED, busy = false,
-        snapshot = null, connectedNode = null, approval = null, replyPreview = null, inspected = null, interactions = emptyList(), observedAt = 0, restoring = false, message = message)
+        snapshot = null, connectedNode = null, approval = null, replyPreview = null, inspected = null, interactions = emptyList(), observedAt = 0, clock = null, restoring = false, message = message)
 }
 
 private val taskStates = setOf("planned", "executing", "awaiting_result", "result_received", "verifying", "verified", "partially_verified", "failed", "blocked", "cancelled", "unknown")

@@ -70,14 +70,21 @@ sessions immediately; a lost response requires re-enrollment, never fallback.
   archive. Without archive sharing, nodes/status remain available but events and
   retained task details/results are redacted. Snapshot foreground polling every 5 seconds; bounded exponential
   backoff with jitter on failure, stop on revoked/expired credentials.
-- `presence {}` returns the existing canonical Core Presence snapshot
-  `{version:1,visible,expression}`. This operation and the optional snapshot field
+- `presence {}` returns the existing canonical Core Presence snapshot with a v2
+  observation field: `{version:1,visible,expression,observed_at_ms}`. The Core
+  samples `observed_at_ms` after obtaining the canonical snapshot; the existing
+  expression is unchanged. This operation and the optional snapshot field
   independently require live `presence:read` scope and Personal Policy approval.
   Denied presence is omitted from snapshot; the dedicated operation returns an
   authority denial. The existing expression source ID, publication generation,
   transition ID, event time and 30-second expiry pass through unchanged. Native
-  clients validate freshness/generation and withdraw stale or missing expression;
-  they do not invent an operational state. This grant enables no overlay,
+  clients validate freshness/generation and withdraw stale or missing expression.
+  Remote clients anchor Core time to the authenticated server observation and
+  local monotonic elapsed time, accounting for transport age rather than assuming
+  synchronized device wall clocks. This mapping does not rewrite expression
+  timestamps, renew expiry, or relax the canonical 250 ms future tolerance;
+  connection loss and missing/stale observations withdraw private Presence.
+  Clients do not invent an operational state. This grant enables no overlay,
   microphone, capture, retention or action permission.
 - `inspect {task_id}`: task projection described below.
 - `submit {text,kind,target,parameters,retain}`: kind is `file_read`, `file_write`,

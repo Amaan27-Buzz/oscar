@@ -50,12 +50,15 @@ class GridConnectedTest {
             val vault = SessionVault(compose.activity)
             val saved = vault.load()!!
             assertEquals(2, saved.getInt("version"))
-            val canonical = io.dawnlight.oscar.expression.Contract.validate(model.state.value.snapshot!!.presence!!, System.currentTimeMillis())!!
+            val canonical = io.dawnlight.oscar.expression.Contract.validate(model.state.value.snapshot!!.presence!!,
+                model.state.value.coreNow(System.currentTimeMillis(), android.os.SystemClock.elapsedRealtime()))!!
             assertEquals(io.dawnlight.oscar.expression.SourceKind.CORE, canonical.source.kind)
             assertTrue(canonical.source.id.startsWith("presence:"))
+            val started = android.os.SystemClock.elapsedRealtime()
             val presence = CoreClient(saved, vault::signDevice).call("presence", JSONObject())
-            val admitted = OverlayAdmission().admit(presence, System.currentTimeMillis(), CoreClient(saved).binding(), true, true, true, true)
-            assertNotNull(io.dawnlight.oscar.expression.Contract.validate(admitted, System.currentTimeMillis()))
+            val clock = CoreClock.observe(presence.getLong("observed_at_ms"), System.currentTimeMillis(), started, android.os.SystemClock.elapsedRealtime())
+            val admitted = OverlayAdmission().admit(presence, clock.now(android.os.SystemClock.elapsedRealtime()), CoreClient(saved).binding(), true, true, true, true)
+            assertNotNull(io.dawnlight.oscar.expression.Contract.validate(admitted, clock.now(android.os.SystemClock.elapsedRealtime())))
             val sealed = compose.activity.getSharedPreferences("session", 0).all.values.joinToString()
             assertFalse(sealed.contains(saved.getString("token")))
             assertNotNull(vault.loadHistory(CoreClient(saved).binding()))
@@ -116,7 +119,8 @@ class GridConnectedTest {
             compose.runOnIdle { model.start() }
             compose.waitUntil(20_000) { model.state.value.link == Link.CONNECTED }
             compose.runOnIdle { model.revoke() }
-            compose.waitUntil(10_000) { SessionVault(compose.activity).load() == null }
+            compose.waitUntil(10_000) { model.state.value.message == "Core revoked this device. Local credentials removed." }
+            assertNull(SessionVault(compose.activity).load())
             val keys = KeyStore.getInstance("AndroidKeyStore").apply { load(null) }
             assertFalse(keys.containsAlias("oscar-device-v2")); assertFalse(keys.containsAlias("oscar-session-v1"))
             assertNull(model.state.value.snapshot); assertEquals(Link.DISCONNECTED, model.state.value.link)

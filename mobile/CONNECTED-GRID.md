@@ -32,7 +32,10 @@ a presentation/control client of the same Core, Grid, Runtime and Event Archive.
   the approved Orb. Stale or non-Core expressions fail closed. Companion's
   separate presence-only connection uses the same signed device proof and still
   requires independent Android overlay/notification permissions and an unlocked
-  device; connection enrollment does not activate an overlay.
+  device; connection enrollment does not activate an overlay. Authenticated Core
+  observation time advances with local monotonic time for freshness and expiry;
+  the full transport round trip is charged against the lease. Canonical events
+  and the strict future/expiry limits remain unchanged despite local clock skew.
 - Expanded real Worker devices offer scoped file reads and preparation of exact
   file edits. Core validates, routes and verifies operations. Mutations require
   exact digest/capability/target/session/generation-bound owner review and the
@@ -60,6 +63,19 @@ bounded backoff, matching independent evidence and approval plan binding.
 All device commands must name an explicitly identified disposable emulator.
 First list identities and verify both its AVD name and `ro.kernel.qemu=1`.
 Never target a physical phone or use an unqualified ADB device command.
+
+After building both APKs, run the actual Core/Worker acceptance from the repository
+root, replacing the serial with the verified disposable emulator:
+
+```powershell
+python -m scripts.verify_android_grid --serial emulator-5590 --adb "$env:ANDROID_HOME/platform-tools/adb.exe"
+```
+
+The launcher checks the emulator identity, reinstalls both exact build outputs,
+and runs the five checks below against a temporary real HTTPS Core and Worker.
+This reinstall is required because Gradle's connected-test teardown removes the
+instrumentation APK. Failures retain redacted output in ignored
+`.oscar/d2-android/instrument-<method>.log`; a skip cannot count as acceptance.
 
 `GridKeystoreTest#exportGridIdentity` writes public installation/key JSON to
 `files/d2-device-identity.json`. Read that public file with explicit emulator

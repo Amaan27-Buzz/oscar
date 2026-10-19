@@ -12,7 +12,7 @@ data class Approval(
     val generation: Int?,
 ) {
     fun material(): JSONObject = JSONObject(String(java.util.Base64.getDecoder().decode(signingPayload), Charsets.UTF_8)).getJSONObject("material")
-    fun current(state: MobileState, now: Long): Boolean = state.link == Link.CONNECTED && state.approval == this && state.coreNow(now) < expiresAt &&
+    fun current(state: MobileState, now: Long, elapsedNow: Long? = null): Boolean = state.link == Link.CONNECTED && state.approval == this && state.coreNow(now, elapsedNow) < expiresAt &&
         (operation !in setOf("approve", "retry", "reply") || !state.privateSuppressed) &&
         (if (operation == "reply") state.replyPreview?.let { acceptsReply(it) } == true
         else state.snapshot?.tasks?.any { it.id == material().getString("task_id") && it.target == target && it.generation == generation && operation in it.actions &&

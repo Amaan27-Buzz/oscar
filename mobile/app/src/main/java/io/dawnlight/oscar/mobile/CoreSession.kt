@@ -82,18 +82,20 @@ class CoreSession(application: Application) : AndroidViewModel(application) {
         val epoch = mutable.value.epoch
         try {
             val remote = client?.remote() == true
+            val started = android.os.SystemClock.elapsedRealtime()
             val response = call("snapshot", if (remote) history.request() else JSONObject(), epoch)
             val received = if (remote) parseGridSnapshot(response, client!!.coreId(), client!!.nodeId()).let { current ->
                 if (client!!.canApprove()) current else current.copy(tasks = current.tasks.map { it.copy(actions = it.actions.filterNot { action -> action == "approve" }) })
             } else parseSnapshot(response)
-            require(kotlin.math.abs(System.currentTimeMillis() - received.observedAt) <= 30_000) { "Stale Core observation" }
+            val clock = CoreClock.observe(received.observedAt, System.currentTimeMillis(), started, android.os.SystemClock.elapsedRealtime())
+            received.presence?.let { require(io.dawnlight.oscar.expression.Contract.validate(it, clock.now(android.os.SystemClock.elapsedRealtime())) != null) }
             val snapshot = if (mutable.value.privateSuppressed) received.withoutPrivate() else received
             if (!active) return
             val old = mutable.value
             val interactions = if (remote && !old.privateSuppressed) history.merge(response) else old.interactions
             if (remote && !old.privateSuppressed) wire.withLock { withContext(Dispatchers.IO) { vault.saveHistory(history.saved(), client!!.binding()) } }
             if (!active || mutable.value.epoch != epoch) return
-            val next = old.fenced(old.copy(link = Link.CONNECTED, remote = remote, connectedNode = client?.nodeId(), snapshot = snapshot, observedAt = System.currentTimeMillis(),
+            val next = old.fenced(old.copy(link = Link.CONNECTED, remote = remote, connectedNode = client?.nodeId(), snapshot = snapshot, observedAt = System.currentTimeMillis(), clock = clock,
                 interactions = if (old.privateSuppressed) emptyList() else interactions,
                 inspected = old.inspected?.let { selected -> snapshot.tasks.find { it.id == selected.id } },
                 message = if (old.link == Link.CONNECTED) old.message else null), epoch)
@@ -207,7 +209,7 @@ class CoreSession(application: Application) : AndroidViewModel(application) {
             return
         }
         request { epoch ->
-            val approval = Approval.parse(call("challenge", JSONObject().put("operation", action).put("task_id", task.id), epoch), mutable.value.coreNow(System.currentTimeMillis()))
+            val approval = Approval.parse(call("challenge", JSONObject().put("operation", action).put("task_id", task.id), epoch), mutable.value.coreNow(System.currentTimeMillis(), android.os.SystemClock.elapsedRealtime()))
             require(client?.matches(approval) == true)
             if (mutable.value.epoch == epoch) { replyText = null; mutable.value = mutable.value.copy(approval = approval, replyPreview = null) }
         }
@@ -218,17 +220,17 @@ class CoreSession(application: Application) : AndroidViewModel(application) {
         request { epoch ->
             val proposal = JSONObject().put("operation", "reply").put("package", source.bounded("package", 256))
                 .put("key_hash", source.bounded("key_hash", 64)).put("text_hash", NotificationBoundary.hash(text))
-            val approval = Approval.parse(call("challenge", proposal, epoch), mutable.value.coreNow(System.currentTimeMillis()))
+            val approval = Approval.parse(call("challenge", proposal, epoch), mutable.value.coreNow(System.currentTimeMillis(), android.os.SystemClock.elapsedRealtime()))
             require(client?.matches(approval) == true)
             require(approval.acceptsReply(text))
             if (mutable.value.epoch == epoch) { replyText = text; mutable.value = mutable.value.copy(approval = approval, replyPreview = text) }
         }
     }
     fun complete(approval: Approval, expectedEpoch: Long) {
-        if (mutable.value.epoch != expectedEpoch || client?.matches(approval) != true || !approval.current(mutable.value, System.currentTimeMillis())) return
+        if (mutable.value.epoch != expectedEpoch || client?.matches(approval) != true || !approval.current(mutable.value, System.currentTimeMillis(), android.os.SystemClock.elapsedRealtime())) return
         request { epoch ->
             val signature = wire.withLock {
-                check(mutable.value.epoch == epoch && approval.current(mutable.value, System.currentTimeMillis()))
+                check(mutable.value.epoch == epoch && approval.current(mutable.value, System.currentTimeMillis(), android.os.SystemClock.elapsedRealtime()))
                 withContext(Dispatchers.IO) { vault.sign(approval.signingPayload) }
             }
             val started = android.os.SystemClock.elapsedRealtime()

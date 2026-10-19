@@ -1,6 +1,7 @@
 import {parseEvent} from '@oscar/expression';
 import type {ExpressionEvent,OperationalState,Source} from '@oscar/expression';
 import type {View} from './bridge';
+import {CoreClock} from './core-clock';
 
 export const freshnessMs=8000;
 /** Trusted native readback only. No context, descriptions, responses or approval material leave this adapter. */
@@ -11,12 +12,26 @@ export class DesktopExpressionAdapter {
   private generation=0;
   private intent='';
   private transition=0;
-  constructor(private kind:Source['kind']='core') {}
+  private coreClock:{key:string;value:CoreClock}|null=null;
+  clock:()=>number=Date.now;
+  constructor(private kind:Source['kind']='core',private monotonic:()=>number=()=>performance.now()) {}
   receive(view:View,now:number):ExpressionEvent|null {
+    const remote=!!view.core_clock||!!view.connection?.node_id;
+    let canonicalUnavailable=false;
     if(view.presence&&view.link==='online'&&view.voice==='idle') {
       const canonical=parseEvent(view.presence.expression);
-      if(canonical&&canonical.source.kind==='core'&&canonical.source.id.startsWith('presence:')&&canonical.eventTime<=now+250&&canonical.expiresAt>now)return canonical;
+      let clock:()=>number=Date.now,at=now;
+      if(remote) {
+        const observation=view.core_clock;
+        const key=observation?`${view.expression?.epoch}:${observation.observed_at_ms}:${observation.received_at_ms}:${observation.transport_ms}`:'';
+        const observed=observation?(this.coreClock?.key===key?this.coreClock.value:CoreClock.observe(observation,now,this.monotonic)):null;
+        if(observed){this.coreClock={key,value:observed};clock=observed.now;at=clock();}
+        else at=Number.MAX_SAFE_INTEGER;
+      }
+      if(canonical&&canonical.source.kind==='core'&&canonical.source.id.startsWith('presence:')&&canonical.eventTime<=at+250&&canonical.expiresAt>at){this.clock=clock;return canonical;}
     }
+    if(remote&&view.link==='online'&&view.voice==='idle')canonicalUnavailable=true;
+    if(view.link!=='online')this.coreClock=null;
     const r=view.expression;
     if(!r||!/^[a-f0-9]{32}$/.test(r.epoch)||!Number.isSafeInteger(r.generation)||r.generation<0||
       !Number.isSafeInteger(r.observed_at_ms)||r.observed_at_ms<0||
@@ -37,7 +52,7 @@ export class DesktopExpressionAdapter {
     let availability:ExpressionEvent['availability']=view.link==='online'?'available':'unavailable';
     let attention:ExpressionEvent['attention']='none';
     let kind:ExpressionEvent['kind']='state';
-    if(!fresh&&view.link==='online') {operation='unknown';availability='unknown';}
+    if((!fresh||canonicalUnavailable)&&view.link==='online') {operation='unknown';availability='unknown';}
     else if(view.link!=='online')operation='unavailable';
     else {
       const freshTasks=r.tasks_observed_at_ms<=now+250&&r.tasks_observed_at_ms+freshnessMs>now;
@@ -72,9 +87,11 @@ export class DesktopExpressionAdapter {
       if(view.tasks.some(t=>!['verified','partially_verified','failed','cancelled'].includes(t.state)))leases.push(r.tasks_observed_at_ms+freshnessMs);
     }
     const expiresAt=Math.min(...leases);
-    return parseEvent({version:1,source:{kind:this.kind,id:`desktop:${this.epoch}`},
+    const event=parseEvent({version:1,source:{kind:this.kind,id:`desktop:${this.epoch}`},
       generation:++this.generation,transitionId:`desktop:${this.transition}`,eventTime:at,expiresAt,
       kind,priority:attention==='owner'?'urgent':'normal',operation,
       delivery:kind==='interrupt'?'interrupted':'composed',availability,muted,attention,reducedMotion:false});
+    if(event)this.clock=Date.now;
+    return event;
   }
 }

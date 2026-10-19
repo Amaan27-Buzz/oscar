@@ -11,34 +11,34 @@ export function ExpressionOrb({snapshot,size=64}:{snapshot:ExpressionSnapshot;si
 }
 
 /** Source must be supplied by a trusted adapter. This component has no bridge, audio or execution APIs. */
-export function ExpressionPresence({event,source,size=64,onAnimationRecord,gaze}:{event:ExpressionEvent;source:Source;size?:number;onAnimationRecord?:(record:AnimationRecord)=>void;gaze?:{x:number;y:number}}) {
+export function ExpressionPresence({event,source,size=64,onAnimationRecord,gaze,now=Date.now}:{event:ExpressionEvent;source:Source;size?:number;onAnimationRecord?:(record:AnimationRecord)=>void;gaze?:{x:number;y:number};now?:()=>number}) {
   const controller=useRef<{key:string;engine:ExpressionController}|null>(null);
   const key=`${source.kind}:${source.id}`;
   if(!controller.current||controller.current.key!==key)controller.current={key,engine:new ExpressionController(source)};
   const engine=controller.current.engine;
-  const [snapshot,setSnapshot]=useState(()=>engine.snapshot(Date.now()));
+  const [snapshot,setSnapshot]=useState(()=>engine.snapshot(now()));
   const callback=useRef(onAnimationRecord);callback.current=onAnimationRecord;
   useLayoutEffect(()=>{
     let frame:number|undefined,timer:ReturnType<typeof setTimeout>|undefined,stopped=false;
     const system=matchMedia('(prefers-reduced-motion: reduce)');
     const refresh=()=>{
       if(stopped)return;
-      const now=Date.now(),next=engine.snapshot(now);setSnapshot(next);
+      const at=now(),next=engine.snapshot(at);setSnapshot(next);
       for(const record of engine.takeAnimationRecords())callback.current?.(record);
       if(next.moving)frame=requestAnimationFrame(refresh);
-      else if(next.expiresAt!==null)timer=setTimeout(refresh,Math.max(1,next.expiresAt-now));
+      else if(next.expiresAt!==null)timer=setTimeout(refresh,Math.max(1,next.expiresAt-at));
     };
-    engine.setReducedMotion(system.matches,Date.now());engine.receive(event,Date.now());
-    if(gaze)engine.setGaze(gaze,Date.now());
+    engine.setReducedMotion(system.matches,now());engine.receive(event,now());
+    if(gaze)engine.setGaze(gaze,now());
     if(document.hidden)engine.suspend();refresh();
     const visibility=()=>{
       if(document.hidden)engine.suspend();
       if(frame!==undefined)cancelAnimationFrame(frame);if(timer!==undefined)clearTimeout(timer);
       refresh();
     };
-    const reduce=()=>{engine.setReducedMotion(system.matches,Date.now());visibility();};
+    const reduce=()=>{engine.setReducedMotion(system.matches,now());visibility();};
     system.addEventListener('change',reduce);document.addEventListener('visibilitychange',visibility);
     return()=>{stopped=true;if(frame!==undefined)cancelAnimationFrame(frame);if(timer!==undefined)clearTimeout(timer);system.removeEventListener('change',reduce);document.removeEventListener('visibilitychange',visibility);};
-  },[engine,event,gaze?.x,gaze?.y]);
+  },[engine,event,gaze?.x,gaze?.y,now]);
   return <ExpressionOrb snapshot={snapshot} size={size}/>;
 }

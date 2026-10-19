@@ -1,6 +1,6 @@
 # OSCAR — Current Status & Checklist
 
-**Verified project checkpoint: 2026-10-18.** This distinguishes merged reference software from actually operational Cloud, Desktop, Android, voice and hardware capabilities. Read [delivery plan](DELIVERY-PLAN.md), [canonical slices](SLICE-NUMBERING.md), [build gates](BUILD-GATES.md), and [deployment](DEPLOYMENT.md). Historical reports remain historical; GitHub Actions green does not mean physical PASS.
+**Verified project checkpoint: 2026-10-19.** This distinguishes merged reference software from actually operational Cloud, Desktop, Android, voice and hardware capabilities. Read [delivery plan](DELIVERY-PLAN.md), [canonical slices](SLICE-NUMBERING.md), [build gates](BUILD-GATES.md), and [deployment](DEPLOYMENT.md). Historical reports remain historical; GitHub Actions green does not mean physical PASS.
 
 ## Completed and integrated for documented scope
 
@@ -23,7 +23,13 @@ extends D1 with versioned authenticated HTTPS, device enrollment and an outbound
 scoped file Worker. Independent Windows Core/Worker TLS tests have exercised real
 read/write, signed synthetic Ask approval, independent readback, canonical
 cross-client history, Core restart and no replay after a lost mutation result.
-The ledger tracks native clients, platform runs and final-head CI separately.
+The ledger tracks native clients, platform runs and CI separately. Last published
+source `676a0b1` passed native Linux x86_64/ARM64 runtime and TLS checks. The owner
+stopped remaining GitHub Actions after quota exhaustion; CI remains PARTIAL and
+remaining verification and harness corrections stay local and unpublished.
+Actual Windows CNG/DPAPI execution and all five disposable Android API 35
+Core/Worker lifecycle checks passed locally, including canonical history/Presence,
+process restoration, Core-loss privacy withdrawal and verified device revocation.
 This candidate is not merged or accepted on an Internet host or owner phone.
 
 - [ ] **Cloud Core hosted acceptance:** D1 now has an implemented deployment candidate composing the existing Core, private authenticated diagnostics, persistent WAL/FTS5 identity/history, conservative recovery, independent backup/restore and constrained Linux packaging. See [D1 evidence](development/GROUP-04-D1.md) and [operations](CLOUD-CORE.md) for exact software/CI evidence. **Oracle remains unprovisioned; hosted acceptance is outstanding.** Optional derived indexes remain explicitly unavailable in this minimal deployment.

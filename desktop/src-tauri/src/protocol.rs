@@ -372,6 +372,7 @@ pub struct View {
     pub connection: Option<ConnectionView>,
     pub nodes: Vec<Value>,
     pub presence: Option<serde_json::Value>,
+    pub core_clock: Option<serde_json::Value>,
     pub setup: Option<serde_json::Value>,
     pub executive: Option<serde_json::Value>,
     pub adaptive_views: Vec<serde_json::Value>,

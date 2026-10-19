@@ -69,7 +69,8 @@ export function LivingPresence({port=send,events=subscribe,sourceKind='core',win
       .catch(()=>{if(alive)setRequestError('Open the native presence prototype.');});
     return()=>{alive=false;stop?.();clearTimeout(retreatTimer.current);};
   },[port,events]);
-  useEffect(()=>{if(!event)return;const timer=setTimeout(()=>setExpired(true),Math.max(1,event.expiresAt-Date.now()));return()=>clearTimeout(timer);},[event]);
+  const clock=adapter.current.clock;
+  useEffect(()=>{if(!event)return;const timer=setTimeout(()=>setExpired(true),Math.max(1,event.expiresAt-clock()));return()=>clearTimeout(timer);},[event,clock]);
   useEffect(()=>{if(!event)return;
     const quiet=event.operation==='attentive'&&event.kind==='state'&&!expired;
     const frame={...event,generation:++presentationGeneration.current,
@@ -80,13 +81,13 @@ export function LivingPresence({port=send,events=subscribe,sourceKind='core',win
     const key=`${event.source.id}:${event.transitionId}`;
     if(!expired&&event.operation==='executing'&&!event.muted&&event.attention==='none'&&event.kind==='state'&&activeAccent.current!==key){
       const timer=setTimeout(()=>{
-        if(Date.now()>=frame.expiresAt)return;
+        if(clock()>=frame.expiresAt)return;
         activeAccent.current=key;
         setPresentation({...frame,generation:++presentationGeneration.current,kind:'accent',accent:'engagement'});
       },70);
       return()=>clearTimeout(timer);
     }
-  },[event,open,hover,expired]);
+  },[event,open,hover,expired,clock]);
   function focusInput(){document.getElementById('presence-ask')?.focus();}
   useEffect(()=>{if(open&&!leaving&&view.window==='interaction')focusInput();},[open,leaving,view.window,view.window_revision]);
   const available=!expired&&event?.availability==='available'&&event.operation!=='unknown';
@@ -219,7 +220,7 @@ export function LivingPresence({port=send,events=subscribe,sourceKind='core',win
         <button className="character-button" ref={orb} aria-label={`OSCAR: ${label}. ${open?'Return to presence':'Open interaction'}`} aria-expanded={open}
           onClick={open&&!leaving?retreat:invoke} onPointerEnter={()=>setHover(true)} onPointerMove={track}
           onPointerLeave={()=>{setHover(false);setGaze({x:0,y:0});}}>
-          {presentation?<ExpressionPresence event={presentation} source={presentation.source} size={76} gaze={gaze}/>:<span className="unconfigured-mark">OSCAR</span>}
+          {presentation?<ExpressionPresence event={presentation} source={presentation.source} size={76} gaze={gaze} now={clock}/>:<span className="unconfigured-mark">OSCAR</span>}
         </button>
         <p className="presence-caption" role="status" aria-live="polite">{label}</p>
       </div>

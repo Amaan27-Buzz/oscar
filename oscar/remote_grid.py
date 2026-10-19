@@ -447,7 +447,7 @@ class RemoteGrid:
                 presence = self.presence(session)
                 if presence is None:
                     raise PermissionError("Presence is not authorized or available")
-                return presence
+                return {**presence, "observed_at_ms": int(time() * 1000)}
             if operation == "inspect" and set(payload) == {"task_id"}:
                 self.require(session, "grid:inspect")
                 return self.inspect(

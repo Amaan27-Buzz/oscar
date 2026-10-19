@@ -18,6 +18,14 @@ binding remain enforced. Disconnect revokes the session when reachable and remov
 the saved connection and exact installation keys. An unreachable Core leaves
 remote revocation explicitly UNKNOWN.
 
+Remote Presence keeps Core's canonical source, generation and timestamps. The
+native HTTPS adapter records server observation time and measured round-trip age;
+the WebView advances that observation with its monotonic clock. It charges
+transport and IPC age against the original lease, bounds initial clock skew to
+30 seconds and transport to 15 seconds, and preserves the strict 250 ms future
+tolerance and original expiry. Missing, stale or invalid observations withdraw
+remote Presence; local wall-clock changes cannot renew it.
+
 The outbound Worker must be started separately with the same Windows account and
 an explicitly chosen existing disposable or authorized workspace. It does not
 start an inbound server or replace Core's archive/policy database. For example:

@@ -18,7 +18,7 @@ class SettingsIntegrationTest {
         val session = androidx.lifecycle.ViewModelProvider(compose.activity)[CoreSession::class.java]
         compose.waitUntil(5000) { !session.state.value.restoring }
         compose.runOnIdle { androidx.lifecycle.ViewModelProvider(compose.activity)[CoreSession::class.java].disconnect() }
-        compose.waitUntil(5000) { SessionVault(compose.activity).load() == null }
+        compose.waitUntil(5000) { session.state.value.message == "Local credentials removed. Revoke this node from Core separately." }
     }
     @After fun cleanup() { if (!isolated) return; compose.activity.getSharedPreferences("appearance", Context.MODE_PRIVATE).edit().clear().commit() }
     private fun page(name: String) {
@@ -90,8 +90,8 @@ class SettingsIntegrationTest {
             assertTrue("$label glyphs must fit the pixel bounds", layout.getBoundingBox(label.lastIndex).right <= layout.size.width + 1f)
         }
         compose.onNodeWithTag("interactionInput").performClick()
-        compose.onNodeWithTag("interactionInput").performTextReplacement("Large text draft")
         compose.waitUntil(10000) { compose.activity.window.decorView.rootWindowInsets.isVisible(android.view.WindowInsets.Type.ime()) }
+        compose.onNodeWithTag("interactionInput").performTextReplacement("Large text draft")
         compose.waitUntil(5000) {
             val bottom = compose.onNodeWithTag("interactionInput").fetchSemanticsNode().boundsInWindow.bottom
             val top = compose.activity.window.decorView.height - compose.activity.window.decorView.rootWindowInsets.getInsets(android.view.WindowInsets.Type.ime()).bottom

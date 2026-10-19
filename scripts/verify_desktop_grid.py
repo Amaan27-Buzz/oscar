@@ -127,6 +127,13 @@ def verify(binary: Path) -> dict[str, object]:
         assert expression["transitionId"] == canonical["expression"]["transitionId"]
         assert expression["generation"] < canonical["expression"]["generation"]
         assert expression["expiresAt"] > expression["eventTime"]
+        clock = projection["core_clock"]
+        assert clock["received_at_ms"] == projection["observed_at_ms"]
+        assert abs(clock["observed_at_ms"] - clock["received_at_ms"]) <= 30_000
+        assert 0 <= clock["transport_ms"] <= 15_000
+        core_now = clock["observed_at_ms"] + clock["transport_ms"]
+        assert expression["eventTime"] <= core_now + 250
+        assert expression["expiresAt"] > core_now
         assert b"token" not in state.read_bytes()
         fixture.stop(worker)
         return {
@@ -139,7 +146,7 @@ def verify(binary: Path) -> dict[str, object]:
             "projection": "native snapshot sees verified task and canonical conversation",
             "presence": (
                 "same canonical Core source and transition on native and owner clients; "
-                "generation advances"
+                "generation advances; authenticated server time and measured transport age"
             ),
             "owner_confirmation": "synthetic fixture; physical owner confirmation NOT_RUN",
             "hosted_internet": "NOT_RUN",

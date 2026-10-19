@@ -87,4 +87,16 @@ class ExpressionRenderingTest {
         val cases=JSONObject(rawFixtures).getJSONArray("malformedInputs")
         for(i in 0 until cases.length()) { val fixture=cases.getJSONObject(i);assertNull(fixture.getString("name"),Contract.validate(fixture.getString("raw"),1000000)) }
     }
+    @Test fun suppliedCanonicalClockRendersAndExpiresWithoutRewritingEvent() {
+        val started = android.os.SystemClock.elapsedRealtime()
+        val coreAt = System.currentTimeMillis() + 5000
+        val raw = JSONObject(event(1)).put("eventTime", coreAt).put("expiresAt", coreAt + 2000).toString()
+        assertNull(Contract.validate(raw, System.currentTimeMillis()))
+        compose.setContent { ExpressionPresence(raw, source, 96.dp, reducedMotion = true,
+            modifier = Modifier.testTag("clocked"), clock = { coreAt + android.os.SystemClock.elapsedRealtime() - started }) }
+        compose.onNodeWithTag("clocked").assert(SemanticsMatcher.expectValue(SemanticsProperties.StateDescription,"SIMULATED — speaking. composed delivery."))
+        compose.waitUntil(6000) { compose.onNodeWithTag("clocked").fetchSemanticsNode().config[SemanticsProperties.StateDescription] == "SIMULATED — unknown. hesitant delivery." }
+        assertTrue(android.os.SystemClock.elapsedRealtime() - started >= 2000)
+        compose.onNodeWithTag("clocked").assert(SemanticsMatcher.expectValue(SemanticsProperties.StateDescription,"SIMULATED — unknown. hesitant delivery."))
+    }
 }

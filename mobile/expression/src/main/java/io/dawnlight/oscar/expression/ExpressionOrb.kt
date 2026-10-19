@@ -34,12 +34,13 @@ private val red = Color(0xFFE74A49)
 }
 
 @Composable fun ExpressionPresence(event: String, source: Source, size: Dp = 64.dp, reducedMotion: Boolean = false,
-    modifier: Modifier = Modifier, onAnimationRecord: (AnimationRecord) -> Unit = {}) {
+    modifier: Modifier = Modifier, onAnimationRecord: (AnimationRecord) -> Unit = {}, clock: () -> Long = System::currentTimeMillis) {
     val context = LocalContext.current
     val owner = LocalLifecycleOwner.current
     val controller = remember(source) { ExpressionController(source, MotionData(context.assets.open("motion-v1.json").bufferedReader().use { it.readText() })) }
     val latest = rememberUpdatedState(event); val reduce = rememberUpdatedState(reducedMotion); val callback = rememberUpdatedState(onAnimationRecord)
-    val state = remember(controller) { mutableStateOf(controller.snapshot(System.currentTimeMillis())) }
+    val time = rememberUpdatedState(clock)
+    val state = remember(controller) { mutableStateOf(controller.snapshot(clock())) }
     LaunchedEffect(controller, owner) {
         val scale = coroutineContext[MotionDurationScale]
         owner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -48,7 +49,7 @@ private val red = Color(0xFFE74A49)
                     launch {
                         var previous: String? = null
                         snapshotFlow { Triple(latest.value, reduce.value, scale?.scaleFactor == 0f) }.collect { (raw, requested, system) ->
-                            val now = System.currentTimeMillis(); controller.setReducedMotion(requested || system, now)
+                            val now = time.value(); controller.setReducedMotion(requested || system, now)
                             if (raw != previous) { controller.receive(raw, now); previous = raw }
                             state.value = controller.snapshot(now)
                             controller.takeAnimationRecords().forEach(callback.value)
@@ -57,14 +58,14 @@ private val red = Color(0xFFE74A49)
                     launch {
                         snapshotFlow { state.value.moving to state.value.expiresAt }.collectLatest { (moving, expires) ->
                             if (moving) while (currentCoroutineContext().isActive) {
-                                withFrameNanos { state.value = controller.snapshot(System.currentTimeMillis()); controller.takeAnimationRecords().forEach(callback.value) }
+                                withFrameNanos { state.value = controller.snapshot(time.value()); controller.takeAnimationRecords().forEach(callback.value) }
                             } else if (expires != null) {
-                                delay(max(1L, expires-System.currentTimeMillis())); state.value = controller.snapshot(System.currentTimeMillis())
+                                delay(max(1L, expires-time.value())); state.value = controller.snapshot(time.value())
                             }
                         }
                     }
                 }
-            } finally { controller.suspend(); state.value = controller.snapshot(System.currentTimeMillis()) }
+            } finally { controller.suspend(); state.value = controller.snapshot(time.value()) }
         }
     }
     ExpressionOrb(state.value, size, modifier)

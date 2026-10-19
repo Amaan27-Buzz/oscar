@@ -64,6 +64,7 @@ class CompanionOverlayService : Service() {
     private var owner: OverlayOwner? = null
     private var view: ComposeView? = null
     private var event by mutableStateOf<String?>(null)
+    private var clock by mutableStateOf<CoreClock?>(null)
     private var polling: Job? = null
     private var watchdog: Job? = null
     private var request: String? = null
@@ -76,7 +77,7 @@ class CompanionOverlayService : Service() {
     private fun allowed(token: String?) = CompanionOverlay.current(token) && CompanionOverlay.enabled(this) && CompanionOverlay.permitted(this) &&
         !getSystemService(KeyguardManager::class.java).isKeyguardLocked
     private fun withdraw() {
-        event = null
+        event = null; clock = null
         view?.let { try { getSystemService(WindowManager::class.java).removeViewImmediate(it) } catch (_: Exception) { } }
         owner?.close(); view = null; owner = null
     }
@@ -105,7 +106,7 @@ class CompanionOverlayService : Service() {
             val admission = OverlayAdmission()
             watchdog = scope.launch {
                 while (isActive && request == token) {
-                    if (!allowed(token) || admission.expiresAt != 0L && System.currentTimeMillis() >= admission.expiresAt) { stopOverlay(); return@launch }
+                    if (!allowed(token) || admission.expiresAt != 0L && (clock?.now(SystemClock.elapsedRealtime()) ?: System.currentTimeMillis()) >= admission.expiresAt) { stopOverlay(); return@launch }
                     delay(500)
                 }
             }
@@ -120,12 +121,17 @@ class CompanionOverlayService : Service() {
                         val vault = SessionVault(this@CompanionOverlayService)
                         val connection = if (binding == nextBinding) wire ?: CoreClient(saved, vault::signDevice) else CoreClient(saved, vault::signDevice)
                         binding = nextBinding; wire = connection
+                        val started = SystemClock.elapsedRealtime()
                         val response = withContext(Dispatchers.IO) { connection.call("presence", JSONObject()) }
+                        val received = SystemClock.elapsedRealtime()
+                        val anchor = if (connection.remote()) CoreClock.observe(response.getLong("observed_at_ms"), System.currentTimeMillis(), started, received)
+                            else CoreClock(System.currentTimeMillis(), received)
                         val current = withContext(Dispatchers.IO) { SessionVault(this@CompanionOverlayService).load() } ?: error("Pairing removed")
                         ensureActive()
                         require(CompanionOverlay.pairing(current) == binding)
-                        event = admission.admit(response, System.currentTimeMillis(), binding, CompanionOverlay.current(token), CompanionOverlay.permitted(this@CompanionOverlayService),
+                        event = admission.admit(response, anchor.now(SystemClock.elapsedRealtime()), binding, CompanionOverlay.current(token), CompanionOverlay.permitted(this@CompanionOverlayService),
                             !getSystemService(KeyguardManager::class.java).isKeyguardLocked, CompanionOverlay.enabled(this@CompanionOverlayService))
+                        clock = anchor
                         check(allowed(token))
                         if (view == null) attach()
                         manager.notify(16, notification.setContentTitle("OSCAR Companion is visible").build())
@@ -146,7 +152,8 @@ class CompanionOverlayService : Service() {
         content.setContent {
             val current = event?.let { raw -> Contract.parse(raw)?.let { raw to it } }
             Column {
-                if (current != null) ExpressionPresence(current.first, current.second.source, 64.dp, current.second.reducedMotion)
+                if (current != null) ExpressionPresence(current.first, current.second.source, 64.dp, current.second.reducedMotion,
+                    clock = { clock?.now(SystemClock.elapsedRealtime()) ?: System.currentTimeMillis() })
                 TextButton(onClick = { CompanionOverlay.hide(this@CompanionOverlayService); stopOverlay() }) { Text("Hide OSCAR") }
             }
         }

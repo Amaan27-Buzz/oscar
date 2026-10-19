@@ -1,4 +1,4 @@
-# AGENTS.md — active development instructions (2026-10-18)
+# AGENTS.md — active development instructions (2026-10-19)
 
 **Read before any OSCAR work:** [Current status](docs/CURRENT-STATUS.md), [new delivery groups](docs/DELIVERY-PLAN.md), [canonical slices](docs/SLICE-NUMBERING.md), [roadmap](docs/ROADMAP.md), [build gates](docs/BUILD-GATES.md) and [deployment](docs/DEPLOYMENT.md).
 
@@ -10,6 +10,7 @@
 - Preserve **one authoritative OSCAR** identity/Core, Controller, Event Archive/Memory, Grid, Policy, Executive, native app designs and canonical Orb. Any capability claiming full PC control, connector authorization or Full Access requires actual enforcement and independent verification.
 - Existing Ask is current. **Full Access** is owner-authorized autonomy over technically available capabilities **without OSCAR per-action prompts** once properly activated; it cannot bypass OS/provider constraints, external mandatory approval, provenance, revocation or deterministic physical safety. Perception, retention and action grants are separate.
 - Group 4/D1 **PR #8 is merged**. The current owner brief authorizes **Group 4/D2 + Group 5/D3–D4 software integration** in one focused draft PR: authenticated remote Grid, an outbound Windows Worker, existing Tauri/Android connectivity, synthetic enrollment and separate-process/emulated acceptance. Preserve Ask/scoped authority; do not activate Secure or Full Access. **Do not access or test the owner's physical Android phone**, including ADB, pairing, installation, biometrics or personal data. Target only an explicitly identified disposable emulator. Oracle procurement/provisioning, cloud billing, public firewall/DNS changes, real owner/provider enrollment, firmware flashing, real audio capture, release and PR merge remain separately authorized commissioning work. [Current integration evidence and boundaries](docs/development/GROUP-04-D2.md).
+- **2026-10-19 local-only continuation:** the owner stopped GitHub Actions after quota exhaustion. Continue implementation, verification and evidence locally; do not push or trigger further CI. Draft PR #9 was last pushed at `676a0b1`; subsequent local changes remain unpublished. Completed CI receipts and intentionally cancelled jobs retain their distinct statuses in the integration ledger.
 - **All obsolete PR-specific and dated run prohibitions from 2026-10-04 through 2026-10-17 are superseded**; read historical implementation/evidence receipts for provenance, not as current instructions. Preserve that history in Git. Don't add another Group 3 or resurrect PR #7.
 
 ## Durable engineering standards

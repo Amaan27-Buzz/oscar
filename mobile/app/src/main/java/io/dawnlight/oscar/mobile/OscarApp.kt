@@ -186,14 +186,14 @@ private val Ink = Color(0xFF1A1B18)
         state.inspected?.let { TaskInspector(it, session::closeInspector, { task, action -> session.closeInspector(); session.review(task, action) }, state.link == Link.CONNECTED && !state.busy) }
         state.approval?.let { approval ->
             DisposableEffect(state.epoch, approval.id) { onDispose { confirmation.cancel() } }
-            ApprovalDialog(approval, state.busy, approval.current(state, System.currentTimeMillis()), session::dismissApproval, confirm = {
+            ApprovalDialog(approval, state.busy, approval.current(state, System.currentTimeMillis(), android.os.SystemClock.elapsedRealtime()), session::dismissApproval, confirm = {
                 val epoch = state.epoch
                 confirmation.confirm(approval, { session.complete(approval, epoch) }, {
                     if (session.state.value.epoch == epoch && session.state.value.approval == approval) {
                         session.dismissApproval(); session.message("Android confirmation was denied or unavailable. This phone granted no consent.")
                     }
                 })
-            }, replyPreview = state.replyPreview, coreNow = state.coreNow(System.currentTimeMillis()), decline =
+            }, replyPreview = state.replyPreview, coreNow = state.coreNow(System.currentTimeMillis(), android.os.SystemClock.elapsedRealtime()), decline =
                 state.snapshot?.tasks?.firstOrNull { task -> approval.operation == "approve" && task.id == approval.material().getString("task_id") && "deny" in task.actions }
                     ?.let { task -> { session.dismissApproval(); session.review(task, "deny") } })
         }
@@ -249,6 +249,8 @@ private val Ink = Color(0xFF1A1B18)
     val event = canonical ?: remember(state, composing, reduced, voice) { adapter.event(state, System.currentTimeMillis(), composing, reduced, voice.phase) }
     val source = io.dawnlight.oscar.expression.Contract.parse(event)?.source ?: adapter.source
     Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-        ExpressionPresence(event, source, size, reduced, Modifier.testTag(tag))
+        ExpressionPresence(event, source, size, reduced, Modifier.testTag(tag), clock = {
+            if (canonical != null) state.coreNow(System.currentTimeMillis(), android.os.SystemClock.elapsedRealtime()) else System.currentTimeMillis()
+        })
     }
 }
