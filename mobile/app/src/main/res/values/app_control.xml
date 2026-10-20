@@ -1,0 +1,3 @@
+<resources>
+    <string name="app_control_description">Optional OSCAR app control. Reads selected apps only for an explicitly reviewed request and may perform the exact reviewed click or text entry. No continuous capture, password access or automatic authority. Enable inspection and actions separately in OSCAR Privacy; disable this service here at any time.</string>
+</resources>

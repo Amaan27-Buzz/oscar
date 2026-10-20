@@ -1,0 +1,9 @@
+<resources>
+    <item name="capability_fixture_input" type="id" />
+    <item name="capability_fixture_submit" type="id" />
+    <item name="capability_fixture_result" type="id" />
+    <string name="capability_fixture_hint">Synthetic agenda</string>
+    <string name="capability_fixture_empty">Not submitted</string>
+    <string name="capability_fixture_review">Review synthetic agenda</string>
+    <string name="capability_fixture_result">Reviewed: %1$s</string>
+</resources>

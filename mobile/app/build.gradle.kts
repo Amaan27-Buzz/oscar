@@ -35,6 +35,7 @@ android {
     }
     sourceSets["main"].assets.srcDir(layout.buildDirectory.dir("generated/mobile-assets"))
     sourceSets["review"].res.srcDir("src/debug/res")
+    sourceSets["review"].java.srcDir("src/debug/java")
 }
 tasks.named("preBuild") { dependsOn(mobileAssets) }
 kotlin { compilerOptions { jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17) } }

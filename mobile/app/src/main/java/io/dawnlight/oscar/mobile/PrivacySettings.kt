@@ -138,12 +138,22 @@ import androidx.compose.ui.semantics.liveRegion
     SupportingDetails("Drafts & retention") { Text("Unsent drafts use encrypted recovery. Discard clears the draft, not Core memory. Perception never enables retention; Core memory policy is managed separately.", style = MaterialTheme.typography.bodySmall) }
     }
     PreferenceGroup("Actions") {
+    LocalGrant("Allow reviewed app actions", "app_actions", "Selected apps only; each action still needs a current Core review.")
+    HorizontalDivider()
+    LocalGrant("Allow selected app inspection", "accessibility_perception", "Also needs Android accessibility access. Does not retain screen content.")
+    HorizontalDivider()
+    LocalGrant("Allow reviewed accessibility actions", "accessibility_actions", "Exact reviewed clicks or text entry in selected apps. No password access.")
+    HorizontalDivider()
+    NativeAppScope()
+    HorizontalDivider()
     LocalGrant("Allow confirmed notification replies", "notification_reply", "Each reply requires a fresh Core review and Android confirmation.")
-    SupportingDetails("Action permissions") { Text("Remote task actions require Core pairing and confirmation. Other communication, location, camera and overlay actions are unavailable.", style = MaterialTheme.typography.bodySmall) }
+    SupportingDetails("Action permissions") { Text("Remote task actions require Core pairing and confirmation. App-control execution also needs a commissioned Core binding. Location and camera actions are unavailable.", style = MaterialTheme.typography.bodySmall) }
     var revokeFailed by remember { mutableStateOf(false) }
     OscarButton(onClick = { scope.launch {
         val applied = withContext(Dispatchers.IO) { prefs.edit().putBoolean("microphone_perception", false)
-            .putBoolean("notification_context", false).putBoolean("notification_reply", false).putString("notification_sources", "").commit() }
+            .putBoolean("notification_context", false).putBoolean("notification_reply", false).putString("notification_sources", "")
+            .putBoolean("app_actions", false).putBoolean("accessibility_perception", false).putBoolean("accessibility_actions", false)
+            .putString("native_action_packages", "").commit() }
         revokeFailed = !applied
         NotificationBoundary.privacyChanged(); VoicePresentation.cancel(context)
     } }, modifier = Modifier.fillMaxWidth(), outlined = true, color = Clay) { Text("Revoke OSCAR grants") }

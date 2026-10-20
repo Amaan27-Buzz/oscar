@@ -27,9 +27,12 @@ class CoreSession(application: Application) : AndroidViewModel(application) {
     private val history = GridHistory()
     private var rejected = false
     private var enrollment: CoreClient? = null
+    private var pendingShare: String? = null
+    internal val nativeCapabilities = NativeCapabilities(application)
     private fun connection(saved: JSONObject) = CoreClient(saved, vault::signDevice)
 
     fun start() {
+        nativeCapabilities.gate.foreground(true)
         active = true
         polling?.cancel()
         polling = viewModelScope.launch {
@@ -54,6 +57,7 @@ class CoreSession(application: Application) : AndroidViewModel(application) {
                 } catch (cancelled: CancellationException) { throw cancelled }
                 catch (_: Exception) { if (mutable.value.epoch == epoch) mutable.value = mutable.value.unavailable("Saved connection unavailable. Reconnect from trusted Core.") }
             }
+            pendingShare?.let { pendingShare = null; acceptSharedText(it) }
             var failures = 0
             while (isActive && !rejected) {
                 if (!mutable.value.busy) refresh()
@@ -63,6 +67,7 @@ class CoreSession(application: Application) : AndroidViewModel(application) {
         }
     }
     fun stop() {
+        nativeCapabilities.gate.foreground(false)
         if (BuildConfig.DEBUG) android.util.Log.d("OscarSession", "stop; epoch=${mutable.value.epoch}")
         VoicePresentation.cancel(getApplication())
         val loaded = !mutable.value.restoring
@@ -104,10 +109,12 @@ class CoreSession(application: Application) : AndroidViewModel(application) {
             alerts.changed(old.snapshot, snapshot)
         } catch (cancelled: CancellationException) { throw cancelled }
         catch (_: CoreClient.SessionRejected) {
+            nativeCapabilities.revoke()
             rejected = true
             if (mutable.value.epoch == epoch) mutable.value = mutable.value.unavailable("This device’s connection expired or was revoked. Re-enroll from your trusted Core.")
         }
         catch (failure: Exception) {
+            nativeCapabilities.revoke()
             if (mutable.value.epoch == epoch) {
                 if (BuildConfig.DEBUG) android.util.Log.w("OscarSession", "snapshot failed (${failure.javaClass.simpleName}); epoch=$epoch")
                 mutable.value = mutable.value.unavailable("Core is unavailable or returned invalid state. No action is confirmed; refresh before retrying.")
@@ -123,10 +130,12 @@ class CoreSession(application: Application) : AndroidViewModel(application) {
             try { work(epoch) }
             catch (cancelled: CancellationException) { throw cancelled }
             catch (_: CoreClient.SessionRejected) {
+                nativeCapabilities.revoke()
                 rejected = true
                 if (mutable.value.epoch == epoch) mutable.value = mutable.value.unavailable("This device’s connection expired or was revoked. Re-enroll from your trusted Core.")
             }
             catch (failure: Exception) {
+                nativeCapabilities.revoke()
                 if (mutable.value.epoch == epoch) {
                     if (BuildConfig.DEBUG) android.util.Log.w("OscarSession", "request failed (${failure.javaClass.simpleName}); epoch=$epoch")
                     mutable.value = mutable.value.unavailable("Request could not be confirmed. Inspect current Core state before retrying.")
@@ -140,6 +149,15 @@ class CoreSession(application: Application) : AndroidViewModel(application) {
     fun writeDraft(text: String) {
         if (mutable.value.restoring || mutable.value.link == Link.CONNECTING) return
         persistDraft(text)
+    }
+    fun acceptSharedText(text: String) {
+        if (text.isBlank() || text.length > 1000) return
+        if (mutable.value.restoring) { pendingShare = text; return }
+        if (mutable.value.draft.isNotBlank() && mutable.value.draft != text) {
+            message("Shared text was not imported because your existing draft is still open.")
+            return
+        }
+        mutable.value = mutable.value.copy(draft = text)
     }
     private fun persistDraft(text: String, saved: () -> Unit = {}) {
         if (text.length > 1000) return
@@ -258,6 +276,7 @@ class CoreSession(application: Application) : AndroidViewModel(application) {
         mutable.value = mutable.value.unavailable("Stopped waiting locally. Core execution may continue; reconnect and inspect before another action.")
     }
     fun connect(session: JSONObject) {
+        nativeCapabilities.revoke()
         CompanionOverlay.hide(getApplication())
         VoicePresentation.cancel(getApplication())
         operation?.cancel(); client?.cancel()
@@ -288,6 +307,7 @@ class CoreSession(application: Application) : AndroidViewModel(application) {
         }
     }
     fun enroll(origin: String, invitation: JSONObject, retain: Boolean) {
+        nativeCapabilities.revoke()
         operation?.cancel(); client?.cancel(); enrollment?.cancel(); polling?.cancel()
         CompanionOverlay.hide(getApplication()); VoicePresentation.cancel(getApplication())
         val epoch = mutable.value.epoch + 1
@@ -311,6 +331,7 @@ class CoreSession(application: Application) : AndroidViewModel(application) {
         }
     }
     fun rotateConnection() {
+        nativeCapabilities.revoke()
         if (client?.remote() != true) return
         request { epoch ->
             val previous = client!!
@@ -393,5 +414,5 @@ class CoreSession(application: Application) : AndroidViewModel(application) {
             catch (_: Exception) { if (mutable.value.epoch == epoch) message("Owner key unavailable. Configure a device lock and verify platform support during commissioning.") }
         }
     }
-    override fun onCleared() { client?.cancel(); enrollment?.cancel(); super.onCleared() }
+    override fun onCleared() { nativeCapabilities.close(); client?.cancel(); enrollment?.cancel(); super.onCleared() }
 }

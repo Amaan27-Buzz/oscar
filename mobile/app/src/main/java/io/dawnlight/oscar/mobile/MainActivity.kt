@@ -19,6 +19,7 @@ class MainActivity : ComponentActivity() {
         window.addFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE)
         enableEdgeToEdge()
         session = ViewModelProvider(this)[CoreSession::class.java]
+        if (savedInstanceState == null) acceptShare(intent)
         confirmation = OwnerConfirmation(this)
         if (BuildConfig.DEBUG) lifecycle.addObserver(androidx.lifecycle.LifecycleEventObserver { _, event ->
             android.util.Log.d("OscarLifecycle", "$event; changingConfigurations=$isChangingConfigurations; finishing=$isFinishing")
@@ -29,6 +30,16 @@ class MainActivity : ComponentActivity() {
                 session.start()
                 try { awaitCancellation() } finally { confirmation.cancel(); session.stop() }
             }
+        }
+    }
+    override fun onNewIntent(intent: android.content.Intent) {
+        super.onNewIntent(intent)
+        acceptShare(intent)
+    }
+    private fun acceptShare(intent: android.content.Intent?) {
+        if (intent?.action == android.content.Intent.ACTION_SEND && intent.type == "text/plain") {
+            try { intent.getStringExtra(android.content.Intent.EXTRA_TEXT)?.let(session::acceptSharedText) }
+            catch (_: android.os.BadParcelableException) { }
         }
     }
 }

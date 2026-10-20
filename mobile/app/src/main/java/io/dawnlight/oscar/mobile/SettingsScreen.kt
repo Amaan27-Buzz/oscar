@@ -138,6 +138,7 @@ import kotlinx.coroutines.withContext
         TextButton(onClick = { CompanionOverlay.hide(context) }) { Text("Hide Companion") }
         TextButton(onClick = { CompanionOverlay.hide(context, disable = true) }) { Text("Disable Companion overlay") }
         Text("Requires separately authorized Core presence. Stops on lock, disconnection or permission loss. Does not listen or display conversations. Widgets remain unavailable.", style = MaterialTheme.typography.bodySmall)
-        Text("Background microphone access is unavailable until voice setup is complete. OSCAR does not start capture at boot or use Accessibility automation.", style = MaterialTheme.typography.bodySmall)
+        Text("Background microphone access is unavailable until voice setup is complete. OSCAR does not start capture at boot.", style = MaterialTheme.typography.bodySmall)
     }
+    NativeCapabilitySettings()
 }
