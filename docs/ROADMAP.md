@@ -6,6 +6,9 @@
 
 ## Development principle
 
+Current local software work: [Group 5 C1/C2 foundation and acceptance](development/GROUP-05-CAPABILITY-IDENTITY.md),
+based on the unmerged D2 candidate. This adds no slice numbers or gate promotion.
+
 One OSCAR identity and continuous relationship → Controller/Personal Policy → canonical Event Archive and Memory Fabric → authorized Grid and Worker/Executive → evidence and independent verification → native Desktop and Android Presence. Perception ≠ retention ≠ action. No fake success; no alternative Core.
 
 ## Slice 00 — Repository / architecture foundation

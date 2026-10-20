@@ -1,5 +1,13 @@
 # OSCAR — Current Status & Checklist
 
+**2026-10-20 local Group 5 C1/C2 candidate:** the
+[foundation ledger](development/GROUP-05-CAPABILITY-IDENTITY.md) records account
+identity/Auth Broker, actual MCP SDK sessions, account browser isolation, native
+management and synthetic Windows/emulator acceptance. It depends on local D2
+`bd0102a`; neither candidate is merged. Live providers, Android remote execution,
+hosted/owner acceptance and broad autonomous control remain incomplete. No CI
+was triggered; Ask is active and C3/C4 are separate milestones.
+
 **Verified project checkpoint: 2026-10-19.** This distinguishes merged reference software from actually operational Cloud, Desktop, Android, voice and hardware capabilities. Read [delivery plan](DELIVERY-PLAN.md), [canonical slices](SLICE-NUMBERING.md), [build gates](BUILD-GATES.md), and [deployment](DEPLOYMENT.md). Historical reports remain historical; GitHub Actions green does not mean physical PASS.
 
 ## Completed and integrated for documented scope

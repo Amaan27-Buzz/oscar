@@ -1,5 +1,15 @@
 # Native Connector Fabric
 
+**2026-10-20 local candidate:** [Group 5 C1/C2](development/GROUP-05-CAPABILITY-IDENTITY.md)
+adds stable operational/account identities, PKCE/OIDC native-vault brokerage,
+account/generation/audience checks and actual official MCP SDK stdio/Streamable
+HTTP sessions. [Authentication details](development/GROUP-05-AUTH.md) and
+[MCP lifecycle](development/GROUP-05-MCP.md) distinguish synthetic acceptance
+from live provider commissioning. The older injected MCP boundary remains a
+compatibility adapter; it is not the new session manager. Existing Grid,
+Personal Policy, Runtime and Executive remain authoritative. New account-bound
+callers must not use the legacy unbound connector compatibility path.
+
 **Current delivery, 2026-10-18:** [verified checklist](CURRENT-STATUS.md), [Group 5 C2 plugin/MCP plan](DELIVERY-PLAN.md). The Connector Fabric, manifests, bounded HTTP/MCP adapters and a narrow owner-verified GitHub OAuth/federation path are **software foundations**, not a deployable general plugin marketplace/client. Real provider/MCP commissioning, easy discovery/install and independent verification remain active capability work after Group 4 authenticated Grid.
 
 OSCAR prefers official structured authenticated APIs, then official connectors,

@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-10-20 — Group 5 C1/C2 local capability and identity foundation
+
+- Added OSCAR operational identity, stable multi-account selection, account-bound
+  credential references, PKCE/OIDC Auth Broker and native credential lifecycle.
+- Added official MCP SDK sessions and reviewed plugin lifecycle through the
+  existing Connector Fabric/Grid/Runtime, preserving Ask and independent evidence.
+- Added typed browser operations and per-account persistent profiles; exercised
+  real Chromium sessions and a disposable Windows UIA form.
+- Added Android native intent/app-control boundaries and disposable-emulator
+  checks. Android remote execution and physical/OEM acceptance remain separate.
+- Added native Desktop account/plugin state and signed management review; no
+  owner/provider enrollment, cloud provisioning, push, CI or merge.
+
 ## 2026-10-18 — Group 4/D1 persistent Cloud Core candidate
 
 - Composed the existing Core as a configurable persistent Linux service with explicit initialization, canonical volume identity, single-writer locking and conservative crash recovery.

@@ -1,5 +1,11 @@
 # OSCAR
 
+The local [Group 5 C1/C2 foundation](docs/development/GROUP-05-CAPABILITY-IDENTITY.md)
+adds operational identity, account-bound authentication, real MCP sessions,
+isolated persistent browser profiles and native connection management to the
+same Core. It depends on the unmerged D2 candidate and is not published or
+owner/provider commissioned. Ask remains active; Secure/Full Access is unavailable.
+
 Group 4/D1 provides the persistent Linux Cloud Core. The D2/D3–D4 integration
 candidate adds authenticated outbound Grid transport, scoped file execution and
 native connection support using that same Core. [Connected integration evidence](docs/development/GROUP-04-D2.md)

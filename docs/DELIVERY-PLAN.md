@@ -33,6 +33,15 @@ independent-network Windows operation. Physical Android stays separately gated.
 
 ## Group 5: make OSCAR capable and pleasant to use
 
+**2026-10-20:** [C1/C2 local foundation](development/GROUP-05-CAPABILITY-IDENTITY.md)
+now has executable synthetic acceptance for identity/account binding, official
+MCP transports, isolated browser profiles and Windows UIA, plus emulator-tested
+Android adapters. Native Desktop manages enrolled account/plugin state with
+signed Ask review. Trusted enrollment remains required; Android is not yet a
+remote execution Worker. This is a local branch based on unmerged D2, with no
+push/CI/merge, owner credentials or physical-phone access. C3 signed standing
+delegation and C4 portable voice/awareness requirements are in that ledger.
+
 The current owner brief authorizes **D3/D4 software integration alongside D2**:
 existing Tauri and Kotlin/Compose connectivity, synthetic credentials, builds,
 unit tests and explicitly selected disposable emulators. It prohibits physical

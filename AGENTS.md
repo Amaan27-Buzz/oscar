@@ -4,6 +4,15 @@
 
 ## Current owner sequencing and authorization
 
+- **2026-10-20 Group 5 C1/C2 local continuation:** the owner authorizes the
+  universal capability/identity foundation on `codex/group-05-universal-capabilities`,
+  based on unmerged D2 `bd0102a`. Implementation, local tests, synthetic native
+  credentials, disposable emulator checks and local commits are authorized.
+  No push, Actions, remote PR, merge, cloud/real-account commissioning or physical
+  Android access. Ask remains active; C3/C4 remain separate. Read the
+  [foundation ledger](docs/development/GROUP-05-CAPABILITY-IDENTITY.md) and its
+  authentication/MCP/Android companion evidence before continuing.
+
 - Software foundations Slices **00–17 are integrated**. Single **Group 3 Slices 14–17, PR #7 is MERGED**, not a draft requiring completion. GitHub Actions was enabled; final-head and main CI passed. **Gate C/D PARTIAL**, Gate E NOT PASSED.
 - Next **Group 4 D1** persistent secure Cloud Core (Oracle Always Free preferred **candidate**, not deployed), then **D2** authenticated remote Grid. **Group 5** real Desktop/Android and owner onboarding, full computer use, plugins/MCP, Secure/Full Access, real voice, Sentry, automation and Chief of Staff. **Group 6** scoped operational alpha. **Group 7** dedicated home-server laptop *when available*. **Group 8** ESP32/Pico physical acceptance and remaining formal gates.
 - **Keep canonical slices 00–20**. Delivery stages D1–D4/C1–C4 and Groups 4–8 are not renumbered slices. Physical **Slice 18 is deferred, not cancelled**; remote-facing Slice 19 hardening is mandatory in Group 4. A scoped alpha must not claim full Slice 20 / Gate E PASS while mandatory physical acceptance remains incomplete.
