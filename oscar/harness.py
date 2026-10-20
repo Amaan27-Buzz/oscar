@@ -6,16 +6,22 @@ from pathlib import Path
 from time import time
 from typing import Any
 
+from .accounts import AccountRegistry
+from .auth_broker import AuthBroker
 from .capabilities import Cancellation, FileExecutor, ScopedFiles, Verifier, addition_executor
+from .connector_mount import ConnectorMount
+from .connectors import ConnectorFabric, ConnectorVerifier, EnvironmentSecrets
 from .contracts import Action, Capability, Result, new_id
 from .credentials import CredentialPool
 from .discovery import HTTPDiscovery
 from .event_archive import EventArchive
 from .executive import Executive
 from .grid import Grid, InternalSessionRuntime, Node, NodeRole
+from .mcp_client import MCPPlugins
 from .memory_fabric import MemoryFabric
 from .models import Mode, ModelRequest, ProviderError, RoutingPolicy
-from .oauth_device import Vault
+from .oauth_device import Vault, VaultResolver
+from .policy import PersonalPolicy
 from .presence import PresenceRuntime
 from .providers import HTTPAdapter
 from .registry import Registry
@@ -23,6 +29,7 @@ from .retrieval import ProviderInventorySource, RetrievalExecutor
 from .router import Router, RouteUnavailable
 from .runtime import Runtime
 from .search import TavilySource
+from .secure_credentials import WindowsCredentialStore
 from .setup_runtime import SetupRuntime
 from .storage import StateConflict, Store
 from .transport import Dispatcher
@@ -89,6 +96,28 @@ class Harness:
         self.runtime = Runtime(
             self.store, self.grid, Verifier(self.files), memory=MemoryFabric(self.archive)
         )
+        self.accounts = AccountRegistry(self.store, clock)
+        self.accounts.operational_identity(self.runtime.relationship_id)
+        if vault is None:
+            try:
+                vault = WindowsCredentialStore()
+            except OSError:
+                pass
+        # Empty provider configuration permits private local cleanup, never enrollment.
+        self.auth = AuthBroker(self.accounts, vault, [], clock=clock) if vault is not None else None
+        self.connectors = ConnectorFabric(
+            self.store,
+            VaultResolver(vault) if vault is not None else EnvironmentSecrets({}),
+            PersonalPolicy(self.store),
+            accounts=self.accounts,
+        )
+
+        def authorize_account(account_id: str, generation: int) -> None:
+            self.accounts.check(account_id, generation)
+
+        self.plugins = MCPPlugins(self.store, self.connectors, authorize_account=authorize_account)
+        self.runtime.verifier = ConnectorVerifier(self.runtime.verifier, self.connectors)
+        self.runtime.connections = self
         self.registry = Registry.load(manifest, self.store)
         self.pool = CredentialPool(
             list(self.registry.providers.values()), credential_environ, store=self.store
@@ -192,7 +221,22 @@ class Harness:
             self.close()
             raise
 
+    def mount_connectors(
+        self,
+        node_id: str,
+        grants: tuple[str, ...],
+        *,
+        owner_authorized: bool,
+        confirmed: Callable[[Action], bool] | None = None,
+    ) -> ConnectorMount:
+        if any(node_id == node for node in self.executive.targets):
+            raise StateConflict("executor node is already mounted")
+        return ConnectorMount(
+            self, node_id, grants, owner_authorized=owner_authorized, confirmed=confirmed
+        )
+
     def close_services(self) -> None:
+        self.plugins.close()
         self.executive.close()
         if self.execution_session.thread.ident is not None:
             self.execution_session.close()

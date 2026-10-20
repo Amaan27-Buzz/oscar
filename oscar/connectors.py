@@ -15,12 +15,12 @@ from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field, replace
 from enum import StrEnum
 from time import time
-from typing import Any, Protocol
+from typing import TYPE_CHECKING, Any, Protocol
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote, urlencode, urlparse
 from urllib.request import Request, build_opener
 
-from .capabilities import Cancellation, Verifier
+from .capabilities import Cancellation, Executor, Verifier
 from .contracts import (
     Action,
     Capability,
@@ -39,6 +39,9 @@ from .grid import Grid, SessionHandle
 from .http_client import NoRedirects
 from .policy import PersonalPolicy
 from .storage import Store
+
+if TYPE_CHECKING:
+    from .accounts import AccountRegistry
 
 
 class RiskLevel(StrEnum):
@@ -214,6 +217,9 @@ class ConnectorInstance:
     granted_scopes: frozenset[str] = frozenset()
     available: bool = True
     session_ready: bool = False
+    account_id: str | None = None
+    account_generation: int | None = None
+    account_audience: str | None = None
 
 
 @dataclass(frozen=True)
@@ -360,9 +366,12 @@ class ConnectorFabric:
         secrets: SecretResolver,
         policy: PersonalPolicy,
         http: ConnectorHTTP | None = None,
+        *,
+        accounts: "AccountRegistry | None" = None,
     ):
         self.store, self.secrets, self.policy = store, secrets, policy
         self.http = http or HTTPSConnector()
+        self.accounts = accounts
         self.instances: dict[str, ConnectorInstance] = {}
         self.outcomes: dict[str, ConnectorOutcome] = {}
         self.requests: dict[str, dict[str, Any]] = {}
@@ -416,11 +425,57 @@ class ConnectorFabric:
     def install(self, instance: ConnectorInstance) -> None:
         if instance.id in self.instances:
             raise ValueError("connector instance already installed")
+        if instance.account_id is not None:
+            if (
+                instance.account_generation is None
+                or (
+                    instance.manifest.auth == AuthType.MCP
+                    and not callable(getattr(self.http, "connection_state", None))
+                )
+                or (
+                    instance.manifest.auth != AuthType.MCP
+                    and (
+                        self.accounts is None
+                        or instance.account_audience is None
+                        or instance.credential is None
+                    )
+                )
+            ):
+                raise ValueError("complete trusted account binding required")
         self.instances[instance.id] = instance
 
     def state(self, instance: ConnectorInstance, spec: ConnectorCapability) -> ConnectionState:
         if not instance.available:
             return ConnectionState.UNAVAILABLE
+        observed = None
+        connection_state = getattr(self.http, "connection_state", None)
+        if connection_state:
+            observed = connection_state(instance)
+            if observed is not None and observed != ConnectionState.READY:
+                return ConnectionState(observed)
+        if instance.account_id is not None:
+            # MCP's trusted transport checks its private session/account binding itself.
+            if instance.manifest.auth == AuthType.MCP:
+                return (
+                    ConnectionState.READY
+                    if observed == ConnectionState.READY and instance.session_ready
+                    else ConnectionState.AUTH_MISSING
+                )
+            try:
+                if self.accounts is None or instance.account_generation is None:
+                    return ConnectionState.AUTH_MISSING
+                self.accounts.check(
+                    instance.account_id,
+                    instance.account_generation,
+                    service=instance.manifest.id,
+                    provider=instance.manifest.provider,
+                    audience=instance.account_audience,
+                    scopes=spec.scopes,
+                    capability=spec.name,
+                    credential=instance.credential,
+                )
+            except (KeyError, PermissionError):
+                return ConnectionState.AUTH_MISSING
         if instance.manifest.auth == AuthType.MCP:
             return ConnectionState.READY if instance.session_ready else ConnectionState.AUTH_MISSING
         if instance.manifest.auth != AuthType.NONE and (
@@ -444,7 +499,7 @@ class ConnectorFabric:
                 "connector-reference",
                 "low" if spec.risk == RiskLevel.READ else "high",
             )
-            for instance in self.instances.values()
+            for instance in tuple(self.instances.values())
             for spec in instance.manifest.capabilities
             if not eligible_only or self.state(instance, spec) == ConnectionState.READY
         ]
@@ -500,9 +555,17 @@ class ConnectorFabric:
                 raise ValueError("credential material cannot enter connector inputs")
             endpoint(spec, action.parameters)
             try:
-                payload, identity = self.http.request(
-                    instance.manifest, spec, action.parameters, secret
-                )
+                if self.state(instance, spec) != ConnectionState.READY:
+                    raise ConnectorError("auth_missing")
+                cancellable = getattr(self.http, "request_cancellable", None)
+                if cancellable:
+                    payload, identity = cancellable(
+                        instance.manifest, spec, action.parameters, secret, cancellation
+                    )
+                else:
+                    payload, identity = self.http.request(
+                        instance.manifest, spec, action.parameters, secret
+                    )
                 cleaned = self.secrets.redact(json.dumps(payload))
                 payload = json.loads(cleaned)
                 source = SourceRef(
@@ -529,6 +592,10 @@ class ConnectorFabric:
                         "provider_rejected",
                         "invalid_credential",
                         "mcp_tool_failed",
+                        "mcp_timeout",
+                        "mcp_disconnected",
+                        "mcp_request_failed",
+                        "mcp_tool_removed",
                     }
                     else "connector_failure"
                 )
@@ -562,6 +629,8 @@ class ConnectorFabric:
             "connector_result",
             {
                 "instance_id": instance.id,
+                "account_id": instance.account_id,
+                "account_generation": instance.account_generation,
                 "capability": name,
                 "result_id": result.id,
                 "status": Epistemic.REPORTED,
@@ -584,7 +653,7 @@ class ConnectorFabric:
         granted: frozenset[str],
         *,
         confirmed: Callable[[Action], bool] = lambda _: False,
-    ) -> Callable[[Action, Cancellation], Result]:
+    ) -> Executor:
         def invoke(action: Action, cancellation: Cancellation) -> Result:
             if set(action.parameters) != {"request_ref"}:
                 raise ValueError("durable connector actions must use transient input references")
@@ -732,6 +801,8 @@ class ConnectorVerifier(Verifier):
             secret = (
                 self.fabric.secrets.resolve(instance.credential) if instance.credential else None
             )
+            if self.fabric.state(instance, read) != ConnectionState.READY:
+                raise ConnectorError("readback_unavailable")
             payload, _ = self.fabric.http.request(instance.manifest, read, params, secret)
             matches = payload.get("id") == response_id and all(
                 payload.get(k) == v for k, v in criterion["expected"].items()

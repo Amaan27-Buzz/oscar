@@ -513,6 +513,11 @@ class Desktop(Mobile):
             return self.conversation(session, payload["before"])
         if op == "snapshot" and payload == {}:
             view = super().request(session, data)
+            if self.runtime.connections is not None:
+                from .connections import snapshot
+
+                self.permission(session, "desktop.connections", ("desktop:inspect",))
+                view["connections"] = snapshot(self.runtime.connections)
             view["conversation"] = self.conversation(session)
             view["voice_available"] = (
                 self.voice is not None
@@ -537,6 +542,30 @@ class Desktop(Mobile):
                 "automations": "task_foundation",
             }
             return view
+        if op in {"management_challenge", "management_complete"}:
+            from .connections import Connections
+
+            h = self.runtime.connections
+            if h is None:
+                raise PermissionError("Connections unavailable")
+            scope = "control:approve:" + h.node_id
+            self.permission(session, "connections.manage", ("desktop:connect", scope))
+            key = self.store.get("sunday_key", session.node_id)
+            if key["session_id"] != session.id:
+                raise PermissionError("current owner key enrollment required")
+            manager = Connections(h)
+            if op == "management_challenge":
+                return manager.challenge(
+                    session.node_id, session.id, scope, self.grants(session), payload
+                )
+            return manager.complete(
+                session.node_id,
+                session.id,
+                key["public_key"],
+                scope,
+                self.grants(session),
+                payload,
+            )
         if op in {"catalog", "act"}:
             self.authenticate(session, "desktop:connect")
             self.permission(session, "desktop.catalog", ("desktop:inspect",))

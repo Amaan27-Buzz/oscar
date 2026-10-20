@@ -28,6 +28,7 @@ from .transport import Transport, action_envelope, parse_result
 
 if TYPE_CHECKING:
     from .executive import Executive
+    from .harness import Harness
     from .presence import PresenceRuntime
     from .setup_runtime import SetupRuntime
     from .world_runtime import WorldRuntime
@@ -51,6 +52,7 @@ class Runtime:
         self.setup: SetupRuntime | None = None
         self.presence: PresenceRuntime | None = None
         self.executive: Executive | None = None
+        self.connections: Harness | None = None
         self.store.task_resources.add(self)
 
     @property

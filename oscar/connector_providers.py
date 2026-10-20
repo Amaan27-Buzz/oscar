@@ -1,6 +1,8 @@
 """Provider manifests map official APIs into the same native Grid capability contracts."""
 
+import hashlib
 import json
+import re
 from pathlib import Path
 from typing import Any, Protocol
 
@@ -263,11 +265,27 @@ class MCPSession(Protocol):
     def call_tool(self, name: str, arguments: dict[str, Any]) -> dict[str, Any]: ...
 
 
+def mcp_capability_name(name: str) -> str:
+    # Grid names are lowercase; preserve case-sensitive MCP names at the transport boundary.
+    return "mcp." + (
+        name
+        if re.fullmatch(r"[a-z0-9_.-]+", name)
+        else "tool-" + hashlib.sha256(name.encode()).hexdigest()
+    )
+
+
 class MCPBoundary:
     """Untrusted tool annotations cannot grant authority or assert successful verification."""
 
-    def __init__(self, session: MCPSession, reviewed: dict[str, RiskLevel | tuple[RiskLevel, ...]]):
+    def __init__(
+        self,
+        session: MCPSession,
+        reviewed: dict[str, RiskLevel | tuple[RiskLevel, ...]],
+        *,
+        manifest_id: str = "mcp",
+    ):
         self.session, self.reviewed = session, reviewed
+        self.manifest_id = manifest_id
 
     def manifest(self) -> ConnectorManifest:
         tools = self.session.list_tools()
@@ -286,7 +304,7 @@ class MCPBoundary:
                 raise ConnectorError("reviewed_risks_missing")
             caps.append(
                 _cap(
-                    "mcp." + name,
+                    mcp_capability_name(name),
                     "/tools/{name}",
                     method="POST",
                     risk=risks[0],
@@ -296,7 +314,7 @@ class MCPBoundary:
                 )
             )
         return ConnectorManifest(
-            "mcp",
+            self.manifest_id,
             "MCP reviewed session",
             "https://mcp.invalid",
             tuple(caps),
@@ -326,12 +344,17 @@ class MCPConnectorHTTP:
         parameters: dict[str, Any],
         secret: str | None,
     ) -> tuple[dict[str, Any], str]:
-        if manifest.id != "mcp" or spec.name not in {
+        if manifest.id != self.boundary.manifest_id or spec.name not in {
             c.name for c in self.boundary.manifest().capabilities
         }:
             raise PermissionError("MCP capability was not owner reviewed")
         endpoint(spec, parameters)
-        name = spec.name.removeprefix("mcp.")
+        name = next(
+            (name for name in self.boundary.reviewed if mcp_capability_name(name) == spec.name),
+            None,
+        )
+        if name is None:
+            raise PermissionError("MCP tool not owner reviewed")
         if parameters["path"]["name"] != name:
             raise PermissionError("MCP tool identity mismatch")
         response = self.boundary.call(name, parameters["body"])

@@ -10,6 +10,7 @@ from threading import Thread
 from time import time
 from typing import Any
 
+from .browser_profiles import BrowserProfiles
 from .capabilities import Cancellation
 from .contracts import Action, Capability, Result, new_id
 from .machine import MachineWorker
@@ -165,9 +166,11 @@ class InteractiveWorker(MachineWorker):
         desktop: bool = False,
         browser: bool = False,
         desktop_app_ids: tuple[str, ...] = (),
+        browser_profiles: BrowserProfiles | None = None,
         **kwargs: Any,
     ):
         super().__init__(*args, **kwargs)
+        self.browser_profiles = browser_profiles
         self.desktop: Any = None
         self.browser_python = (
             next(
@@ -259,6 +262,13 @@ class InteractiveWorker(MachineWorker):
             )
         return caps
 
+    def check(self, action: Action, cancellation: Cancellation) -> None:
+        super().check(action, cancellation)
+        if action.capability_id == "machine.browser" and "account_id" in action.parameters:
+            if self.browser_profiles is None:
+                raise PermissionError("account browser storage unavailable")
+            self.browser_profiles.check(action.parameters)
+
     def execute(self, action: Action, cancellation: Cancellation) -> Result:
         if action.capability_id not in {
             "machine.apps",
@@ -337,13 +347,30 @@ class InteractiveWorker(MachineWorker):
 
                 validate(request)
                 assert self.browser_python is not None
-                code, output = self.run_command(
-                    action,
-                    cancellation,
-                    browser_command(self.browser_python, ["--request", json.dumps(request)]),
-                    ".",
-                    request["timeout"],
-                )
+                arguments = ["--request", json.dumps(request)]
+                if "account_id" in action.parameters:
+                    if self.browser_profiles is None:
+                        raise PermissionError("account browser storage unavailable")
+                    with self.browser_profiles.open(action.parameters, self.scope.root) as profile:
+                        code, output = self.run_command(
+                            action,
+                            cancellation,
+                            browser_command(
+                                self.browser_python, [*arguments, "--profile", str(profile)]
+                            ),
+                            ".",
+                            request["timeout"],
+                        )
+                else:
+                    if set(action.parameters) - {"request", "timeout"}:
+                        raise ValueError("unsupported browser parameters")
+                    code, output = self.run_command(
+                        action,
+                        cancellation,
+                        browser_command(self.browser_python, arguments),
+                        ".",
+                        request["timeout"],
+                    )
                 if code:
                     diagnostic = browser_diagnostic(output, code)
                     self.outputs[action.id] = json.dumps(diagnostic)

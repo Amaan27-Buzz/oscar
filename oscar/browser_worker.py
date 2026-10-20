@@ -104,6 +104,13 @@ def validate(request: dict[str, Any]) -> None:
         "inspect": set(),
         "screenshot": {"path"},
         "download": {"selector", "path", "max_bytes"},
+        "select": {"selector", "value"},
+        "scroll": {"selector"},
+        "accessibility": {"selector"},
+        "upload": {"selector", "path"},
+        "new_tab": set(),
+        "switch_tab": {"index"},
+        "close_tab": set(),
     }
     for step in steps:
         if not isinstance(step, dict):
@@ -132,6 +139,14 @@ def validate(request: dict[str, Any]) -> None:
             type(step["max_bytes"]) is not int or not 1 <= step["max_bytes"] <= 1_000_000
         ):
             raise ValueError("bounded download required")
+        if operation == "select" and (
+            not isinstance(step["value"], str) or len(step["value"]) > 1000
+        ):
+            raise ValueError("bounded option value required")
+        if operation == "switch_tab" and (
+            type(step["index"]) is not int or not 0 <= step["index"] < 8
+        ):
+            raise ValueError("bounded tab index required")
 
 
 class BrowserFailure(RuntimeError):
@@ -159,7 +174,7 @@ def probe() -> None:
             raise BrowserFailure("browser.playwright_launch", type(error).__name__) from error
 
 
-def run(request: dict[str, Any], root: Path) -> dict[str, Any]:
+def run(request: dict[str, Any], root: Path, *, profile: Path | None = None) -> dict[str, Any]:
     validate(request)
     sync_playwright = playwright_runtime()
 
@@ -171,14 +186,22 @@ def run(request: dict[str, Any], root: Path) -> dict[str, Any]:
     }
     observations = []
     with sync_playwright() as playwright:
+        browser = None
         try:
-            browser = playwright.chromium.launch(headless=True, env=env)
+            if profile is not None:
+                context = playwright.chromium.launch_persistent_context(
+                    str(profile),
+                    headless=True,
+                    env=env,
+                    accept_downloads=False,
+                    service_workers="block",
+                )
+            else:
+                browser = playwright.chromium.launch(headless=True, env=env)
+                context = browser.new_context(accept_downloads=False, service_workers="block")
         except Exception as error:
-            raise BrowserFailure("browser.playwright_launch", type(error).__name__) from error
-        try:
-            context = browser.new_context(accept_downloads=False)
-        except Exception as error:
-            browser.close()
+            if browser:
+                browser.close()
             raise BrowserFailure("browser.playwright_launch", type(error).__name__) from error
 
         # Recheck redirects, subresources and navigation at the network boundary.
@@ -190,9 +213,16 @@ def run(request: dict[str, Any], root: Path) -> dict[str, Any]:
             route.continue_() if permitted else route.abort()
 
         context.route("**/*", authorize_route)
+
+        def configure_page(target: Any) -> None:
+            target.on("dialog", lambda dialog: dialog.dismiss())
+            target.on("popup", lambda popup: popup.close())
+
+        for restored in context.pages:
+            restored.close()
         page = context.new_page()
-        page.on("dialog", lambda dialog: dialog.dismiss())
-        page.on("popup", lambda popup: popup.close())
+        configure_page(page)
+        tabs = [page]
         try:
             for step in request["steps"]:
                 remaining = request["timeout"] - (monotonic() - started)
@@ -209,6 +239,45 @@ def run(request: dict[str, Any], root: Path) -> dict[str, Any]:
                     page.locator(step["selector"]).click()
                 elif operation == "wait":
                     page.locator(step["selector"]).wait_for(state="visible")
+                elif operation == "select":
+                    page.locator(step["selector"]).select_option(step["value"])
+                elif operation == "scroll":
+                    page.locator(step["selector"]).scroll_into_view_if_needed()
+                elif operation == "accessibility":
+                    observations.append(
+                        {
+                            "url": page.url,
+                            "accessibility": page.locator(step["selector"]).aria_snapshot()[
+                                : request["max_text"]
+                            ],
+                            "status": "REPORTED",
+                        }
+                    )
+                elif operation == "new_tab":
+                    if len(tabs) >= 8:
+                        raise ValueError("browser tab bound exceeded")
+                    page = context.new_page()
+                    configure_page(page)
+                    tabs.append(page)
+                elif operation == "switch_tab":
+                    page = tabs[step["index"]]
+                elif operation == "close_tab":
+                    if len(tabs) == 1:
+                        raise ValueError("cannot close final tab within a plan")
+                    tabs.remove(page)
+                    page.close()
+                    page = tabs[-1]
+                elif operation == "upload":
+                    data = ScopedFiles(root).read(step["path"])
+                    if len(data) > 1_000_000:
+                        raise ValueError("upload bound exceeded")
+                    page.locator(step["selector"]).set_input_files(
+                        {
+                            "name": step["path"],
+                            "mimeType": "application/octet-stream",
+                            "buffer": data,
+                        }
+                    )
                 elif operation == "inspect":
                     # Fixed bounded evaluation avoids retrieving an entire unbounded DOM first.
                     snapshot = page.evaluate(
@@ -243,7 +312,8 @@ def run(request: dict[str, Any], root: Path) -> dict[str, Any]:
             return {"observations": observations, "isolated": True, "status": "REPORTED"}
         finally:
             context.close()
-            browser.close()
+            if browser:
+                browser.close()
 
 
 def main() -> int:
@@ -251,13 +321,14 @@ def main() -> int:
     mode = parser.add_mutually_exclusive_group(required=True)
     mode.add_argument("--request")
     mode.add_argument("--probe", action="store_true")
+    parser.add_argument("--profile", type=Path)
     args = parser.parse_args()
     try:
         if args.probe:
             probe()
             print(json.dumps({"category": "browser.ready"}))
         else:
-            print(json.dumps(run(json.loads(args.request), Path.cwd())))
+            print(json.dumps(run(json.loads(args.request), Path.cwd(), profile=args.profile)))
         return 0
     except BrowserFailure as error:
         print(json.dumps({"category": error.category, "error_type": error.error_type}))

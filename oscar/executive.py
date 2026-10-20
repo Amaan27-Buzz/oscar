@@ -84,6 +84,9 @@ def authorize_step(store: Store, grid: Grid, task_id: str, capability: dict[str,
         {"source": "executive", "node": capability["node_id"]},
         now=grid.clock(),
         confirmed=confirmed,
+        confirmation_required=(
+            capability["execution_class"] == "connector" and capability["risk"] != "low"
+        ),
     )
     if not decision.allowed:
         raise PermissionError(decision.reason)

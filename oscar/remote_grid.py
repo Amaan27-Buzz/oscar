@@ -450,6 +450,26 @@ class RemoteGrid:
         with self.lock:
             self.require(session, "grid:connect")
             self.grid.heartbeat(session)
+            if operation in {"management_challenge", "management_complete"}:
+                from .connections import Connections
+
+                binding = self.require(session, "grid:approve")
+                if not binding["owner_public_key"]:
+                    raise PermissionError("enrolled owner review required")
+                grants = frozenset(self.store.get("session", session.id)["scopes"])
+                manager = Connections(self.h)
+                if operation == "management_challenge":
+                    return manager.challenge(
+                        session.node_id, session.id, "grid:approve", grants, payload
+                    )
+                return manager.complete(
+                    session.node_id,
+                    session.id,
+                    binding["owner_public_key"],
+                    "grid:approve",
+                    grants,
+                    payload,
+                )
             if operation in {"snapshot", "conversation"}:
                 return self.snapshot(session, payload)
             if operation == "presence" and not payload:
@@ -1302,6 +1322,10 @@ class RemoteGrid:
             "observed_at_ms": int(time() * 1000),
         }
         presence = self.presence(session)
+        if "grid:approve" in self.store.get("session", session.id)["scopes"]:
+            from .connections import snapshot as connections_snapshot
+
+            snapshot["connections"] = connections_snapshot(self.h)
         if presence is not None:
             snapshot["presence"] = presence
         while len(json.dumps(snapshot).encode()) > 245760:
