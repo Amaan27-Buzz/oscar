@@ -20,6 +20,7 @@ pub fn now_ms() -> u64 {
         .as_millis() as u64
 }
 struct CoreSnapshot {
+    connections: Option<Value>,
     nodes: Vec<Value>,
     presence: Option<Value>,
     core_clock: Option<Value>,
@@ -46,6 +47,7 @@ pub struct CoreClient {
     pub reference_target: Option<Value>,
 }
 struct Pending {
+    complete_operation: String,
     challenge_id: String,
     body: Vec<u8>,
     view: ReviewView,
@@ -215,6 +217,7 @@ impl CoreClient {
         };
         let operating = value.get("operating").cloned();
         Ok(CoreSnapshot {
+            connections: value.get("connections").cloned(),
             nodes: value["nodes"].as_array().cloned().unwrap_or_default(),
             presence: value.get("presence").cloned(),
             core_clock: value.get("core_clock").cloned(),
@@ -233,10 +236,20 @@ impl CoreClient {
         })
     }
     pub fn review(&self, task_id: &str, operation: ControlOperation) -> Result<ReviewView, String> {
+        self.review_change(task_id, operation, "challenge", "complete", None)
+    }
+    fn review_change(
+        &self,
+        task_id: &str,
+        operation: ControlOperation,
+        challenge_operation: &str,
+        complete_operation: &str,
+        payload: Option<Value>,
+    ) -> Result<ReviewView, String> {
         bound(task_id, 80)?;
         let value = self.request(
-            "challenge",
-            json!({"operation":operation,"task_id":task_id}),
+            challenge_operation,
+            payload.unwrap_or_else(|| json!({"operation":operation,"task_id":task_id})),
         )?;
         let body = STANDARD
             .decode(
@@ -264,7 +277,7 @@ impl CoreClient {
         if claim["expires_at_ms"] != expires || claim["material"]["target"] != value["target"] {
             return Err("review presentation is not bound to signed target/expiry".into());
         }
-        if self.is_remote() {
+        if self.is_remote() || challenge_operation == "management_challenge" {
             use sha2::{Digest, Sha256};
             let mut digest = Sha256::new();
             for field in ["operation", "scope", "target", "review", "exact_request"] {
@@ -276,7 +289,7 @@ impl CoreClient {
                 digest.update(bytes);
             }
             if claim["version"] != 2
-                || claim["scope"] != "grid:approve"
+                || (self.is_remote() && claim["scope"] != "grid:approve")
                 || claim["generation"] != value["generation"]
                 || claim["display_digest"] != format!("{:x}", digest.finalize())
             {
@@ -318,6 +331,7 @@ impl CoreClient {
         pending.insert(
             id,
             Pending {
+                complete_operation: complete_operation.into(),
                 challenge_id: text("challenge_id")?,
                 body,
                 view: view.clone(),
@@ -349,7 +363,7 @@ impl CoreClient {
         }
         let signature = self.signer.sign(&pending.body)?;
         self.request(
-            "complete",
+            &pending.complete_operation,
             json!({"challenge_id":pending.challenge_id,"signature":STANDARD.encode(signature)}),
         )
     }
@@ -423,6 +437,7 @@ impl Bridge {
             self.voice_request(json!({"operation":"inspect"}))?;
         }
         let CoreSnapshot {
+            connections,
             nodes,
             presence,
             core_clock,
@@ -515,6 +530,7 @@ impl Bridge {
             connection.status = "online".into();
         }
         view.operating = operating;
+        view.connections = connections;
         view.presence = presence;
         view.core_clock = core_clock;
         view.setup = setup;
@@ -589,6 +605,7 @@ impl Bridge {
             view.adaptive_views.clear();
             view.executive = None;
             view.setup = None;
+            view.connections = None;
             view.capabilities.clear();
             view.nodes.clear();
             if let Some(connection) = &mut view.connection {
@@ -655,6 +672,9 @@ impl Bridge {
             return Ok(view.clone());
         }
         view.message = value["message"].as_str().map(str::to_owned);
+        if let Some(connections) = value.get("connections") {
+            view.connections = Some(connections.clone());
+        }
         if value["task_id"].is_string() {
             view.feedback = None;
             view.expression.current_observed_at_ms = now_ms();
@@ -915,6 +935,29 @@ impl Bridge {
                 drop(view);
                 result
             }
+            Command::ManageConnection {
+                operation,
+                id,
+                value,
+            } => {
+                bound(&operation, 40)?;
+                bound(&id, 80)?;
+                bound(&value, 500)?;
+                client.invalidate_reviews();
+                let review = client.review_change(
+                    &id,
+                    ControlOperation::Approve,
+                    "management_challenge",
+                    "management_complete",
+                    Some(json!({"operation": operation, "id": id, "value": value})),
+                )?;
+                let mut view = self.view.lock().map_err(|_| "native state unavailable")?;
+                if revision == Some(self.content_revision.load(Ordering::SeqCst)) {
+                    view.review = Some(review);
+                    view.expression.generation += 1;
+                }
+                return Ok(view.clone());
+            }
             Command::Review { task_id, operation } => {
                 client.invalidate_reviews();
                 let review = client.review(&task_id, operation)?;
@@ -1058,6 +1101,7 @@ mod tests {
         client.pending.lock().expect("pending").insert(
             "stale".into(),
             Pending {
+                complete_operation: "complete".into(),
                 challenge_id: "challenge".into(),
                 body: vec![],
                 view: view.clone(),
@@ -1078,6 +1122,7 @@ mod tests {
         client.pending.lock().unwrap().insert(
             "fresh".into(),
             Pending {
+                complete_operation: "complete".into(),
                 challenge_id: "challenge".into(),
                 body: vec![],
                 view: fresh.clone(),

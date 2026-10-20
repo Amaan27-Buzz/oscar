@@ -28,6 +28,14 @@ export interface Operating {access:string;secure:string;full_access:string;aware
 export interface GridNode {id:string;role:string;status:string}
 export interface CoreClockObservation {observed_at_ms:number;received_at_ms:number;transport_ms:number}
 export interface ConnectionView {endpoint:string;installation_id:string;node_id:string|null;public_key:string;owner_public_key:string;status:string}
+export interface ConnectionsView {
+  identity:{id:string;display_name:string;operational_email:string|null;status:string};
+  accounts:{id:string;provider:string;tenant:string;subject:string;alias:string;identity_class:string;generation:number;status:string;remote_revocation:string;local_credentials?:string;services:{id:string;scopes:string[];expires_at:number|null;restrictions:string[]}[]}[];
+  plugins:{id:string;name:string;account_id:string;enabled:boolean;health:string;transport:string;permissions:Record<string,string[]>;tools:{name:string}[];activity:{event?:string;observed_at?:number}[]}[];
+  access:string;enrollment:string;observed_at_ms:number;
+  credential_deletion?:'available'|'unavailable';accounts_total?:number;plugins_total?:number;truncated?:boolean;
+}
+export interface View {connections?:ConnectionsView|null}
 export interface View {connection?:ConnectionView|null;nodes?:GridNode[];core_clock?:CoreClockObservation|null;executive?:ExecutiveSummary|null;presence?:{version:1;visible:boolean;expression:unknown}|null;setup?:Record<string,{configured?:boolean;operational?:boolean}>|null;adaptive_views?:unknown[];access_mode?:string|null;voice_available?:boolean;conversation?:ConversationHistory;operating?:Operating|null;theme?:'light'|'dark';expression:ExpressionReadback|null;link:string;orb:string;window:WindowMode;tasks:Task[];capabilities:Capability[];
   context:Context|null;preview:Preview|null;review:Review|null;current:Task|null;message:string|null;
   voice:string;voice_support?:VoiceSupport;shortcut:string;shortcut_enabled?:boolean;capture_choice?:ContextChoice;observed_at_ms:number;reference:boolean;window_revision?:number;feedback?:RequestFeedback|null}
@@ -41,6 +49,7 @@ export type ActForm=
   |{operation:'launch_app';app_id:string}
   |{operation:'list_files'|'git_status'|'git_diff'|'git_log'|'git_branches'|'ps_environment'|'list_apps'|'worker_tools'};
 export type Command=
+  |{kind:'manage_connection';operation:'rename_account'|'default_account'|'disconnect_account'|'connect_plugin'|'disable_plugin'|'enable_plugin'|'remove_plugin';id:string;value:string}
   |{kind:'connection_prepare';url:string}|{kind:'connection_enroll';invitation:string}|{kind:'connection_logout'}|{kind:'cancel_remote';task_id:string}
   |{kind:'history';before:number}
   |{kind:'ready'|'refresh'|'discard'|'voice_stop'|'voice_cancel'}|{kind:'window';mode:WindowMode}

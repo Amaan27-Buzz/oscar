@@ -97,6 +97,11 @@ impl ActForm {
 #[derive(Deserialize)]
 #[serde(tag = "kind", rename_all = "snake_case", deny_unknown_fields)]
 pub enum Command {
+    ManageConnection {
+        operation: String,
+        id: String,
+        value: String,
+    },
     ConnectionPrepare {
         url: String,
     },
@@ -369,6 +374,7 @@ pub enum ThemeChoice {
 }
 #[derive(Clone, Serialize, Default, PartialEq)]
 pub struct View {
+    pub connections: Option<Value>,
     pub connection: Option<ConnectionView>,
     pub nodes: Vec<Value>,
     pub presence: Option<serde_json::Value>,

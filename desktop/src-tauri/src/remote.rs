@@ -437,10 +437,12 @@ impl RemoteClient {
                 Ok(
                     json!({"tasks":tasks,"nodes":projection.nodes,"conversation":projection.conversation,
                     "presence":snapshot["presence"],
+                    "connections":snapshot["connections"],
                     "core_clock":clock,"observed_at_ms":received_at,"voice_available":false,
                     "operating":{"access":"Ask","secure":"unavailable","full_access":"unavailable"}}),
                 )
             }
+            "management_challenge" | "management_complete" => self.request(operation, payload),
             "catalog" => Ok(
                 json!({"capabilities":self.projection.lock().map_err(|_| "native synchronization unavailable")?.capabilities}),
             ),
