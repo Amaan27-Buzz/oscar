@@ -43,6 +43,7 @@ class WindowsAppWorkflowTests(unittest.TestCase):
                         self.fail(f"synthetic app exited: {process.communicate()[1]!r}")
                     sleep(0.1)
                 handle = int((root / "window.txt").read_text())
+                self.assertEqual("False", (root / "keyboard-focus.txt").read_text())
                 with closing(Store(root / "runtime.sqlite")) as store:
                     grid = Grid(store)
                     grants = (
@@ -108,7 +109,9 @@ class WindowsAppWorkflowTests(unittest.TestCase):
                         )
                         return runtime.run(task.id, transports)
 
-                    execute("set_text_checked", editor, text=text, expected_text="")
+                    self.assertEqual("", editor["text"])
+                    entered = execute("set_text_checked", editor, text=text, expected_text="")
+                    self.assertEqual(TaskState.PARTIALLY_VERIFIED, entered.state)
                     observed = worker.desktop.observe(
                         {"operation": "read", **target, "runtime_id": editor["runtime_id"]}
                     )
