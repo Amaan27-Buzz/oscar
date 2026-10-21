@@ -43,6 +43,9 @@ pub struct CoreClient {
     client: Client,
     signer: Arc<Signer>,
     pending: Mutex<HashMap<String, Pending>>,
+    oauth_active: AtomicBool,
+    oauth_epoch: AtomicU64,
+    oauth_notice: Mutex<Option<String>>,
     pub reference: bool,
     pub reference_target: Option<Value>,
 }
@@ -92,6 +95,9 @@ impl CoreClient {
             client,
             signer,
             pending: Mutex::new(HashMap::new()),
+            oauth_active: AtomicBool::new(false),
+            oauth_epoch: AtomicU64::new(0),
+            oauth_notice: Mutex::new(None),
             reference: bootstrap.reference,
             reference_target: bootstrap.reference_target,
         })
@@ -116,6 +122,9 @@ impl CoreClient {
                 connection.installation_id
             ))?),
             pending: Mutex::new(HashMap::new()),
+            oauth_active: AtomicBool::new(false),
+            oauth_epoch: AtomicU64::new(0),
+            oauth_notice: Mutex::new(None),
             reference: false,
             reference_target: None,
             remote: Some(remote),
@@ -161,6 +170,8 @@ impl CoreClient {
         let status = response.status();
         let limit = if matches!(operation, "snapshot" | "conversation") {
             4_194_304
+        } else if matches!(operation, "assistance_complete" | "management_complete") {
+            262_144
         } else {
             65_536
         };
@@ -264,7 +275,7 @@ impl CoreClient {
             || claim["operation"]
                 != serde_json::to_value(operation).map_err(|_| "invalid operation")?
             || claim["material"]["task_id"] != task_id
-            || body.len() > 16384
+            || body.len() > 32768
         {
             return Err("signing envelope identity rejected".into());
         }
@@ -277,7 +288,7 @@ impl CoreClient {
         if claim["expires_at_ms"] != expires || claim["material"]["target"] != value["target"] {
             return Err("review presentation is not bound to signed target/expiry".into());
         }
-        if self.is_remote() || challenge_operation == "management_challenge" {
+        if self.is_remote() || challenge_operation.ends_with("_challenge") {
             use sha2::{Digest, Sha256};
             let mut digest = Sha256::new();
             for field in ["operation", "scope", "target", "review", "exact_request"] {
@@ -372,6 +383,56 @@ impl CoreClient {
             p.clear();
         }
     }
+    fn start_oauth(self: &Arc<Self>, value: &mut Value) -> Result<(), String> {
+        let Some(enrollment) = value.as_object_mut().and_then(|v| v.remove("enrollment")) else {
+            return Ok(());
+        };
+        let enrollment = crate::oauth::Enrollment::parse(&enrollment, now_ms() / 1000)?;
+        let listener = enrollment.bind()?;
+        if self
+            .oauth_active
+            .compare_exchange(false, true, Ordering::AcqRel, Ordering::Acquire)
+            .is_err()
+        {
+            return Err("Finish the current account enrollment before starting another.".into());
+        }
+        if let Err(error) = enrollment.open() {
+            self.oauth_active.store(false, Ordering::Release);
+            return Err(error);
+        }
+        let client = Arc::clone(self);
+        let epoch = self.oauth_epoch.load(Ordering::Acquire);
+        std::thread::spawn(move || {
+            let current = || client.oauth_epoch.load(Ordering::Acquire) == epoch;
+            let result = enrollment.wait(listener, current).and_then(|code| {
+                if !current() {
+                    return Err("Account enrollment cancelled.".into());
+                }
+                client.request(
+                    "oauth_callback",
+                    json!({"id":enrollment.id,"state":enrollment.state(),"code":code}),
+                )
+            });
+            if current() {
+                let notice = match result {
+                    Ok(value) => value["message"].as_str().unwrap_or("Account response received; check Connections for current state.").to_owned(),
+                    Err(_) => "Account connection could not be verified. Check Connections before trying again.".into(),
+                };
+                if let Ok(mut pending) = client.oauth_notice.lock() {
+                    *pending = Some(notice);
+                }
+            }
+            client.oauth_active.store(false, Ordering::Release);
+        });
+        Ok(())
+    }
+    fn review_needs_task(&self, id: &str) -> bool {
+        self.pending
+            .lock()
+            .ok()
+            .and_then(|p| p.get(id).map(|r| r.complete_operation == "complete"))
+            .unwrap_or(true)
+    }
 }
 
 pub struct Bridge {
@@ -425,6 +486,7 @@ impl Bridge {
         self.voice_revision.fetch_add(1, Ordering::SeqCst);
         if let Some(previous) = active.as_ref() {
             previous.invalidate_reviews();
+            previous.oauth_epoch.fetch_add(1, Ordering::AcqRel);
         }
         Ok(std::mem::replace(&mut *active, client))
     }
@@ -506,25 +568,31 @@ impl Bridge {
         view.tasks = tasks;
         if view.review.as_ref().is_some_and(|review| {
             review.expires_at_ms <= now_ms()
-                || !view
-                    .current
-                    .as_ref()
-                    .filter(|task| {
-                        task.task_id == review.task_id
-                            && view.expression.current_observed_at_ms
-                                >= view.expression.tasks_observed_at_ms
-                    })
-                    .or_else(|| {
-                        view.tasks
-                            .iter()
-                            .find(|task| task.task_id == review.task_id)
-                    })
-                    .is_some_and(|task| task.actions.contains(&review.operation))
+                || (client.review_needs_task(&review.review_id)
+                    && !view
+                        .current
+                        .as_ref()
+                        .filter(|task| {
+                            task.task_id == review.task_id
+                                && view.expression.current_observed_at_ms
+                                    >= view.expression.tasks_observed_at_ms
+                        })
+                        .or_else(|| {
+                            view.tasks
+                                .iter()
+                                .find(|task| task.task_id == review.task_id)
+                        })
+                        .is_some_and(|task| task.actions.contains(&review.operation)))
         }) {
             client.invalidate_reviews();
             view.review = None;
         }
         view.capabilities = caps;
+        if let Ok(mut notice) = client.oauth_notice.lock() {
+            if let Some(message) = notice.take() {
+                view.message = Some(message);
+            }
+        }
         view.nodes = nodes;
         if let Some(connection) = &mut view.connection {
             connection.status = "online".into();
@@ -604,6 +672,7 @@ impl Bridge {
             view.core_clock = None;
             view.adaptive_views.clear();
             view.executive = None;
+            view.day_brief = None;
             view.setup = None;
             view.connections = None;
             view.capabilities.clear();
@@ -675,6 +744,31 @@ impl Bridge {
         if let Some(connections) = value.get("connections") {
             view.connections = Some(connections.clone());
         }
+        if !self.hide_private.load(Ordering::Acquire) {
+            if let Some(brief) = value.get("day_brief") {
+                view.day_brief = Some(brief.clone());
+            }
+            if let Some(executive) = value.get("executive") {
+                view.executive = Some(executive.clone());
+            }
+            if let Some(assistance) = value.get("assistance") {
+                if let Some(executive) = &mut view.executive {
+                    executive["management"] = assistance.clone();
+                }
+            }
+        }
+        if let Some(authority) = value.get("authority") {
+            if let Some(executive) = &mut view.executive {
+                executive["management"]["authority"] = authority.clone();
+            }
+            if let Some(operating) = &mut view.operating {
+                operating["access"] = json!(match authority["mode"].as_str() {
+                    Some("full") => "Full Access",
+                    Some("secure") => "Secure",
+                    _ => "Ask",
+                });
+            }
+        }
         if value["task_id"].is_string() {
             view.feedback = None;
             view.expression.current_observed_at_ms = now_ms();
@@ -721,8 +815,15 @@ impl Bridge {
             ));
             view.preview = None;
         }
+        let voice_state = value["voice_state"].as_str().or_else(|| {
+            if value["task_id"].is_string() {
+                None
+            } else {
+                value["state"].as_str()
+            }
+        });
         if matches!(
-            value["state"].as_str(),
+            voice_state,
             Some(
                 "idle"
                     | "listening"
@@ -732,9 +833,8 @@ impl Bridge {
                     | "interrupted"
                     | "cancelled"
             )
-        ) && !value["task_id"].is_string()
-        {
-            view.voice = value["state"].as_str().unwrap_or_default().into();
+        ) {
+            view.voice = voice_state.unwrap_or_default().into();
             view.expression.voice_observed_at_ms = now_ms();
         }
         if value["preview_id"].is_string() || value["state"] == "blocked" {
@@ -785,6 +885,7 @@ impl Bridge {
             view.conversation = ConversationView::default();
             view.adaptive_views.clear();
             view.executive = None;
+            view.day_brief = None;
             for task in &mut view.tasks {
                 task.response = None;
                 task.value = None;
@@ -831,6 +932,14 @@ impl Bridge {
                 crate::remote::task(&value)?
             }
             Command::Refresh => return self.refresh(),
+            Command::DayBrief => {
+                self.hide_private.store(false, Ordering::Release);
+                self.view
+                    .lock()
+                    .map_err(|_| "native state unavailable")?
+                    .day_brief = None;
+                client.request("day_brief", json!({}))?
+            }
             Command::History { before } => {
                 let page: ConversationView = serde_json::from_value(
                     client.request("conversation", json!({"before":before}))?,
@@ -935,21 +1044,60 @@ impl Bridge {
                 drop(view);
                 result
             }
-            Command::ManageConnection {
-                operation,
-                id,
-                value,
-            } => {
-                bound(&operation, 40)?;
-                bound(&id, 80)?;
-                bound(&value, 500)?;
+            command @ (Command::ManageConnection { .. }
+            | Command::ManageAssistance { .. }
+            | Command::SetAccess { .. }) => {
+                let (id, family, payload) = match command {
+                    Command::ManageConnection {
+                        operation,
+                        id,
+                        value,
+                    } => {
+                        bound(&operation, 40)?;
+                        bound(&id, 80)?;
+                        bound(&value, 20000)?;
+                        (
+                            id.clone(),
+                            "management",
+                            json!({"operation":operation,"id":id,"value":value}),
+                        )
+                    }
+                    Command::ManageAssistance {
+                        operation,
+                        id,
+                        value,
+                    } => {
+                        bound(&operation, 40)?;
+                        bound(&id, 80)?;
+                        (
+                            id.clone(),
+                            "assistance",
+                            json!({"operation":operation,"id":id,"value":value}),
+                        )
+                    }
+                    Command::SetAccess {
+                        relationship_id,
+                        value,
+                    } => {
+                        bound(&relationship_id, 80)?;
+                        (relationship_id, "authority", value)
+                    }
+                    _ => unreachable!(),
+                };
+                if serde_json::to_vec(&payload)
+                    .map_err(|_| "invalid management request")?
+                    .len()
+                    > 24000
+                {
+                    return Err("management request too large".into());
+                }
                 client.invalidate_reviews();
                 let review = client.review_change(
                     &id,
                     ControlOperation::Approve,
-                    "management_challenge",
-                    "management_complete",
-                    Some(json!({"operation": operation, "id": id, "value": value})),
+                    &format!("{family}_challenge"),
+                    &format!("{family}_complete"),
+                    Some(payload),
                 )?;
                 let mut view = self.view.lock().map_err(|_| "native state unavailable")?;
                 if revision == Some(self.content_revision.load(Ordering::SeqCst)) {
@@ -957,6 +1105,10 @@ impl Bridge {
                     view.expression.generation += 1;
                 }
                 return Ok(view.clone());
+            }
+            Command::RevokeAccess => {
+                client.invalidate_reviews();
+                client.request("authority_revoke", json!({}))?
             }
             Command::Review { task_id, operation } => {
                 client.invalidate_reviews();
@@ -969,7 +1121,8 @@ impl Bridge {
                 return Ok(view.clone());
             }
             Command::Confirm { review_id, accept } => {
-                let result = client.confirm(&review_id, accept, owner_review)?;
+                let mut result = client.confirm(&review_id, accept, owner_review)?;
+                client.start_oauth(&mut result)?;
                 let mut view = self.view.lock().map_err(|_| "native state unavailable")?;
                 if revision == Some(self.content_revision.load(Ordering::SeqCst)) {
                     view.review = None;
@@ -977,9 +1130,11 @@ impl Bridge {
                 drop(view);
                 result
             }
-            Command::VoiceStart { context_id } => {
+            Command::VoiceStart { context_id, mode } => {
                 bound(&context_id, 80)?;
-                return self.voice_request(json!({"operation":"start","context_id":context_id}));
+                return self.voice_request(
+                    json!({"operation":"start","context_id":context_id,"mode":mode}),
+                );
             }
             Command::VoiceStop => return self.voice_request(json!({"operation":"stop"})),
             Command::VoiceCancel => return self.voice_request(json!({"operation":"cancel"})),
@@ -991,6 +1146,79 @@ impl Bridge {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn speech_lifecycle_preserves_issued_task_truth() {
+        let bridge = Bridge::new();
+        for speech in ["speaking", "cancelled", "idle"] {
+            let view = bridge.response(json!({"task_id":"issued","state":"verified","target":"fixture","voice_state":speech})).unwrap();
+            assert_eq!(view.voice, speech);
+            assert_eq!(view.current.unwrap().state, "verified");
+        }
+    }
+    #[test]
+    #[ignore = "requires scripts.software_voice_reference synthetic local Core fixture"]
+    fn synthetic_voice_loopback_bridge() {
+        let path =
+            std::env::var("OSCAR_VOICE_REFERENCE_BOOTSTRAP").expect("synthetic bootstrap required");
+        let bytes = std::fs::read(path).expect("synthetic bootstrap readable");
+        assert!(bytes.len() < 32768);
+        let bootstrap: Bootstrap =
+            serde_json::from_slice(&bytes).expect("bounded synthetic bootstrap");
+        assert!(bootstrap.reference && bootstrap.url.starts_with("http://127.0.0.1:"));
+        let client = CoreClient::new(bootstrap, Arc::new(Signer::new().unwrap())).unwrap();
+        let bridge = Bridge::new();
+        bridge.replace_client(Some(Arc::new(client))).unwrap();
+        assert!(bridge.refresh().unwrap().voice_available);
+        bridge
+            .execute(
+                Command::VoiceStart {
+                    context_id: String::new(),
+                    mode: VoiceMode::Ask,
+                },
+                |_| false,
+            )
+            .unwrap();
+        let deadline = std::time::Instant::now() + std::time::Duration::from_secs(60);
+        let task_id = loop {
+            assert!(
+                std::time::Instant::now() < deadline,
+                "synthetic Ask voice timed out"
+            );
+            let view = bridge.refresh().unwrap();
+            if view.voice == "idle" {
+                let task = view.current.expect("Ask reached canonical task admission");
+                assert_eq!(task.state, "planned");
+                assert!(task.actions.contains(&"approve".into()));
+                break task.task_id;
+            }
+            std::thread::sleep(std::time::Duration::from_millis(100));
+        };
+        let cancelled = bridge.execute(Command::VoiceCancel, |_| false).unwrap();
+        assert_eq!(cancelled.voice, "cancelled");
+        assert_eq!(cancelled.current.as_ref().unwrap().state, "planned");
+        bridge
+            .execute(
+                Command::VoiceStart {
+                    context_id: String::new(),
+                    mode: VoiceMode::Dictate,
+                },
+                |_| false,
+            )
+            .unwrap();
+        let deadline = std::time::Instant::now() + std::time::Duration::from_secs(60);
+        loop {
+            assert!(
+                std::time::Instant::now() < deadline,
+                "synthetic Dictate voice timed out"
+            );
+            let view = bridge.refresh().unwrap();
+            if view.preview.is_some() {
+                assert_eq!(view.current.unwrap().task_id, task_id);
+                break;
+            }
+            std::thread::sleep(std::time::Duration::from_millis(100));
+        }
+    }
     #[test]
     fn discarded_or_obsolete_content_cannot_reappear_from_late_response() {
         let bridge = Bridge::new();
@@ -1128,6 +1356,29 @@ mod tests {
                 view: fresh.clone(),
             },
         );
+        assert!(client.review_needs_task("fresh"));
+        assert!(client.review_needs_task("missing"));
+        for operation in [
+            "management_complete",
+            "assistance_complete",
+            "authority_complete",
+        ] {
+            client
+                .pending
+                .lock()
+                .unwrap()
+                .get_mut("fresh")
+                .unwrap()
+                .complete_operation = operation.into();
+            assert!(!client.review_needs_task("fresh"));
+        }
+        client
+            .pending
+            .lock()
+            .unwrap()
+            .get_mut("fresh")
+            .unwrap()
+            .complete_operation = "complete".into();
         let switching = Bridge::new();
         *switching.client.lock().unwrap() = Some(Arc::new(client));
         switching.view.lock().unwrap().review = Some(fresh);

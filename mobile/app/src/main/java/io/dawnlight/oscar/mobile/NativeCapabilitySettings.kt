@@ -16,12 +16,18 @@ import kotlinx.coroutines.withContext
     val adapter = remember(context) { NativeCapabilities(context) }
     DisposableEffect(adapter) { onDispose { adapter.close() } }
     var failed by remember { mutableStateOf(false) }
+    var workerStatus by remember { mutableStateOf(NativeWorker.status) }
+    LaunchedEffect(Unit) { while (true) { workerStatus = NativeWorker.status; kotlinx.coroutines.delay(1000) } }
     PreferenceGroup("App capabilities") {
         PreferenceValue("Accessibility access", if (access) "Enabled in Android" else "Not enabled")
         TextButton(onClick = { try { context.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)); failed = false }
             catch (_: Exception) { failed = true } }) { Text("Manage Android accessibility") }
         if (failed) Text("Android accessibility settings are unavailable. Access is unchanged.", color = MaterialTheme.colorScheme.error)
         Text("Inspection and actions need separate grants and selected apps in Privacy. Enabling Android access does not authorize a task.", style = MaterialTheme.typography.bodySmall)
+        PreferenceValue("Phone tasks", workerStatus)
+        TextButton(onClick = { try { if (NativeWorker.running) NativeWorker.stop(context) else NativeWorker.start(context); failed = false }
+            catch (_: Exception) { failed = true } }) { Text(if (NativeWorker.running) "Stop phone tasks" else "Start phone tasks") }
+        Text("Start while unlocked after enrolling this phone for execution. A visible notification remains while selected-app tasks run. Locking, Stop, revoked grants or a lost Core connection withdraws execution. Android may require opening OSCAR before launching another app.", style = MaterialTheme.typography.bodySmall)
         SupportingDetails("Available interfaces") {
             remember(revision) { adapter.status() }.forEach { capability ->
                 PreferenceValue(when (capability.id) {
@@ -29,9 +35,10 @@ import kotlinx.coroutines.withContext
                     "android.ui.inspect" -> "Inspect selected app"; "android.ui.click" -> "Click reviewed control"; else -> "Enter reviewed text"
                 }, capability.permission)
             }
-            Text("These native adapters require a commissioned Core execution binding. Remote app control is currently unavailable. Screen recording, coordinate gestures and broad phone control are unavailable.", style = MaterialTheme.typography.bodySmall)
+            Text("App launch, links, text share, selected-app inspection, click, text input, scroll and target-relative gestures use current Core authority. Dial, message and calendar actions open system-supported review screens; they do not claim completed calls, sent messages or saved events. Screen capture remains separately consented.", style = MaterialTheme.typography.bodySmall)
         }
     }
+    NativePlatformSettings()
 }
 
 @Composable internal fun NativeAppScope() {

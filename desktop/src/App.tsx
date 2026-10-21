@@ -20,7 +20,7 @@ export function App({port=send,events=subscribe,expressionKind='core',focusRevie
   const active=view.tasks.filter(t=>!['verified','failed','cancelled'].includes(t.state)).length;
   const attention=view.tasks.filter(t=>t.actions.includes('approve')).length;
   const expanded=view.window!=='compact';
-  function ptt(start:boolean){void run(start?{kind:'voice_start',context_id:view.context?.id??''}:{kind:'voice_stop'});}
+  function ptt(start:boolean){void run(start?{kind:'voice_start',context_id:view.context?.id??'',mode:mode==='Ask'?'Ask':'Dictate'}:{kind:'voice_stop'});}
   return <main className={`oscar ${expanded?'expanded':'compact'}`} data-orb={view.orb}>
     <header data-tauri-drag-region><DesktopExpression view={view} size={expanded?64:58} sourceKind={expressionKind}/>
       <div data-tauri-drag-region><h1>OSCAR</h1><p role="status" aria-live="polite">{stateLabel(view)}</p>

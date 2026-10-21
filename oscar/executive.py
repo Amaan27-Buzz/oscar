@@ -40,10 +40,37 @@ def confirmation_digest(store: Store, task_id: str) -> str:
     )
 
 
-def authorize_step(store: Store, grid: Grid, task_id: str, capability: dict[str, Any]) -> None:
+def authorize_step(
+    store: Store,
+    grid: Grid,
+    task_id: str,
+    capability: dict[str, Any],
+    executor: SessionHandle | None = None,
+) -> None:
     binding = store.get("plan", task_id)["executive"]
     worker = store.get("executive_worker", binding["worker_id"])
     goal = store.get("executive_goal", binding["goal_id"])
+    try:
+        owner = store.get("executive_owner", goal["id"])
+    except KeyError:
+        owner = None  # Trusted local authoring predates native owner sessions.
+    if owner is not None:
+        from .authority import StandingAuthority
+
+        current = StandingAuthority(store, grid, binding["relationship"])
+        if (
+            current._owner(
+                owner["node"], owner["session"], owner["scope"], frozenset({owner["scope"]})
+            )
+            != owner["public_key"]
+        ):
+            raise PermissionError("native responsibility owner key changed")
+        owner_session = store.get("session", owner["session"])
+        owner_node = store.get("node", owner["node"])
+        if owner["review_digest"] != goal["review_digest"] or not set(
+            capability["permissions"]
+        ) <= (set(owner_session["scopes"]) & set(owner_node["scopes"])):
+            raise PermissionError("native responsibility owner scope changed")
     pin = {
         "node_id": capability["node_id"],
         "capability_id": capability["id"],
@@ -77,6 +104,13 @@ def authorize_step(store: Store, grid: Grid, task_id: str, capability: dict[str,
         )
     except KeyError:
         confirmed = False
+    if executor is not None:
+        from .authority import StandingAuthority, delegated_confirmation
+
+        authority = StandingAuthority(store, grid, binding["relationship"])
+        if store.task(task_id).state == TaskState.PLANNED:
+            authority.bind(task_id, capability, executor)
+        confirmed = confirmed or delegated_confirmation(store, grid, task_id, capability, executor)
     decision = PersonalPolicy(store).evaluate(
         capability["id"],
         tuple(capability["permissions"]),
@@ -591,7 +625,12 @@ class Executive:
         return fences
 
     def learn(
-        self, goal_id: str, *, owner_authorized: bool, retain_authorized: bool
+        self,
+        goal_id: str,
+        *,
+        owner_authorized: bool,
+        retain_authorized: bool,
+        event_id: str | None = None,
     ) -> dict[str, str]:
         self._owner(owner_authorized)
         if retain_authorized is not True or self.runtime.memory is None:
@@ -642,7 +681,22 @@ class Executive:
             kind="workflow_candidate",
             sensitivity="personal",
             expires_at=self.grid.clock() + 604800,
+            id=event_id or new_id(),
         )
+        if event_id is not None:
+            try:
+                prior = self.runtime.memory.archive.event(event_id)
+                if (
+                    prior.content != event.content
+                    or prior.relationship_id != event.relationship_id
+                    or prior.kind != event.kind
+                    or prior.source != event.source
+                    or prior.status != event.status
+                ):
+                    raise StateConflict("retention receipt belongs to different work")
+                event = prior
+            except KeyError:
+                pass
         self.runtime.memory.archive.append(event, retain_authorized=True)
         row = {
             "id": event.id,
@@ -766,6 +820,7 @@ class Executive:
         *,
         owner_authorized: bool,
         retain_authorized: bool,
+        event_id: str | None = None,
     ) -> str:
         self._owner(owner_authorized)
         if retain_authorized is not True:
@@ -820,12 +875,32 @@ class Executive:
             status=Epistemic.VERIFIED,
             sensitivity="personal",
             expires_at=self.grid.clock() + 604800,
+            id=event_id or new_id(),
         )
+        if event_id is not None:
+            try:
+                prior = self.runtime.memory.archive.event(event_id)
+                if (
+                    prior.content != event.content
+                    or prior.relationship_id != event.relationship_id
+                    or prior.kind != event.kind
+                    or prior.source != event.source
+                    or prior.status != event.status
+                ):
+                    raise StateConflict("retention receipt belongs to different work")
+                event = prior
+            except KeyError:
+                pass
         self.runtime.memory.archive.append(event, retain_authorized=True)
         self.store.put("executive_workflow", workflow_id, {**row, "evaluation_event_id": event.id})
         return event.id
 
     def control(self, goal_id: str, operation: str, *, owner_authorized: bool) -> None:
+        for task_id in self.control_state(goal_id, operation, owner_authorized=owner_authorized):
+            self.runtime.cancel(task_id, self.targets)
+
+    def control_state(self, goal_id: str, operation: str, *, owner_authorized: bool) -> list[str]:
+        """Commit control state; the caller cancels returned tasks after its outer transaction."""
         self._owner(owner_authorized)
         if operation not in {"pause", "resume", "cancel"}:
             raise ValueError("unsupported commitment control")
@@ -835,12 +910,16 @@ class Executive:
                 raise StateConflict("commitment is not active")
             state = {"pause": "paused", "resume": "enabled", "cancel": "cancelled"}[operation]
             self.store.put("executive_goal", goal_id, {**row, "state": state})
-        if operation == "cancel":
-            for task_id in self._tasks(goal_id):
-                self.runtime.cancel(task_id, self.targets)
+        return self._tasks(goal_id) if operation == "cancel" else []
 
     def revoke_worker(self, worker_id: str, *, owner_authorized: bool) -> None:
+        for task_id in self.revoke_worker_state(worker_id, owner_authorized=owner_authorized):
+            self.runtime.cancel(task_id, self.targets)
+
+    def revoke_worker_state(self, worker_id: str, *, owner_authorized: bool) -> list[str]:
+        """Retire authority atomically; return tasks to cancel after the caller commits."""
         self._owner(owner_authorized)
+        tasks = []
         with self.store.transaction():
             row = self._row("executive_worker", worker_id)
             self.store.put(
@@ -848,9 +927,10 @@ class Executive:
                 worker_id,
                 {**row, "enabled": False, "revision": row["revision"] + 1},
             )
-        for goal in self.store.all("executive_goal"):
-            if goal["worker_id"] == worker_id and goal["state"] in {"enabled", "paused"}:
-                self.control(goal["id"], "cancel", owner_authorized=True)
+            for goal in self.store.all("executive_goal"):
+                if goal["worker_id"] == worker_id and goal["state"] in {"enabled", "paused"}:
+                    tasks.extend(self.control_state(goal["id"], "cancel", owner_authorized=True))
+        return tasks
 
     def _tasks(self, goal_id: str) -> list[str]:
         self._row("executive_goal", goal_id)
@@ -969,7 +1049,9 @@ class Executive:
                     with self.store.transaction():
                         if self.store.task(task.id).state == TaskState.PLANNED:
                             self.store.put("executive_context", task.id, {"fences": fences})
-                    authorize_step(self.store, self.grid, task.id, capability)
+                    authorize_step(
+                        self.store, self.grid, task.id, capability, self.targets[step["node_id"]][1]
+                    )
                     if self.stop.is_set():
                         break
                     token = new_id()

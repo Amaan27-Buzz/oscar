@@ -12,7 +12,8 @@ import math
 import re
 import secrets
 from collections.abc import Callable
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, replace
+from pathlib import Path
 from time import time
 from typing import Any
 from urllib.error import HTTPError, URLError
@@ -40,6 +41,7 @@ class OAuthProvider:
     audience: str
     tenant: str = ""
     client_secret_ref: str | None = None
+    allowed_scopes: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         for endpoint in (self.authorization_endpoint, self.token_endpoint, self.jwks_uri):
@@ -65,6 +67,48 @@ class OAuthProvider:
         for value in (self.id, self.client_id, self.service, self.audience, self.issuer):
             if not isinstance(value, str) or not value or len(value) > 1000:
                 raise ValueError("bounded OAuth configuration required")
+        if len(self.allowed_scopes) > 100 or any(
+            not isinstance(s, str) or not s or len(s) > 500 or any(c.isspace() for c in s)
+            for s in self.allowed_scopes
+        ):
+            raise ValueError("bounded configured OAuth scopes required")
+
+
+def load_providers(path: Path) -> list[OAuthProvider]:
+    """Load administered public app registrations, never tokens or arbitrary endpoints."""
+    if path.stat().st_size > 64_000:
+        raise ValueError("OAuth configuration bound")
+    data = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(data, dict) or set(data) != {"version", "providers"} or data["version"] != 1:
+        raise ValueError("OAuth configuration version required")
+    if not isinstance(data["providers"], list) or len(data["providers"]) > 32:
+        raise ValueError("bounded OAuth provider list required")
+    result = []
+    for entry in data["providers"]:
+        if not isinstance(entry, dict) or set(entry) - {
+            "provider",
+            "client_id",
+            "redirect_uri",
+            "service",
+            "audience",
+            "tenant",
+            "client_secret_ref",
+            "allowed_scopes",
+        }:
+            raise ValueError("unsupported OAuth app configuration")
+        values = {k: v for k, v in entry.items() if k not in {"provider", "allowed_scopes"}}
+        if not isinstance(entry.get("allowed_scopes"), list) or not entry["allowed_scopes"]:
+            raise ValueError("explicit OAuth scope ceiling required")
+        if entry["provider"] == "google":
+            provider = google_provider(**values)
+        elif entry["provider"] == "microsoft":
+            provider = microsoft_provider(**values)
+        else:
+            raise ValueError("unsupported verified identity provider")
+        result.append(replace(provider, allowed_scopes=tuple(entry["allowed_scopes"])))
+    if len({p.id for p in result}) != len(result):
+        raise ValueError("unique OAuth service configuration required")
+    return result
 
 
 def google_provider(
@@ -138,6 +182,20 @@ def oauth_request(url: str, fields: dict[str, str] | None) -> dict[str, Any]:
         raise RuntimeError("OAuth provider unavailable or rejected") from None
 
 
+def google_revoke(token: str) -> bool:
+    request = Request(
+        "https://oauth2.googleapis.com/revoke",
+        data=urlencode({"token": token}).encode(),
+        headers={"Content-Type": "application/x-www-form-urlencoded"},
+        method="POST",
+    )
+    try:
+        with build_opener(NoRedirects()).open(request, timeout=15) as response:
+            return bool(response.status == 200)
+    except (HTTPError, URLError, OSError):
+        return False
+
+
 def _decode(value: str) -> bytes:
     return base64.urlsafe_b64decode(value + "=" * (-len(value) % 4))
 
@@ -151,14 +209,29 @@ class AuthBroker:
         *,
         request: Callable[[str, dict[str, str] | None], dict[str, Any]] = oauth_request,
         clock: Callable[[], float] = time,
+        revoke_google: Callable[[str], bool] = google_revoke,
     ):
         self.accounts, self.store, self.vault = accounts, accounts.store, vault
         self.providers = {provider.id: provider for provider in providers}
         if len(self.providers) != len(providers):
             raise ValueError("unique OAuth configuration IDs required")
         self.request, self.clock = request, clock
+        self.revoke_google = revoke_google
         self.material = SecretMaterial()
         self.recover()
+
+    def catalog(self) -> list[dict[str, Any]]:
+        return [
+            {
+                "id": p.id,
+                "provider": p.provider,
+                "service": p.service,
+                "scopes": list(p.allowed_scopes),
+                "redirect_uri": p.redirect_uri,
+                "configured": True,
+            }
+            for p in self.providers.values()
+        ]
 
     @staticmethod
     def _fingerprint(provider: OAuthProvider) -> str:
@@ -204,6 +277,8 @@ class AuthBroker:
         if not owner_authorized:
             raise PermissionError("owner enrollment authority required")
         provider = self.providers[provider_id]
+        if provider.allowed_scopes and not scopes <= set(provider.allowed_scopes):
+            raise PermissionError("requested scopes exceed configured provider permissions")
         self.accounts._text(alias)
         if len(scopes) > 100 or any(
             not s or len(s) > 500 or any(c.isspace() for c in s) for s in scopes
@@ -216,6 +291,8 @@ class AuthBroker:
             existing = account.services.get(provider.service)
             if existing:
                 scopes = scopes | frozenset(existing.scopes)
+        if provider.allowed_scopes and not scopes <= set(provider.allowed_scopes):
+            raise PermissionError("existing scopes require updated provider configuration")
         verifier, challenge = pkce_pair()
         nonce, state, identifier = (
             secrets.token_urlsafe(32),
@@ -258,6 +335,7 @@ class AuthBroker:
             "id": identifier,
             "url": provider.authorization_endpoint + "?" + urlencode(fields),
             "expires_at": pending["expires_at"],
+            "redirect_uri": provider.redirect_uri,
         }
 
     def _identity(
@@ -346,12 +424,15 @@ class AuthBroker:
         code: str,
         *,
         owner_authorized: bool,
+        authority_check: Callable[[], None] | None = None,
     ) -> Account:
         if not owner_authorized:
             raise PermissionError("owner callback authority required")
         if not isinstance(code, str) or not code or len(code) > 8000:
             raise ValueError("bounded authorization code required")
         with self.store.transaction():
+            if authority_check:
+                authority_check()
             pending = self.store.get("auth_code_pending", identifier)
             provider = self.providers[pending["provider_id"]]
             if (
@@ -364,7 +445,7 @@ class AuthBroker:
             ):
                 raise PermissionError("OAuth callback state, configuration or expiry mismatch")
             if pending["account_id"]:
-                self.accounts.check(pending["account_id"], pending["generation"])
+                self._enrollment_account(pending["account_id"], pending["generation"])
             pending["state"] = "exchanging"
             self.store.put("auth_code_pending", identifier, pending)
         try:
@@ -376,7 +457,14 @@ class AuthBroker:
                 "code_verifier": self.vault.read(pending["verifier_ref"]).value,
             }
             data = self.request(provider.token_endpoint, fields)
-            return self._accept(identifier, pending, provider, data, pending["nonce_digest"])
+            return self._accept(
+                identifier,
+                pending,
+                provider,
+                data,
+                pending["nonce_digest"],
+                authority_check,
+            )
         except Exception:
             pending["state"] = "blocked_reauthorization_required"
             self.store.put("auth_code_pending", identifier, pending)
@@ -387,6 +475,13 @@ class AuthBroker:
         finally:
             self.vault.delete(pending["verifier_ref"])
 
+    def _enrollment_account(self, identifier: str, generation: int) -> Account:
+        account = self.accounts.get(identifier)
+        if account.generation != generation:
+            raise PermissionError("account changed during authorization")
+        # Fresh provider consent may reconnect a tombstone; old pending grants remain fenced.
+        return account
+
     def _accept(
         self,
         identifier: str,
@@ -394,6 +489,7 @@ class AuthBroker:
         provider: OAuthProvider,
         data: dict[str, Any],
         nonce_digest: str | None,
+        authority_check: Callable[[], None] | None = None,
     ) -> Account:
         self.material.clear()
         for key in ("access_token", "refresh_token", "id_token"):
@@ -429,7 +525,7 @@ class AuthBroker:
                 raise PermissionError("verified OIDC identity token required")
             tenant, subject = self._identity(id_token, provider, nonce_digest, data["access_token"])
         if account_id:
-            account = self.accounts.check(account_id, pending["generation"])
+            account = self._enrollment_account(account_id, pending["generation"])
             if (account.provider, account.tenant, account.subject) != (
                 provider.provider,
                 tenant,
@@ -437,14 +533,17 @@ class AuthBroker:
             ):
                 raise PermissionError("account switching during authorization denied")
         else:
-            account = self.accounts.add(
-                provider.provider,
-                tenant,
-                subject,
-                pending["alias"],
-                identity_class=pending["identity_class"],
-                verified=True,
-            )
+            with self.store.transaction():
+                if authority_check:
+                    authority_check()
+                account = self.accounts.add(
+                    provider.provider,
+                    tenant,
+                    subject,
+                    pending["alias"],
+                    identity_class=pending["identity_class"],
+                    verified=True,
+                )
             expected = pending.get("account_epochs", {}).get(account.id)
             if expected is not None and expected != account.generation:
                 raise PermissionError("account changed during enrollment")
@@ -486,19 +585,40 @@ class AuthBroker:
             self.vault.put(refresh, reference=refresh_ref)
         else:
             connection["refresh_ref"] = ""
-        account = self.accounts.bind(
-            account.id,
-            provider.service,
-            CredentialRef(credential_ref),
-            scopes,
-            provider.audience,
-            expires_at=self.clock() + expiry,
-            expected_generation=account.generation,
-        )
+        with self.store.transaction():
+            if authority_check:
+                authority_check()
+            account = self.accounts.bind(
+                account.id,
+                provider.service,
+                CredentialRef(credential_ref),
+                scopes,
+                provider.audience,
+                expires_at=self.clock() + expiry,
+                expected_generation=account.generation,
+            )
         connection.update(state="ready", generation=account.generation, scopes=sorted(scopes))
         pending["state"] = "authorized"
         with self.store.transaction():
             self.store.put("auth_broker_connection", identifier, connection)
+            # Binding another service rotates the account fence; unchanged private grants follow it.
+            for existing in self.store.all("auth_broker_connection"):
+                configured = self.providers.get(existing.get("provider_id", ""))
+                binding = account.services.get(configured.service) if configured else None
+                if (
+                    existing["account_id"] == account.id
+                    and existing["state"] == "ready"
+                    and binding
+                    and binding.credential_ref == existing["credential_ref"]
+                ):
+                    self.store.put(
+                        "auth_broker_connection",
+                        existing["id"],
+                        {
+                            **existing,
+                            "generation": account.generation,
+                        },
+                    )
             if nonce_digest is not None:
                 self.store.put("auth_code_pending", identifier, pending)
         if previous:
@@ -521,10 +641,18 @@ class AuthBroker:
         connection["state"] = "blocked_reauthorization_required"
         self.store.put("auth_broker_connection", identifier, connection)
 
-    def refresh(self, identifier: str, *, owner_authorized: bool) -> Account:
+    def refresh(
+        self,
+        identifier: str,
+        *,
+        owner_authorized: bool,
+        authority_check: Callable[[], None] | None = None,
+    ) -> Account:
         if not owner_authorized:
             raise PermissionError("owner refresh authority required")
         with self.store.transaction():
+            if authority_check:
+                authority_check()
             connection = self.store.get("auth_broker_connection", identifier)
             provider = self.providers[connection["provider_id"]]
             account = self.accounts.check(connection["account_id"], connection["generation"])
@@ -556,7 +684,7 @@ class AuthBroker:
             # Providers may omit a rotated refresh token; preserve it privately when omitted.
             if "refresh_token" not in data:
                 data["refresh_token"] = self.vault.read(connection["refresh_ref"]).value
-            account = self._accept(identifier, pending, provider, data, None)
+            account = self._accept(identifier, pending, provider, data, None, authority_check)
             self.vault.delete(connection["refresh_ref"])
             return account
         except Exception:
@@ -595,6 +723,22 @@ class AuthBroker:
                 ref for ref in (connection["credential_ref"], connection["refresh_ref"]) if ref
             )
         try:
+            accepted = False
+            for connection in connections:
+                provider = self.providers.get(connection.get("provider_id", ""))
+                if provider and provider.provider == "google" and connection["state"] == "ready":
+                    reference = connection["refresh_ref"] or connection["credential_ref"]
+                    try:
+                        accepted = (
+                            self.revoke_google(self.vault.read(reference, allow_expired=True).value)
+                            or accepted
+                        )
+                    except (KeyError, OSError, PermissionError):
+                        pass
+            if accepted:
+                self.accounts.remote_revocation(
+                    account.id, account.generation, "PROVIDER_ACCEPTED_NOT_INDEPENDENTLY_VERIFIED"
+                )
             for connection in connections:
                 connection["state"] = "deleting"
                 self.store.put("auth_broker_connection", connection["id"], connection)

@@ -7,7 +7,7 @@ from time import time
 from typing import Any
 
 from .accounts import AccountRegistry
-from .auth_broker import AuthBroker
+from .auth_broker import AuthBroker, load_providers
 from .capabilities import Cancellation, FileExecutor, ScopedFiles, Verifier, addition_executor
 from .connector_mount import ConnectorMount
 from .connectors import ConnectorFabric, ConnectorVerifier, EnvironmentSecrets
@@ -88,7 +88,9 @@ class Harness:
         credential_environ: Mapping[str, str] | None = None,
         vault: Vault | None = None,
         start_services: bool = True,
+        auth_config: Path | None = None,
     ):
+        providers = load_providers(auth_config) if auth_config is not None else []
         self.store = Store(state)
         self.grid = Grid(self.store, clock)
         self.files = ScopedFiles(workspace)
@@ -101,16 +103,51 @@ class Harness:
         if vault is None:
             try:
                 vault = WindowsCredentialStore()
+                if auth_config is not None:
+                    import base64
+                    import hashlib
+                    import secrets
+
+                    from .encrypted_credentials import EncryptedCredentialStore
+
+                    with self.store.transaction():
+                        try:
+                            reference = self.store.get("account_vault", "key")["reference"]
+                        except KeyError:
+                            reference = hashlib.sha256(str(state.resolve()).encode()).hexdigest()[
+                                :32
+                            ]
+                        try:
+                            key = vault.read(reference).value
+                        except KeyError:
+                            key = base64.b64encode(secrets.token_bytes(32)).decode()
+                            vault.put(key, reference=reference)
+                        self.store.put("account_vault", "key", {"reference": reference})
+                    vault = EncryptedCredentialStore(
+                        state.with_suffix(".credentials"),
+                        base64.b64decode(key, validate=True),
+                        vault,
+                    )
             except OSError:
-                pass
-        # Empty provider configuration permits private local cleanup, never enrollment.
-        self.auth = AuthBroker(self.accounts, vault, [], clock=clock) if vault is not None else None
+                if auth_config is not None:
+                    self.archive.close()
+                    self.store.close()
+                    raise
+            except ValueError:
+                self.archive.close()
+                self.store.close()
+                raise
+        self.auth = (
+            AuthBroker(self.accounts, vault, providers, clock=clock) if vault is not None else None
+        )
         self.connectors = ConnectorFabric(
             self.store,
             VaultResolver(vault) if vault is not None else EnvironmentSecrets({}),
             PersonalPolicy(self.store),
             accounts=self.accounts,
         )
+        self._account_instances: set[str] = set()
+        self._connections_mount: ConnectorMount | None = None
 
         def authorize_account(account_id: str, generation: int) -> None:
             self.accounts.check(account_id, generation)
@@ -207,6 +244,8 @@ class Harness:
         self.executive = Executive(self.runtime, {self.node_id: (self.dispatcher, self.session)})
         self.runtime.executive = self.executive
         self.store.close_callbacks.append(self.close_services)
+        if auth_config is not None:
+            self.ensure_connections()
         if start_services:
             self.start()
 
@@ -234,6 +273,24 @@ class Harness:
         return ConnectorMount(
             self, node_id, grants, owner_authorized=owner_authorized, confirmed=confirmed
         )
+
+    def ensure_connections(self) -> ConnectorMount:
+        """Mount authorized connections; task Policy and Ask/delegation still control execution."""
+        import hashlib
+
+        from .connectors import RiskLevel
+
+        with self.store.lock:
+            if self._connections_mount is None:
+                node = "core-connections-" + hashlib.sha256(self.node_id.encode()).hexdigest()[:16]
+                self._connections_mount = self.mount_connectors(
+                    node,
+                    tuple("connectors:" + risk.value for risk in RiskLevel),
+                    owner_authorized=True,
+                )
+            mount = self._connections_mount
+        mount.refresh()
+        return mount
 
     def close_services(self) -> None:
         self.plugins.close()

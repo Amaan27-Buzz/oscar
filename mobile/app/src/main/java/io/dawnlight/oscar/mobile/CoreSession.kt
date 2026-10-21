@@ -28,6 +28,10 @@ class CoreSession(application: Application) : AndroidViewModel(application) {
     private var rejected = false
     private var enrollment: CoreClient? = null
     private var pendingShare: String? = null
+    private var accountBrowser: AccountBrowser? = null
+    private var accountJob: Job? = null
+    private var accountClient: CoreClient? = null
+    private var accountCode: String? = null
     internal val nativeCapabilities = NativeCapabilities(application)
     private fun connection(saved: JSONObject) = CoreClient(saved, vault::signDevice)
 
@@ -61,6 +65,7 @@ class CoreSession(application: Application) : AndroidViewModel(application) {
             var failures = 0
             while (isActive && !rejected) {
                 if (!mutable.value.busy) refresh()
+                if (!mutable.value.busy && accountCode != null && mutable.value.link == Link.CONNECTED) finishAccountBrowser()
                 failures = if (mutable.value.link == Link.CONNECTED) 0 else (failures + 1).coerceAtMost(4)
                 delay(if (client?.remote() == true) reconnectDelay(failures, kotlin.random.Random.nextLong(1001)) else 15_000)
             }
@@ -233,6 +238,87 @@ class CoreSession(application: Application) : AndroidViewModel(application) {
         }
     }
     fun dismissApproval() { replyText = null; mutable.value = mutable.value.copy(approval = null, replyPreview = null) }
+    private fun clearAccountBrowser() {
+        accountBrowser?.close(); accountBrowser = null; accountClient = null; accountCode = null
+        accountJob?.cancel(); accountJob = null
+    }
+    fun cancelAccountEnrollment() { clearAccountBrowser(); message("Pending local account enrollment cancelled. No new connection is confirmed.") }
+    private fun beginAccountBrowser(enrollment: JSONObject) {
+        clearAccountBrowser()
+        val browser = AccountBrowser(enrollment, mutable.value.coreNow(System.currentTimeMillis(), android.os.SystemClock.elapsedRealtime()))
+        accountBrowser = browser; accountClient = client
+        accountJob = viewModelScope.launch {
+            try {
+                withContext(Dispatchers.IO) { browser.bind() }
+                check(accountBrowser === browser && accountClient === client)
+                val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(browser.url))
+                    .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+                getApplication<Application>().startActivity(intent)
+                val code = withContext(Dispatchers.IO) { browser.await() }
+                if (accountBrowser === browser && accountClient === client) {
+                    accountCode = code
+                    if (active) { message("Authorization received. Checking your account with Core."); finishAccountBrowser() }
+                    delay((browser.expiresAt - System.currentTimeMillis()).coerceIn(0, 600_000))
+                    if (accountBrowser === browser) {
+                        accountBrowser = null; accountClient = null; accountCode = null
+                        if (active) message("Account enrollment expired. Review current Core connections before starting again.")
+                    }
+                }
+            } catch (cancelled: CancellationException) { throw cancelled }
+            catch (_: Exception) {
+                if (accountBrowser === browser) {
+                    accountCode = null; accountBrowser = null; accountClient = null
+                    if (active) message("Provider enrollment did not finish. No account connection is confirmed. Check provider setup and start a new review.")
+                }
+            } finally { browser.close() }
+        }
+    }
+    private fun finishAccountBrowser() {
+        val browser = accountBrowser ?: return
+        val code = accountCode ?: return
+        if (accountClient !== client || System.currentTimeMillis() >= browser.expiresAt) { clearAccountBrowser(); return }
+        if (!active || mutable.value.busy || mutable.value.link != Link.CONNECTED) return
+        request { epoch ->
+            // Consume locally once; ambiguous network outcomes are inspected, never automatically retried.
+            accountCode = null
+            val result = call("oauth_callback", JSONObject().put("id", browser.id).put("state", browser.state).put("code", code), epoch)
+            require(result.getString("status") == "verified")
+            parseConnections(result.getJSONObject("connections"))
+            clearAccountBrowser()
+            message(result.bounded("message", 1000)); refresh()
+        }
+    }
+    fun reviewManagement(family: String, change: JSONObject): Boolean {
+        val snapshot = mutable.value.snapshot ?: return false
+        if (client?.remote() != true || client?.canApprove() != true || mutable.value.privateSuppressed ||
+            family !in setOf("authority", "assistance", "management") || snapshot.management == null) return false
+        val proposal = JSONObject(change.toString())
+        val stamp = snapshot.managementStamp()
+        return request { epoch ->
+            val review = Approval.management(call("${family}_challenge", proposal, epoch), family, proposal, stamp,
+                mutable.value.coreNow(System.currentTimeMillis(), android.os.SystemClock.elapsedRealtime()))
+            require(client?.matches(review) == true && mutable.value.snapshot?.managementStamp() == stamp)
+            if (mutable.value.epoch == epoch) mutable.value = mutable.value.copy(approval = review, replyPreview = null)
+        }
+    }
+    fun dayBrief(): Boolean {
+        if (mutable.value.link != Link.CONNECTED || mutable.value.privateSuppressed) return false
+        mutable.value = mutable.value.copy(dayBrief = null)
+        return request { epoch ->
+            val brief = parseDayBrief(call("day_brief", JSONObject(), epoch).getJSONObject("day_brief"))
+            if (mutable.value.epoch == epoch && active && !mutable.value.privateSuppressed)
+                mutable.value = mutable.value.copy(dayBrief = brief)
+        }
+    }
+    fun revokeAuthority(): Boolean {
+        if (client?.remote() != true || client?.canApprove() != true || mutable.value.privateSuppressed) return false
+        return request { epoch ->
+            val result = call("authority_revoke", JSONObject(), epoch).getJSONObject("authority")
+            require(result.getString("mode") == "ask" && result.getString("status") == "inactive")
+            mutable.value = mutable.value.copy(approval = null, message = "Standing delegation revoked. Effects already performed still need readback.")
+            refresh()
+        }
+    }
     fun reviewReply(source: JSONObject, text: String) {
         if (text.isBlank() || text.length > 500) return
         request { epoch ->
@@ -252,9 +338,20 @@ class CoreSession(application: Application) : AndroidViewModel(application) {
                 withContext(Dispatchers.IO) { vault.sign(approval.signingPayload) }
             }
             val started = android.os.SystemClock.elapsedRealtime()
-            val result = call("complete", JSONObject().put("challenge_id", approval.id).put("signature", signature), epoch)
+            val result = call(approval.completion, JSONObject().put("challenge_id", approval.id).put("signature", signature), epoch)
             if (mutable.value.epoch != epoch || !active) return@request
-            val message = if (approval.operation == "reply") {
+            val message = if (approval.completion != "complete") {
+                when (approval.completion) {
+                    "authority_complete" -> { result.getJSONObject("authority"); "Access updated by Core. Check the current mode and expiry below." }
+                    "assistance_complete" -> { require(result.getString("status") == "verified"); result.bounded("message", 1000) }
+                    "management_complete" -> {
+                        parseConnections(result.getJSONObject("connections"))
+                        result.optJSONObject("enrollment")?.let { beginAccountBrowser(it) }
+                        result.bounded("message", 1000)
+                    }
+                    else -> error("Unknown signed review route")
+                }
+            } else if (approval.operation == "reply") {
                 val text = replyText ?: throw IllegalStateException("Reply context expired")
                 require(result.bounded("status", 32) == "REPORTED")
                 require(approval.acceptsPermit(result.getJSONObject("permit")))
@@ -276,6 +373,8 @@ class CoreSession(application: Application) : AndroidViewModel(application) {
         mutable.value = mutable.value.unavailable("Stopped waiting locally. Core execution may continue; reconnect and inspect before another action.")
     }
     fun connect(session: JSONObject) {
+        clearAccountBrowser()
+        NativeWorker.stop(getApplication())
         nativeCapabilities.revoke()
         CompanionOverlay.hide(getApplication())
         VoicePresentation.cancel(getApplication())
@@ -307,6 +406,8 @@ class CoreSession(application: Application) : AndroidViewModel(application) {
         }
     }
     fun enroll(origin: String, invitation: JSONObject, retain: Boolean) {
+        clearAccountBrowser()
+        NativeWorker.stop(getApplication())
         nativeCapabilities.revoke()
         operation?.cancel(); client?.cancel(); enrollment?.cancel(); polling?.cancel()
         CompanionOverlay.hide(getApplication()); VoicePresentation.cancel(getApplication())
@@ -324,6 +425,7 @@ class CoreSession(application: Application) : AndroidViewModel(application) {
         }
     }
     fun revoke() {
+        clearAccountBrowser()
         if (client?.remote() != true) { message("Remote revocation requires an authenticated Grid connection."); return }
         request { epoch ->
             require(call("revoke", JSONObject(), epoch).bounded("state", 32) == "revoked")
@@ -331,6 +433,8 @@ class CoreSession(application: Application) : AndroidViewModel(application) {
         }
     }
     fun rotateConnection() {
+        clearAccountBrowser()
+        NativeWorker.stop(getApplication())
         nativeCapabilities.revoke()
         if (client?.remote() != true) return
         request { epoch ->
@@ -356,8 +460,11 @@ class CoreSession(application: Application) : AndroidViewModel(application) {
             }
         }
     }
-    fun disconnect() = clearLocal(false)
+    fun disconnect() { clearAccountBrowser(); clearLocal(false) }
     private fun clearLocal(revoked: Boolean) {
+        clearAccountBrowser()
+        NativeWorker.stop(getApplication())
+        getApplication<Application>().stopService(android.content.Intent(getApplication(), NativeScreenService::class.java))
         CompanionOverlay.hide(getApplication(), disable = true)
         VoicePresentation.cancel(getApplication())
         stop(); client = null; history.clear(); rejected = false; alerts.clear()
@@ -372,10 +479,11 @@ class CoreSession(application: Application) : AndroidViewModel(application) {
         active = true
     }
     fun discard() {
+        clearAccountBrowser()
         if (client?.remote() == true) {
             operation?.cancel(); client?.cancel(); history.clear()
             mutable.value = mutable.value.copy(epoch = mutable.value.epoch + 1, busy = false, draft = "", interactions = emptyList(), approval = null,
-                replyPreview = null, inspected = null, privateSuppressed = true, snapshot = mutable.value.snapshot?.withoutPrivate())
+                replyPreview = null, inspected = null, dayBrief = null, privateSuppressed = true, snapshot = mutable.value.snapshot?.withoutPrivate())
             val epoch = mutable.value.epoch
             persistDraft("") {
                 viewModelScope.launch {
@@ -389,7 +497,7 @@ class CoreSession(application: Application) : AndroidViewModel(application) {
         if (mutable.value.link == Link.CONNECTING) { message("Wait for the connection outcome or disconnect locally before clearing Core context."); return }
         operation?.cancel(); client?.cancel(); replyText = null
         mutable.value = mutable.value.copy(epoch = mutable.value.epoch + 1, busy = false, draft = "", interactions = emptyList(),
-            approval = null, replyPreview = null, inspected = null, snapshot = null, privateSuppressed = true, message = "Clearing encrypted private recovery state…")
+            approval = null, replyPreview = null, inspected = null, snapshot = null, dayBrief = null, privateSuppressed = true, message = "Clearing encrypted private recovery state…")
         persistDraft("") {
         if (!request { epoch ->
             val result = call("discard", JSONObject(), epoch)
@@ -414,5 +522,5 @@ class CoreSession(application: Application) : AndroidViewModel(application) {
             catch (_: Exception) { if (mutable.value.epoch == epoch) message("Owner key unavailable. Configure a device lock and verify platform support during commissioning.") }
         }
     }
-    override fun onCleared() { nativeCapabilities.close(); client?.cancel(); enrollment?.cancel(); super.onCleared() }
+    override fun onCleared() { clearAccountBrowser(); nativeCapabilities.close(); client?.cancel(); enrollment?.cancel(); super.onCleared() }
 }

@@ -178,6 +178,9 @@ class WindowsCredentialStore:
         target = self._target(reference)
         pointer = ctypes.POINTER(_Credential)()
         if not self.api.CredReadW(target, 1, 0, ctypes.byref(pointer)):
+            win32: Any = ctypes
+            if win32.get_last_error() != 1168:
+                raise OSError("native credential read failed")
             raise KeyError("OSCAR credential unavailable")
         try:
             data = json.loads(

@@ -53,6 +53,8 @@ class CloudConfig:
     ingress: str
     allowed_hosts: tuple[str, ...]
     provider_secrets: dict[str, str] = field(default_factory=dict)
+    auth_config: Path | None = None
+    credential_key_ref: str | None = None
 
     @classmethod
     def load(cls, path: Path) -> "CloudConfig":
@@ -72,7 +74,11 @@ class CloudConfig:
             "allowed_hosts",
             "provider_secrets",
         }
-        if not isinstance(data, dict) or set(data) != required:
+        if (
+            not isinstance(data, dict)
+            or not required <= set(data)
+            or set(data) - required - {"auth_config", "credential_key_ref"}
+        ):
             raise ValueError("explicit versioned production configuration required")
         if type(data["version"]) is not int or data["version"] != 1:
             raise ValueError("unsupported cloud configuration version")
@@ -147,6 +153,22 @@ class CloudConfig:
         if not manifest.is_file() or manifest.stat().st_size > 1_000_000:
             raise ValueError("provider manifest exceeds bound")
         Registry.load(manifest)
+        auth_config = data.get("auth_config")
+        key_ref = data.get("credential_key_ref")
+        if (auth_config is None) != (key_ref is None):
+            raise ValueError("OAuth configuration requires a separately mounted credential key")
+        if auth_config is not None:
+            from .auth_broker import load_providers
+
+            if (
+                not isinstance(auth_config, str)
+                or not Path(auth_config).is_absolute()
+                or root in Path(auth_config).parents
+            ):
+                raise ValueError("absolute OAuth configuration outside persistent state required")
+            if not isinstance(key_ref, str) or not re.fullmatch(r"[A-Za-z0-9_-]{1,128}", key_ref):
+                raise ValueError("opaque credential key mount required")
+            load_providers(Path(auth_config))
         return cls(
             data["core_id"],
             root,
@@ -157,6 +179,8 @@ class CloudConfig:
             data["ingress"],
             tuple(hosts),
             refs,
+            Path(auth_config) if auth_config else None,
+            key_ref,
         )
 
 
@@ -178,6 +202,18 @@ class CloudCore:
         try:
             initialize_identity(config.data_dir, config.core_id, initialize=initialize)
             vault = InjectedCredentialStore(config.secret_dir)
+            account_vault: Any = vault
+            if config.auth_config is not None:
+                import base64
+
+                from .encrypted_credentials import EncryptedCredentialStore
+
+                if not config.credential_key_ref:
+                    raise ValueError("separately mounted account credential key required")
+                key = base64.b64decode(vault.read(config.credential_key_ref).value, validate=True)
+                account_vault = EncryptedCredentialStore(
+                    config.data_dir / "account-credentials", key, vault
+                )
             credentials: dict[str, str] = {}
             for name, reference in config.provider_secrets.items():
                 try:
@@ -191,7 +227,8 @@ class CloudCore:
                 config.manifest,
                 node_id=config.core_id,
                 credential_environ=credentials,
-                vault=vault,
+                vault=account_vault,
+                auth_config=config.auth_config,
                 execution_enrollment_authorized=renew_execution,
                 start_services=False,
             )

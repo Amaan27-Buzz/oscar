@@ -2,7 +2,7 @@
 
 import hashlib
 import os
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Any
@@ -13,16 +13,38 @@ from .windows_files import WindowsScopedFiles, is_reparse
 
 
 class BrowserProfiles:
-    def __init__(self, accounts: AccountRegistry, root: Path):
+    def __init__(
+        self,
+        accounts: AccountRegistry | None,
+        root: Path,
+        *,
+        authorize: Callable[[str, int], None] | None = None,
+    ):
+        if (accounts is None) == (authorize is None):
+            raise ValueError("one authoritative account checker required")
         self.accounts = accounts
+        self.authorize = authorize
         self.root = Path(os.path.abspath(root))
 
     def check(self, parameters: dict[str, Any]) -> str:
         if set(parameters) != {"request", "account_id", "account_generation"}:
             raise PermissionError("exact account-bound browser request required")
-        account = self.accounts.check(parameters["account_id"], parameters["account_generation"])
+        identifier, generation = parameters["account_id"], parameters["account_generation"]
+        if (
+            not isinstance(identifier, str)
+            or not identifier
+            or type(generation) is not int
+            or generation < 1
+        ):
+            raise PermissionError("current account identity required")
+        if self.authorize is not None:
+            self.authorize(identifier, generation)
+        else:
+            assert self.accounts is not None
+            account = self.accounts.check(identifier, generation)
+            identifier, generation = account.id, account.generation
         # Generation changes cannot silently reuse a previously authenticated profile.
-        return hashlib.sha256((account.id + ":" + str(account.generation)).encode()).hexdigest()
+        return hashlib.sha256((identifier + ":" + str(generation)).encode()).hexdigest()
 
     @contextmanager
     def open(self, parameters: dict[str, Any], workspace: Path) -> Iterator[Path]:

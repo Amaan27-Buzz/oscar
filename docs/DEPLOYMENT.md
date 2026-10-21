@@ -1,5 +1,11 @@
 # OSCAR — Deployment Architecture and Hosting Decision
 
+**2026-10-21 software candidate:** writable account credentials use an encrypted
+vault under a separately protected service key; optional public OAuth client
+registration configuration is described in [Cloud operations](CLOUD-CORE.md).
+The [completion ledger](development/OSCAR-FULL-SOFTWARE-COMPLETION.md) tracks
+local acceptance. This is not hosted deployment or real provider commissioning.
+
 **Owner priority (2026-10-18):** bring up one OSCAR on a persistent cloud host, then make Windows Desktop and the owner's Android phone connect to that same Core. When the owner returns home, add the dedicated home-server laptop; integrate ESP32/Pico physical hardware later. **No Oracle/Vercel/Internet deployment is currently accepted.** [Live checklist](CURRENT-STATUS.md) · [New delivery groups](DELIVERY-PLAN.md).
 
 **Persistent Core and connected candidate:** `python -m oscar.cloud --config /etc/oscar/cloud.json` composes the existing Harness, Controller, Grid, Router, Event Archive/Memory and Executive. Production configuration and explicit initialization are mandatory. One local volume holds both canonical databases, identity and artifacts under an exclusive lifecycle lock. D1 bounded diagnostics and D2's two versioned Grid POST interfaces use explicit authentication and durable replay fences. Legacy privileged reference APIs remain private. [Operations and commissioning](CLOUD-CORE.md) · [D1 evidence](development/GROUP-04-D1.md) · [Connected software evidence](development/GROUP-04-D2.md).

@@ -331,3 +331,14 @@ class AccountRegistry:
             account = self.get(account_id)
             if account.generation == generation and account.status == "disconnected":
                 self._save(replace(account, local_credentials=state))
+
+    def remote_revocation(self, account_id: str, generation: int, state: str) -> None:
+        if state not in {
+            "PROVIDER_ACCEPTED_NOT_INDEPENDENTLY_VERIFIED",
+            "UNKNOWN_OWNER_ACTION_REQUIRED",
+        }:
+            raise ValueError("explicit provider revocation evidence required")
+        with self._mutation():
+            account = self.get(account_id)
+            if account.generation == generation and account.status == "disconnected":
+                self._save(replace(account, remote_revocation=state))

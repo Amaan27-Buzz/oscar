@@ -439,10 +439,18 @@ impl RemoteClient {
                     "presence":snapshot["presence"],
                     "connections":snapshot["connections"],
                     "core_clock":clock,"observed_at_ms":received_at,"voice_available":false,
-                    "operating":{"access":"Ask","secure":"unavailable","full_access":"unavailable"}}),
+                    "executive":snapshot["executive"],"operating":snapshot["operating"]}),
                 )
             }
-            "management_challenge" | "management_complete" => self.request(operation, payload),
+            "management_challenge"
+            | "management_complete"
+            | "oauth_callback"
+            | "assistance_challenge"
+            | "assistance_complete"
+            | "authority_challenge"
+            | "authority_complete"
+            | "authority_revoke"
+            | "day_brief" => self.request(operation, payload),
             "catalog" => Ok(
                 json!({"capabilities":self.projection.lock().map_err(|_| "native synchronization unavailable")?.capabilities}),
             ),

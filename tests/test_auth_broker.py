@@ -192,6 +192,7 @@ class AuthBrokerTests(unittest.TestCase):
             [self.provider],
             request=self.fixture.request,
             clock=lambda: self.now,
+            revoke_google=lambda token: False,
         )
 
     def begin(self, **kwargs):

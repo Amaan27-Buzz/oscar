@@ -37,8 +37,9 @@ import kotlinx.coroutines.withContext
         "Accessibility" -> AppearanceSettings()
         "Diagnostics" -> DiagnosticsSettings(state)
         "Privacy" -> PrivacySettings()
-        "Awareness" -> AwarenessScreen { navigate("Privacy") }
-        "Access" -> AccessScreen()
+        "Awareness" -> AwarenessScreen(session, state) { navigate("Privacy") }
+        "Access" -> AccessScreen(session, state)
+        "Connections" -> ConnectionsScreen(session, state)
         "Memory" -> {
             IllustratedIntro("Memory", artwork = R.drawable.illustration_reading, height = 112.dp)
             PreferenceGroup("History & recall") {
@@ -71,8 +72,8 @@ import kotlinx.coroutines.withContext
             IllustratedIntro("Make OSCAR", "yours.", artwork = R.drawable.illustration_preferences, height = 144.dp)
             val groups = listOf(
                 "Personal" to listOf(Triple("Persona", "Expression preview", "Persona"), Triple("Voice", "Audio & input", "Voice"), Triple("Accessibility", "Theme & motion", "Appearance")),
-                "Your context" to listOf(Triple("Privacy", "Permissions & capture", "Privacy"), Triple("Awareness", "Off", "Awareness"), Triple("Memory", "History & drafts", "Memory"), Triple("Notifications", "Alerts & replies", "Notifications")),
-                "Control" to listOf(Triple("Access", "Ask mode", "Conversation"), Triple("Platform", "Assistant & system access", "Android")),
+                "Your context" to listOf(Triple("Privacy", "Permissions & capture", "Privacy"), Triple("Awareness", if (state.snapshot?.management == null) "Check connection" else "Sources & permissions", "Awareness"), Triple("Memory", "History & drafts", "Memory"), Triple("Notifications", "Alerts & replies", "Notifications")),
+                "Control" to listOf(Triple("Access", state.snapshot?.management?.mode?.replaceFirstChar { it.uppercase() } ?: "Check connection", "Conversation"), Triple("Connections", "Accounts & tools", "Devices"), Triple("Platform", "Assistant & system access", "Android")),
                 "Application" to listOf(Triple("Diagnostics", "Connection & device", "Activity"), Triple("About", "OSCAR · Dawnlight Labs", "About")))
             groups.forEach { (title, areas) ->
                 PreferenceGroup(title, flat = true) {

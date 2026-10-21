@@ -37,7 +37,7 @@ def load_google(path: Path) -> tuple[ConnectorManifest, ...]:
         manifests.append(
             ConnectorManifest(
                 "google." + family,
-                "Google " + family,
+                "google",
                 service["origin"],
                 capabilities,
                 events=("polling", "incremental-sync")
@@ -130,7 +130,7 @@ def github_manifest(*, public: bool = False) -> ConnectorManifest:
 def microsoft_manifest() -> ConnectorManifest:
     return ConnectorManifest(
         "microsoft.graph",
-        "Microsoft 365",
+        "microsoft",
         "https://graph.microsoft.com",
         (
             _cap(

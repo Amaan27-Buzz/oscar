@@ -459,6 +459,7 @@ class MCPPlugins:
         self.store, self.fabric, self.authorize_account = store, fabric, authorize_account
         self.sessions: dict[str, MCPClient] = {}
         self.adapters: dict[str, MCPConnectorHTTP] = {}
+        self._lifecycle_lock = threading.RLock()
         self._fallback = fabric.http
         fabric.http = self
         store.close_callbacks.append(self.close)
@@ -542,6 +543,16 @@ class MCPPlugins:
         *,
         expected_config: MCPServerConfig | None = None,
     ) -> dict[str, Any]:
+        # SDK launch/teardown is serialized so a late failed connect cannot remove a newer session.
+        with self._lifecycle_lock:
+            return self._connect(identifier, expected_config=expected_config)
+
+    def _connect(
+        self,
+        identifier: str,
+        *,
+        expected_config: MCPServerConfig | None = None,
+    ) -> dict[str, Any]:
         initial = self._config(self.store.get("mcp_installation", identifier))
         if expected_config is not None and initial != expected_config:
             raise PermissionError("MCP installation changed after review")
@@ -618,6 +629,15 @@ class MCPPlugins:
         self.store.put("mcp_installation", record["id"], record)
 
     def disconnect(
+        self,
+        identifier: str,
+        *,
+        expected_config: MCPServerConfig | None = None,
+    ) -> None:
+        with self._lifecycle_lock:
+            self._disconnect(identifier, expected_config=expected_config)
+
+    def _disconnect(
         self,
         identifier: str,
         *,

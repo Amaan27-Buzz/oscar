@@ -1,0 +1,371 @@
+"""Actual native Android execution through a separate TLS Core on one disposable AVD."""
+
+import json
+import os
+import re
+import subprocess
+from pathlib import Path
+from time import monotonic, sleep
+
+from scripts.verify_connected_grid import android_core_fixture
+
+ROOT = Path(__file__).resolve().parents[1]
+PACKAGE = "io.dawnlight.oscar.mobile"
+SERIAL = "emulator-5582"
+AVD = "oscar_group05_capability_api35"
+
+
+def main() -> int:
+    adb = Path(os.environ["ANDROID_HOME"]) / "platform-tools/adb.exe"
+    output = ROOT / ".oscar/software-android"
+    output.mkdir(parents=True, exist_ok=True)
+    receipt: dict | None = None
+    (output / "native-grid.json").unlink(missing_ok=True)
+
+    def raw(*arguments: str, timeout: int = 30) -> str:
+        try:
+            result = subprocess.run(
+                [str(adb), "-s", SERIAL, *arguments],
+                capture_output=True,
+                text=True,
+                timeout=timeout,
+                check=False,
+            )
+        except subprocess.TimeoutExpired:
+            raise RuntimeError("Exact disposable emulator request timed out") from None
+        if result.returncode:
+            raise RuntimeError("Exact disposable emulator request failed")
+        return result.stdout
+
+    def guard() -> None:
+        assert raw("emu", "avd", "name").splitlines()[0].strip() == AVD
+        assert raw("shell", "getprop", "ro.kernel.qemu").strip() == "1"
+        assert raw("shell", "getprop", "ro.build.version.sdk").strip() == "35"
+        assert raw("shell", "getprop", "sys.boot_completed").strip() == "1"
+
+    def device(*arguments: str, timeout: int = 30) -> str:
+        guard()
+        return raw(*arguments, timeout=timeout)
+
+    def instrument(method: str, *, details: dict | None = None, background: bool = False):
+        guard()
+        args = [
+            str(adb),
+            "-s",
+            SERIAL,
+            "shell",
+            "am",
+            "instrument",
+            "-w",
+            "-r",
+            "-e",
+            "class",
+            PACKAGE + "." + method,
+        ]
+        for name, value in (details or {}).items():
+            if name.startswith("grid_") and name not in {
+                "grid_port",
+                "grid_target",
+                "grid_path",
+                "grid_task",
+            }:
+                args += ["-e", name, str(value)]
+        args += [PACKAGE + ".test/androidx.test.runner.AndroidJUnitRunner"]
+        log_path = output / (method.replace("#", "-") + ".log")
+        with log_path.open("w", encoding="utf-8") as log:
+            process = subprocess.Popen(args, stdout=log, stderr=subprocess.STDOUT)
+        if background:
+            return process, log_path
+        try:
+            process.wait(timeout=180)
+        except subprocess.TimeoutExpired:
+            process.kill()
+            process.wait()
+            raise RuntimeError("Disposable instrumentation deadline exceeded") from None
+        accepted(process, log_path)
+        return None
+
+    def accepted(process, path):
+        log = path.read_text(encoding="utf-8")
+        assert (
+            process.returncode == 0
+            and re.search(r"OK \(1 test\)", log)
+            and not re.search(
+                r"FAILURES|INSTRUMENTATION_FAILED|INSTRUMENTATION_STATUS_CODE: -[34]", log
+            )
+        ), "Inspect private Android instrumentation log"
+
+    def wait(check, message: str, seconds: int = 40):
+        deadline = monotonic() + seconds
+        while monotonic() < deadline:
+            if check():
+                return
+            sleep(0.2)
+        raise RuntimeError(message)
+
+    guard()
+    device("shell", "input", "keyevent", "KEYCODE_WAKEUP")
+    device("shell", "wm", "dismiss-keyguard")
+    previous_services = device(
+        "shell", "settings", "get", "secure", "enabled_accessibility_services"
+    ).strip()
+    previous_access = device("shell", "settings", "get", "secure", "accessibility_enabled").strip()
+    process = None
+    try:
+        for apk in (
+            "app/build/outputs/apk/debug/app-debug.apk",
+            "app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk",
+        ):
+            assert "Success" in device(
+                "install", "-r", "-t", str(ROOT / "mobile" / apk), timeout=120
+            )
+        device("shell", "pm", "grant", PACKAGE, "android.permission.POST_NOTIFICATIONS")
+        device(
+            "shell",
+            "settings",
+            "put",
+            "secure",
+            "enabled_accessibility_services",
+            PACKAGE + "/.AppControlService",
+        )
+        device("shell", "settings", "put", "secure", "accessibility_enabled", "1")
+        instrument("GridKeystoreTest#exportGridIdentity")
+        identity = json.loads(
+            device("exec-out", "run-as", PACKAGE, "cat", "files/d2-device-identity.json")
+        )
+        with android_core_fixture(identity, android_workspace="selected-apps", management=True) as (
+            fixture,
+            _,
+            details,
+        ):
+            port = str(details["grid_port"])
+            device("reverse", "tcp:" + port, "tcp:" + port)
+            try:
+                process, log_path = instrument(
+                    "NativeGridExecutionTest#actualGridExecutesThenWithdrawsAndRevokes",
+                    details=details,
+                    background=True,
+                )
+                rebound = False
+
+                def ready():
+                    nonlocal rebound
+                    if not rebound:
+                        stage = device(
+                            "exec-out", "run-as", PACKAGE, "cat", "files/software-native-stage.txt"
+                        ).strip()
+                        if stage == "Worker start requested":
+                            # Instrumentation force-stops leave an old Android service binding dead.
+                            device(
+                                "shell",
+                                "settings",
+                                "delete",
+                                "secure",
+                                "enabled_accessibility_services",
+                            )
+                            device(
+                                "shell",
+                                "settings",
+                                "put",
+                                "secure",
+                                "enabled_accessibility_services",
+                                PACKAGE + "/.AppControlService",
+                            )
+                            device(
+                                "shell", "settings", "put", "secure", "accessibility_enabled", "1"
+                            )
+                            rebound = True
+                    if process.poll() is not None:
+                        accepted(process, log_path)
+                        raise RuntimeError("Native fixture ended before readiness")
+                    try:
+                        return (
+                            json.loads(
+                                device(
+                                    "exec-out",
+                                    "run-as",
+                                    PACKAGE,
+                                    "cat",
+                                    "files/software-native-ready.json",
+                                )
+                            )
+                            == {}
+                        )
+                    except (RuntimeError, ValueError):
+                        return False
+
+                wait(
+                    ready,
+                    "Native fixture did not become ready; inspect native stage receipt",
+                    seconds=120,
+                )
+                node = "synthetic-emulated-android"
+
+                def capabilities():
+                    return {
+                        c["id"]
+                        for c in next(
+                            (
+                                item["capabilities"]
+                                for item in fixture.mobile.request("snapshot", {})["nodes"]
+                                if item["id"] == node
+                            ),
+                            [],
+                        )
+                    }
+
+                wait(
+                    lambda: "android.ui.set_text" in capabilities(),
+                    "Native capability was not advertised",
+                )
+                timings = []
+                tasks = []
+                for kind, target, value in (
+                    (
+                        "android_ui_set_text",
+                        PACKAGE + ":id/capability_fixture_input",
+                        "Grid synthetic agenda",
+                    ),
+                    ("android_ui_click", PACKAGE + ":id/capability_fixture_submit", ""),
+                ):
+                    started = monotonic()
+                    task = fixture.mobile.request(
+                        "submit",
+                        {
+                            "text": "Synthetic selected-app acceptance",
+                            "kind": kind,
+                            "target": node,
+                            "parameters": {"package": PACKAGE, "target": target, "value": value},
+                            "retain": True,
+                        },
+                    )
+                    if task["approval_required"]:
+                        fixture.approve(task)
+                    final = fixture.wait_task(
+                        task["task_id"], states=("verified", "partially_verified")
+                    )
+                    assert final["evidence"] and final["result"]["success"]
+                    if kind == "android_ui_set_text":
+                        assert final["state"] == "verified"
+                    tasks.append(
+                        {
+                            "task_id": task["task_id"],
+                            "kind": kind,
+                            "state": final["state"],
+                            "evidence": final["evidence"],
+                        }
+                    )
+                    timings.append(
+                        {"kind": kind, "elapsed_ms": round((monotonic() - started) * 1000, 1)}
+                    )
+                device("shell", "run-as", PACKAGE, "touch", "files/software-native-verified")
+                wait(
+                    lambda: "android.ui.set_text" not in capabilities(),
+                    "Permission withdrawal did not withdraw remote capability",
+                )
+                device(
+                    "shell", "run-as", PACKAGE, "touch", "files/software-native-withdrawal-verified"
+                )
+                process.wait(timeout=90)
+                accepted(process, log_path)
+                result = json.loads(
+                    device(
+                        "exec-out", "run-as", PACKAGE, "cat", "files/software-native-result.json"
+                    )
+                )
+                nodes = fixture.mobile.request("snapshot", {})["nodes"]
+                assert any(
+                    n["id"] == node and n["revoked"] and n["status"] == "offline" for n in nodes
+                )
+                device("shell", "am", "force-stop", PACKAGE)
+                instrument("NativeGridExecutionTest#processRestorationDoesNotReplayOrStartWorker")
+                instrument("MobileVisualTest#productionNavigationAndUnavailableControls")
+                captures = (
+                    "01-oscar-home",
+                    "05-automations-overview",
+                    "06-worker-detail",
+                    "07-create-automation",
+                    "13-today-chief-of-staff",
+                    "11-devices",
+                    "15-preferences",
+                    "14-access-modes",
+                    "12-sentry-awareness",
+                    "08-activity-feed",
+                    "04-voice-interaction",
+                )
+                for name in captures:
+                    guard()
+                    with (output / (name + ".png")).open("wb") as capture:
+                        subprocess.run(
+                            [
+                                str(adb),
+                                "-s",
+                                SERIAL,
+                                "exec-out",
+                                "run-as",
+                                PACKAGE,
+                                "cat",
+                                "files/group25b/" + name + ".png",
+                            ],
+                            stdout=capture,
+                            stderr=subprocess.DEVNULL,
+                            timeout=30,
+                            check=True,
+                        )
+                    assert (output / (name + ".png")).read_bytes().startswith(b"\x89PNG")
+                receipt = {
+                    "classification": "EMULATED_SYNTHETIC_ACTUAL_GRID",
+                    "serial": SERIAL,
+                    "avd": AVD,
+                    "transport": "separate actual TLS Core and native Android Keystore proof",
+                    "native_readback": result,
+                    "tasks": tasks,
+                    "timings": timings,
+                    "physical_phone": "NOT_RUN",
+                    "owner_biometrics": "NOT_RUN",
+                    "real_accounts": "NOT_RUN",
+                    "accessibility_service_enabled": True,
+                    "native_navigation_captures": list(captures),
+                }
+            finally:
+                device("reverse", "--remove", "tcp:" + port)
+    finally:
+        if process is not None and process.poll() is None:
+            stage = device(
+                "exec-out", "run-as", PACKAGE, "cat", "files/software-native-stage.txt"
+            ).strip()
+            if stage:
+                print(json.dumps({"native_stage": stage}), flush=True)
+            print(device("logcat", "-d", "-t", "300", "OscarNativeWorker:W", "*:S"), flush=True)
+            process.terminate()
+            process.wait(timeout=20)
+        device(
+            "shell",
+            "settings",
+            "put",
+            "secure",
+            "enabled_accessibility_services",
+            previous_services,
+        )
+        device("shell", "settings", "put", "secure", "accessibility_enabled", previous_access)
+        assert (
+            device("shell", "settings", "get", "secure", "enabled_accessibility_services").strip()
+            == previous_services
+        )
+        assert (
+            device("shell", "settings", "get", "secure", "accessibility_enabled").strip()
+            == previous_access
+        )
+        device("uninstall", PACKAGE + ".test")
+        device("uninstall", PACKAGE)
+    assert receipt is not None
+    receipt["cleanup"] = (
+        "previous Accessibility settings read back; both disposable apps uninstalled"
+    )
+    (output / "native-grid.json").write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8")
+    print(json.dumps(receipt))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

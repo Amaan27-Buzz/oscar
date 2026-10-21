@@ -10,18 +10,18 @@ from pathlib import Path
 
 
 @contextmanager
-def android_core_fixture(identity: dict):
+def android_core_fixture(identity: dict, *, android_workspace: str = "", management: bool = False):
     """Yield actual TLS Core and Worker authority for one disposable emulator."""
     from cryptography import x509
     from cryptography.hazmat.primitives import serialization
 
     from oscar.cloud import CloudCore
     from oscar.remote_grid import create_invitation
-    from tests.test_connected_acceptance import ConnectedAcceptanceTests
+    from tests.test_connected_acceptance import ConnectedAcceptanceTests, public_key
 
     fixture = ConnectedAcceptanceTests()
     try:
-        fixture.setUp()
+        fixture.setUp(android_control=bool(android_workspace))
         core_process = fixture.start_core()
         fixture.enroll()
         worker = fixture.start_worker()
@@ -43,7 +43,9 @@ def android_core_fixture(identity: dict):
                 "mobile",
                 identity["installation_id"],
                 identity["public_key"],
+                workspace=android_workspace,
                 retain=True,
+                owner_public_key=public_key(fixture.owner_key) if management else None,
             )
         finally:
             core.close()

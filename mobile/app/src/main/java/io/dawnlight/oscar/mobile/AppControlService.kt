@@ -4,11 +4,15 @@ import android.accessibilityservice.AccessibilityService
 import android.content.Intent
 import android.os.Bundle
 import android.os.Build
+import android.graphics.Path
+import android.graphics.Rect
+import android.accessibilityservice.GestureDescription
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
 
-/** User-enabled deterministic adapter. Events are discarded; no background capture or autonomous actions. */
+/** User-enabled exact-task adapter. Events are discarded; no continuous capture. */
 class AppControlService : AccessibilityService() {
+    internal fun selectedPackage(): String? = rootInActiveWindow?.packageName?.toString()
     override fun onServiceConnected() { connected = this }
     override fun onAccessibilityEvent(event: AccessibilityEvent?) = Unit
     override fun onInterrupt() { if (connected === this) connected = null }
@@ -44,6 +48,23 @@ class AppControlService : AccessibilityService() {
             "android.ui.click" -> node.isClickable && node.performAction(AccessibilityNodeInfo.ACTION_CLICK)
             "android.ui.set_text" -> node.isEditable && node.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT,
                 Bundle().apply { putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, action.value) })
+            "android.ui.scroll" -> node.isScrollable && action.value in setOf("forward", "backward") && node.performAction(
+                if (action.value == "forward") AccessibilityNodeInfo.ACTION_SCROLL_FORWARD else AccessibilityNodeInfo.ACTION_SCROLL_BACKWARD)
+            "android.ui.gesture" -> {
+                val bounds = Rect().also(node::getBoundsInScreen)
+                val rootBounds = Rect().also(root::getBoundsInScreen)
+                if (node.isEditable || bounds.width() < 20 || bounds.height() < 20 || !rootBounds.contains(bounds) ||
+                    action.value !in setOf("up", "down", "left", "right") || !current()) return result("blocked", "Safe target-relative gesture required")
+                val x = bounds.exactCenterX(); val y = bounds.exactCenterY()
+                val dx = bounds.width() * 0.3f; val dy = bounds.height() * 0.3f
+                val path = Path().apply { when(action.value) {
+                    "up" -> { moveTo(x, y + dy); lineTo(x, y - dy) }
+                    "down" -> { moveTo(x, y - dy); lineTo(x, y + dy) }
+                    "left" -> { moveTo(x + dx, y); lineTo(x - dx, y) }
+                    else -> { moveTo(x - dx, y); lineTo(x + dx, y) }
+                } }
+                dispatchGesture(GestureDescription.Builder().addStroke(GestureDescription.StrokeDescription(path, 0, 200)).build(), null, null)
+            }
             else -> false
         }
         return result(if (accepted) "reported" else "failed", if (accepted) "Android accepted the action; fresh independent result readback is required" else "Android did not perform the action")

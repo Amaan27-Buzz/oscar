@@ -152,10 +152,10 @@ private val Ink = Color(0xFF1A1B18)
                     when (destination) {
                         Destination.OSCAR -> if (voiceOpen) VoiceExperience(state, {
                             navigate(Destination.SETTINGS); settingsPage = "Privacy"
-                        }) else if (conversationPage == "Today") TodayScreen(state, { conversationPage = "Conversation" }, { navigate(Destination.ACTIVITY) })
+                        }) else if (conversationPage == "Today") TodayScreen(session, state, { conversationPage = "Conversation" }, { navigate(Destination.ACTIVITY) })
                         else PresenceScreen(state, draft, session::writeDraft, send, session::cancelRequest,
                             { navigate(Destination.ACTIVITY) }, { focus.clearFocus(); keyboard?.hide(); voiceOpen = true }, false, { conversationPage = "Today" }, { id -> session.inspect(id); navigate(Destination.ACTIVITY) })
-                        Destination.AUTOMATIONS -> AutomationsScreen(state, automationPage, { automationPage = it }) { text -> session.writeDraft(text); navigate(Destination.OSCAR) }
+                        Destination.AUTOMATIONS -> AutomationsScreen(session, state, automationPage, { automationPage = it }) { text -> session.writeDraft(text); navigate(Destination.OSCAR) }
                         Destination.ACTIVITY -> ActivityScreen(state, session::inspect, session::review)
                         Destination.DEVICES -> DevicesScreen(state, { pairing = true }, session::disconnect, session::revoke, session::rotateConnection) { target, kind, parameters ->
                             session.submitRemote("${if (kind == "file_write") "Write" else "Read"} workspace file ${parameters.getString("path")}", kind, target, parameters)
@@ -194,7 +194,7 @@ private val Ink = Color(0xFF1A1B18)
                     }
                 })
             }, replyPreview = state.replyPreview, coreNow = state.coreNow(System.currentTimeMillis(), android.os.SystemClock.elapsedRealtime()), decline =
-                state.snapshot?.tasks?.firstOrNull { task -> approval.operation == "approve" && task.id == approval.material().getString("task_id") && "deny" in task.actions }
+                state.snapshot?.tasks?.firstOrNull { task -> approval.completion == "complete" && approval.operation == "approve" && task.id == approval.material().getString("task_id") && "deny" in task.actions }
                     ?.let { task -> { session.dismissApproval(); session.review(task, "deny") } })
         }
     }

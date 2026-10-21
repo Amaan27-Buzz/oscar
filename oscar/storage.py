@@ -7,6 +7,7 @@ from contextlib import contextmanager
 from pathlib import Path
 from threading import RLock
 from typing import Any, Protocol
+from uuid import uuid4
 from weakref import WeakSet
 
 from .contracts import TERMINAL, TRANSITIONS, Evidence, Task, TaskState, record
@@ -67,13 +68,21 @@ class Store:
     @contextmanager
     def transaction(self, *, write: bool = True) -> Iterator[None]:
         with self.lock:
-            self.db.execute("BEGIN IMMEDIATE" if write else "BEGIN")
+            nested = self.db.in_transaction
+            savepoint = "nested_" + uuid4().hex if nested else ""
+            self.db.execute(
+                "SAVEPOINT " + savepoint if nested else "BEGIN IMMEDIATE" if write else "BEGIN"
+            )
             try:
                 yield
-                self.db.execute("COMMIT")
+                self.db.execute("RELEASE SAVEPOINT " + savepoint if nested else "COMMIT")
             except BaseException:
                 if self.db.in_transaction:
-                    self.db.execute("ROLLBACK")
+                    if nested:
+                        self.db.execute("ROLLBACK TO SAVEPOINT " + savepoint)
+                        self.db.execute("RELEASE SAVEPOINT " + savepoint)
+                    else:
+                        self.db.execute("ROLLBACK")
                 raise
 
     def close(self) -> None:

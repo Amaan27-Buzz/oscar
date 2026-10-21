@@ -21,4 +21,4 @@ base64 = "0.22"
 sha2 = "0.10"
 zeroize = "1"
 uuid = { version = "1", features = ["v4"] }
-windows-sys = { version = "=0.61.2", features = ["Win32_Security_Cryptography", "Win32_UI_WindowsAndMessaging"] }
+windows-sys = { version = "=0.61.2", features = ["Win32_Security_Cryptography", "Win32_UI_WindowsAndMessaging", "Win32_UI_Shell"] }

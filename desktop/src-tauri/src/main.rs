@@ -1,5 +1,6 @@
 #![cfg_attr(target_os = "windows", windows_subsystem = "windows")]
 mod core;
+mod oauth;
 mod preferences;
 mod presence;
 mod protocol;
@@ -156,6 +157,7 @@ async fn surface_command(
                 bridge.execute(
                     Command::VoiceStart {
                         context_id: String::new(),
+                        mode: VoiceMode::Ask,
                     },
                     |_| false,
                 )

@@ -105,15 +105,15 @@ class WorkerCancellation(Cancellation):
 class MachineWorker:
     def __init__(
         self,
-        store: Store,
-        grid: Grid,
+        store: Store | None,
+        grid: Grid | None,
         session: SessionHandle,
         scope: MachineScope,
         policy: PersonalPolicy | None = None,
     ):
         self.store, self.grid, self.session, self.scope = store, grid, session, scope
         self.files = ScopedFiles(scope.root)
-        self.policy = policy or PersonalPolicy(store)
+        self.policy = policy or (PersonalPolicy(store) if store is not None else None)
         self.git = shutil.which("git") if scope.trusted_host_execution else None
         if self.git not in scope.allowed_executables:
             self.git = None
@@ -190,6 +190,7 @@ class MachineWorker:
         return {cap.id: self.execute for cap in self.capabilities()}
 
     def checkpoint(self, action: Action, step: str, fraction: float) -> None:
+        assert self.store is not None and self.grid is not None
         task = self.store.task(action.task_id)
         if not task.lease_id:
             raise StateConflict("machine execution requires native task lease")
@@ -221,18 +222,21 @@ class MachineWorker:
         )
 
     def controls(self, task_id: str) -> dict[str, Any]:
+        assert self.store is not None
         try:
             return self.store.get("worker_control", task_id)
         except KeyError:
             return {"paused": False}
 
     def set_paused(self, task_id: str, paused: bool, *, owner_authorized: bool) -> None:
+        assert self.store is not None
         if not owner_authorized:
             raise PermissionError("pause requires owner authority")
         self.store.put("worker_control", task_id, {"paused": paused})
         self.store.audit(task_id, "worker_pause" if paused else "worker_resume", {})
 
     def check(self, action: Action, cancellation: Cancellation) -> None:
+        assert self.store is not None and self.grid is not None
         cancellation.check()
         task = self.store.task(action.task_id)
         lease = self.store.get("lease", task.lease_id or "")
@@ -493,12 +497,50 @@ class MachineWorker:
             return prefix + ["commit", "-m", message]
         raise ValueError("unsupported Git operation")
 
-    def execute(self, action: Action, cancellation: Cancellation) -> Result:
-        caps = {c.id: c for c in self.capabilities()}
-        cap = caps[action.capability_id]
+    def authorize_execution(self, action: Action, cap: Capability) -> bool:
+        from .authority import delegated_confirmation
+
+        assert self.store is not None and self.grid is not None and self.policy is not None
         # Existing Dispatcher already checks grants; policies are rechecked at the target.
-        decision = self.policy.evaluate(cap.name, cap.permissions, frozenset(cap.permissions))
-        if not decision.allowed:
+        decision = self.policy.evaluate(
+            cap.name,
+            cap.permissions,
+            frozenset(cap.permissions),
+            confirmed=delegated_confirmation(
+                self.store, self.grid, action.task_id, asdict(cap), self.session
+            ),
+        )
+        if decision.allowed:
+            self.owners[action.id] = self.store.task(action.task_id).lease_id or ""
+        return decision.allowed
+
+    def execution_cancellation(self, action: Action, cancellation: Cancellation) -> Cancellation:
+        assert self.store is not None
+        return WorkerCancellation(
+            self.store, action.task_id, lambda: self.check(action, cancellation)
+        )
+
+    def audit_execution(self, action: Action, metadata: dict[str, Any]) -> None:
+        assert self.store is not None
+        self.store.audit(
+            action.task_id,
+            "machine_execution",
+            {
+                "action_id": action.id,
+                "capability": action.capability_id,
+                **metadata,
+                "status": Epistemic.REPORTED,
+                "correlation_id": action.correlation_id,
+            },
+        )
+
+    def check_permission(self, permission: str) -> None:
+        assert self.grid is not None
+        self.grid.authenticate(self.session, permission)
+
+    def execute(self, action: Action, cancellation: Cancellation) -> Result:
+        cap = {c.id: c for c in self.capabilities()}[action.capability_id]
+        if not self.authorize_execution(action, cap):
             return Result(
                 new_id(),
                 action.id,
@@ -508,13 +550,10 @@ class MachineWorker:
                 False,
                 error="machine_blocked:policy",
             )
-        self.owners[action.id] = self.store.task(action.task_id).lease_id or ""
         self.check(action, cancellation)
         self.checkpoint(action, "started", 0)
         p = action.parameters
-        guarded_cancel = WorkerCancellation(
-            self.store, action.task_id, lambda: self.check(action, cancellation)
-        )
+        guarded_cancel = self.execution_cancellation(action, cancellation)
         artifact: ArtifactRef | None = None
         metadata: dict[str, Any] = {}
         try:
@@ -615,17 +654,7 @@ class MachineWorker:
                     )
             self.checkpoint(action, "execution-finished", 1)
             # All log/progress is metadata-only. Arbitrary command output never enters persistence.
-            self.store.audit(
-                action.task_id,
-                "machine_execution",
-                {
-                    "action_id": action.id,
-                    "capability": cap.id,
-                    **metadata,
-                    "status": Epistemic.REPORTED,
-                    "correlation_id": action.correlation_id,
-                },
-            )
+            self.audit_execution(action, metadata)
             if len(self.outputs) > 100:
                 self.outputs.pop(next(iter(self.outputs)))
             return Result(

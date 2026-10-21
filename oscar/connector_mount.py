@@ -1,8 +1,11 @@
 """Explicit Connector Fabric executor enrollment in the existing Core Grid/runtime."""
 
+import hashlib
 import sqlite3
 from collections.abc import Callable
 from dataclasses import replace
+from functools import cache
+from pathlib import Path
 from threading import Event, RLock, Thread
 from typing import TYPE_CHECKING
 
@@ -14,7 +17,53 @@ from .storage import StateConflict
 from .transport import Dispatcher
 
 if TYPE_CHECKING:
+    from .connectors import ConnectorManifest
     from .harness import Harness
+
+
+@cache
+def account_manifests() -> tuple["ConnectorManifest", ...]:
+    from .connector_providers import load_google, microsoft_manifest
+
+    return (
+        *load_google(Path(__file__).resolve().parents[1] / "config/google-connectors.json"),
+        microsoft_manifest(),
+    )
+
+
+def project_accounts(harness: "Harness") -> None:
+    """Rebuild executor bindings from current verified account metadata, never cached grants."""
+    from .connectors import ConnectorInstance, CredentialRef
+
+    manifests = account_manifests()
+    projected = {}
+    with harness.store.lock:
+        for account in harness.accounts.list_accounts():
+            if account.status != "connected":
+                continue
+            for manifest in manifests:
+                binding = account.services.get(manifest.id)
+                if account.provider != manifest.provider or binding is None:
+                    continue
+                if binding.expires_at is not None and binding.expires_at <= harness.grid.clock():
+                    continue
+                identifier = (
+                    "native-account-"
+                    + hashlib.sha256((account.id + ":" + manifest.id).encode()).hexdigest()[:24]
+                )
+                projected[identifier] = ConnectorInstance(
+                    identifier,
+                    manifest,
+                    CredentialRef(binding.credential_ref),
+                    frozenset(binding.scopes),
+                    account_id=account.id,
+                    account_generation=account.generation,
+                    account_audience=binding.audience,
+                )
+        for identifier in harness._account_instances:
+            harness.connectors.instances.pop(identifier, None)
+        harness.connectors.instances.update(projected)
+        harness._account_instances = set(projected)
 
 
 class ConnectorMount:
@@ -61,6 +110,16 @@ class ConnectorMount:
         self.thread.start()
 
     def _confirmed(self, action: Action) -> bool:
+        from .authority import delegated_confirmation
+        from .contracts import record
+
+        capability = next(
+            (cap for cap in self._advertised or [] if cap.id == action.capability_id), None
+        )
+        if capability is not None and delegated_confirmation(
+            self.harness.store, self.harness.grid, action.task_id, record(capability), self.session
+        ):
+            return True
         try:
             receipt = self.harness.store.get("executive_confirmation", action.task_id)
             return bool(
@@ -75,6 +134,7 @@ class ConnectorMount:
         with self.lock:
             if self.stop.is_set():
                 return []
+            project_accounts(self.harness)
             caps = [
                 replace(cap, input_kind=cap.id)
                 for cap in self.harness.connectors.capabilities(self.node_id)

@@ -155,7 +155,7 @@ class NativeCapabilitiesTest {
         ActivityScenario.launch(CapabilityFixtureActivity::class.java).use { scenario ->
             scenario.onActivity { activity ->
                 val native = NativeCapabilities(context).also { adapter = it; it.gate.foreground(true) }
-                assertEquals(6, native.status().size)
+                assertEquals(nativeCapabilityIds.size, native.status().size)
                 assertTrue(native.status().all { it.availability == "blocked" && it.version == 1 })
                 assertTrue(MainActivity::class.java.name in native.discover(context.packageName))
                 assertTrue(native.discover("example.unselected").isEmpty())

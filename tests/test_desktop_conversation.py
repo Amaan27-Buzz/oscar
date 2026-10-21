@@ -120,7 +120,7 @@ class ConversationTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 self.call("conversation", {"before": invalid})
 
-    def test_revocation_policy_and_unavailable_access_modes_fail_closed(self):
+    def test_revocation_policy_and_unsigned_access_modes_fail_closed(self):
         self.ask("2 + 3")
         self.core.policy.save(
             PolicyRule(
@@ -138,7 +138,7 @@ class ConversationTests(unittest.TestCase):
         snapshot = self.call("snapshot", {})
         self.assertEqual(snapshot["conversation"]["turns"], [])
         self.assertEqual(snapshot["operating"]["access"], "Ask")
-        self.assertEqual(snapshot["operating"]["full_access"], "unavailable")
+        self.assertEqual(snapshot["operating"]["full_access"], "signed_delegation_available")
         for mode in ("Secure", "Full Access"):
             with self.assertRaises(ValueError):
                 self.call("access", {"mode": mode})

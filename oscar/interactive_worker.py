@@ -155,7 +155,7 @@ def browser_available(executable: str, workspace: Path) -> bool:
 class InteractiveWorker(MachineWorker):
     def clipboard_granted(self) -> bool:
         try:
-            self.grid.authenticate(self.session, "desktop:clipboard")
+            self.check_permission("desktop:clipboard")
             return True
         except (PermissionError, KeyError):
             return False
@@ -288,7 +288,7 @@ class InteractiveWorker(MachineWorker):
                 False,
                 error="machine_blocked:capability_unavailable",
             )
-        if not self.policy.evaluate(cap.name, cap.permissions, frozenset(cap.permissions)).allowed:
+        if not self.authorize_execution(action, cap):
             return Result(
                 new_id(),
                 action.id,
@@ -298,7 +298,6 @@ class InteractiveWorker(MachineWorker):
                 False,
                 error="machine_blocked:policy",
             )
-        self.owners[action.id] = self.store.task(action.task_id).lease_id or ""
         self.check(action, cancellation)
         self.checkpoint(action, "interactive-started", 0)
         try:
@@ -322,7 +321,7 @@ class InteractiveWorker(MachineWorker):
                 if request.get("operation") in {"clipboard_write", "clipboard_read"}:
                     if cap.id != "machine.clipboard":
                         raise PermissionError("clipboard requires its separately scoped capability")
-                    self.grid.authenticate(self.session, "desktop:clipboard")
+                    self.check_permission("desktop:clipboard")
                 elif cap.id == "machine.clipboard":
                     raise PermissionError("clipboard capability cannot execute UIA operations")
                 if set(request) == {"operation", "handle", "pid", "app_id"} and (

@@ -115,7 +115,7 @@ impl Signer {
         }
     }
     pub fn sign(&self, body: &[u8]) -> Result<Vec<u8>, String> {
-        if body.len() > 16384 {
+        if body.len() > 32768 {
             return Err("signing envelope exceeds bound".into());
         }
         let guard = self.handles.lock().map_err(|_| "native key unavailable")?;

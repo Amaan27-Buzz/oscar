@@ -12,6 +12,8 @@ from threading import BoundedSemaphore, Event, RLock, Thread
 from time import monotonic, time
 from typing import TYPE_CHECKING, Any
 
+from .android_worker import ANDROID_CAPABILITIES, android_readback, validate_android
+from .authority import StandingAuthority
 from .capabilities import Verifier, addition_operands
 from .contracts import (
     Action,
@@ -34,6 +36,7 @@ from .mobile import display_digest, fingerprint
 from .mobile import public_key as load_public_key
 from .policy import PersonalPolicy
 from .remote_client import request_proof
+from .remote_machine import REMOTE_MACHINE_CAPABILITIES, machine_readback, validate_remote_machine
 from .storage import StateConflict
 from .transport import parse_result
 
@@ -43,6 +46,8 @@ if TYPE_CHECKING:
 WORKER_CAPABILITIES = {
     "machine.files.read": ("file_read", "files:read", "low"),
     "machine.files.write": ("file_write", "files:write", "high"),
+    **ANDROID_CAPABILITIES,
+    **REMOTE_MACHINE_CAPABILITIES,
 }
 
 
@@ -81,16 +86,16 @@ def create_invitation(
     owner_public_key: str | None = None,
     ttl: int = 300,
     recover: bool = False,
+    android_control: bool = False,
+    machine_control: bool = False,
 ) -> dict[str, Any]:
     """Trusted offline owner operation. Reachability alone cannot call this method."""
     identifier(node_id, node=True)
     identifier(installation_id)
     if role not in {"desktop", "mobile"} or not 30 <= ttl <= 300:
         raise ValueError("explicit supported role and bounded invitation lifetime required")
-    if role == "desktop":
+    if role == "desktop" or workspace:
         identifier(workspace)
-    elif workspace:
-        raise ValueError("owner client cannot own a Worker workspace")
     if node_id == core.config.core_id:
         raise ValueError("device cannot replace Core identity")
     load_public_key(public_key)
@@ -111,10 +116,18 @@ def create_invitation(
     ]
     if retain:
         scopes += ["archive:retain", "archive:read"]
-    if role == "desktop":
+    if role == "desktop" or workspace:
         scopes += ["advertise", "execute"]
+    if type(android_control) is not bool:
+        raise ValueError("explicit Android control scope required")
+    if role == "mobile" and workspace or android_control:
+        scopes += ["android:act", "android:perceive"]
+    if type(machine_control) is not bool:
+        raise ValueError("explicit machine control scope required")
+    if machine_control:
+        scopes += ["machine:host", "desktop:control", "desktop:clipboard", "browser:control"]
     if owner_public_key:
-        scopes += ["grid:approve"]
+        scopes += ["grid:approve", "world:read"]
     challenge = new_id()
     binding = {
         "core_id": core.config.core_id,
@@ -191,6 +204,7 @@ class OutboundTransport:
         self.remote = remote
 
     def invoke(self, envelope: Envelope, session: SessionHandle) -> Result:
+        self.remote.prepare_executive(envelope, session)
         return parse_result(self.remote.exchange(envelope.task_id, "action"))
 
     def control(self, envelope: Envelope, session: SessionHandle) -> dict[str, Any]:
@@ -209,6 +223,75 @@ class RemoteVerifier(Verifier):
         self.original.release_task(task_id)
 
     def verify(self, objective: Objective, result: Result) -> Verification:
+        if objective.criterion["kind"] == "remote_machine":
+            if "text" in objective.criterion:
+                actual = self.remote.exchange(result.task_id, "readback")["content"]
+                observed = json.loads(actual)
+                matches = (
+                    isinstance(observed, dict)
+                    and observed.get("text") == objective.criterion["text"]
+                )
+                return Verification(
+                    TaskState.VERIFIED if matches else TaskState.FAILED,
+                    Evidence(
+                        new_id(), result.task_id, result.correlation_id,
+                        "remote-native-observer",
+                        "separate native read and Core exact-text comparison",
+                        time(), matches, Epistemic.VERIFIED if matches else Epistemic.KNOWN,
+                        "destination compared",
+                        content_hash=hashlib.sha256(actual.encode()).hexdigest(),
+                    ),
+                )
+            return Verification(
+                TaskState.PARTIALLY_VERIFIED,
+                Evidence(
+                    new_id(), result.task_id, result.correlation_id,
+                    "remote-machine-report", "authenticated native executor report", time(),
+                    None, Epistemic.REPORTED,
+                    "Native execution reported; objective-specific independent readback required",
+                ),
+            )
+        if objective.criterion["kind"] == "remote_android":
+            criterion = objective.criterion
+            actual = self.remote.exchange(result.task_id, "readback")["content"]
+            observed = json.loads(actual)
+            if not isinstance(observed, dict) or observed.get("package") != criterion["package"]:
+                raise ValueError("Android readback package mismatch")
+            matches = None
+            if criterion["operation"] == "android_ui_set_text":
+                candidates = [
+                    n
+                    for n in observed.get("observations", [])
+                    if n.get("resource_id") == criterion["target"]
+                ]
+                matches = len(candidates) == 1 and candidates[0].get("text") == criterion["value"]
+            elif criterion["operation"] == "android_ui_inspect":
+                matches = actual == result.value
+            return Verification(
+                TaskState.PARTIALLY_VERIFIED
+                if matches is None
+                else TaskState.VERIFIED
+                if matches
+                else TaskState.FAILED,
+                Evidence(
+                    new_id(),
+                    result.task_id,
+                    result.correlation_id,
+                    "remote-android-accessibility",
+                    "separate read-only UI observation and Core comparison",
+                    time(),
+                    matches,
+                    Epistemic.REPORTED
+                    if matches is None
+                    else Epistemic.VERIFIED
+                    if matches
+                    else Epistemic.KNOWN,
+                    "Native effect requires app-specific observation"
+                    if matches is None
+                    else "Exact Android readback",
+                    content_hash=hashlib.sha256(actual.encode()).hexdigest(),
+                ),
+            )
         if objective.criterion["kind"] != "remote_file":
             return self.original.verify(objective, result)
         actual = self.remote.exchange(result.task_id, "readback")["content"]
@@ -447,22 +530,48 @@ class RemoteGrid:
             raise ValueError("versioned Grid request required")
         identifier(data["request_id"])
         operation, payload = data["operation"], data["payload"]
-        with self.lock:
-            self.require(session, "grid:connect")
-            self.grid.heartbeat(session)
-            if operation in {"management_challenge", "management_complete"}:
-                from .connections import Connections
-
+        if operation in {
+            "management_challenge",
+            "management_complete",
+            "oauth_callback",
+            "assistance_challenge",
+            "assistance_complete",
+            "authority_challenge",
+            "authority_complete",
+            "authority_revoke",
+        }:
+            with self.lock:
                 binding = self.require(session, "grid:approve")
                 if not binding["owner_public_key"]:
                     raise PermissionError("enrolled owner review required")
                 grants = frozenset(self.store.get("session", session.id)["scopes"])
-                manager = Connections(self.h)
-                if operation == "management_challenge":
-                    return manager.challenge(
+            from .assistance import Assistance
+            from .authority import StandingAuthority
+            from .connections import Connections
+
+            manager: Any = (
+                StandingAuthority(self.store, self.grid, self.h.runtime.relationship_id)
+                if operation.startswith("authority_")
+                else Assistance(self.h)
+                if operation.startswith("assistance_")
+                else Connections(self.h)
+            )
+            if operation.endswith("_challenge"):
+                return dict(
+                    manager.challenge(session.node_id, session.id, "grid:approve", grants, payload)
+                )
+            if operation == "authority_revoke":
+                if payload:
+                    raise ValueError("downgrade takes no parameters")
+                return dict(manager.revoke(session.node_id, session.id, "grid:approve", grants))
+            if operation == "oauth_callback":
+                return dict(
+                    manager.oauth_callback(
                         session.node_id, session.id, "grid:approve", grants, payload
                     )
-                return manager.complete(
+                )
+            return dict(
+                manager.complete(
                     session.node_id,
                     session.id,
                     binding["owner_public_key"],
@@ -470,6 +579,10 @@ class RemoteGrid:
                     grants,
                     payload,
                 )
+            )
+        with self.lock:
+            self.require(session, "grid:connect")
+            self.grid.heartbeat(session)
             if operation in {"snapshot", "conversation"}:
                 return self.snapshot(session, payload)
             if operation == "presence" and not payload:
@@ -477,6 +590,16 @@ class RemoteGrid:
                 if presence is None:
                     raise PermissionError("Presence is not authorized or available")
                 return {**presence, "observed_at_ms": int(time() * 1000)}
+            if operation == "day_brief" and not payload:
+                self.require(session, "world:read")
+                grants = frozenset(self.store.get("session", session.id)["scopes"])
+                permission = PersonalPolicy(self.store).evaluate(
+                    "core.world.read", ("world:read",), grants,
+                    {"node": session.node_id, "source": "remote-grid"},
+                )
+                if not permission.allowed:
+                    raise PermissionError(permission.reason)
+                return {"day_brief": self.h.world.brief()}
             if operation == "inspect" and set(payload) == {"task_id"}:
                 self.require(session, "grid:inspect")
                 return self.inspect(
@@ -501,6 +624,7 @@ class RemoteGrid:
                 return self.advertise(session, payload)
             if operation == "poll" and not payload:
                 self.require(session, "execute")
+                self.grid.executor_heartbeat(session)
                 for row in self.store.all("remote_delivery"):
                     if row["node_id"] == session.node_id and row["state"] == "pending":
                         try:
@@ -513,10 +637,18 @@ class RemoteGrid:
                         self.store.put("remote_delivery", row["id"], {**row, "state": "claimed"})
                         return {"delivery": self.delivery_view(row)}
                 return {"delivery": None}
-            if operation == "check" and set(payload) == {"delivery_id"}:
-                self.check(session, identifier(payload["delivery_id"]))
-                return {"authorized": True}
+            if operation == "check" and set(payload) in (
+                {"delivery_id"},
+                {"delivery_id", "authority"},
+            ):
+                self.grid.executor_heartbeat(session)
+                delivery = self.check(session, identifier(payload["delivery_id"]))
+                authority = self.store.get("remote_task", delivery["task_id"]).get("authority")
+                if payload.get("authority") != authority:
+                    raise PermissionError("Worker authority pin differs from Core")
+                return {"authorized": True, **({"authority": authority} if authority else {})}
             if operation == "deliver" and set(payload) == {"delivery_id", "result"}:
+                self.grid.executor_heartbeat(session)
                 return self.deliver(session, payload)
             if operation == "rotate" and not payload:
                 binding = self.require(session, "grid:connect")
@@ -558,7 +690,7 @@ class RemoteGrid:
             set(payload) != {"workspace", "capabilities"}
             or payload["workspace"] != binding["workspace"]
             or not isinstance(payload["capabilities"], list)
-            or len(payload["capabilities"]) > 2
+            or len(payload["capabilities"]) > 32
         ):
             raise PermissionError("advertisement outside enrolled workspace")
         capabilities = []
@@ -569,10 +701,21 @@ class RemoteGrid:
             spec = WORKER_CAPABILITIES.get(cap.id)
             if (
                 spec is None
-                or (cap.input_kind, cap.permissions, cap.risk) != (spec[0], (spec[1],), spec[2])
+                or (cap.id.startswith("android.") and binding["role"] != "mobile")
+                or (not cap.id.startswith("android.") and binding["role"] != "desktop")
+                or (cap.input_kind, cap.permissions, cap.risk)
+                != (spec[0], (spec[1],) if isinstance(spec[1], str) else spec[1], spec[2])
                 or cap.node_id != session.node_id
                 or cap.execution_class != "machine"
-                or cap.output_kind != ("file" if cap.input_kind == "file_write" else "reference")
+                or cap.output_kind
+                != (
+                    "file" if cap.input_kind == "file_write"
+                    else "artifact" if cap.input_kind == "repository_task"
+                    else "metadata"
+                    if cap.id in REMOTE_MACHINE_CAPABILITIES
+                    and cap.input_kind not in {"directory_list", "file_search"}
+                    else "reference"
+                )
                 or type(cap.version) is not int
                 or cap.version != 1
                 or type(cap.reversible) is not bool
@@ -592,7 +735,9 @@ class RemoteGrid:
             ):
                 raise PermissionError("capability exceeds owner enrollment")
             capabilities.append(cap)
-        self.grid.advertise(session, capabilities)
+        self.grid.advertise(session, capabilities, executor=True)
+        if isinstance(self.h.executive.targets, dict):
+            self.h.executive.targets[session.node_id] = (self.transport, session)
         return {"state": "online", "capabilities": [record(c) for c in capabilities]}
 
     def submit(
@@ -635,6 +780,36 @@ class RemoteGrid:
             raise StateConflict("remote task queue full")
         kind, parameters, target = payload["kind"], payload["parameters"], payload["target"]
         identifier(target, node=True)
+        if kind == "text" and target == self.h.node_id:
+            if parameters:
+                raise ValueError("text parameters must be empty")
+            from .desktop_actions import OPERATIONS, conversation_form, form_intent
+
+            form = conversation_form(payload["text"])
+            if form is not None:
+                operation, fields = form
+                candidates = [
+                    cap for input_kind, operations in OPERATIONS.items()
+                    if operation in operations
+                    for cap in self.grid.search(input_kind)
+                    if cap.node_id in self.sessions and cap.node_id != self.h.node_id
+                    and cap.id in WORKER_CAPABILITIES
+                ]
+                if len(candidates) != 1:
+                    raise StateConflict(
+                        "action target is unavailable or ambiguous; select a device"
+                    )
+                selected = candidates[0]
+                typed = form_intent(
+                    selected,
+                    {"capability_id": selected.id, "operation": operation, "fields": fields},
+                    {},
+                )
+                if typed.parameters is None or typed.capability_kind is None:
+                    raise ValueError("typed capability action required")
+                kind, parameters, target = (
+                    typed.capability_kind, typed.parameters, selected.node_id
+                )
         criterion: dict[str, Any] = {"kind": "unavailable"}
         if kind in {"file_read", "file_write"}:
             needed = {"path", "content"} if kind == "file_write" else {"path"}
@@ -668,6 +843,35 @@ class RemoteGrid:
                 capability_kind=kind,
                 parameters=parameters,
                 criterion=criterion,
+            )
+        elif kind in {spec[0] for spec in ANDROID_CAPABILITIES.values()}:
+            parameters = validate_android(kind, parameters)
+            candidates = [c for c in self.grid.search(kind) if c.node_id == target]
+            if len(candidates) != 1:
+                raise StateConflict("exact Android capability unavailable")
+            capability = candidates[0]
+            self.policy(session, capability, confirmed=capability.risk != "low")
+            criterion = {"kind": "remote_android", "operation": kind, **parameters}
+            intent = Intent(
+                payload["text"],
+                kind="capability",
+                capability_kind=kind,
+                parameters=parameters,
+                criterion=criterion,
+            )
+        elif kind in {spec[0] for spec in REMOTE_MACHINE_CAPABILITIES.values()}:
+            parameters = validate_remote_machine(kind, parameters)
+            candidates = [c for c in self.grid.search(kind) if c.node_id == target]
+            if len(candidates) != 1:
+                raise StateConflict("exact machine capability unavailable")
+            capability = candidates[0]
+            self.policy(session, capability, confirmed=capability.risk != "low")
+            criterion = {"kind": "remote_machine", "operation": kind}
+            if machine_readback(capability.id, parameters) is not None:
+                criterion["text"] = parameters["request"]["text"]
+            intent = Intent(
+                payload["text"], kind="capability", capability_kind=kind,
+                parameters=parameters, criterion=criterion,
             )
         elif kind in {"addition", "text"} and target == self.h.node_id:
             if kind == "addition":
@@ -707,7 +911,7 @@ class RemoteGrid:
             choices = [c for c in self.grid.search(plan["kind"]) if c.node_id == target]
             if choices:
                 capability = choices[0]
-        self.policy(session, capability, confirmed=kind == "file_write")
+        self.policy(session, capability, confirmed=capability.risk != "low")
         action = Action(
             new_id(),
             task.id,
@@ -716,6 +920,12 @@ class RemoteGrid:
             plan["parameters"],
             task.id,
             session.node_id,
+        )
+        executor = self.h.session if target == self.h.node_id else self.sessions.get(target)
+        if executor is None:
+            raise PermissionError("executor session unavailable")
+        authority = StandingAuthority(self.store, self.grid, self.h.runtime.relationship_id).bind(
+            task.id, record(capability), executor
         )
         deadline = int((time() + 120) * 1000)
         workspace = (
@@ -738,8 +948,9 @@ class RemoteGrid:
             "workspace": workspace,
             "deadline_ms": deadline,
             "review_digest": review,
-            "approval_required": kind == "file_write",
-            "approved": kind != "file_write",
+            "approval_required": capability.risk != "low" and authority is None,
+            "approved": capability.risk == "low" or authority is not None,
+            "authority": authority,
             "event_id": new_id(),
             "occurred_at": time(),
             "text": payload["text"],
@@ -826,7 +1037,10 @@ class RemoteGrid:
         results = [r for r in self.store.all("result") if r["task_id"] == task_id]
         evidence = [r for r in self.store.all("evidence") if r["task_id"] == task_id]
         try:
-            self.h.archive.event(row["event_id"])
+            if row.get("source") == "executive":
+                self.h.executive._row("executive_goal", row["goal_id"])
+            else:
+                self.h.archive.event(row["event_id"])
             forgotten = redacted
         except KeyError:
             forgotten = True
@@ -902,8 +1116,8 @@ class RemoteGrid:
             "description": row["text"],
             "target": row["target"],
             "capability": view["capability"],
-            "reason": "Exact scoped remote file mutation",
-            "consequence": "Write the reviewed file in the enrolled workspace",
+            "reason": "Exact scoped remote action",
+            "consequence": "Execute only the reviewed operation on the enrolled device",
             "policy_reason": "Core and Worker recheck scoped Ask authority",
             "confirmation": "biometric_or_device_credential",
             "review": review,
@@ -1031,6 +1245,94 @@ class RemoteGrid:
         self.threads.append(thread)
         thread.start()
 
+    def prepare_executive(self, envelope: Envelope, session: SessionHandle) -> None:
+        """Bind a signed native responsibility to this exact live remote delivery."""
+        from .executive import authorize_step
+
+        with self.lock, self.store.transaction():
+            try:
+                self.store.get("remote_task", envelope.task_id)
+                return
+            except KeyError:
+                pass
+            task = self.store.task(envelope.task_id)
+            plan = self.store.get("plan", task.id)
+            try:
+                execution = plan["executive"]
+                owner = self.store.get("executive_owner", execution["goal_id"])
+            except KeyError:
+                raise PermissionError("signed native responsibility required") from None
+            action = self.store.get("planned_action", task.id)
+            if (
+                record(envelope)["payload"] != action
+                or envelope.node_id != session.node_id
+                or envelope.session_id != session.id
+                or task.lease_id != envelope.lease_id
+            ):
+                raise PermissionError("remote responsibility action or lease changed")
+            capability = next(
+                c
+                for c in self.store.get("node", session.node_id)["capabilities"]
+                if c["id"] == action["capability_id"]
+            )
+            authorize_step(self.store, self.grid, task.id, capability, session)
+            device = self.require(session, "execute")
+            objective = self.store.get("objective", task.objective_id)
+            parameters = action["parameters"]
+            if capability["id"].startswith("android."):
+                validate_android(capability["input_kind"], parameters)
+                criterion = {
+                    "kind": "remote_android",
+                    "operation": capability["input_kind"],
+                    **parameters,
+                }
+            elif capability["id"] in {"machine.files.read", "machine.files.write"}:
+                criterion = {"kind": "remote_file", "path": parameters["path"]}
+                if capability["id"] == "machine.files.write":
+                    criterion["content"] = parameters["content"]
+            elif capability["id"] in REMOTE_MACHINE_CAPABILITIES:
+                validate_remote_machine(capability["input_kind"], parameters)
+                criterion = {"kind": "remote_machine", "operation": capability["input_kind"]}
+                if machine_readback(capability["id"], parameters) is not None:
+                    criterion["text"] = parameters["request"]["text"]
+            else:
+                raise PermissionError("remote responsibility verifier unavailable")
+            self.store.put("objective", task.objective_id, {**objective, "criterion": criterion})
+            authority = StandingAuthority(
+                self.store, self.grid, self.h.runtime.relationship_id
+            ).bind(task.id, capability, session)
+            deadline = int((time() + 120) * 1000)
+            review = fingerprint(
+                {
+                    "action": action,
+                    "target": session.node_id,
+                    "workspace": device["workspace"],
+                    "deadline_ms": deadline,
+                }
+            )
+            self.store.put(
+                "remote_task",
+                task.id,
+                {
+                    "task_id": task.id,
+                    "source": "executive",
+                    "goal_id": execution["goal_id"],
+                    "target": session.node_id,
+                    "requester": owner["node"],
+                    "requester_session": owner["session"],
+                    "capability": capability,
+                    "workspace": device["workspace"],
+                    "deadline_ms": deadline,
+                    "review_digest": review,
+                    "approval_required": False,
+                    "approved": True,
+                    "authority": authority,
+                    "event_id": "",
+                    "occurred_at": time(),
+                    "text": objective["description"],
+                },
+            )
+
     def exchange(self, task_id: str, kind: str) -> dict[str, Any]:
         with self.lock:
             task = self.store.task(task_id)
@@ -1075,7 +1377,14 @@ class RemoteGrid:
             "workspace": binding["workspace"],
             "review_digest": binding["review_digest"],
             "approved": binding["approved"],
-            "parameters": {"path": action["parameters"]["path"]}
+            "authority": binding.get("authority"),
+            "parameters": (
+                android_readback(action["parameters"])
+                if binding["capability"]["id"].startswith("android.")
+                else machine_readback(action["capability_id"], action["parameters"])
+                if action["capability_id"] in REMOTE_MACHINE_CAPABILITIES
+                else {"path": action["parameters"]["path"]}
+            )
             if row["kind"] == "readback"
             else action["parameters"],
         }
@@ -1085,7 +1394,12 @@ class RemoteGrid:
         row = self.store.get("remote_delivery", delivery_id)
         binding = self.store.get("remote_task", row["task_id"])
         # Forgotten source material cannot be resurfaced by a pending delivery.
-        self.h.archive.event(binding["event_id"])
+        if binding.get("source") == "executive":
+            from .executive import authorize_step
+
+            authorize_step(self.store, self.grid, row["task_id"], binding["capability"], session)
+        else:
+            self.h.archive.event(binding["event_id"])
         task = self.store.task(row["task_id"])
         lease = self.store.get("lease", row["lease_id"])
         if (
@@ -1105,7 +1419,19 @@ class RemoteGrid:
         if task.state != expected:
             raise PermissionError("task no longer accepts delivery")
         cap = Capability.from_dict(binding["capability"])
-        if binding["capability"] not in self.store.get("node", session.node_id)["capabilities"]:
+        parameters = self.store.get("planned_action", task.id)["parameters"]
+        if cap.input_kind == "browser" and "account_id" in parameters:
+            self.h.accounts.check(parameters["account_id"], parameters["account_generation"])
+        authority = StandingAuthority(self.store, self.grid, self.h.runtime.relationship_id)
+        authority.check_task(task.id, binding["capability"], session)
+        if binding.get("authority") is not None and not authority.permits(
+            binding["capability"], session, task_id=task.id
+        ):
+            raise PermissionError("delegated authority unavailable")
+        if not any(
+            node["id"] == session.node_id and binding["capability"] in node["capabilities"]
+            for node in self.grid.nodes()
+        ):
             raise PermissionError("capability withdrawn")
         self.policy(session, cap, confirmed=binding["approved"])
         requester = self.store.get("session", binding["requester_session"])
@@ -1216,6 +1542,8 @@ class RemoteGrid:
                 )
             ][::-1]
         for row in recent:
+            if row.get("source") == "executive":
+                continue  # Responsibility storage does not grant conversation retention.
             task = self.store.task(row["task_id"])
             result_id = hashlib.sha256((row["event_id"] + ":result").encode()).hexdigest()[:32]
             if (
@@ -1323,9 +1651,26 @@ class RemoteGrid:
         }
         presence = self.presence(session)
         if "grid:approve" in self.store.get("session", session.id)["scopes"]:
+            from .assistance import Assistance
             from .connections import snapshot as connections_snapshot
 
             snapshot["connections"] = connections_snapshot(self.h)
+            snapshot["executive"] = {
+                **self.h.executive.snapshot(),
+                "management": Assistance(self.h).snapshot(),
+            }
+        authority = StandingAuthority(
+            self.store, self.grid, self.h.runtime.relationship_id
+        ).snapshot()
+        snapshot["operating"] = {
+            "access": {"ask": "Ask", "secure": "Secure", "full": "Full Access"}[authority["mode"]],
+            "secure": "signed_delegation_available",
+            "full_access": "signed_delegation_available",
+            "awareness": self.h.world.sentry.settings().mode.value,
+            "sentry": self.h.world.sentry.settings().state.value,
+            "worker_autonomy": "scoped",
+            "automations": "signed_authoring",
+        }
         if presence is not None:
             snapshot["presence"] = presence
         while len(json.dumps(snapshot).encode()) > 245760:
@@ -1353,6 +1698,8 @@ def main() -> None:
     parser.add_argument("--workspace", default="")
     parser.add_argument("--retain", action="store_true")
     parser.add_argument("--recover", action="store_true")
+    parser.add_argument("--android-control", action="store_true")
+    parser.add_argument("--machine-control", action="store_true")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     core = CloudCore(CloudConfig.load(args.config), start_services=False)
@@ -1370,6 +1717,8 @@ def main() -> None:
                 if args.owner_key_file
                 else None,
                 recover=args.recover,
+                android_control=args.android_control,
+                machine_control=args.machine_control,
             )
             json.dump(invitation, output)
     finally:

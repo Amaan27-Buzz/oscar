@@ -1,5 +1,11 @@
 # Executive runtime — Group 3 software candidate
 
+**2026-10-21 local continuation:** [signed native responsibility/procedure
+authoring](development/SOFTWARE-EXECUTIVE-AUTHORING.md) now adds action-line
+authoring, explicit retention and freshly reviewed replay to this same Executive.
+The older native-authoring and standing-authority limitations below describe
+the Group 3 checkpoint; current acceptance remains local and synthetic.
+
 The Executive coordinates the existing Controller, Runtime, Grid, Dispatcher,
 Personal Policy, Memory Fabric and independent verifier. It owns commitments and
 schedules; canonical Tasks/Actions/Results/Evidence remain the execution truth.

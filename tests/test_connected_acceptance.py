@@ -55,7 +55,7 @@ def save_key(path, key):
 
 
 class ConnectedAcceptanceTests(unittest.TestCase):
-    def setUp(self):
+    def setUp(self, *, android_control=False):
         from oscar.remote_grid import create_invitation
 
         self.temp = TemporaryDirectory(prefix="oscar-connected-")
@@ -91,6 +91,7 @@ class ConnectedAcceptanceTests(unittest.TestCase):
                     public_key(self.client_key),
                     retain=True,
                     owner_public_key=public_key(self.owner_key),
+                    android_control=android_control,
                 ),
             }
         finally:

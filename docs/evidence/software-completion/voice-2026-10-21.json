@@ -1,0 +1,121 @@
+{
+  "classification": "ACTUAL_LOCAL_MODELS_SYNTHETIC_AUDIO_CORE_INTEGRATION",
+  "microphone": "NOT_RUN",
+  "speaker_playback": "NOT_RUN",
+  "physical_barge_in_and_room_aec": "NOT_RUN",
+  "owner_voice_match": "NOT_RUN",
+  "native_product_bridge": "PASS_PRODUCTION_RUST_BRIDGE_LOOPBACK_SYNTHETIC_AUDIO",
+  "cases": [
+    {
+      "source_phrase": "Oscar. What is two plus three?",
+      "transcript": "What is 2 plus 3?",
+      "task_state": "verified",
+      "evidence_count": 1,
+      "wake_vad_events": [
+        "speech_present",
+        "wake",
+        "speech_started",
+        "speech_ended"
+      ],
+      "stt_seconds": 0.429,
+      "total_seconds": 1.339,
+      "response_provider": "kokoro",
+      "response_pcm_bytes": 138240
+    },
+    {
+      "source_phrase": "Oscar. Please write agenda with text ready for review.",
+      "transcript": "Please write agenda with text ready for review.",
+      "task_state": "verified",
+      "evidence_count": 1,
+      "wake_vad_events": [
+        "speech_present",
+        "wake",
+        "speech_started",
+        "speech_ended"
+      ],
+      "stt_seconds": 0.46,
+      "total_seconds": 1.111,
+      "response_provider": "kokoro",
+      "response_pcm_bytes": 101376
+    }
+  ],
+  "canonical_conversation_turns": 3,
+  "self_output_suppression": "PASS_SYNTHETIC_EXACT_REFERENCE",
+  "barge_in": "PASS_ACTUAL_VAD_KNOWN_SYNTHETIC_HUMAN_INPUT",
+  "synthetic_barge_in_processing_ms": 4.043,
+  "issued_task_not_replayed_or_reversed": true,
+  "native_webview_and_audio_devices": "NOT_RUN",
+  "source_provenance": {
+    "base_revision": "b700a6c68e7afdff7cc78ea1a615793fd6ac475d",
+    "working_tree_uncommitted": true,
+    "captured_at_utc": "2026-10-21T05:49:47.463071+00:00",
+    "files_sha256": {
+      "oscar/desktop_voice.py": "a16a6aaf418dc1b6b8712d0e7bb90f8cf05d2f06a693a34d66be4f8b8c5eeb2d",
+      "oscar/desktop.py": "270d3891e834028a79daaec3c424ae48e06a594c245a4a4d65135a301b5233c5",
+      "oscar/cli.py": "4d45d201d00143d4e0c894acd20f87b4bb2cda0cc0f5142467adcf19d62e13d6",
+      "desktop/src-tauri/src/core.rs": "df532079b98d90dbd29a193e30614c9747673b8c71f1c090e7ff64e82f03d40e",
+      "desktop/src-tauri/src/protocol.rs": "addaa51a3c53c5a92c85e444e7a849a69943fdb9c5e80eaba896069f7197783c",
+      "desktop/src-tauri/src/main.rs": "fbedfa2c1bb108b469a388e242eeb2baf70b83a2c3bfcba647d391e7e80681d9",
+      "desktop/src/App.tsx": "df3d204bc60bdfb3328e19d91f6d5cb9b15919fd43dbf4dbae07035e8f0d4c31",
+      "desktop/src/Workspace.tsx": "78e9185478a0bf36564ef574a811872c078d25b7b82b819d47e69c039cc684dc",
+      "desktop/src/bridge.ts": "019d9166e748db25a90d91def8c5c0a298749e205b136ad2f9fb4c3a214daedb",
+      "scripts/software_voice_reference.py": "3f24eb358907745590df92b09bf700f47ecd2194ea6d041246e471a690131df4",
+      "tests/test_voice_dialogue.py": "97748ee10ee44616568773b76e0c3b3574c89b8c56d6704ca3de64d896f7b9a8",
+      "tests/test_desktop.py": "50d092d58e42424e65f5f89a5bae1f199ad638fc2554baf4fcaef81fb042c870"
+    }
+  },
+  "runtime": {
+    "synthetic_model_python": "3.12.10 (.tmp/voice-env)",
+    "unit_checks_python": "3.14.2",
+    "rust_toolchain": "1.99.0",
+    "providers": "prepared Sherpa KWS, Silero VAD, faster-whisper base.en CPU/int8, Kokoro fp32; Windows installed speech generates synthetic input"
+  },
+  "checks": [
+    {
+      "command": "python -m unittest tests.test_voice tests.test_voice_quality tests.test_voice_dialogue tests.test_desktop tests.test_desktop_completion -q",
+      "result": "PASS: 90 tests"
+    },
+    {
+      "command": "python -m mypy oscar/desktop_voice.py oscar/desktop.py oscar/cli.py",
+      "result": "PASS: 3 source files"
+    },
+    {
+      "command": "python -m ruff check oscar/desktop_voice.py scripts/software_voice_reference.py tests/test_voice_dialogue.py",
+      "result": "PASS"
+    },
+    {
+      "command": "cargo +1.99.0 test --manifest-path desktop/src-tauri/Cargo.toml",
+      "result": "PASS: 29 passed, 1 fixture-dependent ignored"
+    },
+    {
+      "command": "cargo +1.99.0 test --manifest-path desktop/src-tauri/Cargo.toml core::tests::synthetic_voice_loopback_bridge -- --ignored --exact --nocapture",
+      "result": "PASS: 1 passed; invoked by synthetic fixture script with disposable private bootstrap"
+    },
+    {
+      "command": "npm --prefix desktop test",
+      "result": "PASS: 107 tests /20 files"
+    },
+    {
+      "command": "npm --prefix desktop run build",
+      "result": "PASS: TypeScript and Vite production build"
+    },
+    {
+      "command": "& .tmp/voice-env/Scripts/python.exe -m scripts.software_voice_reference",
+      "result": "PASS: actual local models, synthetic audio, canonical Core, production Rust bridge/HTTP"
+    }
+  ],
+  "private_local_log_sha256": {
+    "software-voice-focused.log": "53ff70722879994c9a1591a1846bc5d02d119f74a7d8f9e83a875b92bfa4250c",
+    "software-voice-mypy.log": "281a094c39385b4d7b53e5db635f52158036861433c2a4975b9039e77a627a24",
+    "software-voice-rust.log": "957d3265c48f7ab484a97704a6ccaee4a2bb309efe23990c7afbfaee0e9b1c8a",
+    "software-voice-native-bridge.log": "0f689ef7f2b916df5afe73032c2d2c7ae602a0db913685e8f92e2efcbb14dd2d",
+    "software-voice-frontend.log": "21ff7cd32192e5085954e285cafb4edebcbeb3cc95b83dba536c690186172f47",
+    "software-voice-frontend-build.log": "cc1529a3275fb6abdc986cf9f13f45fb5965aec6b054fd0b5a60275b43d4b7de"
+  },
+  "remaining": [
+    "Real microphone, loudspeaker, room AEC and physical barge-in NOT_RUN",
+    "Owner Voice Match and provider-independent voice quality listening acceptance NOT_RUN",
+    "Native WebView interaction not exercised by the Rust bridge fixture",
+    "Continuous native wake listening and persisted mute/device selection UI are not established by bounded push-to-talk"
+  ]
+}

@@ -122,6 +122,37 @@ class RemoteGridTests(unittest.TestCase):
         }
         return self.mobile.request("submit", payload)
 
+    def test_day_brief_requires_current_world_scope_and_personal_policy(self):
+        brief = self.mobile.request("day_brief", {})["day_brief"]
+        self.assertEqual(1, brief["version"])
+        self.assertEqual(self.core.harness.runtime.relationship_id, brief["relationship_id"])
+        self.assertNotIn("day_brief", self.mobile.request("snapshot", {}))
+        store = self.core.harness.store
+        PersonalPolicy(store).save(PolicyRule(
+            "deny-world", "core.world.read", PolicyEffect.DENY, "synthetic-owner",
+            time(), time(), {}, user_authoritative=True,
+        ), owner_authorized=True)
+        with self.assertRaises(PermissionError):
+            self.mobile.request("day_brief", {})
+        row = store.get("session", self.mobile.handle.id)
+        store.put("session", self.mobile.handle.id, {
+            **row, "scopes": [s for s in row["scopes"] if s != "world:read"]
+        })
+        with self.assertRaises(PermissionError):
+            self.mobile.request("day_brief", {})
+
+    def test_snapshot_cannot_keep_worker_capabilities_alive(self):
+        grid = self.core.harness.grid
+        observed = time()
+        with patch.object(grid, "clock", return_value=observed + 31):
+            snapshot = self.desktop.request("snapshot", {})
+            node = next(n for n in snapshot["nodes"] if n["id"] == "test-desktop")
+            self.assertEqual("online", node["status"])
+            self.assertEqual([], node["capabilities"])
+            self.assertEqual([], grid.search("file_read"))
+            self.assertIsNone(self.desktop.request("poll", {})["delivery"])
+            self.assertTrue(grid.search("file_read"))
+
     def approve(self, task):
         challenge = self.mobile.request(
             "challenge", {"task_id": task["task_id"], "operation": "approve"}
@@ -145,6 +176,80 @@ class RemoteGridTests(unittest.TestCase):
                 return view
             sleep(0.02)
         self.fail("real scoped Worker did not complete within test deadline")
+
+    def responsibility(self, path, *, start_at=None):
+        change = {
+            "operation": "create",
+            "id": "new",
+            "value": {
+                "name": "Synthetic remote routine",
+                "goal": "Write reviewed remote notes",
+                "steps": [
+                    {
+                        "id": "save",
+                        "node_id": "test-desktop",
+                        "capability_id": "machine.files.write",
+                        "intent": {
+                            "text": "Write reviewed remote notes",
+                            "kind": "file_write",
+                            "path": path,
+                            "content": "synthetic routine",
+                        },
+                        "depends_on": [],
+                    }
+                ],
+                "start_at": start_at,
+                "interval_seconds": None,
+                "max_runs": 1,
+                "priority": 0,
+                "conditions": [],
+            },
+        }
+        review = self.mobile.request("assistance_challenge", change)
+        result = self.mobile.request(
+            "assistance_complete",
+            {
+                "challenge_id": review["challenge_id"],
+                "signature": signature(self.owner_key, base64.b64decode(review["signing_payload"])),
+            },
+        )
+        return result["executive"]["goals"][-1]["id"]
+
+    def test_signed_responsibility_runs_existing_remote_worker_with_independent_readback(self):
+        goal_id = self.responsibility("routine.txt")
+        h = self.core.harness
+        until = time() + 8
+        while time() < until:
+            self.worker.step()
+            goal = h.store.get("executive_goal", goal_id)
+            if goal["state"] == "completed":
+                break
+            sleep(0.02)
+        self.assertEqual("completed", goal["state"])
+        task_id = next(
+            r["task_id"] for r in h.store.all("executive_task") if r["goal_id"] == goal_id
+        )
+        self.assertEqual("verified", h.store.task(task_id).state)
+        self.assertEqual("synthetic routine", (self.workspace / "routine.txt").read_text())
+        view = self.mobile.request("inspect", {"task_id": task_id})
+        self.assertTrue(view["evidence"][0]["matches"])
+        self.assertFalse(view["approval_required"])
+        self.assertEqual("executive", h.store.get("remote_task", task_id)["source"])
+        self.assertEqual([], self.mobile.request("snapshot", {})["events"])
+
+    def test_owner_revocation_fences_scheduled_responsibility_before_remote_effect(self):
+        goal_id = self.responsibility("revoked-routine.txt", start_at=time() + 0.2)
+        self.mobile.request("revoke", {})
+        h = self.core.harness
+        until = time() + 3
+        while time() < until:
+            self.worker.step()
+            if any(r["goal_id"] == goal_id for r in h.store.all("executive_task")):
+                break
+            sleep(0.02)
+        self.assertTrue(any(r["goal_id"] == goal_id for r in h.store.all("executive_task")))
+        self.assertFalse((self.workspace / "revoked-routine.txt").exists())
+        self.assertFalse(h.store.all("remote_delivery"))
 
     def delivery(self):
         for _ in range(100):
@@ -205,6 +310,19 @@ class RemoteGridTests(unittest.TestCase):
         self.core.remote.authenticate(headers, body)
         with self.assertRaises(StateConflict):
             self.core.remote.authenticate(headers, body)
+
+    def test_native_conversation_routes_explicit_file_request_through_real_worker(self):
+        task = self.submit(
+            "text", text="Please write notes.txt with text Synthetic conversation routine",
+            target=self.core.config.core_id, parameters={},
+        )
+        self.assertEqual("planned", task["state"])
+        self.assertFalse((self.workspace / "notes.txt").exists())
+        self.approve(task)
+        self.assertEqual("verified", self.finish(task)["state"])
+        self.assertEqual(
+            "Synthetic conversation routine", (self.workspace / "notes.txt").read_text()
+        )
 
     def test_real_file_read_and_signed_write_independently_verified(self):
         read = self.finish(self.submit())

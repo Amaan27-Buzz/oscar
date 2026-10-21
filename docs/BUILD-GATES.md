@@ -1,5 +1,11 @@
 # OSCAR — Build Gates (current truth 2026-10-18)
 
+**2026-10-21 local candidate:** signed Secure/Full delegation is implemented and
+tested with synthetic native credentials; intended-surface integration remains
+under acceptance. The earlier “unavailable” statement below is historical.
+See the [active completion ledger](development/OSCAR-FULL-SOFTWARE-COMPLETION.md).
+Gate classifications remain unchanged.
+
 See [current checklist](CURRENT-STATUS.md), [delivery groups](DELIVERY-PLAN.md), [canonical slices](SLICE-NUMBERING.md) and [roadmap](ROADMAP.md). Gates are **acceptance**; groups are **delivery order**. Green CI only verifies the exercised software environment, not a physical device or deployment.
 
 | Checkpoint | State |

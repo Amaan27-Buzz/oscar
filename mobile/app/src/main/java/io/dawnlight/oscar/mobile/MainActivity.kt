@@ -12,6 +12,9 @@ import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
+    override fun onResume() { super.onResume(); foregroundActivity = this }
+    override fun onPause() { if (foregroundActivity === this) foregroundActivity = null; super.onPause() }
+    companion object { @Volatile internal var foregroundActivity: MainActivity? = null; private set }
     private lateinit var session: CoreSession
     private lateinit var confirmation: OwnerConfirmation
     override fun onCreate(savedInstanceState: Bundle?) {

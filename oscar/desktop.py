@@ -3,10 +3,11 @@
 Presentation never executes apps. Private payloads expire on restart, not into memory.
 """
 
+import re
 import sqlite3
 from typing import Any
 
-from .contracts import Epistemic, Task, TaskState, new_id
+from .contracts import Capability, Epistemic, Task, TaskState, new_id, record
 from .desktop_actions import (
     OPERATIONS,
     conversation_form,
@@ -38,6 +39,18 @@ def orb_state(state: str | None, *, online: bool = True, voice: str = "idle") ->
 
 class Desktop(Mobile):
     source = "desktop"
+
+    def delegated(self, session: SessionHandle, capability: Capability) -> bool:
+        from .authority import StandingAuthority
+
+        target = self.targets.get(capability.node_id)
+        return bool(
+            target
+            and "control:approve:" + capability.node_id in self.grants(session)
+            and StandingAuthority(self.store, self.grid, self.runtime.relationship_id).permits(
+                record(capability), target[1]
+            )
+        )
 
     def __init__(
         self,
@@ -281,6 +294,7 @@ class Desktop(Mobile):
         capability_id: str | None = None,
         target_id: str | None = None,
         context_text: str | None = None,
+        context_id: str | None = None,
     ) -> dict[str, Any]:
         route = decide(intent)
         kind = (
@@ -303,13 +317,15 @@ class Desktop(Mobile):
                 continue
             if cap.node_id not in self.targets:
                 continue
-            if cap.risk == "critical":
+            delegated = self.delegated(session, cap)
+            if cap.risk == "critical" and not delegated:
                 continue  # Native strong owner verification is a manual acceptance boundary.
             check = self.policy.evaluate(
                 cap.id,
                 cap.permissions,
                 self.grants(session),
                 {"source": "desktop", "node": session.node_id, "target": cap.node_id},
+                confirmed=delegated,
             )
             if check.allowed or check.reason == "personal policy requires confirmation":
                 eligible.append(cap)
@@ -344,8 +360,29 @@ class Desktop(Mobile):
         self.store.put(
             "desktop_task", task.id, {"id": task.id, "mode": mode, "session_id": session.id}
         )
+        if context_id:
+            self.attached(session, context_id)
+            self.store.transient[task.id]["context_id"] = context_id
+        selected = eligible[0]
+        from .mobile import fingerprint
+
+        plan = self.store.get("plan", task.id)
+        self.store.put(
+            "plan",
+            task.id,
+            {
+                **plan,
+                "selection": {
+                    "node_id": target,
+                    "capability_id": selected.id,
+                    "contract": fingerprint(record(selected)),
+                },
+            },
+        )
+        if self.delegated(session, selected):
+            self.runtime.run(task.id, {target: self.targets[target]})
         view = self.inspect(session, task.id)
-        view["approval_required"] = task.state == TaskState.PLANNED
+        view["approval_required"] = view["state"] == TaskState.PLANNED
         return view
 
     def inspect(self, session: SessionHandle, task_id: str) -> dict[str, Any]:
@@ -512,12 +549,18 @@ class Desktop(Mobile):
                 raise ValueError("bounded conversation cursor required")
             return self.conversation(session, payload["before"])
         if op == "snapshot" and payload == {}:
+            from .assistance import Assistance
+
             view = super().request(session, data)
             if self.runtime.connections is not None:
                 from .connections import snapshot
 
                 self.permission(session, "desktop.connections", ("desktop:inspect",))
                 view["connections"] = snapshot(self.runtime.connections)
+                if "executive" in view:
+                    view["executive"]["management"] = Assistance(
+                        self.runtime.connections
+                    ).snapshot()
             view["conversation"] = self.conversation(session)
             view["voice_available"] = (
                 self.voice is not None
@@ -528,10 +571,17 @@ class Desktop(Mobile):
                     {"node": session.node_id, "source": self.source},
                 ).allowed
             )
+            from .authority import StandingAuthority
+
+            authority = StandingAuthority(
+                self.store, self.grid, self.runtime.relationship_id
+            ).snapshot()
             view["operating"] = {
-                "access": "Ask",
-                "secure": "unavailable",
-                "full_access": "unavailable",
+                "access": {"ask": "Ask", "secure": "Secure", "full": "Full Access"}[
+                    authority["mode"]
+                ],
+                "secure": "signed_delegation_available",
+                "full_access": "signed_delegation_available",
                 "awareness": self.runtime.world.sentry.settings().mode.value
                 if self.runtime.world
                 else "unavailable",
@@ -539,10 +589,21 @@ class Desktop(Mobile):
                 if self.runtime.world and self.runtime.world.sentry.settings().source_ids
                 else "unavailable",
                 "worker_autonomy": "Manual",
-                "automations": "task_foundation",
+                "automations": "signed_authoring",
             }
             return view
-        if op in {"management_challenge", "management_complete"}:
+        if op in {
+            "management_challenge",
+            "management_complete",
+            "oauth_callback",
+            "assistance_challenge",
+            "assistance_complete",
+            "authority_challenge",
+            "authority_complete",
+            "authority_revoke",
+        }:
+            from .assistance import Assistance
+            from .authority import StandingAuthority
             from .connections import Connections
 
             h = self.runtime.connections
@@ -553,18 +614,40 @@ class Desktop(Mobile):
             key = self.store.get("sunday_key", session.node_id)
             if key["session_id"] != session.id:
                 raise PermissionError("current owner key enrollment required")
-            manager = Connections(h)
-            if op == "management_challenge":
-                return manager.challenge(
-                    session.node_id, session.id, scope, self.grants(session), payload
+            manager: Any = (
+                StandingAuthority(self.store, self.grid, self.runtime.relationship_id)
+                if op.startswith("authority_")
+                else Assistance(h)
+                if op.startswith("assistance_")
+                else Connections(h)
+            )
+            if op.endswith("_challenge"):
+                return dict(
+                    manager.challenge(
+                        session.node_id, session.id, scope, self.grants(session), payload
+                    )
                 )
-            return manager.complete(
-                session.node_id,
-                session.id,
-                key["public_key"],
-                scope,
-                self.grants(session),
-                payload,
+            if op == "authority_revoke":
+                if payload:
+                    raise ValueError("downgrade takes no parameters")
+                return dict(
+                    manager.revoke(session.node_id, session.id, scope, self.grants(session))
+                )
+            if op == "oauth_callback":
+                return dict(
+                    manager.oauth_callback(
+                        session.node_id, session.id, scope, self.grants(session), payload
+                    )
+                )
+            return dict(
+                manager.complete(
+                    session.node_id,
+                    session.id,
+                    key["public_key"],
+                    scope,
+                    self.grants(session),
+                    payload,
+                )
             )
         if op in {"catalog", "act"}:
             self.authenticate(session, "desktop:connect")
@@ -585,7 +668,7 @@ class Desktop(Mobile):
                         self.grants(session),
                         {"node": session.node_id, "source": "desktop", "target": cap.node_id},
                     )
-                    if cap.risk != "critical" and (
+                    if (cap.risk != "critical" or self.delegated(session, cap)) and (
                         decision.allowed
                         or decision.reason == "personal policy requires confirmation"
                     ):
@@ -651,6 +734,12 @@ class Desktop(Mobile):
                 return dict(self.voice.inspect(session))
             if set(payload) == {"operation", "context_id"} and payload["operation"] == "start":
                 return dict(self.voice.start(session, payload["context_id"]))
+            if (
+                set(payload) == {"operation", "context_id", "mode"}
+                and payload["operation"] == "start"
+                and payload["mode"] in {"Ask", "Dictate"}
+            ):
+                return dict(self.voice.start(session, payload["context_id"], mode=payload["mode"]))
             raise ValueError("unsupported voice operation")
         if op in {"interact", "apply"} and not self.admit(session, data):
             return {"replayed": True, "inspect_required": True}
@@ -741,7 +830,10 @@ class Desktop(Mobile):
                             and node["status"] in {"online", "degraded"}
                             for c in node["capabilities"]
                             if operation in OPERATIONS.get(c["input_kind"], ())
-                            and c["risk"] != "critical"
+                            and (
+                                c["risk"] != "critical"
+                                or self.delegated(session, Capability.from_dict(c))
+                            )
                         ]
                         if len(candidates) != 1:
                             return {
@@ -761,13 +853,18 @@ class Desktop(Mobile):
                         )
                         from dataclasses import replace
 
-                        return self.propose(
+                        view = self.propose(
                             session,
                             replace(typed, text=text),
-                            "Act",
+                            "Ask",
                             capability_id=cap.id,
                             target_id=cap.node_id,
                         )
+                        if "task_id" in view:
+                            self.retain_turn(session, view["task_id"], "owner", view)
+                            if view["state"] != TaskState.PLANNED:
+                                self.retain_turn(session, view["task_id"], "oscar", view)
+                        return view
                 if mode == "Dictate":
                     return self.preview(session, text, context, mode)
                 if mode == "Act":
@@ -826,11 +923,14 @@ class Desktop(Mobile):
                         and decide(intent).execution_class == ExecutionClass.MODEL
                     ),
                     context_text=context.text if context else working,
+                    context_id=context.id if context else None,
                 )
                 if context and "task_id" in view:
                     self.store.transient[view["task_id"]]["context_id"] = context.id
                 if "task_id" in view:
                     self.retain_turn(session, view["task_id"], "owner", view)
+                    if view["state"] != TaskState.PLANNED:
+                        self.retain_turn(session, view["task_id"], "oscar", view)
                 if mode == "Edit" and "task_id" in view:
                     self.previews[view["task_id"]] = {
                         "session": session.id,
@@ -974,11 +1074,38 @@ class Desktop(Mobile):
         }
 
     def transcript(
-        self, session: SessionHandle, transcript: Transcript, stop: StopToken, context_id: str = ""
+        self,
+        session: SessionHandle,
+        transcript: Transcript,
+        stop: StopToken,
+        context_id: str = "",
+        *,
+        mode: str = "Dictate",
     ) -> dict[str, Any]:
         self.permission(session, "desktop.voice", ("desktop:microphone",))
         stop.check()
         if not transcript.final:
-            raise ValueError("provisional dictation cannot be applied")
-        context = self.attached(session, context_id) if context_id else None
-        return self.preview(session, transcript.text, context, "Dictate")
+            raise ValueError("provisional speech cannot reach Core")
+        if mode == "Ask":
+            text = re.sub(r"^(?:hey\s+)?oscar(?:[,.:!?]\s*|\s+)", "", transcript.text, flags=re.I)
+            with self.lock:
+                stop.check()
+                return self.request(
+                    session,
+                    {
+                        "version": 1,
+                        "request_id": new_id(),
+                        "operation": "interact",
+                        "payload": {
+                            "mode": "Ask",
+                            "text": text,
+                            "context_id": context_id,
+                        },
+                    },
+                )
+        if mode != "Dictate":
+            raise ValueError("voice supports Dictate or Ask")
+        with self.lock:
+            stop.check()
+            context = self.attached(session, context_id) if context_id else None
+            return self.preview(session, transcript.text, context, "Dictate")

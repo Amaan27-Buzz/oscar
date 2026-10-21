@@ -355,6 +355,44 @@ To repeat that bounded metadata-only audit in a disposable Linux container:
 docker run --rm oscar-cloud:local sh -c 'python -m pip install --target /tmp/audit-pip pip==26.2.1 && PYTHONPATH=/tmp/audit-pip python -m pip install --dry-run --ignore-installed --only-binary=:all: --platform manylinux_2_28_aarch64 --platform manylinux_2_27_aarch64 --platform manylinux_2_17_aarch64 --platform manylinux2014_aarch64 --platform any --python-version 3.12 --implementation cp --abi cp312 --abi abi3 --abi none qdrant-client==1.19.1 graphiti-core==0.30.2 fastembed==0.8.1'
 ```
 
+## Optional native account enrollment
+
+The local software candidate accepts public OAuth application registrations via
+`auth_config`, an absolute JSON path outside the canonical data directory. Copy
+and administer [the example](../config/oauth-providers.example.json): replace
+native client IDs, the explicit Microsoft tenant UUID and exact registered
+numeric-loopback redirects. Endpoints are fixed by OSCAR. The all-zero tenant in
+the example is a placeholder, not a commissioned tenant. Service IDs must match
+the installed manifests (`google.gmail`, `google.calendar`, `google.drive`,
+other explicitly present Google families, or `microsoft.graph`). Scope ceilings
+are explicit and never imply a grant before provider consent. Native Desktop
+holds callback codes outside React; real consent remains a commissioning step.
+
+In Cloud configuration, `auth_config` and `credential_key_ref` are an optional
+pair. The latter names a private JSON file in the existing `secret_dir`, with
+the same injected-secret format: `{"secret":"BASE64_OF_32_RANDOM_BYTES",
+"expires_at":null}`. Provision this key through the approved secret-management
+procedure, mount it read-only and retain it separately from data backups. Never
+place the key, provider client secrets, refresh/access tokens or real callback
+codes in source, public config, command arguments or logs.
+
+Account tokens are encrypted using AES-GCM in `data_dir/account-credentials`;
+opaque references and current account generations remain in canonical SQLite.
+Files are bounded, privately permissioned, atomically replaced and authenticated
+against their opaque reference. Account disconnect fences metadata before remote
+revocation and local token removal. Provider revocation response is reported
+evidence, not independent proof. The existing offline state backup includes the
+encrypted credential files; restore requires the separately retained same key.
+Losing or changing that key requires account reauthorization. Backup possession
+alone must not grant token access. Existing injected administrator credentials
+remain read-only and separately mounted.
+
+Local Windows composition with `--auth-config` stores the vault master key in
+Windows Credential Manager and uses the same encrypted token files. Restored
+canonical metadata retains its original native key reference; copying data to a
+different host does not copy native key custody. No automatic provider enrollment
+or secret generation occurs in a web/native request.
+
 ## Reproduce software acceptance
 
 ```sh

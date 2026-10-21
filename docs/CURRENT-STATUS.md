@@ -1,5 +1,14 @@
 # OSCAR — Current Status & Checklist
 
+**2026-10-21 full software continuation:** active local branch
+`codex/software-completion` extends the unmerged D2/C1/C2 candidate. The
+[completion ledger](development/OSCAR-FULL-SOFTWARE-COMPLETION.md) records signed
+standing authority, native account/automation management, encrypted account
+credentials and actual disposable-emulator Grid execution. Full software
+acceptance remains PARTIAL; broader Windows integration and other executable
+product work remain active. No publication, CI or owner commissioning occurred.
+The dated C1/C2-only restrictions below describe that earlier checkpoint.
+
 **2026-10-20 local Group 5 C1/C2 candidate:** the
 [foundation ledger](development/GROUP-05-CAPABILITY-IDENTITY.md) records account
 identity/Auth Broker, actual MCP SDK sessions, account browser isolation, native

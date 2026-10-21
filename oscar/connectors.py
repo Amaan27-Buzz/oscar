@@ -508,6 +508,81 @@ class ConnectorFabric:
         # Composition root combines other capabilities before advertising when sharing a node.
         grid.advertise(session, self.capabilities(session.node_id))
 
+    def read_context(
+        self,
+        instance_id: str,
+        name: str,
+        parameters: dict[str, Any],
+        guard: Callable[[], None],
+    ) -> tuple[dict[str, Any], SourceRef]:
+        """A separately granted perception read never acquires mutation/task authority."""
+        instance = self.instances[instance_id]
+        spec = next(c for c in instance.manifest.capabilities if c.name == name)
+        if (
+            instance.account_id is None
+            or spec.method != "GET"
+            or spec.risk != RiskLevel.READ
+            or spec.permissions != ("connectors:read",)
+            or spec.body_required
+            or "body" in parameters
+        ):
+            raise PermissionError("ambient context requires an account-bound read-only GET")
+
+        class ReadCancellation(Cancellation):
+            def __init__(self) -> None:
+                pass
+
+            def check(inner_self) -> None:
+                guard()
+                if self.instances.get(instance_id) != instance:
+                    raise PermissionError("connector binding changed during perception")
+                if self.state(instance, spec) != ConnectionState.READY:
+                    raise PermissionError("connector account or scope unavailable")
+                for capability in (name, "connectors:read"):
+                    if not self.policy.evaluate(
+                        capability,
+                        ("connectors:read",),
+                        frozenset({"connectors:read"}),
+                        {"account_id": instance.account_id or "", "purpose": "perception"},
+                    ).allowed:
+                        raise PermissionError("personal policy denies ambient retrieval")
+
+        cancellation = ReadCancellation()
+        cancellation.check()
+        payload, source = self._request(instance, spec, parameters, cancellation)
+        cancellation.check()
+        return payload, source
+
+    def _request(
+        self,
+        instance: ConnectorInstance,
+        spec: ConnectorCapability,
+        parameters: dict[str, Any],
+        cancellation: Cancellation,
+    ) -> tuple[dict[str, Any], SourceRef]:
+        secret = self.secrets.resolve(instance.credential) if instance.credential else None
+        if self.secrets.redact(json.dumps(parameters)) != json.dumps(parameters):
+            raise ValueError("credential material cannot enter connector inputs")
+        endpoint(spec, parameters)
+        if self.state(instance, spec) != ConnectionState.READY:
+            raise ConnectorError("auth_missing")
+        cancellable = getattr(self.http, "request_cancellable", None)
+        if cancellable:
+            payload, identity = cancellable(
+                instance.manifest, spec, parameters, secret, cancellation
+            )
+        else:
+            payload, identity = self.http.request(instance.manifest, spec, parameters, secret)
+        payload = json.loads(self.secrets.redact(json.dumps(payload)))
+        return payload, SourceRef(
+            identity,
+            Authority.LIVE_API,
+            "account" if instance.manifest.auth != AuthType.NONE else "provider",
+            time(),
+            spec.freshness_seconds,
+            evidence_id=new_id(),
+        )
+
     def execute(
         self,
         instance_id: str,
@@ -524,6 +599,11 @@ class ConnectorFabric:
             raise ValueError("active connector outcome bound; release completed results")
         instance = self.instances[instance_id]
         spec = next(c for c in instance.manifest.capabilities if c.name == name)
+        from .authority import check_task_account
+
+        check_task_account(
+            self.store, action.task_id, instance.account_id, instance.account_generation
+        )
         if action.capability_id != instance_id + ":" + name:
             raise ValueError("connector executor identity mismatch")
         state = self.state(instance, spec)
@@ -549,33 +629,8 @@ class ConnectorFabric:
         elif not decision.allowed or any(not d.allowed for d in consequences):
             error = "connector_blocked:policy"
         else:
-            secret = self.secrets.resolve(instance.credential) if instance.credential else None
-            # Check credential material before any output/storage boundary.
-            if self.secrets.redact(json.dumps(action.parameters)) != json.dumps(action.parameters):
-                raise ValueError("credential material cannot enter connector inputs")
-            endpoint(spec, action.parameters)
             try:
-                if self.state(instance, spec) != ConnectionState.READY:
-                    raise ConnectorError("auth_missing")
-                cancellable = getattr(self.http, "request_cancellable", None)
-                if cancellable:
-                    payload, identity = cancellable(
-                        instance.manifest, spec, action.parameters, secret, cancellation
-                    )
-                else:
-                    payload, identity = self.http.request(
-                        instance.manifest, spec, action.parameters, secret
-                    )
-                cleaned = self.secrets.redact(json.dumps(payload))
-                payload = json.loads(cleaned)
-                source = SourceRef(
-                    identity,
-                    Authority.LIVE_API,
-                    "account" if instance.manifest.auth != AuthType.NONE else "provider",
-                    time(),
-                    spec.freshness_seconds,
-                    evidence_id=new_id(),
-                )
+                payload, source = self._request(instance, spec, action.parameters, cancellation)
             except ConnectorError as failure:
                 category = str(failure)
                 error = (

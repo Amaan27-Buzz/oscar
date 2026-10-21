@@ -136,7 +136,9 @@ def form_intent(cap: Capability, payload: dict[str, Any], native: dict[str, Any]
     elif operation == "read_file":
         parameters = {"path": fields["path"]}
     elif operation in {"list_files", "find_files"}:
-        parameters = {"cwd": ".", "pattern": fields.get("pattern", "")}
+        parameters = {"cwd": "."}
+        if operation == "find_files":
+            parameters["pattern"] = fields["pattern"]
     elif operation.startswith("git_"):
         parameters = {"operation": operation.removeprefix("git_"), **fields}
     elif operation.startswith("ps_"):

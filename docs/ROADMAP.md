@@ -1,5 +1,10 @@
 # OSCAR — Canonical Roadmap
 
+**Active local work, 2026-10-21:**
+[full software completion](development/OSCAR-FULL-SOFTWARE-COMPLETION.md)
+supersedes the earlier C1/C2-only scope. Groups 4–6 remain in progress; canonical
+Slices 00–20 and deferred hardware boundaries are preserved.
+
 **Current roadmap — 2026-10-18.** Exactly 21 top-level slices (00–20), preserved for historical compatibility. **Groups 4–8 now determine execution order**, not the old numerical "physical hardware next" sequence. Read [active delivery plan](DELIVERY-PLAN.md), [checked capability status](CURRENT-STATUS.md), [canonical numbering](SLICE-NUMBERING.md) and [build gates](BUILD-GATES.md). Historic detailed slices/PR instructions remain available in Git history and dated evidence, not active here.
 
 **Truth:** software integrated ≠ owner/device verified ≠ remote deployed. Gate A/B scoped PASS, Gate C/D PARTIAL, Gate E NOT PASSED.

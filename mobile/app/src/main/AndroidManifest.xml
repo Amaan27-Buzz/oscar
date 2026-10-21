@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
     <uses-feature android:name="android.hardware.microphone" android:required="false" />
@@ -53,6 +54,10 @@
         </service>
         <service android:name=".MicrophoneService" android:exported="false"
             android:foregroundServiceType="microphone" />
+        <service android:name=".NativeWorkerService" android:exported="false" android:foregroundServiceType="specialUse">
+            <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE" android:value="Owner-started visible selected-app task executor; current signed Core task authority and local grants required; stop control; no boot restart, microphone or camera" />
+        </service>
+        <service android:name=".NativeScreenService" android:exported="false" android:foregroundServiceType="mediaProjection" />
         <service android:name=".CompanionOverlayService" android:exported="false" android:foregroundServiceType="specialUse">
             <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE" android:value="User-started visible OSCAR Companion Orb with read-only Core presence; user can hide or disable it; no audio capture or boot start" />
         </service>

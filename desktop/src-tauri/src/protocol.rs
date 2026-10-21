@@ -97,6 +97,16 @@ impl ActForm {
 #[derive(Deserialize)]
 #[serde(tag = "kind", rename_all = "snake_case", deny_unknown_fields)]
 pub enum Command {
+    ManageAssistance {
+        operation: String,
+        id: String,
+        value: serde_json::Value,
+    },
+    SetAccess {
+        relationship_id: String,
+        value: serde_json::Value,
+    },
+    RevokeAccess,
     ManageConnection {
         operation: String,
         id: String,
@@ -114,6 +124,7 @@ pub enum Command {
     },
     Ready,
     Refresh,
+    DayBrief,
     History {
         before: u64,
     },
@@ -156,12 +167,20 @@ pub enum Command {
     },
     VoiceStart {
         context_id: String,
+        #[serde(default)]
+        mode: VoiceMode,
     },
     VoiceStop,
     VoiceCancel,
     Shortcut {
         accelerator: String,
     },
+}
+#[derive(Clone, Copy, Deserialize, Serialize, Default)]
+pub enum VoiceMode {
+    Ask,
+    #[default]
+    Dictate,
 }
 #[derive(Deserialize, Serialize)]
 pub enum InteractionMode {
@@ -381,6 +400,7 @@ pub struct View {
     pub core_clock: Option<serde_json::Value>,
     pub setup: Option<serde_json::Value>,
     pub executive: Option<serde_json::Value>,
+    pub day_brief: Option<serde_json::Value>,
     pub adaptive_views: Vec<serde_json::Value>,
     #[serde(default)]
     pub conversation: ConversationView,
@@ -459,6 +479,33 @@ pub fn orb(link: &str, task: Option<&TaskView>, voice: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn voice_mode_is_explicit_and_legacy_dictation_is_preserved() {
+        assert!(matches!(
+            serde_json::from_value::<Command>(json!({"kind":"voice_start","context_id":""}))
+                .unwrap(),
+            Command::VoiceStart {
+                mode: VoiceMode::Dictate,
+                ..
+            }
+        ));
+        assert!(matches!(
+            serde_json::from_value::<Command>(
+                json!({"kind":"voice_start","context_id":"","mode":"Ask"})
+            )
+            .unwrap(),
+            Command::VoiceStart {
+                mode: VoiceMode::Ask,
+                ..
+            }
+        ));
+        assert!(
+            serde_json::from_value::<Command>(
+                json!({"kind":"voice_start","context_id":"","mode":"Act"})
+            )
+            .is_err()
+        );
+    }
     #[test]
     fn malformed_frontend_never_becomes_native_authority() {
         for v in [

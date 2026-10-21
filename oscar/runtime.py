@@ -286,6 +286,17 @@ class Runtime:
                 blocker="private context expired; create a fresh request",
             )
         candidates = [c for c in self.grid.search(plan["kind"]) if c.node_id in transports]
+        if plan.get("selection"):
+            from .mobile import fingerprint
+
+            selection = plan["selection"]
+            candidates = [
+                c
+                for c in candidates
+                if c.node_id == selection["node_id"]
+                and c.id == selection["capability_id"]
+                and fingerprint(record(c)) == selection["contract"]
+            ]
         if plan.get("executive"):
             binding = plan["executive"]
             candidates = [
@@ -299,6 +310,16 @@ class Runtime:
             )
         capability = candidates[0]
         transport, session = transports[capability.node_id]
+        from .authority import StandingAuthority
+
+        try:
+            StandingAuthority(self.store, self.grid, self.relationship_id).bind(
+                task.id, record(capability), session
+            )
+        except PermissionError:
+            return self.store.transition(
+                task.id, TaskState.BLOCKED, blocker="standing authority changed"
+            )
         try:
             task = self.store.transition(task.id, TaskState.EXECUTING, expected=TaskState.PLANNED)
         except StateConflict:

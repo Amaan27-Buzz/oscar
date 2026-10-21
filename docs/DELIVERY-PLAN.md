@@ -1,5 +1,13 @@
 # OSCAR — Active Delivery Plan
 
+**Active 2026-10-21:** the owner has authorized full non-deferred software
+completion across Groups 4–6 locally. Read the
+[active completion ledger](development/OSCAR-FULL-SOFTWARE-COMPLETION.md).
+Signed synthetic Secure/Full tests and native management implementation are now
+in scope. Earlier C1/C2-only and standing-authority prohibitions describe previous
+checkpoints. Push/Actions, real accounts, cloud and physical commissioning remain
+separately gated; this change promotes no formal acceptance gate.
+
 **Owner decision, 2026-10-18:** Get one OSCAR operational across **Cloud, Windows Desktop and Android phone** first; add the dedicated home-server laptop when available, then ESP32/Pico. This supersedes the former "hardware Slice 18 is next" sequencing. Slices **00–20 remain canonical**; **Groups 4–8** are the new delivery batches, and D/C stage labels are *not* new numbered slices. Preserve historic PRs and evidence.
 
 [Verified checklist](CURRENT-STATUS.md) · [Slice map](SLICE-NUMBERING.md) · [Acceptance gates](BUILD-GATES.md) · [Deployment architecture](DEPLOYMENT.md)

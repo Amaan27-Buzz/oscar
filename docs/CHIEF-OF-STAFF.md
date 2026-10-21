@@ -1,5 +1,12 @@
 # Ambient Chief of Staff
 
+The local software-completion candidate now connects explicitly authorized clock
+and connected-account calendar observations to the existing World Runtime and
+Sentry, with a bounded read-only day brief and conflict evidence. Native source
+creation uses signed review; perception, retention and action remain independent.
+[Implementation, local checks and remaining live-source gaps](development/SOFTWARE-AMBIENT-CONTEXT.md)
+distinguish this candidate from real-provider, owner and operational acceptance.
+
 OSCAR should behave as a continuously available, context-aware personal Chief of Staff, not as a chatbot the user repeatedly opens and prompts.
 
 This document owns the durable product contract for day-to-day context awareness, schedule/task coordination, interruption behavior and proactive assistance. OSCAR Mobile, World Model, Perception Fabric, Communication, Personal Policy and the Executive Planner implement different parts of this contract.

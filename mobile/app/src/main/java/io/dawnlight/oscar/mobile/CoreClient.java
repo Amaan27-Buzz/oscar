@@ -36,6 +36,12 @@ final class CoreClient {
     String coreId() { return session.optString("core_id"); }
     boolean remote() { return session.optInt("version", 1) == 2; }
     boolean retainsConversation() { return session.optBoolean("retain_conversation", false); }
+    String workspace() { return session.optString("workspace"); }
+    boolean hasScope(String scope) {
+        var scopes = session.optJSONArray("scopes");
+        if (scopes != null) for (int index = 0; index < scopes.length(); index++) if (scope.equals(scopes.optString(index))) return true;
+        return false;
+    }
     boolean canApprove() {
         var scopes = session.optJSONArray("scopes");
         if (scopes != null) for (int index = 0; index < scopes.length(); index++) if ("grid:approve".equals(scopes.optString(index))) return true;
@@ -103,6 +109,11 @@ final class CoreClient {
             if (issued.getInt("version") != 2 || !issued.getString("core_id").equals(invitation.getString("core_id")) ||
                 !issued.getString("node_id").equals(invitation.getString("node_id")) || issued.getLong("expires_at_ms") <= System.currentTimeMillis())
                 throw new SecurityException("Enrollment response does not match trusted invitation");
+            if (!invitation.optString("workspace").isEmpty()) {
+                if (!issued.optString("workspace", invitation.getString("workspace")).equals(invitation.getString("workspace")))
+                    throw new SecurityException("Worker workspace differs from trusted invitation");
+                issued.put("workspace", invitation.getString("workspace"));
+            }
             return issued.put("url", origin);
         } finally { connection.disconnect(); if (active == connection) active = null; }
     }

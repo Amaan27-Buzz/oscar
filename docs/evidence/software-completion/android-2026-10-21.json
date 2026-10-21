@@ -1,0 +1,97 @@
+{
+  "classification": "EMULATED_SYNTHETIC_ACTUAL_GRID",
+  "serial": "emulator-5582",
+  "avd": "oscar_group05_capability_api35",
+  "transport": "separate actual TLS Core and native Android Keystore proof",
+  "native_readback": {
+    "text": "Grid synthetic agenda",
+    "result": "Reviewed: Grid synthetic agenda",
+    "claims": 4,
+    "revoked": true,
+    "management_review": true,
+    "owner_activation": false
+  },
+  "tasks": [
+    {
+      "task_id": "7718caf84faa4d1e8db1baaa1916e9ce",
+      "kind": "android_ui_set_text",
+      "state": "verified",
+      "evidence": [
+        {
+          "id": "1f8f9824efb94ca2a8c52d6633cf9707",
+          "task_id": "7718caf84faa4d1e8db1baaa1916e9ce",
+          "correlation_id": "13e8efcf51924d6d8527dc47c03192c8",
+          "source": "remote-android-accessibility",
+          "method": "separate read-only UI observation and Core comparison",
+          "observed_at": 1792586955.0190275,
+          "matches": true,
+          "status": "VERIFIED",
+          "detail": "Exact Android readback",
+          "artifact_id": null,
+          "content_hash": "13b0d942395a647f8301c0f2c23539b2325a7543dfe57f5b1d4c710a6c62e342"
+        }
+      ]
+    },
+    {
+      "task_id": "06ea5be0c9424f868622a13626e7241a",
+      "kind": "android_ui_click",
+      "state": "partially_verified",
+      "evidence": [
+        {
+          "id": "e7fce3294b334341b8a87238046e2bb6",
+          "task_id": "06ea5be0c9424f868622a13626e7241a",
+          "correlation_id": "0ddfab5d5e4446f988c90d08dc81f032",
+          "source": "remote-android-accessibility",
+          "method": "separate read-only UI observation and Core comparison",
+          "observed_at": 1792586958.2290385,
+          "matches": null,
+          "status": "REPORTED",
+          "detail": "Native effect requires app-specific observation",
+          "artifact_id": null,
+          "content_hash": "add2b2b9fe3cec3a226a4f6f53a05a15bbfff169a269c137f238acdb56dd127f"
+        }
+      ]
+    }
+  ],
+  "timings": [
+    {
+      "kind": "android_ui_set_text",
+      "elapsed_ms": 4203.1
+    },
+    {
+      "kind": "android_ui_click",
+      "elapsed_ms": 3145.5
+    }
+  ],
+  "physical_phone": "NOT_RUN",
+  "owner_biometrics": "NOT_RUN",
+  "real_accounts": "NOT_RUN",
+  "accessibility_service_enabled": true,
+  "native_navigation_captures": [
+    "01-oscar-home",
+    "05-automations-overview",
+    "06-worker-detail",
+    "07-create-automation",
+    "13-today-chief-of-staff",
+    "11-devices",
+    "15-preferences",
+    "14-access-modes",
+    "12-sentry-awareness",
+    "08-activity-feed",
+    "04-voice-interaction"
+  ],
+  "cleanup": "previous Accessibility settings read back; both disposable apps uninstalled",
+  "source_sha256": {
+    "scripts/software_android_reference.py": "3eb940e769cd6fd5e203c678e02dc4da0a42087f28d8076aff01a6deb38508a7",
+    "mobile/app/src/androidTest/java/io/dawnlight/oscar/mobile/NativeGridExecutionTest.kt": "3aecb97afff93694d94887b97d91b2f22fb1eced239a2ce84a4574956d9f6ed2",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/ManagementState.kt": "6c6599ec9a4b68403901bf978c7dcdeab5710a7787085f27f58494d1a7fffab4",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/AwarenessScreen.kt": "146147b70a4cf83e9fa4b55800d1848958753e580d688041ebf8ac3977b1ca26"
+  },
+  "visual_inspection": {
+    "captures": [
+      "07-create-automation.png",
+      "13-today-chief-of-staff.png"
+    ],
+    "observation": "Approved production direction retained; disabled unavailable review and disconnected services visible. Owner visual acceptance NOT_RUN."
+  }
+}

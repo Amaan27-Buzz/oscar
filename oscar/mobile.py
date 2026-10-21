@@ -631,7 +631,9 @@ class Mobile:
                     round(self.grid.clock() * 1000),
                     payload["supported"],
                 )
-            elif operation == "world" and set(payload) == {"entity_id", "key"}:
+            elif (operation == "world" and set(payload) == {"entity_id", "key"}) or (
+                operation == "day_brief" and not payload
+            ):
                 self.authenticate(session, "mobile:inspect")
                 permission = self.policy.evaluate(
                     "core.world.read",
@@ -641,7 +643,12 @@ class Mobile:
                 )
                 if not permission.allowed:
                     raise PermissionError(permission.reason)
-                response = self.runtime.current(payload["entity_id"], payload["key"])
+                if operation == "day_brief":
+                    if self.runtime.world is None:
+                        raise PermissionError("Current context is unavailable")
+                    response = {"day_brief": self.runtime.world.brief()}
+                else:
+                    response = self.runtime.current(payload["entity_id"], payload["key"])
             elif operation == "discard" and not payload:
                 for task_id in list(self.store.transient):
                     if not self.private_for(session, task_id):

@@ -32,7 +32,8 @@ data class CoreProgress(val fraction: Double, val step: String, val current: Boo
 data class CoreArtifact(val id: String, val kind: String, val status: String, val hash: String?)
 data class CoreNode(val id: String, val role: String, val status: String, val paired: Boolean, val capabilities: List<String>, val inputKinds: Set<String> = emptySet())
 data class CoreSnapshot(val tasks: List<CoreTask>, val nodes: List<CoreNode>, val observedAt: Long,
-    val presence: String? = null, val setup: Map<String, String> = emptyMap(), val adaptive: List<AdaptiveDescriptor> = emptyList(), val executive: List<ExecutiveGoal>? = null)
+    val presence: String? = null, val setup: Map<String, String> = emptyMap(), val adaptive: List<AdaptiveDescriptor> = emptyList(), val executive: List<ExecutiveGoal>? = null,
+    val management: ManagementView? = null, val connections: ConnectionView? = null)
 data class ExecutiveGoal(val id: String, val goal: String, val state: String, val runs: Int, val maxRuns: Int)
 data class Interaction(val text: String, val response: String, val taskId: String? = null)
 /** An authenticated observation advances only with this process's monotonic clock. */
@@ -60,6 +61,7 @@ data class MobileState(
     val remote: Boolean = false,
     val enrollmentIdentity: String? = null,
     val clock: CoreClock? = null,
+    val dayBrief: DayBrief? = null,
 ) {
     fun coreNow(localNow: Long, elapsedNow: Long? = null): Long = if (link == Link.CONNECTED && observedAt > 0 && snapshot != null)
         if (clock != null && elapsedNow != null) clock.now(elapsedNow) else localNow + snapshot.observedAt - observedAt else localNow
@@ -73,7 +75,7 @@ data class MobileState(
     }
     fun fenced(next: MobileState, expectedEpoch: Long): MobileState = if (epoch == expectedEpoch) next else this
     fun unavailable(message: String) = copy(epoch = epoch + 1, link = Link.DEGRADED, busy = false,
-        snapshot = null, connectedNode = null, approval = null, replyPreview = null, inspected = null, interactions = emptyList(), observedAt = 0, clock = null, restoring = false, message = message)
+        snapshot = null, connectedNode = null, approval = null, replyPreview = null, inspected = null, interactions = emptyList(), dayBrief = null, observedAt = 0, clock = null, restoring = false, message = message)
 }
 
 private val taskStates = setOf("planned", "executing", "awaiting_result", "result_received", "verifying", "verified", "partially_verified", "failed", "blocked", "cancelled", "unknown")
@@ -137,7 +139,7 @@ fun parseTask(json: JSONObject): CoreTask {
         json.bounded("target", 80), status, generation, if (status == "online") actions else actions.filter { it in setOf("cancel", "deny") },
         evidence, value, blocker, response, json.optBoolean("response_truncated", false), progress, artifacts, ownership, origin, originNode)
 }
-fun CoreSnapshot.withoutPrivate() = copy(adaptive = emptyList(), executive = null, tasks = tasks.map { it.copy(description = "Private request hidden", response = null, value = null,
+fun CoreSnapshot.withoutPrivate() = copy(adaptive = emptyList(), executive = null, management = null, connections = null, tasks = tasks.map { it.copy(description = "Private request hidden", response = null, value = null,
     artifacts = emptyList(), progress = it.progress?.copy(step = "Worker checkpoint available"),
     blocker = it.blocker?.let { "Inspect Core before continuing" }, actions = it.actions.filter { action -> action in setOf("deny", "cancel") }) })
 fun parseSnapshot(json: JSONObject): CoreSnapshot {
@@ -184,5 +186,7 @@ fun parseSnapshot(json: JSONObject): CoreSnapshot {
             ExecutiveGoal(goal.bounded("id", 80), goal.bounded("goal", 512), status, goal.getInt("verified_runs"), goal.getInt("max_runs"))
         }
     }
-    return CoreSnapshot(parsedTasks, parsedNodes, observed.toLong(), presence, setup, adaptive, executive)
+    return CoreSnapshot(parsedTasks, parsedNodes, observed.toLong(), presence, setup, adaptive, executive,
+        json.optJSONObject("executive")?.optJSONObject("management")?.let(::parseManagement),
+        json.optJSONObject("connections")?.let(::parseConnections))
 }

@@ -200,6 +200,7 @@ def parser() -> argparse.ArgumentParser:
     result.add_argument("--state", type=Path, default=Path(".oscar/state.sqlite"))
     result.add_argument("--workspace", type=Path, default=Path(".oscar/workspace"))
     result.add_argument("--manifest", type=Path, default=Path("config/development-models.json"))
+    result.add_argument("--auth-config", type=Path)
     commands = result.add_subparsers(dest="command", required=True)
     commands.add_parser("credentials")
     commands.add_parser("proof")
@@ -234,6 +235,7 @@ def parser() -> argparse.ArgumentParser:
     watch.add_argument("--retain", action="store_true")
     serve = commands.add_parser("serve")
     serve.add_argument("--seconds", type=int, default=3600)
+    serve.add_argument("--voice-config", type=Path)
     serve.add_argument(
         "--reenroll-execution",
         action="store_true",
@@ -285,6 +287,7 @@ def main() -> int:
             args.manifest,
             template,
             execution_enrollment_authorized=getattr(args, "reenroll_execution", False),
+            auth_config=args.auth_config,
         ) as harness:
             transports = {harness.node_id: (harness.dispatcher, harness.session)}
             if args.command == "executive":
@@ -405,13 +408,16 @@ def main() -> int:
 
                 if not 1 <= args.seconds <= 86400:
                     raise ValueError("bounded local serving lifetime required")
+                desktop_core = Desktop(harness.runtime, PersonalPolicy(harness.store), transports)
+                if args.voice_config is not None:
+                    from .desktop_voice import configured_voice
+
+                    desktop_core.voice = configured_voice(desktop_core, args.voice_config)
                 with (
                     MobileServer(
                         Mobile(harness.runtime, PersonalPolicy(harness.store), transports)
                     ) as mobile,
-                    MobileServer(
-                        Desktop(harness.runtime, PersonalPolicy(harness.store), transports)
-                    ) as desktop,
+                    MobileServer(desktop_core) as desktop,
                 ):
                     print_json(
                         {
@@ -424,6 +430,9 @@ def main() -> int:
                         Event().wait(args.seconds)
                     except KeyboardInterrupt:
                         pass
+                    finally:
+                        if desktop_core.voice is not None:
+                            desktop_core.voice.close()
             elif args.command in {"sources", "world", "watch-core"}:
                 if harness.runtime.world is None:
                     raise StateConflict("current-state runtime unavailable")

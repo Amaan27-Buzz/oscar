@@ -57,11 +57,28 @@ class ConnectionManagementTests(unittest.TestCase):
         ).decode()
         self.scope = "grid:approve"
         self.grants = frozenset({self.scope})
+        self.enroll_owner()
+
+    def enroll_owner(self):
+        from oscar.grid import Node, NodeRole
+
+        self.h.grid.register(Node("owner-node", NodeRole.MOBILE, (self.scope,)))
+        session = self.h.grid.pair("owner-node", (self.scope,))
+        self.session_id = session.id
+        self.h.store.put(
+            "remote_device",
+            "owner-node",
+            {
+                "session_id": session.id,
+                "owner_public_key": self.public,
+                "owner_id": self.h.runtime.relationship_id,
+            },
+        )
 
     def review(self, operation="rename_account", value="Renamed", identifier=None):
         return self.manager.challenge(
             "owner-node",
-            "session",
+            self.session_id,
             self.scope,
             self.grants,
             {
@@ -85,7 +102,7 @@ class ConnectionManagementTests(unittest.TestCase):
     def complete(self, review, **changes):
         return self.manager.complete(
             "owner-node",
-            "session",
+            self.session_id,
             self.public,
             self.scope,
             self.grants,
@@ -108,6 +125,78 @@ class ConnectionManagementTests(unittest.TestCase):
         self.assertTrue(projected["truncated"])
         self.assertEqual(101, projected["accounts_total"])
         self.assertLess(len(projected["accounts"]), projected["accounts_total"])
+
+    def test_callback_mounts_scoped_accounts_and_refresh_revocation_fence_live_tools(self):
+        from oscar.connectors import ConnectionState
+
+        scope = "https://www.googleapis.com/auth/gmail.readonly"
+        accounts = []
+        for subject in ("personal", "work"):
+            account = self.h.accounts.add("google", "google", subject, subject, verified=True)
+            reference = subject + "-token"
+            self.vault.put("synthetic-" + subject, reference=reference)
+            accounts.append(
+                self.h.accounts.bind(
+                    account.id,
+                    "google.gmail",
+                    CredentialRef(reference),
+                    (scope,),
+                    "google-api",
+                    expected_generation=account.generation,
+                )
+            )
+        self.h.store.put(
+            "native_auth_pending",
+            "callback",
+            {
+                "id": "callback",
+                "node": "owner-node",
+                "session": self.session_id,
+                "scope": self.scope,
+                "used": False,
+            },
+        )
+        with patch.object(self.h.auth, "complete", return_value=accounts[0]):
+            self.manager.oauth_callback(
+                "owner-node",
+                self.session_id,
+                self.scope,
+                self.grants,
+                {"id": "callback", "state": "state", "code": "code"},
+            )
+        mount = self.h.ensure_connections()
+        first = mount.capability("google.gmail.search", account_id=accounts[0].id)
+        second = mount.capability("google.gmail.search", account_id=accounts[1].id)
+        self.assertNotEqual(first.id, second.id)
+        with self.assertRaises(ValueError):
+            mount.capability("google.gmail.search")
+        with self.assertRaises(ValueError):
+            mount.capability("google.gmail.send", account_id=accounts[0].id)
+        instance_id = first.id.split(":", 1)[0]
+        previous = self.h.connectors.instances[instance_id]
+        self.vault.put("synthetic-rotated", reference="rotated")
+        self.h.accounts.bind(
+            accounts[0].id,
+            "google.gmail",
+            CredentialRef("rotated"),
+            (scope,),
+            "google-api",
+            expected_generation=accounts[0].generation,
+        )
+        mount.refresh()
+        current = self.h.connectors.instances[instance_id]
+        self.assertEqual("rotated", current.credential.id)
+        self.assertNotEqual(previous.account_generation, current.account_generation)
+        self.assertEqual(
+            ConnectionState.AUTH_MISSING,
+            self.h.connectors.state(previous, previous.manifest.capabilities[0]),
+        )
+        self.h.accounts.disconnect(accounts[0].id)
+        mount.refresh()
+        self.assertNotIn(instance_id, self.h.connectors.instances)
+        self.assertEqual(
+            second.id, mount.capability("google.gmail.search", account_id=accounts[1].id).id
+        )
 
     def test_changed_account_expiry_session_and_forged_signature_deny(self):
         review = self.review()
@@ -310,6 +399,7 @@ class ConnectionManagementTests(unittest.TestCase):
         self.assertIsNotNone(native.auth)
         self.assertIsInstance(native.auth.vault, WindowsCredentialStore)
         self.h, self.manager = native, Connections(native)
+        self.enroll_owner()
         self.account = native.accounts.add("fixture", "tenant", "native", "Native", verified=True)
         reference = uuid4().hex
         vault = native.auth.vault
@@ -328,7 +418,7 @@ class ConnectionManagementTests(unittest.TestCase):
         with self.assertRaises(PermissionError):
             self.manager.challenge(
                 "owner-node",
-                "session",
+                self.session_id,
                 self.scope,
                 frozenset(),
                 {

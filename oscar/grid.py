@@ -263,11 +263,51 @@ class Grid:
             )
             self.store.put("node", session.node_id, node)
 
-    def advertise(self, session: SessionHandle, capabilities: list[Capability]) -> None:
+    def executor_available(self, node: dict[str, Any]) -> bool:
+        """Remote executor leases are independent of a connected control surface."""
+        if "executor_session" not in node:
+            return True
+        try:
+            session = self.store.get("session", node["executor_session"])
+        except KeyError:
+            return False
+        return bool(
+            not node["revoked"]
+            and not session["revoked"]
+            and session["node_id"] == node["id"]
+            and session["expires_at"] > self.clock()
+            and "execute" in session["scopes"]
+            and "execute" in node["scopes"]
+            and node.get("executor_seen") is not None
+            and 0 <= self.clock() - node["executor_seen"] <= self.heartbeat_ttl
+        )
+
+    def executor_heartbeat(self, session: SessionHandle) -> None:
+        with self.store.transaction():
+            self.authenticate(session, "execute")
+            self.authenticate(session, "heartbeat")
+            node = self.store.get("node", session.node_id)
+            if node.get("executor_session") != session.id:
+                raise PermissionError("current executor advertisement required")
+            if not self.executor_available(node):
+                # A recovered poll must not revive an effect's expired lease.
+                self.reap()
+            if 0 <= self.clock() - node["executor_seen"] < min(10, self.heartbeat_ttl / 3):
+                return
+            node["executor_seen"] = self.clock()
+            self.store.put("node", session.node_id, node)
+
+    def advertise(
+        self, session: SessionHandle, capabilities: list[Capability], *, executor: bool = False
+    ) -> None:
         with self.store.transaction():
             self.authenticate(session, "advertise")
             self.authenticate(session, "heartbeat")
             node = self.store.get("node", session.node_id)
+            if executor:
+                self.authenticate(session, "execute")
+                if not self.executor_available(node):
+                    self.reap()
             for capability in capabilities:
                 if (
                     capability.node_id != session.node_id
@@ -283,6 +323,8 @@ class Grid:
                 health="healthy",
                 last_seen=self.clock(),
             )
+            if executor:
+                node.update(executor_session=session.id, executor_seen=self.clock())
             self.store.put("node", session.node_id, node)
 
     def nodes(self) -> list[dict[str, Any]]:
@@ -304,6 +346,8 @@ class Grid:
             )
             if not fresh or data["revoked"]:
                 data.update(status="offline", health="unknown", capabilities=[])
+            elif not self.executor_available(data):
+                data["capabilities"] = []
             data["active_leases"] = [
                 lease["id"]
                 for lease in leases
@@ -376,7 +420,10 @@ class Grid:
         with self.store.transaction():
             task = self.store.task(task_id)
             live = any(
-                n["id"] == node_id and n["status"] in {"online", "degraded"} for n in self.nodes()
+                n["id"] == node_id
+                and n["status"] in {"online", "degraded"}
+                and self.executor_available(n)
+                for n in self.nodes()
             )
             if (
                 not live
@@ -441,6 +488,7 @@ class Grid:
                 raise PermissionError("stale or unrelated task lease")
             if not any(
                 n["id"] == envelope.node_id and n["status"] in {"online", "degraded"}
+                and self.executor_available(n)
                 for n in self.nodes()
             ):
                 raise PermissionError("target node unavailable")
@@ -476,6 +524,7 @@ class Grid:
                 or lease["node_id"] != session.node_id
                 or task.lease_id != lease_id
                 or task.state not in {TaskState.EXECUTING, TaskState.AWAITING_RESULT}
+                or not self.executor_available(self.store.get("node", session.node_id))
             ):
                 raise StateConflict("stale lease cannot be renewed")
             lease["expires_at"] = self.clock() + ttl
@@ -519,14 +568,19 @@ class Grid:
                 self.disconnect(str(node["id"]), only_if_stale=True)
         expired = []
         for lease in self.store.all("lease"):
-            if lease["active"] and lease["expires_at"] <= self.clock():
+            executor_lost = not self.executor_available(self.store.get("node", lease["node_id"]))
+            if lease["active"] and (lease["expires_at"] <= self.clock() or executor_lost):
                 task = self.store.task(lease["task_id"])
                 if task.state in {TaskState.EXECUTING, TaskState.AWAITING_RESULT}:
                     try:
                         self.store.transition(
                             task.id,
                             TaskState.BLOCKED,
-                            blocker="executor lease expired",
+                            blocker=(
+                                "executor unavailable"
+                                if executor_lost
+                                else "executor lease expired"
+                            ),
                             expected_lease=lease["id"],
                         )
                     except StateConflict:

@@ -35,7 +35,7 @@ it('stale observations disable submission and never claim monitoring or persiste
   mount({expression:{epoch:'b'.repeat(32),generation:1,observed_at_ms:Date.now()-10000,voice_observed_at_ms:0,tasks_observed_at_ms:0,current_observed_at_ms:0}});
   await screen.findByText(/OSCAR is offline/);fireEvent.change(screen.getByLabelText('Ask OSCAR'),{target:{value:'hello'}});
   expect((screen.getByRole('button',{name:'Send'}) as HTMLButtonElement).disabled).toBe(true);
-  fireEvent.click(screen.getByRole('button',{name:'Preferences'}));fireEvent.click(screen.getByRole('button',{name:'Sentry and listening controls'}));expect(screen.getByText(/Sentry, wake-word activation and persistent mute are not available yet/)).toBeTruthy();
+  fireEvent.click(screen.getByRole('button',{name:'Preferences'}));fireEvent.click(screen.getByRole('button',{name:'Sentry and listening controls'}));expect(screen.getByText(/Configure available Sentry sources separately/)).toBeTruthy();
 });
 it('Activity discard clears unsent private drafts across navigation',async()=>{
   const port=mount();await waitFor(()=>expect(port).toHaveBeenCalled());
@@ -106,7 +106,7 @@ it('a retention grant never claims that history read was granted',async()=>{
 });
 
 it('only offers a microphone for real available voice and sends bounded native commands',async()=>{
- const port=mount({voice_available:true});await screen.findByRole('button',{name:'Use voice'});fireEvent.click(screen.getByRole('button',{name:'Use voice'}));await waitFor(()=>expect(port).toHaveBeenCalledWith({kind:'voice_start',context_id:''}));
+ const port=mount({voice_available:true});await screen.findByRole('button',{name:'Use voice'});fireEvent.click(screen.getByRole('button',{name:'Use voice'}));await waitFor(()=>expect(port).toHaveBeenCalledWith({kind:'voice_start',context_id:'',mode:'Ask'}));
  act(()=>port.emit({voice:'listening'}));fireEvent.click(screen.getByRole('button',{name:'Finish voice message'}));await waitFor(()=>expect(port).toHaveBeenCalledWith({kind:'voice_stop'}));
 });
 it('keeps empty Conversation free of utility controls, headings and memory/debug metadata',async()=>{

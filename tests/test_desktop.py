@@ -412,7 +412,7 @@ class DesktopTests(unittest.TestCase):
 
     def test_conversation_file_write_uses_existing_plan_signature_and_verification(self):
         proposal = self.ask("Create notes/review.txt with text Owner review")
-        self.assertEqual(proposal["mode"], "Act")
+        self.assertEqual(proposal["mode"], "Ask")
         self.assertEqual(proposal["state"], "planned")
         self.assertFalse((self.root / "workspace/notes/review.txt").exists())
         result = self.confirm(proposal["task_id"])

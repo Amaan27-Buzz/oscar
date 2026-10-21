@@ -4,6 +4,18 @@
 
 ## Current owner sequencing and authorization
 
+- **2026-10-20 full software-completion mandate:** the owner authorizes all
+  non-deferred Groups 4–6 software, including C3 signed standing delegation and
+  C4, on `codex/software-completion`, starting at `b700a6c`. Local implementation,
+  cohesive commits, synthetic credentials, disposable emulator acceptance and
+  parallel engineering are authorized. This supersedes the earlier C1/C2-only
+  scope. No push, Actions, remote mutation/merge, real-account authentication,
+  personal data, physical phone, real microphone/camera capture, public deployment,
+  spending or privileged owner activation without separate explicit consent.
+  Group 7/8 hardware and physical Slice 18 remain deferred. Software modes may be
+  implemented/tested with synthetic owners; production authority is never silently
+  activated. Preserve the approved UI, one Core and the unmerged D2 dependency.
+
 - **2026-10-20 Group 5 C1/C2 local continuation:** the owner authorizes the
   universal capability/identity foundation on `codex/group-05-universal-capabilities`,
   based on unmerged D2 `bd0102a`. Implementation, local tests, synthetic native

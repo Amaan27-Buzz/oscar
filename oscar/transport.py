@@ -80,6 +80,9 @@ class Dispatcher:
             self.grid.authenticate(session, permission, lease_id=envelope.lease_id)
 
         def authorize_execution() -> None:
+            from .authority import check_task_authority
+
+            check_task_authority(self.store, self.grid, action.task_id, candidates[0], session)
             latest = self.store.get("node", self.node_id)
             if [c for c in latest["capabilities"] if c["id"] == action.capability_id] != candidates:
                 raise PermissionError("target capability withdrawn or changed")
@@ -98,7 +101,7 @@ class Dispatcher:
             if plan.get("executive"):
                 from .executive import authorize_step
 
-                authorize_step(self.store, self.grid, action.task_id, candidates[0])
+                authorize_step(self.store, self.grid, action.task_id, candidates[0], session)
 
         cancellation = Cancellation(self.store, action.task_id, authorize_execution)
         cancellation.check()

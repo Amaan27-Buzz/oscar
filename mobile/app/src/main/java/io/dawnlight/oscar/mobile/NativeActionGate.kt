@@ -2,7 +2,7 @@ package io.dawnlight.oscar.mobile
 
 import java.util.UUID
 
-/** Native admission is subordinate to an exact, live Core Ask decision. It creates no grants. */
+/** Native admission is subordinate to an exact, live Core decision. It creates no grants. */
 internal data class NativeAction(
     val requestId: String, val taskId: String, val nodeId: String, val sessionId: String,
     val taskGeneration: Long, val authorityEpoch: Long,
@@ -39,4 +39,6 @@ internal class NativeActionGate(private val now: () -> Long, private val authori
     }
 }
 
-internal val nativeCapabilityIds = setOf("android.app.launch", "android.link.open", "android.share.text", "android.ui.inspect", "android.ui.click", "android.ui.set_text")
+internal val nativeCapabilityIds = setOf("android.app.launch", "android.link.open", "android.share.text", "android.ui.inspect", "android.ui.click", "android.ui.set_text",
+    "android.ui.scroll", "android.ui.gesture", "android.phone.dial", "android.message.compose", "android.contact.view", "android.calendar.insert", "android.settings.open",
+    "android.files.read", "android.files.write", "android.clipboard.read", "android.clipboard.write", "android.media.inspect", "android.media.control", "android.screen.capture")

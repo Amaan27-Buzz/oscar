@@ -32,10 +32,11 @@ export interface ConnectionsView {
   identity:{id:string;display_name:string;operational_email:string|null;status:string};
   accounts:{id:string;provider:string;tenant:string;subject:string;alias:string;identity_class:string;generation:number;status:string;remote_revocation:string;local_credentials?:string;services:{id:string;scopes:string[];expires_at:number|null;restrictions:string[]}[]}[];
   plugins:{id:string;name:string;account_id:string;enabled:boolean;health:string;transport:string;permissions:Record<string,string[]>;tools:{name:string}[];activity:{event?:string;observed_at?:number}[]}[];
+  providers?:{id:string;provider:string;service:string;scopes:string[];redirect_uri:string;configured:boolean}[];
   access:string;enrollment:string;observed_at_ms:number;
   credential_deletion?:'available'|'unavailable';accounts_total?:number;plugins_total?:number;truncated?:boolean;
 }
-export interface View {connections?:ConnectionsView|null}
+export interface View {connections?:ConnectionsView|null;day_brief?:Record<string,unknown>|null}
 export interface View {connection?:ConnectionView|null;nodes?:GridNode[];core_clock?:CoreClockObservation|null;executive?:ExecutiveSummary|null;presence?:{version:1;visible:boolean;expression:unknown}|null;setup?:Record<string,{configured?:boolean;operational?:boolean}>|null;adaptive_views?:unknown[];access_mode?:string|null;voice_available?:boolean;conversation?:ConversationHistory;operating?:Operating|null;theme?:'light'|'dark';expression:ExpressionReadback|null;link:string;orb:string;window:WindowMode;tasks:Task[];capabilities:Capability[];
   context:Context|null;preview:Preview|null;review:Review|null;current:Task|null;message:string|null;
   voice:string;voice_support?:VoiceSupport;shortcut:string;shortcut_enabled?:boolean;capture_choice?:ContextChoice;observed_at_ms:number;reference:boolean;window_revision?:number;feedback?:RequestFeedback|null}
@@ -49,10 +50,13 @@ export type ActForm=
   |{operation:'launch_app';app_id:string}
   |{operation:'list_files'|'git_status'|'git_diff'|'git_log'|'git_branches'|'ps_environment'|'list_apps'|'worker_tools'};
 export type Command=
-  |{kind:'manage_connection';operation:'rename_account'|'default_account'|'disconnect_account'|'connect_plugin'|'disable_plugin'|'enable_plugin'|'remove_plugin';id:string;value:string}
+  |{kind:'manage_assistance';operation:string;id:string;value:Record<string,unknown>}
+  |{kind:'set_access';relationship_id:string;value:Record<string,unknown>}
+  |{kind:'revoke_access'}
+  |{kind:'manage_connection';operation:'begin_account'|'refresh_account'|'register_plugin'|'rename_account'|'default_account'|'disconnect_account'|'connect_plugin'|'disable_plugin'|'enable_plugin'|'remove_plugin';id:string;value:string}
   |{kind:'connection_prepare';url:string}|{kind:'connection_enroll';invitation:string}|{kind:'connection_logout'}|{kind:'cancel_remote';task_id:string}
   |{kind:'history';before:number}
-  |{kind:'ready'|'refresh'|'discard'|'voice_stop'|'voice_cancel'}|{kind:'window';mode:WindowMode}
+  |{kind:'ready'|'refresh'|'day_brief'|'discard'|'voice_stop'|'voice_cancel'}|{kind:'window';mode:WindowMode}
   |{kind:'capture_choice'|'capture';source:ContextChoice}
   |{kind:'interact';mode:Exclude<Mode,'Act'>;text:string;context_id:string}
   |{kind:'act';capability_id:string;form:ActForm}
@@ -60,7 +64,7 @@ export type Command=
   |{kind:'review';task_id:string;operation:'approve'|'deny'|'cancel'}
   |{kind:'confirm';review_id:string;accept:boolean}
   |{kind:'apply';preview_id:string;destination:'surface'|'clipboard'|'focused'}
-  |{kind:'voice_start';context_id:string}|{kind:'shortcut';accelerator:string};
+  |{kind:'voice_start';context_id:string;mode?:'Ask'|'Dictate'}|{kind:'shortcut';accelerator:string};
 export type Send=(command:Command)=>Promise<View>;
 export const send:Send=command=>invoke<View>('desktop_command',{request:command});
 export const subscribe=(callback:(view:View)=>void)=>listen<View>('desktop-state',event=>callback(event.payload));

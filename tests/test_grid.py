@@ -25,6 +25,45 @@ class GridTests(unittest.TestCase):
         self.assertEqual(node["protocol_version"], 1)
         self.assertIsNotNone(node["last_seen"])
 
+    def test_remote_executor_expires_while_control_surface_remains_connected(self):
+        r = self.r
+        r.grid.advertise(r.session, r.caps, executor=True)
+        task, _, envelope = r.leased_action()
+        r.grid.renew(envelope.lease_id, r.session, ttl=120)
+        r.clock.now += 31
+        r.grid.heartbeat(r.session)
+        self.assertEqual("online", r.grid.nodes()[0]["status"])
+        self.assertEqual([], r.grid.search("file_write"))
+        with self.assertRaises(StateConflict):
+            r.grid.renew(envelope.lease_id, r.session)
+        with self.assertRaises(PermissionError):
+            r.grid.accept(replace(envelope, sent_at=r.clock()), r.session.token, "execute")
+        unleased = r.file_task("next.txt")
+        self.assertEqual(TaskState.BLOCKED, unleased.state)
+        with self.assertRaises(StateConflict):
+            r.grid.lease(task.id, "test-node")
+        r.grid.executor_heartbeat(r.session)
+        self.assertEqual(TaskState.BLOCKED, r.store.task(task.id).state)
+        self.assertFalse(r.store.get("lease", envelope.lease_id)["active"])
+        self.assertEqual(["file"], [c.id for c in r.grid.search("file_write")])
+        with self.assertRaises(PermissionError):
+            r.grid.accept(replace(envelope, sent_at=r.clock()), r.session.token, "execute")
+
+    def test_remote_executor_session_cannot_be_replaced_by_ui_heartbeat(self):
+        r = self.r
+        r.grid.advertise(r.session, r.caps, executor=True)
+        replacement = r.grid.pair("test-node", r.scopes)
+        with self.assertRaises(PermissionError):
+            r.grid.executor_heartbeat(replacement)
+        old = r.store.get("session", r.session.id)
+        r.store.put("session", r.session.id, {**old, "revoked": True})
+        r.grid.heartbeat(replacement)
+        self.assertEqual([], r.grid.search("file_write"))
+        with self.assertRaises(PermissionError):
+            r.grid.executor_heartbeat(r.session)
+        r.grid.advertise(replacement, r.caps, executor=True)
+        self.assertEqual(["file"], [c.id for c in r.grid.search("file_write")])
+
     def test_background_disconnect_cannot_overwrite_concurrent_pairing(self):
         self.r.grid.register(Node("pairing", NodeRole.DESKTOP, ("heartbeat",)))
         other = Store(self.r.root / "state.sqlite")

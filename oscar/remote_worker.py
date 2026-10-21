@@ -170,6 +170,8 @@ class RemoteCancellation(Cancellation):
 
 
 class RemoteWorker:
+    capability_ids = frozenset({"machine.files.read", "machine.files.write"})
+
     def __init__(
         self,
         client: Client,
@@ -184,11 +186,8 @@ class RemoteWorker:
             raise ValueError("existing absolute workspace required")
         if not workspace_id or len(workspace_id) > 128:
             raise ValueError("bounded enrolled workspace identity required")
-        if not capabilities or not set(capabilities) <= {
-            "machine.files.read",
-            "machine.files.write",
-        }:
-            raise PermissionError("only explicitly scoped file capabilities are available")
+        if not capabilities or not set(capabilities) <= self.capability_ids:
+            raise PermissionError("only explicitly enrolled capabilities are available")
         if journal.resolve().is_relative_to(workspace.resolve()):
             raise ValueError("execution journal must be outside the remotely writable workspace")
         self.client, self.workspace_id = client, workspace_id
@@ -231,7 +230,7 @@ class RemoteWorker:
         self.status = "online"
 
     def validate(self, delivery: dict[str, Any]) -> Action:
-        if set(delivery) != {
+        if set(delivery) - {"authority"} != {
             "id",
             "kind",
             "node_id",
@@ -246,6 +245,35 @@ class RemoteWorker:
             "parameters",
         }:
             raise ValueError("invalid delivery contract")
+        authority = delivery.get("authority")
+        if authority is not None:
+            if (
+                not isinstance(authority, dict)
+                or set(authority)
+                != {
+                    "grant_id",
+                    "epoch",
+                    "mode",
+                    "task_generation",
+                    "owner_node",
+                    "owner_session",
+                    "expires_at_ms",
+                }
+                or (
+                    authority["mode"] not in {"secure", "full"}
+                    or type(authority["epoch"]) is not int
+                    or authority["epoch"] < 1
+                    or type(authority["task_generation"]) is not int
+                    or authority["task_generation"] < 1
+                    or type(authority["expires_at_ms"]) is not int
+                    or authority["expires_at_ms"] <= time() * 1000
+                    or any(
+                        not isinstance(authority[k], str) or not authority[k]
+                        for k in ("grant_id", "owner_node", "owner_session")
+                    )
+                )
+            ):
+                raise PermissionError("invalid or expired standing authority delivery")
         if (
             delivery["node_id"] != self.client.session["node_id"]
             or delivery["session_id"] != self.client.session["session_id"]
@@ -273,6 +301,13 @@ class RemoteWorker:
         )
         if delivery["review_digest"] != expected:
             raise PermissionError("exact action review digest mismatch")
+        self.validate_effect(action, delivery)
+        if self.local_authorize is not None and not self.local_authorize(action):
+            raise PermissionError("local Personal Policy denied execution")
+        return action
+
+    def validate_effect(self, action: Action, delivery: dict[str, Any]) -> None:
+        authority = delivery.get("authority")
         fields = {"path", "content"} if action.capability_id.endswith("write") else {"path"}
         parameters = action.parameters
         if not isinstance(parameters, dict) or set(parameters) != fields:
@@ -284,7 +319,11 @@ class RemoteWorker:
             not isinstance(parameters["content"], str) or len(parameters["content"].encode()) > 8192
         ):
             raise ValueError("bounded UTF8 content required")
-        if action.capability_id.endswith("write") and not delivery["approved"]:
+        if (
+            action.capability_id.endswith("write")
+            and not delivery["approved"]
+            and not (authority is not None and authority["mode"] == "full")
+        ):
             raise PermissionError("Ask requires exact current owner approval")
         if delivery["kind"] == "readback" and delivery["parameters"] != {
             "path": parameters["path"]
@@ -292,27 +331,31 @@ class RemoteWorker:
             raise PermissionError("readback must inspect the original action target")
         if delivery["kind"] == "action" and delivery["parameters"] != parameters:
             raise PermissionError("delivery parameters changed after review")
-        if self.local_authorize is not None and not self.local_authorize(action):
-            raise PermissionError("local Personal Policy denied execution")
-        return action
 
     def execute(self, delivery: dict[str, Any]) -> dict[str, Any]:
         action = self.validate(delivery)
 
         def authorize() -> None:
             self.validate(delivery)
-            if self.client.request("check", {"delivery_id": delivery["id"]}) != {
-                "authorized": True
-            }:
+            check = {"delivery_id": delivery["id"]}
+            if delivery.get("authority") is not None:
+                check["authority"] = delivery["authority"]
+            expected = {
+                "authorized": True,
+                **(
+                    {"authority": delivery["authority"]}
+                    if delivery.get("authority") is not None
+                    else {}
+                ),
+            }
+            if self.client.request("check", check) != expected:
                 raise PermissionError("remote authority unavailable")
 
         authorize()
         if delivery["kind"] == "readback":
-            data = self.files.read(action.parameters["path"])
-            if len(data) > 8192:
-                raise ValueError("readback exceeds permitted content boundary")
+            observed = self.readback_effect(action, delivery)
             authorize()
-            return {"content": data.decode("utf-8", errors="strict")}
+            return observed
         digest = fingerprint(record(action))
         previous = self.journal.execute(
             "SELECT fingerprint,result FROM execution_claim WHERE action_id=?", (action.id,)
@@ -327,6 +370,21 @@ class RemoteWorker:
             "INSERT INTO execution_claim(action_id,fingerprint) VALUES (?,?)", (action.id, digest)
         )
         cancellation = RemoteCancellation(authorize)
+        result = self.execute_effect(action, cancellation)
+        receipt = record(result)
+        self.journal.execute(
+            "UPDATE execution_claim SET result=? WHERE action_id=?",
+            (json.dumps(receipt, allow_nan=False), action.id),
+        )
+        return receipt
+
+    def readback_effect(self, action: Action, delivery: dict[str, Any]) -> dict[str, Any]:
+        data = self.files.read(action.parameters["path"])
+        if len(data) > 8192:
+            raise ValueError("readback exceeds permitted content boundary")
+        return {"content": data.decode("utf-8", errors="strict")}
+
+    def execute_effect(self, action: Action, cancellation: Cancellation) -> Result:
         if action.capability_id == "machine.files.write":
             result = FileExecutor(self.files)(action, cancellation)
             if result.artifact:
@@ -350,12 +408,7 @@ class RemoteWorker:
                 True,
                 value=data.decode("utf-8", errors="strict"),
             )
-        receipt = record(result)
-        self.journal.execute(
-            "UPDATE execution_claim SET result=? WHERE action_id=?",
-            (json.dumps(receipt, allow_nan=False), action.id),
-        )
-        return receipt
+        return result
 
     def step(self) -> bool:
         delivery = self.client.request("poll", {})["delivery"]

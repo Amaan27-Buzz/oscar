@@ -1,0 +1,47 @@
+{
+  "classification": "LOCAL_SOFTWARE_INTERMEDIATE",
+  "branch": "codex/software-completion",
+  "starting_sha": "b700a6c68e7afdff7cc78ea1a615793fd6ac475d",
+  "python": {
+    "tests": 903,
+    "seconds": 375.755,
+    "passed": true,
+    "skipped": 10,
+    "skip_groups": {
+      "POSIX_descriptor_mode_and_symlink_checks_on_Windows": 4,
+      "optional_prepared_voice_reference": 6
+    }
+  },
+  "desktop": {
+    "tests": 108,
+    "passed": true,
+    "production_build": true,
+    "subsequent_brief_core_clock_tests": 5
+  },
+  "rust": {
+    "passed": 29,
+    "ignored": 1,
+    "toolchain": "1.99.0",
+    "ignored_reason": "requires live synthetic native voice fixture; explicitly run by voice reference receipt"
+  },
+  "android": {
+    "jvm_tests": 69,
+    "assemble_debug": true,
+    "assemble_instrumentation": true,
+    "lint_debug": true,
+    "native_grid_receipt": "android-2026-10-21.json"
+  },
+  "static": {
+    "mypy_files": 93,
+    "passed": true
+  },
+  "status": "Intermediate checkpoint. Executor freshness changes require separate targeted verification. Broad software completion remains PARTIAL.",
+  "not_run": [
+    "remote CI",
+    "public deployment",
+    "real provider authentication",
+    "real owner authority activation",
+    "physical phone",
+    "real microphone/camera"
+  ]
+}

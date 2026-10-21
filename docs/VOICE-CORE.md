@@ -2,6 +2,11 @@
 
 ## Desktop Dictate adapter
 
+The 2026-10-21 software integration adds opt-in native Ask dialogue alongside
+Dictate, through the existing Desktop Core. See [voice integration and exact
+acceptance boundaries](development/SOFTWARE-VOICE-INTEGRATION.md). Historical
+Slice 08 reference receipts below do not establish physical audio acceptance.
+
 Slice 10 accepts final transcripts through the existing Voice Core contracts and provides an opt-in bounded local push-to-talk adapter. It adds no STT/TTS research, default microphone opening, recordings or physical voice evidence. The reference surface has no audio adapter and reports BLOCKED. Prepared microphone/output routes and real-room acceptance remain consolidated Gate C work. See [Desktop foundation](DESKTOP-FOUNDATION.md).
 
 Owner closure scope: **COMPLETE FOR SOFTWARE / REFERENCE VOICE FOUNDATION**.
