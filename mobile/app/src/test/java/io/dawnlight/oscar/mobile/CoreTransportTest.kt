@@ -9,6 +9,15 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 class CoreTransportTest {
+    @Test fun cancellationDuringProofStopsTheRequestBeforeConnecting() {
+        val session = JSONObject().put("url", "http://127.0.0.1:1").put("version", 2)
+            .put("expires_at_ms", System.currentTimeMillis() + 60_000).put("node_id", "fixture")
+            .put("session_id", "fixture").put("token", "synthetic-only")
+        lateinit var client: CoreClient
+        client = CoreClient(session) { client.cancel(); "unused" }
+        try { client.call("snapshot", JSONObject()); fail("Cancelled request connected") }
+        catch (failure: java.io.IOException) { assertTrue(failure.message!!.startsWith("Request cancelled")) }
+    }
     @Test fun expiredRemoteCredentialAndIncompatibleProtocolFailBeforeNetworking() {
         val expired = JSONObject().put("url", "http://127.0.0.1:1").put("version", 2).put("expires_at_ms", 1)
         var signed = false

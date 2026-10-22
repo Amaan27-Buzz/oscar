@@ -1,0 +1,27 @@
+{
+  "source_sha": "111aba543821368c00c8d90804e9c5a408df2f89",
+  "classification": "SOFTWARE_VERIFIED_CONSTRAINED_LINUX",
+  "tests": 138,
+  "seconds": 97.404,
+  "passed": true,
+  "skipped": 1,
+  "skip": "optional MCP SDK not installed in minimal Cloud image; corresponding Windows SDK test runs separately",
+  "runtime": {
+    "user": "10001:10001",
+    "image": "sha256:904bd029a744b348be42ebdf6a4f0b554b1fe47fcd51b6909c15c37875322b24",
+    "read_only": true,
+    "cap_drop": [
+      "ALL"
+    ],
+    "memory": 1073741824,
+    "nano_cpus": 1000000000,
+    "network": "none",
+    "exit_code": 0
+  },
+  "coverage": "Cloud recovery/backup/enrollment/permissions, Grid/connected native file Worker, signed authority, account vault, Executive authoring and time/calendar context",
+  "not_claimed": [
+    "hosted deployment",
+    "weather/communication/native Worker UI changes after source SHA",
+    "physical/owner/provider acceptance"
+  ]
+}

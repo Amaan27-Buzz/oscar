@@ -58,6 +58,7 @@ class HTTPDiscovery:
                     raise ProviderError(Failure.CAPABILITY)
                 return data
         except HTTPError as error:
+            error.close()
             raise ProviderError(
                 error_category(error.code, error.headers), http_status=error.code
             ) from None

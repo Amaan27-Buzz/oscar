@@ -44,6 +44,11 @@ native host path.
 
 ## Native entry point
 
+Desktop Preferences now provides explicit native setup/start/stop and contained
+process supervision for this entry point. See the
+[native execution-sharing acceptance](SOFTWARE-DESKTOP-WORKER.md), including its
+actual synthetic CNG/DPAPI/TLS/readback receipt and installed-runtime boundary.
+
 Use an already enrolled native DPAPI connection and an explicit local scope:
 
 ```powershell

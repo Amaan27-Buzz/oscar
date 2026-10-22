@@ -34,6 +34,16 @@ request does not silently create indefinite standing work. This is deterministic
 bounded authoring; arbitrary model-generated plans still use the existing
 separately reviewed model-planning contract.
 
+The primary Desktop and connected Android conversation also accepts
+`Every day for 3 runs: 2 + 2` and `Create automation: 2 + 2`. Core returns an
+unsigned proposal, and the native client opens the same complete signed
+Assistance review. Receiving that proposal creates no task, Worker or goal.
+Unsupported schedules remain blocked; cancelling review leaves the draft
+available. Account/permission/executor changes still invalidate the exact plan.
+Desktop keeps the original Core client and content revision while requesting
+review, so a late response cannot move private instructions into a replacement
+connection. Android checks its connection epoch and management stamp.
+
 ## Reusable procedures
 
 Native `learn` requires a completed exact goal, independent canonical evidence

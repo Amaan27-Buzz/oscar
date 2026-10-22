@@ -5,8 +5,8 @@ import math
 from collections.abc import Callable
 from dataclasses import replace
 from pathlib import Path
-from threading import Event
-from typing import Any
+from threading import Event, Thread
+from typing import Any, TextIO
 
 from .browser_profiles import BrowserProfiles
 from .browser_worker import validate as validate_browser
@@ -321,20 +321,46 @@ class RemoteMachine(RemoteWorker):
         return {"content": json.dumps({"text": observed["text"]}, allow_nan=False)}
 
 
+def supervised_scope(stream: TextIO) -> dict[str, Any]:
+    line = stream.readline(16002)
+    if not line.endswith("\n") or len(line.encode("utf-8")) > 16001:
+        raise ValueError("bounded native scope line required")
+    value = json.loads(line)
+    if not isinstance(value, dict):
+        raise ValueError("native scope object required")
+    return value
+
+
+def supervise_stop(stream: TextIO, stop: Event) -> None:
+    # Closing the native parent pipe also withdraws the local execution grant.
+    try:
+        line = stream.readline(65)
+        if line != "stop\n":
+            return
+    finally:
+        stop.set()
+
+
 def main() -> int:
     """Native enrollment is separate; this command never creates an identity or grants."""
     import argparse
+    import sys
 
     from .remote_client import GridClient
     from .remote_worker import WindowsNativeSigner, native_connection
 
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--connection", type=Path, required=True)
-    parser.add_argument("--scope", type=Path, required=True)
+    source = parser.add_mutually_exclusive_group(required=True)
+    source.add_argument("--scope", type=Path)
+    source.add_argument("--scope-stdin", action="store_true")
     args = parser.parse_args()
-    if args.scope.stat().st_size > 16_000:
-        raise ValueError("bounded local native-sharing configuration required")
-    config = json.loads(args.scope.read_text(encoding="utf-8"))
+    if args.scope_stdin:
+        config = supervised_scope(sys.stdin)
+    else:
+        if args.scope.stat().st_size > 16_000:
+            raise ValueError("bounded local native-sharing configuration required")
+        config = json.loads(args.scope.read_text(encoding="utf-8"))
     if not isinstance(config, dict) or set(config) - {
         "workspace",
         "workspace_id",
@@ -358,7 +384,10 @@ def main() -> int:
         ):
             raise ValueError("explicit native sharing list required")
     connection = native_connection(args.connection)
+    if args.scope_stdin and config.get("workspace_id") != connection.get("workspace"):
+        raise PermissionError("native scope differs from enrolled workspace")
     signer = WindowsNativeSigner(connection["installation_id"])
+    stop = Event()
     try:
         client = GridClient(connection["url"], connection["session"], signer)
         scope = MachineScope(
@@ -377,13 +406,33 @@ def main() -> int:
             browser=config.get("browser", False),
             desktop_app_ids=tuple(config.get("desktop_app_ids", ())),
             profile_root=Path(config["profile_root"]) if config.get("profile_root") else None,
+            local_authorize=lambda action: not stop.is_set(),
         )
+        monitor_done = Event()
+        if args.scope_stdin:
+            Thread(target=supervise_stop, args=(sys.stdin, stop), daemon=True).start()
+
+            def report() -> None:
+                previous = None
+                while not monitor_done.wait(0.1):
+                    status = worker.status
+                    if status != previous:
+                        print(json.dumps({"status": status}), flush=True)
+                        previous = status
+
+            Thread(target=report, daemon=True).start()
         try:
-            worker.run(Event())
+            worker.run(stop)
         except KeyboardInterrupt:
             pass
         finally:
+            monitor_done.set()
             worker.close()
+            if args.scope_stdin:
+                print(
+                    json.dumps({"status": "stopped" if stop.is_set() else "unavailable"}),
+                    flush=True,
+                )
     finally:
         signer.close()
     return 0

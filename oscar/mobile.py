@@ -324,6 +324,7 @@ class Mobile:
             "private_digest": fingerprint(
                 {
                     "parameters": private.get("parameters", {}),
+                    "review_parameters": private.get("review_parameters"),
                     "request": private.get("request", private["objective"].description)
                     if private
                     else "",
@@ -354,7 +355,11 @@ class Mobile:
             description = self.inspect(session, task_id)["description"]
             if operation in {"approve", "retry"}:
                 private = self.private_for(session, task_id)
-                review = json.dumps(private["parameters"], ensure_ascii=False, allow_nan=False)
+                review = json.dumps(
+                    private.get("review_parameters", private["parameters"]),
+                    ensure_ascii=False,
+                    allow_nan=False,
+                )
                 exact_request = private.get("request", private["objective"].description)
                 if len((review + exact_request).encode("utf-8")) > 24_000:
                     raise ValueError(
@@ -556,6 +561,18 @@ class Mobile:
                 return self.inspect(session, task_id)
             if self.store.task(task_id).state != TaskState.PLANNED:
                 raise StateConflict("task no longer awaiting approval")
+            capability = candidates[0]
+            if capability.execution_class == "connector":
+                from .executive import confirmation_digest
+
+                self.store.put(
+                    "executive_confirmation",
+                    task_id,
+                    {
+                        "digest": confirmation_digest(self.store, task_id),
+                        "expires_at": claim["expires_at_ms"] / 1000,
+                    },
+                )
             self.runtime.run(task_id, {material["target"]: self.targets[material["target"]]})
             return self.inspect(session, task_id)
         if operation == "cancel":

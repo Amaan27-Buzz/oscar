@@ -1,5 +1,11 @@
 # Product Vision
 
+**2026-10-22 local software implementation:** signed standing delegation and
+native exact review/revocation now have synthetic software acceptance. The
+historical activation-unavailable statements below describe the earlier product
+checkpoint. No production owner authority has been activated; see the
+[current software ledger](development/OSCAR-FULL-SOFTWARE-COMPLETION.md).
+
 **Current owner-approved direction:** [product direction](PRODUCT-DIRECTION.md), [future Adaptive Interface Engine](ADAPTIVE-INTERFACE.md), [canonical slices](SLICE-NUMBERING.md). Group 2.5A Desktop was provisionally accepted and merged 2026-10-14; Mobile Group 2.5B UI/UX was explicitly approved on 2026-10-16. [Engineering closure](ui/mobile/group25b/FINAL-CLOSURE.md), real audio, biometric/PIN and OEM commissioning remain separate.
 
 ## Group 2.5 owner correction — 2026-10-14

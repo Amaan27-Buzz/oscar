@@ -9,6 +9,7 @@ import tempfile
 import wave
 from dataclasses import replace
 from pathlib import Path
+from queue import Empty, Queue
 from threading import Event
 from time import perf_counter
 
@@ -17,7 +18,7 @@ from cryptography.hazmat.primitives.asymmetric import padding, rsa
 
 from oscar.contracts import new_id
 from oscar.desktop import Desktop
-from oscar.desktop_voice import DesktopVoice
+from oscar.desktop_voice import DesktopVoice, grant_continuous_voice
 from oscar.grid import Node, NodeRole
 from oscar.harness import Harness
 from oscar.mobile import MobileServer
@@ -61,6 +62,23 @@ class Frames:
         for frame in self.audio:
             stop.check()
             yield frame
+
+    def close(self):
+        pass
+
+
+class QueuedFrames:
+    def __init__(self, frames):
+        self.audio = Queue()
+        for frame in frames:
+            self.audio.put(frame)
+
+    def frames(self, stop):
+        while not stop.event.is_set():
+            try:
+                yield self.audio.get(timeout=0.02)
+            except Empty:
+                continue
 
     def close(self):
         pass
@@ -234,6 +252,7 @@ def main():
                     Frames(completed),
                     recognizer,
                     mode="Ask",
+                    muted=False,
                     synthesis=synthesis,
                     playback=sink,
                     profile=oscar_voice_profile(),
@@ -273,6 +292,7 @@ def main():
                 Frames(captured[0]),
                 recognizer,
                 mode="Ask",
+                muted=False,
                 synthesis=synthesis,
                 playback=sink,
                 profile=oscar_voice_profile(),
@@ -319,12 +339,45 @@ def main():
                 (perf_counter() - interrupt_started) * 1000, 3
             )
             report["issued_task_not_replayed_or_reversed"] = True
+            # Same product continuous loop, with actual local wake/VAD/STT and no audio devices.
+            wake.reset()
+            vad.reset()
+            audio = synthetic_audio("Oscar. What is two plus three?")
+            silence_at = audio[-1].timestamp + len(audio[-1].samples) / 16000
+            audio += tuple(
+                AudioFrame(
+                    (0.0,) * 512, silence_at + i * 0.032, "synthetic", origin=Origin.SIMULATED
+                )
+                for i in range(60)
+            )
+            grant_continuous_voice(core, owner.id)
+            core.voice = DesktopVoice(
+                core, QueuedFrames(audio), recognizer, muted=False, wake=wake, vad=vad
+            )
+            before = len(harness.store.all("task"))
+            core.voice.listen(owner)
+            deadline = perf_counter() + 90
+            while perf_counter() < deadline:
+                view = core.voice.inspect(owner)
+                if view.get("state") == "verified" and len(harness.store.all("task")) > before:
+                    break
+                Event().wait(0.1)
+            else:
+                raise AssertionError("actual continuous local model path did not verify")
+            assert view["value"] == "5"
+            assert "wake" in [event.kind for event in core.voice.acoustic.events]
+            core.voice.cancel(owner)
+            core.voice.close()
+            assert not core.voice.listener_thread.is_alive()
+            report["continuous_wake_dialogue"] = "PASS_ACTUAL_LOCAL_MODELS_SYNTHETIC_INPUT"
+            report["continuous_cancel"] = "PASS_LISTENER_STOPPED_NO_REPLAY"
             call("authority_revoke", {})
             # Production Rust Bridge and HTTP client; fixed synthetic capture opens no device.
             core.voice = DesktopVoice(
                 core,
                 Frames(captured[0]),
                 recognizer,
+                muted=False,
                 synthesis=synthesis,
                 playback=MemoryPlayback(),
                 profile=oscar_voice_profile(),
@@ -373,6 +426,7 @@ def main():
                 )
                 report["native_webview_and_audio_devices"] = "NOT_RUN"
             core.voice.close()
+            assert not harness.store.all("executive_goal"), "declined automation created a goal"
     path = Path(".oscar/software-voice-reference.json")
     path.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(report, indent=2))

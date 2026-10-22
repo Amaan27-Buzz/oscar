@@ -91,6 +91,17 @@ class DesktopTests(unittest.TestCase):
     def ask(self, text: str = "2 + 3", mode: str = "Ask", context: str = "") -> dict:
         return self.call("interact", {"mode": mode, "text": text, "context_id": context})
 
+    def test_conversation_schedule_only_proposes_an_unsigned_management_change(self):
+        result = self.ask("every day for 3 runs: 2 + 3")
+        proposal = result["assistance_proposal"]
+        self.assertEqual("create_natural", proposal["operation"])
+        self.assertEqual(86400, proposal["value"]["interval_seconds"])
+        self.assertEqual(3, proposal["value"]["max_runs"])
+        self.assertEqual([], self.h.store.all("executive_goal"))
+        self.assertEqual([], self.h.store.all("task"))
+        self.assertEqual("blocked", self.ask("every day: 2 + 3")["state"])
+        self.assertEqual([], self.h.store.all("executive_worker"))
+
     def confirm(self, task_id: str, operation: str = "approve") -> dict:
         from cryptography.hazmat.primitives import hashes
         from cryptography.hazmat.primitives.asymmetric import padding
@@ -731,7 +742,7 @@ class DesktopTests(unittest.TestCase):
                 return Transcript("synthetic dictation", final, "en", 1.0, 1, 2, self.id)
 
         capture = Capture()
-        self.core.voice = DesktopVoice(self.core, capture, Recognizer())
+        self.core.voice = DesktopVoice(self.core, capture, Recognizer(), muted=False)
         self.call("voice", {"operation": "start", "context_id": ""})
         self.core.voice.thread.join(timeout=5)
         self.assertTrue(capture.closed)

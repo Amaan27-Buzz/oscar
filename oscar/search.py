@@ -295,6 +295,7 @@ class TavilySource:
                 )
             return RetrievalResult(tuple(facts), limitations=limitations)
         except HTTPError as error:
+            error.close()
             limits = rate_limits(error.headers, "tavily", self.clock())
             category = (
                 Failure.QUOTA
@@ -323,7 +324,6 @@ class TavilySource:
                 category=category.value,
                 rate_limits=asdict(limits),
             )
-            error.close()
             raise failure from None
         except (URLError, HTTPException, OSError):
             observation.update(status="UNAVAILABLE", category=Failure.NETWORK.value)

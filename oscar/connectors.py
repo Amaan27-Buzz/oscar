@@ -20,7 +20,7 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import quote, urlencode, urlparse
 from urllib.request import Request, build_opener
 
-from .capabilities import Cancellation, Executor, Verifier
+from .capabilities import Cancellation, Cancelled, Executor, Verifier
 from .contracts import (
     Action,
     Capability,
@@ -341,6 +341,7 @@ class HTTPSConnector:
             category = {401: "auth_missing", 403: "access_denied", 429: "rate_limited"}.get(
                 error.code, "http_failure"
             )
+            error.close()
             raise ConnectorError(category) from None
         except (URLError, OSError, TimeoutError):
             raise ConnectorError("network_failure") from None
@@ -573,6 +574,12 @@ class ConnectorFabric:
             )
         else:
             payload, identity = self.http.request(instance.manifest, spec, parameters, secret)
+        cancellation.check()
+        if (
+            self.instances.get(instance.id) != instance
+            or self.state(instance, spec) != ConnectionState.READY
+        ):
+            raise ConnectorError("auth_missing")
         payload = json.loads(self.secrets.redact(json.dumps(payload)))
         return payload, SourceRef(
             identity,
@@ -607,6 +614,19 @@ class ConnectorFabric:
         if action.capability_id != instance_id + ":" + name:
             raise ValueError("connector executor identity mismatch")
         state = self.state(instance, spec)
+        private = self.store.transient.get(action.task_id, {})
+        objective = private.get("objective")
+        account_pin = objective.criterion.get("connector_account") if objective else None
+        if account_pin is not None and account_pin != {
+            "id": instance.account_id,
+            "generation": instance.account_generation,
+        }:
+            state = ConnectionState.AUTH_MISSING
+        reviewed = private.get("review_parameters")
+        if reviewed is not None and (
+            reviewed.get("capability") != name or reviewed.get("parameters") != action.parameters
+        ):
+            raise PermissionError("connector input differs from exact owner review")
         permissions = spec.action_permissions(action.parameters)
         decision = self.policy.evaluate(
             name,
@@ -630,7 +650,33 @@ class ConnectorFabric:
             error = "connector_blocked:policy"
         else:
             try:
-                payload, source = self._request(instance, spec, action.parameters, cancellation)
+
+                def authorize() -> None:
+                    cancellation.check()
+                    if private.get("connector_guard"):
+                        private["connector_guard"]()
+                    check_task_account(
+                        self.store, action.task_id, instance.account_id, instance.account_generation
+                    )
+                    if self.instances.get(instance_id) != instance:
+                        raise PermissionError("connector binding changed")
+                    for operation, required in [
+                        (name, permissions),
+                        *[(p, (p,)) for p in permissions],
+                    ]:
+                        if not self.policy.evaluate(
+                            operation,
+                            required,
+                            granted,
+                            context,
+                            confirmed=confirmed,
+                            confirmation_required=operation == name and spec.risk != RiskLevel.READ,
+                        ).allowed:
+                            raise PermissionError("connector policy changed")
+
+                guarded = Cancellation(self.store, action.task_id, authorize)
+                guarded.check()
+                payload, source = self._request(instance, spec, action.parameters, guarded)
             except ConnectorError as failure:
                 category = str(failure)
                 error = (
@@ -662,6 +708,9 @@ class ConnectorFabric:
             action.capability_id,
             error is None,
             error=error,
+            value=json.dumps(payload, ensure_ascii=False)[:8192]
+            if error is None and action.task_id in self.store.transient
+            else None,
         )
         outcome = ConnectorOutcome(
             result,
@@ -786,7 +835,7 @@ class ConnectorVerifier(Verifier):
             self.fabric.forget_outcome(result.id)
 
     def _verify(self, objective: Objective, result: Result) -> Verification:
-        if objective.criterion.get("kind") != "connector_fields":
+        if objective.criterion.get("kind") not in {"connector_fields", "connector_communication"}:
             return self.base.verify(objective, result)
         criterion = objective.criterion
         matches: bool | None = None
@@ -799,7 +848,7 @@ class ConnectorVerifier(Verifier):
             if (
                 result != outcome.result
                 or objective.correlation_id != result.correlation_id
-                or instance is not outcome.executed_instance
+                or instance != outcome.executed_instance
                 or result.executor != instance.id + ":" + outcome.capability_name
             ):
                 raise ConnectorError("readback_executor_mismatch")
@@ -837,7 +886,6 @@ class ConnectorVerifier(Verifier):
                 raise ConnectorError("readback_permission_missing")
             if not criterion.get("expected") or not outcome.result.success:
                 raise ConnectorError("completion_fields_missing")
-            params = criterion["read_parameters"]
             # Correlate the requested resource with the actual mutation response.
             response_id = outcome.payload.get("id")
             expected_path = dict(outcome.resource_path)
@@ -845,6 +893,12 @@ class ConnectorVerifier(Verifier):
             resource_keys = read_keys - expected_path.keys()
             if len(resource_keys) == 1:
                 expected_path[next(iter(resource_keys))] = response_id
+            communication = criterion["kind"] == "connector_communication"
+            params: dict[str, Any] = (
+                criterion["read_parameters"] if not communication else {"path": expected_path}
+            )
+            if communication and mutation.name.startswith("google.gmail."):
+                params["query"] = {"format": "raw"}
             if (
                 not response_id
                 or len(resource_keys) > 1
@@ -853,17 +907,62 @@ class ConnectorVerifier(Verifier):
             ):
                 raise ConnectorError("readback_resource_mismatch")
             endpoint(read, params)
-            secret = (
-                self.fabric.secrets.resolve(instance.credential) if instance.credential else None
-            )
-            if self.fabric.state(instance, read) != ConnectionState.READY:
-                raise ConnectorError("readback_unavailable")
-            payload, _ = self.fabric.http.request(instance.manifest, read, params, secret)
-            matches = payload.get("id") == response_id and all(
-                payload.get(k) == v for k, v in criterion["expected"].items()
-            )
+
+            def authorize_readback() -> None:
+                from .authority import check_task_account
+
+                check_task_account(
+                    self.fabric.store,
+                    result.task_id,
+                    instance.account_id,
+                    instance.account_generation,
+                )
+                private = self.fabric.store.transient.get(result.task_id, {})
+                if private.get("connector_guard"):
+                    private["connector_guard"]()
+                if (
+                    self.fabric.instances.get(instance.id) != instance
+                    or self.fabric.state(instance, read) != ConnectionState.READY
+                ):
+                    raise PermissionError("readback account changed")
+                for operation, required in [
+                    (read.name, read.permissions),
+                    *[(p, (p,)) for p in read.permissions],
+                ]:
+                    if not self.fabric.policy.evaluate(
+                        operation,
+                        required,
+                        outcome.granted,
+                        outcome.context,
+                        confirmed=outcome.confirmed,
+                    ).allowed:
+                        raise PermissionError("readback policy changed")
+
+            cancellation = Cancellation(self.fabric.store, result.task_id, authorize_readback)
+            cancellation.check()
+            payload, _ = self.fabric._request(instance, read, params, cancellation)
+            if communication:
+                from .communication import matches as communication_matches
+
+                if criterion["operation"] != mutation.name:
+                    raise ConnectorError("readback_operation_mismatch")
+                matches = payload.get("id") == response_id and communication_matches(
+                    mutation.name, payload, criterion["expected"]
+                )
+            else:
+                matches = payload.get("id") == response_id and all(
+                    payload.get(k) == v for k, v in criterion["expected"].items()
+                )
             detail = "expected fields match" if matches else "read-back fields differ"
-        except (KeyError, StopIteration, ConnectorError, ValueError):
+        except (
+            KeyError,
+            StopIteration,
+            ConnectorError,
+            ValueError,
+            Cancelled,
+            PermissionError,
+            TypeError,
+        ):
             pass
         state = (
             TaskState.PARTIALLY_VERIFIED

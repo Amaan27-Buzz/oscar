@@ -35,7 +35,7 @@ it('stale observations disable submission and never claim monitoring or persiste
   mount({expression:{epoch:'b'.repeat(32),generation:1,observed_at_ms:Date.now()-10000,voice_observed_at_ms:0,tasks_observed_at_ms:0,current_observed_at_ms:0}});
   await screen.findByText(/OSCAR is offline/);fireEvent.change(screen.getByLabelText('Ask OSCAR'),{target:{value:'hello'}});
   expect((screen.getByRole('button',{name:'Send'}) as HTMLButtonElement).disabled).toBe(true);
-  fireEvent.click(screen.getByRole('button',{name:'Preferences'}));fireEvent.click(screen.getByRole('button',{name:'Sentry and listening controls'}));expect(screen.getByText(/Configure available Sentry sources separately/)).toBeTruthy();
+  fireEvent.click(screen.getByRole('button',{name:'Preferences'}));expect((screen.getByRole('button',{name:'Check audio controls'}) as HTMLButtonElement).disabled).toBe(true);expect(screen.getByText(/Background listening is stopped/)).toBeTruthy();
 });
 it('Activity discard clears unsent private drafts across navigation',async()=>{
   const port=mount();await waitFor(()=>expect(port).toHaveBeenCalled());
@@ -61,7 +61,7 @@ it('Preferences shows native shortcut state, theme selection and unavailable awa
   expect(screen.getByLabelText('Configured shortcut: Ctrl+Alt+K')).toBeTruthy();
   act(()=>port.emit({shortcut_enabled:false}));
   expect(screen.getByRole('switch',{name:'Global shortcut'}).getAttribute('aria-checked')).toBe('false');
-  expect(screen.getByText(/Voice is not available on this device/)).toBeTruthy();
+  expect((screen.getByRole('button',{name:'Check audio controls'}) as HTMLButtonElement).disabled).toBe(true);expect(screen.getByText(/Background listening is stopped/)).toBeTruthy();
 });
 it('Devices reveals real capability scope and prepares without executing',async()=>{
   const port=mount({capabilities:[{id:'files',node:'desktop-1',kind:'native',label:'Write exact file',summary:'Scoped file creation',risk:'low',operations:['write_file'],programs:[],applications:[],permissions:['files.write']}]});

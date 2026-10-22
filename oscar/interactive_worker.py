@@ -131,6 +131,8 @@ def browser_preflight(executable: str, workspace: Path) -> dict[str, Any]:
             return browser_diagnostic("", 1)
         diagnostic = browser_diagnostic(captured.decode(errors="replace"), process.returncode)
         return diagnostic
+    except subprocess.TimeoutExpired:
+        return {**browser_diagnostic("", 1), "error_type": "TimeoutError"}
     except (OSError, subprocess.SubprocessError):
         return browser_diagnostic("", 1)
     finally:

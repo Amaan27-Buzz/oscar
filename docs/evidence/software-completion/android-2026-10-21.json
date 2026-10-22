@@ -6,24 +6,66 @@
   "native_readback": {
     "text": "Grid synthetic agenda",
     "result": "Reviewed: Grid synthetic agenda",
-    "claims": 4,
+    "claims": 8,
+    "clipboard": true,
+    "media": true,
     "revoked": true,
     "management_review": true,
     "owner_activation": false
   },
   "tasks": [
     {
-      "task_id": "7718caf84faa4d1e8db1baaa1916e9ce",
+      "task_id": "1d5823b2477a4e73b13ba689440b242a",
+      "kind": "android_clipboard_write",
+      "state": "verified",
+      "evidence": [
+        {
+          "id": "f17c1e79903b4321b365e5e60e52ac49",
+          "task_id": "1d5823b2477a4e73b13ba689440b242a",
+          "correlation_id": "4f642f6204f44e37b0d4f8432d9bd68a",
+          "source": "remote-android-native",
+          "method": "separate read-only native observation and Core comparison",
+          "observed_at": 1792588392.187566,
+          "matches": true,
+          "status": "VERIFIED",
+          "detail": "Exact Android readback",
+          "artifact_id": null,
+          "content_hash": "22ef713344152b58dbbac153539dac94842452020631e5ac9daf4174baeb9828"
+        }
+      ]
+    },
+    {
+      "task_id": "caea0da4db37423c93f5ac1494938646",
+      "kind": "android_media_control",
+      "state": "verified",
+      "evidence": [
+        {
+          "id": "d936b83333484db2bf64c222cbad0e68",
+          "task_id": "caea0da4db37423c93f5ac1494938646",
+          "correlation_id": "8972f91f80c348ec904d0724f0346d29",
+          "source": "remote-android-native",
+          "method": "separate read-only native observation and Core comparison",
+          "observed_at": 1792588395.4311967,
+          "matches": true,
+          "status": "VERIFIED",
+          "detail": "Exact Android readback",
+          "artifact_id": null,
+          "content_hash": "c5bff72cc28f37781206228e7e834e1567e6aa49d69b4ad39b9ec4748bebdf2c"
+        }
+      ]
+    },
+    {
+      "task_id": "c946f870eb8a4a36a92ca743625bb9f6",
       "kind": "android_ui_set_text",
       "state": "verified",
       "evidence": [
         {
-          "id": "1f8f9824efb94ca2a8c52d6633cf9707",
-          "task_id": "7718caf84faa4d1e8db1baaa1916e9ce",
-          "correlation_id": "13e8efcf51924d6d8527dc47c03192c8",
-          "source": "remote-android-accessibility",
-          "method": "separate read-only UI observation and Core comparison",
-          "observed_at": 1792586955.0190275,
+          "id": "d6ec2a3fed224f48b34ac45cdf238a0f",
+          "task_id": "c946f870eb8a4a36a92ca743625bb9f6",
+          "correlation_id": "aa45e731fc6c4681814b6967edf51140",
+          "source": "remote-android-native",
+          "method": "separate read-only native observation and Core comparison",
+          "observed_at": 1792588398.8296626,
           "matches": true,
           "status": "VERIFIED",
           "detail": "Exact Android readback",
@@ -33,17 +75,17 @@
       ]
     },
     {
-      "task_id": "06ea5be0c9424f868622a13626e7241a",
+      "task_id": "6e2216c630fc43e4a8351365f0628227",
       "kind": "android_ui_click",
       "state": "partially_verified",
       "evidence": [
         {
-          "id": "e7fce3294b334341b8a87238046e2bb6",
-          "task_id": "06ea5be0c9424f868622a13626e7241a",
-          "correlation_id": "0ddfab5d5e4446f988c90d08dc81f032",
-          "source": "remote-android-accessibility",
-          "method": "separate read-only UI observation and Core comparison",
-          "observed_at": 1792586958.2290385,
+          "id": "74f702b2a89e45a28e1d096cb2a28e46",
+          "task_id": "6e2216c630fc43e4a8351365f0628227",
+          "correlation_id": "eb820d6c19eb429696deeacbda43bb8c",
+          "source": "remote-android-native",
+          "method": "separate read-only native observation and Core comparison",
+          "observed_at": 1792588402.0140932,
           "matches": null,
           "status": "REPORTED",
           "detail": "Native effect requires app-specific observation",
@@ -55,12 +97,20 @@
   ],
   "timings": [
     {
+      "kind": "android_clipboard_write",
+      "elapsed_ms": 4193.4
+    },
+    {
+      "kind": "android_media_control",
+      "elapsed_ms": 2173.8
+    },
+    {
       "kind": "android_ui_set_text",
-      "elapsed_ms": 4203.1
+      "elapsed_ms": 3150.3
     },
     {
       "kind": "android_ui_click",
-      "elapsed_ms": 3145.5
+      "elapsed_ms": 3204.8
     }
   ],
   "physical_phone": "NOT_RUN",
@@ -80,12 +130,23 @@
     "08-activity-feed",
     "04-voice-interaction"
   ],
-  "cleanup": "previous Accessibility settings read back; both disposable apps uninstalled",
+  "cleanup": "previous Accessibility/notification settings read back; synthetic clipboard cleared; both disposable apps uninstalled",
   "source_sha256": {
-    "scripts/software_android_reference.py": "3eb940e769cd6fd5e203c678e02dc4da0a42087f28d8076aff01a6deb38508a7",
-    "mobile/app/src/androidTest/java/io/dawnlight/oscar/mobile/NativeGridExecutionTest.kt": "3aecb97afff93694d94887b97d91b2f22fb1eced239a2ce84a4574956d9f6ed2",
+    "scripts/software_android_reference.py": "cbcad6f8d361af5637007b10ea9b86ff97ebd4d0f1ae18f3c6ae214852c80f12",
+    "mobile/app/src/androidTest/java/io/dawnlight/oscar/mobile/NativeGridExecutionTest.kt": "af7c5f5502175250e318d129fc004243cd3f2293c15eec63c0ae8e6bd61b1836",
     "mobile/app/src/main/java/io/dawnlight/oscar/mobile/ManagementState.kt": "6c6599ec9a4b68403901bf978c7dcdeab5710a7787085f27f58494d1a7fffab4",
-    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/AwarenessScreen.kt": "146147b70a4cf83e9fa4b55800d1848958753e580d688041ebf8ac3977b1ca26"
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/AwarenessScreen.kt": "6413e783b9a949cd796c50c63685fb2280f3ad45467f23f250fad53480e3f172",
+    "oscar/android_worker.py": "14a684aeec5cd45fedd921ea2fbedb21b2c45aa44cbeeffc90eced64645a11cc",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/PlanningScreens.kt": "17d66966594132d4433853125071056e1b582bf2e87fdc1098963186843dbf8b",
+    "mobile/app/src/androidTest/java/io/dawnlight/oscar/mobile/MobileVisualTest.kt": "f221da0ce13c6396ecbcef6450cb7f1fe4153bc34e86cc8a8f07a4a4ead6af03"
+  },
+  "checks": {
+    "jvm_tests": 70,
+    "jvm_suites": 16,
+    "assemble_lint": "PASS",
+    "actual_grid": "PASS",
+    "process_restoration": "PASS",
+    "navigation": "11 captures; PASS"
   },
   "visual_inspection": {
     "captures": [

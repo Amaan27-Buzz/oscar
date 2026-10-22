@@ -515,7 +515,10 @@ class Desktop(Mobile):
         if payload.get("operation") != "reply":
             state = self.inspect(session, str(payload.get("task_id")))["state"]
             private = self.private_for(session, str(payload.get("task_id")))
-            review = json.dumps(private.get("parameters", {}), ensure_ascii=False)
+            review = json.dumps(
+                private.get("review_parameters", private.get("parameters", {})),
+                ensure_ascii=False,
+            )
             if len(review.encode("utf-8")) > 24_000:
                 raise ValueError(
                     "Exact review exceeds its safe display bound; shorten the request or context. "
@@ -732,6 +735,33 @@ class Desktop(Mobile):
                 return dict(self.voice.cancel(session))
             if payload == {"operation": "inspect"}:
                 return dict(self.voice.inspect(session))
+            if payload == {"operation": "settings"}:
+                return dict(self.voice.settings(session))
+            if payload == {"operation": "devices"}:
+                return dict(self.voice.devices(session))
+            if payload == {"operation": "listen"}:
+                return dict(self.voice.listen(session))
+            if payload == {"operation": "mute"}:
+                return dict(
+                    self.voice.configure(
+                        session,
+                        muted=True,
+                        input_device=self.voice.capture.device,
+                        output_device=getattr(self.voice.playback, "device", None),
+                    )
+                )
+            if (
+                set(payload) == {"operation", "muted", "input_device", "output_device"}
+                and payload["operation"] == "configure"
+            ):
+                return dict(
+                    self.voice.configure(
+                        session,
+                        muted=payload["muted"],
+                        input_device=payload["input_device"],
+                        output_device=payload["output_device"],
+                    )
+                )
             if set(payload) == {"operation", "context_id"} and payload["operation"] == "start":
                 return dict(self.voice.start(session, payload["context_id"]))
             if (
@@ -818,6 +848,53 @@ class Desktop(Mobile):
                 if mode == "Ask":
                     if context is not None and editing_request(text):
                         mode = "Edit"
+                    if context is None and self.runtime.connections is not None:
+                        from .assistance import Assistance
+                        from .communication import prepare
+
+                        try:
+                            proposal = Assistance.conversation_change(text)
+                            if proposal is not None:
+                                return {"assistance_proposal": proposal}
+                            communication = prepare(self.runtime.connections, text)
+                        except (ValueError, PermissionError):
+                            return {
+                                "state": "blocked",
+                                "epistemic": "UNKNOWN",
+                                "message": (
+                                    "Specify an exact action, available account "
+                                    "or bounded schedule. "
+                                    "Nothing changed."
+                                ),
+                            }
+                        if communication is not None:
+                            cap = communication.capability
+                            self.targets = {
+                                **self.targets,
+                                cap.node_id: self.runtime.connections.executive.targets[
+                                    cap.node_id
+                                ],
+                            }
+                            view = self.propose(
+                                session,
+                                communication.intent,
+                                "Ask",
+                                capability_id=cap.id,
+                                target_id=cap.node_id,
+                            )
+                            if "task_id" in view:
+                                private = self.store.transient[view["task_id"]]
+                                private["review_parameters"] = communication.review
+                                private["request"] = text
+                                self.retain_turn(session, view["task_id"], "owner", view)
+                                if view["state"] != TaskState.PLANNED:
+                                    self.retain_turn(session, view["task_id"], "oscar", view)
+                            else:
+                                assert communication.intent.parameters is not None
+                                self.runtime.connections.connectors.release_request(
+                                    communication.intent.parameters["request_ref"]
+                                )
+                            return view
                     form = conversation_form(text)
                     if form:
                         operation, fields = form

@@ -83,6 +83,13 @@ internal fun parseManagement(root: JSONObject): ManagementView? {
             require(procedure.bounded("state", 32) in setOf("candidate", "exact_replay_verified"))
         }
     }
+    root.optJSONArray("planner_drafts")?.let { drafts ->
+        require(drafts.length() <= 64)
+        (0 until drafts.length()).forEach { index ->
+            val draft = drafts.getJSONObject(index)
+            draft.bounded("id", 80); draft.bounded("goal", 480); draft.bounded("state", 32)
+        }
+    }
     return ManagementView(root.bounded("relationship_id", 128), mode, status, expires, epoch, caps,
         root.getJSONArray("ask_rules").texts(256).sorted(), canonicalJson(root))
 }
@@ -129,4 +136,13 @@ internal fun fileRoutine(name: String, goal: String, path: String, content: Stri
         .put("steps", JSONArray().put(JSONObject().put("id", "write").put("node_id", cap.node).put("capability_id", cap.id).put("depends_on", JSONArray())
             .put("intent", JSONObject().put("text", goal).put("kind", "file_write").put("path", path).put("content", content))))
     return JSONObject().put("operation", "create").put("id", "new").put("value", value).also { require(it.toString().toByteArray().size <= 16_000) }
+}
+
+internal fun planningRoutine(name: String, goal: String, mode: String, caps: List<ManagedCapability>): JSONObject {
+    require(name.matches(Regex("[A-Za-z0-9 _-]{1,64}")) && goal.length in 1..480)
+    require(mode in setOf("private", "auto") && caps.size in 2..16)
+    require(caps.count { it.kind == "model_reasoning" } == 1 && caps.map { it.node to it.id }.distinct().size == caps.size)
+    return JSONObject().put("operation", "plan_draft").put("id", "new").put("value", JSONObject()
+        .put("name", name).put("goal", goal).put("mode", mode)
+        .put("capabilities", JSONArray(caps.map { JSONObject().put("node_id", it.node).put("capability_id", it.id) })))
 }

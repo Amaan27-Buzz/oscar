@@ -12,6 +12,22 @@ class AssistanceTests(unittest.TestCase):
     setUp = fixture.StandingAuthorityTests.setUp
     signature = fixture.StandingAuthorityTests.signature
 
+    def test_conversation_schedule_still_needs_exact_signed_plan_and_current_scope(self):
+        self.create()
+        change = Assistance.conversation_change("every day for 3 runs: 2 + 3")
+        self.assertIsNotNone(change)
+        review = self.review(change)
+        self.assertEqual([], self.h.store.all("executive_goal"))
+        self.assertIn("math.add", review["review"])
+        result = self.complete(review)
+        self.assertEqual("enabled", result["executive"]["goals"][0]["state"])
+        self.assertEqual(1, len(self.h.store.all("executive_goal")))
+        with self.assertRaises(PermissionError):
+            self.complete(review)
+        self.assertIsNone(Assistance.conversation_change("What did we decide?"))
+        with self.assertRaises(ValueError):
+            Assistance.conversation_change("every day: 2 + 3")
+
     def create(self, **changes):
         grants = self.grants | frozenset({"math", "files:write", "heartbeat"})
         for kind, identifier in (("session", self.owner.id), ("node", self.owner.node_id)):

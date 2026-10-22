@@ -73,6 +73,11 @@ internal fun change(operation: String, id: String, value: JSONObject = JSONObjec
     var interval by remember(state.epoch) { mutableStateOf("") }
     var runs by remember(state.epoch) { mutableStateOf("1") }
     var editing by remember(state.epoch) { mutableStateOf<String?>(null) }
+    var modelPlan by remember(state.epoch) { mutableStateOf(false) }
+    var privacy by remember(state.epoch) { mutableStateOf("private") }
+    var planningPins by remember(state.epoch) { mutableStateOf(setOf<String>()) }
+    val available = state.snapshot?.management?.capabilities.orEmpty()
+    val plannerDrafts = state.snapshot?.management?.source?.let { JSONObject(it).optJSONArray("planner_drafts") }?.let { array -> (0 until array.length()).map { array.getJSONObject(it) } }.orEmpty()
     var instructions by remember(state.epoch) { mutableStateOf(true) }
     var node by remember(state.epoch) { mutableStateOf("") }
     var retain by remember(state.epoch) { mutableStateOf(false) }
@@ -80,7 +85,7 @@ internal fun change(operation: String, id: String, value: JSONObject = JSONObjec
         require(array.length() <= 64); (0 until array.length()).map { array.getJSONObject(it) }
     }.orEmpty()
     val schedule = runCatching { routineSchedule(start, interval, runs) }.getOrNull()
-    val routine = if (schedule == null || name.isBlank() || goal.isBlank()) null else if (instructions)
+    val routine = if (modelPlan) runCatching { planningRoutine(name, goal, privacy, available.filter { "${it.node}/${it.id}" in planningPins }) }.getOrNull() else if (schedule == null || name.isBlank() || goal.isBlank()) null else if (instructions)
         change("create_natural", "new", JSONObject(schedule.toString()).put("name", name).put("instruction", goal).put("node_id", node).put("conditions", org.json.JSONArray()))
     else if (cap == null) null else runCatching { fileRoutine(name, goal, path, content, cap, schedule) }.getOrNull()
     if (page == "Create") {
@@ -89,10 +94,22 @@ internal fun change(operation: String, id: String, value: JSONObject = JSONObjec
         OscarField(name, { name = it.take(80) }, label = "Name", modifier = Modifier.fillMaxWidth())
         OscarField(goal, { goal = it.take(512) }, label = "Responsibility", minLines = 2, modifier = Modifier.fillMaxWidth().testTag("automationDraft"))
         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            FilterChip(selected = instructions, onClick = { instructions = true }, label = { Text("Action instructions") })
-            FilterChip(selected = !instructions, onClick = { instructions = false }, label = { Text("Exact file contents") })
+            FilterChip(selected = !modelPlan && instructions, onClick = { modelPlan = false; instructions = true }, label = { Text("Action instructions") })
+            FilterChip(selected = !modelPlan && !instructions, onClick = { modelPlan = false; instructions = false }, label = { Text("Exact file contents") })
         }
-        if (instructions) {
+        FilterChip(selected = modelPlan, onClick = { modelPlan = true }, label = { Text("Propose a plan") })
+        if (modelPlan) {
+            Text("Only your goal and selected capability descriptions are model input. Files, memories and ambient context are not attached. Review sources first; suggested actions require a second review.", style = MaterialTheme.typography.bodySmall)
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                FilterChip(selected = privacy == "private", onClick = { privacy = "private" }, label = { Text("Private configured sources") })
+                FilterChip(selected = privacy == "auto", onClick = { privacy = "auto" }, label = { Text("Configured sources, including cloud") })
+            }
+            Text("Select one model route and the actions it may propose", style = MaterialTheme.typography.titleSmall)
+            available.forEach { candidate ->
+                val pin = "${candidate.node}/${candidate.id}"
+                FilterChip(selected = pin in planningPins, onClick = { planningPins = if (pin in planningPins) planningPins - pin else planningPins + pin }, label = { Text("${candidate.node} � ${candidate.id}") })
+            }
+        } else if (instructions) {
             Text("One explicit action per line, such as ‘What is 2 plus 3?’ or ‘Write agenda.txt with text Ready for review’. Core resolves exact available executors; ambiguous requests are rejected. Your review shows every compiled step.", style = MaterialTheme.typography.bodySmall)
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 FilterChip(selected = node.isEmpty(), onClick = { node = "" }, label = { Text("Choose an unambiguous executor") })
@@ -107,15 +124,24 @@ internal fun change(operation: String, id: String, value: JSONObject = JSONObjec
         OscarField(path, { path = it.take(1024) }, label = "Workspace path", modifier = Modifier.fillMaxWidth())
         OscarField(content, { content = it.take(8192) }, label = "Exact file contents", minLines = 3, modifier = Modifier.fillMaxWidth())
         }
-        ScheduleFields(start, { start = it }, interval, { interval = it }, runs, { runs = it })
+        if (!modelPlan) ScheduleFields(start, { start = it }, interval, { interval = it }, runs, { runs = it })
         OscarButton(onClick = { if (routine != null) reviewChange(session, "assistance", routine) },
-            enabled = state.canManage() && routine != null, modifier = Modifier.fillMaxWidth().testTag("createResponsibility")) { Text("Review responsibility") }
+            enabled = state.canManage() && routine != null, modifier = Modifier.fillMaxWidth().testTag("createResponsibility")) { Text(if (modelPlan) "Review model input and sources" else "Review responsibility") }
         TextButton(onClick = { converse(goal) }, enabled = goal.isNotBlank()) { Text("Discuss with OSCAR") }
         Text("The reviewed task stays within this executor's current workspace and permissions. Each run uses current authority and requires independent result verification.", style = MaterialTheme.typography.bodySmall)
         return
     }
     IllustratedIntro(if (page == "Worker") "Core responsibilities" else "Automations", artwork = R.drawable.illustration_automations, height = 152.dp)
     StatusLabel(if (state.snapshot?.executive == null) "Responsibility readback unavailable" else "Current Core readback")
+    plannerDrafts.forEach { draft -> key(draft.getString("id")) {
+        TactileSurface(Modifier.fillMaxWidth()) {
+            Text(draft.getString("goal"), style = MaterialTheme.typography.titleSmall)
+            Text("Suggested plan � ${draft.getString("state")}", style = MaterialTheme.typography.bodySmall)
+            if (draft.getString("state") == "reported") TextButton(enabled = state.canManage(), onClick = {
+                reviewChange(session, "assistance", change("plan_accept", draft.getString("id"), routineSchedule("", "", "1")))
+            }) { Text("Review suggested one-time actions") }
+        }
+    } }
     state.snapshot?.executive?.forEach { item ->
         key(item.id) { TactileSurface(Modifier.fillMaxWidth()) {
             FeatureRow(item.goal, "${item.state} · ${item.runs} of ${item.maxRuns} runs verified", "Activity")

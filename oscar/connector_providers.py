@@ -63,6 +63,7 @@ def _cap(
     read_request: bool = False,
     consequences: tuple[RiskLevel, ...] = (),
     communication_trigger: str | None = None,
+    readback: str | None = None,
 ) -> ConnectorCapability:
     return ConnectorCapability(
         name,
@@ -75,6 +76,7 @@ def _cap(
         read_request=read_request,
         consequences=consequences,
         communication_trigger=communication_trigger,
+        readback=readback,
     )
 
 
@@ -141,6 +143,15 @@ def microsoft_manifest() -> ConnectorManifest:
             ),
             _cap("microsoft.mail.read", "/v1.0/me/messages/{id}", ("Mail.Read",)),
             _cap(
+                "microsoft.mail.draft",
+                "/v1.0/me/messages",
+                ("Mail.ReadWrite",),
+                method="POST",
+                risk=RiskLevel.WRITE,
+                body=True,
+                readback="microsoft.mail.read",
+            ),
+            _cap(
                 "microsoft.mail.send",
                 "/v1.0/me/sendMail",
                 ("Mail.Send",),
@@ -156,6 +167,11 @@ def microsoft_manifest() -> ConnectorManifest:
                 query=("$top", "$filter", "$select"),
             ),
             _cap(
+                "microsoft.calendar.events.get",
+                "/v1.0/me/events/{id}",
+                ("Calendars.Read",),
+            ),
+            _cap(
                 "microsoft.calendar.events.create",
                 "/v1.0/me/events",
                 ("Calendars.ReadWrite",),
@@ -163,6 +179,7 @@ def microsoft_manifest() -> ConnectorManifest:
                 risk=RiskLevel.WRITE,
                 communication_trigger="calendar",
                 body=True,
+                readback="microsoft.calendar.events.get",
             ),
             _cap(
                 "microsoft.onedrive.list",
@@ -176,7 +193,8 @@ def microsoft_manifest() -> ConnectorManifest:
                 "microsoft.sharepoint.search", "/v1.0/sites", ("Sites.Read.All",), query=("search",)
             ),
         ),
-        provenance="https://learn.microsoft.com/en-us/graph/api/overview; 2026-10-03 IST",
+        headers=(("Prefer", 'outlook.body-content-type="text"'),),
+        provenance="https://learn.microsoft.com/en-us/graph/api/overview; 2026-10-21 IST",
     )
 
 

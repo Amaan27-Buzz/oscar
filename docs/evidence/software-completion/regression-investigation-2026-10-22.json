@@ -1,0 +1,49 @@
+{
+  "classification": "INTERMEDIATE_REGRESSION_FAILED_WITH_FOCUSED_RECOVERY",
+  "branch": "codex/software-completion",
+  "checkpoint": "111aba543821368c00c8d90804e9c5a408df2f89",
+  "source_scope": "Working tree changed during aggregate execution; this is a diagnostic record, not final source acceptance.",
+  "aggregate": {
+    "command": "python -m unittest discover -s tests -t . -q",
+    "tests": 948,
+    "elapsed_seconds": 1079.281,
+    "failures": 1,
+    "errors": 2,
+    "skipped": 10,
+    "result": "FAILED"
+  },
+  "failures": [
+    "tests.test_browser_profiles.RealProfileTests.test_real_two_accounts_forms_tabs_artifacts_restart_and_revocation",
+    "tests.test_remote_machine.RemoteMachineExecutionTests.test_actual_browser_form_and_artifact_over_remote_grid",
+    "tests.test_remote_machine.RemoteMachineExecutionTests.test_revoked_browser_account_cannot_reopen_private_profile"
+  ],
+  "diagnostic": {
+    "category": "browser.worker_launch",
+    "error_type": "Exception",
+    "exit_code": 1,
+    "output_bytes": 0
+  },
+  "isolated_browser": {
+    "command": "python -m unittest tests.test_browser_profiles tests.test_remote_machine -q",
+    "tests": 15,
+    "elapsed_seconds": 63.349,
+    "result": "PASS"
+  },
+  "launcher_diagnostics": {
+    "command": "python -m unittest tests.test_browser_launch -q",
+    "tests": 11,
+    "elapsed_seconds": 12.944,
+    "result": "PASS",
+    "change": "TimeoutExpired retains a distinct redacted TimeoutError without extending deadline or adding retry."
+  },
+  "root_cause": "UNRESOLVED. Memory pressure was observed during concurrent native jobs; causation is not established. Current direct and Job-owned launch probes succeeded for both runtime and manager executable paths.",
+  "http_resource_warnings": "Aggregate predates explicit owned HTTP error closure; 124 affected tests subsequently passed. Aggregate warning cleanliness not yet established.",
+  "private_log_sha256": {
+    "aggregate": "af3bf9f7b50435a452806de9f816bcf4257109c96f75f0b1252454d222e25449",
+    "isolated_browser": "8f46dc505c4b9d56b5f6b8a307cdb6810c608049a829f92aa8cc9537f17e175b",
+    "launcher_diagnostics": "4a9ebefc5af7633014e5a2a7c98a531f2822cd65de61ec545594141f309a1524"
+  },
+  "owner_accounts": "NOT_RUN",
+  "physical_phone": "NOT_RUN",
+  "remote_publication": "NOT_RUN"
+}

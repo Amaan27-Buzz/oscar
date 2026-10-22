@@ -92,8 +92,13 @@ does not mean an arbitrary plugin is allowed to inspect the native vault.
   Local disconnect does not revoke remotely: UNKNOWN_OWNER_ACTION_REQUIRED.
 - Provider results remain REPORTED. `ConnectorVerifier` independently fetches a
   correlated resource and compares explicit expected fields before verification.
-  Gmail sent-recipient/header verification and arbitrary nested/batch-update
-  verification remain unimplemented; they must stay PARTIAL.
+  The explicit communication request path verifies Gmail draft/sent saved-resource
+  recipients, subject and plain body through an independent raw-message GET;
+  sent mail also requires the SENT label. This is saved-resource verification,
+  not recipient delivery. Microsoft draft and Google/Microsoft calendar creation
+  have corresponding independent resource checks. Microsoft sendMail's empty
+  202 response and arbitrary nested/batch-update verification remain PARTIAL.
+  See [communication integration](development/SOFTWARE-COMMUNICATION-INTEGRATION.md).
 - Private bodies/results stay in bounded task-scoped transient context. `stage`
   returns an opaque input reference for durable Actions; process restart expires
   that input and BLOCKS execution. Metadata-only receipt/ledger records retain

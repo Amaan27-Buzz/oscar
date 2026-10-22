@@ -72,7 +72,9 @@ def post(path: str, fields: dict[str, str]) -> dict[str, Any]:
         if not isinstance(data, dict):
             raise ValueError("invalid OAuth response")
         return data
-    except (HTTPError, URLError, OSError, ValueError):
+    except (HTTPError, URLError, OSError, ValueError) as error:
+        if isinstance(error, HTTPError):
+            error.close()
         raise RuntimeError("official OAuth endpoint unavailable or rejected") from None
 
 

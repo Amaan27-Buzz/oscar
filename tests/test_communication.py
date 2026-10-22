@@ -1,0 +1,630 @@
+"""Synthetic provider state over real HTTP through native Ask/signature/Fabric/verification."""
+
+import base64
+import json
+import unittest
+from copy import deepcopy
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from pathlib import Path
+from tempfile import TemporaryDirectory
+from threading import Thread
+from time import monotonic, sleep, time
+from unittest.mock import patch
+from urllib.parse import urlsplit
+from urllib.request import Request, build_opener
+
+from cryptography.hazmat.primitives import hashes, serialization
+from cryptography.hazmat.primitives.asymmetric import padding, rsa
+
+from oscar.cloud import CloudConfig, CloudCore
+from oscar.cloud_http import CloudHTTPServer
+from oscar.communication import matches, prepare
+from oscar.connector_mount import account_manifests
+from oscar.connectors import CredentialRef, RiskLevel
+from oscar.contracts import new_id
+from oscar.desktop import Desktop
+from oscar.grid import Node, NodeRole
+from oscar.harness import Harness
+from oscar.http_client import NoRedirects
+from oscar.mobile import display_digest
+from oscar.oauth_device import VaultResolver
+from oscar.policy import PersonalPolicy
+from oscar.remote_client import request_proof
+from oscar.remote_grid import create_invitation
+from oscar.storage import StateConflict
+from tests.test_cloud import configuration, request
+from tests.test_connections import PrivateVault
+
+
+class Provider:
+    def __init__(self):
+        self.calls, self.resources = [], {}
+        self.after_get, self.tamper, self.fail = None, False, False
+        owner = self
+
+        class Handler(BaseHTTPRequestHandler):
+            def do_POST(self):
+                self.respond()
+
+            def do_GET(self):
+                self.respond()
+
+            def respond(self):
+                body = self.rfile.read(int(self.headers.get("Content-Length", 0)))
+                body = json.loads(body) if body else None
+                path = urlsplit(self.path).path
+                owner.calls.append((self.command, path, body))
+                if owner.fail and self.command == "POST":
+                    self.send_response(503)
+                    self.end_headers()
+                    return
+                if self.command == "POST":
+                    if path.endswith("sendMail"):
+                        self.send_response(202)
+                        self.end_headers()
+                        return
+                    result = {"id": "synthetic-resource", **body}
+                    if path.endswith("messages/send"):
+                        result["labelIds"] = ["SENT"]
+                        read_path = path.removesuffix("/send") + "/synthetic-resource"
+                    else:
+                        read_path = path + "/synthetic-resource"
+                    if path == "/v1.0/me/messages":
+                        result["isDraft"] = True
+                    owner.resources[read_path] = result
+                elif path in owner.resources:
+                    result = deepcopy(owner.resources[path])
+                    if owner.tamper:
+                        result["subject"] = result["summary"] = "wrong"
+                        result["raw"] = "bm90IGFuIGVtYWls"
+                        if "message" in result:
+                            result["message"]["raw"] = result["raw"]
+                    if owner.after_get:
+                        owner.after_get()
+                else:
+                    result = (
+                        {"messages": [{"id": "synthetic-resource"}]}
+                        if "gmail" in path
+                        else {
+                            "value": [{"id": "synthetic-resource", "subject": "Synthetic mail"}],
+                            "@odata.nextLink": "provider-pagination-is-explicit",
+                        }
+                    )
+                raw = json.dumps(result).encode()
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json")
+                self.send_header("Content-Length", str(len(raw)))
+                self.end_headers()
+                self.wfile.write(raw)
+
+            def log_message(self, *args):
+                pass
+
+        self.server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+        self.url = f"http://127.0.0.1:{self.server.server_port}"
+        self.thread = Thread(target=self.server.serve_forever, daemon=True)
+        self.thread.start()
+
+    def opener(self):
+        owner = self
+
+        class Opener:
+            def open(self, request, timeout):
+                url = urlsplit(request.full_url)
+                remapped = Request(
+                    owner.url + url.path + ("?" + url.query if url.query else ""),
+                    data=request.data,
+                    headers=dict(request.header_items()),
+                    method=request.get_method(),
+                )
+                return build_opener(NoRedirects()).open(remapped, timeout=timeout)
+
+        return Opener()
+
+    def close(self):
+        self.server.shutdown()
+        self.server.server_close()
+        self.thread.join(timeout=2)
+
+
+class CommunicationTests(unittest.TestCase):
+    def setUp(self):
+        temporary = TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        self.root, self.vault = Path(temporary.name), PrivateVault()
+        self.h = Harness(
+            self.root / "core.sqlite",
+            self.root / "files",
+            Path("config/development-models.json"),
+            start_services=False,
+            vault=self.vault,
+        )
+        self.addCleanup(self.h.close)
+        self.provider = Provider()
+        self.addCleanup(self.provider.close)
+        patched = patch("oscar.connectors.build_opener", return_value=self.provider.opener())
+        patched.start()
+        self.addCleanup(patched.stop)
+        self.accounts = {}
+        for provider, alias in (("google", "Google"), ("microsoft", "Work")):
+            account = self.h.accounts.add(provider, "fixture", alias, alias, verified=True)
+            for manifest in account_manifests():
+                if manifest.provider != provider or manifest.id not in {
+                    "google.gmail",
+                    "google.calendar",
+                    "microsoft.graph",
+                }:
+                    continue
+                reference = (alias + manifest.id).lower()
+                self.vault.put("synthetic-secret-" + reference, reference=reference)
+                account = self.h.accounts.bind(
+                    account.id,
+                    manifest.id,
+                    CredentialRef(reference),
+                    {s for c in manifest.capabilities for s in c.scopes},
+                    manifest.base_url,
+                )
+            self.accounts[alias] = account
+        self.mount = self.h.ensure_connections()
+        self.scopes = (
+            "heartbeat",
+            "desktop:connect",
+            "desktop:inspect",
+            "desktop:text",
+            *("connectors:" + risk.value for risk in RiskLevel),
+            "control:inspect:" + self.mount.node_id,
+            "control:approve:" + self.mount.node_id,
+            "control:cancel:" + self.mount.node_id,
+        )
+        self.h.grid.register(Node("communication-desktop", NodeRole.DESKTOP, self.scopes))
+        self.session = self.h.grid.pair("communication-desktop", self.scopes)
+        self.desktop = Desktop(
+            self.h.runtime, PersonalPolicy(self.h.store), self.h.executive.targets
+        )
+        self.key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+        encoded = base64.b64encode(
+            self.key.public_key().public_bytes(
+                serialization.Encoding.DER,
+                serialization.PublicFormat.SubjectPublicKeyInfo,
+            )
+        ).decode()
+        self.desktop.register_owner_key(self.session, encoded, owner_authorized=True)
+
+    def call(self, operation, payload):
+        return self.desktop.request(
+            self.session,
+            {
+                "version": 1,
+                "request_id": new_id(),
+                "operation": operation,
+                "payload": payload,
+            },
+        )
+
+    def ask(self, text):
+        return self.call("interact", {"mode": "Ask", "text": text, "context_id": ""})
+
+    def approval(self, task_id):
+        review = self.call("challenge", {"operation": "approve", "task_id": task_id})
+        claim = json.loads(base64.b64decode(review["signing_payload"]))
+        self.assertEqual(
+            claim["display_digest"],
+            display_digest(
+                "approve",
+                review["scope"],
+                review["target"],
+                review["review"],
+                review["exact_request"],
+            ),
+        )
+        signature = self.key.sign(
+            base64.b64decode(review["signing_payload"]),
+            padding.PSS(mgf=padding.MGF1(hashes.SHA256()), salt_length=32),
+            hashes.SHA256(),
+        )
+        return review, {
+            "challenge_id": review["challenge_id"],
+            "signature": base64.b64encode(signature).decode(),
+        }
+
+    def execute(self, text):
+        before = len(self.provider.calls)
+        view = self.ask(text)
+        self.assertEqual("planned", view["state"], view)
+        self.assertEqual("Ask", view["mode"])
+        self.assertEqual(before, len(self.provider.calls))
+        review, signed = self.approval(view["task_id"])
+        self.assertIn("account_generation", review["review"])
+        result = self.call("complete", signed)
+        self.assertNotIn("retry", result["actions"])
+        return result
+
+    def test_google_draft_send_and_calendar_independent_saved_resource_readback(self):
+        for text in (
+            "draft email using Google to friend@example.com "
+            'subject "Subject" body "Private marker"',
+            'send email using Google to friend@example.com subject "Subject" body "Private marker"',
+            'create calendar event using Google titled "Private marker" '
+            "from 2026-10-22T09:00:00+05:30 to 2026-10-22T10:00:00+05:30 with friend@example.com",
+        ):
+            with self.subTest(text=text):
+                result = self.execute(text)
+                self.assertEqual("verified", result["state"], result)
+                self.assertEqual(["POST", "GET"], [c[0] for c in self.provider.calls[-2:]])
+                self.assertEqual({}, self.h.connectors.requests)
+                self.assertEqual({}, self.h.connectors.outcomes)
+        durable = json.dumps(self.h.store.db.execute("SELECT data FROM records").fetchall())
+        durable += json.dumps(self.h.store.db.execute("SELECT data FROM audit").fetchall())
+        self.assertNotIn("Private marker", durable)
+        self.assertNotIn("friend@example.com", durable)
+        self.assertEqual(
+            0, self.h.archive.db.execute("SELECT count(*) FROM archive_events").fetchone()[0]
+        )
+
+    def test_graph_draft_and_calendar_independent_readback_send_stays_partial(self):
+        for text in (
+            'draft email using Work to friend@example.com subject "Subject" body "Private marker"',
+            'create calendar event using Work titled "Appointment" '
+            "from 2026-10-22T09:00:00Z to 2026-10-22T10:00:00Z with friend@example.com",
+        ):
+            self.assertEqual("verified", self.execute(text)["state"])
+        result = self.execute(
+            'send email using Work to friend@example.com subject "Subject" body "Private marker"'
+        )
+        self.assertEqual("partially_verified", result["state"])
+        self.assertTrue(self.provider.calls[-1][1].endswith("sendMail"))
+
+    def test_lists_and_reads_remain_reported_transient_results(self):
+        for alias in ("Google", "Work"):
+            result = self.execute("list email using " + alias)
+            self.assertEqual("partially_verified", result["state"])
+            self.assertIn("synthetic-resource", result["response"])
+            self.assertEqual("REPORTED", result["response_status"])
+
+    def test_readback_lie_never_verifies(self):
+        self.provider.tamper = True
+        for alias in ("Google", "Work"):
+            result = self.execute(
+                f'draft email using {alias} to friend@example.com subject "Subject" body "Text"'
+            )
+            self.assertNotEqual("verified", result["state"])
+
+    def test_account_generation_change_before_approval_cannot_use_new_credential(self):
+        view = self.ask(
+            'draft email using Work to friend@example.com subject "Subject" body "Text"'
+        )
+        account = self.accounts["Work"]
+        self.h.accounts.bind(
+            account.id,
+            "microsoft.graph",
+            CredentialRef("workmicrosoft.graph"),
+            account.services["microsoft.graph"].scopes,
+            "https://graph.microsoft.com",
+        )
+        self.mount.refresh()
+        _, signature = self.approval(view["task_id"])
+        self.assertNotEqual("verified", self.call("complete", signature)["state"])
+        self.assertEqual([], self.provider.calls)
+
+    def test_account_revocation_and_policy_change_during_get_withdraw_proof(self):
+        for change in ("account", "policy"):
+            with self.subTest(change=change):
+
+                def revoke(change=change):
+                    if change == "account":
+                        self.h.accounts.disconnect(self.accounts["Google"].id)
+                    else:
+                        now = self.h.grid.clock()
+                        self.h.store.put(
+                            "personal_policy",
+                            "deny-read",
+                            {
+                                "id": "deny-read",
+                                "capability": "connectors:read",
+                                "effect": "deny",
+                                "source": "owner",
+                                "created_at": now,
+                                "updated_at": now,
+                                "conditions": {},
+                            },
+                        )
+
+                self.provider.after_get = revoke
+                alias = "Google" if change == "account" else "Work"
+                result = self.execute(
+                    f'draft email using {alias} to friend@example.com subject "Subject" body "Text"'
+                )
+                self.assertNotEqual("verified", result["state"])
+
+    def test_uncertain_mutation_has_no_retry_or_replay(self):
+        self.provider.fail = True
+        view = self.ask(
+            'send email using Google to friend@example.com subject "Subject" body "Text"'
+        )
+        _, signed = self.approval(view["task_id"])
+        result = self.call("complete", signed)
+        self.assertNotEqual("verified", result["state"])
+        self.assertNotIn("retry", result["actions"])
+        self.h.runtime.run(view["task_id"], self.h.executive.targets)
+        with self.assertRaises((PermissionError, StateConflict)):
+            self.call("complete", signed)
+        self.assertEqual(1, len(self.provider.calls))
+
+    def test_reject_ambiguous_headers_and_times_before_task_or_effect(self):
+        for text in (
+            "send email using Work to friend@example.com "
+            'subject "Bad\\nBcc: hidden@example.com" body "Text"',
+            'send email using unknown to friend@example.com subject "Subject" body "Text"',
+            'send email using Work to Friend<friend@example.com> subject "Subject" body "Text"',
+            'create calendar event using Work titled "Event" '
+            "from 2026-10-22T09:00 to 2026-10-22T10:00",
+            'create calendar event using Work titled "Event" '
+            "from 2026-10-22T10:00Z to 2026-10-22T09:00Z",
+            "send email using Work to friend@example.com "
+            'subject "Subject" body "Text" and delete mail',
+        ):
+            with self.subTest(text=text):
+                self.assertEqual("blocked", self.ask(text)["state"])
+        self.assertEqual([], self.provider.calls)
+        self.assertEqual([], self.h.store.all("task"))
+        self.assertEqual({}, self.h.connectors.requests)
+        self.assertIsNone(prepare(self.h, "What did we decide?"))
+
+    def test_review_tamper_requires_new_signed_review(self):
+        view = self.ask(
+            'draft email using Work to friend@example.com subject "Subject" body "Text"'
+        )
+        _, signed = self.approval(view["task_id"])
+        self.h.store.transient[view["task_id"]]["review_parameters"]["account_generation"] += 1
+        with self.assertRaises(StateConflict):
+            self.call("complete", signed)
+        self.assertEqual([], self.provider.calls)
+
+    def test_dispatch_input_cannot_differ_from_the_signed_review(self):
+        view = self.ask(
+            'draft email using Work to friend@example.com subject "Subject" body "Text"'
+        )
+        _, signed = self.approval(view["task_id"])
+        reference = self.h.store.transient[view["task_id"]]["parameters"]["request_ref"]
+        self.h.connectors.requests[reference]["body"]["toRecipients"][0]["emailAddress"][
+            "address"
+        ] = "changed@example.com"
+        self.assertNotEqual("verified", self.call("complete", signed)["state"])
+        self.assertEqual([], self.provider.calls)
+
+    def test_known_credential_is_rejected_before_mime_encoding(self):
+        result = self.ask(
+            'draft email using Google to friend@example.com subject "Subject" '
+            'body "synthetic-secret-googlegoogle.gmail"'
+        )
+        self.assertEqual("blocked", result["state"])
+        self.assertEqual([], self.provider.calls)
+        self.assertEqual({}, self.h.connectors.requests)
+
+    def test_event_readback_normalizes_offset_without_claiming_delivery(self):
+        self.assertTrue(
+            matches(
+                "google.calendar.events.create",
+                {
+                    "summary": "Event",
+                    "start": {"dateTime": "2026-10-22T03:30:00Z"},
+                    "end": {"dateTime": "2026-10-22T04:30:00Z"},
+                },
+                {
+                    "title": "Event",
+                    "start": "2026-10-22T09:00:00+05:30",
+                    "end": "2026-10-22T10:00:00+05:30",
+                    "attendees": [],
+                },
+            )
+        )
+
+    def cloud_client(self, core, server, node, *, connector=True):
+        public = base64.b64encode(
+            self.key.public_key().public_bytes(
+                serialization.Encoding.DER,
+                serialization.PublicFormat.SubjectPublicKeyInfo,
+            )
+        ).decode()
+
+        def sign(body):
+            return base64.b64encode(
+                self.key.sign(
+                    body,
+                    padding.PSS(mgf=padding.MGF1(hashes.SHA256()), salt_length=32),
+                    hashes.SHA256(),
+                )
+            ).decode()
+
+        invitation = create_invitation(
+            core,
+            node,
+            "mobile",
+            "installation-" + node,
+            public,
+            retain=True,
+            owner_public_key=public,
+            connector_control=connector,
+        )
+        status, session = request(
+            core.config,
+            "/v2/grid/enroll",
+            headers={"Content-Type": "application/json"},
+            body={
+                "version": 2,
+                "challenge_id": invitation["challenge_id"],
+                "signature": sign(base64.b64decode(invitation["signing_payload"])),
+            },
+        )
+        self.assertEqual(200, status, session)
+
+        def call(operation, payload, request_id=None, expected=200):
+            body = {
+                "version": 2,
+                "operation": operation,
+                "payload": payload,
+                "request_id": request_id or new_id(),
+            }
+            nonce, instant = new_id(), str(int(time() * 1000))
+            status, response = request(
+                core.config,
+                "/v2/grid/request",
+                body=body,
+                headers={
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + session["token"],
+                    "X-Oscar-Node": node,
+                    "X-Oscar-Session": session["session_id"],
+                    "X-Oscar-Nonce": nonce,
+                    "X-Oscar-Time": instant,
+                    "X-Oscar-Signature": sign(
+                        request_proof(
+                            node,
+                            session["session_id"],
+                            nonce,
+                            instant,
+                            json.dumps(body).encode(),
+                        )
+                    ),
+                },
+            )
+            self.assertEqual(expected, status, response)
+            return response
+
+        return session, call, sign
+
+    def cloud(self):
+        root = self.root / "cloud"
+        root.mkdir()
+        core = CloudCore(
+            CloudConfig.load(configuration(root)), initialize=True, start_services=False
+        )
+        self.addCleanup(core.close)
+        core.harness.connectors.secrets = VaultResolver(self.vault)
+        account = core.harness.accounts.add("microsoft", "fixture", "Work", "Work", verified=True)
+        manifest = next(m for m in account_manifests() if m.id == "microsoft.graph")
+        self.cloud_account = core.harness.accounts.bind(
+            account.id,
+            manifest.id,
+            CredentialRef("workmicrosoft.graph"),
+            {s for c in manifest.capabilities for s in c.scopes},
+            manifest.base_url,
+        )
+        server = CloudHTTPServer(core)
+        server.start()
+        self.addCleanup(server.close)
+        return core, server
+
+    def test_cloud_native_request_actual_http_signature_readback_and_private_output(self):
+        core, server = self.cloud()
+        session, call, sign = self.cloud_client(core, server, "communication-phone")
+        _, other, _ = self.cloud_client(core, server, "communication-other", connector=False)
+        instruction = (
+            'draft email using Work to friend@example.com subject "Subject" body "Private marker"'
+        )
+        payload = {
+            "kind": "text",
+            "text": instruction,
+            "target": core.config.core_id,
+            "parameters": {},
+            "retain": True,
+        }
+        other("submit", payload, expected=403)
+        self.assertEqual([], self.provider.calls)
+        request_id = new_id()
+        view = call("submit", payload, request_id=request_id)
+        self.assertTrue(view["approval_required"])
+        task_id = view["task_id"]
+        self.assertEqual(task_id, call("submit", payload, request_id=request_id)["task_id"])
+        self.assertEqual(1, len(core.harness.store.all("remote_task")))
+        review = call("challenge", {"operation": "approve", "task_id": task_id})
+        self.assertIn("Private marker", review["review"])
+        claim = json.loads(base64.b64decode(review["signing_payload"]))
+        self.assertEqual(
+            claim["display_digest"],
+            display_digest(
+                "approve",
+                review["scope"],
+                review["target"],
+                review["review"],
+                instruction,
+            ),
+        )
+        signed = {
+            "challenge_id": review["challenge_id"],
+            "signature": sign(base64.b64decode(review["signing_payload"])),
+        }
+        call("complete", signed)
+        deadline = monotonic() + 10
+        while monotonic() < deadline:
+            view = call("inspect", {"task_id": task_id})
+            if view["state"] in {"verified", "failed", "blocked", "unknown", "cancelled"}:
+                break
+            sleep(0.05)
+        self.assertEqual("verified", view["state"], view)
+        self.assertIn("Private marker", view["result"]["value"])
+        self.assertIsNone(other("inspect", {"task_id": task_id})["result"]["value"])
+        self.assertEqual(["POST", "GET"], [c[0] for c in self.provider.calls])
+        call("complete", signed, expected=403)
+        self.assertEqual(task_id, call("submit", payload, request_id=request_id)["task_id"])
+        self.assertEqual(2, len(self.provider.calls))
+        store = core.harness.store
+        self.assertNotIn("Private marker", json.dumps(store.all("plan")))
+        self.assertNotIn("Private marker", json.dumps(store.all("objective")))
+        self.assertNotIn("Private marker", json.dumps(store.all("result")))
+        self.assertEqual(
+            session["session_id"], store.get("remote_task", task_id)["requester_session"]
+        )
+
+    def test_cloud_requester_revoked_after_approval_blocks_actual_provider_io(self):
+        core, server = self.cloud()
+        session, call, sign = self.cloud_client(core, server, "communication-phone")
+        payload = {
+            "kind": "text",
+            "target": core.config.core_id,
+            "parameters": {},
+            "retain": True,
+            "text": 'send email using Work to friend@example.com subject "Subject" body "Text"',
+        }
+        view = call("submit", payload)
+        review = call("challenge", {"operation": "approve", "task_id": view["task_id"]})
+        with patch.object(core.remote, "start"):
+            call(
+                "complete",
+                {
+                    "challenge_id": review["challenge_id"],
+                    "signature": sign(base64.b64decode(review["signing_payload"])),
+                },
+            )
+        row = core.harness.store.get("session", session["session_id"])
+        core.harness.store.put("session", row["id"], {**row, "revoked": True})
+        core.remote.start(view["task_id"])
+        for thread in core.remote.threads:
+            thread.join(timeout=10)
+        self.assertNotEqual("verified", core.harness.store.task(view["task_id"]).state)
+        self.assertEqual([], self.provider.calls)
+
+    def test_cloud_restart_cannot_recreate_private_connector_input_or_replay(self):
+        core, server = self.cloud()
+        _, call, _ = self.cloud_client(core, server, "communication-phone")
+        view = call(
+            "submit",
+            {
+                "kind": "text",
+                "target": core.config.core_id,
+                "parameters": {},
+                "retain": True,
+                "text": (
+                    'draft email using Work to friend@example.com subject "Subject" body "Text"'
+                ),
+            },
+        )
+        server.close()
+        config = core.config
+        core.close()
+        restarted = CloudCore(config, start_services=False)
+        self.addCleanup(restarted.close)
+        self.assertEqual({}, restarted.harness.store.transient)
+        self.assertEqual("blocked", restarted.harness.store.task(view["task_id"]).state)
+        restarted.harness.runtime.run(view["task_id"], restarted.harness.executive.targets)
+        self.assertEqual([], self.provider.calls)

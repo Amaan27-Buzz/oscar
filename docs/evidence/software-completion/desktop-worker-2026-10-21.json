@@ -1,0 +1,35 @@
+{
+  "status": "SOFTWARE_VERIFIED",
+  "transport": "actual loopback TLS",
+  "identity": "synthetic Windows CNG and DPAPI",
+  "runtime": "current package installed into disposable isolated Python site-packages",
+  "checks": [
+    "native supervisor startup",
+    "actual enrolled workspace binding",
+    "signed Ask file write",
+    "independent Core readback",
+    "separate file bytes",
+    "cooperative stop",
+    "capability withdrawal"
+  ],
+  "owner_activation": "NOT_RUN",
+  "physical_device": "NOT_RUN",
+  "hosted_deployment": "NOT_RUN",
+  "cleanup": "Synthetic CNG keys, DPAPI state, processes and disposable installed interpreter removed",
+  "native_checks": {
+    "full_rust_passed": 36,
+    "existing_opt_in_ignored": 1,
+    "final_focused_worker_tests_passed": 7,
+    "ui_tests_passed": 3,
+    "python_boundary_tests_passed": 2,
+    "typescript": "PASS",
+    "ruff": "PASS",
+    "focused_mypy": "PASS"
+  },
+  "source_sha256": {
+    "oscar/remote_machine.py": "10c04e03f58bd92db5084de001d30e29386620384dc7d210feb8bc3827a02aea",
+    "desktop/src-tauri/src/worker_sharing.rs": "05a0f7567907f857970b65d3607a3cb88d921e9ee13814998fd4d41a501909ed",
+    "desktop/src/WorkerSharing.tsx": "62106fadac3b06c539fde0c00b4e1914048fa7e6eeee5244ecb0470c36234396",
+    "scripts/software_desktop_worker_reference.py": "bce5025400d8af103993c51ea578ac5b0b4b859d4dc5830c7ea17428b8c7494c"
+  }
+}

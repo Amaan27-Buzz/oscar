@@ -99,12 +99,13 @@ class CoreSession(application: Application) : AndroidViewModel(application) {
             } else parseSnapshot(response)
             val clock = CoreClock.observe(received.observedAt, System.currentTimeMillis(), started, android.os.SystemClock.elapsedRealtime(), mutable.value.clock)
             received.presence?.let { require(io.dawnlight.oscar.expression.Contract.validate(it, clock.now(android.os.SystemClock.elapsedRealtime())) != null) }
-            val snapshot = if (mutable.value.privateSuppressed) received.withoutPrivate() else received
             if (!active) return
-            val old = mutable.value
-            val interactions = if (remote && !old.privateSuppressed) history.merge(response) else old.interactions
-            if (remote && !old.privateSuppressed) wire.withLock { withContext(Dispatchers.IO) { vault.saveHistory(history.saved(), client!!.binding()) } }
+            val interactions = if (remote && !mutable.value.privateSuppressed) history.merge(response) else mutable.value.interactions
+            if (remote && !mutable.value.privateSuppressed) wire.withLock { withContext(Dispatchers.IO) { vault.saveHistory(history.saved(), client!!.binding()) } }
             if (!active || mutable.value.epoch != epoch) return
+            // History persistence suspends; preserve decisions and drafts changed during that wait.
+            val old = mutable.value
+            val snapshot = if (old.privateSuppressed) received.withoutPrivate() else received
             val next = old.fenced(old.copy(link = Link.CONNECTED, remote = remote, connectedNode = client?.nodeId(), snapshot = snapshot, observedAt = System.currentTimeMillis(), clock = clock,
                 interactions = if (old.privateSuppressed) emptyList() else interactions,
                 inspected = old.inspected?.let { selected -> snapshot.tasks.find { it.id == selected.id } },
@@ -207,6 +208,15 @@ class CoreSession(application: Application) : AndroidViewModel(application) {
         return request { epoch ->
             val result = call("submit", JSONObject().put("text", text).put("kind", kind).put("target", target)
                 .put("parameters", parameters).put("retain", true), epoch)
+            if (result.has("assistance_proposal")) {
+                stageManagement("assistance", result.getJSONObject("assistance_proposal"), epoch)
+                return@request
+            }
+            if (result.optString("state") == "blocked" && !result.has("task_id")) {
+                require(result.bounded("epistemic", 32) == "UNKNOWN")
+                message(result.bounded("message", 1000))
+                return@request
+            }
             parseGridTask(result, mutable.value.snapshot?.nodes.orEmpty())
             if (mutable.value.epoch == epoch && mutable.value.draft == text) writeDraft("")
             refresh()
@@ -293,13 +303,20 @@ class CoreSession(application: Application) : AndroidViewModel(application) {
         if (client?.remote() != true || client?.canApprove() != true || mutable.value.privateSuppressed ||
             family !in setOf("authority", "assistance", "management") || snapshot.management == null) return false
         val proposal = JSONObject(change.toString())
-        val stamp = snapshot.managementStamp()
         return request { epoch ->
-            val review = Approval.management(call("${family}_challenge", proposal, epoch), family, proposal, stamp,
-                mutable.value.coreNow(System.currentTimeMillis(), android.os.SystemClock.elapsedRealtime()))
-            require(client?.matches(review) == true && mutable.value.snapshot?.managementStamp() == stamp)
-            if (mutable.value.epoch == epoch) mutable.value = mutable.value.copy(approval = review, replyPreview = null)
+            stageManagement(family, proposal, epoch)
         }
+    }
+    private suspend fun stageManagement(family: String, proposal: JSONObject, epoch: Long) {
+        require(client?.remote() == true && client?.canApprove() == true && !mutable.value.privateSuppressed)
+        val snapshot = requireNotNull(mutable.value.snapshot)
+        require(snapshot.management != null)
+        val stamp = snapshot.managementStamp()
+        val review = Approval.management(call("${family}_challenge", proposal, epoch), family, proposal, stamp,
+            mutable.value.coreNow(System.currentTimeMillis(), android.os.SystemClock.elapsedRealtime()))
+        require(client?.matches(review) == true && mutable.value.snapshot?.managementStamp() == stamp)
+        if (mutable.value.epoch == epoch && active && !mutable.value.privateSuppressed)
+            mutable.value = mutable.value.copy(approval = review, replyPreview = null)
     }
     fun dayBrief(): Boolean {
         if (mutable.value.link != Link.CONNECTED || mutable.value.privateSuppressed) return false

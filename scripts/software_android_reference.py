@@ -1,5 +1,6 @@
 """Actual native Android execution through a separate TLS Core on one disposable AVD."""
 
+import hashlib
 import json
 import os
 import re
@@ -15,12 +16,25 @@ SERIAL = "emulator-5582"
 AVD = "oscar_group05_capability_api35"
 
 
+def source_hashes() -> dict[str, str]:
+    paths = [*ROOT.glob("oscar/*.py"), Path(__file__), ROOT / "scripts/verify_connected_grid.py"]
+    paths += [
+        p for p in (ROOT / "mobile/app/src").rglob("*") if p.suffix in {".kt", ".java"}
+    ]
+    paths += list((ROOT / "mobile/app/build/outputs/apk").rglob("*.apk"))
+    return {
+        p.relative_to(ROOT).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
+        for p in sorted(paths)
+    }
+
+
 def main() -> int:
     adb = Path(os.environ["ANDROID_HOME"]) / "platform-tools/adb.exe"
     output = ROOT / ".oscar/software-android"
     output.mkdir(parents=True, exist_ok=True)
     receipt: dict | None = None
     (output / "native-grid.json").unlink(missing_ok=True)
+    sources = source_hashes()
 
     def raw(*arguments: str, timeout: int = 30) -> str:
         try:
@@ -110,6 +124,14 @@ def main() -> int:
         "shell", "settings", "get", "secure", "enabled_accessibility_services"
     ).strip()
     previous_access = device("shell", "settings", "get", "secure", "accessibility_enabled").strip()
+    previous_listeners = device(
+        "shell", "settings", "get", "secure", "enabled_notification_listeners"
+    ).strip()
+    listener = PACKAGE + "/.NotificationBoundary"
+    listener_was_enabled = any(
+        item in {listener, PACKAGE + "/" + PACKAGE + ".NotificationBoundary"}
+        for item in previous_listeners.split(":")
+    )
     process = None
     try:
         for apk in (
@@ -120,6 +142,7 @@ def main() -> int:
                 "install", "-r", "-t", str(ROOT / "mobile" / apk), timeout=120
             )
         device("shell", "pm", "grant", PACKAGE, "android.permission.POST_NOTIFICATIONS")
+        device("shell", "cmd", "notification", "allow_listener", listener)
         device(
             "shell",
             "settings",
@@ -214,20 +237,10 @@ def main() -> int:
                         )
                     }
 
-                wait(
-                    lambda: "android.ui.set_text" in capabilities(),
-                    "Native capability was not advertised",
-                )
                 timings = []
                 tasks = []
-                for kind, target, value in (
-                    (
-                        "android_ui_set_text",
-                        PACKAGE + ":id/capability_fixture_input",
-                        "Grid synthetic agenda",
-                    ),
-                    ("android_ui_click", PACKAGE + ":id/capability_fixture_submit", ""),
-                ):
+
+                def execute(kind, target, value):
                     started = monotonic()
                     task = fixture.mobile.request(
                         "submit",
@@ -258,6 +271,52 @@ def main() -> int:
                     timings.append(
                         {"kind": kind, "elapsed_ms": round((monotonic() - started) * 1000, 1)}
                     )
+
+                wait(
+                    lambda: "android.clipboard.write" in capabilities(),
+                    "Foreground native clipboard capability was not advertised",
+                )
+                execute("android_clipboard_write", "", "Grid synthetic clipboard")
+                assert tasks[-1]["state"] == "verified"
+                device(
+                    "shell", "run-as", PACKAGE, "touch", "files/software-native-clipboard-verified"
+                )
+
+                wait(
+                    lambda: "android.media.control" in capabilities(),
+                    "Native media capability not advertised",
+                )
+                execute("android_media_control", "", "pause")
+                assert tasks[-1]["state"] == "verified"
+                device("shell", "run-as", PACKAGE, "touch", "files/software-native-media-verified")
+
+                def target_ready():
+                    try:
+                        device(
+                            "exec-out",
+                            "run-as",
+                            PACKAGE,
+                            "cat",
+                            "files/software-native-target-ready",
+                        )
+                        return True
+                    except RuntimeError:
+                        return False
+
+                wait(target_ready, "Synthetic target did not become ready")
+                wait(
+                    lambda: "android.ui.set_text" in capabilities(),
+                    "Native capability was not advertised",
+                )
+                for kind, target, value in (
+                    (
+                        "android_ui_set_text",
+                        PACKAGE + ":id/capability_fixture_input",
+                        "Grid synthetic agenda",
+                    ),
+                    ("android_ui_click", PACKAGE + ":id/capability_fixture_submit", ""),
+                ):
+                    execute(kind, target, value)
                 device("shell", "run-as", PACKAGE, "touch", "files/software-native-verified")
                 wait(
                     lambda: "android.ui.set_text" not in capabilities(),
@@ -356,11 +415,27 @@ def main() -> int:
             device("shell", "settings", "get", "secure", "accessibility_enabled").strip()
             == previous_access
         )
+        if not listener_was_enabled:
+            device("shell", "cmd", "notification", "disallow_listener", listener)
+        device(
+            "shell",
+            "settings",
+            "put",
+            "secure",
+            "enabled_notification_listeners",
+            previous_listeners,
+        )
+        assert device(
+            "shell", "settings", "get", "secure", "enabled_notification_listeners"
+        ).strip() == previous_listeners
         device("uninstall", PACKAGE + ".test")
         device("uninstall", PACKAGE)
     assert receipt is not None
+    assert sources == source_hashes(), "Source or APK changed during acceptance; receipt rejected"
+    receipt["source_sha256"] = sources
     receipt["cleanup"] = (
-        "previous Accessibility settings read back; both disposable apps uninstalled"
+        "previous Accessibility/notification settings read back; "
+        "synthetic clipboard cleared; both disposable apps uninstalled"
     )
     (output / "native-grid.json").write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(receipt))

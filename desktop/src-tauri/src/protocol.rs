@@ -119,6 +119,10 @@ pub enum Command {
         invitation: String,
     },
     ConnectionLogout,
+    WorkerStart {
+        config: crate::worker_sharing::Config,
+    },
+    WorkerStop,
     CancelRemote {
         task_id: String,
     },
@@ -169,6 +173,15 @@ pub enum Command {
         context_id: String,
         #[serde(default)]
         mode: VoiceMode,
+    },
+    VoiceSettings {},
+    VoiceDevices {},
+    VoiceListen {},
+    VoiceMute {},
+    VoiceConfigure {
+        muted: bool,
+        input_device: u16,
+        output_device: Option<u16>,
     },
     VoiceStop,
     VoiceCancel,
@@ -375,14 +388,33 @@ pub struct RequestFeedback {
 pub enum AwarenessAvailability {
     #[default]
     Unavailable,
+    Available,
 }
-// Future awareness adapters must supply a real contract before extending this projection.
 #[derive(Clone, Serialize, Default, PartialEq)]
 pub struct VoiceSupport {
     pub persistent_mute: AwarenessAvailability,
     pub sentry: AwarenessAvailability,
     pub acoustic_awareness: AwarenessAvailability,
     pub wake_word: AwarenessAvailability,
+}
+#[derive(Clone, Deserialize, Serialize, PartialEq)]
+#[serde(deny_unknown_fields)]
+pub struct VoiceSettingsView {
+    pub muted: bool,
+    pub input_device: Option<u16>,
+    pub output_device: Option<u16>,
+    pub continuous_available: bool,
+    pub continuous_active: bool,
+    pub continuous_granted: bool,
+    pub persisted: bool,
+}
+#[derive(Clone, Deserialize, Serialize, PartialEq)]
+#[serde(deny_unknown_fields)]
+pub struct AudioDeviceView {
+    pub id: u16,
+    pub name: String,
+    pub input: bool,
+    pub output: bool,
 }
 #[derive(Clone, Copy, Deserialize, Serialize, Default, PartialEq)]
 #[serde(rename_all = "lowercase")]
@@ -393,6 +425,7 @@ pub enum ThemeChoice {
 }
 #[derive(Clone, Serialize, Default, PartialEq)]
 pub struct View {
+    pub worker_sharing: Option<crate::worker_sharing::WorkerView>,
     pub connections: Option<Value>,
     pub connection: Option<ConnectionView>,
     pub nodes: Vec<Value>,
@@ -408,6 +441,8 @@ pub struct View {
     pub operating: Option<serde_json::Value>,
     pub access_mode: Option<String>,
     pub voice_available: bool,
+    pub voice_settings: Option<VoiceSettingsView>,
+    pub voice_devices: Vec<AudioDeviceView>,
     pub theme: ThemeChoice,
     pub expression: ExpressionReadback,
     pub link: String,
@@ -435,6 +470,7 @@ pub struct ConnectionView {
     pub endpoint: String,
     pub installation_id: String,
     pub node_id: Option<String>,
+    pub workspace: Option<String>,
     pub public_key: String,
     pub owner_public_key: String,
     pub status: String,
@@ -505,6 +541,27 @@ mod tests {
             )
             .is_err()
         );
+    }
+    #[test]
+    fn audio_settings_are_typed_and_do_not_accept_capture_or_authority_expansion() {
+        assert!(matches!(
+            serde_json::from_value::<Command>(json!({
+                "kind":"voice_configure", "muted":false, "input_device":3, "output_device":null
+            }))
+            .unwrap(),
+            Command::VoiceConfigure {
+                input_device: 3,
+                ..
+            }
+        ));
+        for invalid in [
+            json!({"kind":"voice_configure", "muted":false, "input_device":-1, "output_device":null}),
+            json!({"kind":"voice_configure", "muted":false, "input_device":true, "output_device":null}),
+            json!({"kind":"voice_listen", "grant":true}),
+            json!({"kind":"voice_settings", "start":true}),
+        ] {
+            assert!(serde_json::from_value::<Command>(invalid).is_err());
+        }
     }
     #[test]
     fn malformed_frontend_never_becomes_native_authority() {

@@ -18,8 +18,12 @@ final class CoreClient {
     }
     private final JSONObject session;
     private final Signer signer;
+    private final java.util.concurrent.atomic.AtomicLong cancellation = new java.util.concurrent.atomic.AtomicLong();
     private volatile HttpURLConnection active;
-    void cancel() { HttpURLConnection current = active; if (current != null) current.disconnect(); }
+    void cancel() { cancellation.incrementAndGet(); HttpURLConnection current = active; if (current != null) current.disconnect(); }
+    private void current(long epoch) throws java.io.IOException {
+        if (cancellation.get() != epoch) throw new java.io.IOException("Request cancelled; inspect state before retrying");
+    }
     CoreClient(JSONObject session) throws Exception {
         this(session, null);
     }
@@ -60,6 +64,7 @@ final class CoreClient {
         return call(operation, payload, UUID.randomUUID().toString());
     }
     JSONObject call(String operation, JSONObject payload, String requestId) throws Exception {
+        long epoch = cancellation.get();
         if (remote() && System.currentTimeMillis() >= session.getLong("expires_at_ms")) throw new SessionRejected();
         byte[] body = new JSONObject().put("version", remote() ? 2 : 1).put("operation", operation)
             .put("request_id", requestId).put("payload", payload).toString().getBytes(StandardCharsets.UTF_8);
@@ -79,7 +84,7 @@ final class CoreClient {
             connection.setRequestProperty("X-Oscar-Signature", signer.sign(signingMaterial(session.getString("node_id"),
                 session.getString("session_id"), nonce, timestamp, body)));
         }
-            return exchange(connection, body);
+            return exchange(connection, body, epoch);
         } finally { connection.disconnect(); if (active == connection) active = null; }
         // Never retry a mutation automatically after an ambiguous network outcome.
     }
@@ -89,6 +94,7 @@ final class CoreClient {
         return ("OSCAR-GRID-2\nPOST\n/v2/grid/request\n" + node + "\n" + session + "\n" + nonce + "\n" + time + "\n" + digest).getBytes(StandardCharsets.UTF_8);
     }
     JSONObject enroll(JSONObject invitation, JSONObject identity, Signer proofSigner) throws Exception {
+        long epoch = cancellation.get();
         String origin = session.getString("url");
         validateEndpoint(origin);
         if (invitation.toString().length() > 24000 || invitation.getInt("version") != 2 ||
@@ -105,7 +111,7 @@ final class CoreClient {
         HttpURLConnection connection = open(origin, "/v2/grid/enroll");
         active = connection;
         try {
-            JSONObject issued = exchange(connection, body);
+            JSONObject issued = exchange(connection, body, epoch);
             if (issued.getInt("version") != 2 || !issued.getString("core_id").equals(invitation.getString("core_id")) ||
                 !issued.getString("node_id").equals(invitation.getString("node_id")) || issued.getLong("expires_at_ms") <= System.currentTimeMillis())
                 throw new SecurityException("Enrollment response does not match trusted invitation");
@@ -125,19 +131,24 @@ final class CoreClient {
         connection.setRequestProperty("Content-Type", "application/json");
         return connection;
     }
-    private static JSONObject exchange(HttpURLConnection connection, byte[] body) throws Exception {
+    private JSONObject exchange(HttpURLConnection connection, byte[] body, long epoch) throws Exception {
+        current(epoch);
         connection.setFixedLengthStreamingMode(body.length);
         try (var output = connection.getOutputStream()) { output.write(body); }
+        current(epoch);
         int status = connection.getResponseCode();
+        current(epoch);
         if (status == 401) throw new SessionRejected();
         if (status != 200) throw new SecurityException("Core rejected the request; inspect current state before retrying");
         try (InputStream input = connection.getInputStream()) {
             ByteArrayOutputStream collected = new ByteArrayOutputStream();
             byte[] buffer = new byte[8192]; int count;
             while ((count = input.read(buffer)) != -1) {
+                current(epoch);
                 if (collected.size() + count > 262144) throw new SecurityException("Core response exceeds boundary");
                 collected.write(buffer, 0, count);
             }
+            current(epoch);
             return new JSONObject(new String(collected.toByteArray(), StandardCharsets.UTF_8));
         }
     }

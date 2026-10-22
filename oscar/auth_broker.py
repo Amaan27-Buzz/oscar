@@ -178,7 +178,9 @@ def oauth_request(url: str, fields: dict[str, str] | None) -> dict[str, Any]:
         if not isinstance(value, dict):
             raise ValueError("OAuth response must be an object")
         return value
-    except (HTTPError, URLError, OSError, ValueError):
+    except (HTTPError, URLError, OSError, ValueError) as error:
+        if isinstance(error, HTTPError):
+            error.close()
         raise RuntimeError("OAuth provider unavailable or rejected") from None
 
 
@@ -192,7 +194,9 @@ def google_revoke(token: str) -> bool:
     try:
         with build_opener(NoRedirects()).open(request, timeout=15) as response:
             return bool(response.status == 200)
-    except (HTTPError, URLError, OSError):
+    except (HTTPError, URLError, OSError) as error:
+        if isinstance(error, HTTPError):
+            error.close()
         return False
 
 

@@ -1,13 +1,20 @@
 """Core-owned bounded perception polling and canonical retention maintenance."""
 
 import json
+import math
 import sqlite3
 from functools import partial
 from threading import Event, RLock, Thread
 from typing import TYPE_CHECKING, Any
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
-from .ambient import CalendarContextSource, ClockContextSource, calendar_conflicts
+from .ambient import (
+    WEATHER_URL,
+    CalendarContextSource,
+    ClockContextSource,
+    WeatherContextSource,
+    calendar_conflicts,
+)
 from .capabilities import ScopedFiles
 from .connectors import ConnectorError
 from .context_sources import FileContextSource
@@ -72,6 +79,7 @@ class WorldRuntime:
         self.next_maintenance = 0.0
         self.health = "idle"
         self.tasks_changed = Event()
+        self.weather_cache: dict[str, dict[str, Any]] = {}
         self.store.task_resources.add(self)
 
     def task_transitioned(self, task: Task) -> None:
@@ -93,7 +101,7 @@ class WorldRuntime:
             raise PermissionError("source setup requires trusted owner authority")
         reference(entity_id)
         if (
-            adapter not in {"grid", "tasks", "files", "time", "calendar"}
+            adapter not in {"grid", "tasks", "files", "time", "calendar", "weather"}
             or type(interval_seconds) is not int
             or not 1 <= interval_seconds <= 3600
             or entity_id not in source.entities
@@ -106,7 +114,7 @@ class WorldRuntime:
             for key, path in paths.items():
                 reference(key)
                 self.files.parts(path) if hasattr(self.files, "parts") else reference(path)
-        elif adapter in {"time", "calendar"}:
+        elif adapter in {"time", "calendar", "weather"}:
             if native_config is None or paths:
                 raise ValueError("reviewed native source configuration required")
             reviewed = self.review_source(native_config)
@@ -146,13 +154,13 @@ class WorldRuntime:
     def review_source(self, value: dict[str, Any]) -> dict[str, Any]:
         common = {"id", "adapter", "entity_id", "interval_seconds", "retain", "retention_seconds"}
         adapter = value.get("adapter")
-        extra = (
-            {"timezone"}
-            if adapter == "time"
-            else {"account_id", "account_generation", "calendar_id", "horizon_seconds"}
-        )
-        if adapter not in {"time", "calendar"} or set(value) != common | extra:
-            raise ValueError("exact native clock or calendar configuration required")
+        extras = {
+            "time": {"timezone"},
+            "calendar": {"account_id", "account_generation", "calendar_id", "horizon_seconds"},
+            "weather": {"latitude", "longitude", "place"},
+        }
+        if adapter not in extras or set(value) != common | extras[adapter]:
+            raise ValueError("exact native context configuration required")
         for key in ("id", "entity_id"):
             reference(value[key])
         if (
@@ -170,6 +178,43 @@ class WorldRuntime:
         else:
             raise ValueError("source identifier already registered")
         material = {"configuration": value, "perceive": True, "act": False}
+        if adapter == "weather":
+            for key, limit in (("latitude", 90), ("longitude", 180)):
+                coordinate = value[key]
+                if (
+                    type(coordinate) not in {int, float}
+                    or not math.isfinite(coordinate)
+                    or not -limit <= coordinate <= limit
+                    or round(coordinate, 4) != coordinate
+                ):
+                    raise ValueError("finite coordinates with at most four decimals required")
+            if (
+                value["interval_seconds"] < 600
+                or not isinstance(value["place"], str)
+                or not 1 <= len(value["place"].strip()) <= 80
+                or not value["place"].isprintable()
+            ):
+                raise ValueError("explicit place and weather interval >= ten minutes required")
+            return material | {
+                "key": "weather.state",
+                "kind": "environment",
+                "ttl_seconds": 3600,
+                "fields": [
+                    "place",
+                    "latitude",
+                    "longitude",
+                    "updated_at",
+                    "forecast_time",
+                    "temperature_c",
+                    "wind_mps",
+                    "humidity_percent",
+                ],
+                "source": "MET Norway Locationforecast",
+                "endpoint": WEATHER_URL,
+                "disclosure": "MET Norway receives selected coordinates and Core network address",
+                "freshness": "Earlier of provider expiry, retrieval + one hour, forecast hour end",
+                "claim": "Provider forecast; no local sensor observation or severe weather alert",
+            }
         if adapter == "time":
             try:
                 ZoneInfo(value["timezone"])
@@ -363,6 +408,14 @@ class WorldRuntime:
                 self.world.relationship, row["native_config"]["timezone"], self.world.clock
             )
             observation_kind = ObservationKind.ENVIRONMENT
+        elif kind == "weather":
+            source = WeatherContextSource(
+                self.world.relationship,
+                row["native_config"],
+                self.world.clock,
+                self.weather_cache.setdefault(row["id"], {}),
+            )
+            observation_kind = ObservationKind.ENVIRONMENT
         elif kind == "calendar":
             config = row["native_config"]
             h = self.runtime.connections
@@ -474,7 +527,7 @@ class WorldRuntime:
                         raise PermissionError("source revoked or reconfigured")
                     settings, generation = self.sentry.configuration()
                     is_file = row["adapter"] == "files"
-                    ambient = row["adapter"] in {"files", "calendar"}
+                    ambient = row["adapter"] in {"files", "calendar", "weather"}
                     paths = row["paths"]
                     if is_file and settings.mode == AwarenessMode.TRIGGER_ONLY:
                         paths = {k: v for k, v in paths.items() if k in settings.trigger_keys}
@@ -485,14 +538,21 @@ class WorldRuntime:
                         and not paths
                         or not is_file
                         and settings.mode == AwarenessMode.TRIGGER_ONLY
-                        and "calendar.state" not in settings.trigger_keys
+                        and ("weather.state" if row["adapter"] == "weather" else "calendar.state")
+                        not in settings.trigger_keys
                     ):
                         self.fabric.disconnect(row["id"], row["epoch"], guard=self._guard)
-                        row.update(state="paused", next_at=now + row["interval"])
+                        row.update(
+                            state="paused",
+                            next_at=now + (30 if row["adapter"] == "weather" else row["interval"]),
+                        )
                         self._save_poll(row)
                         continue
                     self.fabric.connect(
-                        row["id"], row["epoch"], lease_seconds=30, guard=self._guard
+                        row["id"],
+                        row["epoch"],
+                        lease_seconds=60 if row["adapter"] == "weather" else 30,
+                        guard=self._guard,
                     )
                     adapter = self._adapter({**row, "paths": paths})
                     guard = partial(self._guard, generation=generation if ambient else None)
@@ -505,7 +565,7 @@ class WorldRuntime:
                         state="operational",
                         last_success=now,
                         failures=0,
-                        next_at=now + row["interval"],
+                        next_at=now + (30 if row["adapter"] == "weather" else row["interval"]),
                     )
                 except (
                     OSError,
@@ -585,13 +645,16 @@ class WorldRuntime:
                 r
                 for r in self.store.all("perception_poll")
                 if r["relationship"] == self.world.relationship
-                and r["adapter"] in {"time", "calendar", "tasks"}
+                and r["adapter"] in {"time", "calendar", "tasks", "weather"}
             ]
             sources = []
             for row in rows[:8]:
-                key = {"time": "clock.state", "calendar": "calendar.state", "tasks": "tasks.state"}[
-                    row["adapter"]
-                ]
+                key = {
+                    "time": "clock.state",
+                    "calendar": "calendar.state",
+                    "tasks": "tasks.state",
+                    "weather": "weather.state",
+                }[row["adapter"]]
                 available = True
                 if row["adapter"] == "calendar":
                     try:

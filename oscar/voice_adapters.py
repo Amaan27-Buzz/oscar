@@ -394,6 +394,29 @@ class PlaybackReference:
         return AcousticDecision(cleaned, "human", "playback_reference_residual")
 
 
+def audio_identity(sd: Any, device: int) -> dict[str, Any]:
+    info = sd.query_devices(device)
+    identity: dict[str, Any] = {
+        "name": str(info["name"]),
+        "host_api": str(sd.query_hostapis(info["hostapi"])["name"]),
+        "input_channels": int(info["max_input_channels"]),
+        "output_channels": int(info["max_output_channels"]),
+    }
+    if (
+        not 0 < len(identity["name"]) <= 160
+        or not 0 < len(identity["host_api"]) <= 160
+        or not 0 <= identity["input_channels"] <= 256
+        or not 0 <= identity["output_channels"] <= 256
+    ):
+        raise VoiceError("audio device identity exceeds bound")
+    return identity
+
+
+def check_audio_identity(sd: Any, device: int, identity: dict[str, Any] | None) -> None:
+    if identity is None or audio_identity(sd, device) != identity:
+        raise VoiceError("selected audio device changed; find and select devices again")
+
+
 def audio_settings(sd: Any, device: int) -> Any:
     info = sd.query_devices(device)
     host = sd.query_hostapis(info["hostapi"])["name"]
@@ -404,10 +427,17 @@ class SoundDeviceCapture:
     def __init__(self, device: int, node_id: str = "windows-voice"):
         self.device, self.node_id = device, node_id
         self.stream: Any = None
+        self.require_identity = False
+        self.expected_identity: dict[str, Any] | None = None
+
+    def validate_device(self) -> None:
+        if self.require_identity:
+            check_audio_identity(optional("sounddevice"), self.device, self.expected_identity)
 
     def frames(self, stop: StopToken) -> Iterable[AudioFrame]:
         sd = optional("sounddevice")
         try:
+            self.validate_device()
             with sd.InputStream(
                 device=self.device,
                 channels=1,
@@ -447,6 +477,8 @@ class SoundDevicePlayback:
         self.utterance: str | None = None
         self.rate = 0
         self.lock = Lock()
+        self.require_identity = False
+        self.expected_identity: dict[str, Any] | None = None
 
     def _close(self) -> None:
         stream, self.stream = self.stream, None
@@ -463,6 +495,8 @@ class SoundDevicePlayback:
             sd, np = optional("sounddevice"), optional("numpy")
             try:
                 if self.utterance != chunk.utterance_id or self.rate != chunk.rate:
+                    if self.require_identity:
+                        check_audio_identity(sd, self.device, self.expected_identity)
                     self.cancel()
                     self._close()
                     self.stream = sd.RawOutputStream(

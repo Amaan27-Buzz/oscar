@@ -7,6 +7,7 @@ mod protocol;
 mod remote;
 mod secure_connection;
 mod signing;
+mod worker_sharing;
 use crate::{
     core::{Bridge, CoreClient},
     protocol::*,
@@ -32,6 +33,7 @@ use windows_sys::Win32::UI::WindowsAndMessaging::{
 };
 
 struct Native {
+    worker: Arc<Mutex<worker_sharing::Sharing>>,
     isolated_preferences: bool,
     preferences_lock: Mutex<()>,
     presence: bool,
@@ -62,8 +64,16 @@ fn save_preferences(app: &tauri::AppHandle, state: &Native) -> Result<(), String
     )
 }
 fn emit(app: &tauri::AppHandle, state: &Native) {
+    sync_worker(state);
     let view = state.bridge.view();
     let _ = app.emit_to("main", "desktop-state", &view);
+}
+fn sync_worker(state: &Native) {
+    if let Ok(mut worker) = state.worker.lock()
+        && let Ok(mut view) = state.bridge.view.lock()
+    {
+        view.worker_sharing = Some(worker.snapshot());
+    }
 }
 // Only operational metadata crosses into the Companion WebView.
 fn companion_view(mut view: View) -> View {
@@ -80,6 +90,7 @@ fn companion_view(mut view: View) -> View {
     view.capabilities.clear();
     view.nodes.clear();
     view.connection = None;
+    view.worker_sharing = None;
     view.context = None;
     view.preview = None;
     view.review = None;
@@ -709,6 +720,46 @@ async fn desktop_command(
         return Err("Workspace authority required".into());
     }
     match request {
+        Command::WorkerStart { config } => {
+            if state.isolated_preferences {
+                return Err("Desktop sharing is unavailable in this isolated surface".into());
+            }
+            let directory = app
+                .path()
+                .app_config_dir()
+                .map_err(|_| "Native execution directory unavailable")?;
+            let handle = app.clone();
+            let worker = state.worker.clone();
+            tauri::async_runtime::spawn_blocking(move || -> Result<(), String> {
+                let mut sharing = worker.lock().map_err(|_| "Desktop execution state unavailable")?;
+                std::fs::create_dir_all(&directory).map_err(|_| "Native execution directory unavailable")?;
+                let path = directory.join("connection.dat");
+                let connection = remote::Connection::load(&path)?.ok_or("Connect this Desktop first")?;
+                let scope = config.scope(&connection, &directory)?;
+                let review = ReviewView {review_id:"desktop-sharing".into(),task_id:"desktop-sharing".into(),operation:"share".into(),
+                    description:"Share this Desktop's execution capabilities".into(),target:connection.url.clone(),capability:"Local Desktop execution".into(),
+                    reason:"Explicit local workspace and capability selection".into(),consequence:"The enrolled Core may request these capabilities while sharing is running. Host commands use your Windows account's OS permissions.".into(),
+                    policy_reason:"This grant does not activate Secure or Full Access. Existing Core approval, policy and revocation remain authoritative.".into(),evidence_state:"Installed capability availability is checked by the runtime".into(),
+                    review:format!("Core: {}\nPython: {}\nExact local scope:\n{}",connection.url,config.python,serde_json::to_string_pretty(&scope).map_err(|_| "Invalid local review")?),expires_at_ms:0};
+                if !owner_review(&handle,&review) {return Err("Desktop sharing review dismissed".into());}
+                sharing.start(config,scope,&path)
+            }).await.map_err(|_| "Native execution setup failed")??;
+            emit(&app, &state);
+            return Ok(state.bridge.view());
+        }
+        Command::WorkerStop => {
+            let worker = state.worker.clone();
+            tauri::async_runtime::spawn_blocking(move || {
+                worker
+                    .lock()
+                    .map_err(|_| "Desktop execution state unavailable")
+                    .map(|mut worker| worker.stop())
+            })
+            .await
+            .map_err(|_| "Native execution stop failed")??;
+            emit(&app, &state);
+            return Ok(state.bridge.view());
+        }
         Command::ConnectionPrepare { url } => {
             let path = app
                 .path()
@@ -760,6 +811,11 @@ async fn desktop_command(
             return Ok(state.bridge.view());
         }
         Command::ConnectionLogout => {
+            state
+                .worker
+                .lock()
+                .map_err(|_| "Desktop execution state unavailable")?
+                .stop();
             let path = app
                 .path()
                 .app_config_dir()
@@ -1079,6 +1135,7 @@ fn main() {
     let presence = cfg!(debug_assertions) && std::env::args().any(|a| a == "--living-presence");
     let bridge = Arc::new(Bridge::new());
     let native = Native {
+        worker: Arc::new(Mutex::new(worker_sharing::Sharing::default())),
         isolated_preferences: check
             || baseline.is_some()
             || presence
@@ -1196,10 +1253,12 @@ fn main() {
                     }
                     let active_client=state.bridge.client().ok();
                     let revoked=state.bridge.view().connection.is_some_and(|c|c.status=="revoked_or_expired");
-                    let view=if active_client.is_some()&&!revoked{match state.bridge.refresh(){Ok(v)=>{retry_ms=5000;v},Err(e)=>{retry_ms=(retry_ms*2).min(60000);state.bridge.fail(e)}}}else{
+                    let _view=if active_client.is_some()&&!revoked{match state.bridge.refresh(){Ok(v)=>{retry_ms=5000;v},Err(e)=>{retry_ms=(retry_ms*2).min(60000);state.bridge.fail(e)}}}else{
                         if state.presence { let mut view=state.bridge.view.lock().unwrap_or_else(|p|p.into_inner());view.expression.generation+=1;view.expression.observed_at_ms=core::now_ms(); }
                         state.bridge.view()
                     };
+                    sync_worker(&state);
+                    let view=state.bridge.view();
                     if view!=emitted {emit(&handle,&state);emitted=view;}
                     let sleep_ms=if active_client.is_some_and(|c|c.is_remote()){
                         let jitter=(uuid::Uuid::new_v4().as_u128()%1000) as u64;
@@ -1218,7 +1277,7 @@ fn main() {
             },
             tauri::RunEvent::WindowEvent{label,event:tauri::WindowEvent::Focused(focused),..} if label == "main" => companion_layer(app, !focused),
             tauri::RunEvent::ExitRequested{code:None,api,..}=>api.prevent_exit(),
-            tauri::RunEvent::Exit=>{let _=app.global_shortcut().unregister_all();app.state::<Native>().stop.store(true,Ordering::Release);},
+            tauri::RunEvent::Exit=>{let _=app.state::<Native>().bridge.execute(Command::VoiceCancel, |_| false);let _=app.global_shortcut().unregister_all();app.state::<Native>().stop.store(true,Ordering::Release);if let Ok(mut worker)=app.state::<Native>().worker.lock(){worker.stop();}},
             _=>{}
         });
 }

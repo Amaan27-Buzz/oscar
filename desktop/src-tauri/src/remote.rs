@@ -35,6 +35,8 @@ pub struct Connection {
     pub url: String,
     pub installation_id: String,
     pub session: Option<Session>,
+    #[serde(default)]
+    pub workspace: Option<String>,
 }
 impl Connection {
     pub fn load(path: &Path) -> Result<Option<Self>, String> {
@@ -66,6 +68,7 @@ impl Connection {
             url,
             installation_id: uuid::Uuid::new_v4().to_string(),
             session: None,
+            workspace: None,
         };
         let view = value.view("awaiting_enrollment")?;
         value.save(path)?;
@@ -78,6 +81,7 @@ impl Connection {
             endpoint: self.url.clone(),
             installation_id: self.installation_id.clone(),
             node_id: self.session.as_ref().map(|s| s.node_id.clone()),
+            workspace: self.workspace.clone(),
             status: status.into(),
             public_key: STANDARD.encode(transport.public_der()?),
             owner_public_key: STANDARD.encode(owner.public_der()?),
@@ -154,6 +158,11 @@ impl Connection {
         {
             return Err("Core enrollment identity mismatch".into());
         }
+        let workspace = value["workspace"]
+            .as_str()
+            .filter(|v| !v.is_empty() && v.len() <= 128)
+            .ok_or("invalid enrolled workspace identity")?;
+        self.workspace = Some(workspace.to_owned());
         self.session = Some(session);
         Ok(())
     }
@@ -459,6 +468,10 @@ impl RemoteClient {
                     return Err("This remote capability is unavailable".into());
                 }
                 let result = self.request("submit", json!({"text":payload["text"],"kind":"text","target":self.session.core_id,"parameters":{},"retain":true}))?;
+                if result.get("assistance_proposal").is_some()
+                    || (result["state"] == "blocked" && !result["task_id"].is_string()) {
+                    return Ok(result);
+                }
                 task(&result)
             }
             "act" => {
@@ -594,6 +607,7 @@ pub fn fixture_cli(arguments: &[String]) -> Result<bool, String> {
             url,
             installation_id: format!("fixture-{}", uuid::Uuid::new_v4()),
             session: None,
+            workspace: None,
         };
         value.save(state)?;
         println!(
@@ -642,6 +656,49 @@ pub fn fixture_cli(arguments: &[String]) -> Result<bool, String> {
         connection.enroll_using(&invitation, &client)?;
         connection.save(state)?;
         println!("{{\"enrolled\":true}}");
+        return Ok(true);
+    }
+    if operation == "--grid-fixture-worker" {
+        let config_path = Path::new(
+            arguments
+                .get(4)
+                .ok_or("synthetic Worker configuration required")?,
+        );
+        let bytes =
+            std::fs::read(config_path).map_err(|_| "synthetic Worker configuration unavailable")?;
+        if bytes.len() > 16000 {
+            return Err("bounded synthetic Worker configuration required".into());
+        }
+        let config: crate::worker_sharing::Config =
+            serde_json::from_slice(&bytes).map_err(|_| "invalid synthetic Worker configuration")?;
+        let data = state
+            .parent()
+            .ok_or("fixture directory required")?
+            .join("worker-private");
+        std::fs::create_dir_all(&data).map_err(|_| "fixture Worker directory unavailable")?;
+        let scope = config.scope(&connection, &data)?;
+        let mut sharing = crate::worker_sharing::Sharing::default();
+        sharing.start(config, scope, state)?;
+        let deadline = Instant::now() + Duration::from_secs(20);
+        loop {
+            let view = sharing.snapshot();
+            if view.status == "online" {
+                break;
+            }
+            if view.status == "unavailable" || Instant::now() >= deadline {
+                sharing.stop();
+                return Err("synthetic native Worker did not become online".into());
+            }
+            std::thread::sleep(Duration::from_millis(50));
+        }
+        println!("{{\"worker\":\"online\",\"scope\":\"synthetic\"}}");
+        std::io::Write::flush(&mut std::io::stdout()).map_err(|_| "fixture output unavailable")?;
+        let mut stop = String::new();
+        std::io::stdin()
+            .read_line(&mut stop)
+            .map_err(|_| "fixture stop unavailable")?;
+        sharing.stop();
+        println!("{{\"worker\":\"stopped\"}}");
         return Ok(true);
     }
     let mut remote = RemoteClient::new(&connection)?;

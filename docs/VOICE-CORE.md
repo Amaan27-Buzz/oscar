@@ -2,8 +2,10 @@
 
 ## Desktop Dictate adapter
 
-The 2026-10-21 software integration adds opt-in native Ask dialogue alongside
-Dictate, through the existing Desktop Core. See [voice integration and exact
+The 2026-10-22 software integration adds opt-in native Ask dialogue alongside
+Dictate, explicit continuous local wake, persisted mute and pinned audio-device
+selection through the existing Desktop Core. Separate perception grants and a
+foreground control heartbeat gate listening; restart never opens audio. See [voice integration and exact
 acceptance boundaries](development/SOFTWARE-VOICE-INTEGRATION.md). Historical
 Slice 08 reference receipts below do not establish physical audio acceptance.
 

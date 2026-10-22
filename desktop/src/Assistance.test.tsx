@@ -64,3 +64,18 @@ it('reuses a candidate only through a fresh exact one-time review',()=>{
  fireEvent.click(screen.getByRole('button',{name:'Review one-time replay'}));
  expect(run).toHaveBeenCalledExactlyOnceWith({kind:'manage_assistance',operation:'reuse',id:'procedure',value:{start_at:null,interval_seconds:null,max_runs:1,priority:0}});
 });
+
+it('reviews model input separately from reported suggested actions',()=>{
+ const run=vi.fn();const planned={...executive,management:{...management,planner_drafts:[{id:'draft',goal:'Make a plan',state:'reported'}],capabilities:[...management.capabilities,{id:'models.reason',node_id:'core',session_id:'session',input_kind:'model_reasoning',risk:'model',permissions:['models']}]}};
+ render(<Automations discuss={()=>{}} executive={planned} run={run}/>);
+ fireEvent.click(screen.getByRole('button',{name:'Create a responsibility'}));
+ fireEvent.click(screen.getByRole('button',{name:'Describe responsibility'}));fireEvent.click(screen.getByRole('radio',{name:'Ask OSCAR to propose a plan'}));
+ fireEvent.change(screen.getByLabelText('Responsibility name'),{target:{value:'Planner'}});
+ fireEvent.change(screen.getByLabelText('What should OSCAR handle?'),{target:{value:'Make a plan'}});
+ fireEvent.click(screen.getByLabelText('core · files.write'));fireEvent.click(screen.getByLabelText('core · models.reason'));
+ expect(run).not.toHaveBeenCalled();fireEvent.click(screen.getByRole('button',{name:'Review model planning request'}));
+ expect(run).toHaveBeenLastCalledWith({kind:'manage_assistance',operation:'plan_draft',id:'new',value:{name:'Planner',goal:'Make a plan',mode:'private',capabilities:[{node_id:'core',capability_id:'files.write'},{node_id:'core',capability_id:'models.reason'}]}});
+ fireEvent.click(screen.getByRole('button',{name:'Review suggested actions'}));
+ expect(run).toHaveBeenLastCalledWith({kind:'manage_assistance',operation:'plan_accept',id:'draft',value:{start_at:null,interval_seconds:null,max_runs:1,priority:0}});
+ expect(assistanceSummary({...management,planner_drafts:[{id:'draft',goal:'Missing state'}]})).toBeNull();
+});

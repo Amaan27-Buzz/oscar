@@ -396,6 +396,7 @@ class ProviderContractTests(unittest.TestCase):
                 )
         self.assertEqual(caught.exception.category, Failure.CREDENTIAL)
         self.assertNotIn("synthetic-only", repr(caught.exception))
+        body.close.assert_called_once()
 
     def test_network_policy_denial_is_separate(self):
         self.status = 403

@@ -63,7 +63,7 @@ class MobileVisualTest {
         capture("07-create-automation")
         navigateReview(compose, "OSCAR")
         compose.onNodeWithText("Today").performScrollTo().performClick()
-        compose.onAllNodesWithText("Not connected").assertCountEquals(2)
+        compose.onAllNodesWithText("Not connected").assertCountEquals(3)
         capture("13-today-chief-of-staff")
         navigateReview(compose, "DEVICES")
         compose.onNodeWithText("Connect Core to see your other devices.").assertExists()

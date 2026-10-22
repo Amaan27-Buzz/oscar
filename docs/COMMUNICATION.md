@@ -25,6 +25,17 @@ Where platform capability and permission allow, OSCAR may cover:
 
 OSCAR Mobile is the primary mobile execution/control surface. Desktop and other nodes can provide equivalent capabilities where technically supported.
 
+## Executable mail and calendar subset
+
+The existing Desktop request input and authenticated Cloud Grid text request path
+accept bounded explicit Google/Microsoft mail and calendar requests. They compile
+into existing account-bound Connector Fabric capabilities and canonical Runtime
+tasks. Ask uses the existing signed native exact-parameter review. Supported forms,
+independent readback checks, scope and retention boundaries, and synthetic HTTP
+acceptance are documented in
+[communication integration](development/SOFTWARE-COMMUNICATION-INTEGRATION.md).
+Real account commissioning and recipient delivery are not established by that evidence.
+
 ## Universal Channel Gateway
 
 Supported communication enters OSCAR through one normalized event/action envelope while preserving channel-specific limits.

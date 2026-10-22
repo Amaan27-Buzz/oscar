@@ -1,11 +1,14 @@
 # OSCAR — Current Status & Checklist
 
-**2026-10-21 full software continuation:** active local branch
+**2026-10-22 full software continuation:** active local branch
 `codex/software-completion` extends the unmerged D2/C1/C2 candidate. The
 [completion ledger](development/OSCAR-FULL-SOFTWARE-COMPLETION.md) records signed
 standing authority, native account/automation management, encrypted account
-credentials and actual disposable-emulator Grid execution. Full software
-acceptance remains PARTIAL; broader Windows integration and other executable
+credentials, supervised Windows sharing, bounded communication, continuous local
+voice, source-backed weather and actual disposable-emulator Grid execution.
+Source-scoped receipts include local models, synthetic TLS/provider effects and
+repeatable performance samples. Full software acceptance remains PARTIAL;
+broader conversational planning, integrated acceptance and other executable
 product work remain active. No publication, CI or owner commissioning occurred.
 The dated C1/C2-only restrictions below describe that earlier checkpoint.
 

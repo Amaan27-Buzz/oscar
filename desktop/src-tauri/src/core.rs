@@ -485,6 +485,18 @@ impl Bridge {
         self.content_revision.fetch_add(1, Ordering::SeqCst);
         self.voice_revision.fetch_add(1, Ordering::SeqCst);
         if let Some(previous) = active.as_ref() {
+            if self
+                .view()
+                .voice_settings
+                .as_ref()
+                .is_some_and(|settings| settings.continuous_active)
+                || matches!(
+                    self.view().voice.as_str(),
+                    "listening" | "processing" | "speaking"
+                )
+            {
+                let _ = previous.request("voice", json!({"operation":"cancel"}));
+            }
             previous.invalidate_reviews();
             previous.oauth_epoch.fetch_add(1, Ordering::AcqRel);
         }
@@ -494,8 +506,13 @@ impl Bridge {
         let client = self.client()?;
         if matches!(
             self.view().voice.as_str(),
-            "listening" | "processing" | "speaking"
-        ) {
+            "listening" | "processing" | "speaking" | "aware"
+        ) || self
+            .view()
+            .voice_settings
+            .as_ref()
+            .is_some_and(|settings| settings.continuous_active)
+        {
             self.voice_request(json!({"operation":"inspect"}))?;
         }
         let CoreSnapshot {
@@ -673,6 +690,9 @@ impl Bridge {
             view.adaptive_views.clear();
             view.executive = None;
             view.day_brief = None;
+            view.voice_settings = None;
+            view.voice_devices.clear();
+            view.voice_support = VoiceSupport::default();
             view.setup = None;
             view.connections = None;
             view.capabilities.clear();
@@ -715,7 +735,19 @@ impl Bridge {
         let content_revision = self.content_revision.load(Ordering::SeqCst);
         let revision = self.voice_revision.fetch_add(1, Ordering::SeqCst) + 1;
         let epoch = self.view().expression.epoch;
+        let operation = payload["operation"].as_str().unwrap_or_default().to_owned();
         let value = self.client()?.request("voice", payload)?;
+        let value = if matches!(
+            operation.as_str(),
+            "settings" | "configure" | "mute" | "listen"
+        ) && value["muted"].is_boolean()
+        {
+            json!({"voice_settings":value})
+        } else if operation == "devices" && value["devices"].is_array() {
+            json!({"voice_devices":value["devices"]})
+        } else {
+            value
+        };
         self.response_fenced(value, Some((revision, epoch)), Some(content_revision))
     }
     #[cfg(test)]
@@ -741,6 +773,41 @@ impl Bridge {
             return Ok(view.clone());
         }
         view.message = value["message"].as_str().map(str::to_owned);
+        if let Some(settings) = value.get("voice_settings") {
+            let settings: VoiceSettingsView = serde_json::from_value(settings.clone())
+                .map_err(|_| "invalid Core audio settings")?;
+            if settings.input_device.is_some_and(|device| device > 1024)
+                || settings.output_device.is_some_and(|device| device > 1024)
+            {
+                return Err("Core audio device exceeds bound".into());
+            }
+            view.voice_support.persistent_mute = if settings.persisted {
+                AwarenessAvailability::Available
+            } else {
+                AwarenessAvailability::Unavailable
+            };
+            view.voice_support.wake_word =
+                if settings.continuous_available && settings.continuous_granted {
+                    AwarenessAvailability::Available
+                } else {
+                    AwarenessAvailability::Unavailable
+                };
+            view.voice_settings = Some(settings);
+        }
+        if let Some(devices) = value["voice_devices"].as_array() {
+            if devices.len() > 256 {
+                return Err("audio inventory exceeds bound".into());
+            }
+            let devices: Vec<AudioDeviceView> = serde_json::from_value(json!(devices))
+                .map_err(|_| "invalid Core audio inventory")?;
+            if devices
+                .iter()
+                .any(|device| device.id > 1024 || device.name.len() > 640)
+            {
+                return Err("Core audio inventory field exceeds bound".into());
+            }
+            view.voice_devices = devices;
+        }
         if let Some(connections) = value.get("connections") {
             view.connections = Some(connections.clone());
         }
@@ -832,6 +899,8 @@ impl Bridge {
                     | "muted"
                     | "interrupted"
                     | "cancelled"
+                    | "aware"
+                    | "off"
             )
         ) {
             view.voice = voice_state.unwrap_or_default().into();
@@ -886,6 +955,9 @@ impl Bridge {
             view.adaptive_views.clear();
             view.executive = None;
             view.day_brief = None;
+            view.voice_settings = None;
+            view.voice_devices.clear();
+            view.voice_support = VoiceSupport::default();
             for task in &mut view.tasks {
                 task.response = None;
                 task.value = None;
@@ -976,10 +1048,37 @@ impl Bridge {
             } => {
                 bound(&text, 4096)?;
                 bound(&context_id, 80)?;
-                client.request(
+                let result = client.request(
                     "interact",
                     json!({"mode":mode,"text":text,"context_id":context_id}),
-                )?
+                )?;
+                if let Some(proposal) = result.get("assistance_proposal") {
+                    if proposal.as_object().is_none_or(|p| p.len() != 3)
+                        || proposal["operation"] != "create_natural"
+                        || proposal["id"] != "new"
+                        || !proposal["value"].is_object()
+                    {
+                        return Err("invalid responsibility proposal".into());
+                    }
+                    if revision != Some(self.content_revision.load(Ordering::SeqCst)) {
+                        return Ok(self.view());
+                    }
+                    client.invalidate_reviews();
+                    let review = client.review_change(
+                        "new",
+                        ControlOperation::Approve,
+                        "assistance_challenge",
+                        "assistance_complete",
+                        Some(proposal.clone()),
+                    )?;
+                    let mut view = self.view.lock().map_err(|_| "native state unavailable")?;
+                    if revision == Some(self.content_revision.load(Ordering::SeqCst)) {
+                        view.review = Some(review);
+                        view.expression.generation += 1;
+                    }
+                    return Ok(view.clone());
+                }
+                result
             }
             Command::Act {
                 capability_id,
@@ -1136,6 +1235,23 @@ impl Bridge {
                     json!({"operation":"start","context_id":context_id,"mode":mode}),
                 );
             }
+            Command::VoiceSettings {} => {
+                return self.voice_request(json!({"operation":"settings"}));
+            }
+            Command::VoiceDevices {} => return self.voice_request(json!({"operation":"devices"})),
+            Command::VoiceListen {} => return self.voice_request(json!({"operation":"listen"})),
+            Command::VoiceMute {} => return self.voice_request(json!({"operation":"mute"})),
+            Command::VoiceConfigure {
+                muted,
+                input_device,
+                output_device,
+            } => {
+                if input_device > 1024 || output_device.is_some_and(|device| device > 1024) {
+                    return Err("audio device index exceeds bound".into());
+                }
+                return self.voice_request(json!({"operation":"configure", "muted":muted,
+                    "input_device":input_device, "output_device":output_device}));
+            }
             Command::VoiceStop => return self.voice_request(json!({"operation":"stop"})),
             Command::VoiceCancel => return self.voice_request(json!({"operation":"cancel"})),
             _ => return Err("native window command requires native handling".into()),
@@ -1146,6 +1262,31 @@ impl Bridge {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn audio_projection_is_current_bounded_and_withdrawn_after_connection_loss() {
+        let bridge = Bridge::new();
+        let settings = json!({"muted":true,"input_device":2,"output_device":null,
+            "continuous_available":true,"continuous_active":false,
+            "continuous_granted":true,"persisted":true});
+        let view = bridge
+            .response(json!({"voice_settings":settings,
+            "voice_devices":[{"id":2,"name":"Synthetic input","input":true,"output":false}]}))
+            .unwrap();
+        assert!(view.voice_settings.unwrap().muted);
+        assert_eq!(view.voice_devices.len(), 1);
+        assert!(matches!(
+            view.voice_support.persistent_mute,
+            AwarenessAvailability::Available
+        ));
+        assert!(
+            bridge
+                .response(json!({"voice_settings":{"muted":false}}))
+                .is_err()
+        );
+        let offline = bridge.fail("Core unavailable; synthetic disconnect".into());
+        assert!(offline.voice_settings.is_none());
+        assert!(offline.voice_devices.is_empty());
+    }
     #[test]
     fn speech_lifecycle_preserves_issued_task_truth() {
         let bridge = Bridge::new();
@@ -1169,6 +1310,29 @@ mod tests {
         let bridge = Bridge::new();
         bridge.replace_client(Some(Arc::new(client))).unwrap();
         assert!(bridge.refresh().unwrap().voice_available);
+        let proposed = bridge
+            .execute(
+                Command::Interact {
+                    mode: InteractionMode::Ask,
+                    text: "every day for 3 runs: 2 + 3".into(),
+                    context_id: String::new(),
+                },
+                |_| false,
+            )
+            .unwrap();
+        let review = proposed
+            .review
+            .expect("conversation must open exact responsibility review");
+        assert!(review.review.contains("math.add"));
+        bridge
+            .execute(
+                Command::Confirm {
+                    review_id: review.review_id,
+                    accept: false,
+                },
+                |_| false,
+            )
+            .unwrap();
         bridge
             .execute(
                 Command::VoiceStart {

@@ -142,3 +142,36 @@ def android_readback(parameters: dict[str, Any]) -> dict[str, str]:
         else "",
         "value": "",
     }
+
+
+def platform_readback_matches(
+    operation: str, parameters: dict[str, Any], observed: dict[str, Any]
+) -> bool | None:
+    """Compare only independent native read results for effects with exact outcomes."""
+    if operation not in {"android_files_write", "android_clipboard_write", "android_media_control"}:
+        return None
+    resource = parameters["target"] or (
+        "android.clipboard.read"
+        if operation == "android_clipboard_write"
+        else "android.media.inspect"
+    )
+    nodes = observed.get("observations")
+    if not isinstance(nodes, list) or len(nodes) != 1 or not isinstance(nodes[0], dict):
+        return False
+    if observed.get("package") != parameters["package"] or nodes[0].get("resource_id") != resource:
+        return False
+    if operation != "android_media_control":
+        return bool(nodes[0].get("text") == parameters["value"])
+    expected = {"play": 3, "pause": 2, "stop": 1}.get(parameters["value"])
+    if expected is None:
+        return None
+    try:
+        playback = json.loads(nodes[0]["text"])
+        return bool(
+            isinstance(playback, dict)
+            and playback.get("package") == parameters["package"]
+            and type(playback.get("state")) is int
+            and playback["state"] == expected
+        )
+    except (KeyError, TypeError, ValueError):
+        return False

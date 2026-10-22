@@ -1,7 +1,8 @@
 """Developer composition root; reference roles are not physical-device availability claims."""
 
+import json
 from collections.abc import Callable, Mapping
-from dataclasses import replace
+from dataclasses import asdict, replace
 from pathlib import Path
 from time import time
 from typing import Any
@@ -11,7 +12,7 @@ from .auth_broker import AuthBroker, load_providers
 from .capabilities import Cancellation, FileExecutor, ScopedFiles, Verifier, addition_executor
 from .connector_mount import ConnectorMount
 from .connectors import ConnectorFabric, ConnectorVerifier, EnvironmentSecrets
-from .contracts import Action, Capability, Result, new_id
+from .contracts import Action, Capability, Result, new_id, record
 from .credentials import CredentialPool
 from .discovery import HTTPDiscovery
 from .event_archive import EventArchive
@@ -40,6 +41,18 @@ class ModelExecutor:
     def __init__(self, router: Router, template: ModelRequest, policy: RoutingPolicy):
         self.router, self.template, self.policy = router, template, policy
 
+    def planning_configuration(self) -> dict[str, Any]:
+        template = {
+            k: v
+            for k, v in asdict(self.template).items()
+            if k not in {"prompt", "task_id", "correlation_id"}
+        }
+        return dict(
+            json.loads(
+                json.dumps({"template": template, "policy": asdict(self.policy)}, default=sorted)
+            )
+        )
+
     def __call__(self, action: Action, cancellation: Cancellation) -> Result:
         request = replace(
             self.template,
@@ -48,8 +61,35 @@ class ModelExecutor:
             prompt=action.parameters["prompt"],
             mode=Mode.PRIVATE if action.parameters.get("mode") == "private" else self.template.mode,
         )
+        policy = self.policy
+        if "planning_sources" in action.parameters:
+            from .executive import digest
+
+            if action.parameters.get("planning_configuration") != digest(
+                self.planning_configuration()
+            ):
+                raise PermissionError("reviewed model routing configuration changed")
+            sources = action.parameters["planning_sources"]
+            if not isinstance(sources, list) or not 1 <= len(sources) <= 32:
+                raise PermissionError("reviewed planning sources required")
+            allowed = set()
+            for source in sources:
+                if (
+                    not isinstance(source, dict)
+                    or set(source) != {"id", "contract"}
+                    or not isinstance(source["id"], str)
+                    or not isinstance(source["contract"], str)
+                ):
+                    raise PermissionError("exact reviewed model source required")
+                provider = self.router.registry.providers.get(source["id"])
+                if provider is None or digest(record(provider)) != source["contract"]:
+                    raise PermissionError("reviewed model provider changed")
+                allowed.add(provider.id)
+            if policy.allowed_providers is not None:
+                allowed &= policy.allowed_providers
+            policy = replace(policy, allowed_providers=frozenset(allowed))
         try:
-            routed = self.router.execute(request, self.policy, cancellation.check)
+            routed = self.router.execute(request, policy, cancellation.check)
             return Result(
                 new_id(),
                 action.id,

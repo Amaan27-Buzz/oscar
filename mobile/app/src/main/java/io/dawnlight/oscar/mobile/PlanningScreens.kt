@@ -17,7 +17,7 @@ import androidx.activity.compose.BackHandler
     TactileSurface(Modifier.fillMaxWidth()) {
         FeatureRow("Calendar", if (state.dayBrief?.sources?.any { it.adapter == "calendar" } == true) "Observed context · refresh below" else "Not connected", "Calendar", Clay)
         HorizontalDivider()
-        FeatureRow("Weather", "Unavailable", "Sun", Color(0xFFE7AD3B))
+        FeatureRow("Weather", if (state.dayBrief?.sources?.any { it.adapter == "weather" } == true) "Observed forecast · refresh below" else "Not connected", "Sun", Color(0xFFE7AD3B))
         HorizontalDivider()
         FeatureRow("Communications", "Not connected", "Conversation")
     }
@@ -28,5 +28,5 @@ import androidx.activity.compose.BackHandler
         tasks.take(5).forEach { task -> FeatureRow(task.description, task.label, "Activity", action = activity) }
     }
     OscarButton(onClick = converse, modifier = Modifier.fillMaxWidth()) { Text("Plan with OSCAR"); Spacer(Modifier.width(12.dp)); Glyph("Send", color = Color.White) }
-    SupportingDetails("Planning capabilities") { Text("Connect time and calendar sources in Preferences → Awareness, then refresh their qualified context here. Calendar changes require a separately available capability and reviewed authority. Weather and communication awareness are unavailable.", style = MaterialTheme.typography.bodySmall) }
+    SupportingDetails("Planning capabilities") { Text("Connect time, calendar and weather sources in Preferences → Awareness, then refresh their qualified context here. Calendar changes require a separately available capability and reviewed authority. Communication awareness is not connected.", style = MaterialTheme.typography.bodySmall) }
 }

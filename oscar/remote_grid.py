@@ -12,7 +12,12 @@ from threading import BoundedSemaphore, Event, RLock, Thread
 from time import monotonic, time
 from typing import TYPE_CHECKING, Any
 
-from .android_worker import ANDROID_CAPABILITIES, android_readback, validate_android
+from .android_worker import (
+    ANDROID_CAPABILITIES,
+    android_readback,
+    platform_readback_matches,
+    validate_android,
+)
 from .authority import StandingAuthority
 from .capabilities import Verifier, addition_operands
 from .contracts import (
@@ -88,6 +93,7 @@ def create_invitation(
     recover: bool = False,
     android_control: bool = False,
     machine_control: bool = False,
+    connector_control: bool = False,
 ) -> dict[str, Any]:
     """Trusted offline owner operation. Reachability alone cannot call this method."""
     identifier(node_id, node=True)
@@ -126,6 +132,10 @@ def create_invitation(
         raise ValueError("explicit machine control scope required")
     if machine_control:
         scopes += ["machine:host", "desktop:control", "desktop:clipboard", "browser:control"]
+    if type(connector_control) is not bool:
+        raise ValueError("explicit connector control scope required")
+    if connector_control:
+        scopes += ["connectors:read", "connectors:write", "connectors:external-communication"]
     if owner_public_key:
         scopes += ["grid:approve", "world:read"]
     challenge = new_id()
@@ -234,10 +244,14 @@ class RemoteVerifier(Verifier):
                 return Verification(
                     TaskState.VERIFIED if matches else TaskState.FAILED,
                     Evidence(
-                        new_id(), result.task_id, result.correlation_id,
+                        new_id(),
+                        result.task_id,
+                        result.correlation_id,
                         "remote-native-observer",
                         "separate native read and Core exact-text comparison",
-                        time(), matches, Epistemic.VERIFIED if matches else Epistemic.KNOWN,
+                        time(),
+                        matches,
+                        Epistemic.VERIFIED if matches else Epistemic.KNOWN,
                         "destination compared",
                         content_hash=hashlib.sha256(actual.encode()).hexdigest(),
                     ),
@@ -245,9 +259,14 @@ class RemoteVerifier(Verifier):
             return Verification(
                 TaskState.PARTIALLY_VERIFIED,
                 Evidence(
-                    new_id(), result.task_id, result.correlation_id,
-                    "remote-machine-report", "authenticated native executor report", time(),
-                    None, Epistemic.REPORTED,
+                    new_id(),
+                    result.task_id,
+                    result.correlation_id,
+                    "remote-machine-report",
+                    "authenticated native executor report",
+                    time(),
+                    None,
+                    Epistemic.REPORTED,
                     "Native execution reported; objective-specific independent readback required",
                 ),
             )
@@ -257,7 +276,7 @@ class RemoteVerifier(Verifier):
             observed = json.loads(actual)
             if not isinstance(observed, dict) or observed.get("package") != criterion["package"]:
                 raise ValueError("Android readback package mismatch")
-            matches = None
+            matches = platform_readback_matches(criterion["operation"], criterion, observed)
             if criterion["operation"] == "android_ui_set_text":
                 candidates = [
                     n
@@ -265,7 +284,11 @@ class RemoteVerifier(Verifier):
                     if n.get("resource_id") == criterion["target"]
                 ]
                 matches = len(candidates) == 1 and candidates[0].get("text") == criterion["value"]
-            elif criterion["operation"] == "android_ui_inspect":
+            elif criterion["operation"] in {
+                "android_ui_inspect",
+                "android_files_read",
+                "android_clipboard_read",
+            }:
                 matches = actual == result.value
             return Verification(
                 TaskState.PARTIALLY_VERIFIED
@@ -277,8 +300,8 @@ class RemoteVerifier(Verifier):
                     new_id(),
                     result.task_id,
                     result.correlation_id,
-                    "remote-android-accessibility",
-                    "separate read-only UI observation and Core comparison",
+                    "remote-android-native",
+                    "separate read-only native observation and Core comparison",
                     time(),
                     matches,
                     Epistemic.REPORTED
@@ -594,7 +617,9 @@ class RemoteGrid:
                 self.require(session, "world:read")
                 grants = frozenset(self.store.get("session", session.id)["scopes"])
                 permission = PersonalPolicy(self.store).evaluate(
-                    "core.world.read", ("world:read",), grants,
+                    "core.world.read",
+                    ("world:read",),
+                    grants,
                     {"node": session.node_id, "source": "remote-grid"},
                 )
                 if not permission.allowed:
@@ -603,7 +628,9 @@ class RemoteGrid:
             if operation == "inspect" and set(payload) == {"task_id"}:
                 self.require(session, "grid:inspect")
                 return self.inspect(
-                    identifier(payload["task_id"]), redacted=not self.can_read(session)
+                    identifier(payload["task_id"]),
+                    redacted=not self.can_read(session),
+                    viewer_session=session.id,
                 )
             if operation == "submit":
                 return self.submit(session, data["request_id"], payload)
@@ -709,8 +736,10 @@ class RemoteGrid:
                 or cap.execution_class != "machine"
                 or cap.output_kind
                 != (
-                    "file" if cap.input_kind == "file_write"
-                    else "artifact" if cap.input_kind == "repository_task"
+                    "file"
+                    if cap.input_kind == "file_write"
+                    else "artifact"
+                    if cap.input_kind == "repository_task"
                     else "metadata"
                     if cap.id in REMOTE_MACHINE_CAPABILITIES
                     and cap.input_kind not in {"directory_list", "file_search"}
@@ -783,16 +812,42 @@ class RemoteGrid:
         if kind == "text" and target == self.h.node_id:
             if parameters:
                 raise ValueError("text parameters must be empty")
+            from .assistance import Assistance
+            from .communication import prepare
+
+            try:
+                proposal = Assistance.conversation_change(payload["text"])
+            except ValueError:
+                return {
+                    "state": "blocked",
+                    "epistemic": "UNKNOWN",
+                    "message": (
+                        "Specify every hour/day/week for 1..100 runs, followed by exact actions."
+                    ),
+                }
+            if proposal is not None:
+                return {"assistance_proposal": proposal}
+            communication = prepare(self.h, payload["text"])
+            if communication is not None:
+                try:
+                    return self.submit_communication(session, key, digest, payload, communication)
+                finally:
+                    assert communication.intent.parameters is not None
+                    reference = communication.intent.parameters["request_ref"]
+                    if reference not in self.h.connectors.request_owners:
+                        self.h.connectors.release_request(reference)
             from .desktop_actions import OPERATIONS, conversation_form, form_intent
 
             form = conversation_form(payload["text"])
             if form is not None:
                 operation, fields = form
                 candidates = [
-                    cap for input_kind, operations in OPERATIONS.items()
+                    cap
+                    for input_kind, operations in OPERATIONS.items()
                     if operation in operations
                     for cap in self.grid.search(input_kind)
-                    if cap.node_id in self.sessions and cap.node_id != self.h.node_id
+                    if cap.node_id in self.sessions
+                    and cap.node_id != self.h.node_id
                     and cap.id in WORKER_CAPABILITIES
                 ]
                 if len(candidates) != 1:
@@ -808,7 +863,9 @@ class RemoteGrid:
                 if typed.parameters is None or typed.capability_kind is None:
                     raise ValueError("typed capability action required")
                 kind, parameters, target = (
-                    typed.capability_kind, typed.parameters, selected.node_id
+                    typed.capability_kind,
+                    typed.parameters,
+                    selected.node_id,
                 )
         criterion: dict[str, Any] = {"kind": "unavailable"}
         if kind in {"file_read", "file_write"}:
@@ -870,8 +927,11 @@ class RemoteGrid:
             if machine_readback(capability.id, parameters) is not None:
                 criterion["text"] = parameters["request"]["text"]
             intent = Intent(
-                payload["text"], kind="capability", capability_kind=kind,
-                parameters=parameters, criterion=criterion,
+                payload["text"],
+                kind="capability",
+                capability_kind=kind,
+                parameters=parameters,
+                criterion=criterion,
             )
         elif kind in {"addition", "text"} and target == self.h.node_id:
             if kind == "addition":
@@ -965,6 +1025,135 @@ class RemoteGrid:
             self.start(task.id)
         return self.inspect(task.id)
 
+    def submit_communication(
+        self,
+        session: SessionHandle,
+        key: str,
+        digest: str,
+        payload: dict[str, Any],
+        communication: Any,
+    ) -> dict[str, Any]:
+        capability = communication.capability
+        self.policy(session, capability, confirmed=capability.risk != "low")
+        if (
+            not PersonalPolicy(self.store)
+            .evaluate(
+                "core.archive.retain",
+                ("archive:retain",),
+                frozenset(self.store.get("session", session.id)["scopes"]),
+                {"source": "remote-grid", "relationship": self.h.runtime.relationship_id},
+            )
+            .allowed
+        ):
+            raise PermissionError("retention policy denied")
+        with self.store.transaction():
+            task = self.h.runtime.create(
+                communication.intent,
+                initiator=session.node_id,
+                retry_budget=0,
+                transient=True,
+            )
+            private = self.store.transient[task.id]
+            private["review_parameters"] = communication.review
+            private["connector_guard"] = lambda: self.authorize_communication(task.id)
+            plan = self.store.get("plan", task.id)
+            executor = self.h.executive.targets[capability.node_id][1]
+            authority = StandingAuthority(
+                self.store, self.grid, self.h.runtime.relationship_id
+            ).bind(
+                task.id,
+                record(capability),
+                executor,
+            )
+            action = Action(
+                new_id(),
+                task.id,
+                task.correlation_id,
+                capability.id,
+                plan["parameters"],
+                task.id,
+                session.node_id,
+            )
+            deadline = int((time() + 120) * 1000)
+            row = {
+                "task_id": task.id,
+                "target": capability.node_id,
+                "requester": session.node_id,
+                "requester_session": session.id,
+                "capability": record(capability),
+                "workspace": "",
+                "deadline_ms": deadline,
+                "review_digest": fingerprint(
+                    {
+                        "action": record(action),
+                        "target": capability.node_id,
+                        "workspace": "",
+                        "deadline_ms": deadline,
+                    }
+                ),
+                "private_review_digest": fingerprint(communication.review),
+                "approval_required": capability.risk != "low" and authority is None,
+                "approved": capability.risk == "low" or authority is not None,
+                "authority": authority,
+                "event_id": new_id(),
+                "occurred_at": time(),
+                "text": payload["text"],
+                "source": "communication",
+            }
+            self.store.put("planned_action", task.id, record(action))
+            self.store.put("action", action.id, record(action))
+            self.store.put("remote_task", task.id, row)
+            self.store.put("remote_admission", key, {"digest": digest, "task_id": task.id})
+        self.retain(row, result=False)
+        if not row["approval_required"]:
+            self.start(task.id)
+        return self.inspect(task.id)
+
+    def authorize_communication(self, task_id: str) -> None:
+        row = self.store.get("remote_task", task_id)
+        self.h.archive.event(row["event_id"])
+        if row["deadline_ms"] <= time() * 1000 or not self.review_matches(row):
+            raise PermissionError("communication review expired or changed")
+        requester = self.store.get("session", row["requester_session"])
+        # The token is checked at admission; current persisted scopes and expiry fence execution.
+        for identifier in (row["requester_session"], row.get("approval_session")):
+            if identifier is None:
+                continue
+            session = self.store.get("session", identifier)
+            node = self.store.get("node", session["node_id"])
+            if session["revoked"] or node["revoked"] or session["expires_at"] <= time():
+                raise PermissionError("communication owner session expired or revoked")
+            if identifier == row.get("approval_session") and (
+                "grid:approve" not in session["scopes"] or "grid:approve" not in node["scopes"]
+            ):
+                raise PermissionError("communication approver scope withdrawn")
+        capability = Capability.from_dict(row["capability"])
+        granted = frozenset(requester["scopes"]) & frozenset(
+            self.store.get("node", row["requester"])["scopes"]
+        )
+        for operation in (capability.id, *capability.permissions):
+            if (
+                not PersonalPolicy(self.store)
+                .evaluate(
+                    operation,
+                    capability.permissions,
+                    granted,
+                    {
+                        "node": row["requester"],
+                        "target": capability.node_id,
+                        "source": "remote-grid",
+                    },
+                    confirmed=row["approved"],
+                    confirmation_required=capability.risk != "low",
+                )
+                .allowed
+            ):
+                raise PermissionError("communication requester scope or policy withdrawn")
+        if row["approval_required"] and (
+            not row["approved"] or row.get("approval_expires_ms", 0) <= time() * 1000
+        ):
+            raise PermissionError("communication approval expired")
+
     def retain(self, row: dict[str, Any], *, result: bool) -> None:
         task = self.store.task(row["task_id"])
         content = row["text"]
@@ -1024,7 +1213,13 @@ class RemoteGrid:
             for kind, identifier in (("session", session.id), ("node", session.node_id))
         )
 
-    def inspect(self, task_id: str, *, redacted: bool = False) -> dict[str, Any]:
+    def inspect(
+        self,
+        task_id: str,
+        *,
+        redacted: bool = False,
+        viewer_session: str | None = None,
+    ) -> dict[str, Any]:
         row = self.store.get("remote_task", task_id)
         task = self.store.task(task_id)
         if task.state == TaskState.PLANNED and row["deadline_ms"] <= time() * 1000:
@@ -1044,6 +1239,20 @@ class RemoteGrid:
             forgotten = redacted
         except KeyError:
             forgotten = True
+        result = results[-1] if results and not forgotten else None
+        if (
+            row.get("source") == "communication"
+            and not forgotten
+            and viewer_session == row["requester_session"]
+        ):
+            private_result = self.store.transient.get(task_id, {}).get("result")
+            if private_result is not None:
+                try:
+                    self.authorize_communication(task_id)
+                except (PermissionError, KeyError):
+                    pass
+                else:
+                    result = record(private_result)
         return {
             "task_id": task.id,
             "state": task.state,
@@ -1058,7 +1267,7 @@ class RemoteGrid:
             "review_digest": row["review_digest"],
             "action_id": action["id"],
             "deadline_ms": row["deadline_ms"],
-            "result": results[-1] if results and not forgotten else None,
+            "result": result,
             "evidence": evidence if not forgotten else [],
             "blocker": "Retained interaction unavailable" if forgotten else task.blocker,
             "generation": task.attempts,
@@ -1082,7 +1291,9 @@ class RemoteGrid:
         ):
             raise StateConflict("approval is stale or unavailable")
         review = json.dumps(
-            self.store.get("planned_action", task_id)["parameters"],
+            self.store.transient.get(task_id, {}).get(
+                "review_parameters", self.store.get("planned_action", task_id)["parameters"]
+            ),
             ensure_ascii=False,
             separators=(",", ":"),
         )
@@ -1168,6 +1379,17 @@ class RemoteGrid:
                 "approval_expires_ms": claim["expires_at_ms"],
             },
         )
+        if row.get("source") == "communication":
+            from .executive import confirmation_digest
+
+            self.store.put(
+                "executive_confirmation",
+                task_id,
+                {
+                    "digest": confirmation_digest(self.store, task_id),
+                    "expires_at": claim["expires_at_ms"] / 1000,
+                },
+            )
         self.store.audit(
             task_id,
             "remote_owner_confirmed",
@@ -1182,7 +1404,14 @@ class RemoteGrid:
 
     def review_matches(self, row: dict[str, Any]) -> bool:
         return bool(
-            row["review_digest"]
+            (
+                row.get("source") != "communication"
+                or row["private_review_digest"]
+                == fingerprint(
+                    self.store.transient.get(row["task_id"], {}).get("review_parameters")
+                )
+            )
+            and row["review_digest"]
             == fingerprint(
                 {
                     "action": self.store.get("planned_action", row["task_id"]),
@@ -1201,7 +1430,16 @@ class RemoteGrid:
             return
         row = self.store.get("remote_task", task_id)
         target = row["target"]
-        session = self.h.session if target == self.h.node_id else self.sessions.get(target)
+        mounted = (
+            self.h.executive.targets.get(target) if row.get("source") == "communication" else None
+        )
+        session = (
+            mounted[1]
+            if mounted
+            else self.h.session
+            if target == self.h.node_id
+            else self.sessions.get(target)
+        )
         if session is None:
             self.slots.release()
             self.store.transition(
@@ -1211,7 +1449,13 @@ class RemoteGrid:
 
         def run() -> None:
             try:
-                transport = self.h.dispatcher if target == self.h.node_id else self.transport
+                transport = (
+                    mounted[0]
+                    if mounted
+                    else self.h.dispatcher
+                    if target == self.h.node_id
+                    else self.transport
+                )
                 self.h.runtime.run(task_id, {target: (transport, session)})
                 # Snapshot repair and completion must retain one event and memory together.
                 with self.lock:
@@ -1634,7 +1878,10 @@ class RemoteGrid:
                     "occurred_at": event["occurred_at"],
                 }
             )
-        tasks = [self.inspect(row["task_id"], redacted=not can_read) for row in recent]
+        tasks = [
+            self.inspect(row["task_id"], redacted=not can_read, viewer_session=session.id)
+            for row in recent
+        ]
         snapshot = {
             "version": 2,
             "core_id": self.core.config.core_id,
@@ -1700,6 +1947,7 @@ def main() -> None:
     parser.add_argument("--recover", action="store_true")
     parser.add_argument("--android-control", action="store_true")
     parser.add_argument("--machine-control", action="store_true")
+    parser.add_argument("--connector-control", action="store_true")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     core = CloudCore(CloudConfig.load(args.config), start_services=False)
@@ -1719,6 +1967,7 @@ def main() -> None:
                 recover=args.recover,
                 android_control=args.android_control,
                 machine_control=args.machine_control,
+                connector_control=args.connector_control,
             )
             json.dump(invitation, output)
     finally:

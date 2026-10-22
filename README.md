@@ -1,5 +1,16 @@
 # OSCAR
 
+**Active local software candidate, 2026-10-22:**
+[full software completion](docs/development/OSCAR-FULL-SOFTWARE-COMPLETION.md)
+extends the unmerged D2/C1/C2 foundation with signed standing delegation,
+native account/automation controls, supervised Windows sharing, communication,
+continuous local voice and source-backed awareness. Synthetic local acceptance
+is recorded separately from owner activation, hosted deployment and real
+provider/device commissioning. Software completion remains in progress;
+Gate C/D remain PARTIAL and Gate E is NOT PASSED.
+
+The following C1/C2 introduction describes the earlier foundation checkpoint.
+
 The local [Group 5 C1/C2 foundation](docs/development/GROUP-05-CAPABILITY-IDENTITY.md)
 adds operational identity, account-bound authentication, real MCP sessions,
 isolated persistent browser profiles and native connection management to the

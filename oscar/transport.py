@@ -230,7 +230,9 @@ class HTTPTransport:
         try:
             with build_opener(NoRedirects()).open(request, timeout=self.timeout) as response:
                 data = json.loads(response.read(2_000_001))
-        except (HTTPException, HTTPError, URLError, TimeoutError, OSError):
+        except (HTTPException, HTTPError, URLError, TimeoutError, OSError) as error:
+            if isinstance(error, HTTPError):
+                error.close()
             raise StateConflict(
                 "reference transport failed; execution outcome may be unknown"
             ) from None
@@ -270,7 +272,9 @@ class HTTPTransport:
             if data != expected:
                 raise ValueError("invalid cancellation acknowledgement")
             return dict(data)
-        except (HTTPException, HTTPError, URLError, TimeoutError, OSError):
+        except (HTTPException, HTTPError, URLError, TimeoutError, OSError) as error:
+            if isinstance(error, HTTPError):
+                error.close()
             raise StateConflict("remote cancellation delivery unverified") from None
 
 

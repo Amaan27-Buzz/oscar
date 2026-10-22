@@ -21,13 +21,17 @@ export interface Review {review_id:string;task_id?:string;operation:string;descr
   consequence:string;policy_reason:string;evidence_state:string;review:string;expires_at_ms:number}
 export interface ExpressionReadback {epoch:string;generation:number;observed_at_ms:number;voice_observed_at_ms:number;tasks_observed_at_ms:number;current_observed_at_ms:number}
 export interface RequestFeedback {kind:'blocked'|'denied'|'unknown'|'rejected';message:string;observed_at_ms:number}
-export interface VoiceSupport {persistent_mute:'unavailable';sentry:'unavailable';acoustic_awareness:'unavailable';wake_word:'unavailable'}
+export interface VoiceSettings {muted:boolean;input_device:number|null;output_device:number|null;continuous_available:boolean;continuous_active:boolean;continuous_granted:boolean;persisted:boolean}
+export interface AudioDevice {id:number;name:string;input:boolean;output:boolean}
+export interface VoiceSupport {persistent_mute:'unavailable'|'available';sentry:'unavailable';acoustic_awareness:'unavailable';wake_word:'unavailable'|'available'}
 export interface ConversationTurn {id:string;task_id:string;role:'owner'|'oscar';text:string;status:string;occurred_at:number;retained:boolean}
 export interface ConversationHistory {turns:ConversationTurn[];before:number|null;persistence:string;revision:number;retention?:boolean}
 export interface Operating {access:string;secure:string;full_access:string;awareness:string;sentry:string;worker_autonomy:string;automations:string}
 export interface GridNode {id:string;role:string;status:string}
 export interface CoreClockObservation {observed_at_ms:number;received_at_ms:number;transport_ms:number}
-export interface ConnectionView {endpoint:string;installation_id:string;node_id:string|null;public_key:string;owner_public_key:string;status:string}
+export interface ConnectionView {endpoint:string;installation_id:string;node_id:string|null;workspace?:string|null;public_key:string;owner_public_key:string;status:string}
+export interface WorkerConfig {python:string;workspace:string;capabilities:string[];trusted_host_execution:boolean;allowed_executables:string[];desktop_app_ids:string[]}
+export interface WorkerSharingView {status:string;workspace:string;capabilities:string[];message:string}
 export interface ConnectionsView {
   identity:{id:string;display_name:string;operational_email:string|null;status:string};
   accounts:{id:string;provider:string;tenant:string;subject:string;alias:string;identity_class:string;generation:number;status:string;remote_revocation:string;local_credentials?:string;services:{id:string;scopes:string[];expires_at:number|null;restrictions:string[]}[]}[];
@@ -36,7 +40,7 @@ export interface ConnectionsView {
   access:string;enrollment:string;observed_at_ms:number;
   credential_deletion?:'available'|'unavailable';accounts_total?:number;plugins_total?:number;truncated?:boolean;
 }
-export interface View {connections?:ConnectionsView|null;day_brief?:Record<string,unknown>|null}
+export interface View {voice_settings?:VoiceSettings|null;voice_devices?:AudioDevice[];connections?:ConnectionsView|null;day_brief?:Record<string,unknown>|null;worker_sharing?:WorkerSharingView|null}
 export interface View {connection?:ConnectionView|null;nodes?:GridNode[];core_clock?:CoreClockObservation|null;executive?:ExecutiveSummary|null;presence?:{version:1;visible:boolean;expression:unknown}|null;setup?:Record<string,{configured?:boolean;operational?:boolean}>|null;adaptive_views?:unknown[];access_mode?:string|null;voice_available?:boolean;conversation?:ConversationHistory;operating?:Operating|null;theme?:'light'|'dark';expression:ExpressionReadback|null;link:string;orb:string;window:WindowMode;tasks:Task[];capabilities:Capability[];
   context:Context|null;preview:Preview|null;review:Review|null;current:Task|null;message:string|null;
   voice:string;voice_support?:VoiceSupport;shortcut:string;shortcut_enabled?:boolean;capture_choice?:ContextChoice;observed_at_ms:number;reference:boolean;window_revision?:number;feedback?:RequestFeedback|null}
@@ -50,6 +54,9 @@ export type ActForm=
   |{operation:'launch_app';app_id:string}
   |{operation:'list_files'|'git_status'|'git_diff'|'git_log'|'git_branches'|'ps_environment'|'list_apps'|'worker_tools'};
 export type Command=
+  |{kind:'voice_settings'|'voice_devices'|'voice_listen'|'voice_mute'}
+  |{kind:'voice_configure';muted:boolean;input_device:number;output_device:number|null}
+  |{kind:'worker_start';config:WorkerConfig}|{kind:'worker_stop'}
   |{kind:'manage_assistance';operation:string;id:string;value:Record<string,unknown>}
   |{kind:'set_access';relationship_id:string;value:Record<string,unknown>}
   |{kind:'revoke_access'}

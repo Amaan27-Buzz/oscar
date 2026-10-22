@@ -237,6 +237,14 @@ def parser() -> argparse.ArgumentParser:
     serve.add_argument("--seconds", type=int, default=3600)
     serve.add_argument("--voice-config", type=Path)
     serve.add_argument(
+        "--continuous-voice",
+        metavar="SESSION_ID",
+        help=(
+            "Grant continuous microphone perception to one existing Desktop session; "
+            "never starts capture"
+        ),
+    )
+    serve.add_argument(
         "--reenroll-execution",
         action="store_true",
         help="Explicit trusted-local execution enrollment after credential expiry/revocation",
@@ -413,6 +421,12 @@ def main() -> int:
                     from .desktop_voice import configured_voice
 
                     desktop_core.voice = configured_voice(desktop_core, args.voice_config)
+                if args.continuous_voice is not None:
+                    if desktop_core.voice is None:
+                        raise ValueError("continuous voice grant requires --voice-config")
+                    from .desktop_voice import grant_continuous_voice
+
+                    grant_continuous_voice(desktop_core, args.continuous_voice)
                 with (
                     MobileServer(
                         Mobile(harness.runtime, PersonalPolicy(harness.store), transports)

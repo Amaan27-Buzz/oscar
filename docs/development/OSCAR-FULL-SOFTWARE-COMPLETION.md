@@ -1,6 +1,6 @@
 # OSCAR full software completion — active local ledger
 
-Updated 2026-10-21. **IMPLEMENTATION_IN_PROGRESS / SOFTWARE ACCEPTANCE PARTIAL.**
+Updated 2026-10-22. **IMPLEMENTATION_IN_PROGRESS / SOFTWARE ACCEPTANCE PARTIAL.**
 Material executable work remains. This ledger does not declare
 `SOFTWARE_FEATURE_COMPLETE`, owner acceptance, hosted deployment or Gate E PASS.
 
@@ -49,24 +49,24 @@ implementation is not automatically evidence of intended-surface integration.
 | --- | --- | --- | --- |
 | Brain / Controller / Model Router | Existing deterministic Controller and routing reused by Desktop and Grid tasks | Core regression and delegated arithmetic acceptance | Configured production model/provider and broader natural-language task routing remain to be accepted |
 | Continuous Memory Fabric | Existing canonical archive, FTS, correction/forget and derived-index boundaries retained | Full Core regression; remote routines do not implicitly retain conversation | Live derived-service commissioning and integrated long-context acceptance remain separate |
-| Persistent Cloud Core | Existing D1 composition; encrypted writable account vault added | Cloud restart and offline backup/restore; 115 tests in a non-root read-only 1 CPU/1 GB Linux container | Receipt predates latest conversation/native readback changes; Oracle is not deployed |
+| Persistent Cloud Core | Existing D1 composition; encrypted writable account vault added | Cloud restart and offline backup/restore; 138 tests at checkpoint `111aba5` in a non-root read-only 1 CPU/1 GB Linux container | Receipt is pinned to `111aba5`; later weather/communication/sharing changes need their own regression. Oracle is not deployed |
 | Distributed Grid | Existing signed HTTPS enrollment, leases, cancellation and no-replay journal extended | Separate TLS Core/native Android Grid execution; remote responsibility tests | Independent Internet-host acceptance requires commissioning |
 | Universal identity / multi-account | Existing stable identities and generation checks; connected accounts projected into executable Fabric | Two-account isolation, scope withdrawal, refresh/disconnect and callback mounting tests | Real owner accounts, tenant constraints and provider token interoperability uncommissioned |
 | Self-service authentication | Public Google/Microsoft app registration config; native Desktop PKCE callback stays outside React | Rust loopback/state/host/expiry/cancellation tests; Auth Broker tests | Real browser consent not run; Android continuation still under integration |
 | Plugins / MCP | Existing SDK transports; signed registration/connect/disable/remove; lifecycle synchronization | Synthetic SDK and connection tests | Trusted stdio has host-user authority, not an OS sandbox; untrusted installations must be denied. Broader service catalog and production interoperability remain open |
 | Browser / web apps | Existing typed isolated profiles reused by actual outbound executor | Real local Chromium form submission, screenshot and account-generation cookie isolation | Owner browser/account attachment and broad conversation-to-browser acceptance remain open |
-| Windows computer control | Existing native executors available through outbound adapter with explicit opt-in; exact UIA text and clipboard readback added | Actual disposable WPF UIA text/invoke and child-process cancellation; Windows/Grid 38-test regression passed before one added contract case | Generic native reports remain partial; installed app commissioning and native sharing supervision remain open |
-| Android production execution | Actual native foreground Worker, Keystore session, typed delivery, live ads and pre-effect checks | Disposable API 35 Grid run: text entry VERIFIED; click PARTIALLY_VERIFIED with separate fixture observation | Physical phone/OEM acceptance prohibited. SAF, clipboard, media and screen grants need additional platform acceptance |
+| Windows computer control | Existing native executors available through outbound adapter with explicit opt-in; exact UIA text and clipboard readback added | Actual disposable WPF UIA text/invoke and child-process cancellation; Windows/Grid 38-test regression passed before one added contract case | Generic native reports remain partial; native supervised sharing passed actual CNG/DPAPI/TLS file execution and shutdown; installed app commissioning remains open |
+| Android production execution | Actual native foreground Worker, Keystore session, typed delivery, live ads and pre-effect checks | Disposable API 35 Grid run: clipboard write, media pause and text entry VERIFIED; click PARTIALLY_VERIFIED with separate fixture observation | Physical phone/OEM acceptance prohibited. SAF and screen grants need additional platform acceptance; clipboard and media pause passed actual emulator acceptance |
 | Ask / Secure / Full | Signed native exact activation and revocation; runtime and executor recheck | Authority regression, expiry/revoke/policy/account/session drift, actual delegated task test | Synthetic activation only; no owner Full Access activation. Native Android management integration underway |
-| Voice | Existing portable input/output now reaches Desktop Ask and canonical task/archive | Actual synthetic wake/VAD/Whisper → verified math/file effect → Kokoro PCM; echo suppression and synthetic barge-in | Production native Bridge/CoreClient synthetic acceptance passed; continuous wake and persisted audio controls remain open. No real microphone/speaker/owner voice recognition or room AEC acceptance |
-| Sentry / World Model | Existing source fabric and awareness engine; signed separate source grants and configuration | Grant independence and stale-review tests | Signed source creation, time/calendar adapters and bounded freshness-qualified day briefing integrated on Desktop/Android; weather, native sensory inputs and broader acceptance remain open |
+| Voice | Continuous local wake, persisted mute, explicit input/output binding and native controls reuse existing Desktop Voice/Session/Playback contracts | Actual Sherpa/Silero/Whisper continuous product loop → verified Core math/file effect → Kokoro PCM; synthetic echo/barge-in; native Bridge/CoreClient and cancellation pass | Separate continuous permission and 10-second control heartbeat enforced; defaults muted with no restart capture. Physical audio, room AEC, owner Voice Match and WebView device acceptance remain open |
+| Sentry / World Model | Existing source fabric and awareness engine; signed separate source grants and configuration | Grant independence and stale-review tests | Signed source creation, time/calendar adapters and bounded freshness-qualified day briefing integrated on Desktop/Android; explicit-place MET Norway weather now reaches existing World/Sentry and both clients; native sensory inputs and broader acceptance remain open |
 | Chief of Staff | Existing World Model now supplies source-backed day briefing and observed calendar overlap/incompleteness | Source/grant/account drift and Core-time expiry tests; native briefing API parses actual Core response | Scheduling/communication effects, richer live context and daily-use acceptance remain open |
-| Workers / Automations | Existing Executive; native signed create/edit/pause/resume/retire and schedules; remote file routines | Signed routine writes actual outbound Worker file with independent Core readback; owner revocation blocks delivery | Deterministic natural action-line authoring and learned procedure save/reuse/evaluation now reach existing Executive on both clients; broad conversational planner integration remains open |
-| Communication | Existing connector contracts and account projection | Connector isolation tests | Actual supported communication routes and readback must be demonstrated; no real messages sent |
+| Workers / Automations | Existing Executive; native signed create/edit/pause/resume/retire and schedules; remote file routines; conversation opens unsigned bounded responsibility review | Signed routine writes actual outbound Worker file with independent Core readback; owner revocation blocks delivery; native conversation review/decline tested with no goal creation | Explicit action-line authoring and learned procedure save/reuse/evaluation reach both clients; broader model-assisted conversational planner integration remains open |
+| Communication | Explicit account-bound mail/list/read/draft/send and calendar authoring through existing Fabric; native exact signed review | 155 focused tests passed; 15 communication tests rechecked after automation hooks; actual synthetic provider HTTP and Cloud-native proof/approval/readback | Gmail saved SENT resource verified; Graph send without correlated resource remains PARTIAL. Recipient delivery and real accounts uncommissioned; no real messages sent |
 | Adaptive Interface Engine | Existing typed Presence/AIE surfaces retained | Desktop regression and Android build/lint | Full runtime-backed cross-device scenarios and native visual acceptance remain open |
-| Desktop / Android product | Desktop and Android native authority/automation/account controls integrated locally | Desktop 101 tests, Rust 27; Android build/unit/lint and 68 JVM tests pass | Actual native authority/assistance full review, day-brief parsing and 11 production navigation captures passed; owner visual acceptance remains pending |
+| Desktop / Android product | Desktop and Android native authority/automation/account controls integrated locally | Intermediate source: Desktop 117 tests across 22 files, Rust 38 plus explicit native fixture; Android assemble/unit/lint and 71 JVM tests pass | Actual native authority/assistance full review, conversation-to-automation review/decline, day-brief parsing and 11 production navigation captures passed; owner visual acceptance remains pending |
 | Slice 19 hardening | Exact signature/session/grant boundaries, encrypted token vault, bounded projections and callback reads | Core regression, native tests and targeted trust-boundary tests | Final integrated security review, broader recovery/soak and fresh constrained-runtime run remain required |
-| Performance / Slice 20 | Local measurements and bounded transport checks underway | Android text 4.21 s, click 3.15 s in one synthetic run | These are single samples, not percentiles or an operational soak. Final end-to-end performance and completion campaign outstanding |
+| Performance / Slice 20 | Existing closure benchmark reused with stable-source enforcement and exported raw samples/plots | 80 samples each for arithmetic, files, loopback HTTP and reviewed Executive goals; source-pinned baseline/candidate, idle CPU/RSS/SQL traces and profiles | Local host load uncontrolled; later source changes require their own qualification. Android timings are single samples. Provider, battery, physical audio and sustained-use acceptance outstanding |
 
 ## Canonical slices and delivery groups
 
@@ -108,32 +108,46 @@ attached after final integration. Rerun affected checks after subsequent edits.
 
 | Check | Observed result |
 | --- | --- |
-| `python -m unittest discover -s tests -t . -q` | 903 tests in 375.755 s; OK, ten explicit skips; before final executor-liveness regression |
+| `python -m unittest discover -s tests -t . -q` | Latest aggregate: 948 tests in 1079.281 s; FAILED with one browser preflight failure, two dependent browser errors and ten skips. Later edits require a fresh aggregate |
+| Browser failure investigation | All 15 browser-profile/RemoteMachine tests passed on isolated rerun (63.349 s); original aggregate cause unresolved. Launcher tests: 11 passed (12.944 s), including bounded real timeout with distinct redacted TimeoutError; no retry added |
 | Focused Core integration | 88 tests passed; authority, account vault, Grid, assistance and connections |
 | Remote responsibilities | Actual file effect + independent readback and revoked-owner fencing passed |
-| Desktop TypeScript / Vitest / production build | 108 tests across 20 files and production build passed; subsequent five Core-time briefing tests passed |
-| Rust native unit suite | 29 passed, one live-fixture-dependent voice case ignored in ordinary suite; explicitly passed in voice receipt; toolchain 1.99.0 |
+| Desktop TypeScript / Vitest / production build | 117 tests across 22 files and production build passed before planner UI changes |
+| Rust native unit suite | 38 passed, one live-fixture-dependent voice case ignored in ordinary suite; explicitly passed in continuous-voice receipt; toolchain 1.99.0 |
 | Android assemble / instrumentation APK / JVM unit / lint | Passed; production Worker and screen-freshness changes compile |
-| Android management JVM suite | 69 tests across 16 suites passed, including actual TCP callback read deadline |
-| Constrained Linux runtime | 115 tests, 62.285 s, one optional MCP dependency skip; non-root/read-only/cap-drop/1 CPU/1 GB |
+| Android management JVM suite | 71 tests across 16 suites passed, including actual TCP callback read deadline and cancellation during signing; before planner UI changes |
+| Constrained Linux runtime | 138 tests at `111aba5`, 97.404 s, one optional MCP dependency skip; non-root/read-only/cap-drop/1 CPU/1 GB |
 | Outbound Windows/Grid | 38 tests in 39.156 s passed; exact UIA destination now independently verified; invoke remains partial |
 | Synthetic real-model voice | Actual local wake/VAD/Whisper, Desktop Ask, signed synthetic Full, math/file readback and Kokoro output passed; production Rust Bridge/CoreClient loopback Ask/Dictate and cancellation acceptance passed |
-| Mypy | 93 files passed; final liveness Grid modules separately passed |
-| Actual native Android Grid | EMULATED_SYNTHETIC_ACTUAL_GRID; text verified, click partial; actual management review/day brief, withdrawal, revocation, restoration/no replay, 11 navigation captures and cleanup readback passed |
+| Mypy | 94 files passed before planner additions; changed HTTP modules separately passed |
+| Actual native Android Grid | EMULATED_SYNTHETIC_ACTUAL_GRID; clipboard/media pause/text verified, click partial; actual management review/day brief, withdrawal, revocation, restoration/no replay, 11 navigation captures and cleanup readback passed |
 | GitHub Actions / hosted / real provider / physical phone | NOT_RUN under this authorization |
 
-The full Python run emitted ResourceWarnings for synthetic HTTP errors. These
-remain visible and are not clean production-resource evidence. Ten skips are
+The failed full Python run emitted ResourceWarnings for synthetic HTTP errors.
+Subsequent explicit error-response closure passed 124 affected tests; aggregate
+warning cleanliness still needs a fresh run. Ten skips are
 four Windows-unavailable POSIX descriptor/mode/symlink checks and six optional
 prepared voice/model executor checks. The separate voice receipt exercises the
-prepared product model/bridge path; Linux permission checks still need a fresh
-constrained-runtime run. Executor liveness was subsequently verified by 56
+prepared product model/bridge path; Linux permission checks subsequently passed in the pinned constrained-runtime run.  Executor liveness was subsequently verified by 56
 Grid/RemoteGrid tests (21.081 s), Ruff and mypy; the UI can stay connected while
 Worker capabilities expire, and recovery cannot revive an expired effect lease.
 
 Sanitized source-scoped receipts: [regression](../evidence/software-completion/regression-2026-10-21.json),
 [Android](../evidence/software-completion/android-2026-10-21.json) and
-[voice](../evidence/software-completion/voice-2026-10-21.json).
+[voice](../evidence/software-completion/voice-2026-10-21.json),
+[Linux checkpoint](../evidence/software-completion/linux-111aba5.json),
+[weather](../evidence/software-completion/weather-2026-10-21.json) and
+[native Desktop Worker](../evidence/software-completion/desktop-worker-2026-10-21.json).
+
+Additional current receipts: [communication](../evidence/software-completion/communication-2026-10-22.json),
+[continuous voice](../evidence/software-completion/voice-continuous-2026-10-22.json)
+and [performance](../evidence/software-completion/performance-2026-10-22/performance.md).
+HTTP response ownership has its own [focused receipt](../evidence/software-completion/http-resources-2026-10-22.json).
+The failed aggregate and isolated browser recovery are preserved in the
+[regression investigation](../evidence/software-completion/regression-investigation-2026-10-22.json);
+an isolated pass does not establish the cause or erase the aggregate failure.
+Performance output rejects sampling across different runtime source hashes;
+an earlier mixed-source attempt was rejected and is not published as acceptance.
 
 ## Bugs corrected during integration
 
@@ -158,6 +172,10 @@ Sanitized source-scoped receipts: [regression](../evidence/software-completion/r
   procedure storage/evaluation requires independent retention consent.
 - Briefing source visibility checks TTL, account generation and perception epoch;
   Desktop expiry advances from Core observation with monotonic elapsed time.
+- Android cancellation generations prevent progression into a later HTTP phase
+  or acceptance of a late response after cancellation, including during signing.
+- Android snapshot refresh reads current presentation state after suspended
+  history persistence, preserving a review dismissed or draft edited meanwhile.
 
 ## Reproduction and owner commissioning
 
@@ -168,7 +186,8 @@ that top-level setting. Use Desktop package scripts and Rust toolchain 1.99.0.
 Android acceptance must validate exact AVD `oscar_group05_capability_api35`, serial
 `emulator-5582`, qemu/API/boot state before each operation. The synthetic script
 is `python -m scripts.software_android_reference`; it installs only disposable
-test apps, restores Accessibility settings and removes its reverse mapping/apps.
+test apps, restores Accessibility and notification settings, clears its synthetic
+clipboard and removes its reverse mapping/apps.
 
 Future owner actions: approve provider app registrations/consent, commission
 host/storage/TLS/network and off-host key custody, review native new controls,

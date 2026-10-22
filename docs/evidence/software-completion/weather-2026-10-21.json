@@ -1,0 +1,44 @@
+{
+  "status": "PUBLIC_PROVIDER_READ_VERIFIED",
+  "observed_at": 1792587971.5873506,
+  "source": "https://api.met.no/weatherapi/locationforecast/2.0/compact",
+  "configuration": {
+    "id": "public-sydney-weather",
+    "adapter": "weather",
+    "entity_id": "weather:public-sydney",
+    "interval_seconds": 600,
+    "retain": false,
+    "retention_seconds": 3600,
+    "latitude": -33.8688,
+    "longitude": 151.2093,
+    "place": "Sydney public reference"
+  },
+  "report": {
+    "place": "Sydney public reference",
+    "latitude": -33.8688,
+    "longitude": 151.2093,
+    "updated_at": "2026-10-21T11:23:25Z",
+    "forecast_time": "2026-10-21T13:00:00Z",
+    "temperature_c": 17.0,
+    "wind_mps": 2.8,
+    "humidity_percent": 93.5,
+    "credit": "MET Norway \u00b7 CC BY 4.0",
+    "license": "https://creativecommons.org/licenses/by/4.0/",
+    "kind": "forecast"
+  },
+  "evidence": {
+    "id": "831aaaa025fd951b0e23b64a699aa2fc333e9e628efed17ce3661e89939bc1c1",
+    "observed_at": 1792587971.582945,
+    "fresh_until": 1792588634.0
+  },
+  "retained_events": 0,
+  "owner_location": false,
+  "owner_activation": false,
+  "tls": "verified host CA trust; SSL_CERT_FILE may supply an installed CA bundle",
+  "boundary": "Public forecast acquisition; no personal weather or physical acceptance",
+  "sha256": {
+    "oscar/ambient.py": "4cada3c71d61de34d61806c9ccc2f95f8a39576fe86db8add97ee762f20afd9e",
+    "oscar/world_runtime.py": "79ae140fc64ecde2829764acaf2dc013f75b01d89b6eb89be7a056552f6e4ca8",
+    "scripts/software_weather_reference.py": "a53d0e5a74d95a4e2081f3f70f04651dec00420a5cbe239a643e066c2a598953"
+  }
+}

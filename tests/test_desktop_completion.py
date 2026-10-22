@@ -324,7 +324,7 @@ class AskCompletionTests(unittest.TestCase):
                 return Transcript("spoken reference", True, "en", None, 0, 1, "SIMULATED")
 
         capture, recognizer = Capture(), Recognizer()
-        self.core.voice = DesktopVoice(self.core, capture, recognizer)
+        self.core.voice = DesktopVoice(self.core, capture, recognizer, muted=False)
         return capture, recognizer
 
     def test_voice_finish_publishes_processing_then_preview_not_a_phantom_listening_state(self):

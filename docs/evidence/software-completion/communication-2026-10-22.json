@@ -1,0 +1,62 @@
+{
+  "status": "SYNTHETIC_HTTP_SOFTWARE_VERIFIED",
+  "observed_at": "2026-10-21T19:11:23.203062+00:00",
+  "base_head": "111aba543821368c00c8d90804e9c5a408df2f89",
+  "scope": "Bounded explicit Google/Microsoft communication through existing Desktop and Cloud Grid native request, signed approval, Connector Fabric and independent saved-resource GET",
+  "evidence_type": "actual loopback HTTP with synthetic provider state, test-only fixed host mapping; no external provider requests",
+  "tests": [
+    {
+      "command": "python -m unittest tests.test_communication tests.test_connectors tests.test_connector_http tests.test_connector_mount tests.test_desktop tests.test_mobile tests.test_connections tests.test_remote_grid -q",
+      "count": 155,
+      "seconds": 97.512,
+      "result": "PASS",
+      "qualification": "Before subsequent parent automation-hook additions to shared Desktop/RemoteGrid files"
+    },
+    {
+      "command": "python -m unittest tests.test_communication -q",
+      "count": 15,
+      "seconds": 40.399,
+      "result": "PASS",
+      "qualification": "Rechecked current shared Desktop/RemoteGrid hooks after automation-hook additions"
+    }
+  ],
+  "static_checks": {
+    "mypy": "PASS: six communication source modules",
+    "ruff": "PASS for communication-owned changes; parent informed of new RemoteGrid automation line length",
+    "diff_check": "PASS"
+  },
+  "verified": [
+    "Gmail draft and send saved resource raw MIME and SENT label for send",
+    "Graph draft and Google/Graph event saved resource fields",
+    "actual Cloud HTTP enrollment, proof-signed admission and owner approval",
+    "requester-session-only transient provider output",
+    "account-generation and current policy/session authority checks",
+    "independent readback mismatch and revocation fail closed",
+    "uncertain mutation, duplicate admission and replay do not redispatch",
+    "restart loses private inputs and blocks pending work",
+    "exact-review body drift and known credential rejection"
+  ],
+  "remaining_partial": [
+    "Graph sendMail empty HTTP 202 has no correlated resource ID",
+    "recipient and invitation delivery unproven",
+    "arbitrary nested/batch mutation verification unavailable"
+  ],
+  "not_exercised": [
+    "real provider OAuth/accounts",
+    "real mail/calendar mutations",
+    "public deployment",
+    "physical phone",
+    "production owner Full Access activation"
+  ],
+  "private_content_in_receipt": false,
+  "sha256": {
+    "oscar/communication.py": "bba61ed9bead1bf6e8af2b6aa21bb9433da9314a2be73893a8fe401e0b2b1846",
+    "oscar/connector_providers.py": "9cf904a4c2ff605a8bfaafdfb8cb34ebc711bb6513777328c20c12c310fbb402",
+    "oscar/connectors.py": "00346bc117eb5c54db4f18b54d91dc8c0b64836eacee6ddb65a3964362144b66",
+    "oscar/desktop.py": "22cb72b143ae942ebc15e60bd4983f55642922c789adcdf01bc53f7dc144a4fe",
+    "oscar/mobile.py": "e02835f9ad4daf8c0604599a9dff302d86bf40a3854be94bfac6778d07d3ed53",
+    "oscar/remote_grid.py": "a7678f3f482d0e66dfafe6304d839a61de295510794ff1d7f346496fbccec2c2",
+    "tests/test_communication.py": "995ed50f0c3930dbd2b3eccf6032a35f963c3567075ac9cdfcbfeee7ad5f2fde"
+  },
+  "hash_scope_note": "Working-tree source bytes at receipt creation; later shared-source changes require their own focused verification. Test-only loopback fixture is not real provider acceptance."
+}

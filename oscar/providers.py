@@ -410,6 +410,8 @@ class HTTPAdapter:
                 body = error.read(4096)
             except (HTTPException, OSError):
                 body = b""
+            finally:
+                error.close()
             category = error_category(error.code, error.headers, body)
             limits = rate_limits(error.headers, provider.id)
             raise ProviderError(

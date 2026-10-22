@@ -7,6 +7,35 @@ import org.junit.Test
 import java.util.Base64
 
 class ManagementContractsTest {
+    @org.junit.Test fun weatherReviewPinsExplicitCoordinatesWithoutDeviceLocation() {
+        val value = weatherSourceValue("weather-oslo", "Oslo", "59.9139", "10.7522", false)!!
+        org.junit.Assert.assertEquals("weather:weather-oslo", value.getString("entity_id"))
+        org.junit.Assert.assertEquals(600, value.getInt("interval_seconds"))
+        org.junit.Assert.assertEquals(59.9139, value.getDouble("latitude"), 0.0)
+        org.junit.Assert.assertFalse(value.getBoolean("retain"))
+        org.junit.Assert.assertFalse(value.has("device_location"))
+        listOf("NaN", "91", "59.91391", "https://example.com").forEach {
+            org.junit.Assert.assertNull(weatherSourceValue("weather-oslo", "Oslo", it, "10.7522", false))
+        }
+        org.junit.Assert.assertNull(weatherSourceValue("weather-oslo", "Oslo\n", "59", "10", false))
+    }
+
+    @Test fun planningRequiresExplicitPrivacyAndFiniteScopeBeforeSignedReview() {
+        val model = ManagedCapability("models.reason", "core", "session", "model_reasoning", "model", listOf("models"))
+        val action = ManagedCapability("math.add", "core", "session", "addition", "low", listOf("math"))
+        val request = planningRoutine("Planner", "Calculate a sum", "private", listOf(model, action))
+        assertEquals("plan_draft", request.getString("operation"))
+        assertEquals("private", request.getJSONObject("value").getString("mode"))
+        assertEquals(2, request.getJSONObject("value").getJSONArray("capabilities").length())
+        assertFalse(request.getJSONObject("value").has("context"))
+        assertThrows(Exception::class.java) { planningRoutine("Planner", "Goal", "auto", listOf(action)) }
+        assertThrows(Exception::class.java) { planningRoutine("Planner", "Goal", "public", listOf(model, action)) }
+        val malformed = management().put("planner_drafts", JSONArray().put(JSONObject().put("id", "draft").put("goal", "Goal")))
+        assertThrows(Exception::class.java) { parseManagement(malformed) }
+        val approval = Approval.management(challenge("assistance", request), "assistance", request, snapshot().managementStamp(), 1000)
+        assertEquals("assistance_complete", approval.completion)
+    }
+
     private fun management() = JSONObject("""{"version":1,"relationship_id":"owner","core_node_id":"core","truncated":false,"observed_at_ms":1000,
         "authority":{"mode":"ask","status":"inactive","epoch":0},"ask_rules":["existing-ask"],
         "capabilities":[{"id":"files.write","node_id":"desktop","session_id":"session","input_kind":"file_write","risk":"high","permissions":["files:write"]}],

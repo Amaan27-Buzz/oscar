@@ -78,6 +78,17 @@ class SourceBrowserLaunchTests(unittest.TestCase):
         self.assertEqual("browser.worker_launch", diagnostic["category"])
         self.assertLess(len(json.dumps(diagnostic)), 200)
 
+    def test_probe_timeout_is_distinct_without_retry_or_private_output(self):
+        with patch(
+            "oscar.interactive_worker.browser_command",
+            return_value=[self.python, "-I", "-c", "import time; time.sleep(30)"],
+        ) as command:
+            diagnostic = browser_preflight(self.python, self.workspace)
+        self.assertEqual("browser.worker_launch", diagnostic["category"])
+        self.assertEqual("TimeoutError", diagnostic["error_type"])
+        self.assertEqual(0, diagnostic["output_bytes"])
+        command.assert_called_once()
+
 
 class BrowserDiagnosticTests(unittest.TestCase):
     def test_missing_chromium_is_distinct_and_does_not_launch(self):

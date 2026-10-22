@@ -90,7 +90,12 @@ import org.json.JSONObject
                 val value = source.value?.let { runCatching { JSONObject(it) }.getOrNull() }
                 if (current && value != null) {
                     if (source.adapter == "time") Text(value.optString("datetime", "Time unavailable"))
-                    else if (source.adapter == "calendar") {
+                    else if (source.adapter == "weather") {
+                        Text(value.optString("place", "Selected place"))
+                        Text("${value.optString("temperature_c", "Unknown")} °C · wind ${value.optString("wind_mps", "Unknown")} m/s", style = MaterialTheme.typography.bodySmall)
+                        Text("Forecast ${value.optString("forecast_time", "time unavailable")} · updated ${value.optString("updated_at", "time unavailable")}", style = MaterialTheme.typography.bodySmall)
+                        Text("MET Norway · CC BY 4.0 · https://creativecommons.org/licenses/by/4.0/", style = MaterialTheme.typography.bodySmall)
+                    } else if (source.adapter == "calendar") {
                         val events = runCatching { value.objects("events", 8) }.getOrDefault(emptyList())
                         Text("${events.size} observed events")
                         events.forEach { event -> Text(event.optString("summary", event.optString("subject", "Calendar event")).take(200), style = MaterialTheme.typography.bodySmall) }
@@ -105,7 +110,10 @@ import org.json.JSONObject
 
 @Composable private fun AddContextSource(session: CoreSession, state: MobileState) {
     var id by remember(state.epoch) { mutableStateOf("") }
-    var calendar by remember(state.epoch) { mutableStateOf(false) }
+    var kind by remember(state.epoch) { mutableStateOf("time") }
+    var place by remember(state.epoch) { mutableStateOf("") }
+    var latitude by remember(state.epoch) { mutableStateOf("") }
+    var longitude by remember(state.epoch) { mutableStateOf("") }
     var timezone by remember(state.epoch) { mutableStateOf(java.time.ZoneId.systemDefault().id) }
     var accountId by remember(state.epoch) { mutableStateOf("") }
     var calendarId by remember(state.epoch) { mutableStateOf("primary") }
@@ -113,31 +121,50 @@ import org.json.JSONObject
     val accounts = state.snapshot?.connections?.accounts().orEmpty().filter { account ->
         account.getString("status") == "connected" && account.objects("services", 64).any { service ->
             val scopes = service.getJSONArray("scopes").texts(128)
-            service.getString("id") == "google.calendar" && "https://www.googleapis.com/auth/calendar.readonly" in scopes ||
+            service.getString("id") == "google.calendar" && "https://www.googleapis.com/auth/calendar.events.readonly" in scopes ||
                 service.getString("id") == "microsoft.graph" && "Calendars.Read" in scopes
         }
     }
     SupportingDetails("Connect current context") {
         OscarField(id, { id = it.take(80) }, label = "Source name", modifier = Modifier.fillMaxWidth())
         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            FilterChip(selected = !calendar, onClick = { calendar = false }, label = { Text("Time and date") })
-            FilterChip(selected = calendar, onClick = { calendar = true }, label = { Text("Connected calendar") })
+            listOf("time" to "Time and date", "calendar" to "Connected calendar", "weather" to "Weather").forEach { (value, label) ->
+                FilterChip(selected = kind == value, onClick = { kind = value }, label = { Text(label) })
+            }
         }
-        if (!calendar) OscarField(timezone, { timezone = it.take(100) }, label = "Timezone", modifier = Modifier.fillMaxWidth())
-        else {
+        if (kind == "time") OscarField(timezone, { timezone = it.take(100) }, label = "Timezone", modifier = Modifier.fillMaxWidth())
+        else if (kind == "weather") {
+            OscarField(place, { place = it.take(80) }, label = "Place name", modifier = Modifier.fillMaxWidth())
+            OscarField(latitude, { latitude = it.take(16) }, label = "Latitude", modifier = Modifier.fillMaxWidth())
+            OscarField(longitude, { longitude = it.take(16) }, label = "Longitude", modifier = Modifier.fillMaxWidth())
+            Text("Forecast from MET Norway for coordinates you choose. Coordinates are sent to its public weather service; your device location is never requested. Use up to four decimal places. Updates every ten minutes while selected in Sentry.", style = MaterialTheme.typography.bodySmall)
+        } else {
             if (accounts.isEmpty()) Text("Connect an account with calendar read permission first.")
             accounts.forEach { account -> FilterChip(selected = accountId == account.getString("id"), onClick = { accountId = account.getString("id") }, label = { Text(account.getString("alias")) }) }
             OscarField(calendarId, { calendarId = it.take(160) }, label = "Calendar ID", modifier = Modifier.fillMaxWidth())
         }
         Row { Checkbox(retain, { retain = it }); Text("Retain selected observations for one hour", Modifier.weight(1f).padding(top = 12.dp)) }
-        Text("Updates every 30 seconds after you select the source in Sentry. Calendar reads cover the next 24 hours, up to eight events; additional pages remain incomplete. No action authority is granted.", style = MaterialTheme.typography.bodySmall)
+        Text("Time and calendar update every 30 seconds after you select the source in Sentry. Calendar reads cover the next 24 hours, up to eight events; additional pages remain incomplete. No action authority is granted.", style = MaterialTheme.typography.bodySmall)
         val account = accounts.find { it.getString("id") == accountId }
+        val weather = weatherSourceValue(id, place, latitude, longitude, retain)
         OscarButton(onClick = {
-            val value = JSONObject().put("id", id).put("adapter", if (calendar) "calendar" else "time")
-                .put("entity_id", if (calendar) "calendar:$id" else "core").put("interval_seconds", 30).put("retain", retain).put("retention_seconds", 3600)
-            if (calendar) value.put("account_id", accountId).put("account_generation", account!!.getInt("generation")).put("calendar_id", calendarId).put("horizon_seconds", 86400)
-            else value.put("timezone", timezone)
+            val value = if (kind == "weather") weather!! else JSONObject().put("id", id).put("adapter", kind)
+                .put("entity_id", if (kind == "calendar") "calendar:$id" else "core").put("interval_seconds", 30).put("retain", retain).put("retention_seconds", 3600)
+            if (kind == "calendar") value.put("account_id", accountId).put("account_generation", account!!.getInt("generation")).put("calendar_id", calendarId).put("horizon_seconds", 86400)
+            else if (kind == "time") value.put("timezone", timezone)
             reviewChange(session, "assistance", change("source_create", id, value))
-        }, enabled = state.canManage() && id.matches(Regex("[A-Za-z0-9_.:/-]{1,80}")) && (!calendar || account != null), modifier = Modifier.fillMaxWidth()) { Text("Review context source") }
+        }, enabled = state.canManage() && id.matches(Regex("[A-Za-z0-9_.:/-]{1,80}")) && (kind != "calendar" || account != null) && (kind != "weather" || weather != null), modifier = Modifier.fillMaxWidth()) { Text("Review context source") }
     }
+}
+
+internal fun weatherSourceValue(id: String, place: String, latitude: String, longitude: String, retain: Boolean): JSONObject? {
+    fun coordinate(text: String, bound: Double): Double? = text.toDoubleOrNull()?.takeIf {
+        it.isFinite() && it >= -bound && it <= bound && java.math.BigDecimal.valueOf(it).stripTrailingZeros().scale() <= 4
+    }
+    val lat = coordinate(latitude, 90.0) ?: return null
+    val lon = coordinate(longitude, 180.0) ?: return null
+    if (!id.matches(Regex("[A-Za-z0-9_.:/-]{1,80}")) || place.length !in 1..80 || place.any { it.isISOControl() }) return null
+    return JSONObject().put("id", id).put("adapter", "weather").put("entity_id", "weather:$id")
+        .put("interval_seconds", 600).put("retain", retain).put("retention_seconds", 3600)
+        .put("latitude", lat).put("longitude", lon).put("place", place)
 }

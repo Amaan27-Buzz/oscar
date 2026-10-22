@@ -1,0 +1,9 @@
+.desktop-sharing form{display:grid;gap:10px;margin-top:20px}
+.workspace .desktop-sharing form>label{margin:8px 0 0}
+.desktop-sharing fieldset{border:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 16px;margin:12px 0}
+.desktop-sharing legend{font-size:12px;margin-bottom:12px;font-weight:600}
+.workspace .desktop-sharing .sharing-check{display:flex;align-items:center;gap:9px;margin:0;line-height:1.5}
+.workspace .desktop-sharing input[type=checkbox]{width:17px;height:17px;padding:0;flex-shrink:0;accent-color:var(--focus)}
+.desktop-sharing form button{justify-self:start;margin-top:12px}
+.workspace .desktop-sharing textarea{min-height:80px;resize:none}
+@media(max-width:640px){.desktop-sharing fieldset{grid-template-columns:1fr}}

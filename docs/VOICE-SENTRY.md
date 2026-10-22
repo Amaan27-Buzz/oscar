@@ -1,5 +1,16 @@
 # Voice + Sentry
 
+## Desktop voice software integration — 2026-10-22
+
+Opt-in local Desktop voice now has explicit continuous wake, persisted mute and
+selected endpoint identity checks, using the existing Desktop Ask/Dictate path.
+An independent continuous microphone scope, current policy/session, explicit start
+and ten-second foreground control heartbeat are required. Core restart never
+starts capture. This does not enable Sentry audio retention, Voice Match or Voice
+Map, nor establish physical microphone/speaker acceptance. See [current software
+integration and evidence](development/SOFTWARE-VOICE-INTEGRATION.md). Dated
+unavailable statements below describe their historical checkpoints.
+
 ## Group 3 backend candidate — 2026-10-16
 
 `oscar.sentry.SentryRuntime` now provides local headless mode configuration,

@@ -1,6 +1,12 @@
+import json
 import unittest
 
-from oscar.android_worker import ANDROID_CAPABILITIES, android_readback, validate_android
+from oscar.android_worker import (
+    ANDROID_CAPABILITIES,
+    android_readback,
+    platform_readback_matches,
+    validate_android,
+)
 
 
 class AndroidAdmissionTests(unittest.TestCase):
@@ -59,3 +65,56 @@ class AndroidAdmissionTests(unittest.TestCase):
                     "value": '{"title":"Meeting","begin_ms":true,"end_ms":2}',
                 },
             )
+
+
+class AndroidPlatformReadbackTests(unittest.TestCase):
+    def test_exact_document_and_clipboard_destination_readback(self):
+        for kind, target, resource in (
+            ("android_files_write", "agenda.txt", "agenda.txt"),
+            ("android_clipboard_write", "", "android.clipboard.read"),
+        ):
+            parameters = {"package": "example.synthetic", "target": target, "value": "Agenda"}
+            observed = {
+                "package": "example.synthetic",
+                "observations": [{"resource_id": resource, "text": "Agenda"}],
+            }
+            self.assertTrue(platform_readback_matches(kind, parameters, observed))
+            for changed in (
+                {**observed, "package": "example.other"},
+                {**observed, "observations": [{"resource_id": resource, "text": "different"}]},
+                {**observed, "observations": observed["observations"] * 2},
+                {**observed, "observations": [{"resource_id": "other", "text": "Agenda"}]},
+            ):
+                self.assertFalse(platform_readback_matches(kind, parameters, changed))
+
+    def test_media_readback_checks_state_and_leaves_skip_objective_unknown(self):
+        parameters = {"package": "example.synthetic", "target": "", "value": "pause"}
+
+        def observation(package="example.synthetic", state=2):
+            return {
+                "package": "example.synthetic",
+                "observations": [
+                    {
+                        "resource_id": "android.media.inspect",
+                        "text": json.dumps({"package": package, "state": state, "position_ms": 10}),
+                    }
+                ],
+            }
+
+        self.assertTrue(
+            platform_readback_matches("android_media_control", parameters, observation())
+        )
+        self.assertFalse(
+            platform_readback_matches("android_media_control", parameters, observation(state=3))
+        )
+        self.assertFalse(
+            platform_readback_matches(
+                "android_media_control", parameters, observation(package="example.other")
+            )
+        )
+        self.assertIsNone(
+            platform_readback_matches(
+                "android_media_control", {**parameters, "value": "next"}, observation()
+            )
+        )
+        self.assertIsNone(platform_readback_matches("android_ui_click", parameters, observation()))

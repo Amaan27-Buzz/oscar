@@ -22,6 +22,14 @@ class Assistance:
         self.h = harness
 
     @staticmethod
+    def conversation_change(text: str) -> dict[str, Any] | None:
+        instruction = text.strip()
+        if re.match(r"every\b", instruction, re.IGNORECASE):
+            return Assistance.natural_change(instruction)
+        match = re.fullmatch(r"create automation: ?(.+)", instruction, re.IGNORECASE | re.DOTALL)
+        return Assistance.natural_change(match[1]) if match else None
+
+    @staticmethod
     def natural_change(text: str, name: str = "OSCAR responsibility") -> dict[str, Any]:
         """Explicit bounded schedules; missing run counts never imply standing authority."""
         if not isinstance(text, str) or not 1 <= len(text) <= 512:
@@ -133,6 +141,8 @@ class Assistance:
         from .authority import StandingAuthority
 
         h = self.h
+        from .planner_authoring import PlannerAuthoring
+
         result: dict[str, Any] = {
             "version": 1,
             "relationship_id": h.runtime.relationship_id,
@@ -142,6 +152,7 @@ class Assistance:
                 r.id for r in PersonalPolicy(h.store).rules() if r.enabled and r.effect == "ask"
             ],
             "procedures": self.procedures(),
+            "planner_drafts": PlannerAuthoring(h).snapshot(),
             "capabilities": [
                 {k: c[k] for k in ("id", "node_id", "input_kind", "risk", "permissions")}
                 | {"session_id": h.executive.targets[node["id"]][1].id}
@@ -177,6 +188,8 @@ class Assistance:
                 result["capabilities"].pop()
             elif result["sentry"]["sources"]:
                 result["sentry"]["sources"].pop()
+            elif result["planner_drafts"]:
+                result["planner_drafts"].pop()
             elif result["procedures"]:
                 result["procedures"].pop()
             elif result["ask_rules"]:
@@ -238,7 +251,11 @@ class Assistance:
             raise ValueError("bounded non-secret assistance configuration required")
         h, state = self.h, {}
         proposal = None
-        if operation == "create_natural":
+        if operation in {"plan_draft", "plan_accept"}:
+            from .planner_authoring import PlannerAuthoring
+
+            state = PlannerAuthoring(h).material(operation, identifier, value, grants)
+        elif operation == "create_natural":
             value = self.natural_value(value, grants)
             proposal = {"operation": "create", "id": identifier, "value": value}
             operation = "create"
@@ -257,7 +274,9 @@ class Assistance:
             }
             proposal = {"operation": "create", "id": identifier, "value": value}
             operation = "create"
-        if operation == "create":
+        if operation in {"plan_draft", "plan_accept"}:
+            pass
+        elif operation == "create":
             if set(value) != {
                 "name",
                 "goal",
@@ -434,6 +453,8 @@ class Assistance:
         )
         material = self.material(change, grants)
         description = {
+            "plan_draft": "Review model input, sources and planning scope",
+            "plan_accept": "Review the exact suggested plan",
             "create_natural": "Review this responsibility",
             "create": "Review this responsibility",
             "reuse": "Review a one-time procedure replay",
@@ -527,7 +548,17 @@ class Assistance:
                 change = material["review"]["proposal"]
             operation, identifier, value = change["operation"], change["id"], change["value"]
             h.store.put("assistance_review", payload["challenge_id"], {**row, "used": True})
-            if operation == "create":
+            if operation in {"plan_draft", "plan_accept"}:
+                from .planner_authoring import PlannerAuthoring
+
+                PlannerAuthoring(h).complete(
+                    operation,
+                    identifier,
+                    value,
+                    material["review"]["current"],
+                    {"node": node, "session": session, "scope": scope, "public_key": key},
+                )
+            elif operation == "create":
                 pairs = list(
                     dict.fromkeys((s["node_id"], s["capability_id"]) for s in value["steps"])
                 )

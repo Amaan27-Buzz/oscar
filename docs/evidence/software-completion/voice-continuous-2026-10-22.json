@@ -1,0 +1,141 @@
+{
+  "classification": "ACTUAL_LOCAL_MODELS_SYNTHETIC_AUDIO_CORE_INTEGRATION",
+  "microphone": "NOT_RUN",
+  "speaker_playback": "NOT_RUN",
+  "physical_barge_in_and_room_aec": "NOT_RUN",
+  "owner_voice_match": "NOT_RUN",
+  "native_product_bridge": "PASS_PRODUCTION_RUST_BRIDGE_LOOPBACK_SYNTHETIC_AUDIO",
+  "cases": [
+    {
+      "source_phrase": "Oscar. What is two plus three?",
+      "transcript": "What is 2 plus 3?",
+      "task_state": "verified",
+      "evidence_count": 1,
+      "wake_vad_events": [
+        "speech_present",
+        "wake",
+        "speech_started",
+        "speech_ended"
+      ],
+      "stt_seconds": 1.678,
+      "total_seconds": 6.452,
+      "response_provider": "kokoro",
+      "response_pcm_bytes": 138240
+    },
+    {
+      "source_phrase": "Oscar. Please write agenda with text ready for review.",
+      "transcript": "Please write agenda with text ready for review.",
+      "task_state": "verified",
+      "evidence_count": 1,
+      "wake_vad_events": [
+        "speech_present",
+        "wake",
+        "speech_started",
+        "speech_ended"
+      ],
+      "stt_seconds": 2.995,
+      "total_seconds": 6.746,
+      "response_provider": "kokoro",
+      "response_pcm_bytes": 101376
+    }
+  ],
+  "canonical_conversation_turns": 3,
+  "self_output_suppression": "PASS_SYNTHETIC_EXACT_REFERENCE",
+  "barge_in": "PASS_ACTUAL_VAD_KNOWN_SYNTHETIC_HUMAN_INPUT",
+  "synthetic_barge_in_processing_ms": 32.167,
+  "issued_task_not_replayed_or_reversed": true,
+  "continuous_wake_dialogue": "PASS_ACTUAL_LOCAL_MODELS_SYNTHETIC_INPUT",
+  "continuous_cancel": "PASS_LISTENER_STOPPED_NO_REPLAY",
+  "native_webview_and_audio_devices": "NOT_RUN",
+  "source_provenance": {
+    "base_revision": "111aba543821368c00c8d90804e9c5a408df2f89",
+    "working_tree_uncommitted": true,
+    "captured_at_utc": "2026-10-21T19:22:45.145562+00:00",
+    "files_sha256": {
+      "oscar/desktop_voice.py": "2799254be345e1ee304d511ef11ff4868758fb5c975fa5415d3ea9ec503c5f05",
+      "oscar/voice_adapters.py": "74fec3b0d98490b5db393af3c70336de60615da3a0d321d1e3c624b5a84172b5",
+      "oscar/desktop.py": "c1f4a8020b8f4abaee82baa92232c15cb798e47697a538c8763527a5390f2590",
+      "oscar/cli.py": "7a04176d08ca9724635aea50a62ecc0da9a9e26edbf3ecbd6176e34003a71340",
+      "desktop/src-tauri/src/core.rs": "05e82d280b5161617441266674d012a9d8d76bad29624c42e0693b050e76bac0",
+      "desktop/src-tauri/src/protocol.rs": "2df5f849a6adb2b9b292fcb4c9fd85592ee47dfdeddf645b80ea92eb6231a615",
+      "desktop/src-tauri/src/main.rs": "966adccef2178cf07c3b3a462a995494f5ef16ffb223493aefaf8a658336cdc1",
+      "desktop/src/VoiceSettings.tsx": "bd381adb6c7da251942b44e702a0721f51f1bbdc0b1b34660850f06b4f230cf7",
+      "desktop/src/VoiceSettings.test.tsx": "2c485d76e1a6165e0cea5b0b9993c242dbd4c70f192a6101c59bb4c801c63e07",
+      "desktop/src/Workspace.tsx": "2b67a39ce2c0028cb6953e239f1b908356236cbca4ca82ab582aae5ed2ac48b5",
+      "desktop/src/Workspace.test.tsx": "ea3371ee755c28c5c0f165af6bf7baa1cb3ff8fbb737801528a04d4210246c72",
+      "desktop/src/bridge.ts": "f17db8a22553f9dcc5b1e2971f8757cb86864150e82a2b46100571476ea6ec91",
+      "scripts/software_voice_reference.py": "c535b5e58ba1b77dfa13cae1730644f8416a4cd0ad2dfc4bb96d1d68aeb819e9",
+      "tests/test_voice_dialogue.py": "e513ad77fec047c1fd3cd662c3fc7c0a7cc05e04910ef0c57ed47a4884b6cca4",
+      "tests/test_desktop.py": "2f0ff7e723079dafcf11033e84dd8c58bd695add1f40f2834e5f7735cef4bb0f",
+      "tests/test_desktop_completion.py": "c683f4a5e49e33d3fd1e506c371964dba889b72b4296d30d5795d241d2bb0b2d"
+    }
+  },
+  "checks": [
+    {
+      "command": "python -m unittest tests.test_voice tests.test_voice_quality tests.test_voice_dialogue tests.test_desktop tests.test_desktop_completion -q",
+      "result": "PASS: 102 tests"
+    },
+    {
+      "command": "python -m unittest tests.test_voice_dialogue -q",
+      "result": "PASS: 20 tests, including current inventory/save reorder rejection"
+    },
+    {
+      "command": "python -m mypy oscar/desktop_voice.py oscar/voice_adapters.py oscar/cli.py",
+      "result": "PASS: 3 source files"
+    },
+    {
+      "command": "python -m ruff check oscar/desktop_voice.py oscar/voice_adapters.py oscar/cli.py tests/test_voice_dialogue.py scripts/software_voice_reference.py",
+      "result": "PASS"
+    },
+    {
+      "command": "cargo +1.99.0 test --manifest-path desktop/src-tauri/Cargo.toml",
+      "result": "PASS: 38 passed, 1 fixture-dependent ignored"
+    },
+    {
+      "command": "& .tmp/voice-env/Scripts/python.exe -m scripts.software_voice_reference",
+      "result": "PASS: actual local models, continuous product loop, synthetic input/output, Core verification and production Rust bridge/HTTP; ignored native fixture explicitly ran 1 passing test"
+    },
+    {
+      "command": "npm --prefix desktop test -- --maxWorkers=2",
+      "result": "PASS: 117 tests /22 files"
+    },
+    {
+      "command": "npm --prefix desktop run build",
+      "result": "PASS: TypeScript and Vite production build"
+    },
+    {
+      "command": "git diff --check",
+      "result": "PASS"
+    }
+  ],
+  "controls": {
+    "startup": "MUTED_BY_DEFAULT_AND_NO_AUTOMATIC_CAPTURE",
+    "persistence": "VERSION_3_ATOMIC_MUTED_AND_SELECTED_ENDPOINT_IDENTITIES",
+    "device_identity": "NAME_HOST_API_CHANNEL_COUNTS_RECHECKED_BEFORE_INPUT_AND_EACH_OUTPUT_STREAM",
+    "continuous_scope": "desktop:voice:continuous",
+    "continuous_grant": "EXACT_EXISTING_LIVE_DESKTOP_MICROPHONE_SESSION_ONLY_TRUSTED_LOCAL_CLI",
+    "foreground_control_heartbeat_seconds": 10,
+    "utterance_seconds": 15,
+    "raw_audio_archive": "NONE",
+    "full_access_implies_perception": false,
+    "identical_os_endpoint_metadata": "Cannot distinguish two endpoints with identical reported name, host API and channel counts; physical commissioning remains required"
+  },
+  "not_run": [
+    "physical microphone",
+    "physical loudspeaker",
+    "room AEC/calibration",
+    "owner Voice Match",
+    "native WebView audio device operation",
+    "real owner activation",
+    "remote CI",
+    "public deployment"
+  ],
+  "private_local_log_sha256": {
+    "software-continuous-voice-tests.log": "8cca1c3c8d5eec9661c1985d967572cc041974f292649e1b19d582671a910ad9",
+    "software-continuous-voice-contracts.log": "e5e3a4086d3628849c4d37ba9e9b08b58e95bad1648bc8d673053477a5a876c6",
+    "software-continuous-native.log": "6675806bc719569660fd82a666e25d7dfced848ff8ac22858218d3be024f534c",
+    "software-voice-native-bridge.log": "16bca5e56d94d3791ee9aba90c023103c2fdbbd2390a0b5377fa220445b44975",
+    "software-continuous-desktop-tests.log": "ed31afbc8d366aabaa0a6978bc3bc45a83dcca0b6eb5684268f7ebfa7c68da93",
+    "software-continuous-desktop-build.log": "0d3d72497ed131c031a44d886e1b4932e80c43039961ade7db0c8af419f33b63"
+  }
+}

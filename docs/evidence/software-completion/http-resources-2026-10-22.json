@@ -1,0 +1,43 @@
+{
+  "date": "2026-10-22",
+  "status": "SOFTWARE_VERIFIED",
+  "scope": "Owned urllib HTTPError response resource cleanup; synthetic and loopback only",
+  "source_sha256": {
+    "oscar/auth_broker.py": "f70e569573764a96acb26deb080bc8ebce2b03dcdf9bccf02e0adb2fface23ba",
+    "oscar/oauth_device.py": "bd3abaefe3c00e2c580a77fe439dd2aba01a1786e53b5503b59bbb94296b0fda",
+    "oscar/transport.py": "9a70036844cce8bb21024652b35dbe22e07d8fee8d4b5806e82be1c56c60e5d5",
+    "oscar/providers.py": "0fd512674d763b64726fa09e9a135d352b767f9fb1b2c9dd3848c05ba5416bc0",
+    "oscar/discovery.py": "c69c56973ab25d1f57ba0b04a948cd5cbb649fe9beabd8267f8b340297f47e32",
+    "oscar/search.py": "d68505e4cc2ac1146fed1246095750abef0bf34af2fbe0952580a28d2af3f3c1",
+    "tests/test_http_resources.py": "1b24f460c43b801c2b28a1518e9049e854dea2daa4befccd037a349c3af5f71b",
+    "tests/test_providers.py": "af1abce52585d015de8af1a359c0b698869aeccf148fff96c3e6614e02ba5ceb"
+  },
+  "checks": [
+    {
+      "command": "python -m unittest tests.test_http_resources tests.test_providers -q",
+      "tests": 40,
+      "seconds": 29.201,
+      "result": "PASS"
+    },
+    {
+      "command": "python -m unittest tests.test_auth_broker tests.test_oauth_device tests.test_search tests.test_control_ack tests.test_core -q",
+      "tests": 84,
+      "seconds": 24.423,
+      "result": "PASS"
+    },
+    {
+      "command": "python -m ruff check tests/test_http_resources.py tests/test_providers.py oscar/auth_broker.py oscar/oauth_device.py oscar/transport.py oscar/providers.py oscar/discovery.py oscar/search.py",
+      "result": "PASS"
+    },
+    {
+      "command": "python -m mypy oscar/auth_broker.py oscar/oauth_device.py oscar/transport.py oscar/providers.py oscar/discovery.py oscar/search.py",
+      "source_files": 6,
+      "result": "PASS"
+    }
+  ],
+  "limits": [
+    "Earlier full suite emitted ResourceWarnings and predates this patch",
+    "No hosted provider, real account or external network acceptance",
+    "No retries, authority or execution truth changes"
+  ]
+}
