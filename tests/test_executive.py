@@ -97,11 +97,17 @@ class ExecutiveTests(unittest.TestCase):
     def test_recurring_restart_missed_times_and_max_runs(self):
         goal = self.goal(interval_seconds=10, max_runs=2)
         self.e.tick()
+        self.assertEqual(
+            goal["start_at"] + 10, self.r.store.get("executive_goal", goal["id"])["next_at"]
+        )
         self.r.clock.now += 101
         other = Executive(self.r.runtime, self.r.transports)
         self.assertEqual(1, other.tick())
         self.assertEqual(2, len(self.r.store.all("task")))
         self.assertEqual("completed", self.r.store.get("executive_goal", goal["id"])["state"])
+        self.assertEqual(
+            goal["start_at"] + 110, self.r.store.get("executive_goal", goal["id"])["next_at"]
+        )
         self.assertEqual(0, other.tick())
 
     def test_crash_after_atomic_admission_recovers_same_task(self):

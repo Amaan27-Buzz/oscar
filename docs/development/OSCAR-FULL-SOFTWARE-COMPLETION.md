@@ -176,6 +176,11 @@ an earlier mixed-source attempt was rejected and is not published as acceptance.
   or acceptance of a late response after cancellation, including during signing.
 - Android snapshot refresh reads current presentation state after suspended
   history persistence, preserving a review dismissed or draft edited meanwhile.
+- The installed Windows Python 3.14.2 repeatedly raised `MemoryError` at the
+  recurring occurrence's `math.floor` call only after combined Executive tests;
+  direct reevaluation returned zero. Computing the clamped nonnegative index
+  with `int` preserved schedule alignment and passed the same 49-test campaign.
+  This is a verified local mitigation, not a proven upstream interpreter cause.
 
 ## Reproduction and owner commissioning
 

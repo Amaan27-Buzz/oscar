@@ -1168,7 +1168,7 @@ class Executive:
                     interval = goal["interval_seconds"]
                     next_at = (
                         goal["start_at"]
-                        + (math.floor(max(0, self.grid.clock() - goal["start_at"]) / interval) + 1)
+                        + (int(max(0, self.grid.clock() - goal["start_at"]) / interval) + 1)
                         * interval
                         if interval
                         else 0
