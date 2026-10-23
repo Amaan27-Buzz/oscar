@@ -36,7 +36,7 @@ from .contracts import (
 from .credentials import redact_runtime_secrets
 from .event_archive import MemoryWriter, SourceEvent
 from .grid import Node, NodeRole, SessionHandle
-from .jev import Intent
+from .jev import Intent, decide
 from .mobile import display_digest, fingerprint
 from .mobile import public_key as load_public_key
 from .policy import PersonalPolicy
@@ -94,6 +94,7 @@ def create_invitation(
     android_control: bool = False,
     machine_control: bool = False,
     connector_control: bool = False,
+    memory_control: bool = False,
 ) -> dict[str, Any]:
     """Trusted offline owner operation. Reachability alone cannot call this method."""
     identifier(node_id, node=True)
@@ -136,6 +137,10 @@ def create_invitation(
         raise ValueError("explicit connector control scope required")
     if connector_control:
         scopes += ["connectors:read", "connectors:write", "connectors:external-communication"]
+    if type(memory_control) is not bool:
+        raise ValueError("explicit canonical memory control scope required")
+    if memory_control:
+        scopes += ["memory:read", "memory:manage"]
     if owner_public_key:
         scopes += ["grid:approve", "world:read"]
     challenge = new_id()
@@ -472,7 +477,7 @@ class RemoteGrid:
     def _fence_sessions(self, node_id: str) -> None:
         for row in self.store.all("session"):
             if row["node_id"] == node_id:
-                self.store.put("session", row["id"], {**row, "revoked": True})
+                self._revoke_session(row["id"])
 
     def authenticate(
         self, headers: Any, body: bytes, admit: Callable[[str], None] | None = None
@@ -613,6 +618,13 @@ class RemoteGrid:
                 if presence is None:
                     raise PermissionError("Presence is not authorized or available")
                 return {**presence, "observed_at_ms": int(time() * 1000)}
+            if operation == "phone_context":
+                from .phone_context import request
+
+                def phone_authority() -> None:
+                    self.require(session, "android:perceive")
+
+                return request(self.h.world, session, payload, phone_authority)
             if operation == "day_brief" and not payload:
                 self.require(session, "world:read")
                 grants = frozenset(self.store.get("session", session.id)["scopes"])
@@ -627,8 +639,14 @@ class RemoteGrid:
                 return {"day_brief": self.h.world.brief()}
             if operation == "inspect" and set(payload) == {"task_id"}:
                 self.require(session, "grid:inspect")
+                task_id = identifier(payload["task_id"])
+                row = self.store.get("remote_task", task_id)
+                if row.get("source") == "memory" and not row.get("retain", True):
+                    from .memory_executor import authorize_recall
+
+                    authorize_recall(self.h.runtime, task_id, session.id)
                 return self.inspect(
-                    identifier(payload["task_id"]),
+                    task_id,
                     redacted=not self.can_read(session),
                     viewer_session=session.id,
                 )
@@ -651,6 +669,17 @@ class RemoteGrid:
                 return self.advertise(session, payload)
             if operation == "poll" and not payload:
                 self.require(session, "execute")
+                node = self.store.get("node", session.node_id)
+                target = self.h.executive.targets.get(session.node_id)
+                if (
+                    node.get("executor_session") != session.id
+                    or target is None
+                    or target[1].id != session.id
+                    or target[1].node_id != session.node_id
+                ):
+                    # Restart discards remote capabilities/targets. No delivery is claimed
+                    # until the authenticated Worker explicitly advertises them again.
+                    return {"delivery": None, "advertise_required": True}
                 self.grid.executor_heartbeat(session)
                 for row in self.store.all("remote_delivery"):
                     if row["node_id"] == session.node_id and row["state"] == "pending":
@@ -702,6 +731,9 @@ class RemoteGrid:
                                 self.store.delete("remote_invitation", invitation["id"])
                     self.grid.revoke(session.node_id)
                 else:
+                    from .phone_context import withdraw
+
+                    withdraw(self.h.world, session.id)
                     self.grid.disconnect(session.node_id)
                 self.sessions.pop(session.node_id, None)
                 return {"state": "revoked" if operation == "revoke" else "offline"}
@@ -710,6 +742,9 @@ class RemoteGrid:
     def _revoke_session(self, session_id: str) -> None:
         row = self.store.get("session", session_id)
         self.store.put("session", session_id, {**row, "revoked": True})
+        from .phone_context import withdraw
+
+        withdraw(self.h.world, session_id)
 
     def advertise(self, session: SessionHandle, payload: dict[str, Any]) -> dict[str, Any]:
         binding = self.require(session, "advertise")
@@ -773,16 +808,26 @@ class RemoteGrid:
         self, session: SessionHandle, request_id: str, payload: dict[str, Any]
     ) -> dict[str, Any]:
         self.require(session, "grid:submit")
-        self.require(session, "archive:retain")
         required = {"text", "kind", "target", "parameters", "retain"}
         if (
             set(payload) != required
-            or payload["retain"] is not True
+            or type(payload["retain"]) is not bool
             or not isinstance(payload["parameters"], dict)
             or not isinstance(payload["text"], str)
             or not 0 < len(payload["text"].encode()) <= 8192
         ):
-            raise ValueError("explicit retained bounded request required")
+            raise ValueError("explicit bounded request and retention choice required")
+        ephemeral_recall = (
+            not payload["retain"]
+            and payload["kind"] == "text"
+            and payload["target"] == self.h.node_id
+            and not payload["parameters"]
+            and decide(Intent(payload["text"])).capability_kind == "memory"
+        )
+        if not ephemeral_recall:
+            self.require(session, "archive:retain")
+            if not payload["retain"]:
+                raise ValueError("this remote operation requires explicit retention")
         if redact_runtime_secrets(json.dumps(payload)) != json.dumps(payload):
             raise ValueError("secrets cannot enter canonical history")
         key, digest = session.node_id + ":" + request_id, fingerprint(payload)
@@ -794,7 +839,7 @@ class RemoteGrid:
             if old["digest"] != digest:
                 raise StateConflict("request identity changed")
             self.retain(self.store.get("remote_task", old["task_id"]), result=False)
-            return self.inspect(old["task_id"])
+            return self.inspect(old["task_id"], viewer_session=session.id)
         if (
             len(
                 [
@@ -809,7 +854,7 @@ class RemoteGrid:
             raise StateConflict("remote task queue full")
         kind, parameters, target = payload["kind"], payload["parameters"], payload["target"]
         identifier(target, node=True)
-        if kind == "text" and target == self.h.node_id:
+        if kind == "text" and target == self.h.node_id and not ephemeral_recall:
             if parameters:
                 raise ValueError("text parameters must be empty")
             from .assistance import Assistance
@@ -867,6 +912,22 @@ class RemoteGrid:
                     typed.parameters,
                     selected.node_id,
                 )
+            else:
+                from .planner_authoring import PlannerAuthoring
+
+                planned = (
+                    None
+                    if decide(Intent(payload["text"])).capability_kind == "memory"
+                    else PlannerAuthoring(self.h).conversation(
+                        payload["text"],
+                        session.node_id,
+                        session.id,
+                        "grid:approve",
+                        frozenset(self.store.get("session", session.id)["scopes"]),
+                    )
+                )
+                if planned is not None:
+                    return planned
         criterion: dict[str, Any] = {"kind": "unavailable"}
         if kind in {"file_read", "file_write"}:
             needed = {"path", "content"} if kind == "file_write" else {"path"}
@@ -947,12 +1008,18 @@ class RemoteGrid:
                     raise ValueError("text parameters must be empty")
                 intent = Intent(payload["text"], kind="reason")
                 capability = next(
-                    c for c in self.grid.search("model_reasoning") if c.node_id == target
+                    c
+                    for c in self.grid.search(
+                        "memory"
+                        if decide(intent).capability_kind == "memory"
+                        else "model_reasoning"
+                    )
+                    if c.node_id == target
                 )
         else:
             raise ValueError("unsupported typed remote request")
         # Retention is a distinct policy decision, not a side effect of action permission.
-        if (
+        if payload["retain"] and (
             not PersonalPolicy(self.store)
             .evaluate(
                 "core.archive.retain",
@@ -963,9 +1030,33 @@ class RemoteGrid:
             .allowed
         ):
             raise PermissionError("retention policy denied")
+        recalling = capability.input_kind == "memory"
+        self.policy(session, capability, confirmed=capability.risk != "low")
+        if recalling:
+            if (
+                not PersonalPolicy(self.store)
+                .evaluate(
+                    "memory.read",
+                    ("memory:read",),
+                    frozenset(self.store.get("session", session.id)["scopes"]),
+                    {
+                        "node": session.node_id,
+                        "source": "remote-grid",
+                        "relationship": self.h.runtime.relationship_id,
+                    },
+                )
+                .allowed
+            ):
+                raise PermissionError("memory read policy denied")
         task = self.h.runtime.create(
-            intent, initiator=session.node_id, retry_budget=0, creation_key="remote:" + key
+            intent,
+            initiator=session.node_id,
+            retry_budget=0,
+            transient=recalling,
+            creation_key=None if recalling else "remote:" + key,
         )
+        if ephemeral_recall:
+            self.store.transient[task.id]["remote_query"] = payload["text"]
         plan = self.store.get("plan", task.id)
         if kind == "text":
             choices = [c for c in self.grid.search(plan["kind"]) if c.node_id == target]
@@ -1013,7 +1104,9 @@ class RemoteGrid:
             "authority": authority,
             "event_id": new_id(),
             "occurred_at": time(),
-            "text": payload["text"],
+            "text": "" if ephemeral_recall else payload["text"],
+            "retain": payload["retain"],
+            **({"source": "memory"} if recalling else {}),
         }
         with self.store.transaction():
             self.store.put("planned_action", task.id, record(action))
@@ -1023,7 +1116,7 @@ class RemoteGrid:
         self.retain(row, result=False)
         if not row["approval_required"]:
             self.start(task.id)
-        return self.inspect(task.id)
+        return self.inspect(task.id, viewer_session=session.id)
 
     def submit_communication(
         self,
@@ -1155,6 +1248,10 @@ class RemoteGrid:
             raise PermissionError("communication approval expired")
 
     def retain(self, row: dict[str, Any], *, result: bool) -> None:
+        if not row.get("retain", True):
+            return
+        if result and row.get("source") == "memory":
+            return  # Recalled answers remain derived from their original canonical sources.
         task = self.store.task(row["task_id"])
         content = row["text"]
         event_id = row["event_id"]
@@ -1236,9 +1333,11 @@ class RemoteGrid:
                 self.h.executive._row("executive_goal", row["goal_id"])
             else:
                 self.h.archive.event(row["event_id"])
-            forgotten = redacted
+            forgotten = redacted and row.get("source") != "memory"
         except KeyError:
             forgotten = True
+        if row.get("source") == "memory" and not row.get("retain", True):
+            forgotten = not bool(self.store.transient.get(task_id))
         result = results[-1] if results and not forgotten else None
         if (
             row.get("source") == "communication"
@@ -1253,11 +1352,60 @@ class RemoteGrid:
                     pass
                 else:
                     result = record(private_result)
+        recalled: dict[str, Any] = {}
+        transient_description = ""
+        if row.get("source") == "memory":
+            from .memory_executor import authorize_recall, recall_context, recall_text
+
+            result = None
+            recalled = {"response_status": Epistemic.UNKNOWN, "source_event_ids": []}
+            if not forgotten and viewer_session is not None:
+                try:
+                    authorize_recall(self.h.runtime, task_id, viewer_session)
+                    transient_description = self.store.transient.get(task_id, {}).get(
+                        "remote_query", ""
+                    )
+                    private = self.store.transient.get(task_id, {}).get("result")
+                    context = recall_context(
+                        self.h.memory,
+                        self.h.runtime.relationship_id,
+                        self.store.transient.get(task_id, {}).get("remote_query", row["text"]),
+                    )
+                    if (
+                        private
+                        and private.success
+                        and recall_text(context) == private.value
+                        and context["memories"]
+                    ):
+                        result = record(private)
+                        recalled = {
+                            "response_status": Epistemic.INFERRED
+                            if any(
+                                item["status"] == Epistemic.INFERRED for item in context["memories"]
+                            )
+                            else Epistemic.RECALLED,
+                            "source_event_ids": sorted(
+                                {
+                                    event
+                                    for item in context["memories"]
+                                    for event in item["event_ids"]
+                                }
+                            ),
+                        }
+                except (KeyError, PermissionError):
+                    pass
         return {
             "task_id": task.id,
             "state": task.state,
-            "retained_available": not forgotten,
-            "description": "Retained interaction unavailable" if forgotten else row["text"][:256],
+            "retained_available": not forgotten and row.get("retain", True),
+            "request_retained": row.get("retain", True),
+            "description": (
+                transient_description[:256] or "Historical request unavailable"
+                if not row.get("retain", True)
+                else "Retained interaction unavailable"
+                if forgotten
+                else row["text"][:256]
+            ),
             "target": row["target"],
             "capability": action["capability_id"],
             "approval_required": task.state == TaskState.PLANNED
@@ -1272,6 +1420,7 @@ class RemoteGrid:
             "blocker": "Retained interaction unavailable" if forgotten else task.blocker,
             "generation": task.attempts,
             "correlation_id": task.correlation_id,
+            **recalled,
         }
 
     def challenge(self, session: SessionHandle, payload: dict[str, Any]) -> dict[str, Any]:
@@ -1785,6 +1934,19 @@ class RemoteGrid:
                     "SELECT data FROM records WHERE kind='remote_task' ORDER BY rowid DESC LIMIT 12"
                 )
             ][::-1]
+        visible = []
+        for row in recent:
+            if not row.get("retain", True):
+                from .memory_executor import authorize_recall
+
+                try:
+                    authorize_recall(self.h.runtime, row["task_id"], session.id)
+                except (KeyError, PermissionError):
+                    continue
+                if not self.store.transient.get(row["task_id"]):
+                    continue
+            visible.append(row)
+        recent = visible
         for row in recent:
             if row.get("source") == "executive":
                 continue  # Responsibility storage does not grant conversation retention.
@@ -1904,7 +2066,11 @@ class RemoteGrid:
             snapshot["connections"] = connections_snapshot(self.h)
             snapshot["executive"] = {
                 **self.h.executive.snapshot(),
-                "management": Assistance(self.h).snapshot(),
+                "management": Assistance(self.h).snapshot(
+                    frozenset(self.store.get("session", session.id)["scopes"])
+                    & frozenset(self.store.get("node", session.node_id)["scopes"]),
+                    session.node_id,
+                ),
             }
         authority = StandingAuthority(
             self.store, self.grid, self.h.runtime.relationship_id
@@ -1948,6 +2114,7 @@ def main() -> None:
     parser.add_argument("--android-control", action="store_true")
     parser.add_argument("--machine-control", action="store_true")
     parser.add_argument("--connector-control", action="store_true")
+    parser.add_argument("--memory-control", action="store_true")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     core = CloudCore(CloudConfig.load(args.config), start_services=False)
@@ -1968,6 +2135,7 @@ def main() -> None:
                 android_control=args.android_control,
                 machine_control=args.machine_control,
                 connector_control=args.connector_control,
+                memory_control=args.memory_control,
             )
             json.dump(invitation, output)
     finally:

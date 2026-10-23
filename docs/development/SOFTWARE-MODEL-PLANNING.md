@@ -64,3 +64,57 @@ bounded draft projection and reuse of the generic signed owner review.
 No hosted provider, real owner account, production secret, physical phone,
 microphone or camera is used. Automated acceptance does not establish owner
 visual approval, production model quality or general-purpose task reliability.
+
+## Conversation requests
+
+Desktop Ask and authenticated remote text submission now offer this same reviewed
+planner for ordinary actionable objectives after the existing exact operation,
+schedule and communication routes. The Controller still owns memory preflight
+and current-evidence routes. Recognized historical/current-context requests do
+not enter this planner with unreviewed memory or ambient inputs.
+
+The initial response is an unsigned `plan_draft` proposal. Review construction
+performs no inference; its signed completion creates the model-only draft. A
+follow-up such as **Review the plan** or **Proceed with the plan** locates one
+unaccepted draft belonging to the same relationship, owner node, exact session
+and approval scope, and opens the separate action review. Those words do not
+approve effects. Multiple drafts require `Review plan PLAN-ID`. Multiple devices
+with the same action kind require `On device DEVICE-ID: objective`. Revoked
+sessions, stale capabilities, changed contracts and consumed reviews fail closed.
+
+Only currently scoped, implemented typed action contracts are sent as examples.
+These include exact workspace file writes, arithmetic, bounded file inspection,
+directory/search operations, Git operations, selected PowerShell operations,
+page inspection and application/tool catalog inspection when advertised. This
+path does not yet provide generic Android actions, arbitrary computer use,
+connector account selection, coding-agent orchestration, registered application
+launch selection or terminal program selection. A dependency orders literal
+steps; it does not substitute earlier outputs into later steps. Plans cannot
+invent account IDs, device IDs, retrieved facts, credentials or output bindings.
+Missing information can produce a bounded clarification instead of an executable
+plan. Unsupported output remains blocked.
+
+`tests.test_conversation_planning` exercises both signatures through Desktop and
+actual authenticated remote TLS/HTTP submission, a disposable loopback synthetic
+model, real file effects and independent byte readback. It also checks decline,
+consumed-review replay, exact-session continuity, multiple drafts/devices,
+revocation, private history exclusion, missing routes, malformed model field
+types, unselected capabilities and untrusted authority escalation. These fixtures
+prove the integration and enforcement, not general model quality.
+
+The [23 October local inference receipt](../evidence/software-completion/conversation-planning-2026-10-23.json)
+records an actual installed `qwen3.5:4b` run through conversation, both synthetic
+RSA owner signatures, the production Model Router/HTTP adapter/Executive, a real
+workspace file write and independent exact-byte verification. The immutable
+source campaign passed in 77.964 seconds; the planner/conversation regression
+passed 19 tests. No model output was replaced with fixture steps.
+
+This campaign explicitly configured the local Ollama server with cloud disabled
+and a 16,384-token context, and used an 8,192-token output budget. The configured
+model's advertised context alone does not change Ollama's runtime context.
+Earlier malformed and empty model outputs were rejected without file effects;
+the default 4,096-token server context truncated one later attempt. Another
+earlier fixture omitted normal Core services and consequently lost capability
+freshness during inference. The successful campaign ran the normal independent
+execution-session heartbeat. These failed receipts remain separately recorded;
+one successful objective does not establish general-purpose planning reliability.

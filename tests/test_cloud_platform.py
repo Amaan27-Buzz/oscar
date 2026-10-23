@@ -133,7 +133,7 @@ class CloudPlatformTests(unittest.TestCase):
             self.assertFalse(h.pool.slots["groq-1"].present)
             self.assertFalse(h.search.pool.slots["tavily-1"].present)
             self.assertEqual(
-                {"files.write", "math.add", "models.reason", "sources.retrieve"},
+                {"files.write", "math.add", "models.reason", "sources.retrieve", "memory.recall"},
                 set(h.dispatcher.executors),
             )
             self.assertIs(h.archive, h.runtime.memory.archive)

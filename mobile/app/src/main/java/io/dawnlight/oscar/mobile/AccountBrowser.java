@@ -11,6 +11,9 @@ final class AccountBrowser implements AutoCloseable {
     final String id, url, state;
     final long expiresAt;
     final URI redirect;
+    final String expectedIssuer;
+    final boolean issuerRequired;
+    volatile String responseIssuer;
     private volatile ServerSocket listener;
     AccountBrowser(JSONObject enrollment, long now) throws Exception {
         id = text(enrollment, "id", 128); url = text(enrollment, "url", 8192);
@@ -18,14 +21,24 @@ final class AccountBrowser implements AutoCloseable {
         if (!Double.isFinite(expires) || expires * 1000 <= now || expires * 1000 > now + 600000) throw new SecurityException("Expired enrollment");
         expiresAt = (long)(expires * 1000);
         URI provider = new URI(url); redirect = new URI(text(enrollment, "redirect_uri", 8192));
+        boolean resourceGrant = "mcp-resource".equals(enrollment.optString("authorization_kind"));
+        expectedIssuer = resourceGrant ? text(enrollment, "issuer", 2048) : null;
+        issuerRequired = resourceGrant && enrollment.optBoolean("issuer_required");
         boolean known = "accounts.google.com".equals(provider.getHost()) && "/o/oauth2/v2/auth".equals(provider.getPath()) ||
             "login.microsoftonline.com".equals(provider.getHost()) && provider.getPath().endsWith("/oauth2/v2.0/authorize");
-        if (!known || !"https".equals(provider.getScheme()) || provider.getPort() != -1 && provider.getPort() != 443 || provider.getRawUserInfo() != null || provider.getFragment() != null)
+        if (resourceGrant) {
+            URI endpoint = new URI(text(enrollment, "authorization_endpoint", 2048));
+            known = endpoint.getRawQuery() == null && endpoint.getFragment() == null && endpoint.getRawUserInfo() == null &&
+                endpoint.toString().equals(url.substring(0, url.indexOf('?')));
+        }
+        if (!known || !"https".equals(provider.getScheme()) || !resourceGrant && provider.getPort() != -1 && provider.getPort() != 443 || provider.getRawUserInfo() != null || provider.getFragment() != null)
             throw new SecurityException("Verified provider endpoint required");
         if (!"http".equals(redirect.getScheme()) || !"127.0.0.1".equals(redirect.getHost()) || redirect.getPort() < 1024 || redirect.getPort() > 65535 ||
             redirect.getRawUserInfo() != null || redirect.getRawQuery() != null || redirect.getFragment() != null || redirect.getRawPath().length() > 200)
             throw new SecurityException("Exact IPv4 loopback callback required");
         Map<String,String> query = pairs(provider.getRawQuery()); state = query.get("state");
+        if (resourceGrant && (!"S256".equals(query.get("code_challenge_method")) || !text(enrollment, "resource", 2048).equals(query.get("resource"))))
+            throw new SecurityException("MCP resource and PKCE binding required");
         if (state == null || state.length() < 24 || state.length() > 512 || !redirect.toString().equals(query.get("redirect_uri")))
             throw new SecurityException("Provider callback binding rejected");
     }
@@ -65,8 +78,11 @@ final class AccountBrowser implements AutoCloseable {
         if (!redirect.getScheme().equals(callback.getScheme()) || !redirect.getAuthority().equals(callback.getAuthority()) || !redirect.getRawPath().equals(callback.getRawPath()) || callback.getFragment() != null)
             throw new SecurityException("Callback path rejected");
         Map<String,String> query = pairs(callback.getRawQuery()); String code = query.get("code");
+        if (expectedIssuer != null && (query.containsKey("iss") && !expectedIssuer.equals(query.get("iss")) || issuerRequired && !query.containsKey("iss")))
+            throw new SecurityException("MCP callback issuer rejected");
         if (!state.equals(query.get("state")) || query.containsKey("error") || code == null || code.isEmpty() || code.length() > 4096)
             throw new SecurityException("Callback authorization rejected");
+        responseIssuer = query.get("iss");
         return code;
     }
     void bind() throws Exception {

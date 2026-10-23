@@ -1,0 +1,31 @@
+{
+  "status": "FAILED_INTERMEDIATE",
+  "source": "Frozen working tree manifest; subsequent preflight and security changes excluded",
+  "source_manifest_sha256": "69e50dc6d8dea7f80cf4a7497491e7b85285f69bc84e9d745be6b25b8eee8016",
+  "tests": 986,
+  "passed": 975,
+  "skipped": 10,
+  "failures": 1,
+  "seconds": 590.967,
+  "failure": "tests.test_browser_profiles.RealProfileTests.test_real_two_accounts_forms_tabs_artifacts_restart_and_revocation",
+  "diagnostic": {
+    "category": "browser.worker_launch",
+    "error_type": "TimeoutError",
+    "exit_code": 1,
+    "output_bytes": 0
+  },
+  "log_sha256": "6c2ac19ba3483a1b16911f417e7284656016919dc656ff20b24814ee91061a61",
+  "subsequent_observation": {
+    "healthy_cold_seconds": 7.918,
+    "healthy_frozen_seconds": 1.137,
+    "scope": "Two direct isolated subprocess probes; no proof of every prior timeout cause"
+  },
+  "mitigation": "Bounded overall startup allowance increased from8to30seconds; timeout remains redacted with process cleanup and no retry",
+  "focused": {
+    "tests": 26,
+    "seconds": 50.04,
+    "result": "PASS",
+    "log_sha256": "85550c4b4fc58aaba961a1f3e8653ab5ac06884f4a5047815332723178bef7ea"
+  },
+  "authority_race": "Later review identified and is repairing a separate memory revocation race; this aggregate is not final acceptance"
+}

@@ -43,6 +43,8 @@ def main() -> int:
             "source_sha256": {
                 path: hashlib.sha256((ROOT / path).read_bytes()).hexdigest()
                 for path in (
+                    "mobile/app/src/androidTest/AndroidManifest.xml",
+                    "mobile/app/src/androidTest/java/io/dawnlight/oscar/mobile/ScreenFixtureActivity.java",
                     "mobile/app/src/androidTest/java/io/dawnlight/oscar/mobile/NativePlatformConsentTest.kt",
                     "mobile/app/src/main/java/io/dawnlight/oscar/mobile/NativeCapabilities.kt",
                     "mobile/app/src/main/java/io/dawnlight/oscar/mobile/NativeActionGate.kt",
@@ -87,14 +89,6 @@ def main() -> int:
         created = True
         device("shell", "mkdir", directory)
         device("shell", "touch", outside)
-        component = PACKAGE + "/.AppControlService"
-        services = ":".join(
-            item
-            for item in (previous_services if previous_services != "null" else "", component)
-            if item
-        )
-        device("shell", "settings", "put", "secure", "enabled_accessibility_services", services)
-        device("shell", "settings", "put", "secure", "accessibility_enabled", "1")
         methods = (
             "systemFolderSelectionScopesWriteReadAndWithdrawal",
             "systemSingleAppConsentRequiresAuthorityAndStopsOnStopAndLock",

@@ -1,5 +1,15 @@
 # Voice + Sentry
 
+## Sentry notice delivery candidate — 2026-10-22
+
+World Runtime now consumes authorized Sentry proposals into bounded generic
+in-app notices and Android native notification delivery, subject to independent
+delivery policy, current source/configuration/freshness and Android permission.
+No source content is retained as notification history. See [software delivery
+contract and acceptance boundaries](development/SOFTWARE-SENTRY-DELIVERY.md).
+Actual native acceptance is recorded separately; historical unavailable claims
+below retain their original checkpoint meaning.
+
 ## Desktop voice software integration — 2026-10-22
 
 Opt-in local Desktop voice now has explicit continuous wake, persisted mute and

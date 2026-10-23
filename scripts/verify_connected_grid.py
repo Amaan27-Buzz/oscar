@@ -10,7 +10,13 @@ from pathlib import Path
 
 
 @contextmanager
-def android_core_fixture(identity: dict, *, android_workspace: str = "", management: bool = False):
+def android_core_fixture(
+    identity: dict,
+    *,
+    android_workspace: str = "",
+    management: bool = False,
+    memory_control: bool = False,
+):
     """Yield actual TLS Core and Worker authority for one disposable emulator."""
     from cryptography import x509
     from cryptography.hazmat.primitives import serialization
@@ -46,6 +52,7 @@ def android_core_fixture(identity: dict, *, android_workspace: str = "", managem
                 workspace=android_workspace,
                 retain=True,
                 owner_public_key=public_key(fixture.owner_key) if management else None,
+                memory_control=memory_control,
             )
         finally:
             core.close()

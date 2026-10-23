@@ -93,4 +93,55 @@ class GridSyncTest {
         item.getJSONObject("result").put("task_id", "other-task")
         try { parseGridTask(item, nodes); fail("Cross-task result accepted") } catch (_: IllegalArgumentException) { }
     }
+    private fun recall(status: String, sources: JSONArray = JSONArray().put("canonical-source")) = JSONObject()
+        .put("task_id", "recall").put("description", "What did we decide?").put("target", "core")
+        .put("action_id", "action").put("correlation_id", "correlation").put("state", "partially_verified")
+        .put("retained_available", true).put("generation", 1).put("approval_required", false)
+        .put("review_digest", "ab".repeat(32)).put("capability", "memory.recall").put("evidence", JSONArray())
+        .put("response_status", status).put("source_event_ids", sources)
+        .put("result", JSONObject().put("task_id", "recall").put("action_id", "action").put("correlation_id", "correlation")
+            .put("status", "REPORTED").put("success", true).put("value", "Earlier project decision"))
+    @Test fun recallKeepsHistoricalStatusAndProvenanceWithoutInventingVerification() {
+        for ((status, label) in listOf("RECALLED" to "Earlier retained evidence", "INFERRED" to "Inference from earlier evidence")) {
+            val parsed = parseGridTask(recall(status), emptyList())
+            assertEquals(status, parsed.responseStatus); assertEquals(listOf("canonical-source"), parsed.sourceEventIds)
+            assertEquals(label, parsed.responseLabel); assertNull(parsed.value)
+        }
+        val unknown = parseGridTask(recall("UNKNOWN", JSONArray()), emptyList())
+        assertEquals("Not established", unknown.responseLabel); assertTrue(unknown.sourceEventIds.isEmpty())
+        val withdrawn = parseGridTask(recall("UNKNOWN", JSONArray()).put("result", JSONObject.NULL), emptyList())
+        assertNull(withdrawn.response); assertTrue(withdrawn.sourceEventIds.isEmpty())
+    }
+    @Test fun recallRejectsUnprovenStatusMalformedSourcesAndWorkerVerificationClaims() {
+        val invalid = listOf(recall("VERIFIED"), recall("RECALLED", JSONArray()),
+            recall("INFERRED", JSONArray()), recall("UNKNOWN"), recall("REPORTED"),
+            recall("RECALLED", JSONArray().put("source").put("source")),
+            recall("RECALLED", JSONArray().put(4)), recall("RECALLED", JSONArray().put("x".repeat(129))),
+            recall("RECALLED", JSONArray(List(33) { "source-$it" })),
+            recall("RECALLED").put("source_event_ids", "source"),
+            recall("RECALLED").also { it.getJSONObject("result").put("status", "VERIFIED") })
+        invalid.forEach { item ->
+            try { parseGridTask(item, emptyList()); fail("Malformed recall accepted") }
+            catch (_: IllegalArgumentException) { } catch (_: org.json.JSONException) { }
+        }
+    }
+    @Test fun nonretainedRecallIsTransientAndCannotRelaxOtherTaskBoundaries() {
+        val wire = recall("RECALLED").put("request_retained", false).put("retained_available", false)
+        val parsed = parseGridTask(wire, emptyList())
+        assertFalse(parsed.requestRetained)
+        assertEquals("Earlier project decision", parsed.response)
+        val history = GridHistory()
+        val saved = history.saved().toString()
+        val interactions = gridInteractions(history.interactions(), listOf(parsed))
+        assertEquals(parsed.id, interactions.single().taskId)
+        assertEquals(saved, history.saved().toString())
+        assertTrue(gridInteractions(history.interactions(), emptyList()).isEmpty())
+        for (invalid in listOf(JSONObject(wire.toString()).put("capability", "machine.files.read"),
+            JSONObject(wire.toString()).put("request_retained", "false"),
+            JSONObject(wire.toString()).put("state", "verified"),
+            JSONObject(wire.toString()).put("retained_available", true))) {
+            try { parseGridTask(invalid, emptyList()); fail("Invalid transient recall accepted") }
+            catch (_: IllegalArgumentException) { }
+        }
+    }
 }

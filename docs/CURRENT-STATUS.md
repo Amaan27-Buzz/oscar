@@ -1,6 +1,6 @@
 # OSCAR — Current Status & Checklist
 
-**2026-10-22 full software continuation:** active local branch
+**2026-10-23 full software continuation:** active local branch
 `codex/software-completion` extends the unmerged D2/C1/C2 candidate. The
 [completion ledger](development/OSCAR-FULL-SOFTWARE-COMPLETION.md) records signed
 standing authority, native account/automation management, encrypted account
@@ -8,8 +8,19 @@ credentials, supervised Windows sharing, bounded communication, continuous local
 voice, source-backed weather and actual disposable-emulator Grid execution.
 Source-scoped receipts include local models, synthetic TLS/provider effects and
 repeatable performance samples. Full software acceptance remains PARTIAL;
-broader conversational planning, integrated acceptance and other executable
-product work remain active. No publication, CI or owner commissioning occurred.
+native canonical memory correction/forgetting and source revocation, standalone real local
+derived indexes, OS-consented emulator screen/SAF access and a ten-minute
+restart soak now have separate source-scoped receipts in that ledger. The latest
+constrained Linux campaign passed 204 tests with two explicit skips.
+An actual local-model conversation passed both signed reviews, file execution and
+exact readback; a separate reviewed browser workflow submitted a real Chromium
+form with independent readback. The later frozen aggregate passed 994 tests with
+ten explicit skips. Normal-runtime cached-model Qdrant/Graphiti recall, restart,
+fallback and physical projection deletion now passed; rendered Android sourced
+conversation recall and forgetting passed. Reviewed MCP resource authorization
+passed real SDK/synthetic HTTP integration. Latest native checks passed 125
+Desktop tests, 40 Rust tests and 85 Android JVM tests; fresh integrated acceptance
+is being recorded. No publication, CI or owner commissioning occurred.
 The dated C1/C2-only restrictions below describe that earlier checkpoint.
 
 **2026-10-20 local Group 5 C1/C2 candidate:** the

@@ -1,0 +1,301 @@
+{
+  "schema": 1,
+  "status": "SOFTWARE_VERIFIED",
+  "observed_at": 1792693047.001942,
+  "duration_seconds": 26.109,
+  "head": "dcfbc393f93070479ab5e5a8368324b08497b1df",
+  "scope": "current working tree, imported source hashes stable; synthetic local Windows CPU and disposable loopback Neo4j",
+  "python": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+  "dependencies": {
+    "qdrant-client": "1.19.1",
+    "graphiti-core": "0.30.2",
+    "fastembed": "0.8.1",
+    "onnxruntime": "1.30.0",
+    "neo4j": "6.3.1"
+  },
+  "source_sha256": {
+    ".oscar/software_memory_indexes_acceptance_20261022.py": "3e17f10ede5af3b0dee211c9e9f649e90242dfa461fd3a2f07298bbc5a588316",
+    "oscar/capabilities.py": "5f4e21fb01e1f3ba5c11023dc84615c26e006d20e3f5ab2363e9995facdb6cbe",
+    "oscar/connectors.py": "00346bc117eb5c54db4f18b54d91dc8c0b64836eacee6ddb65a3964362144b66",
+    "oscar/context_sources.py": "f978d59ea03a12890835d68f08d5fc7ba09a1d9a4bd81c1817c353097af65c60",
+    "oscar/continuity.py": "b64908b0fa6663cf0f8b981e5d665286b64fa4677e08a726048a19aa18a32de7",
+    "oscar/contracts.py": "e1c99ef95ccb9968728bb944c363d1d4170ab4ac902e584286eb000cad708794",
+    "oscar/credentials.py": "2eba30d9403300f29c22146341c134757eafe6779d4e7df5d90990d0f790497d",
+    "oscar/discovery.py": "c69c56973ab25d1f57ba0b04a948cd5cbb649fe9beabd8267f8b340297f47e32",
+    "oscar/event_archive.py": "e8b967f27ed6b6bbc7c7487b38e1a30167acc80306688b892a79d9d0ab8d7a54",
+    "oscar/fabric_backend.py": "6efbe9e254ed7104b15bb3a7422a58b643fe9355e62a160a9ff9d1d3c35177e8",
+    "oscar/freshness.py": "88dedfaa76611e58cf90b0b57b9194bae92d6160892dfeb4b5d2dcd4b51a38fd",
+    "oscar/grid.py": "fc0bf57aa0ddebaf3edbdcd397fa0cec92dc8a49ab05736ee761d0409e218ff8",
+    "oscar/http_client.py": "0e93997a46f47eece32a97c6ad8fba3cbed03d250de711b42d7f9d74c4f087bc",
+    "oscar/jev.py": "9aa905f6453cb2040d62f0f5f6d3a44494e00af5642bff3cb2f830bbdc52897c",
+    "oscar/memory_fabric.py": "d5c1330cd1b2579d99d932c62d7251b784a67ac966b37d5aae0166d8b8f1b25b",
+    "oscar/memory_indexes.py": "ab000f4059eb3e38ff8bea270d7f8f4cf7c49c77cc4f15a9e0970a186ad6668d",
+    "oscar/models.py": "9a7661517815f995644b87e381c6aa587387eb60955c5a965294ef03c3cecb0c",
+    "oscar/policy.py": "3cc78fce9a84ba5948dd78ca59a92617f66f0190e24f03cf3c9fc1c304ced00e",
+    "oscar/providers.py": "0fd512674d763b64726fa09e9a135d352b767f9fb1b2c9dd3848c05ba5416bc0",
+    "oscar/registry.py": "86dcc5433a69bb2df50b4858946cfaa9f73c80da6a37a392f1f1049fcc72066f",
+    "oscar/retrieval.py": "ff1a5a89f4d3cf31051980358f16b8da4fde65b66efb4ebd1c3a5fa0feee6466",
+    "oscar/router.py": "6b2878b0f05b6cfc30dc3d14f55f70fdf8c6130c56904cbf3729ee96f26141f7",
+    "oscar/storage.py": "16f3a9af401f402dced999a8a9e62c5f39b5f3365066268d2e0df5b0a6b4d16b",
+    "oscar/windows_files.py": "60620953f525c77782ea3581add3812f1256accc13dd3aa6ab63402359412d53",
+    "scripts/evaluate_memory.py": "1e031f4f893c3ee77851a3c62fcaf8c041b067230a821a5b798760d8690db6da",
+    "scripts/verify_memory_indexes.py": "5c9046221508837e0d438da1e4d3d5cc78f8c6f3c32fa223e068361493efda37"
+  },
+  "source_unchanged": true,
+  "model_artifacts": {
+    "dense": "fastembed:0.8.1:BAAI/bge-small-en-v1.5:5dc9fe36c81e64b98d40c803c759fd1d3fa98d3435c783bf9150c092959a235a",
+    "reranker": "fastembed:0.8.1:Xenova/ms-marco-MiniLM-L-6-v2:e94b6cbe772c7ef98fa80cb99827942fa20d6e0ebf149b696d56d642e8de5e32",
+    "bm25_snapshot_sha256": {
+      "snapshots/22b8d2af71a76161e18dd432d2cee0eefa66e412/arabic.txt": "0df01c0a184d8c15077c6f0ee70e25e0c0308d827b92b14a19f5f819a0c465d0",
+      "snapshots/22b8d2af71a76161e18dd432d2cee0eefa66e412/config.json": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "snapshots/22b8d2af71a76161e18dd432d2cee0eefa66e412/danish.txt": "1bedc9cf5a8830dacf8c4ee0d8b301f0801861756ad0d504431d01047f961b0c",
+      "snapshots/22b8d2af71a76161e18dd432d2cee0eefa66e412/dutch.txt": "e5a2a7c390fe3ad0c0a132586ed11492b635d66a1f426cd89677f80b07bc76a6",
+      "snapshots/22b8d2af71a76161e18dd432d2cee0eefa66e412/english.txt": "019f104ba2ed07436d05f9cdd3383034ad66014edc27fc651f837e1a038b6451",
+      "snapshots/22b8d2af71a76161e18dd432d2cee0eefa66e412/finnish.txt": "952af766edc9b8e7ddc877fc464cbd94b91754b5621fdfdd7020568fd4813fcd",
+      "snapshots/22b8d2af71a76161e18dd432d2cee0eefa66e412/french.txt": "58ac7f7c074b70dc0fc86f6fcf40b2c227e9f95627e90e57971d5cce1e30e2e9",
+      "snapshots/22b8d2af71a76161e18dd432d2cee0eefa66e412/german.txt": "f0c25acd7ec02a31f6679d9664ec5222ca846fdbc58db96160f4e7c0ddb0f7ea",
+      "snapshots/22b8d2af71a76161e18dd432d2cee0eefa66e412/greek.txt": "7a97c6dc81144f7e8fcfe976025954ca3731f78a75d1fd86aa87f261fd195dae",
+      "snapshots/22b8d2af71a76161e18dd432d2cee0eefa66e412/hungarian.txt": "64a68b5ebaa616b25bd976ac915c326f2ea8cce8b59a0ac8c5728b980ae4fb0c",
+      "snapshots/22b8d2af71a76161e18dd432d2cee0eefa66e412/italian.txt": "293d7841f198e4012f49e8e5653c3bfd073a58cea1259fa2c0fcec894167b628",
+      "snapshots/22b8d2af71a76161e18dd432d2cee0eefa66e412/norwegian.txt": "f7e5b42208ccf1b1f282f9e0f8570e464272762bda5718b6b26750f510a688dc",
+      "snapshots/22b8d2af71a76161e18dd432d2cee0eefa66e412/portuguese.txt": "6e7b98378c6b728266a83ebf035d927abf16b9e0d815d6204d81d90d896bcc9b",
+      "snapshots/22b8d2af71a76161e18dd432d2cee0eefa66e412/romanian.txt": "0ab53d21cbde00c6bf367706a0243c646140ba564cce7e83ac33d80f8923e957",
+      "snapshots/22b8d2af71a76161e18dd432d2cee0eefa66e412/russian.txt": "1743191192b4a4f77fcc216499455dc00c1b8626fdd407076a8deefff80e3d59",
+      "snapshots/22b8d2af71a76161e18dd432d2cee0eefa66e412/spanish.txt": "6125eadf28ba664a60bf4296147bcbd40b80be93670056fdb229960ac15e2310",
+      "snapshots/22b8d2af71a76161e18dd432d2cee0eefa66e412/swedish.txt": "2a9d9d756bc4257d49329994f805c712cd5ab6746162e2082752238766c1c0c8",
+      "snapshots/22b8d2af71a76161e18dd432d2cee0eefa66e412/turkish.txt": "f2c7f0c2bd3dba42da700776266831853a3b5f1207fada5c15207334109abb57"
+    }
+  },
+  "native_indexes": {
+    "status": "VERIFIED",
+    "observed_at": 1792693033.0939572,
+    "relationship": "synthetic-owner",
+    "source_event_ids": [
+      "3dfb46d099a04278964f8ffacc7a02ae",
+      "4650ac2a86254da3b5ddca5b2fa82c16",
+      "e34b74eb84b148f6a32cc56d3ba60401",
+      "9ed79ccba38142b3aef239f64ed87f46"
+    ],
+    "memory_ids": [
+      "c1c9d8320c5a401ca061c3df275a0398",
+      "592da698c1274018b040ae1af6288e61",
+      "1cf9eb60a2334d1ea936fd273448faef",
+      "cd282ab94cc94ad6a6d165d39c840c5a"
+    ],
+    "graph_group": "oscar_4957da9bfc012d1cc5c1",
+    "embedding": "fastembed:0.8.1:BAAI/bge-small-en-v1.5:5dc9fe36c81e64b98d40c803c759fd1d3fa98d3435c783bf9150c092959a235a",
+    "reranker": "fastembed:0.8.1:Xenova/ms-marco-MiniLM-L-6-v2:e94b6cbe772c7ef98fa80cb99827942fa20d6e0ebf149b696d56d642e8de5e32",
+    "checks": [
+      "exact rare build identifier uses native BM25 plus configured Qdrant IDF",
+      "rebuild preserves second group and unrelated same-group node",
+      "real Qdrant dense+sparse RRF paraphrase and relationship filter",
+      "real Graphiti native hybrid search against Neo4j",
+      "canonical time filters distinguish current Zed and historical VS Code",
+      "real local embedding/reranker paraphrase candidates with source IDs",
+      "unsupported personal claim UNKNOWN; retrieved claim remains RECALLED",
+      "independent injected reranker and embedding failures preserve archive recall",
+      "independent Neo4j query confirms source episode IDs and validity interval",
+      "canonical archive and Qdrant reopen preserve one relationship",
+      "deleted derived collection gives explicit fallback and canonical rebuild",
+      "forget fences cached evidence, deletes native index entries, survives rebuild"
+    ],
+    "limitations": [
+      "synthetic local fixture only",
+      "Neo4j fixture has loopback ports and no authentication; never load private data",
+      "exact claim validation; arbitrary paraphrased entailment remains UNKNOWN",
+      "forget is not secure disk erasure"
+    ]
+  },
+  "evaluation": {
+    "status": "VERIFIED",
+    "observed_at": 1792693046.854321,
+    "cases": [
+      {
+        "case": "A",
+        "name": "exact",
+        "status": "PASS"
+      },
+      {
+        "case": "B",
+        "name": "semantic paraphrase",
+        "status": "PASS",
+        "paths": [
+          "3-qdrant-hybrid",
+          "4-graphiti-temporal"
+        ]
+      },
+      {
+        "case": "C",
+        "name": "three-year gap",
+        "status": "PASS"
+      },
+      {
+        "case": "D",
+        "name": "temporal current",
+        "status": "PASS"
+      },
+      {
+        "case": "E",
+        "name": "historical",
+        "status": "PASS"
+      },
+      {
+        "case": "F",
+        "name": "correction provenance",
+        "status": "PASS"
+      },
+      {
+        "case": "G",
+        "name": "live source outranks recalled archive",
+        "status": "PASS"
+      },
+      {
+        "case": "H",
+        "name": "ambiguous alias",
+        "status": "PASS"
+      },
+      {
+        "case": "I",
+        "name": "similar names distinct",
+        "status": "PASS"
+      },
+      {
+        "case": "J",
+        "name": "project scope",
+        "status": "PASS"
+      },
+      {
+        "case": "K",
+        "name": "negative retrieval",
+        "status": "PASS"
+      },
+      {
+        "case": "L",
+        "name": "empty active/structured triggers escalation",
+        "status": "PASS"
+      },
+      {
+        "case": "M",
+        "name": "inference remains INFERRED",
+        "status": "PASS"
+      },
+      {
+        "case": "N",
+        "name": "plausible unsupported claims",
+        "status": "PASS",
+        "rejected": 6
+      },
+      {
+        "case": "O",
+        "name": "forget",
+        "status": "PASS"
+      },
+      {
+        "case": "P",
+        "name": "both native indexes rebuild",
+        "status": "PASS"
+      },
+      {
+        "case": "Q",
+        "name": "restart reopen",
+        "status": "PASS"
+      },
+      {
+        "case": "R",
+        "name": "one relationship across episodes",
+        "status": "PASS",
+        "episodes": 167
+      }
+    ],
+    "metrics": {
+      "component_retrieval": {
+        "dense": {
+          "top5_hit_rate": 1.0,
+          "queries": 5,
+          "query_seconds": [
+            0.0007516000005125534,
+            0.0008866000025591347,
+            0.0008911999975680374,
+            0.0009728999975777697,
+            0.0011378999988664873
+          ]
+        },
+        "lexical": {
+          "top5_hit_rate": 0.8,
+          "queries": 5,
+          "query_seconds": [
+            0.00048710000191931613,
+            0.0008761999997659586,
+            0.000517000000400003,
+            0.0005930000006628688,
+            0.0009500999985903036
+          ]
+        }
+      },
+      "positive_top5_hit_rate": 1.0,
+      "positive_queries": 5,
+      "unsupported_claim_acceptance_rate": 0.0,
+      "unsupported_claim_queries": 6,
+      "temporal_cases_passed": 3,
+      "entity_error_cases": 0
+    },
+    "limitations": [
+      "small synthetic dataset; no universal hallucination claim",
+      "exact sourced assertion verifier; arbitrary model paraphrases remain UNKNOWN",
+      "reopen evidence here; separate process continuity evaluated independently",
+      "Neo4j loopback synthetic fixture without auth; no private records"
+    ]
+  },
+  "limitations": [
+    "synthetic software fixtures only",
+    "loopback unauthenticated Neo4j never contains private records",
+    "no hosted resource fit, real owner data, secure erasure, or universal recall accuracy claim",
+    "Qdrant local embedded engine; no external Qdrant server exercised",
+    "BM25 SDK performs public artifact metadata requests at construction; dense/reranker cached offline and all embedding/reranking inference local CPU"
+  ],
+  "runtime": {
+    "neo4j_version": "2026.09.0 Community",
+    "neo4j_image": "neo4j@sha256:0dfcadbd51e1d2e5a0cf86d054a0bb537a4bce212796d967cbd88445aaf3fbf3",
+    "published_ports": {
+      "7687/tcp": "127.0.0.1:17687"
+    },
+    "memory_limit_bytes": 1073741824,
+    "cpu_limit": 2,
+    "pids_limit": 512,
+    "usage_report_enabled": false,
+    "fleet_discovery_enabled": false,
+    "cleanup": "named disposable container stopped and removed with its anonymous volumes; exact-name docker ps -a readback empty",
+    "raw_fixture_records": "synthetic archive/index fixture roots retained under ignored .oscar for local evidence"
+  },
+  "commands": {
+    "interpreter": ".oscar/gate-b-venv/Scripts/python.exe",
+    "harness": ".oscar/software_memory_indexes_acceptance_20261022.py",
+    "verifiers": [
+      "scripts/verify_memory_indexes.py:run",
+      "scripts/evaluate_memory.py:run"
+    ],
+    "cache_selection": "existing FastEmbedding/FastReranker constructors supplied existing prepared cache; production BM25Embedding constructor uses isolated new cache",
+    "network": "public BM25 artifact metadata/download only; no provider inference or authenticated account access"
+  },
+  "setup_findings": [
+    {
+      "status": "RESOLVED_ENVIRONMENT",
+      "issue": "Default temporary FastEmbed cache empty; reused existing prepared dense/reranker artifacts."
+    },
+    {
+      "status": "BOUNDED_DEPENDENCY_LIMITATION",
+      "issue": "Pinned FastEmbed0.8.1 BM25 local_files_only checks require mock.file/tamil.txt absent from official fetched snapshot. Legitimate 18 artifact files fetched unauthenticated into isolated cache; no synthetic files fabricated. Public metadata requests remain necessary in this exercised constructor mode."
+    },
+    {
+      "status": "RESOLVED_HARNESS_CONFIGURATION",
+      "issue": "Test-only HF_HUB_DISABLE_IMPLICIT_TOKEN=1 flag value was treated as secret by existing environment redactor. Flag omitted; public HuggingFace client confirmed unauthenticated access."
+    }
+  ],
+  "raw_log_sha256": {
+    ".oscar/software-memory-indexes-20261022.log": "ff54f56f49643682c82deb630968b0294c11f767889cf734cc638486ca37db1a",
+    ".oscar/software-memory-model-preload-20261022.log": "884d7e5da00b8c85ad2824d06976f865ae76e45462e5ecf7f3f6dae8b3f72847",
+    ".oscar/software-memory-indexes-20261022-02.log": "7e57354264315ee62d831506f5dcbc3e67e9228a0db447f1760aa134f9bd4b7e",
+    ".oscar/software-memory-indexes-20261022-03.log": "bda3d785e619e3f2b6b9cb01843ae15653873657bea181d14a55b66f11206060",
+    ".oscar/software-memory-indexes-20261022-04.log": "d4cb4197ee188e172f8e24db413672dc4018c6c3f5bcb204b4f4c171f4cf86a5"
+  }
+}

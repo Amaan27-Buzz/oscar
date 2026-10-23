@@ -65,8 +65,13 @@ internal fun parseGridTask(item: JSONObject, nodes: List<CoreNode>): CoreTask {
     val state = item.bounded("state", 32)
     require(item.get("retained_available") is Boolean)
     val retained = item.getBoolean("retained_available")
+    require(!item.has("request_retained") || item.get("request_retained") is Boolean)
+    val requestRetained = item.optBoolean("request_retained", true)
+    val capability = item.bounded("capability", 128)
+    require(requestRetained || !retained && capability == "memory.recall" && state != "verified" && item.has("response_status"))
+    val available = retained || !requestRetained
     val evidence = item.getJSONArray("evidence"); require(evidence.length() <= 100)
-    require(retained || evidence.length() == 0 && item.isNull("result") && !item.getBoolean("approval_required"))
+    require(available || evidence.length() == 0 && item.isNull("result") && !item.getBoolean("approval_required"))
     val ids = JSONArray()
     var verified = false
     for (index in 0 until evidence.length()) {
@@ -86,7 +91,14 @@ internal fun parseGridTask(item: JSONObject, nodes: List<CoreNode>): CoreTask {
     val normalized = JSONObject().put("task_id", taskId).put("description", item.bounded("description", 8192).take(256))
         .put("state", if (state == "verified" && !retained) "unknown" else state).put("target", target).put("node_status", status).put("generation", item.get("generation"))
         .put("actions", actions).put("evidence_ids", ids)
-        .put("blocker", if (!retained) "Retained result and verification proof unavailable" else item.opt("blocker") ?: JSONObject.NULL)
+        .put("blocker", if (!available) "Retained result and verification proof unavailable" else item.opt("blocker") ?: JSONObject.NULL)
+    if (item.has("response_status")) {
+        val recallStatus = item.bounded("response_status", 32)
+        require(recallStatus in setOf("RECALLED", "INFERRED", "UNKNOWN"))
+        val sources = item.getJSONArray("source_event_ids")
+        require(recallStatus != "UNKNOWN" || sources.length() == 0)
+        require(recallStatus == "UNKNOWN" || state != "verified" && !item.isNull("result") && !item.getJSONObject("result").isNull("value"))
+    } else require(!item.has("source_event_ids"))
     item.optJSONObject("result")?.let { result ->
         require(result.bounded("task_id", 80) == taskId && result.bounded("status", 32) == "REPORTED" && result.get("success") is Boolean)
         require(result.bounded("action_id", 80) == action && result.bounded("correlation_id", 80) == correlation)
@@ -94,12 +106,17 @@ internal fun parseGridTask(item: JSONObject, nodes: List<CoreNode>): CoreTask {
         if (!result.isNull("value")) {
             val value = result.boundedText("value", 8192)
             if (state == "verified") normalized.put("value", value)
-            else normalized.put("response", value).put("response_status", "REPORTED")
+            else normalized.put("response", value).put("response_status", item.opt("response_status") ?: "REPORTED")
+                .put("source_event_ids", item.opt("source_event_ids") ?: JSONArray())
         }
     }
     val digest = item.bounded("review_digest", 64).also { require(it.matches(Regex("[a-f0-9]{64}"))) }
-    return parseTask(normalized).copy(reviewDigest = digest, capability = item.bounded("capability", 128))
+    return parseTask(normalized).copy(reviewDigest = digest, capability = capability, requestRetained = requestRetained)
 }
+
+internal fun gridInteractions(canonical: List<Interaction>, tasks: List<CoreTask>): List<Interaction> =
+    canonical + tasks.filter { !it.requestRetained && canonical.none { saved -> saved.taskId == it.id } }
+        .map { Interaction(it.description, it.label, it.id) }
 
 internal fun parseGridSnapshot(json: JSONObject, expectedCore: String, expectedNode: String): CoreSnapshot {
     require(json.get("version") == 2 && json.bounded("core_id", 80) == expectedCore && json.bounded("node_id", 80) == expectedNode)

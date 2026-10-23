@@ -137,8 +137,11 @@ class Assistance:
             "steps": steps,
         }
 
-    def snapshot(self) -> dict[str, Any]:
+    def snapshot(
+        self, grants: frozenset[str] = frozenset(), node: str | None = None
+    ) -> dict[str, Any]:
         from .authority import StandingAuthority
+        from .memory_management import MemoryManagement
 
         h = self.h
         from .planner_authoring import PlannerAuthoring
@@ -153,6 +156,7 @@ class Assistance:
             ],
             "procedures": self.procedures(),
             "planner_drafts": PlannerAuthoring(h).snapshot(),
+            "memory": MemoryManagement(h, node).snapshot(grants),
             "capabilities": [
                 {k: c[k] for k in ("id", "node_id", "input_kind", "risk", "permissions")}
                 | {"session_id": h.executive.targets[node["id"]][1].id}
@@ -163,6 +167,7 @@ class Assistance:
             "sentry": {
                 **record(h.world.sentry.settings()),
                 "generation": h.world.sentry.configuration()[1],
+                "alerts": h.world.alerts() if "world:read" in grants else [],
                 "sources": [
                     {k: row[k] for k in ("id", "perceive", "retain", "act", "simulated", "epoch")}
                     for row in h.store.all("perception_source")
@@ -236,7 +241,9 @@ class Assistance:
             )
         return result[:64]
 
-    def material(self, change: dict[str, Any], grants: frozenset[str]) -> dict[str, Any]:
+    def material(
+        self, change: dict[str, Any], grants: frozenset[str], viewer_node: str | None = None
+    ) -> dict[str, Any]:
         if set(change) != {"operation", "id", "value"}:
             raise ValueError("exact assistance change required")
         operation, identifier, value = change["operation"], change["id"], change["value"]
@@ -251,7 +258,11 @@ class Assistance:
             raise ValueError("bounded non-secret assistance configuration required")
         h, state = self.h, {}
         proposal = None
-        if operation in {"plan_draft", "plan_accept"}:
+        if operation in {"memory_correct", "memory_forget"}:
+            from .memory_management import MemoryManagement
+
+            state = MemoryManagement(h, viewer_node).material(operation, identifier, value, grants)
+        elif operation in {"plan_draft", "plan_accept"}:
             from .planner_authoring import PlannerAuthoring
 
             state = PlannerAuthoring(h).material(operation, identifier, value, grants)
@@ -274,7 +285,7 @@ class Assistance:
             }
             proposal = {"operation": "create", "id": identifier, "value": value}
             operation = "create"
-        if operation in {"plan_draft", "plan_accept"}:
+        if operation in {"plan_draft", "plan_accept", "memory_correct", "memory_forget"}:
             pass
         elif operation == "create":
             if set(value) != {
@@ -451,8 +462,10 @@ class Assistance:
         StandingAuthority(self.h.store, self.h.grid, self.h.runtime.relationship_id)._owner(
             node, session, scope, grants
         )
-        material = self.material(change, grants)
+        material = self.material(change, grants, node)
         description = {
+            "memory_correct": "Review this exact memory correction and retention",
+            "memory_forget": "Review forgetting this memory and selected sources",
             "plan_draft": "Review model input, sources and planning scope",
             "plan_accept": "Review the exact suggested plan",
             "create_natural": "Review this responsibility",
@@ -483,7 +496,22 @@ class Assistance:
             raise ValueError("signed responsibility exceeds native review bound")
         encoded = base64.b64encode(body).decode()
         identifier = new_id()
-        self.h.store.put("assistance_review", identifier, {"payload": encoded, "used": False})
+        self.h.store.put(
+            "assistance_review",
+            identifier,
+            {
+                "payload": encoded,
+                "used": False,
+                **(
+                    {
+                        "memory_relationship": self.h.runtime.relationship_id,
+                        "expires_at_ms": expires,
+                    }
+                    if change["operation"].startswith("memory_")
+                    else {}
+                ),
+            },
+        )
         return {
             "challenge_id": identifier,
             "signing_payload": encoded,
@@ -517,8 +545,11 @@ class Assistance:
             raise ValueError("exact signed assistance review required")
         h = self.h
         cancellations: list[str] = []
+        memory_request = None
         with h.store.transaction():
             row = h.store.get("assistance_review", payload["challenge_id"])
+            if row["used"]:
+                raise PermissionError("assistance review consumed")
             body = base64.b64decode(row["payload"], validate=True)
             claim = json.loads(body)
             if (
@@ -540,7 +571,7 @@ class Assistance:
             ):
                 raise PermissionError("owner key changed")
             grants = self.authorize(node, session, scope, grants)
-            material = self.material(claim["material"]["change"], grants)
+            material = self.material(claim["material"]["change"], grants, node)
             if material != claim["material"]:
                 raise PermissionError("assistance changed since review")
             change = material["change"]
@@ -548,7 +579,24 @@ class Assistance:
                 change = material["review"]["proposal"]
             operation, identifier, value = change["operation"], change["id"], change["value"]
             h.store.put("assistance_review", payload["challenge_id"], {**row, "used": True})
-            if operation in {"plan_draft", "plan_accept"}:
+            if operation in {"memory_correct", "memory_forget"}:
+                memory_request = (operation, identifier, value, material["review"]["current"])
+                h.store.put(
+                    "memory_mutation",
+                    payload["challenge_id"],
+                    {
+                        "relationship": h.runtime.relationship_id,
+                        "operation": operation,
+                        "status": "pending",
+                    },
+                )
+                for review_id, data in h.store.db.execute(
+                    "SELECT id,data FROM records WHERE kind='assistance_review'"
+                ).fetchall():
+                    if json.loads(data).get("memory_relationship") == h.runtime.relationship_id:
+                        # A reviewed payload is not a second archive after correction/deletion.
+                        h.store.put("assistance_review", review_id, {"used": True})
+            elif operation in {"plan_draft", "plan_accept"}:
                 from .planner_authoring import PlannerAuthoring
 
                 PlannerAuthoring(h).complete(
@@ -670,9 +718,43 @@ class Assistance:
             )
         for task_id in cancellations:
             h.runtime.cancel(task_id, h.executive.targets)
-        return {
-            "assistance": self.snapshot(),
-            "executive": h.executive.snapshot(),
+        outcome: dict[str, Any] = {
             "status": "verified",
             "message": "OSCAR responsibility settings updated",
+        }
+        if memory_request is not None:
+            from .memory_management import MemoryManagement
+
+            try:
+                # Lock authority through the canonical mutation; the review is already consumed.
+                with h.store.transaction():
+                    if (
+                        StandingAuthority(h.store, h.grid, h.runtime.relationship_id)._owner(
+                            node, session, scope, grants
+                        )
+                        != key
+                    ):
+                        raise PermissionError("owner key changed before memory mutation")
+                    current_grants = self.authorize(node, session, scope, grants)
+                    outcome = MemoryManagement(h, node).complete(*memory_request, current_grants)
+            except Exception:
+                outcome = {
+                    "status": "unknown",
+                    "message": "Memory change outcome is unknown. Refresh Core memory before "
+                    "creating a new review; this signed change will not replay.",
+                }
+            h.store.put(
+                "memory_mutation",
+                payload["challenge_id"],
+                {
+                    "relationship": h.runtime.relationship_id,
+                    "operation": memory_request[0],
+                    "status": outcome["status"],
+                },
+            )
+            outcome["memory_changed"] = True
+        return {
+            "assistance": self.snapshot(grants, node),
+            "executive": h.executive.snapshot(),
+            **outcome,
         }

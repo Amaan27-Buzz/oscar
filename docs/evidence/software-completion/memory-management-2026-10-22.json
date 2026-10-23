@@ -1,0 +1,92 @@
+{
+  "version": 1,
+  "observed_at": "2026-10-22T05:05:44.329697+00:00",
+  "scope": "local synthetic canonical memory inspection, correction and forgetting; no owner commissioning",
+  "source_sha256": {
+    "oscar/memory_management.py": "81e3006f67311191c9312fe8bdea63727c2caa0bed6bc6aa685a287d0248ee2f",
+    "oscar/event_archive.py": "e8b967f27ed6b6bbc7c7487b38e1a30167acc80306688b892a79d9d0ab8d7a54",
+    "oscar/assistance.py": "13bb512a56f323c17febdb14a3082dd764d4cb5c8e29c2a43ff4d833c8d009ce",
+    "oscar/desktop.py": "65ddd45ad53e64d171ee5a83e9af8f6dce95b3b841095f8f77c959c0e0c6b9be",
+    "oscar/remote_grid.py": "6c87501a099ee3570c6d9cfb1dc8110bc72e2a33ff0f6728bc29fd29fee25d2b",
+    "tests/test_memory_management.py": "3699ca3d7391ad46e049149cf31be2c7ef6628cbe068f702306707069dc46f57",
+    "tests/test_remote_grid.py": "70dc387a7876cd14064610d57524893beef809ca878a8f4edbf367ab657da5d6",
+    "desktop/src/MemorySettings.tsx": "79d87d88218860f32066458b3d29b36d2ad2876ef4382ae02687b9d2feca69ad",
+    "desktop/src/MemorySettings.test.tsx": "7aa1331c0facaec48abbed5a5997c7bb07eb8399cc0800d704a1a1612035482b",
+    "desktop/src/Workspace.tsx": "d37ad8e656c56d8f0deed905b95afe095f5a25f5c59b97ee7d4d6c9e3d621e15",
+    "desktop/src/Automations.tsx": "50ffb36eb9a725313cdb2c948ffb30a4a072a439a746abca34c151da5a2b7cac",
+    "desktop/src-tauri/src/core.rs": "f68ba84018e867918897f9235f2fcb80fdf1008108da342d70887cf5937913e9",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/MemoryScreen.kt": "2e3c2ae497263cecf5a098aada5a538032d9b100f602f7f6f59e3e9044642808",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/ManagementState.kt": "1910d3c86e300bd33a451a7ff6a3e0ae7a73f4cb6470211033ae10fd4a96be2f",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/SettingsScreen.kt": "414df774873b7e55f75527be4a8e40329f353c5df95d92ed3309dd9755d1c8fe",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/CoreSession.kt": "7fe87820ec551a76fa71854ccae1012b23cb104f74e75bfcb069634c8efc2669",
+    "mobile/app/src/test/java/io/dawnlight/oscar/mobile/MemoryContractsTest.kt": "6a0c5398ee72e3ee30d6c6a3882b1aee9484a8f549e5c245f978c32c5718e260"
+  },
+  "checks": [
+    {
+      "command": "python -m unittest tests.test_memory_management tests.test_assistance tests.test_memory_fabric tests.test_desktop_conversation tests.test_remote_grid.RemoteGridTests.test_memory_control_invitation_is_explicit_and_separate_from_retention -q",
+      "status": "PASS",
+      "tests": 56,
+      "seconds": 18.245,
+      "log": ".oscar/software-memory-final-focused-3.log"
+    },
+    {
+      "command": "python -m ruff check oscar/event_archive.py oscar/memory_management.py oscar/assistance.py oscar/desktop.py oscar/remote_grid.py tests/test_memory_management.py tests/test_remote_grid.py",
+      "status": "PASS"
+    },
+    {
+      "command": "python -m mypy oscar/event_archive.py oscar/memory_management.py oscar/assistance.py oscar/desktop.py oscar/remote_grid.py",
+      "status": "PASS",
+      "source_files": 5,
+      "log": ".oscar/software-memory-mypy-final-3.log"
+    },
+    {
+      "command": "npm test -- --run src/MemorySettings.test.tsx src/Workspace.test.tsx",
+      "status": "PASS",
+      "tests": 19,
+      "files": 2,
+      "seconds": 2.35,
+      "log": ".oscar/software-memory-ui-final-3.log"
+    },
+    {
+      "command": "npm run typecheck",
+      "status": "PASS"
+    },
+    {
+      "command": "Gradle :app:assembleDebug :app:assembleDebugAndroidTest :app:testDebugUnitTest :app:lintDebug",
+      "status": "PASS",
+      "executor": "shared Sentry acceptance campaign, independently inspected its log and MemoryContracts XML",
+      "memory_contract_tests": 2,
+      "memory_contract_failures": 0,
+      "log": ".oscar/software-sentry-android-ttl-build-final.log",
+      "qualification": "MemoryScreen received one explanatory text-only line after this build; the parent campaign will include it."
+    },
+    {
+      "command": "cargo fmt -- --check",
+      "status": "PASS",
+      "qualification": "Initially found an existing remote.rs brace-format difference; cargo fmt normalized it."
+    }
+  ],
+  "verified_contracts": [
+    "explicit read/manage invitation opt-in without retention",
+    "node/source Personal Policy denial remains authoritative",
+    "exact synthetic signed generic Desktop transport",
+    "generation, content and relationship fences",
+    "canonical temporal correction, current recall and historical supersession",
+    "atomic source append and memory correction rollback",
+    "at-most-once consumed review on unknown execution",
+    "canonical FTS and source deletion; reopened persisted archive",
+    "partial failed derived deletion without stale canonical admission",
+    "expired/consumed review content stripped",
+    "native canonical conversation refresh handlers and bounded schemas"
+  ],
+  "not_verified": [
+    "physical Android phone",
+    "rendered native memory-screen acceptance",
+    "real owner activation or personal memories",
+    "secure erasure of WAL, backups or physical storage",
+    "bulk or older-page native memory inspection",
+    "native derived index rebuild/export authorization",
+    "final whole-product regression on this combined working tree"
+  ],
+  "source_qualification": "Dedicated module and tests stable at receipt creation. Shared files include concurrent software integrations; this is focused acceptance, not a whole-product completion claim."
+}

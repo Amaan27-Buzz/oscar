@@ -19,6 +19,7 @@ import org.json.JSONObject
         return
     }
     StatusLabel("${current.getString("mode").replace('_', ' ')} · ${current.getString("state")}")
+    SentryNotices(state)
     CurrentBrief(session, state)
     AddContextSource(session, state)
     val sources = current.objects("sources", 64)
@@ -26,6 +27,7 @@ import org.json.JSONObject
     var attention by remember(state.epoch, current.getInt("generation")) { mutableStateOf(current.getString("state")) }
     var selected by remember(state.epoch, current.getInt("generation")) { mutableStateOf(current.getJSONArray("source_ids").texts(32).toSet()) }
     var interrupts by remember(state.epoch, current.getInt("generation")) { mutableStateOf(current.getBoolean("allow_interrupt")) }
+    var triggers by remember(state.epoch, current.getInt("generation")) { mutableStateOf(current.getJSONArray("trigger_keys").texts(32).joinToString(", ")) }
     PreferenceGroup("Source permissions", flat = true) {
         if (sources.isEmpty()) Text("No awareness sources are connected.")
         sources.forEach { item -> key(item.getString("id"), item.getInt("epoch")) {
@@ -56,13 +58,31 @@ import org.json.JSONObject
             Row { Checkbox(id in selected, enabled = state.canManage() && item.getBoolean("perceive"), onCheckedChange = { checked -> selected = if (checked) selected + id else selected - id }); Text(id, Modifier.padding(top = 12.dp)) }
         }
         Row { Checkbox(interrupts, { interrupts = it }, enabled = state.canManage()); Text("Allow policy-checked interruptions", Modifier.weight(1f).padding(top = 12.dp)) }
+        OscarField(triggers, { triggers = it.take(1000) }, label = "Trigger keys, separated by commas", modifier = Modifier.fillMaxWidth())
+        Text("Delivery also needs an explicit Allow policy for sentry:deliver. Android notifications need activity alerts and notification permission. No source content appears in an alert.", style = MaterialTheme.typography.bodySmall)
         OscarButton(onClick = { reviewChange(session, "assistance", change("sentry", "awareness", JSONObject().put("mode", mode).put("state", attention)
-            .put("source_ids", JSONArray(selected.sorted())).put("trigger_keys", current.getJSONArray("trigger_keys")).put("allow_interrupt", interrupts))) },
-            enabled = state.canManage(), modifier = Modifier.fillMaxWidth()) { Text("Review awareness change") }
+            .put("source_ids", JSONArray(selected.sorted())).put("trigger_keys", JSONArray(triggers.split(',').map { it.trim() }.filter { it.isNotEmpty() }.distinct())).put("allow_interrupt", interrupts))) },
+            enabled = state.canManage() && triggers.split(',').filter { it.isNotBlank() }.let { keys -> keys.size <= 32 && keys.all { it.trim().matches(Regex("[A-Za-z0-9_.:/-]{1,160}")) } }, modifier = Modifier.fillMaxWidth()) { Text("Review awareness change") }
     }
     SupportingDetails("Awareness & privacy") {
         Text("Perception, durable retention and action are separate signed grants. These controls configure connected sources. Capture still requires Android or provider permission, and source readiness remains separate from configuration. This screen never starts microphone or camera capture.", style = MaterialTheme.typography.bodySmall)
         TextButton(onClick = privacy) { Text("Android capture permissions") }
+    }
+}
+
+@Composable internal fun SentryNotices(state: MobileState) {
+    var now by remember(state.epoch) { mutableLongStateOf(0) }
+    LaunchedEffect(state.epoch, state.snapshot) {
+        while (state.snapshot != null) {
+            now = state.coreNow(System.currentTimeMillis(), android.os.SystemClock.elapsedRealtime())
+            kotlinx.coroutines.delay(1000)
+        }
+    }
+    val notices = if (state.privateSuppressed || state.link != Link.CONNECTED) emptyList()
+        else parseSentryAlerts(state.snapshot?.management, now)
+    if (notices.isNotEmpty()) PreferenceGroup("Needs your attention", flat = true) {
+        notices.forEach { notice -> Text("${if (notice.simulated) "Simulated · " else ""}${notice.source} · ${notice.key}") }
+        Text("A selected source triggered an authorized notice. Check current context before acting.", style = MaterialTheme.typography.bodySmall)
     }
 }
 
@@ -99,6 +119,17 @@ import org.json.JSONObject
                         val events = runCatching { value.objects("events", 8) }.getOrDefault(emptyList())
                         Text("${events.size} observed events")
                         events.forEach { event -> Text(event.optString("summary", event.optString("subject", "Calendar event")).take(200), style = MaterialTheme.typography.bodySmall) }
+                    } else if (source.adapter == "android") {
+                        Text("Selected phone metadata. Playback does not establish attention.", style = MaterialTheme.typography.bodySmall)
+                        if (!value.optBoolean("notifications_available")) Text("Notification context unavailable.")
+                        else runCatching { value.objects("notifications", 8) }.getOrDefault(emptyList()).forEach { item ->
+                            Text("${item.optString("package").take(100)} · ${item.optInt("count")} selected notifications", style = MaterialTheme.typography.bodySmall)
+                        }
+                        if (!value.optBoolean("media_available")) Text("Media context unavailable.")
+                        else runCatching { value.objects("media", 8) }.getOrDefault(emptyList()).forEach { item ->
+                            val playback = when (item.optInt("state", -1)) { 3 -> "playing"; 2 -> "paused"; 1 -> "stopped"; else -> "other playback state" }
+                            Text("${item.optString("package").take(100)} · $playback", style = MaterialTheme.typography.bodySmall)
+                        }
                     }
                 }
             }
@@ -128,7 +159,7 @@ import org.json.JSONObject
     SupportingDetails("Connect current context") {
         OscarField(id, { id = it.take(80) }, label = "Source name", modifier = Modifier.fillMaxWidth())
         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            listOf("time" to "Time and date", "calendar" to "Connected calendar", "weather" to "Weather").forEach { (value, label) ->
+            listOf("time" to "Time and date", "calendar" to "Connected calendar", "weather" to "Weather", "android" to "This phone").forEach { (value, label) ->
                 FilterChip(selected = kind == value, onClick = { kind = value }, label = { Text(label) })
             }
         }
@@ -138,6 +169,8 @@ import org.json.JSONObject
             OscarField(latitude, { latitude = it.take(16) }, label = "Latitude", modifier = Modifier.fillMaxWidth())
             OscarField(longitude, { longitude = it.take(16) }, label = "Longitude", modifier = Modifier.fillMaxWidth())
             Text("Forecast from MET Norway for coordinates you choose. Coordinates are sent to its public weather service; your device location is never requested. Use up to four decimal places. Updates every ten minutes while selected in Sentry.", style = MaterialTheme.typography.bodySmall)
+        } else if (kind == "android") {
+            Text("Uses this phone's current enrolled session and the app IDs selected in Android capture permissions. Up to eight apps. Only counts and playback state are shared, while OSCAR is open or phone tasks are visibly running. Enable sharing separately in capture permissions, then select this source in Sentry.", style = MaterialTheme.typography.bodySmall)
         } else {
             if (accounts.isEmpty()) Text("Connect an account with calendar read permission first.")
             accounts.forEach { account -> FilterChip(selected = accountId == account.getString("id"), onClick = { accountId = account.getString("id") }, label = { Text(account.getString("alias")) }) }
@@ -147,13 +180,14 @@ import org.json.JSONObject
         Text("Time and calendar update every 30 seconds after you select the source in Sentry. Calendar reads cover the next 24 hours, up to eight events; additional pages remain incomplete. No action authority is granted.", style = MaterialTheme.typography.bodySmall)
         val account = accounts.find { it.getString("id") == accountId }
         val weather = weatherSourceValue(id, place, latitude, longitude, retain)
+        val phone = if (kind == "android") session.phoneContextSource(id, retain) else null
         OscarButton(onClick = {
-            val value = if (kind == "weather") weather!! else JSONObject().put("id", id).put("adapter", kind)
+            val value = if (kind == "weather") weather!! else if (kind == "android") phone!! else JSONObject().put("id", id).put("adapter", kind)
                 .put("entity_id", if (kind == "calendar") "calendar:$id" else "core").put("interval_seconds", 30).put("retain", retain).put("retention_seconds", 3600)
             if (kind == "calendar") value.put("account_id", accountId).put("account_generation", account!!.getInt("generation")).put("calendar_id", calendarId).put("horizon_seconds", 86400)
             else if (kind == "time") value.put("timezone", timezone)
             reviewChange(session, "assistance", change("source_create", id, value))
-        }, enabled = state.canManage() && id.matches(Regex("[A-Za-z0-9_.:/-]{1,80}")) && (kind != "calendar" || account != null) && (kind != "weather" || weather != null), modifier = Modifier.fillMaxWidth()) { Text("Review context source") }
+        }, enabled = state.canManage() && id.matches(Regex("[A-Za-z0-9_.:/-]{1,80}")) && (kind != "calendar" || account != null) && (kind != "weather" || weather != null) && (kind != "android" || phone != null), modifier = Modifier.fillMaxWidth()) { Text("Review context source") }
     }
 }
 

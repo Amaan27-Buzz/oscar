@@ -6,6 +6,19 @@ import org.junit.Test
 import java.security.MessageDigest
 
 class NativeGridWireTest {
+    @Test fun explicitRestartPollRequiresFreshRegistrationWithoutDelivery() {
+        val restart = JSONObject().put("delivery", JSONObject.NULL).put("advertise_required", true)
+        assertTrue(nativeReadvertisementRequired(restart))
+        assertFalse(nativeReadvertisementRequired(JSONObject().put("delivery", JSONObject.NULL)))
+        assertFalse(nativeReadvertisementRequired(JSONObject().put("delivery", JSONObject())))
+        // An instruction carrying a delivery could replay an already claimed effect.
+        assertThrows(IllegalArgumentException::class.java) {
+            nativeReadvertisementRequired(JSONObject().put("delivery", JSONObject()).put("advertise_required", true))
+        }
+        assertThrows(IllegalArgumentException::class.java) {
+            nativeReadvertisementRequired(JSONObject().put("delivery", JSONObject.NULL).put("advertise_required", "true"))
+        }
+    }
     private fun delivery(): JSONObject {
         val action = JSONObject("""{"id":"action","task_id":"task","correlation_id":"correlation","capability_id":"android.ui.set_text","parameters":{"package":"example.synthetic","target":"example.synthetic:id/input","value":"Synthetic café"},"idempotency_key":"task","initiator":"owner"}""")
         val review = JSONObject().put("action", action).put("target", "phone").put("workspace", "selected-apps").put("deadline_ms", 2000)

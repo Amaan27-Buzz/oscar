@@ -203,6 +203,14 @@ and redirect refusal. This verifies local HTTP/contract behavior, not Google
 account access. `scripts.verify_connector_public --run-public` performs only a
 real unauthenticated public GitHub response-contract check with source/time/ID.
 
+The [2026-10-23 reviewed resource-authorization candidate](development/SOFTWARE-MCP-AUTHORIZATION.md)
+adds native Connections consent for administered MCP resources. Its distinct
+`resource-grant` identity class records resource access without asserting a
+verified provider person. Explicit signed refresh, exact resource audience,
+generation fencing and local credential-deletion readback remain separate from
+tool action authority and unknown provider-side revocation. Synthetic HTTP/SDK
+acceptance does not commission a real provider account.
+
 MCP has an SDK session HTTP-interface adapter through Fabric permission/policy
 checks. Session readiness must be supplied by trusted composition. Destructive
 MCP tool calls require both reviewed risk scope and confirmation even if the server

@@ -70,16 +70,33 @@ class NativeWorkerService : Service() {
                         action == permitted && SystemClock.elapsedRealtime() < permitUntil && NativeWorker.current(token) &&
                             !getSystemService(KeyguardManager::class.java).isKeyguardLocked
                     }; adapter = native; native.gate.foreground(true)
+                    var advertised: String? = null
                     while (isActive && NativeWorker.current(requested)) {
                         phase = "advertisement"
                         require(!getSystemService(KeyguardManager::class.java).isKeyguardLocked)
                         val current = withContext(Dispatchers.IO) { vault.load() } ?: error("Connection removed")
                         require(CoreClient(current).binding() == binding)
                         val caps = native.status().filter { it.availability == "available" }.map { cap -> nativeAdvertisement(cap.id, connection.nodeId()) }
-                        withContext(Dispatchers.IO) { connection.call("advertise", JSONObject().put("workspace", workspace).put("capabilities", JSONArray(caps))) }
+                        val advertisement = JSONObject().put("workspace", workspace).put("capabilities", JSONArray(caps))
+                        val fingerprint = advertisement.toString()
+                        if (fingerprint != advertised) {
+                            withContext(Dispatchers.IO) { connection.call("advertise", advertisement) }
+                            advertised = fingerprint
+                        }
+                        if (connection.hasScope("android:perceive")) try {
+                            withContext(Dispatchers.IO) { PhoneContext.publish(this@NativeWorkerService) { name, value -> connection.call(name, value) } }
+                        } catch (cancelled: CancellationException) { throw cancelled }
+                        catch (rejected: CoreClient.SessionRejected) { throw rejected }
+                        catch (_: Exception) { android.util.Log.w("OscarNativeWorker", "Selected phone context unavailable") }
                         NativeWorker.state(true, "Connected · ${caps.size} available capabilities")
                         phase = "poll"
                         val response = withContext(Dispatchers.IO) { connection.call("poll", JSONObject()) }
+                        if (nativeReadvertisementRequired(response)) {
+                            advertised = null
+                            NativeWorker.state(true, "Refreshing available capabilities")
+                            delay(NATIVE_WORKER_POLL_MS)
+                            continue
+                        }
                         if (!response.isNull("delivery")) {
                             phase = "delivery validation"
                             val delivery = NativeGridDelivery.parse(response.getJSONObject("delivery"), connection.nodeId(), saved.getString("session_id"), workspace, System.currentTimeMillis())
@@ -108,7 +125,8 @@ class NativeWorkerService : Service() {
                             phase = "result delivery"
                             withContext(Dispatchers.IO) { require(connection.call("deliver", JSONObject().put("delivery_id", delivery.id).put("result", receipt)).getBoolean("accepted")) }
                         }
-                        delay(1500)
+                        // Poll renews the executor lease; unchanged advertisements add no authority.
+                        delay(NATIVE_WORKER_POLL_MS)
                     }
                 } catch (cancelled: CancellationException) { throw cancelled }
                 catch (failure: Exception) {
@@ -132,6 +150,16 @@ class NativeWorkerService : Service() {
     }
     override fun onBind(intent: Intent?): IBinder? = null
     companion object { @Volatile internal var instance: NativeWorkerService? = null; private set }
+}
+
+internal const val NATIVE_WORKER_POLL_MS = 2000L
+
+/** Only an explicit unclaimed poll can recover registration; never retry a failed request. */
+internal fun nativeReadvertisementRequired(response: JSONObject): Boolean {
+    if (!response.has("advertise_required")) return false
+    require(response.keysSet() == setOf("delivery", "advertise_required") &&
+        response.get("advertise_required") == true && response.get("delivery") == JSONObject.NULL)
+    return true
 }
 
 internal fun nativeAdvertisement(id: String, node: String): JSONObject {

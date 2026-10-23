@@ -411,7 +411,19 @@ class RemoteWorker:
         return result
 
     def step(self) -> bool:
-        delivery = self.client.request("poll", {})["delivery"]
+        response = self.client.request("poll", {})
+        if "advertise_required" in response:
+            if (
+                set(response) != {"delivery", "advertise_required"}
+                or response["advertise_required"] is not True
+                or response["delivery"] is not None
+            ):
+                raise PermissionError("invalid Worker registration response")
+            # Core explicitly confirms this poll claimed nothing. Do not retry an
+            # ambiguous poll/effect; only rebuild the lost executor registration.
+            self.advertise()
+            return False
+        delivery = response["delivery"]
         self.status = "online"
         if delivery is None:
             return False

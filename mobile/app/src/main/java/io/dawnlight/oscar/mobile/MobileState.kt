@@ -15,7 +15,15 @@ data class CoreTask(
     val progress: CoreProgress? = null, val artifacts: List<CoreArtifact> = emptyList(), val ownership: String = "planned",
     val origin: String = "Core", val originNode: String? = null,
     val reviewDigest: String? = null, val capability: String? = null,
+    val responseStatus: String? = null, val sourceEventIds: List<String> = emptyList(),
+    val requestRetained: Boolean = true,
 ) {
+    val responseLabel: String get() = when (responseStatus) {
+        "RECALLED" -> "Earlier retained evidence"
+        "INFERRED" -> "Inference from earlier evidence"
+        "UNKNOWN" -> "Not established"
+        else -> "Reported response"
+    }
     val label: String get() = if (state in setOf("executing", "awaiting_result", "result_received", "verifying") && nodeStatus != "online") "Executor unavailable · outcome UNKNOWN" else when (state) {
         "planned" -> "Needs approval"
         "executing" -> "Working"
@@ -108,8 +116,15 @@ fun parseTask(json: JSONObject): CoreTask {
     require(value == null || (state == "verified" && evidence.isNotEmpty()))
     val blocker = if (json.has("blocker") && !json.isNull("blocker") && json.getString("blocker").isNotEmpty()) json.bounded("blocker", 1000) else null
     val status = json.bounded("node_status", 32)
+    val responseStatus = if (json.has("response")) json.bounded("response_status", 32).also {
+        require(it in setOf("REPORTED", "RECALLED", "INFERRED", "UNKNOWN"))
+    } else null
+    val sources = if (json.has("source_event_ids")) json.strings("source_event_ids", 32).also {
+        require(it.all { id -> id.length <= 128 } && it.distinct().size == it.size)
+    } else emptyList()
+    require(sources.isEmpty() || responseStatus in setOf("RECALLED", "INFERRED"))
+    require(responseStatus !in setOf("RECALLED", "INFERRED") || sources.isNotEmpty())
     val response = if (json.has("response")) {
-        require(json.bounded("response_status", 32) == "REPORTED")
         json.boundedText("response", 8192)
     } else null
     require(status in setOf("online", "offline", "degraded"))
@@ -137,9 +152,11 @@ fun parseTask(json: JSONObject): CoreTask {
     val originNode = if (json.has("origin_node") && !json.isNull("origin_node")) json.bounded("origin_node", 80) else null
     return CoreTask(json.bounded("task_id", 80), json.bounded("description", 256), state,
         json.bounded("target", 80), status, generation, if (status == "online") actions else actions.filter { it in setOf("cancel", "deny") },
-        evidence, value, blocker, response, json.optBoolean("response_truncated", false), progress, artifacts, ownership, origin, originNode)
+        evidence, value, blocker, response, json.optBoolean("response_truncated", false), progress, artifacts, ownership, origin, originNode,
+        responseStatus = responseStatus, sourceEventIds = sources)
 }
 fun CoreSnapshot.withoutPrivate() = copy(adaptive = emptyList(), executive = null, management = null, connections = null, tasks = tasks.map { it.copy(description = "Private request hidden", response = null, value = null,
+    responseStatus = null, sourceEventIds = emptyList(),
     artifacts = emptyList(), progress = it.progress?.copy(step = "Worker checkpoint available"),
     blocker = it.blocker?.let { "Inspect Core before continuing" }, actions = it.actions.filter { action -> action in setOf("deny", "cancel") }) })
 fun parseSnapshot(json: JSONObject): CoreSnapshot {

@@ -1,0 +1,13 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <application>
+        <activity android:name="io.dawnlight.oscar.mobile.PhoneNotificationFixtureActivity"
+            android:exported="true" android:label="OSCAR synthetic notification"
+            android:taskAffinity="io.dawnlight.oscar.mobile.test.phonecontext"
+            android:theme="@android:style/Theme.Material.Light.NoActionBar" />
+        <activity android:name="io.dawnlight.oscar.mobile.ScreenFixtureActivity"
+            android:exported="true" android:label="OSCAR synthetic screen"
+            android:taskAffinity="io.dawnlight.oscar.mobile.test.screenfixture"
+            android:theme="@android:style/Theme.Material.Light.NoActionBar" />
+    </application>
+</manifest>

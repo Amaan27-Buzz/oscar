@@ -191,9 +191,17 @@ class BM25Embedding:
 
     identity = "fastembed:Qdrant/bm25:0.8.1"
 
-    def __init__(self) -> None:
+    def __init__(self, *, model_path: Path | None = None, offline: bool = False) -> None:
         module = importlib.import_module("fastembed")
-        self.model = module.SparseTextEmbedding(model_name="Qdrant/bm25")
+        self.model = module.SparseTextEmbedding(
+            model_name="Qdrant/bm25",
+            local_files_only=offline,
+            specific_model_path=str(model_path) if model_path else None,
+        )
+        if model_path is not None:
+            self.identity += (
+                ":" + hashlib.sha256((model_path / "english.txt").read_bytes()).hexdigest()
+            )
 
     def embed(self, text: str) -> tuple[list[int], list[float]]:
         if not 0 < len(text) <= 64_000:
@@ -271,6 +279,13 @@ class QdrantIndex:
             },
             sparse_vectors_config={"lexical": m.SparseVectorParams(modifier=m.Modifier.IDF)},
         )
+        # Local Qdrant can retain an open SQLite file after collection removal on Windows.
+        # Clear through its public storage API, including any records reopened on recreation.
+        self.client.delete(
+            self.collection, points_selector=m.FilterSelector(filter=m.Filter()), wait=True
+        )
+        if self.client.count(self.collection, exact=True).count:
+            raise RuntimeError("derived projection reset was not independently confirmed")
         for start in range(0, len(records), 100):
             batch = records[start : start + 100]
             vectors = self.embedder.embed([record.content for record in batch])
@@ -441,16 +456,25 @@ class GraphitiIndex:
         self.identity = f"graphiti-v2:{database}:{group}:{embedder.identity}:{reranker.identity}"
         self.loop = asyncio.new_event_loop()
         self.generation: str | None = None
-        self.loop.run_until_complete(self.graph.build_indices_and_constraints())
-        # Create schema tokens, not a freshness marker, before native scoped reads.
-        self.loop.run_until_complete(
-            self.graph.driver.execute_query(
-                "CREATE (n:OSCARMemoryProjection:OSCARProjectionState "
-                "{group_id:$group,identity:$identity,digest:''}) DELETE n",
-                group=self.group,
-                identity=self.identity,
+        try:
+            self.loop.run_until_complete(
+                asyncio.wait_for(self.graph.build_indices_and_constraints(), timeout=30)
             )
-        )
+            # Create schema tokens, not a freshness marker, before native scoped reads.
+            self.loop.run_until_complete(
+                asyncio.wait_for(
+                    self.graph.driver.execute_query(
+                        "CREATE (n:OSCARMemoryProjection:OSCARProjectionState "
+                        "{group_id:$group,identity:$identity,digest:''}) DELETE n",
+                        group=self.group,
+                        identity=self.identity,
+                    ),
+                    timeout=5,
+                )
+            )
+        except BaseException:
+            self.close()
+            raise
 
     async def _rebuild(self, records: Sequence[MemoryRecord], relationship: str | None) -> None:
         relationships = {record.relationship_id for record in records}
@@ -585,7 +609,7 @@ class GraphitiIndex:
             raise ValueError("bounded derived projection required")
         self.generation = None
         self.loop.run_until_complete(
-            asyncio.wait_for(self._rebuild(records, relationship), timeout=300)
+            asyncio.wait_for(self._rebuild(records, relationship), timeout=30)
         )
         self.generation = digest(records)
 
@@ -599,13 +623,15 @@ class GraphitiIndex:
             )
             return str(rows[0]["digest"]) if len(rows) == 1 else None
 
-        return self.loop.run_until_complete(read())
+        return self.loop.run_until_complete(asyncio.wait_for(read(), timeout=2))
 
     def query(self, query: str, relationship: str, *, limit: int = 20) -> list[str]:
         if not 1 <= limit <= 100:
             raise ValueError("bounded temporal query required")
         edges = self.loop.run_until_complete(
-            self.graph.search(query, group_ids=[self.group], num_results=limit)
+            asyncio.wait_for(
+                self.graph.search(query, group_ids=[self.group], num_results=limit), timeout=8
+            )
         )
         return [
             str(edge.attributes["memory_id"])
@@ -631,9 +657,11 @@ class GraphitiIndex:
                 "MATCH (n:OSCARProjectionState {group_id:$group}) DELETE n", group=self.group
             )
 
-        self.loop.run_until_complete(remove())
+        self.loop.run_until_complete(asyncio.wait_for(remove(), timeout=10))
         self.generation = None
 
     def close(self) -> None:
-        self.loop.run_until_complete(self.graph.close())
-        self.loop.close()
+        try:
+            self.loop.run_until_complete(asyncio.wait_for(self.graph.close(), timeout=5))
+        finally:
+            self.loop.close()

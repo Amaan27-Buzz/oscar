@@ -9,10 +9,7 @@ from oscar.desktop_context import ContextSource
 from oscar.desktop_voice import DesktopVoice
 from oscar.event_archive import MemoryWriter, SourceEvent
 from oscar.grid import Node, NodeRole
-from oscar.memory_executor import MemoryExecutor
-from oscar.memory_fabric import MemoryFabric
 from oscar.storage import StateConflict
-from oscar.transport import Dispatcher
 from oscar.voice_contracts import AudioFrame, Origin, Transcript
 
 from . import test_desktop
@@ -185,7 +182,7 @@ class AskCompletionTests(unittest.TestCase):
 
     def test_sourced_memory_uses_existing_fabric_and_forget_withdraws_recall(self):
         archive = self.h.archive
-        memory = MemoryFabric(archive)
+        memory = self.h.memory
         event = SourceEvent(
             "owner",
             "Project Cedar uses typed controls",
@@ -201,38 +198,9 @@ class AskCompletionTests(unittest.TestCase):
             retain_authorized=True,
             inferred=False,
         )
-        self.h.runtime.memory = memory
-        worker_scopes = ("heartbeat", "advertise", "execute", "memory:read", "cancel")
-        self.h.grid.register(Node("recall-worker", NodeRole.CLOUD, worker_scopes))
-        worker = self.h.grid.pair("recall-worker", worker_scopes)
-        self.h.grid.advertise(
-            worker,
-            [
-                Capability(
-                    "memory.recall",
-                    "Recall",
-                    "Source-backed archive retrieval",
-                    "retrieval",
-                    worker.node_id,
-                    ("memory:read",),
-                    "memory",
-                    "text",
-                )
-            ],
-        )
-        dispatcher = Dispatcher(
-            self.h.store,
-            self.h.grid,
-            worker.node_id,
-            {"memory.recall": MemoryExecutor(memory, "owner")},
-        )
-        self.core.targets[worker.node_id] = (dispatcher, worker)
         scopes = (
             *self.base.scopes,
             "memory:read",
-            "control:inspect:recall-worker",
-            "control:approve:recall-worker",
-            "control:cancel:recall-worker",
         )
         self.h.grid.register(Node("recall-owner", NodeRole.DESKTOP, scopes))
         self.base.session = self.h.grid.pair("recall-owner", scopes)
@@ -250,6 +218,22 @@ class AskCompletionTests(unittest.TestCase):
         self.assertNotIn(event.content, forgotten["response"])
 
     def test_missing_recall_capability_never_falls_back_to_a_model_prior(self):
+        with self.assertRaises(PermissionError):
+            self.base.ask("Recall an earlier project decision")
+        for kind, identity in (
+            ("session", self.base.session.id),
+            ("node", self.base.session.node_id),
+        ):
+            row = self.h.store.get(kind, identity)
+            self.h.store.put(kind, identity, {**row, "scopes": [*row["scopes"], "memory:read"]})
+        self.h.grid.advertise(
+            self.h.session,
+            [
+                Capability.from_dict(cap)
+                for cap in self.h.store.get("node", self.h.node_id)["capabilities"]
+                if cap["id"] != "memory.recall"
+            ],
+        )
         task = self.base.ask("Recall an earlier project decision")
         self.assertEqual("blocked", task["state"])
         self.assertNotIn("task_id", task)

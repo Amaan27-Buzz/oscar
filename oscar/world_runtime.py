@@ -25,6 +25,7 @@ from .perception import PerceptionFabric, PerceptionSource
 from .perception_adapters import ContextPerceptionAdapter
 from .policy import PersonalPolicy
 from .sentry import AwarenessMode, SentryRuntime
+from .sentry_delivery import SentryDelivery
 from .storage import StateConflict
 from .world_model import ObservationKind, WorldModel, reference
 
@@ -72,6 +73,7 @@ class WorldRuntime:
         )
         self.fabric = PerceptionFabric(self.world, PersonalPolicy(self.store))
         self.sentry = SentryRuntime(self.fabric, runtime.memory)
+        self.delivery = SentryDelivery(self.sentry)
         self.instance = new_id()
         self.stop_event, self.wake = Event(), Event()
         self.lock = RLock()
@@ -101,7 +103,7 @@ class WorldRuntime:
             raise PermissionError("source setup requires trusted owner authority")
         reference(entity_id)
         if (
-            adapter not in {"grid", "tasks", "files", "time", "calendar", "weather"}
+            adapter not in {"grid", "tasks", "files", "time", "calendar", "weather", "android"}
             or type(interval_seconds) is not int
             or not 1 <= interval_seconds <= 3600
             or entity_id not in source.entities
@@ -114,7 +116,7 @@ class WorldRuntime:
             for key, path in paths.items():
                 reference(key)
                 self.files.parts(path) if hasattr(self.files, "parts") else reference(path)
-        elif adapter in {"time", "calendar", "weather"}:
+        elif adapter in {"time", "calendar", "weather", "android"}:
             if native_config is None or paths:
                 raise ValueError("reviewed native source configuration required")
             reviewed = self.review_source(native_config)
@@ -158,6 +160,7 @@ class WorldRuntime:
             "time": {"timezone"},
             "calendar": {"account_id", "account_generation", "calendar_id", "horizon_seconds"},
             "weather": {"latitude", "longitude", "place"},
+            "android": {"node_id", "session_id", "packages"},
         }
         if adapter not in extras or set(value) != common | extras[adapter]:
             raise ValueError("exact native context configuration required")
@@ -178,6 +181,10 @@ class WorldRuntime:
         else:
             raise ValueError("source identifier already registered")
         material = {"configuration": value, "perceive": True, "act": False}
+        if adapter == "android":
+            from .phone_context import review
+
+            return material | review(self, value)
         if adapter == "weather":
             for key, limit in (("latitude", 90), ("longitude", 180)):
                 coordinate = value[key]
@@ -512,12 +519,16 @@ class WorldRuntime:
                             continue
                         row.update(state="unavailable", next_at=now + row["interval"])
                         self._save_poll(row)
+            from .phone_context import recheck
+
+            recheck(self)
             tasks_changed = self.tasks_changed.is_set()
             self.tasks_changed.clear()
             rows = [
                 r
                 for r in self.store.all("perception_poll")
                 if r["relationship"] == self.world.relationship
+                and r["adapter"] != "android"
                 and (r["next_at"] <= now or tasks_changed and r["adapter"] == "tasks")
             ]
             for row in sorted(rows, key=lambda r: r["next_at"])[:8]:
@@ -558,7 +569,7 @@ class WorldRuntime:
                     guard = partial(self._guard, generation=generation if ambient else None)
                     adapter.acquisition_guard = guard
                     if ambient:
-                        adapter.observer = partial(self.sentry.observe, guard=guard)
+                        adapter.observer = partial(self.delivery.observe, guard=guard)
                     adapter.poll()
                     counts["polled"] += 1
                     row.update(
@@ -604,6 +615,9 @@ class WorldRuntime:
             return counts
 
     def snapshot(self) -> dict[str, Any]:
+        from .phone_context import recheck
+
+        recheck(self)
         now = self.world.clock()
         sources = []
         for row in self.store.all("perception_poll"):
@@ -638,14 +652,23 @@ class WorldRuntime:
             "health": self.health,
         }
 
+    def alerts(self) -> list[dict[str, Any]]:
+        from .phone_context import recheck
+
+        recheck(self)
+        return self.delivery.snapshot()
+
     def brief(self) -> dict[str, Any]:
         """Caller must hold world:read; metadata snapshots never include private context."""
+        from .phone_context import recheck
+
         with self.store.transaction():
+            recheck(self)
             rows = [
                 r
                 for r in self.store.all("perception_poll")
                 if r["relationship"] == self.world.relationship
-                and r["adapter"] in {"time", "calendar", "tasks", "weather"}
+                and r["adapter"] in {"time", "calendar", "tasks", "weather", "android"}
             ]
             sources = []
             for row in rows[:8]:
@@ -654,6 +677,7 @@ class WorldRuntime:
                     "calendar": "calendar.state",
                     "tasks": "tasks.state",
                     "weather": "weather.state",
+                    "android": "phone.state",
                 }[row["adapter"]]
                 available = True
                 if row["adapter"] == "calendar":

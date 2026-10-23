@@ -11,6 +11,21 @@ import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
 class AccountBrowserTest {
+    @Test fun mcpResourceCallbackKeepsExactIssuerAndResourceBinding() {
+        val resource = "https://mcp.example.com/mcp"
+        val issuer = "https://auth.example.com/tenant"
+        val value = enrollment().put("authorization_kind", "mcp-resource").put("issuer", issuer)
+            .put("issuer_required", true).put("resource", resource)
+            .put("authorization_endpoint", "https://auth.example.com/authorize")
+            .put("url", "https://auth.example.com/authorize?state=$state&redirect_uri=${URLEncoder.encode(redirect,"UTF-8")}&resource=${URLEncoder.encode(resource,"UTF-8")}&code_challenge_method=S256")
+        AccountBrowser(value, 100_000).use { browser ->
+            assertThrows(Exception::class.java) { browser.callback(request("state=$state&code=x")) }
+            assertThrows(Exception::class.java) { browser.callback(request("state=$state&code=x&iss=https%3A%2F%2Fattacker.test")) }
+            assertEquals("synthetic-code", browser.callback(request("state=$state&code=synthetic-code&iss=${URLEncoder.encode(issuer,"UTF-8")}")))
+            assertEquals(issuer, browser.responseIssuer)
+        }
+        assertThrows(Exception::class.java) { AccountBrowser(value.put("resource", "https://other.example/mcp"), 100_000) }
+    }
     private val state = "synthetic-owner-state-with-32-characters"
     private val redirect = "http://127.0.0.1:48123/oauth/callback"
     private fun enrollment() = JSONObject().put("id", "pending").put("expires_at", 120)

@@ -18,7 +18,9 @@ from .discovery import HTTPDiscovery
 from .event_archive import EventArchive
 from .executive import Executive
 from .grid import Grid, InternalSessionRuntime, Node, NodeRole
+from .local_memory import LocalMemory, LocalMemoryConfig
 from .mcp_client import MCPPlugins
+from .memory_executor import MemoryExecutor
 from .memory_fabric import MemoryFabric
 from .models import Mode, ModelRequest, ProviderError, RoutingPolicy
 from .oauth_device import Vault, VaultResolver
@@ -129,15 +131,19 @@ class Harness:
         vault: Vault | None = None,
         start_services: bool = True,
         auth_config: Path | None = None,
+        memory_config: LocalMemoryConfig | None = None,
     ):
         providers = load_providers(auth_config) if auth_config is not None else []
         self.store = Store(state)
         self.grid = Grid(self.store, clock)
         self.files = ScopedFiles(workspace)
         self.archive = EventArchive(state.with_suffix(".archive.sqlite"))
-        self.runtime = Runtime(
-            self.store, self.grid, Verifier(self.files), memory=MemoryFabric(self.archive)
-        )
+        if memory_config is not None and memory_config.relationship_id != "owner":
+            self.archive.close()
+            self.store.close()
+            raise ValueError("configured memory relationship differs from Core")
+        self.memory = MemoryFabric(self.archive)
+        self.runtime = Runtime(self.store, self.grid, Verifier(self.files), memory=self.memory)
         self.accounts = AccountRegistry(self.store, clock)
         self.accounts.operational_identity(self.runtime.relationship_id)
         if vault is None:
@@ -206,11 +212,33 @@ class Harness:
         self.search = TavilySource(self.store, credential_environ, redact=self.pool.redact)
         self.runtime.on_verification = self.router.observe_verification
         self.node_id = node_id
-        scopes = ("heartbeat", "advertise", "execute", "files:write", "math", "models", "cancel")
+        scopes: tuple[str, ...] = (
+            "heartbeat",
+            "advertise",
+            "execute",
+            "files:write",
+            "math",
+            "models",
+            "cancel",
+            "memory:read",
+        )
         try:
-            self.store.get("node", self.node_id)
+            existing = self.store.get("node", self.node_id)
         except KeyError:
             self.grid.register(Node(self.node_id, NodeRole.CLOUD, scopes))
+        else:
+            if "memory:read" not in existing["scopes"]:
+                if execution_enrollment_authorized and not existing["revoked"]:
+                    self.store.put(
+                        "node",
+                        self.node_id,
+                        {
+                            **existing,
+                            "scopes": [*existing["scopes"], "memory:read"],
+                        },
+                    )
+                else:
+                    scopes = tuple(scope for scope in scopes if scope != "memory:read")
         try:
             self.session = self.grid.pair(
                 self.node_id, scopes, internal=True, reenroll=execution_enrollment_authorized
@@ -262,6 +290,19 @@ class Harness:
                 "text",
             ),
         ]
+        if "memory:read" in scopes:
+            capabilities.append(
+                Capability(
+                    "memory.recall",
+                    "Recall retained evidence",
+                    "Read canonical sourced history",
+                    "retrieval",
+                    self.node_id,
+                    ("memory:read",),
+                    "memory",
+                    "text",
+                )
+            )
         self.grid.advertise(self.session, capabilities)
         template = model_request or ModelRequest(new_id(), new_id(), "")
         self.dispatcher = Dispatcher(
@@ -276,6 +317,12 @@ class Harness:
                     self.router, (ProviderInventorySource(self.router), self.search)
                 ),
             },
+        )
+        if memory_config is not None:
+            self.memory = LocalMemory(self.archive, memory_config, credential_environ or {})
+            self.runtime.memory = self.memory
+        self.dispatcher.executors["memory.recall"] = MemoryExecutor(
+            self.memory, self.runtime.relationship_id, self.runtime
         )
         self.world = WorldRuntime(self.runtime, self.files)
         self.runtime.world = self.world
@@ -338,7 +385,11 @@ class Harness:
         if self.execution_session.thread.ident is not None:
             self.execution_session.close()
         self.world.close()
-        self.archive.close()
+        try:
+            if isinstance(self.memory, LocalMemory):
+                self.memory.close()
+        finally:
+            self.archive.close()
 
     def close(self) -> None:
         self.store.close()

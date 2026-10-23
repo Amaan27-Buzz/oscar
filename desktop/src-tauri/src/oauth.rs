@@ -2,6 +2,7 @@
 use reqwest::Url;
 use serde_json::Value;
 use std::{
+    cell::RefCell,
     collections::HashMap,
     io::{Read, Write},
     net::{IpAddr, TcpListener, TcpStream},
@@ -14,6 +15,9 @@ pub struct Enrollment {
     authorization: Url,
     redirect: Url,
     state: String,
+    issuer: Option<String>,
+    issuer_required: bool,
+    received_issuer: RefCell<Option<String>>,
 }
 impl Enrollment {
     pub fn parse(value: &Value, now: u64) -> Result<Self, String> {
@@ -33,6 +37,12 @@ impl Enrollment {
             .ok_or("expired account enrollment")?;
         let expires_at = expiry.floor() as u64;
         let authorization = Url::parse(text("url")?).map_err(|_| "invalid provider URL")?;
+        let resource_grant = value["authorization_kind"] == "mcp-resource";
+        let issuer = if resource_grant {
+            Some(text("issuer")?.to_owned())
+        } else {
+            None
+        };
         let redirect = Url::parse(text("redirect_uri")?).map_err(|_| "invalid callback URL")?;
         redirect
             .host_str()
@@ -50,21 +60,33 @@ impl Enrollment {
             return Err("exact loopback callback required".into());
         }
         if authorization.scheme() != "https"
-            || authorization.port_or_known_default() != Some(443)
+            || !resource_grant && authorization.port_or_known_default() != Some(443)
             || authorization.fragment().is_some()
             || !authorization.username().is_empty()
             || authorization.password().is_some()
-            || !match authorization.host_str() {
-                Some("accounts.google.com") => authorization.path() == "/o/oauth2/v2/auth",
-                Some("login.microsoftonline.com") => {
-                    authorization.path().ends_with("/oauth2/v2.0/authorize")
+            || !if resource_grant {
+                let mut endpoint = authorization.clone();
+                endpoint.set_query(None);
+                endpoint.as_str() == text("authorization_endpoint")?
+            } else {
+                match authorization.host_str() {
+                    Some("accounts.google.com") => authorization.path() == "/o/oauth2/v2/auth",
+                    Some("login.microsoftonline.com") => {
+                        authorization.path().ends_with("/oauth2/v2.0/authorize")
+                    }
+                    _ => false,
                 }
-                _ => false,
             }
         {
             return Err("verified provider authorization endpoint required".into());
         }
         let query = pairs(&authorization)?;
+        if resource_grant
+            && (query.get("resource").map(String::as_str) != Some(text("resource")?)
+                || query.get("code_challenge_method").map(String::as_str) != Some("S256"))
+        {
+            return Err("MCP resource and PKCE binding required".into());
+        }
         let state = query
             .get("state")
             .filter(|s| (24..=512).contains(&s.len()))
@@ -79,6 +101,9 @@ impl Enrollment {
             authorization,
             redirect,
             state,
+            issuer,
+            issuer_required: value["issuer_required"].as_bool().unwrap_or(false),
+            received_issuer: RefCell::new(None),
         })
     }
     pub fn bind(&self) -> Result<TcpListener, String> {
@@ -165,12 +190,20 @@ impl Enrollment {
             return Err("callback path rejected".into());
         }
         let query = pairs(&callback)?;
+        if let Some(expected) = &self.issuer {
+            if query.get("iss").is_some_and(|actual| actual != expected)
+                || self.issuer_required && !query.contains_key("iss")
+            {
+                return Err("MCP callback issuer rejected".into());
+            }
+        }
         if query.get("state") != Some(&self.state) {
             return Err("callback state rejected".into());
         }
         if query.contains_key("error") {
             return Err("Provider authorization was declined.".into());
         }
+        *self.received_issuer.borrow_mut() = query.get("iss").cloned();
         query
             .get("code")
             .filter(|code| {
@@ -233,6 +266,9 @@ impl Enrollment {
     pub fn state(&self) -> &str {
         &self.state
     }
+    pub fn response_issuer(&self) -> Option<String> {
+        self.received_issuer.borrow().clone()
+    }
 }
 fn pairs(url: &Url) -> Result<HashMap<String, String>, String> {
     let mut result = HashMap::new();
@@ -276,6 +312,30 @@ fn read_request(stream: &mut TcpStream) -> Result<String, String> {
 mod tests {
     use super::*;
     use serde_json::json;
+    #[test]
+    fn mcp_resource_callback_preserves_exact_issuer_and_resource() {
+        let value = json!({"id":"pending","expires_at":120,
+            "authorization_kind":"mcp-resource","issuer":"https://auth.example.com/tenant",
+            "issuer_required":true,"resource":"https://mcp.example.com/mcp",
+            "authorization_endpoint":"https://auth.example.com/authorize",
+            "redirect_uri":"http://127.0.0.1:48123/oauth/callback",
+            "url":"https://auth.example.com/authorize?state=synthetic-state-with-32-characters&redirect_uri=http%3A%2F%2F127.0.0.1%3A48123%2Foauth%2Fcallback&resource=https%3A%2F%2Fmcp.example.com%2Fmcp&code_challenge_method=S256"});
+        let e = Enrollment::parse(&value, 100).unwrap();
+        let request = "GET /oauth/callback?state=synthetic-state-with-32-characters&code=x&iss=https%3A%2F%2Fauth.example.com%2Ftenant HTTP/1.1\r\nHost: 127.0.0.1:48123\r\n\r\n";
+        assert_eq!(e.callback(request).unwrap(), "x");
+        assert_eq!(
+            e.response_issuer().as_deref(),
+            Some("https://auth.example.com/tenant")
+        );
+        assert!(
+            e.callback(&request.replace("auth.example.com", "attacker.test"))
+                .is_err()
+        );
+        assert!(
+            e.callback(&request.replace("&iss=https%3A%2F%2Fauth.example.com%2Ftenant", ""))
+                .is_err()
+        );
+    }
     fn enrollment() -> Enrollment {
         Enrollment::parse(&json!({"id":"pending","url":"https://accounts.google.com/o/oauth2/v2/auth?redirect_uri=http%3A%2F%2F127.0.0.1%3A48123%2Foauth%2Fcallback&state=synthetic-state-with-32-characters","redirect_uri":"http://127.0.0.1:48123/oauth/callback","expires_at":120}),100).unwrap()
     }

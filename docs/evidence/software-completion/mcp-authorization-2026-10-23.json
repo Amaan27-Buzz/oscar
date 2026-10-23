@@ -1,0 +1,43 @@
+{
+  "classification": "SYNTHETIC_LOCAL_SOFTWARE_VERIFIED",
+  "sources": {
+    "oscar/mcp_auth.py": "66b7aac63452a891c94eccc8ae5276cf26684fa4bbb6c0e53e3eab95fca4c57d",
+    "oscar/accounts.py": "239531aea5e84b40c0bc5dc6b1ac9a8613b7433cc5c9faf53c33ca3ea2d42cba",
+    "oscar/auth_broker.py": "f9af4fe778c3d829afc2abbb29e6bdad27b65e6bff2b42c378d4677c401de4a0",
+    "oscar/connections.py": "b612c719786e9f053e372a54d09c8031eb32e4a8038a66aba79c9ff78382ca55",
+    "tests/test_mcp_auth.py": "9765dfc7e8192b37cc9dcd2a00642998706b98f968d1e9ad4b3f050e95173a18",
+    "desktop/src/Connections.tsx": "08af0deb223687cfe2f1caee64eb2f248cf97c5e1a38503400100508cd299f8e",
+    "desktop/src/Connections.test.tsx": "06d77c8976774425cb3f126b8ae2e9cdacad822460d7b975ea216ef2f8d3ae30",
+    "desktop/src/bridge.ts": "305daa9ae7c33ee35387c88f7eecce11206e945e327796a82fc4b0f4ca762649",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/AccountBrowser.java": "ceed01b34abc7364b2c88bf67c6762557a15958e8dc14b38fc7dc838d0ec6c9f",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/ConnectionsScreen.kt": "8e615124876c2e58c6a5248576449cc4da17f6928b125b6ed3b1a4dfb1330bbd",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/CoreSession.kt": "9051ad3834d78292b6d45f53d73f5c0026962245cc51fc375223085b2f38857c",
+    "mobile/app/src/test/java/io/dawnlight/oscar/mobile/AccountBrowserTest.kt": "cdf13391ef0f9b9db7168e8120efa5610bccc5425ec555578dd7f4965299fa9c",
+    "desktop/src-tauri/src/oauth.rs": "e37c44b56e521d79562c5b6d745cf815a689b38e1e9222a459e71cb2ec036963",
+    "desktop/src-tauri/src/core.rs": "2db64e9f182b1dfcff967abca4e169c98f0e695bd4c509a513ffaa46e3349eb3"
+  },
+  "checks": {
+    "auth_sdk_regression": {
+      "state": "PASS",
+      "log_sha256": "e6c1dd7481eec144226f7d824f780d7b8fdac12a9f64ec2eeac56e6837bd37c5"
+    },
+    "desktop_components": {
+      "state": "PASS",
+      "log_sha256": "005fa4b275d18db13f9f3b0fa36a8845117c19f60b9b15820126b8c81c2a6780"
+    },
+    "desktop_build": {
+      "state": "PASS",
+      "log_sha256": "f215f696aaa6ca1cea4d2193eb32fa16f46f9615e9564f084213bd96b2f53c17"
+    },
+    "mypy": {
+      "state": "PASS",
+      "log_sha256": "d9a5631f7d87a741fbecc3236286d1792d22d349ff13846d71cdc9217307bb76"
+    }
+  },
+  "limits": [
+    "Fixed HTTPS aliases map to synthetic loopback HTTP; no public TLS or real provider consent acceptance",
+    "Resource grant does not authenticate a human identity",
+    "No automatic effect replay, automatic refresh, dynamic client registration or remote provider revocation",
+    "Native callback unit/build evidence is separate from actual browser consent"
+  ]
+}

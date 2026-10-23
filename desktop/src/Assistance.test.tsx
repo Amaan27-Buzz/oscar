@@ -72,7 +72,7 @@ it('reviews model input separately from reported suggested actions',()=>{
  fireEvent.click(screen.getByRole('button',{name:'Describe responsibility'}));fireEvent.click(screen.getByRole('radio',{name:'Ask OSCAR to propose a plan'}));
  fireEvent.change(screen.getByLabelText('Responsibility name'),{target:{value:'Planner'}});
  fireEvent.change(screen.getByLabelText('What should OSCAR handle?'),{target:{value:'Make a plan'}});
- fireEvent.click(screen.getByLabelText('core · files.write'));fireEvent.click(screen.getByLabelText('core · models.reason'));
+ fireEvent.click(screen.getByLabelText('core Â· files.write'));fireEvent.click(screen.getByLabelText('core Â· models.reason'));
  expect(run).not.toHaveBeenCalled();fireEvent.click(screen.getByRole('button',{name:'Review model planning request'}));
  expect(run).toHaveBeenLastCalledWith({kind:'manage_assistance',operation:'plan_draft',id:'new',value:{name:'Planner',goal:'Make a plan',mode:'private',capabilities:[{node_id:'core',capability_id:'files.write'},{node_id:'core',capability_id:'models.reason'}]}});
  fireEvent.click(screen.getByRole('button',{name:'Review suggested actions'}));

@@ -105,6 +105,7 @@ import androidx.compose.ui.semantics.liveRegion
     LaunchedEffect(storedSources) { sources = storedSources }
     val scope = rememberCoroutineScope()
     PreferenceGroup("Notification context") {
+    LocalGrant("Share selected phone context with Core", "phone_context", "Only selected notification counts and media playback states. Also requires a signed source and Sentry selection; no notification text or track titles. Updates while OSCAR is open or phone tasks are visibly running.")
     LocalGrant("Selected notification context", "notification_context", "Selected apps only. Does not retain content or allow replies.")
     HorizontalDivider()
     PreferenceControl("Android access", if (listener) "Granted" else "Not granted", "Android") {

@@ -1,6 +1,7 @@
 """Bounded owner forms translated to existing Worker contracts at the authoritative Core."""
 
 import hashlib
+import json
 import re
 from pathlib import Path
 from typing import Any
@@ -18,7 +19,7 @@ OPERATIONS = {
     "git_operation": ("git_status", "git_diff", "git_log", "git_branches", "git_branch"),
     "powershell": ("ps_environment", "ps_file_hash", "ps_write_utf8"),
     "terminal_command": ("program_version",),
-    "browser": ("inspect_page",),
+    "browser": ("inspect_page", "browser_workflow"),
     "installed_app": ("list_apps", "launch_app"),
     "executable_discovery": ("worker_tools",),
 }
@@ -85,7 +86,8 @@ def public_capability(cap: Capability, native: dict[str, Any]) -> dict[str, Any]
         "summary": cap.summary[:200],
         "risk": cap.risk,
         "permissions": list(cap.permissions),
-        "operations": list(OPERATIONS.get(cap.input_kind, ())),
+        # Workflow composition uses conversation and the existing exact native review.
+        "operations": [op for op in OPERATIONS.get(cap.input_kind, ()) if op != "browser_workflow"],
         "programs": [{"id": k, "name": Path(v).name} for k, v in programs(native).items()],
         "applications": [
             {"id": a["id"], "name": a["name"]}
@@ -118,12 +120,14 @@ def form_intent(cap: Capability, payload: dict[str, Any], native: dict[str, Any]
         "ps_write_utf8": {"path", "text"},
         "program_version": {"program_id"},
         "inspect_page": {"url"},
+        "browser_workflow": {"workflow"},
         "list_apps": set(),
         "launch_app": {"app_id"},
         "worker_tools": set(),
     }
     if set(fields) != allowed_fields[operation] or any(
-        not isinstance(v, str) or len(v) > (4096 if k == "text" else 500) for k, v in fields.items()
+        not isinstance(v, str) or len(v) > ({"text": 4096, "workflow": 16_000}.get(k, 500))
+        for k, v in fields.items()
     ):
         raise ValueError("invalid bounded Act fields")
     if "path" in fields:
@@ -152,6 +156,11 @@ def form_intent(cap: Capability, payload: dict[str, Any], native: dict[str, Any]
         if executable is None:
             raise PermissionError("registered version executor unavailable")
         parameters = {"argv": [executable, "--version"], "timeout": 10, "cwd": "."}
+    elif operation == "browser_workflow":
+        from .remote_machine import validate_remote_machine
+
+        parameters = json.loads(fields["workflow"])
+        validate_remote_machine("browser", parameters)
     elif operation == "inspect_page":
         url = fields["url"]
         parameters = {

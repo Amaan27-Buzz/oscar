@@ -1,0 +1,120 @@
+{
+  "version": 1,
+  "observed_at": "2026-10-22T04:53:55.526473+00:00",
+  "scope": "local synthetic software; generic Sentry metadata only",
+  "source_sha256": {
+    "oscar/sentry_delivery.py": "ca04e9490e3ba3fe6f5ec1e0461f6309f67e531187eda5a96fe2efeb3188a653",
+    "oscar/world_runtime.py": "78b05a9410324c9bc9ead7f77f33c6e84483a5fbf356f66ebf8a1586fb719f60",
+    "tests/test_sentry_delivery.py": "a9562c83cc1840cacd9f40f5f2e854bb3136511d5c96526a7d3d1fc16dfeed00",
+    "desktop/src/SentryNotices.tsx": "36de41cd9f136992b252f6c837ed34aeeadeed13bc7d5b1de319712b934d3fcb",
+    "desktop/src/SentryNotices.test.tsx": "29591eb8191ccd03ea56fc99e3226c27988ea70a951e0a21eaf96cfbd1258c58",
+    "desktop/src/OperatingSettings.tsx": "20835a1670efd95b263f256d729c7f48dab67f4198918300da78c399fb0961c6",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/SentryAlerts.kt": "ffbbb2e8f0745e9545a498e3d94035820a1a80f83ec7114e75f5609c80aaec7a",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/TaskNotifications.kt": "bc76e6eb99acb264e2ba3a2a8abe91414c8df815397d730cc289d0c9122d7a33",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/AwarenessScreen.kt": "173103dc7391fadfbba1ad09fc6cb54b4dcd116f30e5df4a889eb7306da9b7c1",
+    "mobile/app/src/test/java/io/dawnlight/oscar/mobile/SentryAlertsTest.kt": "74d4a83eea24bb876ce69c353142d8c05320a8e81f3222ceb2dba8c44c6b31a6",
+    "mobile/app/src/androidTest/java/io/dawnlight/oscar/mobile/NativeSentryDeliveryTest.kt": "f03e58e8f2727f42440e280503825a30117f242d1fbbaf76b83036c13a1bc535",
+    "desktop/src/OperatingSettings.test.tsx": "7fcd892f8e299a8ec319a675c833cc0f6be35ed53f7978733034e263d57d25f8",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/CoreSession.kt": "7fe87820ec551a76fa71854ccae1012b23cb104f74e75bfcb069634c8efc2669",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/ManagementState.kt": "1910d3c86e300bd33a451a7ff6a3e0ae7a73f4cb6470211033ae10fd4a96be2f",
+    "mobile/app/build/outputs/apk/debug/app-debug.apk": "b9457730b4ccc5f08667601628177853128d2c19da1b51016c240f13db6fd7d9",
+    "mobile/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk": "b51d96fadab8d09beecd49a40aa20a12565eaf2122db833d6a8bc4f87b635f0a",
+    "scripts/software_sentry_reference.py": "e89e2c1bc201741e12846975de0666b85456cf5929bfcdd8a38497b120e2e5b5"
+  },
+  "checks": [
+    {
+      "command": "python -m unittest tests.test_sentry_delivery tests.test_world_runtime tests.test_world_model -q",
+      "status": "passed",
+      "tests": 56,
+      "seconds": 7.445
+    },
+    {
+      "command": "python -m unittest tests.test_sentry_delivery -q",
+      "status": "passed",
+      "tests": 4,
+      "seconds": 0.77,
+      "note": "final policy-conflict assertion added"
+    },
+    {
+      "command": "npm.cmd --prefix desktop test -- SentryNotices.test.tsx OperatingSettings.test.tsx",
+      "status": "passed",
+      "tests": 9,
+      "files": 2,
+      "seconds": 4.16
+    },
+    {
+      "command": "npm.cmd --prefix desktop run typecheck",
+      "status": "passed"
+    },
+    {
+      "command": "python -m ruff check oscar/sentry_delivery.py oscar/world_runtime.py tests/test_sentry_delivery.py",
+      "status": "passed"
+    },
+    {
+      "command": "python -m mypy --follow-imports=silent oscar/sentry_delivery.py oscar/world_runtime.py",
+      "status": "passed",
+      "files": 2,
+      "note": "normal import-following initial check reported another in-progress memory agent source annotation; not hidden as a full-tree pass"
+    },
+    {
+      "command": "gradlew.bat :app:assembleDebug :app:assembleDebugAndroidTest :app:testDebugUnitTest :app:lintDebug --console=plain",
+      "status": "passed",
+      "tests": 75,
+      "suites": 18,
+      "seconds": 8,
+      "log": ".oscar/software-sentry-android-ttl-build-final.log",
+      "note": "Final Core monotonic TTL signature compiled; actual instrumentation separate below"
+    },
+    {
+      "command": "python -m ruff check scripts/software_sentry_reference.py",
+      "status": "passed"
+    }
+  ],
+  "android": {
+    "version": 1,
+    "observed_at": "2026-10-22T05:00:16.158963+00:00",
+    "serial": "emulator-5582",
+    "avd": "oscar_group05_capability_api35",
+    "api": 35,
+    "source_apk_sha256": {
+      "mobile/app/src/main/java/io/dawnlight/oscar/mobile/SentryAlerts.kt": "ffbbb2e8f0745e9545a498e3d94035820a1a80f83ec7114e75f5609c80aaec7a",
+      "mobile/app/src/main/java/io/dawnlight/oscar/mobile/TaskNotifications.kt": "bc76e6eb99acb264e2ba3a2a8abe91414c8df815397d730cc289d0c9122d7a33",
+      "mobile/app/src/main/java/io/dawnlight/oscar/mobile/AwarenessScreen.kt": "173103dc7391fadfbba1ad09fc6cb54b4dcd116f30e5df4a889eb7306da9b7c1",
+      "mobile/app/src/main/java/io/dawnlight/oscar/mobile/CoreSession.kt": "7fe87820ec551a76fa71854ccae1012b23cb104f74e75bfcb069634c8efc2669",
+      "mobile/app/src/main/java/io/dawnlight/oscar/mobile/ManagementState.kt": "1910d3c86e300bd33a451a7ff6a3e0ae7a73f4cb6470211033ae10fd4a96be2f",
+      "mobile/app/src/androidTest/java/io/dawnlight/oscar/mobile/NativeSentryDeliveryTest.kt": "f03e58e8f2727f42440e280503825a30117f242d1fbbaf76b83036c13a1bc535",
+      "mobile/app/build/outputs/apk/debug/app-debug.apk": "b9457730b4ccc5f08667601628177853128d2c19da1b51016c240f13db6fd7d9",
+      "mobile/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk": "b51d96fadab8d09beecd49a40aa20a12565eaf2122db833d6a8bc4f87b635f0a"
+    },
+    "status": "passed",
+    "tests": 1,
+    "fixtures_uninstalled": true,
+    "checks": [
+      "real Compose attention surface",
+      "Android notification permission denied",
+      "local alert opt-in denied",
+      "real NotificationManager result",
+      "generic notification body",
+      "persisted native receipt suppresses replay",
+      "source act revocation hides UI and cancels posted notification"
+    ],
+    "limitations": [
+      "synthetic Core metadata",
+      "no signed remote Core transport in this campaign",
+      "no real perception or owner activation",
+      "not physical-device acceptance"
+    ],
+    "command": "python -m scripts.software_sentry_reference",
+    "instrumentation_seconds": 6.057,
+    "instrumentation_log_sha256": "311636f7cb57a82027c85b8ccfcf7d312d01697504fc4a5faf4ad08d3af8b6ed"
+  },
+  "excluded": [
+    "physical phone",
+    "personal accounts or notification bodies",
+    "real microphone/camera",
+    "hosted push",
+    "desktop OS notifications",
+    "spoken interruption",
+    "real owner activation"
+  ]
+}

@@ -201,6 +201,7 @@ def parser() -> argparse.ArgumentParser:
     result.add_argument("--workspace", type=Path, default=Path(".oscar/workspace"))
     result.add_argument("--manifest", type=Path, default=Path("config/development-models.json"))
     result.add_argument("--auth-config", type=Path)
+    result.add_argument("--memory-config", type=Path)
     commands = result.add_subparsers(dest="command", required=True)
     commands.add_parser("credentials")
     commands.add_parser("proof")
@@ -276,6 +277,8 @@ def parser() -> argparse.ArgumentParser:
 def main() -> int:
     args = parser().parse_args()
     try:
+        from .local_memory import LocalMemoryConfig
+
         template = None
         if args.command in {"reason", "routes"}:
             template = ModelRequest(
@@ -296,6 +299,9 @@ def main() -> int:
             template,
             execution_enrollment_authorized=getattr(args, "reenroll_execution", False),
             auth_config=args.auth_config,
+            memory_config=LocalMemoryConfig.load(args.memory_config)
+            if args.memory_config
+            else None,
         ) as harness:
             transports = {harness.node_id: (harness.dispatcher, harness.session)}
             if args.command == "executive":

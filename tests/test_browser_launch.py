@@ -2,6 +2,7 @@ import json
 import os
 import subprocess
 import sys
+import time
 import unittest
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -83,7 +84,10 @@ class SourceBrowserLaunchTests(unittest.TestCase):
             "oscar.interactive_worker.browser_command",
             return_value=[self.python, "-I", "-c", "import time; time.sleep(30)"],
         ) as command:
-            diagnostic = browser_preflight(self.python, self.workspace)
+            started = time.monotonic()
+            with patch("oscar.interactive_worker.BROWSER_PREFLIGHT_TIMEOUT", 0.2):
+                diagnostic = browser_preflight(self.python, self.workspace)
+            self.assertLess(time.monotonic() - started, 3)
         self.assertEqual("browser.worker_launch", diagnostic["category"])
         self.assertEqual("TimeoutError", diagnostic["error_type"])
         self.assertEqual(0, diagnostic["output_bytes"])

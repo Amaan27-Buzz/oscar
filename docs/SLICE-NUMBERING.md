@@ -1,5 +1,10 @@
 # OSCAR Slice Numbering — canonical plan (updated 2026-10-18)
 
+The 2026-10-23 local continuation extends existing slices with executable
+normal-runtime recall, native memory management, MCP resource authorization and
+reviewed model/browser workflows. See the completion ledger for source-scoped
+software evidence; the physical/hosted acceptance distinctions below remain.
+
 **CURRENT NUMBERING AUTHORITY.** There are **21 slices, 00–20**, with exactly one top-level ID each. The owner reorganized the **delivery groups and execution order**, not the existing slice identifiers. New **D1–D4** and **C1–C4** are checklist stages, **not numbered slices**. Do not revive old 09R/10R/13A/13B names in current plans; retain their historical provenance.
 
 Read [active delivery plan](DELIVERY-PLAN.md), [checked status](CURRENT-STATUS.md), [roadmap](ROADMAP.md) and [build gates](BUILD-GATES.md).

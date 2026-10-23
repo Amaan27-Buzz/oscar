@@ -244,8 +244,9 @@ class EdgeIntegrationTests(unittest.TestCase):
         }
         with urlopen(Request(url, raw, headers), timeout=3) as response:
             self.assertEqual(Frame.decode(response.read()).kind, Kind.GPIO_WRITE)
-        with self.assertRaises(HTTPError):
+        with self.assertRaises(HTTPError) as rejected:
             urlopen(Request(url, raw, {**headers, "Authorization": "Bearer wrong"}), timeout=3)
+        rejected.exception.close()
         with self.assertRaises(ValueError):
             server(self.bridge, ("0.0.0.0", 0))
 

@@ -1,0 +1,19 @@
+{
+  "status": "SOFTWARE_VERIFIED",
+  "source_commit": "dcfbc393f93070479ab5e5a8368324b08497b1df",
+  "source": "Tracked source exported with git archive before run; later working-tree edits excluded",
+  "command": "python -m unittest discover -s tests -t . -q",
+  "tests_run": 964,
+  "passed": 954,
+  "skipped": 10,
+  "seconds": 466.877,
+  "platform": "Windows-11-10.0.26300-SP0",
+  "python": "3.14.2",
+  "log_sha256": "3c9e0ab886c20ee3647cfa5d6eef3a4a90f395e9d48b2153df16b5f044d1333b",
+  "warnings": "One HTTPError 403 ResourceWarning remained from a direct HTTP-denial test. tests/test_edge.py subsequently closes the caught response; focused20 passed, later edit excluded here.",
+  "limits": [
+    "No CI, hosted, real-account, physical-phone or owner activation evidence",
+    "Memory management, Sentry delivery and phone context edits after this commit require fresh regression",
+    "This successful run does not establish the cause of the earlier aggregate browser failure"
+  ]
+}

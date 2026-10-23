@@ -1,5 +1,23 @@
 # OSCAR Memory Fabric
 
+## Configured runtime and conversation recall — 2026-10-23
+
+Normal Harness/Cloud composition now supports explicit local derived indexes and
+advertises read-only conversation recall. Reading historical evidence does not
+require retaining the new request. Replies preserve canonical provenance and
+withdraw on source deletion or loss of read permission; transient answers are not
+copied into durable task results or native canonical history caches. See
+[runtime contract and actual acceptance](development/SOFTWARE-MEMORY-RUNTIME.md).
+
+## Native owner controls — 2026-10-22
+
+Desktop Preferences and Android Memory expose bounded canonical inspection and
+exact signed correction/forget reviews. Separate memory read/management grants
+and source-appropriate retention authority remain mandatory; clearing local drafts
+does not forget retained Core memory. Corrections supersede temporally, forgetting
+propagates canonical tombstones, and failed derived deletion remains partial.
+See [implementation, verification and limits](development/SOFTWARE-MEMORY-MANAGEMENT.md).
+
 ## Group 3 current-state boundary — 2026-10-16
 
 The Slice 14 World Model candidate holds bounded current pointers, not another

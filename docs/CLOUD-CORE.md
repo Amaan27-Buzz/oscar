@@ -368,6 +368,12 @@ other explicitly present Google families, or `microsoft.graph`). Scope ceilings
 are explicit and never imply a grant before provider consent. Native Desktop
 holds callback codes outside React; real consent remains a commissioning step.
 
+The same file accepts administered `mcp-resource` public-client registrations with
+fixed HTTPS resource/issuer and an explicit scope ceiling. Their native consent
+creates resource access, without claiming verified provider person identity.
+See [reviewed MCP resource authorization](development/SOFTWARE-MCP-AUTHORIZATION.md)
+for discovery, refresh/replay boundaries and synthetic acceptance qualifications.
+
 In Cloud configuration, `auth_config` and `credential_key_ref` are an optional
 pair. The latter names a private JSON file in the existing `secret_dir`, with
 the same injected-secret format: `{"secret":"BASE64_OF_32_RANDOM_BYTES",

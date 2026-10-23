@@ -1,5 +1,10 @@
 # OSCAR — Build Gates (current truth 2026-10-18)
 
+**2026-10-23 local evidence:** native build/unit checks, rendered Android sourced
+recall and forgetting, actual normal-runtime derived memory and synthetic MCP
+resource authorization passed. These source-scoped checks are recorded in the
+completion ledger and do not promote the physical/hosted gates below.
+
 **2026-10-21 local candidate:** signed Secure/Full delegation is implemented and
 tested with synthetic native credentials; intended-surface integration remains
 under acceptance. The earlier “unavailable” statement below is historical.

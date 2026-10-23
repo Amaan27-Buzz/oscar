@@ -163,6 +163,23 @@ class AccountRegistry:
                 )
             )
 
+    def add_resource_grant(self, issuer: str, resource: str, alias: str) -> Account:
+        """Trusted OAuth adapter only: resource authority asserts no provider person identity."""
+        for value in (issuer, resource, alias):
+            self._text(value)
+        with self._mutation():
+            return self._save(
+                Account(
+                    new_id(),
+                    "mcp-resource",
+                    issuer,
+                    new_id(),
+                    alias,
+                    "resource-grant",
+                    self.operational_identity().owner_id,
+                )
+            )
+
     def bind(
         self,
         account_id: str,

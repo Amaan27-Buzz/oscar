@@ -1,6 +1,6 @@
 # OSCAR full software completion — active local ledger
 
-Updated 2026-10-22. **IMPLEMENTATION_IN_PROGRESS / SOFTWARE ACCEPTANCE PARTIAL.**
+Updated 2026-10-23. **IMPLEMENTATION_IN_PROGRESS / SOFTWARE ACCEPTANCE PARTIAL.**
 Material executable work remains. This ledger does not declare
 `SOFTWARE_FEATURE_COMPLETE`, owner acceptance, hosted deployment or Gate E PASS.
 
@@ -47,24 +47,24 @@ implementation is not automatically evidence of intended-surface integration.
 
 | Capability | Implemented / integrated and intended surfaces | Current evidence | Security / live boundary and remaining work |
 | --- | --- | --- | --- |
-| Brain / Controller / Model Router | Existing deterministic Controller and routing reused by Desktop and Grid tasks | Core regression and delegated arithmetic acceptance | Configured production model/provider and broader natural-language task routing remain to be accepted |
-| Continuous Memory Fabric | Existing canonical archive, FTS, correction/forget and derived-index boundaries retained | Full Core regression; remote routines do not implicitly retain conversation | Live derived-service commissioning and integrated long-context acceptance remain separate |
+| Brain / Controller / Model Router | Existing deterministic Controller and routing reused by Desktop and Grid tasks; conversation can propose a model planning review followed by a separate exact action review | Actual local Qwen conversation → both signed reviews → file effect and exact readback passed in 77.964 s, with rejected malformed/empty attempts retained | Local synthetic acceptance; configured production providers and broader intended-surface workflows remain to be accepted |
+| Continuous Memory Fabric | Canonical archive/FTS, native signed correction/forgetting, normal Harness optional local indexes and advertised read-only conversation recall; independent read/manage/retention grants | Actual cached models + embedded Qdrant + Graphiti/Neo4j passed normal Desktop/Grid recall, restart, drift fallback and physical deletion. Rendered Android conversation recall → forgetting → answer withdrawal passed in 43.69 s; 121 focused Core tests passed | Synthetic owners only. Local projections require explicit configuration. Native nonretained turns stay outside canonical history caches; no personal-memory, secure disk erasure or hosted-index acceptance |
 | Persistent Cloud Core | Existing D1 composition; encrypted writable account vault added | Cloud restart and offline backup/restore; 138 tests at checkpoint `111aba5` in a non-root read-only 1 CPU/1 GB Linux container | Receipt is pinned to `111aba5`; later weather/communication/sharing changes need their own regression. Oracle is not deployed |
 | Distributed Grid | Existing signed HTTPS enrollment, leases, cancellation and no-replay journal extended | Separate TLS Core/native Android Grid execution; remote responsibility tests | Independent Internet-host acceptance requires commissioning |
 | Universal identity / multi-account | Existing stable identities and generation checks; connected accounts projected into executable Fabric | Two-account isolation, scope withdrawal, refresh/disconnect and callback mounting tests | Real owner accounts, tenant constraints and provider token interoperability uncommissioned |
-| Self-service authentication | Public Google/Microsoft app registration config; native Desktop PKCE callback stays outside React | Rust loopback/state/host/expiry/cancellation tests; Auth Broker tests | Real browser consent not run; Android continuation still under integration |
-| Plugins / MCP | Existing SDK transports; signed registration/connect/disable/remove; lifecycle synchronization | Synthetic SDK and connection tests | Trusted stdio has host-user authority, not an OS sandbox; untrusted installations must be denied. Broader service catalog and production interoperability remain open |
-| Browser / web apps | Existing typed isolated profiles reused by actual outbound executor | Real local Chromium form submission, screenshot and account-generation cookie isolation | Owner browser/account attachment and broad conversation-to-browser acceptance remain open |
+| Self-service authentication | Public Google/Microsoft registration config and native Desktop/Android PKCE callbacks; reviewed preregistered MCP resource grants reuse the same account Vault | Native callback checks and combined 59-test Auth Broker/account/MCP SDK campaign passed; Desktop existing-grant reauthorization selection tested and Android compiled | Real provider browser consent and physical OEM behavior are uncommissioned. A resource token never implies verified person identity |
+| Plugins / MCP | SDK transports, signed lifecycle and exact-resource OAuth discovery, PKCE S256, issuer checking, bounded scopes, rotating refresh and same-grant reauthorization | Real installed MCP SDK initializes/discovers/calls a synthetic HTTP resource using its issued token; 12 authorization cases and combined 59 tests passed | Fixed HTTPS aliases map to loopback HTTP in tests. Trusted stdio retains host-user authority. Dynamic registration, automatic refresh, incremental challenges and remote token revocation are unsupported; unsupported contracts fail closed |
+| Browser / web apps | Existing typed isolated profiles and bounded browser workflow reused by conversation planner and actual outbound executor | Signed HTTPS conversation → synthetic model → both reviews → real Chromium form submission; independent server and fresh Chromium DOM readback passed; 38 focused tests passed | Core/Worker composed in-process for this campaign; real browser child. Generic browser outcomes remain partially verified; multi-step workflows can partially mutate before failure. Owner accounts remain uncommissioned |
 | Windows computer control | Existing native executors available through outbound adapter with explicit opt-in; exact UIA text and clipboard readback added | Actual disposable WPF UIA text/invoke and child-process cancellation; Windows/Grid 38-test regression passed before one added contract case | Generic native reports remain partial; native supervised sharing passed actual CNG/DPAPI/TLS file execution and shutdown; installed app commissioning remains open |
-| Android production execution | Actual native foreground Worker, Keystore session, typed delivery, live ads and pre-effect checks | Disposable API 35 Grid run: clipboard write, media pause and text entry VERIFIED; click PARTIALLY_VERIFIED with separate fixture observation | Physical phone/OEM acceptance prohibited. SAF and screen grants need additional platform acceptance; clipboard and media pause passed actual emulator acceptance |
+| Android production execution | Actual native foreground Worker, Keystore session, typed delivery, live ads and pre-effect checks | Disposable API 35 Grid run: clipboard write, media pause and text entry VERIFIED; click PARTIALLY_VERIFIED with separate fixture observation. Actual SAF and OS-consented new-frame JPEG/withdrawal checks passed; eight-source sustained phone/Grid campaign passed | Physical phone/OEM acceptance prohibited. Screen acceptance exercises the production adapter callback with synthetic authority, not a signed Grid capture task. Cached-advertisement recovery after Core restart requires its own acceptance |
 | Ask / Secure / Full | Signed native exact activation and revocation; runtime and executor recheck | Authority regression, expiry/revoke/policy/account/session drift, actual delegated task test | Synthetic activation only; no owner Full Access activation. Native Android management integration underway |
 | Voice | Continuous local wake, persisted mute, explicit input/output binding and native controls reuse existing Desktop Voice/Session/Playback contracts | Actual Sherpa/Silero/Whisper continuous product loop → verified Core math/file effect → Kokoro PCM; synthetic echo/barge-in; native Bridge/CoreClient and cancellation pass | Separate continuous permission and 10-second control heartbeat enforced; defaults muted with no restart capture. Physical audio, room AEC, owner Voice Match and WebView device acceptance remain open |
-| Sentry / World Model | Existing source fabric and awareness engine; signed separate source grants and configuration | Grant independence and stale-review tests | Signed source creation, time/calendar adapters and bounded freshness-qualified day briefing integrated on Desktop/Android; explicit-place MET Norway weather now reaches existing World/Sentry and both clients; native sensory inputs and broader acceptance remain open |
+| Sentry / World Model | Existing source fabric, signed grants, time/calendar/weather sources and transient independently authorized delivery; batched selected phone notification counts/playback states feed the same World Model | Actual emulator Compose/NotificationManager denial/expiry/dedup/withdrawal passed; eight actual phone sources stayed current for 65.032 s across 31 readbacks, with zero retained observations, followed by local opt-out and Grid execution | Delivery contains generic metadata, expires within source TTL/60 seconds and needs explicit sentry:deliver policy. One-minute source budget accepted on frozen source; Core-restart advertisement recovery and overlay retreat geometry remain separate. No personal perception or hosted push claim |
 | Chief of Staff | Existing World Model now supplies source-backed day briefing and observed calendar overlap/incompleteness | Source/grant/account drift and Core-time expiry tests; native briefing API parses actual Core response | Scheduling/communication effects, richer live context and daily-use acceptance remain open |
-| Workers / Automations | Existing Executive; native signed create/edit/pause/resume/retire and schedules; remote file routines; conversation opens unsigned bounded responsibility review | Signed routine writes actual outbound Worker file with independent Core readback; owner revocation blocks delivery; native conversation review/decline tested with no goal creation | Explicit action-line authoring and learned procedure save/reuse/evaluation reach both clients; broader model-assisted conversational planner integration remains open |
+| Workers / Automations | Existing Executive; native signed schedules and routine lifecycle; learned procedures; model-assisted plan drafting and separate exact execution review | Actual outbound file routine/readback and revocation; 49 combined Executive/Assistance/planner tests pass; native conversation review/decline grants no execution | Configured model planning is bounded by signed input scope and current capability/provider contracts; production provider and broader native workflow acceptance remain open |
 | Communication | Explicit account-bound mail/list/read/draft/send and calendar authoring through existing Fabric; native exact signed review | 155 focused tests passed; 15 communication tests rechecked after automation hooks; actual synthetic provider HTTP and Cloud-native proof/approval/readback | Gmail saved SENT resource verified; Graph send without correlated resource remains PARTIAL. Recipient delivery and real accounts uncommissioned; no real messages sent |
 | Adaptive Interface Engine | Existing typed Presence/AIE surfaces retained | Desktop regression and Android build/lint | Full runtime-backed cross-device scenarios and native visual acceptance remain open |
-| Desktop / Android product | Desktop and Android native authority/automation/account controls integrated locally | Intermediate source: Desktop 117 tests across 22 files, Rust 38 plus explicit native fixture; Android assemble/unit/lint and 71 JVM tests pass | Actual native authority/assistance full review, conversation-to-automation review/decline, day-brief parsing and 11 production navigation captures passed; owner visual acceptance remains pending |
+| Desktop / Android product | Desktop and Android native authority/automation/account controls integrated locally | Desktop 124 tests across 24 files, typecheck/build; Rust 38 plus explicit native fixture; Android assemble/unit/lint and 77 JVM tests across 19 suites pass | Actual native authority/assistance full review, conversation-to-automation review/decline, day-brief parsing and 11 production navigation captures passed; rendered memory acceptance added; owner visual acceptance pending |
 | Slice 19 hardening | Exact signature/session/grant boundaries, encrypted token vault, bounded projections and callback reads | Core regression, native tests and targeted trust-boundary tests | Final integrated security review, broader recovery/soak and fresh constrained-runtime run remain required |
 | Performance / Slice 20 | Existing closure benchmark reused with stable-source enforcement and exported raw samples/plots | 80 samples each for arithmetic, files, loopback HTTP and reviewed Executive goals; source-pinned baseline/candidate, idle CPU/RSS/SQL traces and profiles | Local host load uncontrolled; later source changes require their own qualification. Android timings are single samples. Provider, battery, physical audio and sustained-use acceptance outstanding |
 
@@ -108,24 +108,37 @@ attached after final integration. Rerun affected checks after subsequent edits.
 
 | Check | Observed result |
 | --- | --- |
-| `python -m unittest discover -s tests -t . -q` | Latest aggregate: 948 tests in 1079.281 s; FAILED with one browser preflight failure, two dependent browser errors and ten skips. Later edits require a fresh aggregate |
-| Browser failure investigation | All 15 browser-profile/RemoteMachine tests passed on isolated rerun (63.349 s); original aggregate cause unresolved. Launcher tests: 11 passed (12.944 s), including bounded real timeout with distinct redacted TimeoutError; no retry added |
-| Focused Core integration | 88 tests passed; authority, account vault, Grid, assistance and connections |
+| `python -m unittest discover -s tests -t . -v` | Frozen memory/Sentry/phone candidate: 987 tests in 578.767 s, 977 passed and ten skipped. Later memory authority-race fix is covered by the 98-test campaign below; no final-head aggregate claim. Earlier failed 948/986-test runs retained |
+| Later frozen Python aggregate | 1004 tests in 461.591 s: 994 passed, ten skipped. Includes memory authority-race correction, phone batching, conversation planning and Worker advertisement recovery; precedes later recall/runtime, browser workflow and MCP resource-grant changes |
+| Actual TLS Worker recovery | Eleven tests passed in 6.993 s, including persisted Worker session after an actual TLS Core process restart and no replay of earlier uncertain delivery; native protocol tests remain separate from Android restart acceptance |
+| Model conversation and browser workflow | Real local Qwen conversation/file acceptance passed in 77.964 s; synthetic-model signed browser workflow independently observed one real Chromium form submission. Each has a separate source-qualified receipt |
+| Browser failure investigation | Healthy isolated cold startup observed at 7.918 s, near old 8 s boundary. Bounded preflight increased to 30 s; no retry added; real hung-process cleanup remains tested. All 26 launcher/profile/RemoteMachine cases passed in 50.040 s, then the frozen aggregate passed. This does not prove every historical timeout's cause |
+| Focused Core integration | 98 tests in 89.324 s passed: current memory session/node/scope revocation race, phone trigger-only withdrawal, authority, Assistance, Grid, Sentry and World Model |
 | Remote responsibilities | Actual file effect + independent readback and revoked-owner fencing passed |
-| Desktop TypeScript / Vitest / production build | 117 tests across 22 files and production build passed before planner UI changes |
+| Desktop TypeScript / Vitest / production build | 124 tests across 24 files passed; typecheck and production build passed |
 | Rust native unit suite | 38 passed, one live-fixture-dependent voice case ignored in ordinary suite; explicitly passed in continuous-voice receipt; toolchain 1.99.0 |
+| Native recall / MCP Rust checkpoint | 40 passed, one explicit live-voice fixture case ignored. Includes retained-source recall normalization and exact MCP callback issuer handling; not a real-provider authorization receipt |
+| Latest native integration | Desktop 125 tests across 24 files and production build passed; Rust 40 passed/one explicit live-fixture skip; Android full assemble/unit/lint passed with 85 JVM tests, zero failures or skips. Nonretained recall presentation does not enter canonical history caches |
+| Normal configured memory | Actual cached models/Qdrant/Graphiti/Neo4j normal composition passed in 8.438 s with zero non-loopback attempts. Exact-source recall, read without retention/manage, restart, withdrawal, stale-index fallback and physical projection deletion passed; 121 focused tests passed in 62.028 s |
+| Latest rendered Android recall | Actual synthetic TLS Core and API35 Compose controls: sourced answer displayed in Reading, signed correction/forget, answer withdrawal, encrypted-history refresh, activity recreation and revoked-session notice removal passed in 43.69 s. Three earlier test-navigation/selector failures remain preserved |
+| MCP resource authorization | 59 combined account/Auth Broker/Connections/real SDK tests passed in 83.865 s; includes 12 resource OAuth cases. Exact issuer/resource/scope, callback, interruption/no replay, rotation, reauthorization and local deletion exercised |
 | Android assemble / instrumentation APK / JVM unit / lint | Passed; production Worker and screen-freshness changes compile |
-| Android management JVM suite | 71 tests across 16 suites passed, including actual TCP callback read deadline and cancellation during signing; before planner UI changes |
-| Constrained Linux runtime | 138 tests at `111aba5`, 97.404 s, one optional MCP dependency skip; non-root/read-only/cap-drop/1 CPU/1 GB |
+| Android management JVM suite | 77 tests across 19 suites passed, including TCP callback cancellation, planner/memory/phone contracts and Sentry expiry; latest full assemble/unit/lint build passed in 2 m 10 s |
+| Constrained Linux runtime | 206 tests in 89.939 s: 204 passed, optional MCP and Windows-native broker skipped; current Python source hashes independently matched the image. Non-root/read-only/cap-drop/no-new-privileges/1 CPU/1 GB/no external network |
 | Outbound Windows/Grid | 38 tests in 39.156 s passed; exact UIA destination now independently verified; invoke remains partial |
 | Synthetic real-model voice | Actual local wake/VAD/Whisper, Desktop Ask, signed synthetic Full, math/file readback and Kokoro output passed; production Rust Bridge/CoreClient loopback Ask/Dictate and cancellation acceptance passed |
-| Mypy | 94 files passed before planner additions; changed HTTP modules separately passed |
-| Actual native Android Grid | EMULATED_SYNTHETIC_ACTUAL_GRID; clipboard/media pause/text verified, click partial; actual management review/day brief, withdrawal, revocation, restoration/no replay, 11 navigation captures and cleanup readback passed |
+| Mypy / Ruff | Mypy: 98 source files passed; repository Python Ruff checks passed |
+| Restart soak | Frozen `dcfbc39`: 600.13 s, 98 actual file effects with independent readback; Worker and Core restart/recovery passed. Core RSS about 55–59 MiB, Worker about 40 MiB; retained task/WAL storage grew; no multi-day or leak-free claim |
+| Real derived memory indexes | Actual local Qdrant, Graphiti/Neo4j and CPU models: 12 checks plus all 18 A–R cases passed in 26.109 s; imported source hashes stable; disposable Neo4j removed |
+| Rendered Android memory | Native exact reviews and host synthetic signatures, canonical correction/forgetting/readback, encrypted-history refresh, activity recreation/no replay and revocation notice withdrawal passed; cleaned up and source/APK hashes stable |
+| Actual native Android Grid | Current phone campaign: main native test 31.434 s; actual selected notification/media context, zero retention and opt-out; clipboard/media pause/text verified, click partial; management review/day brief, withdrawal, revocation, process restoration/no replay, 11 navigation captures and cleanup readback passed |
+| Sustained maximum-source Android Grid | Separate frozen campaign: eight sources current for 65.032 s, 31 readbacks and zero retained observations. Main instrumentation 97.411 s, process restoration 0.056 s, navigation 13.193 s; all passed. Core restart not exercised by this campaign |
 | GitHub Actions / hosted / real provider / physical phone | NOT_RUN under this authorization |
 
 The failed full Python run emitted ResourceWarnings for synthetic HTTP errors.
-Subsequent explicit error-response closure passed 124 affected tests; aggregate
-warning cleanliness still needs a fresh run. Ten skips are
+Subsequent explicit error-response closure passed 124 affected tests. The passing
+`dcfbc39` run retained one direct HTTP-denial fixture warning; closing that test's
+caught response subsequently passed all 20 Edge tests. Ten skips are
 four Windows-unavailable POSIX descriptor/mode/symlink checks and six optional
 prepared voice/model executor checks. The separate voice receipt exercises the
 prepared product model/bridge path; Linux permission checks subsequently passed in the pinned constrained-runtime run.  Executor liveness was subsequently verified by 56
@@ -143,9 +156,29 @@ Additional current receipts: [communication](../evidence/software-completion/com
 [continuous voice](../evidence/software-completion/voice-continuous-2026-10-22.json)
 and [performance](../evidence/software-completion/performance-2026-10-22/performance.md).
 HTTP response ownership has its own [focused receipt](../evidence/software-completion/http-resources-2026-10-22.json).
+The later [1004-test frozen regression and TLS recovery receipt](../evidence/software-completion/regression-phone-planner-2026-10-23.json),
+[real-model conversation](../evidence/software-completion/conversation-planning-2026-10-23.json)
+and [browser workflow](../evidence/software-completion/browser-workflow-2026-10-23.json)
+retain independent source hashes and limits; none certifies the later working tree.
 The failed aggregate and isolated browser recovery are preserved in the
 [regression investigation](../evidence/software-completion/regression-investigation-2026-10-22.json);
 an isolated pass does not establish the cause or erase the aggregate failure.
+The later successful frozen run has its own
+[regression receipt](../evidence/software-completion/regression-dcfbc39-2026-10-22.json).
+[Memory management](SOFTWARE-MEMORY-MANAGEMENT.md) and
+[Sentry delivery](SOFTWARE-SENTRY-DELIVERY.md) record their separate source-scoped checks.
+The later frozen [987-test regression and current 98-test security campaign](../evidence/software-completion/regression-memory-phone-2026-10-22.json),
+[constrained Linux runtime](../evidence/software-completion/linux-memory-phone-2026-10-22.json),
+[rendered native memory](../evidence/software-completion/android-memory-2026-10-22.json),
+[Android platform consent](../evidence/software-completion/android-platform-2026-10-22.json),
+[phone context and Grid](../evidence/software-completion/android-phone-grid-2026-10-22.json),
+[sustained eight-source phone/Grid](../evidence/software-completion/android-phone-batch-2026-10-23.json),
+[native build/UI regression](../evidence/software-completion/native-build-memory-phone-2026-10-22.json),
+[derived indexes](SOFTWARE-MEMORY-INDEX-ACCEPTANCE.md) and
+[restart soak](../evidence/software-completion/soak-dcfbc39-2026-10-22.json)
+retain their individual source boundaries. A Linux test-loader typo and native
+acceptance harness corrections are retained as intermediate failures; they are
+not counted as passing acceptance.
 Performance output rejects sampling across different runtime source hashes;
 an earlier mixed-source attempt was rejected and is not published as acceptance.
 
@@ -164,7 +197,14 @@ an earlier mixed-source attempt was rejected and is not published as acceptance.
 - Android action deadlines account for the existing transport clock allowance;
   Core still checks actual expiry immediately before effects.
 - Android screen capture requests require a new frame after the request;
-  compilation is verified, OS-consent/frame acceptance remains pending.
+  actual OS consent, external synthetic app frame readback, cancellation and
+  screen-off withdrawal passed. Freshness uses the ImageReader producer's
+  increasing timestamp after draining queued frames, avoiding cross-clock comparison.
+- Memory completion rechecks current owner/session/node/scope and Personal Policy
+  under the authority-store lock through canonical mutation. Consumed reviews stay
+  consumed when authority is withdrawn between review consumption and mutation.
+- Native interactive-request error handling now clears Sentry notices, matching
+  refresh failure behavior; actual revoked-session notice withdrawal passed.
 - Mixed Desktop source encodings were corrected; typecheck/build/tests passed.
 - UI heartbeat and executor liveness are independent; a crashed Worker cannot
   retain advertised control capabilities because its UI remains open.

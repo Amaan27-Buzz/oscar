@@ -1,5 +1,12 @@
 # OSCAR — Active Delivery Plan
 
+**Local integration, 2026-10-23:** normal-Core indexed recall, native signed memory
+correction/forgetting, MCP resource authorization, reviewed conversation planning,
+browser workflows, transient Sentry delivery and sustained eight-source Android
+context now have executable source-scoped receipts in the completion ledger.
+These extend the existing Groups 4–6 candidate; hosted, real-provider, physical
+device and formal Gate E acceptance remain separate. No additional slice is added.
+
 **Active 2026-10-21:** the owner has authorized full non-deferred software
 completion across Groups 4–6 locally. Read the
 [active completion ledger](development/OSCAR-FULL-SOFTWARE-COMPLETION.md).

@@ -22,8 +22,9 @@ class NativeScreenService : Service() {
     private var display: android.hardware.display.VirtualDisplay? = null
     private var reader: ImageReader? = null
     private data class Capture(val packageName: String, val authorized: () -> Boolean,
-        val afterNanos: Long = System.nanoTime(), val ready: CountDownLatch = CountDownLatch(1), var result: String? = null)
+        var afterTimestamp: Long = Long.MIN_VALUE, val ready: CountDownLatch = CountDownLatch(1), var result: String? = null)
     private val pending = AtomicReference<Capture?>()
+    private var lastTimestamp = Long.MIN_VALUE
     private val handler = Handler(Looper.getMainLooper())
     private val lock = object : BroadcastReceiver() { override fun onReceive(context: Context?, intent: Intent?) { stopSelf() } }
     override fun onCreate() {
@@ -52,12 +53,13 @@ class NativeScreenService : Service() {
             val frames = ImageReader.newInstance(width, height, PixelFormat.RGBA_8888, 2); reader = frames
             frames.setOnImageAvailableListener({ images ->
                 images.acquireLatestImage()?.use { image ->
+                    lastTimestamp = maxOf(lastTimestamp, image.timestamp)
                     val request = pending.get() ?: return@use
-                    if (image.timestamp < request.afterNanos) return@use
+                    if (image.timestamp <= request.afterTimestamp) return@use
                     try {
-                        if (authorized(request)) {
+                        if (request.ready.count > 0 && authorized(request)) {
                             val encoded = encode(image)
-                            if (authorized(request)) request.result = encoded
+                            if (request.ready.count > 0 && authorized(request)) request.result = encoded
                         }
                     } catch (_: Exception) { request.result = null }
                     finally { pending.compareAndSet(request, null); request.ready.countDown() }
@@ -76,11 +78,20 @@ class NativeScreenService : Service() {
     internal fun capture(packageName: String, authorized: () -> Boolean): String? {
         check(Looper.myLooper() != Looper.getMainLooper())
         val request = Capture(packageName, authorized)
-        if (!authorized(request) || !pending.compareAndSet(null, request)) return null
+        if (!authorized(request)) return null
+        handler.post {
+            if (request.ready.count == 0L || !authorized(request)) { request.ready.countDown(); return@post }
+            try {
+                // Image timestamps use the producer's clock; drain old frames before arming a request.
+                reader?.acquireLatestImage()?.use { lastTimestamp = maxOf(lastTimestamp, it.timestamp) }
+                request.afterTimestamp = lastTimestamp
+                if (!pending.compareAndSet(null, request)) request.ready.countDown()
+            } catch (_: Exception) { request.ready.countDown() }
+        }
         try {
             if (!request.ready.await(200, TimeUnit.MILLISECONDS) || !authorized(request)) return null
             return request.result
-        } finally { pending.compareAndSet(request, null) }
+        } finally { request.ready.countDown(); pending.compareAndSet(request, null) }
     }
 
     private fun encode(image: android.media.Image): String? {

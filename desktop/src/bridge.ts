@@ -36,7 +36,7 @@ export interface ConnectionsView {
   identity:{id:string;display_name:string;operational_email:string|null;status:string};
   accounts:{id:string;provider:string;tenant:string;subject:string;alias:string;identity_class:string;generation:number;status:string;remote_revocation:string;local_credentials?:string;services:{id:string;scopes:string[];expires_at:number|null;restrictions:string[]}[]}[];
   plugins:{id:string;name:string;account_id:string;enabled:boolean;health:string;transport:string;permissions:Record<string,string[]>;tools:{name:string}[];activity:{event?:string;observed_at?:number}[]}[];
-  providers?:{id:string;provider:string;service:string;scopes:string[];redirect_uri:string;configured:boolean}[];
+  providers?:{id:string;provider:string;service:string;scopes:string[];redirect_uri:string;configured:boolean;resource?:string;issuer?:string}[];
   access:string;enrollment:string;observed_at_ms:number;
   credential_deletion?:'available'|'unavailable';accounts_total?:number;plugins_total?:number;truncated?:boolean;
 }

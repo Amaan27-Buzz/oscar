@@ -66,6 +66,16 @@ class DirectClient:
 
 
 class RemoteGridTests(unittest.TestCase):
+    def test_memory_control_invitation_is_explicit_and_separate_from_retention(self):
+        ordinary = self.invitation("ordinary-memory", retain=False)
+        granted = self.invitation("granted-memory", retain=False, memory_control=True)
+        normal_scopes = json.loads(base64.b64decode(ordinary["signing_payload"]))["scopes"]
+        memory_scopes = json.loads(base64.b64decode(granted["signing_payload"]))["scopes"]
+        self.assertNotIn("memory:read", normal_scopes)
+        self.assertTrue({"memory:read", "memory:manage"} <= set(memory_scopes))
+        self.assertNotIn("archive:retain", memory_scopes)
+        self.assertNotIn("retain", memory_scopes)
+
     def setUp(self):
         self.tmp = TemporaryDirectory()
         self.root = Path(self.tmp.name)
@@ -96,7 +106,7 @@ class RemoteGridTests(unittest.TestCase):
             "installation-" + node,
             self.public,
             workspace="test-workspace" if role == "desktop" else "",
-            retain=True,
+            retain=changes.pop("retain", True),
             **changes,
         )
 
@@ -128,16 +138,27 @@ class RemoteGridTests(unittest.TestCase):
         self.assertEqual(self.core.harness.runtime.relationship_id, brief["relationship_id"])
         self.assertNotIn("day_brief", self.mobile.request("snapshot", {}))
         store = self.core.harness.store
-        PersonalPolicy(store).save(PolicyRule(
-            "deny-world", "core.world.read", PolicyEffect.DENY, "synthetic-owner",
-            time(), time(), {}, user_authoritative=True,
-        ), owner_authorized=True)
+        PersonalPolicy(store).save(
+            PolicyRule(
+                "deny-world",
+                "core.world.read",
+                PolicyEffect.DENY,
+                "synthetic-owner",
+                time(),
+                time(),
+                {},
+                user_authoritative=True,
+            ),
+            owner_authorized=True,
+        )
         with self.assertRaises(PermissionError):
             self.mobile.request("day_brief", {})
         row = store.get("session", self.mobile.handle.id)
-        store.put("session", self.mobile.handle.id, {
-            **row, "scopes": [s for s in row["scopes"] if s != "world:read"]
-        })
+        store.put(
+            "session",
+            self.mobile.handle.id,
+            {**row, "scopes": [s for s in row["scopes"] if s != "world:read"]},
+        )
         with self.assertRaises(PermissionError):
             self.mobile.request("day_brief", {})
 
@@ -313,8 +334,10 @@ class RemoteGridTests(unittest.TestCase):
 
     def test_native_conversation_routes_explicit_file_request_through_real_worker(self):
         task = self.submit(
-            "text", text="Please write notes.txt with text Synthetic conversation routine",
-            target=self.core.config.core_id, parameters={},
+            "text",
+            text="Please write notes.txt with text Synthetic conversation routine",
+            target=self.core.config.core_id,
+            parameters={},
         )
         self.assertEqual("planned", task["state"])
         self.assertFalse((self.workspace / "notes.txt").exists())
@@ -534,6 +557,7 @@ class RemoteGridTests(unittest.TestCase):
         delivery = self.delivery()
         self.worker.execute(delivery)
         self.assertEqual((self.workspace / "once.txt").read_text(), "write once")
+
         self.core.close()
         self.core = CloudCore(self.config)
         self.desktop.core, self.mobile.core = self.core, self.core
@@ -542,6 +566,29 @@ class RemoteGridTests(unittest.TestCase):
         view = self.mobile.request("inspect", {"task_id": task["task_id"]})
         self.assertIn(view["state"], {"blocked", "unknown"})
         self.assertEqual((self.workspace / "once.txt").read_text(), "write once")
+
+    def test_restart_requests_fresh_advertisement_without_claiming_or_replaying_delivery(self):
+        task = self.submit("file_write", parameters={"path": "never.txt", "content": "never"})
+        self.approve(task)
+        delivery = self.delivery()
+        self.core.close()
+        self.core = CloudCore(self.config)
+        self.desktop.core, self.mobile.core = self.core, self.core
+        self.assertEqual(
+            {"delivery": None, "advertise_required": True}, self.desktop.request("poll", {})
+        )
+        self.assertEqual(
+            "uncertain", self.core.harness.store.get("remote_delivery", delivery["id"])["state"]
+        )
+        self.assertNotIn(self.desktop.handle.node_id, self.core.harness.executive.targets)
+        self.worker.advertise()
+        self.assertIn(self.desktop.handle.node_id, self.core.harness.executive.targets)
+        self.assertEqual({"delivery": None}, self.desktop.request("poll", {}))
+        self.assertFalse((self.workspace / "never.txt").exists())
+        self.assertIn(
+            self.mobile.request("inspect", {"task_id": task["task_id"]})["state"],
+            {"blocked", "unknown"},
+        )
 
     def test_expired_approval_and_revoked_requester(self):
         task = self.submit("file_write", parameters={"path": "never.txt", "content": "no"})
@@ -804,7 +851,7 @@ class RemoteGridTests(unittest.TestCase):
         text = self.mobile.request(
             "submit",
             {
-                "text": "Explain my day",
+                "text": "Explain an ocean tide",
                 "kind": "text",
                 "target": self.config.core_id,
                 "parameters": {},

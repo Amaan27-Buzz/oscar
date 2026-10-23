@@ -22,6 +22,7 @@ from .event_archive import MemoryWriter, SourceEvent
 from .grid import Node, NodeRole, SessionHandle
 from .harness import Harness
 from .jev import Intent
+from .local_memory import LocalMemory, LocalMemoryConfig
 from .policy import PersonalPolicy
 from .registry import Registry
 from .secure_credentials import InjectedCredentialStore
@@ -55,6 +56,7 @@ class CloudConfig:
     provider_secrets: dict[str, str] = field(default_factory=dict)
     auth_config: Path | None = None
     credential_key_ref: str | None = None
+    local_memory: LocalMemoryConfig | None = None
 
     @classmethod
     def load(cls, path: Path) -> "CloudConfig":
@@ -77,7 +79,7 @@ class CloudConfig:
         if (
             not isinstance(data, dict)
             or not required <= set(data)
-            or set(data) - required - {"auth_config", "credential_key_ref"}
+            or set(data) - required - {"auth_config", "credential_key_ref", "local_memory"}
         ):
             raise ValueError("explicit versioned production configuration required")
         if type(data["version"]) is not int or data["version"] != 1:
@@ -181,6 +183,7 @@ class CloudConfig:
             refs,
             Path(auth_config) if auth_config else None,
             key_ref,
+            LocalMemoryConfig.parse(data["local_memory"]) if "local_memory" in data else None,
         )
 
 
@@ -231,6 +234,7 @@ class CloudCore:
                 auth_config=config.auth_config,
                 execution_enrollment_authorized=renew_execution,
                 start_services=False,
+                memory_config=config.local_memory,
             )
             pools = (
                 (self.core.pool, list(self.core.registry.providers.values())),
@@ -322,7 +326,9 @@ class CloudCore:
             "version": 1,
             "core_id": self.config.core_id,
             "ready": ready,
-            "memory": {
+            "memory": h.memory.status()
+            if isinstance(h.memory, LocalMemory)
+            else {
                 "canonical": "sqlite-wal-fts5",
                 "semantic": "unavailable",
                 "temporal": "unavailable",

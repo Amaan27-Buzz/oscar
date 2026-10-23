@@ -5,6 +5,7 @@ import json
 from dataclasses import asdict
 from typing import TYPE_CHECKING, Any
 
+from .accounts import Account
 from .connectors import RiskLevel
 from .contracts import new_id
 from .mcp_client import MCPServerConfig
@@ -73,6 +74,32 @@ class Connections:
     def __init__(self, h: "Harness"):
         self.h = h
 
+    def _rebind_resource_plugins(
+        self, account: Account, node: str, session: str, scope: str
+    ) -> None:
+        if account.identity_class != "resource-grant":
+            return
+        store = self.h.store
+        for installed in store.all("mcp_installation"):
+            config = self.h.plugins._config(installed)
+            if config.account_id != account.id:
+                continue
+            self.h.plugins.disconnect(installed["id"], expected_config=config)
+            bindings = [b for b in account.services.values() if b.audience == config.url]
+            if len(bindings) == 1:
+                with store.transaction():
+                    self._authority(node, session, scope)
+                    self.h.accounts.check(account.id, account.generation)
+                    current = store.get("mcp_installation", installed["id"])
+                    if self.h.plugins._config(current) != config:
+                        raise PermissionError("MCP binding changed during authorization")
+                    current["config"].update(
+                        account_generation=account.generation,
+                        credential_ref=bindings[0].credential_ref,
+                    )
+                    current["health"] = "disconnected"
+                    store.put("mcp_installation", installed["id"], current)
+
     def _current_owner(
         self,
         node: str,
@@ -135,6 +162,10 @@ class Connections:
                 raise PermissionError("configured Auth Broker required")
             provider = self.h.auth.providers[identifier]
             options = self._enrollment(value)
+            if (provider.provider == "mcp-resource") != (
+                options["identity_class"] == "resource-grant"
+            ):
+                raise PermissionError("resource access and provider person identity are distinct")
             if not provider.allowed_scopes or not set(options["scopes"]) <= set(
                 provider.allowed_scopes
             ):
@@ -192,12 +223,12 @@ class Connections:
             or any(not isinstance(s, str) for s in options["scopes"])
         ):
             raise ValueError("select explicit service permissions")
-        if options["identity_class"] not in {"owner-delegated", "oscar-owned"}:
+        if options["identity_class"] not in {"owner-delegated", "oscar-owned", "resource-grant"}:
             raise ValueError("interactive account identity class required")
         return options
 
-    @staticmethod
     def _registration(
+        self,
         value: str,
     ) -> tuple[MCPServerConfig, dict[str, RiskLevel | tuple[RiskLevel, ...]]]:
         data = json.loads(value)
@@ -207,6 +238,12 @@ class Connections:
         # Fixture bypasses and opaque vault references cannot be submitted by a native client.
         if config.get("fixture_origin") or config.get("credential_ref"):
             raise PermissionError("server credentials require trusted account provisioning")
+        account = self.h.accounts.check(config["account_id"], config["account_generation"])
+        if account.identity_class == "resource-grant":
+            bindings = [b for b in account.services.values() if b.audience == config.get("url")]
+            if len(bindings) != 1 or not config.get("url"):
+                raise PermissionError("exact MCP resource grant required")
+            config["credential_ref"] = bindings[0].credential_ref
         config["arguments"] = tuple(config.get("arguments", ()))
         config["reviewed_files"] = tuple(tuple(p) for p in config.get("reviewed_files", ()))
         candidate = MCPServerConfig(**config)
@@ -433,11 +470,12 @@ class Connections:
                 ]
                 if len(candidates) != 1:
                     raise PermissionError("choose an unambiguous service to reconnect")
-                self.h.auth.refresh(
+                refreshed = self.h.auth.refresh(
                     candidates[0]["id"],
                     owner_authorized=True,
                     authority_check=lambda: self._authority(node, session, scope),
                 )
+                self._rebind_resource_plugins(refreshed, node, session, scope)
                 self.h.ensure_connections()
                 message = "Service credentials refreshed. Previous sessions need reconnecting."
         store.audit(
@@ -455,7 +493,7 @@ class Connections:
         grants: frozenset[str],
         payload: dict[str, Any],
     ) -> dict[str, Any]:
-        if set(payload) != {"id", "state", "code"} or any(
+        if set(payload) not in ({"id", "state", "code"}, {"id", "state", "code", "iss"}) or any(
             not isinstance(v, str) or not v or len(v) > 8000 for v in payload.values()
         ):
             raise ValueError("bounded native OAuth callback required")
@@ -486,7 +524,9 @@ class Connections:
             payload["code"],
             owner_authorized=True,
             authority_check=lambda: self._authority(node, session, scope),
+            issuer=payload.get("iss"),
         )
+        self._rebind_resource_plugins(account, node, session, scope)
         self.h.ensure_connections()
         self.h.store.audit(
             "connections",
@@ -500,5 +540,9 @@ class Connections:
         return {
             "connections": snapshot(self.h),
             "status": "verified",
-            "message": "Account connected.",
+            "message": (
+                "MCP resource access connected. Provider person identity was not verified."
+                if account.identity_class == "resource-grant"
+                else "Account connected."
+            ),
         }

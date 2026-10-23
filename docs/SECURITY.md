@@ -1,5 +1,25 @@
 # Security + Permissions
 
+## Local software integration — 2026-10-23
+
+Read-only historical recall requires current `memory:read`, independently of
+retention or management. Unretained query/answer presentation stays transient;
+restart, read withdrawal or forgetting removes it. Canonical admission rejects
+stale derived results; physical projection deletion is checked separately.
+See [memory runtime](development/SOFTWARE-MEMORY-RUNTIME.md).
+
+MCP resource OAuth binds reviewed resource, issuer, scope ceiling, public client,
+PKCE and exact native callback. An opaque resource grant never authenticates a
+person. Consumed/interrupted code and rotating refresh exchanges are not replayed;
+local deletion does not claim provider-side revocation. See
+[authorization contract](development/SOFTWARE-MCP-AUTHORIZATION.md).
+
+Conversation models propose bounded plans. Signed input-scope approval and exact
+effect approval remain separate; browser workflows may partially mutate before
+failure and never retry uncertain effects automatically. Actual source-scoped
+tests are linked from the completion ledger. Production owner activation, provider
+consent, public hosting and physical-device acceptance have not been inferred.
+
 ## Connected Grid candidate — 2026-10-18
 
 The [2026-10-19 independent closure](development/GROUP-04-D2-CLOSURE.md) corrects

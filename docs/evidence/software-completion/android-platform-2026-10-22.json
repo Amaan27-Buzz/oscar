@@ -1,0 +1,33 @@
+{
+  "status": "EMULATED_OS_VERIFIED",
+  "serial": "emulator-5582",
+  "avd": "oscar_group05_capability_api35",
+  "api": 35,
+  "checks": [
+    "systemFolderSelectionScopesWriteReadAndWithdrawal",
+    "systemSingleAppConsentRequiresAuthorityAndStopsOnStopAndLock"
+  ],
+  "input_stability": "Source and APK SHA-256 matched before and after execution",
+  "authority": "Synthetic exact adapter callback only; not signed Grid task acceptance or owner activation",
+  "source_sha256": {
+    "mobile/app/src/androidTest/AndroidManifest.xml": "421ed3a127bac7cba7d9cc40f6667f0f287dd0d651ef7b6b761b0a9e631656ce",
+    "mobile/app/src/androidTest/java/io/dawnlight/oscar/mobile/ScreenFixtureActivity.java": "1aaae1d2d2e0da16dc196f708d9dc1a210a3ea8d9c838255413cedc89a7a2bd5",
+    "mobile/app/src/androidTest/java/io/dawnlight/oscar/mobile/NativePlatformConsentTest.kt": "c371dc8ca18a0af04d0ced8f8e7f0c61c686e0c73d61b33bd0cb3636bb97966a",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/NativeCapabilities.kt": "c2423494a03adeb7dac440dbd7d5871a19f82d67a442f15e3fdd52715994f5c3",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/NativeActionGate.kt": "fb469c87c679f3e5013f66ae1be205751de49a7900fe447346dfd0e2e77b5382",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/NativePlatform.kt": "a114bb608475843c70c0b628cb32ffcc8efe672c43039d2f30908c3bbee12cab",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/NativePlatformSettings.kt": "df0f41a4d8866a2a3ab9d192312b3efb4c0133b7b7e60191125cbfe2f18e22c8",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/NativeScreenService.kt": "0142e787c018e12b3f642bdc09aaeb268cc71b0cbb84e7e57793a466fdce9631",
+    "scripts/software_android_platform_reference.py": "a719427fa93cf9f4657b602d7f395fee0d6abdf62306cc98a9d4b5073307fd73"
+  },
+  "apk_sha256": {
+    "app/build/outputs/apk/debug/app-debug.apk": "5f34a6e2a1e502e71ef0a1058c2710584a9d76545cad08c2ab346a1e33224345",
+    "app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk": "aa724164c7187b3c50861d53c279ce2761f9cb9902411ecee37aea78b752da96"
+  },
+  "cleanup": "Both packages removed; exact accessibility settings restored and read back; only exact synthetic document paths removed",
+  "qualification": "Actual OS consent and adapter authority; independent from signed Grid task acceptance",
+  "log_sha256": {
+    "systemFolderSelectionScopesWriteReadAndWithdrawal.log": "952d5b1aee0b6983198f1f5ab6f09c1632d66c78bc96cb176cebe4321637ca63",
+    "systemSingleAppConsentRequiresAuthorityAndStopsOnStopAndLock.log": "65f974fa91d788b3118a6b154e07bae28742ce6d4f729747d3775afd7567df73"
+  }
+}

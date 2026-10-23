@@ -40,20 +40,7 @@ import kotlinx.coroutines.withContext
         "Awareness" -> AwarenessScreen(session, state) { navigate("Privacy") }
         "Access" -> AccessScreen(session, state)
         "Connections" -> ConnectionsScreen(session, state)
-        "Memory" -> {
-            IllustratedIntro("Memory", artwork = R.drawable.illustration_reading, height = 112.dp)
-            PreferenceGroup("History & recall") {
-                FeatureRow("OSCAR memory", "Managed by your Core", "Book", Lilac)
-                HorizontalDivider()
-                PreferenceValue("History tools", "Unavailable on this phone")
-            }
-            PreferenceGroup("On this phone") {
-                PreferenceValue("Unsent drafts", "Encrypted recovery")
-                HorizontalDivider()
-                PreferenceValue("Responses", "Cleared on leaving the app")
-            }
-            SupportingDetails("Drafts & memory") { Text("Unsent drafts use encrypted recovery. Discard clears the draft, not Core memory. History, forgetting and retention controls are managed by Core.", style = MaterialTheme.typography.bodySmall) }
-        }
+        "Memory" -> MemoryScreen(session, state)
         "Platform" -> PlatformSettings()
         "Notifications" -> NotificationSettings(session, state)
         "About" -> {
@@ -138,6 +125,7 @@ import kotlinx.coroutines.withContext
         TextButton(enabled = CompanionOverlay.permitted(context), onClick = { try { CompanionOverlay.show(context) } catch (_: Exception) { unavailable = true } }) { Text("Show Companion Orb") }
         TextButton(onClick = { CompanionOverlay.hide(context) }) { Text("Hide Companion") }
         TextButton(onClick = { CompanionOverlay.hide(context, disable = true) }) { Text("Disable Companion overlay") }
+        LocalGrant("Retreat during selected media playback", "overlay_retreat_media", "When enabled, current playing media from selected apps reduces the Orb to an edge button. Requires separate media inspection and Android listener access. Playback does not establish your attention.")
         Text("Requires separately authorized Core presence. Stops on lock, disconnection or permission loss. Does not listen or display conversations. Widgets remain unavailable.", style = MaterialTheme.typography.bodySmall)
         Text("Background microphone access is unavailable until voice setup is complete. OSCAR does not start capture at boot.", style = MaterialTheme.typography.bodySmall)
     }

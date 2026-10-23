@@ -37,6 +37,7 @@ final class CoreClient {
     String binding() throws Exception { return NotificationBoundary.hash(session.optString("url") + "\n" + session.optString("node_id") + "\n" + session.optString("session_id")); }
     boolean matches(Approval approval) { return session.optString("node_id").equals(approval.getNodeId()) && session.optString("session_id").equals(approval.getSessionId()); }
     String nodeId() { return session.optString("node_id"); }
+    String sessionId() { return session.optString("session_id"); }
     String coreId() { return session.optString("core_id"); }
     boolean remote() { return session.optInt("version", 1) == 2; }
     boolean retainsConversation() { return session.optBoolean("retain_conversation", false); }

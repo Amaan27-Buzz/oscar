@@ -1,5 +1,10 @@
 # OSCAR — Canonical Roadmap
 
+**2026-10-23:** indexed normal-Core recall, rendered native memory lifecycle,
+reviewed MCP resource OAuth and conversation/browser execution are implemented
+and locally exercised. Current exact evidence and remaining acceptance boundaries
+are in the [completion ledger](development/OSCAR-FULL-SOFTWARE-COMPLETION.md).
+
 **Active local work, 2026-10-21:**
 [full software completion](development/OSCAR-FULL-SOFTWARE-COMPLETION.md)
 supersedes the earlier C1/C2-only scope. Groups 4–6 remain in progress; canonical

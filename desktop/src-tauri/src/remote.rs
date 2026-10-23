@@ -443,8 +443,10 @@ impl RemoteClient {
                     self.session.scopes.iter().any(|s| s == "archive:retain");
                 projection.capabilities = capabilities(&nodes);
                 projection.nodes = nodes;
+                let conversation =
+                    transient_conversation(&projection.conversation, &tasks, received_at)?;
                 Ok(
-                    json!({"tasks":tasks,"nodes":projection.nodes,"conversation":projection.conversation,
+                    json!({"tasks":tasks,"nodes":projection.nodes,"conversation":conversation,
                     "presence":snapshot["presence"],
                     "connections":snapshot["connections"],
                     "core_clock":clock,"observed_at_ms":received_at,"voice_available":false,
@@ -467,9 +469,15 @@ impl RemoteClient {
                 if payload["mode"] != "Ask" || payload["context_id"] != "" {
                     return Err("This remote capability is unavailable".into());
                 }
-                let result = self.request("submit", json!({"text":payload["text"],"kind":"text","target":self.session.core_id,"parameters":{},"retain":true}))?;
+                let retain = self
+                    .session
+                    .scopes
+                    .iter()
+                    .any(|scope| scope == "archive:retain");
+                let result = self.request("submit", json!({"text":payload["text"],"kind":"text","target":self.session.core_id,"parameters":{},"retain":retain}))?;
                 if result.get("assistance_proposal").is_some()
-                    || (result["state"] == "blocked" && !result["task_id"].is_string()) {
+                    || (result["state"] == "blocked" && !result["task_id"].is_string())
+                {
                     return Ok(result);
                 }
                 task(&result)
@@ -528,8 +536,23 @@ pub fn task(value: &Value) -> Result<Value, String> {
     let approval = value["approval_required"]
         .as_bool()
         .ok_or("invalid task approval")?;
+    let request_retained = value
+        .get("request_retained")
+        .map(|v| v.as_bool().ok_or("invalid request retention"))
+        .transpose()?
+        .unwrap_or(true);
+    if !request_retained
+        && (retained
+            || value["capability"] != "memory.recall"
+            || state == "verified"
+            || value.get("response_status").is_none()
+            || approval)
+    {
+        return Err("invalid private recall task".into());
+    }
+    let available = retained || !request_retained;
     if evidence.len() > 100
-        || (!retained && (!evidence.is_empty() || !value["result"].is_null() || approval))
+        || (!available && (!evidence.is_empty() || !value["result"].is_null() || approval))
     {
         return Err("redacted task exposed retained material".into());
     }
@@ -566,6 +589,33 @@ pub fn task(value: &Value) -> Result<Value, String> {
     if retained && state == "verified" && (!verified || value["result"].is_null()) {
         return Err("verified task lacks correlated result and evidence".into());
     }
+    let recall_status = value
+        .get("response_status")
+        .map(|status| {
+            status
+                .as_str()
+                .filter(|status| matches!(*status, "RECALLED" | "INFERRED" | "UNKNOWN"))
+                .ok_or("invalid recall status")
+        })
+        .transpose()?;
+    let sources = match value.get("source_event_ids") {
+        Some(ids) => ids.as_array().ok_or("invalid recall sources")?.clone(),
+        None => Vec::new(),
+    };
+    if sources.len() > 32
+        || sources
+            .iter()
+            .any(|id| id.as_str().is_none_or(|id| id.is_empty() || id.len() > 128))
+        || sources
+            .iter()
+            .enumerate()
+            .any(|(i, id)| sources[..i].contains(id))
+        || (matches!(recall_status, Some("RECALLED" | "INFERRED"))
+            && (sources.is_empty() || value["result"]["value"].is_null() || state == "verified"))
+        || (!sources.is_empty() && !matches!(recall_status, Some("RECALLED" | "INFERRED")))
+    {
+        return Err("invalid recall provenance".into());
+    }
     let mut actions = Vec::new();
     if value["approval_required"] == true {
         actions.push("approve");
@@ -574,11 +624,48 @@ pub fn task(value: &Value) -> Result<Value, String> {
         actions.push("cancel");
     }
     Ok(
-        json!({"task_id":task_id,"state":state,"retained_available":retained,"description":value["description"],"generation":value["generation"].as_u64().unwrap_or(0),
-        "target":value["target"],"blocker":if retained {value["blocker"].clone()} else {json!("Retained result and evidence are unavailable")},"actions":actions,"value":if retained {value["result"]["value"].clone()} else {Value::Null},
+        json!({"task_id":task_id,"state":state,"retained_available":retained,"request_retained":request_retained,"description":value["description"],"generation":value["generation"].as_u64().unwrap_or(0),
+        "target":value["target"],"blocker":if available {value["blocker"].clone()} else {json!("Retained result and evidence are unavailable")},"actions":actions,"value":if available {value["result"]["value"].clone()} else {Value::Null},
         "evidence":evidence.iter().map(|e|json!({"id":e["id"],"source":e["source"],"method":e["method"],"observed_at":e["observed_at"],"matches":e["matches"],"status":e["status"]})).collect::<Vec<_>>(),
-        "mode":"Ask","epistemic":if !retained {"UNKNOWN"} else if state=="verified" {"VERIFIED"} else {"REPORTED"}}),
+        "mode":"Ask","response_status":recall_status,"source_event_ids":sources,
+        "epistemic":if !available {"UNKNOWN"} else if let Some(status)=recall_status {status} else if state=="verified" {"VERIFIED"} else {"REPORTED"}}),
     )
+}
+fn transient_conversation(
+    canonical: &ConversationView,
+    tasks: &[Value],
+    observed_at: u64,
+) -> Result<ConversationView, String> {
+    if tasks.len() > 100 {
+        return Err("too many Core tasks".into());
+    }
+    let mut conversation = canonical.clone();
+    for task in tasks
+        .iter()
+        .filter(|task| task["request_retained"] == false)
+    {
+        let task_id = string(task, "task_id")?;
+        let text = string(task, "description")?;
+        if text.is_empty() || text.len() > 8192 {
+            return Err("invalid private recall text".into());
+        }
+        if !conversation
+            .turns
+            .iter()
+            .any(|turn| turn.task_id == task_id)
+        {
+            conversation.turns.push(ConversationTurn {
+                id: format!("transient-{task_id}"),
+                task_id,
+                role: "owner".into(),
+                text,
+                status: "REPORTED".into(),
+                occurred_at: observed_at as f64 / 1000.0,
+                retained: false,
+            });
+        }
+    }
+    Ok(conversation)
 }
 fn capabilities(nodes: &[Value]) -> Vec<Value> {
     nodes.iter().filter(|node| matches!(node["status"].as_str(),Some("online"|"degraded")))
@@ -723,6 +810,54 @@ pub fn fixture_cli(arguments: &[String]) -> Result<bool, String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn recall_preserves_history_provenance_and_rejects_fabricated_verification() {
+        let mut value = json!({"task_id":"task","action_id":"action","correlation_id":"corr","state":"partially_verified","description":"Earlier decision","target":"core","approval_required":false,"retained_available":true,"result":{"task_id":"task","action_id":"action","correlation_id":"corr","success":true,"status":"REPORTED","value":"Earlier evidence"},"evidence":[],"response_status":"RECALLED","source_event_ids":["canonical-source"]});
+        for status in ["RECALLED", "INFERRED"] {
+            value["response_status"] = json!(status);
+            let parsed = task(&value).unwrap();
+            assert_eq!(parsed["epistemic"], status);
+            assert_eq!(parsed["source_event_ids"], json!(["canonical-source"]));
+        }
+        value["request_retained"] = json!(false);
+        value["retained_available"] = json!(false);
+        value["capability"] = json!("memory.recall");
+        let private = task(&value).unwrap();
+        assert_eq!(private["value"], "Earlier evidence");
+        let canonical = ConversationView::default();
+        let rendered = transient_conversation(&canonical, &[private], 1000).unwrap();
+        assert_eq!(rendered.turns.len(), 1);
+        assert!(!rendered.turns[0].retained);
+        assert!(canonical.turns.is_empty());
+        assert!(
+            transient_conversation(&canonical, &[], 2000)
+                .unwrap()
+                .turns
+                .is_empty()
+        );
+        value["capability"] = json!("machine.files.read");
+        assert!(task(&value).is_err());
+        value["request_retained"] = json!(true);
+        value["retained_available"] = json!(true);
+        for sources in [
+            json!([]),
+            json!(["duplicate", "duplicate"]),
+            json!([4]),
+            json!(["x".repeat(129)]),
+            json!("source"),
+        ] {
+            value["source_event_ids"] = sources;
+            assert!(task(&value).is_err());
+        }
+        value["source_event_ids"] = json!([]);
+        value["response_status"] = json!("VERIFIED");
+        assert!(task(&value).is_err());
+        value["response_status"] = json!("UNKNOWN");
+        value["result"] = Value::Null;
+        let withdrawn = task(&value).unwrap();
+        assert_eq!(withdrawn["epistemic"], "UNKNOWN");
+        assert!(withdrawn["value"].is_null());
+    }
     #[test]
     fn authenticated_clock_bounds_skew_and_transport_without_rewriting_core_time() {
         for local in [99_000, 101_000] {

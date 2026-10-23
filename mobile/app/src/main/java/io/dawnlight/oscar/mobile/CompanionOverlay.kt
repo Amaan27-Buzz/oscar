@@ -12,10 +12,14 @@ import android.view.*
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.lifecycle.*
 import androidx.savedstate.*
 import io.dawnlight.oscar.expression.Contract
@@ -68,6 +72,9 @@ class CompanionOverlayService : Service() {
     private var polling: Job? = null
     private var watchdog: Job? = null
     private var request: String? = null
+    private var retreating by mutableStateOf(false)
+    private var windowParams: WindowManager.LayoutParams? = null
+    private var expandedPosition: Pair<Int, Int>? = null
     private val screen = object : BroadcastReceiver() { override fun onReceive(c: Context?, i: Intent?) { if (i?.action == Intent.ACTION_SCREEN_OFF) stopOverlay() } }
     override fun onCreate() {
         super.onCreate()
@@ -80,6 +87,7 @@ class CompanionOverlayService : Service() {
         event = null; clock = null
         view?.let { try { getSystemService(WindowManager::class.java).removeViewImmediate(it) } catch (_: Exception) { } }
         owner?.close(); view = null; owner = null
+        windowParams = null; expandedPosition = null; retreating = false
     }
     private fun stopOverlay() {
         CompanionOverlay.invalidate(request); polling?.cancel(); wire?.cancel(); watchdog?.cancel(); withdraw(); stopSelf()
@@ -107,6 +115,7 @@ class CompanionOverlayService : Service() {
             watchdog = scope.launch {
                 while (isActive && request == token) {
                     if (!allowed(token) || admission.expiresAt != 0L && (clock?.now(SystemClock.elapsedRealtime()) ?: System.currentTimeMillis()) >= admission.expiresAt) { stopOverlay(); return@launch }
+                    updateRetreat(PhoneContext.retreat(this@CompanionOverlayService))
                     delay(500)
                 }
             }
@@ -152,15 +161,24 @@ class CompanionOverlayService : Service() {
         content.setContent {
             val current = event?.let { raw -> Contract.parse(raw)?.let { raw to it } }
             Column {
-                if (current != null) ExpressionPresence(current.first, current.second.source, 64.dp, current.second.reducedMotion,
-                    clock = { clock?.now(SystemClock.elapsedRealtime()) ?: System.currentTimeMillis() })
-                TextButton(onClick = { CompanionOverlay.hide(this@CompanionOverlayService); stopOverlay() }) { Text("Hide OSCAR") }
+                if (retreating) IconButton(onClick = {
+                    startActivity(Intent(this@CompanionOverlayService, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                }, modifier = Modifier.semantics { contentDescription = "Open OSCAR" }) {
+                    if (current != null) ExpressionPresence(current.first, current.second.source, 24.dp, current.second.reducedMotion,
+                        clock = { clock?.now(SystemClock.elapsedRealtime()) ?: System.currentTimeMillis() })
+                    else Text("Open")
+                } else {
+                    if (current != null) ExpressionPresence(current.first, current.second.source, 64.dp, current.second.reducedMotion,
+                        clock = { clock?.now(SystemClock.elapsedRealtime()) ?: System.currentTimeMillis() })
+                    TextButton(onClick = { CompanionOverlay.hide(this@CompanionOverlayService); stopOverlay() }) { Text("Hide OSCAR") }
+                }
             }
         }
         val density = resources.displayMetrics.density
         val params = WindowManager.LayoutParams((120 * density).toInt(), (120 * density).toInt(), WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_SECURE, PixelFormat.TRANSLUCENT)
         params.gravity = Gravity.TOP or Gravity.START; params.x = 0; params.y = (160 * density).toInt()
+        windowParams = params
         var x = 0f; var y = 0f
         content.setOnTouchListener { _, touch ->
             when (touch.actionMasked) {
@@ -175,6 +193,22 @@ class CompanionOverlayService : Service() {
             }
         }
         windows.addView(content, params); lifecycle.start()
+    }
+    private fun updateRetreat(compact: Boolean) {
+        val content = view ?: return
+        val params = windowParams ?: return
+        if (compact == retreating) return
+        val density = resources.displayMetrics.density
+        if (compact) {
+            expandedPosition = params.x to params.y
+            params.width = (48 * density).toInt(); params.height = (48 * density).toInt(); params.x = 0
+        } else {
+            params.width = (120 * density).toInt(); params.height = (120 * density).toInt()
+            expandedPosition?.let { params.x = it.first; params.y = it.second }
+        }
+        retreating = compact
+        try { getSystemService(WindowManager::class.java).updateViewLayout(content, params) }
+        catch (_: Exception) { stopOverlay() }
     }
     override fun onDestroy() {
         CompanionOverlay.invalidate(request)

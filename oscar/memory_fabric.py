@@ -397,6 +397,10 @@ class MemoryFabric:
         self.archive.forget(
             memory_id, owner_authorized=owner_authorized, forget_sources=forget_sources
         )
+        return self.forget_derived()
+
+    def forget_derived(self) -> tuple[str, ...]:
+        """Propagate canonical tombstones; composition can serialize index maintenance."""
         identifiers = [
             row[0] for row in self.archive.db.execute("SELECT id FROM archive_tombstones")
         ]

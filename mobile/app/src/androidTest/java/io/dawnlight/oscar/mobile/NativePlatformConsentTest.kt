@@ -66,9 +66,9 @@ class NativePlatformConsentTest {
             clickable?.performAction(AccessibilityNodeInfo.ACTION_CLICK) == true
         }
     }
-    private fun action(native: NativeCapabilities, capability: String, target: String = "", value: String = "") = NativeAction(
+    private fun action(native: NativeCapabilities, capability: String, target: String = "", value: String = "", packageName: String = context.packageName) = NativeAction(
         "platform-${System.nanoTime()}", "synthetic-platform-task", "synthetic-node", "synthetic-session", 1, 1,
-        native.gate.generation, SystemClock.elapsedRealtime() + 30_000, capability, context.packageName, target, value)
+        native.gate.generation, SystemClock.elapsedRealtime() + 30_000, capability, packageName, target, value)
     private fun shell(command: String) = automation.executeShellCommand(command).use { descriptor ->
         android.os.ParcelFileDescriptor.AutoCloseInputStream(descriptor).use { it.readBytes() }
     }
@@ -117,9 +117,10 @@ class NativePlatformConsentTest {
     }
 
     private fun consentScreen() {
+        shell("am start --activity-reorder-to-front -n ${context.packageName}/.MainActivity")
         compose.onNodeWithText("Review screen-sharing consent").performScrollTo().performClick()
         systemClick("Start", "Start now", "Start recording")
-        systemClick("OSCAR")
+        systemClick(instrumentation.context.packageName)
         waitFor("MediaProjection did not start") { NativeScreenService.current != null }
     }
 
@@ -129,38 +130,29 @@ class NativePlatformConsentTest {
         systemClick("Cancel", "CANCEL")
         assertNull(NativeScreenService.current)
         compose.runOnIdle { prefs.edit().putBoolean("screen_perception", true).putBoolean("accessibility_perception", true)
-            .putString("native_action_packages", context.packageName).commit() }
+            .putString("native_action_packages", instrumentation.context.packageName).commit() }
         // Instrumentation process restart does not rebind an already enabled service.
         val services = String(shell("settings get secure enabled_accessibility_services")).trim()
         require(services.matches(Regex("[A-Za-z0-9_./:$-]+")))
         val other = services.split(':').filterNot { it == "null" || it == context.packageName + "/.AppControlService" || it == context.packageName + "/" + AppControlService::class.java.name }.joinToString(":")
-        shell("settings put secure enabled_accessibility_services '$other'")
-        shell("settings put secure enabled_accessibility_services '${listOf(other, context.packageName + "/.AppControlService").filter(String::isNotEmpty).joinToString(":")}'")
+        shell("settings delete secure enabled_accessibility_services")
+        if (other.isNotEmpty()) shell("settings put secure enabled_accessibility_services $other")
+        waitFor("Accessibility setting did not withdraw") { !accessibilityEnabled(context) }
+        shell("settings put secure enabled_accessibility_services ${listOf(other, context.packageName + "/.AppControlService").filter(String::isNotEmpty).joinToString(":")}")
         shell("settings put secure accessibility_enabled 1")
         waitFor("Real accessibility service not connected") { AppControlService.connected != null }
+        shell("am start -W -n ${instrumentation.context.packageName}/${ScreenFixtureActivity::class.java.name}")
+        waitFor("Synthetic screen app did not open") { AppControlService.connected?.selectedPackage() == instrumentation.context.packageName }
         consentScreen()
-        val fixtureMonitor = android.app.Instrumentation.ActivityMonitor(CapabilityFixtureActivity::class.java.name, null, false)
-        instrumentation.addMonitor(fixtureMonitor)
-        var fixture: android.app.Activity? = null
         try {
-            compose.runOnIdle { compose.activity.startActivity(Intent(compose.activity, CapabilityFixtureActivity::class.java)) }
-            fixture = instrumentation.waitForMonitorWithTimeout(fixtureMonitor, 10_000)
-            assertNotNull(fixture)
-            instrumentation.runOnMainSync { requireNotNull(fixture).window.decorView.setBackgroundColor(android.graphics.Color.rgb(30, 140, 60)) }
-            waitFor("Selected synthetic app not foreground") { AppControlService.connected?.selectedPackage() == context.packageName }
-            val handler = android.os.Handler(android.os.Looper.getMainLooper())
-            val animate = object : Runnable { override fun run() {
-                fixture?.findViewById<android.widget.TextView>(R.id.capability_fixture_result)?.text = "Synthetic frame ${SystemClock.elapsedRealtime()}"
-                handler.postDelayed(this, 40)
-            } }
-            handler.post(animate)
-            try {
+            waitFor("Selected synthetic app not foreground") { AppControlService.connected?.selectedPackage() == instrumentation.context.packageName }
                 NativeCapabilities(context, true) { it == approved }.use { native ->
                     native.gate.foreground(true)
-                    assertEquals("blocked", native.execute(context, action(native, "android.screen.capture")).state)
+                    fun capture() = action(native, "android.screen.capture", packageName = instrumentation.context.packageName)
+                    assertEquals("blocked", native.execute(context, capture()).state)
                     var frame: NativeResult? = null
                     waitFor("No fresh authorized selected-app frame") {
-                        val capture = action(native, "android.screen.capture"); approved = capture
+                        val capture = capture(); approved = capture
                         frame = native.execute(context, capture)
                         frame!!.observations.isNotEmpty()
                     }
@@ -173,15 +165,13 @@ class NativePlatformConsentTest {
                     val pixel = bitmap.getPixel(bitmap.width / 2, bitmap.height / 2)
                     assertTrue("Captured frame did not contain the selected synthetic app", android.graphics.Color.green(pixel) > 100 && android.graphics.Color.red(pixel) < 60 && android.graphics.Color.blue(pixel) < 90)
                     bitmap.recycle()
-                    val cancelled = action(native, "android.screen.capture"); approved = cancelled; native.cancel(cancelled.requestId)
+                    val cancelled = capture(); approved = cancelled; native.cancel(cancelled.requestId)
                     assertEquals("blocked", native.execute(context, cancelled).state)
                     compose.activity.stopService(Intent(context, NativeScreenService::class.java))
                     waitFor("Screen service survived stop") { NativeScreenService.current == null }
-                    val stopped = action(native, "android.screen.capture"); approved = stopped
+                    val stopped = capture(); approved = stopped
                     assertEquals("blocked", native.execute(context, stopped).state)
                 }
-            } finally { handler.removeCallbacks(animate) }
-            instrumentation.runOnMainSync { requireNotNull(fixture).finish() }; fixture = null
             consentScreen()
             shell("input keyevent KEYCODE_SLEEP")
             waitFor("Screen sharing survived OS screen-off") { NativeScreenService.current == null }
@@ -189,8 +179,6 @@ class NativePlatformConsentTest {
         } finally {
             shell("input keyevent KEYCODE_WAKEUP"); shell("wm dismiss-keyguard")
             context.stopService(Intent(context, NativeScreenService::class.java))
-            fixture?.let { activity -> instrumentation.runOnMainSync { activity.finish() } }
-            instrumentation.removeMonitor(fixtureMonitor)
             prefs.edit().putBoolean("screen_perception", false).putBoolean("accessibility_perception", false).putString("native_action_packages", "").commit()
         }
     }

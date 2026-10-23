@@ -34,6 +34,7 @@ class CoreSession(application: Application) : AndroidViewModel(application) {
     private var accountCode: String? = null
     internal val nativeCapabilities = NativeCapabilities(application)
     private fun connection(saved: JSONObject) = CoreClient(saved, vault::signDevice)
+    internal fun phoneContextSource(id: String, retain: Boolean) = PhoneContext.configuration(getApplication(), client, id, retain)
 
     fun start() {
         nativeCapabilities.gate.foreground(true)
@@ -98,9 +99,14 @@ class CoreSession(application: Application) : AndroidViewModel(application) {
                 if (client!!.canApprove()) current else current.copy(tasks = current.tasks.map { it.copy(actions = it.actions.filterNot { action -> action == "approve" }) })
             } else parseSnapshot(response)
             val clock = CoreClock.observe(received.observedAt, System.currentTimeMillis(), started, android.os.SystemClock.elapsedRealtime(), mutable.value.clock)
+            if (remote && client?.hasScope("android:perceive") == true) try {
+                PhoneContext.publish(getApplication()) { name, value -> call(name, value, epoch) }
+            } catch (cancelled: CancellationException) { throw cancelled }
+            catch (rejected: CoreClient.SessionRejected) { throw rejected }
+            catch (_: Exception) { if (BuildConfig.DEBUG) android.util.Log.w("OscarSession", "Selected phone context unavailable") }
             received.presence?.let { require(io.dawnlight.oscar.expression.Contract.validate(it, clock.now(android.os.SystemClock.elapsedRealtime())) != null) }
             if (!active) return
-            val interactions = if (remote && !mutable.value.privateSuppressed) history.merge(response) else mutable.value.interactions
+            val interactions = if (remote && !mutable.value.privateSuppressed) gridInteractions(history.merge(response), received.tasks) else mutable.value.interactions
             if (remote && !mutable.value.privateSuppressed) wire.withLock { withContext(Dispatchers.IO) { vault.saveHistory(history.saved(), client!!.binding()) } }
             if (!active || mutable.value.epoch != epoch) return
             // History persistence suspends; preserve decisions and drafts changed during that wait.
@@ -112,15 +118,17 @@ class CoreSession(application: Application) : AndroidViewModel(application) {
                 message = if (old.link == Link.CONNECTED) old.message else null), epoch)
             if (next == old) return
             mutable.value = next
-            alerts.changed(old.snapshot, snapshot)
+            alerts.changed(old.snapshot, snapshot, clock.now(android.os.SystemClock.elapsedRealtime()))
         } catch (cancelled: CancellationException) { throw cancelled }
         catch (_: CoreClient.SessionRejected) {
             nativeCapabilities.revoke()
+            alerts.clearSentry()
             rejected = true
             if (mutable.value.epoch == epoch) mutable.value = mutable.value.unavailable("This device’s connection expired or was revoked. Re-enroll from your trusted Core.")
         }
         catch (failure: Exception) {
             nativeCapabilities.revoke()
+            alerts.clearSentry()
             if (mutable.value.epoch == epoch) {
                 if (BuildConfig.DEBUG) android.util.Log.w("OscarSession", "snapshot failed (${failure.javaClass.simpleName}); epoch=$epoch")
                 mutable.value = mutable.value.unavailable("Core is unavailable or returned invalid state. No action is confirmed; refresh before retrying.")
@@ -137,11 +145,13 @@ class CoreSession(application: Application) : AndroidViewModel(application) {
             catch (cancelled: CancellationException) { throw cancelled }
             catch (_: CoreClient.SessionRejected) {
                 nativeCapabilities.revoke()
+                alerts.clearSentry()
                 rejected = true
                 if (mutable.value.epoch == epoch) mutable.value = mutable.value.unavailable("This device’s connection expired or was revoked. Re-enroll from your trusted Core.")
             }
             catch (failure: Exception) {
                 nativeCapabilities.revoke()
+                alerts.clearSentry()
                 if (mutable.value.epoch == epoch) {
                     if (BuildConfig.DEBUG) android.util.Log.w("OscarSession", "request failed (${failure.javaClass.simpleName}); epoch=$epoch")
                     mutable.value = mutable.value.unavailable("Request could not be confirmed. Inspect current Core state before retrying.")
@@ -203,11 +213,12 @@ class CoreSession(application: Application) : AndroidViewModel(application) {
     }
     fun submitRemote(text: String, kind: String, target: String, parameters: JSONObject): Boolean {
         if (client?.remote() != true || text.isBlank() || text.length > 1000 || mutable.value.privateSuppressed) return false
-        if (!client!!.retainsConversation()) { message("Enable conversation sharing during trusted enrollment before sending to Core."); return false }
+        val retain = client!!.retainsConversation()
+        if (!retain && kind != "text") { message("This action needs conversation sharing during trusted enrollment."); return false }
         if (kind !in setOf("text", "addition", "file_read", "file_write")) return false
         return request { epoch ->
             val result = call("submit", JSONObject().put("text", text).put("kind", kind).put("target", target)
-                .put("parameters", parameters).put("retain", true), epoch)
+                .put("parameters", parameters).put("retain", retain), epoch)
             if (result.has("assistance_proposal")) {
                 stageManagement("assistance", result.getJSONObject("assistance_proposal"), epoch)
                 return@request
@@ -291,7 +302,9 @@ class CoreSession(application: Application) : AndroidViewModel(application) {
         request { epoch ->
             // Consume locally once; ambiguous network outcomes are inspected, never automatically retried.
             accountCode = null
-            val result = call("oauth_callback", JSONObject().put("id", browser.id).put("state", browser.state).put("code", code), epoch)
+            val callback = JSONObject().put("id", browser.id).put("state", browser.state).put("code", code)
+            browser.responseIssuer?.let { callback.put("iss", it) }
+            val result = call("oauth_callback", callback, epoch)
             require(result.getString("status") == "verified")
             parseConnections(result.getJSONObject("connections"))
             clearAccountBrowser()
@@ -360,7 +373,15 @@ class CoreSession(application: Application) : AndroidViewModel(application) {
             val message = if (approval.completion != "complete") {
                 when (approval.completion) {
                     "authority_complete" -> { result.getJSONObject("authority"); "Access updated by Core. Check the current mode and expiry below." }
-                    "assistance_complete" -> { require(result.getString("status") == "verified"); result.bounded("message", 1000) }
+                    "assistance_complete" -> {
+                        require(result.getString("status") in setOf("verified", "partially_verified", "unknown"))
+                        if (result.optBoolean("memory_changed")) {
+                            history.clear()
+                            withContext(Dispatchers.IO) { vault.clearHistory() }
+                            mutable.value = mutable.value.copy(snapshot = null)
+                        }
+                        result.bounded("message", 1000)
+                    }
                     "management_complete" -> {
                         parseConnections(result.getJSONObject("connections"))
                         result.optJSONObject("enrollment")?.let { beginAccountBrowser(it) }

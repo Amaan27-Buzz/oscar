@@ -90,8 +90,11 @@ internal fun parseManagement(root: JSONObject): ManagementView? {
             draft.bounded("id", 80); draft.bounded("goal", 480); draft.bounded("state", 32)
         }
     }
+    root.optJSONObject("memory")?.let(::parseMemory)
     return ManagementView(root.bounded("relationship_id", 128), mode, status, expires, epoch, caps,
-        root.getJSONArray("ask_rules").texts(256).sorted(), canonicalJson(root))
+        root.getJSONArray("ask_rules").texts(256).sorted(), canonicalJson(root)).also {
+            if (sentry.has("alerts")) parseSentryAlerts(it, root.getLong("observed_at_ms"))
+        }
 }
 internal fun parseConnections(root: JSONObject): ConnectionView {
     require(root.toString().toByteArray().size <= 50_000 && root.get("truncated") is Boolean)

@@ -107,6 +107,36 @@ class NativeGridExecutionTest {
                 assertNull("Refresh restored a dismissed automation review", product.state.value.approval)
                 instrumentation.waitForIdleSync()
                 assertEquals(0, parseDayBrief(connection.call("day_brief", JSONObject()).getJSONObject("day_brief")).sources.size)
+                assertTrue(prefs.edit().putBoolean("phone_context", true).putBoolean("notification_context", true)
+                    .putString("notification_sources", context.packageName + ".test").putBoolean("overlay_retreat_media", true).commit())
+                context.openFileOutput("software-phone-binding.json", Context.MODE_PRIVATE).use { it.write(JSONObject()
+                    .put("node_id", saved.getString("node_id")).put("session_id", saved.getString("session_id")).toString().toByteArray()) }
+                stage("Phone context ready")
+                waitFor("Host did not review the exact phone source") { context.getFileStreamPath("software-phone-configured").exists() }
+                waitFor("Actual selected notification/media metadata did not reach Core") {
+                    SystemClock.sleep(1_000)
+                    val brief = connection.call("day_brief", JSONObject()).getJSONObject("day_brief")
+                    val selected = brief.objects("sources", 8).find { it.getString("id") == "synthetic-phone-context" }
+                    if (selected == null || selected.optString("state") != "current" || selected.isNull("value")) false
+                    else {
+                        val value = JSONObject(selected.getString("value"))
+                        !value.toString().contains("synthetic-sensitive-body-marker") && value.getBoolean("notifications_available") &&
+                            value.objects("notifications", 8).any { it.getString("package") == context.packageName + ".test" && it.getInt("count") >= 1 } &&
+                            value.getBoolean("media_available") && value.objects("media", 8).any { it.getString("package") == context.packageName && it.getInt("state") == 3 }
+                    }
+                }
+                assertTrue("Explicit media retreat did not use the actual playing session", PhoneContext.retreat(context))
+                assertTrue(prefs.edit().putBoolean("overlay_retreat_media", false).commit())
+                assertFalse(PhoneContext.retreat(context))
+                context.openFileOutput("software-phone-observed", Context.MODE_PRIVATE).close()
+                waitFor("Host did not independently inspect canonical phone context", 90_000) { context.getFileStreamPath("software-phone-verified").exists() }
+                assertTrue(prefs.edit().putBoolean("phone_context", false).commit())
+                waitFor("Local phone sharing withdrawal left current context visible") {
+                    SystemClock.sleep(1_000)
+                    connection.call("day_brief", JSONObject()).getJSONObject("day_brief").objects("sources", 8)
+                        .find { it.getString("id") == "synthetic-phone-context" }?.getString("state") != "current"
+                }
+                stage("Phone context and local withdrawal accepted")
                 // Parsing a review cannot activate authority; native owner authentication is separate.
                 assertEquals("ask", requireNotNull(currentSnapshot().management).mode)
                 stage("Actual Core management projection and exact unsigned review accepted")
@@ -147,7 +177,7 @@ class NativeGridExecutionTest {
                     assertTrue("No durable pre-effect execution claim", claims >= 3)
                     context.openFileOutput("software-native-result.json", Context.MODE_PRIVATE).use { it.write(JSONObject()
                         .put("text", "Grid synthetic agenda").put("result", "Reviewed: Grid synthetic agenda")
-                        .put("claims", claims).put("clipboard", true).put("media", true).put("revoked", true).put("management_review", true).put("owner_activation", false).toString().toByteArray()) }
+                        .put("phone_context", true).put("phone_context_withdrawal", true).put("media_retreat", true).put("claims", claims).put("clipboard", true).put("media", true).put("revoked", true).put("management_review", true).put("owner_activation", false).toString().toByteArray()) }
                 }
             }
         } finally {
@@ -156,6 +186,7 @@ class NativeGridExecutionTest {
             context.getSharedPreferences("permissions", Context.MODE_PRIVATE).edit().putBoolean("app_actions", false)
                 .putBoolean("accessibility_perception", false).putBoolean("accessibility_actions", false)
                 .putBoolean("clipboard_perception", false).putBoolean("clipboard_actions", false)
+                .putBoolean("phone_context", false).putBoolean("notification_context", false).putString("notification_sources", "").putBoolean("overlay_retreat_media", false)
                 .putBoolean("media_perception", false).putBoolean("media_actions", false).putString("native_action_packages", "").commit()
             HttpsURLConnection.setDefaultSSLSocketFactory(previous)
         }

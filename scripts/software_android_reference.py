@@ -1,14 +1,18 @@
 """Actual native Android execution through a separate TLS Core on one disposable AVD."""
 
+import base64
 import hashlib
 import json
 import os
 import re
+import sqlite3
 import subprocess
+from contextlib import closing
 from pathlib import Path
 from time import monotonic, sleep
 
 from scripts.verify_connected_grid import android_core_fixture
+from tests.test_connected_acceptance import sign
 
 ROOT = Path(__file__).resolve().parents[1]
 PACKAGE = "io.dawnlight.oscar.mobile"
@@ -18,9 +22,7 @@ AVD = "oscar_group05_capability_api35"
 
 def source_hashes() -> dict[str, str]:
     paths = [*ROOT.glob("oscar/*.py"), Path(__file__), ROOT / "scripts/verify_connected_grid.py"]
-    paths += [
-        p for p in (ROOT / "mobile/app/src").rglob("*") if p.suffix in {".kt", ".java"}
-    ]
+    paths += [p for p in (ROOT / "mobile/app/src").rglob("*") if p.suffix in {".kt", ".java"}]
     paths += list((ROOT / "mobile/app/build/outputs/apk").rglob("*.apk"))
     return {
         p.relative_to(ROOT).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
@@ -142,6 +144,7 @@ def main() -> int:
                 "install", "-r", "-t", str(ROOT / "mobile" / apk), timeout=120
             )
         device("shell", "pm", "grant", PACKAGE, "android.permission.POST_NOTIFICATIONS")
+        device("shell", "pm", "grant", PACKAGE + ".test", "android.permission.POST_NOTIFICATIONS")
         device("shell", "cmd", "notification", "allow_listener", listener)
         device(
             "shell",
@@ -170,9 +173,37 @@ def main() -> int:
                     background=True,
                 )
                 rebound = False
+                phone_configured = False
+                phone_context: dict = {}
+                phone_ids = ["synthetic-phone-context"] + [
+                    "synthetic-phone-context-" + str(index) for index in range(2, 9)
+                ]
+                phone_started = None
+                phone_samples = 0
+                next_phone_check = 0.0
+
+                def review_phone(change: dict) -> None:
+                    challenge = fixture.mobile.request("assistance_challenge", change)
+                    fixture.mobile.request(
+                        "assistance_complete",
+                        {
+                            "challenge_id": challenge["challenge_id"],
+                            "signature": base64.b64encode(
+                                sign(
+                                    fixture.owner_key,
+                                    base64.b64decode(challenge["signing_payload"]),
+                                )
+                            ).decode(),
+                        },
+                    )
 
                 def ready():
-                    nonlocal rebound
+                    nonlocal \
+                        rebound, \
+                        phone_configured, \
+                        phone_started, \
+                        phone_samples, \
+                        next_phone_check
                     if not rebound:
                         stage = device(
                             "exec-out", "run-as", PACKAGE, "cat", "files/software-native-stage.txt"
@@ -198,6 +229,135 @@ def main() -> int:
                                 "shell", "settings", "put", "secure", "accessibility_enabled", "1"
                             )
                             rebound = True
+                    if not phone_configured:
+                        try:
+                            phone = json.loads(
+                                device(
+                                    "exec-out",
+                                    "run-as",
+                                    PACKAGE,
+                                    "cat",
+                                    "files/software-phone-binding.json",
+                                )
+                            )
+                        except (RuntimeError, ValueError):
+                            phone = None
+                        if phone is not None:
+                            assert phone["node_id"] == "synthetic-emulated-android"
+                            device("shell", "cmd", "notification", "disallow_listener", listener)
+                            device("shell", "cmd", "notification", "allow_listener", listener)
+                            device(
+                                "shell",
+                                "am",
+                                "start",
+                                "-W",
+                                "-n",
+                                PACKAGE + ".test/" + PACKAGE + ".PhoneNotificationFixtureActivity",
+                            )
+                            for source_id in phone_ids:
+                                review_phone(
+                                    {
+                                        "operation": "source_create",
+                                        "id": source_id,
+                                        "value": {
+                                            "id": source_id,
+                                            "adapter": "android",
+                                            "entity_id": "phone:" + phone["node_id"],
+                                            "interval_seconds": 5,
+                                            "retain": False,
+                                            "retention_seconds": 3600,
+                                            **phone,
+                                            "packages": [PACKAGE + ".test", PACKAGE],
+                                        },
+                                    }
+                                )
+                            review_phone(
+                                {
+                                    "operation": "sentry",
+                                    "id": "awareness",
+                                    "value": {
+                                        "mode": "sentry",
+                                        "state": "aware",
+                                        "source_ids": phone_ids,
+                                        "trigger_keys": [],
+                                        "allow_interrupt": False,
+                                    },
+                                }
+                            )
+                            device(
+                                "shell",
+                                "run-as",
+                                PACKAGE,
+                                "touch",
+                                "files/software-phone-configured",
+                            )
+                            phone_configured = True
+                    if phone_configured and not phone_context and monotonic() >= next_phone_check:
+                        next_phone_check = monotonic() + 2
+                        brief = fixture.mobile.request("day_brief", {})["day_brief"]
+                        current_phone = [s for s in brief["sources"] if s["id"] in phone_ids]
+                        all_current = len(current_phone) == 8 and all(
+                            s["state"] == "current" for s in current_phone
+                        )
+                        if phone_started is not None:
+                            assert all_current, "A phone source expired during sustained acceptance"
+                        selected = next(
+                            (
+                                source
+                                for source in brief["sources"]
+                                if source["id"] == "synthetic-phone-context"
+                            ),
+                            None,
+                        )
+                        if all_current and selected:
+                            value = json.loads(selected["value"])
+                            if value["notifications_available"] and value["media_available"]:
+                                assert all(json.loads(s["value"]) == value for s in current_phone)
+                                assert any(
+                                    item["package"] == PACKAGE + ".test" and item["count"] >= 1
+                                    for item in value["notifications"]
+                                )
+                                assert any(
+                                    item["package"] == PACKAGE and item["state"] == 3
+                                    for item in value["media"]
+                                )
+                                assert "synthetic-sensitive-body-marker" not in selected["value"]
+                                archive = fixture.config.data_dir / "core.archive.sqlite"
+                                with closing(
+                                    sqlite3.connect(archive.as_uri() + "?mode=ro", uri=True)
+                                ) as database:
+                                    retained = database.execute(
+                                        "SELECT count(*) FROM archive_events "
+                                        "WHERE json_extract(payload,'$.source_id') "
+                                        "LIKE 'synthetic-phone-context%'",
+                                    ).fetchone()[0]
+                                assert retained == 0
+                                phone_samples += 1
+                                if phone_started is None:
+                                    phone_started = monotonic()
+                                elapsed = monotonic() - phone_started
+                                if elapsed >= 65:
+                                    phone_context.update(
+                                        {
+                                            "source": selected["id"],
+                                            "epoch": selected["epoch"],
+                                            "value": value,
+                                            "evidence": selected["evidence"],
+                                            "retained_observations": retained,
+                                            "retention": False,
+                                            "sentry": "quiet authorized context",
+                                            "source_ids": phone_ids,
+                                            "sustained_seconds": round(elapsed, 3),
+                                            "fresh_readback_samples": phone_samples,
+                                        }
+                                    )
+                                    device(
+                                        "shell",
+                                        "run-as",
+                                        PACKAGE,
+                                        "touch",
+                                        "files/software-phone-verified",
+                                    )
                     if process.poll() is not None:
                         accepted(process, log_path)
                         raise RuntimeError("Native fixture ended before readiness")
@@ -220,7 +380,7 @@ def main() -> int:
                 wait(
                     ready,
                     "Native fixture did not become ready; inspect native stage receipt",
-                    seconds=120,
+                    seconds=180,
                 )
                 node = "synthetic-emulated-android"
 
@@ -254,9 +414,23 @@ def main() -> int:
                     )
                     if task["approval_required"]:
                         fixture.approve(task)
-                    final = fixture.wait_task(
-                        task["task_id"], states=("verified", "partially_verified")
-                    )
+                    try:
+                        final = fixture.wait_task(
+                            task["task_id"], states=("verified", "partially_verified")
+                        )
+                    except AssertionError:
+                        diagnostics = []
+                        for line in (fixture.root / "process.log").read_text().splitlines():
+                            try:
+                                item = json.loads(line)
+                            except ValueError:
+                                continue
+                            if item.get("event") == "http_request_failed":
+                                diagnostics.append(
+                                    {key: item[key] for key in ("category", "count")}
+                                )
+                        print(json.dumps({"core_request_diagnostics": diagnostics}), flush=True)
+                        raise
                     assert final["evidence"] and final["result"]["success"]
                     if kind == "android_ui_set_text":
                         assert final["state"] == "verified"
@@ -378,6 +552,7 @@ def main() -> int:
                     "avd": AVD,
                     "transport": "separate actual TLS Core and native Android Keystore proof",
                     "native_readback": result,
+                    "phone_context": phone_context,
                     "tasks": tasks,
                     "timings": timings,
                     "physical_phone": "NOT_RUN",
@@ -425,9 +600,10 @@ def main() -> int:
             "enabled_notification_listeners",
             previous_listeners,
         )
-        assert device(
-            "shell", "settings", "get", "secure", "enabled_notification_listeners"
-        ).strip() == previous_listeners
+        assert (
+            device("shell", "settings", "get", "secure", "enabled_notification_listeners").strip()
+            == previous_listeners
+        )
         device("uninstall", PACKAGE + ".test")
         device("uninstall", PACKAGE)
     assert receipt is not None

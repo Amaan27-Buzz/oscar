@@ -1,6 +1,8 @@
 """Two signed reviews over the existing Executive model-planning path."""
 
-from dataclasses import replace
+import json
+import re
+from dataclasses import asdict, replace
 from typing import TYPE_CHECKING, Any
 
 from .contracts import TaskState, new_id, record
@@ -17,14 +19,241 @@ class PlannerAuthoring:
     def __init__(self, harness: "Harness"):
         self.h = harness
 
+    @staticmethod
+    def descriptor(cap: dict[str, Any]) -> dict[str, Any]:
+        """Examples pass through the same typed forms used by native action admission."""
+        from .contracts import Capability
+        from .desktop_actions import OPERATIONS, form_intent
+        from .jev import Intent
+
+        kind = cap["input_kind"]
+        examples = []
+        if kind == "addition":
+            examples.append(asdict(Intent("2 + 3")))
+        elif kind == "file_write":
+            examples.append(asdict(Intent("Save reviewed text", "file_write", "notes.txt", "Text")))
+        else:
+            values = {
+                "path": "notes.txt",
+                "pattern": "*.txt",
+                "name": "reviewed-branch",
+                "text": "Text",
+                "url": "https://example.com",
+                "workflow": json.dumps(
+                    {
+                        "request": {
+                            "origins": ["https://example.com"],
+                            "steps": [
+                                {"operation": "navigate", "url": "https://example.com/form"},
+                                {
+                                    "operation": "fill",
+                                    "selector": "#message",
+                                    "text": "Reviewed text",
+                                },
+                                {"operation": "submit", "selector": "#submit"},
+                                {"operation": "wait", "selector": "#receipt"},
+                                {"operation": "inspect"},
+                            ],
+                            "timeout": 30,
+                            "max_text": 4096,
+                        }
+                    }
+                ),
+            }
+            fields = {
+                "read_file": ("path",),
+                "find_files": ("pattern",),
+                "git_branch": ("name",),
+                "ps_file_hash": ("path",),
+                "ps_write_utf8": ("path", "text"),
+                "inspect_page": ("url",),
+                "browser_workflow": ("workflow",),
+            }
+            for operation in OPERATIONS.get(kind, ()):
+                # Native app/program identity requires a separate registered-target selection.
+                if operation in {"launch_app", "program_version"}:
+                    continue
+                intent = form_intent(
+                    Capability.from_dict(cap),
+                    {
+                        "capability_id": cap["id"],
+                        "operation": operation,
+                        "fields": {key: values[key] for key in fields.get(operation, ())},
+                    },
+                    {},
+                )
+                examples.append(asdict(intent))
+        return {
+            "node_id": cap["node_id"],
+            "capability_id": cap["id"],
+            "kind": kind,
+            "summary": cap["summary"],
+            "intent_examples": examples,
+        }
+
+    def conversation(
+        self, text: str, node: str, session: str, scope: str, grants: frozenset[str]
+    ) -> dict[str, Any] | None:
+        """Unsigned proposals only; conversational assent never replaces either signature."""
+        from .assistance import Assistance
+        from .jev import DecisionRoute, Intent, decide
+
+        instruction = re.sub(
+            r"^(?:please |(?:can|could|would) you )", "", text.strip(), count=1, flags=re.IGNORECASE
+        )
+        followup = re.fullmatch(
+            r"(?:review|proceed with|accept)(?: the)? (?:suggested )?plan"
+            r"(?: ([a-f0-9-]{16,80}))?[.!]?",
+            instruction,
+            re.IGNORECASE,
+        )
+        explicit = re.fullmatch(
+            r"on device ([A-Za-z0-9_.-]{1,80}):\s*(.+)", instruction, re.IGNORECASE | re.DOTALL
+        )
+        target = explicit[1] if explicit else None
+        goal = explicit[2] if explicit else instruction
+        if not followup:
+            names = tuple(
+                row[0]
+                for row in self.h.archive.db.execute(
+                    "SELECT alias FROM archive_aliases WHERE relationship=? LIMIT 1000",
+                    (self.h.runtime.relationship_id,),
+                )
+            )
+            decision = decide(Intent(goal), names)
+            if (
+                decision.memory_required
+                or decision.route
+                in {DecisionRoute.WORLD, DecisionRoute.RECALL, DecisionRoute.VERIFY}
+                or not re.match(
+                    r"(?:plan|create|write|save|make|prepare|build|organize|open|launch|"
+                    r"send|schedule|update|edit|fix|debug|implement|download|upload|"
+                    r"move|copy|rename|delete|run|install|publish|deploy|"
+                    r"fill|click|submit|select|navigate)\b",
+                    goal,
+                    re.IGNORECASE,
+                )
+            ):
+                return None
+        try:
+            grants = Assistance(self.h).authorize(node, session, scope, grants)
+            from .authority import StandingAuthority
+
+            StandingAuthority(self.h.store, self.h.grid, self.h.runtime.relationship_id)._owner(
+                node, session, scope, grants
+            )
+            if followup:
+                rows = []
+                for row in self.h.store.all("planner_request"):
+                    if (
+                        row["relationship"] != self.h.runtime.relationship_id
+                        or row.get("accepted_goal")
+                        or followup[1]
+                        and row["id"] != followup[1]
+                    ):
+                        continue
+                    owner = self.h.store.get("executive_owner", row["goal_id"])
+                    if (owner["node"], owner["session"], owner["scope"]) == (node, session, scope):
+                        rows.append(row)
+                if len(rows) != 1:
+                    raise ValueError(
+                        "Choose one current plan by its ID; no unique plan belongs to this session."
+                    )
+                change = {
+                    "operation": "plan_accept",
+                    "id": rows[0]["id"],
+                    "value": {
+                        "start_at": None,
+                        "interval_seconds": None,
+                        "max_runs": 1,
+                        "priority": 0,
+                    },
+                }
+            else:
+                if not 1 <= len(goal) <= 480:
+                    raise ValueError("Describe the objective in at most 480 characters.")
+                if re.match(r"(?:send|schedule|publish|deploy|install)\b", goal, re.IGNORECASE):
+                    raise ValueError(
+                        "Specify the exact available account, destination and supported action. "
+                        "Account or privileged operations cannot be inferred from a plan."
+                    )
+                available = [
+                    cap
+                    for n in self.h.grid.nodes()
+                    if n["id"] in self.h.executive.targets
+                    for cap in n["capabilities"]
+                    if set(cap["permissions"]) <= grants
+                    and any(
+                        c.id == cap["id"] and c.node_id == cap["node_id"]
+                        for c in self.h.grid.search(cap["input_kind"])
+                    )
+                ]
+                planners = [
+                    c
+                    for c in available
+                    if c["input_kind"] == "model_reasoning" and c["node_id"] == self.h.node_id
+                ]
+                actions = [
+                    c
+                    for c in available
+                    if (target is None or c["node_id"] == target)
+                    and self.descriptor(c)["intent_examples"]
+                ]
+                duplicates = {
+                    c["input_kind"]
+                    for c in actions
+                    if sum(a["input_kind"] == c["input_kind"] for a in actions) > 1
+                }
+                if duplicates:
+                    devices = ", ".join(
+                        sorted({c["node_id"] for c in actions if c["input_kind"] in duplicates})
+                    )
+                    raise ValueError(
+                        "Choose an action device: "
+                        + devices
+                        + ". Use ‘On device DEVICE-ID: objective’."
+                    )
+                if len(planners) != 1 or not actions:
+                    raise PermissionError(
+                        "A configured model and available scoped action device are required."
+                    )
+                if len(actions) > 15:
+                    raise ValueError(
+                        "Choose a device with at most fifteen supported action capabilities."
+                    )
+                change = {
+                    "operation": "plan_draft",
+                    "id": "new",
+                    "value": {
+                        "name": "Conversation objective",
+                        "goal": goal,
+                        "mode": "auto",
+                        "capabilities": [
+                            {"node_id": c["node_id"], "capability_id": c["id"]}
+                            for c in [planners[0], *actions]
+                        ],
+                    },
+                }
+            self.material(change["operation"], change["id"], change["value"], grants)
+            return {"assistance_proposal": change}
+        except (ValueError, PermissionError, StateConflict) as error:
+            return {"state": "blocked", "epistemic": "UNKNOWN", "message": str(error)}
+
     def capabilities(self, pins: Any, grants: frozenset[str]) -> list[dict[str, Any]]:
         if not isinstance(pins, list) or not 2 <= len(pins) <= 16:
             raise ValueError("select a model and one to fifteen action capabilities")
         result = []
         for pin in pins:
-            if not isinstance(pin, dict) or set(pin) != {"node_id", "capability_id"}:
+            if (
+                not isinstance(pin, dict)
+                or set(pin) != {"node_id", "capability_id"}
+                or any(not isinstance(v, str) or not 1 <= len(v) <= 240 for v in pin.values())
+            ):
                 raise ValueError("exact capability selection required")
-            node = self.h.store.get("node", pin["node_id"])
+            try:
+                node = self.h.store.get("node", pin["node_id"])
+            except KeyError:
+                raise PermissionError("selected planning executor unavailable") from None
             matches = [c for c in node["capabilities"] if c["id"] == pin["capability_id"]]
             if len(matches) != 1 or pin["node_id"] not in self.h.executive.targets:
                 raise PermissionError("selected planning executor unavailable")
@@ -49,8 +278,6 @@ class PlannerAuthoring:
                 raise ValueError("explicit goal, capabilities and model privacy required")
             if not isinstance(value["goal"], str) or not 1 <= len(value["goal"]) <= 480:
                 raise ValueError("bounded planning goal required")
-            import re
-
             if not isinstance(value["name"], str) or not re.fullmatch(
                 r"[A-Za-z0-9 _-]{1,64}", value["name"]
             ):
@@ -79,11 +306,7 @@ class PlannerAuthoring:
                 {"id": p, "contract": digest(record(executor.router.registry.providers[p]))}
                 for p in providers
             ]
-            pins = [
-                {"node_id": c["node_id"], "capability_id": c["id"], "kind": c["input_kind"]}
-                for c in caps
-                if c != planner
-            ]
+            pins = [self.descriptor(c) for c in caps if c != planner]
             step = h.executive.planning_step(
                 value["goal"],
                 pins,
@@ -215,13 +438,7 @@ class PlannerAuthoring:
                 tuple(sorted({p for c in caps for p in c["permissions"]})),
                 owner_authorized=True,
             )
-            proposal = h.executive.draft_plan(
-                worker,
-                value["goal"],
-                mode=value["mode"],
-                planning_sources=state["sources"],
-                planning_configuration=digest(state["model_configuration"]),
-            )
+            proposal = h.executive.propose(worker, "Draft plan: " + value["goal"], [state["step"]])
             request_id = new_id()
             h.store.put(
                 "planner_request",

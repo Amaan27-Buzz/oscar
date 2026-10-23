@@ -289,6 +289,45 @@ runpy.run_module('oscar.remote_worker', run_name='__main__')
             sleep(1)
         self.fail("bounded task deadline exceeded: " + json.dumps(task))
 
+    def test_persisted_worker_session_rebuilds_registration_after_actual_tls_core_restart(self):
+        from oscar.remote_worker import RemoteWorker
+
+        core = self.start_core()
+        self.enroll()
+        worker = RemoteWorker(
+            self.desktop,
+            self.workspace,
+            "disposable-workspace",
+            self.root / "restart-journal.sqlite",
+        )
+        self.addCleanup(worker.close)
+        worker.advertise()
+        self.assertFalse(worker.step())
+        self.stop(core)
+        core = self.start_core()
+        self.assertEqual(
+            {"delivery": None, "advertise_required": True}, self.desktop.request("poll", {})
+        )
+        # The same live Worker/session keeps its old registration cache across restart.
+        self.assertFalse(worker.step())
+        node = next(
+            n
+            for n in self.mobile.request("snapshot", {})["nodes"]
+            if n["id"] == "synthetic-desktop"
+        )
+        self.assertTrue(node["capabilities"])
+        task = self.submit("file_read", {"path": "known.txt"})
+        deadline = monotonic() + 20
+        while monotonic() < deadline:
+            worker.step()
+            view = self.mobile.request("inspect", {"task_id": task["task_id"]})
+            if view["state"] == "verified":
+                break
+            sleep(1)
+        self.assertEqual("verified", view["state"])
+        self.assertTrue(view["evidence"])
+        self.stop(core)
+
     def test_tls_enrollment_actual_worker_read_write_history_restart_and_cleanup(self):
         core = self.start_core()
         self.enroll()

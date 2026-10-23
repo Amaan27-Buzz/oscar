@@ -5,6 +5,8 @@ import json
 import math
 import re
 import sqlite3
+from collections.abc import Iterator
+from contextlib import contextmanager
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from threading import RLock, local
@@ -118,6 +120,22 @@ class EventArchive:
         ).fetchone()
         return int(row[0]) if row else 0
 
+    @contextmanager
+    def transaction(self) -> Iterator[None]:
+        """Compose canonical mutations without an inner operation committing its caller."""
+        nested = self.db.in_transaction
+        name = "archive_" + new_id().replace("-", "")
+        self.db.execute("SAVEPOINT " + name if nested else "BEGIN IMMEDIATE")
+        try:
+            yield
+            self.db.execute("RELEASE " + name if nested else "COMMIT")
+        except BaseException:
+            if self.db.in_transaction:
+                self.db.execute("ROLLBACK TO " + name if nested else "ROLLBACK")
+                if nested:
+                    self.db.execute("RELEASE " + name)
+            raise
+
     def index_state(self, relationship: str, identity: str) -> str:
         row = self.db.execute(
             "SELECT generation,state FROM archive_index_state WHERE relationship=? AND identity=?",
@@ -200,7 +218,7 @@ class EventArchive:
             or redact_runtime_secrets(payload) != payload
         ):
             raise ValueError("credential material cannot enter event metadata")
-        with self.db:
+        with self.transaction():
             existing = self.db.execute(
                 "SELECT payload,forgotten FROM archive_events WHERE id=?", (event.id,)
             ).fetchone()
@@ -402,7 +420,7 @@ class EventArchive:
         if not row:
             raise KeyError(memory_id)
         sources = json.loads(row[0])["event_ids"] if forget_sources else []
-        with self.db:
+        with self.transaction():
             targets = {memory_id}
             if sources:
                 for identifier, payload in self.db.execute(
@@ -498,7 +516,7 @@ class MemoryWriter:
             ),
             context_key=events[0].context_key,
         )
-        with self.archive.db:
+        with self.archive.transaction():
             if supersedes:
                 row = self.archive.db.execute(
                     "SELECT payload FROM archive_memories WHERE id=? AND forgotten=0", (supersedes,)

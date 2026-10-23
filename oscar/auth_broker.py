@@ -24,6 +24,7 @@ from .accounts import Account, AccountRegistry
 from .connectors import CredentialRef, pkce_pair
 from .credentials import SecretMaterial
 from .http_client import NoRedirects
+from .mcp_auth import MCPAuthorization, MCPProvider
 from .oauth_device import Vault
 
 
@@ -74,7 +75,7 @@ class OAuthProvider:
             raise ValueError("bounded configured OAuth scopes required")
 
 
-def load_providers(path: Path) -> list[OAuthProvider]:
+def load_providers(path: Path) -> list[OAuthProvider | MCPProvider]:
     """Load administered public app registrations, never tokens or arbitrary endpoints."""
     if path.stat().st_size > 64_000:
         raise ValueError("OAuth configuration bound")
@@ -83,7 +84,7 @@ def load_providers(path: Path) -> list[OAuthProvider]:
         raise ValueError("OAuth configuration version required")
     if not isinstance(data["providers"], list) or len(data["providers"]) > 32:
         raise ValueError("bounded OAuth provider list required")
-    result = []
+    result: list[OAuthProvider | MCPProvider] = []
     for entry in data["providers"]:
         if not isinstance(entry, dict) or set(entry) - {
             "provider",
@@ -94,11 +95,17 @@ def load_providers(path: Path) -> list[OAuthProvider]:
             "tenant",
             "client_secret_ref",
             "allowed_scopes",
+            "id",
+            "resource",
+            "issuer",
         }:
             raise ValueError("unsupported OAuth app configuration")
         values = {k: v for k, v in entry.items() if k not in {"provider", "allowed_scopes"}}
         if not isinstance(entry.get("allowed_scopes"), list) or not entry["allowed_scopes"]:
             raise ValueError("explicit OAuth scope ceiling required")
+        if entry["provider"] == "mcp-resource":
+            result.append(MCPProvider(**values, allowed_scopes=tuple(entry["allowed_scopes"])))
+            continue
         if entry["provider"] == "google":
             provider = google_provider(**values)
         elif entry["provider"] == "microsoft":
@@ -209,7 +216,7 @@ class AuthBroker:
         self,
         accounts: AccountRegistry,
         vault: Vault,
-        providers: list[OAuthProvider],
+        providers: list[OAuthProvider | MCPProvider],
         *,
         request: Callable[[str, dict[str, str] | None], dict[str, Any]] = oauth_request,
         clock: Callable[[], float] = time,
@@ -222,6 +229,7 @@ class AuthBroker:
         self.request, self.clock = request, clock
         self.revoke_google = revoke_google
         self.material = SecretMaterial()
+        self.mcp = MCPAuthorization(self)
         self.recover()
 
     def catalog(self) -> list[dict[str, Any]]:
@@ -233,12 +241,17 @@ class AuthBroker:
                 "scopes": list(p.allowed_scopes),
                 "redirect_uri": p.redirect_uri,
                 "configured": True,
+                **(
+                    {"resource": p.resource, "issuer": p.issuer}
+                    if isinstance(p, MCPProvider)
+                    else {}
+                ),
             }
             for p in self.providers.values()
         ]
 
     @staticmethod
-    def _fingerprint(provider: OAuthProvider) -> str:
+    def _fingerprint(provider: OAuthProvider | MCPProvider) -> str:
         return hashlib.sha256(json.dumps(asdict(provider), sort_keys=True).encode()).hexdigest()
 
     def recover(self) -> None:
@@ -281,6 +294,12 @@ class AuthBroker:
         if not owner_authorized:
             raise PermissionError("owner enrollment authority required")
         provider = self.providers[provider_id]
+        if isinstance(provider, MCPProvider):
+            if identity_class != "resource-grant":
+                raise PermissionError(
+                    "MCP authorization creates resource access, not person identity"
+                )
+            return self.mcp.begin(provider, scopes, alias, account_id)
         if provider.allowed_scopes and not scopes <= set(provider.allowed_scopes):
             raise PermissionError("requested scopes exceed configured provider permissions")
         self.accounts._text(alias)
@@ -429,16 +448,21 @@ class AuthBroker:
         *,
         owner_authorized: bool,
         authority_check: Callable[[], None] | None = None,
+        issuer: str | None = None,
     ) -> Account:
         if not owner_authorized:
             raise PermissionError("owner callback authority required")
         if not isinstance(code, str) or not code or len(code) > 8000:
             raise ValueError("bounded authorization code required")
+        if self.store.get("auth_code_pending", identifier).get("resource_grant"):
+            return self.mcp.complete(identifier, state, code, issuer, authority_check)
         with self.store.transaction():
             if authority_check:
                 authority_check()
             pending = self.store.get("auth_code_pending", identifier)
             provider = self.providers[pending["provider_id"]]
+            if not isinstance(provider, OAuthProvider):
+                raise PermissionError("verified identity configuration required")
             if (
                 pending["state"] != "pending"
                 or pending["expires_at"] <= self.clock()
@@ -654,11 +678,15 @@ class AuthBroker:
     ) -> Account:
         if not owner_authorized:
             raise PermissionError("owner refresh authority required")
+        if self.store.get("auth_broker_connection", identifier).get("resource_grant"):
+            return self.mcp.refresh(identifier, authority_check)
         with self.store.transaction():
             if authority_check:
                 authority_check()
             connection = self.store.get("auth_broker_connection", identifier)
             provider = self.providers[connection["provider_id"]]
+            if not isinstance(provider, OAuthProvider):
+                raise PermissionError("verified identity configuration required")
             account = self.accounts.check(connection["account_id"], connection["generation"])
             if (
                 connection["state"] != "ready"

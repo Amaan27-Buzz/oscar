@@ -98,6 +98,29 @@ public final class NotificationBoundary extends NotificationListenerService {
         }
         return result;
     }
+    static org.json.JSONArray contextCounts(android.content.Context context, Set<String> selected) {
+        NotificationBoundary listener = active;
+        var preferences = context.getSharedPreferences("permissions", MODE_PRIVATE);
+        Set<String> allowed = new HashSet<>(Arrays.asList(preferences.getString("notification_sources", "").split(",")));
+        allowed.retainAll(selected); allowed.remove(context.getPackageName());
+        if (listener == null || !preferences.getBoolean("notification_context", false) || allowed.isEmpty()) return null;
+        try {
+            if (!context.getSystemService(NotificationManager.class).isNotificationListenerAccessGranted(new ComponentName(context, NotificationBoundary.class))) return null;
+            StatusBarNotification[] notifications = listener.getActiveNotifications();
+            if (notifications == null || notifications.length > 256) return null;
+            Map<String, Integer> counts = new TreeMap<>();
+            for (String source : allowed) counts.put(source, 0);
+            for (StatusBarNotification notification : notifications) if (allowed.contains(notification.getPackageName())) {
+                int count = counts.get(notification.getPackageName()) + 1;
+                if (count > 32) return null;
+                counts.put(notification.getPackageName(), count);
+            }
+            org.json.JSONArray values = new org.json.JSONArray();
+            for (var entry : counts.entrySet()) values.put(new JSONObject().put("package", entry.getKey()).put("count", entry.getValue()));
+            if (active != listener || !preferences.getBoolean("notification_context", false)) return null;
+            return values;
+        } catch (Exception unavailable) { return null; }
+    }
     static JSONObject metadata(StatusBarNotification notification) throws Exception {
         return new JSONObject().put("package", notification.getPackageName()).put("key_hash", identity(notification))
             .put("title", notification.getPackageName() + " · reply available");

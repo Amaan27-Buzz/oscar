@@ -70,7 +70,7 @@ import androidx.compose.ui.unit.DpOffset
             ResponseText(task?.response ?: task?.value ?: task?.blocker ?: task?.label
                 ?: if (interaction.taskId != null) "Task unavailable in current readback · outcome unknown" else interaction.response, maxLines = 12)
         }
-        if (task?.response != null) StatusLabel("Reported response") else task?.let { StatusLabel(it.label) }
+        if (task?.response != null) StatusLabel(task.responseLabel) else task?.let { StatusLabel(it.label) }
         state.snapshot?.adaptive?.firstOrNull { it.taskId == interaction.taskId }?.let { view -> inspect?.let { callback -> AdaptiveTask(view) { callback(view.taskId) } } }
         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             TextButton(onClick = { reading = interaction }) { Glyph("Book"); Spacer(Modifier.width(8.dp)); Text("Read response") }
@@ -116,7 +116,8 @@ import androidx.compose.ui.unit.DpOffset
     DetailPage("Reading", close, "responseDialog") {
         IllustratedIntro(interaction.text, artwork = R.drawable.illustration_reading, maxLines = 3)
         if (interaction.text.length > 140) SupportingDetails("Original request") { Text(interaction.text) }
-        StatusLabel(if (task?.response != null) "Reported response" else task?.label ?: if (interaction.taskId == null) "Core response" else "Outcome unknown")
+        StatusLabel(if (task?.response != null) task.responseLabel else task?.label ?: if (interaction.taskId == null) "Core response" else "Outcome unknown")
+        if (task?.sourceEventIds?.isNotEmpty() == true) Text("From ${task.sourceEventIds.size} retained sources. Current facts may differ.", style = MaterialTheme.typography.bodySmall)
         if (task?.responseTruncated == true) StatusLabel("Bounded excerpt. Core returned only part of this response.")
         SelectionContainer {
             ResponseText(task?.response ?: task?.value ?: task?.blocker ?: if (task != null) "No response yet. Inspect Activity for the current task." else interaction.response)
@@ -124,7 +125,7 @@ import androidx.compose.ui.unit.DpOffset
         task?.let {
             SupportingDetails("Source & verification") {
                 Text(it.label, style = MaterialTheme.typography.bodySmall)
-                Text("Reported text is not independent verification.", style = MaterialTheme.typography.bodySmall)
+                Text(if (it.sourceEventIds.isNotEmpty()) "Earlier evidence does not establish current facts." else "Reported text is not independent verification.", style = MaterialTheme.typography.bodySmall)
                 if (it.evidence.isNotEmpty()) Text(it.evidence.joinToString("\n"), style = MaterialTheme.typography.bodySmall)
             }
         }

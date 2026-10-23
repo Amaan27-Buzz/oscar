@@ -49,6 +49,7 @@ BROWSER_CATEGORIES = frozenset(
         "browser.plan_execution",
     }
 )
+BROWSER_PREFLIGHT_TIMEOUT = 30
 
 
 def browser_command(executable: str, arguments: list[str]) -> list[str]:
@@ -125,7 +126,7 @@ def browser_preflight(executable: str, workspace: Path) -> dict[str, Any]:
             raise OSError("probe output unavailable")
         reader = Thread(target=lambda: captured.extend(stream.read(4097)), daemon=True)
         reader.start()
-        process.wait(timeout=8)
+        process.wait(timeout=BROWSER_PREFLIGHT_TIMEOUT)
         reader.join(timeout=1)
         if reader.is_alive() or len(captured) > 4096:
             return browser_diagnostic("", 1)

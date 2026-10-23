@@ -1,0 +1,89 @@
+{
+  "version": 1,
+  "observed_at": "2026-10-22T10:16:17.267625+00:00",
+  "scope": "Selected Android notification counts and media states; local synthetic software only",
+  "source_sha256": {
+    "oscar/phone_context.py": "c3520a78b566783f6aaa054592c36e3ed0ad74b077877bc61cbebdc51e589ec1",
+    "oscar/world_runtime.py": "ce0d2d0fbee06c8fa6d1e321ce85ca7e6f1d036208cd33c1f8759234ef1ad5fc",
+    "oscar/remote_grid.py": "6c87501a099ee3570c6d9cfb1dc8110bc72e2a33ff0f6728bc29fd29fee25d2b",
+    "tests/test_phone_context.py": "a76f9f062ecd70d375ec2d0b9f74005e11e41b2cd55545592dab706c062b8c84",
+    "desktop/src/OperatingSettings.tsx": "56ae82ff5ed8b3140ac3a3198306927ed82bb2df747bd9763497b53727813c85",
+    "desktop/src/OperatingSettings.test.tsx": "dc5b25227caf5f66ad819198c3ca7493a39c71de7fad072e5a15ef1feeec3c81",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/PhoneContext.kt": "88d58113bff801886066924eee50739490b8c03945cb4eea86361df86fdb2533",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/NotificationBoundary.java": "4d95982cca24eb063cae14fd389b714d9ae780dc5a84b7be267351f723237598",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/CoreClient.java": "2a844ed283fde902d990e71aa75eb645afc232a0d1ba8e305cd313af351c021e",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/CoreSession.kt": "2bda109b2cdb2ced4c971558563406781407f920b14e322dfc965d72a5cf794f",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/NativeWorkerService.kt": "931ef6a5f62be9fca16bf064ba54c3d214cb559689b1e2dc03ff459edfb6ae29",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/CompanionOverlay.kt": "040121e07ef2c86d57ebfc242a6fdfc1cec93c0dabf2834d74d761485f6ff894",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/SettingsScreen.kt": "823654097394ea76483787ea2285c0fdd7e7720a27f1b3f489131e8771ebe4dd",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/PrivacySettings.kt": "aa5b6ced0a271b2269413ae126bda37a7e9cdeecbebe5049856215af2bc8121f",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/AwarenessScreen.kt": "472ffa96bf66e180e57c350e7ad8eb2f800ab748d4ad3b4c12477f606223fc33",
+    "mobile/app/src/test/java/io/dawnlight/oscar/mobile/PhoneContextTest.kt": "125d0557184713658481130cbd49ceba7d4b7b62f399c0c109a9b268eb4d6371",
+    "mobile/app/src/androidTest/java/io/dawnlight/oscar/mobile/NativeGridExecutionTest.kt": "bd3f9398a88e6bff26dbd2f36a20fb509ccd9822b7ce743db7a03dc89bd09b5e",
+    "scripts/software_android_reference.py": "9e493debc728a68f010beff162a42d8e68bb085da1559f7beb96646faeda8f0d",
+    "mobile/app/src/androidTest/AndroidManifest.xml": "421ed3a127bac7cba7d9cc40f6667f0f287dd0d651ef7b6b761b0a9e631656ce",
+    "mobile/app/src/androidTest/java/io/dawnlight/oscar/mobile/PhoneNotificationFixtureActivity.java": "d701583cb3fa74be336761ca5a00b01253f8212c243f8524234ec5a578b1481c"
+  },
+  "checks": [
+    {
+      "command": "python -m unittest tests.test_phone_context tests.test_world_runtime tests.test_remote_grid tests.test_sentry_delivery -q",
+      "status": "passed",
+      "tests": 58,
+      "seconds": 36.556,
+      "log": ".oscar/phone-context-python.log"
+    },
+    {
+      "command": "npm exec vitest run src/OperatingSettings.test.tsx",
+      "cwd": "desktop",
+      "status": "passed",
+      "tests": 10,
+      "seconds": 39.13
+    },
+    {
+      "command": "npm exec tsc -- --noEmit",
+      "cwd": "desktop",
+      "status": "passed"
+    },
+    {
+      "command": "python -m ruff check oscar/phone_context.py oscar/world_runtime.py oscar/remote_grid.py tests/test_phone_context.py scripts/software_android_reference.py",
+      "status": "passed"
+    },
+    {
+      "command": "python -m mypy oscar/phone_context.py oscar/world_runtime.py oscar/remote_grid.py",
+      "status": "passed",
+      "files": 3
+    }
+  ],
+  "native": {
+    "build": "NOT_RUN_FOR_CURRENT_SOURCES",
+    "jvm_contracts": "NOT_RUN",
+    "actual_tls_core_campaign": "PREPARED_NOT_RUN",
+    "campaign": "python -m scripts.software_android_reference",
+    "exact_disposable_avd": "oscar_group05_capability_api35",
+    "serial": "emulator-5582",
+    "retreat_window_visual_geometry": "NOT_RUN",
+    "notification_fixture": "Java standalone test package Activity; actual OS notification; test APK uninstall removes it"
+  },
+  "boundaries": {
+    "physical_phone": "NOT_RUN",
+    "real_accounts": "NOT_RUN",
+    "raw_notification_text": "NOT_CAPTURED",
+    "raw_audio_video": "NOT_CAPTURED",
+    "remote_mutation": "NOT_RUN",
+    "default_durable_capture": false
+  },
+  "later_acceptance": {
+    "observed_at": "2026-10-22T18:28:41.594600+00:00",
+    "status": "EMULATED_SYNTHETIC_ACTUAL_GRID",
+    "receipt": "android-phone-grid-2026-10-22.json",
+    "receipt_sha256": "a5abcf2741491bec59f7317942765c04d2220e84857c8cf5e92056a228fda5e5",
+    "scope": "Later source-scoped actual notification/media/TLS Core/no-retention/local-withdrawal acceptance; earlier hashes/checks remain historical",
+    "retreat_window_visual_geometry": "NOT_RUN",
+    "maximum_source_sustained_budget": "NOT_RUN",
+    "core_trigger_only_withdrawal": {
+      "tests": 27,
+      "seconds": 24.619,
+      "result": "PASS"
+    }
+  }
+}

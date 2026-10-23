@@ -49,6 +49,23 @@ class RemoteWorkerTests(unittest.TestCase):
         self.worker.close()
         self.temp.cleanup()
 
+    def test_registration_recovery_never_accepts_a_claimed_delivery_or_coerced_flag(self):
+        for response in (
+            {"delivery": {}, "advertise_required": True},
+            {"delivery": None, "advertise_required": "true"},
+            {"delivery": None, "advertise_required": True, "extra": True},
+        ):
+            with (
+                self.subTest(response=response),
+                patch.object(self.client, "request", return_value=response),
+                patch.object(self.worker, "advertise") as advertise,
+                patch.object(self.worker, "execute") as execute,
+                self.assertRaises(PermissionError),
+            ):
+                self.worker.step()
+            advertise.assert_not_called()
+            execute.assert_not_called()
+
     def delivery(self, write=True):
         action = Action(
             new_id(),

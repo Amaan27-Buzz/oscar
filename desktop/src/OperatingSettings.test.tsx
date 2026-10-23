@@ -5,6 +5,14 @@ import {initialView} from './bridge';
 const management={version:1 as const,relationship_id:'owner',core_node_id:'core',ask_rules:[],authority:{mode:'ask' as const,status:'inactive'},capabilities:[],sentry:{mode:'manual',state:'passive',generation:0,source_ids:[],trigger_keys:[],allow_interrupt:false,sources:[]}};
 const executive={version:1 as const,health:'operational',running:true,management,goals:[],workers:[]};
 afterEach(()=>{cleanup();vi.useRealTimers();});
+it('reviews explicit trigger keys and interruption without granting delivery',()=>{
+  const run=vi.fn();render(<OperatingSettings view={{...initialView,link:'online',executive}} busy={false} run={run}/>);
+  fireEvent.click(screen.getByRole('button',{name:'Configure awareness'}));
+  fireEvent.change(screen.getByLabelText('Trigger keys, separated by commas'),{target:{value:'status, status, calendar.state'}});
+  fireEvent.click(screen.getByLabelText('Allow policy-checked interruptions'));
+  fireEvent.click(screen.getByRole('button',{name:'Review awareness change'}));
+  expect(run).toHaveBeenLastCalledWith({kind:'manage_assistance',operation:'sentry',id:'awareness',value:{mode:'manual',state:'passive',source_ids:[],trigger_keys:['status','calendar.state'],allow_interrupt:true}});
+});
 it('creates an explicitly reviewed clock source without granting retention or action',()=>{
   const run=vi.fn();render(<OperatingSettings view={{...initialView,link:'online',executive}} busy={false} run={run}/>);
   fireEvent.click(screen.getByRole('button',{name:'Connect a context source'}));
@@ -93,4 +101,29 @@ it('presents current weather as a credited forecast and hides revoked evidence',
   expect(screen.getByRole('link',{name:'CC BY 4.0'}).getAttribute('href')).toBe('https://creativecommons.org/licenses/by/4.0/');
   rerender(<DayBrief observation={observation} value={brief} accounts={[]} grants={[{id:'weather',epoch:2,perceive:false}]}/>);
   expect(screen.queryByText(/Oslo public reference/)).toBeNull();
+});
+it('presents only fresh selected phone metadata and hides a withdrawn source',()=>{
+  const now=Date.now(),observation={observed_at_ms:now,received_at_ms:now,transport_ms:0};
+  const source={id:'phone',epoch:1,adapter:'android',state:'current',epistemic:'KNOWN',value:JSON.stringify({notifications_available:true,notifications:[{package:'example.selected',count:2}],media_available:true,media:[{package:'example.player',state:3}]}),evidence:[{fresh_until:(now+15000)/1000}]};
+  const brief={version:1,observed_at:now/1000,sources:[source],schedule:{}};
+  const {rerender}=render(<DayBrief observation={observation} value={brief} accounts={[]} grants={[{id:'phone',epoch:1,perceive:true}]}/>);
+  expect(screen.getByText('example.selected · 2 selected notifications')).toBeTruthy();
+  expect(screen.getByText('example.player · playing')).toBeTruthy();
+  expect(screen.getByText(/playback does not establish attention/)).toBeTruthy();
+  rerender(<DayBrief observation={observation} value={brief} accounts={[]} grants={[{id:'phone',epoch:2,perceive:false}]}/>);
+  expect(screen.queryByText(/example.selected/)).toBeNull();
+});
+it('reviews selected phone metadata against its current advertised session',()=>{
+  const run=vi.fn(),phone={id:'android.media.inspect',node_id:'selected-phone',session_id:'current-session',input_kind:'android_media_inspect',risk:'low',permissions:['android:perceive']};
+  const management={...executive.management,capabilities:[phone]};
+  render(<OperatingSettings view={{...initialView,link:'online',executive:{...executive,management}}} busy={false} run={run}/>);
+  fireEvent.click(screen.getByRole('button',{name:'Connect a context source'}));
+  fireEvent.change(screen.getByLabelText('Source name'),{target:{value:'Phone context'}});
+  fireEvent.click(screen.getByRole('button',{name:'Context source'}));
+  fireEvent.click(screen.getByRole('radio',{name:'Selected phone metadata'}));
+  fireEvent.click(screen.getByRole('button',{name:'Phone'}));
+  fireEvent.click(screen.getByRole('radio',{name:'selected-phone'}));
+  fireEvent.change(screen.getByLabelText('Selected app package IDs'),{target:{value:'example.selected'}});
+  fireEvent.click(screen.getByRole('button',{name:'Review context source'}));
+  expect(run).toHaveBeenCalledWith({kind:'manage_assistance',operation:'source_create',id:'phone-context',value:{id:'phone-context',adapter:'android',entity_id:'phone:selected-phone',interval_seconds:5,retain:false,retention_seconds:3600,node_id:'selected-phone',session_id:'current-session',packages:['example.selected']}});
 });

@@ -408,10 +408,12 @@ impl CoreClient {
                 if !current() {
                     return Err("Account enrollment cancelled.".into());
                 }
-                client.request(
-                    "oauth_callback",
-                    json!({"id":enrollment.id,"state":enrollment.state(),"code":code}),
-                )
+                let mut callback =
+                    json!({"id":enrollment.id,"state":enrollment.state(),"code":code});
+                if let Some(issuer) = enrollment.response_issuer() {
+                    callback["iss"] = json!(issuer);
+                }
+                client.request("oauth_callback", callback)
             });
             if current() {
                 let notice = match result {
@@ -1225,8 +1227,16 @@ impl Bridge {
                 let mut view = self.view.lock().map_err(|_| "native state unavailable")?;
                 if revision == Some(self.content_revision.load(Ordering::SeqCst)) {
                     view.review = None;
+                    if result["memory_changed"] == true {
+                        view.conversation = ConversationView::default();
+                        view.current = None;
+                        view.tasks.clear();
+                    }
                 }
                 drop(view);
+                if result["memory_changed"] == true {
+                    self.refresh()?;
+                }
                 result
             }
             Command::VoiceStart { context_id, mode } => {

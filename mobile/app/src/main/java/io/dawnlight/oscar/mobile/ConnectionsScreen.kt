@@ -36,6 +36,7 @@ internal fun connectionChange(operation: String, id: String, value: String = "")
             TactileSurface(Modifier.fillMaxWidth()) {
                 FeatureRow(account.getString("alias"), "${account.getString("provider")} · ${account.getString("status")}", "Person")
                 SupportingDetails("Identity & permissions") {
+                    if (account.getString("identity_class") == "resource-grant") Text("MCP resource access. Provider person identity was not verified.")
                     listOf("id", "identity_class", "subject", "tenant", "generation", "remote_revocation", "local_credentials").forEach { field ->
                         if (account.has(field) && !account.isNull(field)) Text("${field.replace('_', ' ')}: ${account.get(field)}", style = MaterialTheme.typography.bodySmall)
                     }
@@ -63,16 +64,28 @@ internal fun connectionChange(operation: String, id: String, value: String = "")
             var alias by remember(state.epoch) { mutableStateOf("") }
             var scopes by remember(state.epoch) { mutableStateOf(emptySet<String>()) }
             var identityClass by remember(state.epoch) { mutableStateOf("owner-delegated") }
+            val resourceGrant = provider.getString("provider") == "mcp-resource"
+            var grantId by remember(state.epoch) { mutableStateOf("") }
+            val existingGrants = if (resourceGrant) data.accounts().filter { account ->
+                account.getString("identity_class") == "resource-grant" && account.getString("tenant") == provider.optString("issuer") &&
+                    account.objects("services", 64).any { it.getString("id") == provider.getString("service") }
+            } else emptyList()
+            val existingGrant = existingGrants.find { it.getString("id") == grantId }
             Text("${provider.getString("provider")} · ${provider.getString("service")}", style = MaterialTheme.typography.titleMedium)
-            OscarField(alias, { alias = it.take(80) }, label = "Account name", modifier = Modifier.fillMaxWidth())
-            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            if (existingGrants.isNotEmpty()) FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                FilterChip(selected = grantId.isEmpty(), onClick = { grantId = "" }, label = { Text("New resource access") })
+                existingGrants.forEach { grant -> FilterChip(selected = grantId == grant.getString("id"), onClick = { grantId = grant.getString("id") }, label = { Text("Reconnect ${grant.getString("alias")}") }) }
+            }
+            if (existingGrant == null) OscarField(alias, { alias = it.take(80) }, label = if (resourceGrant) "Resource access name" else "Account name", modifier = Modifier.fillMaxWidth())
+            if (resourceGrant) Text("Resource access: ${provider.optString("resource")} through ${provider.optString("issuer")}. This does not verify a provider person identity.")
+            if (!resourceGrant) FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 listOf("owner-delegated" to "Your account", "oscar-owned" to "OSCAR's account").forEach { (value, label) -> FilterChip(selected = identityClass == value, onClick = { identityClass = value }, label = { Text(label) }) }
             }
             provider.getJSONArray("scopes").texts(128).forEach { scope ->
                 Row { Checkbox(scope in scopes, { checked -> scopes = if (checked) scopes + scope else scopes - scope }); Text(scope, Modifier.padding(top = 12.dp)) }
             }
-            OscarButton(onClick = { review("begin_account", provider.getString("id"), JSONObject().put("alias", alias.trim()).put("identity_class", identityClass).put("scopes", JSONArray(scopes.sorted())).toString()) },
-                enabled = available && alias.isNotBlank() && scopes.isNotEmpty(), modifier = Modifier.fillMaxWidth().testTag("connectAccount")) { Text("Review account connection") }
+            OscarButton(onClick = { review("begin_account", provider.getString("id"), JSONObject().put("alias", existingGrant?.getString("alias") ?: alias.trim()).put("identity_class", if (resourceGrant) "resource-grant" else identityClass).put("scopes", JSONArray(scopes.sorted())).also { if (existingGrant != null) it.put("account_id", grantId) }.toString()) },
+                enabled = available && (existingGrant != null || alias.isNotBlank()) && scopes.isNotEmpty(), modifier = Modifier.fillMaxWidth().testTag("connectAccount")) { Text("Review account connection") }
         } }
         Text("After signed review, authorization opens in your browser. The native callback is bound to this device session and expires within ten minutes. Return to OSCAR to finish. If Android ends this process, start a fresh review. No connection is shown as ready until Core verifies it.", style = MaterialTheme.typography.bodySmall)
         TextButton(onClick = session::cancelAccountEnrollment) { Text("Cancel pending account enrollment") }

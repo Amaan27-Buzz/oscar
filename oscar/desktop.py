@@ -241,6 +241,8 @@ class Desktop(Mobile):
             text = private["result"].value or text
         if not text:
             return
+        if role == "oscar" and self.store.get("plan", task_id)["kind"] == "memory":
+            return  # Recalled statements retain their original sources, never an independent copy.
         event = SourceEvent(
             self.runtime.relationship_id,
             text,
@@ -297,6 +299,8 @@ class Desktop(Mobile):
         context_id: str | None = None,
     ) -> dict[str, Any]:
         route = decide(intent)
+        if route.capability_kind == "memory":
+            self.permission(session, "memory.read", ("memory:read",))
         kind = (
             "model_reasoning"
             if route.execution_class == ExecutionClass.MODEL
@@ -450,19 +454,14 @@ class Desktop(Mobile):
         view["mode"] = desktop_record.get("mode", "")
         view["response_truncated"] = bool(view.get("response")) and response_length > 8192
         if self.store.get("plan", task_id)["kind"] == "memory" and view.get("response"):
-            from .memory_executor import recall_text
+            from .memory_executor import authorize_recall, recall_context, recall_text
+
+            authorize_recall(self.runtime, task_id, session.id)
 
             memory = self.runtime.memory
             objective = private.get("objective")
             context = (
-                memory.context(
-                    memory.retrieve(self.runtime.relationship_id, objective.description),
-                    objective=objective.description,
-                    project=None,
-                    live={},
-                    policy_ids=(),
-                    max_chars=8192,
-                )
+                recall_context(memory, self.runtime.relationship_id, objective.description)
                 if memory and objective
                 else {"memories": []}
             )
@@ -561,9 +560,9 @@ class Desktop(Mobile):
                 self.permission(session, "desktop.connections", ("desktop:inspect",))
                 view["connections"] = snapshot(self.runtime.connections)
                 if "executive" in view:
-                    view["executive"]["management"] = Assistance(
-                        self.runtime.connections
-                    ).snapshot()
+                    view["executive"]["management"] = Assistance(self.runtime.connections).snapshot(
+                        self.grants(session), session.node_id
+                    )
             view["conversation"] = self.conversation(session)
             view["voice_available"] = (
                 self.voice is not None
@@ -942,6 +941,18 @@ class Desktop(Mobile):
                             if view["state"] != TaskState.PLANNED:
                                 self.retain_turn(session, view["task_id"], "oscar", view)
                         return view
+                    if context is None and self.runtime.connections is not None:
+                        from .planner_authoring import PlannerAuthoring
+
+                        planned = PlannerAuthoring(self.runtime.connections).conversation(
+                            text,
+                            session.node_id,
+                            session.id,
+                            "control:approve:" + self.runtime.connections.node_id,
+                            self.grants(session),
+                        )
+                        if planned is not None:
+                            return planned
                 if mode == "Dictate":
                     return self.preview(session, text, context, mode)
                 if mode == "Act":

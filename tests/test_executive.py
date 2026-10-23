@@ -7,6 +7,7 @@ from dataclasses import asdict
 from pathlib import Path
 from threading import Event
 from time import time
+from unittest.mock import patch
 
 from oscar.capabilities import FileExecutor, Verifier
 from oscar.contracts import Result, new_id
@@ -80,6 +81,20 @@ class ExecutiveTests(unittest.TestCase):
         self.assertEqual("completed", self.r.store.get("executive_goal", goal["id"])["state"])
         self.assertEqual(0, self.e.tick())
         self.assertEqual(2, len(self.r.store.all("task")))
+
+    def test_connector_mount_during_heartbeat_does_not_stop_executive_tick(self):
+        heartbeat = self.e.grid.heartbeat
+        called = []
+
+        def mount_during_heartbeat(session):
+            called.append(session)
+            self.e.targets["new-connector"] = next(iter(self.e.targets.values()))
+            return heartbeat(session)
+
+        with patch.object(self.e.grid, "heartbeat", side_effect=mount_during_heartbeat):
+            self.assertEqual(0, self.e.tick())
+        self.assertTrue(called)
+        self.assertIn("new-connector", self.e.targets)
 
     def test_exact_review_and_dag_validation(self):
         proposal = self.e.propose(self.worker, "Pending", [self.step()])
