@@ -404,7 +404,7 @@ See [Voice Core](VOICE-CORE.md), [quality pass](VOICE-QUALITY.md) and
 Slice 09 software is authorized after Slice 08 integration; device acceptance is
 owner-deferred. This statement describes the historical Slice 07/08 acceptance boundary. Current Slice 10 Desktop runtime is a draft PR; deployment and Home Node remain deferred. See [canonical numbering](SLICE-NUMBERING.md).
 
-## Outbound child-process authority cadence — 2026-10-24
+## Outbound child-process authority cadence â€” 2026-10-24
 
 The native outbound Worker checks Core authority before each child launch and
 other effect boundaries. While a child is already running, it schedules one

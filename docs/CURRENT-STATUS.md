@@ -1,5 +1,13 @@
 # OSCAR — Current Status & Checklist
 
+**2026-10-24 regression correction:** local runtime checkpoint `d2b5a21`
+passed 1,035 Python tests (1,025 passed, ten explicit skips) with stable source
+hashes. Remote process supervision no longer exhausts Core admission; pre-effect
+checks remain fresh and uncertain effects are not replayed. A constrained Linux
+run passed 217 tests (212 passed, five skips). Failed campaigns and the missing-Git
+fixture prerequisite remain recorded in the [completion ledger](development/OSCAR-FULL-SOFTWARE-COMPLETION.md).
+This is a passing regression baseline, not full product or owner acceptance.
+
 **2026-10-23 full software continuation:** active local branch
 `codex/software-completion` extends the unmerged D2/C1/C2 candidate. The
 [completion ledger](development/OSCAR-FULL-SOFTWARE-COMPLETION.md) records signed
