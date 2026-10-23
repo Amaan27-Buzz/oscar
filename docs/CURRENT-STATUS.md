@@ -1,5 +1,15 @@
 # OSCAR — Current Status & Checklist
 
+**2026-10-24 Android conversation integration:** exact text commands now use
+the existing signed Grid/native Android executor. Actual emulator clipboard
+before/after Core restart, media pause and text entry readbacks passed; generic
+click remains PARTIALLY_VERIFIED. The current stable-source Python regression
+passed 1,029 tests with ten skips; constrained Linux passed 221 with five skips.
+[Current evidence and limits](development/OSCAR-FULL-SOFTWARE-COMPLETION.md) include
+a separate ten-minute restart soak, performance measurements and scoped security
+review. Exact app/resource targets are required. Both disposable packages were
+removed and the exact emulator stopped. Full software acceptance remains PARTIAL.
+
 **2026-10-24 Android recovery acceptance:** actual separate TLS Core termination,
 native Worker stop, explicit restart using the saved Keystore session, fresh
 clipboard execution and unchanged pre-existing claims passed on the disposable

@@ -15,6 +15,7 @@ from typing import TYPE_CHECKING, Any
 from .android_worker import (
     ANDROID_CAPABILITIES,
     android_readback,
+    conversation_android,
     platform_readback_matches,
     validate_android,
 )
@@ -884,7 +885,22 @@ class RemoteGrid:
             from .desktop_actions import OPERATIONS, conversation_form, form_intent
 
             form = conversation_form(payload["text"])
-            if form is not None:
+            native = conversation_android(payload["text"])
+            if native is not None:
+                requested_node, kind, parameters = native
+                candidates = [
+                    cap
+                    for cap in self.grid.search(kind)
+                    if cap.node_id in self.sessions
+                    and cap.id in ANDROID_CAPABILITIES
+                    and (requested_node is None or cap.node_id == requested_node)
+                ]
+                if len(candidates) != 1:
+                    raise StateConflict(
+                        "Android target is unavailable or ambiguous; select a device"
+                    )
+                target = candidates[0].node_id
+            elif form is not None:
                 operation, fields = form
                 candidates = [
                     cap

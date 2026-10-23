@@ -384,3 +384,32 @@ remains in Git and the [consolidated Gate C contract](GATE-C-CONSOLIDATED-ACCEPT
 ## Tauri surface continuity
 
 Rust projects existing Core task/capability state into local typed events; frontend state grants no authority. Worker withdrawal removes eligible Act forms. Surface restart/reconnect inspects existing shared tasks; it does not replay private work or invent task truth. Existing Grid interaction fencing remains authoritative. See [Desktop foundation](DESKTOP-FOUNDATION.md).
+
+## Explicit Android conversation actions
+
+The normal signed Grid `text` request can propose bounded Android operations from
+the owner's exact app/resource arguments. Examples:
+
+```text
+Pause media in example.player
+Copy Exact text to clipboard in example.editor
+type Exact text into example.editor:id/input
+On device phone-1: click example.editor:id/submit
+Read phone file agenda.txt in example.editor
+Write phone file agenda.txt in example.editor with text Exact text
+Capture screen of example.editor
+```
+
+Read clipboard/media, inspect app, scroll/swipe an exact resource and launch an
+exact selected app component use the same typed Android contracts. Package,
+component and resource identity are not inferred from friendly app names. An
+explicit device prefix selects that exact current executor; otherwise there must
+be exactly one available capability. Ambiguous or withdrawn executors fail closed.
+
+Parsing grants no execution authority. Core still validates the native contract,
+current session scopes, Personal Policy, exact signed review or standing authority
+and independent retention choice. The target rechecks Android permissions, local
+selected-app grants and current Core authority before claiming/executing a task.
+Exact text remains verbatim. Generic click/screen outcomes retain their existing
+partial-verification semantics. A conversation request never enables a native
+service, selects an unapproved app or retries an uncertain earlier effect.

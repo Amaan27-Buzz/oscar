@@ -402,13 +402,19 @@ def main() -> int:
 
                 def execute(kind, target, value):
                     started = monotonic()
+                    command = {
+                        "android_clipboard_write": f"Copy {value} to clipboard in {PACKAGE}",
+                        "android_media_control": f"{value} media in {PACKAGE}",
+                        "android_ui_set_text": f"type {value} into {target}",
+                        "android_ui_click": f"click {target}",
+                    }[kind]
                     task = fixture.mobile.request(
                         "submit",
                         {
-                            "text": "Synthetic selected-app acceptance",
-                            "kind": kind,
-                            "target": node,
-                            "parameters": {"package": PACKAGE, "target": target, "value": value},
+                            "text": command,
+                            "kind": "text",
+                            "target": fixture.config.core_id,
+                            "parameters": {},
                             "retain": True,
                         },
                     )
@@ -438,6 +444,7 @@ def main() -> int:
                         {
                             "task_id": task["task_id"],
                             "kind": kind,
+                            "input_kind": "text",
                             "state": final["state"],
                             "evidence": final["evidence"],
                         }

@@ -332,6 +332,90 @@ class RemoteGridTests(unittest.TestCase):
         with self.assertRaises(StateConflict):
             self.core.remote.authenticate(headers, body)
 
+    def test_android_conversation_requires_exact_live_device_and_current_owner_scope(self):
+        from oscar.contracts import Capability, record
+
+        def enroll_native(node, workspace="", control=False):
+            invitation = create_invitation(
+                self.core,
+                node,
+                "mobile",
+                "installation-" + node,
+                self.public,
+                workspace=workspace,
+                android_control=control,
+                retain=True,
+                owner_public_key=self.owner_public if control else None,
+            )
+            return DirectClient(
+                self.core,
+                self.core.remote.enroll(
+                    {
+                        "version": 2,
+                        "challenge_id": invitation["challenge_id"],
+                        "signature": signature(
+                            self.key, base64.b64decode(invitation["signing_payload"])
+                        ),
+                    }
+                ),
+            )
+
+        self.mobile = enroll_native("native-owner", control=True)
+        phone = enroll_native("native-phone", "selected-apps")
+
+        def advertise(client, active=True):
+            cap = Capability(
+                id="android.clipboard.write",
+                name="Selected clipboard",
+                summary="Scoped clipboard",
+                execution_class="machine",
+                node_id=client.handle.node_id,
+                permissions=("android:act",),
+                input_kind="android_clipboard_write",
+                output_kind="reference",
+                risk="high",
+                version=1,
+                reversible=False,
+            )
+            client.request(
+                "advertise",
+                {"workspace": "selected-apps", "capabilities": [record(cap)] if active else []},
+            )
+
+        def submit(text):
+            return self.submit("text", text=text, target=self.core.config.core_id, parameters={})
+
+        advertise(phone)
+        task = submit("Copy Exact  Text to clipboard in example.editor")
+        self.assertEqual("planned", task["state"])
+        self.assertTrue(task["approval_required"])
+        self.assertEqual("native-phone", task["target"])
+        action = self.core.harness.store.get("planned_action", task["task_id"])
+        self.assertEqual("android.clipboard.write", action["capability_id"])
+        self.assertEqual(
+            {"package": "example.editor", "target": "", "value": "Exact  Text"},
+            action["parameters"],
+        )
+        self.assertIsNone(phone.request("poll", {})["delivery"])
+        other = enroll_native("other-phone", "selected-apps")
+        advertise(other)
+        with self.assertRaises(StateConflict):
+            submit("Copy Text to clipboard in example.editor")
+        exact = submit("On device native-phone: Copy Text to clipboard in example.editor")
+        self.assertEqual("native-phone", exact["target"])
+        advertise(phone, active=False)
+        with self.assertRaises(StateConflict):
+            submit("On device native-phone: Copy Text to clipboard in example.editor")
+        store = self.core.harness.store
+        owner = store.get("session", self.mobile.handle.id)
+        store.put(
+            "session",
+            self.mobile.handle.id,
+            {**owner, "scopes": [s for s in owner["scopes"] if s != "android:act"]},
+        )
+        with self.assertRaises(PermissionError):
+            submit("On device other-phone: Copy Text to clipboard in example.editor")
+
     def test_native_conversation_routes_explicit_file_request_through_real_worker(self):
         task = self.submit(
             "text",

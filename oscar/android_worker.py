@@ -175,3 +175,48 @@ def platform_readback_matches(
         )
     except (KeyError, TypeError, ValueError):
         return False
+
+
+def conversation_android(text: str) -> tuple[str | None, str, dict[str, str]] | None:
+    """Exact owner-supplied targets only; names, app identity and arguments are never inferred."""
+    request = re.sub(
+        r"^(?:please |(?:can|could|would) you )", "", text.lstrip(), count=1, flags=re.IGNORECASE
+    )
+    device = re.fullmatch(
+        r"on device ([A-Za-z0-9_.-]{1,80}):\s*(.+)", request, re.IGNORECASE | re.DOTALL
+    )
+    node, instruction = (device[1], device[2]) if device else (None, request)
+    for pattern, kind, fields in (
+        (r"read clipboard in (\S+)", "android_clipboard_read", ("package",)),
+        (r"copy (.+) to clipboard in (\S+)", "android_clipboard_write", ("value", "package")),
+        (
+            r"(play|pause|next|previous|stop) media in (\S+)",
+            "android_media_control",
+            ("value", "package"),
+        ),
+        (r"inspect media in (\S+)", "android_media_inspect", ("package",)),
+        (r"inspect app (\S+)", "android_ui_inspect", ("package",)),
+        (r"capture screen of (\S+)", "android_screen_capture", ("package",)),
+        (r"read phone file (\S+) in (\S+)", "android_files_read", ("target", "package")),
+        (
+            r"write phone file (\S+) in (\S+) with text (.+)",
+            "android_files_write",
+            ("target", "package", "value"),
+        ),
+        (r"type (.+) into (\S+:id/\S+)", "android_ui_set_text", ("value", "target")),
+        (r"click (\S+:id/\S+)", "android_ui_click", ("target",)),
+        (r"scroll (\S+:id/\S+) (forward|backward)", "android_ui_scroll", ("target", "value")),
+        (r"swipe (\S+:id/\S+) (up|down|left|right)", "android_ui_gesture", ("target", "value")),
+        (r"open app (\S+) component (\S+)", "android_app_launch", ("package", "target")),
+    ):
+        match = re.fullmatch(pattern, instruction, re.IGNORECASE | re.DOTALL)
+        if match is None:
+            continue
+        parameters = {"package": "", "target": "", "value": ""}
+        parameters.update(zip(fields, match.groups(), strict=True))
+        if not parameters["package"]:
+            parameters["package"] = parameters["target"].split(":id/", 1)[0]
+        if kind in {"android_media_control", "android_ui_scroll", "android_ui_gesture"}:
+            parameters["value"] = parameters["value"].lower()
+        return node, kind, validate_android(kind, parameters)
+    return None

@@ -118,3 +118,61 @@ class AndroidPlatformReadbackTests(unittest.TestCase):
             )
         )
         self.assertIsNone(platform_readback_matches("android_ui_click", parameters, observation()))
+
+
+class AndroidConversationTests(unittest.TestCase):
+    def test_exact_text_resource_and_optional_device_selection(self):
+        from oscar.android_worker import conversation_android
+
+        cases = (
+            (
+                "Copy Exact  Text to clipboard in example.editor",
+                "android_clipboard_write",
+                "",
+                "Exact  Text",
+            ),
+            (
+                "type Exact  Text into example.editor:id/input",
+                "android_ui_set_text",
+                "example.editor:id/input",
+                "Exact  Text",
+            ),
+            (
+                "write phone file agenda.txt in example.editor with text Exact  Text  ",
+                "android_files_write",
+                "agenda.txt",
+                "Exact  Text  ",
+            ),
+            ("PAUSE media in example.editor", "android_media_control", "", "pause"),
+        )
+        for text, kind, target, value in cases:
+            with self.subTest(kind=kind):
+                expected = {"package": "example.editor", "target": target, "value": value}
+                self.assertEqual((None, kind, expected), conversation_android(text))
+                self.assertEqual(
+                    ("phone-1", kind, expected), conversation_android("On device phone-1: " + text)
+                )
+
+    def test_invalid_native_contracts_never_reach_an_executor(self):
+        from oscar.android_worker import conversation_android
+
+        for text in (
+            "pause media in player",
+            "read phone file ../private.txt in example.editor",
+            "copy " + "x" * 2001 + " to clipboard in example.editor",
+            "open app example.editor component other.editor.MainActivity",
+        ):
+            with self.subTest(command=text[:40]), self.assertRaises(ValueError):
+                conversation_android(text)
+
+    def test_app_and_argument_identity_is_never_inferred(self):
+        from oscar.android_worker import conversation_android
+
+        for text in (
+            "pause music",
+            "open Spotify",
+            "click the right button",
+            "type text into password",
+            "send an unreviewed message",
+        ):
+            self.assertIsNone(conversation_android(text))
