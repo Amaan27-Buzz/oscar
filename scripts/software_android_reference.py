@@ -161,7 +161,7 @@ def main() -> int:
         )
         with android_core_fixture(identity, android_workspace="selected-apps", management=True) as (
             fixture,
-            _,
+            core_process,
             details,
         ):
             port = str(details["grid_port"])
@@ -456,6 +456,89 @@ def main() -> int:
                     "shell", "run-as", PACKAGE, "touch", "files/software-native-clipboard-verified"
                 )
 
+                def marker(name):
+                    try:
+                        if name.endswith(".json"):
+                            return isinstance(
+                                json.loads(
+                                    device("exec-out", "run-as", PACKAGE, "cat", "files/" + name)
+                                ),
+                                dict,
+                            )
+                        path = "files/" + name
+                        return device("shell", "run-as", PACKAGE, "ls", path).strip() == path
+                    except (RuntimeError, ValueError):
+                        return False
+
+                wait(
+                    lambda: marker("software-core-restart-ready.json"),
+                    "Native restart preflight missing",
+                )
+                restart_before = json.loads(
+                    device(
+                        "exec-out",
+                        "run-as",
+                        PACKAGE,
+                        "cat",
+                        "files/software-core-restart-ready.json",
+                    )
+                )
+                original_task = tasks[-1]["task_id"]
+                fixture.stop(core_process)
+                wait(
+                    lambda: marker("software-core-restart-stopped"),
+                    "Core loss left native Worker active",
+                    seconds=75,
+                )
+                core_process = fixture.start_core()
+                assert "android.clipboard.write" not in capabilities()
+                device("shell", "run-as", PACKAGE, "touch", "files/software-core-restart-restored")
+                wait(
+                    lambda: marker("software-core-restart-worker-ready"),
+                    "Explicit native restart failed",
+                )
+                wait(
+                    lambda: "android.clipboard.write" in capabilities(),
+                    "Fresh native advertisement missing",
+                )
+                execute(
+                    "android_clipboard_write", "", "Grid synthetic clipboard after Core restart"
+                )
+                assert tasks[-1]["state"] == "verified"
+                previous = fixture.mobile.request("inspect", {"task_id": original_task})
+                assert previous["state"] == "verified"
+                device("shell", "run-as", PACKAGE, "touch", "files/software-core-restart-verified")
+                wait(
+                    lambda: marker("software-core-restart-native.json"),
+                    "Native restart-phase readback missing",
+                )
+                native_restart = json.loads(
+                    device(
+                        "exec-out",
+                        "run-as",
+                        PACKAGE,
+                        "cat",
+                        "files/software-core-restart-native.json",
+                    )
+                )
+                assert native_restart["session_unchanged"] is True
+                assert native_restart["fresh_clipboard_observed"] is True
+                assert native_restart["claims_before"] == restart_before["claims"]
+                assert native_restart["claims_after"] == restart_before["claims"] + 2
+                core_restart = {
+                    "core_process_restarted": True,
+                    "native_worker_stopped_on_loss": True,
+                    "explicit_native_restart": True,
+                    "persisted_session": True,
+                    "claims_unchanged_before_new_task": restart_before["claims"],
+                    "previous_task": original_task,
+                    "previous_task_state": "verified",
+                    "fresh_clipboard_task": tasks[-1]["task_id"],
+                    "fresh_clipboard_state": "verified",
+                    "automatic_effect_retry": False,
+                    "native_readback": native_restart,
+                }
+
                 wait(
                     lambda: "android.media.control" in capabilities(),
                     "Native media capability not advertised",
@@ -465,17 +548,7 @@ def main() -> int:
                 device("shell", "run-as", PACKAGE, "touch", "files/software-native-media-verified")
 
                 def target_ready():
-                    try:
-                        device(
-                            "exec-out",
-                            "run-as",
-                            PACKAGE,
-                            "cat",
-                            "files/software-native-target-ready",
-                        )
-                        return True
-                    except RuntimeError:
-                        return False
+                    return marker("software-native-target-ready")
 
                 wait(target_ready, "Synthetic target did not become ready")
                 wait(
@@ -552,6 +625,7 @@ def main() -> int:
                     "avd": AVD,
                     "transport": "separate actual TLS Core and native Android Keystore proof",
                     "native_readback": result,
+                    "core_restart": core_restart,
                     "phone_context": phone_context,
                     "tasks": tasks,
                     "timings": timings,

@@ -124,13 +124,7 @@ class NativePlatformConsentTest {
         waitFor("MediaProjection did not start") { NativeScreenService.current != null }
     }
 
-    @Test fun systemSingleAppConsentRequiresAuthorityAndStopsOnStopAndLock() {
-        assertNull(NativeScreenService.current)
-        compose.onNodeWithText("Review screen-sharing consent").performScrollTo().performClick()
-        systemClick("Cancel", "CANCEL")
-        assertNull(NativeScreenService.current)
-        compose.runOnIdle { prefs.edit().putBoolean("screen_perception", true).putBoolean("accessibility_perception", true)
-            .putString("native_action_packages", instrumentation.context.packageName).commit() }
+    private fun connectAccessibility() {
         // Instrumentation process restart does not rebind an already enabled service.
         val services = String(shell("settings get secure enabled_accessibility_services")).trim()
         require(services.matches(Regex("[A-Za-z0-9_./:$-]+")))
@@ -141,6 +135,16 @@ class NativePlatformConsentTest {
         shell("settings put secure enabled_accessibility_services ${listOf(other, context.packageName + "/.AppControlService").filter(String::isNotEmpty).joinToString(":")}")
         shell("settings put secure accessibility_enabled 1")
         waitFor("Real accessibility service not connected") { AppControlService.connected != null }
+    }
+
+    @Test fun systemSingleAppConsentRequiresAuthorityAndStopsOnStopAndLock() {
+        assertNull(NativeScreenService.current)
+        compose.onNodeWithText("Review screen-sharing consent").performScrollTo().performClick()
+        systemClick("Cancel", "CANCEL")
+        assertNull(NativeScreenService.current)
+        compose.runOnIdle { prefs.edit().putBoolean("screen_perception", true).putBoolean("accessibility_perception", true)
+            .putString("native_action_packages", instrumentation.context.packageName).commit() }
+        connectAccessibility()
         shell("am start -W -n ${instrumentation.context.packageName}/${ScreenFixtureActivity::class.java.name}")
         waitFor("Synthetic screen app did not open") { AppControlService.connected?.selectedPackage() == instrumentation.context.packageName }
         consentScreen()
@@ -154,7 +158,14 @@ class NativePlatformConsentTest {
                     waitFor("No fresh authorized selected-app frame") {
                         val capture = capture(); approved = capture
                         frame = native.execute(context, capture)
-                        frame!!.observations.isNotEmpty()
+                        if (frame!!.observations.isEmpty()) false else {
+                            val image = JSONObject(frame!!.observations.single().text)
+                            val bytes = android.util.Base64.decode(image.getString("base64"), android.util.Base64.DEFAULT)
+                            val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+                            val pixel = bitmap.getPixel(bitmap.width / 2, bitmap.height / 2)
+                            bitmap.recycle()
+                            android.graphics.Color.green(pixel) > 100 && android.graphics.Color.red(pixel) < 60 && android.graphics.Color.blue(pixel) < 90
+                        }
                     }
                     assertEquals("reported", frame!!.state)
                     val image = JSONObject(frame!!.observations.single().text)
@@ -180,6 +191,51 @@ class NativePlatformConsentTest {
             shell("input keyevent KEYCODE_WAKEUP"); shell("wm dismiss-keyguard")
             context.stopService(Intent(context, NativeScreenService::class.java))
             prefs.edit().putBoolean("screen_perception", false).putBoolean("accessibility_perception", false).putString("native_action_packages", "").commit()
+        }
+    }
+
+    @Test fun signedGridCapturesSelectedAppAndWithdrawsOnStop() {
+        val args = InstrumentationRegistry.getArguments()
+        require(args.getString("grid_invitation") != null)
+        val previous = javax.net.ssl.HttpsURLConnection.getDefaultSSLSocketFactory()
+        try {
+            val certificate = java.security.cert.CertificateFactory.getInstance("X.509").generateCertificate(
+                java.util.Base64.getDecoder().decode(args.getString("grid_ca")).inputStream())
+            val trust = java.security.KeyStore.getInstance(java.security.KeyStore.getDefaultType()).apply {
+                load(null); setCertificateEntry("disposable-core-ca", certificate)
+            }
+            val managers = javax.net.ssl.TrustManagerFactory.getInstance(javax.net.ssl.TrustManagerFactory.getDefaultAlgorithm()).apply { init(trust) }
+            javax.net.ssl.HttpsURLConnection.setDefaultSSLSocketFactory(javax.net.ssl.SSLContext.getInstance("TLS").apply {
+                init(null, managers.trustManagers, null)
+            }.socketFactory)
+            val vault = SessionVault(context)
+            val invitation = JSONObject(String(java.util.Base64.getDecoder().decode(args.getString("grid_invitation")), Charsets.UTF_8))
+            val saved = CoreClient(JSONObject().put("url", args.getString("grid_origin"))).enroll(invitation, vault.deviceIdentity(), vault::signDevice)
+            vault.save(saved)
+            compose.runOnIdle { prefs.edit().putBoolean("screen_perception", true).putBoolean("accessibility_perception", true)
+                .putString("native_action_packages", instrumentation.context.packageName).commit() }
+            connectAccessibility()
+            compose.runOnIdle { NativeWorker.start(compose.activity) }
+            waitFor("Native Grid Worker did not connect") { NativeWorker.running }
+            shell("am start -W -n ${instrumentation.context.packageName}/${ScreenFixtureActivity::class.java.name}")
+            consentScreen()
+            waitFor("Selected synthetic app not foreground") { AppControlService.connected?.selectedPackage() == instrumentation.context.packageName }
+            context.openFileOutput("software-screen-ready", Context.MODE_PRIVATE).close()
+            val end = SystemClock.elapsedRealtime() + 90_000
+            while (!context.getFileStreamPath("software-screen-verified").exists() && SystemClock.elapsedRealtime() < end) SystemClock.sleep(100)
+            assertTrue("Host did not decode and verify the actual signed Grid frame", context.getFileStreamPath("software-screen-verified").exists())
+            context.stopService(Intent(context, NativeScreenService::class.java))
+            waitFor("Screen service survived stop") { NativeScreenService.current == null }
+            assertFalse(NativePlatform(context).available("android.screen.capture"))
+            context.openFileOutput("software-screen-stopped", Context.MODE_PRIVATE).close()
+            val withdrawn = SystemClock.elapsedRealtime() + 30_000
+            while (!context.getFileStreamPath("software-screen-withdrawn").exists() && SystemClock.elapsedRealtime() < withdrawn) SystemClock.sleep(100)
+            assertTrue("Host did not observe capability withdrawal", context.getFileStreamPath("software-screen-withdrawn").exists())
+        } finally {
+            NativeWorker.stop(context)
+            context.stopService(Intent(context, NativeScreenService::class.java))
+            prefs.edit().putBoolean("screen_perception", false).putBoolean("accessibility_perception", false).putString("native_action_packages", "").commit()
+            javax.net.ssl.HttpsURLConnection.setDefaultSSLSocketFactory(previous)
         }
     }
 }

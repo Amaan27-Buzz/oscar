@@ -1,5 +1,18 @@
 # OSCAR — Current Status & Checklist
 
+**2026-10-24 Android recovery acceptance:** actual separate TLS Core termination,
+native Worker stop, explicit restart using the saved Keystore session, fresh
+clipboard execution and unchanged pre-existing claims passed on the disposable
+API35 emulator. Media pause/text readback, revocation, process restoration and
+11 navigation captures also passed. [Source-qualified receipt](evidence/software-completion/android-recovery-2026-10-24.json)
+retains three failed harness campaigns. This adds recovery acceptance, not
+physical-phone acceptance or automatic uncertain-effect replay.
+Actual OS-consented signed screen capture also passed: independent JPEG pixel
+readback and capability withdrawal, with Core retaining PARTIALLY_VERIFIED for
+generic screen content. [Screen Grid receipt](evidence/software-completion/android-screen-grid-2026-10-24.json)
+records explicit synthetic retention and the failed initial render-readiness
+attempt. Both disposable apps were removed and the exact emulator shut down.
+
 **2026-10-24 regression correction:** local runtime checkpoint `d2b5a21`
 passed 1,035 Python tests (1,025 passed, ten explicit skips) with stable source
 hashes. Remote process supervision no longer exhausts Core admission; pre-effect

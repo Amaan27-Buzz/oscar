@@ -153,11 +153,42 @@ class NativeGridExecutionTest {
                     value == "Grid synthetic clipboard"
                 }
                 waitFor("Host did not verify independent clipboard readback") { context.getFileStreamPath("software-native-clipboard-verified").exists() }
+                val claimsBeforeRestart = context.getSharedPreferences("native-execution-claims", Context.MODE_PRIVATE).all.size
+                context.openFileOutput("software-core-restart-ready.json", Context.MODE_PRIVATE).use {
+                    it.write(JSONObject().put("claims", claimsBeforeRestart).toString().toByteArray())
+                }
+                waitFor("Core loss did not stop the native Worker", 60_000) { !NativeWorker.running && NativeWorkerService.instance == null }
+                assertEquals(claimsBeforeRestart, context.getSharedPreferences("native-execution-claims", Context.MODE_PRIVATE).all.size)
+                context.openFileOutput("software-core-restart-stopped", Context.MODE_PRIVATE).close()
+                waitFor("Host did not restore Core", 60_000) { context.getFileStreamPath("software-core-restart-restored").exists() }
+                source.onActivity { NativeWorker.start(it) }
+                waitFor("Explicit restart did not reconnect native Worker") { NativeWorker.running }
+                assertEquals(saved.getString("session_id"), requireNotNull(vault.load()).getString("session_id"))
+                assertEquals(claimsBeforeRestart, context.getSharedPreferences("native-execution-claims", Context.MODE_PRIVATE).all.size)
+                context.openFileOutput("software-core-restart-worker-ready", Context.MODE_PRIVATE).close()
+                waitFor("Fresh post-restart task did not reach the real clipboard") {
+                    var value = ""
+                    source.onActivity { value = it.getSystemService(android.content.ClipboardManager::class.java).primaryClip?.getItemAt(0)?.text?.toString().orEmpty() }
+                    value == "Grid synthetic clipboard after Core restart"
+                }
+                waitFor("Host did not independently verify the post-restart effect") { context.getFileStreamPath("software-core-restart-verified").exists() }
+                stage("Actual Core loss, explicit Worker restart, unchanged session and no replay accepted")
+                context.openFileOutput("software-core-restart-native.json", Context.MODE_PRIVATE).use {
+                    it.write(JSONObject().put("session_unchanged", true).put("fresh_clipboard_observed", true)
+                        .put("claims_before", claimsBeforeRestart)
+                        .put("claims_after", context.getSharedPreferences("native-execution-claims", Context.MODE_PRIVATE).all.size).toString().toByteArray())
+                }
                 waitFor("Core media task did not pause synthetic media metadata") { media?.controller?.playbackState?.state == android.media.session.PlaybackState.STATE_PAUSED }
                 waitFor("Host did not verify independent media readback") { context.getFileStreamPath("software-native-media-verified").exists() }
                 source.onActivity { it.getSystemService(android.content.ClipboardManager::class.java).clearPrimaryClip() }
                 assertTrue(prefs.edit().putBoolean("clipboard_perception", false).putBoolean("clipboard_actions", false).commit())
                 ActivityScenario.launch(CapabilityFixtureActivity::class.java).use { target ->
+                    waitFor("Exact accessible fixture input did not become ready") {
+                        val root = instrumentation.getUiAutomation(android.app.UiAutomation.FLAG_DONT_SUPPRESS_ACCESSIBILITY_SERVICES).rootInActiveWindow
+                        root?.packageName?.toString() == context.packageName &&
+                            root.findAccessibilityNodeInfosByViewId(context.packageName + ":id/capability_fixture_input")
+                                .count { it.isVisibleToUser && it.isEditable && it.isEnabled } == 1
+                    }
                     context.openFileOutput("software-native-target-ready", Context.MODE_PRIVATE).close()
                     waitFor("Core task did not set the real target text") {
                         var text = ""; target.onActivity { text = it.findViewById<EditText>(R.id.capability_fixture_input).text.toString() }; text == "Grid synthetic agenda"
@@ -177,7 +208,7 @@ class NativeGridExecutionTest {
                     assertTrue("No durable pre-effect execution claim", claims >= 3)
                     context.openFileOutput("software-native-result.json", Context.MODE_PRIVATE).use { it.write(JSONObject()
                         .put("text", "Grid synthetic agenda").put("result", "Reviewed: Grid synthetic agenda")
-                        .put("phone_context", true).put("phone_context_withdrawal", true).put("media_retreat", true).put("claims", claims).put("clipboard", true).put("media", true).put("revoked", true).put("management_review", true).put("owner_activation", false).toString().toByteArray()) }
+                        .put("core_restart", true).put("phone_context", true).put("phone_context_withdrawal", true).put("media_retreat", true).put("claims", claims).put("clipboard", true).put("media", true).put("revoked", true).put("management_review", true).put("owner_activation", false).toString().toByteArray()) }
                 }
             }
         } finally {
