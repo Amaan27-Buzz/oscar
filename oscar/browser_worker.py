@@ -1,6 +1,7 @@
 """Bounded typed Playwright plans in isolated contexts. No personal browser profile."""
 
 import argparse
+import hashlib
 import importlib
 import json
 import os
@@ -103,6 +104,7 @@ def validate(request: dict[str, Any]) -> None:
         "wait": {"selector"},
         "inspect": set(),
         "screenshot": {"path"},
+        "visual_click": {"url", "sha256", "width", "height", "x", "y"},
         "download": {"selector", "path", "max_bytes"},
         "select": {"selector", "value"},
         "scroll": {"selector"},
@@ -120,6 +122,20 @@ def validate(request: dict[str, Any]) -> None:
             raise ValueError("unsupported browser operation")
         if operation == "navigate" and origin(step["url"]) not in request["origins"]:
             raise PermissionError("navigation origin outside grant")
+        if operation == "visual_click":
+            if origin(step["url"]) not in request["origins"]:
+                raise PermissionError("visual target origin outside grant")
+            if (
+                not isinstance(step["sha256"], str)
+                or len(step["sha256"]) != 64
+                or any(c not in "0123456789abcdef" for c in step["sha256"])
+                or any(type(step[k]) is not int for k in ("width", "height", "x", "y"))
+                or not 64 <= step["width"] <= 4096
+                or not 64 <= step["height"] <= 4096
+                or not 0 <= step["x"] < step["width"]
+                or not 0 <= step["y"] < step["height"]
+            ):
+                raise ValueError("exact screenshot hash, viewport and pixel target required")
         if "selector" in step and (
             not isinstance(step["selector"], str) or not 0 < len(step["selector"]) <= 500
         ):
@@ -172,6 +188,15 @@ def probe() -> None:
             browser.close()
         except Exception as error:
             raise BrowserFailure("browser.playwright_launch", type(error).__name__) from error
+
+
+def visual_snapshot(page: Any) -> tuple[bytes, dict[str, Any]]:
+    """CSS-pixel coordinates and the hash use the same fixed screenshot contract."""
+    viewport = page.viewport_size
+    if viewport is None:
+        raise PermissionError("fixed browser viewport required")
+    data = page.screenshot(full_page=False, animations="disabled", caret="hide", scale="css")
+    return data, {"url": page.url, "sha256": hashlib.sha256(data).hexdigest(), **viewport}
 
 
 def run(request: dict[str, Any], root: Path, *, profile: Path | None = None) -> dict[str, Any]:
@@ -300,7 +325,19 @@ def run(request: dict[str, Any], root: Path, *, profile: Path | None = None) -> 
                     )
                 elif operation == "screenshot":
                     artifact = root / step["path"]
-                    write_artifact(artifact, page.screenshot(full_page=False))
+                    data, binding = visual_snapshot(page)
+                    write_artifact(artifact, data)
+                    observations.append({**binding, "path": step["path"], "status": "REPORTED"})
+                elif operation == "visual_click":
+                    if page.url != step["url"]:
+                        raise PermissionError("visual target URL changed")
+                    _, binding = visual_snapshot(page)
+                    if binding != {k: step[k] for k in ("url", "sha256", "width", "height")}:
+                        raise PermissionError("visual target pixels or viewport changed")
+                    if page.url != step["url"] or monotonic() - started >= request["timeout"]:
+                        raise PermissionError("visual target expired or navigated")
+                    # One attempt only; a matching frame does not prove the click's outcome.
+                    page.mouse.click(step["x"], step["y"])
                 elif operation == "download":
                     artifact = root / step["path"]
                     if artifact.exists():

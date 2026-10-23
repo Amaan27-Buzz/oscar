@@ -413,3 +413,26 @@ selected-app grants and current Core authority before claiming/executing a task.
 Exact text remains verbatim. Generic click/screen outcomes retain their existing
 partial-verification semantics. A conversation request never enables a native
 service, selects an unapproved app or retries an uncertain earlier effect.
+
+## Browser visual fallback
+
+The existing reviewed `browser_workflow` supports a `visual_click` when a canvas
+or other rendered target has no usable DOM control. First capture a `screenshot`
+in the scoped artifact workspace. Its observation includes the exact URL, PNG
+SHA-256 and CSS-pixel viewport width/height. A later exact reviewed step supplies
+those four values and integer `x`/`y` coordinates inside that viewport.
+
+The outbound browser Worker captures a fresh frame using the same CSS-pixel
+contract and rejects any URL, pixel hash, viewport or deadline mismatch before
+one mouse click. Existing origin restrictions, account-generation checks,
+isolated profiles, cancellation, Core authority and no-replay journal apply.
+Screenshots disable animations and hide the caret consistently. A dynamic page
+may therefore require a new capture and review; mismatch never retries a click.
+
+This operates only in the owned browser viewport, never on the Windows desktop.
+It does not infer coordinates from an image or grant screenshot retention from
+perception alone. Scoped artifacts remain subject to the task's explicit grants.
+Pixel equality establishes the observed target, not the outcome of an action;
+generic browser results remain partially verified until independent readback.
+There is still a small page-mutation interval between observation and input;
+pixel matching is not an atomic transaction with an untrusted web application.
