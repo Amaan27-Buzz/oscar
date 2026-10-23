@@ -12,12 +12,45 @@ from time import sleep, time
 from oscar.cloud import CloudConfig, CloudCore
 from oscar.machine import MachineScope
 from oscar.remote_grid import create_invitation
-from oscar.remote_machine import RemoteMachine, machine_readback, validate_remote_machine
+from oscar.remote_machine import (
+    RemoteEffects,
+    RemoteMachine,
+    machine_readback,
+    validate_remote_machine,
+)
+from oscar.remote_worker import RemoteCancellation
 from tests.test_cloud import configuration
 from tests.test_remote_grid import DirectClient, keypair, signature
 
 
 class RemoteMachineContractTests(unittest.TestCase):
+    def test_running_poll_is_bounded_but_effect_boundaries_and_revocation_are_fresh(self):
+        from unittest.mock import Mock, patch
+
+        effects = object.__new__(RemoteEffects)
+        effects._last_running_check = 0.0
+        guard = Mock()
+        action = Mock()
+        cancellation = RemoteCancellation(guard)
+        with patch("oscar.remote_machine.monotonic", return_value=10) as clock:
+            effects.check_running(action, cancellation)
+            for instant in (10.02, 10.5, 10.99):
+                clock.return_value = instant
+                effects.check_running(action, cancellation)
+            self.assertEqual(1, guard.call_count)
+            effects.check(action, cancellation)  # A new effect never inherits the polling cache.
+            self.assertEqual(2, guard.call_count)
+            clock.return_value = 11
+            effects.check_running(action, cancellation)
+            self.assertEqual(3, guard.call_count)
+            guard.side_effect = PermissionError("revoked")
+            clock.return_value = 12
+            with self.assertRaises(PermissionError):
+                effects.check_running(action, cancellation)
+            self.assertEqual(11, effects._last_running_check)
+        with self.assertRaises(PermissionError):
+            effects.check(action, Mock())
+
     def test_readback_derives_only_the_exact_reviewed_destination(self):
         request = {"operation": "set_text_checked", "handle": 123, "pid": 456,
                    "runtime_id": "selected", "text": "reviewed", "expected_text": "old"}

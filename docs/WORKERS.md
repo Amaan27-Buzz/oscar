@@ -403,3 +403,18 @@ See [Voice Core](VOICE-CORE.md), [quality pass](VOICE-QUALITY.md) and
 [consolidated acceptance](GATE-C-CONSOLIDATED-ACCEPTANCE.md).
 Slice 09 software is authorized after Slice 08 integration; device acceptance is
 owner-deferred. This statement describes the historical Slice 07/08 acceptance boundary. Current Slice 10 Desktop runtime is a draft PR; deployment and Home Node remain deferred. See [canonical numbering](SLICE-NUMBERING.md).
+
+## Outbound child-process authority cadence — 2026-10-24
+
+The native outbound Worker checks Core authority before each child launch and
+other effect boundaries. While a child is already running, it schedules one
+fresh remote check per second. A revoked lease, cancelled task, local sharing
+withdrawal or failed check terminates the supervised process group/Windows Job.
+The interval is plus the existing bounded transport deadline; this is not an
+instantaneous remote-stop guarantee. Local shared-store Workers retain their
+fast cancellation checks.
+
+Running progress does not issue a second identical check. The remote cancellation
+contract itself performs the authenticated check, avoiding two requests at every
+fence. Core's existing per-node admission limit remains unchanged. Rejection or
+an uncertain result never authorizes replay of an effect.

@@ -9,7 +9,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from threading import Event, Thread
-from time import sleep, time
+from time import monotonic, sleep, time
 from unittest.mock import patch
 
 from oscar.browser_worker import bounded_download, validate, write_artifact
@@ -311,8 +311,12 @@ class BrowserLifecycleTests(unittest.TestCase):
         self.assertEqual(TaskState.CANCELLED, self.runtime.run(task.id, self.transports).state)
 
     def test_timeout_after_real_navigation(self):
-        task = self.task(3)
-        result = self.runtime.run(task.id, self.transports)
+        task = self.task(20)
+        # Advance only the supervisor clock after real navigation, independent of cold startup.
+        with patch("oscar.machine.monotonic", side_effect=lambda: (
+            monotonic() + (21 if self.visited.is_set() else 0)
+        )):
+            result = self.runtime.run(task.id, self.transports)
         self.assertTrue(self.visited.is_set())
         self.assertEqual(TaskState.FAILED, result.state)
         self.assertEqual("command_timeout", result.blocker)

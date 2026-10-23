@@ -6,6 +6,7 @@ from collections.abc import Callable
 from dataclasses import replace
 from pathlib import Path
 from threading import Event, Thread
+from time import monotonic
 from typing import Any, TextIO
 
 from .browser_profiles import BrowserProfiles
@@ -140,6 +141,7 @@ class RemoteEffects(InteractiveWorker):
     ):
         self.remote_grants = frozenset(client.session["scopes"])
         self.guard, self.active = guard, False
+        self._last_running_check = 0.0
         # This is the existing remote credential, never a generated local execution session.
         session = SessionHandle(
             client.session["session_id"],
@@ -163,8 +165,15 @@ class RemoteEffects(InteractiveWorker):
         return True
 
     def check(self, action: Action, cancellation: Cancellation) -> None:
+        if not isinstance(cancellation, RemoteCancellation):
+            raise PermissionError("remote Core cancellation required")
         cancellation.check()
-        self.guard()
+
+    def check_running(self, action: Action, cancellation: Cancellation) -> None:
+        # Bound running-child revocation polling without consuming Core admission at 50 Hz.
+        if monotonic() - self._last_running_check >= 1:
+            self.check(action, cancellation)
+            self._last_running_check = monotonic()
 
     def check_permission(self, permission: str) -> None:
         if permission not in self.remote_grants:
@@ -173,7 +182,8 @@ class RemoteEffects(InteractiveWorker):
             self.guard()
 
     def checkpoint(self, action: Action, step: str, fraction: float) -> None:
-        self.guard()
+        if step != "process-running":  # Running checks already refresh Core authority each second.
+            self.guard()
 
     def controls(self, task_id: str) -> dict[str, Any]:
         return {"paused": False}

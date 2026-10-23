@@ -281,7 +281,7 @@ class BrowserWorkflowAcceptanceTests(unittest.TestCase):
                 "unknown",
             }:
                 break
-            sleep(0.02)
+            sleep(2)  # Match the production outbound Worker polling cadence.
         self.assertEqual("partially_verified", h.store.task(tasks[0]).state)
         self.assertEqual("Synthetic receipt:b", path.read_text())
         self.assertEqual([{"message": ["Synthetic receipt"], "choice": ["b"]}], submissions)

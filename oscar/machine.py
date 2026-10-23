@@ -254,6 +254,9 @@ class MachineWorker:
         ):
             raise StateConflict("worker disconnected")
 
+    def check_running(self, action: Action, cancellation: Cancellation) -> None:
+        self.check(action, cancellation)
+
     def run_command(
         self,
         action: Action,
@@ -314,7 +317,7 @@ class MachineWorker:
         paused = False
         try:
             while True:
-                self.check(action, cancellation)
+                self.check_running(action, cancellation)
                 want_pause = self.controls(action.task_id)["paused"] is True
                 if want_pause != paused:
                     _posix_os.killpg(
@@ -426,7 +429,7 @@ class MachineWorker:
                 output = bytearray()
                 last_progress = 0.0
                 while True:
-                    self.check(action, cancellation)
+                    self.check_running(action, cancellation)
                     if monotonic() - started >= timeout:
                         raise TimeoutError("machine command timeout")
                     if monotonic() - last_progress >= 1:

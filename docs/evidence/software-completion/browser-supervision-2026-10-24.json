@@ -1,0 +1,46 @@
+{
+  "classification": "LOCAL_FOCUSED_REGRESSION",
+  "source_sha256": {
+    "oscar/machine.py": "1fdbdb9b99dec38b2da7cd2a6d66f5558f036dff5ec0ee9d5dc6103476a8db2f",
+    "oscar/remote_machine.py": "e842bc3001ccb1d2ac2aa120a62c17feb0d2df8a39ff7d56a6e74f0d6e361f65",
+    "tests/test_browser_profiles.py": "3751fbc83dbea0d64f8f5e05ae80a89bee93bd8e1214506e55c3b8b0c7e3d74e",
+    "tests/test_windows_capabilities.py": "1f152a4effb6c31546bdea9f1fb08de82a73590d14717f5407ec2cd9ed4c5994",
+    "tests/test_remote_machine.py": "be512abd85313b3e26fdc1a451ea014cf38e6cf9bb16031f1efe457eb00cd63b",
+    "tests/test_browser_workflow.py": "c5c1f7a3c4959d06e72139889ccfd0dd2165cfc7d641f5302dea454630747fa5"
+  },
+  "checks": {
+    "software-browser-fix-focused-20261024.log": {
+      "state": "PASS",
+      "log_sha256": "93cf30e8ccf30a345567070e030c30111604d1215c049e9f302bf5a4a44fa9b5"
+    },
+    "software-browser-fix-encoding-20261024.log": {
+      "state": "PASS",
+      "log_sha256": "8fe80bd6c0ac70184375801cee717bedc3cc12962b70c2f09be9a07b8fef192f"
+    },
+    "software-browser-fix-ruff-20261024.log": {
+      "state": "PASS",
+      "log_sha256": "a4443afdcfb6d7363adb285762515ccf7cf50473b1a05c20c1a50f6bed4d26b0"
+    },
+    "software-browser-fix-mypy-20261024.log": {
+      "state": "PASS",
+      "log_sha256": "c91889240cf6847b6794f71ad5e9b20e81b7f026ae48fdd625d07cf45173df84"
+    },
+    "software-repository-final-20261024.log": {
+      "state": "PASS",
+      "log_sha256": "64116ee34d6ca8c3cc9f8d873ba155dc42d9f593a12499c5ac4ba99589c83151"
+    }
+  },
+  "qualification": "48 affected checks passed, then five contract/UTF-8 checks passed after restoring an incidental test-string encoding change. Campaigns overlap and are not summed. Full aggregate recorded separately.",
+  "fixes": [
+    "Running remote child authority polls scheduled once per second; pre-effect checks remain fresh",
+    "RemoteCancellation performs one authenticated check per fence; running progress no longer duplicates it",
+    "Core admission limit and no-effect-replay journal unchanged",
+    "Windows cleanup inventory reads command lines only for Chromium; disappeared Chromium processes handled, other inspection errors still fail",
+    "Post-navigation timeout test advances only supervisor clock after actual fixture visit; real child cleanup and timeout outcome verified"
+  ],
+  "limits": [
+    "Remote stop scheduling interval is one second plus bounded transport deadline",
+    "Generic browser outcomes remain partially verified; multi-step effects can be partial before failure",
+    "No owner accounts, physical phone, real capture, hosted deployment or CI run"
+  ]
+}

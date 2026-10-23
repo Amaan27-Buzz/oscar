@@ -230,11 +230,13 @@ class RealProfileTests(unittest.TestCase):
         if os.name == "nt":
             import psutil
 
-            for process in psutil.process_iter(["name", "cmdline"]):
+            for process in psutil.process_iter(["name"]):
                 if "chrom" in (process.info["name"] or "").lower():
-                    self.assertNotIn(
-                        str(self.profiles.root), " ".join(process.info["cmdline"] or [])
-                    )
+                    try:
+                        command = process.cmdline()
+                    except psutil.NoSuchProcess:
+                        continue
+                    self.assertNotIn(str(self.profiles.root), " ".join(command or []))
 
 
 if __name__ == "__main__":
