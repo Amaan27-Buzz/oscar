@@ -157,6 +157,7 @@ class ModelRequest:
     pinned_model: str | None = None
     pinned_slot: str | None = None
     ollama_think: bool | None = None
+    executive_plan: bool = False
 
     @classmethod
     def from_config(cls, data: Any) -> "ModelRequest":
@@ -197,6 +198,10 @@ class ModelRequest:
         return cls("template", "template", "", **values)
 
     def __post_init__(self) -> None:
+        if type(self.executive_plan) is not bool or (
+            self.executive_plan and "structured" not in self.required
+        ):
+            raise ValueError("Executive decoding requires explicit structured model output")
         if self.ollama_think is not None and type(self.ollama_think) is not bool:
             raise ValueError("Ollama thinking preference must be an explicit boolean")
         if (

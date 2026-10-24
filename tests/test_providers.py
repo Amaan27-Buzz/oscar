@@ -176,6 +176,30 @@ class ProviderContractTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 replace(self.request, ollama_think=invalid)
 
+    def test_executive_ollama_decoding_uses_schema_without_changing_generic_json(self):
+        from oscar.planning_contract import executive_plan_schema
+
+        self.body = {"message": {"content": '{"clarification":"Which file?"}'}, "done": True}
+        request = replace(self.request, required=frozenset({"text", "structured"}))
+        self.generate("ollama", request=request)
+        self.assertEqual("json", self.requests[-1]["body"]["format"])
+        self.assertNotIn("temperature", self.requests[-1]["body"]["options"])
+        response = self.generate("ollama", request=replace(request, executive_plan=True))
+        self.assertTrue(response.structured_ok)
+        self.assertEqual(executive_plan_schema(), self.requests[-1]["body"]["format"])
+        self.assertEqual(0, self.requests[-1]["body"]["options"]["temperature"])
+        self.body["message"]["content"] = 'not JSON: {\\"steps\\":[]}'
+        with self.assertRaises(ProviderError) as failure:
+            self.generate("ollama", request=replace(request, executive_plan=True))
+        self.assertEqual(Failure.STRUCTURED, failure.exception.category)
+        for invalid in (0, 1, "true", [], {}):
+            with self.assertRaises(ValueError):
+                replace(request, executive_plan=invalid)
+        with self.assertRaises(ValueError):
+            replace(self.request, executive_plan=True)
+        with self.assertRaises(ValueError):
+            ModelRequest.from_config({"executive_plan": True})
+
     def test_invalid_structured_output_is_failure(self):
         with self.assertRaises(ProviderError) as caught:
             self.generate(request=replace(self.request, required=frozenset({"text", "structured"})))

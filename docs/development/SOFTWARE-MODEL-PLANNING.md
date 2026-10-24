@@ -118,3 +118,34 @@ earlier fixture omitted normal Core services and consequently lost capability
 freshness during inference. The successful campaign ran the normal independent
 execution-session heartbeat. These failed receipts remain separately recorded;
 one successful objective does not establish general-purpose planning reliability.
+
+## Structured local Executive decoding (24 October)
+
+When the existing model configuration explicitly requires `structured` output,
+native Executive model tasks carry an internal `executive_plan` marker. The local
+Ollama adapter then sends a JSON Schema for exactly one `steps` array or one
+`clarification`, with typed Intent fields, bounded dependency names and at most
+16 steps. It uses temperature zero. The marker is internal and rejected by the
+owner configuration parser. Generic structured requests still use ordinary JSON
+mode; text-only routes remain text-only. Other provider adapters retain their
+existing JSON modes. No arbitrary schemas, image inputs or dependencies were added.
+
+Schema decoding is not authority or semantic verification. Executive still checks
+capability pins, actual node/account/session state, topological order, typed
+operations, policy and current owner authority. Ask still requires the two native
+reviews, while signed synthetic Full uses its current delegation. Malformed output
+is rejected; no repair, replacement output or automatic uncertain-effect retry was
+introduced. Existing pending reviews bind model configuration and may need renewal
+after configuration/source drift.
+
+[The local receipt](../evidence/software-completion/planning-schema-2026-10-24.json)
+records 159 passed regressions and three actual installed-Qwen runs on the final
+source, with independently verified file bytes. An earlier schema-only source
+failed with `structured_output_failure`; its raw failing response was not captured,
+so the exact cause remains unknown. Later success does not establish a universal
+model reliability fix. The trace only wraps the actual HTTP read to retain exact
+synthetic request/response bytes; it never repairs or substitutes model output.
+[Ollama's official contract](https://docs.ollama.com/capabilities/structured-outputs)
+specifies the schema format and recommends lower temperature for deterministic
+completions. No real owner account, microphone/camera or production Full activation
+was used.

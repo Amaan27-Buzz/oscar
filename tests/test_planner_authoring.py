@@ -269,6 +269,32 @@ class PlannerAuthoringTests(unittest.TestCase):
         with self.assertRaises(PermissionError):
             self.complete(review)
 
+    def test_structured_ollama_plan_constrains_decoding_and_keeps_both_reviews(self):
+        from oscar.planning_contract import executive_plan_schema
+
+        router = self.executor.router
+        router.registry.providers["fixture"] = replace(self.provider, adapter="ollama")
+        router.registry.models = {
+            key: replace(model, capabilities=frozenset({"text", "structured"}))
+            for key, model in router.registry.models.items()
+        }
+        router.adapters = {"ollama": HTTPAdapter("ollama")}
+        self.executor.template = replace(
+            self.executor.template, required=frozenset({"text", "structured"})
+        )
+        self.body = {"message": {"content": json.dumps({"steps": self.steps})}, "done": True}
+        row = self.draft()
+        self.assertEqual(executive_plan_schema(), self.requests[0]["body"]["format"])
+        self.assertEqual(["partially_verified"], [t["state"] for t in self.h.store.all("task")])
+        review = self.review(self.accept_change(row))
+        self.h.executive.tick()
+        self.assertEqual(1, len(self.h.store.all("task")))
+        self.complete(review)
+        self.h.executive.tick()
+        self.assertEqual(
+            ["partially_verified", "verified"], [t["state"] for t in self.h.store.all("task")]
+        )
+
     def test_provider_drift_prevents_call_and_unavailable_route_creates_nothing(self):
         review = self.review(self.change)
         self.executor.router.registry.providers["fixture"] = replace(

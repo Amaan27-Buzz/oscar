@@ -12,8 +12,8 @@ software work under the existing authorization; no new agent delegation is neede
 
 ## 2. Current candidate
 
-Latest committed base `0c217af` on `codex/software-completion`; the native observer
-correction checkpoint follows it. Use `git rev-parse HEAD` for the exact
+Latest committed base `723df7e` on `codex/software-completion`; the structured
+local planning checkpoint follows it. Use `git rev-parse HEAD` for the exact
 checkout, and `git log b700a6c..HEAD --oneline` for all local implementation commits.
 The final owner message must name the actual resulting checkout, not an invented
 self-referential documentation SHA.
@@ -23,6 +23,7 @@ self-referential documentation SHA.
 Newest first, after the starting source:
 
 ```text
+723df7e fix: keep native observers from displacing Windows input focus
 0c217af test: verify signed cross-account browser file transfer
 77542e2 feat: add signed contact reads and close stalled MCP startup
 61e8f0a feat: verify exact browser receipts before dependent work
@@ -200,6 +201,16 @@ A separate frozen-source constrained Linux run passed 221/225 cases with four
 explicit skips (73.685 s). [Failed aggregate](../evidence/software-completion/current-windows-failed-2026-10-24.json),
 [observer correction](../evidence/software-completion/windows-observer-2026-10-24.json) and
 [Linux receipt](../evidence/software-completion/current-linux-2026-10-24.json).
+
+**2026-10-24 structured local planning:** native Executive drafts on configured
+structured Ollama routes now send a bounded steps-or-clarification JSON schema
+with temperature zero. This constrains decoding; native validation, selected
+capabilities, Ask reviews and signed Full authority still own execution. All 159
+affected checks passed (85.315 s). Three installed-Qwen runs passed on stable
+sources: Ask 4.130/4.115 s and synthetic Full 3.982 s, with exact file readback.
+An earlier schema-only run failed safely and remains recorded; general planning
+reliability and the full software mandate remain incomplete.
+[Receipt](../evidence/software-completion/planning-schema-2026-10-24.json).
 
 Previous native checkpoints: Desktop 128 tests/typecheck/build; Rust 42 passed
 with one explicit live-voice ignore; Android 86 JVM cases/assemble/lint. They

@@ -261,7 +261,13 @@ class HTTPAdapter:
                 if request.ollama_think is not None:
                     body["think"] = request.ollama_think
                 if "structured" in request.required:
-                    body["format"] = "json"
+                    if request.executive_plan:
+                        from .planning_contract import executive_plan_schema
+
+                        body["format"] = executive_plan_schema()
+                        body["options"]["temperature"] = 0
+                    else:
+                        body["format"] = "json"
             else:
                 body["max_tokens"] = request.max_output_tokens
                 if "structured" in request.required:

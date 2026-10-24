@@ -62,6 +62,9 @@ class ModelExecutor:
             correlation_id=action.correlation_id,
             prompt=action.parameters["prompt"],
             mode=Mode.PRIVATE if action.parameters.get("mode") == "private" else self.template.mode,
+            executive_plan=(
+                "planning_sources" in action.parameters and "structured" in self.template.required
+            ),
         )
         policy = self.policy
         if "planning_sources" in action.parameters:

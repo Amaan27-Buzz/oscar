@@ -4,6 +4,16 @@ Updated 2026-10-24. **IMPLEMENTATION_IN_PROGRESS / SOFTWARE ACCEPTANCE PARTIAL.*
 Material executable work remains. This ledger does not declare
 `SOFTWARE_FEATURE_COMPLETE`, owner acceptance, hosted deployment or Gate E PASS.
 
+**2026-10-24 structured local planning:** native Executive drafts on configured
+structured Ollama routes now send a bounded steps-or-clarification JSON schema
+with temperature zero. This constrains decoding; native validation, selected
+capabilities, Ask reviews and signed Full authority still own execution. All 159
+affected checks passed (85.315 s). Three installed-Qwen runs passed on stable
+sources: Ask 4.130/4.115 s and synthetic Full 3.982 s, with exact file readback.
+An earlier schema-only run failed safely and remains recorded; general planning
+reliability and the full software mandate remain incomplete.
+[Receipt](../evidence/software-completion/planning-schema-2026-10-24.json).
+
 **2026-10-24 combined regression and native observer correction:** the current
 Windows aggregate ran 1,088 cases: 1,077 passed, ten skipped and one failed
 (631.981 s). The isolated failure was native rejection of a nonforeground
