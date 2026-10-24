@@ -378,3 +378,10 @@ The Worker aggregate ran 1,114 tests: 1,103 passed, ten skipped and one native
 visual-click case failed (655.061 s; unchanged source). An unchanged module
 recheck passed three tests; the rejection cause remains unproven. This is not
 an aggregate PASS. Subsequent formatting preserved identical Python ASTs.
+
+**2026-10-25 installed coding planner:** advertised Codex execution now composes
+through signed Ask and exact synthetic Full delegation. All 101 affected checks
+passed (80.231 s), including real synthetic child execution, independent exact-file
+inspection, no replay, revocation and unknown-objective preservation. Fresh real
+Codex/provider and remote artifact acceptance remain open.
+[Receipt](../evidence/software-completion/coding-planner-2026-10-25.json).

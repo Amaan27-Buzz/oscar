@@ -251,6 +251,16 @@ class WindowsVisualTests(unittest.TestCase):
                     worker = InteractiveWorker(
                         store, grid, session, MachineScope(root, True, (shell,))
                     )
+                    native_failures = []
+                    run_command = worker.run_command
+
+                    def inspect_command(*args, **kwargs):
+                        result = run_command(*args, **kwargs)
+                        if result[0]:
+                            native_failures.append(result[1])
+                        return result
+
+                    worker.run_command = inspect_command
                     app = InstalledApp(
                         "synthetic-visual",
                         "Synthetic visual window",
@@ -360,7 +370,9 @@ class WindowsVisualTests(unittest.TestCase):
                         )
                         self.assertFalse((root / "clicks.txt").exists())
                     clicked = execute("visual_control", click)
-                    self.assertEqual("partially_verified", clicked.state, store.all("result"))
+                    self.assertEqual(
+                        "partially_verified", clicked.state, (store.all("result"), native_failures)
+                    )
                     deadline = monotonic() + 3
                     while not (root / "clicks.txt").exists() and monotonic() < deadline:
                         sleep(0.05)

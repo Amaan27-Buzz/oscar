@@ -2,6 +2,7 @@
 
 import base64
 import json
+import sys
 import unittest
 from dataclasses import asdict, replace
 from time import monotonic, sleep
@@ -13,12 +14,14 @@ from oscar.event_archive import SourceEvent
 from oscar.grid import Node, NodeRole
 from oscar.harness import ModelExecutor
 from oscar.jev import Intent
+from oscar.machine import MachineScope, MachineWorker
 from oscar.models import Funding, ModelRequest, ModelSpec, RoutingPolicy
 from oscar.planner_authoring import PlannerAuthoring
 from oscar.policy import PersonalPolicy
 from oscar.providers import HTTPAdapter
 from oscar.registry import Registry
 from oscar.router import Router
+from oscar.transport import Dispatcher
 from tests import test_planner_authoring as planner_fixture
 from tests import test_providers as provider_fixture
 from tests import test_remote_grid as remote_fixture
@@ -114,6 +117,157 @@ class ConversationPlanningTests(unittest.TestCase):
     def test_autonomous_named_worker_uses_result_under_current_full_delegation(self):
         planner_fixture.PlannerAuthoringTests.delegate(self, actions=("math.add", "files.write"))
         self.result_handoff(full=True)
+
+    def coding_worker(self):
+        self.grants |= frozenset({"machine:host"})
+        for kind, identifier in (("session", self.owner.id), ("node", self.owner.node_id)):
+            row = self.h.store.get(kind, identifier)
+            self.h.store.put(kind, identifier, {**row, "scopes": sorted(self.grants)})
+        scopes = ("heartbeat", "advertise", "execute", "cancel", "machine:host")
+        self.h.grid.register(Node("coding-device", NodeRole.DESKTOP, scopes))
+        session = self.h.grid.pair("coding-device", scopes)
+        worker = MachineWorker(
+            self.h.store,
+            self.h.grid,
+            session,
+            MachineScope(self.h.files.root, True, (sys.executable,)),
+        )
+        # Synthetic installed-agent fixture executes real Python, never an authenticated agent.
+        worker.agents = {"codex": sys.executable}
+        self.h.grid.advertise(
+            session, [c for c in worker.capabilities() if c.input_kind == "coding"]
+        )
+        self.h.executive.targets[session.node_id] = (
+            Dispatcher(self.h.store, self.h.grid, session.node_id, worker.executors()),
+            session,
+        )
+        return worker
+
+    def coding_plan(self, criterion):
+        self.coding_worker()
+        code = (
+            "from pathlib import Path; p=Path('executions.txt'); "
+            "p.write_text(p.read_text()+'1' if p.exists() else '1'); "
+            "Path('coded.txt').write_text('42')"
+        )
+        self.body["choices"][0]["message"]["content"] = json.dumps(
+            {
+                "steps": [
+                    {
+                        "id": "code",
+                        "intent": asdict(
+                            Intent(
+                                "Implement the exact requested file",
+                                "capability",
+                                capability_kind="coding",
+                                parameters={"arguments": ["-c", code], "cwd": ".", "timeout": 20},
+                                criterion=criterion,
+                            )
+                        ),
+                        "node_id": "coding-device",
+                        "capability_id": "machine.agent.codex",
+                        "depends_on": [],
+                    }
+                ]
+            }
+        )
+        return self.proposed(
+            "Create worker Code result: On device coding-device: "
+            'Implement coded.txt containing "42"'
+        )
+
+    def test_signed_coding_plan_runs_real_process_once_and_reads_exact_artifact(self):
+        change = self.coding_plan({"kind": "file_exact", "path": "coded.txt", "content": "42"})
+        self.complete(self.review(change))
+        self.h.executive.tick()
+        self.assertIn("machine.agent.codex", json.dumps(self.requests))
+        self.assertFalse((self.h.files.root / "coded.txt").exists())
+        review = self.review(self.proposed("Review the plan"))
+        self.assertIn("arguments", review["review"])
+        self.complete(review)
+        self.h.executive.tick()
+        self.h.executive.tick()
+        self.assertEqual("42", (self.h.files.root / "coded.txt").read_text())
+        self.assertEqual("1", (self.h.files.root / "executions.txt").read_text())
+        self.assertEqual("verified", self.h.store.all("task")[-1]["state"])
+        self.assertEqual("Code result", self.h.store.all("executive_worker")[-1]["name"])
+
+    def test_coding_process_success_does_not_verify_an_unknown_objective(self):
+        self.complete(self.review(self.coding_plan({"kind": "unavailable"})))
+        self.h.executive.tick()
+        self.complete(self.review(self.proposed("Review the plan")))
+        self.h.executive.tick()
+        self.assertEqual("partially_verified", self.h.store.all("task")[-1]["state"])
+        self.assertNotEqual("completed", self.h.store.all("executive_goal")[-1]["state"])
+
+    def delegate_coding(self):
+        payload = planner_fixture.authority_fixture.StandingAuthorityTests.payload(
+            self,
+            "full",
+            capabilities=[
+                {"node_id": node, "session_id": session.id, "capability_id": capability}
+                for node, capability in (
+                    (self.h.node_id, "models.reason"),
+                    ("coding-device", "machine.agent.codex"),
+                )
+                for session in (self.h.executive.targets[node][1],)
+            ],
+        )
+        review = self.authority.challenge(
+            self.owner.node_id, self.owner.id, self.owner_scope, self.grants, payload
+        )
+        self.authority.complete(
+            self.owner.node_id,
+            self.owner.id,
+            self.public,
+            self.owner_scope,
+            self.grants,
+            self.signature(review),
+        )
+
+    def test_coding_worker_runs_autonomously_under_exact_standing_delegation(self):
+        self.coding_plan({"kind": "file_exact", "path": "coded.txt", "content": "42"})
+        self.delegate_coding()
+        response = self.conversation(
+            "Create worker Code result: On device coding-device: "
+            'Implement coded.txt containing "42"'
+        )
+        self.assertIn("assistance_started", response)
+        for _ in range(4):
+            self.h.executive.tick()
+        self.assertEqual("42", (self.h.files.root / "coded.txt").read_text())
+        self.assertEqual("1", (self.h.files.root / "executions.txt").read_text())
+        self.assertEqual("verified", self.h.store.all("task")[-1]["state"])
+        self.assertEqual(1, len(self.requests))
+
+    def test_coding_delegation_revoked_after_planning_blocks_process(self):
+        self.coding_plan({"kind": "file_exact", "path": "coded.txt", "content": "42"})
+        self.delegate_coding()
+        self.conversation("On device coding-device: Implement the requested file")
+        self.h.executive.tick()
+        self.authority.revoke(self.owner.node_id, self.owner.id, self.owner_scope, self.grants)
+        for _ in range(3):
+            self.h.executive.tick()
+        self.assertFalse((self.h.files.root / "executions.txt").exists())
+        self.assertEqual("blocked", PlannerAuthoring(self.h).snapshot()[0]["state"])
+
+    def test_coding_parameters_are_validated_before_effect_review(self):
+        change = self.coding_plan({"kind": "unavailable"})
+        output = json.loads(self.body["choices"][0]["message"]["content"])
+        for parameters in (
+            {"arguments": "shell code"},
+            {"arguments": [None]},
+            {"arguments": [], "timeout": 121},
+            {"arguments": [], "authority": "full"},
+        ):
+            with self.subTest(parameters=parameters):
+                output["steps"][0]["intent"]["parameters"] = parameters
+                self.body["choices"][0]["message"]["content"] = json.dumps(output)
+                self.complete(self.review(change))
+                self.h.executive.tick()
+                row = self.h.store.all("planner_request")[-1]
+                self.assertEqual("blocked", self.conversation("Review plan " + row["id"])["state"])
+        self.assertFalse((self.h.files.root / "executions.txt").exists())
 
     def result_handoff(self, full=False):
         steps = [

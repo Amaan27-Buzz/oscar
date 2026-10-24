@@ -598,3 +598,10 @@ Synthetic signed OIDC/PKCE, refresh, revocation qualification and uncertain-effe
 no-replay checks pass. All 120 affected checks passed (91.222 s). Real account
 commissioning and broader adaptive workflows remain separate.
 [Receipt](../evidence/software-completion/gitlab-2026-10-25.json).
+
+**2026-10-25 installed coding planner:** advertised Codex execution now composes
+through signed Ask and exact synthetic Full delegation. All 101 affected checks
+passed (80.231 s), including real synthetic child execution, independent exact-file
+inspection, no replay, revocation and unknown-objective preservation. Fresh real
+Codex/provider and remote artifact acceptance remain open.
+[Receipt](../evidence/software-completion/coding-planner-2026-10-25.json).

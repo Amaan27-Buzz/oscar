@@ -407,6 +407,12 @@ class Executive:
                 raise ValueError("typed step intent required") from None
             if not isinstance(intent.text, str) or not 1 <= len(intent.text) <= 4096:
                 raise ValueError("bounded step instruction required")
+            if intent.kind == "capability" and intent.capability_kind == "coding":
+                from .remote_machine import validate_remote_machine
+
+                if not isinstance(intent.parameters, dict):
+                    raise ValueError("typed coding parameters required")
+                validate_remote_machine("coding", intent.parameters)
             if any(
                 value is not None and not isinstance(value, str)
                 for value in (intent.kind, intent.path, intent.content, intent.capability_kind)

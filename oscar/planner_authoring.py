@@ -32,6 +32,25 @@ class PlannerAuthoring:
             examples.append(asdict(Intent("2 + 3")))
         elif kind == "file_write":
             examples.append(asdict(Intent("Save reviewed text", "file_write", "notes.txt", "Text")))
+        elif kind == "coding" and cap["id"] == "machine.agent.codex":
+            examples.append(
+                asdict(
+                    Intent(
+                        "Implement the requested repository change",
+                        "capability",
+                        capability_kind="coding",
+                        parameters={
+                            "arguments": [
+                                "exec",
+                                "Implement the requested change and run relevant checks.",
+                            ],
+                            "cwd": ".",
+                            "timeout": 120,
+                        },
+                        criterion={"kind": "unavailable"},
+                    )
+                )
+            )
         else:
             values = {
                 "path": "notes.txt",
@@ -94,6 +113,20 @@ class PlannerAuthoring:
             "kind": kind,
             "summary": cap["summary"],
             "intent_examples": examples,
+            **(
+                {
+                    "intent_rule": (
+                        "Use only this advertised installed Codex executor. arguments is an exact "
+                        "argv array. Host execution is trusted host authority, not a filesystem "
+                        "sandbox. Do not request credential enrollment, permission bypasses or "
+                        "unrequested publication. Process exit/output is only REPORTED. "
+                        "Use file_exact with literal path/content only when the objective supplies "
+                        "those exact expected bytes; never invent successful test evidence."
+                    )
+                }
+                if kind == "coding" and examples
+                else {}
+            ),
             **(
                 {
                     "intent_rule": "Addition intent text must be only A + B, "

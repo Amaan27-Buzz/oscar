@@ -1,0 +1,39 @@
+{
+  "status": "LOCAL_SIGNED_INSTALLED_CODEX_PLANNING_PATH_VERIFIED",
+  "base_head": "37d0604",
+  "tests": {
+    "total": 101,
+    "passed": 101,
+    "skipped": 0,
+    "seconds": 80.231,
+    "local_log": ".oscar/software-coding-planner-integrated-20261025.log",
+    "log_sha256": "6f8c274cb04edd64ec0ebc8752ea512a9526cb4e1c1adc531a8ca103a80d3a99"
+  },
+  "sources": {
+    "oscar/executive.py": "4dd3a422a49ee432990cc483f65122a504cd2675fd4dd4320fc2502ed6754eb5",
+    "oscar/planner_authoring.py": "d9793793656c268b3b6aa9a100f144257883fe249e758c426d5368d3ff94bb94",
+    "tests/test_conversation_planning.py": "447defc026378bb1f5688cd73aad2d574f543867b9993a4efd9585bc1fd201af",
+    "tests/test_windows_visual.py": "d31eb45444d5c7b7e664429c118636545ef8bd4cc122c6ad6e0f7a6749b3df26"
+  },
+  "scope": [
+    "Selected advertised machine.agent.codex is available to the existing reviewed planner",
+    "Synthetic HTTP model proposes exact argv to a real Python child standing in for the installed agent; no authenticated coding agent was launched",
+    "Signed Ask input/effect reviews, named Worker, independent exact-file inspection and one execution",
+    "Exact synthetic Full delegation runs without per-action review; revocation after planning prevents child launch",
+    "Malformed vectors/timeouts/unknown fields rejected before effect review",
+    "Successful process with unknown objective remains partially_verified"
+  ],
+  "native_diagnostic": {
+    "local_log": ".oscar/software-native-visual-diagnostics-20261025.log",
+    "total": 3,
+    "passed": 3,
+    "seconds": 7.656,
+    "scope": "Synthetic fixture retains unchanged child return/output for failure assertions only; production input guards unchanged; prior intermittent failure cause remains unproven"
+  },
+  "not_claimed": [
+    "Fresh authenticated Codex or other coding-provider interoperability",
+    "General arbitrary terminal planning",
+    "Independent remote coding artifact acceptance",
+    "Image-grounded adaptive computer execution or whole-product completion"
+  ]
+}

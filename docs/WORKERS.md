@@ -460,3 +460,28 @@ Running progress does not issue a second identical check. The remote cancellatio
 contract itself performs the authenticated check, avoiding two requests at every
 fence. Core's existing per-node admission limit remains unchanged. Rejection or
 an uncertain result never authorizes replay of an effect.
+
+## Installed coding executor planning — 2026-10-25
+
+The existing reviewed planner can now select an advertised `machine.agent.codex`
+on an explicitly chosen device. Its descriptor uses the installed CLI's observed
+`exec PROMPT` contract and an exact argument array. Executive validates coding
+parameters before accepting an effect plan. This does not enroll credentials or
+change the executor's current native permissions, environment, timeout or process
+supervision. Trusted host execution is not a filesystem sandbox.
+
+Signed Ask keeps both reviews. Current synthetic Full delegation covers the
+selected model and executor without per-action prompts; revocation after planning
+prevents execution. Process exit/output remains REPORTED. An exact reviewed file
+criterion is independently read when that authoritative filesystem is available;
+unknown objectives remain partially verified and do not complete a commitment.
+General remote coding artifact inspection and adaptive coding verification remain
+unfinished. Other coding CLIs retain existing explicit executor contracts; this
+change does not invent their argument syntax.
+
+The [receipt](evidence/software-completion/coding-planner-2026-10-25.json) records
+101 passing checks. New tests use synthetic HTTP model output and a real Python
+child standing in for the installed coding agent. No authenticated coding agent
+was launched during this continuation. The native visual fixture now retains
+actual child failure output for diagnosis; its three checks passed, without a
+claim to have explained the earlier intermittent failure.
