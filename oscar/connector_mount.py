@@ -23,11 +23,12 @@ if TYPE_CHECKING:
 
 @cache
 def account_manifests() -> tuple["ConnectorManifest", ...]:
-    from .connector_providers import load_google, microsoft_manifest
+    from .connector_providers import gitlab_manifest, load_google, microsoft_manifest
 
     return (
         *load_google(Path(__file__).resolve().parents[1] / "config/google-connectors.json"),
         microsoft_manifest(),
+        gitlab_manifest(),
     )
 
 

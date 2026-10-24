@@ -1,5 +1,13 @@
 # OSCAR — Current Status & Checklist
 
+**2026-10-25 GitLab integration:** selected GitLab.com accounts now support signed
+Desktop and phone/Core issue creation with independent project-local `iid`
+readback, project/issue reads, explicit visibility and bounded pagination.
+Synthetic signed OIDC/PKCE, refresh, revocation qualification and uncertain-effect
+no-replay checks pass. All 120 affected checks passed (91.222 s). Real account
+commissioning and broader adaptive workflows remain separate.
+[Receipt](evidence/software-completion/gitlab-2026-10-25.json).
+
 **2026-10-25 Meet integration:** signed native Desktop and phone/Core requests
 now create and independently read back restricted app-created Meet spaces under
 the selected account and exact scope. Synthetic signed OIDC/refresh/revocation,

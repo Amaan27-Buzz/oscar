@@ -1,0 +1,46 @@
+{
+  "status": "LOCAL_ACCOUNT_SCOPED_GITLAB_ISSUES_VERIFIED",
+  "base_head": "9ab7747",
+  "tests": {
+    "total": 120,
+    "passed": 120,
+    "skipped": 0,
+    "seconds": 91.222,
+    "local_log": ".oscar/software-gitlab-integration-final-20261025.log",
+    "log_sha256": "785a57899be5cc2275225680d174522e28b962f75a6ec8370962a0e1ba1745ee"
+  },
+  "sources": {
+    "config/oauth-providers.example.json": "5e372a406889bbd0e069b2d0f7f90814e763e470715bd77488c29f26c5902aeb",
+    "oscar/auth_broker.py": "9fbc95784cf3f28657eb7f595a901cf7908bc48d1cf860e22c313f3789affc59",
+    "oscar/communication.py": "830d77c855a393094d6962ae781e9f0d31c6ed987627115c8262b4232268ec1c",
+    "oscar/connector_mount.py": "d705dcde79fd05191de0d68d50e9964694f66146edb1d1b5c7d83021713a45a3",
+    "oscar/connector_providers.py": "6a7730432fbf6675b15d4abe074c7c34bc3ad5293722c874a7e92e7ebbc3c0b1",
+    "oscar/connectors.py": "34b24073314e4cd669dd517e64eb2c86e9a0769ea0b020ed2c5e3b03033d6cd1",
+    "tests/test_auth_broker.py": "0269386f123983ea1257028550ef0a817305ed69516714ac7547af306c28a2f4",
+    "tests/test_communication.py": "abe2ac1e42c288c181bc5821226d34230c475556b293fa95d5dc3f0d5df45430",
+    "tests/test_connectors.py": "0b4a75a096738d86b5a80af78ffa1b6a3ab35ba81de957b5fb870cdda389e422"
+  },
+  "scope": [
+    "Synthetic signed OIDC/PKCE exact issuer/audience/nonce, account binding, refresh and local/provider revocation qualification",
+    "Signed Desktop and phone/Core actual loopback HTTP issue creation and independent project-local integer iid readback",
+    "Read-only read_api or api scope; writes require api and communication authority",
+    "Exact title/body/project/visibility/state verification; malformed IID and account/scope/generation fail closed",
+    "Stored effect followed by HTTP503 remains uncertain and is never replayed",
+    "Bounded explicit pagination preserves unknown coverage for missing or invalid X-Next-Page; no automatic following",
+    "Private provider output remains requester-scoped"
+  ],
+  "official_contracts": [
+    "https://gitlab.com/.well-known/openid-configuration",
+    "https://docs.gitlab.com/integration/openid_connect_provider/",
+    "https://docs.gitlab.com/api/oauth2/",
+    "https://docs.gitlab.com/api/issues/",
+    "https://docs.gitlab.com/api/rest/authentication/"
+  ],
+  "not_claimed": [
+    "Real GitLab account/provider interoperability",
+    "Self-hosted GitLab, pipelines, merge requests or repository mutation",
+    "Independent verification of provider revocation acknowledgement",
+    "Complete adaptive account workflow or whole-product completion"
+  ],
+  "qualification": "120 focused checks qualify these sources; full aggregate remains to be rerun. Initial 120-case run had one non-GitLab mock compatibility error; fixed by limiting GitLab pagination header access to GitLab responses."
+}

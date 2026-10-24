@@ -44,6 +44,7 @@ class Provider:
         self.requests = []
         self.after_get, self.tamper, self.fail = None, False, False
         self.transform = None
+        self.response_headers = {}
         self.fail_after_post = False
         owner = self
 
@@ -84,6 +85,15 @@ class Provider:
                         read_path = path + "/synthetic-resource"
                     if path == "/v2/spaces":
                         read_path = "/v2/spaces/SyntheticSpace"
+                    if path.startswith("/api/v4/projects/") and path.endswith("/issues"):
+                        result = {
+                            "id": 9001,
+                            "iid": 7,
+                            "project_id": int(path.split("/")[4]),
+                            "state": "opened",
+                            **body,
+                        }
+                        read_path = path + "/7"
                     if path == "/v1.0/me/messages":
                         result["isDraft"] = True
                     owner.resources[read_path] = result
@@ -115,6 +125,8 @@ class Provider:
                 self.send_response(200)
                 self.send_header("Content-Type", "application/json")
                 self.send_header("Content-Length", str(len(raw)))
+                for key, value in owner.response_headers.items():
+                    self.send_header(key, value)
                 self.end_headers()
                 self.wfile.write(raw)
 
@@ -167,7 +179,7 @@ class CommunicationTests(unittest.TestCase):
         patched.start()
         self.addCleanup(patched.stop)
         self.accounts = {}
-        for provider, alias in (("google", "Google"), ("microsoft", "Work")):
+        for provider, alias in (("google", "Google"), ("microsoft", "Work"), ("gitlab", "Code")):
             account = self.h.accounts.add(provider, "fixture", alias, alias, verified=True)
             for manifest in account_manifests():
                 if manifest.provider != provider or manifest.id not in {
@@ -177,6 +189,7 @@ class CommunicationTests(unittest.TestCase):
                     "google.contacts",
                     "google.meet",
                     "microsoft.graph",
+                    "gitlab.api",
                 }:
                     continue
                 reference = (alias + manifest.id).lower()
@@ -262,6 +275,151 @@ class CommunicationTests(unittest.TestCase):
         result = self.call("complete", signed)
         self.assertNotIn("retry", result["actions"])
         return result
+
+    def test_gitlab_issue_signed_exact_review_and_project_local_readback(self):
+        instruction = (
+            'create gitlab issue using Code in project 51 titled "Issue" '
+            'body "Private marker" visibility confidential'
+        )
+        view = self.ask(instruction)
+        self.assertEqual("planned", view["state"], view)
+        self.assertEqual([], self.provider.calls)
+        review, signed = self.approval(view["task_id"])
+        parameters = json.loads(review["review"])["parameters"]
+        self.assertEqual({"project": "51"}, parameters["path"])
+        self.assertIs(True, parameters["body"]["confidential"])
+        result = self.call("complete", signed)
+        self.assertEqual("verified", result["state"], result)
+        self.assertEqual(
+            [("POST", "/api/v4/projects/51/issues"), ("GET", "/api/v4/projects/51/issues/7")],
+            [(method, path) for method, path, _ in self.provider.calls],
+        )
+        resource = self.provider.resources["/api/v4/projects/51/issues/7"]
+        self.assertNotEqual(resource["id"], resource["iid"])
+        read = self.execute("read gitlab issue 7 using Code in project 51")
+        self.assertEqual("partially_verified", read["state"])
+        self.assertIn("Private marker", read["response"])
+        self.assertEqual("REPORTED", read["response_status"])
+
+    def test_gitlab_reads_accept_read_api_without_api_or_mutation_authority(self):
+        account = self.accounts["Code"]
+        binding = account.services["gitlab.api"]
+        self.h.accounts.bind(
+            account.id,
+            "gitlab.api",
+            CredentialRef(binding.credential_ref),
+            {"openid", "read_api"},
+            "https://gitlab.com",
+        )
+        self.mount.refresh()
+        for instruction in (
+            "list gitlab projects using Code",
+            "list gitlab issues using Code in project 51",
+            "read gitlab issue 7 using Code in project 51",
+        ):
+            result = self.execute(instruction)
+            self.assertEqual("partially_verified", result["state"], result)
+            self.assertEqual("GET", self.provider.calls[-1][0])
+        prepared = prepare(self.h, "list gitlab issues using Code in project 51")
+        self.assertEqual(
+            {"state": "opened", "per_page": 10, "page": 1}, prepared.review["parameters"]["query"]
+        )
+        with self.assertRaises((ValueError, PermissionError)):
+            prepare(
+                self.h,
+                'create gitlab issue using Code in project 51 titled "Issue" '
+                'body "Text" visibility project',
+            )
+        self.assertTrue(all(method == "GET" for method, _, _ in self.provider.calls))
+
+    def test_gitlab_pagination_is_explicit_unknown_or_bounded_without_following_links(self):
+        self.provider.resources["/api/v4/projects/51/issues"] = [{"id": 9001, "iid": 7}]
+        for header, expected in (
+            ("2", {"next_page": 2, "complete": False}),
+            ("", {"next_page": None, "complete": True}),
+            (None, {"next_page": None, "complete": None}),
+            ("https://other.example/", {"next_page": None, "complete": None}),
+            ("0", {"next_page": None, "complete": None}),
+        ):
+            with self.subTest(header=header):
+                self.provider.response_headers = {} if header is None else {"X-Next-Page": header}
+                before = len(self.provider.calls)
+                result = self.execute("list gitlab issues using Code in project 51 page 2")
+                self.assertEqual("partially_verified", result["state"])
+                self.assertEqual(expected, json.loads(result["response"])["pagination"])
+                self.assertEqual(1, len(self.provider.calls) - before)
+                query = parse_qs(urlsplit(self.provider.requests[-1][0]).query)
+                self.assertEqual(["2"], query["page"])
+                self.assertEqual(["10"], query["per_page"])
+
+    def test_gitlab_readback_requires_typed_iid_project_fields_and_visibility(self):
+        for change in (
+            {"iid": 8},
+            {"iid": True},
+            {"iid": "7"},
+            {"project_id": 52},
+            {"project_id": True},
+            {"title": "Other"},
+            {"description": "Other"},
+            {"confidential": False},
+            {"state": "closed"},
+        ):
+            with self.subTest(change=change):
+                self.provider.transform = lambda method, value, change=change: (
+                    {**value, **change} if method == "GET" else value
+                )
+                result = self.execute(
+                    'create gitlab issue using Code in project 51 titled "Issue" '
+                    'body "Text" visibility confidential'
+                )
+                self.assertEqual("failed", result["state"], result)
+
+    def test_gitlab_malformed_mutation_iid_never_selects_another_resource(self):
+        for iid in (None, True, 0, -1, "7", "../7", 2**63):
+            with self.subTest(iid=iid):
+                self.provider.transform = lambda method, value, iid=iid: {**value, "iid": iid}
+                before = len(self.provider.calls)
+                result = self.execute(
+                    'create gitlab issue using Code in project 51 titled "Issue" '
+                    'body "Text" visibility project'
+                )
+                self.assertNotEqual("verified", result["state"])
+                self.assertEqual(1, len(self.provider.calls) - before)
+
+    def test_gitlab_uncertain_saved_issue_is_not_replayed(self):
+        self.provider.fail_after_post = True
+        view = self.ask(
+            'create gitlab issue using Code in project 51 titled "Issue" '
+            'body "Text" visibility project'
+        )
+        _, signed = self.approval(view["task_id"])
+        self.assertNotEqual("verified", self.call("complete", signed)["state"])
+        self.assertIn("/api/v4/projects/51/issues/7", self.provider.resources)
+        self.h.runtime.run(view["task_id"], self.h.executive.targets)
+        with self.assertRaises((PermissionError, StateConflict)):
+            self.call("complete", signed)
+        self.assertEqual(1, len(self.provider.calls))
+
+    def test_gitlab_bad_account_or_resource_fields_have_no_effect(self):
+        for instruction in (
+            'create gitlab issue using Google in project 51 titled "Issue" '
+            'body "Text" visibility project',
+            'create gitlab issue using Code in project ../51 titled "Issue" '
+            'body "Text" visibility project',
+            'create gitlab issue using Code in project 0 titled "Issue" '
+            'body "Text" visibility project',
+            'create gitlab issue using Code in project 51 titled "Bad\\nTitle" '
+            'body "Text" visibility project',
+            'create gitlab issue using Code in project 51 titled "Issue" body "Text"',
+            "read gitlab issue ../7 using Code in project 51",
+        ):
+            with (
+                self.subTest(instruction=instruction),
+                self.assertRaises((ValueError, PermissionError)),
+            ):
+                prepare(self.h, instruction)
+        self.assertEqual([], self.provider.calls)
+        self.assertEqual({}, self.h.connectors.requests)
 
     def test_meet_signed_creation_and_read_use_correlated_resource_name(self):
         view = self.ask("create meet space using Google access restricted")
@@ -886,9 +1044,10 @@ class CommunicationTests(unittest.TestCase):
         )
         self.addCleanup(core.close)
         core.harness.connectors.secrets = VaultResolver(self.vault)
-        provider, alias = (
-            ("google", "Google") if service == "google.meet" else ("microsoft", "Work")
-        )
+        provider, alias = {
+            "google.meet": ("google", "Google"),
+            "gitlab.api": ("gitlab", "Code"),
+        }.get(service, ("microsoft", "Work"))
         account = core.harness.accounts.add(provider, "fixture", alias, alias, verified=True)
         manifest = next(m for m in account_manifests() if m.id == service)
         self.cloud_account = core.harness.accounts.bind(
@@ -917,6 +1076,13 @@ class CommunicationTests(unittest.TestCase):
     def test_cloud_meet_creation_actual_http_signature_resource_name_and_private_output(self):
         self.check_cloud_native_request(
             "create meet space using Google access restricted", service="google.meet"
+        )
+
+    def test_cloud_gitlab_issue_actual_http_signature_iid_and_private_output(self):
+        self.check_cloud_native_request(
+            'create gitlab issue using Code in project 51 titled "Issue" '
+            'body "Private marker" visibility confidential',
+            service="gitlab.api",
         )
 
     def check_cloud_native_request(self, instruction, service="microsoft.graph"):

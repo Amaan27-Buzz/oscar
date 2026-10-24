@@ -92,7 +92,7 @@ partial and open acceptance separately.
 | Microsoft Outlook / Calendar / To Do | Bounded account-bound mail/event/task operations with synthetic HTTP/Cloud proof; sendMail 202 remains PARTIAL without a correlated resource |
 | OneDrive / Teams / SharePoint | Thin admitted read contracts; real tenant consent/provider workflows uncommissioned; not full application coverage |
 | GitHub / Git | Existing scoped Git/native commands and HTTPS API subset; historical narrow GitHub device-OAuth private-read evidence is not a new live/write claim. CI/CD mutation and broad issue/PR lifecycle are not fully accepted |
-| GitLab | Configurable MCP/browser transport exists; no dedicated accepted GitLab integration established here |
+| GitLab | LOCAL signed Desktop and phone/Core account-scoped issue create/read/list and project reads; exact iid/readback, synthetic OIDC/refresh/revocation and uncertain-effect checks. Real GitLab commissioning and broader workflows remain OPEN. [Receipt](../evidence/software-completion/gitlab-2026-10-25.json) |
 | Slack / Notion | Existing bounded HTTP adapter subsets; not live-account accepted. Discord and arbitrary messaging are not implied |
 | Local notes / Obsidian | Scoped file execution/readback; no claim of controlling the actual Obsidian GUI or every vault format |
 | Oracle / Vercel / Cloudflare / Supabase | Core packaging and generic executor/MCP paths are available; no commissioned cloud service or complete provider-specific workflow accepted here |
@@ -343,7 +343,7 @@ substitution or broad model-reliability claim.
 The complete software mandate remains in progress. Major executable gaps are
 image-grounded model/computer control, broader cross-application and account
 reasoning, Chief-of-Staff prioritization/replanning/daily-use acceptance, requested
-service-specific integrations (including Meet, GitLab, Discord and creative/cloud
+broader service-specific workflows (including Discord and creative/cloud
 workflows), unsupported MCP automatic authorization lifecycle paths and newest
 native accessibility/rendered/end-to-end acceptance. Model quality remains
 bounded despite successful typed examples. These are not all credential blockers.

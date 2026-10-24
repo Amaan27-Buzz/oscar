@@ -208,6 +208,12 @@ class ConnectorTests(unittest.TestCase):
         for prefix in ("", "../", "spaces/nested/", "/spaces/", "https://other/", 7, []):
             with self.subTest(prefix=prefix), self.assertRaises(ValueError):
                 replace(create, resource_name_prefix=prefix)
+        for field in ("iid", "name", [], 7):
+            with self.subTest(field=field), self.assertRaises(ValueError):
+                replace(create, resource_id_field=field)
+        for scopes in (["api"], ("",), (7,), ("read api",)):
+            with self.subTest(scopes=scopes), self.assertRaises(ValueError):
+                replace(create, any_scopes=scopes)
 
     def test_each_google_endpoint_contract(self):
         for manifest in load_google(ROOT / "config/google-connectors.json"):

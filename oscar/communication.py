@@ -53,7 +53,7 @@ def prepare(harness: "Harness", text: str) -> PreparedCommunication | None:
     if not re.match(
         r"(?:(?:draft|send|list|read) email\b|create calendar event\b|"
         r"create task\b|list task lists\b|list tasks\b|list contacts\b|read contact\b|"
-        r"create meet space\b|read meet space\b)",
+        r"create meet space\b|read meet space\b|(?:create|read|list) gitlab (?:issue|project))",
         request,
         re.IGNORECASE,
     ):
@@ -104,6 +104,28 @@ def prepare(harness: "Harness", text: str) -> PreparedCommunication | None:
     meet_read = re.fullmatch(
         r"read meet space ([A-Za-z0-9_-]{1,128}) using (\S+)", request, re.IGNORECASE
     )
+    gitlab_create = re.fullmatch(
+        r"create gitlab issue using (\S+) in project ([1-9][0-9]{0,17}) titled "
+        + quoted
+        + " body "
+        + quoted
+        + r" visibility (project|confidential)",
+        request,
+        re.IGNORECASE,
+    )
+    gitlab_read = re.fullmatch(
+        r"read gitlab issue ([1-9][0-9]{0,17}) using (\S+) in project ([1-9][0-9]{0,17})",
+        request,
+        re.IGNORECASE,
+    )
+    gitlab_list = re.fullmatch(
+        r"list gitlab issues using (\S+) in project ([1-9][0-9]{0,17})(?: page ([1-9][0-9]{0,4}))?",
+        request,
+        re.IGNORECASE,
+    )
+    gitlab_projects = re.fullmatch(
+        r"list gitlab projects using (\S+)(?: page ([1-9][0-9]{0,4}))?", request, re.IGNORECASE
+    )
     if not any(
         (
             mail,
@@ -117,13 +139,22 @@ def prepare(harness: "Harness", text: str) -> PreparedCommunication | None:
             contact,
             meet_create,
             meet_read,
+            gitlab_create,
+            gitlab_read,
+            gitlab_list,
+            gitlab_projects,
         )
     ):
         raise ValueError(
             "Specify account and exact mail fields, event offset times, "
             "task list/title/date/notes, contact ID, or restricted Meet space"
         )
-    if meet_create:
+    gitlab = gitlab_create or gitlab_read or gitlab_list or gitlab_projects
+    if gitlab_read:
+        alias = gitlab_read[2]
+    elif gitlab:
+        alias = gitlab[1]
+    elif meet_create:
         alias = meet_create[1]
     elif meet_read:
         alias = meet_read[2]
@@ -148,16 +179,55 @@ def prepare(harness: "Harness", text: str) -> PreparedCommunication | None:
         for a in harness.accounts.list_accounts()
         if a.status == "connected"
         and (a.id == alias or a.alias == alias)
-        and a.provider in {"google", "microsoft"}
+        and a.provider in {"google", "microsoft", "gitlab"}
     ]
     if len(accounts) != 1:
         raise ValueError("select an unambiguous connected account ID or alias")
     account = accounts[0]
+    if (account.provider == "gitlab") != bool(gitlab):
+        raise ValueError("GitLab requests require the selected connected GitLab account")
     google = account.provider == "google"
     prefix = "google.gmail" if google else "microsoft.mail"
     parameters: dict[str, Any] = {"path": {"userId": "me"}} if google else {"path": {}}
     expected: dict[str, Any] = {}
-    if meet_create or meet_read:
+    if gitlab:
+        parameters = {"path": {}}
+        if gitlab_projects:
+            name = "gitlab.projects.list"
+            parameters["query"] = {
+                "membership": True,
+                "per_page": 10,
+                "page": int(gitlab_projects[2] or 1),
+            }
+        else:
+            project = gitlab_read[3] if gitlab_read else gitlab[2]
+            parameters["path"]["project"] = project
+            if gitlab_create:
+                title, description = json.loads(gitlab_create[3]), json.loads(gitlab_create[4])
+                if not title or len(title) > 200 or any(ord(c) < 32 for c in title):
+                    raise ValueError("single-line bounded issue title required")
+                if len(description) > 3000 or "\x00" in description or "\r" in description:
+                    raise ValueError("bounded issue body with LF line endings required")
+                confidential = gitlab_create[5].lower() == "confidential"
+                parameters["body"] = {
+                    "title": title,
+                    "description": description,
+                    "confidential": confidential,
+                }
+                expected = {**parameters["body"], "project_id": int(project)}
+                name = "gitlab.issues.create"
+            elif gitlab_read:
+                name = "gitlab.issues.get"
+                parameters["path"]["issue"] = gitlab_read[1]
+            else:
+                name = "gitlab.issues.list"
+                assert gitlab_list is not None
+                parameters["query"] = {
+                    "state": "opened",
+                    "per_page": 10,
+                    "page": int(gitlab_list[3] or 1),
+                }
+    elif meet_create or meet_read:
         if not google:
             raise ValueError("Meet requires the selected connected Google account")
         name = "google.meet." + ("create" if meet_create else "get")
@@ -337,6 +407,15 @@ def prepare(harness: "Harness", text: str) -> PreparedCommunication | None:
 
 def matches(name: str, payload: dict[str, Any], expected: dict[str, Any]) -> bool:
     """Prove the saved provider resource, never delivery to another person's inbox."""
+    if name == "gitlab.issues.create":
+        return bool(
+            payload.get("title") == expected["title"]
+            and payload.get("description", "") == expected["description"]
+            and payload.get("confidential") is expected["confidential"]
+            and type(payload.get("project_id")) is int
+            and payload["project_id"] == expected["project_id"]
+            and payload.get("state") == "opened"
+        )
     if name == "google.meet.create":
         code = payload.get("meetingCode")
         config = payload.get("config")

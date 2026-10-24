@@ -48,6 +48,16 @@
       "allowed_scopes": [
         "files:read"
       ]
+    },
+    {
+      "provider": "gitlab",
+      "client_id": "REPLACE_WITH_REGISTERED_NATIVE_CLIENT_ID",
+      "redirect_uri": "http://127.0.0.1:48126/oauth/callback",
+      "allowed_scopes": [
+        "openid",
+        "api",
+        "read_api"
+      ]
     }
   ]
 }

@@ -51,6 +51,7 @@ class OAuthFixture:
         self.error = None
         self.scopes = None
         self.calls = []
+        self.revocations = []
         self.refreshes = 0
         self.before_response = None
         self.omit_refresh = False
@@ -79,6 +80,10 @@ class OAuthFixture:
 
             def do_POST(self):
                 data = parse_qs(self.rfile.read(int(self.headers["Content-Length"])).decode())
+                if self.path == "/revoke":
+                    fixture.revocations.append(data)
+                    self.respond({"error": fixture.error} if fixture.error else {})
+                    return
                 fixture.calls.append(data["grant_type"][0])
                 if fixture.error:
                     self.respond({"error": fixture.error})
@@ -150,7 +155,9 @@ class OAuthFixture:
     def request(self, official_url, fields):
         # Only the fixture transport redirects fixed provider endpoints to this isolated server.
         request = Request(
-            "http://127.0.0.1:" + str(self.server.server_port) + "/fixture",
+            "http://127.0.0.1:"
+            + str(self.server.server_port)
+            + ("/revoke" if official_url.endswith("/oauth/revoke") else "/fixture"),
             data=urlencode(fields).encode() if fields is not None else None,
         )
         with urlopen(request, timeout=3) as response:
@@ -279,6 +286,71 @@ class AuthBrokerTests(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             self.complete(begin)
         self.assertEqual([], self.accounts.list_accounts())
+
+    def gitlab_begin(self):
+        from oscar.auth_broker import load_providers
+
+        configured = next(
+            p
+            for p in load_providers(Path("config/oauth-providers.example.json"))
+            if p.provider == "gitlab"
+        )
+        self.provider = replace(configured, client_id="synthetic-gitlab-client")
+        self.broker = self.make_broker()
+        begin = self.broker.begin(
+            self.provider.id, frozenset({"api"}), owner_authorized=True, alias="Code"
+        )
+        self.fixture.expected = parse_qs(urlparse(begin["url"]).query)
+        return begin
+
+    def test_gitlab_oidc_pkce_refresh_and_provider_revocation_receipt(self):
+        begin = self.gitlab_begin()
+        self.assertEqual("https://gitlab.com/oauth/discovery/keys", self.provider.jwks_uri)
+        self.assertEqual(["S256"], self.fixture.expected["code_challenge_method"])
+        account = self.complete(begin)
+        self.assertEqual("gitlab", account.provider)
+        self.assertEqual("gitlab", account.tenant)
+        self.assertEqual("synthetic-subject", account.subject)
+        self.assertEqual({"gitlab.api"}, set(account.services))
+        self.assertEqual({"openid", "api"}, set(account.services["gitlab.api"].scopes))
+        current = self.broker.refresh(begin["id"], owner_authorized=True)
+        self.assertGreater(current.generation, account.generation)
+        self.broker.disconnect(account.id, owner_authorized=True)
+        current = self.accounts.get(account.id)
+        self.assertEqual("disconnected", current.status)
+        self.assertEqual("PROVIDER_ACCEPTED_NOT_INDEPENDENTLY_VERIFIED", current.remote_revocation)
+        self.assertEqual("deleted", current.local_credentials)
+        self.assertEqual(
+            [{"client_id": ["synthetic-gitlab-client"], "token": ["synthetic-refresh"]}],
+            self.fixture.revocations,
+        )
+        self.assertEqual({}, self.vault.values)
+
+    def test_gitlab_identity_does_not_accept_google_issuer_wrong_audience_or_nonce(self):
+        for changes in (
+            {"iss": "https://accounts.google.com"},
+            {"aud": "other-client"},
+            {"nonce": "foreign"},
+            {"exp": 999},
+        ):
+            with self.subTest(changes=changes):
+                begin = self.gitlab_begin()
+                self.fixture.changes = changes
+                with self.assertRaises((PermissionError, RuntimeError)):
+                    self.complete(begin)
+                self.assertEqual([], self.accounts.list_accounts())
+        self.assertEqual([], self.fixture.revocations)
+
+    def test_gitlab_failed_remote_revocation_keeps_unknown_and_deletes_local_credentials(self):
+        begin = self.gitlab_begin()
+        account = self.complete(begin)
+        self.fixture.error = "temporarily_unavailable"
+        self.broker.disconnect(account.id, owner_authorized=True)
+        current = self.accounts.get(account.id)
+        self.assertEqual("disconnected", current.status)
+        self.assertEqual("UNKNOWN_OWNER_ACTION_REQUIRED", current.remote_revocation)
+        self.assertEqual("deleted", current.local_credentials)
+        self.assertEqual({}, self.vault.values)
 
     def test_meet_registered_scope_signed_oidc_refresh_and_local_revocation(self):
         from oscar.auth_broker import load_providers

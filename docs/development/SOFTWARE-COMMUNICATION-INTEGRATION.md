@@ -255,3 +255,45 @@ The [source-scoped receipt](../evidence/software-completion/meet-2026-10-25.json
 records the final checks. No real Google enrollment, meeting, participant access,
 invitation, call, recording or recipient delivery is claimed. Broader meeting
 participation and adaptive account/application workflows remain unfinished.
+
+## GitLab.com account-bound issues — 2026-10-25
+
+The configured broker verifies signed OIDC identity with PKCE and binds the
+selected account to `gitlab.api`. Native Connections lists configured providers
+on Desktop and Android. No personal access token or arbitrary provider endpoint
+is inferred. The example configuration grants nothing by itself.
+
+```text
+create gitlab issue using ACCOUNT in project NUMERIC-ID titled "TITLE" body "BODY" visibility project
+create gitlab issue using ACCOUNT in project NUMERIC-ID titled "TITLE" body "BODY" visibility confidential
+read gitlab issue IID using ACCOUNT in project NUMERIC-ID
+list gitlab issues using ACCOUNT in project NUMERIC-ID [page N]
+list gitlab projects using ACCOUNT [page N]
+```
+
+Reads require either `read_api` or `api`; writes require `api` and Core
+communication authority. Signed Ask or current standing delegation still applies.
+Project visibility is explicit, and an issue may notify project participants.
+Creation is independently read back using the exact positive integer project-local
+`iid`, never the global issue `id`. Project, title, body, confidential flag and
+opened state must match. Wrong identities/types, missing grants and rotated
+account generations fail closed. A stored effect followed by an HTTP error is
+uncertain and never replayed. Provider bodies remain transient and private.
+
+Each list page is limited to ten items. The explicit next-page header provides
+coverage; missing or malformed pagination leaves coverage UNKNOWN. No provider
+URL is followed automatically. GitLab revocation's documented empty-object
+acknowledgement is recorded as accepted, not independently verified. Local
+credential deletion remains independent and remote rejection remains UNKNOWN.
+
+Official contracts: [OIDC discovery](https://gitlab.com/.well-known/openid-configuration),
+[OIDC identity](https://docs.gitlab.com/integration/openid_connect_provider/),
+[OAuth/PKCE/revocation](https://docs.gitlab.com/api/oauth2/),
+[issue identity and fields](https://docs.gitlab.com/api/issues/), and
+[API authentication](https://docs.gitlab.com/api/rest/authentication/).
+
+The [source-scoped receipt](../evidence/software-completion/gitlab-2026-10-25.json)
+records 120 passing checks with synthetic signed identity and actual loopback HTTP,
+including signed Desktop and phone/Core requests. No real enrollment, GitLab
+mutation, self-hosted instance, pipeline, merge request or general account-agent
+acceptance is claimed.

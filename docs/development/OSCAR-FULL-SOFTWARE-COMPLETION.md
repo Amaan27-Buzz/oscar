@@ -591,3 +591,10 @@ resource-name checks, private output and uncertain-effect no-replay cases pass.
 All 95 affected checks passed (68.207 s). Real Google enrollment, calls/media and
 broad adaptive account workflows remain separate. [Receipt](../evidence/software-completion/meet-2026-10-25.json).
 
+**2026-10-25 GitLab integration:** selected GitLab.com accounts now support signed
+Desktop and phone/Core issue creation with independent project-local `iid`
+readback, project/issue reads, explicit visibility and bounded pagination.
+Synthetic signed OIDC/PKCE, refresh, revocation qualification and uncertain-effect
+no-replay checks pass. All 120 affected checks passed (91.222 s). Real account
+commissioning and broader adaptive workflows remain separate.
+[Receipt](../evidence/software-completion/gitlab-2026-10-25.json).

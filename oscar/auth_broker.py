@@ -110,6 +110,8 @@ def load_providers(path: Path) -> list[OAuthProvider | MCPProvider]:
             provider = google_provider(**values)
         elif entry["provider"] == "microsoft":
             provider = microsoft_provider(**values)
+        elif entry["provider"] == "gitlab":
+            provider = gitlab_provider(**values)
         else:
             raise ValueError("unsupported verified identity provider")
         result.append(replace(provider, allowed_scopes=tuple(entry["allowed_scopes"])))
@@ -163,6 +165,27 @@ def microsoft_provider(
         service,
         "https://graph.microsoft.com",
         tenant,
+    )
+
+
+def gitlab_provider(
+    client_id: str,
+    redirect_uri: str,
+    *,
+    client_secret_ref: str | None = None,
+) -> OAuthProvider:
+    return OAuthProvider(
+        "gitlab:gitlab.api",
+        "gitlab",
+        client_id,
+        redirect_uri,
+        "https://gitlab.com/oauth/authorize",
+        "https://gitlab.com/oauth/token",
+        "https://gitlab.com/oauth/discovery/keys",
+        "https://gitlab.com",
+        "gitlab.api",
+        "https://gitlab.com",
+        client_secret_ref=client_secret_ref,
     )
 
 
@@ -350,8 +373,9 @@ class AuthBroker:
             "nonce": nonce,
             "code_challenge": challenge,
             "code_challenge_method": "S256",
-            "prompt": "select_account",
         }
+        if provider.provider in {"google", "microsoft"}:
+            fields["prompt"] = "select_account"
         if provider.provider == "google":
             fields["access_type"] = "offline"
         return {
@@ -424,7 +448,7 @@ class AuthBroker:
             ):
                 raise ValueError
             subject = self.accounts._text(claims["sub"])
-            tenant = "google"
+            tenant = provider.provider
             if provider.provider == "microsoft":
                 if claims["tid"] != provider.tenant:
                     raise ValueError
@@ -758,14 +782,23 @@ class AuthBroker:
             accepted = False
             for connection in connections:
                 provider = self.providers.get(connection.get("provider_id", ""))
-                if provider and provider.provider == "google" and connection["state"] == "ready":
+                if (
+                    isinstance(provider, OAuthProvider)
+                    and provider.provider in {"google", "gitlab"}
+                    and connection["state"] == "ready"
+                ):
                     reference = connection["refresh_ref"] or connection["credential_ref"]
                     try:
-                        accepted = (
-                            self.revoke_google(self.vault.read(reference, allow_expired=True).value)
-                            or accepted
-                        )
-                    except (KeyError, OSError, PermissionError):
+                        token = self.vault.read(reference, allow_expired=True).value
+                        if provider.provider == "google":
+                            accepted = self.revoke_google(token) or accepted
+                        else:
+                            response = self.request(
+                                "https://gitlab.com/oauth/revoke",
+                                {**self._token_fields(provider), "token": token},
+                            )
+                            accepted = response == {} or accepted
+                    except (KeyError, OSError, PermissionError, RuntimeError):
                         pass
             if accepted:
                 self.accounts.remote_revocation(

@@ -135,6 +135,8 @@ class ConnectorCapability:
     consequences: tuple[RiskLevel, ...] = ()
     communication_trigger: str | None = None
     resource_name_prefix: str | None = None
+    resource_id_field: str = "id"
+    any_scopes: tuple[str, ...] = ()
 
     @property
     def permissions(self) -> tuple[str, ...]:
@@ -182,6 +184,21 @@ class ConnectorCapability:
             raise ValueError("single resource collection prefix required")
         if not math.isfinite(self.freshness_seconds) or self.freshness_seconds < 0:
             raise ValueError("invalid freshness")
+        if (
+            not isinstance(self.resource_id_field, str)
+            or self.resource_id_field not in {"id", "iid"}
+            or (self.resource_id_field != "id" and self.resource_name_prefix is not None)
+        ):
+            raise ValueError("one declared resource identity convention required")
+        if (
+            not isinstance(self.any_scopes, tuple)
+            or len(self.any_scopes) > 8
+            or any(
+                not isinstance(s, str) or not 1 <= len(s) <= 500 or any(c.isspace() for c in s)
+                for s in self.any_scopes
+            )
+        ):
+            raise ValueError("bounded explicit alternative scopes required")
 
 
 @dataclass(frozen=True)
@@ -330,6 +347,9 @@ class HTTPSConnector:
         try:
             with build_opener(NoRedirects()).open(request, timeout=self.timeout) as response:
                 raw = response.read(2_000_001)
+                next_page = (
+                    response.headers.get("X-Next-Page") if manifest.provider == "gitlab" else None
+                )
             if len(raw) > 2_000_000:
                 raise ConnectorError("response_bound")
             if spec.response_kind == "bytes":
@@ -338,6 +358,14 @@ class HTTPSConnector:
                 payload = json.loads(raw) if raw else {}
             if isinstance(payload, list):
                 payload = {"items": payload}
+                if manifest.provider == "gitlab":
+                    valid_page = isinstance(next_page, str) and (
+                        next_page == "" or re.fullmatch(r"[1-9][0-9]{0,4}", next_page)
+                    )
+                    payload["pagination"] = {
+                        "next_page": int(next_page) if valid_page and next_page else None,
+                        "complete": next_page == "" if valid_page else None,
+                    }
             if not isinstance(payload, dict):
                 raise ConnectorError("invalid_contract")
             if payload.get("ok") is False or payload.get("error"):
@@ -489,7 +517,9 @@ class ConnectorFabric:
             instance.credential is None or not self.secrets.resolve(instance.credential)
         ):
             return ConnectionState.AUTH_MISSING
-        if not set(spec.scopes) <= instance.granted_scopes:
+        if not set(spec.scopes) <= instance.granted_scopes or (
+            spec.any_scopes and not set(spec.any_scopes) & instance.granted_scopes
+        ):
             return ConnectionState.SCOPE_MISSING
         return ConnectionState.READY
 
@@ -893,9 +923,13 @@ class ConnectorVerifier(Verifier):
             if not criterion.get("expected") or not outcome.result.success:
                 raise ConnectorError("completion_fields_missing")
             # Correlate the requested resource with the actual mutation response.
-            response_id = outcome.payload.get("id")
-            identity_field = "id"
+            identity_field = mutation.resource_id_field
+            response_id = outcome.payload.get(identity_field)
             response_identity = response_id
+            if identity_field == "iid":
+                if type(response_id) is not int or not 1 <= response_id < 2**63:
+                    raise ConnectorError("readback_resource_mismatch")
+                response_id = str(response_id)
             if mutation.resource_name_prefix:
                 identity_field = "name"
                 response_identity = outcome.payload.get("name")
@@ -958,18 +992,20 @@ class ConnectorVerifier(Verifier):
             cancellation = Cancellation(self.fabric.store, result.task_id, authorize_readback)
             cancellation.check()
             payload, _ = self.fabric._request(instance, read, params, cancellation)
+            identity_matches = (
+                type(payload.get(identity_field)) is type(response_identity)
+                and payload.get(identity_field) == response_identity
+            )
             if communication:
                 from .communication import matches as communication_matches
 
                 if criterion["operation"] != mutation.name:
                     raise ConnectorError("readback_operation_mismatch")
-                matches = payload.get(
-                    identity_field
-                ) == response_identity and communication_matches(
+                matches = identity_matches and communication_matches(
                     mutation.name, payload, criterion["expected"]
                 )
             else:
-                matches = payload.get(identity_field) == response_identity and all(
+                matches = identity_matches and all(
                     payload.get(k) == v for k, v in criterion["expected"].items()
                 )
             detail = "expected fields match" if matches else "read-back fields differ"

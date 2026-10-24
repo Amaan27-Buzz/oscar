@@ -68,6 +68,7 @@ def _cap(
     consequences: tuple[RiskLevel, ...] = (),
     communication_trigger: str | None = None,
     readback: str | None = None,
+    any_scopes: tuple[str, ...] = (),
 ) -> ConnectorCapability:
     return ConnectorCapability(
         name,
@@ -81,6 +82,48 @@ def _cap(
         consequences=consequences,
         communication_trigger=communication_trigger,
         readback=readback,
+        any_scopes=any_scopes,
+    )
+
+
+def gitlab_manifest() -> ConnectorManifest:
+    reads = (
+        _cap(
+            "gitlab.projects.list",
+            "/api/v4/projects",
+            any_scopes=("api", "read_api"),
+            query=("membership", "per_page", "page"),
+        ),
+        _cap(
+            "gitlab.issues.list",
+            "/api/v4/projects/{project}/issues",
+            any_scopes=("api", "read_api"),
+            query=("state", "per_page", "page"),
+        ),
+        _cap(
+            "gitlab.issues.get",
+            "/api/v4/projects/{project}/issues/{issue}",
+            any_scopes=("api", "read_api"),
+        ),
+    )
+    create = ConnectorCapability(
+        "gitlab.issues.create",
+        "POST",
+        "/api/v4/projects/{project}/issues",
+        ("api",),
+        RiskLevel.COMMUNICATION,
+        body_required=True,
+        verification="independent-readback",
+        readback="gitlab.issues.get",
+        resource_id_field="iid",
+    )
+    return ConnectorManifest(
+        "gitlab.api",
+        "gitlab",
+        "https://gitlab.com",
+        (*reads, create),
+        provenance="official GitLab REST/OIDC/discovery verified 2026-10-25; "
+        "SOFTWARE-COMMUNICATION-INTEGRATION.md",
     )
 
 
