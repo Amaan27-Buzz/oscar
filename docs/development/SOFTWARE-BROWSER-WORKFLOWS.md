@@ -130,3 +130,28 @@ skip; an installed but unusable Chromium is a failure.
 This is synthetic local browser acceptance. Real provider accounts, arbitrary
 external websites, native visual approval and production owner commissioning are
 not verified by this campaign.
+
+## Signed two-account confirmation transfer, 2026-10-24
+
+The same production conversation/Executive path now has actual integrated
+acceptance for an explicitly reviewed cross-account workflow: submit a synthetic
+registration under account A, independently verify its exact receipt, save and
+independently read back the scoped confirmation file, then upload those exact
+bytes under account B and independently verify the destination receipt. The
+owner objective supplies both immutable account IDs; the native signature review
+contains both IDs/generations and all three exact effect plans. A synthetic HTTP
+model proposes those already explicit details; this is not installed-model
+account discovery or arbitrary step-output substitution.
+
+Chromium opens fresh child processes for each effect and observer. Two distinct
+private profiles persist only their respective synthetic sessions. The archive
+page rejects any source cookie, and its receipt requires the destination cookie.
+Independent server state checks the uploaded filename and exact bytes. Repeated
+owner follow-up and Worker polls leave one source submission and one upload.
+All 15 browser workflow/profile cases passed together in 111.284 seconds with
+stable source hashes, including existing wrong-text/redirect/overflow negatives.
+[Receipt](../evidence/software-completion/browser-cross-account-2026-10-24.json).
+
+This establishes the explicit browser/file/browser subset. General cross-account
+reasoning, arbitrary installed application workflows, real provider consent,
+remote Core/Worker process-lifecycle and production usability remain separate.

@@ -1,5 +1,14 @@
 # OSCAR — Current Status & Checklist
 
+**2026-10-24 cross-account workflow:** signed conversation now has actual synthetic
+registration → independent receipt → verified file → second-account upload
+acceptance. Both account IDs are explicit; isolated cookies, exact uploaded bytes,
+independent server state and fresh browser receipts passed. All 15 shared workflow
+and profile cases passed in 111.284 seconds with stable source hashes.
+[Receipt](evidence/software-completion/browser-cross-account-2026-10-24.json).
+Broader account reasoning, installed-app workflows and real commissioning remain
+open; this does not complete the original software mandate.
+
 **2026-10-24 connected contacts and MCP cleanup:** native signed conversation now
 lists and reads Google/Microsoft contacts using exact account bindings and
 read-only service scopes, bounded fields and explicit first-page pagination.

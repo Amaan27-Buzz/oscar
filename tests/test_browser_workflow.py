@@ -1,4 +1,4 @@
-"""Reviewed conversation reaches the existing browser Worker; effects remain REPORTED."""
+"""Signed browser/file workflows with independent exact postconditions and account isolation."""
 
 import base64
 import importlib.util
@@ -6,6 +6,8 @@ import json
 import ssl
 import unittest
 from dataclasses import asdict, replace
+from email import policy
+from email.parser import BytesParser
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from threading import Thread
 from time import monotonic, sleep
@@ -130,6 +132,9 @@ class BrowserWorkflowAcceptanceTests(unittest.TestCase):
     def test_authenticated_profile_is_used_by_independent_readback(self):
         self.check_workflow("authenticated")
 
+    def test_two_accounts_submit_verify_save_and_upload_without_cookie_leakage(self):
+        self.check_workflow("cross-account")
+
     def test_wrong_browser_text_fails_without_replaying_submission(self):
         self.check_workflow("mismatch")
 
@@ -137,6 +142,10 @@ class BrowserWorkflowAcceptanceTests(unittest.TestCase):
         self.check_workflow("redirect")
 
     def check_workflow(self, verification=None):
+        cross_account = verification == "cross-account"
+        authenticated = verification in {"authenticated", "cross-account"}
+        verified = verification in {"match", "authenticated", "cross-account"}
+        expected_tasks = 3 if cross_account else 2
         connected_fixture.ConnectedAcceptanceTests.certificate(self)
         tls = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
         tls.load_cert_chain(self.ca, self.root / "tls-key.pem")
@@ -175,12 +184,40 @@ class BrowserWorkflowAcceptanceTests(unittest.TestCase):
             RoutingPolicy(),
         )
         path = self.root / "independent-server-effect.txt"
+        uploaded = self.root / "independent-upload.txt"
         submissions = []
         receipt_reads = []
+        uploads = []
+        archive_reads = []
 
         class Handler(BaseHTTPRequestHandler):
             def do_GET(self):
-                if verification == "authenticated" and self.path == "/receipt":
+                if cross_account and self.path in {"/archive", "/archive-receipt"}:
+                    cookie = self.headers.get("Cookie", "")
+                    archive_reads.append(cookie)
+                    expected_cookie = "" if self.path == "/archive" else "archive=synthetic"
+                    if cookie != expected_cookie:
+                        self.send_response(403)
+                        self.end_headers()
+                        return
+                    self.send_response(200)
+                    if self.path == "/archive":
+                        self.send_header(
+                            "Set-Cookie",
+                            "archive=synthetic; Max-Age=3600; HttpOnly; SameSite=Strict",
+                        )
+                    self.end_headers()
+                    receipt = uploaded.read_text() if uploaded.exists() else "No archive"
+                    self.wfile.write(
+                        (
+                            '<html><body><output id="receipt">' + receipt + "</output>"
+                            '<form method="post" enctype="multipart/form-data" action="/archive">'
+                            '<input type="file" id="attachment" name="attachment">'
+                            '<button id="upload">Archive</button></form></body></html>'
+                        ).encode()
+                    )
+                    return
+                if authenticated and self.path == "/receipt":
                     receipt_reads.append(self.headers.get("Cookie", ""))
                     if self.headers.get("Cookie", "") != "readback=synthetic":
                         self.send_response(403)
@@ -193,7 +230,7 @@ class BrowserWorkflowAcceptanceTests(unittest.TestCase):
                     self.end_headers()
                     return
                 self.send_response(200)
-                if verification == "authenticated" and self.path == "/":
+                if authenticated and self.path == "/":
                     self.send_header(
                         "Set-Cookie", "readback=synthetic; Max-Age=3600; HttpOnly; SameSite=Strict"
                     )
@@ -210,6 +247,28 @@ class BrowserWorkflowAcceptanceTests(unittest.TestCase):
                 )
 
             def do_POST(self):
+                if cross_account and self.path == "/archive":
+                    raw = self.rfile.read(int(self.headers["Content-Length"]))
+                    message = BytesParser(policy=policy.default).parsebytes(
+                        ("Content-Type: " + self.headers["Content-Type"] + "\r\n\r\n").encode()
+                        + raw
+                    )
+                    attachment = message.get_payload(0)
+                    data = attachment.get_payload(decode=True)
+                    uploads.append((attachment.get_filename(), data, self.headers.get("Cookie")))
+                    if uploads[-1] != (
+                        "registration.txt",
+                        b"Synthetic receipt:b",
+                        "archive=synthetic",
+                    ):
+                        self.send_response(400)
+                        self.end_headers()
+                        return
+                    uploaded.write_bytes(data)
+                    self.send_response(303)
+                    self.send_header("Location", "/archive-receipt")
+                    self.end_headers()
+                    return
                 fields = parse_qs(self.rfile.read(int(self.headers["Content-Length"])).decode())
                 submissions.append(fields)
                 path.write_text(fields["message"][0] + ":" + fields["choice"][0])
@@ -228,7 +287,7 @@ class BrowserWorkflowAcceptanceTests(unittest.TestCase):
         self.start_worker(
             ("machine.browser", "machine.files.write"),
             browser=True,
-            profiles=verification == "authenticated",
+            profiles=authenticated,
         )
         request = {
             "origins": [origin],
@@ -245,7 +304,7 @@ class BrowserWorkflowAcceptanceTests(unittest.TestCase):
         }
         cap = next(c for c in self.worker.effects.capabilities() if c.id == "machine.browser")
         parameters = {"request": request}
-        if verification == "authenticated":
+        if authenticated:
             account = h.accounts.add("fixture", "synthetic", "browser-owner", "Work", verified=True)
             parameters.update(account_id=account.id, account_generation=account.generation)
         if verification:
@@ -291,6 +350,51 @@ class BrowserWorkflowAcceptanceTests(unittest.TestCase):
                     "depends_on": ["submit"],
                 }
             )
+        if cross_account:
+            destination = h.accounts.add(
+                "fixture", "synthetic", "archive-owner", "Archive", verified=True
+            )
+            archive = {
+                "request": {
+                    **request,
+                    "steps": [
+                        {"operation": "navigate", "url": origin + "/archive"},
+                        {
+                            "operation": "upload",
+                            "selector": "#attachment",
+                            "path": "registration.txt",
+                        },
+                        {"operation": "submit", "selector": "#upload"},
+                        {"operation": "wait", "selector": "#receipt"},
+                    ],
+                },
+                "account_id": destination.id,
+                "account_generation": destination.generation,
+                "verification": {
+                    "url": origin + "/archive-receipt",
+                    "selector": "#receipt",
+                    "text": "Synthetic receipt:b",
+                },
+            }
+            steps.append(
+                {
+                    "id": "archive-confirmation",
+                    "intent": asdict(
+                        form_intent(
+                            cap,
+                            {
+                                "capability_id": cap.id,
+                                "operation": "browser_workflow",
+                                "fields": {"workflow": json.dumps(archive)},
+                            },
+                            {},
+                        )
+                    ),
+                    "node_id": "test-machine",
+                    "capability_id": "machine.browser",
+                    "depends_on": ["save-confirmation"],
+                }
+            )
         self.body["choices"][0]["message"]["content"] = json.dumps({"steps": steps})
 
         def ask(text):
@@ -325,6 +429,11 @@ class BrowserWorkflowAcceptanceTests(unittest.TestCase):
             "On device test-machine: Fill the local synthetic form and submit it"
             + (
                 "; save registration.txt only after the exact receipt matches"
+                + (
+                    f"; source account {account.id}; then upload it using account {destination.id}"
+                    if cross_account
+                    else ""
+                )
                 if verification
                 else ""
             )
@@ -342,14 +451,17 @@ class BrowserWorkflowAcceptanceTests(unittest.TestCase):
         self.assertFalse(path.exists())
         review = approve(second)
         self.assertIn("Synthetic receipt", review["review"])
+        if cross_account:
+            self.assertIn(account.id, review["review"])
+            self.assertIn(destination.id, review["review"])
         goal = h.store.all("planner_request")[0]["accepted_goal"]
-        until = monotonic() + 40
+        until = monotonic() + (75 if cross_account else 40)
         while monotonic() < until:
             self.worker.step()
             tasks = h.executive._tasks(goal)
             if (
-                verification in {"match", "authenticated"}
-                and len(tasks) == 2
+                verified
+                and len(tasks) == expected_tasks
                 and all(h.store.task(task).state == "verified" for task in tasks)
             ):
                 break
@@ -361,18 +473,12 @@ class BrowserWorkflowAcceptanceTests(unittest.TestCase):
             }:
                 break
             sleep(2)  # Match the production outbound Worker polling cadence.
-        expected = (
-            "verified"
-            if verification in {"match", "authenticated"}
-            else "failed"
-            if verification
-            else "partially_verified"
-        )
+        expected = "verified" if verified else "failed" if verification else "partially_verified"
         self.assertEqual(
             expected, h.store.task(tasks[0]).state, (h.store.all("result"), h.store.all("evidence"))
         )
-        if verification in {"match", "authenticated"}:
-            self.assertEqual(2, len(tasks))
+        if verified:
+            self.assertEqual(expected_tasks, len(tasks))
             self.assertTrue(all(h.store.task(task).state == "verified" for task in tasks))
             self.assertEqual(
                 "Synthetic receipt:b", (self.workspace / "registration.txt").read_text()
@@ -391,7 +497,7 @@ class BrowserWorkflowAcceptanceTests(unittest.TestCase):
             },
             self.workspace,
         )
-        if verification == "authenticated":
+        if authenticated:
             self.assertNotIn("Synthetic receipt:b", observed["observations"][0]["text"])
             self.assertGreaterEqual(receipt_reads.count("readback=synthetic"), 2)
             self.assertEqual("", receipt_reads[-1])
@@ -401,3 +507,11 @@ class BrowserWorkflowAcceptanceTests(unittest.TestCase):
         for _ in range(3):
             self.worker.step()
         self.assertEqual(1, len(submissions))
+        if cross_account:
+            self.assertEqual(b"Synthetic receipt:b", uploaded.read_bytes())
+            self.assertEqual(
+                [("registration.txt", b"Synthetic receipt:b", "archive=synthetic")], uploads
+            )
+            self.assertEqual("", archive_reads[0])
+            self.assertGreaterEqual(archive_reads.count("archive=synthetic"), 2)
+            self.assertEqual(2, len(list((self.root / "private-profiles").iterdir())))

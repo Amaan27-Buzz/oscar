@@ -12,8 +12,8 @@ software work under the existing authorization; no new agent delegation is neede
 
 ## 2. Current candidate
 
-Latest committed base `61e8f0a` on `codex/software-completion`; the contacts
-checkpoint follows it. Use `git rev-parse HEAD` for the exact
+Latest committed base `77542e2` on `codex/software-completion`; the cross-account
+acceptance checkpoint follows it. Use `git rev-parse HEAD` for the exact
 checkout, and `git log b700a6c..HEAD --oneline` for all local implementation commits.
 The final owner message must name the actual resulting checkout, not an invented
 self-referential documentation SHA.
@@ -23,6 +23,7 @@ self-referential documentation SHA.
 Newest first, after the starting source:
 
 ```text
+77542e2 feat: add signed contact reads and close stalled MCP startup
 61e8f0a feat: verify exact browser receipts before dependent work
 3016ea3 fix: include recurring Microsoft events in current day briefing
 5151a13 fix: align planner output with provider JSON object modes
@@ -159,6 +160,10 @@ becomes real provider or whole-product acceptance.
 
 ## 16. Tests and skipped cases
 
+Two-account browser/file/browser acceptance and shared negatives: 15/15,
+111.284 s, no skips and stable source hashes.
+[Receipt](../evidence/software-completion/browser-cross-account-2026-10-24.json).
+
 Contacts/connector/Grid/MCP acceptance: 205/205, no skips, 437.160 s and
 stable source hashes. The first campaign retained a stale catalog assertion
 and a reproduced MCP startup teardown defect; the corrected campaign passed.
@@ -215,7 +220,7 @@ Ollama configuration but malformed planning output remains a quality bottleneck.
 
 | Impact | Confirmed limitation / evidence boundary |
 | --- | --- |
-| P1 product completeness | General image-grounded computer use, broad Chief-of-Staff prioritization/replanning, useful cross-application/cross-account native workflows and several requested service-specific integrations lack complete executable/accepted paths. These are not all owner-credential blockers |
+| P1 product completeness | General image-grounded computer use, broad Chief-of-Staff prioritization/replanning, broader cross-application/cross-account workflows beyond the explicit receipt/file transfer and several requested service-specific integrations lack complete executable/accepted paths. These are not all owner-credential blockers |
 | P2 planning quality | Installed local model can return malformed output despite structured mode. Failure recovery is safe and useful, but successful small examples do not establish broad reliability |
 | P2 unsupported contracts | Blob/cross-origin authenticated downloads; MCP dynamic registration/automatic resource refresh/incremental challenge/remote revoke; arbitrary nested provider mutation verification |
 | P2 verification limits | Generic native click/capture/invoke and Microsoft sendMail 202 remain PARTIAL; recipient delivery unproven |

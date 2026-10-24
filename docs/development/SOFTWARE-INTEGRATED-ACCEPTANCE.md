@@ -22,7 +22,7 @@ does not repeat their native UI, model or long-running acceptance.
 | 6 | Live vs memory disagreement | LOCAL Core tests and actual index fallback; broader native everyday disagreement scenario PARTIAL (`tests/test_memory_fabric.py`, `tests/test_local_memory.py`) |
 | 7 | Two same-provider accounts | LOCAL account/Fabric isolation tests; real two-account provider commissioning OPEN (`tests/test_connector_mount.py`, `tests/test_auth_broker.py`) |
 | 8 | OSCAR-owned vs owner-delegated identity | PARTIAL: explicit identity classification and signed authority enforced; no real OSCAR-owned provider account operation accepted |
-| 9 | Cross-account workflow | PARTIAL: explicit account-bound operations and isolation; useful chained native cross-account outcome OPEN |
+| 9 | Cross-account workflow | LOCAL explicit-ID synthetic registration in account A → fresh receipt read → verified scoped file → upload and fresh receipt in account B; isolated cookies and exact uploaded bytes checked. Broader account reasoning and real providers OPEN. [Receipt](../evidence/software-completion/browser-cross-account-2026-10-24.json) |
 | 10 | OAuth refresh / expiry / revoke | LOCAL synthetic HTTP/broker tests; real provider interoperability OPEN. [MCP authorization](SOFTWARE-MCP-AUTHORIZATION.md) |
 | 11 | MCP discovery / execution / cancellation / restart | LOCAL installed SDK and synthetic resource/stdio lifecycle tests. [MCP receipt](../evidence/software-completion/mcp-authorization-2026-10-23.json) |
 | 12 | Removal blocks future plugin execution | LOCAL signed lifecycle, disable/remove and account-generation tests (`tests/test_connections.py`, `tests/test_mcp_client.py`) |
@@ -79,7 +79,8 @@ does not repeat their native UI, model or long-running acceptance.
 
 ## Active executable gaps
 
-Useful chained cross-account/cross-application workflows, broader Chief-of-Staff
+Broader cross-account and installed-application workflows beyond the explicit
+browser/file/browser transfer, richer Chief-of-Staff
 coordination, reliable general model planning and semantic
 visual reasoning need further implementation or integration acceptance. They are
 not reclassified as owner-only commissioning. API/OAuth consent, actual owner
