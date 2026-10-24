@@ -1,0 +1,264 @@
+# Local software engineering handoff — active partial candidate
+
+2026-10-24. **The original full software-completion objective is not achieved.**
+This report consolidates the owner's 24 handoff items and makes remaining
+executable gaps explicit. It is not a release, commissioning request, owner
+acceptance or `SOFTWARE_FEATURE_COMPLETE` certificate. Continue independent
+software work under the existing authorization; no new agent delegation is needed.
+
+## 1. Starting source
+
+`b700a6c68e7afdff7cc78ea1a615793fd6ac475d`, following the C1/C2 local foundation.
+
+## 2. Current candidate
+
+Runtime candidate `953b9e88a78ac706bd4714cf2dd924ea96c68447` on
+`codex/software-completion`. Documentation-only sealing can follow this runtime
+SHA. Use `git rev-parse HEAD` for the exact checkout including such documentation.
+The final owner message must name the actual resulting checkout, not an invented
+self-referential documentation SHA.
+
+## 3. Local implementation commits
+
+Newest first, after the starting source:
+
+```text
+953b9e8 fix: explain failed planning and preserve reviewed recovery
+09ec699 feat: download authenticated HTTP files within isolated browser profiles
+a9b0153 feat: create account-bound tasks through signed native conversation
+b4dc890 feat: authorize selected Windows capture and screenshot-bound input
+783d539 fix: configure real local model planning through normal Core
+104596b feat: progress conversation plans under signed Full Access
+b6dbab5 feat: bind browser visual clicks to reviewed screenshot pixels
+0e77572 feat: route exact Android conversation actions through native Grid
+fbe12e3 test: verify native Core recovery and signed Android screen capture
+87ad58a docs: record source-stable integrated software regression
+d2b5a21 fix: bound remote process authority checks without effect retries
+1b15222 feat: integrate native memory, MCP authorization and task workflows
+dcfbc39 fix: preserve recurring schedule progress in combined runtime
+453f596 feat: integrate voice communication planning and native workers
+111aba5 feat: integrate signed authority and connected native software
+```
+
+## 4. Branch and dependencies
+
+`codex/software-completion` retains unmerged D2
+`bd0102a9e933017b62f4caf23cfc5f88e04404c7` and the existing C1/C2 foundation.
+No history rewrite, push, remote PR mutation, Actions or merge was performed.
+The dependency must be reviewed during later authorized publication; it is not
+silently treated as merged main.
+
+## 5. Architecture
+
+One authoritative Core/Harness composes Controller, Model Router, canonical
+SQLite Event Archive/Memory, World Model, Policy, Grid and Executive. Native
+Desktop/Android are enrolled surfaces; outbound Workers execute real bounded
+capabilities. Account-bound Fabric and optional MCP/providers remain executors
+under Core authority. Derived indexes are rebuildable; native clients own no
+second canonical history or scheduler. Independent perception, retention and
+action grants remain mandatory.
+
+## 6–8. Canonical slices, Groups 4–6 and capability matrix
+
+The [completion ledger](OSCAR-FULL-SOFTWARE-COMPLETION.md) contains every canonical
+slice 00–20, exact Group 4–6 classifications and the capability matrix. Slices
+00–17 foundations remain integrated; this does not complete their broader new
+mandate. Slice 18/Groups 7–8 remain owner-deferred. Mandatory Slice 19 hardening
+has scoped software evidence; Slice 20/Group 6 whole-product acceptance is not
+passed. Gate C/D remain PARTIAL and Gate E is NOT PASSED. The
+[62-scenario matrix](SOFTWARE-INTEGRATED-ACCEPTANCE.md) states actual local,
+partial and open acceptance separately.
+
+## 9. Plugins and providers
+
+| Integration family | Executable path and evidence boundary |
+| --- | --- |
+| Model providers | Native OpenAI-compatible, Google generateContent and Ollama adapters; actual installed local Qwen planning passed and also failed safely. Provider aliases/manifests are not independent live-provider acceptance |
+| Gmail / Google Calendar | Account-bound typed native requests, real synthetic provider HTTP, exact review and independent saved-resource readback. Real consent/accounts pending |
+| Google Tasks | New list discovery/list/get/create adapter and native authoring; real synthetic HTTP/Cloud task proof. Real accounts pending |
+| Drive / Docs / Sheets / Slides / Classroom | Bounded declared methods through the real HTTPS adapter and synthetic HTTP contracts. General document semantics, owner services and actual app workflows are not globally accepted |
+| Google Contacts / Meet | No dedicated accepted provider workflow established by this continuation; generic MCP/browser support is not service acceptance |
+| Microsoft Outlook / Calendar / To Do | Bounded account-bound mail/event/task operations with synthetic HTTP/Cloud proof; sendMail 202 remains PARTIAL without a correlated resource |
+| OneDrive / Teams / SharePoint | Thin admitted read contracts; real tenant consent/provider workflows uncommissioned; not full application coverage |
+| GitHub / Git | Existing scoped Git/native commands and HTTPS API subset; historical narrow GitHub device-OAuth private-read evidence is not a new live/write claim. CI/CD mutation and broad issue/PR lifecycle are not fully accepted |
+| GitLab | Configurable MCP/browser transport exists; no dedicated accepted GitLab integration established here |
+| Slack / Notion | Existing bounded HTTP adapter subsets; not live-account accepted. Discord and arbitrary messaging are not implied |
+| Local notes / Obsidian | Scoped file execution/readback; no claim of controlling the actual Obsidian GUI or every vault format |
+| Oracle / Vercel / Cloudflare / Supabase | Core packaging and generic executor/MCP paths are available; no commissioned cloud service or complete provider-specific workflow accepted here |
+| Figma / Canva / SceneLab / creative tools | Generic reviewed MCP/browser/native execution is available where configured. No dedicated live creative-provider or general media-generation workflow accepted by these receipts |
+| MCP | Actual installed SDK stdio/Streamable HTTP initialization/discovery/call/lifecycle and resource OAuth with synthetic accounts. Trusted local processes retain host-user authority. Dynamic registration, automatic resource refresh, incremental challenges and remote token revocation unsupported |
+
+These distinctions are deliberate: a JSON manifest or access to a tool in the
+engineering environment is not an OSCAR product integration.
+
+## 10. Multi-account support
+
+Immutable account identity, aliases, generation fences, scoped Vault credentials,
+separate browser profiles and request-session private results are implemented and
+tested. Two synthetic same-provider/profile accounts remain isolated. Real
+personal/work/university account consent and useful chained cross-account native
+workflows remain separate acceptance items.
+
+## 11. Actual Windows execution
+
+Run-owned native fixtures exercised scoped files/commands, CNG/DPAPI signing and
+session protection, real WPF UIA text/invoke, clipboard, child-process Job
+cancellation, selected-window PrintWindow PNG capture and screenshot-bound
+SendInput. PNG RGB/alpha and fixture counters were read independently. Exact UIA
+text/file outcomes can verify; generic invoke/click/screen semantics stay PARTIAL.
+Owner applications, protected desktops, broad visual model reasoning and native
+rendered acceptance of the newest sharing controls are not claimed.
+
+## 12. Actual Android execution
+
+Only disposable API35 AVD `oscar_group05_capability_api35`, serial
+`emulator-5582`, was authorized. Earlier native campaigns exercised signed Grid
+clipboard before/after actual TLS Core death, media pause, exact-resource text,
+click fixture observation, Keystore process restoration, revocation, OS single-app
+capture/independent JPEG pixels, SAF and source withdrawals. Core generic
+click/screen state remains PARTIAL. Apps were removed and the exact emulator
+stopped; no physical phone/OEM or newest-source native acceptance is implied.
+
+## 13. Voice, Sentry, Chief of Staff and Workers
+
+Real prepared local wake/VAD/STT/TTS models and synthetic audio reached Core
+math/file actions and native Bridge contracts. Physical acoustics/owner Voice
+Match remain pending. Sentry has independently granted, freshness-qualified
+World Model sources and actual eight-source emulator evidence with zero retained
+observations. Chief of Staff has sourced briefing/overlap and signed calendar,
+mail and connected-task authoring; general prioritization/replanning and sustained
+usefulness remain incomplete. Executive has signed schedules, conditional/event
+triggers, durable claims, pause/cancel/restart and evaluated procedure contracts.
+Broad native daily-use automation remains PARTIAL.
+
+## 14. Secure and Full Access
+
+Signed synthetic standing delegation binds current owner/session, exact
+capability/account generations, policy, expiry and revocation epoch. Full
+conversation model/action progression passed without OSCAR per-action prompts;
+Ask/Secure preserve protected exact reviews. Runtime/target checks remain current.
+Actual owner Full Access is inactive. OS/provider limits and independent
+retention/perception grants are not bypassed.
+
+## 15. Integrated workflow evidence
+
+Installed Qwen → normal Cloud composition → signed Ask/Full → real saved-file
+readback; signed HTTPS conversation → synthetic model → Chromium form → server
+and separate DOM readback; native Android conversation → actual Grid effects and
+Core recovery; native signed task authoring → real synthetic HTTP POST/GET;
+separate Chromium accounts → authenticated bounded file download; malformed
+planning → safe rejection/cooldown → newly signed draft → verified file. Each
+has source-scoped receipts in the completion ledger. A successful fixture never
+becomes real provider or whole-product acceptance.
+
+## 16. Tests and skipped cases
+
+At `b4dc890`: 1,059 Python cases, 1,049 passed/ten skipped, 506.912 seconds and
+334 stable hashed source files. Later focused campaigns: connected tasks
+235/235 (136.826 s); authenticated browser/native/Grid 48/48 (72.271 s);
+planning recovery 54/54 (35.988 s), each source-qualified. These overlap and
+must not be added into a fictitious unique total. The latest full aggregate and
+Linux closure receipts are recorded in the completion ledger. At `953b9e8`,
+the combined run completed 1,070 cases: 1,060 passed/ten skipped in 517.267 s,
+with all 338 source hashes stable. The constrained nonroot/read-only/offline
+Linux campaign completed 215 selected cases: 211 passed/four skipped in
+71.276 s. [Windows receipt](../evidence/software-completion/regression-closure-2026-10-24.json)
+and [Linux receipt](../evidence/software-completion/regression-linux-2026-10-24.json)
+qualify that source; neither repeats all native/model/hosted acceptance.
+
+Previous native checkpoints: Desktop 128 tests/typecheck/build; Rust 42 passed
+with one explicit live-voice ignore; Android 86 JVM cases/assemble/lint. They
+qualify their own sources. Four POSIX tests unavailable on Windows and six
+prepared optional voice/model checks explain the ten ordinary Python skips;
+separate prepared-voice and Linux receipts do not turn those skips into passes.
+
+## 17. Security
+
+See the [scoped review](SOFTWARE-COMPLETION-SECURITY-REVIEW.md). No exhaustive
+pentest or dependency certification is claimed. Current boundary evidence covers
+signed review/standing authority, account/session drift, exact resources,
+revocation, current leases, isolated profiles, bounded artifacts/processes and
+uncertain-effect fencing. Repository links/value-silent credential scans passed
+at the subsystem checkpoints. Trusted stdio is not an OS sandbox; remote
+revocation has bounded detection latency; selected pixels and native input are
+not atomic or semantic verification.
+
+## 18. Performance and bottlenecks
+
+The [raw performance report](../evidence/software-completion/performance-2026-10-24/performance.md)
+has 80 samples/operation and zero errors: p50/p95 ms arithmetic 12.736/15.738,
+files 22.019/29.463, loopback HTTP 97.351/136.696 and reviewed Executive
+21.627/28.724. Host load was uncontrolled and the source checkpoint predates
+later changes. The ten-minute restart soak observed 98 independently read-back
+file effects, Core roughly 55–59 MiB RSS and Worker roughly 40 MiB; retained
+task/WAL storage grows. No newest-source benchmark, multi-day stability,
+battery-life or leak-free claim. Installed Qwen latency improved with explicit
+Ollama configuration but malformed planning output remains a quality bottleneck.
+
+## 19. Remaining defects and product gaps by impact
+
+| Impact | Confirmed limitation / evidence boundary |
+| --- | --- |
+| P1 product completeness | General image-grounded computer use, broad Chief-of-Staff prioritization/replanning, useful cross-application/cross-account native workflows and several requested service-specific integrations lack complete executable/accepted paths. These are not all owner-credential blockers |
+| P2 planning quality | Installed local model can return malformed output despite structured mode. Failure recovery is safe and useful, but successful small examples do not establish broad reliability |
+| P2 unsupported contracts | Blob/cross-origin authenticated downloads; MCP dynamic registration/automatic resource refresh/incremental challenge/remote revoke; arbitrary nested provider mutation verification |
+| P2 verification limits | Generic native click/capture/invoke and Microsoft sendMail 202 remain PARTIAL; recipient delivery unproven |
+| Unassessed | No exhaustive security finding inventory or production incident claim; absence of a confirmed defect in these campaigns is not proof of absence |
+
+## 20. Owner commissioning
+
+Separate explicit consent is required for real provider app registration/OAuth,
+actual owner access activation, Oracle resources/billing/public TLS/network,
+physical Android, microphone/camera and hardware. Exact setup guides are
+[Cloud operations](../CLOUD-CORE.md), [deployment](../DEPLOYMENT.md),
+[authentication](GROUP-05-CAPABILITY-IDENTITY.md) and the domain contracts linked
+above. No automatic push, spending or commissioning is requested by this report.
+
+## 21. CI / publication / merge
+
+Local only. No final-head Actions, push, PR publication or merge. Historical CI
+and merged D1/Group 3 evidence retain their original boundaries. D2 remains an
+unmerged dependency. Local passing tests cannot stand in for remote CI.
+
+## 22. Exact acceptance remaining
+
+Use the OPEN/PARTIAL rows of the [62-scenario matrix](SOFTWARE-INTEGRATED-ACCEPTANCE.md)
+and the impact table above. In particular: general visual/model/native workflows,
+cross-account/application chaining, richer Chief-of-Staff behavior, provider
+coverage, current full assistive-technology inspection and newest-surface review.
+Hosted/real account/physical acceptance remains a separate set. Do not call
+Slice 20 or Group 6 passed merely because isolated capabilities work.
+
+## 23. Reproduction
+
+From repository root on the documented Windows toolchain:
+
+```powershell
+python -m unittest discover -s tests -t . -v
+python -m ruff check oscar tests scripts
+python -m mypy oscar
+python -m scripts.check_repository
+python -m unittest tests.test_communication tests.test_browser_profiles tests.test_conversation_planning -v
+```
+
+Use Desktop package scripts, Rust 1.99 and the existing Android Gradle/JDK21
+instructions for native gates. Real-model reproduction is
+`python -m scripts.software_conversation_planning_reference` and its `--full`
+variant: requires the exact already-installed Qwen model and a local Ollama
+service, creates only synthetic owner/workspace data and can fail honestly.
+It does not download a model. Disposable emulator and constrained Linux commands
+remain in their source-qualified domain receipts; validate the exact AVD before
+every Android operation. Do not use these tests against a physical phone.
+
+## 24. Real-user acceptance checklist
+
+After separately authorized commissioning, exercise one normal relationship:
+connect exact accounts, inspect scopes, submit a simple file objective, inspect
+both Ask reviews, read the artifact independently, repeat a contextual follow-up,
+correct/forget a sourced memory, create/read back a task, operate a chosen app,
+download an authorized file, revoke a source/account/device and verify withdrawal.
+Then test Secure/Full under signed owner activation, schedule an automation,
+close the UI, restart Core/Worker, inspect the same canonical task on phone and
+Desktop, stop/mute voice and inspect freshness-qualified briefing/notices.
+Include rejection, cancellation, outage, expired authority, large text and error
+recovery. This is an unexecuted owner checklist, not acceptance evidence.

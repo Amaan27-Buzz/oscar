@@ -1,5 +1,17 @@
 # OSCAR — Current Status & Checklist
 
+**2026-10-24 combined runtime checkpoint `953b9e8`:** all 1,070 Python cases
+completed: 1,060 passed, ten skipped, 517.267 seconds. All 338 hashed runtime,
+test, configuration and native source files stayed stable. Constrained nonroot,
+read-only, network-disabled Linux passed 211 of 215 selected cases with four
+explicit skips in 71.276 seconds; its frozen sources matched the checkout.
+[Windows receipt](evidence/software-completion/regression-closure-2026-10-24.json),
+[Linux receipt](evidence/software-completion/regression-linux-2026-10-24.json).
+The [24-item engineering handoff](development/SOFTWARE-COMPLETION-HANDOFF.md)
+records the active candidate and remaining executable gaps. These regressions
+do not repeat physical, hosted, installed-model or all native UI acceptance.
+The original full software objective remains PARTIAL; implementation continues.
+
 **2026-10-24 planning recovery:** failed/malformed plans now return actionable,
 bounded guidance. Repeated review sends no model calls or effects; a fresh signed
 draft after Router cooldown can recover through a separately reviewed verified

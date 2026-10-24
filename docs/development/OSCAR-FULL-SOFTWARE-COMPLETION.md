@@ -4,6 +4,17 @@ Updated 2026-10-24. **IMPLEMENTATION_IN_PROGRESS / SOFTWARE ACCEPTANCE PARTIAL.*
 Material executable work remains. This ledger does not declare
 `SOFTWARE_FEATURE_COMPLETE`, owner acceptance, hosted deployment or Gate E PASS.
 
+The [24-item engineering handoff](SOFTWARE-COMPLETION-HANDOFF.md) consolidates
+current implementation, evidence and executable gaps without declaring completion.
+At runtime checkpoint `953b9e8`, the stable 338-source Windows aggregate completed
+1,070 cases: 1,060 passed/ten skipped in 517.267 seconds.
+[Receipt](../evidence/software-completion/regression-closure-2026-10-24.json).
+The same current Core/config/test sources passed constrained Linux: 211 passed,
+four skipped of 215 selected cases in 71.276 seconds, nonroot/read-only/offline.
+[Receipt](../evidence/software-completion/regression-linux-2026-10-24.json).
+Later focused changes retain their own evidence; neither regression repeats
+installed-model, rendered native UI, Android, soak, hosted or physical acceptance.
+
 ## Source and authorization
 
 Starting source: `b700a6c68e7afdff7cc78ea1a615793fd6ac475d` on
