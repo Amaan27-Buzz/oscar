@@ -12,8 +12,8 @@ software work under the existing authorization; no new agent delegation is neede
 
 ## 2. Current candidate
 
-Latest committed base `7e31202` on `codex/software-completion`; the connected-task
-briefing checkpoint follows it. Use `git rev-parse HEAD` for the exact
+Latest committed base `94bd7eb` on `codex/software-completion`; the combined
+regression receipt follows it. Use `git rev-parse HEAD` for the exact
 checkout, and `git log b700a6c..HEAD --oneline` for all local implementation commits.
 The final owner message must name the actual resulting checkout, not an invented
 self-referential documentation SHA.
@@ -23,6 +23,7 @@ self-referential documentation SHA.
 Newest first, after the starting source:
 
 ```text
+94bd7eb feat: include authorized connected tasks in native day briefings
 7e31202 feat: constrain structured local Executive plan decoding
 723df7e fix: keep native observers from displacing Windows input focus
 0c217af test: verify signed cross-account browser file transfer
@@ -315,3 +316,14 @@ passed, with Desktop build and Android assemble/lint. This adds signed selected
 Google Tasks/Microsoft To Do awareness with date precision, bounded coverage,
 revocation and independent retention; it does not add automatic prioritization.
 [Receipt](../evidence/software-completion/tasks-briefing-2026-10-24.json).
+
+**2026-10-24 combined regression at `94bd7eb`:** the full Windows Python
+suite completed 1,099 cases: 1,089 passed, ten skipped and zero failed/error
+(657.352 s), with unchanged source hashes. The previously failed native visual
+case passed in this aggregate. A matching frozen-source restricted Linux run
+completed 313 selected cases: 308 passed/five skipped (93.642 s). Both qualify
+the stated source; neither repeats every native/model/hosted acceptance. Earlier
+failed receipts remain intact. [Windows](../evidence/software-completion/post-brief-windows-2026-10-24.json)
+and [Linux](../evidence/software-completion/post-brief-linux-2026-10-24.json).
+The full software mandate remains incomplete.
+

@@ -544,3 +544,14 @@ passed, and Android 87 JVM cases/assemble/lint passed. Real accounts and new
 native rendered acceptance were not exercised. Broader prioritization,
 calendar/task coordination and daily-use acceptance remain OPEN; this checkpoint
 does not complete the original software mandate.
+
+**2026-10-24 combined regression at `94bd7eb`:** the full Windows Python
+suite completed 1,099 cases: 1,089 passed, ten skipped and zero failed/error
+(657.352 s), with unchanged source hashes. The previously failed native visual
+case passed in this aggregate. A matching frozen-source restricted Linux run
+completed 313 selected cases: 308 passed/five skipped (93.642 s). Both qualify
+the stated source; neither repeats every native/model/hosted acceptance. Earlier
+failed receipts remain intact. [Windows](../evidence/software-completion/post-brief-windows-2026-10-24.json)
+and [Linux](../evidence/software-completion/post-brief-linux-2026-10-24.json).
+The full software mandate remains incomplete.
+
