@@ -1,6 +1,7 @@
 """Bounded typed Playwright plans in isolated contexts. No personal browser profile."""
 
 import argparse
+import base64
 import hashlib
 import importlib
 import json
@@ -45,12 +46,15 @@ class NoDownloadRedirects(HTTPRedirectHandler):
 
 
 def bounded_download(
-    url: str, artifact: Path, allowed: list[str], maximum: int, timeout: float
+    url: str,
+    artifact: Path,
+    allowed: list[str],
+    maximum: int,
+    timeout: float,
+    *,
+    page: Any = None,
 ) -> None:
-    """Anonymous HTTP anchor download, with a streaming byte admission limit.
-
-    Browser cookies never leave the context. Blob/JS/authenticated downloads are unsupported.
-    """
+    """Bounded HTTP anchor bytes; same-origin credentials stay inside the browser."""
     if type(maximum) is not int or not 1 <= maximum <= 1_000_000:
         raise ValueError("bounded download required")
     if type(timeout) not in {int, float} or not 0 < timeout <= 120:
@@ -58,10 +62,50 @@ def bounded_download(
     WindowsScopedFiles.parts(artifact.name)
     if origin(url) not in allowed:
         raise PermissionError("download origin outside grant")
-    with build_opener(NoDownloadRedirects()).open(
-        Request(url), timeout=min(timeout, 15)
-    ) as response:
-        data = response.read(maximum + 1)
+    if artifact.exists():
+        raise FileExistsError("artifact overwrite rejected")
+    if page is not None and origin(url) == origin(page.url):
+        encoded = page.evaluate(
+            """async ({url, maximum, timeout}) => {
+                const controller = new AbortController();
+                const timer = setTimeout(() => controller.abort(), timeout);
+                try {
+                    const response = await fetch(url, {
+                        credentials: 'same-origin', redirect: 'error', cache: 'no-store',
+                        referrerPolicy: 'no-referrer', signal: controller.signal
+                    });
+                    if (!response.ok || !response.body) throw new Error('download rejected');
+                    const reader = response.body.getReader();
+                    const chunks = [];
+                    let total = 0;
+                    while (true) {
+                        const {done, value} = await reader.read();
+                        if (done) break;
+                        total += value.byteLength;
+                        if (total > maximum) throw new Error('download bound exceeded');
+                        chunks.push(value);
+                    }
+                    let binary = '';
+                    for (const chunk of chunks)
+                        for (let i = 0; i < chunk.length; i += 32768)
+                            binary += String.fromCharCode(...chunk.subarray(i, i + 32768));
+                    return btoa(binary);
+                } finally {
+                    controller.abort();
+                    clearTimeout(timer);
+                }
+            }""",
+            {"url": url, "maximum": maximum, "timeout": min(timeout, 15) * 1000},
+        )
+        if not isinstance(encoded, str) or len(encoded) > 4 * ((maximum + 2) // 3):
+            raise ValueError("download bound exceeded")
+        data = base64.b64decode(encoded, validate=True)
+    else:
+        # Other granted origins stay anonymous; browser credentials are never exported.
+        with build_opener(NoDownloadRedirects()).open(
+            Request(url), timeout=min(timeout, 15)
+        ) as response:
+            data = response.read(maximum + 1)
     if len(data) > maximum:
         raise ValueError("download bound exceeded")
     # Exclusive creation rejects preexisting files, including links/reparse targets.
@@ -344,7 +388,7 @@ def run(request: dict[str, Any], root: Path, *, profile: Path | None = None) -> 
                         raise ValueError("artifact overwrite rejected")
                     url = page.locator(step["selector"]).evaluate("e => e.href || ''")
                     bounded_download(
-                        url, artifact, request["origins"], step["max_bytes"], remaining
+                        url, artifact, request["origins"], step["max_bytes"], remaining, page=page
                     )
             return {"observations": observations, "isolated": True, "status": "REPORTED"}
         finally:

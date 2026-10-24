@@ -30,7 +30,7 @@ does not repeat their native UI, model or long-running acceptance.
 | 14 | Operate supported Windows app | LOCAL run-owned WPF UIA text/invoke and canvas fixture; owner installed apps uncommissioned. [Windows receipt](../evidence/software-completion/windows-visual-2026-10-24.json) |
 | 15 | Browser form with authorized account | LOCAL explicit synthetic account/profile and signed Grid form; real provider browser consent OPEN. [Browser workflow](SOFTWARE-BROWSER-WORKFLOWS.md) |
 | 16 | Screenshot / DOM / visual observation | LOCAL actual Chromium DOM/frame and selected Windows PNG; semantic vision/coordinate reasoning OPEN. Windows/browser receipts are separate |
-| 17 | File upload / download | PARTIAL bounded scoped upload and anonymous HTTP-anchor download; authenticated/blob download unsupported |
+| 17 | File upload / download | PARTIAL bounded scoped upload and same-origin authenticated HTTP-anchor download through isolated profiles; real provider upload/download and blob/cross-origin authenticated transfers unaccepted or unsupported. [Browser contract](SOFTWARE-BROWSER-WORKFLOWS.md) |
 | 18 | Terminal / Git development | PARTIAL actual scoped native processes and terminal tests; minimal constrained image lacks Git, so its failed Git-fixture campaign is not acceptance |
 | 19 | Cross-application automation | OPEN broader useful application-to-application acceptance; individual app/browser/file executors do not establish it |
 | 20 | Independent result verification | LOCAL files, UIA text, provider saved resources and fixture observers; generic screen/click/invoke outcomes remain PARTIAL |

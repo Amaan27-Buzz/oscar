@@ -57,7 +57,7 @@ rows below do not replace scenario acceptance.
 | Universal identity / multi-account | Existing stable identities and generation checks; connected accounts projected into executable Fabric | Two-account isolation, scope withdrawal, refresh/disconnect and callback mounting tests | Real owner accounts, tenant constraints and provider token interoperability uncommissioned |
 | Self-service authentication | Public Google/Microsoft registration config and native Desktop/Android PKCE callbacks; reviewed preregistered MCP resource grants reuse the same account Vault | Native callback checks and combined 59-test Auth Broker/account/MCP SDK campaign passed; Desktop existing-grant reauthorization selection tested and Android compiled | Real provider browser consent and physical OEM behavior are uncommissioned. A resource token never implies verified person identity |
 | Plugins / MCP | SDK transports, signed lifecycle and exact-resource OAuth discovery, PKCE S256, issuer checking, bounded scopes, rotating refresh and same-grant reauthorization | Real installed MCP SDK initializes/discovers/calls a synthetic HTTP resource using its issued token; 12 authorization cases and combined 59 tests passed | Fixed HTTPS aliases map to loopback HTTP in tests. Trusted stdio retains host-user authority. Dynamic registration, automatic refresh, incremental challenges and remote token revocation are unsupported; unsupported contracts fail closed |
-| Browser / web apps | Existing typed isolated profiles, bounded browser workflow and screenshot-bound visual click reused by conversation planner and actual outbound executor | Signed HTTPS conversation → synthetic model → both reviews → real Chromium form submission; independent server and fresh Chromium DOM readback passed. Actual signed HTTPS Grid canvas capture/visual click accepted one independently read-back effect; three mismatches had zero effects; 34 affected cases passed | Core/Worker composed in-process for this campaign; real browser child. Generic browser outcomes remain partially verified; multi-step workflows can partially mutate before failure. Owner accounts remain uncommissioned |
+| Browser / web apps | Existing typed isolated profiles, bounded browser workflow, same-origin authenticated HTTP downloads and screenshot-bound visual click reused by conversation planner and outbound executor | Signed HTTPS conversation → synthetic model → both reviews → real Chromium form submission; independent server and fresh Chromium DOM readback passed. Actual signed HTTPS Grid canvas capture/visual click accepted one independently read-back effect; three mismatches had zero effects; later profile download checks are recorded separately | Core/Worker composed in-process for these campaigns; real browser child. Generic outcomes remain partially verified; multi-step workflows can partially mutate before failure. Blob/cross-origin authenticated downloads unsupported; owner accounts uncommissioned |
 | Windows computer control | Existing native executors available through outbound adapter with explicit opt-in; exact UIA text and clipboard readback added | Actual disposable WPF UIA text/invoke and child-process cancellation; Windows/Grid 38-test regression passed before one added contract case | Generic native reports remain partial; native supervised sharing passed actual CNG/DPAPI/TLS file execution and shutdown; installed app commissioning remains open |
 | Android production execution | Actual native foreground Worker, Keystore session, typed delivery, live ads and pre-effect checks | Disposable API35 ordinary conversation text through signed Grid: clipboard write before/after actual Core restart, media pause and text entry VERIFIED; click PARTIALLY_VERIFIED with separate fixture observation. Signed Grid screen JPEG decoded independently with expected selected-app pixels; OS stop withdrew capture. Actual SAF and eight-source sustained phone/Grid checks passed | Physical phone/OEM acceptance prohibited. Generic screen capture remains PARTIALLY_VERIFIED by Core. Failed transport stops the Worker; explicit restart preserves session and claims without effect replay. Synthetic frame retention was explicitly authorized |
 | Ask / Secure / Full | Signed native exact activation and revocation; runtime and executor recheck | Authority regression, expiry/revoke/policy/account/session drift, actual delegated task test | Synthetic activation only; no owner Full Access activation. Actual Android management review and native contract checks passed; owner activation and physical acceptance remain separate |
@@ -104,6 +104,20 @@ VERIFIED. Groups 7/8 and optional unavailable hardware remain deliberately
 deferred. Gate A/B historical scoped PASS; Gate C/D PARTIAL; Gate E NOT PASSED.
 
 ## Current local verification receipts
+
+### Authenticated browser downloads, 2026-10-24
+
+Same-origin HTTP anchor downloads now stream inside the selected isolated Chromium
+profile rather than making an anonymous request. Actual synthetic HttpOnly alpha
+and beta sessions each downloaded the exact fixture file. Missing authentication,
+oversized streamed bodies and redirects were rejected without creating an
+artifact; the redirect sink was not visited. Exact binary bytes were independently
+read back, and existing artifacts were preserved without attempting their GET.
+All 48 affected browser/native/Grid cases passed in 72.271 seconds, no skips,
+with stable source hashes; Ruff/Mypy passed. [Receipt](../evidence/software-completion/browser-auth-download-2026-10-24.json)
+and [contract](SOFTWARE-BROWSER-WORKFLOWS.md). Blob/cross-origin authenticated
+transfers and real owner/provider accounts remain unsupported or unaccepted;
+generic browser objective state remains PARTIALLY_VERIFIED.
 
 ### Connected task authoring, 2026-10-24
 

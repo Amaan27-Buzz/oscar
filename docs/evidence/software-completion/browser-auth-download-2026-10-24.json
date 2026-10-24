@@ -1,0 +1,41 @@
+{
+  "status": "ACTUAL_CHROMIUM_SYNTHETIC_ACCOUNT_DOWNLOAD_VERIFIED",
+  "base_head": "a9b015334608a3fdbabea32df0eeabd912532022",
+  "tests": 48,
+  "passed": 48,
+  "skipped": 0,
+  "seconds": 72.271,
+  "source_stable": true,
+  "source_manifest_sha256": "29fb8ed083504604a38f2128b7beeeb2c6b172a75ea4432f0b1065b897f7cf7d",
+  "log_sha256": "1a73517cca46cd6ac4a646803d3d65303b1c67560307392207927a251207140c",
+  "sources": {
+    "oscar/browser_worker.py": "f0dd4f0bac473e0fc41ff142e8c01c2483a6cd611996e18c41b1a07b2e73f2a0",
+    "tests/test_browser_profiles.py": "d81ccecb328c69777b652e72a1a2eca2225bc462ba567585ae6115e6ae3d8a4e",
+    "tests/test_windows_capabilities.py": "1f152a4effb6c31546bdea9f1fb08de82a73590d14717f5407ec2cd9ed4c5994",
+    "tests/test_browser_workflow.py": "c5c1f7a3c4959d06e72139889ccfd0dd2165cfc7d641f5302dea454630747fa5",
+    "tests/test_browser_visual.py": "640ef7d65203144724de0e5a461fd1a100be7ea414995c7303d2dd36f9e33335",
+    "tests/test_browser_launch.py": "2ef1047e9b9ff109fc370f3f046b1da7e5bca1c7dfcfc4b08d34cbf25b57caf4",
+    "tests/test_remote_machine.py": "be512abd85313b3e26fdc1a451ea014cf38e6cf9bb16031f1efe457eb00cd63b"
+  },
+  "accepted": [
+    "Actual isolated persistent Chromium alpha and beta profiles with separate synthetic HttpOnly login cookies; server requires a current fixture cookie to return file",
+    "Both selected accounts downloaded exact fixture bytes through native MachineWorker browser plans, without exporting cookies from Chromium",
+    "Fresh unauthenticated context denied; oversized streamed response and redirect rejected; redirect sink not reached; no rejected artifact created",
+    "Exact binary payload 0..255 independently compared with saved bytes; existing artifact preserved and download GET not attempted for it",
+    "Browser form/visual/outbound Grid/profile generation revocation/process cleanup affected cases passed"
+  ],
+  "static_checks": {
+    "ruff": "PASS oscar tests scripts",
+    "mypy": "PASS 100 files",
+    "diff_check": "PASS"
+  },
+  "initial_checks": "Initial six actual profile cases passed in 15.016 seconds. Ruff rejected a blind Exception assertion, replaced by specific Playwright error categories before the final 48-case campaign. No functional failure hidden.",
+  "limits": [
+    "Only same-origin HTTP anchors use browser credentials; other explicitly allowed origins remain anonymous",
+    "Blob/JavaScript download-manager and cross-origin authenticated transfers unsupported",
+    "No real owner accounts, personal browser profile, external website or provider interoperability accepted",
+    "Generic browser objective remains PARTIALLY_VERIFIED; saved fixture bytes alone are not semantic task completion",
+    "No automatic retries or overwrite; browser CSP/CORS/OS restrictions retained"
+  ],
+  "private_material_in_receipt": false
+}

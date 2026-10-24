@@ -1,5 +1,14 @@
 # OSCAR — Current Status & Checklist
 
+**2026-10-24 browser file transfer:** same-origin HTTP downloads now keep profile
+authentication inside Chromium and enforce streaming byte/deadline bounds.
+Actual separate synthetic sessions, binary readback, unauthenticated denial,
+oversize/redirect rejection and artifact preservation passed. All 48 affected
+browser/native/Grid tests passed with stable sources; Ruff/Mypy passed.
+[Receipt](evidence/software-completion/browser-auth-download-2026-10-24.json).
+Blob/cross-origin authenticated transfers and real-account commissioning remain
+outside this accepted scope; overall software completion remains PARTIAL.
+
 **2026-10-24 connected tasks:** Google Tasks and Microsoft To Do creation/listing
 now use existing native conversation, exact signed review and account-bound
 Fabric. Actual synthetic provider HTTP and Cloud signed requests passed independent

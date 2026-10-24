@@ -11,7 +11,7 @@ from urllib.parse import parse_qs
 
 from oscar.accounts import AccountRegistry
 from oscar.browser_profiles import BrowserProfiles
-from oscar.browser_worker import validate
+from oscar.browser_worker import run, validate
 from oscar.grid import Grid, Node, NodeRole
 from oscar.interactive_worker import InteractiveWorker
 from oscar.jev import Intent
@@ -78,6 +78,8 @@ class RealProfileTests(unittest.TestCase):
 
     def setUp(self):
         ProfileBindingTests.setUp(self)
+        owner = self
+        self.download_requests = []
 
         class Handler(BaseHTTPRequestHandler):
             def do_POST(self):
@@ -92,9 +94,26 @@ class RealProfileTests(unittest.TestCase):
                 self.end_headers()
 
             def do_GET(self):
+                owner.download_requests.append((self.path, self.headers.get("Cookie", "")))
+                if self.path == "/redirect":
+                    self.send_response(302)
+                    self.send_header("Location", "/sink")
+                    self.end_headers()
+                    return
+                if self.path == "/download" and self.headers.get("Cookie", "") not in {
+                    "fixture=alpha",
+                    "fixture=beta",
+                }:
+                    self.send_response(401)
+                    self.end_headers()
+                    return
                 self.send_response(200)
                 self.end_headers()
-                if self.path == "/download":
+                if self.path == "/oversized":
+                    self.wfile.write(b"x" * 2000)
+                elif self.path == "/binary":
+                    self.wfile.write(bytes(range(256)))
+                elif self.path == "/download":
                     self.wfile.write(b"synthetic-agenda")
                 else:
                     self.wfile.write(
@@ -106,7 +125,10 @@ class RealProfileTests(unittest.TestCase):
                             '<option value="a">A</option><option value="b">B</option></select>'
                             '<input id="upload" type="file">'
                             '<button id="submit">Continue</button></form>'
-                            '<a id="download" href="/download">Download</a></body></html>'
+                            '<a id="download" href="/download">Download</a>'
+                            '<a id="large" href="/oversized">Large</a>'
+                            '<a id="binary" href="/binary">Binary</a>'
+                            '<a id="redirect" href="/redirect">Redirect</a></body></html>'
                         ).encode()
                     )
 
@@ -208,6 +230,7 @@ class RealProfileTests(unittest.TestCase):
         self.assertIn("fixture=alpha", first["observations"][0]["text"])
         self.assertTrue(first["observations"][1]["accessibility"])
         self.assertEqual(b"synthetic-agenda", self.worker.files.read("agenda.txt"))
+        self.assertIn(("/download", "fixture=alpha"), self.download_requests)
         self.assertTrue(self.worker.files.read("proof.png").startswith(b"\x89PNG"))
         anonymous = self.execute_browser(second, [navigation, {"operation": "inspect"}])
         self.assertIn("anonymous", anonymous["observations"][0]["text"])
@@ -218,8 +241,16 @@ class RealProfileTests(unittest.TestCase):
                 {"operation": "fill", "selector": "#identity", "text": "beta"},
                 {"operation": "submit", "selector": "#submit"},
                 {"operation": "inspect"},
+                {
+                    "operation": "download",
+                    "selector": "#download",
+                    "path": "beta-agenda.txt",
+                    "max_bytes": 100,
+                },
             ],
         )
+        self.assertIn(("/download", "fixture=beta"), self.download_requests)
+        self.assertEqual(b"synthetic-agenda", self.worker.files.read("beta-agenda.txt"))
         # Every plan launches a new Chromium process; disk profile is the only session continuity.
         for account, name in [(self.account, "alpha"), (second, "beta")]:
             observed = self.execute_browser(account, [navigation, {"operation": "inspect"}])
@@ -237,6 +268,44 @@ class RealProfileTests(unittest.TestCase):
                     except psutil.NoSuchProcess:
                         continue
                     self.assertNotIn(str(self.profiles.root), " ".join(command or []))
+
+    def test_actual_browser_download_rejects_missing_auth_oversize_redirect_and_overwrite(self):
+        from playwright.sync_api import Error
+
+        workspace = self.root / "workspace"
+        for selector in ("#download", "#large", "#redirect"):
+            with self.subTest(selector=selector):
+                request = {
+                    "origins": [self.origin],
+                    "timeout": 15,
+                    "max_text": 100,
+                    "steps": [
+                        {"operation": "navigate", "url": self.origin},
+                        {
+                            "operation": "download",
+                            "selector": selector,
+                            "path": "rejected.bin",
+                            "max_bytes": 10,
+                        },
+                    ],
+                }
+                with self.assertRaisesRegex(
+                    Error, "download rejected|download bound exceeded|Failed to fetch"
+                ):
+                    run(request, workspace)
+                self.assertFalse((workspace / "rejected.bin").exists())
+        self.assertFalse(any(path == "/sink" for path, _ in self.download_requests))
+        request["steps"][-1].update(selector="#binary", path="binary.bin", max_bytes=256)
+        run(request, workspace)
+        self.assertEqual(bytes(range(256)), (workspace / "binary.bin").read_bytes())
+        request["steps"][-1].update(selector="#redirect", max_bytes=10)
+        (workspace / "preserved.bin").write_bytes(b"original")
+        request["steps"][-1]["path"] = "preserved.bin"
+        before = sum(path == "/redirect" for path, _ in self.download_requests)
+        with self.assertRaises(ValueError):
+            run(request, workspace)
+        self.assertEqual(b"original", (workspace / "preserved.bin").read_bytes())
+        self.assertEqual(before, sum(path == "/redirect" for path, _ in self.download_requests))
 
 
 if __name__ == "__main__":
