@@ -8,6 +8,7 @@ import base64
 import hashlib
 import json
 import subprocess
+from contextlib import closing
 from dataclasses import asdict
 from datetime import UTC, datetime
 from pathlib import Path
@@ -18,16 +19,11 @@ from urllib.request import urlopen
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding, rsa
 
+from oscar.cloud import CloudConfig, CloudCore
 from oscar.contracts import new_id
-from oscar.credentials import CredentialPool
 from oscar.desktop import Desktop
 from oscar.grid import Node, NodeRole
-from oscar.harness import Harness, ModelExecutor
-from oscar.models import Funding, Mode, ModelRequest, ModelSpec, ProviderSpec, RoutingPolicy
 from oscar.policy import PersonalPolicy
-from oscar.providers import HTTPAdapter
-from oscar.registry import Registry
-from oscar.router import Router
 
 ROOT = Path(__file__).resolve().parents[1]
 MODEL = "qwen3.5:4b"
@@ -71,57 +67,73 @@ def run(full=False):
     try:
         with TemporaryDirectory(prefix="oscar-conversation-local-") as temporary:
             root = Path(temporary)
-            with Harness(
-                root / "core.sqlite",
-                root / "files",
-                ROOT / "config/development-models.json",
-                credential_environ={},
-                start_services=True,
-            ) as h:
-                provider = ProviderSpec(
-                    "local-acceptance",
-                    "ollama",
-                    "http://127.0.0.1:11434/api",
-                    {},
-                    local=True,
-                    private=True,
-                    provenance="exact installed local model; no cloud fallback",
-                )
-                model = ModelSpec(
-                    provider.id,
-                    MODEL,
-                    frozenset({"text"}),
-                    2,
-                    {"reasoning": 1},
-                    32768,
-                    8192,
-                    Funding.LOCAL,
-                    provenance="installed local acceptance; quality tier is test configuration",
-                )
-                router = Router(
-                    Registry([provider], [model]),
-                    CredentialPool([provider], {}, h.store),
-                    {"ollama": HTTPAdapter("ollama")},
-                    h.store,
-                )
-                h.dispatcher.executors["models.reason"] = ModelExecutor(
-                    router,
-                    ModelRequest(
-                        "template",
-                        "template",
-                        "",
-                        input_tokens=4096,
-                        max_output_tokens=8192,
-                        mode=Mode.PRIVATE,
-                        pinned_provider=provider.id,
-                        pinned_model=MODEL,
-                    ),
-                    RoutingPolicy(
-                        allowed_providers=frozenset({provider.id}),
-                        max_attempts=1,
-                        timeout_seconds=120,
-                    ),
-                )
+            manifest = root / "models.json"
+            manifest.write_text(
+                json.dumps(
+                    {
+                        "version": 1,
+                        "providers": [
+                            {
+                                "id": "local-acceptance",
+                                "adapter": "ollama",
+                                "base_url": "http://127.0.0.1:11434/api",
+                                "credential_envs": {},
+                                "local": True,
+                                "private": True,
+                                "provenance": "exact installed local model; no cloud fallback",
+                            }
+                        ],
+                        "models": [
+                            {
+                                "provider_id": "local-acceptance",
+                                "id": MODEL,
+                                "capabilities": ["text", "structured"],
+                                "quality": 2,
+                                "affinities": {"reasoning": 1},
+                                "context_limit": 32768,
+                                "output_limit": 8192,
+                                "funding": "local",
+                                "provenance": "installed local acceptance; unbenchmarked tier",
+                            }
+                        ],
+                    }
+                ),
+                encoding="utf-8",
+            )
+            configuration = {
+                "max_output_tokens": 8192,
+                "mode": "private",
+                "pinned_provider": "local-acceptance",
+                "pinned_model": MODEL,
+                "ollama_think": False,
+                "required": ["text", "structured"],
+            }
+            report["model_configuration"] = configuration
+            report["normal_cloud_configuration"] = True
+            secrets = root / "secrets"
+            secrets.mkdir()
+            cloud = root / "cloud.json"
+            cloud.write_text(
+                json.dumps(
+                    {
+                        "version": 1,
+                        "environment": "production",
+                        "core_id": "synthetic-model-core",
+                        "data_dir": str(root / "data"),
+                        "manifest": str(manifest),
+                        "secret_dir": str(secrets),
+                        "listen_host": "127.0.0.1",
+                        "listen_port": 8080,
+                        "ingress": "loopback",
+                        "allowed_hosts": ["127.0.0.1"],
+                        "provider_secrets": {},
+                        "model_request": configuration,
+                    }
+                ),
+                encoding="utf-8",
+            )
+            with closing(CloudCore(CloudConfig.load(cloud), initialize=True)) as core:
+                h = core.harness
                 scopes = (
                     "heartbeat",
                     "desktop:connect",

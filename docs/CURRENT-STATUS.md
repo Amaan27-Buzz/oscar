@@ -1,5 +1,17 @@
 # OSCAR — Current Status & Checklist
 
+**2026-10-24 real local-model planning:** the existing Cloud Core startup now
+accepts bounded model request configuration; local serving exposes the same
+configuration without replacing the executor. Installed Qwen 3.5 4B completed a
+synthetic file objective with independent readback through signed Full Access
+(4.151 s) and Ask's two exact reviews (4.093 s). A repeat Full run passed in
+4.121 s, while repeat Ask failed structured-output validation before effects.
+Native Ollama thinking and JSON
+output settings are explicit; incompatible adapters cannot silently ignore them.
+[Source-qualified receipt](evidence/software-completion/local-model-authority-2026-10-24.json)
+retains failed unstructured/structured output and earlier model failures. This is bounded
+real inference acceptance, not general planning reliability or product completion.
+
 **2026-10-24 signed Full Access planning:** exact signed standing authority now
 covers one conversational model/action objective without per-action prompts;
 Ask/Secure retain exact reviews. Originating grant ID/epoch is pinned through

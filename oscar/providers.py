@@ -230,6 +230,8 @@ class HTTPAdapter:
     def _request(
         self, provider: ProviderSpec, model: str, secret: str, request: ModelRequest, stream: bool
     ) -> Request:
+        if request.ollama_think is not None and self.kind != "ollama":
+            raise ProviderError(Failure.CAPABILITY)
         body: dict[str, Any]
         headers = {"Content-Type": "application/json", "User-Agent": "OSCAR/0.1"}
         root = provider.base_url.rstrip("/")
@@ -256,6 +258,8 @@ class HTTPAdapter:
             }
             if self.kind == "ollama":
                 body["options"] = {"num_predict": request.max_output_tokens}
+                if request.ollama_think is not None:
+                    body["think"] = request.ollama_think
                 if "structured" in request.required:
                     body["format"] = "json"
             else:

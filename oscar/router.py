@@ -65,6 +65,8 @@ class Router:
         for provider in self.registry.providers.values():
             if not provider.enabled or not provider.discovery_required:
                 continue
+            if request.ollama_think is not None and provider.adapter != "ollama":
+                continue
             if request.pinned_provider and request.pinned_provider != provider.id:
                 continue
             if policy.allowed_providers is not None and provider.id not in policy.allowed_providers:
@@ -204,6 +206,8 @@ class Router:
             provider = self.registry.providers[model.provider_id]
             if (
                 not provider.enabled
+                or request.ollama_think is not None
+                and provider.adapter != "ollama"
                 or provider.adapter not in self.adapters
                 or self._health_blocked(provider.id, model.id)
             ):

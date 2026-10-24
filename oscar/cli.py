@@ -237,6 +237,7 @@ def parser() -> argparse.ArgumentParser:
     serve = commands.add_parser("serve")
     serve.add_argument("--seconds", type=int, default=3600)
     serve.add_argument("--voice-config", type=Path)
+    serve.add_argument("--model-config", type=Path)
     serve.add_argument(
         "--continuous-voice",
         metavar="SESSION_ID",
@@ -280,6 +281,15 @@ def main() -> int:
         from .local_memory import LocalMemoryConfig
 
         template = None
+        if args.command == "serve" and args.model_config is not None:
+            from .cloud import strict_object
+
+            path = args.model_config
+            if path.is_symlink() or not path.is_file() or path.stat().st_size > 16384:
+                raise ValueError("bounded regular model configuration required")
+            template = ModelRequest.from_config(
+                json.loads(path.read_text(encoding="utf-8"), object_pairs_hook=strict_object)
+            )
         if args.command in {"reason", "routes"}:
             template = ModelRequest(
                 new_id(),

@@ -1,6 +1,7 @@
 import json
 import socket
 import unittest
+from contextlib import closing
 from dataclasses import replace
 from http.client import HTTPConnection
 from pathlib import Path
@@ -122,6 +123,82 @@ class CloudTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             CloudConfig.load(self.path)
         self.assertFalse(self.config.data_dir.exists())
+
+    def test_model_configuration_reaches_normal_executor_without_changing_authority(self):
+        from oscar.models import Mode
+
+        options = {
+            "mode": "private",
+            "pinned_provider": "local-acceptance",
+            "pinned_model": "qwen3.5:4b",
+            "max_output_tokens": 8192,
+            "ollama_think": False,
+            "required": ["text", "structured"],
+        }
+        config = CloudConfig.load(configuration(self.root, model_request=options))
+        with closing(CloudCore(config, initialize=True, start_services=False)) as core:
+            executor = core.harness.dispatcher.executors["models.reason"]
+            self.assertEqual(executor.template.mode, Mode.PRIVATE)
+            self.assertEqual(executor.template.max_output_tokens, 8192)
+            self.assertIs(executor.template.ollama_think, False)
+            self.assertEqual(executor.template.required, frozenset({"text", "structured"}))
+            self.assertEqual(executor.template.pinned_model, "qwen3.5:4b")
+            self.assertEqual(core.harness.store.all("standing_grant"), [])
+            self.assertEqual(core.harness.store.all("task"), [])
+
+    def test_model_configuration_rejects_invalid_options_before_state_initialization(self):
+        invalid = [
+            None,
+            [],
+            {"prompt": "untrusted"},
+            {"mode": "invalid"},
+            {"mode": "manual"},
+            {"max_output_tokens": True},
+            {"max_output_tokens": 0},
+            {"max_output_tokens": 32769},
+            {"max_output_tokens": "8192"},
+            {"ollama_think": 0},
+            {"pinned_model": ""},
+            {"pinned_model": "a\nb"},
+            {"pinned_provider": 7},
+            {"pinned_slot": "x" * 257},
+            {"required": "text"},
+            {"required": []},
+            {"required": ["structured"]},
+            {"required": ["text", "image"]},
+            {"required": ["text", "text"]},
+            {"required": ["text", {}]},
+        ]
+        for options in invalid:
+            with self.subTest(options=options):
+                with self.assertRaises((ValueError, TypeError)):
+                    CloudConfig.load(configuration(self.root, model_request=options))
+        self.assertFalse(self.config.data_dir.exists())
+
+    def test_local_serve_model_configuration_reaches_harness(self):
+        from unittest.mock import patch
+
+        from oscar.cli import main
+
+        path = self.root / "model-request.json"
+        path.write_text('{"max_output_tokens":8192,"ollama_think":false}')
+        with (
+            patch("sys.argv", ["oscar", "serve", "--model-config", str(path)]),
+            patch("oscar.cli.Harness", side_effect=RuntimeError("configured boundary")) as ctor,
+        ):
+            with self.assertRaisesRegex(RuntimeError, "configured boundary"):
+                main()
+        template = ctor.call_args.args[3]
+        self.assertEqual(template.max_output_tokens, 8192)
+        self.assertIs(template.ollama_think, False)
+        path.write_text('{"ollama_think":true,"ollama_think":false}')
+        with (
+            patch("sys.argv", ["oscar", "serve", "--model-config", str(path)]),
+            patch("oscar.cli.Harness") as ctor,
+            patch("oscar.cli.print_json"),
+        ):
+            self.assertEqual(main(), 2)
+            ctor.assert_not_called()
 
     def test_real_http_core_archive_idempotency_and_degraded_retrieval(self):
         self.start()

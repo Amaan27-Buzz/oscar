@@ -23,6 +23,7 @@ from .grid import Node, NodeRole, SessionHandle
 from .harness import Harness
 from .jev import Intent
 from .local_memory import LocalMemory, LocalMemoryConfig
+from .models import ModelRequest
 from .policy import PersonalPolicy
 from .registry import Registry
 from .secure_credentials import InjectedCredentialStore
@@ -57,6 +58,7 @@ class CloudConfig:
     auth_config: Path | None = None
     credential_key_ref: str | None = None
     local_memory: LocalMemoryConfig | None = None
+    model_request: ModelRequest | None = None
 
     @classmethod
     def load(cls, path: Path) -> "CloudConfig":
@@ -79,7 +81,14 @@ class CloudConfig:
         if (
             not isinstance(data, dict)
             or not required <= set(data)
-            or set(data) - required - {"auth_config", "credential_key_ref", "local_memory"}
+            or set(data)
+            - required
+            - {
+                "auth_config",
+                "credential_key_ref",
+                "local_memory",
+                "model_request",
+            }
         ):
             raise ValueError("explicit versioned production configuration required")
         if type(data["version"]) is not int or data["version"] != 1:
@@ -184,6 +193,7 @@ class CloudConfig:
             Path(auth_config) if auth_config else None,
             key_ref,
             LocalMemoryConfig.parse(data["local_memory"]) if "local_memory" in data else None,
+            ModelRequest.from_config(data["model_request"]) if "model_request" in data else None,
         )
 
 
@@ -235,6 +245,7 @@ class CloudCore:
                 execution_enrollment_authorized=renew_execution,
                 start_services=False,
                 memory_config=config.local_memory,
+                model_request=config.model_request,
             )
             pools = (
                 (self.core.pool, list(self.core.registry.providers.values())),

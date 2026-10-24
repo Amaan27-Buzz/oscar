@@ -102,6 +102,50 @@ deferred. Gate A/B historical scoped PASS; Gate C/D PARTIAL; Gate E NOT PASSED.
 
 ## Current local verification receipts
 
+### Normal Core configuration and actual local inference, 2026-10-24
+
+Cloud Core's normal versioned configuration and local `serve --model-config`
+now reach the existing model executor with bounded routing pins, output budget,
+output requirements and native Ollama thinking preference. Omission preserves
+defaults; unknown fields, unsupported requirements, invalid types and duplicate
+JSON keys fail before Core initialization. The settings create no credentials,
+standing authority or tasks. Explicit Ollama thinking cannot fall back to an
+adapter that ignores it. Existing signed reviews bind the full configuration.
+
+The planner prompt includes a complete typed step from current selected contracts;
+model arguments are still never repaired or filled after inference. The acceptance
+script now loads an actual synthetic Cloud configuration/manifest and uses its
+unmodified model executor, with no replacement router or special retry policy.
+Installed Qwen 3.5 4B produced a validated plan, actual file effect and exact
+independent readback in Full Access (4.151 seconds, no per-action review) and Ask
+(4.093 seconds, both exact signatures required). Native JSON mode and an explicit
+8192-token budget were configured; no download or cloud fallback occurred.
+A repeat Full run passed in 4.121 seconds; repeat Ask failed at the adapter's
+structured-output validation in 3.020 seconds, before any effect. Native JSON mode
+therefore does not establish reliable generation for this installed model. No
+automatic regeneration, argument repair or effect replay was added to hide failure.
+
+One earlier Cloud run without JSON mode returned malformed escaping and was
+rejected before any file effect. Earlier isolated Harness campaigns passed in
+8.622/4.078 seconds; prior attempts also failed on missing fields, no usable output
+or deadline. These remain distinct from the final passing pair. One objective per
+mode is insufficient evidence of general model reliability, visual reasoning or
+unrestricted computer control. Structured output configuration applies to the
+selected executor's requests, so ordinary prose configurations should retain
+the default text requirement. See [configuration](../CLOUD-CORE.md) and the
+[source-qualified receipt](../evidence/software-completion/local-model-authority-2026-10-24.json).
+
+The prior 1,050-test aggregate and native/Linux receipts below predate this
+provider request/configuration change. Current affected checks are recorded
+separately; no new rendered native, physical, production account or hosted result
+is implied. The initial new Cloud test incorrectly used a context-manager protocol
+that CloudCore does not implement; standard `closing` fixed test resource cleanup.
+The final stable-source affected campaign passed all 146 tests in 66.800 seconds;
+Ruff and Mypy (100 source files) passed. Actual one-second local CLI startup,
+authenticated loopback endpoint creation and shutdown passed with the new config.
+A discovery-filter test initially left inventory freshness enabled while asserting
+cached ranking; correcting its setup retained the production discovery exclusion.
+
 ### Full Access conversation planning, 2026-10-24
 
 The current local continuation removes per-action planning prompts only when an

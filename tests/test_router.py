@@ -35,6 +35,28 @@ class RouterTests(unittest.TestCase):
         self.assertTrue(route.reasons)
         self.assertIn("quality tier 2", " ".join(route.reasons))
 
+    def test_explicit_ollama_thinking_never_routes_to_an_adapter_that_ignores_it(self):
+        from unittest.mock import Mock
+
+        request = replace(self.r.request, ollama_think=False)
+        self.assertEqual([], self.r.router.rank(request))
+        self.r.registry.providers = {
+            key: replace(value, discovery_required=True)
+            for key, value in self.r.registry.providers.items()
+        }
+        self.r.router.discovery = Mock()
+        self.r.router.refresh(request)
+        self.r.router.discovery.inventory.assert_not_called()
+        self.r.router.discovery.account.assert_not_called()
+        provider = self.r.registry.providers["plentiful"]
+        self.r.registry.providers[provider.id] = replace(
+            provider, adapter="ollama", discovery_required=False
+        )
+        self.r.router.adapters["ollama"] = self.r.adapter
+        routes = self.r.router.rank(request)
+        self.assertTrue(routes)
+        self.assertEqual({"plentiful"}, {route.provider for route in routes})
+
     def test_free_first_preserves_scarce_high_value_route(self):
         self.assertEqual(self.route(mode=Mode.FREE_FIRST).provider, "plentiful")
 

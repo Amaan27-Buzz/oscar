@@ -156,6 +156,26 @@ class ProviderContractTests(unittest.TestCase):
         self.assertTrue(response.structured_ok)
         self.assertEqual(self.requests[0]["body"]["response_format"], {"type": "json_object"})
 
+    def test_explicit_ollama_thinking_is_typed_and_never_ignored_by_other_adapters(self):
+        self.body = {"message": {"content": "OSCAR_PROVIDER_OK"}, "done": True}
+        for preference in (None, False, True):
+            with self.subTest(preference=preference):
+                request = replace(self.request, ollama_think=preference)
+                self.generate("ollama", request=request)
+                body = self.requests[-1]["body"]
+                self.assertEqual(preference is not None, "think" in body)
+                if preference is not None:
+                    self.assertIs(body["think"], preference)
+        before = len(self.requests)
+        for adapter in ("openai", "google"):
+            with self.assertRaises(ProviderError) as caught:
+                self.generate(adapter, request=replace(self.request, ollama_think=False))
+            self.assertEqual(Failure.CAPABILITY, caught.exception.category)
+        self.assertEqual(before, len(self.requests))
+        for invalid in (0, 1, "false", [], {}):
+            with self.assertRaises(ValueError):
+                replace(self.request, ollama_think=invalid)
+
     def test_invalid_structured_output_is_failure(self):
         with self.assertRaises(ProviderError) as caught:
             self.generate(request=replace(self.request, required=frozenset({"text", "structured"})))

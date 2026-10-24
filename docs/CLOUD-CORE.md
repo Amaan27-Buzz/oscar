@@ -101,6 +101,42 @@ environment variables or the checkout. An empty mapping enables no external
 provider account. The Core does not enroll providers, discover owner secrets or
 invent credentials.
 
+Optional `model_request` in `cloud.json` configures the existing reasoning/planning
+executor. Local Desktop Core serving accepts the same object in a bounded JSON
+file through `python -m oscar serve --model-config PATH`. Accepted fields are
+`mode`, `pinned_provider`, `pinned_model`, `pinned_slot`, `required`, `max_output_tokens`
+(integer 1–32768) and `ollama_think` (boolean or null). Unknown fields and invalid
+pins fail before Core initialization. Omission preserves the existing defaults,
+including the 128-token output budget; configure a sufficient bounded budget for
+multi-step plans. The following uses an already installed local model and a
+matching provider/model entry in the selected manifest:
+
+```json
+{
+  "mode": "private",
+  "pinned_provider": "local-acceptance",
+  "pinned_model": "qwen3.5:4b",
+  "max_output_tokens": 8192,
+  "ollama_think": false,
+  "required": ["text", "structured"]
+}
+```
+
+An explicit thinking preference selects only the native Ollama adapter; it cannot
+silently fall back to an adapter that ignores the preference. Omit it for other
+providers. This follows [Ollama's native thinking contract](https://github.com/ollama/ollama/blob/main/docs/capabilities/thinking.mdx).
+The setting changes inference configuration only: credentials, spending policy,
+model availability, current signed authority and validated plan contracts remain
+independent. Review material binds this configuration; changing it invalidates an
+outstanding plan review. The local acceptance covers one synthetic file objective
+per mode, not general model quality or sufficient context for arbitrary plans.
+`required` accepts `["text"]` or `["text", "structured"]`; the latter requires
+an advertised structured-capable model and the adapter's native JSON mode.
+Structured mode constrains JSON syntax; OSCAR still validates every plan field,
+scope, current capability contract and authority before any effect. Use a dedicated
+structured configuration only when JSON is appropriate for all requests handled
+by that executor; ordinary prose remains the default.
+
 Set only nonsecret operational paths in the commissioning shell:
 
 ```sh

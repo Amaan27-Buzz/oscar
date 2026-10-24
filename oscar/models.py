@@ -3,6 +3,7 @@
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from enum import StrEnum
+from typing import Any
 
 from .freshness import SourceRef
 
@@ -155,9 +156,55 @@ class ModelRequest:
     pinned_provider: str | None = None
     pinned_model: str | None = None
     pinned_slot: str | None = None
+    ollama_think: bool | None = None
+
+    @classmethod
+    def from_config(cls, data: Any) -> "ModelRequest":
+        allowed = {
+            "mode",
+            "pinned_provider",
+            "pinned_model",
+            "pinned_slot",
+            "max_output_tokens",
+            "ollama_think",
+            "required",
+        }
+        if not isinstance(data, dict) or set(data) - allowed:
+            raise ValueError("bounded model request configuration required")
+        values = dict(data)
+        if "required" in values:
+            required = values["required"]
+            if (
+                not isinstance(required, list)
+                or not 1 <= len(required) <= 2
+                or any(not isinstance(v, str) for v in required)
+                or len(set(required)) != len(required)
+                or set(required) - {"text", "structured"}
+                or "text" not in required
+            ):
+                raise ValueError("explicit supported model output requirements required")
+            values["required"] = frozenset(required)
+        if "mode" in values:
+            values["mode"] = Mode(values["mode"])
+        for key in ("pinned_provider", "pinned_model", "pinned_slot"):
+            value = values.get(key)
+            if value is not None and (
+                not isinstance(value, str)
+                or not 1 <= len(value) <= 256
+                or any(c.isspace() or ord(c) < 32 or ord(c) == 127 for c in value)
+            ):
+                raise ValueError("bounded model routing pin required")
+        return cls("template", "template", "", **values)
 
     def __post_init__(self) -> None:
-        if not 1 <= self.min_quality <= 5 or not 1 <= self.max_output_tokens <= 32768:
+        if self.ollama_think is not None and type(self.ollama_think) is not bool:
+            raise ValueError("Ollama thinking preference must be an explicit boolean")
+        if (
+            type(self.min_quality) is not int
+            or not 1 <= self.min_quality <= 5
+            or type(self.max_output_tokens) is not int
+            or not 1 <= self.max_output_tokens <= 32768
+        ):
             raise ValueError("invalid task quality/output budget")
         if (
             type(self.input_tokens) is not int
