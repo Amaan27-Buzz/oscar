@@ -113,6 +113,45 @@ class ConversationPlanningTests(unittest.TestCase):
         self.assertEqual(1, len(self.requests))
         self.assertFalse((self.h.files.root / "welcome.txt").exists())
 
+    def test_failed_planning_explains_recovery_without_retries_and_new_review_can_succeed(self):
+        self.body["choices"][0]["message"]["content"] = ""
+        self.complete(self.review(self.proposed()))
+        self.h.executive.tick()
+        count = len(self.requests)
+        for _ in range(2):
+            response = self.conversation("Review the plan")
+            self.assertEqual("blocked", response["state"])
+            self.assertIn("request a new draft", response["message"])
+            self.assertIn("No proposed action was accepted", response["message"])
+        self.assertEqual(count, len(self.requests))
+        self.assertFalse((self.h.files.root / "welcome.txt").exists())
+        self.file_result()
+        self.assertEqual("blocked", self.conversation("Prepare a welcome file")["state"])
+        self.now = max(r["until"] for r in self.h.store.all("route_health")) + 1
+        self.h.grid.heartbeat(self.h.session)
+        self.h.grid.heartbeat(self.owner)
+        change = self.proposed()
+        self.assertEqual(count, len(self.requests))
+        self.complete(self.review(change))
+        self.h.executive.tick()
+        row = self.h.store.all("planner_request")[-1]
+        effects = self.proposed("Review plan " + row["id"])
+        self.assertFalse((self.h.files.root / "welcome.txt").exists())
+        self.complete(self.review(effects))
+        self.h.executive.tick()
+        self.assertEqual("Welcome to OSCAR", (self.h.files.root / "welcome.txt").read_text())
+        self.assertEqual("verified", self.h.store.all("task")[-1]["state"])
+
+    def test_malformed_plan_guidance_never_echoes_model_content_or_executes_it(self):
+        self.body["choices"][0]["message"]["content"] = "Private malformed model marker"
+        self.complete(self.review(self.proposed()))
+        self.h.executive.tick()
+        response = self.conversation("Review the plan")
+        self.assertEqual("blocked", response["state"])
+        self.assertIn("Request a new draft", response["message"])
+        self.assertNotIn("Private malformed model marker", response["message"])
+        self.assertFalse((self.h.files.root / "welcome.txt").exists())
+
     def test_multiple_plans_require_exact_reference_and_revocation_denies_it(self):
         first = self.draft()
         self.draft()

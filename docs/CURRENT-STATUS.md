@@ -1,5 +1,12 @@
 # OSCAR — Current Status & Checklist
 
+**2026-10-24 planning recovery:** failed/malformed plans now return actionable,
+bounded guidance. Repeated review sends no model calls or effects; a fresh signed
+draft after Router cooldown can recover through a separately reviewed verified
+file action. All 54 affected cases passed with stable sources; Ruff/Mypy passed.
+[Receipt](evidence/software-completion/planning-recovery-2026-10-24.json).
+General installed-model planning remains imperfect and full completion PARTIAL.
+
 **2026-10-24 browser file transfer:** same-origin HTTP downloads now keep profile
 authentication inside Chromium and enforce streaming byte/deadline bounds.
 Actual separate synthetic sessions, binary readback, unauthenticated denial,

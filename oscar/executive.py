@@ -612,11 +612,23 @@ class Executive:
             or self.store.get("plan", planner_task_id)["kind"] != "model_reasoning"
         ):
             raise PermissionError("scoped Core model task required")
-        if self.store.task(planner_task_id).state not in {
+        state = self.store.task(planner_task_id).state
+        if state not in {
             TaskState.PARTIALLY_VERIFIED,
             TaskState.VERIFIED,
         }:
-            raise StateConflict("planner result is not available")
+            if state in {
+                TaskState.FAILED,
+                TaskState.BLOCKED,
+                TaskState.CANCELLED,
+                TaskState.UNKNOWN,
+            }:
+                raise StateConflict(
+                    "Planning stopped before a usable plan was available. "
+                    "No proposed action was accepted. Inspect the planning task, "
+                    "then request a new draft."
+                )
+            raise StateConflict("Planning is still running. Wait before reviewing its result.")
         results = [
             r for r in self.store.all("result") if r["task_id"] == planner_task_id and r["success"]
         ]
@@ -626,7 +638,13 @@ class Executive:
             or len(results[-1]["value"]) > 32768
         ):
             raise StateConflict("bounded model result required")
-        steps = json.loads(results[-1]["value"])
+        try:
+            steps = json.loads(results[-1]["value"])
+        except json.JSONDecodeError:
+            raise ValueError(
+                "The model returned an unusable plan. Request a new draft; "
+                "no proposed action was accepted."
+            ) from None
         if (
             isinstance(steps, dict)
             and set(steps) == {"clarification"}

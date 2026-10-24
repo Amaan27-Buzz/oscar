@@ -123,17 +123,18 @@ does not mean an arbitrary plugin is allowed to inspect the native vault.
 
 ## Concrete adapters
 
-`config/google-connectors.json` contains 35 selected official-discovery-backed
+`config/google-connectors.json` contains 39 selected capabilities: 35 official-discovery-backed
 capabilities across Gmail (search/read/threads/drafts/send/labels/history), Calendar
 (events list/get/create/patch/delete/freebusy), Drive (search/metadata/media/export/
 metadata create/patch), Classroom (courses/coursework/submissions/announcements),
 Docs (get/create/batchUpdate), Sheets (metadata/ranges get/update/create), and Slides
-(get/create/batchUpdate). Bodies are bounded JSON objects; provider validation still
+(get/create/batchUpdate), plus four Google Tasks REST capabilities (list discovery,
+task list/get/create, checked 2026-10-24). Bodies are bounded JSON objects; provider validation still
 owns full API schemas. Pagination is explicit, caller-driven; a page is not a
 complete inbox or course inventory. Drive create/patch currently covers metadata,
 not media uploads. Google proprietary documents require explicit MIME export.
 
-Thin Microsoft Graph (mail/calendar/OneDrive/Teams/SharePoint), GitHub (repository/
+Thin Microsoft Graph (mail/calendar/To Do/OneDrive/Teams/SharePoint), GitHub (repository/
 issues/PRs/commits/Actions/status), Slack (channels/history/search/post), and Notion
 (search/pages/blocks/databases/data sources) use the same HTTP adapter. Scope
 requirements are deliberately explicit, not inferred from token presence. GitHub
@@ -141,8 +142,17 @@ fine-grained/App installation permissions and Notion integration access remain
 provider-side checks; HTTP denial does not diagnose global account health.
 
 MCP maps only owner-reviewed tools into manifests; untrusted annotations cannot
-lower risk or grant scope. An authenticated external SDK session is required.
-The current MCP boundary is manifest/session plumbing, not a deployed MCP client.
+lower risk or grant scope. Current stdio/Streamable HTTP execution uses the installed
+SDK and reviewed lifecycle/resource authorization. Actual synthetic SDK and resource
+OAuth checks are recorded in [MCP authorization](development/SOFTWARE-MCP-AUTHORIZATION.md);
+that is local software acceptance, not a commissioned external provider.
+
+Google Tasks and Microsoft To Do list/create requests reuse native conversation,
+exact signed review, account-generation fences and independent saved-resource GET.
+The [task integration contract](development/SOFTWARE-COMMUNICATION-INTEGRATION.md)
+records exact forms, date semantics and literal OAuth scopes. Existing account
+scope ceilings do not expand automatically. Synthetic task HTTP/Cloud integration
+passed; real provider accounts and reminder delivery remain uncommissioned.
 
 **Broader live Google/Microsoft/Slack/Notion/MCP account integration: NOT ACCEPTED.** Fixture testing does not establish live private provider access. The separate narrow owner-authorized **GitHub device OAuth/private-read** flow *was* verified for Gate B, with scope `user:email`; it does not imply a deployed general GitHub MCP service, write access, complete Auth Broker or remote provider revocation.
 

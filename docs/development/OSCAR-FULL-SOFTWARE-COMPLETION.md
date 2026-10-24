@@ -105,6 +105,18 @@ deferred. Gate A/B historical scoped PASS; Gate C/D PARTIAL; Gate E NOT PASSED.
 
 ## Current local verification receipts
 
+### Planning failure recovery, 2026-10-24
+
+Failed/stopped model planning now explains that no proposed action was accepted
+and directs the user to inspect the task and request a fresh draft. Malformed JSON
+gets bounded guidance without echoing model content. Repeated review makes no
+model calls or effects. The Router's cooldown remains enforced; after it expires,
+a newly signed draft and separate effects review can produce a verified file.
+All 54 affected conversation/planner/Executive cases passed in 35.988 seconds,
+no skips, with stable source hashes; Ruff/Mypy passed. A new test's incorrect
+immediate-recovery assumption is retained in the [receipt](../evidence/software-completion/planning-recovery-2026-10-24.json).
+This improves safe recovery, not installed-model reliability or general planning.
+
 ### Authenticated browser downloads, 2026-10-24
 
 Same-origin HTTP anchor downloads now stream inside the selected isolated Chromium

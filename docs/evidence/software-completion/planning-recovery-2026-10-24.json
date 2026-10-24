@@ -1,0 +1,37 @@
+{
+  "status": "SOFTWARE_PLANNING_RECOVERY_VERIFIED",
+  "base_head": "09ec699138ed2c7431f4ce520e86b575d2ccd373",
+  "tests": 54,
+  "passed": 54,
+  "skipped": 0,
+  "seconds": 35.988,
+  "source_stable": true,
+  "sources": {
+    "oscar/executive.py": "d00bea8101faf300c15798ceaeac9ad7a770d4a97b30c7763138e5e1dfc0b547",
+    "oscar/planner_authoring.py": "d3e748a3b7a0029186c4cfd8db13c9a5798d9846fc2480bb5b891d1e4b2ff241",
+    "tests/test_conversation_planning.py": "10d13d5cdcb81b482da4fdd384b75c4b83ab43a6e1f6da5162f74da620f8e0f4",
+    "tests/test_planner_authoring.py": "f0ae6d64f97da1e467ab2911a6168a611b4c1d7cacaf68fa2cabe6b8fa061be6",
+    "tests/test_executive.py": "d86a19dc97e8cca8fb7c40ff2490dcf6b408357c3cc3d9f67f45378b9cec288a"
+  },
+  "log_sha256": "ea91adb9b9be1c4808d389ee2bb3eb7c1e731d5c3f39d89701642ac4f4470a2b",
+  "verified": [
+    "Failed planning returns a bounded actionable message instead of generic unavailable result",
+    "Malformed JSON guidance does not echo private model text",
+    "Repeated review sends no new model calls and performs no action",
+    "New draft remains blocked during real Router cooldown; after simulated clock expiry and legitimate heartbeat a freshly signed draft and separately signed effects review produce a real independently read file",
+    "No repair of model arguments, automatic effect retries or authority change"
+  ],
+  "failure_retained": "First 54-case campaign failed one new test which incorrectly assumed immediate provider recovery. Router cooldown was honored in the corrected test; focused recovery passed and all 54 then passed together. Production cooldown enforcement unchanged.",
+  "failed_log_sha256": "61342dbeff1a60e010ebb768aff1c81d4ad17b2a3e63c03f112c55514382d182",
+  "static_checks": {
+    "ruff": "PASS oscar tests scripts",
+    "mypy": "PASS 100 source files",
+    "diff_check": "PASS"
+  },
+  "limits": [
+    "Actual synthetic HTTP model, not new installed-Qwen reliability acceptance",
+    "No new native rendered acceptance; existing response shape is unchanged",
+    "General model planning can still fail safely"
+  ],
+  "private_material_in_receipt": false
+}
