@@ -385,3 +385,10 @@ passed (80.231 s), including real synthetic child execution, independent exact-f
 inspection, no replay, revocation and unknown-objective preservation. Fresh real
 Codex/provider and remote artifact acceptance remain open.
 [Receipt](../evidence/software-completion/coding-planner-2026-10-25.json).
+
+**2026-10-25 combined execution aggregate at `e8b6932`:** 1,139 Windows
+Python tests completed: 1,129 passed, ten skipped, zero failed/error (679.849 s).
+Source hashes remained unchanged. The native visual fixture passed; earlier
+failed evidence remains preserved and its cause is unproven. No whole-product,
+real-provider, physical or deployment promotion follows from this aggregate.
+[Receipt](../evidence/software-completion/combined-execution-windows-2026-10-25.json).

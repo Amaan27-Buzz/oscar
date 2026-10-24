@@ -339,3 +339,10 @@ Evidence terms: SOFTWARE_VERIFIED / CI_VERIFIED / SIMULATED / OWNER_VERIFIED / P
 separately authorized host and owner-device commissioning. The physical Android
 phone must not be accessed in this software run. Hardware Slice 18 remains later.
 See [delivery plan](DELIVERY-PLAN.md).
+
+**2026-10-25 combined execution aggregate at `e8b6932`:** 1,139 Windows
+Python tests completed: 1,129 passed, ten skipped, zero failed/error (679.849 s).
+Source hashes remained unchanged. The native visual fixture passed; earlier
+failed evidence remains preserved and its cause is unproven. No whole-product,
+real-provider, physical or deployment promotion follows from this aggregate.
+[Receipt](evidence/software-completion/combined-execution-windows-2026-10-25.json).
