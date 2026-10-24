@@ -43,6 +43,8 @@ class Provider:
         self.calls, self.resources = [], {}
         self.requests = []
         self.after_get, self.tamper, self.fail = None, False, False
+        self.transform = None
+        self.fail_after_post = False
         owner = self
 
         class Handler(BaseHTTPRequestHandler):
@@ -68,11 +70,20 @@ class Provider:
                         self.end_headers()
                         return
                     result = {"id": "synthetic-resource", **body}
+                    if path == "/v2/spaces":
+                        result = {
+                            "name": "spaces/SyntheticSpace",
+                            "meetingCode": "abc-defg-hij",
+                            "meetingUri": "https://meet.google.com/abc-defg-hij",
+                            **body,
+                        }
                     if path.endswith("messages/send"):
                         result["labelIds"] = ["SENT"]
                         read_path = path.removesuffix("/send") + "/synthetic-resource"
                     else:
                         read_path = path + "/synthetic-resource"
+                    if path == "/v2/spaces":
+                        read_path = "/v2/spaces/SyntheticSpace"
                     if path == "/v1.0/me/messages":
                         result["isDraft"] = True
                     owner.resources[read_path] = result
@@ -94,6 +105,12 @@ class Provider:
                             "@odata.nextLink": "provider-pagination-is-explicit",
                         }
                     )
+                if self.command == "POST" and owner.fail_after_post:
+                    self.send_response(503)
+                    self.end_headers()
+                    return
+                if owner.transform:
+                    result = owner.transform(self.command, deepcopy(result))
                 raw = json.dumps(result).encode()
                 self.send_response(200)
                 self.send_header("Content-Type", "application/json")
@@ -158,6 +175,7 @@ class CommunicationTests(unittest.TestCase):
                     "google.calendar",
                     "google.tasks",
                     "google.contacts",
+                    "google.meet",
                     "microsoft.graph",
                 }:
                     continue
@@ -244,6 +262,107 @@ class CommunicationTests(unittest.TestCase):
         result = self.call("complete", signed)
         self.assertNotIn("retry", result["actions"])
         return result
+
+    def test_meet_signed_creation_and_read_use_correlated_resource_name(self):
+        view = self.ask("create meet space using Google access restricted")
+        self.assertEqual("planned", view["state"], view)
+        self.assertEqual([], self.provider.calls)
+        review, signed = self.approval(view["task_id"])
+        self.assertEqual(
+            {"path": {}, "body": {"config": {"accessType": "RESTRICTED"}}},
+            json.loads(review["review"])["parameters"],
+        )
+        result = self.call("complete", signed)
+        self.assertEqual("verified", result["state"], result)
+        self.assertEqual(
+            [("POST", "/v2/spaces"), ("GET", "/v2/spaces/SyntheticSpace")],
+            [(method, path) for method, path, _ in self.provider.calls],
+        )
+        self.assertNotIn("id", self.provider.resources["/v2/spaces/SyntheticSpace"])
+        read = self.execute("read meet space SyntheticSpace using Google")
+        self.assertEqual("partially_verified", read["state"])
+        self.assertEqual("REPORTED", read["response_status"])
+        self.assertIn("https://meet.google.com/abc-defg-hij", read["response"])
+
+    def test_meet_invalid_mutation_identity_blocks_readback_without_retry(self):
+        for name in (None, "other/Foreign", "spaces/../foreign", "spaces/a/b", "spaces/"):
+            with self.subTest(name=name):
+                self.provider.transform = lambda method, value, name=name: {**value, "name": name}
+                before = len(self.provider.calls)
+                result = self.execute("create meet space using Google access restricted")
+                self.assertNotEqual("verified", result["state"])
+                self.assertEqual(1, len(self.provider.calls) - before)
+                self.assertNotIn("retry", result["actions"])
+
+    def test_meet_readback_identity_access_and_join_uri_must_match(self):
+        for change in (
+            {"name": "spaces/OtherSpace"},
+            {"config": {"accessType": "OPEN"}},
+            {"config": None},
+            {"config": []},
+            {"meetingUri": "https://other.example/abc-defg-hij"},
+            {"meetingCode": "invalid"},
+        ):
+            with self.subTest(change=change):
+                self.provider.transform = lambda method, value, change=change: (
+                    {**value, **change} if method == "GET" else value
+                )
+                result = self.execute("create meet space using Google access restricted")
+                self.assertEqual("failed", result["state"], result)
+                self.assertEqual(["POST", "GET"], [c[0] for c in self.provider.calls[-2:]])
+
+    def test_meet_requires_exact_account_scope_and_syntax(self):
+        for text in (
+            "create meet space using Work access restricted",
+            "create meet space using Google access open",
+            "create meet space using unknown access restricted",
+            "read meet space ../Foreign using Google",
+        ):
+            with self.subTest(text=text), self.assertRaises((ValueError, PermissionError)):
+                prepare(self.h, text)
+        account = self.accounts["Google"]
+        service = account.services["google.meet"]
+        self.h.accounts.bind(
+            account.id,
+            "google.meet",
+            CredentialRef(service.credential_ref),
+            {"openid"},
+            "https://meet.googleapis.com",
+        )
+        self.mount.refresh()
+        with self.assertRaises((ValueError, PermissionError)):
+            prepare(self.h, "create meet space using Google access restricted")
+        self.assertEqual([], self.provider.calls)
+        self.assertEqual({}, self.h.connectors.requests)
+
+    def test_meet_uncertain_after_effect_is_not_replayed(self):
+        self.provider.fail_after_post = True
+        view = self.ask("create meet space using Google access restricted")
+        _, signed = self.approval(view["task_id"])
+        result = self.call("complete", signed)
+        self.assertNotEqual("verified", result["state"])
+        self.assertIn("/v2/spaces/SyntheticSpace", self.provider.resources)
+        self.assertNotIn("retry", result["actions"])
+        self.h.runtime.run(view["task_id"], self.h.executive.targets)
+        with self.assertRaises((PermissionError, StateConflict)):
+            self.call("complete", signed)
+        self.assertEqual(1, len(self.provider.calls))
+
+    def test_meet_generation_rotation_denies_reviewed_creation(self):
+        view = self.ask("create meet space using Google access restricted")
+        account = self.accounts["Google"]
+        service = account.services["google.meet"]
+        self.h.accounts.bind(
+            account.id,
+            "google.meet",
+            CredentialRef(service.credential_ref),
+            service.scopes,
+            "https://meet.googleapis.com",
+        )
+        self.mount.refresh()
+        _, signed = self.approval(view["task_id"])
+        self.assertNotEqual("verified", self.call("complete", signed)["state"])
+        self.assertEqual([], self.provider.calls)
 
     def test_google_draft_send_and_calendar_independent_saved_resource_readback(self):
         for text in (
@@ -759,7 +878,7 @@ class CommunicationTests(unittest.TestCase):
 
         return session, call, sign
 
-    def cloud(self):
+    def cloud(self, service="microsoft.graph"):
         root = self.root / "cloud"
         root.mkdir()
         core = CloudCore(
@@ -767,12 +886,15 @@ class CommunicationTests(unittest.TestCase):
         )
         self.addCleanup(core.close)
         core.harness.connectors.secrets = VaultResolver(self.vault)
-        account = core.harness.accounts.add("microsoft", "fixture", "Work", "Work", verified=True)
-        manifest = next(m for m in account_manifests() if m.id == "microsoft.graph")
+        provider, alias = (
+            ("google", "Google") if service == "google.meet" else ("microsoft", "Work")
+        )
+        account = core.harness.accounts.add(provider, "fixture", alias, alias, verified=True)
+        manifest = next(m for m in account_manifests() if m.id == service)
         self.cloud_account = core.harness.accounts.bind(
             account.id,
             manifest.id,
-            CredentialRef("workmicrosoft.graph"),
+            CredentialRef((alias + service).lower()),
             {s for c in manifest.capabilities for s in c.scopes},
             manifest.base_url,
         )
@@ -792,8 +914,14 @@ class CommunicationTests(unittest.TestCase):
             'due 2026-10-25 notes "Private marker"'
         )
 
-    def check_cloud_native_request(self, instruction):
-        core, server = self.cloud()
+    def test_cloud_meet_creation_actual_http_signature_resource_name_and_private_output(self):
+        self.check_cloud_native_request(
+            "create meet space using Google access restricted", service="google.meet"
+        )
+
+    def check_cloud_native_request(self, instruction, service="microsoft.graph"):
+        core, server = self.cloud(service)
+        marker = "SyntheticSpace" if service == "google.meet" else "Private marker"
         session, call, sign = self.cloud_client(core, server, "communication-phone")
         _, other, _ = self.cloud_client(core, server, "communication-other", connector=False)
         payload = {
@@ -812,7 +940,7 @@ class CommunicationTests(unittest.TestCase):
         self.assertEqual(task_id, call("submit", payload, request_id=request_id)["task_id"])
         self.assertEqual(1, len(core.harness.store.all("remote_task")))
         review = call("challenge", {"operation": "approve", "task_id": task_id})
-        self.assertIn("Private marker", review["review"])
+        self.assertIn("RESTRICTED" if service == "google.meet" else marker, review["review"])
         claim = json.loads(base64.b64decode(review["signing_payload"]))
         self.assertEqual(
             claim["display_digest"],
@@ -836,16 +964,16 @@ class CommunicationTests(unittest.TestCase):
                 break
             sleep(0.05)
         self.assertEqual("verified", view["state"], view)
-        self.assertIn("Private marker", view["result"]["value"])
+        self.assertIn(marker, view["result"]["value"])
         self.assertIsNone(other("inspect", {"task_id": task_id})["result"]["value"])
         self.assertEqual(["POST", "GET"], [c[0] for c in self.provider.calls])
         call("complete", signed, expected=403)
         self.assertEqual(task_id, call("submit", payload, request_id=request_id)["task_id"])
         self.assertEqual(2, len(self.provider.calls))
         store = core.harness.store
-        self.assertNotIn("Private marker", json.dumps(store.all("plan")))
-        self.assertNotIn("Private marker", json.dumps(store.all("objective")))
-        self.assertNotIn("Private marker", json.dumps(store.all("result")))
+        self.assertNotIn(marker, json.dumps(store.all("plan")))
+        self.assertNotIn(marker, json.dumps(store.all("objective")))
+        self.assertNotIn(marker, json.dumps(store.all("result")))
         self.assertEqual(
             session["session_id"], store.get("remote_task", task_id)["requester_session"]
         )

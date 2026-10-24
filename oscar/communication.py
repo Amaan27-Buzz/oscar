@@ -52,7 +52,8 @@ def prepare(harness: "Harness", text: str) -> PreparedCommunication | None:
     request = re.sub(r"^please ", "", text.strip(), count=1, flags=re.IGNORECASE)
     if not re.match(
         r"(?:(?:draft|send|list|read) email\b|create calendar event\b|"
-        r"create task\b|list task lists\b|list tasks\b|list contacts\b|read contact\b)",
+        r"create task\b|list task lists\b|list tasks\b|list contacts\b|read contact\b|"
+        r"create meet space\b|read meet space\b)",
         request,
         re.IGNORECASE,
     ):
@@ -97,12 +98,36 @@ def prepare(harness: "Harness", text: str) -> PreparedCommunication | None:
         request,
         re.IGNORECASE,
     )
-    if not any((mail, listing, reading, event, task, task_lists, task_listing, contacts, contact)):
+    meet_create = re.fullmatch(
+        r"create meet space using (\S+) access restricted", request, re.IGNORECASE
+    )
+    meet_read = re.fullmatch(
+        r"read meet space ([A-Za-z0-9_-]{1,128}) using (\S+)", request, re.IGNORECASE
+    )
+    if not any(
+        (
+            mail,
+            listing,
+            reading,
+            event,
+            task,
+            task_lists,
+            task_listing,
+            contacts,
+            contact,
+            meet_create,
+            meet_read,
+        )
+    ):
         raise ValueError(
             "Specify account and exact mail fields, event offset times, "
-            "task list/title/date/notes, or contact ID"
+            "task list/title/date/notes, contact ID, or restricted Meet space"
         )
-    if mail:
+    if meet_create:
+        alias = meet_create[1]
+    elif meet_read:
+        alias = meet_read[2]
+    elif mail:
         alias = mail[2]
     elif listing:
         alias = listing[1]
@@ -132,7 +157,18 @@ def prepare(harness: "Harness", text: str) -> PreparedCommunication | None:
     prefix = "google.gmail" if google else "microsoft.mail"
     parameters: dict[str, Any] = {"path": {"userId": "me"}} if google else {"path": {}}
     expected: dict[str, Any] = {}
-    if contacts or contact:
+    if meet_create or meet_read:
+        if not google:
+            raise ValueError("Meet requires the selected connected Google account")
+        name = "google.meet." + ("create" if meet_create else "get")
+        parameters = {"path": {}}
+        if meet_create:
+            parameters["body"] = {"config": {"accessType": "RESTRICTED"}}
+            expected = {"accessType": "RESTRICTED"}
+        else:
+            assert meet_read is not None
+            parameters["path"]["space"] = meet_read[1]
+    elif contacts or contact:
         prefix = "google.contacts" if google else "microsoft.contacts"
         name = prefix + (".read" if contact else ".list")
         parameters = {"path": {}}
@@ -301,6 +337,17 @@ def prepare(harness: "Harness", text: str) -> PreparedCommunication | None:
 
 def matches(name: str, payload: dict[str, Any], expected: dict[str, Any]) -> bool:
     """Prove the saved provider resource, never delivery to another person's inbox."""
+    if name == "google.meet.create":
+        code = payload.get("meetingCode")
+        config = payload.get("config")
+        return bool(
+            isinstance(code, str)
+            and re.fullmatch(r"[a-z]+-[a-z]+-[a-z]+", code)
+            and len(code) <= 128
+            and payload.get("meetingUri") == "https://meet.google.com/" + code
+            and isinstance(config, dict)
+            and config.get("accessType") == expected["accessType"]
+        )
     if name == "google.tasks.create":
         return bool(
             payload.get("title") == expected["title"]

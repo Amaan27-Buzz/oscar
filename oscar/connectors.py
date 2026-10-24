@@ -134,6 +134,7 @@ class ConnectorCapability:
     read_request: bool = False
     consequences: tuple[RiskLevel, ...] = ()
     communication_trigger: str | None = None
+    resource_name_prefix: str | None = None
 
     @property
     def permissions(self) -> tuple[str, ...]:
@@ -174,6 +175,11 @@ class ConnectorCapability:
             raise ValueError("read capability cannot declare mutation consequences")
         if self.communication_trigger not in {None, "calendar"}:
             raise ValueError("unknown communication trigger")
+        if self.resource_name_prefix is not None and (
+            not isinstance(self.resource_name_prefix, str)
+            or not re.fullmatch(r"[a-zA-Z][a-zA-Z0-9]*/", self.resource_name_prefix)
+        ):
+            raise ValueError("single resource collection prefix required")
         if not math.isfinite(self.freshness_seconds) or self.freshness_seconds < 0:
             raise ValueError("invalid freshness")
 
@@ -888,6 +894,17 @@ class ConnectorVerifier(Verifier):
                 raise ConnectorError("completion_fields_missing")
             # Correlate the requested resource with the actual mutation response.
             response_id = outcome.payload.get("id")
+            identity_field = "id"
+            response_identity = response_id
+            if mutation.resource_name_prefix:
+                identity_field = "name"
+                response_identity = outcome.payload.get("name")
+                if not isinstance(response_identity, str) or not re.fullmatch(
+                    re.escape(mutation.resource_name_prefix) + r"[A-Za-z0-9_-]{1,128}",
+                    response_identity,
+                ):
+                    raise ConnectorError("readback_resource_mismatch")
+                response_id = response_identity.removeprefix(mutation.resource_name_prefix)
             expected_path = dict(outcome.resource_path)
             read_keys = set(re.findall(r"\{(.*?)\}", read.path))
             resource_keys = read_keys - expected_path.keys()
@@ -946,11 +963,13 @@ class ConnectorVerifier(Verifier):
 
                 if criterion["operation"] != mutation.name:
                     raise ConnectorError("readback_operation_mismatch")
-                matches = payload.get("id") == response_id and communication_matches(
+                matches = payload.get(
+                    identity_field
+                ) == response_identity and communication_matches(
                     mutation.name, payload, criterion["expected"]
                 )
             else:
-                matches = payload.get("id") == response_id and all(
+                matches = payload.get(identity_field) == response_identity and all(
                     payload.get(k) == v for k, v in criterion["expected"].items()
                 )
             detail = "expected fields match" if matches else "read-back fields differ"

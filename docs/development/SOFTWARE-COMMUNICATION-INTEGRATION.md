@@ -212,3 +212,46 @@ python -m unittest tests.test_communication tests.test_connectors tests.test_con
 See the [source-scoped receipt](../evidence/software-completion/communication-2026-10-22.json).
 No real OAuth, real mail/event mutation, recipient delivery, public deployment or
 physical-phone acceptance is claimed.
+
+## Google Meet app-created spaces — 2026-10-25
+
+The existing account broker, native conversation admission, signed review,
+Fabric and independent verifier now support:
+
+```text
+create meet space using ACCOUNT-ALIAS access restricted
+read meet space SERVER-GENERATED-SPACE-ID using ACCOUNT-ALIAS
+```
+
+Only the selected connected Google account's exact `google.meet` service binding
+and `https://www.googleapis.com/auth/meetings.space.created` grant enable these
+capabilities. The example OAuth configuration supplies the service and scope
+ceiling; it grants nothing by itself. Existing accounts are not upgraded.
+Creation is a write operation; reading separately needs Core connector-read
+permission. Signed Ask and current account-generation/policy checks apply.
+
+Create posts an explicit `config.accessType: RESTRICTED` to the official v2 API.
+The returned `name` must identify one resource under `spaces/`; the independent
+GET must return that exact full name, restricted access and a consistent official
+Meet join URL/code. No guessed IDs or response-only success can verify the write.
+A declared resource-name prefix extends the existing verifier; ordinary providers
+retain exact `id` correlation. Read-only responses remain REPORTED. Account
+rotation, wrong names, malformed/nested names, wrong access, invalid URLs and
+malformed configuration fail closed. A stored effect followed by HTTP failure is
+not retried or replayed. Space payloads remain transient and requester-scoped.
+
+Official contracts: [create](https://developers.google.com/workspace/meet/api/reference/rest/v2/spaces/create),
+[get](https://developers.google.com/workspace/meet/api/reference/rest/v2/spaces/get),
+[space configuration](https://developers.google.com/workspace/meet/api/reference/rest/v2/spaces),
+and [user authorization](https://developers.google.com/workspace/meet/api/guides/authenticate-authorize).
+RESTRICTED means only invitees join without knocking; it is not a promise that
+other users can never request entry. Meeting codes are aliases, not durable
+resource identities.
+
+Synthetic acceptance exercises real loopback HTTP with signed Desktop review,
+a signed phone/Core request, private output isolation, actual synthetic signed
+OIDC/PKCE scope binding, refresh, local revocation and after-effect uncertainty.
+The [source-scoped receipt](../evidence/software-completion/meet-2026-10-25.json)
+records the final checks. No real Google enrollment, meeting, participant access,
+invitation, call, recording or recipient delivery is claimed. Broader meeting
+participation and adaptive account/application workflows remain unfinished.

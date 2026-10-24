@@ -44,9 +44,10 @@ def load_google(path: Path) -> tuple[ConnectorManifest, ...]:
                 if family in {"gmail", "calendar"}
                 else ("polling",),
                 provenance=(
-                    "official Google " + family + " REST verified 2026-10-24; "
+                    f"official Google {family} REST verified "
+                    f"{'2026-10-25' if family == 'meet' else '2026-10-24'}; "
                     "SOFTWARE-COMMUNICATION-INTEGRATION.md"
-                    if family in {"tasks", "contacts"}
+                    if family in {"tasks", "contacts", "meet"}
                     else "official Google Discovery retrieved 2026-10-03 IST; CONNECTOR-FABRIC.md"
                 ),
             )

@@ -88,7 +88,7 @@ partial and open acceptance separately.
 | Google Tasks | New list discovery/list/get/create adapter and native authoring; real synthetic HTTP/Cloud task proof. Real accounts pending |
 | Drive / Docs / Sheets / Slides / Classroom | Bounded declared methods through the real HTTPS adapter and synthetic HTTP contracts. General document semantics, owner services and actual app workflows are not globally accepted |
 | Google / Microsoft Contacts | Bounded account-bound list/exact-read through signed native conversation and actual synthetic HTTP; real provider commissioning pending |
-| Google Meet | No dedicated accepted provider workflow established; generic MCP/browser support is not service acceptance |
+| Google Meet | LOCAL signed Desktop and phone/Core app-created restricted space create/get with exact resource-name readback; synthetic OIDC/refresh/revocation and uncertain-effect tests. Real Google commissioning and conference participation remain OPEN. [Contract](SOFTWARE-COMMUNICATION-INTEGRATION.md) |
 | Microsoft Outlook / Calendar / To Do | Bounded account-bound mail/event/task operations with synthetic HTTP/Cloud proof; sendMail 202 remains PARTIAL without a correlated resource |
 | OneDrive / Teams / SharePoint | Thin admitted read contracts; real tenant consent/provider workflows uncommissioned; not full application coverage |
 | GitHub / Git | Existing scoped Git/native commands and HTTPS API subset; historical narrow GitHub device-OAuth private-read evidence is not a new live/write claim. CI/CD mutation and broad issue/PR lifecycle are not fully accepted |

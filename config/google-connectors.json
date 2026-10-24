@@ -662,6 +662,38 @@
           "response_kind": "json"
         }
       ]
+    },
+    "meet": {
+      "origin": "https://meet.googleapis.com",
+      "capabilities": [
+        {
+          "name": "google.meet.get",
+          "method": "GET",
+          "path": "/v2/spaces/{space}",
+          "scopes": [
+            "https://www.googleapis.com/auth/meetings.space.created"
+          ],
+          "risk": "read",
+          "query_fields": [],
+          "body_required": false,
+          "response_kind": "json"
+        },
+        {
+          "name": "google.meet.create",
+          "method": "POST",
+          "path": "/v2/spaces",
+          "scopes": [
+            "https://www.googleapis.com/auth/meetings.space.created"
+          ],
+          "risk": "write",
+          "query_fields": [],
+          "body_required": true,
+          "response_kind": "json",
+          "verification": "independent-readback",
+          "readback": "google.meet.get",
+          "resource_name_prefix": "spaces/"
+        }
+      ]
     }
   }
 }

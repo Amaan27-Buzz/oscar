@@ -176,7 +176,7 @@ class ConnectorTests(unittest.TestCase):
 
     def test_google_and_non_google_catalog(self):
         google = load_google(ROOT / "config/google-connectors.json")
-        self.assertEqual(41, sum(len(m.capabilities) for m in google))
+        self.assertEqual(43, sum(len(m.capabilities) for m in google))
         for manifest in (
             *google,
             microsoft_manifest(),
@@ -198,6 +198,16 @@ class ConnectorTests(unittest.TestCase):
         self.assertTrue(grid.search("google.gmail.search"))
         self.assertTrue(grid.search("github.repositories.get"))
         self.assertTrue(grid.search("notion.data_sources.query"))
+
+    def test_resource_name_collection_is_explicit_and_bounded(self):
+        manifest = next(
+            m for m in load_google(ROOT / "config/google-connectors.json") if m.id == "google.meet"
+        )
+        create = next(c for c in manifest.capabilities if c.name == "google.meet.create")
+        self.assertEqual("spaces/", create.resource_name_prefix)
+        for prefix in ("", "../", "spaces/nested/", "/spaces/", "https://other/", 7, []):
+            with self.subTest(prefix=prefix), self.assertRaises(ValueError):
+                replace(create, resource_name_prefix=prefix)
 
     def test_each_google_endpoint_contract(self):
         for manifest in load_google(ROOT / "config/google-connectors.json"):

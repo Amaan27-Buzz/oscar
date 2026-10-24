@@ -280,6 +280,39 @@ class AuthBrokerTests(unittest.TestCase):
             self.complete(begin)
         self.assertEqual([], self.accounts.list_accounts())
 
+    def test_meet_registered_scope_signed_oidc_refresh_and_local_revocation(self):
+        from oscar.auth_broker import load_providers
+
+        configured = next(
+            p
+            for p in load_providers(Path("config/oauth-providers.example.json"))
+            if p.service == "google.meet"
+        )
+        scope = "https://www.googleapis.com/auth/meetings.space.created"
+        self.assertIn(scope, configured.allowed_scopes)
+        self.provider = replace(
+            self.provider,
+            id="google:google.meet",
+            service="google.meet",
+            audience="https://meet.googleapis.com",
+            allowed_scopes=("openid", scope),
+        )
+        self.broker = self.make_broker()
+        begin = self.broker.begin(
+            self.provider.id, frozenset({scope}), owner_authorized=True, alias="Meet account"
+        )
+        self.fixture.expected = parse_qs(urlparse(begin["url"]).query)
+        account = self.complete(begin)
+        self.assertEqual("synthetic-subject", account.subject)
+        self.assertEqual({"google.meet"}, set(account.services))
+        self.assertEqual({"openid", scope}, set(account.services["google.meet"].scopes))
+        refreshed = self.broker.refresh(begin["id"], owner_authorized=True)
+        self.assertGreater(refreshed.generation, account.generation)
+        self.assertEqual("synthetic-subject", refreshed.subject)
+        revoked = self.broker.disconnect(account.id, owner_authorized=True)
+        self.assertEqual("disconnected", revoked.status)
+        self.assertEqual({}, self.vault.values)
+
     def test_expired_state_configuration_change_provider_error_and_no_automatic_replay(self):
         begin = self.begin()
         self.now += 301

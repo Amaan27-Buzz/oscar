@@ -1,5 +1,13 @@
 # OSCAR — Current Status & Checklist
 
+**2026-10-25 Meet integration:** signed native Desktop and phone/Core requests
+now create and independently read back restricted app-created Meet spaces under
+the selected account and exact scope. Synthetic signed OIDC/refresh/revocation,
+resource-name checks, private output and uncertain-effect no-replay cases pass.
+All 95 affected checks passed (68.207 s). Real Google enrollment, calls/media and
+broad adaptive account workflows remain separate. [Receipt](evidence/software-completion/meet-2026-10-25.json).
+
+
 **2026-10-25 local Worker execution checkpoint:**
 
 Scoped named temporary Workers now support reviewed verified-result handoffs and

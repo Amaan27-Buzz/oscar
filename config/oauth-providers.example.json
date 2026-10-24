@@ -14,12 +14,29 @@
       ]
     },
     {
+      "provider": "google",
+      "client_id": "REPLACE_WITH_REGISTERED_NATIVE_CLIENT_ID",
+      "redirect_uri": "http://127.0.0.1:48123/oauth/callback",
+      "service": "google.meet",
+      "audience": "https://meet.googleapis.com",
+      "allowed_scopes": [
+        "openid",
+        "email",
+        "https://www.googleapis.com/auth/meetings.space.created"
+      ]
+    },
+    {
       "provider": "microsoft",
       "client_id": "REPLACE_WITH_REGISTERED_NATIVE_CLIENT_ID",
       "redirect_uri": "http://127.0.0.1:48124/oauth/callback",
       "service": "microsoft.graph",
       "tenant": "00000000-0000-0000-0000-000000000000",
-      "allowed_scopes": ["openid", "email", "offline_access", "User.Read"]
+      "allowed_scopes": [
+        "openid",
+        "email",
+        "offline_access",
+        "User.Read"
+      ]
     },
     {
       "provider": "mcp-resource",
@@ -28,7 +45,9 @@
       "redirect_uri": "http://127.0.0.1:48125/oauth/callback",
       "resource": "https://mcp.example.com/mcp",
       "issuer": "https://auth.example.com/tenant",
-      "allowed_scopes": ["files:read"]
+      "allowed_scopes": [
+        "files:read"
+      ]
     }
   ]
 }

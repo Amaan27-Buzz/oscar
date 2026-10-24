@@ -1,0 +1,44 @@
+{
+  "status": "LOCAL_APP_CREATED_MEET_SPACE_VERIFIED",
+  "base_head": "5b40f64",
+  "tests": {
+    "total": 95,
+    "passed": 95,
+    "skipped": 0,
+    "seconds": 68.207,
+    "local_log": ".oscar/software-meet-integrated-final-20261025.log",
+    "log_sha256": "4a17f15ff9f2e1b5110ef4e218d10c5b433fa42c741014f0b08a0b40f2144376"
+  },
+  "sources": {
+    "config/google-connectors.json": "6ad4de288f11ef057dac03d84926411a5df028bda9d35927721d730e812163b7",
+    "config/oauth-providers.example.json": "ac8d7e4078df11e7a8bb909f76d97a4e58dd536a25c0521c291b495b258d9258",
+    "oscar/communication.py": "d543b7853f8c022c7a0e3a775a2cacda228047ab41e7cb669a506e8e7747ee8d",
+    "oscar/connector_providers.py": "ce457c92baccfd4a3a64676d4b65c93680b61858cad46006da87aef40a768eec",
+    "oscar/connectors.py": "c8e8113209e3edfd2e9835881a3a5b01cff1b2d58677ad05a55faab347789d67",
+    "tests/test_communication.py": "7b50e3c9329f9b45e109d3608c5a7a54f13f442d3fa0d406257afc146ec67a0a",
+    "tests/test_connectors.py": "e50fabb4500afb9b24ae7c3f076d32526de2ed3d40850ee28bae79659673121d",
+    "tests/test_connector_http.py": "c261559539fe0698959dc8379dfd2b1ef469ae4448e7e17ba9b4f538dff3c810",
+    "tests/test_auth_broker.py": "bba7830cea97a7b1adfa90bd1bcdfd80e129f32c141c7ca32025fbf11ef7dac5"
+  },
+  "scope": [
+    "Signed Desktop and actual signed phone/Core HTTP creation and readback",
+    "Synthetic actual HTTP PKCE and signed OIDC Meet service scope binding, refresh and local revocation",
+    "Exact immutable spaces/name correlation, RESTRICTED config and consistent official join URL",
+    "Wrong/malformed names, wrong access, malformed configuration, invalid URI, missing scopes and rotated account generation deny verification",
+    "Synthetic provider effect stored before HTTP503 remains uncertain and is not retried/replayed",
+    "Private output remains requester-scoped and absent from durable plan/objective/result payloads"
+  ],
+  "official_contracts": [
+    "https://developers.google.com/workspace/meet/api/reference/rest/v2/spaces/create",
+    "https://developers.google.com/workspace/meet/api/reference/rest/v2/spaces/get",
+    "https://developers.google.com/workspace/meet/api/reference/rest/v2/spaces",
+    "https://developers.google.com/workspace/meet/api/guides/authenticate-authorize"
+  ],
+  "not_claimed": [
+    "Real Google account/provider interoperability",
+    "Conference participation, invitations, media, recording or delivery",
+    "Complete general-purpose adaptive account workflow",
+    "Whole-product completion or passing aggregate regression"
+  ],
+  "qualification": "95 focused checks qualify this source; prior Worker aggregate retained one unproven native visual-click failure. No GitHub, physical device, real credential or cloud commissioning actions."
+}
