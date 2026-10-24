@@ -4,6 +4,18 @@ import {WorkerSharing} from './WorkerSharing';
 import {initialView} from './bridge';
 const connection={endpoint:'https://core.example',installation_id:'synthetic',node_id:'desktop',workspace:'actual-enrolled-workspace',public_key:'public',owner_public_key:'public',status:'online'};
 afterEach(cleanup);
+it('keeps capture and visual input as independent reviewed host capabilities',()=>{
+ const run=vi.fn();render(<WorkerSharing view={{...initialView,link:'online',connection}} busy={false} run={run}/>);
+ fireEvent.click(screen.getByRole('button',{name:'Set up Desktop sharing'}));
+ const capture=screen.getByLabelText('Save selected-window screenshots') as HTMLInputElement;
+ const visual=screen.getByLabelText('Click within reviewed window screenshots') as HTMLInputElement;
+ expect(capture.disabled).toBe(true);expect(visual.disabled).toBe(true);
+ fireEvent.click(screen.getByLabelText("Allow execution with this Windows account's permissions"));
+ fireEvent.click(capture);expect(capture.checked).toBe(true);expect(visual.checked).toBe(false);
+ fireEvent.click(visual);expect(visual.checked).toBe(true);
+ fireEvent.click(screen.getByLabelText("Allow execution with this Windows account's permissions"));
+ expect(capture.checked).toBe(false);expect(visual.checked).toBe(false);expect(run).not.toHaveBeenCalled();
+});
 it('requires explicit workspace, installed runtime and capability review',()=>{
  const run=vi.fn();render(<WorkerSharing view={{...initialView,link:'online',connection}} busy={false} run={run}/>);
  fireEvent.click(screen.getByRole('button',{name:'Set up Desktop sharing'}));

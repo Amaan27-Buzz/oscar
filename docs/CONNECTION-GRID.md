@@ -4,6 +4,41 @@
 
 Grid now stores expiring generation-fenced interaction leases alongside existing task/executor leases. A reviewed text application binds input ownership to its Core task and rechecks it at Dispatcher; loss expires ownership. Desktop tasks are inspectable by eligible Mobile owner sessions without a private desktop task universe. Real Mobile/Desktop handoff remains owner acceptance. See [Desktop foundation](DESKTOP-FOUNDATION.md).
 
+## Selected Windows frame capture and input
+
+Native sharing exposes `machine.screen` (save a selected-window PNG) and
+`machine.visual` (click within a freshly matched frame). Existing machine-control
+enrollments gain neither permission automatically. Trusted local invitation
+creation requires explicit `--machine-control --screen-capture`; saving frames
+additionally requires `--screen-retain`. Enroll both the executor and the owner
+controller with the intended independent scopes. Actual capture advertisements
+remain Desktop-only. Native sharing independently selects the two capabilities;
+removing host execution clears both choices.
+
+`machine.screen` requires `machine:host`, `desktop:control`, `desktop:capture`,
+`screen:retain` and `files:write`. It saves a new PNG within the selected workspace
+using native CREATE_NEW/reparse protection; it cannot overwrite a prior file.
+`machine.visual` requires the first three scopes and retains no frame. Share
+`machine.desktop` too when binding a registered app/window: the existing explicit
+`bind` operation establishes the exact window/process/executable identity.
+
+Capture is limited to that visible, non-minimized top-level window's client area,
+4096×2160 pixels and a 1 MB PNG. It runs in the existing cancellable Windows Job;
+only bounded metadata and the explicitly retained artifact reference enter Core
+results. PNG bytes in the native process pipe remain transient. Screen metadata
+contains `width`, `height`, `sha256` and the relative `path`.
+
+Visual input takes exact `handle`, `pid`, `width`, `height`, `sha256`, `x` and `y`
+in physical client pixels. The child re-renders the same window and requires
+matching dimensions/hash, the selected foreground window, an unobstructed target
+point and released mouse/modifier keys. It sends one down/up pair, with no retry.
+Core authority, cancellation and the durable execution claim retain their existing
+checks. Pixel equality does not prove semantic correctness or atomicity against
+concurrent UI changes. PrintWindow is app-rendered, and unsupported/protected
+surfaces remain unavailable; OS input restrictions are preserved. Generic capture
+and input results remain PARTIALLY_VERIFIED unless an objective-specific independent
+observer establishes the outcome. This adds no image-model coordinate inference.
+
 ## Purpose
 
 OSCAR should not feel tied to one machine. The **Connection Grid** is the persistent availability and control fabric across OSCAR Mobile, desktop machines, cloud coordination and OSCAR Edge.

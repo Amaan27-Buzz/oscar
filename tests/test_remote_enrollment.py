@@ -50,6 +50,38 @@ class RemoteEnrollmentTests(unittest.TestCase):
         self.core.close()
         self.core = CloudCore(self.config)
 
+    def test_screen_capture_and_retention_need_separate_desktop_consent(self):
+        for capture, retain in ((False, False), (True, False), (True, True)):
+            invite = create_invitation(
+                self.core,
+                "screen-desktop",
+                "desktop",
+                "screen-installation",
+                self.public,
+                workspace="screen-workspace",
+                machine_control=True,
+                screen_capture=capture,
+                screen_retain=retain,
+            )
+            row = self.core.harness.store.get("remote_invitation", invite["challenge_id"])
+            self.assertEqual(capture, "desktop:capture" in row["binding"]["scopes"])
+            self.assertEqual(retain, "screen:retain" in row["binding"]["scopes"])
+        for options in (
+            {"screen_retain": True},
+            {"screen_capture": "yes"},
+            {"screen_capture": True, "machine_control": False},
+        ):
+            with self.subTest(options=options), self.assertRaises(ValueError):
+                create_invitation(
+                    self.core,
+                    "denied-desktop",
+                    "desktop",
+                    "denied-installation",
+                    self.public,
+                    workspace="screen-workspace",
+                    **options,
+                )
+
     def authority(self):
         store = self.core.harness.store
         return {

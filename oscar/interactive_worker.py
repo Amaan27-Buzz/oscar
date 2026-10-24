@@ -1,5 +1,6 @@
 """Typed desktop/browser capabilities composed with the existing machine Worker."""
 
+import base64
 import hashlib
 import json
 import os
@@ -12,7 +13,7 @@ from typing import Any
 
 from .browser_profiles import BrowserProfiles
 from .capabilities import Cancellation
-from .contracts import Action, Capability, Result, new_id
+from .contracts import Action, ArtifactRef, Capability, Result, new_id
 from .machine import MachineWorker
 
 # A fixed OSCAR package entrypoint: source anchoring is separate from artifact cwd.
@@ -156,6 +157,18 @@ def browser_available(executable: str, workspace: Path) -> bool:
 
 
 class InteractiveWorker(MachineWorker):
+    def capture_granted(self, *, retain: bool = False) -> bool:
+        try:
+            for scope in (
+                ("desktop:capture", "screen:retain", "files:write")
+                if retain
+                else ("desktop:capture",)
+            ):
+                self.check_permission(scope)
+            return True
+        except (PermissionError, KeyError):
+            return False
+
     def clipboard_granted(self) -> bool:
         try:
             self.check_permission("desktop:clipboard")
@@ -199,6 +212,8 @@ class InteractiveWorker(MachineWorker):
             desktop_permissions = {"machine:host", "desktop:control"}
             if self.clipboard_granted():
                 desktop_permissions.add("desktop:clipboard")
+            if self.capture_granted():
+                desktop_permissions.add("desktop:capture")
             adapter = WindowsDesktop(
                 permissions=frozenset(desktop_permissions),
                 allowed_apps=tuple(app for app in catalog if app.id in desktop_app_ids),
@@ -235,6 +250,40 @@ class InteractiveWorker(MachineWorker):
                     "high",
                 ),
             ]
+            if "desktop:capture" in self.desktop.permissions and self.capture_granted():
+                caps.append(
+                    Capability(
+                        "machine.visual",
+                        "machine.visual",
+                        "Screenshot-bound Windows input",
+                        "machine",
+                        self.session.node_id,
+                        ("machine:host", "desktop:control", "desktop:capture"),
+                        "visual_control",
+                        "metadata",
+                        "high",
+                    )
+                )
+                if self.capture_granted(retain=True):
+                    caps.append(
+                        Capability(
+                            "machine.screen",
+                            "machine.screen",
+                            "Save selected-window screenshot",
+                            "machine",
+                            self.session.node_id,
+                            (
+                                "machine:host",
+                                "desktop:control",
+                                "desktop:capture",
+                                "screen:retain",
+                                "files:write",
+                            ),
+                            "screen_capture",
+                            "artifact",
+                            "high",
+                        )
+                    )
             if "desktop:clipboard" in self.desktop.permissions and self.clipboard_granted():
                 caps.append(
                     Capability(
@@ -278,6 +327,8 @@ class InteractiveWorker(MachineWorker):
             "machine.desktop",
             "machine.clipboard",
             "machine.browser",
+            "machine.screen",
+            "machine.visual",
         }:
             return super().execute(action, cancellation)
         cap = next((c for c in self.capabilities() if c.id == action.capability_id), None)
@@ -304,8 +355,64 @@ class InteractiveWorker(MachineWorker):
         self.check(action, cancellation)
         self.checkpoint(action, "interactive-started", 0)
         try:
+            artifact = None
             request = action.parameters["request"]
-            if cap.id == "machine.apps":
+            if cap.id in {"machine.screen", "machine.visual"}:
+                from .windows_files import WindowsScopedFiles
+
+                files = WindowsScopedFiles(self.scope.root)
+                if cap.id == "machine.screen":
+                    if (
+                        set(request) != {"operation", "handle", "pid", "path"}
+                        or request["operation"] != "screenshot"
+                    ):
+                        raise ValueError("exact screenshot destination required")
+                    files.parts(request["path"])
+                    if files.exists(request["path"]):
+                        raise FileExistsError("screenshot overwrite rejected")
+                    native = {k: v for k, v in request.items() if k != "path"}
+                else:
+                    if request.get("operation") != "visual_click":
+                        raise ValueError("exact screenshot-bound input required")
+                    native = request
+                code, captured = self.run_command(
+                    action,
+                    cancellation,
+                    self.desktop.command(native),
+                    ".",
+                    15,
+                    input_data=self.desktop.input(native),
+                    max_output=1_400_000,
+                )
+                if code:
+                    raise ValueError("selected-window operation unavailable")
+                self.check(action, cancellation)
+                if cap.id == "machine.screen":
+                    frame = json.loads(captured)
+                    png = base64.b64decode(frame.pop("png"), validate=True)
+                    if (
+                        not png.startswith(b"\x89PNG\r\n\x1a\n")
+                        or len(png) > 1_000_000
+                        or set(frame) != {"width", "height", "sha256"}
+                        or hashlib.sha256(png).hexdigest() != frame["sha256"]
+                    ):
+                        raise ValueError("bounded native PNG required")
+                    self.check_permission("screen:retain")
+                    self.check_permission("files:write")
+                    files.create_bytes(request["path"], png)
+                    artifact = ArtifactRef(
+                        new_id(),
+                        action.task_id,
+                        cap.id,
+                        "screenshot",
+                        str(self.scope.root.resolve() / request["path"]),
+                        time(),
+                        content_hash=frame["sha256"],
+                    )
+                    output = json.dumps({**frame, "path": request["path"]})
+                else:
+                    output = captured
+            elif cap.id == "machine.apps":
                 if request == {"operation": "catalog"}:
                     output = json.dumps(self.desktop.catalog())
                 elif (
@@ -321,6 +428,8 @@ class InteractiveWorker(MachineWorker):
                 else:
                     raise ValueError("typed app operation required")
             elif cap.id in {"machine.desktop", "machine.clipboard"}:
+                if request.get("operation") in {"screenshot", "visual_click"}:
+                    raise PermissionError("visual operations require their separate capability")
                 if request.get("operation") in {"clipboard_write", "clipboard_read"}:
                     if cap.id != "machine.clipboard":
                         raise PermissionError("clipboard requires its separately scoped capability")
@@ -396,7 +505,10 @@ class InteractiveWorker(MachineWorker):
                 action.correlation_id,
                 cap.id,
                 True,
-                value=json.dumps(
+                artifact=artifact,
+                value=output
+                if cap.id == "machine.screen"
+                else json.dumps(
                     {
                         "sha256": hashlib.sha256(output.encode()).hexdigest(),
                         "bytes": len(output.encode()),

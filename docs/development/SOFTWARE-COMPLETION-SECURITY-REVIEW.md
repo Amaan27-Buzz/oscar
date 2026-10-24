@@ -34,6 +34,23 @@ or a claim that the upstream server is vulnerable.
 
 ## Evidence
 
+Selected Windows visual execution additionally separates `desktop:capture` from
+`screen:retain` and existing control/file grants. Old invitations gain no screen
+scope. The new frame path checks registered executable/process/window identity,
+rejects overwrite/reparse destinations, caps pixels/PNG/pipe output and uses the
+existing kill-on-close Job. Native input rechecks frame, foreground, point
+obstruction and held input; its generic outcome remains partial. Fixture PNG RGB
+and alpha were independently decoded, so a transparent or blank renderer report
+does not establish acceptance. The actual signed synthetic Core/Worker campaign
+retains native OS input and two independent exact owner reviews.
+
+[Microsoft PrintWindow](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-printwindow)
+renders through the selected application and can block, which is why it stays
+inside the bounded child. [SendInput](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-sendinput)
+retains OS integrity restrictions. Frame equality and point checks cannot make
+rendering/input atomic or establish a semantic objective. No image-model inference,
+protected-desktop bypass or owner-application acceptance is claimed.
+
 - [Integrated Python regression](../evidence/software-completion/regression-integrated-2026-10-24.json).
 - [Constrained Linux runtime](../evidence/software-completion/linux-browser-fix-2026-10-24.json).
 - [Browser process supervision](../evidence/software-completion/browser-supervision-2026-10-24.json).

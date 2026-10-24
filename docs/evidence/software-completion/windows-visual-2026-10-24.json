@@ -1,0 +1,126 @@
+{
+  "classification": "WINDOWS_SELECTED_FRAME_AND_INPUT_ACCEPTANCE",
+  "base_head": "783d53924240ec065e7cae84b71e03b0f7708d0e",
+  "actual_native": {
+    "window": "run-owned synthetic WPF canvas; no owner applications",
+    "independent_png_rgb": [
+      19,
+      167,
+      229
+    ],
+    "independent_png_alpha": 255,
+    "physical_client_pixels": true,
+    "local_input_count": 1,
+    "outbound_grid_input_total_count": 2,
+    "zero_effect_cases": [
+      "wrong SHA256",
+      "wrong width",
+      "stale post-click frame",
+      "completed-task replay",
+      "broad desktop capability capture bypass"
+    ],
+    "unchanged_existing_png": true,
+    "withdraw_capture_withdraws_both_capabilities": true,
+    "signed_grid": "actual Core, signed invitations/exact owner reviews, RemoteMachine journal, native Windows Job and OS input; in-process DirectClient transport",
+    "qualification": "PARTIALLY_VERIFIED generic Core outcomes retained; no image-model coordinate inference"
+  },
+  "checks": {
+    "windows_grid": {
+      "tests": 71,
+      "passed": 71,
+      "skipped": 0,
+      "seconds": 81.562,
+      "log_sha256": "386258a5055b4efe2dae8aa874b73c3d37e1f97b0ea285381ca17df8496b7e0d"
+    },
+    "native_after_path_guard": {
+      "tests": 17,
+      "passed": 17,
+      "skipped": 0,
+      "seconds": 20.042,
+      "log_sha256": "c1dce806c8542473a18856b8a96a8a762f5ef449a6612fd5db651f7e6ca25927"
+    },
+    "earlier_native_grid": {
+      "tests": 4,
+      "passed": 4,
+      "skipped": 0,
+      "seconds": 8.087,
+      "log_sha256": "d1401eafc7338ed502abf314bab59d312a933fd9e01efad7e74d218b59b626a9"
+    },
+    "earlier_windows": {
+      "tests": 61,
+      "passed": 61,
+      "skipped": 0,
+      "seconds": 69.543,
+      "log_sha256": "36d97155043c3a0660adc5696d8e8e97c40894825bc7fb1142f29498acefb460"
+    },
+    "linux": {
+      "tests": 55,
+      "passed": 52,
+      "skipped": 3,
+      "seconds": 38.399,
+      "log_sha256": "08670a27374ccca69b37b66bbb6b80ff7419e886a3e11d2cfb25d9b399fc3930"
+    },
+    "desktop": {
+      "tests": 128,
+      "files": 24,
+      "typecheck": "PASS",
+      "build": "PASS"
+    },
+    "rust": {
+      "passed": 42,
+      "ignored": 1,
+      "reason": "existing synthetic live-voice fixture required",
+      "fmt": "PASS"
+    },
+    "ruff": "PASS",
+    "mypy_source_files": 100
+  },
+  "linux_runtime": {
+    "image_id": "sha256:5b59389d17e34af1e2551b888fb657efce056befcf71ebd5ea01390554207ba9",
+    "user": "10001:10001",
+    "read_only": true,
+    "network": "none",
+    "cap_drop": [
+      "ALL"
+    ],
+    "memory_bytes": 1073741824,
+    "nano_cpus": 1000000000,
+    "no_new_privileges": [
+      "no-new-privileges"
+    ],
+    "container_removed": true,
+    "qualification": "Read-only copied source snapshot precedes final Windows-only path guard and test assertion."
+  },
+  "failed_campaigns": [
+    "Initial synthetic Grid scopes omitted files:read; no capability advertisement.",
+    "Initial test assumed 100% DPI; actual physical client was 400x250 for 320x200 DIP. Test now uses captured physical dimensions.",
+    "Initial enrollment test read scopes outside the existing binding; corrected test.",
+    "New screen artifact advertisement initially rejected by old metadata-only contract; exact artifact contract added.",
+    "Controller required independent explicit desktop:capture/screen:retain scopes in signed enrollment; no broad implicit grant added.",
+    "Initial Linux campaign: 27 tests, 12 Git-fixture setup errors, three skips. Minimal Core image has no Git; failure retained, no Git acceptance claimed."
+  ],
+  "limits": [
+    "PrintWindow app-rendered pixels may be unavailable for GPU/protected windows.",
+    "4096x2160 client pixels and 1MB PNG; capture and input remain within native Job deadline.",
+    "Frame and obstruction checks do not provide atomicity against concurrent UI/input changes.",
+    "No owner applications/accounts, personal data, physical phone, microphone/camera, push/Actions or hosted deployment.",
+    "The earlier 1050-test aggregate predates this change; affected Windows/Linux/native campaigns are separate.",
+    "Target binding uses the existing machine.desktop capability, which must also be shared for registered app/window selection."
+  ],
+  "source_sha256": {
+    "oscar/machine.py": "8b89bc2b247ad22f2c7fbda0b49478254fa471ccfc22c9695e2c5c570dae80c0",
+    "oscar/interactive_worker.py": "eb35de1c10a984dd9790b86ced477b1bba0e4345c1554bf36b65c20c6da8fa18",
+    "oscar/remote_grid.py": "bc2ffb79501c774428665e5ab7ec348dfae04308b08d39487df10a6a84758c8d",
+    "oscar/remote_machine.py": "094a52ec79c7544b26246f7e5c31e8de50bc1ba409740fb1eb593152890119bf",
+    "oscar/windows_desktop.py": "173ceb73c4e81dac8f7ef37bf9d9e11138d0753f96a9d549bebff6fe45449efa",
+    "oscar/windows_files.py": "0e2cbed9cd517e4a24dfcb747a57b235d9de5111e39198a946ff14271ffe256c",
+    "oscar/windows_uia.ps1": "8beeb4d879649aa027d5235bc58cd2b2839a5ce3cd6739a2a0fa95afc11261be",
+    "oscar/windows_visual.ps1": "a12281ede97cca9635b3ce579f9fc448fdbe62bfe3d8752d2e4017e837ce9278",
+    "tests/test_windows_visual.py": "0a79caf5e954b3ac5b3dec5e536ec19c2c16323edb6df0cc7202720defa2b011",
+    "tests/fixtures/windows_visual.ps1": "3e0da0771edf0f683d2061fcb076a78e56af0b341218555933fcc756d994b3ee",
+    "tests/test_remote_enrollment.py": "1ce8ff460eaa77af6dc0690561d53a9deb3d683caacbe63c98cfc5cc555958b3",
+    "desktop/src/WorkerSharing.tsx": "50d5777ec4c3b3a1edcda06e909c25a16eebca4083397e605f66d7feba81cfb8",
+    "desktop/src/WorkerSharing.test.tsx": "6eb3ea1eee4dad65c527c742a186091a030fbfcce8f8619c7b184843864c312c",
+    "desktop/src-tauri/src/worker_sharing.rs": "90093336ae0e48e0fc51a8926666e8d64f81712d53380ac47fd3e803f2c60b54"
+  }
+}

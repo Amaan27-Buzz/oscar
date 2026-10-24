@@ -54,6 +54,10 @@ if ($p.operation -eq 'clipboard_read') {
 }
 $window=[Windows.Automation.AutomationElement]::FromHandle([IntPtr]$p.handle)
 if ($null -eq $window -or $window.Current.ProcessId -ne $p.pid) { throw 'target identity changed' }
+if ($p.operation -in @('screenshot','visual_click')) {
+ & (Join-Path $PSScriptRoot 'windows_visual.ps1') -Request $p
+ exit
+}
 if ($p.operation -eq 'tree') {
  $queue=[Collections.Generic.Queue[object]]::new();$queue.Enqueue(@{e=$window;depth=0});$result=@()
  $walker=[Windows.Automation.TreeWalker]::ControlViewWalker

@@ -1,5 +1,16 @@
 # OSCAR — Current Status & Checklist
 
+**2026-10-24 Windows visual execution:** separately consented selected-window PNG
+capture and screenshot-bound input now reach the outbound native Worker and native
+sharing review. An actual synthetic WPF canvas passed independent RGB/alpha
+readback and real input through local Dispatcher and signed Core/Grid delivery.
+Wrong frame/dimensions, overwrite, replay and capability bypass checks passed.
+Generic Core outcomes remain PARTIALLY_VERIFIED. Windows/Grid passed 71 affected
+tests, final native rerun 17; Desktop 128, Rust 42 with one existing ignore, and
+constrained Linux 52 of 55 with three skips passed. [Receipt](evidence/software-completion/windows-visual-2026-10-24.json)
+separates snapshots, failed fixture campaigns and limits. General image-model
+reasoning, owner app acceptance and full product completion remain unverified.
+
 **2026-10-24 real local-model planning:** the existing Cloud Core startup now
 accepts bounded model request configuration; local serving exposes the same
 configuration without replacing the executor. Installed Qwen 3.5 4B completed a

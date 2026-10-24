@@ -96,6 +96,8 @@ def create_invitation(
     machine_control: bool = False,
     connector_control: bool = False,
     memory_control: bool = False,
+    screen_capture: bool = False,
+    screen_retain: bool = False,
 ) -> dict[str, Any]:
     """Trusted offline owner operation. Reachability alone cannot call this method."""
     identifier(node_id, node=True)
@@ -134,6 +136,19 @@ def create_invitation(
         raise ValueError("explicit machine control scope required")
     if machine_control:
         scopes += ["machine:host", "desktop:control", "desktop:clipboard", "browser:control"]
+    if (
+        type(screen_capture) is not bool
+        or type(screen_retain) is not bool
+        or screen_retain
+        and not screen_capture
+        or screen_capture
+        and not machine_control
+    ):
+        raise ValueError("separate Desktop capture and retention consent required")
+    if screen_capture:
+        scopes.append("desktop:capture")
+    if screen_retain:
+        scopes.append("screen:retain")
     if type(connector_control) is not bool:
         raise ValueError("explicit connector control scope required")
     if connector_control:
@@ -775,7 +790,7 @@ class RemoteGrid:
                     "file"
                     if cap.input_kind == "file_write"
                     else "artifact"
-                    if cap.input_kind == "repository_task"
+                    if cap.input_kind in {"repository_task", "screen_capture"}
                     else "metadata"
                     if cap.id in REMOTE_MACHINE_CAPABILITIES
                     and cap.input_kind not in {"directory_list", "file_search"}
@@ -2129,6 +2144,8 @@ def main() -> None:
     parser.add_argument("--recover", action="store_true")
     parser.add_argument("--android-control", action="store_true")
     parser.add_argument("--machine-control", action="store_true")
+    parser.add_argument("--screen-capture", action="store_true")
+    parser.add_argument("--screen-retain", action="store_true")
     parser.add_argument("--connector-control", action="store_true")
     parser.add_argument("--memory-control", action="store_true")
     parser.add_argument("--output", type=Path, required=True)
@@ -2152,6 +2169,8 @@ def main() -> None:
                 machine_control=args.machine_control,
                 connector_control=args.connector_control,
                 memory_control=args.memory_control,
+                screen_capture=args.screen_capture,
+                screen_retain=args.screen_retain,
             )
             json.dump(invitation, output)
     finally:

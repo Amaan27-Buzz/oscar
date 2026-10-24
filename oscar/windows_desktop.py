@@ -198,10 +198,29 @@ class WindowsDesktop:
             "context": {"handle", "pid", "runtime_id", "include_current"},
             "clipboard_write": {"text"},
             "clipboard_read": set(),
+            "screenshot": {"handle", "pid"},
+            "visual_click": {"handle", "pid", "sha256", "width", "height", "x", "y"},
         }
         operation = request.get("operation")
         if operation not in fields or set(request) != fields[operation] | {"operation"}:
             raise ValueError("invalid desktop operation")
+        if operation in {"screenshot", "visual_click"}:
+            if "desktop:capture" not in self.permissions:
+                raise PermissionError("separate selected-window capture grant required")
+            if type(request["handle"]) is not int or type(request["pid"]) is not int:
+                raise ValueError("numeric window/process identity required")
+        if operation == "visual_click":
+            if (
+                not isinstance(request["sha256"], str)
+                or len(request["sha256"]) != 64
+                or any(c not in "0123456789abcdef" for c in request["sha256"])
+                or any(type(request[k]) is not int for k in ("width", "height", "x", "y"))
+                or not 1 <= request["width"] <= 4096
+                or not 1 <= request["height"] <= 2160
+                or not 0 <= request["x"] < request["width"]
+                or not 0 <= request["y"] < request["height"]
+            ):
+                raise ValueError("exact bounded screenshot and client coordinates required")
         if operation in {"clipboard_write", "clipboard_read"} and (
             "desktop:clipboard" not in self.permissions
         ):

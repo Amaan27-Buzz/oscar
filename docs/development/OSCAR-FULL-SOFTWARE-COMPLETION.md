@@ -102,6 +102,48 @@ deferred. Gate A/B historical scoped PASS; Gate C/D PARTIAL; Gate E NOT PASSED.
 
 ## Current local verification receipts
 
+### Selected Windows visual execution, 2026-10-24
+
+The existing native Worker now exposes independently reviewed selected-window
+capture and screenshot-bound input. Old enrollment has no new authority; trusted
+local invitations require explicit capture/retention flags for both executor and
+controller scopes. Native sharing selects the capabilities independently. Saving
+requires capture, retention and file-write grants; visual input does not grant
+retention. Existing registered app/window binding remains required.
+
+Actual synthetic WPF canvas acceptance decoded expected RGB (19,167,229) and
+opaque alpha independently from the newly saved PNG, then checked real input
+against a separate fixture counter. The local Dispatcher and actual outbound
+RemoteMachine/Core/owner-signature path passed. The latter uses the authenticated
+in-process DirectClient test transport, not new HTTPS/separate-host acceptance;
+only the run-owned fixture app catalog is injected, with native effects and
+authority checks unchanged. Wrong hashes/dimensions produced zero clicks; stale
+post-effect frames and replayed tasks produced no additional click. Existing
+files were preserved, and the broad desktop capability could not bypass the
+capture capability. Removing capture permission withdrew both advertisements.
+
+Windows/Grid passed 71 affected tests (81.562 s), with a final 17-case native rerun
+(20.042 s) after adding typed Windows path validation. Desktop passed 128 tests,
+typecheck and build; Rust passed 42 tests with one existing live-voice ignore and
+format checks. A read-only/nonroot/networkless Linux campaign passed 52 of 55
+cases (38.399 s), with three explicit skips. Its source snapshot precedes the final
+Windows-only path type guard, which the native rerun covers. Ruff/Mypy passed.
+The earlier 61-case Windows campaign passed; failures for missing synthetic scope,
+an incorrect 100% DPI assertion, invitation-row lookup and the missing artifact
+output contract were corrected and retained. The first Linux campaign had 12
+fixture setup errors because this minimal Core image does not install Git; no
+POSIX Git acceptance is claimed for that image. The succeeding campaign exercises
+actual POSIX command execution through RemoteMachine without the Git fixture.
+
+Capture remains bounded to a visible registered client window, 4096×2160 and a
+1 MB PNG, with the existing process deadline/cancellation. PrintWindow is
+app-rendered and may be unsupported; image hashes do not establish semantic
+correctness. Input requires current foreground/point/window/frame matching and
+released modifiers/buttons; concurrent UI mutation cannot be made atomic.
+Generic Core outcomes remain PARTIALLY_VERIFIED. No image-model inference,
+arbitrary owner-window capture, protected desktop or physical acceptance is added.
+See [contract](../CONNECTION-GRID.md) and [receipt](../evidence/software-completion/windows-visual-2026-10-24.json).
+
 ### Normal Core configuration and actual local inference, 2026-10-24
 
 Cloud Core's normal versioned configuration and local `serve --model-config`

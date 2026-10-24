@@ -266,7 +266,11 @@ class MachineWorker:
         timeout: float,
         *,
         input_data: bytes | None = None,
+        max_output: int | None = None,
     ) -> tuple[int, str]:
+        output_limit = self.scope.max_output if max_output is None else max_output
+        if type(output_limit) is not int or not 1 <= output_limit <= 1_500_000:
+            raise ValueError("bounded native output required")
         if not self.scope.trusted_host_execution:
             raise PermissionError("host subprocess execution is not enabled")
         if input_data is not None and (os.name != "nt" or len(input_data) > 262144):
@@ -299,7 +303,14 @@ class MachineWorker:
         self.check(action, cancellation)
         if os.name == "nt":
             return self.run_windows_command(
-                action, cancellation, argv, directory, timeout, env, input_data=input_data
+                action,
+                cancellation,
+                argv,
+                directory,
+                timeout,
+                env,
+                input_data=input_data,
+                max_output=output_limit,
             )
         process = subprocess.Popen(
             argv,
@@ -326,7 +337,7 @@ class MachineWorker:
                     paused = want_pause
                 chunk = process.stdout.read(8192) or b""
                 output.extend(chunk)
-                if len(output) > self.scope.max_output:
+                if len(output) > output_limit:
                     raise ValueError("command output bound exceeded")
                 if monotonic() - started >= timeout:
                     raise TimeoutError("machine command timeout")
@@ -334,9 +345,9 @@ class MachineWorker:
                     self.checkpoint(action, "process-running", 0.5)
                     last_progress = monotonic()
                 if process.poll() is not None:
-                    tail = process.stdout.read(self.scope.max_output + 1) or b""
+                    tail = process.stdout.read(output_limit + 1) or b""
                     output.extend(tail)
-                    if len(output) > self.scope.max_output:
+                    if len(output) > output_limit:
                         raise ValueError("command output bound exceeded")
                     break
                 sleep(0.02)
@@ -360,9 +371,14 @@ class MachineWorker:
         env: dict[str, str],
         *,
         input_data: bytes | None = None,
+        max_output: int | None = None,
     ) -> tuple[int, str]:
         from .windows_files import WindowsScopedFiles
         from .windows_process import WindowsJob
+
+        output_limit = self.scope.max_output if max_output is None else max_output
+        if type(output_limit) is not int or not 1 <= output_limit <= 1_500_000:
+            raise ValueError("bounded native output required")
 
         started = monotonic()
         # Windows pause is cooperative before a subprocess starts, never fake SIGSTOP.
@@ -444,7 +460,7 @@ class MachineWorker:
                     if chunk is None:
                         break
                     output.extend(chunk)
-                    if len(output) > self.scope.max_output:
+                    if len(output) > output_limit:
                         raise ValueError("command output bound exceeded")
                 code = process.wait(timeout=max(0.1, timeout - (monotonic() - started)))
                 return code, redact_runtime_secrets(output.decode(errors="replace"))

@@ -34,6 +34,8 @@ class WindowsScopedFiles(ScopedFiles):
 
     @staticmethod
     def parts(relative: str) -> list[str]:
+        if not isinstance(relative, str):
+            raise ValueError("text workspace path required")
         parts = relative.split("/")
         if not relative or any(
             not p

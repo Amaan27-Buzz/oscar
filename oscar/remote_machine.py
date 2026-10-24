@@ -29,6 +29,16 @@ REMOTE_MACHINE_CAPABILITIES = {
     "machine.powershell": ("powershell", ("machine:host",), "high"),
     "machine.desktop": ("desktop_control", ("machine:host", "desktop:control"), "high"),
     "machine.apps": ("installed_app", ("machine:host", "desktop:control"), "high"),
+    "machine.visual": (
+        "visual_control",
+        ("machine:host", "desktop:control", "desktop:capture"),
+        "high",
+    ),
+    "machine.screen": (
+        "screen_capture",
+        ("machine:host", "desktop:control", "desktop:capture", "screen:retain", "files:write"),
+        "high",
+    ),
     "machine.clipboard": (
         "desktop_clipboard",
         ("machine:host", "desktop:control", "desktop:clipboard"),
@@ -77,6 +87,8 @@ def validate_remote_machine(kind: str, parameters: dict[str, Any]) -> dict[str, 
         "desktop_control": ({"request"}, {"request"}),
         "installed_app": ({"request"}, {"request"}),
         "desktop_clipboard": ({"request"}, {"request"}),
+        "visual_control": ({"request"}, {"request"}),
+        "screen_capture": ({"request"}, {"request"}),
         "browser": ({"request", "account_id", "account_generation"}, {"request"}),
     }
     allowed, required = fields[kind]
@@ -264,7 +276,8 @@ class RemoteMachine(RemoteWorker):
         validate_remote_machine(spec[0], action.parameters)
         expected = (
             machine_readback(action.capability_id, action.parameters)
-            if delivery["kind"] == "readback" else action.parameters
+            if delivery["kind"] == "readback"
+            else action.parameters
         )
         if expected is None or delivery["parameters"] != expected:
             raise PermissionError("only the exact reviewed destination can be read back")
