@@ -196,6 +196,12 @@ def microsoft_manifest() -> ConnectorManifest:
                 ("Calendars.Read",),
             ),
             _cap(
+                "microsoft.calendar.view",
+                "/v1.0/me/calendar/calendarView",
+                ("Calendars.Read",),
+                query=("startDateTime", "endDateTime", "$top", "$select", "$orderby"),
+            ),
+            _cap(
                 "microsoft.calendar.events.create",
                 "/v1.0/me/events",
                 ("Calendars.ReadWrite",),
@@ -218,7 +224,10 @@ def microsoft_manifest() -> ConnectorManifest:
             ),
         ),
         headers=(("Prefer", 'outlook.body-content-type="text"'),),
-        provenance="https://learn.microsoft.com/en-us/graph/api/overview; 2026-10-21 IST",
+        provenance=(
+            "https://learn.microsoft.com/en-us/graph/api/overview; 2026-10-21 IST; "
+            "calendar-list-calendarview verified 2026-10-24"
+        ),
     )
 
 

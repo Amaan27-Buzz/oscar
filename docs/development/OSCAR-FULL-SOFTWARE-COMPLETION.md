@@ -4,6 +4,11 @@ Updated 2026-10-24. **IMPLEMENTATION_IN_PROGRESS / SOFTWARE ACCEPTANCE PARTIAL.*
 Material executable work remains. This ledger does not declare
 `SOFTWARE_FEATURE_COMPLETE`, owner acceptance, hosted deployment or Gate E PASS.
 
+Microsoft day context now uses `calendarView` to include recurring occurrences
+and exceptions within its explicit window; Google retains expanded single events.
+Actual synthetic HTTP/Core briefing and 194 affected cases passed with stable
+sources. [Receipt](../evidence/software-completion/calendar-view-2026-10-24.json).
+
 Latest focused planning change requests an exact `steps` object envelope to
 match provider JSON modes, retains legacy typed arrays and rejects extra members.
 All 59 affected cases passed. Actual installed Qwen passed three of four main

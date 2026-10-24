@@ -23,6 +23,10 @@ from .http_client import NoRedirects
 
 WEATHER_URL = "https://api.met.no/weatherapi/locationforecast/2.0/compact"
 WEATHER_CREDIT = "MET Norway · CC BY 4.0"
+CALENDAR_CAPABILITIES = {
+    "google": "google.calendar.events.list",
+    "microsoft": "microsoft.calendar.view",
+}
 
 
 def weather_request(
@@ -310,7 +314,9 @@ class CalendarContextSource:
                 "query": {
                     "$top": "8",
                     "$select": "id,subject,start,end,isCancelled",
-                    "$filter": f"end/dateTime ge '{start}' and start/dateTime le '{end}'",
+                    "$orderby": "start/dateTime",
+                    "startDateTime": start,
+                    "endDateTime": end,
                 }
             }
         )

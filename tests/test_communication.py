@@ -4,6 +4,7 @@ import base64
 import json
 import unittest
 from copy import deepcopy
+from datetime import UTC, datetime
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -31,6 +32,7 @@ from oscar.oauth_device import VaultResolver
 from oscar.policy import PersonalPolicy
 from oscar.remote_client import request_proof
 from oscar.remote_grid import create_invitation
+from oscar.sentry import AwarenessMode, SentrySettings, SentryState
 from oscar.storage import StateConflict
 from tests.test_cloud import configuration, request
 from tests.test_connections import PrivateVault
@@ -274,6 +276,57 @@ class CommunicationTests(unittest.TestCase):
         )
         self.assertEqual("partially_verified", result["state"])
         self.assertTrue(self.provider.calls[-1][1].endswith("sendMail"))
+
+    def test_graph_day_brief_reads_expanded_occurrences_over_real_http(self):
+        stamp = datetime.fromtimestamp(time() + 600, UTC).isoformat()
+        end = datetime.fromtimestamp(time() + 1200, UTC).isoformat()
+        self.provider.resources["/v1.0/me/calendar/calendarView"] = {
+            "value": [
+                {
+                    "id": identifier,
+                    "subject": "Recurring appointment",
+                    "start": {"dateTime": stamp},
+                    "end": {"dateTime": end},
+                    "isCancelled": False,
+                    "body": "unselected occurrence detail",
+                }
+                for identifier in ("occurrence-one", "exception-two")
+            ],
+            "@odata.nextLink": "synthetic-next-page",
+        }
+        account = self.accounts["Work"]
+        world = self.h.world
+        world.configure_native_source(
+            {
+                "id": "work-day",
+                "adapter": "calendar",
+                "entity_id": "work-calendar",
+                "interval_seconds": 30,
+                "retain": False,
+                "retention_seconds": 3600,
+                "calendar_id": "primary",
+                "horizon_seconds": 86400,
+                "account_id": account.id,
+                "account_generation": account.generation,
+            },
+            owner_authorized=True,
+        )
+        world.sentry.configure(
+            SentrySettings(AwarenessMode.SENTRY, SentryState.AWARE, ("work-day",)),
+            owner_authorized=True,
+        )
+        self.assertEqual(1, world.tick()["polled"])
+        self.assertEqual([("GET", "/v1.0/me/calendar/calendarView", None)], self.provider.calls)
+        brief = world.brief()
+        self.assertEqual(1, len(brief["schedule"]["overlaps"]))
+        self.assertTrue(brief["schedule"]["incomplete"])
+        self.assertNotIn("unselected occurrence detail", brief["sources"][0]["value"])
+        self.assertEqual(
+            0, self.h.archive.db.execute("SELECT count(*) FROM archive_events").fetchone()[0]
+        )
+        self.h.accounts.disconnect(account.id)
+        self.assertEqual("unavailable", world.brief()["sources"][0]["state"])
+        self.assertEqual(1, len(self.provider.calls))
 
     def test_lists_and_reads_remain_reported_transient_results(self):
         for alias in ("Google", "Work"):

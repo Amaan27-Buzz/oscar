@@ -1,5 +1,13 @@
 # OSCAR — Current Status & Checklist
 
+**2026-10-24 recurring calendar correction:** Microsoft day briefing now reads
+time-bounded `calendarView` occurrences/exceptions instead of filtering the
+ordinary event list. Actual synthetic HTTP through Core passed overlap,
+incomplete-page and immediate account-withdrawal checks. All 194 affected cases
+passed with stable sources; Ruff/Mypy passed.
+[Receipt](evidence/software-completion/calendar-view-2026-10-24.json).
+Real provider commissioning and general automatic replanning remain open.
+
 **2026-10-24 planning output contract:** the planner now requests a JSON object
 containing `steps`, matching provider JSON modes; persisted typed arrays remain
 supported. All 59 affected cases passed, including strict envelope rejection

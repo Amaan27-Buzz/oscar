@@ -238,7 +238,13 @@ class AmbientTests(unittest.TestCase):
         self.assertEqual(1, self.world.tick()["polled"])
         current = json.loads(self.world.world.resolve("owner-calendar", "calendar.state").value)
         self.assertFalse(current["complete"])
-        self.assertIn("$filter", self.calls[0][1]["query"])
+        spec, parameters, _ = self.calls[0]
+        self.assertEqual("microsoft.calendar.view", spec.name)
+        self.assertEqual("/v1.0/me/calendar/calendarView", spec.path)
+        self.assertEqual("start/dateTime", parameters["query"]["$orderby"])
+        self.assertEqual("2027-01-15T08:00:00Z", parameters["query"]["startDateTime"])
+        self.assertEqual("2027-01-16T08:00:00Z", parameters["query"]["endDateTime"])
+        self.assertNotIn("$filter", parameters["query"])
 
     def test_brief_uses_current_sources_with_provenance_and_honest_conflicts(self):
         event = self.payload["items"][0]

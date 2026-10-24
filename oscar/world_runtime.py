@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING, Any
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from .ambient import (
+    CALENDAR_CAPABILITIES,
     WEATHER_URL,
     CalendarContextSource,
     ClockContextSource,
@@ -250,7 +251,7 @@ class WorldRuntime:
 
         project_accounts(h)
         account = h.accounts.check(value["account_id"], value["account_generation"])
-        name = account.provider + ".calendar.events.list"
+        name = CALENDAR_CAPABILITIES.get(account.provider, "")
         matches = [
             (instance, spec)
             for instance in h.connectors.instances.values()
@@ -439,7 +440,7 @@ class WorldRuntime:
                 if instance.account_id == account.id
                 and instance.account_generation == account.generation
                 and any(
-                    spec.name == account.provider + ".calendar.events.list"
+                    spec.name == CALENDAR_CAPABILITIES.get(account.provider, "")
                     and h.connectors.state(instance, spec) == ConnectionState.READY
                     for spec in instance.manifest.capabilities
                 )
@@ -461,7 +462,7 @@ class WorldRuntime:
                 | {
                     "instance_id": matches[0].id,
                     "provider": account.provider,
-                    "capability": account.provider + ".calendar.events.list",
+                    "capability": CALENDAR_CAPABILITIES.get(account.provider, ""),
                 },
                 self.world.clock,
                 guard,

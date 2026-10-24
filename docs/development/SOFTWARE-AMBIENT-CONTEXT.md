@@ -4,6 +4,16 @@
 Perception Fabric, Sentry and Connector Fabric. It introduces no second Core or
 history store and grants no calendar mutation authority.
 
+2026-10-24 correction: Microsoft briefing uses the bounded primary-calendar
+`calendarView` capability with explicit UTC `startDateTime`/`endDateTime`,
+ordered by start and capped at eight entries. Unlike the ordinary event list,
+this API expands recurring occurrences and exceptions. Google retains
+`singleEvents=true`. Pagination is still marked incomplete and cannot establish
+free time. Existing account/source/retention checks remain authoritative.
+[Official contract](https://learn.microsoft.com/en-us/graph/api/calendar-list-calendarview?view=graph-rest-1.0)
+and [194-case receipt](../evidence/software-completion/calendar-view-2026-10-24.json)
+separate actual synthetic HTTP from real-account commissioning.
+
 ## Connected implementation
 
 - Native signed Assistance `source_create` configures a Core clock (explicit
