@@ -54,6 +54,11 @@ REMOTE_MACHINE_CAPABILITIES = {
 
 def machine_readback(capability: str, parameters: dict[str, Any]) -> dict[str, Any] | None:
     """Derive only a read of the exact reviewed destination, never another effect."""
+    spec = REMOTE_MACHINE_CAPABILITIES.get(capability)
+    verification = parameters.get("verification")
+    if spec and spec[0] in {"coding", "terminal_command"} and isinstance(verification, dict):
+        if set(verification) == {"path", "content"}:
+            return {"path": verification["path"]}
     request = parameters.get("request")
     if not isinstance(request, dict):
         return None
@@ -93,10 +98,10 @@ def validate_remote_machine(kind: str, parameters: dict[str, Any]) -> dict[str, 
         "directory_list": ({"cwd"}, set()),
         "file_search": ({"cwd", "pattern"}, {"pattern"}),
         "executable_discovery": (set(), set()),
-        "terminal_command": ({"argv", "cwd", "timeout"}, {"argv"}),
+        "terminal_command": ({"argv", "cwd", "timeout", "verification"}, {"argv"}),
         "git_operation": ({"operation", "name", "message", "cwd", "timeout"}, {"operation"}),
         "repository_task": ({"path", "content", "message"}, {"path", "content", "message"}),
-        "coding": ({"arguments", "cwd", "timeout"}, {"arguments"}),
+        "coding": ({"arguments", "cwd", "timeout", "verification"}, {"arguments"}),
         "powershell": ({"request", "cwd", "timeout"}, {"request"}),
         "desktop_control": ({"request"}, {"request"}),
         "installed_app": ({"request"}, {"request"}),
@@ -139,6 +144,20 @@ def validate_remote_machine(kind: str, parameters: dict[str, Any]) -> dict[str, 
             raise ValueError("bounded native argument vector required")
     if "request" in parameters and not isinstance(parameters["request"], dict):
         raise ValueError("structured native request required")
+    if kind in {"coding", "terminal_command"} and "verification" in parameters:
+        from .windows_files import WindowsScopedFiles
+
+        expected = parameters["verification"]
+        if (
+            not isinstance(expected, dict)
+            or set(expected) != {"path", "content"}
+            or not isinstance(expected["path"], str)
+            or not 1 <= len(expected["path"]) <= 240
+            or not isinstance(expected["content"], str)
+            or len(expected["content"].encode()) > 8192
+        ):
+            raise ValueError("bounded exact artifact verification required")
+        WindowsScopedFiles.parts(expected["path"])
     if kind == "browser":
         if ("account_id" in parameters) != ("account_generation" in parameters):
             raise ValueError("exact browser account identity required")
@@ -301,6 +320,12 @@ class RemoteMachine(RemoteWorker):
         if spec is None:
             raise PermissionError("native capability is not shared")
         validate_remote_machine(spec[0], action.parameters)
+        if spec[0] in {"coding", "terminal_command"} and "verification" in action.parameters:
+            if (
+                "machine.files.read" not in self.allowed
+                or "files:read" not in self.effects.remote_grants
+            ):
+                raise PermissionError("artifact verification requires separately shared file read")
         expected = (
             machine_readback(action.capability_id, action.parameters)
             if delivery["kind"] == "readback"
@@ -367,6 +392,15 @@ class RemoteMachine(RemoteWorker):
         if action.capability_id in {"machine.files.read", "machine.files.write"}:
             return super().readback_effect(action, delivery)
         self._guard()
+        if action.capability_id in REMOTE_MACHINE_CAPABILITIES and (
+            REMOTE_MACHINE_CAPABILITIES[action.capability_id][0] in {"coding", "terminal_command"}
+            and "verification" in action.parameters
+        ):
+            data = self.files.read(delivery["parameters"]["path"])
+            if len(data) > 8192:
+                raise ValueError("artifact readback exceeds permitted content boundary")
+            self._guard()
+            return {"content": data.decode("utf-8", errors="strict")}
         if action.capability_id == "machine.browser":
             observed = self.effects.execute(
                 replace(action, parameters=delivery["parameters"]), RemoteCancellation(self._guard)

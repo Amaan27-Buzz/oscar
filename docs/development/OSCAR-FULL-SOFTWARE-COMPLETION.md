@@ -612,3 +612,30 @@ Source hashes remained unchanged. The native visual fixture passed; earlier
 failed evidence remains preserved and its cause is unproven. No whole-product,
 real-provider, physical or deployment promotion follows from this aggregate.
 [Receipt](../evidence/software-completion/combined-execution-windows-2026-10-25.json).
+
+**2026-10-25 remote process artifact verification:** outbound coding and terminal
+execution now use a separately authorized file reader and Core comparison for
+literal expected artifacts. Signed phone/Core/model acceptance creates a named
+remote coding Worker under Ask and synthetic Full; no per-action prompts occur
+under a matching standing grant. Process-only grants, missing read permission,
+permission-specific policy denial, wrong bytes and reader withdrawal fail closed
+without effect replay. This uses synthetic model/agent fixtures and actual Python
+children; fresh authenticated coding-provider and general adaptive verification
+remain open. [Receipt](../evidence/software-completion/remote-artifacts-2026-10-25.json).
+
+The same reviewed planner now admits general terminal execution through the
+actual `machine.command` contract without an invented executable example. Ask
+and synthetic Full both passed actual remote command/artifact checks. Initial
+new test failures (manual concurrent scheduler tick, then command descriptor
+filtering) remain in local logs; the tests now use the existing Core scheduler
+and command selection has an explicit typed contract. No input guard was relaxed.
+The seven-module affected run passed 148 checks before this terminal descriptor
+addition; two focused terminal checks then passed (4.689 s). The following full aggregate completed with the qualified failure below. All original unfinished software domains remain open.
+
+**Remote process aggregate:** 1,153 Windows Python tests ran: 1,142 passed,
+ten skipped and one native visual foreground assertion failed (708.148 s;
+source hashes unchanged). This is **not an aggregate PASS**. The unchanged
+three-test native visual module passed in isolation (7.606 s); the focus-loss
+cause remains unproven and no native guard was changed. Ruff then only wrapped
+one planner expression, with identical Python AST asserted. Static checks pass.
+[Receipt](../evidence/software-completion/remote-artifacts-2026-10-25.json).

@@ -1,5 +1,15 @@
 # OSCAR — Current Status & Checklist
 
+**2026-10-25 remote process artifact verification:** outbound coding and terminal
+execution now use a separately authorized file reader and Core comparison for
+literal expected artifacts. Signed phone/Core/model acceptance creates a named
+remote coding Worker under Ask and synthetic Full; no per-action prompts occur
+under a matching standing grant. Process-only grants, missing read permission,
+permission-specific policy denial, wrong bytes and reader withdrawal fail closed
+without effect replay. This uses synthetic model/agent fixtures and actual Python
+children; fresh authenticated coding-provider and general adaptive verification
+remain open. [Receipt](evidence/software-completion/remote-artifacts-2026-10-25.json).
+
 **2026-10-25 GitLab integration:** selected GitLab.com accounts now support signed
 Desktop and phone/Core issue creation with independent project-local `iid`
 readback, project/issue reads, explicit visibility and bounded pagination.
@@ -346,3 +356,11 @@ Source hashes remained unchanged. The native visual fixture passed; earlier
 failed evidence remains preserved and its cause is unproven. No whole-product,
 real-provider, physical or deployment promotion follows from this aggregate.
 [Receipt](evidence/software-completion/combined-execution-windows-2026-10-25.json).
+
+**Remote process aggregate:** 1,153 Windows Python tests ran: 1,142 passed,
+ten skipped and one native visual foreground assertion failed (708.148 s;
+source hashes unchanged). This is **not an aggregate PASS**. The unchanged
+three-test native visual module passed in isolation (7.606 s); the focus-loss
+cause remains unproven and no native guard was changed. Ruff then only wrapped
+one planner expression, with identical Python AST asserted. Static checks pass.
+[Receipt](evidence/software-completion/remote-artifacts-2026-10-25.json).

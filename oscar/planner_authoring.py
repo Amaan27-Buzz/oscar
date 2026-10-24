@@ -122,9 +122,32 @@ class PlannerAuthoring:
                         "unrequested publication. Process exit/output is only REPORTED. "
                         "Use file_exact with literal path/content only when the objective supplies "
                         "those exact expected bytes; never invent successful test evidence."
+                        " For remote exact-file verification, also set parameters.verification "
+                        "to {path: literal relative path, content: literal expected text}. "
+                        "This requires a separately selected machine.files.read capability on "
+                        "the same device and current read permission/standing delegation."
                     )
                 }
                 if kind == "coding" and examples
+                else {}
+            ),
+            **(
+                {
+                    "intent_rule": (
+                        "Use capability_kind terminal_command with parameters.argv: an exact "
+                        "nonempty array of arguments, starting with the selected installed "
+                        "allowlisted absolute executable path from the objective or current "
+                        "authoritative evidence. Do not invent installed paths or request shell "
+                        "wrapping, credential enrollment, permission bypasses or unrequested "
+                        "publication. Optional cwd is scoped; timeout is at most 120 seconds. "
+                        "Host execution is trusted host authority, not a filesystem sandbox. "
+                        "Process success is only REPORTED. For an objective's exact literal file "
+                        "bytes, parameters.verification may contain only path and content; "
+                        "select machine.files.read on the same device with separate read "
+                        "permission/delegation. Otherwise use criterion kind unavailable."
+                    )
+                }
+                if kind == "terminal_command" and cap["id"] == "machine.command"
                 else {}
             ),
             **(
@@ -294,7 +317,11 @@ class PlannerAuthoring:
                     c
                     for c in available
                     if (targets is None or c["node_id"] in targets)
-                    and self.descriptor(c)["intent_examples"]
+                    and (
+                        self.descriptor(c)["intent_examples"]
+                        or c["input_kind"] == "terminal_command"
+                        and c["id"] == "machine.command"
+                    )
                 ]
                 duplicates = {
                     c["input_kind"]

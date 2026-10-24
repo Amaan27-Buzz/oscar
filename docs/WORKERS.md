@@ -475,8 +475,9 @@ selected model and executor without per-action prompts; revocation after plannin
 prevents execution. Process exit/output remains REPORTED. An exact reviewed file
 criterion is independently read when that authoritative filesystem is available;
 unknown objectives remain partially verified and do not complete a commitment.
-General remote coding artifact inspection and adaptive coding verification remain
-unfinished. Other coding CLIs retain existing explicit executor contracts; this
+Remote exact-file inspection is now implemented as described below; broader
+adaptive coding verification remains unfinished. Other coding CLIs retain explicit
+executor contracts; this
 change does not invent their argument syntax.
 
 The [receipt](evidence/software-completion/coding-planner-2026-10-25.json) records
@@ -485,3 +486,27 @@ child standing in for the installed coding agent. No authenticated coding agent
 was launched during this continuation. The native visual fixture now retains
 actual child failure output for diagnosis; its three checks passed, without a
 claim to have explained the earlier intermittent failure.
+
+## Remote process artifact verification — 2026-10-25
+
+Remote coding and terminal requests may include `verification` with exactly
+`path` and `content`: a literal scoped relative file and expected UTF-8 text up
+to 8 KiB. Core derives a separate read-only delivery containing only that path
+and independently compares its returned bytes. Process success alone never
+establishes the objective. Workers must separately select/share
+`machine.files.read`; both requester and executor need current read permission
+and applicable Personal Policy. Full delegation must cover the process and reader.
+Revocation or reader withdrawal fences verification without replaying the effect.
+The read is evidence of resulting file state, not proof of authorship or broader
+code correctness. Unknown objectives retain partial status.
+
+Signed phone/Core acceptance uses a synthetic HTTP model to create a named
+remote coding Worker, a real Python fixture child and independent file inspection.
+No authenticated coding agent, real account or physical phone is exercised.
+
+General terminal planning now admits the advertised `machine.command` contract
+without fabricating an example executable. The goal or authoritative evidence
+must supply an actual allowlisted absolute executable; the native executor remains
+the final enforcement point. Ask and synthetic Full model-to-remote-command tests
+both execute a real child and independently verify its artifact. This does not
+introduce shell evaluation, result-to-command substitution or arbitrary app authority.

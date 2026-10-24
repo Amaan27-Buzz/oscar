@@ -568,6 +568,52 @@ class RemoteGrid:
         if not decision.allowed:
             raise PermissionError("Personal Policy denied remote action")
 
+    def artifact_permission(
+        self,
+        requester_id: str,
+        executor: SessionHandle,
+        capability: Capability,
+        parameters: dict[str, Any],
+        *,
+        delegated: bool = False,
+    ) -> None:
+        if (
+            capability.input_kind not in {"coding", "terminal_command"}
+            or "verification" not in parameters
+        ):
+            return
+        reads = [
+            c
+            for c in self.grid.search("file_read")
+            if c.node_id == executor.node_id and c.id == "machine.files.read"
+        ]
+        if len(reads) != 1:
+            raise PermissionError("artifact verification requires a current shared file reader")
+        read = reads[0]
+        self.policy(executor, read, confirmed=False)
+        requester = self.store.get("session", requester_id)
+        node = self.store.get("node", requester["node_id"])
+        if requester["revoked"] or node["revoked"] or requester["expires_at"] <= time():
+            raise PermissionError("artifact requester authority unavailable")
+        granted = frozenset(requester["scopes"]) & frozenset(node["scopes"])
+        policy = PersonalPolicy(self.store)
+        for identifier in (read.id, *read.permissions):
+            for source, scopes in (
+                (node["id"], granted),
+                (executor.node_id, frozenset(self.store.get("session", executor.id)["scopes"])),
+            ):
+                if not policy.evaluate(
+                    identifier,
+                    read.permissions,
+                    scopes,
+                    {"node": source, "target": executor.node_id, "source": "remote-grid"},
+                ).allowed:
+                    raise PermissionError("separate artifact-read permission required")
+        if delegated and not StandingAuthority(
+            self.store, self.grid, self.h.runtime.relationship_id
+        ).permits(record(read), executor):
+            raise PermissionError("standing delegation must also cover the artifact reader")
+
     def request(self, session: SessionHandle, data: dict[str, Any]) -> dict[str, Any]:
         if (
             set(data) != {"version", "operation", "request_id", "payload"}
@@ -1020,7 +1066,13 @@ class RemoteGrid:
             capability = candidates[0]
             self.policy(session, capability, confirmed=capability.risk != "low")
             criterion = {"kind": "remote_machine", "operation": kind}
-            if machine_readback(capability.id, parameters) is not None:
+            if kind in {"coding", "terminal_command"} and "verification" in parameters:
+                executor = self.sessions.get(target)
+                if executor is None:
+                    raise PermissionError("artifact executor unavailable")
+                self.artifact_permission(session.id, executor, capability, parameters)
+                criterion = {"kind": "remote_file", **parameters["verification"]}
+            elif machine_readback(capability.id, parameters) is not None:
                 expected = parameters.get("verification", parameters["request"])
                 criterion["text"] = expected["text"]
                 if capability.id == "machine.browser":
@@ -1116,6 +1168,15 @@ class RemoteGrid:
         authority = StandingAuthority(self.store, self.grid, self.h.runtime.relationship_id).bind(
             task.id, record(capability), executor
         )
+        try:
+            self.artifact_permission(
+                session.id, executor, capability, parameters, delegated=authority is not None
+            )
+        except PermissionError:
+            self.store.transition(
+                task.id, TaskState.BLOCKED, blocker="Artifact read authority unavailable"
+            )
+            raise
         deadline = int((time() + 120) * 1000)
         workspace = (
             self.store.get("remote_device", target)["workspace"] if target != self.h.node_id else ""
@@ -1724,7 +1785,19 @@ class RemoteGrid:
             elif capability["id"] in REMOTE_MACHINE_CAPABILITIES:
                 validate_remote_machine(capability["input_kind"], parameters)
                 criterion = {"kind": "remote_machine", "operation": capability["input_kind"]}
-                if machine_readback(capability["id"], parameters) is not None:
+                if (
+                    capability["input_kind"] in {"coding", "terminal_command"}
+                    and "verification" in parameters
+                ):
+                    self.artifact_permission(
+                        owner["session"],
+                        session,
+                        Capability.from_dict(capability),
+                        parameters,
+                        delegated=bool(owner.get("standing")),
+                    )
+                    criterion = {"kind": "remote_file", **parameters["verification"]}
+                elif machine_readback(capability["id"], parameters) is not None:
                     expected = parameters.get("verification", parameters["request"])
                     criterion["text"] = expected["text"]
                     if capability["id"] == "machine.browser":
@@ -1870,6 +1943,13 @@ class RemoteGrid:
         self.policy(session, cap, confirmed=binding["approved"])
         requester = self.store.get("session", binding["requester_session"])
         requester_node = self.store.get("node", binding["requester"])
+        self.artifact_permission(
+            binding["requester_session"],
+            session,
+            cap,
+            parameters,
+            delegated=binding.get("authority") is not None,
+        )
         if requester["revoked"] or requester["expires_at"] <= time() or requester_node["revoked"]:
             raise PermissionError("requester authority expired or revoked")
         granted = frozenset(requester["scopes"]) & frozenset(requester_node["scopes"])

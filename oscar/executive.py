@@ -407,12 +407,21 @@ class Executive:
                 raise ValueError("typed step intent required") from None
             if not isinstance(intent.text, str) or not 1 <= len(intent.text) <= 4096:
                 raise ValueError("bounded step instruction required")
-            if intent.kind == "capability" and intent.capability_kind == "coding":
+            if intent.kind == "capability" and intent.capability_kind in {
+                "coding",
+                "terminal_command",
+            }:
                 from .remote_machine import validate_remote_machine
 
                 if not isinstance(intent.parameters, dict):
                     raise ValueError("typed coding parameters required")
-                validate_remote_machine("coding", intent.parameters)
+                validate_remote_machine(intent.capability_kind, intent.parameters)
+                if "verification" in intent.parameters and not any(
+                    pin["node_id"] == step["node_id"]
+                    and pin["capability_id"] == "machine.files.read"
+                    for pin in worker["capabilities"]
+                ):
+                    raise PermissionError("artifact verification needs a separately scoped reader")
             if any(
                 value is not None and not isinstance(value, str)
                 for value in (intent.kind, intent.path, intent.content, intent.capability_kind)

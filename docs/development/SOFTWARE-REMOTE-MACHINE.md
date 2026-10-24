@@ -126,3 +126,13 @@ Access activation, physical devices and unrestricted app interoperability were
 not exercised. The nine-test suite does not claim acceptance for every installed
 coding agent, Git mutation, clipboard or PowerShell operation merely because
 their existing executor is reachable through the adapter.
+
+**2026-10-25 remote process artifact verification:** outbound coding and terminal
+execution now use a separately authorized file reader and Core comparison for
+literal expected artifacts. Signed phone/Core/model acceptance creates a named
+remote coding Worker under Ask and synthetic Full; no per-action prompts occur
+under a matching standing grant. Process-only grants, missing read permission,
+permission-specific policy denial, wrong bytes and reader withdrawal fail closed
+without effect replay. This uses synthetic model/agent fixtures and actual Python
+children; fresh authenticated coding-provider and general adaptive verification
+remain open. [Receipt](../evidence/software-completion/remote-artifacts-2026-10-25.json).
