@@ -12,8 +12,8 @@ software work under the existing authorization; no new agent delegation is neede
 
 ## 2. Current candidate
 
-Latest committed base `77542e2` on `codex/software-completion`; the cross-account
-acceptance checkpoint follows it. Use `git rev-parse HEAD` for the exact
+Latest committed base `0c217af` on `codex/software-completion`; the native observer
+correction checkpoint follows it. Use `git rev-parse HEAD` for the exact
 checkout, and `git log b700a6c..HEAD --oneline` for all local implementation commits.
 The final owner message must name the actual resulting checkout, not an invented
 self-referential documentation SHA.
@@ -23,6 +23,7 @@ self-referential documentation SHA.
 Newest first, after the starting source:
 
 ```text
+0c217af test: verify signed cross-account browser file transfer
 77542e2 feat: add signed contact reads and close stalled MCP startup
 61e8f0a feat: verify exact browser receipts before dependent work
 3016ea3 fix: include recurring Microsoft events in current day briefing
@@ -186,6 +187,19 @@ Linux campaign completed 215 selected cases: 211 passed/four skipped in
 71.276 s. [Windows receipt](../evidence/software-completion/regression-closure-2026-10-24.json)
 and [Linux receipt](../evidence/software-completion/regression-linux-2026-10-24.json)
 qualify that source; neither repeats all native/model/hosted acceptance.
+
+**2026-10-24 combined regression and native observer correction:** the current
+Windows aggregate ran 1,088 cases: 1,077 passed, ten skipped and one failed
+(631.981 s). The isolated failure was native rejection of a nonforeground
+synthetic window. Windows UIA observer processes now suppress console creation;
+the fixture explicitly focuses its own registered window and independently checks
+that UIA and PNG observation preserve that foreground identity. All 119 affected
+Desktop/Windows/Grid cases passed (92.478 s), with stable source hashes. The
+original aggregate remains a failed receipt, rather than a new whole-suite PASS.
+A separate frozen-source constrained Linux run passed 221/225 cases with four
+explicit skips (73.685 s). [Failed aggregate](../evidence/software-completion/current-windows-failed-2026-10-24.json),
+[observer correction](../evidence/software-completion/windows-observer-2026-10-24.json) and
+[Linux receipt](../evidence/software-completion/current-linux-2026-10-24.json).
 
 Previous native checkpoints: Desktop 128 tests/typecheck/build; Rust 42 passed
 with one explicit live-voice ignore; Android 86 JVM cases/assemble/lint. They

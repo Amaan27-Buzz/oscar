@@ -1,6 +1,7 @@
 """Selected synthetic window pixels and real input; no owner window capture."""
 
 import base64
+import ctypes
 import hashlib
 import json
 import os
@@ -265,6 +266,17 @@ class WindowsVisualTests(unittest.TestCase):
                         permissions=frozenset(grants), allowed_apps=(app,)
                     )
                     worker.desktop.bind(**target, app_id=app.id)
+                    # Showing a topmost fixture does not establish Windows input focus.
+                    tree = worker.desktop.observe({"operation": "tree", **target})
+                    focused = worker.desktop.observe(
+                        {"operation": "focus", **target, "runtime_id": tree[0]["runtime_id"]}
+                    )
+                    self.assertEqual(process.pid, focused["pid"])
+                    user32 = ctypes.WinDLL("user32", use_last_error=True)
+                    user32.GetForegroundWindow.restype = ctypes.c_void_p
+                    self.assertEqual(target["handle"], user32.GetForegroundWindow())
+                    worker.desktop.observe({"operation": "tree", **target})
+                    self.assertEqual(target["handle"], user32.GetForegroundWindow())
                     grid.advertise(session, worker.capabilities())
                     runtime = Runtime(store, grid, MachineVerifier(worker.files))
                     transports = {
@@ -319,8 +331,10 @@ class WindowsVisualTests(unittest.TestCase):
                         ],
                         text=True,
                         timeout=15,
+                        creationflags=subprocess.CREATE_NO_WINDOW,
                     )
                     self.assertEqual("19,167,229,255", pixel.strip())
+                    self.assertEqual(target["handle"], user32.GetForegroundWindow())
                     original_hash = frame["sha256"]
                     overwrite = execute(
                         "screen_capture",

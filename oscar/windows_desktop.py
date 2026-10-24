@@ -285,6 +285,7 @@ class WindowsDesktop:
             env=env,
             capture_output=True,
             timeout=min(15, timeout),
+            creationflags=0x08000000 if os.name == "nt" else 0,
         )
         if result.returncode or len(result.stdout) > 128_000:
             raise OSError("bounded UI Automation observation failed")

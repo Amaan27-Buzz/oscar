@@ -1,5 +1,18 @@
 # OSCAR — Current Status & Checklist
 
+**2026-10-24 combined regression and native observer correction:** the current
+Windows aggregate ran 1,088 cases: 1,077 passed, ten skipped and one failed
+(631.981 s). The isolated failure was native rejection of a nonforeground
+synthetic window. Windows UIA observer processes now suppress console creation;
+the fixture explicitly focuses its own registered window and independently checks
+that UIA and PNG observation preserve that foreground identity. All 119 affected
+Desktop/Windows/Grid cases passed (92.478 s), with stable source hashes. The
+original aggregate remains a failed receipt, rather than a new whole-suite PASS.
+A separate frozen-source constrained Linux run passed 221/225 cases with four
+explicit skips (73.685 s). [Failed aggregate](evidence/software-completion/current-windows-failed-2026-10-24.json),
+[observer correction](evidence/software-completion/windows-observer-2026-10-24.json) and
+[Linux receipt](evidence/software-completion/current-linux-2026-10-24.json).
+
 **2026-10-24 cross-account workflow:** signed conversation now has actual synthetic
 registration → independent receipt → verified file → second-account upload
 acceptance. Both account IDs are explicit; isolated cookies, exact uploaded bytes,
