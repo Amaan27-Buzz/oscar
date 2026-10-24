@@ -4,6 +4,15 @@ Updated 2026-10-24. **IMPLEMENTATION_IN_PROGRESS / SOFTWARE ACCEPTANCE PARTIAL.*
 Material executable work remains. This ledger does not declare
 `SOFTWARE_FEATURE_COMPLETE`, owner acceptance, hosted deployment or Gate E PASS.
 
+**2026-10-24 connected contacts and MCP cleanup:** native signed conversation now
+lists and reads Google/Microsoft contacts using exact account bindings and
+read-only service scopes, bounded fields and explicit first-page pagination.
+A stalled MCP startup reproduction also found and corrected child/thread cleanup;
+failed initialization now cancels its owning SDK task and fences late transport
+entry. All 205 affected cases passed in 437.160 seconds with stable source hashes.
+[Receipt](../evidence/software-completion/contacts-2026-10-24.json).
+Real-account commissioning and the broader software objective remain incomplete.
+
 **2026-10-24 exact browser postconditions:** reviewed browser workflows can declare
 an exact receipt URL, element and text. Core derives a fresh read-only Chromium
 observation before releasing dependent work. Signed synthetic HTTPS acceptance

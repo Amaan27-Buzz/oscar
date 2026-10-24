@@ -1,5 +1,10 @@
 # Communication Layer
 
+**2026-10-24 local software:** account-bound Google/Microsoft contact listing
+and exact reads now use native conversation, signed reviews and the existing
+Fabric. Read-only scopes, bounded fields, first-page pagination and transient
+output remain explicit. [Implemented contract](development/SOFTWARE-COMMUNICATION-INTEGRATION.md#connected-contacts-2026-10-24).
+
 OSCAR should act as the user's communication layer across calls, meetings, messaging, notifications, dictation, follow-up and optional continuity capture. Communication is one capability family owned by the same OSCAR identity, World Model, Personal Policy, Persona, Voice Identity and task state.
 
 ## Product rule

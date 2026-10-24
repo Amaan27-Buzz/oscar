@@ -44,9 +44,9 @@ def load_google(path: Path) -> tuple[ConnectorManifest, ...]:
                 if family in {"gmail", "calendar"}
                 else ("polling",),
                 provenance=(
-                    "official Google Tasks REST verified 2026-10-24; "
+                    "official Google " + family + " REST verified 2026-10-24; "
                     "SOFTWARE-COMMUNICATION-INTEGRATION.md"
-                    if family == "tasks"
+                    if family in {"tasks", "contacts"}
                     else "official Google Discovery retrieved 2026-10-03 IST; CONNECTOR-FABRIC.md"
                 ),
             )
@@ -138,6 +138,18 @@ def microsoft_manifest() -> ConnectorManifest:
         "microsoft",
         "https://graph.microsoft.com",
         (
+            _cap(
+                "microsoft.contacts.list",
+                "/v1.0/me/contacts",
+                ("Contacts.Read",),
+                query=("$top", "$select"),
+            ),
+            _cap(
+                "microsoft.contacts.read",
+                "/v1.0/me/contacts/{id}",
+                ("Contacts.Read",),
+                query=("$select",),
+            ),
             _cap("microsoft.todo.lists", "/v1.0/me/todo/lists", ("Tasks.Read",), query=("$top",)),
             _cap(
                 "microsoft.todo.tasks.list",
@@ -226,7 +238,7 @@ def microsoft_manifest() -> ConnectorManifest:
         headers=(("Prefer", 'outlook.body-content-type="text"'),),
         provenance=(
             "https://learn.microsoft.com/en-us/graph/api/overview; 2026-10-21 IST; "
-            "calendar-list-calendarview verified 2026-10-24"
+            "calendar-list-calendarview and user-list-contacts/contact-get verified 2026-10-24"
         ),
     )
 

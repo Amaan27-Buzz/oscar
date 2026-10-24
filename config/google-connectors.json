@@ -627,6 +627,41 @@
           "readback": "google.tasks.get"
         }
       ]
+    },
+    "contacts": {
+      "origin": "https://people.googleapis.com",
+      "capabilities": [
+        {
+          "name": "google.contacts.list",
+          "method": "GET",
+          "path": "/v1/people/me/connections",
+          "scopes": [
+            "https://www.googleapis.com/auth/contacts.readonly"
+          ],
+          "risk": "read",
+          "query_fields": [
+            "personFields",
+            "pageSize",
+            "pageToken"
+          ],
+          "body_required": false,
+          "response_kind": "json"
+        },
+        {
+          "name": "google.contacts.read",
+          "method": "GET",
+          "path": "/v1/people/{resourceId}",
+          "scopes": [
+            "https://www.googleapis.com/auth/contacts.readonly"
+          ],
+          "risk": "read",
+          "query_fields": [
+            "personFields"
+          ],
+          "body_required": false,
+          "response_kind": "json"
+        }
+      ]
     }
   }
 }

@@ -125,3 +125,13 @@ Primary contract read on 2026-10-23:
 [MCP 2026-07-28 authorization](https://github.com/modelcontextprotocol/modelcontextprotocol/blob/main/docs/specification/2026-07-28/basic/authorization/index.mdx),
 [authorization server discovery](https://github.com/modelcontextprotocol/modelcontextprotocol/blob/main/docs/specification/2026-07-28/basic/authorization/authorization-server-discovery.mdx),
 [authorization security considerations](https://github.com/modelcontextprotocol/modelcontextprotocol/blob/main/docs/specification/2026-07-28/basic/authorization/security-considerations.mdx).
+
+## Startup cancellation, 2026-10-24
+
+Failed initialization now cancels the SDK owner task before returning rather than
+only setting the ready-session stop event. A close request also survives the
+period before the event loop exists, preventing a late transport launch. Actual
+controlled stdio startup and Windows cwd-release acceptance are recorded with
+[the connector regression](../evidence/software-completion/contacts-2026-10-24.json).
+This is bounded local cleanup evidence; startup speed and arbitrary trusted
+server process trees retain their existing limitations.

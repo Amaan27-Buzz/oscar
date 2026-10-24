@@ -1,5 +1,6 @@
 """Real SDK/process interoperability; synthetic identities, independent file readback."""
 
+import asyncio
 import importlib.util
 import json
 import os
@@ -10,6 +11,7 @@ import sys
 import threading
 import time
 import unittest
+from contextlib import asynccontextmanager
 from dataclasses import asdict, replace
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -17,9 +19,10 @@ from unittest.mock import patch
 
 from oscar.capabilities import Cancellation, Cancelled
 from oscar.connector_providers import mcp_capability_name
-from oscar.connectors import ConnectorFabric, EnvironmentSecrets, RiskLevel
+from oscar.connectors import ConnectorError, ConnectorFabric, EnvironmentSecrets, RiskLevel
 from oscar.contracts import Action, Task, new_id, record
 from oscar.mcp_client import (
+    MCPClient,
     MCPPlugins,
     MCPServerConfig,
     executable_digest,
@@ -243,6 +246,54 @@ class MCPTests(unittest.TestCase):
         self.assertTrue(
             self.invoke("knowledge", "lookup", {"topic": "after-reconnect"}).result.success
         )
+
+    def test_startup_timeout_closes_real_child_before_returning(self):
+        waiting = []
+
+        @asynccontextmanager
+        async def stalled_client(transport, **options):
+            async with transport:
+                gate = asyncio.Event()
+                waiting.append(gate)
+                await gate.wait()
+                raise ConnectorError("synthetic_startup_released")
+                yield  # The controlled startup never completes.
+
+        cwd = self.root / "startup-child"
+        cwd.mkdir()
+        marker = self.root / "startup-pid"
+        config = replace(
+            self.config("knowledge", "mcp_startup_wait.py", str(marker), timeout=0.5),
+            cwd=str(cwd),
+        )
+        client = MCPClient.__new__(MCPClient)
+        try:
+            with (
+                patch("mcp.Client", stalled_client),
+                self.assertRaisesRegex(ConnectorError, "mcp_connection_timeout"),
+            ):
+                client.__init__(config, lambda: None, lambda: None)
+            self.assertTrue(marker.exists(), "actual stdio child did not start")
+            self.assertFalse(client._thread.is_alive(), "startup thread outlived failed connect")
+            cwd.rmdir()  # Windows rejects removal while the child owns this cwd.
+            if os.name != "nt":
+                with self.assertRaises(ProcessLookupError):
+                    os.kill(int(marker.read_text()), 0)
+        finally:
+            if client._loop and not client._loop.is_closed() and waiting:
+                client._loop.call_soon_threadsafe(waiting[0].set)
+            client.close()
+
+    def test_closed_startup_cannot_later_create_transport(self):
+        client = MCPClient.__new__(MCPClient)
+        client._closing = threading.Event()
+        client._closing.set()
+        with (
+            patch("mcp.Client") as sdk,
+            self.assertRaisesRegex(ConnectorError, "mcp_client_closed"),
+        ):
+            asyncio.run(client._serve())
+        sdk.assert_not_called()
 
     def test_real_schema_change_and_fresh_core_recovery(self):
         marker = self.root / "schema-change"

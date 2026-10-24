@@ -11,7 +11,7 @@ from tempfile import TemporaryDirectory
 from threading import Thread
 from time import monotonic, sleep, time
 from unittest.mock import patch
-from urllib.parse import urlsplit
+from urllib.parse import parse_qs, urlsplit
 from urllib.request import Request, build_opener
 
 from cryptography.hazmat.primitives import hashes, serialization
@@ -41,6 +41,7 @@ from tests.test_connections import PrivateVault
 class Provider:
     def __init__(self):
         self.calls, self.resources = [], {}
+        self.requests = []
         self.after_get, self.tamper, self.fail = None, False, False
         owner = self
 
@@ -55,6 +56,7 @@ class Provider:
                 body = self.rfile.read(int(self.headers.get("Content-Length", 0)))
                 body = json.loads(body) if body else None
                 path = urlsplit(self.path).path
+                owner.requests.append((self.path, self.headers.get("Authorization")))
                 owner.calls.append((self.command, path, body))
                 if owner.fail and self.command == "POST":
                     self.send_response(503)
@@ -155,6 +157,7 @@ class CommunicationTests(unittest.TestCase):
                     "google.gmail",
                     "google.calendar",
                     "google.tasks",
+                    "google.contacts",
                     "microsoft.graph",
                 }:
                     continue
@@ -334,6 +337,98 @@ class CommunicationTests(unittest.TestCase):
             self.assertEqual("partially_verified", result["state"])
             self.assertIn("synthetic-resource", result["response"])
             self.assertEqual("REPORTED", result["response_status"])
+
+    def test_contacts_use_selected_account_bounded_fields_and_explicit_pagination(self):
+        for alias, path, collection, token in (
+            ("Google", "/v1/people/me/connections", "connections", "nextPageToken"),
+            ("Work", "/v1.0/me/contacts", "value", "@odata.nextLink"),
+        ):
+            with self.subTest(alias=alias):
+                self.provider.resources[path] = {
+                    collection: [{"id": "synthetic-contact", "displayName": "Private contact"}],
+                    token: "more-contacts-exist",
+                }
+                result = self.execute("list contacts using " + alias)
+                self.assertEqual("partially_verified", result["state"])
+                self.assertEqual("REPORTED", result["response_status"])
+                self.assertIn("Private contact", result["response"])
+                self.assertIn("more-contacts-exist", result["response"])
+                uri, authorization = self.provider.requests[-1]
+                query = parse_qs(urlsplit(uri).query)
+                self.assertEqual(path, urlsplit(uri).path)
+                if alias == "Google":
+                    self.assertEqual(
+                        {"pageSize": ["10"], "personFields": ["names,emailAddresses,phoneNumbers"]},
+                        query,
+                    )
+                    self.assertEqual("Bearer synthetic-secret-googlegoogle.contacts", authorization)
+                else:
+                    self.assertEqual(["10"], query["$top"])
+                    self.assertEqual(
+                        ["id,displayName,emailAddresses,businessPhones,homePhones,mobilePhone"],
+                        query["$select"],
+                    )
+                    self.assertEqual("Bearer synthetic-secret-workmicrosoft.graph", authorization)
+        self.assertEqual(["GET", "GET"], [c[0] for c in self.provider.calls])
+        for family in ("plan", "objective", "result", "evidence"):
+            self.assertNotIn("Private contact", json.dumps(self.h.store.all(family)))
+        self.assertEqual(
+            0, self.h.archive.db.execute("SELECT count(*) FROM archive_events").fetchone()[0]
+        )
+
+    def test_exact_contact_read_uses_provider_resource_id(self):
+        for alias, identifier, path in (
+            ("Google", "people/c123", "/v1/people/c123"),
+            ("Work", "AAMk-contact=", "/v1.0/me/contacts/AAMk-contact%3D"),
+        ):
+            with self.subTest(alias=alias):
+                self.provider.resources[path] = {"displayName": "Private contact"}
+                result = self.execute(f"read contact {identifier} using {alias}")
+                self.assertEqual("partially_verified", result["state"])
+                self.assertIn("Private contact", result["response"])
+                self.assertEqual(("GET", path, None), self.provider.calls[-1])
+
+    def test_contact_revocation_before_signed_read_prevents_provider_io(self):
+        view = self.ask("list contacts using Google")
+        _, signed = self.approval(view["task_id"])
+        self.h.accounts.disconnect(self.accounts["Google"].id)
+        self.mount.refresh()
+        with self.assertRaises(PermissionError):
+            self.call("complete", signed)
+        self.assertEqual([], self.provider.calls)
+
+    def test_contact_read_requires_its_own_service_scope(self):
+        account = self.accounts["Work"]
+        self.h.accounts.bind(
+            account.id,
+            "microsoft.graph",
+            CredentialRef("workmicrosoft.graph"),
+            ("Mail.Read",),
+            "https://graph.microsoft.com",
+        )
+        self.mount.refresh()
+        self.assertEqual("blocked", self.ask("list contacts using Work")["state"])
+        self.assertEqual([], self.provider.calls)
+
+    def test_contact_alias_ambiguity_never_selects_an_account(self):
+        self.h.accounts.add("google", "fixture", "another-owner", "Google", verified=True)
+        self.assertEqual("blocked", self.ask("list contacts using Google")["state"])
+        self.assertEqual([], self.provider.calls)
+        self.assertEqual({}, self.h.connectors.requests)
+
+    def test_invalid_contact_request_never_stages_or_executes(self):
+        for instruction in (
+            "list contacts using unknown",
+            "read contact ../private using Google",
+            "read contact people/c123 using Work",
+            "read contact c123 using Google and send email",
+            "list contacts using Google page https://foreign.example",
+        ):
+            with self.subTest(instruction=instruction):
+                self.assertEqual("blocked", self.ask(instruction)["state"])
+        self.assertEqual([], self.provider.calls)
+        self.assertEqual({}, self.h.connectors.requests)
+        self.assertEqual([], self.h.store.all("task"))
 
     def test_task_creation_uses_exact_list_account_and_independent_get(self):
         for alias in ("Google", "Work"):

@@ -160,9 +160,11 @@ class MCPClient:
         self.schemas: dict[str, str] = {}
         self.metadata: dict[str, Any] = {}
         self._ready = threading.Event()
+        self._closing = threading.Event()
         self._transport_closed = threading.Event()
         self._loop: asyncio.AbstractEventLoop | None = None
         self._stop: asyncio.Event | None = None
+        self._serve_task: asyncio.Task[Any] | None = None
         self._client: Any = None
         self._context = threading.local()
         self._error: BaseException | None = None
@@ -182,6 +184,8 @@ class MCPClient:
         from mcp.client.streamable_http import streamable_http_client
 
         config = self.config
+        if self._closing.is_set():
+            raise ConnectorError("mcp_client_closed")
         self.authorize()
         if config.command:
             reviewed = dict(config.reviewed_files)
@@ -283,7 +287,10 @@ class MCPClient:
     async def _serve(self) -> None:
         from mcp import Client
 
+        if self._closing.is_set():
+            raise ConnectorError("mcp_client_closed")
         self._loop = asyncio.get_running_loop()
+        self._serve_task = asyncio.current_task()
         self._stop = asyncio.Event()
         async with AsyncExitStack() as stack:
             self._client = await stack.enter_async_context(
@@ -440,8 +447,20 @@ class MCPClient:
         return dict(self._submit("call", name, arguments))
 
     def close(self) -> None:
-        if self._loop and self._stop and not self._loop.is_closed():
-            self._loop.call_soon_threadsafe(self._stop.set)
+        self._closing.set()
+
+        def stop() -> None:
+            # Startup is not yet waiting on _stop; cancel in its owning SDK task.
+            if not self._ready.is_set() and self._serve_task:
+                self._serve_task.cancel()
+            elif self._stop:
+                self._stop.set()
+
+        if self._loop and not self._loop.is_closed():
+            try:
+                self._loop.call_soon_threadsafe(stop)
+            except RuntimeError:
+                pass  # The owner loop completed between the check and callback.
         if threading.current_thread() is not self._thread:
             self._thread.join(timeout=self.config.timeout + 5)
         self._client = None

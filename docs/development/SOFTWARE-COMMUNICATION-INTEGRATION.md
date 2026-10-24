@@ -84,6 +84,51 @@ receipt; the final full affected rerun passed. Ruff, Mypy (100 source files) and
 repository link/value-silent credential checks passed. See the
 [source-qualified task receipt](../evidence/software-completion/connected-tasks-2026-10-24.json).
 
+### Connected contacts, 2026-10-24
+
+Native Desktop conversation and authenticated Core-target text requests accept:
+
+```text
+list contacts using Google
+read contact people/c123 using Google
+list contacts using Work
+read contact AAMk-contact= using Work
+```
+
+Select an exact connected account ID or unambiguous alias. Google uses the
+separately consented `google.contacts` service at `https://people.googleapis.com`
+with `https://www.googleapis.com/auth/contacts.readonly`. Microsoft uses the
+existing `microsoft.graph` service with delegated `Contacts.Read`. Mail or task
+scopes do not authorize contact access. Existing service bindings and scope
+ceilings never expand automatically.
+
+List requests ask for ten first-page contacts. Google requests names, email
+addresses and phone numbers; Microsoft requests contact ID/display name,
+email addresses and business/home/mobile numbers. Exact contact reads use those
+same selected fields. Raw provider pagination stays explicit in the transient
+REPORTED response: a first page is not the whole address book. This path does
+not follow pagination URLs, search other contact folders, change contacts,
+resolve ambiguous recipients or authorize sending messages. Google accepts a
+literal `people/ID` resource name or its final ID; Microsoft requires its exact
+contact ID. Traversal, URLs, compound commands and ambiguous accounts reject
+before staging or provider I/O.
+
+The existing native signed review binds the chosen account generation and typed
+request. Disconnect before completion denies the read. Provider responses remain
+transient unless a separate retention contract permits storage; ordinary contact
+reads do not populate canonical memory or establish current identity facts.
+Read results remain PARTIAL/REPORTED rather than verified user assertions.
+
+Official contracts checked on 2026-10-24: [Google connections list](https://developers.google.com/people/api/rest/v1/people.connections/list),
+[Google person read](https://developers.google.com/people/api/rest/v1/people/get),
+[Microsoft contacts list](https://learn.microsoft.com/en-us/graph/api/user-list-contacts?view=graph-rest-1.0)
+and [contact read](https://learn.microsoft.com/en-us/graph/api/contact-get?view=graph-rest-1.0).
+Actual synthetic HTTP acceptance covers both account credentials, exact paths and
+field/page bounds, native signatures, explicit pagination, private-output
+non-retention, missing scope, ambiguous aliases and pre-read disconnect. Real
+provider OAuth/contacts and owner physical/native UI acceptance remain separate.
+[Source-qualified receipt](../evidence/software-completion/contacts-2026-10-24.json).
+
 ## Authority and privacy
 
 The account generation is pinned when preparing the request. Native review binds

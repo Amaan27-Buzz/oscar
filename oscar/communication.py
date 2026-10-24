@@ -52,7 +52,7 @@ def prepare(harness: "Harness", text: str) -> PreparedCommunication | None:
     request = re.sub(r"^please ", "", text.strip(), count=1, flags=re.IGNORECASE)
     if not re.match(
         r"(?:(?:draft|send|list|read) email\b|create calendar event\b|"
-        r"create task\b|list task lists\b|list tasks\b)",
+        r"create task\b|list task lists\b|list tasks\b|list contacts\b|read contact\b)",
         request,
         re.IGNORECASE,
     ):
@@ -91,10 +91,16 @@ def prepare(harness: "Harness", text: str) -> PreparedCommunication | None:
     task_listing = re.fullmatch(
         r"list tasks using (\S+) in list " + identifier, request, re.IGNORECASE
     )
-    if not any((mail, listing, reading, event, task, task_lists, task_listing)):
+    contacts = re.fullmatch(r"list contacts using (\S+)", request, re.IGNORECASE)
+    contact = re.fullmatch(
+        r"read contact ((?:people/)?[A-Za-z0-9_=-]{1,500}) using (\S+)",
+        request,
+        re.IGNORECASE,
+    )
+    if not any((mail, listing, reading, event, task, task_lists, task_listing, contacts, contact)):
         raise ValueError(
             "Specify account and exact mail fields, event offset times, "
-            "or task list/title/date/notes"
+            "task list/title/date/notes, or contact ID"
         )
     if mail:
         alias = mail[2]
@@ -104,6 +110,10 @@ def prepare(harness: "Harness", text: str) -> PreparedCommunication | None:
         alias = reading[2]
     elif event:
         alias = event[1]
+    elif contacts:
+        alias = contacts[1]
+    elif contact:
+        alias = contact[2]
     else:
         selected_task = task or task_lists or task_listing
         assert selected_task is not None
@@ -122,7 +132,25 @@ def prepare(harness: "Harness", text: str) -> PreparedCommunication | None:
     prefix = "google.gmail" if google else "microsoft.mail"
     parameters: dict[str, Any] = {"path": {"userId": "me"}} if google else {"path": {}}
     expected: dict[str, Any] = {}
-    if task or task_lists or task_listing:
+    if contacts or contact:
+        prefix = "google.contacts" if google else "microsoft.contacts"
+        name = prefix + (".read" if contact else ".list")
+        parameters = {"path": {}}
+        parameters["query"] = (
+            {"personFields": "names,emailAddresses,phoneNumbers"}
+            if google
+            else {"$select": "id,displayName,emailAddresses,businessPhones,homePhones,mobilePhone"}
+        )
+        if contact:
+            resource_id = contact[1]
+            if google:
+                resource_id = resource_id.split("/")[-1]
+            elif "/" in resource_id:
+                raise ValueError("select the exact provider contact ID")
+            parameters["path"]["resourceId" if google else "id"] = resource_id
+        else:
+            parameters["query"]["pageSize" if google else "$top"] = "10"
+    elif task or task_lists or task_listing:
         prefix = "google.tasks" if google else "microsoft.todo"
         parameters = {"path": {}}
         if task or task_listing:

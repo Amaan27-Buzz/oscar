@@ -12,8 +12,8 @@ software work under the existing authorization; no new agent delegation is neede
 
 ## 2. Current candidate
 
-Latest committed base `3016ea3` on `codex/software-completion`; the browser
-postcondition checkpoint follows it. Use `git rev-parse HEAD` for the exact
+Latest committed base `61e8f0a` on `codex/software-completion`; the contacts
+checkpoint follows it. Use `git rev-parse HEAD` for the exact
 checkout, and `git log b700a6c..HEAD --oneline` for all local implementation commits.
 The final owner message must name the actual resulting checkout, not an invented
 self-referential documentation SHA.
@@ -23,6 +23,7 @@ self-referential documentation SHA.
 Newest first, after the starting source:
 
 ```text
+61e8f0a feat: verify exact browser receipts before dependent work
 3016ea3 fix: include recurring Microsoft events in current day briefing
 5151a13 fix: align planner output with provider JSON object modes
 ab95432 docs: record stable Windows and constrained Linux integration checkpoint
@@ -80,7 +81,8 @@ partial and open acceptance separately.
 | Gmail / Google Calendar | Account-bound typed native requests, real synthetic provider HTTP, exact review and independent saved-resource readback. Real consent/accounts pending |
 | Google Tasks | New list discovery/list/get/create adapter and native authoring; real synthetic HTTP/Cloud task proof. Real accounts pending |
 | Drive / Docs / Sheets / Slides / Classroom | Bounded declared methods through the real HTTPS adapter and synthetic HTTP contracts. General document semantics, owner services and actual app workflows are not globally accepted |
-| Google Contacts / Meet | No dedicated accepted provider workflow established by this continuation; generic MCP/browser support is not service acceptance |
+| Google / Microsoft Contacts | Bounded account-bound list/exact-read through signed native conversation and actual synthetic HTTP; real provider commissioning pending |
+| Google Meet | No dedicated accepted provider workflow established; generic MCP/browser support is not service acceptance |
 | Microsoft Outlook / Calendar / To Do | Bounded account-bound mail/event/task operations with synthetic HTTP/Cloud proof; sendMail 202 remains PARTIAL without a correlated resource |
 | OneDrive / Teams / SharePoint | Thin admitted read contracts; real tenant consent/provider workflows uncommissioned; not full application coverage |
 | GitHub / Git | Existing scoped Git/native commands and HTTPS API subset; historical narrow GitHub device-OAuth private-read evidence is not a new live/write claim. CI/CD mutation and broad issue/PR lifecycle are not fully accepted |
@@ -156,6 +158,11 @@ has source-scoped receipts in the completion ledger. A successful fixture never
 becomes real provider or whole-product acceptance.
 
 ## 16. Tests and skipped cases
+
+Contacts/connector/Grid/MCP acceptance: 205/205, no skips, 437.160 s and
+stable source hashes. The first campaign retained a stale catalog assertion
+and a reproduced MCP startup teardown defect; the corrected campaign passed.
+[Receipt](../evidence/software-completion/contacts-2026-10-24.json).
 
 The later exact browser postcondition campaign passed 129/129 cases in 321.213 s
 with stable source hashes and no skips. It includes authenticated profile reuse,

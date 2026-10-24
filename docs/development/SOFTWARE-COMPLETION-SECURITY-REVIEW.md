@@ -70,3 +70,25 @@ protected-desktop bypass or owner-application acceptance is claimed.
 
 Later runtime changes need their own affected verification. This report does not
 promote the full product to `SOFTWARE_FEATURE_COMPLETE`.
+
+## MCP startup teardown and contacts reads, 2026-10-24
+
+A combined connector campaign exposed a startup timeout followed by a Windows
+working-directory lock. A controlled stalled-startup reproduction confirmed
+that the old close signal did not cancel an SDK context still entering startup.
+The child/thread could outlive the failed connection. Close now records its
+request before event-loop creation, prevents later transport entry and cancels
+unfinished startup in its owning SDK task. Normal ready-session shutdown keeps
+the existing graceful stop path. A real stdio child test checks thread completion
+and immediate removal of its Windows working directory before failure returns;
+a second test rejects transport creation after an earlier close request.
+This fixes the reproduced teardown path, not every cause of startup slowness or
+every third-party descendant-process behavior. Trusted stdio remains unsandboxed.
+
+Google/Microsoft contact list/read uses independent read-only service scopes,
+exact account-generation review and current target checks. Native requests select
+bounded fields and ten first-page records; raw pagination remains explicit.
+Reads neither infer recipients nor grant contact mutation, communication or
+canonical retention. Synthetic HTTP tests inspect the selected credential,
+provider path, fields, scope denial, alias ambiguity and disconnect. Real contacts
+and owner OAuth were not used. [Receipt](../evidence/software-completion/contacts-2026-10-24.json).
