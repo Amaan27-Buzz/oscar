@@ -54,8 +54,8 @@ does not repeat their native UI, model or long-running acceptance.
 | 38 | Voice authorization | LOCAL source/speaker/grant rules; recognition never grants action authority; owner Voice Match uncommissioned |
 | 39 | Sentry transitions | LOCAL actual emulator and Core mode/expiry/withdrawal tests. [Sentry delivery](SOFTWARE-SENTRY-DELIVERY.md) |
 | 40 | Source capture / retention | LOCAL independent source grants, actual eight-source zero-retention run and explicit single-app frame retention |
-| 41 | Multi-source day context | LOCAL clock/calendar/weather/phone source contracts and actual eight-source phone run; unified daily-use acceptance PARTIAL |
-| 42 | Calendar / task coordination | PARTIAL observed overlap, signed calendar creation and Google Tasks/Microsoft To Do creation with independent saved-resource readback; automatic schedule coordination and daily-use acceptance OPEN. [Task contract](SOFTWARE-COMMUNICATION-INTEGRATION.md) |
+| 41 | Multi-source day context | LOCAL clock/calendar/weather/phone/connected-task source contracts and actual eight-source phone run; unified daily-use acceptance PARTIAL |
+| 42 | Calendar / task coordination | PARTIAL observed overlap, signed selected task-list briefing, signed calendar creation and Google Tasks/Microsoft To Do creation with independent saved-resource readback; automatic schedule coordination and daily-use acceptance OPEN. [Task contract](SOFTWARE-COMMUNICATION-INTEGRATION.md) |
 | 43 | Create scheduled automation | LOCAL actual native conversation review/decline and signed Executive creation. [Authoring](SOFTWARE-EXECUTIVE-AUTHORING.md) |
 | 44 | Persistent Worker after UI closure | LOCAL separate Core scheduled process test and outbound Worker acceptance; no desktop required as permanent Core |
 | 45 | Conditional / schedule triggers | LOCAL Executive event/occurrence tests; richer real daily monitoring acceptance OPEN |

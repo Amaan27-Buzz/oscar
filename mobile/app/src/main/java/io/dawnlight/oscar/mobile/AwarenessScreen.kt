@@ -119,6 +119,15 @@ import org.json.JSONObject
                         val events = runCatching { value.objects("events", 8) }.getOrDefault(emptyList())
                         Text("${events.size} observed events")
                         events.forEach { event -> Text(event.optString("summary", event.optString("subject", "Calendar event")).take(200), style = MaterialTheme.typography.bodySmall) }
+                    } else if (source.adapter == "connected_tasks") {
+                        if (!value.optBoolean("complete")) Text("Task list coverage is incomplete.")
+                        runCatching { value.objects("tasks", 8) }.getOrDefault(emptyList()).forEach { task ->
+                            Text(task.optString("title", "Untitled task").take(1024), style = MaterialTheme.typography.bodySmall)
+                            Text(task.optString("status", "Status unavailable"), style = MaterialTheme.typography.bodySmall)
+                            if (task.has("due_date")) Text("Due date ${task.getString("due_date")} (date only)", style = MaterialTheme.typography.bodySmall)
+                            task.optJSONObject("due_time")?.let { due -> Text("Due ${due.optString("dateTime")} · ${due.optString("timeZone")}", style = MaterialTheme.typography.bodySmall) }
+                            if (task.has("importance")) Text(task.getString("importance"), style = MaterialTheme.typography.bodySmall)
+                        }
                     } else if (source.adapter == "android") {
                         Text("Selected phone metadata. Playback does not establish attention.", style = MaterialTheme.typography.bodySmall)
                         if (!value.optBoolean("notifications_available")) Text("Notification context unavailable.")
@@ -148,18 +157,21 @@ import org.json.JSONObject
     var timezone by remember(state.epoch) { mutableStateOf(java.time.ZoneId.systemDefault().id) }
     var accountId by remember(state.epoch) { mutableStateOf("") }
     var calendarId by remember(state.epoch) { mutableStateOf("primary") }
+    var taskListId by remember(state.epoch) { mutableStateOf("") }
     var retain by remember(state.epoch) { mutableStateOf(false) }
     val accounts = state.snapshot?.connections?.accounts().orEmpty().filter { account ->
         account.getString("status") == "connected" && account.objects("services", 64).any { service ->
             val scopes = service.getJSONArray("scopes").texts(128)
-            service.getString("id") == "google.calendar" && "https://www.googleapis.com/auth/calendar.events.readonly" in scopes ||
+            if (kind == "connected_tasks") service.getString("id") == "google.tasks" && "https://www.googleapis.com/auth/tasks.readonly" in scopes ||
+                service.getString("id") == "microsoft.graph" && "Tasks.Read" in scopes
+            else service.getString("id") == "google.calendar" && "https://www.googleapis.com/auth/calendar.events.readonly" in scopes ||
                 service.getString("id") == "microsoft.graph" && "Calendars.Read" in scopes
         }
     }
     SupportingDetails("Connect current context") {
         OscarField(id, { id = it.take(80) }, label = "Source name", modifier = Modifier.fillMaxWidth())
         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            listOf("time" to "Time and date", "calendar" to "Connected calendar", "weather" to "Weather", "android" to "This phone").forEach { (value, label) ->
+            listOf("time" to "Time and date", "calendar" to "Connected calendar", "connected_tasks" to "Connected tasks", "weather" to "Weather", "android" to "This phone").forEach { (value, label) ->
                 FilterChip(selected = kind == value, onClick = { kind = value }, label = { Text(label) })
             }
         }
@@ -172,22 +184,26 @@ import org.json.JSONObject
         } else if (kind == "android") {
             Text("Uses this phone's current enrolled session and the app IDs selected in Android capture permissions. Up to eight apps. Only counts and playback state are shared, while OSCAR is open or phone tasks are visibly running. Enable sharing separately in capture permissions, then select this source in Sentry.", style = MaterialTheme.typography.bodySmall)
         } else {
-            if (accounts.isEmpty()) Text("Connect an account with calendar read permission first.")
+            if (accounts.isEmpty()) Text("Connect an account with ${if (kind == "connected_tasks") "task" else "calendar"} read permission first.")
             accounts.forEach { account -> FilterChip(selected = accountId == account.getString("id"), onClick = { accountId = account.getString("id") }, label = { Text(account.getString("alias")) }) }
-            OscarField(calendarId, { calendarId = it.take(160) }, label = "Calendar ID", modifier = Modifier.fillMaxWidth())
+            if (kind == "connected_tasks") {
+                OscarField(taskListId, { taskListId = it.take(160) }, label = "Task list ID", modifier = Modifier.fillMaxWidth())
+                Text("Reads the first eight tasks. Additional pages are marked incomplete. Google due is date-only; Microsoft times keep their timezone. Task notes are excluded.", style = MaterialTheme.typography.bodySmall)
+            } else OscarField(calendarId, { calendarId = it.take(160) }, label = "Calendar ID", modifier = Modifier.fillMaxWidth())
         }
         Row { Checkbox(retain, { retain = it }); Text("Retain selected observations for one hour", Modifier.weight(1f).padding(top = 12.dp)) }
-        Text("Time and calendar update every 30 seconds after you select the source in Sentry. Calendar reads cover the next 24 hours, up to eight events; additional pages remain incomplete. No action authority is granted.", style = MaterialTheme.typography.bodySmall)
+        Text("Time, calendar and tasks update every 30 seconds after you select the source in Sentry. Calendar reads cover the next 24 hours, up to eight events; additional pages remain incomplete. No action authority is granted.", style = MaterialTheme.typography.bodySmall)
         val account = accounts.find { it.getString("id") == accountId }
         val weather = weatherSourceValue(id, place, latitude, longitude, retain)
         val phone = if (kind == "android") session.phoneContextSource(id, retain) else null
         OscarButton(onClick = {
             val value = if (kind == "weather") weather!! else if (kind == "android") phone!! else JSONObject().put("id", id).put("adapter", kind)
-                .put("entity_id", if (kind == "calendar") "calendar:$id" else "core").put("interval_seconds", 30).put("retain", retain).put("retention_seconds", 3600)
+                .put("entity_id", if (kind in listOf("calendar", "connected_tasks")) "$kind:$id" else "core").put("interval_seconds", 30).put("retain", retain).put("retention_seconds", 3600)
             if (kind == "calendar") value.put("account_id", accountId).put("account_generation", account!!.getInt("generation")).put("calendar_id", calendarId).put("horizon_seconds", 86400)
+            else if (kind == "connected_tasks") value.put("account_id", accountId).put("account_generation", account!!.getInt("generation")).put("task_list_id", taskListId)
             else if (kind == "time") value.put("timezone", timezone)
             reviewChange(session, "assistance", change("source_create", id, value))
-        }, enabled = state.canManage() && id.matches(Regex("[A-Za-z0-9_.:/-]{1,80}")) && (kind != "calendar" || account != null) && (kind != "weather" || weather != null) && (kind != "android" || phone != null), modifier = Modifier.fillMaxWidth()) { Text("Review context source") }
+        }, enabled = state.canManage() && id.matches(Regex("[A-Za-z0-9_.:/-]{1,80}")) && (kind !in listOf("calendar", "connected_tasks") || account != null) && (kind != "connected_tasks" || taskListId.isNotBlank()) && (kind != "weather" || weather != null) && (kind != "android" || phone != null), modifier = Modifier.fillMaxWidth()) { Text("Review context source") }
     }
 }
 

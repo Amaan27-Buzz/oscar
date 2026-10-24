@@ -389,3 +389,19 @@ Future OSCAR Mobile/Executive acceptance should include at least:
 8. Schedule and communication mutations require real capability, authority and verification.
 9. Weak context signals do not justify confident claims about the user's activity.
 10. The user can quickly make OSCAR quieter, less observant or less autonomous.
+
+## Connected task awareness (2026-10-24)
+
+The native `connected_tasks` source reads a signed, exact account-generation and
+selected task-list binding through the existing Fabric. Google requires its
+Tasks readonly scope; Microsoft requires `Tasks.Read`. It observes the first
+eight tasks, marks additional pages incomplete and never follows them. Provider
+default filters still limit coverage. Google due dates have no exact deadline
+time; Microsoft times keep their provider timezone without conversion. Selected
+fields exclude private notes/body; retention is independent and actions stay off.
+
+Desktop and Android expose source setup and current briefing. Polling requires
+explicit source selection in Sentry (or its selected trigger); stale evidence,
+permission epochs and account drift withdraw visible content. This is read-only
+context, with no automatic priority or schedule decision. See the
+[acceptance receipt](evidence/software-completion/tasks-briefing-2026-10-24.json).

@@ -215,7 +215,7 @@ scan and diff checks passed. The first affected campaign's stale 35-method test
 count failure is retained; the expanded catalog has 39 Google methods. This adds
 genuine synthetic HTTP integration, not real provider accounts, reminder delivery,
 automatic prioritization or rendered native acceptance. [Contract](SOFTWARE-COMMUNICATION-INTEGRATION.md)
-and [receipt](../evidence/software-completion/connected-tasks-2026-10-24.json).
+and [receipt](../evidence/software-completion/tasks-briefing-2026-10-24.json).
 
 ### Combined regression at `b4dc890`, 2026-10-24
 
@@ -526,3 +526,21 @@ host/storage/TLS/network and off-host key custody, review native new controls,
 activate actual owner access only after intended-surface security checks, and
 separately authorize physical phone and real audio acceptance. None substitutes
 for finishing executable software work that can be tested locally now.
+
+## 2026-10-24 connected tasks in current day briefing
+
+Signed source creation now pins an exact Google Tasks or Microsoft To Do read
+binding and list. Desktop/Android expose it alongside calendar, weather and
+phone context. Source epoch/account generation, current read scope and Sentry
+selection are rechecked; late revoked output is discarded. The first eight
+provider tasks retain only identity/title/status/date and Microsoft importance.
+Google due has date precision only; Microsoft time/timezone remain reported.
+Task notes and bodies are excluded. Retention is separately reviewed and action
+remains false. Provider pagination is explicit with no automatic following.
+
+[Source-qualified receipt](../evidence/software-completion/tasks-briefing-2026-10-24.json):
+183 Python cases passed in 79.177 s with stable hashes, 130 Desktop cases/build
+passed, and Android 87 JVM cases/assemble/lint passed. Real accounts and new
+native rendered acceptance were not exercised. Broader prioritization,
+calendar/task coordination and daily-use acceptance remain OPEN; this checkpoint
+does not complete the original software mandate.

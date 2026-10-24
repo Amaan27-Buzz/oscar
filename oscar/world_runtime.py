@@ -104,7 +104,10 @@ class WorldRuntime:
             raise PermissionError("source setup requires trusted owner authority")
         reference(entity_id)
         if (
-            adapter not in {"grid", "tasks", "files", "time", "calendar", "weather", "android"}
+            adapter not in {
+                "grid", "tasks", "files", "time", "calendar", "weather", "android",
+                "connected_tasks",
+            }
             or type(interval_seconds) is not int
             or not 1 <= interval_seconds <= 3600
             or entity_id not in source.entities
@@ -117,7 +120,7 @@ class WorldRuntime:
             for key, path in paths.items():
                 reference(key)
                 self.files.parts(path) if hasattr(self.files, "parts") else reference(path)
-        elif adapter in {"time", "calendar", "weather", "android"}:
+        elif adapter in {"time", "calendar", "weather", "android", "connected_tasks"}:
             if native_config is None or paths:
                 raise ValueError("reviewed native source configuration required")
             reviewed = self.review_source(native_config)
@@ -160,6 +163,7 @@ class WorldRuntime:
         extras = {
             "time": {"timezone"},
             "calendar": {"account_id", "account_generation", "calendar_id", "horizon_seconds"},
+            "connected_tasks": {"account_id", "account_generation", "task_list_id"},
             "weather": {"latitude", "longitude", "place"},
             "android": {"node_id", "session_id", "packages"},
         }
@@ -182,6 +186,10 @@ class WorldRuntime:
         else:
             raise ValueError("source identifier already registered")
         material = {"configuration": value, "perceive": True, "act": False}
+        if adapter == "connected_tasks":
+            from .task_context import review
+
+            return material | review(self, value)
         if adapter == "android":
             from .phone_context import review
 
@@ -424,6 +432,11 @@ class WorldRuntime:
                 self.weather_cache.setdefault(row["id"], {}),
             )
             observation_kind = ObservationKind.ENVIRONMENT
+        elif kind == "connected_tasks":
+            from .task_context import ConnectedTaskSource
+
+            source = ConnectedTaskSource(self, row)
+            observation_kind = ObservationKind.TASK
         elif kind == "calendar":
             config = row["native_config"]
             h = self.runtime.connections
@@ -507,7 +520,9 @@ class WorldRuntime:
                     )
             counts = {"polled": 0, "failed": 0, "expired": 0}
             for row in self.store.all("perception_poll"):
-                if row["relationship"] != self.world.relationship or row["adapter"] != "calendar":
+                if row["relationship"] != self.world.relationship or row["adapter"] not in {
+                    "calendar", "connected_tasks"
+                }:
                     continue
                 try:
                     self._adapter(row)
@@ -539,7 +554,7 @@ class WorldRuntime:
                         raise PermissionError("source revoked or reconfigured")
                     settings, generation = self.sentry.configuration()
                     is_file = row["adapter"] == "files"
-                    ambient = row["adapter"] in {"files", "calendar", "weather"}
+                    ambient = row["adapter"] in {"files", "calendar", "weather", "connected_tasks"}
                     paths = row["paths"]
                     if is_file and settings.mode == AwarenessMode.TRIGGER_ONLY:
                         paths = {k: v for k, v in paths.items() if k in settings.trigger_keys}
@@ -550,7 +565,11 @@ class WorldRuntime:
                         and not paths
                         or not is_file
                         and settings.mode == AwarenessMode.TRIGGER_ONLY
-                        and ("weather.state" if row["adapter"] == "weather" else "calendar.state")
+                        and {
+                            "weather": "weather.state",
+                            "calendar": "calendar.state",
+                            "connected_tasks": "connected_tasks.state",
+                        }[row["adapter"]]
                         not in settings.trigger_keys
                     ):
                         self.fabric.disconnect(row["id"], row["epoch"], guard=self._guard)
@@ -669,7 +688,9 @@ class WorldRuntime:
                 r
                 for r in self.store.all("perception_poll")
                 if r["relationship"] == self.world.relationship
-                and r["adapter"] in {"time", "calendar", "tasks", "weather", "android"}
+                and r["adapter"] in {
+                    "time", "calendar", "tasks", "weather", "android", "connected_tasks"
+                }
             ]
             sources = []
             for row in rows[:8]:
@@ -677,11 +698,12 @@ class WorldRuntime:
                     "time": "clock.state",
                     "calendar": "calendar.state",
                     "tasks": "tasks.state",
+                    "connected_tasks": "connected_tasks.state",
                     "weather": "weather.state",
                     "android": "phone.state",
                 }[row["adapter"]]
                 available = True
-                if row["adapter"] == "calendar":
+                if row["adapter"] in {"calendar", "connected_tasks"}:
                     try:
                         self._adapter(row)
                     except (KeyError, ValueError, PermissionError):

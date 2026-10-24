@@ -137,4 +137,25 @@ class ManagementContractsTest {
         assertThrows(Exception::class.java) { parseDayBrief(JSONObject(wire.toString()).put("observed_at", -1)) }
         assertThrows(Exception::class.java) { parseDayBrief(JSONObject(wire.toString()).put("sources", JSONArray((0..8).map { wire.getJSONArray("sources").getJSONObject(0) }))) }
     }
+    @Test fun taskBriefKeepsAccountGenerationProviderPrecisionAndIncompleteCoverage() {
+        val tasks = JSONObject().put("complete", false).put("tasks", JSONArray().put(JSONObject()
+            .put("id", "task").put("title", "Synthetic task").put("due_date", "2027-01-16")))
+        val wire = JSONObject().put("version", 1).put("observed_at", 1000).put("truncated", false)
+            .put("sources", JSONArray().put(JSONObject().put("id", "tasks").put("epoch", 2)
+                .put("adapter", "connected_tasks").put("state", "current").put("epistemic", "REPORTED")
+                .put("account_id", "synthetic-owner").put("account_generation", 7).put("value", tasks.toString())
+                .put("evidence", JSONArray().put(JSONObject().put("id", "provider-read").put("fresh_until", 1060)))))
+            .put("schedule", JSONObject().put("overlaps", JSONArray()).put("incomplete", false).put("truncated", false))
+        val brief = parseDayBrief(wire)
+        val source = brief.sources.single()
+        assertEquals("connected_tasks", source.adapter)
+        assertEquals(7, source.accountGeneration)
+        assertEquals("synthetic-owner", source.accountId)
+        val selected = JSONObject(source.value!!)
+        assertFalse(selected.getBoolean("complete"))
+        assertEquals("2027-01-16", selected.getJSONArray("tasks").getJSONObject(0).getString("due_date"))
+        assertFalse(selected.getJSONArray("tasks").getJSONObject(0).has("due_time"))
+        assertNull(MobileState(dayBrief = brief).unavailable("Disconnected").dayBrief)
+    }
+
 }

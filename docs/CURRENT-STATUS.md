@@ -1,5 +1,15 @@
 # OSCAR — Current Status & Checklist
 
+**2026-10-24 connected task briefing:** Google Tasks and Microsoft To Do now
+feed the authorized read-only day briefing through exact current account/list
+bindings. Desktop and Android source forms preserve independent retention and
+no action authority. Only eight selected tasks are read; incomplete pages remain
+explicit. Google due dates remain date-only, and Microsoft times retain their
+reported timezone. All 183 affected Python cases and 130 Desktop cases passed;
+Android 87 JVM cases, assemble and lint passed. Native rendered acceptance and
+real-provider commissioning remain separate. No automatic prioritization or
+calendar coordination is claimed. [Receipt](evidence/software-completion/tasks-briefing-2026-10-24.json).
+
 **2026-10-24 structured local planning:** native Executive drafts on configured
 structured Ollama routes now send a bounded steps-or-clarification JSON schema
 with temperature zero. This constrains decoding; native validation, selected
@@ -101,7 +111,7 @@ now use existing native conversation, exact signed review and account-bound
 Fabric. Actual synthetic provider HTTP and Cloud signed requests passed independent
 saved-task readback, account rotation, private-output and no-replay checks.
 All 235 affected tests passed with stable sources; Ruff/Mypy and repository
-hygiene passed. [Receipt](evidence/software-completion/connected-tasks-2026-10-24.json).
+hygiene passed. [Receipt](evidence/software-completion/tasks-briefing-2026-10-24.json).
 Real accounts, timed reminders, general prioritization and full product acceptance
 remain uncommissioned or incomplete as recorded in the acceptance matrix.
 

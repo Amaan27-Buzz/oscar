@@ -127,3 +127,31 @@ it('reviews selected phone metadata against its current advertised session',()=>
   fireEvent.click(screen.getByRole('button',{name:'Review context source'}));
   expect(run).toHaveBeenCalledWith({kind:'manage_assistance',operation:'source_create',id:'phone-context',value:{id:'phone-context',adapter:'android',entity_id:'phone:selected-phone',interval_seconds:5,retain:false,retention_seconds:3600,node_id:'selected-phone',session_id:'current-session',packages:['example.selected']}});
 });
+
+it('reviews a task list with exact read-only account generation and no implicit retention',()=>{
+  const account={id:'task-owner',provider:'google',tenant:'synthetic',subject:'synthetic',alias:'Personal tasks',identity_class:'owner-delegated',generation:7,status:'connected',remote_revocation:'unknown',services:[{id:'google.tasks',scopes:['https://www.googleapis.com/auth/tasks.readonly'],expires_at:null,restrictions:[]}]};
+  const connections={identity:{id:'owner',display_name:'OSCAR',operational_email:null,status:'active'},accounts:[account],plugins:[],access:'Ask',enrollment:'available',observed_at_ms:Date.now()};
+  const run=vi.fn();render(<OperatingSettings view={{...initialView,link:'online',executive,connections}} busy={false} run={run}/>);
+  fireEvent.click(screen.getByRole('button',{name:'Connect a context source'}));
+  fireEvent.change(screen.getByLabelText('Source name'),{target:{value:'Daily tasks'}});
+  fireEvent.click(screen.getByRole('button',{name:'Context source'}));
+  fireEvent.click(screen.getByRole('radio',{name:'Connected tasks'}));
+  fireEvent.click(screen.getByRole('button',{name:'Task account'}));
+  fireEvent.click(screen.getByRole('radio',{name:'Personal tasks · google'}));
+  expect((screen.getByRole('button',{name:'Review context source'}) as HTMLButtonElement).disabled).toBe(true);
+  fireEvent.change(screen.getByLabelText('Task list ID'),{target:{value:'selected-list'}});
+  fireEvent.click(screen.getByRole('button',{name:'Review context source'}));
+  expect(run).toHaveBeenCalledWith({kind:'manage_assistance',operation:'source_create',id:'daily-tasks',value:{id:'daily-tasks',adapter:'connected_tasks',entity_id:'connected_tasks:daily-tasks',interval_seconds:30,retain:false,retention_seconds:3600,account_id:'task-owner',account_generation:7,task_list_id:'selected-list'}});
+});
+it('preserves task date precision and hides reports after account rotation',()=>{
+  const now=Date.now(),observation={observed_at_ms:now,received_at_ms:now,transport_ms:0};
+  const account={id:'tasks',provider:'google',tenant:'synthetic',subject:'synthetic',alias:'Tasks',identity_class:'owner-delegated',generation:7,status:'connected',remote_revocation:'unknown',services:[]};
+  const source={id:'tasks',epoch:1,adapter:'connected_tasks',state:'current',epistemic:'REPORTED',account_id:'tasks',account_generation:7,value:JSON.stringify({tasks:[{title:'Synthetic task',status:'needsAction',due_date:'2027-01-16'},{title:'Graph task',status:'notStarted',due_time:{dateTime:'2027-01-16T09:30:00',timeZone:'India Standard Time'}}],complete:false}),evidence:[{fresh_until:(now+60000)/1000}]};
+  const brief={version:1,observed_at:now/1000,sources:[source],schedule:{}};
+  const {rerender}=render(<DayBrief observation={observation} value={brief} accounts={[account]} grants={[{id:'tasks',epoch:1,perceive:true}]}/>);
+  expect(screen.getByText(/Synthetic task.*Due date 2027-01-16 \(date only\)/)).toBeTruthy();
+  expect(screen.getByText(/Graph task.*India Standard Time/)).toBeTruthy();
+  expect(screen.getByText('Task list coverage is incomplete.')).toBeTruthy();
+  rerender(<DayBrief observation={observation} value={brief} accounts={[{...account,generation:8}]} grants={[{id:'tasks',epoch:1,perceive:true}]}/>);
+  expect(screen.queryByText(/Synthetic task/)).toBeNull();
+});

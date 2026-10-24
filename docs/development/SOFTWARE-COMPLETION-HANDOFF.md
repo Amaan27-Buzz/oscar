@@ -12,8 +12,8 @@ software work under the existing authorization; no new agent delegation is neede
 
 ## 2. Current candidate
 
-Latest committed base `723df7e` on `codex/software-completion`; the structured
-local planning checkpoint follows it. Use `git rev-parse HEAD` for the exact
+Latest committed base `7e31202` on `codex/software-completion`; the connected-task
+briefing checkpoint follows it. Use `git rev-parse HEAD` for the exact
 checkout, and `git log b700a6c..HEAD --oneline` for all local implementation commits.
 The final owner message must name the actual resulting checkout, not an invented
 self-referential documentation SHA.
@@ -23,6 +23,7 @@ self-referential documentation SHA.
 Newest first, after the starting source:
 
 ```text
+7e31202 feat: constrain structured local Executive plan decoding
 723df7e fix: keep native observers from displacing Windows input focus
 0c217af test: verify signed cross-account browser file transfer
 77542e2 feat: add signed contact reads and close stalled MCP startup
@@ -308,3 +309,9 @@ close the UI, restart Core/Worker, inspect the same canonical task on phone and
 Desktop, stop/mute voice and inspect freshness-qualified briefing/notices.
 Include rejection, cancellation, outage, expired authority, large text and error
 recovery. This is an unexecuted owner checklist, not acceptance evidence.
+
+Current connected-task checkpoint: 183 Python/130 Desktop/87 Android JVM cases
+passed, with Desktop build and Android assemble/lint. This adds signed selected
+Google Tasks/Microsoft To Do awareness with date precision, bounded coverage,
+revocation and independent retention; it does not add automatic prioritization.
+[Receipt](../evidence/software-completion/tasks-briefing-2026-10-24.json).

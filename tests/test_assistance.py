@@ -391,3 +391,40 @@ class AssistanceTests(unittest.TestCase):
         self.assertTrue(source["perceive"])
         self.assertFalse(source["retain"])
         self.assertFalse(source["act"])
+
+    def test_connected_tasks_require_signed_source_and_account_drift_rejects_review(self):
+        from oscar.connectors import CredentialRef
+        from oscar.oauth_device import VaultResolver
+        from tests.test_connections import PrivateVault
+
+        vault = PrivateVault()
+        vault.put("synthetic-token", reference="synthetic-tasks")
+        self.h.connectors.secrets = VaultResolver(vault)
+        account = self.h.accounts.add("google", "synthetic", "tasks", "Tasks", verified=True)
+        scopes = ("https://www.googleapis.com/auth/tasks.readonly",)
+        account = self.h.accounts.bind(
+            account.id, "google.tasks", CredentialRef("synthetic-tasks"), scopes,
+            "https://www.googleapis.com",
+        )
+        change = {"operation": "source_create", "id": "reviewed-tasks", "value": {
+            "id": "reviewed-tasks", "adapter": "connected_tasks", "entity_id": "tasks",
+            "interval_seconds": 30, "retain": False, "retention_seconds": 3600,
+            "account_id": account.id, "account_generation": account.generation,
+            "task_list_id": "selected-list",
+        }}
+        review = self.review(change)
+        with self.assertRaises(KeyError):
+            self.h.world.world.source("reviewed-tasks")
+        self.assertEqual("google.tasks.list", json.loads(review["review"])["current"]["capability"])
+        self.h.accounts.bind(
+            account.id, "google.tasks", CredentialRef("synthetic-tasks"), scopes,
+            "https://www.googleapis.com",
+        )
+        with self.assertRaises(PermissionError):
+            self.complete(review)
+        change["value"]["account_generation"] = self.h.accounts.get(account.id).generation
+        self.complete(self.review(change))
+        source = self.h.world.world.source("reviewed-tasks")
+        self.assertTrue(source["perceive"])
+        self.assertFalse(source["retain"])
+        self.assertFalse(source["act"])
