@@ -149,3 +149,13 @@ synthetic request/response bytes; it never repairs or substitutes model output.
 specifies the schema format and recommends lower temperature for deterministic
 completions. No real owner account, microphone/camera or production Full activation
 was used.
+
+**2026-10-24 two-step local model acceptance:** compound Calculate/then
+requests now reach the reviewed planner; simple arithmetic keeps its existing
+path. Capability instructions state the existing exact arithmetic-expression
+contract. Actual installed Qwen passed arithmetic → dependent verified file in
+Ask (4.772 s, both signatures) and synthetic Full (4.905 s). All 71 affected
+checks passed (52.335 s). The initial routing failure and rejected prose
+arithmetic output remain recorded. These are literal steps with no output
+substitution or broad model-reliability claim.
+[Receipt](../evidence/software-completion/multistep-model-2026-10-24.json).

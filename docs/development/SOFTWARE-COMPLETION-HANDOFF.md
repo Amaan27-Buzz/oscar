@@ -12,8 +12,8 @@ software work under the existing authorization; no new agent delegation is neede
 
 ## 2. Current candidate
 
-Latest committed base `94bd7eb` on `codex/software-completion`; the combined
-regression receipt follows it. Use `git rev-parse HEAD` for the exact
+Latest committed base `d596f21` on `codex/software-completion`; the compound
+planning checkpoint follows it. Use `git rev-parse HEAD` for the exact
 checkout, and `git log b700a6c..HEAD --oneline` for all local implementation commits.
 The final owner message must name the actual resulting checkout, not an invented
 self-referential documentation SHA.
@@ -23,6 +23,7 @@ self-referential documentation SHA.
 Newest first, after the starting source:
 
 ```text
+d596f21 test: seal combined Windows and restricted Linux regression
 94bd7eb feat: include authorized connected tasks in native day briefings
 7e31202 feat: constrain structured local Executive plan decoding
 723df7e fix: keep native observers from displacing Windows input focus
@@ -327,3 +328,26 @@ failed receipts remain intact. [Windows](../evidence/software-completion/post-br
 and [Linux](../evidence/software-completion/post-brief-linux-2026-10-24.json).
 The full software mandate remains incomplete.
 
+**2026-10-24 two-step local model acceptance:** compound Calculate/then
+requests now reach the reviewed planner; simple arithmetic keeps its existing
+path. Capability instructions state the existing exact arithmetic-expression
+contract. Actual installed Qwen passed arithmetic → dependent verified file in
+Ask (4.772 s, both signatures) and synthetic Full (4.905 s). All 71 affected
+checks passed (52.335 s). The initial routing failure and rejected prose
+arithmetic output remain recorded. These are literal steps with no output
+substitution or broad model-reliability claim.
+[Receipt](../evidence/software-completion/multistep-model-2026-10-24.json).
+
+## Remaining original job at the usage checkpoint
+
+The complete software mandate remains in progress. Major executable gaps are
+image-grounded model/computer control, broader cross-application and account
+reasoning, Chief-of-Staff prioritization/replanning/daily-use acceptance, requested
+service-specific integrations (including Meet, GitLab, Discord and creative/cloud
+workflows), unsupported MCP automatic authorization lifecycle paths and newest
+native accessibility/rendered/end-to-end acceptance. Model quality remains
+bounded despite successful typed examples. These are not all credential blockers.
+
+Separate owner commissioning still covers Oracle/public deployment, real provider
+accounts, actual owner Full activation, physical phone and real microphone/camera.
+No push, Actions or merge occurred. Physical Slice 18 and Groups 7/8 remain deferred.

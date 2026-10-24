@@ -1,5 +1,15 @@
 # OSCAR — Current Status & Checklist
 
+**2026-10-24 two-step local model acceptance:** compound Calculate/then
+requests now reach the reviewed planner; simple arithmetic keeps its existing
+path. Capability instructions state the existing exact arithmetic-expression
+contract. Actual installed Qwen passed arithmetic → dependent verified file in
+Ask (4.772 s, both signatures) and synthetic Full (4.905 s). All 71 affected
+checks passed (52.335 s). The initial routing failure and rejected prose
+arithmetic output remain recorded. These are literal steps with no output
+substitution or broad model-reliability claim.
+[Receipt](evidence/software-completion/multistep-model-2026-10-24.json).
+
 **2026-10-24 combined regression at `94bd7eb`:** the full Windows Python
 suite completed 1,099 cases: 1,089 passed, ten skipped and zero failed/error
 (657.352 s), with unchanged source hashes. The previously failed native visual

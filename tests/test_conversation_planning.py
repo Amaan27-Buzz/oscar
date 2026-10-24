@@ -100,6 +100,14 @@ class ConversationPlanningTests(unittest.TestCase):
         with self.assertRaises(PermissionError):
             self.complete(reviewed_effects)
 
+    def test_compound_arithmetic_enters_review_but_simple_arithmetic_keeps_fast_path(self):
+        self.assertIsNone(self.conversation("Calculate 17 + 25"))
+        proposal = self.proposed('Calculate 17 + 25, then create welcome.txt containing "42"')
+        self.assertEqual("plan_draft", proposal["operation"])
+        self.assertEqual([], self.requests)
+        self.assertEqual([], self.h.store.all("task"))
+        self.assertFalse((self.h.files.root / "welcome.txt").exists())
+
     def test_followup_resolves_persisted_current_owner_session_and_declines_other_session(self):
         row = self.draft()
         # A new service object reconstructs the reference from canonical state.

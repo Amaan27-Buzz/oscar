@@ -41,8 +41,13 @@ def source_hashes():
     }
 
 
-def run(full=False):
+def run(full=False, multistep=False):
     output = ROOT / ".oscar/conversation-local-full-inference.json" if full else OUTPUT
+    if multistep:
+        output = ROOT / (
+            ".oscar/conversation-local-multistep-full.json" if full
+            else ".oscar/conversation-local-multistep-ask.json"
+        )
     before = source_hashes()
     with urlopen("http://127.0.0.1:11434/api/tags", timeout=5) as response:
         models = json.load(response)["models"]
@@ -185,6 +190,14 @@ def run(full=False):
 
                 path = h.files.root / "welcome.txt"
                 objective = 'Create welcome.txt as a note with exact text "Hello from local OSCAR."'
+                expected = "Hello from local OSCAR."
+                if multistep:
+                    objective = (
+                        'Calculate 17 + 25 using math.add, then create welcome.txt with exact '
+                        'text "42" using files.write. Use two separate steps; the file step '
+                        'must depend on the arithmetic step.'
+                    )
+                    expected = "42"
                 if full:
                     activation = approve(
                         {
@@ -196,7 +209,7 @@ def run(full=False):
                                     "session_id": h.session.id,
                                     "capability_id": cap,
                                 }
-                                for cap in ("models.reason", "files.write")
+                                for cap in ("models.reason", "files.write", "math.add")
                             ],
                             "account_ids": [],
                             "resolve_ask_rules": sorted(
@@ -251,7 +264,16 @@ def run(full=False):
                         break
                     sleep(0.05)
                 assert tasks and all(h.store.task(task).state == "verified" for task in tasks)
-                assert path.read_text(encoding="utf-8") == "Hello from local OSCAR."
+                assert path.read_text(encoding="utf-8") == expected
+                if multistep:
+                    from oscar.capabilities import addition_operands
+
+                    steps = h.store.get("executive_goal", row["accepted_goal"])["steps"]
+                    assert len(steps) == len(tasks) == 2, "two real dependent steps required"
+                    arithmetic = next(s for s in steps if s["capability_id"] == "math.add")
+                    written = next(s for s in steps if s["capability_id"] == "files.write")
+                    assert arithmetic["id"] in written["depends_on"]
+                    assert addition_operands(arithmetic["intent"]["text"]) == (17, 25)
                 assert ask("Proceed with the plan")["state"] == "blocked"
                 report.update(
                     state="PASS",
@@ -284,4 +306,6 @@ def run(full=False):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--full", action="store_true", help="Use signed synthetic Full Access")
-    run(parser.parse_args().full)
+    parser.add_argument("--multistep", action="store_true", help="Require arithmetic then file")
+    args = parser.parse_args()
+    run(args.full, args.multistep)

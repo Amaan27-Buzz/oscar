@@ -94,6 +94,9 @@ class PlannerAuthoring:
             "kind": kind,
             "summary": cap["summary"],
             "intent_examples": examples,
+            **({"intent_rule": "Addition intent text must be only A + B, with integer operands; "
+                "no Calculate prefix or prose. Copy the example's other null fields."}
+               if kind == "addition" else {}),
             **(
                 {
                     "verification_rule": (
@@ -141,14 +144,14 @@ class PlannerAuthoring:
                 decision.memory_required
                 or decision.route
                 in {DecisionRoute.WORLD, DecisionRoute.RECALL, DecisionRoute.VERIFY}
-                or not re.match(
+                or not (re.match(
                     r"(?:plan|create|write|save|make|prepare|build|organize|open|launch|"
                     r"send|schedule|update|edit|fix|debug|implement|download|upload|"
                     r"move|copy|rename|delete|run|install|publish|deploy|"
                     r"fill|click|submit|select|navigate)\b",
                     goal,
                     re.IGNORECASE,
-                )
+                ) or re.match(r"calculate\b.+\bthen\b", goal, re.IGNORECASE | re.DOTALL))
             ):
                 return None
         try:
