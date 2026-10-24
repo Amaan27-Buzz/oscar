@@ -113,6 +113,41 @@ class ConversationPlanningTests(unittest.TestCase):
         self.assertEqual(1, len(self.requests))
         self.assertFalse((self.h.files.root / "welcome.txt").exists())
 
+    def test_object_plan_envelope_matches_json_mode_and_still_requires_effect_review(self):
+        self.file_result()
+        content = self.body["choices"][0]["message"]["content"]
+        self.body["choices"][0]["message"]["content"] = json.dumps(
+            {"steps": json.loads(content)}
+        )
+        self.complete(self.review(self.proposed()))
+        self.h.executive.tick()
+        prompt = self.requests[-1]["body"]["messages"][-1]["content"]
+        self.assertIn('exactly one key, "steps"', prompt)
+        self.assertIn('"steps": [{', prompt)
+        change = self.proposed("Review the plan")
+        path = self.h.files.root / "welcome.txt"
+        self.assertFalse(path.exists())
+        self.complete(self.review(change))
+        self.h.executive.tick()
+        self.assertEqual("Welcome to OSCAR", path.read_text())
+        self.assertEqual("verified", self.h.store.all("task")[-1]["state"])
+
+    def test_object_plan_envelope_rejects_extra_keys_and_untyped_steps(self):
+        self.draft()
+        task_id = self.h.store.all("task")[0]["id"]
+        result = next(r for r in self.h.store.all("result") if r["task_id"] == task_id)
+        for value in (
+            {"steps": [], "authority": "full"},
+            {"steps": [], "clarification": "also execute"},
+            {"steps": {"id": "save"}},
+            {"steps": ["save"]},
+        ):
+            with self.subTest(value=value):
+                self.h.store.put("result", result["id"], {**result, "value": json.dumps(value)})
+                with self.assertRaisesRegex(ValueError, "typed step array"):
+                    self.h.executive.result_steps(task_id)
+        self.assertFalse((self.h.files.root / "welcome.txt").exists())
+
     def test_failed_planning_explains_recovery_without_retries_and_new_review_can_succeed(self):
         self.body["choices"][0]["message"]["content"] = ""
         self.complete(self.review(self.proposed()))

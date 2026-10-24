@@ -4,6 +4,12 @@ Updated 2026-10-24. **IMPLEMENTATION_IN_PROGRESS / SOFTWARE ACCEPTANCE PARTIAL.*
 Material executable work remains. This ledger does not declare
 `SOFTWARE_FEATURE_COMPLETE`, owner acceptance, hosted deployment or Gate E PASS.
 
+Latest focused planning change requests an exact `steps` object envelope to
+match provider JSON modes, retains legacy typed arrays and rejects extra members.
+All 59 affected cases passed. Actual installed Qwen passed three of four main
+trials; malformed escaped member quotes still failed safely. Diagnostic trials
+retain the same honest limitation. [Receipt](../evidence/software-completion/planning-object-contract-2026-10-24.json).
+
 The [24-item engineering handoff](SOFTWARE-COMPLETION-HANDOFF.md) consolidates
 current implementation, evidence and executable gaps without declaring completion.
 At runtime checkpoint `953b9e8`, the stable 338-source Windows aggregate completed

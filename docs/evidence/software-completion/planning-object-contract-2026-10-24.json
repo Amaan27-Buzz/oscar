@@ -1,0 +1,69 @@
+{
+  "status": "PLANNING_OBJECT_CONTRACT_VERIFIED_MODEL_RELIABILITY_PARTIAL",
+  "base_head": "ab95432",
+  "sources": {
+    "oscar/executive.py": "839960ca91bacde3cfc46c46aa66a2d08ed8f41013af449a7e17e184b59abdcb",
+    "tests/test_conversation_planning.py": "3e05f4058585c6b1b350d6e700649ab0f0672f40b8baa46dcf036bbebe322fe2"
+  },
+  "focused_tests": {
+    "tests": 59,
+    "passed": 59,
+    "skipped": 0,
+    "seconds": 47.772,
+    "log_sha256": "f9ac7b3efc7fd5f0cdc7a1cd4a9f917c23b8c5e65ecc935a3c5905bdf0638519"
+  },
+  "local_model_runs": [
+    {
+      "mode": "ask",
+      "state": "PASS",
+      "seconds": 9.46,
+      "source_stable": true,
+      "model": "qwen3.5:4b",
+      "model_digest": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+      "error": null
+    },
+    {
+      "mode": "ask",
+      "state": "FAILED",
+      "seconds": 3.251,
+      "source_stable": true,
+      "model": "qwen3.5:4b",
+      "model_digest": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+      "error": "AssertionError: {'state': 'blocked', 'epistemic': 'UNKNOWN', 'message': 'Planning stopped before a usable plan was available. No proposed action was accepted. Inspect the planning task, then request a new draft.'}"
+    },
+    {
+      "mode": "full",
+      "state": "PASS",
+      "seconds": 4.458,
+      "source_stable": true,
+      "model": "qwen3.5:4b",
+      "model_digest": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+      "error": null
+    },
+    {
+      "mode": "full",
+      "state": "PASS",
+      "seconds": 4.332,
+      "source_stable": true,
+      "model": "qwen3.5:4b",
+      "model_digest": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+      "error": null
+    }
+  ],
+  "diagnostic": "Instrumented synthetic-only local response showed backslash-escaped member quotes outside JSON strings despite Ollama format=json. Rejected as structured_output_failure before effects. Object-envelope correction does not eliminate model/runtime malformed output. Diagnostic runs: three Ask passes followed by one failure. No argument repair or automatic effect replay added.",
+  "diagnostic_sha256": "f641883ae299759921161eef810952ec3900fdf092b99d4b5240d9bde4fc8f4c",
+  "static_checks": [
+    "Ruff oscar/tests/scripts PASS",
+    "Mypy 100 sources PASS",
+    "git diff --check PASS"
+  ],
+  "limits": [
+    "Four recorded main installed-model trials: three passed, one failed safely; diagnostic trials are separate and not a reliability benchmark",
+    "Existing array results stay supported for persisted drafts and configured providers",
+    "Only an object with exactly steps is unwrapped; extra members and untyped steps reject",
+    "Two new tests initially referenced incorrect existing fixture keys; corrected without production change",
+    "Full aggregate at 953b9e8 predates this focused change",
+    "No native UI, hosted deployment, real provider/account or physical acceptance repeated"
+  ],
+  "private_material_in_receipt": false
+}

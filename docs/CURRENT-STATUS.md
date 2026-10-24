@@ -1,5 +1,14 @@
 # OSCAR — Current Status & Checklist
 
+**2026-10-24 planning output contract:** the planner now requests a JSON object
+containing `steps`, matching provider JSON modes; persisted typed arrays remain
+supported. All 59 affected cases passed, including strict envelope rejection
+and signed effect review. Installed Qwen passed three of four main trials;
+the failed trial and a synthetic-only diagnostic confirmed invalid escaped
+member quotes despite JSON mode. No JSON repair or effect retry was added.
+[Receipt](evidence/software-completion/planning-object-contract-2026-10-24.json).
+Planning reliability remains PARTIAL; the earlier full aggregate predates this change.
+
 **2026-10-24 combined runtime checkpoint `953b9e8`:** all 1,070 Python cases
 completed: 1,060 passed, ten skipped, 517.267 seconds. All 338 hashed runtime,
 test, configuration and native source files stayed stable. Constrained nonroot,

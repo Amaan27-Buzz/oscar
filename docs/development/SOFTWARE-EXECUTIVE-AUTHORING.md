@@ -34,6 +34,16 @@ request does not silently create indefinite standing work. This is deterministic
 bounded authoring; arbitrary model-generated plans still use the existing
 separately reviewed model-planning contract.
 
+Planning now requests exactly `{"steps": [...]}` or a clarification object,
+matching provider JSON-object modes. The shared result reader accepts only the
+exact `steps` envelope, retaining earlier typed arrays for existing drafts;
+all existing action, dependency, scope and signature checks still apply. No
+malformed JSON repair is performed. The installed local model still sometimes
+emits invalid escaped member quotes despite JSON mode: those responses fail
+before effects. [Contract receipt](../evidence/software-completion/planning-object-contract-2026-10-24.json).
+Provider references: [Ollama JSON mode](https://github.com/ollama/ollama/blob/main/docs/api.md)
+and [OpenAI JSON mode](https://developers.openai.com/api/docs/guides/structured-outputs).
+
 The primary Desktop and connected Android conversation also accepts
 `Every day for 3 runs: 2 + 2` and `Create automation: 2 + 2`. Core returns an
 unsigned proposal, and the native client opens the same complete signed

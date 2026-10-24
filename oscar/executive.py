@@ -537,7 +537,8 @@ class Executive:
             None,
         )
         prompt = (
-            "Propose a topologically ordered plan as a JSON array, maximum16 steps. "
+            'Return a JSON object with exactly one key, "steps", containing a '
+            "topologically ordered array of maximum 16 steps. "
             "Each step has exactly id, intent, depends_on, node_id, capability_id. "
             "id is a unique lowercase string matching [a-z0-9_-]{1,40}, such as step-1. "
             "depends_on is always an array of earlier step id strings, [] for the first step. "
@@ -558,8 +559,8 @@ class Executive:
             "Use only these capabilities: "
             + json.dumps(pins)
             + (
-                ". Complete step shape example; replace literal arguments from the goal: "
-                + json.dumps(example)
+                ". Complete response example; replace literal arguments from the goal: "
+                + json.dumps({"steps": [example]})
                 if example
                 else ""
             )
@@ -654,6 +655,8 @@ class Executive:
             raise ValueError(
                 "Plan needs clarification: " + redact_runtime_secrets(steps["clarification"])
             )
+        if isinstance(steps, dict) and set(steps) == {"steps"}:
+            steps = steps["steps"]
         if not isinstance(steps, list) or any(not isinstance(step, dict) for step in steps):
             raise ValueError("model result must contain a typed step array")
         return steps
