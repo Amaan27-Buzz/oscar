@@ -44,7 +44,10 @@ def load_google(path: Path) -> tuple[ConnectorManifest, ...]:
                 if family in {"gmail", "calendar"}
                 else ("polling",),
                 provenance=(
-                    "official Google Discovery retrieved 2026-10-03 IST; CONNECTOR-FABRIC.md"
+                    "official Google Tasks REST verified 2026-10-24; "
+                    "SOFTWARE-COMMUNICATION-INTEGRATION.md"
+                    if family == "tasks"
+                    else "official Google Discovery retrieved 2026-10-03 IST; CONNECTOR-FABRIC.md"
                 ),
             )
         )
@@ -135,6 +138,27 @@ def microsoft_manifest() -> ConnectorManifest:
         "microsoft",
         "https://graph.microsoft.com",
         (
+            _cap("microsoft.todo.lists", "/v1.0/me/todo/lists", ("Tasks.Read",), query=("$top",)),
+            _cap(
+                "microsoft.todo.tasks.list",
+                "/v1.0/me/todo/lists/{listId}/tasks",
+                ("Tasks.Read",),
+                query=("$top",),
+            ),
+            _cap(
+                "microsoft.todo.tasks.get",
+                "/v1.0/me/todo/lists/{listId}/tasks/{id}",
+                ("Tasks.Read",),
+            ),
+            _cap(
+                "microsoft.todo.tasks.create",
+                "/v1.0/me/todo/lists/{listId}/tasks",
+                ("Tasks.ReadWrite",),
+                method="POST",
+                risk=RiskLevel.WRITE,
+                body=True,
+                readback="microsoft.todo.tasks.get",
+            ),
             _cap(
                 "microsoft.mail.list",
                 "/v1.0/me/messages",

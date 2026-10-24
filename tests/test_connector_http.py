@@ -114,7 +114,7 @@ class SyntheticHTTPTests(unittest.TestCase):
                     self.assertEqual(
                         "Bearer synthetic-token", self.provider.calls[-1]["authorization"]
                     )
-        self.assertEqual(35, len(self.provider.calls))
+        self.assertEqual(39, len(self.provider.calls))
         media = next(c for c in self.provider.calls if "alt=media" in c["path"])
         self.assertEqual("GET", media["method"])
 

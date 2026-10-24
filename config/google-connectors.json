@@ -567,6 +567,66 @@
           "verification": "authoritative read-back; explicitly selected fields; provider-specific comparison may remain PARTIAL"
         }
       ]
+    },
+    "tasks": {
+      "origin": "https://tasks.googleapis.com",
+      "capabilities": [
+        {
+          "name": "google.tasks.lists",
+          "method": "GET",
+          "path": "/tasks/v1/users/@me/lists",
+          "scopes": [
+            "https://www.googleapis.com/auth/tasks.readonly"
+          ],
+          "risk": "read",
+          "query_fields": [
+            "maxResults",
+            "pageToken"
+          ],
+          "body_required": false,
+          "response_kind": "json"
+        },
+        {
+          "name": "google.tasks.list",
+          "method": "GET",
+          "path": "/tasks/v1/lists/{tasklist}/tasks",
+          "scopes": [
+            "https://www.googleapis.com/auth/tasks.readonly"
+          ],
+          "risk": "read",
+          "query_fields": [
+            "maxResults",
+            "pageToken"
+          ],
+          "body_required": false,
+          "response_kind": "json"
+        },
+        {
+          "name": "google.tasks.get",
+          "method": "GET",
+          "path": "/tasks/v1/lists/{tasklist}/tasks/{task}",
+          "scopes": [
+            "https://www.googleapis.com/auth/tasks.readonly"
+          ],
+          "risk": "read",
+          "query_fields": [],
+          "body_required": false,
+          "response_kind": "json"
+        },
+        {
+          "name": "google.tasks.create",
+          "method": "POST",
+          "path": "/tasks/v1/lists/{tasklist}/tasks",
+          "scopes": [
+            "https://www.googleapis.com/auth/tasks"
+          ],
+          "risk": "write",
+          "query_fields": [],
+          "body_required": true,
+          "response_kind": "json",
+          "readback": "google.tasks.get"
+        }
+      ]
     }
   }
 }

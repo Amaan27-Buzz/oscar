@@ -44,6 +44,9 @@ durable pre-effect claim and require inspection rather than automatic replay.
 
 “Local” below means the exercised synthetic software scope. Existing reference
 implementation is not automatically evidence of intended-surface integration.
+The owner's 62 minimum scenarios have an explicit
+[integrated acceptance matrix](SOFTWARE-INTEGRATED-ACCEPTANCE.md); broad feature
+rows below do not replace scenario acceptance.
 
 | Capability | Implemented / integrated and intended surfaces | Current evidence | Security / live boundary and remaining work |
 | --- | --- | --- | --- |
@@ -60,7 +63,7 @@ implementation is not automatically evidence of intended-surface integration.
 | Ask / Secure / Full | Signed native exact activation and revocation; runtime and executor recheck | Authority regression, expiry/revoke/policy/account/session drift, actual delegated task test | Synthetic activation only; no owner Full Access activation. Actual Android management review and native contract checks passed; owner activation and physical acceptance remain separate |
 | Voice | Continuous local wake, persisted mute, explicit input/output binding and native controls reuse existing Desktop Voice/Session/Playback contracts | Actual Sherpa/Silero/Whisper continuous product loop → verified Core math/file effect → Kokoro PCM; synthetic echo/barge-in; native Bridge/CoreClient and cancellation pass | Separate continuous permission and 10-second control heartbeat enforced; defaults muted with no restart capture. Physical audio, room AEC, owner Voice Match and WebView device acceptance remain open |
 | Sentry / World Model | Existing source fabric, signed grants, time/calendar/weather sources and transient independently authorized delivery; batched selected phone notification counts/playback states feed the same World Model | Actual emulator Compose/NotificationManager denial/expiry/dedup/withdrawal passed; eight actual phone sources stayed current for 65.032 s across 31 readbacks, with zero retained observations, followed by local opt-out and Grid execution | Delivery contains generic metadata, expires within source TTL/60 seconds and needs explicit sentry:deliver policy. One-minute source budget accepted on frozen source; Core-restart advertisement recovery and overlay retreat geometry remain separate. No personal perception or hosted push claim |
-| Chief of Staff | Existing World Model now supplies source-backed day briefing and observed calendar overlap/incompleteness | Source/grant/account drift and Core-time expiry tests; native briefing API parses actual Core response | Scheduling/communication effects, richer live context and daily-use acceptance remain open |
+| Chief of Staff | Existing World Model supplies source-backed day briefing and observed calendar overlap/incompleteness; explicit account-bound calendar/mail and Google Tasks/Microsoft To Do authoring use the existing signed native request path | Source/grant/account drift and Core-time expiry tests; native briefing API parses actual Core response; synthetic provider HTTP calendar/task creation has independent saved-resource GET readback | Read-only briefing grants no mutation authority. General task prioritization, automatic replanning, richer daily context and daily-use acceptance remain open; real provider accounts uncommissioned |
 | Workers / Automations | Existing Executive; native signed schedules and routine lifecycle; learned procedures; model-assisted plan drafting and separate exact execution review | Actual outbound file routine/readback and revocation; 49 combined Executive/Assistance/planner tests pass; native conversation review/decline grants no execution | Configured model planning is bounded by signed input scope and current capability/provider contracts; production provider and broader native workflow acceptance remain open |
 | Communication | Explicit account-bound mail/list/read/draft/send and calendar authoring through existing Fabric; native exact signed review | 155 focused tests passed; 15 communication tests rechecked after automation hooks; actual synthetic provider HTTP and Cloud-native proof/approval/readback | Gmail saved SENT resource verified; Graph send without correlated resource remains PARTIAL. Recipient delivery and real accounts uncommissioned; no real messages sent |
 | Adaptive Interface Engine | Existing typed Presence/AIE surfaces retained | Desktop regression and Android build/lint | Full runtime-backed cross-device scenarios and native visual acceptance remain open |
@@ -101,6 +104,30 @@ VERIFIED. Groups 7/8 and optional unavailable hardware remain deliberately
 deferred. Gate A/B historical scoped PASS; Gate C/D PARTIAL; Gate E NOT PASSED.
 
 ## Current local verification receipts
+
+### Connected task authoring, 2026-10-24
+
+Google Tasks and Microsoft To Do now support literal account/list task creation
+and bounded discovery through existing Desktop/Cloud conversation, exact signed
+review, account-bound Fabric and independent saved-resource GET. The 235-case
+affected regression passed in 136.826 seconds with stable runtime/config/test
+hashes and no skips; Ruff, Mypy (100 modules), local links/value-silent credential
+scan and diff checks passed. The first affected campaign's stale 35-method test
+count failure is retained; the expanded catalog has 39 Google methods. This adds
+genuine synthetic HTTP integration, not real provider accounts, reminder delivery,
+automatic prioritization or rendered native acceptance. [Contract](SOFTWARE-COMMUNICATION-INTEGRATION.md)
+and [receipt](../evidence/software-completion/connected-tasks-2026-10-24.json).
+
+### Combined regression at `b4dc890`, 2026-10-24
+
+The full Python aggregate passed **1,049 tests with ten explicit skips**
+(1,059 discovered; 506.912 seconds). All 334 hashed Python/PowerShell/Rust/TypeScript
+source files remained stable throughout and independently matched afterwards.
+This includes actual Windows visual/Grid regression, not a fresh real-model,
+rendered native UI, Android, hosted or physical acceptance campaign. The
+[source-qualified receipt](../evidence/software-completion/regression-combined-2026-10-24.json)
+preserves the exact skips and log/manifest hashes. Later connected-task changes
+are covered separately rather than silently included in this aggregate.
 
 ### Selected Windows visual execution, 2026-10-24
 
@@ -303,7 +330,8 @@ an earlier mixed-source attempt was rejected and is not published as acceptance.
 
 Latest browser fallback: [actual visual Grid receipt](../evidence/software-completion/browser-visual-2026-10-24.json).
 Screenshots and exact reviewed pixel clicks share the same source-image binding;
-this does not add automatic image-coordinate reasoning or Windows screen capture.
+this does not add automatic image-coordinate reasoning. Selected Windows capture
+has its own later receipt above; browser evidence alone does not certify it.
 
 Latest receipts: [Android conversation regression](../evidence/software-completion/regression-android-conversation-2026-10-24.json),
 [actual native Android conversation](../evidence/software-completion/android-conversation-2026-10-24.json),

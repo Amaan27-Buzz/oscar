@@ -18,6 +18,9 @@ send email using Work to person@example.com subject "Subject" body "Text"
 list email using Work
 read email MESSAGE_ID using Work
 create calendar event using Work titled "Title" from 2026-10-23T09:00:00+05:30 to 2026-10-23T10:00:00+05:30 with person@example.com
+list task lists using Work
+list tasks using Work in list LIST_ID
+create task using Work in list LIST_ID titled "Prepare meeting" due 2026-10-25 notes "Read the agenda"
 ```
 
 Event attendees are optional. Times require an explicit offset; event duration is
@@ -26,6 +29,60 @@ subject/title to 200 and plain text body to 3000. Header injection, ambiguous
 accounts, malformed forms and known credential text fail before staging or I/O.
 Mail list returns a bounded first page (ten items); pagination tokens remain
 explicit provider output, and no complete-inbox claim is made.
+
+### Connected task authoring, 2026-10-24
+
+The same Desktop conversation and authenticated Cloud text entry now compile
+Google Tasks and Microsoft To Do requests into existing account-bound capabilities,
+exact native signed reviews and independent saved-resource verification. No second
+task store, frontend-only task or model-inferred account/list is introduced. The
+provider list ID is literal; list discovery and task listing return at most ten
+first-page items with provider pagination left explicit. Read results stay
+REPORTED, and reading does not create mutation or retention authority.
+
+Task titles are bounded to 200 single-line characters, notes to 3000 characters
+with LF line endings, and the request to the existing 4096-character limit. A
+literal `YYYY-MM-DD` date is required; relative dates, times, implicit lists and
+compound instructions are rejected. This is a due **date**, not a timed reminder
+or a promise of provider notification. Google Tasks stores a date; the Microsoft
+request uses explicit midnight UTC. Saved-resource readback checks account/list
+and returned resource identity, exact title/notes/date, and an uncompleted state.
+Deleted/hidden Google tasks cannot verify. Microsoft HTML body conversion or
+changed due time cannot silently count as an exact plain-text match.
+
+Google uses a separately authenticated `google.tasks` service with audience
+`https://tasks.googleapis.com` and explicit Tasks scopes. Microsoft uses the
+existing `microsoft.graph` service with delegated Tasks scopes. The current
+Fabric checks literal scopes: configure both Google
+`https://www.googleapis.com/auth/tasks.readonly` and
+`https://www.googleapis.com/auth/tasks`, or Microsoft `Tasks.Read` and
+`Tasks.ReadWrite`, for list/create/readback workflows. Read-only scope permits
+listing; write-only scope does not substitute for the verifier's separately
+declared read scope. Missing read scope keeps a mutation partially verified.
+Existing account grants and OAuth scope ceilings never expand automatically.
+Use the existing public app-registration configuration and signed Connections
+flow to request the chosen service/scopes; real owner consent remains pending.
+
+The native task request shares the existing session/account-generation fences,
+staged-input consumption, independent readback policy and uncertain-write journal.
+An HTTP failure is not safe to replay. A saved provider task does not itself grant
+canonical retention of the task title/notes or permission to send messages.
+
+Official contracts checked on 2026-10-24:
+[Google task insert](https://developers.google.com/workspace/tasks/reference/rest/v1/tasks/insert),
+[task GET](https://developers.google.com/workspace/tasks/reference/rest/v1/tasks/get),
+[task date semantics](https://developers.google.com/workspace/tasks/reference/rest/v1/tasks),
+[Microsoft task creation](https://learn.microsoft.com/en-us/graph/api/todotasklist-post-tasks?view=graph-rest-1.0)
+and [GET](https://learn.microsoft.com/en-us/graph/api/todotask-get?view=graph-rest-1.0).
+These support the adapter contract, not a claim of real-account acceptance.
+
+The final affected campaign passed **235 tests in 136.826 seconds**, no skips,
+with stable runtime/configuration/test hashes. It includes 23 communication/task
+cases and real signed synthetic Cloud requests. The initial campaign's stale
+35-method expected-count assertion was corrected to 39 and retained as a failed
+receipt; the final full affected rerun passed. Ruff, Mypy (100 source files) and
+repository link/value-silent credential checks passed. See the
+[source-qualified task receipt](../evidence/software-completion/connected-tasks-2026-10-24.json).
 
 ## Authority and privacy
 
@@ -69,6 +126,8 @@ remains uncertain even when the local task is blocked or cancelled.
 | Microsoft sendMail | Empty 202 response has no correlated resource ID | PARTIAL; acceptance is not delivery |
 | Google/Microsoft calendar create | Returned event ID GET, exact title/instants/attendees, not cancelled | Event resource verified; invite delivery unproven |
 | Mail list/read | Actual bounded provider response through read capability | REPORTED data; no synthetic mutation proof |
+| Google Tasks / Microsoft To Do create | Returned task ID GET in the exact selected list; title/plain notes/due date/uncompleted state | Saved task resource verified; no reminder delivery claim |
+| Task list discovery / task listing | Bounded first provider page under the selected account | REPORTED data; no complete-account coverage claim |
 
 Readback needs its own admitted provider scope and current Core policy. Missing
 read access, changed state, failed GET or a mismatched resource cannot become

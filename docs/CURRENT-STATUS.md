@@ -1,5 +1,23 @@
 # OSCAR — Current Status & Checklist
 
+**2026-10-24 connected tasks:** Google Tasks and Microsoft To Do creation/listing
+now use existing native conversation, exact signed review and account-bound
+Fabric. Actual synthetic provider HTTP and Cloud signed requests passed independent
+saved-task readback, account rotation, private-output and no-replay checks.
+All 235 affected tests passed with stable sources; Ruff/Mypy and repository
+hygiene passed. [Receipt](evidence/software-completion/connected-tasks-2026-10-24.json).
+Real accounts, timed reminders, general prioritization and full product acceptance
+remain uncommissioned or incomplete as recorded in the acceptance matrix.
+
+**2026-10-24 consolidated Python regression:** source checkpoint `b4dc890`
+passed 1,049 tests with ten explicit skips (1,059 discovered, 506.912 seconds).
+All 334 hashed source files remained stable. This aggregate predates the later
+connected-task adapter change and does not repeat native UI, real-model,
+Android, hosted or physical acceptance. [Receipt](evidence/software-completion/regression-combined-2026-10-24.json).
+The owner's 62 minimum end-to-end scenarios now have an explicit
+[acceptance matrix](development/SOFTWARE-INTEGRATED-ACCEPTANCE.md), including
+remaining executable gaps. Overall software completion remains PARTIAL.
+
 **2026-10-24 Windows visual execution:** separately consented selected-window PNG
 capture and screenshot-bound input now reach the outbound native Worker and native
 sharing review. An actual synthetic WPF canvas passed independent RGB/alpha

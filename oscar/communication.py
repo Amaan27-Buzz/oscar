@@ -4,7 +4,7 @@ import base64
 import json
 import re
 from dataclasses import dataclass
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 from email import policy
 from email.message import EmailMessage
 from email.parser import BytesParser
@@ -51,7 +51,10 @@ def prepare(harness: "Harness", text: str) -> PreparedCommunication | None:
     """No model infers account, recipient, body or time; an ambiguous request has no effects."""
     request = re.sub(r"^please ", "", text.strip(), count=1, flags=re.IGNORECASE)
     if not re.match(
-        r"(?:(?:draft|send|list|read) email\b|create calendar event\b)", request, re.IGNORECASE
+        r"(?:(?:draft|send|list|read) email\b|create calendar event\b|"
+        r"create task\b|list task lists\b|list tasks\b)",
+        request,
+        re.IGNORECASE,
     ):
         return None
     if len(text) > 4096:
@@ -73,9 +76,25 @@ def prepare(harness: "Harness", text: str) -> PreparedCommunication | None:
         request,
         re.IGNORECASE,
     )
-    if not any((mail, listing, reading, event)):
+    identifier = r"([A-Za-z0-9_=@+-]{1,500})"
+    task = re.fullmatch(
+        r"create task using (\S+) in list "
+        + identifier
+        + " titled "
+        + quoted
+        + r" due (\d{4}-\d{2}-\d{2}) notes "
+        + quoted,
+        request,
+        re.IGNORECASE,
+    )
+    task_lists = re.fullmatch(r"list task lists using (\S+)", request, re.IGNORECASE)
+    task_listing = re.fullmatch(
+        r"list tasks using (\S+) in list " + identifier, request, re.IGNORECASE
+    )
+    if not any((mail, listing, reading, event, task, task_lists, task_listing)):
         raise ValueError(
-            "Specify account, exact recipients/subject/body or event title/offset times"
+            "Specify account and exact mail fields, event offset times, "
+            "or task list/title/date/notes"
         )
     if mail:
         alias = mail[2]
@@ -83,9 +102,12 @@ def prepare(harness: "Harness", text: str) -> PreparedCommunication | None:
         alias = listing[1]
     elif reading:
         alias = reading[2]
-    else:
-        assert event is not None
+    elif event:
         alias = event[1]
+    else:
+        selected_task = task or task_lists or task_listing
+        assert selected_task is not None
+        alias = selected_task[1]
     accounts = [
         a
         for a in harness.accounts.list_accounts()
@@ -100,7 +122,36 @@ def prepare(harness: "Harness", text: str) -> PreparedCommunication | None:
     prefix = "google.gmail" if google else "microsoft.mail"
     parameters: dict[str, Any] = {"path": {"userId": "me"}} if google else {"path": {}}
     expected: dict[str, Any] = {}
-    if mail:
+    if task or task_lists or task_listing:
+        prefix = "google.tasks" if google else "microsoft.todo"
+        parameters = {"path": {}}
+        if task or task_listing:
+            selected_list = task or task_listing
+            assert selected_list is not None
+            parameters["path"]["tasklist" if google else "listId"] = selected_list[2]
+        if task:
+            title, notes = json.loads(task[3]), json.loads(task[5])
+            if not title or len(title) > 200 or any(ord(c) < 32 for c in title):
+                raise ValueError("single-line bounded task title required")
+            if len(notes) > 3000 or "\x00" in notes or "\r" in notes:
+                raise ValueError("bounded task notes with LF line endings required")
+            due = date.fromisoformat(task[4]).isoformat()
+            expected = {"title": title, "notes": notes, "due": due}
+            parameters["body"] = (
+                {"title": title, "notes": notes, "due": due + "T00:00:00Z", "status": "needsAction"}
+                if google
+                else {
+                    "title": title,
+                    "body": {"contentType": "text", "content": notes},
+                    "dueDateTime": {"dateTime": due + "T00:00:00", "timeZone": "UTC"},
+                    "status": "notStarted",
+                }
+            )
+            name = prefix + (".create" if google else ".tasks.create")
+        else:
+            name = prefix + (".lists" if task_lists else ".list" if google else ".tasks.list")
+            parameters["query"] = {"maxResults": "10"} if google else {"$top": "10"}
+    elif mail:
         operation = mail[1].lower()
         recipients = _addresses(mail[3])
         subject, body = json.loads(mail[4]), json.loads(mail[5])
@@ -222,6 +273,28 @@ def prepare(harness: "Harness", text: str) -> PreparedCommunication | None:
 
 def matches(name: str, payload: dict[str, Any], expected: dict[str, Any]) -> bool:
     """Prove the saved provider resource, never delivery to another person's inbox."""
+    if name == "google.tasks.create":
+        return bool(
+            payload.get("title") == expected["title"]
+            and payload.get("notes", "") == expected["notes"]
+            and _instant(payload["due"]).date().isoformat() == expected["due"]
+            and payload.get("status") == "needsAction"
+            and payload.get("deleted") is not True
+            and payload.get("hidden") is not True
+        )
+    if name == "microsoft.todo.tasks.create":
+        due = payload["dueDateTime"]
+        instant = datetime.fromisoformat(due["dateTime"].replace("Z", "+00:00"))
+        if instant.tzinfo is None:
+            instant = instant.replace(tzinfo=UTC)
+        return bool(
+            payload.get("title") == expected["title"]
+            and payload.get("body", {}).get("contentType", "").lower() == "text"
+            and payload["body"]["content"].replace("\r\n", "\n") == expected["notes"]
+            and due.get("timeZone") in {"UTC", "Etc/UTC"}
+            and instant == _instant(expected["due"] + "T00:00:00Z")
+            and payload.get("status") == "notStarted"
+        )
     if name.startswith("google.gmail."):
         message_data = payload["message"] if name.endswith("draft") else payload
         if name.endswith("send") and "SENT" not in message_data.get("labelIds", []):

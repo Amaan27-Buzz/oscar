@@ -75,7 +75,7 @@ class Provider:
                 elif path in owner.resources:
                     result = deepcopy(owner.resources[path])
                     if owner.tamper:
-                        result["subject"] = result["summary"] = "wrong"
+                        result["subject"] = result["summary"] = result["title"] = "wrong"
                         result["raw"] = "bm90IGFuIGVtYWls"
                         if "message" in result:
                             result["message"]["raw"] = result["raw"]
@@ -152,6 +152,7 @@ class CommunicationTests(unittest.TestCase):
                 if manifest.provider != provider or manifest.id not in {
                     "google.gmail",
                     "google.calendar",
+                    "google.tasks",
                     "microsoft.graph",
                 }:
                     continue
@@ -280,6 +281,123 @@ class CommunicationTests(unittest.TestCase):
             self.assertEqual("partially_verified", result["state"])
             self.assertIn("synthetic-resource", result["response"])
             self.assertEqual("REPORTED", result["response_status"])
+
+    def test_task_creation_uses_exact_list_account_and_independent_get(self):
+        for alias in ("Google", "Work"):
+            with self.subTest(alias=alias):
+                result = self.execute(
+                    f'create task using {alias} in list selected-list titled "Prepare meeting" '
+                    'due 2026-10-25 notes "Private marker"'
+                )
+                self.assertEqual("verified", result["state"], result)
+                post, get = self.provider.calls[-2:]
+                self.assertEqual("POST", post[0])
+                self.assertEqual("GET", get[0])
+                self.assertIn("/selected-list/tasks", post[1])
+                self.assertEqual(post[1] + "/synthetic-resource", get[1])
+                self.assertEqual({}, self.h.connectors.requests)
+                self.assertEqual({}, self.h.connectors.outcomes)
+        for family in ("objective", "plan", "result"):
+            self.assertNotIn("Private marker", json.dumps(self.h.store.all(family)))
+        self.assertEqual(
+            0, self.h.archive.db.execute("SELECT count(*) FROM archive_events").fetchone()[0]
+        )
+
+    def test_task_list_discovery_is_bounded_read_only_and_transient(self):
+        for alias in ("Google", "Work"):
+            for instruction in (
+                f"list task lists using {alias}",
+                f"list tasks using {alias} in list selected-list",
+            ):
+                result = self.execute(instruction)
+                self.assertEqual("partially_verified", result["state"], result)
+                self.assertEqual("GET", self.provider.calls[-1][0])
+                self.assertEqual("REPORTED", result["response_status"])
+
+    def test_task_readback_mismatch_never_verifies(self):
+        self.provider.tamper = True
+        for alias in ("Google", "Work"):
+            result = self.execute(
+                f'create task using {alias} in list selected-list titled "Prepare meeting" '
+                'due 2026-10-25 notes "Private marker"'
+            )
+            self.assertNotEqual("verified", result["state"])
+
+    def test_task_account_rotation_blocks_before_provider_io(self):
+        view = self.ask(
+            'create task using Work in list selected-list titled "Prepare meeting" '
+            'due 2026-10-25 notes "Private marker"'
+        )
+        account = self.accounts["Work"]
+        self.h.accounts.bind(
+            account.id,
+            "microsoft.graph",
+            CredentialRef("workmicrosoft.graph"),
+            account.services["microsoft.graph"].scopes,
+            "https://graph.microsoft.com",
+        )
+        self.mount.refresh()
+        _, signature = self.approval(view["task_id"])
+        self.assertNotEqual("verified", self.call("complete", signature)["state"])
+        self.assertEqual([], self.provider.calls)
+
+    def test_uncertain_task_creation_is_not_retried_or_replayed(self):
+        self.provider.fail = True
+        view = self.ask(
+            'create task using Google in list selected-list titled "Prepare meeting" '
+            'due 2026-10-25 notes "Private marker"'
+        )
+        _, signed = self.approval(view["task_id"])
+        result = self.call("complete", signed)
+        self.assertNotEqual("verified", result["state"])
+        self.assertNotIn("retry", result["actions"])
+        self.h.runtime.run(view["task_id"], self.h.executive.targets)
+        with self.assertRaises((PermissionError, StateConflict)):
+            self.call("complete", signed)
+        self.assertEqual(1, len(self.provider.calls))
+
+    def test_invalid_task_fields_have_no_staged_input_or_provider_effect(self):
+        for instruction in (
+            'create task using Work in list selected-list titled "Title" '
+            'due 2026-02-30 notes "Text"',
+            'create task using Work in list ../foreign titled "Title" due 2026-10-25 notes "Text"',
+            'create task using Work in list selected-list titled "Bad\\nTitle" '
+            'due 2026-10-25 notes "Text"',
+            'create task using unknown in list selected-list titled "Title" '
+            'due 2026-10-25 notes "Text"',
+            'create task using Work in list selected-list titled "Title" '
+            'due 2026-10-25T09:00:00Z notes "Text"',
+            'create task using Work in list selected-list titled "Title" '
+            'due 2026-10-25 notes "Text" and send mail',
+        ):
+            with self.subTest(instruction=instruction):
+                self.assertEqual("blocked", self.ask(instruction)["state"])
+        self.assertEqual([], self.provider.calls)
+        self.assertEqual([], self.h.store.all("task"))
+        self.assertEqual({}, self.h.connectors.requests)
+
+    def test_task_due_readback_preserves_date_and_rejects_false_utc_and_completion(self):
+        expected = {"title": "Title", "notes": "Text", "due": "2026-10-25"}
+        graph = {
+            "title": "Title",
+            "body": {"contentType": "text", "content": "Text"},
+            "dueDateTime": {"dateTime": "2026-10-25T00:00:00", "timeZone": "UTC"},
+            "status": "notStarted",
+        }
+        self.assertTrue(matches("microsoft.todo.tasks.create", graph, expected))
+        graph["dueDateTime"]["dateTime"] += "+05:30"
+        self.assertFalse(matches("microsoft.todo.tasks.create", graph, expected))
+        google = {
+            "title": "Title",
+            "notes": "Text",
+            "due": "2026-10-25T00:00:00.000Z",
+            "status": "needsAction",
+        }
+        self.assertTrue(matches("google.tasks.create", google, expected))
+        google["deleted"] = True
+        self.assertFalse(matches("google.tasks.create", google, expected))
+        google["deleted"], google["status"] = False, "completed"
+        self.assertFalse(matches("google.tasks.create", google, expected))
 
     def test_readback_lie_never_verifies(self):
         self.provider.tamper = True
@@ -516,12 +634,20 @@ class CommunicationTests(unittest.TestCase):
         return core, server
 
     def test_cloud_native_request_actual_http_signature_readback_and_private_output(self):
+        self.check_cloud_native_request(
+            'draft email using Work to friend@example.com subject "Subject" body "Private marker"'
+        )
+
+    def test_cloud_task_creation_actual_http_signature_readback_and_private_output(self):
+        self.check_cloud_native_request(
+            'create task using Work in list selected-list titled "Prepare meeting" '
+            'due 2026-10-25 notes "Private marker"'
+        )
+
+    def check_cloud_native_request(self, instruction):
         core, server = self.cloud()
         session, call, sign = self.cloud_client(core, server, "communication-phone")
         _, other, _ = self.cloud_client(core, server, "communication-other", connector=False)
-        instruction = (
-            'draft email using Work to friend@example.com subject "Subject" body "Private marker"'
-        )
         payload = {
             "kind": "text",
             "text": instruction,

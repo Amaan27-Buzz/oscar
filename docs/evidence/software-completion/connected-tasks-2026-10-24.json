@@ -1,0 +1,45 @@
+{
+  "status": "SYNTHETIC_CONNECTED_TASK_SOFTWARE_VERIFIED",
+  "base_head": "b4dc890582d11a15e3d0a724b8c4bbd71b882a8d",
+  "tests": 235,
+  "passed": 235,
+  "skipped": 0,
+  "seconds": 136.826,
+  "source_stable": true,
+  "source_files": 202,
+  "manifest_sha256": "125b6ac02cf5bb0c79029d2c3225ccf4cff0868b7bd62eea6d7a08260ab20976",
+  "sources": {
+    "oscar/communication.py": "4273d622f5d516e9e9d0b5ca796ebb94f723c53ee61f86853ddd3c91dffeb49b",
+    "oscar/connector_providers.py": "433b92749fe5cbba818ddc3e4e9af9fd70bb1aecfed60a48ac4586348a06493c",
+    "config/google-connectors.json": "b11aef7685cd136ab2fb66fab30bba85cf7f096952bdb5285c2fab0b63aa0550",
+    "tests/test_communication.py": "834d67124189e9efa0ef67c59b4d1c4c4e20e1e95db3a161e9e3fb9bc0070c9d",
+    "tests/test_connectors.py": "c1dca3b07b4be93ce5a1be2f0d16dc7dd9bd9f0a0e14a7847eeb38356ee6b86c",
+    "tests/test_connector_http.py": "eeda4e3a73056ccd83cae7cca990ba61b984a8170abf207ef9a319869f00ded4"
+  },
+  "logs": {
+    ".oscar/software-connected-tasks-final-20261024.log": "92a198a1b69f470e0d5d1ce857799f9c2814982294d81453afb1f316b5dcae82",
+    ".oscar/software-connected-tasks-count-failed-20261024.log": "fe0745e381953978961f62427cce1278f49fef92dcc20d8a3e009f61c221ee27",
+    ".oscar/software-connected-tasks-http-correction-20261024.log": "7fcba7072260c748aa79f150f82ffa6e54af866096bc6dba387ad02bf91855d2"
+  },
+  "accepted": [
+    "Desktop exact native signed review to Google Tasks and Microsoft To Do creation over actual synthetic provider HTTP; independent GET of returned resource in selected list",
+    "Actual Cloud HTTP signed synthetic enrollment, text request, owner proof, exact review, task creation, readback, private output isolation, duplicate admission and replay rejection",
+    "Bounded task list discovery, strict fields/date/list/account checks, current account generation, readback mismatch, UTC-offset mismatch, deleted/completed state and uncertain write without replay",
+    "No task title/notes retained in canonical plans/objectives/results or archive without independent retention"
+  ],
+  "failure_retained": "First 235-case campaign passed 234 with one stale HTTP catalog count assertion (35 expected vs 39 actual). Assertion corrected; two HTTP checks passed in 3.706 seconds, then all 235 passed together. No production failure hidden.",
+  "static_checks": {
+    "ruff": "PASS oscar tests scripts",
+    "mypy": "PASS 100 source files",
+    "repository_links_and_value_silent_secret_scan": "PASS",
+    "git_diff_check": "PASS"
+  },
+  "limits": [
+    "Actual provider endpoints mapped to owned loopback HTTP only in tests; no real OAuth/provider account or real task mutation",
+    "Exact account/list/title/date/notes forms; general prioritization/replanning not implemented by this path",
+    "Due date is not a timed reminder; provider notification/delivery unverified",
+    "Literal read/write OAuth scopes independently required; account scope ceilings never silently expand",
+    "No fresh rendered native UI, physical phone/audio, hosted deployment or production owner activation"
+  ],
+  "private_material_in_receipt": false
+}
