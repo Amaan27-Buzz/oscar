@@ -108,6 +108,63 @@ class ConversationPlanningTests(unittest.TestCase):
         self.assertEqual([], self.h.store.all("task"))
         self.assertFalse((self.h.files.root / "welcome.txt").exists())
 
+    def test_signed_result_handoff_is_visible_and_uses_actual_output(self):
+        self.result_handoff()
+
+    def test_autonomous_named_worker_uses_result_under_current_full_delegation(self):
+        planner_fixture.PlannerAuthoringTests.delegate(self, actions=("math.add", "files.write"))
+        self.result_handoff(full=True)
+
+    def result_handoff(self, full=False):
+        steps = [
+            {**self.steps[0], "id": "sum", "intent": asdict(Intent("17 + 25"))},
+            {
+                "id": "save",
+                "intent": asdict(Intent("Save verified result", "file_write", "answer.txt", "")),
+                "node_id": self.h.node_id,
+                "capability_id": "files.write",
+                "depends_on": ["sum"],
+                "inputs": [{"from_step": "sum", "select": [], "to": ["content"]}],
+            },
+        ]
+        self.body["choices"][0]["message"]["content"] = json.dumps({"steps": steps})
+        objective = "Create worker Verified calculation: Calculate 17 + 25, then save its result"
+        if full:
+            self.assertIn("assistance_started", self.conversation(objective))
+        else:
+            self.complete(self.review(self.proposed(objective)))
+        self.h.executive.tick()
+        if not full:
+            review = self.review(self.proposed("Review the plan"))
+            self.assertIn('"from_step": "sum"', review["review"])
+            self.assertFalse((self.h.files.root / "answer.txt").exists())
+            self.complete(review)
+        self.h.executive.tick()
+        self.assertEqual("42", (self.h.files.root / "answer.txt").read_text())
+        self.assertEqual(1, len(self.requests))
+        worker = self.h.store.all("executive_worker")[-1]
+        self.assertEqual("Verified calculation", worker["name"])
+
+    def test_explicit_multiple_devices_pin_all_targets_without_silent_selection(self):
+        self.test_unavailable_route_and_ambiguous_device_never_send_input()
+        change = self.proposed(
+            "Across devices "
+            + self.h.node_id
+            + ", second-device: Prepare a welcome file on each device"
+        )
+        self.assertEqual(
+            {self.h.node_id, "second-device"},
+            {c["node_id"] for c in change["value"]["capabilities"]},
+        )
+        for devices in ("missing, second-device", "second-device, second-device", "second-device,"):
+            self.assertEqual(
+                "blocked",
+                self.conversation("Across devices " + devices + ": Prepare a welcome file")[
+                    "state"
+                ],
+            )
+        self.assertEqual([], self.requests)
+
     def test_followup_resolves_persisted_current_owner_session_and_declines_other_session(self):
         row = self.draft()
         # A new service object reconstructs the reference from canonical state.
@@ -124,9 +181,7 @@ class ConversationPlanningTests(unittest.TestCase):
     def test_object_plan_envelope_matches_json_mode_and_still_requires_effect_review(self):
         self.file_result()
         content = self.body["choices"][0]["message"]["content"]
-        self.body["choices"][0]["message"]["content"] = json.dumps(
-            {"steps": json.loads(content)}
-        )
+        self.body["choices"][0]["message"]["content"] = json.dumps({"steps": json.loads(content)})
         self.complete(self.review(self.proposed()))
         self.h.executive.tick()
         prompt = self.requests[-1]["body"]["messages"][-1]["content"]
@@ -336,6 +391,12 @@ class RemoteConversationPlanningTests(unittest.TestCase):
     enroll = remote_fixture.RemoteGridTests.enroll
 
     def test_authenticated_remote_conversation_model_and_signed_file_effect(self):
+        self.remote_workflow()
+
+    def test_authenticated_cross_device_result_handoff(self):
+        self.remote_workflow(handoff=True)
+
+    def remote_workflow(self, handoff=False):
         h = self.core.harness
         provider_fixture.ProviderContractTests.setUp(self)
         provider = replace(self.provider, credential_envs={"synthetic": "SYNTHETIC_PLANNER"})
@@ -372,6 +433,30 @@ class RemoteConversationPlanningTests(unittest.TestCase):
                 }
             ]
         )
+        if handoff:
+            self.body["choices"][0]["message"]["content"] = json.dumps(
+                {
+                    "steps": [
+                        {
+                            "id": "sum",
+                            "intent": asdict(Intent("17 + 25")),
+                            "node_id": h.node_id,
+                            "capability_id": "math.add",
+                            "depends_on": [],
+                        },
+                        {
+                            "id": "save",
+                            "intent": asdict(
+                                Intent("Copy actual result", "file_write", "welcome.txt", "")
+                            ),
+                            "node_id": "test-desktop",
+                            "capability_id": "machine.files.write",
+                            "depends_on": ["sum"],
+                            "inputs": [{"from_step": "sum", "select": [], "to": ["content"]}],
+                        },
+                    ]
+                }
+            )
 
         def ask(text):
             return self.mobile.request(
@@ -398,7 +483,11 @@ class RemoteConversationPlanningTests(unittest.TestCase):
             )
 
         self.assertEqual("blocked", ask("Prepare a welcome note and save it")["state"])
-        first = ask("On device test-desktop: Prepare a welcome note and save it as welcome.txt")
+        first = ask(
+            "Across devices " + h.node_id + ", test-desktop: Calculate 17 + 25, then save result"
+            if handoff
+            else "On device test-desktop: Prepare a welcome note and save it as welcome.txt"
+        )
         self.assertEqual([], self.requests)
         approve(first["assistance_proposal"])
         until = monotonic() + 8
@@ -417,10 +506,16 @@ class RemoteConversationPlanningTests(unittest.TestCase):
             if h.store.get("executive_goal", goal)["state"] == "completed":
                 break
             sleep(0.02)
-        self.assertEqual("Synthetic remote welcome", path.read_text())
+        self.assertEqual("42" if handoff else "Synthetic remote welcome", path.read_text())
         tasks = h.executive._tasks(goal)
         self.assertEqual("verified", h.store.task(tasks[0]).state)
         self.assertTrue(h.store.all("evidence")[-1]["matches"])
+        if handoff:
+            self.assertEqual(2, len(tasks))
+            bindings = [h.store.get("plan", t)["executive"] for t in tasks]
+            self.assertEqual({h.node_id, "test-desktop"}, {b["node_id"] for b in bindings})
+            copied = next(b for b in bindings if b["step_id"] == "save")
+            self.assertIn(copied["inputs"][0]["task_id"], tasks)
         self.assertEqual("blocked", ask("Proceed with the plan")["state"])
 
     close = provider_fixture.ProviderContractTests.close

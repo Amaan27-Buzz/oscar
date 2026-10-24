@@ -41,17 +41,28 @@ def source_hashes():
     }
 
 
-def run(full=False, multistep=False):
+def run(full=False, multistep=False, handoff=False, model=MODEL):
+    multistep = multistep or handoff
     output = ROOT / ".oscar/conversation-local-full-inference.json" if full else OUTPUT
     if multistep:
         output = ROOT / (
-            ".oscar/conversation-local-multistep-full.json" if full
+            ".oscar/conversation-local-multistep-full.json"
+            if full
             else ".oscar/conversation-local-multistep-ask.json"
         )
+    if handoff:
+        output = ROOT / (
+            ".oscar/conversation-local-handoff-full.json"
+            if full
+            else ".oscar/conversation-local-handoff-ask.json"
+        )
+    if model != MODEL:
+        output = output.with_stem(output.stem + "-" + model.replace(":", "-"))
+    output = output.with_stem(output.stem + "-" + datetime.now(UTC).strftime("%Y%m%dT%H%M%S%fZ"))
     before = source_hashes()
     with urlopen("http://127.0.0.1:11434/api/tags", timeout=5) as response:
         models = json.load(response)["models"]
-    installed = [model for model in models if model["name"] == MODEL]
+    installed = [entry for entry in models if entry["name"] == model]
     assert len(installed) == 1, "exact already-installed local model required"
     report = {
         "observed_at": datetime.now(UTC).isoformat(),
@@ -60,7 +71,7 @@ def run(full=False, multistep=False):
             ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True
         ).strip(),
         "provider": "http://127.0.0.1:11434/api",
-        "model": MODEL,
+        "model": model,
         "authority_mode": "full" if full else "ask",
         "installed_model_digest": installed[0]["digest"],
         "qualification": (
@@ -91,7 +102,7 @@ def run(full=False, multistep=False):
                         "models": [
                             {
                                 "provider_id": "local-acceptance",
-                                "id": MODEL,
+                                "id": model,
                                 "capabilities": ["text", "structured"],
                                 "quality": 2,
                                 "affinities": {"reasoning": 1},
@@ -109,7 +120,7 @@ def run(full=False, multistep=False):
                 "max_output_tokens": 8192,
                 "mode": "private",
                 "pinned_provider": "local-acceptance",
-                "pinned_model": MODEL,
+                "pinned_model": model,
                 "ollama_think": False,
                 "required": ["text", "structured"],
             }
@@ -188,16 +199,40 @@ def run(full=False, multistep=False):
                         },
                     )
 
+                adapter = h.adapters["ollama"]
+                parse_text = adapter._text
+                build_request = adapter._request
+
+                def observe_request(*args):
+                    request = build_request(*args)
+                    body = json.loads(request.data)
+                    report["provider_decoding"] = {k: body.get(k) for k in ("format", "options")}
+                    return request
+
+                def observe_text(data, streaming=False):
+                    value = parse_text(data, streaming)
+                    report["synthetic_provider_text"] = value
+                    return value
+
+                adapter._text = observe_text
+                adapter._request = observe_request
                 path = h.files.root / "welcome.txt"
                 objective = 'Create welcome.txt as a note with exact text "Hello from local OSCAR."'
                 expected = "Hello from local OSCAR."
                 if multistep:
                     objective = (
-                        'Calculate 17 + 25 using math.add, then create welcome.txt with exact '
+                        "Calculate 17 + 25 using math.add, then create welcome.txt with exact "
                         'text "42" using files.write. Use two separate steps; the file step '
-                        'must depend on the arithmetic step.'
+                        "must depend on the arithmetic step."
                     )
                     expected = "42"
+                if handoff:
+                    objective = (
+                        "Calculate 17 + 25 using math.add, then save the actual result value "
+                        "into welcome.txt using files.write. Use two steps and an inputs handoff "
+                        "from the arithmetic step to file content; do not calculate or hardcode "
+                        "the file content yourself."
+                    )
                 if full:
                     activation = approve(
                         {
@@ -274,6 +309,15 @@ def run(full=False, multistep=False):
                     written = next(s for s in steps if s["capability_id"] == "files.write")
                     assert arithmetic["id"] in written["depends_on"]
                     assert addition_operands(arithmetic["intent"]["text"]) == (17, 25)
+                    if handoff:
+                        assert written["inputs"] == [
+                            {"from_step": arithmetic["id"], "select": [], "to": ["content"]}
+                        ]
+                        copies = [h.store.get("plan", task)["executive"] for task in tasks]
+                        report["result_handoff_provenance"] = [
+                            p["inputs"] for p in copies if p.get("inputs")
+                        ]
+                        assert len(report["result_handoff_provenance"]) == 1
                 assert ask("Proceed with the plan")["state"] == "blocked"
                 report.update(
                     state="PASS",
@@ -291,13 +335,15 @@ def run(full=False, multistep=False):
         report["elapsed_seconds"] = round(monotonic() - started, 3)
         report["source_stable"] = source_hashes() == before
         output.parent.mkdir(exist_ok=True)
-        output.write_text(json.dumps(report, indent=2, default=str) + "\n", encoding="utf-8")
+        with output.open("x", encoding="utf-8") as receipt:
+            receipt.write(json.dumps(report, indent=2, default=str) + "\n")
         print(
             json.dumps(
                 {
                     key: report.get(key)
                     for key in ("state", "model", "elapsed_seconds", "source_stable", "error")
                 }
+                | {"receipt": str(output.relative_to(ROOT))}
             ),
             flush=True,
         )
@@ -307,5 +353,12 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--full", action="store_true", help="Use signed synthetic Full Access")
     parser.add_argument("--multistep", action="store_true", help="Require arithmetic then file")
+    parser.add_argument("--handoff", action="store_true", help="Copy actual verified result")
+    parser.add_argument(
+        "--model",
+        default=MODEL,
+        choices=(MODEL, "qwen3.5:9b"),
+        help="Select an already-installed local model; never download",
+    )
     args = parser.parse_args()
-    run(args.full, args.multistep)
+    run(args.full, args.multistep, args.handoff, args.model)

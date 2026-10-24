@@ -564,3 +564,22 @@ checks passed (52.335 s). The initial routing failure and rejected prose
 arithmetic output remain recorded. These are literal steps with no output
 substitution or broad model-reliability claim.
 [Receipt](../evidence/software-completion/multistep-model-2026-10-24.json).
+
+**2026-10-25 Worker handoffs:** signed conversation now creates named temporary
+Workers and selects multiple exact devices. Explicit inputs carry scalar data
+from independently verified, same-occurrence results into reviewed text fields;
+provenance is rechecked before execution. Identities, paths and commands remain
+literal. Temporary Workers retire after all active responsibilities complete;
+active admission limits preserve historical records. Signed synthetic phone API
+→ Core calculation → outbound desktop file/readback and all 174 focused checks
+passed. Installed Qwen 9B passed Ask/Full handoffs (7.419/7.341 s); repeated 4B
+failures remain, including malformed output and a semantically wrong blank file.
+No broad model-reliability or full-completion claim. The receipt records the
+overwritten historical ignored 4B Ask raw-file limitation; its committed summary
+is retained and new reproductions write unique files.
+[Evidence](../evidence/software-completion/worker-handoffs-2026-10-25.json).
+
+The Worker aggregate ran 1,114 tests: 1,103 passed, ten skipped and one native
+visual-click case failed (655.061 s; unchanged source). An unchanged module
+recheck passed three tests; the rejection cause remains unproven. This is not
+an aggregate PASS. Subsequent formatting preserved identical Python ASTs.

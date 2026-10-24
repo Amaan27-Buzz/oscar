@@ -487,7 +487,8 @@ class Grid:
             ):
                 raise PermissionError("stale or unrelated task lease")
             if not any(
-                n["id"] == envelope.node_id and n["status"] in {"online", "degraded"}
+                n["id"] == envelope.node_id
+                and n["status"] in {"online", "degraded"}
                 and self.executor_available(n)
                 for n in self.nodes()
             ):

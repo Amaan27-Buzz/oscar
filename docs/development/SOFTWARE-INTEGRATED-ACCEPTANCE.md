@@ -1,6 +1,6 @@
 # Integrated software acceptance traceability
 
-2026-10-24. The owner's minimum 62 scenarios are tracked here without promoting
+2026-10-25. The owner's minimum 62 scenarios are tracked here without promoting
 unit coverage into whole-product acceptance. **Overall PARTIAL.** This is an
 execution ledger, not a software completion certificate. Current architecture,
 source boundaries and commands are in the [completion ledger](OSCAR-FULL-SOFTWARE-COMPLETION.md).
@@ -15,7 +15,7 @@ does not repeat their native UI, model or long-running acceptance.
 | ID | Owner scenario | Current classification and matching evidence / gap |
 | --- | --- | --- |
 | 1 | Natural request → plan → tool → verified result | PARTIAL: installed Qwen + normal Cloud configuration + signed Ask/Full + real file readback passed; repeat Ask also failed structured output before effects. [Model receipt](../evidence/software-completion/local-model-authority-2026-10-24.json) |
-| 2 | Multi-step contextual follow-up | PARTIAL: persisted current-owner planning follow-up and ambiguity/revocation tests; broader real-model multi-step native workflow unaccepted (`tests/test_conversation_planning.py`) |
+| 2 | Multi-step contextual follow-up | LOCAL scoped installed Qwen 9B Ask/Full arithmetic-result-to-file handoff, with reviewed provenance and source-change denial. Persisted contextual follow-up tests pass. Broader adaptive native workflow remains PARTIAL; 4B decoding failures retained. [Handoffs](../evidence/software-completion/worker-handoffs-2026-10-25.json) |
 | 3 | Historical recall | LOCAL: actual cached models/Qdrant/Graphiti + normal Harness; rendered Android sourced answer. [Memory acceptance](SOFTWARE-MEMORY-INDEX-ACCEPTANCE.md) |
 | 4 | Correction / temporal supersession | LOCAL: canonical correction/temporal tests and rendered native exact review. [Memory management](SOFTWARE-MEMORY-MANAGEMENT.md) |
 | 5 | Forget / rebuild | LOCAL: actual derived projection deletion/rebuild; Android answer withdrawal. Same memory receipts; no secure disk-erasure claim |
@@ -57,11 +57,11 @@ does not repeat their native UI, model or long-running acceptance.
 | 41 | Multi-source day context | LOCAL clock/calendar/weather/phone/connected-task source contracts and actual eight-source phone run; unified daily-use acceptance PARTIAL |
 | 42 | Calendar / task coordination | PARTIAL observed overlap, signed selected task-list briefing, signed calendar creation and Google Tasks/Microsoft To Do creation with independent saved-resource readback; automatic schedule coordination and daily-use acceptance OPEN. [Task contract](SOFTWARE-COMMUNICATION-INTEGRATION.md) |
 | 43 | Create scheduled automation | LOCAL actual native conversation review/decline and signed Executive creation. [Authoring](SOFTWARE-EXECUTIVE-AUTHORING.md) |
-| 44 | Persistent Worker after UI closure | LOCAL separate Core scheduled process test and outbound Worker acceptance; no desktop required as permanent Core |
+| 44 | Persistent Worker after UI closure | LOCAL separate Core scheduled process and outbound Worker acceptance. Named temporary Workers retire after all responsibilities finish; 65 successive jobs preserve history without lifetime quota exhaustion. Broader autonomous delegation remains PARTIAL. [Handoffs](../evidence/software-completion/worker-handoffs-2026-10-25.json) |
 | 45 | Conditional / schedule triggers | LOCAL Executive event/occurrence tests; richer real daily monitoring acceptance OPEN |
 | 46 | Interrupt / recover / verify | LOCAL actual Core/Worker restart and 98 independently read-back effects; uncertain mutation never replayed. [Soak](../evidence/software-completion/soak-fbe12e3-2026-10-24.json) |
 | 47 | Useful proactive notification | PARTIAL actual transient Sentry notices/quiet/expiry; usefulness and broader Chief-of-Staff follow-up acceptance OPEN |
-| 48 | Same canonical task on Desktop / Android | LOCAL common Core task/readback contracts and historical native remote origin proof; full newest cross-device workflow PARTIAL |
+| 48 | Same canonical task on Desktop / Android | LOCAL signed synthetic phone → Core arithmetic → outbound Desktop file with exact independent readback and result provenance. Explicit device lists pin each executor. Newest rendered native workflow remains PARTIAL. [Handoffs](../evidence/software-completion/worker-handoffs-2026-10-25.json) |
 | 49 | Core restart | LOCAL separate TLS Core death/restart, native Worker recovery and fresh clipboard verification |
 | 50 | Worker disconnect | LOCAL actual stop/liveness expiry and cancellation; UI connectivity cannot preserve executor capability |
 | 51 | Browser / MCP interruption | LOCAL actual browser children/profile cleanup, SDK lifecycle and durable uncertain-effect fencing |

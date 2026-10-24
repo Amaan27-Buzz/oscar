@@ -1,5 +1,22 @@
 # OSCAR — Current Status & Checklist
 
+**2026-10-25 local Worker execution checkpoint:**
+
+Scoped named temporary Workers now support reviewed verified-result handoffs and
+explicit multiple-device selection through conversation. Completed Workers retire
+without deleting history or consuming lifetime admission quotas. Signed synthetic
+phone/Core/outbound desktop acceptance, 174 focused checks and actual installed
+Qwen 9B Ask/Full handoffs passed. The 4B failures remain recorded; this is not
+general model or whole-product acceptance. See [Worker contracts](WORKERS.md)
+and [receipt](evidence/software-completion/worker-handoffs-2026-10-25.json).
+Full software completion remains in progress; publication/commissioning boundaries
+and formal gate classifications remain unchanged.
+
+The Worker aggregate ran 1,114 tests: 1,103 passed, ten skipped and one native
+visual-click case failed (655.061 s; unchanged source). An unchanged module
+recheck passed three tests; the rejection cause remains unproven. This is not
+an aggregate PASS. Subsequent formatting preserved identical Python ASTs.
+
 **2026-10-24 two-step local model acceptance:** compound Calculate/then
 requests now reach the reviewed planner; simple arithmetic keeps its existing
 path. Capability instructions state the existing exact arithmetic-expression

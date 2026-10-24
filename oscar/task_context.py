@@ -28,7 +28,8 @@ def binding(world: "WorldRuntime", value: dict[str, Any]) -> tuple[Any, Any, Any
     matches = [
         (instance, spec)
         for instance in h.connectors.instances.values()
-        if instance.account_id == account.id and instance.account_generation == account.generation
+        if instance.account_id == account.id
+        and instance.account_generation == account.generation
         and instance.manifest.provider == account.provider
         for spec in instance.manifest.capabilities
         if spec.name == CAPABILITIES.get(account.provider, "")
@@ -90,9 +91,7 @@ class ConnectedTaskSource:
         instance, spec = self.connection
         google = self.account.provider == "google"
         parameters = {
-            "path": {
-                "tasklist" if google else "listId": self.row["native_config"]["task_list_id"]
-            },
+            "path": {"tasklist" if google else "listId": self.row["native_config"]["task_list_id"]},
             "query": {"maxResults" if google else "$top": "8"},
         }
         payload, source = self.h.connectors.read_context(

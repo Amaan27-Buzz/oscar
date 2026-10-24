@@ -27,8 +27,11 @@ def run() -> dict:
 
         def native(*args):
             result = subprocess.run(
-                [str(binary), *map(str, args)], capture_output=True, text=True,
-                timeout=30, check=True,
+                [str(binary), *map(str, args)],
+                capture_output=True,
+                text=True,
+                timeout=30,
+                check=True,
             )
             return json.loads(result.stdout)
 
@@ -36,9 +39,15 @@ def run() -> dict:
         core = CloudCore(fixture.config, start_services=False)
         try:
             invitation = create_invitation(
-                core, "synthetic-native-worker", "desktop", identity["installation_id"],
-                identity["public_key"], workspace="native-execution-workspace", retain=True,
-                owner_public_key=identity["owner_public_key"], machine_control=True,
+                core,
+                "synthetic-native-worker",
+                "desktop",
+                identity["installation_id"],
+                identity["public_key"],
+                workspace="native-execution-workspace",
+                retain=True,
+                owner_public_key=identity["owner_public_key"],
+                machine_control=True,
             )
         finally:
             core.close()
@@ -51,21 +60,29 @@ def run() -> dict:
         runtime = fixture.root / "installed-runtime"
         venv.EnvBuilder(with_pip=False, system_site_packages=True).create(runtime)
         # Install the current package into only this disposable interpreter's normal site-packages.
-        shutil.copytree(repo / "oscar", runtime / "Lib/site-packages/oscar",
-                        ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+        shutil.copytree(
+            repo / "oscar",
+            runtime / "Lib/site-packages/oscar",
+            ignore=shutil.ignore_patterns("__pycache__", "*.pyc"),
+        )
         config = {
             "python": str(runtime / "Scripts/python.exe"),
             "workspace": str(fixture.workspace),
             "capabilities": ["machine.files.read", "machine.files.write"],
-            "trusted_host_execution": False, "allowed_executables": [], "desktop_app_ids": [],
+            "trusted_host_execution": False,
+            "allowed_executables": [],
+            "desktop_app_ids": [],
         }
         config_path = fixture.root / "native-worker-scope.json"
         config_path.write_text(json.dumps(config), encoding="utf-8")
         environment = {**os.environ, "SSL_CERT_FILE": str(fixture.ca)}
         process = subprocess.Popen(
             [str(binary), "--grid-fixture-worker", str(state), str(fixture.ca), str(config_path)],
-            stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-            text=True, env=environment,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            env=environment,
         )
         fixture.processes.append(process)
         assert process.stdout is not None and process.stdin is not None
@@ -82,12 +99,19 @@ def run() -> dict:
                     "Synthetic native startup failed: " + process.stderr.read(4096)
                 ) from None
         assert observed == {"worker": "online", "scope": "synthetic"}, observed
-        task = fixture.mobile.request("submit", {
-            "text": "Synthetic native supervisor acceptance", "kind": "file_write",
-            "target": "synthetic-native-worker", "parameters": {
-                "path": "native-supervised.txt", "content": "native child; canonical Core readback",
-            }, "retain": True,
-        })
+        task = fixture.mobile.request(
+            "submit",
+            {
+                "text": "Synthetic native supervisor acceptance",
+                "kind": "file_write",
+                "target": "synthetic-native-worker",
+                "parameters": {
+                    "path": "native-supervised.txt",
+                    "content": "native child; canonical Core readback",
+                },
+                "retain": True,
+            },
+        )
         fixture.approve(task)
         verified = fixture.wait_task(task["task_id"])
         assert verified["state"] == "verified"
@@ -109,21 +133,33 @@ def run() -> dict:
         else:
             raise AssertionError("Stopped Worker retained live capabilities")
         return {
-            "status": "SOFTWARE_VERIFIED", "transport": "actual loopback TLS",
+            "status": "SOFTWARE_VERIFIED",
+            "transport": "actual loopback TLS",
             "identity": "synthetic Windows CNG and DPAPI",
             "runtime": "current package installed into disposable isolated Python site-packages",
-            "checks": ["native supervisor startup", "actual enrolled workspace binding",
-                       "signed Ask file write", "independent Core readback", "separate file bytes",
-                       "cooperative stop", "capability withdrawal"],
-            "owner_activation": "NOT_RUN", "physical_device": "NOT_RUN",
+            "checks": [
+                "native supervisor startup",
+                "actual enrolled workspace binding",
+                "signed Ask file write",
+                "independent Core readback",
+                "separate file bytes",
+                "cooperative stop",
+                "capability withdrawal",
+            ],
+            "owner_activation": "NOT_RUN",
+            "physical_device": "NOT_RUN",
             "hosted_deployment": "NOT_RUN",
         }
     finally:
         if process is not None:
             fixture.stop(process)
         if state is not None and state.exists():
-            subprocess.run([str(binary), "--grid-fixture-cleanup", str(state)],
-                           capture_output=True, timeout=10, check=True)
+            subprocess.run(
+                [str(binary), "--grid-fixture-cleanup", str(state)],
+                capture_output=True,
+                timeout=10,
+                check=True,
+            )
         if not fixture.doCleanups():
             raise AssertionError("Synthetic native fixture cleanup failed")
         if hasattr(fixture, "root") and fixture.root.exists():

@@ -94,9 +94,15 @@ class PlannerAuthoring:
             "kind": kind,
             "summary": cap["summary"],
             "intent_examples": examples,
-            **({"intent_rule": "Addition intent text must be only A + B, with integer operands; "
-                "no Calculate prefix or prose. Copy the example's other null fields."}
-               if kind == "addition" else {}),
+            **(
+                {
+                    "intent_rule": "Addition intent text must be only A + B, "
+                    "with integer operands; "
+                    "no Calculate prefix or prose. Copy the example's other null fields."
+                }
+                if kind == "addition"
+                else {}
+            ),
             **(
                 {
                     "verification_rule": (
@@ -120,6 +126,13 @@ class PlannerAuthoring:
         instruction = re.sub(
             r"^(?:please |(?:can|could|would) you )", "", text.strip(), count=1, flags=re.IGNORECASE
         )
+        delegated = re.fullmatch(
+            r"(?:delegate|create) (?:a )?worker ([A-Za-z0-9 _-]{1,64}):\s*(.+)",
+            instruction,
+            re.IGNORECASE | re.DOTALL,
+        )
+        if delegated:
+            instruction = delegated[2]
         followup = re.fullmatch(
             r"(?:review|proceed with|accept)(?: the)? (?:suggested )?plan"
             r"(?: ([a-f0-9-]{16,80}))?[.!]?",
@@ -129,8 +142,17 @@ class PlannerAuthoring:
         explicit = re.fullmatch(
             r"on device ([A-Za-z0-9_.-]{1,80}):\s*(.+)", instruction, re.IGNORECASE | re.DOTALL
         )
-        target = explicit[1] if explicit else None
-        goal = explicit[2] if explicit else instruction
+        distributed = re.fullmatch(
+            r"across devices ([A-Za-z0-9_., -]+):\s*(.+)", instruction, re.IGNORECASE | re.DOTALL
+        )
+        targets = (
+            [explicit[1]]
+            if explicit
+            else [part.strip() for part in distributed[1].split(",")]
+            if distributed
+            else None
+        )
+        goal = explicit[2] if explicit else distributed[2] if distributed else instruction
         if not followup:
             names = tuple(
                 row[0]
@@ -144,14 +166,17 @@ class PlannerAuthoring:
                 decision.memory_required
                 or decision.route
                 in {DecisionRoute.WORLD, DecisionRoute.RECALL, DecisionRoute.VERIFY}
-                or not (re.match(
-                    r"(?:plan|create|write|save|make|prepare|build|organize|open|launch|"
-                    r"send|schedule|update|edit|fix|debug|implement|download|upload|"
-                    r"move|copy|rename|delete|run|install|publish|deploy|"
-                    r"fill|click|submit|select|navigate)\b",
-                    goal,
-                    re.IGNORECASE,
-                ) or re.match(r"calculate\b.+\bthen\b", goal, re.IGNORECASE | re.DOTALL))
+                or not (
+                    re.match(
+                        r"(?:plan|create|write|save|make|prepare|build|organize|open|launch|"
+                        r"send|schedule|update|edit|fix|debug|implement|download|upload|"
+                        r"move|copy|rename|delete|run|install|publish|deploy|"
+                        r"fill|click|submit|select|navigate)\b",
+                        goal,
+                        re.IGNORECASE,
+                    )
+                    or re.match(r"calculate\b.+\bthen\b", goal, re.IGNORECASE | re.DOTALL)
+                )
             ):
                 return None
         try:
@@ -190,6 +215,12 @@ class PlannerAuthoring:
                     },
                 }
             else:
+                if targets is not None and (
+                    not 1 <= len(targets) <= 8
+                    or len(set(targets)) != len(targets)
+                    or any(not re.fullmatch(r"[A-Za-z0-9_.-]{1,80}", t) for t in targets)
+                ):
+                    raise ValueError("Choose one to eight exact, comma-separated device IDs.")
                 if not 1 <= len(goal) <= 480:
                     raise ValueError("Describe the objective in at most 480 characters.")
                 if re.match(r"(?:send|schedule|publish|deploy|install)\b", goal, re.IGNORECASE):
@@ -229,7 +260,7 @@ class PlannerAuthoring:
                 actions = [
                     c
                     for c in available
-                    if (target is None or c["node_id"] == target)
+                    if (targets is None or c["node_id"] in targets)
                     and self.descriptor(c)["intent_examples"]
                 ]
                 duplicates = {
@@ -237,14 +268,18 @@ class PlannerAuthoring:
                     for c in actions
                     if sum(a["input_kind"] == c["input_kind"] for a in actions) > 1
                 }
-                if duplicates:
+                if targets is not None and set(targets) - {c["node_id"] for c in actions}:
+                    raise PermissionError(
+                        "Every selected device needs a current scoped action capability."
+                    )
+                if duplicates and distributed is None:
                     devices = ", ".join(
                         sorted({c["node_id"] for c in actions if c["input_kind"] in duplicates})
                     )
                     raise ValueError(
                         "Choose an action device: "
                         + devices
-                        + ". Use ‘On device DEVICE-ID: objective’."
+                        + ". Use â€˜On device DEVICE-ID: objectiveâ€™."
                     )
                 if len(planners) != 1 or not actions:
                     raise PermissionError(
@@ -258,7 +293,7 @@ class PlannerAuthoring:
                     "operation": "plan_draft",
                     "id": "new",
                     "value": {
-                        "name": "Conversation objective",
+                        "name": delegated[1].strip() if delegated else "Conversation objective",
                         "goal": goal,
                         "mode": "auto",
                         "capabilities": [
@@ -414,9 +449,25 @@ class PlannerAuthoring:
             mode = value["mode"]
             if mode not in {"auto", "private"}:
                 raise ValueError("choose private or configured routing explicitly")
+            pins = [self.descriptor(c) for c in caps if c != planner]
+            step = h.executive.planning_step(
+                value["goal"],
+                pins,
+                {"node_id": planner["node_id"], "capability_id": planner["id"]},
+                mode,
+                [],
+                digest(executor.planning_configuration()),
+            )
+            parameters = step["intent"]["parameters"]
+            if "structured" in executor.template.required:
+                from .planning_contract import executive_plan_schema
+
+                parameters["prompt"] += "\nResponse JSON schema: " + json.dumps(
+                    executive_plan_schema()
+                )
             request = replace(
                 executor.template,
-                prompt=value["goal"],
+                prompt=parameters["prompt"],
                 mode=Mode.PRIVATE if mode == "private" else executor.template.mode,
             )
             routes = executor.router.rank(request, executor.policy)
@@ -427,15 +478,7 @@ class PlannerAuthoring:
                 {"id": p, "contract": digest(record(executor.router.registry.providers[p]))}
                 for p in providers
             ]
-            pins = [self.descriptor(c) for c in caps if c != planner]
-            step = h.executive.planning_step(
-                value["goal"],
-                pins,
-                {"node_id": planner["node_id"], "capability_id": planner["id"]},
-                mode,
-                sources,
-                digest(executor.planning_configuration()),
-            )
+            parameters["planning_sources"] = sources
             state = {
                 "capabilities": caps,
                 "step": step,
@@ -558,6 +601,7 @@ class PlannerAuthoring:
                 [(c["node_id"], c["id"]) for c in caps],
                 tuple(sorted({p for c in caps for p in c["permissions"]})),
                 owner_authorized=True,
+                temporary=True,
             )
             proposal = h.executive.propose(worker, "Draft plan: " + value["goal"], [state["step"]])
             request_id = new_id()
@@ -584,6 +628,8 @@ class PlannerAuthoring:
                 row["worker_id"], row["goal"], state["planner_task_id"], **value
             )
             h.store.put("planner_request", identifier, {**row, "accepted_goal": proposal["id"]})
+            draft = h.store.get("executive_goal", row["goal_id"])
+            h.store.put("executive_goal", draft["id"], {**draft, "state": "reported"})
         h.executive.accept(proposal["id"], proposal["review_digest"], owner_authorized=True)
         h.store.put(
             "executive_owner", proposal["id"], {**owner, "review_digest": proposal["review_digest"]}

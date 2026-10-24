@@ -305,7 +305,7 @@ class Assistance:
             for step in value["steps"]:
                 if (
                     not isinstance(step, dict)
-                    or set(step)
+                    or set(step) - {"inputs"}
                     != {
                         "id",
                         "intent",

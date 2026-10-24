@@ -27,6 +27,31 @@ def executive_plan_schema() -> dict[str, Any]:
         },
         "node_id": {"type": "string", "minLength": 1},
         "capability_id": {"type": "string", "minLength": 1},
+        "inputs": {
+            "type": "array",
+            "maxItems": 8,
+            "items": {
+                "type": "object",
+                "properties": {
+                    "from_step": {"type": "string", "pattern": "^[a-z0-9_-]{1,40}$"},
+                    **{
+                        key: {
+                            "type": "array",
+                            "maxItems": 8,
+                            "items": {
+                                "anyOf": [
+                                    {"type": "string", "minLength": 1, "maxLength": 80},
+                                    {"type": "integer", "minimum": 0, "maximum": 99},
+                                ]
+                            },
+                        }
+                        for key in ("select", "to")
+                    },
+                },
+                "required": ["from_step", "select", "to"],
+                "additionalProperties": False,
+            },
+        },
     }
     return {
         "oneOf": [
@@ -40,7 +65,7 @@ def executive_plan_schema() -> dict[str, Any]:
                         "items": {
                             "type": "object",
                             "properties": step,
-                            "required": list(step),
+                            "required": [key for key in step if key != "inputs"],
                             "additionalProperties": False,
                         },
                     }

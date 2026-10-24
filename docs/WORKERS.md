@@ -1,5 +1,47 @@
 # Workers
 
+## Reviewed result handoffs and temporary lifecycle — 2026-10-25
+
+Conversation can create a scoped temporary Worker with `Create worker NAME:
+objective` or `Delegate worker NAME: objective`. Ask retains the model-input
+and action-plan signatures; current synthetic Full delegation can cover both.
+`Across devices DEVICE-ID, OTHER-ID: objective` selects multiple exact current
+executors, including duplicate capability kinds. Unselected or unavailable
+devices never become implicit fallbacks. The same selectors work inside a named
+Worker instruction. All execution still uses Core tasks, target authorization
+and the existing Grid; this is not a second agent runtime.
+
+Steps may declare up to eight explicit `inputs` handoffs, each with `from_step`,
+`select` and `to`. The source must be a direct prior dependency in the same goal,
+relationship and scheduled occurrence. `select: []` copies exported result text;
+key/index arrays select a JSON scalar. `to: ["content"]` replaces file contents.
+Other destinations must be existing string fields under parameters/criterion
+named content, text, body or message. Identities, paths, URLs, commands and
+authority remain literal. The signed review includes the exact handoffs and
+selected executors. Missing/private/ambiguous/oversized/known-secret results block.
+Source tasks must be VERIFIED with matching independent evidence; source result
+and evidence digests are pinned into the dependent admission and rechecked before
+execution. Restart cannot substitute another occurrence or replay an uncertain
+effect. Payload text remains untrusted data; source-objective verification does
+not prove every statement contained in that payload.
+
+After a draft is accepted, its planning goal becomes `reported`, preserving the
+model task's actual partial verification. A temporary Worker retires only after
+all its active responsibilities finish. Completed history remains inspectable;
+the limits are 32 active Workers and 64 active/proposed/paused goals rather than
+32/64 lifetime records. Unaccepted/blocked work still needs explicit resolution.
+
+Local acceptance: 174 focused checks passed; real signed phone/API → Core
+arithmetic → outbound desktop file/readback passed. Installed Qwen 9B passed
+Ask/Full result handoffs; 4B development trials failed and remain recorded.
+General visual reasoning, broad planning reliability and real provider/device
+acceptance remain separate. [Evidence](evidence/software-completion/worker-handoffs-2026-10-25.json).
+
+The Worker aggregate ran 1,114 tests: 1,103 passed, ten skipped and one native
+visual-click case failed (655.061 s; unchanged source). An unchanged module
+recheck passed three tests; the rejection cause remains unproven. This is not
+an aggregate PASS. Subsequent formatting preserved identical Python ASTs.
+
 ## Group 3 runtime — 2026-10-16
 
 Named Worker scope and lifecycle now compose through the existing Core, Grid,

@@ -104,8 +104,15 @@ class WorldRuntime:
             raise PermissionError("source setup requires trusted owner authority")
         reference(entity_id)
         if (
-            adapter not in {
-                "grid", "tasks", "files", "time", "calendar", "weather", "android",
+            adapter
+            not in {
+                "grid",
+                "tasks",
+                "files",
+                "time",
+                "calendar",
+                "weather",
+                "android",
                 "connected_tasks",
             }
             or type(interval_seconds) is not int
@@ -521,7 +528,8 @@ class WorldRuntime:
             counts = {"polled": 0, "failed": 0, "expired": 0}
             for row in self.store.all("perception_poll"):
                 if row["relationship"] != self.world.relationship or row["adapter"] not in {
-                    "calendar", "connected_tasks"
+                    "calendar",
+                    "connected_tasks",
                 }:
                     continue
                 try:
@@ -688,9 +696,8 @@ class WorldRuntime:
                 r
                 for r in self.store.all("perception_poll")
                 if r["relationship"] == self.world.relationship
-                and r["adapter"] in {
-                    "time", "calendar", "tasks", "weather", "android", "connected_tasks"
-                }
+                and r["adapter"]
+                in {"time", "calendar", "tasks", "weather", "android", "connected_tasks"}
             ]
             sources = []
             for row in rows[:8]:

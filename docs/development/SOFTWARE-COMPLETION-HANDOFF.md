@@ -12,8 +12,8 @@ software work under the existing authorization; no new agent delegation is neede
 
 ## 2. Current candidate
 
-Latest committed base `d596f21` on `codex/software-completion`; the compound
-planning checkpoint follows it. Use `git rev-parse HEAD` for the exact
+Latest committed base `b0c074b` on `codex/software-completion`; the Worker
+handoff checkpoint follows it. Use `git rev-parse HEAD` for the exact
 checkout, and `git log b700a6c..HEAD --oneline` for all local implementation commits.
 The final owner message must name the actual resulting checkout, not an invented
 self-referential documentation SHA.
@@ -351,3 +351,30 @@ bounded despite successful typed examples. These are not all credential blockers
 Separate owner commissioning still covers Oracle/public deployment, real provider
 accounts, actual owner Full activation, physical phone and real microphone/camera.
 No push, Actions or merge occurred. Physical Slice 18 and Groups 7/8 remain deferred.
+
+## 2026-10-25 continuation: executable Worker result handoffs
+
+Named temporary Workers, explicitly selected multiple devices and signed data
+handoffs now compose through existing conversation, Executive and Grid. A phone
+API request → Core arithmetic → actual outbound desktop file/readback passed.
+Ten focused handoff/lifecycle tests cover independent evidence, same-occurrence
+provenance, drift, failed input, secret/size/path bounds, restart and more than
+64 successive jobs without deleting history. All 174 integration checks passed.
+Installed Qwen 9B passed actual result handoffs in Ask (7.419 s) and synthetic
+Full (7.341 s); repeated 4B development failures remain explicit. There is no
+output repair, automatic privilege expansion or claimed broad model reliability.
+[Receipt](../evidence/software-completion/worker-handoffs-2026-10-25.json).
+
+Reproduce with `python -m scripts.software_conversation_planning_reference
+--handoff --model qwen3.5:9b`, optionally `--full`. The exact model must already
+be installed; no download/cloud fallback. New receipts use timestamped exclusive
+files. A baseline command overwrote the old ignored 4B Ask raw receipt; its
+committed 2026-10-24 summary/historical hash remain, but original raw Ask bytes
+are unavailable. The old Full raw receipt remains. Do not recertify the missing
+raw receipt from the summary. No native rendered, physical or hosted acceptance
+is added here. Continue the remaining general visual/agentic/provider work.
+
+The Worker aggregate ran 1,114 tests: 1,103 passed, ten skipped and one native
+visual-click case failed (655.061 s; unchanged source). An unchanged module
+recheck passed three tests; the rejection cause remains unproven. This is not
+an aggregate PASS. Subsequent formatting preserved identical Python ASTs.

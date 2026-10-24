@@ -313,9 +313,10 @@ class BrowserLifecycleTests(unittest.TestCase):
     def test_timeout_after_real_navigation(self):
         task = self.task(20)
         # Advance only the supervisor clock after real navigation, independent of cold startup.
-        with patch("oscar.machine.monotonic", side_effect=lambda: (
-            monotonic() + (21 if self.visited.is_set() else 0)
-        )):
+        with patch(
+            "oscar.machine.monotonic",
+            side_effect=lambda: (monotonic() + (21 if self.visited.is_set() else 0)),
+        ):
             result = self.runtime.run(task.id, self.transports)
         self.assertTrue(self.visited.is_set())
         self.assertEqual(TaskState.FAILED, result.state)
