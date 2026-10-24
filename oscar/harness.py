@@ -330,6 +330,9 @@ class Harness:
         self.runtime.presence = PresenceRuntime(self.runtime)
         self.executive = Executive(self.runtime, {self.node_id: (self.dispatcher, self.session)})
         self.runtime.executive = self.executive
+        from .planner_authoring import PlannerAuthoring
+
+        self.executive.advance_plans = PlannerAuthoring(self).advance_delegated
         self.store.close_callbacks.append(self.close_services)
         if auth_config is not None:
             self.ensure_connections()

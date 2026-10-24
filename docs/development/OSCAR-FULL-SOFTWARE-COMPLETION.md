@@ -102,6 +102,33 @@ deferred. Gate A/B historical scoped PASS; Gate C/D PARTIAL; Gate E NOT PASSED.
 
 ## Current local verification receipts
 
+### Full Access conversation planning, 2026-10-24
+
+The current local continuation removes per-action planning prompts only when an
+actual signed Full Access grant covers the exact originating owner and selected
+model/actions. Durable planning and effect goals retain that grant's ID/epoch;
+revocation, expiry and replacement stop progression. Ask/Secure retain both exact
+reviews. Desktop now forwards `plan_draft` and the exact `plan_accept` ID into
+native signing; previously its proposal allowlist accepted natural routines only.
+Desktop and Android consume a bounded started receipt without claiming completion.
+The Workspace preserves a newer draft typed during admission.
+
+Affected local checks passed: 72 Python authority/planning/Executive cases and
+34 Remote Grid cases; constrained Linux passed 221 of 226 cases with five skips,
+plus all 43 planning/Executive cases. Desktop passed 127 tests, typecheck and
+production build; Rust passed 42 tests with one existing live-voice skip; Android
+assemble/unit/lint passed with 86 JVM tests across 19 suites and no failures/skips.
+The stable-source full Python aggregate passed 1,050 tests in 591.854 seconds
+(1,040 passed, ten explicit skips). [Source-qualified receipt](../evidence/software-completion/full-planning-2026-10-24.json)
+retains the separate native and Linux results. Synthetic-provider model planning produced an independently read-back
+real file without per-action review. No actual owner authority was activated.
+
+Real-model failures remain distinct: the installed Qwen 4B route returned no
+usable output; Granite 3B returned an invalid string intent and was rejected;
+a larger-context Qwen 4B run exceeded its configured deadline. None executed an
+effect. Qwen 0.8B also exhausted its output budget without usable content.
+These do not establish general model-planning reliability.
+
 These are intermediate working-tree results, not a final-commit certificate.
 Private logs remain under ignored `.oscar/`; synthetic committed receipts will be
 attached after final integration. Rerun affected checks after subsequent edits.

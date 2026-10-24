@@ -1,4 +1,4 @@
-"""Two signed reviews over the existing Executive model-planning path."""
+"""Signed reviews or current standing delegation over Executive model planning."""
 
 import json
 import re
@@ -94,7 +94,7 @@ class PlannerAuthoring:
     def conversation(
         self, text: str, node: str, session: str, scope: str, grants: frozenset[str]
     ) -> dict[str, Any] | None:
-        """Unsigned proposals only; conversational assent never replaces either signature."""
+        """Conversation uses signed reviews unless an exact Full Access grant covers it."""
         from .assistance import Assistance
         from .jev import DecisionRoute, Intent, decide
 
@@ -139,9 +139,10 @@ class PlannerAuthoring:
             grants = Assistance(self.h).authorize(node, session, scope, grants)
             from .authority import StandingAuthority
 
-            StandingAuthority(self.h.store, self.h.grid, self.h.runtime.relationship_id)._owner(
-                node, session, scope, grants
-            )
+            key = StandingAuthority(
+                self.h.store, self.h.grid, self.h.runtime.relationship_id
+            )._owner(node, session, scope, grants)
+            owner = {"node": node, "session": session, "scope": scope, "public_key": key}
             if followup:
                 rows = []
                 for row in self.h.store.all("planner_request"):
@@ -188,6 +189,19 @@ class PlannerAuthoring:
                         for c in self.h.grid.search(cap["input_kind"])
                     )
                 ]
+                try:
+                    self.delegation(owner, [])
+                except PermissionError:
+                    pass
+                else:
+                    authority = StandingAuthority(
+                        self.h.store, self.h.grid, self.h.runtime.relationship_id
+                    )
+                    available = [
+                        c
+                        for c in available
+                        if authority.permits(c, self.h.executive.targets[c["node_id"]][1])
+                    ]
                 planners = [
                     c
                     for c in available
@@ -234,10 +248,98 @@ class PlannerAuthoring:
                         ],
                     },
                 }
-            self.material(change["operation"], change["id"], change["value"], grants)
+            state = self.material(change["operation"], change["id"], change["value"], grants)
+            try:
+                pin = self.delegation(owner, state["capabilities"])
+            except PermissionError:
+                pin = None
+            if pin is not None and change["operation"] == "plan_draft":
+                with self.h.store.transaction():
+                    if self.delegation(owner, state["capabilities"]) != pin:
+                        raise PermissionError("planning delegation changed")
+                    goal_id = self.complete(
+                        change["operation"],
+                        change["id"],
+                        change["value"],
+                        state,
+                        {**owner, "standing": pin},
+                    )
+                return {"assistance_started": {"id": goal_id, "mode": "full", "state": "enabled"}}
             return {"assistance_proposal": change}
         except (ValueError, PermissionError, StateConflict) as error:
             return {"state": "blocked", "epistemic": "UNKNOWN", "message": str(error)}
+
+    def delegation(self, owner: dict[str, Any], caps: list[dict[str, Any]]) -> dict[str, Any]:
+        from .authority import StandingAuthority
+
+        authority = StandingAuthority(self.h.store, self.h.grid, self.h.runtime.relationship_id)
+        state = authority._active()
+        if (
+            state["mode"] != "full"
+            or (state["owner_node"], state["owner_session"], state["scope"])
+            != (owner["node"], owner["session"], owner["scope"])
+            or any(
+                c["node_id"] not in self.h.executive.targets
+                or not authority.permits(c, self.h.executive.targets[c["node_id"]][1])
+                for c in caps
+            )
+        ):
+            raise PermissionError(
+                "current Full Access must cover this owner and every planned capability"
+            )
+        return {k: state[k] for k in ("grant_id", "epoch")}
+
+    def advance_delegated(self) -> None:
+        """Resume durable planning once; each effect still passes current runtime authority."""
+        h = self.h
+        rows = [
+            r
+            for r in h.store.all("planner_request")
+            if r.get("delegation")
+            and not r.get("accepted_goal")
+            and not r.get("autonomy_blocked")
+            and r["relationship"] == h.runtime.relationship_id
+        ]
+        for candidate in rows[:64]:
+            tasks = h.executive._tasks(candidate["goal_id"])
+            if not tasks or any(
+                h.store.task(t).state
+                in {
+                    TaskState.PLANNED,
+                    TaskState.EXECUTING,
+                    TaskState.AWAITING_RESULT,
+                }
+                for t in tasks
+            ):
+                continue
+            try:
+                with h.store.transaction():
+                    row = h.store.get("planner_request", candidate["id"])
+                    if row.get("accepted_goal") or row.get("autonomy_blocked"):
+                        continue
+                    owner = h.store.get("executive_owner", row["goal_id"])
+                    grants = frozenset(h.store.get("session", owner["session"])["scopes"])
+                    from .assistance import Assistance
+
+                    grants = Assistance(h).authorize(
+                        owner["node"], owner["session"], owner["scope"], grants
+                    )
+                    value = {
+                        "start_at": None,
+                        "interval_seconds": None,
+                        "max_runs": 1,
+                        "priority": 0,
+                    }
+                    material = self.material("plan_accept", row["id"], value, grants)
+                    if self.delegation(owner, material["capabilities"]) != row["delegation"]:
+                        raise PermissionError("planning delegation changed")
+                    self.complete("plan_accept", row["id"], value, material, owner)
+            except (KeyError, ValueError, PermissionError, StateConflict):
+                with h.store.transaction():
+                    row = h.store.get("planner_request", candidate["id"])
+                    if not row.get("accepted_goal"):
+                        h.store.put("planner_request", row["id"], {**row, "autonomy_blocked": True})
+                        h.store.audit("", "delegated_planning_blocked", {"request_id": row["id"]})
 
     def capabilities(self, pins: Any, grants: frozenset[str]) -> list[dict[str, Any]]:
         if not isinstance(pins, list) or not 2 <= len(pins) <= 16:
@@ -428,7 +530,7 @@ class PlannerAuthoring:
         value: dict[str, Any],
         state: dict[str, Any],
         owner: dict[str, Any],
-    ) -> None:
+    ) -> str:
         h = self.h
         if operation == "plan_draft":
             caps = state["capabilities"]
@@ -454,6 +556,7 @@ class PlannerAuthoring:
                     "planner_id": state["step"]["capability_id"],
                     "sources": state["sources"],
                     "configuration": digest(state["model_configuration"]),
+                    **({"delegation": owner["standing"]} if owner.get("standing") else {}),
                 },
             )
         else:
@@ -466,6 +569,7 @@ class PlannerAuthoring:
         h.store.put(
             "executive_owner", proposal["id"], {**owner, "review_digest": proposal["review_digest"]}
         )
+        return str(proposal["id"])
 
     def snapshot(self) -> list[dict[str, Any]]:
         rows = []
@@ -473,7 +577,13 @@ class PlannerAuthoring:
             if row["relationship"] != self.h.runtime.relationship_id:
                 continue
             tasks = self.h.executive._tasks(row["goal_id"])
-            state = "accepted" if row.get("accepted_goal") else "waiting"
+            state = (
+                "accepted"
+                if row.get("accepted_goal")
+                else "blocked"
+                if row.get("autonomy_blocked")
+                else "waiting"
+            )
             if state == "waiting" and tasks:
                 status = self.h.store.task(tasks[-1]).state
                 state = (

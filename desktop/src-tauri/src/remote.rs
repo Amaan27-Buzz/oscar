@@ -476,6 +476,7 @@ impl RemoteClient {
                     .any(|scope| scope == "archive:retain");
                 let result = self.request("submit", json!({"text":payload["text"],"kind":"text","target":self.session.core_id,"parameters":{},"retain":retain}))?;
                 if result.get("assistance_proposal").is_some()
+                    || result.get("assistance_started").is_some()
                     || (result["state"] == "blocked" && !result["task_id"].is_string())
                 {
                     return Ok(result);

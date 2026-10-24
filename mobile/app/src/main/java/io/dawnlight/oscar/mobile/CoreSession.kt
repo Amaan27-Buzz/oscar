@@ -223,6 +223,13 @@ class CoreSession(application: Application) : AndroidViewModel(application) {
                 stageManagement("assistance", result.getJSONObject("assistance_proposal"), epoch)
                 return@request
             }
+            if (result.has("assistance_started")) {
+                parseStartedResponsibility(result.getJSONObject("assistance_started"))
+                if (mutable.value.epoch == epoch && mutable.value.draft == text) writeDraft("")
+                message("Started this objective within your Full Access. Check Automations for current progress.")
+                refresh()
+                return@request
+            }
             if (result.optString("state") == "blocked" && !result.has("task_id")) {
                 require(result.bounded("epistemic", 32) == "UNKNOWN")
                 message(result.bounded("message", 1000))

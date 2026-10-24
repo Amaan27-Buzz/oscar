@@ -42,7 +42,7 @@ export interface ConnectionsView {
 }
 export interface View {voice_settings?:VoiceSettings|null;voice_devices?:AudioDevice[];connections?:ConnectionsView|null;day_brief?:Record<string,unknown>|null;worker_sharing?:WorkerSharingView|null}
 export interface View {connection?:ConnectionView|null;nodes?:GridNode[];core_clock?:CoreClockObservation|null;executive?:ExecutiveSummary|null;presence?:{version:1;visible:boolean;expression:unknown}|null;setup?:Record<string,{configured?:boolean;operational?:boolean}>|null;adaptive_views?:unknown[];access_mode?:string|null;voice_available?:boolean;conversation?:ConversationHistory;operating?:Operating|null;theme?:'light'|'dark';expression:ExpressionReadback|null;link:string;orb:string;window:WindowMode;tasks:Task[];capabilities:Capability[];
-  context:Context|null;preview:Preview|null;review:Review|null;current:Task|null;message:string|null;
+  context:Context|null;preview:Preview|null;review:Review|null;current:Task|null;message:string|null;started_goal?:string|null;
   voice:string;voice_support?:VoiceSupport;shortcut:string;shortcut_enabled?:boolean;capture_choice?:ContextChoice;observed_at_ms:number;reference:boolean;window_revision?:number;feedback?:RequestFeedback|null}
 export const initialView:View={expression:null,link:'unconfigured',orb:'unavailable',window:'compact',tasks:[],capabilities:[],
   context:null,preview:null,review:null,current:null,message:null,voice:'idle',shortcut:'Not registered',observed_at_ms:0,reference:false,window_revision:0,feedback:null};

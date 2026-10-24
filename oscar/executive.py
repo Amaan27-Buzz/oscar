@@ -5,7 +5,7 @@ import json
 import math
 import re
 import sqlite3
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from dataclasses import asdict
 from threading import Event, Thread
 from typing import TYPE_CHECKING, Any
@@ -65,6 +65,17 @@ def authorize_step(
             != owner["public_key"]
         ):
             raise PermissionError("native responsibility owner key changed")
+        if owner.get("standing"):
+            standing = current._active()
+            if (
+                standing["mode"] != "full"
+                or {k: standing[k] for k in ("grant_id", "epoch")} != owner["standing"]
+                or (standing["owner_node"], standing["owner_session"], standing["scope"])
+                != (owner["node"], owner["session"], owner["scope"])
+                or executor is not None
+                and not current.permits(capability, executor)
+            ):
+                raise PermissionError("delegated responsibility authority changed")
         owner_session = store.get("session", owner["session"])
         owner_node = store.get("node", owner["node"])
         if owner["review_digest"] != goal["review_digest"] or not set(
@@ -182,6 +193,7 @@ class Executive:
         self.thread: Thread | None = None
         self.health = "idle"
         self.active: set[str] = set()
+        self.advance_plans: Callable[[], None] | None = None
 
     def _owner(self, authorized: bool) -> None:
         if authorized is not True:
@@ -1053,6 +1065,8 @@ class Executive:
                 except (PermissionError, KeyError):
                     pass
         self.grid.reap()
+        if self.advance_plans is not None:
+            self.advance_plans()
         count = 0
         goals = [
             r

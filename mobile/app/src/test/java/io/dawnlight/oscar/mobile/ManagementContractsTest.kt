@@ -7,6 +7,15 @@ import org.junit.Test
 import java.util.Base64
 
 class ManagementContractsTest {
+    @Test fun delegatedConversationRequiresExactFullAccessReadback() {
+        fun response() = JSONObject().put("id", "goal").put("mode", "full").put("state", "enabled")
+        assertEquals("goal", parseStartedResponsibility(response()))
+        listOf(response().put("mode", "ask"), response().put("state", "verified"),
+            response().put("hidden", true), response().put("id", "bad\nidentity"),
+            response().put("id", "x".repeat(81))).forEach {
+            assertThrows(Exception::class.java) { parseStartedResponsibility(it) }
+        }
+    }
     @org.junit.Test fun weatherReviewPinsExplicitCoordinatesWithoutDeviceLocation() {
         val value = weatherSourceValue("weather-oslo", "Oslo", "59.9139", "10.7522", false)!!
         org.junit.Assert.assertEquals("weather:weather-oslo", value.getString("entity_id"))

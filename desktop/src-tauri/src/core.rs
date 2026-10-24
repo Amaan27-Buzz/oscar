@@ -775,6 +775,7 @@ impl Bridge {
             return Ok(view.clone());
         }
         view.message = value["message"].as_str().map(str::to_owned);
+        view.started_goal = None;
         if let Some(settings) = value.get("voice_settings") {
             let settings: VoiceSettingsView = serde_json::from_value(settings.clone())
                 .map_err(|_| "invalid Core audio settings")?;
@@ -973,6 +974,7 @@ impl Bridge {
                 task.artifacts.clear();
             }
             view.message = None;
+            view.started_goal = None;
             view.feedback = None;
             drop(view);
             let acknowledged = if let Ok(client) = self.client() {
@@ -1055,19 +1057,13 @@ impl Bridge {
                     json!({"mode":mode,"text":text,"context_id":context_id}),
                 )?;
                 if let Some(proposal) = result.get("assistance_proposal") {
-                    if proposal.as_object().is_none_or(|p| p.len() != 3)
-                        || proposal["operation"] != "create_natural"
-                        || proposal["id"] != "new"
-                        || !proposal["value"].is_object()
-                    {
-                        return Err("invalid responsibility proposal".into());
-                    }
+                    let proposal_id = conversation_proposal_id(proposal)?;
                     if revision != Some(self.content_revision.load(Ordering::SeqCst)) {
                         return Ok(self.view());
                     }
                     client.invalidate_reviews();
                     let review = client.review_change(
-                        "new",
+                        proposal_id,
                         ControlOperation::Approve,
                         "assistance_challenge",
                         "assistance_complete",
@@ -1076,6 +1072,18 @@ impl Bridge {
                     let mut view = self.view.lock().map_err(|_| "native state unavailable")?;
                     if revision == Some(self.content_revision.load(Ordering::SeqCst)) {
                         view.review = Some(review);
+                        view.expression.generation += 1;
+                    }
+                    return Ok(view.clone());
+                }
+                if let Some(started) = result.get("assistance_started") {
+                    let id = conversation_started_id(started)?;
+                    let mut view = self.view.lock().map_err(|_| "native state unavailable")?;
+                    if revision == Some(self.content_revision.load(Ordering::SeqCst))
+                        && !self.hide_private.load(Ordering::Acquire)
+                    {
+                        view.message = Some("Started this objective within your Full Access. Check Automations for current progress.".into());
+                        view.started_goal = Some(id.into());
                         view.expression.generation += 1;
                     }
                     return Ok(view.clone());
@@ -1269,8 +1277,82 @@ impl Bridge {
         self.response_fenced(value, None, revision)
     }
 }
+fn conversation_started_id(started: &Value) -> Result<&str, String> {
+    let id = started["id"]
+        .as_str()
+        .ok_or("invalid responsibility response")?;
+    if started.as_object().is_none_or(|p| p.len() != 3)
+        || started["mode"] != "full"
+        || started["state"] != "enabled"
+        || id.is_empty()
+        || id.len() > 80
+        || id.chars().any(char::is_control)
+    {
+        return Err("invalid responsibility response".into());
+    }
+    Ok(id)
+}
+fn conversation_proposal_id(proposal: &Value) -> Result<&str, String> {
+    let id = proposal["id"]
+        .as_str()
+        .ok_or("invalid responsibility proposal")?;
+    if proposal.as_object().is_none_or(|p| p.len() != 3)
+        || !proposal["value"].is_object()
+        || !matches!(
+            proposal["operation"].as_str(),
+            Some("create_natural" | "plan_draft" | "plan_accept")
+        )
+        || id.is_empty()
+        || id.len() > 80
+        || id.chars().any(char::is_control)
+        || (proposal["operation"] != "plan_accept" && id != "new")
+    {
+        return Err("invalid responsibility proposal".into());
+    }
+    Ok(id)
+}
+
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn delegated_conversation_requires_bounded_full_access_readback() {
+        use serde_json::json;
+        let valid = json!({"id":"goal","mode":"full","state":"enabled"});
+        assert_eq!(super::conversation_started_id(&valid).unwrap(), "goal");
+        for invalid in [
+            json!({"id":"goal","mode":"ask","state":"enabled"}),
+            json!({"id":"goal","mode":"full","state":"verified"}),
+            json!({"id":"bad\nidentity","mode":"full","state":"enabled"}),
+            json!({"id":"goal","mode":"full","state":"enabled","hidden":true}),
+        ] {
+            assert!(super::conversation_started_id(&invalid).is_err());
+        }
+    }
+    #[test]
+    fn conversation_plans_reach_signed_review_with_the_exact_request_id() {
+        use serde_json::json;
+        for (operation, id) in [
+            ("create_natural", "new"),
+            ("plan_draft", "new"),
+            ("plan_accept", "existing-plan"),
+        ] {
+            assert_eq!(
+                super::conversation_proposal_id(&json!({"operation":operation,"id":id,"value":{}}))
+                    .unwrap(),
+                id
+            );
+        }
+        for proposal in [
+            json!({"operation":"plan_accept","id":"","value":{}}),
+            json!({"operation":"plan_accept","id":"bad\nidentity","value":{}}),
+            json!({"operation":"plan_draft","id":"existing-plan","value":{}}),
+            json!({"operation":"authority_activate","id":"new","value":{}}),
+            json!({"operation":"plan_accept","id":"existing-plan","value":[],}),
+            json!({"operation":"plan_accept","id":"existing-plan","value":{},"hidden":true}),
+        ] {
+            assert!(super::conversation_proposal_id(&proposal).is_err());
+        }
+    }
     use super::*;
     #[test]
     fn audio_projection_is_current_bounded_and_withdrawn_after_connection_loss() {

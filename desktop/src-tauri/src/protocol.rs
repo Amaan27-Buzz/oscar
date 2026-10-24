@@ -456,6 +456,7 @@ pub struct View {
     pub review: Option<ReviewView>,
     pub current: Option<TaskView>,
     pub message: Option<String>,
+    pub started_goal: Option<String>,
     pub feedback: Option<RequestFeedback>,
     pub voice: String,
     pub voice_support: VoiceSupport,

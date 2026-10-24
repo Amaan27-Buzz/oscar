@@ -5,6 +5,31 @@ import {initialView} from './bridge';
 import type {Command,View} from './bridge';
 Object.defineProperty(HTMLElement.prototype,'scrollTo',{configurable:true,value:vi.fn()});
 afterEach(cleanup);
+it('shows a delegated objective receipt and clears only the accepted draft',async()=>{
+ const now=Date.now();const view:View={...initialView,link:'online',expression:{epoch:'a'.repeat(32),generation:1,observed_at_ms:now,voice_observed_at_ms:now,tasks_observed_at_ms:now,current_observed_at_ms:now}};
+ const message='Started this objective within your Full Access. Check Automations for current progress.';
+ const port=vi.fn(async(c:Command)=>c.kind==='interact'?{...view,started_goal:'actual-goal',message}:view);
+ render(<Workspace port={port} events={async()=>()=>{}}/>);
+ await waitFor(()=>expect(port).toHaveBeenCalled());
+ fireEvent.change(screen.getByLabelText('Ask OSCAR'),{target:{value:'Create the requested note'}});
+ fireEvent.click(screen.getByRole('button',{name:'Send'}));
+ expect(await screen.findByText(message)).toBeTruthy();
+ expect((screen.getByLabelText('Ask OSCAR') as HTMLTextAreaElement).value).toBe('');
+ expect(screen.queryByText('Verified')).toBeNull();
+});
+it('preserves text edited while a delegated objective is being admitted',async()=>{
+ const now=Date.now();const view:View={...initialView,link:'online',expression:{epoch:'a'.repeat(32),generation:1,observed_at_ms:now,voice_observed_at_ms:now,tasks_observed_at_ms:now,current_observed_at_ms:now}};
+ let finish:(value:View)=>void=()=>{};
+ const port=vi.fn(async(c:Command)=>c.kind==='interact'?new Promise<View>(resolve=>{finish=resolve;}):view);
+ render(<Workspace port={port} events={async()=>()=>{}}/>);
+ await waitFor(()=>expect(port).toHaveBeenCalled());
+ const composer=screen.getByLabelText('Ask OSCAR');
+ fireEvent.change(composer,{target:{value:'Create the requested note'}});
+ fireEvent.click(screen.getByRole('button',{name:'Send'}));
+ fireEvent.change(composer,{target:{value:'My next request'}});
+ await act(async()=>finish({...view,started_goal:'actual-goal',message:'Started objective'}));
+ expect((composer as HTMLTextAreaElement).value).toBe('My next request');
+});
 it('keeps Core task history in Activity instead of a chat-list sidebar',async()=>{
  const task={task_id:'past-work',state:'verified',description:'Earlier work',target:'worker',actions:[],blocker:null,generation:1,evidence_ids:[],response:'An outcome',response_status:'REPORTED',value:null,epistemic:null};
  const port=mount({tasks:[task]});await waitFor(()=>expect(port).toHaveBeenCalled());

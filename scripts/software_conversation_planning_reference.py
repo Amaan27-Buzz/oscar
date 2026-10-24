@@ -3,6 +3,7 @@
 Only the exact local model below is eligible. No downloads, cloud aliases or owner data.
 """
 
+import argparse
 import base64
 import hashlib
 import json
@@ -44,7 +45,8 @@ def source_hashes():
     }
 
 
-def run():
+def run(full=False):
+    output = ROOT / ".oscar/conversation-local-full-inference.json" if full else OUTPUT
     before = source_hashes()
     with urlopen("http://127.0.0.1:11434/api/tags", timeout=5) as response:
         models = json.load(response)["models"]
@@ -58,6 +60,7 @@ def run():
         ).strip(),
         "provider": "http://127.0.0.1:11434/api",
         "model": MODEL,
+        "authority_mode": "full" if full else "ask",
         "installed_model_digest": installed[0]["digest"],
         "qualification": (
             "Real local model inference; synthetic owner and workspace; Desktop Core API"
@@ -153,15 +156,15 @@ def run():
                 def ask(text):
                     return call("interact", {"mode": "Ask", "text": text, "context_id": ""})
 
-                def approve(change):
-                    challenge = call("assistance_challenge", change)
+                def approve(change, family="assistance"):
+                    challenge = call(family + "_challenge", change)
                     signature = key.sign(
                         base64.b64decode(challenge["signing_payload"]),
                         padding.PSS(mgf=padding.MGF1(hashes.SHA256()), salt_length=32),
                         hashes.SHA256(),
                     )
                     return call(
-                        "assistance_complete",
+                        family + "_complete",
                         {
                             "challenge_id": challenge["challenge_id"],
                             "signature": base64.b64encode(signature).decode(),
@@ -170,10 +173,39 @@ def run():
 
                 path = h.files.root / "welcome.txt"
                 objective = 'Create welcome.txt as a note with exact text "Hello from local OSCAR."'
+                if full:
+                    activation = approve(
+                        {
+                            "mode": "full",
+                            "lifetime_seconds": 600,
+                            "capabilities": [
+                                {
+                                    "node_id": h.node_id,
+                                    "session_id": h.session.id,
+                                    "capability_id": cap,
+                                }
+                                for cap in ("models.reason", "files.write")
+                            ],
+                            "account_ids": [],
+                            "resolve_ask_rules": sorted(
+                                rule.id
+                                for rule in desktop.policy.rules()
+                                if rule.enabled and rule.effect == "ask"
+                            ),
+                        },
+                        "authority",
+                    )
+                    assert activation["authority"]["mode"] == "full", activation
+                    report["signed_standing_activation"] = True
                 first = ask(objective)
-                assert first.get("assistance_proposal", {}).get("operation") == "plan_draft", first
-                assert not h.store.all("task") and not path.exists()
-                approve(first["assistance_proposal"])
+                if full:
+                    assert first.get("assistance_started", {}).get("mode") == "full", first
+                else:
+                    assert first.get("assistance_proposal", {}).get("operation") == "plan_draft", (
+                        first
+                    )
+                    assert not h.store.all("task") and not path.exists()
+                    approve(first["assistance_proposal"])
                 deadline = monotonic() + 125
                 while monotonic() < deadline:
                     tasks = h.store.all("task")
@@ -188,17 +220,21 @@ def run():
                 report["model_tasks"] = h.store.all("task")
                 report["routing_evidence"] = h.store.all("route_history")
                 report["model_result"] = [row.get("value") for row in h.store.all("result")]
-                assert not path.exists(), "model output must not execute"
-                second = ask("Review the plan")
-                assert second.get("assistance_proposal", {}).get("operation") == "plan_accept", (
-                    second
-                )
-                report["second_review_required"] = True
-                approve(second["assistance_proposal"])
-                row = h.store.all("planner_request")[0]
+                if not full:
+                    assert not path.exists(), "model output must not execute"
+                    second = ask("Review the plan")
+                    assert (
+                        second.get("assistance_proposal", {}).get("operation") == "plan_accept"
+                    ), second
+                    approve(second["assistance_proposal"])
+                report["second_review_required"] = not full
                 deadline = monotonic() + 5
+                tasks = []
                 while monotonic() < deadline:
-                    tasks = h.executive._tasks(row["accepted_goal"])
+                    row = h.store.all("planner_request")[0]
+                    tasks = (
+                        h.executive._tasks(row["accepted_goal"]) if row.get("accepted_goal") else []
+                    )
                     if tasks and all(h.store.task(task).state == "verified" for task in tasks):
                         break
                     sleep(0.05)
@@ -211,7 +247,7 @@ def run():
                     artifact_sha256=hashlib.sha256(path.read_bytes()).hexdigest(),
                     verified_tasks=[asdict(h.store.task(task)) for task in tasks],
                     evidence=h.store.all("evidence"),
-                    no_effect_before_second_signature=True,
+                    no_effect_before_second_signature=not full,
                     accepted_plan=h.store.get("executive_goal", row["accepted_goal"])["steps"],
                 )
     except Exception as error:
@@ -220,8 +256,8 @@ def run():
     finally:
         report["elapsed_seconds"] = round(monotonic() - started, 3)
         report["source_stable"] = source_hashes() == before
-        OUTPUT.parent.mkdir(exist_ok=True)
-        OUTPUT.write_text(json.dumps(report, indent=2, default=str) + "\n", encoding="utf-8")
+        output.parent.mkdir(exist_ok=True)
+        output.write_text(json.dumps(report, indent=2, default=str) + "\n", encoding="utf-8")
         print(
             json.dumps(
                 {
@@ -234,4 +270,6 @@ def run():
 
 
 if __name__ == "__main__":
-    run()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--full", action="store_true", help="Use signed synthetic Full Access")
+    run(parser.parse_args().full)

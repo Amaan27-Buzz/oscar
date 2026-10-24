@@ -436,3 +436,28 @@ Pixel equality establishes the observed target, not the outcome of an action;
 generic browser results remain partially verified until independent readback.
 There is still a small page-mutation interval between observation and input;
 pixel matching is not an atomic transaction with an untrusted web application.
+
+## Conversation planning under standing authority
+
+Ask and Secure keep separate signed reviews for model input and the exact
+resulting action plan. A current Full Access grant may instead cover one
+explicit conversational objective: the exact owner/session/scope must match,
+and every selected model/action capability must be covered by the signed grant.
+Capability descriptors and the supplied goal are the model input; Full Access
+does not implicitly retrieve or disclose private context.
+
+The durable planning request and both Executive goals pin the originating
+grant ID and epoch. On the next Executive tick, a completed model result passes
+the same bounded typed-plan validation before a one-run effect goal is accepted.
+Current provider configuration, capability contracts, executor sessions, owner
+scope, policy and standing authority are rechecked. Every effect also passes
+the existing Runtime and executor checks. Revocation, expiry or replacement of
+the originating grant stops progression; a new grant cannot adopt old work.
+Invalid or unavailable results become blocked rather than an automatic model
+or effect retry. Generic executor outcomes retain their existing truth states.
+
+Core returns `assistance_started: {id, mode: "full", state: "enabled"}` only
+after durable acceptance. Desktop and Android validate this receipt and point
+to Automations for current progress. The receipt is not task completion or
+verification. Desktop review routing admits only the existing natural-routine,
+plan-draft and plan-accept operations, preserving the exact plan ID for signing.

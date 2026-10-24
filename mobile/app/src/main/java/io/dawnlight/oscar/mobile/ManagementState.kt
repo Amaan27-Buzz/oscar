@@ -3,6 +3,12 @@ package io.dawnlight.oscar.mobile
 import org.json.JSONArray
 import org.json.JSONObject
 
+internal fun parseStartedResponsibility(root: JSONObject): String {
+    require(root.keys().asSequence().toSet() == setOf("id", "mode", "state"))
+    require(root.getString("mode") == "full" && root.getString("state") == "enabled")
+    return root.bounded("id", 80).also { require(it.none(Char::isISOControl)) }
+}
+
 data class ManagedCapability(val id: String, val node: String, val session: String, val kind: String, val risk: String, val permissions: List<String>)
 data class BriefSource(val id: String, val adapter: String, val state: String, val epistemic: String, val value: String?, val freshUntil: Double?, val epoch: Int, val accountId: String?, val accountGeneration: Int?)
 data class DayBrief(val observedAt: Double, val sources: List<BriefSource>, val overlaps: Int, val incomplete: Boolean)

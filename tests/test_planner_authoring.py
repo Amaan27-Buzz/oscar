@@ -13,6 +13,7 @@ from oscar.providers import HTTPAdapter
 from oscar.registry import Registry
 from oscar.router import Router
 from tests import test_assistance as assistance_fixture
+from tests import test_authority as authority_fixture
 from tests import test_providers as provider_fixture
 
 
@@ -20,6 +21,155 @@ class PlannerAuthoringTests(unittest.TestCase):
     signature = assistance_fixture.AssistanceTests.signature
     review = assistance_fixture.AssistanceTests.review
     complete = assistance_fixture.AssistanceTests.complete
+
+    def delegate(self, mode="full", actions=("math.add",)):
+        payload = authority_fixture.StandingAuthorityTests.payload(
+            self,
+            mode,
+            capabilities=[
+                {"node_id": self.h.node_id, "session_id": self.h.session.id, "capability_id": c}
+                for c in ("models.reason", *actions)
+            ],
+        )
+        review = self.authority.challenge(
+            self.owner.node_id, self.owner.id, self.owner_scope, self.grants, payload
+        )
+        return self.authority.complete(
+            self.owner.node_id,
+            self.owner.id,
+            self.public,
+            self.owner_scope,
+            self.grants,
+            self.signature(review),
+        )
+
+    def conversation(self):
+        return PlannerAuthoring(self.h).conversation(
+            "Plan the requested calculation",
+            self.owner.node_id,
+            self.owner.id,
+            self.owner_scope,
+            self.grants,
+        )
+
+    def revoke(self):
+        self.authority.revoke(self.owner.node_id, self.owner.id, self.owner_scope, self.grants)
+
+    def test_full_access_progresses_once_without_per_action_reviews(self):
+        self.delegate()
+        self.assertIn("assistance_started", self.conversation())
+        self.assertEqual([], self.requests)
+        self.h.executive.tick()
+        self.h.executive.tick()
+        self.h.executive.tick()
+        self.assertEqual(1, len(self.requests))
+        self.assertEqual(
+            ["partially_verified", "verified"], [t["state"] for t in self.h.store.all("task")]
+        )
+        self.assertEqual("accepted", PlannerAuthoring(self.h).snapshot()[0]["state"])
+        owners = self.h.store.all("executive_owner")
+        self.assertEqual(2, len(owners))
+        self.assertEqual(owners[0]["standing"], owners[1]["standing"])
+
+    def test_full_access_model_plan_writes_and_independently_reads_back_real_file(self):
+        self.delegate(actions=("files.write",))
+        self.body["choices"][0]["message"]["content"] = json.dumps(
+            [
+                {
+                    **self.steps[0],
+                    "capability_id": "files.write",
+                    "intent": asdict(
+                        Intent("Save explicit goal", "file_write", "result.txt", "Delegated result")
+                    ),
+                }
+            ]
+        )
+        self.assertIn("assistance_started", self.conversation())
+        self.h.executive.tick()
+        self.h.executive.tick()
+        self.assertEqual(
+            "Delegated result", (self.h.files.root / "result.txt").read_text(encoding="utf-8")
+        )
+        self.assertEqual("verified", self.h.store.all("task")[-1]["state"])
+        self.h.executive.tick()
+        self.assertEqual(1, len(self.requests))
+        self.assertEqual(2, len(self.h.store.all("task")))
+
+    def test_expired_grant_does_not_accept_model_effects(self):
+        self.delegate()
+        self.conversation()
+        self.h.executive.tick()
+        self.now += 601
+        self.h.executive.tick()
+        self.assertEqual(1, len(self.h.store.all("executive_goal")))
+        self.assertEqual("blocked", PlannerAuthoring(self.h).snapshot()[0]["state"])
+
+    def test_ask_and_secure_keep_model_and_effect_reviews(self):
+        for mode in ("ask", "secure"):
+            if mode == "secure":
+                self.delegate(mode)
+            with self.subTest(mode=mode):
+                self.assertIn("assistance_proposal", self.conversation())
+                self.h.executive.tick()
+                self.assertEqual([], self.requests)
+                self.assertEqual([], self.h.store.all("planner_request"))
+
+    def test_revocation_before_model_io_stops_planning(self):
+        self.delegate()
+        self.conversation()
+        self.revoke()
+        self.h.executive.tick()
+        self.h.executive.tick()
+        self.assertEqual([], self.requests)
+        self.assertEqual(1, len(self.h.store.all("executive_goal")))
+
+    def test_revocation_after_model_result_prevents_automatic_acceptance(self):
+        self.delegate()
+        self.conversation()
+        self.h.executive.tick()
+        self.revoke()
+        self.h.executive.tick()
+        self.h.executive.tick()
+        self.assertEqual(1, len(self.requests))
+        self.assertEqual(1, len(self.h.store.all("executive_goal")))
+        self.assertEqual("blocked", PlannerAuthoring(self.h).snapshot()[0]["state"])
+
+    def test_revocation_after_acceptance_stops_effect_without_falling_back_to_ask(self):
+        self.delegate()
+        self.conversation()
+        self.h.executive.tick()
+        PlannerAuthoring(self.h).advance_delegated()
+        self.assertEqual(2, len(self.h.store.all("executive_goal")))
+        self.revoke()
+        self.h.executive.tick()
+        self.assertNotIn("verified", [t["state"] for t in self.h.store.all("task")])
+
+    def test_replacement_grant_cannot_adopt_original_planning(self):
+        self.delegate()
+        self.conversation()
+        self.h.executive.tick()
+        self.revoke()
+        self.delegate()
+        self.h.executive.tick()
+        self.assertEqual(1, len(self.h.store.all("executive_goal")))
+        self.assertEqual("blocked", PlannerAuthoring(self.h).snapshot()[0]["state"])
+
+    def test_model_cannot_add_effects_outside_standing_scope(self):
+        self.delegate()
+        self.body["choices"][0]["message"]["content"] = json.dumps(
+            [
+                {
+                    **self.steps[0],
+                    "capability_id": "files.write",
+                    "intent": asdict(Intent("Write", "file_write", "escape.txt", "unapproved")),
+                }
+            ]
+        )
+        self.conversation()
+        self.h.executive.tick()
+        self.h.executive.tick()
+        self.assertEqual("blocked", PlannerAuthoring(self.h).snapshot()[0]["state"])
+        self.assertFalse((self.h.files.root / "escape.txt").exists())
 
     def setUp(self):
         assistance_fixture.AssistanceTests.setUp(self)

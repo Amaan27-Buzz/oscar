@@ -1,5 +1,16 @@
 # OSCAR — Current Status & Checklist
 
+**2026-10-24 signed Full Access planning:** exact signed standing authority now
+covers one conversational model/action objective without per-action prompts;
+Ask/Secure retain exact reviews. Originating grant ID/epoch is pinned through
+planning and effects, with revocation/expiry/replacement checks. Desktop's native
+plan review route and started receipt are integrated with Android/Workspace.
+The stable-source aggregate passed 1,040 tests with ten skips; Desktop 127,
+Rust 42 with one live-voice skip and Android 86 JVM tests/build/lint passed.
+[Receipt](evidence/software-completion/full-planning-2026-10-24.json) separates
+passing synthetic-provider/file acceptance from failed real local-model attempts.
+General planning reliability and full product acceptance remain incomplete.
+
 **2026-10-24 Android conversation integration:** exact text commands now use
 the existing signed Grid/native Android executor. Actual emulator clipboard
 before/after Core restart, media pause and text entry readbacks passed; generic
