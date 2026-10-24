@@ -56,7 +56,12 @@ class PlannerAuthoring:
                             ],
                             "timeout": 30,
                             "max_text": 4096,
-                        }
+                        },
+                        "verification": {
+                            "url": "https://example.com/receipt",
+                            "selector": "#receipt",
+                            "text": "Reviewed text",
+                        },
                     }
                 ),
             }
@@ -89,6 +94,17 @@ class PlannerAuthoring:
             "kind": kind,
             "summary": cap["summary"],
             "intent_examples": examples,
+            **(
+                {
+                    "verification_rule": (
+                        "Optional browser verification requires an exact URL, selector and "
+                        "expected text supplied by the owner or current source evidence. "
+                        "Omit it when unknown; never invent a receipt."
+                    )
+                }
+                if kind == "browser"
+                else {}
+            ),
         }
 
     def conversation(

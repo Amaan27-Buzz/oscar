@@ -27,7 +27,8 @@ class BrowserProfiles:
         self.root = Path(os.path.abspath(root))
 
     def check(self, parameters: dict[str, Any]) -> str:
-        if set(parameters) != {"request", "account_id", "account_generation"}:
+        required = {"request", "account_id", "account_generation"}
+        if not required <= parameters.keys() or parameters.keys() - required - {"verification"}:
             raise PermissionError("exact account-bound browser request required")
         identifier, generation = parameters["account_id"], parameters["account_generation"]
         if (

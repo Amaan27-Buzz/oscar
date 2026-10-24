@@ -261,6 +261,10 @@ class RemoteVerifier(Verifier):
                 matches = (
                     isinstance(observed, dict)
                     and observed.get("text") == objective.criterion["text"]
+                    and (
+                        "url" not in objective.criterion
+                        or observed.get("url") == objective.criterion["url"]
+                    )
                 )
                 return Verification(
                     TaskState.VERIFIED if matches else TaskState.FAILED,
@@ -1017,7 +1021,10 @@ class RemoteGrid:
             self.policy(session, capability, confirmed=capability.risk != "low")
             criterion = {"kind": "remote_machine", "operation": kind}
             if machine_readback(capability.id, parameters) is not None:
-                criterion["text"] = parameters["request"]["text"]
+                expected = parameters.get("verification", parameters["request"])
+                criterion["text"] = expected["text"]
+                if capability.id == "machine.browser":
+                    criterion["url"] = expected["url"]
             intent = Intent(
                 payload["text"],
                 kind="capability",
@@ -1718,7 +1725,10 @@ class RemoteGrid:
                 validate_remote_machine(capability["input_kind"], parameters)
                 criterion = {"kind": "remote_machine", "operation": capability["input_kind"]}
                 if machine_readback(capability["id"], parameters) is not None:
-                    criterion["text"] = parameters["request"]["text"]
+                    expected = parameters.get("verification", parameters["request"])
+                    criterion["text"] = expected["text"]
+                    if capability["id"] == "machine.browser":
+                        criterion["url"] = expected["url"]
             else:
                 raise PermissionError("remote responsibility verifier unavailable")
             self.store.put("objective", task.objective_id, {**objective, "criterion": criterion})

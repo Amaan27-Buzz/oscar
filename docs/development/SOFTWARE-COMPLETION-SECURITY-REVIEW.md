@@ -21,6 +21,16 @@ UiAutomation flags. Three unsuccessful recovery campaigns and one unsuccessful
 fixture-pixel campaign remain hashed in the passing receipts. They do not prove
 an historical TLS failure cause, and they are not counted as acceptance.
 
+## Exact browser text readback
+
+The optional browser text postcondition derives a fresh read-only plan from
+reviewed origins, URL, selector, expected text and account generation. The
+readback contains no original effects; Core compares the complete bounded text
+and final URL. Duplicate matches, overflow, truncation and redirect mismatches
+cannot promote a task to verified. Page-controlled DOM text remains untrusted
+application evidence and does not establish arbitrary business success. Failed
+or unavailable verification cannot release a dependent Executive step.
+
 ## Requested Stealth Browser MCP evaluation
 
 The [upstream README and trust model](https://github.com/vibheksoni/stealth-browser-mcp#trust-model)

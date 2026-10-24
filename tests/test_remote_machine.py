@@ -52,20 +52,30 @@ class RemoteMachineContractTests(unittest.TestCase):
             effects.check(action, Mock())
 
     def test_readback_derives_only_the_exact_reviewed_destination(self):
-        request = {"operation": "set_text_checked", "handle": 123, "pid": 456,
-                   "runtime_id": "selected", "text": "reviewed", "expected_text": "old"}
+        request = {
+            "operation": "set_text_checked",
+            "handle": 123,
+            "pid": 456,
+            "runtime_id": "selected",
+            "text": "reviewed",
+            "expected_text": "old",
+        }
         self.assertEqual(
             {"operation": "read", "handle": 123, "pid": 456, "runtime_id": "selected"},
             machine_readback("machine.desktop", {"request": request}),
         )
         self.assertIsNone(machine_readback("machine.command", {"request": request}))
-        self.assertIsNone(machine_readback(
-            "machine.desktop", {"request": {**request, "extra": True}}
-        ))
+        self.assertIsNone(
+            machine_readback("machine.desktop", {"request": {**request, "extra": True}})
+        )
         self.assertIsNone(machine_readback("machine.desktop", {"request": {"operation": "invoke"}}))
-        self.assertEqual({"operation": "clipboard_read"}, machine_readback(
-            "machine.clipboard", {"request": {"operation": "clipboard_write", "text": "reviewed"}}
-        ))
+        self.assertEqual(
+            {"operation": "clipboard_read"},
+            machine_readback(
+                "machine.clipboard",
+                {"request": {"operation": "clipboard_write", "text": "reviewed"}},
+            ),
+        )
 
     def test_exact_bounded_arguments_and_browser_plan(self):
         parameters = {"argv": ["C:/trusted/python.exe", "--version"], "timeout": 5}
@@ -100,6 +110,43 @@ class RemoteMachineContractTests(unittest.TestCase):
         plan["steps"] = [{"operation": "evaluate", "script": "document.cookie"}]
         with self.assertRaises(ValueError):
             validate_remote_machine("browser", {"request": plan})
+
+    def test_browser_readback_is_exact_read_only_and_cannot_expand_origins(self):
+        plan = {
+            "origins": ["https://example.com"],
+            "steps": [{"operation": "navigate", "url": "https://example.com/form"}],
+            "timeout": 30,
+            "max_text": 1000,
+        }
+        parameters = {
+            "request": plan,
+            "account_id": "account",
+            "account_generation": 2,
+            "verification": {
+                "url": "https://example.com/receipt",
+                "selector": "#receipt",
+                "text": "Saved",
+            },
+        }
+        validate_remote_machine("browser", parameters)
+        readback = machine_readback("machine.browser", parameters)
+        self.assertEqual("account", readback["account_id"])
+        self.assertEqual(2, readback["account_generation"])
+        self.assertEqual(
+            ["navigate", "read_text"], [step["operation"] for step in readback["request"]["steps"]]
+        )
+        self.assertEqual(15, readback["request"]["timeout"])
+        for change in (
+            {"url": "https://other.example/"},
+            {"selector": ""},
+            {"text": "x" * 8193},
+            {"script": "unreviewed"},
+        ):
+            with self.subTest(change=change), self.assertRaises((ValueError, PermissionError)):
+                validate_remote_machine(
+                    "browser",
+                    {**parameters, "verification": {**parameters["verification"], **change}},
+                )
 
 
 class RemoteMachineExecutionTests(unittest.TestCase):

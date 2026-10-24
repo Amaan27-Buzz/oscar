@@ -147,6 +147,7 @@ def validate(request: dict[str, Any]) -> None:
         "submit": {"selector"},
         "wait": {"selector"},
         "inspect": set(),
+        "read_text": {"selector"},
         "screenshot": {"path"},
         "visual_click": {"url", "sha256", "width", "height", "x", "y"},
         "download": {"selector", "path", "max_bytes"},
@@ -347,6 +348,26 @@ def run(request: dict[str, Any], root: Path, *, profile: Path | None = None) -> 
                             "buffer": data,
                         }
                     )
+                elif operation == "read_text":
+                    target = page.locator(step["selector"])
+                    if target.count() != 1:
+                        raise ValueError("one exact readback element required")
+                    snapshot = target.evaluate(
+                        """(element, limit) => {
+                            const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+                            let text = '', node, count = 0;
+                            while ((node = walker.nextNode())) {
+                                if (++count > 2000) return null;
+                                text += (node.textContent || '').slice(0, limit + 1 - text.length);
+                                if (text.length > limit) return null;
+                            }
+                            return text;
+                        }""",
+                        request["max_text"],
+                    )
+                    if not isinstance(snapshot, str) or len(snapshot) > request["max_text"]:
+                        raise ValueError("readback text bound exceeded")
+                    observations.append({"url": page.url, "text": snapshot, "status": "REPORTED"})
                 elif operation == "inspect":
                     # Fixed bounded evaluation avoids retrieving an entire unbounded DOM first.
                     snapshot = page.evaluate(

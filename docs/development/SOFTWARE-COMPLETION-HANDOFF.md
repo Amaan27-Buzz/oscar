@@ -12,9 +12,9 @@ software work under the existing authorization; no new agent delegation is neede
 
 ## 2. Current candidate
 
-Runtime candidate `953b9e88a78ac706bd4714cf2dd924ea96c68447` on
-`codex/software-completion`. Documentation-only sealing can follow this runtime
-SHA. Use `git rev-parse HEAD` for the exact checkout including such documentation.
+Latest committed base `3016ea3` on `codex/software-completion`; the browser
+postcondition checkpoint follows it. Use `git rev-parse HEAD` for the exact
+checkout, and `git log b700a6c..HEAD --oneline` for all local implementation commits.
 The final owner message must name the actual resulting checkout, not an invented
 self-referential documentation SHA.
 
@@ -23,6 +23,9 @@ self-referential documentation SHA.
 Newest first, after the starting source:
 
 ```text
+3016ea3 fix: include recurring Microsoft events in current day briefing
+5151a13 fix: align planner output with provider JSON object modes
+ab95432 docs: record stable Windows and constrained Linux integration checkpoint
 953b9e8 fix: explain failed planning and preserve reviewed recovery
 09ec699 feat: download authenticated HTTP files within isolated browser profiles
 a9b0153 feat: create account-bound tasks through signed native conversation
@@ -144,7 +147,8 @@ retention/perception grants are not bypassed.
 
 Installed Qwen → normal Cloud composition → signed Ask/Full → real saved-file
 readback; signed HTTPS conversation → synthetic model → Chromium form → server
-and separate DOM readback; native Android conversation → actual Grid effects and
+and fresh exact URL/text readback → dependent verified file (including an
+isolated synthetic account, with mismatch/redirect blocking); native Android conversation → actual Grid effects and
 Core recovery; native signed task authoring → real synthetic HTTP POST/GET;
 separate Chromium accounts → authenticated bounded file download; malformed
 planning → safe rejection/cooldown → newly signed draft → verified file. Each
@@ -152,6 +156,11 @@ has source-scoped receipts in the completion ledger. A successful fixture never
 becomes real provider or whole-product acceptance.
 
 ## 16. Tests and skipped cases
+
+The later exact browser postcondition campaign passed 129/129 cases in 321.213 s
+with stable source hashes and no skips. It includes authenticated profile reuse,
+independent readback and dependency release/denial.
+[Receipt](../evidence/software-completion/browser-readback-2026-10-24.json).
 
 At `b4dc890`: 1,059 Python cases, 1,049 passed/ten skipped, 506.912 seconds and
 334 stable hashed source files. Later focused campaigns: connected tasks

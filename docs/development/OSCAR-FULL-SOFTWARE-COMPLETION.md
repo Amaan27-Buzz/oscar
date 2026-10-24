@@ -4,6 +4,16 @@ Updated 2026-10-24. **IMPLEMENTATION_IN_PROGRESS / SOFTWARE ACCEPTANCE PARTIAL.*
 Material executable work remains. This ledger does not declare
 `SOFTWARE_FEATURE_COMPLETE`, owner acceptance, hosted deployment or Gate E PASS.
 
+**2026-10-24 exact browser postconditions:** reviewed browser workflows can declare
+an exact receipt URL, element and text. Core derives a fresh read-only Chromium
+observation before releasing dependent work. Signed synthetic HTTPS acceptance
+covers anonymous and account-isolated reads, a dependent verified file, wrong text,
+redirects and no submission replay. All 129 affected cases passed in 321.213
+seconds with stable source hashes; Ruff, Mypy and repository checks passed.
+[Receipt](../evidence/software-completion/browser-readback-2026-10-24.json).
+This verifies the explicit DOM postcondition; general page semantics and full
+software completion remain incomplete.
+
 Microsoft day context now uses `calendarView` to include recurring occurrences
 and exceptions within its explicit window; Google retains expanded single events.
 Actual synthetic HTTP/Core briefing and 194 affected cases passed with stable

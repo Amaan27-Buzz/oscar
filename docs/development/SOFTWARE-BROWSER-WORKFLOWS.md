@@ -62,10 +62,51 @@ The intended native surface is conversation and its existing exact signed review
 The direct-operation dropdown continues to expose inspection only because it has
 no workflow composer. No raw JSON editor or design change was introduced.
 
-The browser Worker reports its observations. The canonical browser task remains
-`partially_verified`; a reported DOM or successful click is not promoted to
-independently verified objective completion. A workflow can partially mutate a
-site before a later step fails; there is no transaction or rollback promise.
+Without an explicit objective readback, the canonical browser task remains
+`partially_verified`. A reported DOM or successful click does not establish the
+objective. A workflow can partially mutate a site before a later step fails;
+there is no transaction or rollback promise.
+
+## Exact browser text verification
+
+An optional sibling of `request` in the reviewed workflow parameters declares
+one exact postcondition:
+
+```json
+"verification": {
+  "url": "https://example.com/receipt",
+  "selector": "#receipt",
+  "text": "The exact expected receipt"
+}
+```
+
+The URL must stay inside the already reviewed origins. Only those three members
+are accepted; expected text is bounded by 8,192 characters and the original DOM
+read limit. The planner receives the contract and must omit verification when
+the URL, selector or expected text is unknown. Inventing a receipt is not evidence.
+
+Core derives a separate readback containing only navigation and `read_text`,
+with the same immutable account ID/generation when present. The outbound Worker
+opens a fresh Chromium process/context, using that account's isolated profile,
+and reads exactly one matching element. It bounds text and visited text nodes;
+duplicates, missing elements, overflow and truncated Unicode prefixes reject.
+No submission, click, upload, download or original effect is replayed by readback.
+Current lease, policy, account and owner authority checks remain in force.
+
+Core compares both the final URL and complete element text. A matching exact DOM
+postcondition can become `VERIFIED`; wrong text or a redirected final URL fails.
+This proves only that explicit DOM postcondition, not delivery, financial success,
+server truth or arbitrary page semantics. Missing/unavailable readback remains
+unverified; it never authorizes a dependent step. No browser rollback is promised.
+
+The signed HTTPS synthetic workflow submits once, verifies its exact receipt
+through the independent browser read and then creates a dependent scoped local
+confirmation file with separate byte readback. Wrong-text and redirected-URL
+campaigns leave that file absent and do not repeat the submission. The ordinary
+unverified browser path retains its earlier partial status. Runtime/source-qualified
+regression evidence is recorded in the [source-qualified receipt](../evidence/software-completion/browser-readback-2026-10-24.json).
+The authenticated campaign persists only the selected synthetic profile: fresh
+readback succeeds, while an anonymous browser receives a denial.
 
 Run the focused acceptance with:
 

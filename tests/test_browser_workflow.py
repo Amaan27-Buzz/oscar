@@ -17,6 +17,7 @@ from oscar.contracts import Capability
 from oscar.credentials import CredentialPool
 from oscar.desktop_actions import form_intent, public_capability
 from oscar.harness import ModelExecutor
+from oscar.jev import Intent
 from oscar.models import Funding, ModelRequest, ModelSpec, RoutingPolicy
 from oscar.planner_authoring import PlannerAuthoring
 from oscar.providers import HTTPAdapter
@@ -71,6 +72,7 @@ class BrowserWorkflowContractTests(unittest.TestCase):
         self.assertEqual({"kind": "unavailable"}, intent.criterion)
         self.assertNotIn("browser_workflow", public_capability(self.cap, {})["operations"])
         examples = PlannerAuthoring.descriptor(asdict(self.cap))["intent_examples"]
+        self.assertTrue(any("verification" in e["parameters"] for e in examples))
         self.assertTrue(
             any(
                 any(s["operation"] == "submit" for s in e["parameters"]["request"]["steps"])
@@ -120,6 +122,21 @@ class BrowserWorkflowAcceptanceTests(unittest.TestCase):
     close = provider_fixture.ProviderContractTests.close
 
     def test_conversation_signed_reviews_outbound_submission_and_independent_readback(self):
+        self.check_workflow()
+
+    def test_reviewed_exact_browser_text_can_verify(self):
+        self.check_workflow("match")
+
+    def test_authenticated_profile_is_used_by_independent_readback(self):
+        self.check_workflow("authenticated")
+
+    def test_wrong_browser_text_fails_without_replaying_submission(self):
+        self.check_workflow("mismatch")
+
+    def test_readback_redirect_fails_even_when_text_matches(self):
+        self.check_workflow("redirect")
+
+    def check_workflow(self, verification=None):
         connected_fixture.ConnectedAcceptanceTests.certificate(self)
         tls = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
         tls.load_cert_chain(self.ca, self.root / "tls-key.pem")
@@ -159,10 +176,27 @@ class BrowserWorkflowAcceptanceTests(unittest.TestCase):
         )
         path = self.root / "independent-server-effect.txt"
         submissions = []
+        receipt_reads = []
 
         class Handler(BaseHTTPRequestHandler):
             def do_GET(self):
+                if verification == "authenticated" and self.path == "/receipt":
+                    receipt_reads.append(self.headers.get("Cookie", ""))
+                    if self.headers.get("Cookie", "") != "readback=synthetic":
+                        self.send_response(403)
+                        self.end_headers()
+                        self.wfile.write(b"<html><body>Authorization required</body></html>")
+                        return
+                if verification == "redirect" and self.path == "/readback":
+                    self.send_response(303)
+                    self.send_header("Location", "/receipt")
+                    self.end_headers()
+                    return
                 self.send_response(200)
+                if verification == "authenticated" and self.path == "/":
+                    self.send_header(
+                        "Set-Cookie", "readback=synthetic; Max-Age=3600; HttpOnly; SameSite=Strict"
+                    )
                 self.end_headers()
                 receipt = path.read_text() if path.exists() else "No submission"
                 self.wfile.write(
@@ -191,7 +225,11 @@ class BrowserWorkflowAcceptanceTests(unittest.TestCase):
         self.addCleanup(web.shutdown)
         Thread(target=web.serve_forever, daemon=True).start()
         origin = f"http://127.0.0.1:{web.server_port}"
-        self.start_worker(("machine.browser",), browser=True)
+        self.start_worker(
+            ("machine.browser", "machine.files.write"),
+            browser=True,
+            profiles=verification == "authenticated",
+        )
         request = {
             "origins": [origin],
             "timeout": 30,
@@ -206,26 +244,54 @@ class BrowserWorkflowAcceptanceTests(unittest.TestCase):
             ],
         }
         cap = next(c for c in self.worker.effects.capabilities() if c.id == "machine.browser")
+        parameters = {"request": request}
+        if verification == "authenticated":
+            account = h.accounts.add("fixture", "synthetic", "browser-owner", "Work", verified=True)
+            parameters.update(account_id=account.id, account_generation=account.generation)
+        if verification:
+            parameters["verification"] = {
+                "url": origin + ("/readback" if verification == "redirect" else "/receipt"),
+                "selector": "#receipt",
+                "text": "Different receipt"
+                if verification == "mismatch"
+                else "Synthetic receipt:b",
+            }
         intent = form_intent(
             cap,
             {
                 "capability_id": cap.id,
                 "operation": "browser_workflow",
-                "fields": {"workflow": json.dumps({"request": request})},
+                "fields": {"workflow": json.dumps(parameters)},
             },
             {},
         )
-        self.body["choices"][0]["message"]["content"] = json.dumps(
-            [
+        steps = [
+            {
+                "id": "submit",
+                "intent": asdict(intent),
+                "node_id": "test-machine",
+                "capability_id": "machine.browser",
+                "depends_on": [],
+            }
+        ]
+        if verification:
+            steps.append(
                 {
-                    "id": "submit",
-                    "intent": asdict(intent),
+                    "id": "save-confirmation",
+                    "intent": asdict(
+                        Intent(
+                            "Save confirmed registration",
+                            "file_write",
+                            "registration.txt",
+                            "Synthetic receipt:b",
+                        )
+                    ),
                     "node_id": "test-machine",
-                    "capability_id": "machine.browser",
-                    "depends_on": [],
+                    "capability_id": "machine.files.write",
+                    "depends_on": ["submit"],
                 }
-            ]
-        )
+            )
+        self.body["choices"][0]["message"]["content"] = json.dumps({"steps": steps})
 
         def ask(text):
             return self.owner.request(
@@ -255,7 +321,14 @@ class BrowserWorkflowAcceptanceTests(unittest.TestCase):
         for verb in ("Fill", "Click", "Submit", "Select", "Navigate"):
             candidate = ask(f"On device test-machine: {verb} the local synthetic form")
             self.assertIn("assistance_proposal", candidate, candidate)
-        first = ask("On device test-machine: Fill the local synthetic form and submit it")
+        first = ask(
+            "On device test-machine: Fill the local synthetic form and submit it"
+            + (
+                "; save registration.txt only after the exact receipt matches"
+                if verification
+                else ""
+            )
+        )
         self.assertEqual([], self.requests)
         self.assertFalse(path.exists())
         self.assertIn("assistance_proposal", first, first)
@@ -274,6 +347,12 @@ class BrowserWorkflowAcceptanceTests(unittest.TestCase):
         while monotonic() < until:
             self.worker.step()
             tasks = h.executive._tasks(goal)
+            if (
+                verification in {"match", "authenticated"}
+                and len(tasks) == 2
+                and all(h.store.task(task).state == "verified" for task in tasks)
+            ):
+                break
             if tasks and h.store.task(tasks[0]).state in {
                 "partially_verified",
                 "failed",
@@ -282,7 +361,24 @@ class BrowserWorkflowAcceptanceTests(unittest.TestCase):
             }:
                 break
             sleep(2)  # Match the production outbound Worker polling cadence.
-        self.assertEqual("partially_verified", h.store.task(tasks[0]).state)
+        expected = (
+            "verified"
+            if verification in {"match", "authenticated"}
+            else "failed"
+            if verification
+            else "partially_verified"
+        )
+        self.assertEqual(
+            expected, h.store.task(tasks[0]).state, (h.store.all("result"), h.store.all("evidence"))
+        )
+        if verification in {"match", "authenticated"}:
+            self.assertEqual(2, len(tasks))
+            self.assertTrue(all(h.store.task(task).state == "verified" for task in tasks))
+            self.assertEqual(
+                "Synthetic receipt:b", (self.workspace / "registration.txt").read_text()
+            )
+        else:
+            self.assertFalse((self.workspace / "registration.txt").exists())
         self.assertEqual("Synthetic receipt:b", path.read_text())
         self.assertEqual([{"message": ["Synthetic receipt"], "choice": ["b"]}], submissions)
         observed = run(
@@ -295,7 +391,12 @@ class BrowserWorkflowAcceptanceTests(unittest.TestCase):
             },
             self.workspace,
         )
-        self.assertIn("Synthetic receipt:b", observed["observations"][0]["text"])
+        if verification == "authenticated":
+            self.assertNotIn("Synthetic receipt:b", observed["observations"][0]["text"])
+            self.assertGreaterEqual(receipt_reads.count("readback=synthetic"), 2)
+            self.assertEqual("", receipt_reads[-1])
+        else:
+            self.assertIn("Synthetic receipt:b", observed["observations"][0]["text"])
         self.assertEqual("blocked", ask("Proceed with the plan")["state"])
         for _ in range(3):
             self.worker.step()

@@ -473,7 +473,7 @@ class InteractiveWorker(MachineWorker):
                             request["timeout"],
                         )
                 else:
-                    if set(action.parameters) - {"request", "timeout"}:
+                    if set(action.parameters) - {"request", "timeout", "verification"}:
                         raise ValueError("unsupported browser parameters")
                     code, output = self.run_command(
                         action,

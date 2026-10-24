@@ -32,8 +32,8 @@ does not repeat their native UI, model or long-running acceptance.
 | 16 | Screenshot / DOM / visual observation | LOCAL actual Chromium DOM/frame and selected Windows PNG; semantic vision/coordinate reasoning OPEN. Windows/browser receipts are separate |
 | 17 | File upload / download | PARTIAL bounded scoped upload and same-origin authenticated HTTP-anchor download through isolated profiles; real provider upload/download and blob/cross-origin authenticated transfers unaccepted or unsupported. [Browser contract](SOFTWARE-BROWSER-WORKFLOWS.md) |
 | 18 | Terminal / Git development | PARTIAL actual scoped native processes and terminal tests; minimal constrained image lacks Git, so its failed Git-fixture campaign is not acceptance |
-| 19 | Cross-application automation | OPEN broader useful application-to-application acceptance; individual app/browser/file executors do not establish it |
-| 20 | Independent result verification | LOCAL files, UIA text, provider saved resources and fixture observers; generic screen/click/invoke outcomes remain PARTIAL |
+| 19 | Cross-application automation | PARTIAL: signed browser submission → fresh exact receipt → dependent independently verified local confirmation file; broader installed-application workflows OPEN. [Browser contract](SOFTWARE-BROWSER-WORKFLOWS.md) |
+| 20 | Independent result verification | LOCAL files, UIA text, provider saved resources and exact browser URL/element text through a fresh Chromium read; generic screen/click/invoke outcomes remain PARTIAL |
 | 21 | Operate actual emulator test app | LOCAL actual disposable API35 fixture. [Android conversation](../evidence/software-completion/android-conversation-2026-10-24.json) |
 | 22 | Native capability admission | LOCAL actual OS-grant/session/source admission and withdrawal; physical OEM commissioning OPEN |
 | 23 | Android UI / gestures | LOCAL actual exact-resource click/text/scroll subset; generic outcome PARTIAL, arbitrary app workflows unaccepted |

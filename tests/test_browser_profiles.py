@@ -40,6 +40,12 @@ class ProfileBindingTests(unittest.TestCase):
         key = self.profiles.check(self.parameters())
         self.accounts.rename(self.account.id, "New name")
         self.assertEqual(key, self.profiles.check(self.parameters()))
+        self.assertEqual(
+            key,
+            self.profiles.check(
+                {**self.parameters(), "verification": {"url": "https://example.com"}}
+            ),
+        )
         other = self.accounts.add("fixture", "tenant", "beta", "Same", verified=True)
         self.assertNotEqual(key, self.profiles.check(self.parameters(other)))
         with self.assertRaises(PermissionError):
@@ -109,7 +115,16 @@ class RealProfileTests(unittest.TestCase):
                     return
                 self.send_response(200)
                 self.end_headers()
-                if self.path == "/oversized":
+                if self.path == "/readback":
+                    self.wfile.write(
+                        (
+                            '<html><body><div id="exact">Saved <b>receipt</b></div>'
+                            '<div id="unicode">\U0001f600X</div><div id="many">'
+                            + "<span>.</span>" * 2001
+                            + "</div></body></html>"
+                        ).encode()
+                    )
+                elif self.path == "/oversized":
                     self.wfile.write(b"x" * 2000)
                 elif self.path == "/binary":
                     self.wfile.write(bytes(range(256)))
@@ -268,6 +283,38 @@ class RealProfileTests(unittest.TestCase):
                     except psutil.NoSuchProcess:
                         continue
                     self.assertNotIn(str(self.profiles.root), " ".join(command or []))
+
+    def test_exact_text_readback_rejects_duplicate_overflow_and_unicode_prefix(self):
+        request = {
+            "origins": [self.origin],
+            "timeout": 10,
+            "max_text": 20,
+            "steps": [
+                {"operation": "navigate", "url": self.origin + "/readback"},
+                {"operation": "read_text", "selector": "#exact"},
+            ],
+        }
+        observed = run(request, self.worker.scope.root)
+        self.assertEqual("Saved receipt", observed["observations"][0]["text"])
+        for selector, maximum in (
+            ("#exact", 5),
+            ("span", 20),
+            ("#absent", 20),
+            ("#unicode", 1),
+            ("#many", 5000),
+        ):
+            with self.subTest(selector=selector, maximum=maximum), self.assertRaises(ValueError):
+                run(
+                    {
+                        **request,
+                        "max_text": maximum,
+                        "steps": [
+                            request["steps"][0],
+                            {"operation": "read_text", "selector": selector},
+                        ],
+                    },
+                    self.worker.scope.root,
+                )
 
     def test_actual_browser_download_rejects_missing_auth_oversize_redirect_and_overwrite(self):
         from playwright.sync_api import Error

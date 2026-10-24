@@ -63,6 +63,20 @@ def machine_readback(capability: str, parameters: dict[str, Any]) -> dict[str, A
     if capability == "machine.clipboard" and set(request) == {"operation", "text"}:
         if request["operation"] == "clipboard_write":
             return {"operation": "clipboard_read"}
+    if capability == "machine.browser" and "verification" in parameters:
+        expected = parameters["verification"]
+        return {
+            **{k: parameters[k] for k in ("account_id", "account_generation") if k in parameters},
+            "request": {
+                "origins": request["origins"],
+                "steps": [
+                    {"operation": "navigate", "url": expected["url"]},
+                    {"operation": "read_text", "selector": expected["selector"]},
+                ],
+                "timeout": min(request["timeout"], 15),
+                "max_text": min(request["max_text"], 8192),
+            },
+        }
     return None
 
 
@@ -89,7 +103,7 @@ def validate_remote_machine(kind: str, parameters: dict[str, Any]) -> dict[str, 
         "desktop_clipboard": ({"request"}, {"request"}),
         "visual_control": ({"request"}, {"request"}),
         "screen_capture": ({"request"}, {"request"}),
-        "browser": ({"request", "account_id", "account_generation"}, {"request"}),
+        "browser": ({"request", "account_id", "account_generation", "verification"}, {"request"}),
     }
     allowed, required = fields[kind]
     if not required <= set(parameters) <= allowed:
@@ -135,6 +149,19 @@ def validate_remote_machine(kind: str, parameters: dict[str, Any]) -> dict[str, 
         ):
             raise ValueError("current browser account generation required")
         validate_browser(parameters["request"])
+        if "verification" in parameters:
+            expected = parameters["verification"]
+            if (
+                not isinstance(expected, dict)
+                or set(expected) != {"url", "selector", "text"}
+                or not isinstance(expected["text"], str)
+                or len(expected["text"]) > 8192
+                or len(expected["text"]) > parameters["request"]["max_text"]
+            ):
+                raise ValueError("exact bounded browser text verification required")
+            readback = machine_readback("machine.browser", parameters)
+            assert readback is not None
+            validate_browser(readback["request"])
     return parameters
 
 
@@ -340,6 +367,17 @@ class RemoteMachine(RemoteWorker):
         if action.capability_id in {"machine.files.read", "machine.files.write"}:
             return super().readback_effect(action, delivery)
         self._guard()
+        if action.capability_id == "machine.browser":
+            observed = self.effects.execute(
+                replace(action, parameters=delivery["parameters"]), RemoteCancellation(self._guard)
+            )
+            if not observed.success:
+                raise ValueError("independent browser readback unavailable")
+            report = json.loads(self.effects.outputs.pop(action.id))
+            observations = report.get("observations")
+            if not isinstance(observations, list) or len(observations) != 1:
+                raise ValueError("one browser text observation required")
+            return {"content": json.dumps(observations[0], allow_nan=False)}
         observed = self.effects.desktop.observe(delivery["parameters"], timeout=8)
         return {"content": json.dumps({"text": observed["text"]}, allow_nan=False)}
 
