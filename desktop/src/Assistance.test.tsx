@@ -6,6 +6,13 @@ import {initialView} from './bridge';
 const management={version:1 as const,relationship_id:'owner',core_node_id:'core',ask_rules:['review-rule'],authority:{mode:'ask' as const,status:'inactive'},capabilities:[{id:'files.write',node_id:'core',session_id:'session',input_kind:'file_write',risk:'medium',permissions:['files:write']}],sentry:{mode:'manual',state:'passive',generation:0,source_ids:[],trigger_keys:[],allow_interrupt:false,sources:[{id:'synthetic-events',perceive:false,retain:false,act:false,simulated:true,epoch:1}]}};
 const executive={version:1 as const,health:'operational',running:true,management,goals:[],workers:[]};
 afterEach(cleanup);
+it('reviews a pending action through the existing signed assistance command',()=>{
+ const run=vi.fn();const pending={...executive,management:{...management,pending_actions:[{task_id:'task',goal_id:'goal'}]},goals:[{id:'goal',goal:'Write note',state:'enabled',verified_runs:0,max_runs:1,task_ids:['task']}]};
+ render(<Automations discuss={()=>{}} executive={pending} run={run}/>);
+ expect(run).not.toHaveBeenCalled();fireEvent.click(screen.getByRole('button',{name:'Review next action'}));
+ expect(run).toHaveBeenCalledExactlyOnceWith({kind:'manage_assistance',operation:'confirm_task',id:'task',value:{}});
+ for(const pending_actions of [[{task_id:'',goal_id:'goal'}],[{task_id:'task',goal_id:'goal'},{task_id:'task',goal_id:'goal'}],[{task_id:'task',goal_id:'bad\nidentity'}]])expect(assistanceSummary({...management,pending_actions})).toBeNull();
+});
 it('requires explicit signed activation and sends exact coverage without action approval',()=>{
  const run=vi.fn();render(<OperatingSettings view={{...initialView,link:'online',executive,operating:{access:'Ask',secure:'signed_delegation_available',full_access:'signed_delegation_available',awareness:'manual',sentry:'passive',worker_autonomy:'scoped',automations:'signed_authoring'}}} busy={false} run={run}/>);
  expect(run).not.toHaveBeenCalled();fireEvent.click(screen.getByRole('button',{name:'Access modes'}));fireEvent.click(screen.getByRole('button',{name:'Review Full Access activation'}));

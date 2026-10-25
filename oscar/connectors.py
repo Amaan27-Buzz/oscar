@@ -411,6 +411,7 @@ class ConnectorFabric:
         self.outcomes: dict[str, ConnectorOutcome] = {}
         self.requests: dict[str, dict[str, Any]] = {}
         self.request_owners: dict[str, str] = {}
+        self.request_guards: dict[str, Callable[[], object]] = {}
         self.store.task_resources.add(self)
 
     def task_transitioned(self, task: Task) -> None:
@@ -456,6 +457,7 @@ class ConnectorFabric:
     def release_request(self, reference: str) -> None:
         self.requests.pop(reference, None)
         self.request_owners.pop(reference, None)
+        self.request_guards.pop(reference, None)
 
     def install(self, instance: ConnectorInstance) -> None:
         if instance.id in self.instances:
@@ -813,6 +815,16 @@ class ConnectorFabric:
             owner = self.request_owners.get(reference)
             if owner != action.task_id:
                 raise ValueError("connector input is not bound to this task")
+            guard = self.request_guards.get(reference)
+            if guard:
+                guard()
+                original = cancellation
+
+                def check() -> None:
+                    original.check()
+                    guard()
+
+                cancellation = Cancellation(self.store, action.task_id, check)
             # Consume before dispatch: every success/error/cancel path releases input.
             self.release_request(reference)
             transient = replace(action, parameters=parameters)

@@ -156,6 +156,7 @@ class Assistance:
             ],
             "procedures": self.procedures(),
             "planner_drafts": PlannerAuthoring(h).snapshot(),
+            "pending_actions": h.connector_plans.pending(grants),
             "memory": MemoryManagement(h, node).snapshot(grants),
             "capabilities": [
                 {k: c[k] for k in ("id", "node_id", "input_kind", "risk", "permissions")}
@@ -266,6 +267,10 @@ class Assistance:
             from .planner_authoring import PlannerAuthoring
 
             state = PlannerAuthoring(h).material(operation, identifier, value, grants)
+        elif operation == "confirm_task":
+            if value:
+                raise ValueError("unexpected action approval parameters")
+            state = h.connector_plans.task_review(identifier, grants)
         elif operation == "create_natural":
             value = self.natural_value(value, grants)
             proposal = {"operation": "create", "id": identifier, "value": value}
@@ -285,7 +290,13 @@ class Assistance:
             }
             proposal = {"operation": "create", "id": identifier, "value": value}
             operation = "create"
-        if operation in {"plan_draft", "plan_accept", "memory_correct", "memory_forget"}:
+        if operation in {
+            "plan_draft",
+            "plan_accept",
+            "memory_correct",
+            "memory_forget",
+            "confirm_task",
+        }:
             pass
         elif operation == "create":
             if set(value) != {
@@ -468,6 +479,7 @@ class Assistance:
             "memory_forget": "Review forgetting this memory and selected sources",
             "plan_draft": "Review model input, sources and planning scope",
             "plan_accept": "Review the exact suggested plan",
+            "confirm_task": "Review the exact next action",
             "create_natural": "Review this responsibility",
             "create": "Review this responsibility",
             "reuse": "Review a one-time procedure replay",
@@ -496,11 +508,20 @@ class Assistance:
             raise ValueError("signed responsibility exceeds native review bound")
         encoded = base64.b64encode(body).decode()
         identifier = new_id()
+        private = bool(material["review"].get("current", {}).get("connector_inputs"))
+        if private:
+            self.h.connector_plans.reap()
+            if len(self.h.store.transient) >= 100:
+                raise StateConflict("private review capacity reached")
+            self.h.store.transient["assistance-review:" + identifier] = {
+                "payload": encoded,
+                "expires": expires / 1000,
+            }
         self.h.store.put(
             "assistance_review",
             identifier,
             {
-                "payload": encoded,
+                **({"payload_digest": fingerprint(encoded)} if private else {"payload": encoded}),
                 "used": False,
                 **(
                     {
@@ -550,7 +571,15 @@ class Assistance:
             row = h.store.get("assistance_review", payload["challenge_id"])
             if row["used"]:
                 raise PermissionError("assistance review consumed")
-            body = base64.b64decode(row["payload"], validate=True)
+            encoded = row.get("payload")
+            if encoded is None:
+                entry = h.store.transient.get("assistance-review:" + payload["challenge_id"])
+                if entry is None or entry["expires"] <= h.grid.clock():
+                    raise PermissionError("private review expired or Core restarted")
+                encoded = entry["payload"]
+                if fingerprint(encoded) != row.get("payload_digest"):
+                    raise PermissionError("private review changed")
+            body = base64.b64decode(encoded, validate=True)
             claim = json.loads(body)
             if (
                 row["used"]
@@ -579,6 +608,7 @@ class Assistance:
                 change = material["review"]["proposal"]
             operation, identifier, value = change["operation"], change["id"], change["value"]
             h.store.put("assistance_review", payload["challenge_id"], {**row, "used": True})
+            h.store.transient.pop("assistance-review:" + payload["challenge_id"], None)
             if operation in {"memory_correct", "memory_forget"}:
                 memory_request = (operation, identifier, value, material["review"]["current"])
                 h.store.put(
@@ -605,6 +635,12 @@ class Assistance:
                     value,
                     material["review"]["current"],
                     {"node": node, "session": session, "scope": scope, "public_key": key},
+                )
+            elif operation == "confirm_task":
+                h.executive.confirm_task(
+                    identifier,
+                    material["review"]["current"]["task_review"]["digest"],
+                    owner_authorized=True,
                 )
             elif operation == "create":
                 pairs = list(

@@ -25,6 +25,7 @@ from .memory_executor import MemoryExecutor
 from .memory_fabric import MemoryFabric
 from .models import Mode, ModelRequest, ProviderError, RoutingPolicy
 from .oauth_device import Vault, VaultResolver
+from .planner_connectors import MCPPlanning
 from .policy import PersonalPolicy
 from .presence import PresenceRuntime
 from .providers import HTTPAdapter
@@ -50,10 +51,12 @@ class ModelExecutor:
         *,
         grid: Grid | None = None,
         memory: MemoryFabric | None = None,
+        connector_plans: MCPPlanning | None = None,
     ):
         self.router, self.template, self.policy = router, template, policy
         self.grid = grid
         self.memory = memory
+        self.connector_plans = connector_plans
         if template.images:
             raise ValueError("planning templates cannot contain image material")
         self._images: dict[str, tuple[float, ScreenImage]] = {}
@@ -109,6 +112,7 @@ class ModelExecutor:
                         "template": template,
                         "policy": asdict(self.policy),
                         "observations": self.grid is not None,
+                        "connector_plans": self.connector_plans is not None,
                     },
                     default=sorted,
                 )
@@ -226,6 +230,14 @@ class ModelExecutor:
             policy = replace(policy, allowed_providers=frozenset(allowed))
         try:
             routed = self.router.execute(request, policy, check)
+            value = routed.response.text
+            if action.parameters.get("connector_contracts"):
+                if self.connector_plans is None:
+                    raise PermissionError("private connector planning unavailable")
+                check()
+                value = self.connector_plans.sanitize(
+                    value, action.task_id, action.parameters["connector_contracts"]
+                )
             return Result(
                 new_id(),
                 action.id,
@@ -233,12 +245,16 @@ class ModelExecutor:
                 action.correlation_id,
                 action.capability_id,
                 True,
-                value=routed.response.text,
+                value=value,
             )
         except RouteUnavailable:
             error = "route_unavailable"
         except ProviderError as failure:
             error = failure.category.value
+        except (ValueError, KeyError, TypeError, PermissionError, StopIteration):
+            if not action.parameters.get("connector_contracts"):
+                raise
+            error = "invalid_connector_plan"
         return Result(
             new_id(),
             action.id,
@@ -333,6 +349,7 @@ class Harness:
             self.accounts.check(account_id, generation)
 
         self.plugins = MCPPlugins(self.store, self.connectors, authorize_account=authorize_account)
+        self.connector_plans = MCPPlanning(self)
         self.runtime.verifier = ConnectorVerifier(self.runtime.verifier, self.connectors)
         self.runtime.connections = self
         self.registry = Registry.load(manifest, self.store)
@@ -447,7 +464,11 @@ class Harness:
                 "files.write": FileExecutor(self.files),
                 "math.add": addition_executor,
                 "models.reason": ModelExecutor(
-                    self.router, template, RoutingPolicy(), grid=self.grid
+                    self.router,
+                    template,
+                    RoutingPolicy(),
+                    grid=self.grid,
+                    connector_plans=self.connector_plans,
                 ),
                 "sources.retrieve": RetrievalExecutor(
                     self.router, (ProviderInventorySource(self.router), self.search)

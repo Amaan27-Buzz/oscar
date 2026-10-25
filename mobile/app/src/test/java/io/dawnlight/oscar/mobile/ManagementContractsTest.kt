@@ -7,6 +7,15 @@ import org.junit.Test
 import java.util.Base64
 
 class ManagementContractsTest {
+    @Test fun pendingActionUsesSignedReviewAndRejectsMalformedIdentities() {
+        val pending = JSONArray().put(JSONObject().put("task_id", "task").put("goal_id", "goal"))
+        val view = parseManagement(management().put("pending_actions", pending))!!
+        assertEquals(listOf("task" to "goal"), view.pendingActions())
+        val request = change("confirm_task", view.pendingActions().single().first)
+        assertEquals("assistance_complete", Approval.management(challenge("assistance", request), "assistance", request, snapshot().managementStamp(), 1000).completion)
+        assertThrows(Exception::class.java) { parseManagement(management().put("pending_actions", JSONArray().put(pending.getJSONObject(0)).put(pending.getJSONObject(0)))) }
+        assertThrows(Exception::class.java) { parseManagement(management().put("pending_actions", JSONArray().put(JSONObject().put("task_id", "bad\nidentity").put("goal_id", "goal")))) }
+    }
     @Test fun delegatedConversationRequiresExactFullAccessReadback() {
         fun response() = JSONObject().put("id", "goal").put("mode", "full").put("state", "enabled")
         assertEquals("goal", parseStartedResponsibility(response()))

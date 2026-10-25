@@ -21,12 +21,16 @@ class PlannerAuthoring:
         self.h = harness
 
     @staticmethod
-    def descriptor(cap: dict[str, Any]) -> dict[str, Any]:
+    def descriptor(cap: dict[str, Any], connectors: Any = None) -> dict[str, Any]:
         """Parameter examples remain subject to current native action admission."""
         from .contracts import Capability
         from .desktop_actions import OPERATIONS, form_intent
         from .jev import Intent
 
+        if connectors is not None:
+            descriptor = connectors.descriptor(cap)
+            if descriptor is not None:
+                return dict(descriptor)
         kind = cap["input_kind"]
         examples = []
         if kind == "addition":
@@ -502,7 +506,7 @@ class PlannerAuthoring:
                     for c in available
                     if (targets is None or c["node_id"] in targets)
                     and (
-                        self.descriptor(c)["intent_examples"]
+                        self.descriptor(c, self.h.connector_plans)["intent_examples"]
                         or c["input_kind"] == "terminal_command"
                         and c["id"] == "machine.command"
                     )
@@ -724,7 +728,7 @@ class PlannerAuthoring:
             mode = value["mode"]
             if mode not in {"auto", "private"}:
                 raise ValueError("choose private or configured routing explicitly")
-            pins = [self.descriptor(c) for c in caps if c != planner]
+            pins = [self.descriptor(c, h.connector_plans) for c in caps if c != planner]
             live_required = classify(value["goal"]) in {Freshness.CURRENT, Freshness.LIVE}
             adaptive = value.get("adaptive", live_required)
             if live_required:
@@ -780,6 +784,11 @@ class PlannerAuthoring:
                 adaptive=adaptive,
             )
             parameters = step["intent"]["parameters"]
+            connector_pins = h.connector_plans.pins(caps)
+            if connector_pins:
+                if executor.connector_plans is not h.connector_plans:
+                    raise PermissionError("private connector planning executor unavailable")
+                parameters["connector_contracts"] = connector_pins
             if live_required:
                 parameters["observation_only"] = sorted({p["capability_id"] for p in pins})
                 parameters["prompt"] += (
@@ -945,7 +954,7 @@ class PlannerAuthoring:
                     planner = next(c for c in caps if c["id"] == row["planner_id"])
                     parameters["prompt"] = h.executive.planning_step(
                         row["goal"],
-                        [self.descriptor(c) for c in caps if c != planner],
+                        [self.descriptor(c, h.connector_plans) for c in caps if c != planner],
                         {"node_id": planner["node_id"], "capability_id": planner["id"]},
                         "private",
                         adaptive=True,
@@ -994,6 +1003,14 @@ class PlannerAuthoring:
 
                 context(h.store, h.grid, row["observation_refs"])
             steps = h.executive.validate_steps(worker, document["steps"])
+            connector_inputs = h.connector_plans.review(steps, tasks[0])
+            if connector_inputs and value != {
+                "start_at": None,
+                "interval_seconds": None,
+                "max_runs": 1,
+                "priority": 0,
+            }:
+                raise ValueError("private connector plans run once immediately")
             if classify(row["goal"]) in {Freshness.CURRENT, Freshness.LIVE} and not row.get(
                 "observation_refs"
             ):
@@ -1034,6 +1051,7 @@ class PlannerAuthoring:
                 "worker": worker,
                 "capabilities": caps,
                 "steps": steps,
+                **({"connector_inputs": connector_inputs} if connector_inputs else {}),
                 "observe": document["observe"],
                 "planner_task_id": tasks[0],
                 "routing_evidence": [

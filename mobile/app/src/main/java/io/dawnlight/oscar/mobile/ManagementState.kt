@@ -61,6 +61,18 @@ internal fun parseDayBrief(root: JSONObject): DayBrief {
 }
 data class ManagementView(val relationship: String, val mode: String, val status: String, val expires: Long?, val epoch: Int,
     val capabilities: List<ManagedCapability>, val askRules: List<String>, val source: String)
+
+internal fun ManagementView.pendingActions(): List<Pair<String, String>> =
+    JSONObject(source).optJSONArray("pending_actions")?.let { array ->
+        require(array.length() <= 16)
+        (0 until array.length()).map { index ->
+            val row = array.getJSONObject(index)
+            row.bounded("task_id", 80) to row.bounded("goal_id", 80)
+        }.also { rows ->
+            require(rows.map { it.first }.distinct().size == rows.size)
+            require(rows.all { (task, goal) -> (task + goal).none(Char::isISOControl) })
+        }
+    } ?: emptyList()
 data class ConnectionView(val source: String, val truncated: Boolean) {
     fun json() = JSONObject(source)
     fun accounts() = json().objects("accounts", 128)
@@ -125,6 +137,7 @@ internal fun parseManagement(root: JSONObject): ManagementView? {
     root.optJSONObject("memory")?.let(::parseMemory)
     return ManagementView(root.bounded("relationship_id", 128), mode, status, expires, epoch, caps,
         root.getJSONArray("ask_rules").texts(256).sorted(), canonicalJson(root)).also {
+            it.pendingActions()
             if (sentry.has("alerts")) parseSentryAlerts(it, root.getLong("observed_at_ms"))
         }
 }

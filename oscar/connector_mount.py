@@ -135,6 +135,7 @@ class ConnectorMount:
         with self.lock:
             if self.stop.is_set():
                 return []
+            self.harness.connector_plans.reap()
             project_accounts(self.harness)
             caps = [
                 replace(cap, input_kind=cap.id)

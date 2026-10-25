@@ -146,6 +146,9 @@ internal fun change(operation: String, id: String, value: JSONObject = JSONObjec
     state.snapshot?.executive?.forEach { item ->
         key(item.id) { TactileSurface(Modifier.fillMaxWidth()) {
             FeatureRow(item.goal, "${item.state} · ${item.runs} of ${item.maxRuns} runs verified", "Activity")
+            state.snapshot?.management?.pendingActions()?.filter { it.second == item.id }?.forEach { (taskId, _) ->
+                TextButton(enabled = state.canManage(), onClick = { reviewChange(session, "assistance", change("confirm_task", taskId)) }) { Text("Review next action") }
+            }
             if (item.state in setOf("enabled", "paused", "proposed")) {
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     TextButton(enabled = state.canManage(), onClick = { reviewChange(session, "assistance", change(if (item.state == "enabled") "pause" else "resume", item.id)) }) { Text(if (item.state == "enabled") "Pause" else "Resume") }

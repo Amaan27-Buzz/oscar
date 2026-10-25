@@ -279,3 +279,41 @@ current provider count facts remain REPORTED, with separate source/temporal prov
 Owner run `oauth-gate-b-20261004-234817` passed real private OAuth and controlled
 federation. Slice 06 COMPLETE; Gate B PASS. Remote revocation remains
 `UNKNOWN_OWNER_ACTION_REQUIRED`. See [final acceptance](GATE-B-COMPLETION.md).
+
+
+## Model-authored MCP execution
+
+Installed, connected, owner-reviewed account-bound MCP tools can participate in
+conversation-created temporary Workers. Planning descriptors expose the exact
+executor/capability/account identity and the reviewed argument schema. Tool names
+and schemas are untrusted metadata, not instructions or additional authority.
+The configured model proposes literal `parameters.arguments` only. Native schema,
+capability, account generation, session, policy and standing-authority checks remain
+authoritative. A changed tool schema needs installation review before new planning.
+
+Before the model result is persisted, arguments move into the existing transient
+Connector Fabric. Durable results, goals and actions contain opaque `request_ref`
+values, fixed server-authored account criteria and provenance. Request guards bind
+the input digest and current connector contract through dispatch/cancellation.
+Inputs expire after 120 seconds and are consumed before RPC. Core restart loses
+them; a new draft is required. A later invalid step releases preceding staged
+arguments. The existing 100-input Fabric bound remains enforced.
+
+Ask displays the exact arguments in a signed plan review. That review payload is
+held transiently for its 30-second lifetime; only its digest is durable. Ordinary
+consequential-action confirmation remains required by policy after plan acceptance.
+Desktop and Android expose a pending action through `confirm_task` in the existing
+signed native review. It shows the current private arguments, account and executor;
+the signed completion rechecks input digest, schema/account generation, task/policy
+digest, expiry and current owner scope before recording the existing one-attempt
+Executive confirmation. Pending readback contains IDs only. Standing-delegation
+tasks cannot fall back to this Ask path when their account coverage is missing.
+Synthetic Full Access uses the existing signed owner/account/capability ceiling
+without per-action prompts. Neither mode adds an account, installs a server,
+refreshes authorization or bypasses external mandatory approval.
+
+Connector plans run once immediately. Recurrence, delayed execution, argument
+substitution from other steps and MCP observation continuation are rejected.
+Generic tool success is REPORTED/PARTIALLY_VERIFIED, never independent objective
+verification. Core integration, native contract tests and builds do not establish
+rendered native MCP action-confirmation acceptance or general model accuracy.

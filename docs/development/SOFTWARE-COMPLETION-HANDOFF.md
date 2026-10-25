@@ -701,3 +701,31 @@ authority activation, provisioning, push or remote mutation were used.
 
 
 **2026-10-26 soak result collected:** the pending `5ccceeb` ten-minute synthetic TLS Core/Worker workload completed in 601.58 s with 96 independently verified effects, separate Worker and Core/Worker restarts, and disposable process/credential cleanup. Recorded runtime hashes still match the checkout. This supersedes the preceding pending soak checkpoint; general model/service/native-product acceptance remains open. [Receipt](../evidence/software-completion/soak-5ccceeb-2026-10-25.json).
+
+**2026-10-26 active MCP integration checkpoint:** uncommitted implementation on
+`5401dc2` now admits current account-bound owner-reviewed MCP tools in model-created
+Workers. Literal schema-checked arguments are staged before model-result persistence;
+durable plans/actions/reviews keep references/digests. Ask has a separate signed
+`confirm_task` review in Desktop and Android, with exact private arguments and
+current task/input/account/policy rechecks. Standing Full tasks cannot borrow this
+Ask path when their delegated account is missing. Generic tool outcomes remain
+PARTIALLY_VERIFIED; no MCP observation continuation is admitted.
+
+Before native confirmation additions, 213 affected tests passed in 189.775 s
+(191.572 s wrapper), source-stable, log/manifest
+`.oscar/connector-planning-integration-final*`. Final native-action positive and
+expiry/scope/input/replay tests pass individually; initial combined 14-case run had
+one test-fixture heartbeat expiry error, corrected with explicit internal heartbeat
+renewal after simulated clock advance. Desktop: 133 tests and build PASS. Android:
+88 unit tests, assembleDebug and lintDebug PASS. Ruff, mypy (107 files), repository
+and secret scanner PASS. Rendered native MCP workflow acceptance remains OPEN.
+
+Historical running checkpoint (superseded by the completed result below): exec session **17653**, wrapper
+`.oscar/run-mcp-planning-full.py`, log `.oscar/mcp-planning-full-regression.log`,
+completion manifest `.oscar/mcp-planning-full-regression-manifest.json`.
+Keep runtime/tests/native sources frozen until completion; collect exit code,
+counts and source hashes before committing the receipt. This is not a PASS yet.
+No subagents, real accounts, physical devices or remote publication were used.
+
+
+**2026-10-26 model-authored MCP execution:** current reviewed account-bound tools can run from temporary model-created Workers with private expiring arguments. Desktop and Android expose the separate signed Ask action review; synthetic signed Full enforces account/capability ceilings without per-action prompts. All 14 new MCP tests pass, plus 133 Desktop and 88 Android unit tests, both builds and Android lint. A second synthetic Desktop protocol session approved and executed a real stdio fixture call with exact file inspection; this is not rendered native or actual-model acceptance. The source-stable full regression ran 1,257 tests: 1,246 PASS, ten SKIP, one FAIL (913.104 s). The native image workflow's second focus task was not verified, with an empty native command-error list; cause remains unresolved. Aggregate is PARTIAL, not PASS. Generic MCP outcomes remain PARTIALLY_VERIFIED. [Receipt](../evidence/software-completion/mcp-planning-2026-10-26.json).

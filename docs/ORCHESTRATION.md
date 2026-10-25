@@ -311,6 +311,19 @@ and explicit Worker/device grammar. Questions and recall stay outside this actio
 route. Normalization adds no authority: memory preflight, Ask review and exact
 standing delegation still govern every model disclosure and effect.
 
+### Private connector arguments
+
+Conversation planning can select current account-bound reviewed MCP tools and
+propose literal arguments against their reviewed schemas. Core stages arguments
+before saving the model result, and Executive steps retain only opaque references.
+An exact signed plan review shows the private arguments without retaining its raw
+payload in the canonical store. Ask still requires applicable action confirmation,
+available through the existing signed review in Desktop and Android;
+signed Full Access must cover the executor, capability and account generation.
+These one-shot immediate calls expire after 120 seconds and remain only reported
+unless an independent verifier exists. They cannot become observation evidence or
+implicitly authorize another account. See [Connector Fabric](CONNECTOR-FABRIC.md#model-authored-mcp-execution).
+
 ### Verified observations and private continuation
 
 Reviewed adaptive conversation planning may request a pure observation stage
