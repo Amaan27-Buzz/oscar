@@ -1,0 +1,50 @@
+{
+  "classification": "SYNTHETIC_PRIVATE_DISCOVERY_READ_EFFECT_VERIFIED_FULL_REGRESSION_PENDING",
+  "sources": {
+    "oscar/executive.py": "688c910896adfbcbbd22b26ec1c1f473660b06cea4b1a2048e766c13ee641f66",
+    "oscar/planner_authoring.py": "d04199bb8423516eb85699447532cf088c6ebd0965acae1e371e045ae027e222",
+    "oscar/planner_observations.py": "ce5fc1bd98f8c9f00cd72f96fd377451a52d4506fe0ff59a74f536e65805a7f9",
+    "oscar/remote_grid.py": "8b92cabee3e93c594539b3b7d813ce663bc55dbc080f30d04088fb506078815e",
+    "oscar/remote_machine.py": "b83854e59e4ffeca2e86ce91f9cfa26d219f51db26ab94e40a3a5a8ad6efec87",
+    "tests/test_directory_observations.py": "6d1aed71e1fa45ccb350c2974b18edf888da77e3c50923e5ad4e2e8322054aaa"
+  },
+  "checks": {
+    "focused": {
+      "state": "PASS",
+      "tests": 4,
+      "seconds": 10.904
+    },
+    "affected": {
+      "state": "PASS",
+      "tests": 162,
+      "seconds": 220.851
+    },
+    "static": {
+      "ruff": "PASS",
+      "mypy_sources": 105,
+      "repository": "PASS",
+      "diff_check": "PASS"
+    },
+    "full_regression": {
+      "state": "PENDING",
+      "note": "Earlier frozen browser run does not qualify these later changes"
+    }
+  },
+  "verified": [
+    "Authenticated exact directory search and separate filesystem readback",
+    "Changed listing fails comparison",
+    "Outside directories, oversized name payloads and malformed operations fail closed",
+    "Signed synthetic Full discovers, privately reads, replans and writes actual verified output in one Worker"
+  ],
+  "limits": [
+    "Synthetic owners/model HTTP, not general installed-model repository semantics",
+    "One directory and filename substring search, no recursive content index or arbitrary process output disclosure",
+    "4-KiB name overflow fails instead of truncating silently",
+    "Broader image-grounded control, integrations, Chief of Staff and native whole-product acceptance remain open",
+    "No physical devices, real accounts, owner activation, provisioning or GitHub publication"
+  ],
+  "log_sha256": {
+    "directory-observations-final-focused.log": "68231e13cdd058d0ec4b19caed286839aaad79ad8b73f4cb89f16ac6fc0e15ac",
+    "directory-observations-affected.log": "6d20348f78d5762dca22bd73442837dfd9b5a085ea62f99f913cd313dab5dd58"
+  }
+}

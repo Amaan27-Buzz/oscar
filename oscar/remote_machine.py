@@ -56,6 +56,10 @@ REMOTE_MACHINE_CAPABILITIES = {
 def machine_readback(capability: str, parameters: dict[str, Any]) -> dict[str, Any] | None:
     """Derive only a read of the exact reviewed destination, never another effect."""
     spec = REMOTE_MACHINE_CAPABILITIES.get(capability)
+    if capability in {"machine.files.list", "machine.files.search"}:
+        assert spec is not None
+        validate_remote_machine(spec[0], parameters)
+        return {"cwd": parameters.get("cwd", "."), **parameters}
     verification = parameters.get("verification")
     if spec and spec[0] in {"coding", "terminal_command"} and isinstance(verification, dict):
         if set(verification) == {"path", "content"}:
@@ -139,6 +143,10 @@ def validate_remote_machine(kind: str, parameters: dict[str, Any]) -> dict[str, 
             not isinstance(parameters[field], str) or "\x00" in parameters[field]
         ):
             raise ValueError("text machine parameters required")
+    if kind in {"directory_list", "file_search"} and (
+        len(parameters.get("cwd", ".")) > 240 or len(parameters.get("pattern", "")) > 200
+    ):
+        raise ValueError("bounded scoped directory query required")
     for field in ("argv", "arguments"):
         if field in parameters and (
             not isinstance(parameters[field], list)
@@ -396,6 +404,14 @@ class RemoteMachine(RemoteWorker):
         if action.capability_id in {"machine.files.read", "machine.files.write"}:
             return super().execute_effect(action, cancellation)
         result = self.effects.execute(action, cancellation)
+        if result.success and action.capability_id in {
+            "machine.files.list",
+            "machine.files.search",
+        }:
+            value = self.effects.outputs[action.id]
+            if len(value.encode()) > 4096:
+                return replace(result, success=False, error="directory_observation_too_large")
+            result = replace(result, value=value)
         if (
             result.success
             and action.capability_id == "machine.apps"
@@ -425,6 +441,15 @@ class RemoteMachine(RemoteWorker):
         if action.capability_id in {"machine.files.read", "machine.files.write"}:
             return super().readback_effect(action, delivery)
         self._guard()
+        if action.capability_id in {"machine.files.list", "machine.files.search"}:
+            parameters = delivery["parameters"]
+            value = json.dumps(
+                sorted(self.files.names(parameters["cwd"], parameters.get("pattern", "")))
+            )
+            if len(value.encode()) > 4096:
+                raise ValueError("directory observation exceeds disclosure bound")
+            self._guard()
+            return {"content": value}
         if action.capability_id == "machine.apps":
             observed = self.effects.desktop.app_targets(delivery["parameters"]["request"]["query"])
             self._guard()

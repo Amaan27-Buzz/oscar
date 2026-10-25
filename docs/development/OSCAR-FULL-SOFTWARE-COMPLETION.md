@@ -1,5 +1,11 @@
 # OSCAR full software completion — active local ledger
 
+**2026-10-25 scoped discovery execution:** a signed synthetic Full Worker now
+discovers filenames, reads the actual selected file, privately replans and writes
+independently verified output. Existing filesystem boundaries and a 4-KiB name
+limit remain enforced; changed readback fails. Four focused and 162 affected
+checks passed. [Receipt](../evidence/software-completion/directory-observations-2026-10-25.json).
+
 **2026-10-25 anonymous browser continuation:** separate current static-page
 readback now feeds private replanning and a verified outbound Worker file effect.
 Signed synthetic Ask/Full, changed-source rejection, JavaScript suppression,

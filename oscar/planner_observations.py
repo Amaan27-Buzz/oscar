@@ -14,6 +14,8 @@ from .storage import StateConflict, Store
 
 
 def validate_stage(steps: list[dict[str, Any]]) -> None:
+    from .remote_machine import machine_readback
+
     if not 1 <= len(steps) <= 4:
         raise ValueError("one to four read-only observations per stage")
     for step in steps:
@@ -24,6 +26,14 @@ def validate_stage(steps: list[dict[str, Any]]) -> None:
             and intent.get("capability_kind") == "file_read"
             and isinstance(intent.get("parameters"), dict)
             and set(intent["parameters"]) == {"path"}
+            or step["capability_id"] in {"machine.files.list", "machine.files.search"}
+            and intent.get("kind") == "capability"
+            and intent.get("capability_kind")
+            == {"machine.files.list": "directory_list", "machine.files.search": "file_search"}[
+                step["capability_id"]
+            ]
+            and isinstance(intent.get("parameters"), dict)
+            and machine_readback(step["capability_id"], intent["parameters"]) is not None
             or step["capability_id"] == "math.add"
             and intent.get("kind") is None
             or step["capability_id"] == "machine.apps"

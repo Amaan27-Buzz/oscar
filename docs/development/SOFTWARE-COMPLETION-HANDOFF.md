@@ -527,3 +527,20 @@ but a paired thinking call timed out; no root cause or general semantic success
 is established. The task-owned diagnostic server was stopped. No production
 model, adapter or driver configuration changed.
 [Diagnostic receipt](../evidence/software-completion/model-diagnostics-2026-10-25.json).
+
+The anonymous browser affected regression passed all 157 cases (301.003 s).
+An additional actual public HTTPS read and separate browser readback through the
+signed outbound Worker passed at `https://example.com/` (8.057 s), with source
+hashes recorded for the run. Model responses remain synthetic in browser workflow
+acceptance; public connectivity does not establish general model semantics.
+
+**2026-10-25 scoped repository discovery:** existing directory list/search now
+return bounded names and repeat the scoped read independently. Those verified
+names can feed the same private observation loop. Full synthetic delegation
+completed directory discovery → actual discovered-file read → private replan →
+independently verified file output without action reviews, in one Worker.
+Drift, outside paths, oversized names and malformed queries fail. Search examples
+now reflect actual substring matching. Four focused tests passed (10.904 s), then
+all 162 affected tests passed (220.851 s). The earlier frozen browser aggregate
+has its own source manifest; it does not qualify later directory changes.
+[Receipt](../evidence/software-completion/directory-observations-2026-10-25.json).

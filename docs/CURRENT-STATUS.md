@@ -1,5 +1,12 @@
 # OSCAR — Current Status & Checklist
 
+**2026-10-25 scoped file discovery:** private Workers can now list/search a scoped
+directory, independently recheck its names, read the discovered file and act on
+its verified content. Signed synthetic Full completed the entire sequence without
+per-action reviews. Drift, path escape, oversized results and malformed requests
+fail closed. Four focused and 162 affected tests passed; full integration remains
+separately qualified. [Receipt](evidence/software-completion/directory-observations-2026-10-25.json).
+
 **2026-10-25 anonymous browser observations:** scoped static-page reads now feed
 private Worker replanning after a separate browser readback. Synthetic signed
 Ask and Full complete an actual observed-token file objective. Changed pages

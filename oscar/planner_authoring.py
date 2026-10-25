@@ -83,7 +83,7 @@ class PlannerAuthoring:
         else:
             values = {
                 "path": "notes.txt",
-                "pattern": "*.txt",
+                "pattern": ".txt",
                 "name": "reviewed-branch",
                 "text": "Text",
                 "url": "https://example.com",
@@ -641,7 +641,10 @@ class PlannerAuthoring:
                 parameters["prompt"] += (
                     '\nIf verified tool data is needed, return {"steps":[...],"observe":true}. '
                     "An observation stage permits one to four machine.files.read file_read "
-                    "steps with only a path parameter, math.add steps, or machine.apps "
+                    "steps with only a path parameter, machine.files.list directory_list or "
+                    "machine.files.search file_search steps with a scoped cwd and optional "
+                    "substring pattern (required for search, not a glob), math.add, or "
+                    "machine.apps "
                     "installed_app requests with only operation targets and a bounded query, "
                     "or machine.browser anonymous read_only static inspections as described "
                     "by its capability. "

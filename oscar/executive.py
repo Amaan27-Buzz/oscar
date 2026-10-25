@@ -580,7 +580,14 @@ class Executive:
                 and (
                     not adaptive
                     or c["capability_id"]
-                    in {"machine.files.read", "machine.apps", "machine.browser", "math.add"}
+                    in {
+                        "machine.files.read",
+                        "machine.files.list",
+                        "machine.files.search",
+                        "machine.apps",
+                        "machine.browser",
+                        "math.add",
+                    }
                 )
             ),
             None,

@@ -29,6 +29,25 @@
     },
     "full_regression": {
       "state": "PENDING"
+    },
+    "public_https": {
+      "state": "verified",
+      "seconds": 8.057,
+      "result_success": true,
+      "error": null,
+      "boundary": "Synthetic signed owner and outbound native Worker, actual anonymous public HTTPS, no real accounts or model acceptance",
+      "url": "https://example.com/",
+      "content_sha256": "29e6d07551de5e8454b60a550d4f2c576fc7f86fb7a2f820b390c548d45d55ec",
+      "truncated": false,
+      "sources": {
+        "oscar/browser_worker.py": "602772b2f1d0b52a2cd5cac934e547ab19fd996583e51e3055e8b21edba05d92",
+        "oscar/executive.py": "688c910896adfbcbbd22b26ec1c1f473660b06cea4b1a2048e766c13ee641f66",
+        "oscar/planner_authoring.py": "d04199bb8423516eb85699447532cf088c6ebd0965acae1e371e045ae027e222",
+        "oscar/planner_observations.py": "ce5fc1bd98f8c9f00cd72f96fd377451a52d4506fe0ff59a74f536e65805a7f9",
+        "oscar/remote_grid.py": "8b92cabee3e93c594539b3b7d813ce663bc55dbc080f30d04088fb506078815e",
+        "oscar/remote_machine.py": "b83854e59e4ffeca2e86ce91f9cfa26d219f51db26ab94e40a3a5a8ad6efec87"
+      },
+      "phase": "Primary752e583 with in-progress directory-observation changes; hashes identify actual source"
     }
   },
   "verified": [
@@ -47,6 +66,8 @@
   ],
   "log_sha256": {
     "browser-observations-final-focused.log": "56d8adee7bcf5f985920ae6b7f6e1f77428abaec4ff0b85e3f883cae5c4ec893",
-    "browser-observations-affected.log": "5073c64e5a0f0b6ec5d8430e67a923b5facf59ca6ae2937c20bc38c601cba054"
+    "browser-observations-affected.log": "5073c64e5a0f0b6ec5d8430e67a923b5facf59ca6ae2937c20bc38c601cba054",
+    "browser-public-https.log": "69e64daae807538452a0d8674db6f55781c329fa30faaf3cef288dd55b0e8bf3",
+    "browser-public-https.json": "62996ef71a0a2cdf1c38bd667f03e96800787a490ca6745e54e6ae3be81fcb22"
   }
 }

@@ -342,6 +342,18 @@ verified; a broader app objective still needs its own independent resulting-stat
 check. Adaptive prompts include a complete read-only response example; examples
 never expand the selected capabilities or authorize their placeholder arguments.
 
+## Scoped file discovery observations
+
+Adaptive Workers can list one authorized directory or search its filenames, then
+use separately verified names to choose the next read. Existing scoped-file
+implementations enforce directory/reparse boundaries and scan/result limits.
+Search uses a filename substring, not a glob or recursive content search. Both
+remote execution and independent readback reject more than 4 KiB of names; no
+silently truncated inventory reaches planning. A changed listing fails exact
+comparison. Current file-read authority and the same private-continuation
+checks apply before model disclosure and effects. This enables discovery → read
+→ act within one Worker, without granting arbitrary terminal output as context.
+
 ## Anonymous browser observations
 
 Adaptive Workers can read a scoped static page and independently repeat the read
