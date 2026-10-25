@@ -445,3 +445,11 @@ The adaptive aggregate ran 1,171 tests: 1,159 passed, ten skipped and two failed
 all 23 conversation tests then passed (26.533 s). The unchanged native visual/form
 modules passed four tests in isolation (9.991 s); the recurring foreground failure
 remains unexplained. No native guard was changed. This is not an aggregate PASS.
+
+**2026-10-25 MCP remote disconnect:** both token revocations use the validated
+authorization-server endpoint and unchanged public-client binding, after local
+authority withdrawal. HTTP acceptance is qualified; partial failure stays unknown.
+Interrupted revocation recovers through local deletion without remote replay.
+All 63 MCP/AuthBroker/Connections tests passed (75.370 s); mypy and Ruff passed.
+No real provider or native consent acceptance is claimed.
+[Receipt](../evidence/software-completion/mcp-revocation-2026-10-25.json).

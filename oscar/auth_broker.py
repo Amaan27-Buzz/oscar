@@ -288,7 +288,7 @@ class AuthBroker:
             if pending["state"] != "pending":
                 self.vault.delete(pending["verifier_ref"])
         for connection in self.store.all("auth_broker_connection"):
-            if connection["state"] in {"exchanging", "refreshing", "deleting"}:
+            if connection["state"] in {"exchanging", "refreshing", "deleting", "revoking"}:
                 if connection.get("account_id"):
                     self.accounts.disconnect(connection["account_id"])
                 for key in ("credential_ref", "refresh_ref"):
@@ -782,6 +782,13 @@ class AuthBroker:
             accepted = False
             for connection in connections:
                 provider = self.providers.get(connection.get("provider_id", ""))
+                if isinstance(provider, MCPProvider) and connection["state"] == "ready":
+                    connection["state"] = "revoking"
+                    self.store.put("auth_broker_connection", connection["id"], connection)
+                    try:
+                        accepted = self.mcp.revoke(connection, provider) or accepted
+                    except (KeyError, ValueError, OSError, PermissionError):
+                        pass
                 if (
                     isinstance(provider, OAuthProvider)
                     and provider.provider in {"google", "gitlab"}

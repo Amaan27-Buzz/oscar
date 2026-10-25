@@ -1,5 +1,12 @@
 # OSCAR — Current Status & Checklist
 
+**2026-10-25 MCP disconnect:** validated authorization-server revocation now
+attempts both stored tokens after local authority withdrawal. Partial acceptance
+and transport failure remain unknown; local deletion and interruption recovery
+never replay requests. All 63 affected tests passed (75.370 s). Provider HTTP 200
+is recorded as acceptance, not independent withdrawal proof. Real provider consent
+remains commissioning work. [Receipt](evidence/software-completion/mcp-revocation-2026-10-25.json).
+
 **2026-10-25 remote process artifact verification:** outbound coding and terminal
 execution now use a separately authorized file reader and Core comparison for
 literal expected artifacts. Signed phone/Core/model acceptance creates a named

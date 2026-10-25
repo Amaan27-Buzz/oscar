@@ -1,0 +1,37 @@
+{
+  "classification": "SYNTHETIC_LOCAL_SOFTWARE_VERIFIED",
+  "sources": {
+    "oscar/mcp_auth.py": "fc258fe93dd14082450cc9107e84943e57b0ece00d918e92af14ca8904ec6e40",
+    "oscar/auth_broker.py": "616b1ab703a49fad7e4bd15f097a5df64ba834a051a0e34d32b098d0b4576df9",
+    "tests/test_mcp_auth.py": "aed6ad1e48664e2a0e5766542b042154eabf28db62ae90ac7eb54bfe4e25370f",
+    "oscar/connections.py": "b612c719786e9f053e372a54d09c8031eb32e4a8038a66aba79c9ff78382ca55"
+  },
+  "checks": {
+    "affected": {
+      "state": "PASS",
+      "tests": 63,
+      "seconds": 75.37,
+      "modules": [
+        "tests.test_mcp_auth",
+        "tests.test_auth_broker",
+        "tests.test_connections",
+        "tests.test_mcp_client"
+      ],
+      "log_sha256": "7cb2c8fac39620fda013e242bccf00b32f0f5789746ec2ed4ed2037eac9eb17d"
+    },
+    "mypy": {
+      "state": "PASS",
+      "source_files": 104,
+      "log_sha256": "858ab8dceca8f18b2bc4df8afab8026e434e47b1f9a20a10f857f0d9f1d3505b"
+    },
+    "ruff": {
+      "state": "PASS"
+    }
+  },
+  "limits": [
+    "Synthetic HTTPS aliases mapped to loopback HTTP; no public DNS/TLS or real provider acceptance",
+    "HTTP 200 is provider acceptance, not independently verified resource-server withdrawal",
+    "No automatic remote retry after interruption, real credentials, owner activation or publication",
+    "Latest full aggregate retains unexplained native foreground failure; this affected regression is not a whole-product PASS"
+  ]
+}

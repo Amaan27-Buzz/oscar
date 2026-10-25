@@ -54,6 +54,9 @@ class MCPAuthorizationTests(unittest.TestCase):
         self.challenge_metadata = True
         self.sdk_calls = []
         self.token_override = {}
+        self.revocations = []
+        self.revocation_error = False
+        self.before_revoke = None
         fixture = self
 
         class Handler(BaseHTTPRequestHandler):
@@ -132,6 +135,12 @@ class MCPAuthorizationTests(unittest.TestCase):
                     self.respond(200, {"jsonrpc": "2.0", "id": message["id"], "result": result})
                     return
                 fields = parse_qs(self.rfile.read(int(self.headers["Content-Length"])).decode())
+                if self.path == "/revoke":
+                    fixture.revocations.append(fields)
+                    if fixture.before_revoke:
+                        fixture.before_revoke()
+                    self.respond(503 if fixture.revocation_error else 200, {})
+                    return
                 fixture.calls.append(fields)
                 if fixture.before_token:
                     fixture.before_token()
@@ -326,11 +335,135 @@ class MCPAuthorizationTests(unittest.TestCase):
         self.h.auth.recover()
         self.assertEqual("connected", self.h.accounts.get(account.id).status)
 
+    def test_signed_disconnect_requests_both_token_revocations_after_local_withdrawal(self):
+        self.fixture()
+        self.metadata["revocation_endpoint"] = "https://auth.example.com/revoke"
+        self.metadata["revocation_endpoint_auth_methods_supported"] = ["none"]
+        _, account = self.grant()
+
+        def withdrawn():
+            self.assertEqual("disconnected", self.h.accounts.get(account.id).status)
+            self.assertTrue(self.vault.values)
+
+        self.before_revoke = withdrawn
+        review = self.review("disconnect_account", "", account.id)
+        self.assertEqual([], self.revocations)
+        self.complete(review)
+        self.assertEqual(
+            ["refresh_token", "access_token"], [r["token_type_hint"][0] for r in self.revocations]
+        )
+        self.assertTrue(
+            all(set(r) == {"client_id", "token", "token_type_hint"} for r in self.revocations)
+        )
+        self.assertTrue(all(r["client_id"] == [self.provider.client_id] for r in self.revocations))
+        current = self.h.accounts.get(account.id)
+        self.assertEqual("PROVIDER_ACCEPTED_NOT_INDEPENDENTLY_VERIFIED", current.remote_revocation)
+        self.assertEqual("deleted", current.local_credentials)
+        self.assertFalse(self.vault.values)
+        self.h.auth.finish_disconnect(current)
+        self.h.auth.recover()
+        self.assertEqual(2, len(self.revocations))
+        self.assertNotIn(
+            "synthetic-mcp-access", json.dumps(self.h.store.all("auth_broker_connection"))
+        )
+
+    def test_remote_revoke_failure_still_deletes_local_tokens_and_never_retries(self):
+        self.fixture()
+        self.metadata["revocation_endpoint"] = "https://auth.example.com/revoke"
+        _, account = self.grant()
+        self.revocation_error = True
+        self.complete(self.review("disconnect_account", "", account.id))
+        current = self.h.accounts.get(account.id)
+        self.assertEqual("UNKNOWN_OWNER_ACTION_REQUIRED", current.remote_revocation)
+        self.assertFalse(self.vault.values)
+        self.h.auth.finish_disconnect(current)
+        self.assertEqual(2, len(self.revocations))
+
+    def test_partial_provider_acceptance_remains_unknown(self):
+        self.fixture()
+        self.metadata["revocation_endpoint"] = "https://auth.example.com/revoke"
+        _, account = self.grant()
+
+        def reject_second():
+            self.revocation_error = len(self.revocations) == 2
+
+        self.before_revoke = reject_second
+        self.complete(self.review("disconnect_account", "", account.id))
+        self.assertEqual(2, len(self.revocations))
+        self.assertFalse(self.vault.values)
+        self.assertEqual(
+            "UNKNOWN_OWNER_ACTION_REQUIRED", self.h.accounts.get(account.id).remote_revocation
+        )
+
+    def test_changed_client_configuration_cannot_receive_old_tokens(self):
+        from dataclasses import replace
+
+        self.fixture()
+        self.metadata["revocation_endpoint"] = "https://auth.example.com/revoke"
+        _, account = self.grant()
+        self.h.auth.providers[self.provider.id] = replace(self.provider, client_id="changed-client")
+        self.complete(self.review("disconnect_account", "", account.id))
+        self.assertEqual([], self.revocations)
+        self.assertFalse(self.vault.values)
+        self.assertEqual(
+            "UNKNOWN_OWNER_ACTION_REQUIRED", self.h.accounts.get(account.id).remote_revocation
+        )
+
+    def test_revocation_transport_exception_does_not_preserve_local_credentials(self):
+        self.fixture()
+        self.metadata["revocation_endpoint"] = "https://auth.example.com/revoke"
+        _, account = self.grant()
+        request = self.h.auth.mcp.request
+
+        def unavailable(url, fields=None):
+            if url.endswith("/revoke"):
+                raise RuntimeError("synthetic transport loss")
+            return request(url, fields)
+
+        self.h.auth.mcp.request = unavailable
+        self.complete(self.review("disconnect_account", "", account.id))
+        self.assertFalse(self.vault.values)
+        self.assertEqual(
+            "UNKNOWN_OWNER_ACTION_REQUIRED", self.h.accounts.get(account.id).remote_revocation
+        )
+
+    def test_interrupted_revocation_recovery_deletes_tokens_without_remote_replay(self):
+        self.fixture()
+        self.metadata["revocation_endpoint"] = "https://auth.example.com/revoke"
+        _, account = self.grant()
+
+        def interrupted(url, fields=None):
+            raise KeyboardInterrupt("synthetic process interruption")
+
+        self.h.auth.mcp.request = interrupted
+        with self.assertRaises(KeyboardInterrupt):
+            self.complete(self.review("disconnect_account", "", account.id))
+        self.assertTrue(self.vault.values)
+        with patch.object(self.h.auth.mcp, "request", side_effect=AssertionError("remote replay")):
+            self.h.auth.recover()
+        self.assertFalse(self.vault.values)
+        self.assertEqual("disconnected", self.h.accounts.get(account.id).status)
+
+    def test_public_client_cannot_borrow_confidential_revocation_credentials(self):
+        self.fixture()
+        self.metadata["revocation_endpoint"] = "https://auth.example.com/revoke"
+        self.metadata["revocation_endpoint_auth_methods_supported"] = ["client_secret_basic"]
+        _, account = self.grant()
+        self.complete(self.review("disconnect_account", "", account.id))
+        self.assertEqual([], self.revocations)
+        self.assertFalse(self.vault.values)
+        self.assertEqual(
+            "UNKNOWN_OWNER_ACTION_REQUIRED", self.h.accounts.get(account.id).remote_revocation
+        )
+
     def test_query_endpoints_and_untyped_or_incompatible_metadata_are_rejected(self):
         self.fixture()
         for key, invalid in (
             ("authorization_endpoint", "https://auth.example.com/authorize?client_id=other"),
             ("token_endpoint", "https://auth.example.com/token?resource=other"),
+            ("revocation_endpoint", "http://auth.example.com/revoke"),
+            ("revocation_endpoint", "https://auth.example.com/revoke?token=untrusted"),
+            ("revocation_endpoint_auth_methods_supported", "none"),
             ("code_challenge_methods_supported", "S256"),
             ("authorization_response_iss_parameter_supported", 1),
             ("token_endpoint_auth_methods_supported", ["client_secret_basic"]),

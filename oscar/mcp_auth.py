@@ -179,6 +179,10 @@ class MCPAuthorization:
             raise PermissionError("exact MCP issuer and PKCE S256 required")
         for key in ("authorization_endpoint", "token_endpoint"):
             validate_destination(https_endpoint(metadata.get(key)))
+        if "revocation_endpoint" in metadata:
+            validate_destination(https_endpoint(metadata["revocation_endpoint"]))
+        if "revocation_endpoint_auth_methods_supported" in metadata:
+            string_list(metadata["revocation_endpoint_auth_methods_supported"])
         for key, required in (
             ("token_endpoint_auth_methods_supported", "none"),
             ("response_types_supported", "code"),
@@ -194,6 +198,40 @@ class MCPAuthorization:
         if not set(recommended) <= set(provider.allowed_scopes):
             raise PermissionError("MCP resource permissions exceed configured ceiling")
         return {"metadata": metadata, "recommended": recommended}
+
+    def revoke(self, connection: dict[str, Any], provider: MCPProvider) -> bool:
+        """AS acceptance is not independent proof; local withdrawal already committed."""
+        metadata = connection["metadata"]
+        if (
+            connection["configuration"] != self.b._fingerprint(provider)
+            or not metadata.get("revocation_endpoint")
+            or "revocation_endpoint_auth_methods_supported" in metadata
+            and "none" not in string_list(metadata["revocation_endpoint_auth_methods_supported"])
+        ):
+            return False
+        endpoint = https_endpoint(metadata["revocation_endpoint"])
+        validate_destination(endpoint)
+        accepted = True
+        references = set()
+        for key, hint in (("refresh_ref", "refresh_token"), ("credential_ref", "access_token")):
+            reference = connection.get(key)
+            if not reference or reference in references:
+                continue
+            references.add(reference)
+            try:
+                response = self.request(
+                    endpoint,
+                    {
+                        "client_id": provider.client_id,
+                        "token": self.b.vault.read(reference, allow_expired=True).value,
+                        "token_type_hint": hint,
+                    },
+                )
+                accepted = response.status_code == 200 and accepted
+            except Exception:
+                # Remote failure must never prevent deletion of local credentials.
+                accepted = False
+        return accepted and bool(references)
 
     def begin(
         self, p: MCPProvider, scopes: frozenset[str], alias: str, account_id: str | None = None

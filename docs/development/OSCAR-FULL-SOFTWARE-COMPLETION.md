@@ -4,6 +4,11 @@ Updated 2026-10-24. **IMPLEMENTATION_IN_PROGRESS / SOFTWARE ACCEPTANCE PARTIAL.*
 Material executable work remains. This ledger does not declare
 `SOFTWARE_FEATURE_COMPLETE`, owner acceptance, hosted deployment or Gate E PASS.
 
+**2026-10-25 MCP remote disconnect:** validated public-client token revocation,
+qualified acceptance, local deletion and interruption/no-replay checks passed
+63 affected tests in 75.370 s. Real provider commissioning remains separate.
+[Receipt](../evidence/software-completion/mcp-revocation-2026-10-25.json).
+
 **2026-10-24 structured local planning:** native Executive drafts on configured
 structured Ollama routes now send a bounded steps-or-clarification JSON schema
 with temperature zero. This constrains decoding; native validation, selected

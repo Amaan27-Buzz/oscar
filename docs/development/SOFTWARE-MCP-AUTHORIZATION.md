@@ -90,8 +90,16 @@ automatically retried. Normal MCP dispatch/readback still rechecks account,
 generation, exact audience, credential ownership, reviewed consequences and Policy.
 
 Disconnect commits local revocation/generation fencing before credential I/O and
-checks local deletion by readback. Provider-side revocation remains `UNKNOWN` for
-this bounded adapter; no remote revocation claim is inferred from local deletion.
+checks local deletion by readback. A validated authorization-server revocation
+endpoint receives one request per stored refresh/access token under the unchanged
+public-client configuration. Both requests must return HTTP 200 to record
+`PROVIDER_ACCEPTED_NOT_INDEPENDENTLY_VERIFIED`; partial acceptance, unavailable
+endpoints, confidential-client requirements and transport failures leave remote
+revocation `UNKNOWN_OWNER_ACTION_REQUIRED`. Local deletion proceeds in every case.
+Persisted `revoking` state fences retries; interrupted requests recover by deleting
+local credentials, without replaying remote operations. Acceptance is not proof
+that every resource server has withdrawn the token. See
+[RFC 7009](https://www.rfc-editor.org/rfc/rfc7009.html).
 Already transmitted external effects cannot be recalled by local revocation.
 
 ## Bounds and evidence
@@ -99,8 +107,8 @@ Already transmitted external effects cannot be recalled by local revocation.
 This implementation supports preregistered public clients, queryless HTTPS
 metadata endpoints and exact registered IPv4-loopback native callbacks. Dynamic
 client registration, Client ID Metadata Documents, confidential-client auth,
-incremental scope challenges during tool execution, automatic refresh and remote
-provider revocation are unsupported. Unavailable metadata or unsupported provider
+incremental scope challenges during tool execution and automatic refresh are
+unsupported. Unavailable metadata or unsupported provider
 contracts fail closed. Real provider registrations, real account consent, public
 TLS deployment and physical phone browser/OEM behavior remain commissioning work.
 
