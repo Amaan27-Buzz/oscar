@@ -1014,16 +1014,12 @@ class RemoteGrid:
             else:
                 from .planner_authoring import PlannerAuthoring
 
-                planned = (
-                    None
-                    if decide(Intent(payload["text"])).capability_kind == "memory"
-                    else PlannerAuthoring(self.h).conversation(
-                        payload["text"],
-                        session.node_id,
-                        session.id,
-                        "grid:approve",
-                        frozenset(self.store.get("session", session.id)["scopes"]),
-                    )
+                planned = PlannerAuthoring(self.h).conversation(
+                    payload["text"],
+                    session.node_id,
+                    session.id,
+                    "grid:approve",
+                    frozenset(self.store.get("session", session.id)["scopes"]),
                 )
                 if planned is not None:
                     return planned
@@ -1787,7 +1783,7 @@ class RemoteGrid:
                 for c in self.store.get("node", session.node_id)["capabilities"]
                 if c["id"] == action["capability_id"]
             )
-            authorize_step(self.store, self.grid, task.id, capability, session)
+            authorize_step(self.store, self.grid, task.id, capability, session, self.h.memory)
             device = self.require(session, "execute")
             objective = self.store.get("objective", task.objective_id)
             parameters = action["parameters"]
@@ -1928,7 +1924,9 @@ class RemoteGrid:
         if binding.get("source") == "executive":
             from .executive import authorize_step
 
-            authorize_step(self.store, self.grid, row["task_id"], binding["capability"], session)
+            authorize_step(
+                self.store, self.grid, row["task_id"], binding["capability"], session, self.h.memory
+            )
         else:
             self.h.archive.event(binding["event_id"])
         task = self.store.task(row["task_id"])

@@ -1,0 +1,55 @@
+{
+  "classification": "SYNTHETIC_PRIVATE_MEMORY_EXECUTION_VERIFIED_FULL_REGRESSION_PENDING",
+  "sources": {
+    "oscar/planner_memory.py": "7f322d4ed26376b6a1decb9635887c2363e6f55a8617fef32b3303a78b1c190e",
+    "oscar/planner_authoring.py": "5138bcf916bcf1122ff455615de9e006a4d42cbe11193862341b006b032c02f2",
+    "oscar/harness.py": "2da1b3eb954e10686fede8f1e94733602683a12627cb8bf4576bdfc69942f3c4",
+    "oscar/executive.py": "d7db226a5cdd271fe4777de3e09cc09f4858bffe10e69442947ceb62f522fe10",
+    "oscar/transport.py": "c9871c90994fdb0d44876fb6a2503152696e0962242a96c40f00d08445b64e27",
+    "oscar/remote_grid.py": "33c4e6ab97615b83b82ac41763efc06924a2b82da7d2411c961135891056e2ab",
+    "tests/test_planner_memory.py": "4e23fe8927957ece900e7d9fc2e4b9d8944346c8ba8234decc824e61a2707d04",
+    "tests/test_conversation_planning.py": "fe29b5c7c7d64a5acca07d9ef79988fec32244c248db3848eb314e69d933ed1c"
+  },
+  "checks": {
+    "final_planning_recall": {
+      "state": "PASS",
+      "tests": 51,
+      "seconds": 51.239
+    },
+    "earlier_affected": {
+      "state": "PASS",
+      "tests": 188,
+      "seconds": 183.066,
+      "phase": "Spanned final remote entrypoint and test update; final regression has separate fixed sources"
+    },
+    "static": {
+      "ruff": "PASS",
+      "mypy_sources": 105,
+      "repository": "PASS",
+      "diff_check": "PASS"
+    },
+    "full_regression": {
+      "state": "PENDING",
+      "log": ".oscar/memory-aggregate.log"
+    }
+  },
+  "log_sha256": {
+    "memory-final-planning.log": "bcfbe46a46d6221f99f5ad9a03a84c39ce78f3a1c4c6794e7af2348a1d9b63be",
+    "memory-execution-affected.log": "3c4c1cd651888d9c99472ac70c3352f8aa40afa69f878ddc7bb52266579da574"
+  },
+  "verified": [
+    "Signed Ask private recall then actual file effect and independent readback",
+    "Signed Full includes memory.recall plus effect authority; no per-action reviews",
+    "Phone to Core private sourced planning to outbound Worker and independent file readback",
+    "Forget, correction, missing scope/capability, policy denial and empty recall stop dependent work",
+    "Recalled history composes with verified tool observations, without promoting historical truth",
+    "Durable plans contain canonical source references and digests rather than copied recalled content"
+  ],
+  "limits": [
+    "Synthetic owners/model HTTP, not general installed-model semantic acceptance",
+    "Missing supported history is UNKNOWN, including conservative preflight false positives",
+    "Current retrieval/source drift stops existing work and requires fresh review, not silent adoption",
+    "Broader model/app and image-grounded execution, requested integrations, Chief of Staff and native whole-product acceptance remain open",
+    "No physical devices, real account authentication, owner activation, cloud provisioning or GitHub publication"
+  ]
+}

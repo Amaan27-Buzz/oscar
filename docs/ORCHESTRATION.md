@@ -342,6 +342,25 @@ verified; a broader app objective still needs its own independent resulting-stat
 check. Adaptive prompts include a complete read-only response example; examples
 never expand the selected capabilities or authorize their placeholder arguments.
 
+## Memory-dependent execution
+
+Execution requests can pass Controller memory preflight and continue into the
+same reviewed Worker. This requires the current Core `memory.recall` capability,
+independent `memory:read` permission and, for Full Access, explicit standing
+coverage of recall as well as the selected actions. Pure recall, live-state and
+verification questions retain their Controller routes.
+
+Before planning, bounded sourced recall selects at most 8 KiB of history.
+Only private model routes may receive it. Values retain their actual epistemic
+and source states; history is untrusted data, never current truth or permission.
+Durable plans and continuation goals retain source IDs and digests rather than
+another copy of memory content. Each model boundary and effect rechecks current
+recall authority, the selected capability contract and canonical retrieval/source
+digests. Forgetting, correction, expiry, policy denial or source drift stops the
+pending work. Empty retrieval is UNKNOWN and blocks dependent execution; it does
+not prove no relevant history ever existed. Verified tool observations can be
+combined with recalled history without promoting the latter into verified truth.
+
 ## Voice-driven orchestration
 
 Voice commands enter the same task/orchestration contracts as text.

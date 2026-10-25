@@ -485,5 +485,26 @@ attempts failed on JSON or invalid intent, before launch. A conservative memory
 preflight on “before launch” also found no authorized recall scope: memory-dependent
 execution continuation is still an executable gap. Docker Linux verification was
 unavailable because its existing daemon was stopped. Fresh full Windows regression
-is running; do not claim it passed until its receipt is complete.
+completed at `126b6b6`: 1,186 tests, 1,176 passed, ten skipped and zero failures or
+errors (804.833 s), with unchanged source hashes. The earlier memory-dependent
+execution gap is addressed by the following checkpoint, with separate evidence.
 [Evidence](../evidence/software-completion/app-observations-2026-10-25.json).
+
+**2026-10-25 sourced memory execution:** Controller preflight now feeds bounded
+canonical recall into private planning, and phone submission no longer bypasses
+the planner for memory-dependent action requests. Pure recall/live/verify routes
+remain separate. Ask reviews model input and effects; Full additionally requires
+standing coverage of `memory.recall`. Local and remote signed synthetic flows
+read back actual output. Correction, forgetting, withdrawn permissions/capability,
+policy denial and absent recall block I/O/effects; history stays RECALLED/INFERRED
+according to its actual source state. References/digests persist instead of copied
+memory content. Recall also composes with verified tool observation stages.
+
+Final planning/recall regression passed 51 tests (51.239 s). An earlier 188-case
+affected run passed (183.066 s), spanning the last remote-route/test update;
+the final source-stable full regression remains pending in the local checkout.
+Do not claim its result until the manifest exists. Remaining software includes
+broader real-model semantic/structured-output and app acceptance, image-grounded
+computer use, wider requested integrations, broader Chief-of-Staff decision and
+replanning, and current native whole-product acceptance. Credentialed/provider,
+Oracle, physical and audio commissioning restrictions remain.

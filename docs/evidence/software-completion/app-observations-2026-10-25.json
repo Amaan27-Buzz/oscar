@@ -40,6 +40,16 @@
     "linux": {
       "state": "UNAVAILABLE",
       "reason": "Existing Docker Desktop Linux engine named pipe absent; daemon stopped. No Linux acceptance inferred."
+    },
+    "aggregate": {
+      "state": "PASS",
+      "tests": 1186,
+      "passed": 1176,
+      "skipped": 10,
+      "failures": 0,
+      "seconds": 804.833,
+      "source_stable": true,
+      "head": "126b6b6980f7e61b4e5c4f6572ed2c7330eebc9c"
     }
   },
   "log_sha256": {
@@ -50,7 +60,9 @@
     "preflight_block": "379a8a433a9f99026f66d35eca1fe5983054cc4356b442d4cc1599b5725418bf",
     "model_baseline_failure": "5875a7816697de1f508ace516ddf0bcae895a4183b88677b5582f5c4cf11fc8f",
     "model_launch_contract_rejection": "28d647cf9a64941930d8e12e734fe35e38309f138ad4db30637e12a74bac9f97",
-    "model_launch_shape_failure": "5875a7816697de1f508ace516ddf0bcae895a4183b88677b5582f5c4cf11fc8f"
+    "model_launch_shape_failure": "5875a7816697de1f508ace516ddf0bcae895a4183b88677b5582f5c4cf11fc8f",
+    "aggregate": "2b965ca5877be5f421f37dfb9fdbbc3185f941f0c1f97928043193902d9d9b47",
+    "aggregate_manifest": "f19bc46cdd3b97366c269649b35c57cf50184165e02de0d52343eda84a776a1b"
   },
   "limits": [
     "Synthetic registered app identities and signed owners; no owner app inventory or real accounts inspected",
@@ -58,6 +70,6 @@
     "A goal containing before launch hit conservative memory preflight and lacked recall scope; memory-dependent execution continuation remains unfinished",
     "Native launch alone remains partially verified; synthetic marker readback proves the test process executed, not a general app objective",
     "No physical phone, microphone/camera, real owner activation, cloud provisioning or GitHub publication",
-    "Fresh full Windows regression pending; prior 1180-case regression qualifies checkpoint 32e7161"
+    "Full Windows regression passed 1186 cases at 126b6b6; later memory execution has separate evidence"
   ]
 }

@@ -266,9 +266,8 @@ class PlannerAuthoring:
             )
             decision = decide(Intent(goal), names)
             if (
-                decision.memory_required
-                or decision.route
-                in {DecisionRoute.WORLD, DecisionRoute.RECALL, DecisionRoute.VERIFY}
+                decision.route in {DecisionRoute.WORLD, DecisionRoute.VERIFY}
+                or goal.casefold().startswith(("recall ", "remember "))
                 or not (
                     delegated
                     or targets is not None
@@ -372,6 +371,19 @@ class PlannerAuthoring:
                         and c["id"] == "machine.command"
                     )
                 ]
+                recalls = (
+                    [
+                        c
+                        for c in available
+                        if c["id"] == "memory.recall" and c["node_id"] == self.h.node_id
+                    ]
+                    if decision.memory_required
+                    else []
+                )
+                if decision.memory_required and len(recalls) != 1:
+                    raise PermissionError(
+                        "Current scoped memory recall is required for this objective."
+                    )
                 duplicates = {
                     c["input_kind"]
                     for c in actions
@@ -408,7 +420,7 @@ class PlannerAuthoring:
                         "adaptive": True,
                         "capabilities": [
                             {"node_id": c["node_id"], "capability_id": c["id"]}
-                            for c in [planners[0], *actions]
+                            for c in [planners[0], *actions, *recalls]
                         ],
                     },
                 }
@@ -577,6 +589,32 @@ class PlannerAuthoring:
             if mode not in {"auto", "private"}:
                 raise ValueError("choose private or configured routing explicitly")
             pins = [self.descriptor(c) for c in caps if c != planner]
+            from .memory_fabric import memory_preflight
+
+            aliases = tuple(
+                r[0]
+                for r in h.archive.db.execute(
+                    "SELECT alias FROM archive_aliases WHERE relationship=? LIMIT 1000",
+                    (h.runtime.relationship_id,),
+                )
+            )
+            memory_refs = None
+            if memory_preflight(value["goal"], aliases):
+                from .planner_memory import retrieve
+
+                if (
+                    "memory:read" not in grants
+                    or not any(
+                        c["id"] == "memory.recall" and c["node_id"] == h.node_id for c in caps
+                    )
+                    or executor.grid is not h.grid
+                    or executor.memory is not h.memory
+                ):
+                    raise PermissionError(
+                        "Select current Core memory recall and private memory routing."
+                    )
+                memory_refs, _ = retrieve(h.memory, h.runtime.relationship_id, value["goal"])
+                mode = "private"
             step = h.executive.planning_step(
                 value["goal"],
                 pins,
@@ -587,6 +625,8 @@ class PlannerAuthoring:
                 adaptive=value.get("adaptive", False),
             )
             parameters = step["intent"]["parameters"]
+            if memory_refs is not None:
+                parameters["memory_refs"] = memory_refs
             if value.get("adaptive"):
                 parameters["prompt"] += (
                     '\nIf verified tool data is needed, return {"steps":[...],"observe":true}. '
@@ -631,13 +671,22 @@ class PlannerAuthoring:
                 "sources": sources,
                 "observation_sources": observation_sources,
                 "model_configuration": executor.planning_configuration(),
+                **({"memory_refs": memory_refs} if memory_refs is not None else {}),
                 "privacy": (
-                    "Only this goal and selected capability descriptors are model input. "
+                    (
+                        "This goal, selected capability descriptors and up to 8 KiB of sourced "
+                        "RECALLED history go only to private model sources. History is not current "
+                        "truth or authority. "
+                        if memory_refs is not None
+                        else "Only this goal and selected capability descriptors are model input. "
+                    )
                     + (
                         "Adaptive stages may send up to four verified tool text results "
                         "(16 KiB total) to the selected private model sources. "
-                        "No ambient context or memories are attached."
+                        "No ambient context is attached."
                         if value.get("adaptive")
+                        else "No files or ambient context are attached."
+                        if memory_refs is not None
                         else "No files, memories or ambient context are attached."
                     )
                 ),
@@ -689,6 +738,12 @@ class PlannerAuthoring:
                 h.store.get("session", owner["session"])["scopes"]
             ) & frozenset(h.store.get("node", owner["node"])["scopes"])
             caps = self.capabilities(row["capabilities"], grants & original_grants)
+            if row.get("memory_refs"):
+                from .planner_memory import retrieve
+
+                current_refs, _ = retrieve(h.memory, h.runtime.relationship_id, row["goal"])
+                if current_refs != row["memory_refs"]:
+                    raise PermissionError("Planning memory changed; retrieve and review again.")
             if row["contracts"] != [digest(c) for c in caps]:
                 raise PermissionError("planning capability contracts changed")
             if row.get("observation_pending"):
@@ -847,6 +902,7 @@ class PlannerAuthoring:
                     "planning_step": state["step"],
                     "observation_sources": state["observation_sources"],
                     "stage": 0,
+                    **({"memory_refs": state["memory_refs"]} if state.get("memory_refs") else {}),
                     **({"delegation": owner["standing"]} if owner.get("standing") else {}),
                 },
             )
@@ -903,6 +959,13 @@ class PlannerAuthoring:
                 draft["id"],
                 {**draft, "state": "paused" if state.get("observe") else "reported"},
             )
+        memory_refs = (
+            state.get("memory_refs") if operation == "plan_draft" else row.get("memory_refs")
+        )
+        if memory_refs:
+            proposal["memory_refs"] = memory_refs
+            proposal["review_digest"] = h.executive._review(proposal)
+            h.store.put("executive_goal", proposal["id"], proposal)
         h.executive.accept(proposal["id"], proposal["review_digest"], owner_authorized=True)
         h.store.put(
             "executive_owner", proposal["id"], {**owner, "review_digest": proposal["review_digest"]}

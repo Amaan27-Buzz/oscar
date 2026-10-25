@@ -5,12 +5,12 @@ import json
 import sys
 import unittest
 from dataclasses import asdict, replace
-from time import monotonic, sleep
+from time import monotonic, sleep, time
 
 from oscar.contracts import Capability, new_id
 from oscar.credentials import CredentialPool
 from oscar.desktop import Desktop
-from oscar.event_archive import SourceEvent
+from oscar.event_archive import MemoryWriter, SourceEvent
 from oscar.grid import Node, NodeRole
 from oscar.harness import ModelExecutor
 from oscar.jev import Intent
@@ -485,12 +485,14 @@ class ConversationPlanningTests(unittest.TestCase):
         for text in (
             "2 + 3",
             "What did we decide?",
-            "Prepare the same report as last time",
             "Prepare a report about the current weather",
             "Explain how a compiler works",
         ):
             with self.subTest(text=text):
                 self.assertIsNone(self.conversation(text))
+        recall = self.conversation("Prepare the same report as last time")
+        self.assertEqual("blocked", recall["state"])
+        self.assertIn("scoped memory recall", recall["message"])
         result = self.conversation("Send a message to the university account")
         self.assertEqual("blocked", result["state"])
         self.assertIn("exact available account", result["message"])
@@ -582,7 +584,10 @@ class RemoteConversationPlanningTests(unittest.TestCase):
     def test_authenticated_cross_device_result_handoff(self):
         self.remote_workflow(handoff=True)
 
-    def remote_workflow(self, handoff=False):
+    def test_recalled_owner_preference_reaches_remote_worker_with_private_provenance(self):
+        self.remote_workflow(recalled=True)
+
+    def remote_workflow(self, handoff=False, recalled=False):
         h = self.core.harness
         provider_fixture.ProviderContractTests.setUp(self)
         provider = replace(self.provider, credential_envs={"synthetic": "SYNTHETIC_PLANNER"})
@@ -602,8 +607,27 @@ class RemoteConversationPlanningTests(unittest.TestCase):
             Router(Registry([provider], [model]), pool, {"openai": HTTPAdapter("openai")}, h.store),
             ModelRequest("template", "template", "", max_output_tokens=2048),
             RoutingPolicy(),
+            grid=h.grid,
+            memory=h.memory,
         )
         h.dispatcher.executors["models.reason"] = executor
+        if recalled:
+            for kind, identifier in (
+                ("session", self.mobile.handle.id),
+                ("node", self.mobile.handle.node_id),
+            ):
+                row = h.store.get(kind, identifier)
+                h.store.put(kind, identifier, {**row, "scopes": [*row["scopes"], "memory:read"]})
+            event = SourceEvent(
+                "owner",
+                "My preferred welcome is Synthetic remote welcome",
+                "synthetic-owner",
+                time() - 10,
+            )
+            h.archive.append(event, retain_authorized=True)
+            MemoryWriter(h.archive).retain(
+                (event.id,), event.content, "preference", retain_authorized=True, inferred=False
+            )
         self.body["choices"][0]["message"]["content"] = json.dumps(
             [
                 {
@@ -672,15 +696,21 @@ class RemoteConversationPlanningTests(unittest.TestCase):
         first = ask(
             "Across devices " + h.node_id + ", test-desktop: Calculate 17 + 25, then save result"
             if handoff
+            else "On device test-desktop: Write welcome.txt using my preferred welcome"
+            if recalled
             else "On device test-desktop: Prepare a welcome note and save it as welcome.txt"
         )
         self.assertEqual([], self.requests)
+        self.assertIn("assistance_proposal", first)
         approve(first["assistance_proposal"])
         until = monotonic() + 8
         while monotonic() < until and not self.requests:
             h.executive.tick()
             sleep(0.02)
         self.assertEqual(1, len(self.requests))
+        if recalled:
+            self.assertIn("My preferred welcome", json.dumps(self.requests))
+            self.assertIn(event.id, json.dumps(self.requests))
         second = ask("Proceed with the plan")["assistance_proposal"]
         path = self.workspace / "welcome.txt"
         self.assertFalse(path.exists())

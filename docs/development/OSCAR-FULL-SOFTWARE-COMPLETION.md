@@ -1,5 +1,19 @@
 # OSCAR full software completion — active local ledger
 
+**2026-10-25 execution continuation update:** registered native app discovery and
+launch admission are integrated locally at `126b6b6`. Its source-stable Windows
+aggregate passed 1,186 tests (1,176 passed, ten skipped, zero failures/errors;
+804.833 s). Real Qwen app execution did not pass: malformed JSON or invalid typed
+launch intents were rejected. Installed-model arithmetic/private continuation
+and file readback passed; do not generalize this into broad app/model acceptance.
+
+Sourced memory preflight now continues into private Worker planning and remote
+execution. Synthetic owners/model HTTP prove local and phone–Core–outbound
+Worker execution, correction/forget/authority fences and composition with
+verified tool observations. Final planning/recall tests passed 51 cases; a new
+source-stable full regression is pending. This remains implementation in progress,
+not completion of the full mandate or owner/physical/provider commissioning.
+
 Updated 2026-10-24. **IMPLEMENTATION_IN_PROGRESS / SOFTWARE ACCEPTANCE PARTIAL.**
 Material executable work remains. This ledger does not declare
 `SOFTWARE_FEATURE_COMPLETE`, owner acceptance, hosted deployment or Gate E PASS.

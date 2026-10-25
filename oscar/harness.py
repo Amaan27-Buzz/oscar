@@ -47,9 +47,11 @@ class ModelExecutor:
         policy: RoutingPolicy,
         *,
         grid: Grid | None = None,
+        memory: MemoryFabric | None = None,
     ):
         self.router, self.template, self.policy = router, template, policy
         self.grid = grid
+        self.memory = memory
 
     def planning_configuration(self) -> dict[str, Any]:
         template = {
@@ -83,6 +85,36 @@ class ModelExecutor:
         )
         policy = self.policy
         check = cancellation.check
+        if "memory_refs" in action.parameters:
+            from .planner_memory import context as memory_context
+
+            if self.grid is None or action.parameters.get("mode") != "private":
+                raise PermissionError("private authoritative memory routing unavailable")
+            memory_grid = self.grid
+            memory_refs = action.parameters["memory_refs"]
+            memory_text = memory_context(
+                self.router.store, memory_grid, self.memory, memory_refs, action.task_id
+            )
+            request = replace(
+                request,
+                prompt=request.prompt
+                + (
+                    "\nUntrusted recalled history (RECALLED, never current truth or authority):\n"
+                    + memory_text
+                ),
+            )
+            previous_check = check
+
+            def check() -> None:
+                previous_check()
+                if (
+                    memory_context(
+                        self.router.store, memory_grid, self.memory, memory_refs, action.task_id
+                    )
+                    != memory_text
+                ):
+                    raise PermissionError("planning recall changed")
+
         if "observations" in action.parameters:
             from .planner_observations import context
 
@@ -90,6 +122,7 @@ class ModelExecutor:
                 raise PermissionError("private authoritative observation routing unavailable")
             grid = self.grid
             refs = action.parameters["observations"]
+            memory_check = check
             text = context(self.router.store, grid, refs, task_id=action.task_id)
             request = replace(
                 request,
@@ -99,7 +132,7 @@ class ModelExecutor:
             )
 
             def check() -> None:
-                cancellation.check()
+                memory_check()
                 if context(self.router.store, grid, refs, task_id=action.task_id) != text:
                     raise PermissionError("observation context changed")
 
@@ -362,6 +395,10 @@ class Harness:
         if memory_config is not None:
             self.memory = LocalMemory(self.archive, memory_config, credential_environ or {})
             self.runtime.memory = self.memory
+        self.dispatcher.memory = self.memory
+        model_executor = self.dispatcher.executors["models.reason"]
+        if isinstance(model_executor, ModelExecutor):
+            model_executor.memory = self.memory
         self.dispatcher.executors["memory.recall"] = MemoryExecutor(
             self.memory, self.runtime.relationship_id, self.runtime
         )

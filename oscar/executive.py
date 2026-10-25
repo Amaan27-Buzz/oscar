@@ -21,6 +21,7 @@ from .transport import Dispatcher, Transport
 from .world_model import reference
 
 if TYPE_CHECKING:
+    from .memory_fabric import MemoryFabric
     from .runtime import Runtime
 
 
@@ -46,6 +47,7 @@ def authorize_step(
     task_id: str,
     capability: dict[str, Any],
     executor: SessionHandle | None = None,
+    memory: "MemoryFabric | None" = None,
 ) -> None:
     binding = store.get("plan", task_id)["executive"]
     from .executive_inputs import check_inputs
@@ -53,6 +55,10 @@ def authorize_step(
     check_inputs(store, binding)
     worker = store.get("executive_worker", binding["worker_id"])
     goal = store.get("executive_goal", binding["goal_id"])
+    if "memory_refs" in goal:
+        from .planner_memory import context as memory_context
+
+        memory_context(store, grid, memory, goal["memory_refs"], task_id)
     if "observations" in goal:
         from .planner_observations import context
 
@@ -1337,7 +1343,12 @@ class Executive:
                         if self.store.task(task.id).state == TaskState.PLANNED:
                             self.store.put("executive_context", task.id, {"fences": fences})
                     authorize_step(
-                        self.store, self.grid, task.id, capability, self.targets[step["node_id"]][1]
+                        self.store,
+                        self.grid,
+                        task.id,
+                        capability,
+                        self.targets[step["node_id"]][1],
+                        self.runtime.memory,
                     )
                     if self.stop.is_set():
                         break

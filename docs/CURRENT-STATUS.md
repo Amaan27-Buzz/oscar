@@ -1,5 +1,13 @@
 # OSCAR — Current Status & Checklist
 
+**2026-10-25 memory-dependent execution:** sourced recall now connects to private
+Worker planning and cross-device execution, with independent read authority,
+canonical source checks, correction/forget fences and explicit Full delegation
+coverage. Synthetic model/owner tests verify the local and phone–Core–outbound
+Worker paths; this is not broad real-model acceptance. Final affected and full
+regression results are recorded in the completion handoff and matching receipt.
+[Contract](ORCHESTRATION.md#memory-dependent-execution).
+
 **2026-10-25 registered-app observations:** scoped private plans can now query
 registered Windows targets, independently recheck the result and propose launch
 using an exact returned app ID. Eight-target/4-KiB bounds, explicit truncation,
@@ -10,6 +18,10 @@ cases and six final native cases passed. Real Qwen repeated arithmetic observati
 and exact file proof (8.073 s), but did not pass the app launch objective: malformed
 JSON or an invalid intent was rejected. Broad app/model accuracy remains open.
 [Receipt](evidence/software-completion/app-observations-2026-10-25.json).
+
+The matching unchanged-source Windows aggregate passed 1,186 tests: 1,176 passed,
+ten skipped, zero failures/errors (804.833 s). This qualifies registered-app
+checkpoint `126b6b6`; later memory execution changes have separate verification.
 
 **2026-10-25 explicit Worker routing:** named Worker and device requests now
 reach reviewed planning even when the goal starts with “First”, while retaining

@@ -8,7 +8,10 @@ from http.client import HTTPException
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from threading import Thread
 from time import time
-from typing import Any, Protocol
+from typing import TYPE_CHECKING, Any, Protocol
+
+if TYPE_CHECKING:
+    from .memory_fabric import MemoryFabric
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, build_opener
 
@@ -54,6 +57,7 @@ class Dispatcher:
     ):
         self.store, self.grid, self.node_id, self.executors = store, grid, node_id, executors
         self.pause_semantics = pause_semantics
+        self.memory: MemoryFabric | None = None
 
     def invoke(self, envelope: Envelope, session: SessionHandle) -> Result:
         envelope = Envelope.parse(record(envelope))
@@ -101,7 +105,9 @@ class Dispatcher:
             if plan.get("executive"):
                 from .executive import authorize_step
 
-                authorize_step(self.store, self.grid, action.task_id, candidates[0], session)
+                authorize_step(
+                    self.store, self.grid, action.task_id, candidates[0], session, self.memory
+                )
 
         cancellation = Cancellation(self.store, action.task_id, authorize_execution)
         cancellation.check()
