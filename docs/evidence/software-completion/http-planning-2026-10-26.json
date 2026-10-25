@@ -37,6 +37,18 @@
       "rendered_native_acceptance": false,
       "real_model_or_provider": false,
       "seconds": 0.71
+    },
+    "full_regression": {
+      "base_head": "1996328d3e1a7b29bffeb95e827149272858a367",
+      "total": 1265,
+      "passed": 1255,
+      "skipped": 10,
+      "failed": 0,
+      "errors": 0,
+      "test_seconds": 911.715,
+      "wrapper_seconds": 915.73,
+      "source_stable": true,
+      "qualification": "Both native image and older visual workflows passed on this run. Earlier intermittent foreground failures and stale-frame ambiguity remain unproven; no general reliability or owner acceptance claim."
     }
   },
   "sources": {
@@ -56,13 +68,14 @@
     ".oscar/http-planning-integration-manifest.json": "2a3a5537dcefb6e37c9f1fbbf0d46dea755a219e163d1e03104d8cc204e0c1f0",
     ".oscar/http-desktop-protocol.py": "5beb60d52af87f5da46833c447f3e54322447310829a1d2feb4249faf31d568d",
     ".oscar/http-desktop-protocol-final.log": "ec02b6b8a00e884150af1f588cf139c46e96d4f208581fadfaab6574d59b660f",
-    ".oscar/http-desktop-protocol.json": "e1fcf3bbb52e698a79090c16df5e8462fd5c438ce984670be163c898f45b1ed1"
+    ".oscar/http-desktop-protocol.json": "e1fcf3bbb52e698a79090c16df5e8462fd5c438ce984670be163c898f45b1ed1",
+    ".oscar/http-planning-full-regression.log": "8a76855ca867c410510424496424c1e73491b21bca0bbcb214030fff516a0e0e",
+    ".oscar/http-planning-full-regression-manifest.json": "335cbbb3d694df3da22d8618a49791ad4c1ab0006bd740f6ad0a7afa20142225"
   },
   "limits": [
     "Synthetic model HTTP, provider HTTP and owners; not real provider/OAuth/model commissioning or rendered native acceptance",
     "Endpoint envelope does not provide provider body-field semantics; exact arguments are reviewed and generic outcomes remain PARTIALLY_VERIFIED",
     "Immediate literal requests only; adaptive connector observation and result-substitution workflows remain unsupported",
-    "No fresh full regression; preceding 1257-case aggregate has one native focus failure and remains PARTIAL",
     "No push, Actions, real accounts, physical devices, production activation or cloud provisioning"
   ]
 }
