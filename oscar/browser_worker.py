@@ -127,8 +127,10 @@ def origin(url: str) -> str:
 
 
 def validate(request: dict[str, Any]) -> None:
-    if set(request) != {"origins", "steps", "timeout", "max_text"}:
+    if set(request) - {"read_only"} != {"origins", "steps", "timeout", "max_text"}:
         raise ValueError("invalid browser plan fields")
+    if "read_only" in request and request["read_only"] is not True:
+        raise ValueError("explicit read-only browser observation required")
     if not isinstance(request["origins"], list) or not 1 <= len(request["origins"]) <= 8:
         raise ValueError("bounded explicit origins required")
     if any(origin(url) != url for url in request["origins"]):
@@ -138,6 +140,17 @@ def validate(request: dict[str, Any]) -> None:
     if type(request["max_text"]) is not int or not 1 <= request["max_text"] <= 16_000:
         raise ValueError("bounded DOM text required")
     steps = request["steps"]
+    if request.get("read_only") and (
+        len(request["origins"]) != 1
+        or request["timeout"] > 15
+        or request["max_text"] > 2048
+        or not isinstance(steps, list)
+        or len(steps) != 2
+        or not isinstance(steps[0], dict)
+        or steps[0].get("operation") != "navigate"
+        or steps[1] != {"operation": "inspect"}
+    ):
+        raise ValueError("one bounded anonymous static-page observation required")
     if not isinstance(steps, list) or not 1 <= len(steps) <= 32:
         raise ValueError("bounded browser steps required")
     fields = {
@@ -244,8 +257,23 @@ def visual_snapshot(page: Any) -> tuple[bytes, dict[str, Any]]:
     return data, {"url": page.url, "sha256": hashlib.sha256(data).hexdigest(), **viewport}
 
 
+def static_observation(parameters: dict[str, Any]) -> bool:
+    request = parameters.get("request")
+    if (
+        set(parameters) != {"request"}
+        or not isinstance(request, dict)
+        or request.get("read_only") is not True
+    ):
+        return False
+    validate(request)
+    return True
+
+
 def run(request: dict[str, Any], root: Path, *, profile: Path | None = None) -> dict[str, Any]:
     validate(request)
+    read_only = request.get("read_only", False)
+    if read_only and profile is not None:
+        raise PermissionError("static observations cannot use an authenticated profile")
     sync_playwright = playwright_runtime()
 
     started = monotonic()
@@ -268,7 +296,11 @@ def run(request: dict[str, Any], root: Path, *, profile: Path | None = None) -> 
                 )
             else:
                 browser = playwright.chromium.launch(headless=True, env=env)
-                context = browser.new_context(accept_downloads=False, service_workers="block")
+                context = browser.new_context(
+                    accept_downloads=False,
+                    service_workers="block",
+                    java_script_enabled=not read_only,
+                )
         except Exception as error:
             if browser:
                 browser.close()
@@ -278,6 +310,8 @@ def run(request: dict[str, Any], root: Path, *, profile: Path | None = None) -> 
         def authorize_route(route: Any) -> None:
             try:
                 permitted = origin(route.request.url) in request["origins"]
+                if read_only and route.request.method not in {"GET", "HEAD"}:
+                    permitted = False
             except ValueError:
                 permitted = False
             route.continue_() if permitted else route.abort()
@@ -371,21 +405,35 @@ def run(request: dict[str, Any], root: Path, *, profile: Path | None = None) -> 
                 elif operation == "inspect":
                     # Fixed bounded evaluation avoids retrieving an entire unbounded DOM first.
                     snapshot = page.evaluate(
-                        """limit => {
+                        """({limit,readOnly}) => {
                         const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);
-                        let text='',n,count=0;
-                        while((n=walker.nextNode()) && count++<2000 && text.length<limit)
-                            text+=(n.textContent||'').slice(0,limit-text.length)+' ';
-                        return text.slice(0,limit);
+                        let text='',n,count=0,truncated=false;
+                        while((n=walker.nextNode())) {
+                            if(++count>2000) { truncated=true; break; }
+                            if(readOnly && n.parentElement?.closest('script,style,template'))
+                                continue;
+                            const chunk=n.textContent||'', remaining=limit-text.length;
+                            if(chunk.length+1>remaining) {
+                                text+=chunk.slice(0,Math.max(remaining,0)); truncated=true; break;
+                            }
+                            text+=chunk+' ';
+                        }
+                        return {text:text.slice(0,limit),truncated};
                     }""",
-                        request["max_text"],
+                        {"limit": request["max_text"], "readOnly": read_only},
                     )
+                    title = page.title()
                     observations.append(
                         {
                             "url": page.url,
-                            "title": page.title()[:1000],
-                            "text": snapshot,
+                            "title": title[:1000],
+                            "text": snapshot["text"],
                             "status": "REPORTED",
+                            **(
+                                {"truncated": snapshot["truncated"] or len(title) > 1000}
+                                if read_only
+                                else {}
+                            ),
                         }
                     )
                 elif operation == "screenshot":

@@ -502,9 +502,28 @@ memory content. Recall also composes with verified tool observation stages.
 
 Final planning/recall regression passed 51 tests (51.239 s). An earlier 188-case
 affected run passed (183.066 s), spanning the last remote-route/test update;
-the final source-stable full regression remains pending in the local checkout.
-Do not claim its result until the manifest exists. Remaining software includes
+the final source-stable full regression passed 1,198 tests: 1,188 passed, ten
+skipped, zero failures/errors (912.342 s). Its manifest qualifies `2a2606c`,
+source-equivalent to primary commit `1417955`; later browser changes have separate
+verification. Remaining software includes
 broader real-model semantic/structured-output and app acceptance, image-grounded
 computer use, wider requested integrations, broader Chief-of-Staff decision and
 replanning, and current native whole-product acceptance. Credentialed/provider,
 Oracle, physical and audio commissioning restrictions remain.
+
+**2026-10-25 anonymous browser continuation:** Workers can observe a bounded
+static page, repeat the read in a separate anonymous browser, and use its verified
+text in private replanning. Signed synthetic Ask and Full both save the observed
+token through the outbound Worker and independent file readback. A changing page
+fails; profile/account attachments are rejected; page JavaScript is disabled and
+the test's scripted POST never occurs. Truncation is explicit. Five focused tests
+passed (25.724 s); broader regression is recorded separately in the
+[receipt](../evidence/software-completion/browser-observations-2026-10-25.json).
+This does not establish arbitrary dynamic-page or real-model browser acceptance.
+
+Installed-model diagnostics also preserve the CUDA initialization failure, CPU
+goal timeout and malformed structured prefix. A minimal structured call passed,
+but a paired thinking call timed out; no root cause or general semantic success
+is established. The task-owned diagnostic server was stopped. No production
+model, adapter or driver configuration changed.
+[Diagnostic receipt](../evidence/software-completion/model-diagnostics-2026-10-25.json).

@@ -1,5 +1,13 @@
 # OSCAR full software completion — active local ledger
 
+**2026-10-25 anonymous browser continuation:** separate current static-page
+readback now feeds private replanning and a verified outbound Worker file effect.
+Signed synthetic Ask/Full, changed-source rejection, JavaScript suppression,
+account isolation and explicit truncation passed five focused cases (25.724 s).
+Broader regression remains separately qualified in the
+[receipt](../evidence/software-completion/browser-observations-2026-10-25.json).
+This is not dynamic-page or broad installed-model acceptance.
+
 **2026-10-25 execution continuation update:** registered native app discovery and
 launch admission are integrated locally at `126b6b6`. Its source-stable Windows
 aggregate passed 1,186 tests (1,176 passed, ten skipped, zero failures/errors;
@@ -10,8 +18,9 @@ and file readback passed; do not generalize this into broad app/model acceptance
 Sourced memory preflight now continues into private Worker planning and remote
 execution. Synthetic owners/model HTTP prove local and phone–Core–outbound
 Worker execution, correction/forget/authority fences and composition with
-verified tool observations. Final planning/recall tests passed 51 cases; a new
-source-stable full regression is pending. This remains implementation in progress,
+verified tool observations. Final planning/recall tests passed 51 cases; the
+source-stable full regression passed 1,198 cases (1,188 passed, ten skipped,
+zero failures/errors; 912.342 s) at `1417955`-equivalent sources. This remains implementation in progress,
 not completion of the full mandate or owner/physical/provider commissioning.
 
 Updated 2026-10-24. **IMPLEMENTATION_IN_PROGRESS / SOFTWARE ACCEPTANCE PARTIAL.**
@@ -24,8 +33,9 @@ registered app launch. Signed Ask/Full synthetic-model tests execute a real
 run-owned Pythonw fixture; launch remains partially verified. Integration passed
 158 backend cases, followed by 91 planning cases and six final native cases.
 Actual Qwen app attempts still failed safely on model contract output; arithmetic
-observation/file acceptance passed again (8.073 s). A fresh full regression is
-pending. [Receipt](../evidence/software-completion/app-observations-2026-10-25.json).
+observation/file acceptance passed again (8.073 s). Its source-stable full
+regression passed 1,186 cases (1,176 passed, ten skipped, zero failures/errors;
+804.833 s). [Receipt](../evidence/software-completion/app-observations-2026-10-25.json).
 
 **2026-10-25 integrated local regression:** all 1,180 Windows Python cases
 completed on unchanged sources: 1,170 passed, ten skipped, zero failures/errors

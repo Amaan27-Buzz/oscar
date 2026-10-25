@@ -342,6 +342,22 @@ verified; a broader app objective still needs its own independent resulting-stat
 check. Adaptive prompts include a complete read-only response example; examples
 never expand the selected capabilities or authorize their placeholder arguments.
 
+## Anonymous browser observations
+
+Adaptive Workers can read a scoped static page and independently repeat the read
+before private replanning. This uses the existing browser executor with an exact
+`read_only: true` request: one granted origin, navigate then inspect, at most
+15 seconds and 2,048 text characters. A fresh anonymous context disables page
+JavaScript, permits only GET/HEAD on that origin and cannot attach an account
+profile or an effect-verification receipt. Text/title truncation is explicit;
+dynamic pages may be incomplete. A changing second read fails verification.
+
+Page content remains untrusted source data. Current observation authority,
+freshness, signed Ask reviews or matching Full delegation, private model routing
+and final effect authorization all remain required. Navigation is a scoped web
+read; it cannot guarantee that a server implements GET without side effects.
+Authenticated browser workflows and submissions use their existing effect path.
+
 ## Memory-dependent execution
 
 Execution requests can pass Controller memory preflight and continue into the

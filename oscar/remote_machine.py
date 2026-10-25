@@ -10,6 +10,7 @@ from time import monotonic
 from typing import Any, TextIO
 
 from .browser_profiles import BrowserProfiles
+from .browser_worker import static_observation
 from .browser_worker import validate as validate_browser
 from .capabilities import Cancellation
 from .contracts import Action, Capability, Result, record
@@ -65,6 +66,8 @@ def machine_readback(capability: str, parameters: dict[str, Any]) -> dict[str, A
     if capability == "machine.apps" and set(request) == {"operation", "query"}:
         if request["operation"] == "targets":
             return {"request": request}
+    if capability == "machine.browser" and static_observation(parameters):
+        return parameters
     if capability == "machine.desktop" and request.get("operation") == "set_text_checked":
         if set(request) == {"operation", "handle", "pid", "runtime_id", "text", "expected_text"}:
             return {"operation": "read", **{k: request[k] for k in ("handle", "pid", "runtime_id")}}
@@ -181,6 +184,8 @@ def validate_remote_machine(kind: str, parameters: dict[str, Any]) -> dict[str, 
         ):
             raise ValueError("current browser account generation required")
         validate_browser(parameters["request"])
+        if parameters["request"].get("read_only") and not static_observation(parameters):
+            raise ValueError("static browser observations cannot attach accounts or verification")
         if "verification" in parameters:
             expected = parameters["verification"]
             if (
@@ -397,6 +402,15 @@ class RemoteMachine(RemoteWorker):
             and action.parameters["request"].get("operation") == "targets"
         ):
             result = replace(result, value=self.effects.outputs[action.id])
+        if (
+            result.success
+            and action.capability_id == "machine.browser"
+            and static_observation(action.parameters)
+        ):
+            observations = json.loads(self.effects.outputs[action.id])["observations"]
+            if len(observations) != 1:
+                raise ValueError("one static browser observation required")
+            result = replace(result, value=json.dumps(observations[0], allow_nan=False))
         if result.artifact:
             result = replace(
                 result,

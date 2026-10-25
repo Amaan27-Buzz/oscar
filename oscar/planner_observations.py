@@ -3,6 +3,7 @@
 import json
 from typing import Any
 
+from .browser_worker import static_observation
 from .contracts import record
 from .credentials import redact_runtime_secrets
 from .executive import digest
@@ -36,6 +37,11 @@ def validate_stage(steps: list[dict[str, Any]]) -> None:
             and isinstance(intent["parameters"]["request"]["query"], str)
             and len(intent["parameters"]["request"]["query"]) <= 80
             and "\x00" not in intent["parameters"]["request"]["query"]
+            or step["capability_id"] == "machine.browser"
+            and intent.get("kind") == "capability"
+            and intent.get("capability_kind") == "browser"
+            and isinstance(intent.get("parameters"), dict)
+            and static_observation(intent["parameters"])
         ):
             raise PermissionError("observation stages cannot contain effects or model calls")
 

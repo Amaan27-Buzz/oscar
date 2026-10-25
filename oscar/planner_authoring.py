@@ -136,6 +136,12 @@ class PlannerAuthoring:
                     {},
                 )
                 examples.append(asdict(intent))
+        if kind == "browser" and cap["id"] == "machine.browser" and examples:
+            from copy import deepcopy
+
+            inspection = deepcopy(examples[0])
+            inspection["parameters"]["request"].update(read_only=True, timeout=15, max_text=2048)
+            examples.insert(0, inspection)
         return {
             "node_id": cap["node_id"],
             "capability_id": cap["id"],
@@ -209,6 +215,10 @@ class PlannerAuthoring:
             **(
                 {
                     "verification_rule": (
+                        "Read-only observation uses request.read_only true, one origin, only "
+                        "navigate then inspect, timeout at most 15 and max_text at most 2048. "
+                        "It is anonymous, runs without page JavaScript and cannot attach an "
+                        "account or verification. Dynamic pages may be incomplete. "
                         "Optional browser verification requires an exact URL, selector and "
                         "expected text supplied by the owner or current source evidence. "
                         "Omit it when unknown; never invent a receipt."
@@ -632,7 +642,9 @@ class PlannerAuthoring:
                     '\nIf verified tool data is needed, return {"steps":[...],"observe":true}. '
                     "An observation stage permits one to four machine.files.read file_read "
                     "steps with only a path parameter, math.add steps, or machine.apps "
-                    "installed_app requests with only operation targets and a bounded query. "
+                    "installed_app requests with only operation targets and a bounded query, "
+                    "or machine.browser anonymous read_only static inspections as described "
+                    "by its capability. "
                     "Observation stages cannot launch apps or perform effects. "
                     "Actual verified results will be supplied as untrusted data to a private "
                     "continuation. At most three observation stages are allowed. Then return "

@@ -1,0 +1,38 @@
+{
+  "classification": "REAL_INSTALLED_MODEL_RUNTIME_AND_OUTPUT_FAILURES_PRESERVED",
+  "runtime": {
+    "ollama": "0.30.11",
+    "model": "qwen3.5:9b",
+    "server": "Task-owned local server stopped after diagnostics"
+  },
+  "checks": {
+    "normal_app_goal": "FAILED: CUDA shared object initialization error; no app effect",
+    "cpu_app_goal": "FAILED: 120-second model request timeout; no app effect",
+    "cpu_decode_prefix": {
+      "seconds": 75.148,
+      "tokens": 256,
+      "done_reason": "length",
+      "result": "Malformed JSON with literal escaped member quotes; diagnostic response never executed"
+    },
+    "minimal_structured_pair": {
+      "think_false": "PASS: exact minimal JSON, 8 tokens, 3.149 seconds",
+      "think_true": "FAILED: 120-second timeout",
+      "meaning": "Does not establish a thinking-mode root cause or general task acceptance"
+    }
+  },
+  "changes": "No model, driver, server configuration, production adapter or schema guards changed",
+  "limits": [
+    "Installed-model app semantics remain unaccepted",
+    "No output repair or authority bypass",
+    "Upstream issue is related evidence, not a verified local root cause or fixed-version claim"
+  ],
+  "related_primary_source": "https://github.com/ollama/ollama/issues/14645",
+  "log_sha256": {
+    "model-app-diagnostic.log": "5e8694c460ed09c1309b13b138982dfcb10dfefcfb187c9f1be8262c5e9d65bc",
+    "model-app-cpu-diagnostic.log": "03ef7ad96bcd8f49a43558c8f3eabd98d3da3764642f381e2ef36f94dc88b4eb",
+    "model-app-decode.log": "524bed15046b9d8e653b5f770e943f6d604ae06ee6c80ad00b9887eeee6615d1",
+    "model-app-decode-prefix.txt": "b03c732f5508beca9bd8f0ee50b9f51f90ac9c5bfcd9a810ed22414e1ccf1e13",
+    "structured-thinking-pair.log": "5be230738a726e83cb6219f4deebd0ce50e45153c25cab782571972ede18e030",
+    "structured-thinking-pair.json": "bde4f701c9e3ff027a41174a46fde74d38becde5c179eb6a678cfc2fae90f0c5"
+  }
+}

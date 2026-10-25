@@ -1,0 +1,52 @@
+{
+  "classification": "SYNTHETIC_PRIVATE_BROWSER_EXECUTION_VERIFIED_REGRESSION_PENDING",
+  "sources": {
+    "oscar/browser_worker.py": "602772b2f1d0b52a2cd5cac934e547ab19fd996583e51e3055e8b21edba05d92",
+    "oscar/executive.py": "4f309a4703dd443558d0feea3d23e42854eff0b26ce17d85c1bdd67ebee24a2b",
+    "oscar/planner_authoring.py": "4802967b38a4b6ea030a7f825e927771cac84aa2a11624646ffe7d165d8a6a12",
+    "oscar/planner_observations.py": "687154c5c917221ebfedcddaa121639f0661e019686a1c7c4a1206a674574c64",
+    "oscar/remote_grid.py": "28dde3700917529d89b129996f18031fa61333db89128788e5d5aacf86d682dc",
+    "oscar/remote_machine.py": "add32e8e6d4744561eeea459a3f76d2512a0750e8588d0f4e473257886c1ed59",
+    "tests/test_browser_observations.py": "e735446112c5e56c6e2f02f3d5dc38801e419100a2c49108a6bf00b54eab8b61"
+  },
+  "checks": {
+    "focused": {
+      "state": "PASS",
+      "tests": 5,
+      "seconds": 25.724
+    },
+    "static": {
+      "ruff": "PASS",
+      "mypy_sources": 105,
+      "repository": "PASS",
+      "diff_check": "PASS"
+    },
+    "affected": {
+      "state": "PASS",
+      "tests": 157,
+      "seconds": 301.003,
+      "log": ".oscar/browser-observations-affected.log"
+    },
+    "full_regression": {
+      "state": "PENDING"
+    }
+  },
+  "verified": [
+    "Signed Ask observes anonymous page, repeats browser read, privately replans and writes actual independently verified output",
+    "Signed synthetic Full does the same without per-action reviews",
+    "Changed second read fails without model disclosure",
+    "Disabled page JavaScript produces no scripted POST; account/profile attachments rejected",
+    "Truncated static text is explicitly marked"
+  ],
+  "limits": [
+    "Synthetic owners/model HTTP and public loopback fixtures, not general real-model or live-account acceptance",
+    "Static HTML only; dynamic page text may be incomplete",
+    "GET/HEAD restrictions do not prove server-side absence of side effects",
+    "General image-grounded control and broader mandate remain open",
+    "No physical devices, real accounts, owner activation, provisioning or GitHub publication"
+  ],
+  "log_sha256": {
+    "browser-observations-final-focused.log": "56d8adee7bcf5f985920ae6b7f6e1f77428abaec4ff0b85e3f883cae5c4ec893",
+    "browser-observations-affected.log": "5073c64e5a0f0b6ec5d8430e67a923b5facf59ca6ae2937c20bc38c601cba054"
+  }
+}

@@ -1,11 +1,21 @@
 # OSCAR — Current Status & Checklist
 
+**2026-10-25 anonymous browser observations:** scoped static-page reads now feed
+private Worker replanning after a separate browser readback. Synthetic signed
+Ask and Full complete an actual observed-token file objective. Changed pages
+fail verification; anonymous contexts disable JavaScript, restrict methods and
+origins, reject account profiles and qualify truncation. Five focused tests pass;
+broader regression has separate status in the
+[receipt](evidence/software-completion/browser-observations-2026-10-25.json).
+Dynamic-page and general real-model/browser acceptance remain open.
+
 **2026-10-25 memory-dependent execution:** sourced recall now connects to private
 Worker planning and cross-device execution, with independent read authority,
 canonical source checks, correction/forget fences and explicit Full delegation
 coverage. Synthetic model/owner tests verify the local and phone–Core–outbound
-Worker paths; this is not broad real-model acceptance. Final affected and full
-regression results are recorded in the completion handoff and matching receipt.
+Worker paths; this is not broad real-model acceptance. The source-stable full
+Windows regression passed 1,198 tests: 1,188 passed, ten skipped, zero failures
+(912.342 s), qualifying `1417955`-equivalent sources before later browser edits.
 [Contract](ORCHESTRATION.md#memory-dependent-execution).
 
 **2026-10-25 registered-app observations:** scoped private plans can now query

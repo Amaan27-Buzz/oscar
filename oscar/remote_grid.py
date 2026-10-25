@@ -264,12 +264,12 @@ class RemoteVerifier(Verifier):
                         new_id(),
                         result.task_id,
                         result.correlation_id,
-                        "remote-registered-app-observer",
-                        "separate current registered-target observation and Core exact comparison",
+                        "remote-read-only-observer",
+                        "separate current read-only observation and Core exact comparison",
                         time(),
                         matches,
                         Epistemic.VERIFIED if matches else Epistemic.KNOWN,
-                        "registered targets compared",
+                        "read-only observations compared",
                         content_hash=hashlib.sha256(actual.encode()).hexdigest(),
                     ),
                 )
@@ -1086,7 +1086,11 @@ class RemoteGrid:
                     raise PermissionError("artifact executor unavailable")
                 self.artifact_permission(session.id, executor, capability, parameters)
                 criterion = {"kind": "remote_file", **parameters["verification"]}
-            elif capability.id == "machine.apps" and machine_readback(capability.id, parameters):
+            elif (
+                capability.id == "machine.apps"
+                or capability.id == "machine.browser"
+                and parameters["request"].get("read_only")
+            ) and machine_readback(capability.id, parameters):
                 criterion["match_report"] = True
             elif machine_readback(capability.id, parameters) is not None:
                 expected = parameters.get("verification", parameters["request"])
@@ -1813,9 +1817,11 @@ class RemoteGrid:
                         delegated=bool(owner.get("standing")),
                     )
                     criterion = {"kind": "remote_file", **parameters["verification"]}
-                elif capability["id"] == "machine.apps" and machine_readback(
-                    capability["id"], parameters
-                ):
+                elif (
+                    capability["id"] == "machine.apps"
+                    or capability["id"] == "machine.browser"
+                    and parameters["request"].get("read_only")
+                ) and machine_readback(capability["id"], parameters):
                     criterion["match_report"] = True
                 elif machine_readback(capability["id"], parameters) is not None:
                     expected = parameters.get("verification", parameters["request"])

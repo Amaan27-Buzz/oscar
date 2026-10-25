@@ -1,5 +1,5 @@
 {
-  "classification": "SYNTHETIC_PRIVATE_MEMORY_EXECUTION_VERIFIED_FULL_REGRESSION_PENDING",
+  "classification": "SYNTHETIC_PRIVATE_MEMORY_EXECUTION_AND_WINDOWS_REGRESSION_VERIFIED",
   "sources": {
     "oscar/planner_memory.py": "7f322d4ed26376b6a1decb9635887c2363e6f55a8617fef32b3303a78b1c190e",
     "oscar/planner_authoring.py": "5138bcf916bcf1122ff455615de9e006a4d42cbe11193862341b006b032c02f2",
@@ -29,13 +29,25 @@
       "diff_check": "PASS"
     },
     "full_regression": {
-      "state": "PENDING",
-      "log": ".oscar/memory-aggregate.log"
+      "state": "PASS",
+      "tests": 1198,
+      "passed": 1188,
+      "skipped": 10,
+      "failures": 0,
+      "seconds": 912.342,
+      "wrapper_seconds": 915.426,
+      "source_stable": true,
+      "base_head": "2a2606cb759c1c1ae82bcdafe3a1ea2613f11032",
+      "equivalent_primary_commit": "1417955",
+      "log": ".oscar/memory-aggregate.log",
+      "manifest": ".oscar/memory-aggregate-manifest.json"
     }
   },
   "log_sha256": {
     "memory-final-planning.log": "bcfbe46a46d6221f99f5ad9a03a84c39ce78f3a1c4c6794e7af2348a1d9b63be",
-    "memory-execution-affected.log": "3c4c1cd651888d9c99472ac70c3352f8aa40afa69f878ddc7bb52266579da574"
+    "memory-execution-affected.log": "3c4c1cd651888d9c99472ac70c3352f8aa40afa69f878ddc7bb52266579da574",
+    "memory-aggregate.log": "0624f2f0eab55b029706cb9c2c03cd657dad22c8c7b97ba0f8115d54bd987a1b",
+    "memory-aggregate-manifest.json": "48f1f0dbcd7445140fa7b97f78eee1bfdcfd67e263d226d942170cbc978bc6fb"
   },
   "verified": [
     "Signed Ask private recall then actual file effect and independent readback",

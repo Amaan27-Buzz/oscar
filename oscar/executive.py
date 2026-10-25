@@ -579,7 +579,8 @@ class Executive:
                 if c.get("intent_examples")
                 and (
                     not adaptive
-                    or c["capability_id"] in {"machine.files.read", "machine.apps", "math.add"}
+                    or c["capability_id"]
+                    in {"machine.files.read", "machine.apps", "machine.browser", "math.add"}
                 )
             ),
             None,
