@@ -12,7 +12,7 @@ software work under the existing authorization; no new agent delegation is neede
 
 ## 2. Current candidate
 
-Latest committed base `b2a21e4` on `codex/software-completion`; the explicit Worker
+Latest committed runtime base `8047ed6` on `codex/software-completion`; the explicit Worker
 routing checkpoint follows it. Use `git rev-parse HEAD` for the exact
 checkout, and `git log b700a6c..HEAD --oneline` for all local implementation commits.
 The final owner message must name the actual resulting checkout, not an invented
@@ -646,3 +646,5 @@ work remains open. [Receipt](../evidence/software-completion/observation-decodin
 **2026-10-25 Worker-history regression completed:** the committed `3d4fdfa` checkpoint passed 1,214 tests: 1,204 PASS, ten SKIP, zero failures/errors (862.049 s). Manifest source hashes stayed stable and still match the primary checkout. The worker-history receipt now records the final hashes; the earlier pending checkpoint is superseded. Broader software-completion gaps remain open.
 
 **2026-10-25 private image observations:** selected native captures now receive independent bounded PNG artifact readback, integrity/geometry/hash verification and provenance-bound private local Ollama vision continuation. Capture/retention/action grants stay separate; image data never becomes model instructions or canonical planning text. Native input still rechecks the exact frame and stays PARTIAL without objective readback. Eight portable image contracts pass, including the existing 4096x2160 capture limit. A 16-case native batch passed 15 cases, including the new image continuation and retention withdrawal; the older visual test failed. A 143-case integration run preserved two native failures and one stale contract expectation, which was corrected. Isolated older visual replay acceptance still fails with an unexpected marker increment of unproven cause. Actual Qwen chat attempts failed structured output; the documented generate endpoint enforces JSON in a reproduced diagnostic, but returned incorrect coordinates. General model accuracy and full regression remain OPEN. No publication or production authority activation occurred. [Receipt](../evidence/software-completion/screen-observations-2026-10-25.json).
+
+**2026-10-25 image-observation full regression:** unchanged committed `8047ed6` sources ran 1,224 cases: 1,212 passed, ten skipped and two failed (971.410 s; source hashes stable). Both native visual failures report that the selected fixture window was not foreground; the native guards rejected input. Focus-loss cause remains unproven, and earlier stale-frame marker ambiguity remains unresolved. All 130 Desktop tests and the production build passed separately. This is a failed aggregate, not full software acceptance. Private-image local-route verification is the next implementation checkpoint.
