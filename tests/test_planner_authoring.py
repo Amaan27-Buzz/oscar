@@ -295,6 +295,14 @@ class PlannerAuthoringTests(unittest.TestCase):
             ["partially_verified", "verified"], [t["state"] for t in self.h.store.all("task")]
         )
 
+    def test_decoding_does_not_replace_authoritative_instruction_length_limit(self):
+        self.steps[0]["intent"]["text"] = "x" * 4097
+        self.body["choices"][0]["message"]["content"] = json.dumps(self.steps)
+        row = self.draft()
+        with self.assertRaisesRegex(ValueError, "bounded step instruction"):
+            self.review(self.accept_change(row))
+        self.assertEqual(1, len(self.h.store.all("task")))
+
     def test_provider_drift_prevents_call_and_unavailable_route_creates_nothing(self):
         review = self.review(self.change)
         self.executor.router.registry.providers["fixture"] = replace(

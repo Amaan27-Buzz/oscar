@@ -593,3 +593,14 @@ all eight browser workflows then passed (92.610 s). Production context admission
 was not changed. This resolves that reproduced fixture failure, while preserving
 the failed full run and earlier visual failure. Current full regression remains
 separate.
+
+**2026-10-25 installed-model grammar repair:** Ollama rejected the generated
+`char{1,4096}` rule with a repetition-limit parser error. The decoding schema now
+leaves this upper bound to existing Executive validation; a new 4,097-character
+negative case verifies enforcement. All 59 provider/planner tests pass (45.992 s),
+with Ruff/mypy/diff checks. Installed Granite emits valid structured JSON with
+the repaired schema, but incorrectly attempts a placeholder app identity; native
+admission rejects it. With a current-information goal, the new preflight blocks
+its initial effect plan before tool execution. Qwen generic JSON also remains
+malformed. No general model objective acceptance is claimed.
+[Receipt](../evidence/software-completion/planning-grammar-2026-10-25.json).

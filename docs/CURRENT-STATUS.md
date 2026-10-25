@@ -1,5 +1,12 @@
 # OSCAR — Current Status & Checklist
 
+**2026-10-25 model grammar compatibility:** the installed Ollama parser rejected
+the schema's 4,096-character grammar repetition. Removing that decoding-only
+limit permits valid structured Granite output; Executive's 4,096-character limit
+remains tested. Fifty-nine focused cases pass. Actual-model app objectives still
+fail semantic planning safely; broad model acceptance remains open.
+[Receipt](evidence/software-completion/planning-grammar-2026-10-25.json).
+
 **2026-10-25 live-information execution:** current-information action goals now
 require supported live reads and private observation continuation before effects.
 Signed synthetic Full verifies current-file discovery/read/write and a bound

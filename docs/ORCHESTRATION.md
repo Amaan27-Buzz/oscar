@@ -365,6 +365,11 @@ preflight below; pure live-state questions retain Controller retrieval routing.
 
 ## Live-information execution preflight
 
+The Ollama decoding schema leaves the instruction text upper bound to Executive's
+authoritative 4,096-character validation. Encoding that limit as a grammar repeat
+was rejected by the installed runtime. Other decoding structure, output budgets,
+typed intent validation, native admission and signed authority remain enforced.
+
 Current/live action goals require adaptive private continuation and at least one
 selected file, directory, app, bound-window or anonymous browser reader. Manual
 planning defaults these goals to adaptive stages and includes that disclosure in

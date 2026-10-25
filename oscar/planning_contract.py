@@ -5,7 +5,8 @@ from typing import Any
 
 def executive_plan_schema() -> dict[str, Any]:
     intent = {
-        "text": {"type": "string", "minLength": 1, "maxLength": 4096},
+        # Ollama rejects the 4096-repeat grammar; Executive enforces that text bound.
+        "text": {"type": "string", "minLength": 1},
         **{
             key: {"type": ["string", "null"]}
             for key in ("kind", "path", "content", "capability_kind")

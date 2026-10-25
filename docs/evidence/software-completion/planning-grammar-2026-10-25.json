@@ -1,0 +1,39 @@
+{
+  "classification": "OLLAMA_GRAMMAR_COMPATIBILITY_FIXED_MODEL_OBJECTIVES_NOT_ACCEPTED",
+  "sources": {
+    "oscar/planning_contract.py": "e398ba35fb87816a46ee8be2bea022326e0e3c8d6ec7d89286494424c606cd43",
+    "tests/test_planner_authoring.py": "831474a0a402c4def9bb694bedf3f567567d382f45d05fd4971c34dac04c2e09",
+    "tests/test_providers.py": "fa5fd7e99e8945f3a4d401c5cd233849396780654da564dbf14d298084231d1b"
+  },
+  "checks": {
+    "focused": {
+      "state": "PASS",
+      "tests": 59,
+      "seconds": 45.992
+    },
+    "ruff": "PASS",
+    "mypy_sources": 105,
+    "diff_check": "PASS"
+  },
+  "observed": [
+    "Installed Ollama 0.30.11 and granite4.1:3b rejected original schema with number of repetitions exceeds sane defaults; generated rule used char{1,4096}",
+    "Removing only decoding maxLength enabled structured JSON from actual installed Granite, including production-schema run",
+    "Authoritative Executive still rejects 4097-character instructions before effects; parser/authority/native checks unchanged",
+    "Granite incorrectly planned placeholder app identity rather than observation/private continuation; native executor rejected placeholder; current-goal preflight rejected direct-effect version before tool execution",
+    "Qwen 9B generic JSON CPU diagnostic still returned invalid/incomplete JSON; no schema-only explanation for all Qwen failures"
+  ],
+  "limits": [
+    "Not general model planning or registered-app objective acceptance",
+    "Actual-model calls used process-only CPU options, isolated task-owned loopback server and synthetic owner/workspace",
+    "No production model/driver/server settings changed; only decoding schema compatibility changed",
+    "No credentials, physical devices, cloud provisioning or GitHub publication"
+  ],
+  "log_sha256": {
+    "planning-grammar-focused.log": "121baf0bd9d82b6b786aff059976b7a41b6601a1350957f8a24531ee1486528d",
+    "model-app-json-diagnostic.log": "ba1cd73b625ded9991e0d7a7b4fe7668a1ff01206cf2cfa525637d0d609ed3c7",
+    "model-app-granite-diagnostic.log": "b8833011f697744a2e6adaa2ef14600e3276a34efff551f03b2d9c05c599dc7a",
+    "model-app-granite-bounded-diagnostic.log": "cdc6b31f333f188fb3a47337e4ab02951e276aab5ef0f27b5b2f75ac671ade0c",
+    "model-app-granite-current.log": "97fc11dcad3307149ac9c73c3a4dd5a669172e77145dd60b1b78935ef1a1af72",
+    "model-schema-server-error-grammar-checkpoint.log": "8a46de8f93a54146ad968085d32c80dd9d0ca51ba4c812dc00fdab00e56c0375"
+  }
+}

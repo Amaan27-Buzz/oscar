@@ -187,6 +187,10 @@ class ProviderContractTests(unittest.TestCase):
         response = self.generate("ollama", request=replace(request, executive_plan=True))
         self.assertTrue(response.structured_ok)
         self.assertEqual(executive_plan_schema(), self.requests[-1]["body"]["format"])
+        text_schema = executive_plan_schema()["oneOf"][0]["properties"]["steps"]["items"][
+            "properties"
+        ]["intent"]["properties"]["text"]
+        self.assertNotIn("maxLength", text_schema)
         self.assertEqual(0, self.requests[-1]["body"]["options"]["temperature"])
         self.body["message"]["content"] = 'not JSON: {\\"steps\\":[]}'
         with self.assertRaises(ProviderError) as failure:
