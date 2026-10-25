@@ -1,0 +1,148 @@
+{
+  "status": "SCOPED_PRIVATE_OBSERVATION_CONTINUATION_VERIFIED",
+  "base_head": "39bc4f42b87c2b31d473389d88910c3b5b96decb",
+  "qualification": "Synthetic signed owners and HTTP-model cross-device integration; separate real installed Qwen 9B local arithmetic-to-file acceptance. Real-model remote-read attempts failed safely; no combined real-model remote PASS.",
+  "sources": {
+    "oscar/executive.py": "c2ecd2846ef17c6f61a3cd0b75f8da4e6d3c7a9beb78187e0dd6c68b773a68e8",
+    "oscar/harness.py": "f5e5f92036c983242754e30934519de0d0fcdea99983440f218e229c3f60d5cd",
+    "oscar/planner_authoring.py": "bd585c09f963b01dbe056f8c2e4ad1035d2630617cd43aa42ca5bf7cf73f48e3",
+    "oscar/planner_observations.py": "3152cbe38f83f2afcf7581d398c8fe51539c764f898fd1fd3c8697ad4143061b",
+    "oscar/planning_contract.py": "b1cc7cdfa64c89f2a3c3c5a8a01bed6427dbaa674b3ad8b4a5bb907ba63f75dd",
+    "tests/test_planner_observations.py": "8a7b73bb676d0567538671c6aa5a84f6b7093cb6cbe7c8123dade63d8f6598d4",
+    "tests/test_remote_machine.py": "e34cbda17f151d5542285daf90d5429469f892f4b2bb72f6bcaef2a6f331c86f",
+    "tests/test_conversation_planning.py": "a5df7573149fcc2ff181c167d5170380ef23221ca53dba8cd28b2441598413b2"
+  },
+  "focused": {
+    "tests": 118,
+    "passed": 118,
+    "seconds": 101.663,
+    "log": {
+      "path": ".oscar/software-adaptive-focused-final-20261025.log",
+      "sha256": "876f031097a259a0bfb9abbe66980dde86f22626d57c79d5751b654f84d66991"
+    },
+    "qualification": "Focused checkpoint before final adaptive prompt clarification; following aggregate covers sealed final sources."
+  },
+  "aggregate": {
+    "total": 1171,
+    "passed": 1159,
+    "skipped": 10,
+    "failed_or_error": 2,
+    "seconds": 699.909,
+    "wrapper_seconds": 702.478,
+    "exit_code": 1,
+    "source_stable": true,
+    "manifest": {
+      "path": ".oscar/software-adaptive-aggregate-manifest-20261025.json",
+      "sha256": "a3bf1e2b44d27a20d48d4622f806b1078b197f49e71aa0b6273adf116d352113"
+    },
+    "log": {
+      "path": ".oscar/software-adaptive-aggregate-20261025.log",
+      "sha256": "f6ef8021b6144dd9baaded74b84a40c84ad1bcc2a5e6c0ab27f3c51b589924e1"
+    }
+  },
+  "installed_local_model": {
+    "status": "LOCAL_MODEL_ADAPTIVE_ARTIFACT_VERIFIED",
+    "model": "qwen3.5:9b",
+    "seconds": 7.193,
+    "observation_stages": 1,
+    "task_states": [
+      "partially_verified",
+      "verified",
+      "partially_verified",
+      "verified"
+    ],
+    "routes": [
+      {
+        "mode": "private",
+        "actual_provider": null,
+        "actual_model": "qwen3.5:9b"
+      },
+      {
+        "mode": "private",
+        "actual_provider": null,
+        "actual_model": "qwen3.5:9b"
+      }
+    ],
+    "artifact": "1092",
+    "qualification": "synthetic owner, real installed local model and file readback",
+    "log": {
+      "path": ".oscar/software-adaptive-local-sealed-20261025.log",
+      "sha256": "6f39dfa56638cd8694fc2dd020f489bd6730171cd72fc17472e8305100eed4e8"
+    },
+    "earlier_success_seconds": 6.381
+  },
+  "aggregate_failures": {
+    "stale_prompt_assertion": "Updated for disclosed adaptive observe envelope; no execution guard changed",
+    "native_foreground": "test_actual_capture_visual_fallback_and_no_replay failed at foreground assertion line 287; cause remains unproven. No native source changed."
+  },
+  "subsequent_checks": {
+    "conversation_module": {
+      "tests": 23,
+      "passed": 23,
+      "seconds": 26.533,
+      "log": {
+        "path": ".oscar/software-adaptive-conversation-final-20261025.log",
+        "sha256": "9dc18e8aa00ded49c7d0b785950f0f12dddb0cb5c97f8a1c4f33e8703024ffbb"
+      }
+    },
+    "unchanged_native_modules": {
+      "tests": 4,
+      "passed": 4,
+      "seconds": 9.991,
+      "log": {
+        "path": ".oscar/software-adaptive-native-recheck-20261025.log",
+        "sha256": "7f9fd18e7d619ea21ecbee2309e4f92540b2ff59b50ad45be5c6e54f29476623"
+      }
+    },
+    "qualification": "Aggregate is not PASS. Only stale prompt test expectations changed after aggregate; runtime source hashes match the aggregate manifest."
+  },
+  "scope": [
+    "Same temporary Worker observes, privately replans and executes reviewed effects",
+    "Ask reviews each stage; matching signed Full advances without per-action prompts",
+    "Phone/Core/outbound file observation to synthetic model to actual terminal artifact and independent readback",
+    "At most three stages of four scoped file reads or arithmetic observations; 4 KiB/result, 16 KiB total and 120-second expiry",
+    "Same-owner exact continuation/result/evidence references, current executor grants, policy, capability contracts, delegation and private sources rechecked",
+    "No raw observation copy in canonical model prompts; no privilege, path or command substitution from untrusted data"
+  ],
+  "development_failures_preserved": {
+    "focused_http_fixture_race": {
+      "path": ".oscar/software-adaptive-focused-20261025.log",
+      "sha256": "2a6990529e481805caf84d93ea200ab24e374f6d662d368362e536e9233fce5a"
+    },
+    "wrong_local_api_path": {
+      "path": ".oscar/software-adaptive-local-20261025.log",
+      "sha256": "b38c7c333da85987435fa09a98c0851fb00169d581438866aa23df121bc4fcbc"
+    },
+    "small_model_invalid_steps": {
+      "path": ".oscar/software-adaptive-local-clear-prompt-20261025.log",
+      "sha256": "33d881c9a3aeb7f238c126c0a6a53a701300bcd03f744d558961ec526d1c22d2"
+    },
+    "four_b_model_omitted_observation_marker": {
+      "path": ".oscar/software-adaptive-local-qwen4b-20261025.log",
+      "sha256": "39d1377802b08ee05da72a0ac91e3188bc27f18b0a7b0656f001f4a036079646"
+    },
+    "nine_b_cross_stage_handoff_before_prompt_correction": {
+      "path": ".oscar/software-adaptive-local-qwen9b-final-20261025.log",
+      "sha256": "3cbe6a0618def5a7b6cc7ec1d8f688f5ff14ff45ca13c7961fea631b8b3ba535"
+    },
+    "remote_natural_prefix_not_admitted": {
+      "path": ".oscar/software-adaptive-real-remote-20261025.log",
+      "sha256": "36a9ee59e1ca0e37614fe88ff2e9f315abeccbdac7fa0237db3d46432b212f4a"
+    },
+    "remote_invalid_read_intent": {
+      "path": ".oscar/software-adaptive-real-remote-diagnostic-20261025.log",
+      "sha256": "845a87fce496f18b64ee64ba949a023b7d9c3467095fd06a7b6028b982b7dc41"
+    },
+    "remote_structured_decoding_failed": {
+      "path": ".oscar/software-adaptive-real-remote-typed-20261025.log",
+      "sha256": "dac16d11b73b02996bdc589d2e37f061fbbdc6a1f0bbf5680672da8577271e0e"
+    }
+  },
+  "not_claimed": [
+    "General reliable model planning or semantic objective completion",
+    "Real-model remote-read-to-effect acceptance",
+    "Arbitrary tool/image/DOM feedback or native app discovery",
+    "Real account authentication, physical device, microphone/camera, deployment or GitHub publication",
+    "Whole OSCAR software completion"
+  ]
+}

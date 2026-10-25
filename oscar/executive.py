@@ -53,6 +53,10 @@ def authorize_step(
     check_inputs(store, binding)
     worker = store.get("executive_worker", binding["worker_id"])
     goal = store.get("executive_goal", binding["goal_id"])
+    if "observations" in goal:
+        from .planner_observations import context
+
+        context(store, grid, goal["observations"], task_id=task_id)
     try:
         owner = store.get("executive_owner", goal["id"])
     except KeyError:
@@ -550,6 +554,8 @@ class Executive:
         mode: str = "auto",
         planning_sources: list[dict[str, str]] | None = None,
         planning_configuration: str | None = None,
+        *,
+        adaptive: bool = False,
     ) -> dict[str, Any]:
         if mode not in {"auto", "private"}:
             raise ValueError("explicit configured or private model routing required")
@@ -595,8 +601,13 @@ class Executive:
             + goal
             + "\n"
             + (
-                'Return a JSON object with exactly one key, "steps", containing a '
-                "topologically ordered array of maximum 16 steps. "
+                (
+                    'Return a JSON object with "steps" and optional boolean "observe", '
+                    "containing a "
+                    if adaptive
+                    else 'Return a JSON object with exactly one key, "steps", containing a '
+                )
+                + "topologically ordered array of maximum 16 steps. "
                 "Each step has id, intent, depends_on, node_id, capability_id, "
                 "and optional inputs. "
                 "id is a unique lowercase string matching [a-z0-9_-]{1,40}, such as step-1. "
@@ -611,19 +622,34 @@ class Executive:
                 "Return JSON only, without markdown or explanations. Intent examples describe "
                 "supported parameter shapes; fill their literal arguments from the goal. "
                 "Paths are relative to the selected workspace, with no parent traversal. "
-                'To copy an earlier verified result, add inputs: [{"from_step":"earlier-id",'
-                '"select":[],"to":["content"]}]. The source MUST be in depends_on. '
-                "select [] copies result text; a key/index array selects a scalar from JSON text. "
-                "to targets an existing string: file_write content or a parameters/criterion leaf "
-                "named content, text, body or message. Use an empty string placeholder there. "
-                'For arithmetic-to-file specifically use select [] and to ["content"] exactly: '
-                "the arithmetic result is plain text, not an object. to is an intent field path, "
-                "NEVER a filename. Put the filename only in intent.path. Compute the expression "
-                "from the owner's goal; 2 + 3 in examples is NOT the requested calculation. "
-                "No substitution into identities, paths, URLs, commands or authority is supported. "
-                "When the goal requests an actual earlier result, you MUST include that inputs "
-                "handoff; a blank or guessed literal content does not accomplish the goal. "
-                "Data handoffs require independent VERIFIED source evidence; "
+                + (
+                    "Use literal observed values as intent data. Omit inputs for observations "
+                    "from earlier stages. All depends_on entries must refer to earlier steps "
+                    "IN THIS RESPONSE; use [] for a standalone write of an observed value. "
+                    "Set file_write content to the actual observed text, "
+                    "never an empty placeholder. "
+                    if adaptive
+                    else "To copy an earlier verified result, add inputs: "
+                    '[{"from_step":"earlier-id",'
+                    '"select":[],"to":["content"]}]. The source MUST be in depends_on. '
+                    "select [] copies result text; a key/index array selects a scalar "
+                    "from JSON text. "
+                    "to targets an existing string: file_write content or a "
+                    "parameters/criterion leaf "
+                    "named content, text, body or message. Use an empty string placeholder there. "
+                    'For arithmetic-to-file specifically use select [] and to ["content"] exactly: '
+                    "the arithmetic result is plain text, not an object. "
+                    "to is an intent field path, "
+                    "NEVER a filename. Put the filename only in intent.path. "
+                    "Compute the expression "
+                    "from the owner's goal; 2 + 3 in examples is NOT the requested calculation. "
+                    "No substitution into identities, paths, URLs, commands "
+                    "or authority is supported. "
+                    "When the goal requests an actual earlier result, you MUST include that "
+                    "inputs handoff; a blank or guessed literal content does not accomplish "
+                    "the goal. "
+                )
+                + "Data handoffs require independent VERIFIED source evidence; "
                 "reported results block. "
                 "No unstated account/device binding exists. "
                 "Do not invent missing identities, retrieved facts or tool outputs. If details "
@@ -634,7 +660,7 @@ class Executive:
                 + (
                     ". Complete response example; replace literal arguments from the goal: "
                     + json.dumps({"steps": examples})
-                    if example
+                    if example and not adaptive
                     else ""
                 )
                 + ". Goal: "
@@ -681,6 +707,12 @@ class Executive:
         )
 
     def result_steps(self, planner_task_id: str) -> list[dict[str, Any]]:
+        document = self.result_plan(planner_task_id)
+        if document["observe"]:
+            raise PermissionError("observation plans require the reviewed continuation controller")
+        return list(document["steps"])
+
+    def result_plan(self, planner_task_id: str) -> dict[str, Any]:
         if (
             self.store.get("task_relationship", planner_task_id)["relationship"]
             != self.runtime.relationship_id
@@ -729,11 +761,17 @@ class Executive:
             raise ValueError(
                 "Plan needs clarification: " + redact_runtime_secrets(steps["clarification"])
             )
-        if isinstance(steps, dict) and set(steps) == {"steps"}:
+        observe = False
+        if isinstance(steps, dict) and set(steps) == {"steps", "observe"}:
+            if type(steps["observe"]) is not bool:
+                raise ValueError("explicit observation-stage boolean required")
+            observe = steps["observe"]
+            steps = steps["steps"]
+        elif isinstance(steps, dict) and set(steps) == {"steps"}:
             steps = steps["steps"]
         if not isinstance(steps, list) or any(not isinstance(step, dict) for step in steps):
             raise ValueError("model result must contain a typed step array")
-        return steps
+        return {"steps": steps, "observe": observe}
 
     @staticmethod
     def _review(row: dict[str, Any]) -> str:

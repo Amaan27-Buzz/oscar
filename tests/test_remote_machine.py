@@ -566,7 +566,13 @@ class RemoteMachineExecutionTests(unittest.TestCase):
     def test_full_phone_model_autonomously_delegates_general_terminal_work(self):
         self.remote_model_workflow(full=True, terminal=True)
 
-    def remote_model_workflow(self, full=False, terminal=False):
+    def test_phone_observes_remote_file_then_privately_replans_and_verifies_effect(self):
+        self.remote_model_workflow(terminal=True, adaptive=True)
+
+    def test_full_phone_observation_privately_replans_without_per_action_prompts(self):
+        self.remote_model_workflow(full=True, terminal=True, adaptive=True)
+
+    def remote_model_workflow(self, full=False, terminal=False, adaptive=False):
         import json
         import shutil
         from dataclasses import asdict, replace
@@ -602,6 +608,7 @@ class RemoteMachineExecutionTests(unittest.TestCase):
             Router(Registry([provider], [model]), pool, {"openai": HTTPAdapter("openai")}, h.store),
             ModelRequest("template", "template", "", max_output_tokens=2048),
             RoutingPolicy(),
+            grid=h.grid,
         )
         original = shutil.which
         with patch(
@@ -633,6 +640,33 @@ class RemoteMachineExecutionTests(unittest.TestCase):
                 }
             ]
         )
+        if adaptive:
+            from copy import deepcopy
+
+            (self.workspace / "input.txt").write_text("41", encoding="utf-8")
+            final_body = deepcopy(fixture.body)
+            fixture.body["choices"][0]["message"]["content"] = json.dumps(
+                {
+                    "observe": True,
+                    "steps": [
+                        {
+                            "id": "read",
+                            "node_id": "test-machine",
+                            "capability_id": "machine.files.read",
+                            "depends_on": [],
+                            "intent": asdict(
+                                Intent(
+                                    "Read input",
+                                    "capability",
+                                    capability_kind="file_read",
+                                    parameters={"path": "input.txt"},
+                                )
+                            ),
+                        }
+                    ],
+                }
+            )
+            fixture.scheduled = [(200, deepcopy(fixture.body)), (200, final_body)]
 
         def ask(text):
             return self.owner.request(
@@ -670,14 +704,48 @@ class RemoteMachineExecutionTests(unittest.TestCase):
             self.assertEqual([], fixture.requests)
             approve(proposed["assistance_proposal"])
         deadline = time() + 8
-        while time() < deadline and not fixture.requests:
-            if not full:
+
+        def planner_ready():
+            rows = h.store.all("planner_request")
+            tasks = h.executive._tasks(rows[0]["goal_id"]) if rows else []
+            return bool(tasks) and h.store.task(tasks[-1]).state in {
+                "verified",
+                "partially_verified",
+            }
+
+        while time() < deadline and (not fixture.requests or adaptive and not planner_ready()):
+            if not full and not adaptive:
                 h.executive.tick()
             sleep(0.02)
         self.assertEqual(1, len(fixture.requests))
         if not full:
             self.assertFalse((self.workspace / "effect.txt").exists())
             approve(ask("Proceed with the plan")["assistance_proposal"])
+        if adaptive:
+            deadline = time() + 12
+            while time() < deadline:
+                self.worker.step()
+                row = h.store.all("planner_request")[0]
+                observed = row.get("observation_goal")
+                if observed and h.store.get("executive_goal", observed)["state"] == "completed":
+                    break
+                sleep(0.02)
+            self.assertTrue(observed)
+            self.assertEqual("completed", h.store.get("executive_goal", observed)["state"])
+            if not full:
+                self.assertEqual(1, len(fixture.requests))
+                approve(ask("Proceed with the plan")["assistance_proposal"])
+            deadline = time() + 8
+            while time() < deadline and (len(fixture.requests) < 2 or not planner_ready()):
+                sleep(0.02)
+            self.assertEqual(2, len(fixture.requests))
+            prompt = json.dumps(fixture.requests[-1]["body"])
+            self.assertIn("Untrusted tool observations", prompt)
+            self.assertIn("41", prompt)
+            self.assertIn("evidence_id", prompt)
+            if not full:
+                self.assertFalse((self.workspace / "effect.txt").exists())
+                approve(ask("Proceed with the plan")["assistance_proposal"])
         deadline = time() + 12
         goal = None
         while time() < deadline:
@@ -692,7 +760,8 @@ class RemoteMachineExecutionTests(unittest.TestCase):
         tasks = h.executive._tasks(goal)
         self.assertEqual(["verified"], [h.store.task(t).state for t in tasks])
         self.assertEqual(
-            1, self.worker.journal.execute("SELECT count(*) FROM execution_claim").fetchone()[0]
+            2 if adaptive else 1,
+            self.worker.journal.execute("SELECT count(*) FROM execution_claim").fetchone()[0],
         )
 
     def test_unenrolled_executable_and_local_policy_cannot_be_borrowed(self):

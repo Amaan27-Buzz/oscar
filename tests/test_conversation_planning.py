@@ -339,8 +339,8 @@ class ConversationPlanningTests(unittest.TestCase):
         self.complete(self.review(self.proposed()))
         self.h.executive.tick()
         prompt = self.requests[-1]["body"]["messages"][-1]["content"]
-        self.assertIn('exactly one key, "steps"', prompt)
-        self.assertIn('"steps": [{', prompt)
+        self.assertIn('"steps" and optional boolean "observe"', prompt)
+        self.assertIn('return {"steps":[...],"observe":true}', prompt)
         change = self.proposed("Review the plan")
         path = self.h.files.root / "welcome.txt"
         self.assertFalse(path.exists())

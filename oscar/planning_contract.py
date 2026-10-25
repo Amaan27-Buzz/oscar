@@ -58,6 +58,7 @@ def executive_plan_schema() -> dict[str, Any]:
             {
                 "type": "object",
                 "properties": {
+                    "observe": {"type": "boolean"},
                     "steps": {
                         "type": "array",
                         "minItems": 1,
@@ -68,7 +69,7 @@ def executive_plan_schema() -> dict[str, Any]:
                             "required": [key for key in step if key != "inputs"],
                             "additionalProperties": False,
                         },
-                    }
+                    },
                 },
                 "required": ["steps"],
                 "additionalProperties": False,

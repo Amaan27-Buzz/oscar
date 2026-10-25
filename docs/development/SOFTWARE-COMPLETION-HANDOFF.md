@@ -427,3 +427,21 @@ three-test native visual module passed in isolation (7.606 s); the focus-loss
 cause remains unproven and no native guard was changed. Ruff then only wrapped
 one planner expression, with identical Python AST asserted. Static checks pass.
 [Receipt](../evidence/software-completion/remote-artifacts-2026-10-25.json).
+
+**2026-10-25 private observation continuation:** adaptive conversation plans can
+now observe scoped text, privately replan from independently verified results
+and review or delegate the resulting effects using the same temporary Worker.
+Ask and synthetic Full passed phone/Core/outbound file observation and actual
+process-artifact checks. Three stages, current authority, exact evidence,
+120-second expiry and bounded credential-filtered disclosure fail closed.
+Installed Qwen 9B passed arithmetic observation to private continuation to exact
+file readback twice (6.381/7.193 s). Smaller models and real-model remote-read
+attempts failed safely; broad planning reliability and image-grounded execution
+remain open. [Evidence](../evidence/software-completion/adaptive-observations-2026-10-25.json)
+qualifies this bounded loop; the original full software mandate remains incomplete.
+
+The adaptive aggregate ran 1,171 tests: 1,159 passed, ten skipped and two failed
+(699.909 s; unchanged source hashes). One stale prompt assertion was updated;
+all 23 conversation tests then passed (26.533 s). The unchanged native visual/form
+modules passed four tests in isolation (9.991 s); the recurring foreground failure
+remains unexplained. No native guard was changed. This is not an aggregate PASS.

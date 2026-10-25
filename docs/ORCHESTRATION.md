@@ -303,6 +303,32 @@ Workers and Protocols should pass typed Artifact/Result references instead of co
 
 This preserves producer, version/location, provenance, verification and ownership.
 
+### Verified observations and private continuation
+
+Reviewed adaptive conversation planning may request a pure observation stage
+with `{"steps":[...],"observe":true}`. The current text boundary accepts one to
+four scoped `machine.files.read` reads or `math.add` calculations, without effects
+or result substitutions. A single temporary Worker persists through observation,
+private replanning and final action review. Completing an observation does not
+complete the original objective.
+
+Ask reviews the exact observation, model continuation and final effects. Matching
+signed Full Access advances those same stages without per-action prompts. Both
+recheck current owner/executor sessions, capability contracts, Personal Policy,
+delegation and evidence before model disclosure and effects. References belong
+to the same reviewed continuation and owner. Three observation stages are the
+maximum; observations expire after 120 seconds. Unverified, changed, oversized or
+known credential-bearing output cannot enter the continuation. Each result is
+limited to 4 KiB and total encoded context to 16 KiB.
+
+The initial review discloses the selected private model sources. Raw tool data is
+attached transiently at model execution; canonical planning prompts retain exact
+result/evidence references. The model treats observations as untrusted data and
+returns a new validated plan; data cannot grant authority. New dependencies refer
+only to steps in that response. General image reasoning, arbitrary tool feedback,
+semantic objective verification and unrestricted discovery are not established by
+this bounded text loop.
+
 ## Voice-driven orchestration
 
 Voice commands enter the same task/orchestration contracts as text.
