@@ -667,3 +667,34 @@ work remains open. [Receipt](../evidence/software-completion/observation-decodin
 
 
 **2026-10-25 stacked conversation courtesy:** fixed shared routing of "could you please write" and equivalent spacing/case variants to the existing signed action review. Questions and recall stay excluded; no new authority is granted. All 76 affected conversation/planner tests pass on stable sources (89.258 s), plus Ruff/mypy. The 1,241-case full PASS predates this parser change. [Receipt](../evidence/software-completion/courtesy-routing-2026-10-25.json).
+
+
+**2026-10-25 latest allowance checkpoint (1 percent remaining, 21:28 IST):**
+Runtime checkpoint is `5ccceeb`; full regression receipt commit `8c634b5` records
+source-stable `d58116c` 1,241 total / 1,231 PASS / ten SKIP / zero failures/errors
+(931.956 s). The later shared courtesy-routing fix has 76/76 focused PASS
+(89.258 s), Ruff and mypy PASS; do not call that later source a full-regression
+PASS. No source changes are pending.
+
+The existing ten-minute real synthetic TLS Core/Worker restart/readback/resource
+soak is running in exec session **22190**, started approximately 21:23 IST:
+`python scripts/software_soak_reference.py --seconds 600 --interval 2 --output
+.oscar/soak-courtesy-20261025.json` with `PYTHONPATH=.`. Log:
+`.oscar/soak-courtesy-20261025.log`. At checkpoint there is no final JSON or error
+output; this is PENDING, not PASS. Keep runtime sources frozen until completion.
+On resume, collect the session/result, verify `status`, `source_sha256`, independent
+readback count, both restart receipts and cleanup before integrating the receipt.
+The script owns its disposable processes/workspace and performs cleanup in finally.
+Do not stop unrelated processes or the owner's ML training.
+
+Remaining software: reliable general model/native image reasoning; broader
+model-driven account/MCP/service and cross-app workflows; general Chief-of-Staff
+prioritization/replanning; current whole-product rendered native/accessibility,
+latency and sustained operational acceptance. Existing connector executor admits
+only transient task-bound `request_ref`, consumes it before dispatch and rejects
+expired input; general model tool planning must preserve that private boundary,
+current schemas/account generations and revocation. Read-only task attention is
+implemented, not general replanning. Earlier intermittent focus failures and
+stale-frame marker ambiguity remain unresolved despite the latest full PASS.
+No subagents, quota reset, model load, physical device, real account, production
+authority activation, provisioning, push or remote mutation were used.
