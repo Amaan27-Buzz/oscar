@@ -201,6 +201,25 @@ from inventory updates; missing live limits can use only a still-fresh sourced
 seed, otherwise they are UNKNOWN. An inventory refresh does not refresh facts it
 did not return.
 
+Enabled local Ollama providers can opt into the same discovery path; the disabled
+local template now selects it. After `/tags`, exact-model `/show` reads enrich at
+most 64 installed identities within the remaining inventory request budget.
+Completion maps to text/structured protocol support, and vision is added only
+when declared with completion. Forwarded, malformed or failed metadata leaves
+that listed model inactive. Embedding-only models are not text candidates. No
+model is downloaded, loaded or benchmarked by this metadata discovery.
+
+The declared architecture context length supplies the shared input/output
+envelope; unknown or invalid lengths remain unknown. Ollama's `num_predict`
+bound is constrained by that same envelope, rather than an invented independent
+output allowance. Local generation explicitly requests `num_ctx` for the admitted
+input reservation plus output budget. This can fail if the runtime lacks memory;
+metadata does not prove available hardware capacity or model accuracy. New
+candidates retain conservative unbenchmarked quality tier 1. Full raw `/show`
+templates/model metadata are not retained. The fresh image-disclosure preflight
+still runs for every generation even when the inventory remains cached.
+See the official [Ollama model metadata contract](https://github.com/ollama/ollama/blob/main/docs/api.md#show-model-information).
+
 Visibility, recent generation success, retirement and funding are independent.
 Fresh listings cannot lift a recent access/funding refusal; official retirement
 guards override API catalogs that still list shut-down models. Retirement sources

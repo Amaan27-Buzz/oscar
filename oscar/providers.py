@@ -270,6 +270,8 @@ class HTTPAdapter:
                         base64.b64encode(image.data).decode("ascii") for image in request.images
                     ]
                 body["options"] = {"num_predict": request.max_output_tokens}
+                if provider.local:
+                    body["options"]["num_ctx"] = request.input_tokens + request.max_output_tokens
                 if request.ollama_think is not None:
                     body["think"] = request.ollama_think
                 if "structured" in request.required:

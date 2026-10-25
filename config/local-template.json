@@ -8,6 +8,7 @@
       "credential_envs": {},
       "local": true,
       "private": true,
+      "discovery_required": true,
       "enabled": false
     },
     {

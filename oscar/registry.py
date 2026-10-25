@@ -140,9 +140,13 @@ class Registry:
                     else seed.output_limit,
                     funding=discovered.funding
                     if inventory.provider == "openrouter"
+                    or provider.local
+                    and provider.adapter == "ollama"
                     else seed.funding,
                     funding_source=inventory.source
                     if inventory.provider == "openrouter"
+                    or provider.local
+                    and provider.adapter == "ollama"
                     else seed.funding_source,
                     metadata_source=inventory.source,
                 )
@@ -204,9 +208,22 @@ class Registry:
             else seed.output_limit
             if seed and seed_current
             else None,
-            funding=entry.funding if provider == "openrouter" and entry else spec.funding,
+            funding=entry.funding
+            if entry
+            and (
+                provider == "openrouter"
+                or self.providers[provider].local
+                and self.providers[provider].adapter == "ollama"
+            )
+            else spec.funding,
             funding_source=inventory.source
-            if provider == "openrouter" and entry and inventory
+            if entry
+            and inventory
+            and (
+                provider == "openrouter"
+                or self.providers[provider].local
+                and self.providers[provider].adapter == "ollama"
+            )
             else spec.funding_source,
             price_per_million=0
             if provider == "openrouter" and entry and entry.funding == Funding.FREE

@@ -545,6 +545,191 @@ class ProviderContractTests(unittest.TestCase):
         )
         self.assertEqual(self.requests[0]["path"], "/models")
 
+    def test_local_ollama_inventory_enriches_exact_models_without_loading_them(self):
+        from oscar.registry import Registry
+
+        provider = replace(self.provider, adapter="ollama", discovery_required=True)
+        self.scheduled = [
+            (200, {"models": [{"name": "vision:1"}, {"name": "text:1"}, {"name": "embed:1"}]}),
+            (
+                200,
+                {
+                    "capabilities": ["completion", "vision", "tools"],
+                    "model_info": {"general.architecture": "test", "test.context_length": 32768},
+                    "template": "DO_NOT_RETAIN_RAW_MODEL_METADATA",
+                },
+            ),
+            (
+                200,
+                {
+                    "capabilities": ["completion"],
+                    "model_info": {
+                        "general.architecture": "other",
+                        "other.context_length": 8192,
+                    },
+                },
+            ),
+            (200, {"capabilities": ["embedding"]}),
+        ]
+        inventory = HTTPDiscovery().inventory(provider, "fixture-local", "", 2)
+        self.assertEqual(["/tags", "/show", "/show", "/show"], [r["path"] for r in self.requests])
+        self.assertEqual(
+            [{"model": name} for name in ("vision:1", "text:1", "embed:1")],
+            [r["body"] for r in self.requests[1:]],
+        )
+        vision, text, embedding = inventory.models
+        self.assertEqual(frozenset({"text", "structured", "vision"}), vision.capabilities)
+        self.assertEqual(
+            (32768, 32768, Funding.LOCAL, True),
+            (vision.context_limit, vision.output_limit, vision.funding, vision.active),
+        )
+        self.assertEqual(frozenset({"text", "structured"}), text.capabilities)
+        self.assertEqual(frozenset(), embedding.capabilities)
+        self.assertFalse(embedding.active)
+        registry = Registry([provider], [])
+        registry.apply_inventory(inventory)
+        resolved = registry.model_for_slot(
+            provider.id, vision.id, "fixture-local", inventory.source.observed_at
+        )
+        self.assertEqual(vision.capabilities, resolved.capabilities)
+        self.assertEqual(Funding.LOCAL, resolved.funding)
+        self.assertEqual(1, resolved.quality)  # Discovered candidates remain unbenchmarked.
+        self.assertNotIn("DO_NOT_RETAIN", json.dumps(registry.inventory_record(inventory)))
+
+    def test_local_inventory_rejects_forwarded_unknown_or_failed_metadata_per_model(self):
+        provider = replace(self.provider, adapter="ollama")
+        cases = [
+            (
+                200,
+                {"capabilities": ["completion", "vision"], "remote_host": "https://remote.invalid"},
+            ),
+            (200, {"capabilities": ["completion"], "remote_model": "cloud:1"}),
+            (200, {"capabilities": ["completion"], "remote_host": None}),
+            (200, {}),
+            (200, {"capabilities": "completion"}),
+            (503, {"error": "unavailable"}),
+        ]
+        self.scheduled = [
+            (200, {"models": [{"name": f"model:{n}"} for n in range(len(cases))]})
+        ] + cases
+        inventory = HTTPDiscovery().inventory(provider, "fixture-local", "", 2)
+        self.assertTrue(inventory.complete)  # Membership is complete, metadata is unavailable.
+        self.assertTrue(all(m.active is False and not m.capabilities for m in inventory.models))
+        self.assertTrue(all(m.funding == Funding.UNKNOWN for m in inventory.models))
+
+    def test_local_inventory_metadata_has_one_total_budget_and_bounded_fanout(self):
+        provider = replace(self.provider, adapter="ollama")
+        self.body = {"models": [{"name": "one:1"}, {"name": "two:1"}]}
+        with patch("oscar.discovery.monotonic", side_effect=[0, 3, 3]):
+            inventory = HTTPDiscovery().inventory(provider, "fixture-local", "", 2)
+        self.assertEqual(["/tags"], [r["path"] for r in self.requests])
+        self.assertTrue(all(m.active is False for m in inventory.models))
+        self.body = {"models": [{"name": f"model:{n}"} for n in range(65)]}
+        with self.assertRaises(ProviderError):
+            HTTPDiscovery().inventory(provider, "fixture-local", "", 2)
+        self.assertEqual(["/tags", "/tags"], [r["path"] for r in self.requests])
+
+    def test_local_inventory_missing_context_does_not_invent_capacity(self):
+        provider = replace(self.provider, adapter="ollama")
+        for context in (None, True, "8192", 0, -1, 10**13):
+            with self.subTest(context=context):
+                self.scheduled = [
+                    (200, {"models": [{"name": "text:1"}]}),
+                    (
+                        200,
+                        {
+                            "capabilities": ["completion"],
+                            "model_info": {
+                                "general.architecture": "test",
+                                "test.context_length": context,
+                            },
+                        },
+                    ),
+                ]
+                model = HTTPDiscovery().inventory(provider, "fixture-local", "", 2).models[0]
+                self.assertIsNone(model.context_limit)
+                self.assertIsNone(model.output_limit)
+
+    def test_hosted_ollama_inventory_does_not_claim_local_vision_or_funding(self):
+        provider = replace(self.provider, adapter="ollama", local=False)
+        self.body = {"models": [{"name": "cloud:1"}]}
+        inventory = HTTPDiscovery().inventory(provider, "fixture", "synthetic-only", 2)
+        self.assertEqual(["/tags"], [r["path"] for r in self.requests])
+        self.assertEqual(frozenset(), inventory.models[0].capabilities)
+        self.assertEqual(Funding.UNKNOWN, inventory.models[0].funding)
+
+    def test_local_ollama_context_reservation_is_explicit_and_hosted_is_unchanged(self):
+        request = replace(self.request, prompt="synthetic " * 2000, max_output_tokens=512)
+        local = HTTPAdapter("ollama")._request(self.provider, "model:1", "", request, False)
+        self.assertEqual(request.input_tokens + 512, json.loads(local.data)["options"]["num_ctx"])
+        hosted = HTTPAdapter("ollama")._request(
+            replace(self.provider, local=False), "model:1", "", request, False
+        )
+        self.assertNotIn("num_ctx", json.loads(hosted.data)["options"])
+
+    def test_discovered_local_vision_routes_without_seed_and_rechecks_before_image_disclosure(self):
+        import hashlib
+
+        from oscar.credentials import CredentialPool
+        from oscar.models import Mode, ModelSpec, RoutingPolicy
+        from oscar.registry import Registry
+        from oscar.router import Router
+        from oscar.screen_image import ScreenImage
+        from tests.support import RouterRig
+        from tests.test_screen_observations import png
+
+        rig = RouterRig()
+        self.addCleanup(rig.close)
+        provider = replace(self.provider, adapter="ollama", discovery_required=True)
+        metadata = {
+            "capabilities": ["completion", "vision"],
+            "model_info": {
+                "general.architecture": "test",
+                "test.context_length": 32768,
+            },
+        }
+        self.scheduled = [
+            (200, {"models": [{"name": "discovered:1"}]}),
+            (200, metadata),
+            (200, metadata),
+            (200, {"response": '{"ok":true}', "done": True}),
+        ]
+        registry = Registry([provider], [], rig.store)
+        router = Router(
+            registry,
+            CredentialPool([provider], {}, rig.store),
+            {"ollama": HTTPAdapter("ollama")},
+            rig.store,
+            discovery=HTTPDiscovery(),
+        )
+        raw = png(8, 8)
+        request = replace(
+            self.request,
+            mode=Mode.PRIVATE,
+            required=frozenset({"text", "structured", "vision"}),
+            images=(ScreenImage(raw, 8, 8, hashlib.sha256(raw).hexdigest()),),
+        )
+        result = router.execute(request, RoutingPolicy(timeout_seconds=2), lambda: None)
+        self.assertEqual('{"ok":true}', result.response.text)
+        self.assertEqual("discovered:1", result.route.model)
+        self.assertEqual(
+            ["/tags", "/show", "/show", "/generate"], [r["path"] for r in self.requests]
+        )
+        self.assertTrue(all("images" not in (r["body"] or {}) for r in self.requests[:-1]))
+        self.assertIn("images", self.requests[-1]["body"])
+        self.assertNotIn(raw.hex(), json.dumps(rig.store.all("model_inventory")))
+        inventory = registry.inventories[(provider.id, provider.id + "-local")]
+        # A configured seed's unknown funding must also receive this slot's fresh metadata.
+        seeded = Registry([provider], [ModelSpec(provider.id, "discovered:1", frozenset(), 1, {})])
+        seeded.apply_inventory(inventory)
+        self.assertEqual(Funding.LOCAL, seeded.models[(provider.id, "discovered:1")].funding)
+        self.assertEqual(
+            Funding.LOCAL,
+            seeded.model_for_slot(
+                provider.id, "discovered:1", provider.id + "-local", inventory.source.observed_at
+            ).funding,
+        )
+
     def test_unknown_usage_and_quota_stay_unknown(self):
         del self.body["usage"]
         response = self.generate()

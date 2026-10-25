@@ -1,0 +1,52 @@
+{
+  "classification": "LOCAL_OLLAMA_METADATA_DISCOVERY_SOFTWARE_VERIFIED_MODEL_ACCURACY_OPEN",
+  "base_head": "9112edaf23057efd7ffc9dd591ca42146cb63d72",
+  "sources": {
+    "oscar/discovery.py": "48a95984a7cc1214eecd9019a02c9176c82699897e4d30fe524e8c49982747f1",
+    "oscar/providers.py": "fef3ece76596be22cd236b88214d91f591ce676b81b1e19489fcd53a2782c935",
+    "oscar/registry.py": "30be72d32c9af6f7e4914bcb08aa7b4340edeb025f9c4e39c1164803e987b2f3",
+    "config/local-template.json": "98a4781ee58a788c4d56d82567ebaff8b17f1ba9255cd595750b7f6f888c34a8",
+    "tests/test_providers.py": "93ebd8cefb3c42c35109401594bde1d0bcaaea83f741fc55895902b8c658a315"
+  },
+  "checks": {
+    "affected_integration": {
+      "total": 183,
+      "passed": 183,
+      "failed": 0,
+      "skipped": 0,
+      "seconds": 90.825,
+      "source_stable": true
+    },
+    "ruff": "PASS",
+    "mypy": {
+      "state": "PASS",
+      "source_files": 106
+    },
+    "repository_links_and_secret_safety": "PASS"
+  },
+  "implemented": [
+    "Opt-in local Ollama inventory enrichment through exact-model /show after /tags, at most 64 identities and remaining inventory budget passed to each read",
+    "Completion/text/structured and declared vision support with architecture context envelope; fresh LOCAL funding resolved per slot",
+    "Forwarded, malformed, unavailable or budget-exhausted metadata keeps listed identity inactive; unknown context stays unknown",
+    "Local generation explicitly reserves num_ctx for admitted input plus output instead of relying on the runtime default",
+    "Disabled local template opts into discovery without activating a provider or model",
+    "Real loopback HTTP proves empty-registry discovery to private image generation, including a second /show immediately before disclosure; no seed needed"
+  ],
+  "limits": [
+    "Metadata is a trusted-server declaration, not model accuracy, cryptographic locality or hardware capacity proof",
+    "Output shares the declared total context envelope; this is an admission bound, not measured output capacity",
+    "Runtime context reservation can fail when hardware memory is insufficient; no model was loaded or benchmarked in this campaign",
+    "Per-call socket timeout and remaining-budget admission bound reads; this is not a hard real-time network wall-clock guarantee",
+    "Hosted Ollama metadata behavior is unchanged; embedding-only models are not text candidates",
+    "This 183-case portable integration is not a full regression or native acceptance; previous 152-case native integration retained two foreground failures",
+    "Earlier first attempt at the new test omitted required private mode and failed before any model request; corrected test and final integration pass",
+    "No real account, physical device, production authority, cloud provisioning, publication or owner training-process operation"
+  ],
+  "references": {
+    "ollama_model_information": "https://github.com/ollama/ollama/blob/main/docs/api.md#show-model-information"
+  },
+  "logs": {
+    ".oscar/local-model-discovery-integration.log": "ca118443706580ff5faa5c529d1a7c88be4b835d9afc610a1201af125365ccab",
+    ".oscar/local-model-discovery-integration-manifest.json": "5d6228132540c973b7a79fb505bfca55274201e6342a1c3c90026d7aad41ba81"
+  }
+}

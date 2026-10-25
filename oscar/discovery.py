@@ -3,9 +3,9 @@
 import json
 import re
 from collections.abc import Callable
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from http.client import HTTPException
-from time import time
+from time import monotonic, time
 from typing import Any
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote
@@ -87,6 +87,13 @@ class HTTPDiscovery:
         self, provider: ProviderSpec, model: str, secret: str, timeout: float
     ) -> frozenset[str]:
         """A loopback server can proxy cloud models; inspect before private disclosure."""
+        return frozenset(
+            self._local_ollama_metadata(provider, model, secret, timeout)["capabilities"]
+        )
+
+    def _local_ollama_metadata(
+        self, provider: ProviderSpec, model: str, secret: str, timeout: float
+    ) -> dict[str, Any]:
         if not provider.local or provider.adapter != "ollama":
             raise ProviderError(Failure.CAPABILITY)
         data = self._get(provider, secret, "/show", timeout, payload={"model": model})
@@ -98,7 +105,7 @@ class HTTPDiscovery:
             or any(not isinstance(c, str) or not 1 <= len(c) <= 64 for c in capabilities)
         ):
             raise ProviderError(Failure.CAPABILITY)
-        return frozenset(capabilities)
+        return data
 
     @staticmethod
     def _model(item: Any, provider: ProviderSpec) -> DiscoveredModel:
@@ -158,6 +165,7 @@ class HTTPDiscovery:
     def inventory(
         self, provider: ProviderSpec, slot: str, secret: str, timeout: float = 10
     ) -> Inventory:
+        deadline = monotonic() + timeout
         path = (
             "/tags"
             if provider.adapter == "ollama"
@@ -191,6 +199,44 @@ class HTTPDiscovery:
             raise ProviderError(Failure.CAPABILITY)
         if len({m.id for m in rows}) != len(rows):
             raise ProviderError(Failure.CAPABILITY)
+        if provider.local and provider.adapter == "ollama":
+            if len(rows) > 64:
+                raise ProviderError(Failure.CAPABILITY)
+            enriched = []
+            for model in rows:
+                try:
+                    remaining = deadline - monotonic()
+                    if remaining <= 0:
+                        raise ProviderError(Failure.NETWORK)
+                    metadata = self._local_ollama_metadata(provider, model.id, secret, remaining)
+                    declared = metadata["capabilities"]
+                    caps = {"text", "structured"} if "completion" in declared else set()
+                    if caps and "vision" in declared:
+                        caps.add("vision")
+                    info = metadata.get("model_info", {})
+                    architecture = (
+                        info.get("general.architecture") if isinstance(info, dict) else None
+                    )
+                    context = (
+                        count(info.get(architecture + ".context_length"))
+                        if isinstance(architecture, str) and len(architecture) <= 80
+                        else None
+                    )
+                    enriched.append(
+                        replace(
+                            model,
+                            capabilities=frozenset(caps),
+                            context_limit=context or None,
+                            # Ollama num_predict shares the model's total context envelope.
+                            output_limit=context or None,
+                            funding=Funding.LOCAL,
+                            active=bool(caps),
+                        )
+                    )
+                except ProviderError:
+                    # Keep listed identity, but never activate unavailable or forwarded metadata.
+                    enriched.append(replace(model, active=False))
+            rows = enriched
         links = data.get("links", {})
         complete = not bool(token) and isinstance(links, dict) and not bool(links.get("next"))
         return Inventory(provider.id, slot, source, tuple(rows), complete, pages)
