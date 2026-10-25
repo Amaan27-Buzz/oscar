@@ -37,6 +37,12 @@ def validate_stage(steps: list[dict[str, Any]]) -> None:
             ]
             and isinstance(intent.get("parameters"), dict)
             and machine_readback(step["capability_id"], intent["parameters"]) is not None
+            or ":" in step["capability_id"]
+            and intent.get("kind") == "capability"
+            and intent.get("capability_kind") == step["capability_id"]
+            and isinstance(intent.get("parameters"), dict)
+            and set(intent["parameters"]) == {"request_ref"}
+            and (intent.get("criterion") or {}).get("kind") == "connector_observation"
             or step["capability_id"] == "math.add"
             and intent.get("kind") is None
             or step["capability_id"] == "machine.apps"
@@ -203,6 +209,23 @@ def context(store: Store, grid: Grid, refs: dict[str, Any], *, task_id: str | No
                 raise PermissionError("observation executor denied by current policy")
         result, evidence = verified_result(store, pin["task_id"])
         value = result["value"]
+        expires = row["observation_expires"]
+        source = {}
+        if (step["intent"].get("criterion") or {}).get("kind") == "connector_observation":
+            cached = store.transient.get("connector-observation:" + result["task_id"])
+            if cached is None or cached["expires"] <= grid.clock():
+                raise PermissionError("private provider observation expired or Core restarted")
+            cached["guard"]()
+            value = cached["value"]
+            expires = min(expires, cached["expires"])
+            source = {
+                "account_id": step["intent"]["criterion"]["connector_account"]["id"],
+                "capability_id": step["capability_id"],
+            }
+            if cached["result_id"] != result["id"] or (
+                digest(json.loads(value)) != evidence.get("content_hash")
+            ):
+                raise PermissionError("private provider observation changed")
         if not isinstance(value, str) or len(value.encode()) > 4096:
             raise ValueError("observation exceeds bounded text disclosure")
         if redact_runtime_secrets(value) != value:
@@ -213,8 +236,9 @@ def context(store: Store, grid: Grid, refs: dict[str, Any], *, task_id: str | No
                 "task_id": pin["task_id"],
                 "evidence_id": evidence["id"],
                 "observed_at": evidence["observed_at"],
-                "expires_at": row["observation_expires"],
+                "expires_at": expires,
                 "value": value,
+                **source,
                 **(
                     {
                         "media_type": "image/png",

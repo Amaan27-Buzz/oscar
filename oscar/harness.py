@@ -350,7 +350,9 @@ class Harness:
 
         self.plugins = MCPPlugins(self.store, self.connectors, authorize_account=authorize_account)
         self.connector_plans = ConnectorPlanning(self)
-        self.runtime.verifier = ConnectorVerifier(self.runtime.verifier, self.connectors)
+        self.runtime.verifier = ConnectorVerifier(
+            self.runtime.verifier, self.connectors, self.connector_plans.verify_observation
+        )
         self.runtime.connections = self
         self.registry = Registry.load(manifest, self.store)
         self.pool = CredentialPool(

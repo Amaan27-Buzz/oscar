@@ -866,11 +866,18 @@ class ConnectorFabric:
 
 
 class ConnectorVerifier(Verifier):
-    """Only explicit expected fields and an independently authorized GET can prove a write."""
+    """Independent account GET readback for writes and private read observations."""
 
-    def __init__(self, base: Verifier, fabric: ConnectorFabric):
+    def __init__(
+        self,
+        base: Verifier,
+        fabric: ConnectorFabric,
+        observation_verifier: Callable[[Objective, Result, ConnectorOutcome | None], Verification]
+        | None = None,
+    ):
         super().__init__(base.files, base.clock)
         self.base, self.fabric = base, fabric
+        self.observation_verifier = observation_verifier
 
     def bind_task(self, task_id: str, parameters: dict[str, Any]) -> None:
         self.fabric.bind_task(task_id, parameters)
@@ -883,6 +890,8 @@ class ConnectorVerifier(Verifier):
             self.fabric.forget_outcome(result.id)
 
     def _verify(self, objective: Objective, result: Result) -> Verification:
+        if objective.criterion.get("kind") == "connector_observation" and self.observation_verifier:
+            return self.observation_verifier(objective, result, self.fabric.outcomes.get(result.id))
         if objective.criterion.get("kind") not in {"connector_fields", "connector_communication"}:
             return self.base.verify(objective, result)
         criterion = objective.criterion

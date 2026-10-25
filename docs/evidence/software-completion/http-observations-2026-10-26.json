@@ -1,0 +1,59 @@
+{
+  "classification": "NATIVE_ACCOUNT_GET_PRIVATE_ADAPTIVE_CONTINUATION_SOFTWARE_VERIFIED",
+  "date": "2026-10-26",
+  "base_head": "cfcf6052ff72f9daa4f71c4ade4054eecb4a9610",
+  "change": "Current native account HTTPS GET reads can form a bounded verified observation stage. A separately authorized matching GET proves the source response; private model continuation can then propose independently verified artifact effects under signed Ask or synthetic Full.",
+  "checks": {
+    "focused": {
+      "total": 12,
+      "passed": 12,
+      "seconds": 17.498
+    },
+    "integration": {
+      "total": 243,
+      "passed": 243,
+      "failed": 0,
+      "errors": 0,
+      "test_seconds": 238.541,
+      "wrapper_seconds": 239.679,
+      "source_stable": true
+    },
+    "static": "Ruff, mypy (107 files), repository/link/secret and diff checks PASS",
+    "covered": [
+      "Ask read and independent GET, exact signed private continuation, final reviewed verified file effect",
+      "Synthetic Full current-information preflight, GET comparison, private replanning and file readback without per-action prompts",
+      "Source-response drift, hash tampering, lost private cache, expiry and account rotation block continuation",
+      "Owner revocation during independent GET and read-permission withdrawal prevent proof/disclosure",
+      "Body-bearing GET, native writes and oversized source data cannot become observations",
+      "Structured decoder keeps the selected dynamic connector identity and requires observation mode",
+      "Provider JSON absent from durable result/review records; only content hash and provenance retained"
+    ],
+    "development_failures": "Initial cases used Grid low risk instead of native read risk, corrected to the frozen native contract. Drift fixture initially returned the same tampered response twice; corrected to actual between-read mutation. Full fixture initially used a pure read classified outside execution; corrected to a current-information write objective. Earlier logs retained."
+  },
+  "sources": {
+    "oscar/connectors.py": "cad2c623176ae985e97f4720bb041486999026b7fcaf41df98fa496771a495b6",
+    "oscar/harness.py": "c478e252722485be43a795e6cf0e0f99655c6a944dc67522de981a6aa7e68f32",
+    "oscar/planner_authoring.py": "d4da103c19d8b4c1d75eb2ab966747781492490c652cfec7b84314ff367b0043",
+    "oscar/planner_connectors.py": "22d2551993a93f20c7a98e279109afc766f572f0e06f75f1e4c871c8172159c6",
+    "oscar/planner_observations.py": "ed04ed939dfcbeb402e5ebab0bf5d39762b53efa59b96978f634bd82b50083be",
+    "oscar/planning_contract.py": "e9f0c462bd5d7a86dd3aec476ea2d33ab9054014fcb8f981b82f98fde0668b2c",
+    "tests/test_planner_http_observations.py": "4cb1beac03ef19c31191f15aa7ab6ae4a553e5c4b47d0c230a3db47351f77371"
+  },
+  "logs": {
+    ".oscar/http-observation-focused.log": "539115de7e5ad8df91dc1b326e53a19b07337ca8ec6d6e1a36f640b837092dac",
+    ".oscar/http-observation-focused-2.log": "8ee9a43804091b9431e3fa28176b5c9351eb8f3144abf2ce4bf47aa302efcb8d",
+    ".oscar/http-observation-focused-3.log": "93f1b0f6455c98c824131b88cb5821409cd3dfcf1b8c0241e9ffc9dd481b317c",
+    ".oscar/http-observation-focused-final.log": "b90aa8d33646bdb8030000e9adb1bda9998cdd519d216b16a9a37a0ed2b712f8",
+    ".oscar/http-observation-focused-complete.log": "795a4b769c66c2d322e581b2faa24197ee0e52fa6e73d4be6fe2c4a47fe86988",
+    ".oscar/http-observation-integration.log": "42ee8b0634fb36e2940cf9c8094e4e1f3c43c5382f0b6e0ba6753f4ee02ff124",
+    ".oscar/http-observation-integration-manifest.json": "0f9d065185fc9c47cc3bd6938e87f032b1447dcefbc4d1fea6245b972cce60a3"
+  },
+  "limits": [
+    "Synthetic model/provider HTTP and owners; no actual-model/provider, rendered-native or physical-device acceptance",
+    "Only bodyless native account HTTPS GET declared read-only with connectors:read qualifies; MCP tools and writes remain ineligible",
+    "At most 4 KiB of source JSON, existing three-stage budget and bounded transient-store capacity; expiry is min(remaining input lifetime, endpoint freshness)",
+    "Matching source responses do not prove broader provider semantics, future state, a mutation or the overall objective",
+    "The preceding source-stable 1265-case full PASS at 1996328 predates this change; fresh full regression pending",
+    "No push, Actions, real accounts, production authority, public deployment or cloud provisioning"
+  ]
+}

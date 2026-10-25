@@ -5,8 +5,16 @@ import re
 from dataclasses import asdict
 from typing import TYPE_CHECKING, Any
 
-from .connectors import AuthType, ConnectionState, ConnectorCapability, endpoint
-from .contracts import Task, TaskState
+from .capabilities import Cancellation, Cancelled
+from .connectors import (
+    AuthType,
+    ConnectionState,
+    ConnectorCapability,
+    ConnectorError,
+    ConnectorOutcome,
+    endpoint,
+)
+from .contracts import Epistemic, Evidence, Objective, Result, Task, TaskState, Verification, new_id
 from .executive import digest
 from .jev import Intent
 
@@ -56,6 +64,7 @@ class ConnectorPlanning:
             "instance": {**asdict(instance), "granted_scopes": sorted(instance.granted_scopes)},
             "operation": operation,
             "schema": schema,
+            "risk": spec.risk.value,
             "transport": "mcp" if instance.manifest.auth == AuthType.MCP else "https",
             "endpoint": {
                 "method": spec.method,
@@ -110,6 +119,7 @@ class ConnectorPlanning:
             "account_generation": instance["account_generation"],
             "operation": current["operation"],
             "transport": current["transport"],
+            "risk": current["risk"],
             "endpoint": current["endpoint"],
             "argument_schema": current["schema"],
             "intent_examples": [
@@ -125,7 +135,8 @@ class ConnectorPlanning:
             "intent_rule": (
                 "Supply parameters with exactly arguments, an object matching argument_schema. "
                 "Use the exact selected account/tool; never invent arguments or references. "
-                "No inputs substitutions, verification claims or connector observation stages. "
+                "No input substitutions or verification claims. Observation stages may use "
+                "only native HTTPS GET operations marked read, without a body. "
                 "For HTTPS, arguments contains only path/query/body; origin, method, headers "
                 "and credentials are fixed by Core. Body fields must come from the owner's "
                 "explicit request; the endpoint shape is not a provider body-field schema. "
@@ -133,6 +144,18 @@ class ConnectorPlanning:
                 "A tool report does not independently verify the objective."
             ),
         }
+
+    def is_read(self, cap: dict[str, Any]) -> bool:
+        if self.descriptor(cap) is None:
+            return False
+        current = self.contract(cap)
+        return (
+            current["transport"] == "https"
+            and current["endpoint"]["method"] == "GET"
+            and current["risk"] == "read"
+            and list(cap["permissions"]) == ["connectors:read"]
+            and "body" not in current["schema"]["properties"]
+        )
 
     def pins(self, caps: list[dict[str, Any]]) -> list[dict[str, Any]]:
         return [
@@ -166,10 +189,21 @@ class ConnectorPlanning:
                 self.h.connectors.release_request(ref)
                 self.inputs.pop(ref, None)
         for ref, entry in list(self.h.store.transient.items()):
-            if ref.startswith("assistance-review:") and entry["expires"] <= self.h.grid.clock():
+            if ref.startswith(("assistance-review:", "connector-observation:")) and (
+                entry["expires"] <= self.h.grid.clock()
+            ):
                 self.h.store.transient.pop(ref, None)
 
     def task_transitioned(self, task: Task) -> None:
+        if task.state not in {
+            TaskState.PLANNED,
+            TaskState.EXECUTING,
+            TaskState.AWAITING_RESULT,
+            TaskState.RESULT_RECEIVED,
+            TaskState.VERIFYING,
+            TaskState.VERIFIED,
+        }:
+            self.h.store.transient.pop("connector-observation:" + task.id, None)
         if task.state in {
             TaskState.PLANNED,
             TaskState.EXECUTING,
@@ -236,10 +270,13 @@ class ConnectorPlanning:
                     or intent.get("path") is not None
                     or intent.get("content") is not None
                     or intent.get("criterion") not in (None, {"kind": "unavailable"})
-                    or isinstance(document, dict)
-                    and document.get("observe")
                 ):
                     raise ValueError("exact connector argument plan required")
+                observe = isinstance(document, dict) and document.get("observe") is True
+                if observe and (
+                    not self.is_read(current["capability"]) or "body" in params["arguments"]
+                ):
+                    raise PermissionError("connector observations require a native read-only GET")
                 if current["transport"] == "mcp":
                     from jsonschema import Draft202012Validator  # type: ignore[import-untyped]
 
@@ -265,6 +302,7 @@ class ConnectorPlanning:
                     "pin": selected,
                     "expires": self.h.grid.clock() + 120,
                     "input_digest": digest(self.h.connectors.requests[ref]),
+                    **({"observation": arguments} if observe else {}),
                 }
 
                 def guard(reference: str = ref) -> None:
@@ -279,7 +317,7 @@ class ConnectorPlanning:
                         capability_kind=step["capability_id"],
                         parameters={"request_ref": ref},
                         criterion={
-                            "kind": "unavailable",
+                            "kind": "connector_observation" if observe else "unavailable",
                             "connector_account": {
                                 "id": account["account_id"],
                                 "generation": account["account_generation"],
@@ -303,6 +341,8 @@ class ConnectorPlanning:
         if (
             ref in self.h.connectors.requests
             and digest(self.h.connectors.requests[ref]) != row["input_digest"]
+            or "observation" in row
+            and digest(row["observation"]) != row["input_digest"]
         ):
             raise PermissionError("private connector arguments changed")
         return self.current(row["pin"])
@@ -333,6 +373,108 @@ class ConnectorPlanning:
                 }
             )
         return reviews
+
+    def verify_observation(
+        self, objective: Objective, result: Result, outcome: ConnectorOutcome | None
+    ) -> Verification:
+        matches = None
+        content_hash = None
+        detail = "independent account GET unavailable"
+        try:
+            from .executive import authorize_step
+
+            ref, row = next(
+                (ref, row)
+                for ref, row in self.inputs.items()
+                if row.get("effect_task") == result.task_id and "observation" in row
+            )
+            current = self.check(ref)
+            cap = current["capability"]
+            instance_id, name = cap["id"].split(":", 1)
+            instance = self.h.connectors.instances[instance_id]
+            spec = next(c for c in instance.manifest.capabilities if c.name == name)
+            if (
+                not self.is_read(cap)
+                or outcome is None
+                or not result.success
+                or outcome.result != result
+                or outcome.executed_instance != instance
+                or outcome.instance_id != instance_id
+                or outcome.capability_name != name
+                or result.executor != cap["id"]
+                or objective.correlation_id != result.correlation_id
+                or objective.criterion["connector_account"]
+                != {
+                    "id": instance.account_id,
+                    "generation": instance.account_generation,
+                }
+            ):
+                raise PermissionError("exact native account observation required")
+
+            def guard() -> None:
+                self.check(ref)
+                authorize_step(
+                    self.h.store,
+                    self.h.grid,
+                    result.task_id,
+                    cap,
+                    self.h.executive.targets[cap["node_id"]][1],
+                    self.h.memory,
+                )
+                for identifier in (name, "connectors:read"):
+                    if not self.h.connectors.policy.evaluate(
+                        identifier,
+                        ("connectors:read",),
+                        outcome.granted,
+                        outcome.context,
+                        confirmed=outcome.confirmed,
+                    ).allowed:
+                        raise PermissionError("observation readback denied")
+
+            value = json.dumps(outcome.payload, sort_keys=True, allow_nan=False)
+            if len(value.encode()) > 4096:
+                raise ValueError("bounded provider observation required")
+            cancellation = Cancellation(self.h.store, result.task_id, guard)
+            cancellation.check()
+            payload, _ = self.h.connectors._request(
+                instance, spec, row["observation"], cancellation
+            )
+            cancellation.check()
+            matches = digest(payload) == digest(outcome.payload)
+            detail = "independent account GET matches" if matches else "provider response changed"
+            if matches:
+                if len(self.h.store.transient) >= 100:
+                    raise ValueError("private observation capacity reached")
+                content_hash = digest(payload)
+                pin = dict(row["pin"])
+                self.h.store.transient["connector-observation:" + result.task_id] = {
+                    "value": value,
+                    "result_id": result.id,
+                    "expires": min(row["expires"], self.h.grid.clock() + spec.freshness_seconds),
+                    "guard": lambda: self.current(pin),
+                }
+        except (KeyError, StopIteration, ValueError, PermissionError, Cancelled, ConnectorError):
+            matches = None
+        evidence = Evidence(
+            new_id(),
+            result.task_id,
+            result.correlation_id,
+            "connector-independent-readback",
+            "native account GET response comparison",
+            self.h.grid.clock(),
+            matches,
+            Epistemic.VERIFIED if matches else Epistemic.REPORTED,
+            detail,
+            content_hash=content_hash,
+        )
+        return Verification(
+            TaskState.VERIFIED
+            if matches
+            else TaskState.FAILED
+            if matches is False
+            else TaskState.PARTIALLY_VERIFIED,
+            evidence,
+        )
 
     def arguments(self, ref: str, current: dict[str, Any]) -> dict[str, Any]:
         request = self.h.connectors.requests[ref]

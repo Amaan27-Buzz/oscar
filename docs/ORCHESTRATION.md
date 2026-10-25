@@ -323,8 +323,12 @@ payload in the canonical store. Ask still requires applicable action confirmatio
 available through the existing signed review in Desktop and Android;
 signed Full Access must cover the executor, capability and account generation.
 These one-shot immediate calls expire after 120 seconds and remain only reported
-unless an independent verifier exists. They cannot become observation evidence or
-implicitly authorize another account. See [Connector Fabric](CONNECTOR-FABRIC.md#model-authored-connector-execution).
+unless an independent verifier exists. Native account read-only HTTPS GETs may
+become private observations only after a separately authorized matching GET;
+MCP tools and writes remain ineligible. Expiring response text stays transient,
+with only provenance and a content hash retained as verification evidence.
+No operation implicitly authorizes another account.
+See [Connector Fabric](CONNECTOR-FABRIC.md#model-authored-connector-execution).
 
 ### Verified observations and private continuation
 

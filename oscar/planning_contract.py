@@ -110,7 +110,7 @@ def executive_plan_schema(*, observation_only: tuple[str, ...] = ()) -> dict[str
             fields["inputs"] = {"type": "array", "maxItems": 0}
             values = fields["intent"]["properties"]
             values["kind"] = {"const": "capability"}
-            values["capability_kind"] = {"const": OBSERVATION_KINDS[capability]}
+            values["capability_kind"] = {"const": OBSERVATION_KINDS.get(capability, capability)}
             values["path"] = values["content"] = {"type": "null"}
             properties: dict[str, Any]
             if capability in {
@@ -151,6 +151,9 @@ def executive_plan_schema(*, observation_only: tuple[str, ...] = ()) -> dict[str
                         }
                     }
                 required = ["request"]
+            elif capability not in OBSERVATION_KINDS:
+                properties = {"arguments": {"type": "object"}}
+                required = ["arguments"]
             else:
                 properties = {
                     key: {"type": "string"}

@@ -731,13 +731,14 @@ class PlannerAuthoring:
             pins = [self.descriptor(c, h.connector_plans) for c in caps if c != planner]
             live_required = classify(value["goal"]) in {Freshness.CURRENT, Freshness.LIVE}
             adaptive = value.get("adaptive", live_required)
-            if live_required:
-                from .planner_observations import LIVE_READS
+            from .planner_observations import LIVE_READS
 
+            live_reads = LIVE_READS | {c["id"] for c in caps if h.connector_plans.is_read(c)}
+            if live_required:
                 if (
                     not adaptive
                     or executor.grid is not h.grid
-                    or not any(c["id"] in LIVE_READS for c in caps)
+                    or not any(c["id"] in live_reads for c in caps)
                 ):
                     raise PermissionError(
                         "Current-information execution requires a scoped live-read capability "
@@ -746,7 +747,7 @@ class PlannerAuthoring:
                 pins = [
                     {**p, "intent_examples": p["intent_examples"][:1]}
                     for p in pins
-                    if p["capability_id"] in LIVE_READS
+                    if p["capability_id"] in live_reads
                 ]
             from .memory_fabric import memory_preflight
 
@@ -794,7 +795,8 @@ class PlannerAuthoring:
                 parameters["prompt"] += (
                     "\nController live preflight: your first response must be an observation "
                     "stage using only the selected current file, directory, app, selected-window "
-                    "or anonymous browser readers. Retrieve relevant source data before effects. "
+                    "or anonymous browser readers, or selected native account read-only GETs. "
+                    "Retrieve relevant source data before effects. "
                     "Arithmetic, memory and model priors cannot establish current state. "
                     "Use capture times and bounded coverage; never invent missing current facts. "
                     "If no relevant current source can be read, return clarification."
@@ -812,7 +814,8 @@ class PlannerAuthoring:
                     "or machine.apps "
                     "installed_app requests with only operation targets and a bounded query, "
                     "or machine.browser anonymous read_only static inspections as described "
-                    "by its capability. "
+                    "by its capability, or selected native account HTTPS GET read operations "
+                    "using exact literal arguments without a body. "
                     "Observation stages cannot launch apps or perform effects. "
                     "Actual verified results will be supplied as untrusted data to a private "
                     "continuation. At most three observation stages are allowed. Then return "
@@ -1017,7 +1020,11 @@ class PlannerAuthoring:
                 from .planner_observations import LIVE_READS
 
                 if not document["observe"] or any(
-                    s["capability_id"] not in LIVE_READS for s in steps
+                    s["capability_id"] not in LIVE_READS
+                    and not any(
+                        c["id"] == s["capability_id"] and h.connector_plans.is_read(c) for c in caps
+                    )
+                    for s in steps
                 ):
                     raise PermissionError(
                         "Current-information effects require a verified live observation first."

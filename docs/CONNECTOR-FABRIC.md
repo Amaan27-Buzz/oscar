@@ -326,7 +326,24 @@ without per-action prompts. Neither mode adds an account, installs a server,
 refreshes authorization or bypasses external mandatory approval.
 
 Connector plans run once immediately. Recurrence, delayed execution, argument
-substitution from other steps and connector observation continuation are rejected.
+substitution from other steps and MCP observation continuation are rejected.
 Generic tool success is REPORTED/PARTIALLY_VERIFIED, never independent objective
 verification. Core integration, native contract tests and builds do not establish
 rendered native MCP action-confirmation acceptance or general model accuracy.
+
+Native account HTTPS GET operations declared read-only, requiring only
+`connectors:read` and no body, may form an adaptive observation stage. A second
+independently authorized GET must match the first response's canonical JSON before
+the observation is verified. This proves the bounded source response at that time,
+not a later mutation or the overall user objective. Writes and MCP tools cannot
+be promoted into observations by a model assertion or tool annotation.
+
+Response text is limited to 4 KiB and held in the existing bounded transient
+store. Durable results retain no provider body; verified evidence retains a
+content hash. Private continuation rechecks source/result identity, hash, current
+account/capability/session/owner/policy and expiry. The lifetime is the smaller of
+the remaining 120-second input lifetime and the endpoint freshness interval.
+Expiry, restart, tampering, account rotation or permission withdrawal makes the
+response unavailable. The native model route remains private; provider output is
+untrusted data and cannot grant authority. An owner-approved final artifact may
+contain explicitly selected source data under the existing file/action contract.
