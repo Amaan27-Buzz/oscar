@@ -26,7 +26,20 @@
       "debug_build": "PASS"
     },
     "static": "Ruff/mypy 105/repository/secret/diff checks PASS",
-    "full_regression": "PENDING; latest prior source-stable Core regression 1214 total, 1204 passed, ten skipped at b3ed1c3 equivalence"
+    "full_regression": {
+      "state": "PASS",
+      "total": 1214,
+      "passed": 1204,
+      "skipped": 10,
+      "failures": 0,
+      "errors": 0,
+      "seconds": 862.049,
+      "wrapper_seconds": 865.133,
+      "head": "3d4fdfaa9c6f3fe3812e5c02ff2ebf0b2c1334e4",
+      "source_stable": true,
+      "manifest_sha256": "b7d1253479d4ea1402950233fa5a1fbdc5f469c84815269276f91c015669b0a6",
+      "log_sha256": "3e6662c49f69bb5666f7cc63aa8364c184cf278be79e5d37b01039a0b2d04a68"
+    }
   },
   "verified": [
     "65 completed temporary Workers plus older pending responsibility preserve all 66 canonical goals and Workers",
