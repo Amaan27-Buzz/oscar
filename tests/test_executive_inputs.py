@@ -47,6 +47,7 @@ class ExecutiveInputTests(unittest.TestCase):
         self.assertEqual("completed", self.r.store.get("executive_goal", goal["id"])["state"])
 
     def test_temporary_worker_lifecycle_preserves_history_without_lifetime_job_limit(self):
+        pending = self.e.propose(self.worker, "Keep old pending work visible", [self.step()])
         for index in range(65):
             worker = self.e.worker(
                 "Task " + str(index),
@@ -64,6 +65,15 @@ class ExecutiveInputTests(unittest.TestCase):
             )
         self.assertEqual(65, len(self.r.store.all("task")))
         self.assertTrue(self.r.store.get("executive_worker", self.worker)["enabled"])
+        snapshot = self.e.snapshot()
+        self.assertTrue(snapshot["truncated"])
+        self.assertEqual((66, 66), (snapshot["goals_total"], snapshot["workers_total"]))
+        self.assertEqual((64, 32), (len(snapshot["goals"]), len(snapshot["workers"])))
+        self.assertEqual(pending["id"], snapshot["goals"][0]["id"])
+        self.assertEqual(proposal["id"], snapshot["goals"][-1]["id"])
+        self.assertEqual(self.worker, snapshot["workers"][0]["id"])
+        self.assertEqual(65, snapshot["brief"]["verified_runs"])
+        self.assertEqual(66, len(self.r.store.all("executive_goal")))
 
     def test_temporary_worker_waits_for_other_active_responsibilities(self):
         worker = self.e.worker(

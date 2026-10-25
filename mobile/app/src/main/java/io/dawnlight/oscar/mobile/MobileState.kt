@@ -41,7 +41,7 @@ data class CoreArtifact(val id: String, val kind: String, val status: String, va
 data class CoreNode(val id: String, val role: String, val status: String, val paired: Boolean, val capabilities: List<String>, val inputKinds: Set<String> = emptySet())
 data class CoreSnapshot(val tasks: List<CoreTask>, val nodes: List<CoreNode>, val observedAt: Long,
     val presence: String? = null, val setup: Map<String, String> = emptyMap(), val adaptive: List<AdaptiveDescriptor> = emptyList(), val executive: List<ExecutiveGoal>? = null,
-    val management: ManagementView? = null, val connections: ConnectionView? = null)
+    val management: ManagementView? = null, val connections: ConnectionView? = null, val executiveTruncated: Boolean = false)
 data class ExecutiveGoal(val id: String, val goal: String, val state: String, val runs: Int, val maxRuns: Int)
 data class Interaction(val text: String, val response: String, val taskId: String? = null)
 /** An authenticated observation advances only with this process's monotonic clock. */
@@ -155,7 +155,7 @@ fun parseTask(json: JSONObject): CoreTask {
         evidence, value, blocker, response, json.optBoolean("response_truncated", false), progress, artifacts, ownership, origin, originNode,
         responseStatus = responseStatus, sourceEventIds = sources)
 }
-fun CoreSnapshot.withoutPrivate() = copy(adaptive = emptyList(), executive = null, management = null, connections = null, tasks = tasks.map { it.copy(description = "Private request hidden", response = null, value = null,
+fun CoreSnapshot.withoutPrivate() = copy(adaptive = emptyList(), executive = null, executiveTruncated = false, management = null, connections = null, tasks = tasks.map { it.copy(description = "Private request hidden", response = null, value = null,
     responseStatus = null, sourceEventIds = emptyList(),
     artifacts = emptyList(), progress = it.progress?.copy(step = "Worker checkpoint available"),
     blocker = it.blocker?.let { "Inspect Core before continuing" }, actions = it.actions.filter { action -> action in setOf("deny", "cancel") }) })
@@ -203,7 +203,11 @@ fun parseSnapshot(json: JSONObject): CoreSnapshot {
             ExecutiveGoal(goal.bounded("id", 80), goal.bounded("goal", 512), status, goal.getInt("verified_runs"), goal.getInt("max_runs"))
         }
     }
+    val executiveTruncated = json.optJSONObject("executive")?.let {
+        require(!it.has("truncated") || it.get("truncated") is Boolean)
+        it.optBoolean("truncated", false)
+    } ?: false
     return CoreSnapshot(parsedTasks, parsedNodes, observed.toLong(), presence, setup, adaptive, executive,
         json.optJSONObject("executive")?.optJSONObject("management")?.let(::parseManagement),
-        json.optJSONObject("connections")?.let(::parseConnections))
+        json.optJSONObject("connections")?.let(::parseConnections), executiveTruncated)
 }

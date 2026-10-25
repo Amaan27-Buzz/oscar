@@ -133,6 +133,7 @@ internal fun change(operation: String, id: String, value: JSONObject = JSONObjec
     }
     IllustratedIntro(if (page == "Worker") "Core responsibilities" else "Automations", artwork = R.drawable.illustration_automations, height = 152.dp)
     StatusLabel(if (state.snapshot?.executive == null) "Responsibility readback unavailable" else "Current Core readback")
+    if (state.snapshot?.executiveTruncated == true) Text("Showing current responsibilities and recent history.", style = MaterialTheme.typography.bodySmall)
     plannerDrafts.forEach { draft -> key(draft.getString("id")) {
         TactileSurface(Modifier.fillMaxWidth()) {
             Text(draft.getString("goal"), style = MaterialTheme.typography.titleSmall)

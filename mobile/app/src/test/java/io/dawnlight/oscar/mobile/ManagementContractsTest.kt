@@ -129,6 +129,12 @@ class ManagementContractsTest {
         executive.getJSONArray("goals").put(draft)
         assertEquals("reported", parseGridSnapshot(wire, "core", "mobile").executive!!.single().state)
         assertEquals(0, parseGridSnapshot(wire, "core", "mobile").executive!!.single().runs)
+        executive.put("truncated", true)
+        assertTrue(parseGridSnapshot(wire, "core", "mobile").executiveTruncated)
+        assertFalse(parseGridSnapshot(wire, "core", "mobile").withoutPrivate().executiveTruncated)
+        executive.put("truncated", "true")
+        assertThrows(Exception::class.java) { parseGridSnapshot(wire, "core", "mobile") }
+        executive.put("truncated", false)
         draft.put("state", "invented")
         assertThrows(Exception::class.java) { parseGridSnapshot(wire, "core", "mobile") }
     }

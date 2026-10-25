@@ -1,0 +1,48 @@
+{
+  "classification": "BOUNDED_EXECUTIVE_PRESENTATION_WITH_CANONICAL_HISTORY_PRESERVED",
+  "sources": {
+    "oscar/executive.py": "7ee033172abb78396df7ede67f9cdbad0396bd71411f986172b0123f49e7c085",
+    "tests/test_executive_inputs.py": "dbaf037810e5b6c5955367094db8c49608d2120233bfff1ad06eabae730523ad",
+    "desktop/src/Automations.tsx": "a08e8bf28085d77d67d0f53485223cbb2760445dcb2b2074fbab96add65f4d7b",
+    "desktop/src/Automations.test.tsx": "3823a24194d92eb73f18e5fca3cc807a1f2ada985fa940e4ba3f7202414b23b4",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/MobileState.kt": "a9fecb08c7f49113b147c05ede6ae0b03b703a0a866c60eb05229d295a80d48e",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/ManagementScreens.kt": "1366b1bb85b9637802707ba44d3e4feac9cf238232d213c8c67fb5eb67bbb7b1",
+    "mobile/app/src/test/java/io/dawnlight/oscar/mobile/ManagementContractsTest.kt": "c2edec299b56db6714f141f0be032dae0629e740d274601744c59a8bfcd86da7"
+  },
+  "checks": {
+    "focused": {
+      "tests": 98,
+      "seconds": 79.228,
+      "state": "PASS"
+    },
+    "desktop": {
+      "tests": 130,
+      "state": "PASS",
+      "production_build": "PASS, 304 modules"
+    },
+    "android": {
+      "tests": 87,
+      "unit_tests": "PASS",
+      "debug_build": "PASS"
+    },
+    "static": "Ruff/mypy 105/repository/secret/diff checks PASS",
+    "full_regression": "PENDING; latest prior source-stable Core regression 1214 total, 1204 passed, ten skipped at b3ed1c3 equivalence"
+  },
+  "verified": [
+    "65 completed temporary Workers plus older pending responsibility preserve all 66 canonical goals and Workers",
+    "Snapshot includes all active goals/Workers before recent history, within 64 goals/32 Workers",
+    "Global verified-run count remains 65; totals and truncation are explicit",
+    "Both apps show bounded-history notice and reject invalid truncation types; Android private view clears the flag"
+  ],
+  "limits": [
+    "No deletion or pagination of canonical history; older inactive rows remain in Core storage",
+    "Latest native emulator handoff acceptance predates this presentation change; unit/build coverage does not repeat physical or native visual acceptance",
+    "General image-grounded agentic execution, broader model/service/native workflows and richer Chief-of-Staff coordination remain open"
+  ],
+  "log_sha256": {
+    "worker-history-focused.log": "a06048c4c8cd8339da899b3674776bfbcea340e8f514174ab1ce4fc8928fd80c",
+    "worker-history-desktop-tests.log": "82843db589cd89589092492f90c7cf6b54d516fae85d7426df396bf5002a4e3e",
+    "worker-history-desktop-build.log": "bf2b84f981a793be8babf5f34a0cd7c7925a253b7c5d84bd3565cc3512b6144c",
+    "worker-history-android-final.log": "948801acc5440f66ff04ff9a676d34a2bd310c4fdfa907541fbdaa2af8a1af5c"
+  }
+}

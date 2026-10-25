@@ -1510,17 +1510,31 @@ class Executive:
                     "task_ids": tasks[-16:],
                 }
             )
-        visible_task_ids = {i for g in goals for i in g["task_ids"]}
+        workers = [
+            {"id": r["id"], "name": r["name"], "enabled": r["enabled"]}
+            for r in self.store.all("executive_worker")
+            if r["relationship"] == self.runtime.relationship_id
+        ]
+        active_goals = [g for g in goals if g["state"] in {"proposed", "enabled", "paused"}]
+        history = [g for g in goals if g["state"] not in {"proposed", "enabled", "paused"}]
+        remaining = 64 - len(active_goals)
+        visible_goals = active_goals + (history[-remaining:] if remaining > 0 else [])
+        active_workers = [w for w in workers if w["enabled"]]
+        retired = [w for w in workers if not w["enabled"]]
+        remaining_workers = 32 - len(active_workers)
+        visible_workers = active_workers + (
+            retired[-remaining_workers:] if remaining_workers > 0 else []
+        )
+        visible_task_ids = {i for g in visible_goals for i in g["task_ids"]}
         return {
             "version": 1,
             "health": self.health,
             "running": bool(self.thread and self.thread.is_alive()),
-            "goals": goals,
-            "workers": [
-                {"id": r["id"], "name": r["name"], "enabled": r["enabled"]}
-                for r in self.store.all("executive_worker")
-                if r["relationship"] == self.runtime.relationship_id
-            ],
+            "goals": visible_goals,
+            "workers": visible_workers,
+            "goals_total": len(goals),
+            "workers_total": len(workers),
+            "truncated": len(visible_goals) < len(goals) or len(visible_workers) < len(workers),
             "brief": {
                 "active_commitments": sum(g["state"] == "enabled" for g in goals),
                 "verified_runs": sum(g["verified_runs"] for g in goals),
