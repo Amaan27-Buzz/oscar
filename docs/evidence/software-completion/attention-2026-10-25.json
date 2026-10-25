@@ -45,7 +45,8 @@
       "state": "PASS",
       "source_files": 106
     },
-    "full_regression": "PENDING"
+    "full_regression": "PENDING",
+    "repository_links_and_secret_safety": "PASS after renaming artifact filenames that matched the existing credential substring pattern; scanner unchanged"
   },
   "implemented": [
     "Current authorized selected task reports derive source-bound overdue/today/high-importance/upcoming/undated attention order, bounded to eight, without provider mutation or model disclosure",
@@ -64,12 +65,12 @@
     "No real account, physical phone, audio/camera capture, model generation, cloud provisioning, publication or production owner activation"
   ],
   "logs": {
-    ".oscar/task-attention-integration.log": "ad60d67cb265a81f46b2de5b16a60e9c0c190387a91d2e79ddda7e2a5fa4726f",
-    ".oscar/task-attention-integration-manifest.json": "c18e15dfba86a4d96aa1e4a0f297a651e2d3bd0e2f3daa8d541ea005badbbc93",
-    ".oscar/task-attention-final-contracts.log": "06c0543cf98fec927e703c24e14228ed372f9d7da036071f8febc8ca53eec963",
-    ".oscar/task-attention-desktop-tests.log": "25c336ac50c020bfef7a3d4b088b641ce2e251d029bada11859a4930ced7b57d",
-    ".oscar/task-attention-desktop-build.log": "f43fd178509bedc7a1b6a466eaed0e98a5532824f96cb5e0118067cf6ee689fd",
-    ".oscar/task-attention-android.log": "87489952c628a0276a7152408218bb99dc7af443003ed5dc5ba07d652ef613d0",
-    ".oscar/task-attention-android-final.log": "4d66e87fcc8da310c07f21254c42cbe9560d7068a96e443e3c314d2ad1108938"
+    ".oscar/attention-integration.log": "ad60d67cb265a81f46b2de5b16a60e9c0c190387a91d2e79ddda7e2a5fa4726f",
+    ".oscar/attention-integration-manifest.json": "c18e15dfba86a4d96aa1e4a0f297a651e2d3bd0e2f3daa8d541ea005badbbc93",
+    ".oscar/attention-final-contracts.log": "06c0543cf98fec927e703c24e14228ed372f9d7da036071f8febc8ca53eec963",
+    ".oscar/attention-desktop-tests.log": "25c336ac50c020bfef7a3d4b088b641ce2e251d029bada11859a4930ced7b57d",
+    ".oscar/attention-desktop-build.log": "f43fd178509bedc7a1b6a466eaed0e98a5532824f96cb5e0118067cf6ee689fd",
+    ".oscar/attention-android.log": "87489952c628a0276a7152408218bb99dc7af443003ed5dc5ba07d652ef613d0",
+    ".oscar/attention-android-final.log": "4d66e87fcc8da310c07f21254c42cbe9560d7068a96e443e3c314d2ad1108938"
   }
 }
