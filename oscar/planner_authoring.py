@@ -979,7 +979,7 @@ class PlannerAuthoring:
                     "earlier steps within your new response, never a previous stage."
                 )
                 state = {
-                    "request": row,
+                    "request": self.request_review(row),
                     "owner": owner,
                     "worker": worker,
                     "capabilities": caps,
@@ -1053,7 +1053,7 @@ class PlannerAuthoring:
             ):
                 raise PermissionError("suggested effects cannot initiate another model call")
             state = {
-                "request": row,
+                "request": self.request_review(row),
                 "owner": owner,
                 "worker": worker,
                 "capabilities": caps,
@@ -1092,6 +1092,18 @@ class PlannerAuthoring:
         ]
         state["policy"] = h.store.all("personal_policy")
         return state
+
+    @staticmethod
+    def request_review(row: dict[str, Any]) -> dict[str, Any]:
+        # Bind full history without duplicating old prompts/contracts in each native review.
+        return {
+            **{
+                k: v
+                for k, v in row.items()
+                if k not in {"planning_step", "observation_contracts", "observation_stages"}
+            },
+            "request_digest": digest(row),
+        }
 
     def complete(
         self,
@@ -1136,7 +1148,9 @@ class PlannerAuthoring:
                 },
             )
         else:
-            row = state["request"]
+            row = h.store.get("planner_request", identifier)
+            if self.request_review(row) != state["request"]:
+                raise PermissionError("planning request changed since review")
             proposal = h.executive.propose(
                 row["worker_id"],
                 (

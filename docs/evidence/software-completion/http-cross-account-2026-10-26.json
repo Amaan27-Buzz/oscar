@@ -1,0 +1,71 @@
+{
+  "classification": "CROSS_ACCOUNT_PRIVATE_CONTINUATION_SOFTWARE_VERIFIED",
+  "date": "2026-10-26",
+  "base_head": "3dbb2c8cd08698e4353e7da8cb3ea73f85fdfd58",
+  "change": "Keep native signed plan reviews bounded by omitting duplicate historical prompts/observation contracts; bind all original request fields by digest and reload/compare before acceptance. Display and signature bounds unchanged.",
+  "checks": {
+    "focused": {
+      "total": 14,
+      "passed": 14,
+      "seconds": 20.33,
+      "final_source": true
+    },
+    "integration": {
+      "total": 245,
+      "passed": 245,
+      "failed": 0,
+      "errors": 0,
+      "test_seconds": 257.228,
+      "wrapper_seconds": 258.477,
+      "source_stable": false,
+      "source_audit": "Every runtime/config/test source hash matched except test_planner_http_observations.py: one trailing LF+CRLF normalized to LF. Exact prior hash reconstructed and Python AST equality checked. Final-source 14-case suite also PASS."
+    },
+    "tls_outbound_worker": {
+      "status": "SOFTWARE_VERIFIED",
+      "seconds": 9.701,
+      "cross_account_sources": 2,
+      "account_credentials_isolated": true,
+      "tls_mobile_requests": true,
+      "independent_account_gets": 4,
+      "private_model_continuation": true,
+      "separate_outbound_worker_process": true,
+      "canonical_final_task": "verified",
+      "independent_file_readback": true,
+      "provider_json_absent_from_durable_records": true,
+      "limits": [
+        "Core is a thread in the test driver process",
+        "Synthetic model and provider HTTP fixture, synthetic owner",
+        "Protocol acceptance; no rendered native or physical device acceptance"
+      ]
+    },
+    "static": "Ruff, mypy 107 files, repository/link/secret and diff checks PASS"
+  },
+  "sources": {
+    "oscar/planner_authoring.py": "8bf6725d0fc38f485419f7a2a5e57faaa87744aeb8844283d2f1617428577549",
+    "tests/test_planner_http_observations.py": "2789e03c3a60d9d78c94340b0dd6cba908b3651f9f404931798e8e2697a302cd"
+  },
+  "logs": {
+    ".oscar/http-cross-account-tls.py": "1c97ae67cce2e53bf99d32fdf4ed6307e64be9277bff061a8ed63cb7da271dc8",
+    ".oscar/http-cross-account-tls.log": "cc16c1fef182e8975f31354e2d868cfd9ea5bad71a5facca1bd19527eb900b0e",
+    ".oscar/http-cross-account-tls-2.log": "506831769456b116fc13d595ecfeb0148ceeed2a3653464026f69ee742e6d335",
+    ".oscar/http-cross-account-tls-final.log": "e4c75eedd6024d8b93d0658455ee832f0870be8d67372d394f7323a8a54ea412",
+    ".oscar/http-cross-account-tls-3.log": "6ac24ffb7aa196e5e25d79a2085cd3c5f8168f303dada6fd164ba6360dc7d773",
+    ".oscar/http-cross-account-tls-4.log": "3aeca9da5dca59cde8d80c5d6ac7944169df83319dcebb8891fc4328fbdf9658",
+    ".oscar/http-cross-account-tls-fixed.log": "0e2044cc9412f2e078921a2819e3405e8cf79093a29489ae64ad929b5094525e",
+    ".oscar/http-cross-account-tls-verified.log": "9102754f830b3696168013c6ded4b9b3a24948ff20428785606564a9de4ff296",
+    ".oscar/http-cross-account-tls.json": "31d7c9a2e10db9ac1311676c417d6201bade8d5656f0154e1d0f5eac3b2b2a95",
+    ".oscar/http-review-focused.log": "868e77274ff280801ae6c289590ec785e35cea3e7fa377630d7c0f66804450fe",
+    ".oscar/http-review-focused-final.log": "d6db1d68f04d84a95cb911ef736699d32e0aaa322ddbf16c7c1836353b45ca7c",
+    ".oscar/http-review-focused-current.log": "1cb654da0e5ca55b3154eb839b59b6d92be3973af237a811baafa4ec8a2dac51",
+    ".oscar/http-review-integration.log": "87c1e1979da81b74028fdd9c3c8c369331685e17a92652ac04e6531fbee531b6",
+    ".oscar/http-review-integration-manifest.json": "7c545a326445fe7059f01bbff44faee21c9fb9d5be04615cac69346101e67f55"
+  },
+  "limits": [
+    "Synthetic model/provider and owner; Core in driver process, separate actual outbound Worker and TLS mobile protocol",
+    "No rendered-native, actual-model/provider or physical acceptance",
+    "Preceding ce8fadb 1277-case full PASS predates this focused review change; current 245-case affected suite PASS",
+    "Earlier cross-account attempts retained: fixture 8192-token context too small, then native review size defect; final fixture advertises 32768 context. Initial focused test typo context_window corrected to context_limit.",
+    "Broader model accuracy, general Chief-of-Staff coordination, whole-product acceptance and historical foreground/stale-frame ambiguity remain open",
+    "No push, Actions, real accounts, production owner activation, provisioning or spending"
+  ]
+}

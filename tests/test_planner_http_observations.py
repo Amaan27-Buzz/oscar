@@ -4,7 +4,7 @@ import importlib.util
 import json
 import unittest
 from copy import deepcopy
-from dataclasses import asdict
+from dataclasses import asdict, replace
 from time import monotonic, sleep
 
 from oscar.jev import Intent
@@ -158,6 +158,76 @@ class HTTPObservationTests(unittest.TestCase):
         self.assertEqual([], self.h.store.all("assistance_review"))
         self.assertEqual([], self.h.store.all("executive_confirmation"))
         self.assert_private()
+
+    def test_two_account_reads_fit_signed_review_and_privately_replan(self):
+        self.vault.put("synthetic-calendar-token", reference="planning-calendar")
+        manifest = next(m for m in fixture.account_manifests() if m.id == "google.calendar")
+        account = self.h.accounts.add(
+            "google", "calendar-owner", "calendar", "Calendar", verified=True
+        )
+        account = self.h.accounts.bind(
+            account.id,
+            manifest.id,
+            fixture.CredentialRef("planning-calendar"),
+            {s for c in manifest.capabilities for s in c.scopes},
+            manifest.base_url,
+        )
+        cap = self.mount.capability("google.calendar.events.list", account_id=account.id)
+        self.change["value"]["capabilities"].append(
+            {"node_id": self.mount.node_id, "capability_id": cap.id}
+        )
+        router = self.executor.router
+        router.registry.models = {
+            k: replace(v, context_limit=32768) for k, v in router.registry.models.items()
+        }
+        self.steps.append(
+            {
+                "id": "calendar",
+                "node_id": self.mount.node_id,
+                "capability_id": cap.id,
+                "depends_on": [],
+                "intent": asdict(
+                    Intent(
+                        "Read selected calendar",
+                        "capability",
+                        capability_kind=cap.id,
+                        parameters={"arguments": {"path": {"calendarId": "selected-calendar"}}},
+                    )
+                ),
+            }
+        )
+        self.api.resources["/calendar/v3/calendars/selected-calendar/events"] = {
+            "items": [{"summary": "Synthetic calendar observation"}]
+        }
+        self.body["choices"][0]["message"]["content"] = json.dumps(
+            {"steps": self.steps, "observe": True}
+        )
+        self.row = self.draft()
+        self.complete(self.review(self.accept_change(self.row)))
+        self.assertEqual("verified", self.settle(3)["state"])
+        self.assertEqual(4, len(self.api.calls))
+        self.effects()
+        review = self.review(self.accept_change(self.row))
+        self.assertLess(len(review["review"].encode()), 24000)
+        self.complete(review)
+        self.assertEqual("partially_verified", self.settle(4)["state"])
+        prompt = json.dumps(self.requests[-1]["body"])
+        self.assertIn(self.marker, prompt)
+        self.assertIn("Synthetic calendar observation", prompt)
+        self.complete(self.review(self.accept_change(self.row)))
+        self.assertEqual("verified", self.settle(5)["state"])
+        self.assertEqual("4827", (self.h.files.root / "source-token.txt").read_text())
+        self.assert_private()
+
+    def test_omitted_historical_prompt_stays_bound_to_signed_review(self):
+        self.observe()
+        review = self.review(self.accept_change(self.row))
+        row = self.h.store.get("planner_request", self.row["id"])
+        row["planning_step"]["intent"]["parameters"]["prompt"] += " changed"
+        self.h.store.put("planner_request", row["id"], row)
+        with self.assertRaises(PermissionError):
+            self.complete(review)
+        self.assertEqual(1, len(self.requests))
 
     def test_changed_provider_response_never_becomes_observation(self):
         def change():
