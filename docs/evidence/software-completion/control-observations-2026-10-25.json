@@ -1,5 +1,5 @@
 {
-  "classification": "SYNTHETIC_PRIVATE_BOUND_WINDOW_EXECUTION_VERIFIED_FULL_REGRESSION_PENDING",
+  "classification": "SYNTHETIC_PRIVATE_BOUND_WINDOW_EXECUTION_VERIFIED_WINDOWS_AGGREGATE_FAILED",
   "sources": {
     "oscar/windows_desktop.py": "5f0c7ce8ddca5bdb116ce2aea00c843fee9eb2fbb765243708f197b328e73881",
     "oscar/interactive_worker.py": "ce9c5c3be0f6a5c0c86ae37ea2bf42473eed33f840574c390567ac5ccba1ce8d",
@@ -43,7 +43,26 @@
       "seconds": 261.65
     },
     "full_regression": {
-      "state": "PENDING"
+      "state": "FAIL",
+      "total": 1211,
+      "passed": 1200,
+      "skipped": 10,
+      "failures": 1,
+      "seconds": 862.952,
+      "base_head": "7da387544504c531c09fdee746eec44ad1c6b790",
+      "source_stable": true,
+      "source_normalized_matches_primary_41d3e32": true,
+      "failure": "BrowserWorkflowAcceptanceTests.test_two_accounts_submit_verify_save_and_upload_without_cookie_leakage: synthetic model context limit 8192 below observed prompt input 6200 plus output 2048; router correctly rejected before model I/O",
+      "visual_case": "PASS; previous browser aggregate visual failure is preserved separately",
+      "manifest_sha256": "a0dc652a1ea022b171f8cb83d45878e3835e70cffb309dcbea5c79b87db1072d"
+    },
+    "browser_workflow_after_fixture_correction": {
+      "state": "PASS",
+      "tests": 8,
+      "seconds": 92.61,
+      "changed_source": "tests/test_browser_workflow.py",
+      "sha256": "8c7aa329fae30c4ecf3ff3bf5bc8b16c9aafea555e6ffec1ef5d08f5924a7677",
+      "qualification": "Increased synthetic context allowance only; no production admission change"
     }
   },
   "verified": [
@@ -65,6 +84,9 @@
     "control-desktop-full-tests.log": "bea91c239d7897d8accd83c2275ad53fdcadd4cd4edf5bd1173a1cf8bf40065c",
     "control-desktop-build.log": "f7ae1e4b860f27af92dd388a92fc7de39dc950cee042b1bd9d78f2f18a1e2940",
     "control-native-full-tests.log": "b516d535631fddfaebd9581a373c8fa0532b7839d5e731e061d663fbe4502c1d",
-    "control-observations-affected.log": "d30b4f30eb7e06a379107382ab8400bdf4b208151103401833fa4b6b0e0762c3"
+    "control-observations-affected.log": "d30b4f30eb7e06a379107382ab8400bdf4b208151103401833fa4b6b0e0762c3",
+    "control-aggregate.log": "dcc75dceab5f514e8dbc9439568901675528a80650aa2276864977e0edfe6d17",
+    "control-browser-workflow-fixed.log": "c0e74f5e53e8df02d2b97ac1a8f1acaa56203c0d23e567a17ceeb6d4a5377c0a",
+    "control-cross-account-diagnostic.log": "78b4f7b6db4805db3b521064c8625df6dcf6266cec30a3c7e08d7399782a446e"
   }
 }

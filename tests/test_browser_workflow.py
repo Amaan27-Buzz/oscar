@@ -172,7 +172,7 @@ class BrowserWorkflowAcceptanceTests(unittest.TestCase):
             frozenset({"text"}),
             2,
             {"reasoning": 1},
-            8192,
+            16384,
             4096,
             Funding.FREE,
             provenance="synthetic HTTP fixture",

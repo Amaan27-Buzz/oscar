@@ -9,6 +9,14 @@ Thirty-six focused and 80 planning/memory/freshness tests passed. General search
 connector context and model semantic accuracy remain separately open.
 [Receipt](evidence/software-completion/live-execution-2026-10-25.json).
 
+The frozen selected-control aggregate ran 1,211 cases: 1,200 passed, ten skipped,
+one failed (862.952 s). The native visual case passed. The failing cross-account
+fixture exceeded its synthetic model context allowance: 6,200 input bytes reserved
+plus 2,048 output exceeded 8,192. The router correctly blocked before I/O. Raising
+only that fixture's context allowance to 16,384 passes all eight browser workflow
+cases (92.610 s). The failed aggregate remains recorded; current full acceptance
+is pending a fresh run.
+
 **2026-10-25 selected-window inspection:** a separate capture/retention-scoped
 capability supplies bounded controls from an already bound Windows app to private
 Worker replanning. A signed synthetic Full flow edits a real run-owned WPF input

@@ -582,3 +582,14 @@ Full regression is separate. This validates source class and authority, not mode
 semantic relevance or unchanged real-world state; search/connector observation
 inputs and general model/image-grounded execution remain open.
 [Receipt](../evidence/software-completion/live-execution-2026-10-25.json).
+
+The source-stable selected-control aggregate at `7da3875` ran 1,211 cases:
+1,200 passed, ten skipped, one failed (862.952 s). Sources match primary `41d3e32`
+after CRLF normalization. The native visual test passed; the cross-account browser
+fixture instead exceeded its model's 8,192-token context allowance: conservative
+6,200 input reservation plus 2,048 output. Isolated diagnostic reproduced this
+before any provider request. Only the synthetic fixture limit changed to 16,384;
+all eight browser workflows then passed (92.610 s). Production context admission
+was not changed. This resolves that reproduced fixture failure, while preserving
+the failed full run and earlier visual failure. Current full regression remains
+separate.
