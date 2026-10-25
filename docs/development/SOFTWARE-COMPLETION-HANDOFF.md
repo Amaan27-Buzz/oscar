@@ -97,7 +97,7 @@ partial and open acceptance separately.
 | Local notes / Obsidian | Scoped file execution/readback; no claim of controlling the actual Obsidian GUI or every vault format |
 | Oracle / Vercel / Cloudflare / Supabase | Core packaging and generic executor/MCP paths are available; no commissioned cloud service or complete provider-specific workflow accepted here |
 | Figma / Canva / SceneLab / creative tools | Generic reviewed MCP/browser/native execution is available where configured. No dedicated live creative-provider or general media-generation workflow accepted by these receipts |
-| MCP | Actual installed SDK stdio/Streamable HTTP initialization/discovery/call/lifecycle and resource OAuth with synthetic accounts. Trusted local processes retain host-user authority. Dynamic registration, automatic resource refresh, incremental challenges and remote token revocation unsupported |
+| MCP | Actual installed SDK stdio/Streamable HTTP initialization/discovery/call/lifecycle and resource OAuth with synthetic accounts. Validated public-client remote revocation is implemented, with HTTP acceptance qualified and local deletion guaranteed. Trusted local processes retain host-user authority. Dynamic registration, automatic resource refresh and incremental challenges remain unsupported |
 
 These distinctions are deliberate: a JSON manifest or access to a tool in the
 engineering environment is not an OSCAR product integration.
@@ -544,3 +544,25 @@ now reflect actual substring matching. Four focused tests passed (10.904 s), the
 all 162 affected tests passed (220.851 s). The earlier frozen browser aggregate
 has its own source manifest; it does not qualify later directory changes.
 [Receipt](../evidence/software-completion/directory-observations-2026-10-25.json).
+
+The frozen browser aggregate at `ac468b5` (primary `752e583` equivalent after
+checkout newline normalization) ran 1,203 cases: 1,192 passed, ten skipped and one
+native visual failure (856.017 s). The final intended click was rejected because
+its selected window was not foreground. Native guards were unchanged. Three
+visual cases passed in isolation (9.002 s); the aggregate remains FAILED and
+the cause remains unproven. Both original logs and the stable-source manifest
+are preserved in the browser receipt, including the newline qualification.
+
+**2026-10-25 selected-window controls:** new `machine.controls` uses a separate
+capture/retention contract to inspect an already bound registered app target.
+Its independent readback supplies at most eight controls/4 KiB to private
+replanning; password text is excluded and bounded coverage is explicit. A signed
+synthetic Full Worker inspected a real run-owned WPF input, edited its exact
+returned runtime ID with expected-text guarding, and independently read back the
+result. Retention withdrawal before the second model request prevented disclosure
+and edits. Four focused checks passed (15.408 s), all 130 Desktop frontend tests
+passed (8.55 s), the production frontend built, and Rust passed 42 cases with one
+explicit synthetic-voice integration fixture ignored (2.07 s). Existing selection
+and binding remain required; no owner windows were inspected. Freshness-classified
+“current” wording still routes to live retrieval and is an open integration gap.
+[Receipt](../evidence/software-completion/control-observations-2026-10-25.json).

@@ -32,6 +32,46 @@ class PlannerAuthoring:
             examples.append(asdict(Intent("2 + 3")))
         elif kind == "file_write":
             examples.append(asdict(Intent("Save reviewed text", "file_write", "notes.txt", "Text")))
+        elif kind == "desktop_control" and cap["id"] == "machine.desktop":
+            examples.append(
+                asdict(
+                    Intent(
+                        "Edit an independently observed control",
+                        "capability",
+                        capability_kind=kind,
+                        parameters={
+                            "request": {
+                                "operation": "set_text_checked",
+                                "handle": 1,
+                                "pid": 1,
+                                "runtime_id": "EXACT_VERIFIED_RUNTIME_ID",
+                                "text": "Goal text",
+                                "expected_text": "EXACT_VERIFIED_CURRENT_TEXT",
+                            }
+                        },
+                        criterion={"kind": "unavailable"},
+                    )
+                )
+            )
+        elif kind == "desktop_inspection" and cap["id"] == "machine.controls":
+            examples.append(
+                asdict(
+                    Intent(
+                        "Inspect controls in the owner's selected bound window",
+                        "capability",
+                        capability_kind=kind,
+                        parameters={
+                            "request": {
+                                "operation": "inspect_controls",
+                                "handle": 1,
+                                "pid": 1,
+                                "query": "Control label",
+                            }
+                        },
+                        criterion={"kind": "unavailable"},
+                    )
+                )
+            )
         elif kind == "installed_app" and cap["id"] == "machine.apps":
             examples.append(
                 asdict(
@@ -143,6 +183,23 @@ class PlannerAuthoring:
             inspection["parameters"]["request"].update(read_only=True, timeout=15, max_text=2048)
             examples.insert(0, inspection)
         return {
+            **(
+                {
+                    "intent_rule": (
+                        "Read only the owner's already selected, registered and bound window. "
+                        "Use its exact current handle and pid from the objective or authoritative "
+                        "evidence; example 1 values are placeholders, never discovered identities. "
+                        "query is a bounded label substring. At most eight controls/4 KiB are "
+                        "returned from a bounded UIA view; password text is excluded. "
+                        "Empty results "
+                        "do not prove no control exists. Use returned runtime IDs for separately "
+                        "authorized desktop_control actions; never invent them. Perception and "
+                        "retention grants are required, independently of control."
+                    )
+                }
+                if kind == "desktop_inspection"
+                else {}
+            ),
             "node_id": cap["node_id"],
             "capability_id": cap["id"],
             "kind": kind,
@@ -644,7 +701,8 @@ class PlannerAuthoring:
                     "steps with only a path parameter, machine.files.list directory_list or "
                     "machine.files.search file_search steps with a scoped cwd and optional "
                     "substring pattern (required for search, not a glob), math.add, or "
-                    "machine.apps "
+                    "machine.controls desktop_inspection of an already selected bound window, "
+                    "or machine.apps "
                     "installed_app requests with only operation targets and a bounded query, "
                     "or machine.browser anonymous read_only static inspections as described "
                     "by its capability. "

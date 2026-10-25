@@ -52,6 +52,11 @@ def validate_stage(steps: list[dict[str, Any]]) -> None:
             and intent.get("capability_kind") == "browser"
             and isinstance(intent.get("parameters"), dict)
             and static_observation(intent["parameters"])
+            or step["capability_id"] == "machine.controls"
+            and intent.get("kind") == "capability"
+            and intent.get("capability_kind") == "desktop_inspection"
+            and isinstance(intent.get("parameters"), dict)
+            and machine_readback(step["capability_id"], intent["parameters"]) is not None
         ):
             raise PermissionError("observation stages cannot contain effects or model calls")
 

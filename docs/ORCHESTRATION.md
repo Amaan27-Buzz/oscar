@@ -342,6 +342,27 @@ verified; a broader app objective still needs its own independent resulting-stat
 check. Adaptive prompts include a complete read-only response example; examples
 never expand the selected capabilities or authorize their placeholder arguments.
 
+## Selected-window control observations
+
+`machine.controls` exposes a bounded UIA view of an already registered, bound
+Windows target. Its separate contract requires host/control, capture and retention
+grants. The Desktop sharing option never grants those scopes; an enrollment that
+lacks them cannot enable it. The exact positive window handle/PID and a label
+substring identify the query. No global desktop inventory is disclosed.
+
+At most eight controls and 4 KiB are returned, with runtime IDs, bounded labels
+and nonpassword text. Coverage is explicitly limited by the native tree scan and
+truncation; absence is not proof that a control does not exist. A separate native
+observer repeats the selected query before private replanning. Current authority,
+source provenance and the normal observation expiry are rechecked before I/O.
+Edits use the separately selected `machine.desktop` contract, including its
+expected-text check and independent readback; inspection cannot actuate controls.
+
+This supports inspection → private replan → checked edit in one Worker. The
+window must already be selected and bound; arbitrary app discovery and visual
+reasoning are separate work. Controller live-retrieval routing still applies to
+freshness-classified wording; no general live-evidence planning bypass is added.
+
 ## Scoped file discovery observations
 
 Adaptive Workers can list one authorized directory or search its filenames, then

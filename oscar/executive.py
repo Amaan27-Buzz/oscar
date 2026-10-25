@@ -584,6 +584,7 @@ class Executive:
                         "machine.files.read",
                         "machine.files.list",
                         "machine.files.search",
+                        "machine.controls",
                         "machine.apps",
                         "machine.browser",
                         "math.add",

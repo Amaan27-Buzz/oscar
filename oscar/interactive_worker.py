@@ -157,6 +157,14 @@ def browser_available(executable: str, workspace: Path) -> bool:
 
 
 class InteractiveWorker(MachineWorker):
+    def controls_granted(self) -> bool:
+        try:
+            self.check_permission("desktop:capture")
+            self.check_permission("screen:retain")
+            return True
+        except (PermissionError, KeyError):
+            return False
+
     def capture_granted(self, *, retain: bool = False) -> bool:
         try:
             for scope in (
@@ -214,6 +222,8 @@ class InteractiveWorker(MachineWorker):
                 desktop_permissions.add("desktop:clipboard")
             if self.capture_granted():
                 desktop_permissions.add("desktop:capture")
+            if self.controls_granted():
+                desktop_permissions.add("screen:retain")
             adapter = WindowsDesktop(
                 permissions=frozenset(desktop_permissions),
                 allowed_apps=tuple(app for app in catalog if app.id in desktop_app_ids),
@@ -250,6 +260,23 @@ class InteractiveWorker(MachineWorker):
                     "high",
                 ),
             ]
+            if (
+                self.controls_granted()
+                and {"desktop:capture", "screen:retain"} <= self.desktop.permissions
+            ):
+                caps.append(
+                    Capability(
+                        "machine.controls",
+                        "machine.controls",
+                        "Read selected-window controls",
+                        "machine",
+                        self.session.node_id,
+                        ("machine:host", "desktop:control", "desktop:capture", "screen:retain"),
+                        "desktop_inspection",
+                        "metadata",
+                        "high",
+                    )
+                )
             if "desktop:capture" in self.desktop.permissions and self.capture_granted():
                 caps.append(
                     Capability(
@@ -323,6 +350,7 @@ class InteractiveWorker(MachineWorker):
 
     def execute(self, action: Action, cancellation: Cancellation) -> Result:
         if action.capability_id not in {
+            "machine.controls",
             "machine.apps",
             "machine.desktop",
             "machine.clipboard",
@@ -357,7 +385,12 @@ class InteractiveWorker(MachineWorker):
         try:
             artifact = None
             request = action.parameters["request"]
-            if cap.id in {"machine.screen", "machine.visual"}:
+            if cap.id == "machine.controls":
+                if not self.controls_granted():
+                    raise PermissionError("selected-window disclosure grants withdrawn")
+                output = json.dumps(self.desktop.inspect_controls(request))
+                self.check(action, cancellation)
+            elif cap.id in {"machine.screen", "machine.visual"}:
                 from .windows_files import WindowsScopedFiles
 
                 files = WindowsScopedFiles(self.scope.root)

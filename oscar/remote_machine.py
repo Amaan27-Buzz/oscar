@@ -21,6 +21,11 @@ from .remote_worker import Client, RemoteCancellation, RemoteWorker
 
 # Core admits the contract; the native Worker additionally checks installed executors/local grants.
 REMOTE_MACHINE_CAPABILITIES = {
+    "machine.controls": (
+        "desktop_inspection",
+        ("machine:host", "desktop:control", "desktop:capture", "screen:retain"),
+        "high",
+    ),
     "machine.files.list": ("directory_list", ("files:read",), "low"),
     "machine.files.search": ("file_search", ("files:read",), "low"),
     "machine.executables": ("executable_discovery", ("files:read",), "low"),
@@ -56,6 +61,9 @@ REMOTE_MACHINE_CAPABILITIES = {
 def machine_readback(capability: str, parameters: dict[str, Any]) -> dict[str, Any] | None:
     """Derive only a read of the exact reviewed destination, never another effect."""
     spec = REMOTE_MACHINE_CAPABILITIES.get(capability)
+    if capability == "machine.controls":
+        validate_remote_machine("desktop_inspection", parameters)
+        return parameters
     if capability in {"machine.files.list", "machine.files.search"}:
         assert spec is not None
         validate_remote_machine(spec[0], parameters)
@@ -114,6 +122,7 @@ def validate_remote_machine(kind: str, parameters: dict[str, Any]) -> dict[str, 
         "coding": ({"arguments", "cwd", "timeout", "verification"}, {"arguments"}),
         "powershell": ({"request", "cwd", "timeout"}, {"request"}),
         "desktop_control": ({"request"}, {"request"}),
+        "desktop_inspection": ({"request"}, {"request"}),
         "installed_app": ({"request"}, {"request"}),
         "desktop_clipboard": ({"request"}, {"request"}),
         "visual_control": ({"request"}, {"request"}),
@@ -158,6 +167,10 @@ def validate_remote_machine(kind: str, parameters: dict[str, Any]) -> dict[str, 
             raise ValueError("bounded native argument vector required")
     if "request" in parameters and not isinstance(parameters["request"], dict):
         raise ValueError("structured native request required")
+    if kind == "desktop_inspection":
+        from .windows_desktop import inspect_request
+
+        inspect_request(parameters["request"])
     if kind == "installed_app":
         request = parameters["request"]
         if request.get("operation") == "targets":
@@ -404,6 +417,8 @@ class RemoteMachine(RemoteWorker):
         if action.capability_id in {"machine.files.read", "machine.files.write"}:
             return super().execute_effect(action, cancellation)
         result = self.effects.execute(action, cancellation)
+        if result.success and action.capability_id == "machine.controls":
+            result = replace(result, value=self.effects.outputs[action.id])
         if result.success and action.capability_id in {
             "machine.files.list",
             "machine.files.search",
@@ -441,6 +456,10 @@ class RemoteMachine(RemoteWorker):
         if action.capability_id in {"machine.files.read", "machine.files.write"}:
             return super().readback_effect(action, delivery)
         self._guard()
+        if action.capability_id == "machine.controls":
+            observed = self.effects.desktop.inspect_controls(delivery["parameters"]["request"])
+            self._guard()
+            return {"content": json.dumps(observed)}
         if action.capability_id in {"machine.files.list", "machine.files.search"}:
             parameters = delivery["parameters"]
             value = json.dumps(

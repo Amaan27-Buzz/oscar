@@ -1,5 +1,5 @@
 {
-  "classification": "SYNTHETIC_PRIVATE_BROWSER_EXECUTION_VERIFIED_REGRESSION_PENDING",
+  "classification": "BROWSER_FOCUSED_AND_AFFECTED_VERIFIED_WINDOWS_AGGREGATE_FAILED",
   "sources": {
     "oscar/browser_worker.py": "602772b2f1d0b52a2cd5cac934e547ab19fd996583e51e3055e8b21edba05d92",
     "oscar/executive.py": "4f309a4703dd443558d0feea3d23e42854eff0b26ce17d85c1bdd67ebee24a2b",
@@ -28,7 +28,19 @@
       "log": ".oscar/browser-observations-affected.log"
     },
     "full_regression": {
-      "state": "PENDING"
+      "state": "FAILED",
+      "tests": 1203,
+      "passed": 1192,
+      "skipped": 10,
+      "failures": 1,
+      "seconds": 856.017,
+      "source_stable": true,
+      "base_head": "ac468b5d067dd95f1eab879ed43cfcd355233a6b",
+      "equivalent_primary_commit": "752e583",
+      "failed_case": "tests.test_windows_visual.WindowsVisualTests.test_actual_capture_visual_fallback_and_no_replay",
+      "error": "Selected window is not foreground; preceding changed-frame rejections expected",
+      "cause": "Unproven; native guards unchanged",
+      "source_hash_note": "remote_machine.py differs from initial receipt bytes due checkout newline normalization; all tested files independently matched committed752e583 after newline normalization"
     },
     "public_https": {
       "state": "verified",
@@ -48,6 +60,12 @@
         "oscar/remote_machine.py": "b83854e59e4ffeca2e86ce91f9cfa26d219f51db26ab94e40a3a5a8ad6efec87"
       },
       "phase": "Primary752e583 with in-progress directory-observation changes; hashes identify actual source"
+    },
+    "native_isolated": {
+      "state": "PASS",
+      "tests": 3,
+      "seconds": 9.002,
+      "phase": "Same frozen checkout; does not erase aggregate failure or establish a root cause"
     }
   },
   "verified": [
@@ -68,6 +86,9 @@
     "browser-observations-final-focused.log": "56d8adee7bcf5f985920ae6b7f6e1f77428abaec4ff0b85e3f883cae5c4ec893",
     "browser-observations-affected.log": "5073c64e5a0f0b6ec5d8430e67a923b5facf59ca6ae2937c20bc38c601cba054",
     "browser-public-https.log": "69e64daae807538452a0d8674db6f55781c329fa30faaf3cef288dd55b0e8bf3",
-    "browser-public-https.json": "62996ef71a0a2cdf1c38bd667f03e96800787a490ca6745e54e6ae3be81fcb22"
+    "browser-public-https.json": "62996ef71a0a2cdf1c38bd667f03e96800787a490ca6745e54e6ae3be81fcb22",
+    "browser-aggregate.log": "c20c67b4a881203be6b45cd472c793fbce7ca714a0a0ed53ff510eb02c40a5a7",
+    "browser-aggregate-manifest.json": "94e013edb468a267167913fc1655549e378d3e126ef365dfe1ab2179ed2fd754",
+    "browser-native-isolated.log": "8aafb0e97b10dea62f41cfe68bd76b2067772355d5f3b00b4aaaa75eaa6f0f52"
   }
 }

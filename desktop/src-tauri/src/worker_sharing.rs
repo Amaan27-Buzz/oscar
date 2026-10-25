@@ -47,6 +47,12 @@ pub fn permissions(capability: &str) -> Option<&'static [&'static str]> {
         "machine.desktop" | "machine.apps" => &["machine:host", "desktop:control"],
         "machine.clipboard" => &["machine:host", "desktop:control", "desktop:clipboard"],
         "machine.visual" => &["machine:host", "desktop:control", "desktop:capture"],
+        "machine.controls" => &[
+            "machine:host",
+            "desktop:control",
+            "desktop:capture",
+            "screen:retain",
+        ],
         "machine.screen" => &[
             "machine:host",
             "desktop:control",
@@ -158,7 +164,7 @@ impl Config {
         let scope = json!({"workspace":workspace,"workspace_id":workspace_id,
             "journal":data.join("worker-execution.sqlite"),"capabilities":self.capabilities,
             "trusted_host_execution":self.trusted_host_execution,"allowed_executables":executables,
-            "desktop":has("machine.desktop")||has("machine.apps")||has("machine.clipboard")||has("machine.screen")||has("machine.visual"),
+            "desktop":has("machine.desktop")||has("machine.apps")||has("machine.clipboard")||has("machine.screen")||has("machine.visual")||has("machine.controls"),
             "browser":has("machine.browser"),"desktop_app_ids":self.desktop_app_ids,
             "profile_root":if has("machine.browser") {Some(data.join("worker-browser-profiles"))}else{None}});
         if serde_json::to_vec(&scope)
@@ -470,6 +476,16 @@ mod tests {
         };
         assert!(config.scope(&connection, Path::new(".")).is_err());
         assert!(permissions("machine.unknown").is_none());
+        assert!(
+            permissions("machine.controls")
+                .unwrap()
+                .contains(&"screen:retain")
+        );
+        assert!(
+            !permissions("machine.controls")
+                .unwrap()
+                .contains(&"files:write")
+        );
         assert_eq!(
             permissions("machine.clipboard").unwrap(),
             &["machine:host", "desktop:control", "desktop:clipboard"]

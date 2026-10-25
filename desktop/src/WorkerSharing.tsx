@@ -11,6 +11,7 @@ const capabilities=[
   ['machine.desktop','Windows app controls'],['machine.apps','Launch registered apps'],
   ['machine.clipboard','Read and write clipboard'],['machine.browser','Isolated browser'],
   ['machine.screen','Save selected-window screenshots'],['machine.visual','Click within reviewed window screenshots'],
+  ['machine.controls','Read selected-window controls'],
   ['machine.agent.codex','Installed Codex'],['machine.agent.claude-code','Installed Claude Code'],
   ['machine.agent.opencode','Installed OpenCode'],['machine.agent.gemini-cli','Installed Gemini CLI'],
 ];

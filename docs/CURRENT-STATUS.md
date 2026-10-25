@@ -1,5 +1,17 @@
 # OSCAR — Current Status & Checklist
 
+**2026-10-25 selected-window inspection:** a separate capture/retention-scoped
+capability supplies bounded controls from an already bound Windows app to private
+Worker replanning. A signed synthetic Full flow edits a real run-owned WPF input
+and independently reads it back; retention withdrawal blocks further disclosure
+and edits. Password text is excluded. Four focused tests pass; affected/full
+integration has separate status. [Receipt](evidence/software-completion/control-observations-2026-10-25.json).
+
+The earlier frozen browser aggregate ran 1,203 cases: 1,192 passed, ten skipped
+and one native visual failure (856.017 s). The selected window lost foreground;
+its guard rejected the click. The same three-test module passed in isolation
+(9.002 s). Cause remains unproven, and this is not a full-regression PASS.
+
 **2026-10-25 scoped file discovery:** private Workers can now list/search a scoped
 directory, independently recheck its names, read the discovered file and act on
 its verified content. Signed synthetic Full completed the entire sequence without

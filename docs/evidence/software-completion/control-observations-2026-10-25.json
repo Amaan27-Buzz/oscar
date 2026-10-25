@@ -1,0 +1,70 @@
+{
+  "classification": "SYNTHETIC_PRIVATE_BOUND_WINDOW_EXECUTION_VERIFIED_FULL_REGRESSION_PENDING",
+  "sources": {
+    "oscar/windows_desktop.py": "5f0c7ce8ddca5bdb116ce2aea00c843fee9eb2fbb765243708f197b328e73881",
+    "oscar/interactive_worker.py": "ce9c5c3be0f6a5c0c86ae37ea2bf42473eed33f840574c390567ac5ccba1ce8d",
+    "oscar/executive.py": "a5e9bac6a74073211e88a9620f5c0d0175886cd57828c5a8da980f0612a183fb",
+    "oscar/planner_authoring.py": "e40ed1b908892d09da9546c35dd9ad3560d754bc5d0eee19fd07c4e10eafb6ff",
+    "oscar/planner_observations.py": "202f4614077a5cebbb0f4cce838667ac04db273d58cf19b7edb34d050e7519ca",
+    "oscar/remote_grid.py": "5d5d3f65bb0162a456515ee0feb8b8e08a08b2d8579e04b5c1de95085a0d8bb6",
+    "oscar/remote_machine.py": "cd7315dfd2bbb97609b532b47104cb052082668120f14a7e56412220bca3d120",
+    "desktop/src/WorkerSharing.tsx": "f325906769d8433cd4b4d260d375f844976386b671a93a1ffcf7b492fa569ae5",
+    "desktop/src-tauri/src/worker_sharing.rs": "1e51b148e40d2a659d0fb88aef6d1973cd7410f650a3056f348b010357dea995",
+    "tests/test_control_observations.py": "5fed4af69386407b1598457912f4a54265fa07e019839dacac01a8634ab9586c"
+  },
+  "checks": {
+    "focused": {
+      "state": "PASS",
+      "tests": 4,
+      "seconds": 15.408
+    },
+    "frontend": {
+      "state": "PASS",
+      "tests": 130,
+      "seconds": 8.55,
+      "production_build": "PASS"
+    },
+    "rust": {
+      "state": "PASS",
+      "passed": 42,
+      "ignored": 1,
+      "seconds": 2.07,
+      "ignored_case": "explicit synthetic voice loopback bridge integration fixture"
+    },
+    "static": {
+      "ruff": "PASS",
+      "mypy_sources": 105,
+      "diff_check": "PASS",
+      "repository": "PASS"
+    },
+    "affected": {
+      "state": "PASS",
+      "tests": 175,
+      "seconds": 261.65
+    },
+    "full_regression": {
+      "state": "PENDING"
+    }
+  },
+  "verified": [
+    "Exact positive selected-window identity and bounded query; effects rejected by inspection contract",
+    "Actual bound run-owned WPF control inspection, separate native readback, private continuation and checked edit/readback under signed synthetic Full",
+    "Separate perception and retention grants; withdrawal before continuation prevents second provider request and edit",
+    "No unbound target inspection; password values excluded; bounded coverage and truncation explicit",
+    "Native sharing validates enrollment scopes and exposes explicit control-read selection without granting authority"
+  ],
+  "limits": [
+    "Synthetic owners/model HTTP, not general real-model GUI semantics",
+    "An already selected registered bound target is required; global app/window discovery is not added",
+    "Bounded UIA controls, not model image-grounded reasoning or complete app coverage",
+    "Freshness-classified current wording still routes to live retrieval; general live-dependent execution remains open",
+    "No physical devices, real accounts, owner activation, provisioning or GitHub publication"
+  ],
+  "log_sha256": {
+    "control-observations-final-focused.log": "94e92e1fdfec1ddfa37c8fb01c7c68095c28831fc5bbcd6b8c2ad86781f993e2",
+    "control-desktop-full-tests.log": "bea91c239d7897d8accd83c2275ad53fdcadd4cd4edf5bd1173a1cf8bf40065c",
+    "control-desktop-build.log": "f7ae1e4b860f27af92dd388a92fc7de39dc950cee042b1bd9d78f2f18a1e2940",
+    "control-native-full-tests.log": "b516d535631fddfaebd9581a373c8fa0532b7839d5e731e061d663fbe4502c1d",
+    "control-observations-affected.log": "d30b4f30eb7e06a379107382ab8400bdf4b208151103401833fa4b6b0e0762c3"
+  }
+}

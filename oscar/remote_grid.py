@@ -1087,7 +1087,13 @@ class RemoteGrid:
                 self.artifact_permission(session.id, executor, capability, parameters)
                 criterion = {"kind": "remote_file", **parameters["verification"]}
             elif (
-                capability.id in {"machine.apps", "machine.files.list", "machine.files.search"}
+                capability.id
+                in {
+                    "machine.apps",
+                    "machine.files.list",
+                    "machine.files.search",
+                    "machine.controls",
+                }
                 or capability.id == "machine.browser"
                 and parameters["request"].get("read_only")
             ) and machine_readback(capability.id, parameters):
@@ -1819,7 +1825,12 @@ class RemoteGrid:
                     criterion = {"kind": "remote_file", **parameters["verification"]}
                 elif (
                     capability["id"]
-                    in {"machine.apps", "machine.files.list", "machine.files.search"}
+                    in {
+                        "machine.apps",
+                        "machine.files.list",
+                        "machine.files.search",
+                        "machine.controls",
+                    }
                     or capability["id"] == "machine.browser"
                     and parameters["request"].get("read_only")
                 ) and machine_readback(capability["id"], parameters):

@@ -15,6 +15,18 @@ BRIDGE_PATH = Path(__file__).with_name("windows_uia.ps1")
 BRIDGE = BRIDGE_PATH.read_text(encoding="utf-8")
 
 
+def inspect_request(request: dict[str, Any]) -> None:
+    if (
+        set(request) != {"operation", "handle", "pid", "query"}
+        or request["operation"] != "inspect_controls"
+        or any(type(request[k]) is not int or request[k] <= 0 for k in ("handle", "pid"))
+        or not isinstance(request["query"], str)
+        or len(request["query"]) > 80
+        or "\x00" in request["query"]
+    ):
+        raise ValueError("exact selected-window control query required")
+
+
 @dataclass(frozen=True)
 class InstalledApp:
     id: str
@@ -295,6 +307,44 @@ class WindowsDesktop:
         if result.returncode or len(result.stdout) > 128_000:
             raise OSError("bounded UI Automation observation failed")
         return json.loads(result.stdout.decode("utf-8-sig"))
+
+    def inspect_controls(self, request: dict[str, Any]) -> dict[str, Any]:
+        inspect_request(request)
+        if not {"desktop:capture", "screen:retain"} <= self.permissions:
+            raise PermissionError("selected-window perception and retention grants required")
+        tree = self.observe(
+            {"operation": "tree", "handle": request["handle"], "pid": request["pid"]}
+        )
+        query = request["query"].casefold()
+        matches = [e for e in tree if query in str(e.get("name", "")).casefold()]
+        controls = []
+        for element in matches[:8]:
+            text = element.get("text") if not element.get("password") else None
+            controls.append(
+                {
+                    "runtime_id": element["runtime_id"],
+                    "name": str(element.get("name", ""))[:80],
+                    "type": element["type"],
+                    "enabled": element["enabled"],
+                    "offscreen": element["offscreen"],
+                    "password": element["password"],
+                    "text": text[:160] if isinstance(text, str) else None,
+                    "truncated": len(str(element.get("name", ""))) > 80
+                    or isinstance(text, str)
+                    and len(text) > 160,
+                }
+            )
+        result = {
+            "handle": request["handle"],
+            "pid": request["pid"],
+            "controls": controls,
+            "truncated": len(matches) > len(controls) or len(tree) >= 200,
+            "coverage": "bounded UIA view: 200 nodes, depth 8, 100 children per node",
+        }
+        while len(json.dumps(result).encode()) > 4096 and controls:
+            controls.pop()
+            result["truncated"] = True
+        return result
 
     def catalog(self) -> list[dict[str, Any]]:
         self._authorize()
