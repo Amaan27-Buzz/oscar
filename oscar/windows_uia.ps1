@@ -59,7 +59,21 @@ if ($p.operation -in @('screenshot','visual_click')) {
  exit
 }
 if ($p.operation -eq 'focus_window') {
+ Add-Type -TypeDefinition @'
+using System;
+using System.Runtime.InteropServices;
+public static class OscarActivate {
+ [DllImport("user32.dll")] public static extern bool SetForegroundWindow(IntPtr window);
+ [DllImport("user32.dll")] public static extern IntPtr GetForegroundWindow();
+}
+'@
  $window.SetFocus()
+ if ([OscarActivate]::GetForegroundWindow() -ne [IntPtr]$p.handle) {
+  $null=[OscarActivate]::SetForegroundWindow([IntPtr]$p.handle)
+ }
+ if ([OscarActivate]::GetForegroundWindow() -ne [IntPtr]$p.handle) {
+  throw 'Windows declined selected-window foreground request'
+ }
  @{status='REPORTED';operation='focus_window'}|ConvertTo-Json -Compress;exit
 }
 if ($p.operation -eq 'focus_check') {

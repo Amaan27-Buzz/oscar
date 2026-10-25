@@ -158,9 +158,9 @@ class WindowsVisualTests(unittest.TestCase):
             with closing(worker):
                 worker.advertise()
                 # The remote phase has its own foreground prerequisite after Core startup.
-                tree = adapter.observe({"operation": "tree", **target})
-                adapter.observe(
-                    {"operation": "focus", **target, "runtime_id": tree[0]["runtime_id"]}
+                adapter.observe({"operation": "focus_window", **target})
+                self.assertTrue(
+                    adapter.observe({"operation": "focus_check", **target})["foreground"]
                 )
                 native_failures = []
                 run_command = worker.effects.run_command
@@ -307,11 +307,10 @@ class WindowsVisualTests(unittest.TestCase):
                     )
                     worker.desktop.bind(**target, app_id=app.id)
                     # Showing a topmost fixture does not establish Windows input focus.
-                    tree = worker.desktop.observe({"operation": "tree", **target})
-                    focused = worker.desktop.observe(
-                        {"operation": "focus", **target, "runtime_id": tree[0]["runtime_id"]}
-                    )
+                    worker.desktop.observe({"operation": "focus_window", **target})
+                    focused = worker.desktop.observe({"operation": "focus_check", **target})
                     self.assertEqual(process.pid, focused["pid"])
+                    self.assertTrue(focused["foreground"])
                     user32 = ctypes.WinDLL("user32", use_last_error=True)
                     user32.GetForegroundWindow.restype = ctypes.c_void_p
                     self.assertEqual(target["handle"], user32.GetForegroundWindow())

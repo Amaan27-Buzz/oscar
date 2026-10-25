@@ -1,0 +1,46 @@
+{
+  "classification": "EXPLICIT_WINDOWS_FOREGROUND_REQUEST_NATIVE_ACCEPTANCE_PARTIAL",
+  "date": "2026-10-26",
+  "base_head": "57cf054",
+  "change": "Bound selected-window focus requests UIA focus then native SetForegroundWindow when needed, and reports an explicit error if foreground identity still differs. Independent later readback and visual pre-input guards remain mandatory. Older visual fixture now uses this explicit focus contract.",
+  "checks": {
+    "before_change": "Standalone native focus task reported success but independent foreground comparison was false; no native command error was recorded",
+    "after_change_standalone": {
+      "passed": 1,
+      "seconds": 9.587,
+      "focus_tasks_verified": 2
+    },
+    "integration": {
+      "total": 49,
+      "passed": 48,
+      "failed": 1,
+      "seconds": 90.943,
+      "source_stable": true,
+      "qualification": "Predates the final older fixture migration to the explicit focus operation"
+    },
+    "final_older_fixture": "Still FAILED because selected window was no longer foreground before visual input",
+    "diagnostic": "Foreground changed from the selected run-owned HwndWrapper fixture to Chrome_WidgetWin_1 during the capture interval; cause unknown. No title, content or owner window capture collected.",
+    "full_regression": "1257-case aggregate preceding this change had 1246 PASS, ten SKIP and one native focus failure; not PASS"
+  },
+  "sources": {
+    "oscar/windows_uia.ps1": "5fa3c275833c2140892b9852f13657c087b00a4f872a3f77292255b4f963254b",
+    "tests/test_windows_visual.py": "b40f6ef9edc866ff1a9ec3cd2caf52ff409ed1d48463c6b1ca586f173191509e"
+  },
+  "logs": {
+    ".oscar/native-focus-diagnostic.log": "3252e77b5ecf1928c6df8392c9e2ae233c2aa867484f512a679fb0d8fcda8126",
+    ".oscar/native-focus-initial.json": "61e20d46ef96bdf1a860d2c6b0795b5e5c16a7d747f478ac8179722540bad09c",
+    ".oscar/native-focus-explicit.log": "4bf18c6da2c4adf607b52a0248e6cd9551b35d0361a5dcf7b54c02e8a33deab9",
+    ".oscar/native-focus-explicit.json": "3b0ff1e2c3d7040f2592a3cba345572b089cea10ff607f8982d90ea2b1e96470",
+    ".oscar/native-foreground-integration.log": "02929227dfdefc1a424c26c79bac1cbb93eb19b53cecf76600468f23907426bf",
+    ".oscar/native-foreground-integration-manifest.json": "0d3120b723bfedca635235818dca0db5147128437c9cc441db28d949e52479f3",
+    ".oscar/native-visual-explicit.log": "5f1a79cbae82da53472244c713736beef978a173df650186fba7aaeefc0e37c9",
+    ".oscar/visual-foreground-trace.log": "bcb23b3bc6e6ff23306fa74c4532dccc5f62a31715ba168866c6a90ba650851f",
+    ".oscar/visual-foreground-trace.json": "935dd7b377d9d7f9d2965168d242902c9453911a92d0d09898b6871e32f1399b"
+  },
+  "limits": [
+    "Not a general focus reliability fix or a full native acceptance PASS",
+    "Operating system foreground restrictions are respected; no activation bypass, synthetic keyboard focus hack or late-focus-loss retry",
+    "Earlier stale-frame marker ambiguity remains unresolved",
+    "No real model, owner app operation, physical device or remote publication"
+  ]
+}
