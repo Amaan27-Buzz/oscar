@@ -377,6 +377,18 @@ class CalendarContextSource:
         return (ContextObservation("calendar.state", current, scope, source, Epistemic.REPORTED),)
 
 
+def qualified_instant(stamp: dict[str, str]) -> float:
+    """A local wall time must identify one real instant, including across DST changes."""
+    parsed = datetime.fromisoformat(stamp["dateTime"].replace("Z", "+00:00"))
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=ZoneInfo(stamp["timeZone"]))
+        if parsed.utcoffset() != parsed.replace(fold=1).utcoffset() or parsed.astimezone(
+            UTC
+        ).astimezone(parsed.tzinfo).replace(tzinfo=None) != parsed.replace(tzinfo=None):
+            raise ValueError("ambiguous or nonexistent local time")
+    return parsed.timestamp()
+
+
 def calendar_conflicts(sources: list[dict[str, Any]]) -> dict[str, Any]:
     """Only explicit timed events with qualified current provenance enter overlap detection."""
     events: list[tuple[float, float, str, str]] = []
@@ -394,11 +406,7 @@ def calendar_conflicts(sources: list[dict[str, Any]]) -> dict[str, Any]:
             try:
                 times = []
                 for key in ("start", "end"):
-                    stamp = event[key]
-                    parsed = datetime.fromisoformat(stamp["dateTime"].replace("Z", "+00:00"))
-                    if parsed.tzinfo is None:
-                        parsed = parsed.replace(tzinfo=ZoneInfo(stamp["timeZone"]))
-                    times.append(parsed.timestamp())
+                    times.append(qualified_instant(event[key]))
                 if times[1] <= times[0] or not isinstance(event["id"], str):
                     raise ValueError("invalid interval")
                 if event.get("status") != "cancelled" and not event.get("isCancelled", False):

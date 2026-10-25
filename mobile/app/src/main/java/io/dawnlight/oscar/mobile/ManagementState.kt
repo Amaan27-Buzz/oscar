@@ -11,7 +11,20 @@ internal fun parseStartedResponsibility(root: JSONObject): String {
 
 data class ManagedCapability(val id: String, val node: String, val session: String, val kind: String, val risk: String, val permissions: List<String>)
 data class BriefSource(val id: String, val adapter: String, val state: String, val epistemic: String, val value: String?, val freshUntil: Double?, val epoch: Int, val accountId: String?, val accountGeneration: Int?)
-data class DayBrief(val observedAt: Double, val sources: List<BriefSource>, val overlaps: Int, val incomplete: Boolean)
+data class TaskAttention(val sourceId: String, val taskId: String, val reason: String)
+internal val taskAttentionLabels = mapOf("overdue" to "Overdue", "due_today" to "Due today", "high_importance" to "Reported high importance", "upcoming" to "Upcoming", "no_due_date" to "No due date", "due_unknown" to "Due date or time needs clarification")
+data class DayBrief(val observedAt: Double, val sources: List<BriefSource>, val overlaps: Int, val incomplete: Boolean,
+    val attention: List<TaskAttention> = emptyList(), val attentionIncomplete: Boolean = false, val unknownDueTimes: Int = 0,
+    val attentionFreshUntil: Double? = null) {
+    fun attentionLines(currentSources: Set<String>, nowSeconds: Double): List<String> {
+        if (!nowSeconds.isFinite() || nowSeconds <= 0 || attentionFreshUntil?.let { nowSeconds < it } != true || sources.any { it.id !in currentSources }) return emptyList()
+        return attention.mapNotNull { item ->
+            val source = sources.find { it.id == item.sourceId && it.adapter == "connected_tasks" } ?: return@mapNotNull null
+            val task = runCatching { JSONObject(source.value!!).objects("tasks", 8).find { it.getString("id") == item.taskId } }.getOrNull() ?: return@mapNotNull null
+            "${task.optString("title", "Untitled task").take(1024)} · ${taskAttentionLabels[item.reason]}"
+        }
+    }
+}
 internal fun parseDayBrief(root: JSONObject): DayBrief {
     require(root.toString().toByteArray().size <= 50_000 && root.get("version") == 1)
     val observed = root.getDouble("observed_at"); require(observed.isFinite() && observed > 0)
@@ -31,7 +44,20 @@ internal fun parseDayBrief(root: JSONObject): DayBrief {
     val schedule = root.getJSONObject("schedule")
     val overlaps = schedule.objects("overlaps", 16).size
     require(schedule.get("incomplete") is Boolean && schedule.get("truncated") is Boolean)
-    return DayBrief(observed, sources, overlaps, root.getBoolean("truncated") || schedule.getBoolean("incomplete") || schedule.getBoolean("truncated"))
+    val attention = root.optJSONObject("attention")
+    val items = attention?.objects("tasks", 8)?.map {
+        val reason = it.bounded("reason", 32); require(reason in taskAttentionLabels)
+        val source = it.bounded("source_id", 128)
+        require(sources.any { s -> s.id == source && s.adapter == "connected_tasks" })
+        TaskAttention(source, it.bounded("task_id", 1024), reason)
+    } ?: emptyList()
+    require(items.map { it.sourceId to it.taskId }.toSet().size == items.size)
+    val unknown = attention?.get("unknown_due_times") ?: 0
+    require(unknown is Int && unknown in 0..64)
+    if (attention != null) require(attention.get("incomplete") is Boolean && attention.get("truncated") is Boolean)
+    val attentionExpiry = attention?.getDouble("fresh_until")?.also { require(it.isFinite() && it > 0) }
+    return DayBrief(observed, sources, overlaps, root.getBoolean("truncated") || schedule.getBoolean("incomplete") || schedule.getBoolean("truncated"),
+        items, attention?.let { it.getBoolean("incomplete") || it.getBoolean("truncated") } ?: false, unknown, attentionExpiry)
 }
 data class ManagementView(val relationship: String, val mode: String, val status: String, val expires: Long?, val epoch: Int,
     val capabilities: List<ManagedCapability>, val askRules: List<String>, val source: String)

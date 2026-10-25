@@ -12,7 +12,7 @@ software work under the existing authorization; no new agent delegation is neede
 
 ## 2. Current candidate
 
-Latest committed runtime base `9112eda` on `codex/software-completion`; the explicit Worker
+Latest committed runtime base `ea2133c` on `codex/software-completion`; the explicit Worker
 routing checkpoint follows it. Use `git rev-parse HEAD` for the exact
 checkout, and `git log b700a6c..HEAD --oneline` for all local implementation commits.
 The final owner message must name the actual resulting checkout, not an invented
@@ -655,4 +655,7 @@ work remains open. [Receipt](../evidence/software-completion/observation-decodin
 
 
 **2026-10-25 local model discovery:** enabled discovery-required local Ollama providers now enrich installed identities with exact-model capabilities/context and per-slot LOCAL funding. Invalid, forwarded or unavailable metadata leaves entries inactive; the disabled local template opts in without activation. Local generation reserves admitted input/output context explicitly. Real HTTP acceptance discovers a vision model from an empty registry and rechecks metadata immediately before private image disclosure. All 183 affected portable integration cases pass (90.825 s), with stable source hashes; Ruff, mypy and repository checks pass. Metadata is not model accuracy or hardware-capacity proof, and no model was loaded. Native foreground failures and full software acceptance remain OPEN. [Receipt](../evidence/software-completion/local-model-discovery-2026-10-25.json).
+
+
+**2026-10-25 reported task attention:** the read-only briefing now orders selected current task reports by overdue/today, reported high importance and later/undated work. Date-only urgency needs a current selected timezone; ambiguous DST and unknown timezone instants stay unknown. Derived labels expire at evidence/deadline/date boundaries and withdraw in both apps after source/account change. No provider priority, calendar or communication mutation is added. The stable broader integration passed 140 cases; final wording/clock checks passed 14 Core contracts, all 132 Desktop and 87 Android unit tests, both builds and Android lint. Rendered native/accessibility acceptance and general schedule replanning remain OPEN; fresh full regression is pending. [Receipt](../evidence/software-completion/task-attention-2026-10-25.json).
 

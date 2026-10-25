@@ -155,3 +155,32 @@ it('preserves task date precision and hides reports after account rotation',()=>
   rerender(<DayBrief observation={observation} value={brief} accounts={[{...account,generation:8}]} grants={[{id:'tasks',epoch:1,perceive:true}]}/>);
   expect(screen.queryByText(/Synthetic task/)).toBeNull();
 });
+
+it('withdraws derived task attention on account drift and at its earlier deadline',()=>{
+  const now=Date.now(),observation={observed_at_ms:now,received_at_ms:now,transport_ms:0};
+  const account={id:'owner',provider:'google',tenant:'synthetic',subject:'synthetic',alias:'Tasks',identity_class:'owner-delegated',generation:7,status:'connected',remote_revocation:'unknown',services:[]};
+  const source={id:'tasks',epoch:1,adapter:'connected_tasks',state:'current',epistemic:'REPORTED',account_id:'owner',account_generation:7,value:JSON.stringify({tasks:[{id:'task',title:'Synthetic task',status:'needsAction'}],complete:true}),evidence:[{fresh_until:(now+60000)/1000}]};
+  const attention={tasks:[{source_id:'tasks',task_id:'task',reason:'overdue'}],incomplete:false,truncated:false,unknown_due_times:0,fresh_until:(now+30000)/1000};
+  const brief={version:1,observed_at:now/1000,sources:[source],schedule:{},attention};
+  const grants=[{id:'tasks',epoch:1,perceive:true}];
+  const {rerender}=render(<DayBrief observation={observation} value={brief} accounts={[account]} grants={grants}/>);
+  expect(screen.getByText('Synthetic task · Overdue')).toBeTruthy();
+  rerender(<DayBrief observation={observation} value={brief} accounts={[{...account,generation:8}]} grants={grants}/>);
+  expect(screen.queryByText('Synthetic task · Overdue')).toBeNull();
+  rerender(<DayBrief observation={observation} value={{...brief,attention:{...attention,fresh_until:(now-1)/1000}}} accounts={[account]} grants={grants}/>);
+  expect(screen.queryByText('Synthetic task · Overdue')).toBeNull();
+  expect(screen.getByText('Refresh to reassess task attention.')).toBeTruthy();
+});
+it('bounds task attention and does not render unknown reasons or unselected task identities',()=>{
+  const now=Date.now(),observation={observed_at_ms:now,received_at_ms:now,transport_ms:0};
+  const source={id:'tasks',epoch:1,adapter:'connected_tasks',state:'current',epistemic:'REPORTED',value:JSON.stringify({tasks:[{id:'task',title:'Synthetic task'}],complete:true}),evidence:[{fresh_until:(now+60000)/1000}]};
+  const attention={tasks:[{source_id:'tasks',task_id:'task',reason:'due_today'}],incomplete:true,truncated:false,unknown_due_times:1,fresh_until:(now+30000)/1000};
+  const brief={version:1,observed_at:now/1000,sources:[source],schedule:{},attention},grants=[{id:'tasks',epoch:1,perceive:true}];
+  const {rerender}=render(<DayBrief observation={observation} value={brief} accounts={[]} grants={grants}/>);
+  expect(screen.getByText('Synthetic task · Due today')).toBeTruthy();
+  expect(screen.getByText('Some task due dates or times need clarification.')).toBeTruthy();
+  for(const tasks of [[{source_id:'tasks',task_id:'task',reason:'invented'}],[{source_id:'tasks',task_id:'not-selected',reason:'overdue'}],Array(9).fill(attention.tasks[0])]){
+    rerender(<DayBrief observation={observation} value={{...brief,attention:{...attention,tasks}}} accounts={[]} grants={grants}/>);
+    expect(screen.queryByText('Reported task attention')).toBeNull();
+  }
+});

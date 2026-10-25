@@ -22,7 +22,15 @@
       "state": "PASS",
       "source_files": 106
     },
-    "repository_links_and_secret_safety": "PASS"
+    "repository_links_and_secret_safety": "PASS",
+    "installed_runtime_probe": {
+      "state": "UNAVAILABLE",
+      "seconds": 2.02,
+      "attempted_endpoints": [
+        "/api/ps"
+      ],
+      "qualification": "Default local service did not answer the initial metadata-only read; inventory and loaded-state comparison were not reached. No service was started."
+    }
   },
   "implemented": [
     "Opt-in local Ollama inventory enrichment through exact-model /show after /tags, at most 64 identities and remaining inventory budget passed to each read",
@@ -47,6 +55,7 @@
   },
   "logs": {
     ".oscar/local-model-discovery-integration.log": "ca118443706580ff5faa5c529d1a7c88be4b835d9afc610a1201af125365ccab",
-    ".oscar/local-model-discovery-integration-manifest.json": "5d6228132540c973b7a79fb505bfca55274201e6342a1c3c90026d7aad41ba81"
+    ".oscar/local-model-discovery-integration-manifest.json": "5d6228132540c973b7a79fb505bfca55274201e6342a1c3c90026d7aad41ba81",
+    ".oscar/installed-local-discovery-metadata.json": "620606e7699acaef8a5e25ab0dca14d3ebe9bac6a74d4d6e8a42e7ad52ceb55c"
   }
 }

@@ -1,0 +1,75 @@
+{
+  "classification": "READ_ONLY_TASK_ATTENTION_SOFTWARE_VERIFIED_NATIVE_RENDERED_ACCEPTANCE_OPEN",
+  "base_head": "ea2133c820638abc67af1cf8fd179109205e175e",
+  "sources": {
+    "oscar/ambient.py": "4a00908d909a63d2f5a079598816cb65c71d458a112ac7dbd38b54307f7f53de",
+    "oscar/task_context.py": "5dfdce0616096550b041b18147c1b41c0e1310a61d6b723e3b2c722672855171",
+    "oscar/world_runtime.py": "1274970c7408d73b35fc17a06d0d7ef558cb7ff00deb171f961446c287c1c616",
+    "tests/test_task_context.py": "4235618eb1471a7aaba5d00cdac847dd0385a10a65391e87f55799706e0ed723",
+    "desktop/src/OperatingSettings.tsx": "38b7aa04bf47fa9e064a8f106a233125395dd2a5804f321c4860f417f786ed0b",
+    "desktop/src/OperatingSettings.test.tsx": "d8ce9a07dda15d80e94afc17d46c98340d2a30c719388d3ced98fd561ee06a21",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/ManagementState.kt": "00748dc10f58bad9371cd78a66bd64ab6fe03e68c10eb399f5b3b314c381929a",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/AwarenessScreen.kt": "eee0d59175c745dbb8bb1441fe693baa146871055586b5b78d4075a3bb2c3ba7",
+    "mobile/app/src/test/java/io/dawnlight/oscar/mobile/ManagementContractsTest.kt": "335e4d9bd1e8dd2850508660b8be340ec804ac04f4ff2f78b23a87c38450b2a2"
+  },
+  "checks": {
+    "integration": {
+      "total": 140,
+      "passed": 140,
+      "failed": 0,
+      "skipped": 0,
+      "seconds": 155.205,
+      "source_stable": true,
+      "qualification": "Predates final source-review wording and Android rejection of nonpositive Core time; subsequent focused checks below cover those final changes"
+    },
+    "final_core_contracts": {
+      "passed": 14,
+      "failed": 0,
+      "seconds": 3.001
+    },
+    "desktop": {
+      "passed": 132,
+      "failed": 0,
+      "production_build": "PASS"
+    },
+    "android": {
+      "passed": 87,
+      "failed": 0,
+      "skipped": 0,
+      "debug_build": "PASS",
+      "lint": "PASS",
+      "final_gradle_seconds": 45
+    },
+    "ruff": "PASS",
+    "mypy": {
+      "state": "PASS",
+      "source_files": 106
+    },
+    "full_regression": "PENDING"
+  },
+  "implemented": [
+    "Current authorized selected task reports derive source-bound overdue/today/high-importance/upcoming/undated attention order, bounded to eight, without provider mutation or model disclosure",
+    "Completed tasks omitted; unknown provider status, partial lists, truncation and unknown due times remain explicit; duplicate provider task identities rejected",
+    "Date-only urgency needs one current selected timezone; explicit-offset or unambiguous recognized-zone instants only; unknown Windows zones remain unknown",
+    "Calendar conflicts share the same DST ambiguity/gap rejection",
+    "Attention expires at source evidence, next local midnight or next timed deadline; both clients withdraw on expiry/account/source change",
+    "Titles resolved only from current selected source data; private views retain existing suppression; Android also hides old conflict counts after source withdrawal"
+  ],
+  "limits": [
+    "Reported deadlines and provider importance do not establish user priorities, effort, dependencies or general schedule replanning usefulness",
+    "Only eight sources and the selected bounded task pages contribute; missing work or free time cannot be inferred",
+    "No account mutation, calendar move, message, autonomous reprioritization or retention grant is added",
+    "Android unit/build/lint and Desktop component/build evidence do not establish newest-source rendered native or assistive-technology acceptance",
+    "Earlier broader full suite and native focus failures retain their separate source qualifications; fresh aggregate pending",
+    "No real account, physical phone, audio/camera capture, model generation, cloud provisioning, publication or production owner activation"
+  ],
+  "logs": {
+    ".oscar/task-attention-integration.log": "ad60d67cb265a81f46b2de5b16a60e9c0c190387a91d2e79ddda7e2a5fa4726f",
+    ".oscar/task-attention-integration-manifest.json": "c18e15dfba86a4d96aa1e4a0f297a651e2d3bd0e2f3daa8d541ea005badbbc93",
+    ".oscar/task-attention-final-contracts.log": "06c0543cf98fec927e703c24e14228ed372f9d7da036071f8febc8ca53eec963",
+    ".oscar/task-attention-desktop-tests.log": "25c336ac50c020bfef7a3d4b088b641ce2e251d029bada11859a4930ced7b57d",
+    ".oscar/task-attention-desktop-build.log": "f43fd178509bedc7a1b6a466eaed0e98a5532824f96cb5e0118067cf6ee689fd",
+    ".oscar/task-attention-android.log": "87489952c628a0276a7152408218bb99dc7af443003ed5dc5ba07d652ef613d0",
+    ".oscar/task-attention-android-final.log": "4d66e87fcc8da310c07f21254c42cbe9560d7068a96e443e3c314d2ad1108938"
+  }
+}

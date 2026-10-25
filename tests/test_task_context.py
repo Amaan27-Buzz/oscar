@@ -1,8 +1,10 @@
 import json
 import unittest
+from datetime import UTC, datetime
 
 from oscar.connectors import CredentialRef
 from oscar.sentry import AwarenessMode, SentrySettings, SentryState
+from oscar.task_context import task_attention
 from tests import test_ambient as ambient
 
 
@@ -72,8 +74,10 @@ class ConnectedTaskTests(unittest.TestCase):
         self.assertFalse(self.world.world.source("task-source")["act"])
         brief = self.world.brief()
         self.assertEqual("connected_tasks.state", brief["sources"][0]["key"])
+        self.assertEqual("due_unknown", brief["attention"]["tasks"][0]["reason"])
         self.now += 61
         self.assertIsNone(self.world.brief()["sources"][0]["value"])
+        self.assertEqual([], self.world.brief()["attention"]["tasks"])
 
     def test_manual_trigger_gating_and_no_authority_before_setup(self):
         with self.assertRaises(PermissionError):
@@ -161,6 +165,7 @@ class ConnectedTaskTests(unittest.TestCase):
             {"items": [{"id": "x", "due": "2027-01-01"}]},
             {"items": [{"id": str(i), "title": "x" * 1024} for i in range(8)]},
             {"items": [{"id": str(i)} for i in range(9)]},
+            {"items": [{"id": "duplicate"}, {"id": "duplicate"}]},
         ):
             with self.subTest(payload=str(payload)[:60]):
                 self.payload = payload
@@ -194,3 +199,138 @@ class ConnectedTaskTests(unittest.TestCase):
         self.now += 31
         self.assertEqual(1, self.world.tick()["failed"])
         self.assertIsNone(self.world.brief()["sources"][0]["value"])
+
+
+class TaskAttentionTests(unittest.TestCase):
+    now = datetime(2027, 1, 15, 20, tzinfo=UTC).timestamp()
+
+    def source(self, tasks, **changes):
+        return {
+            "id": "tasks",
+            "adapter": "connected_tasks",
+            "state": "current",
+            "evidence": [{"fresh_until": self.now + 120}],
+            "value": json.dumps({"tasks": tasks, "complete": True}),
+            **changes,
+        }
+
+    def clock(self, zone="Asia/Kolkata", **changes):
+        return {
+            "id": "clock",
+            "adapter": "time",
+            "state": "current",
+            "evidence": [{"fresh_until": self.now + 120}],
+            "value": json.dumps({"timezone": zone}),
+            **changes,
+        }
+
+    def test_reported_deadlines_rank_before_importance_without_changing_tasks(self):
+        tasks = [
+            {"id": "undated", "status": "needsAction"},
+            {"id": "tomorrow", "status": "needsAction", "due_date": "2027-01-17"},
+            {"id": "important", "status": "notStarted", "importance": "high"},
+            {"id": "today", "status": "needsAction", "due_date": "2027-01-16"},
+            {"id": "late", "status": "needsAction", "due_date": "2027-01-15"},
+            {"id": "done", "status": "completed", "due_date": "2020-01-01"},
+        ]
+        source = self.source(tasks)
+        before = json.dumps(source)
+        result = task_attention([source, self.clock()], self.now)
+        self.assertEqual(
+            ["late", "today", "important", "tomorrow", "undated"],
+            [t["task_id"] for t in result["tasks"]],
+        )
+        self.assertEqual(
+            ["overdue", "due_today", "high_importance", "upcoming", "no_due_date"],
+            [t["reason"] for t in result["tasks"]],
+        )
+        self.assertEqual(before, json.dumps(source))
+        self.assertEqual("Asia/Kolkata", result["timezone"])
+
+    def test_date_only_does_not_become_midnight_or_borrow_an_ambiguous_timezone(self):
+        source = self.source([{"id": "date", "status": "needsAction", "due_date": "2027-01-15"}])
+        for clocks in (
+            [],
+            [self.clock(state="stale")],
+            [self.clock(), self.clock("UTC")],
+            [self.clock("Unknown/Zone")],
+        ):
+            with self.subTest(clocks=clocks):
+                result = task_attention([source, *clocks], self.now)
+                self.assertEqual("due_unknown", result["tasks"][0]["reason"])
+                self.assertEqual(1, result["unknown_due_times"])
+                self.assertIsNone(result["timezone"])
+
+    def test_offset_deadline_is_comparable_without_a_clock_timezone(self):
+        source = self.source(
+            [
+                {
+                    "id": "timed",
+                    "status": "inProgress",
+                    "due_time": {
+                        "dateTime": "2027-01-15T19:59:00+00:00",
+                        "timeZone": "UTC",
+                    },
+                }
+            ]
+        )
+        result = task_attention([source], self.now)
+        self.assertEqual("overdue", result["tasks"][0]["reason"])
+        self.assertEqual(0, result["unknown_due_times"])
+
+    def test_derived_attention_expires_at_deadline_midnight_or_evidence_expiry(self):
+        deadline = datetime(2027, 1, 15, 20, 1, tzinfo=UTC).timestamp()
+        source = self.source(
+            [
+                {
+                    "id": "timed",
+                    "status": "notStarted",
+                    "due_time": {
+                        "dateTime": "2027-01-15T20:01:00Z",
+                        "timeZone": "UTC",
+                    },
+                }
+            ]
+        )
+        self.assertEqual(deadline, task_attention([source], self.now)["fresh_until"])
+        self.assertEqual("overdue", task_attention([source], deadline)["tasks"][0]["reason"])
+        midnight = datetime(2027, 1, 16, tzinfo=UTC).timestamp()
+        clock = self.clock("UTC", evidence=[{"fresh_until": midnight + 60}])
+        source = self.source([], evidence=[{"fresh_until": midnight + 60}])
+        self.assertEqual(midnight, task_attention([source, clock], midnight - 10)["fresh_until"])
+        source["evidence"][0]["fresh_until"] = midnight - 5
+        self.assertEqual(
+            midnight - 5, task_attention([source, clock], midnight - 10)["fresh_until"]
+        )
+
+    def test_dst_ambiguity_missing_timezone_and_unmapped_windows_zone_stay_unknown(self):
+        for stamp in (
+            {"dateTime": "2026-11-01T01:30:00", "timeZone": "America/New_York"},
+            {"dateTime": "2026-03-08T02:30:00", "timeZone": "America/New_York"},
+            {"dateTime": "2027-01-15T19:00:00", "timeZone": "India Standard Time"},
+            {"dateTime": "2027-01-15T19:00:00"},
+        ):
+            with self.subTest(stamp=stamp):
+                result = task_attention(
+                    [self.source([{"id": "unknown", "status": "notStarted", "due_time": stamp}])],
+                    self.now,
+                )
+                self.assertEqual("due_unknown", result["tasks"][0]["reason"])
+                self.assertEqual(1, result["unknown_due_times"])
+
+    def test_withdrawal_partial_lists_unknown_status_and_total_bounds_remain_visible(self):
+        source = self.source([{"id": str(i), "status": "needsAction"} for i in range(8)])
+        another = self.source(
+            [
+                {"id": "more", "status": "needsAction"},
+                {"id": "unknown", "status": "provider-new-status"},
+            ],
+            id="other",
+        )
+        result = task_attention(
+            [source, another, self.source([], id="lost", state="unavailable")], self.now
+        )
+        self.assertEqual(8, len(result["tasks"]))
+        self.assertTrue(result["truncated"])
+        self.assertTrue(result["incomplete"])
+        self.assertEqual([], task_attention([self.source([], state="stale")], self.now)["tasks"])

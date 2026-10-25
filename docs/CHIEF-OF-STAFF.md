@@ -7,6 +7,27 @@ creation uses signed review; perception, retention and action remain independent
 [Implementation, local checks and remaining live-source gaps](development/SOFTWARE-AMBIENT-CONTEXT.md)
 distinguish this candidate from real-provider, owner and operational acceptance.
 
+The read-only day brief also derives a bounded attention order for the selected
+connected task reports: overdue, due today, provider-reported high importance,
+upcoming, then undated/unclear deadlines. Completed tasks are omitted; unknown
+provider status remains incomplete coverage. This is an explanation of reported
+deadlines and importance, not a claim to know the user's priorities or task effort.
+It does not change provider priorities, schedule blocks or send messages.
+
+Date-only deadlines require one unambiguous current selected clock timezone;
+they never become midnight timestamps. Timed deadlines need an explicit offset
+or a recognized timezone; ambiguous/nonexistent local DST times remain unknown.
+Unknown Windows timezone names are preserved as reported rather than guessed.
+Calendar overlap checks use the same qualified-instant rule.
+
+The derived attention list expires at supporting evidence expiry, the next local
+date boundary or the next timed deadline, whichever comes first. Both native
+clients hide it after expiry or source/account withdrawal. Task IDs retain their
+source IDs; titles are resolved from the same currently authorized source report.
+Only eight tasks are presented; partial provider lists, omitted tasks and unknown
+due times remain explicit. This improves day-to-day coordination without claiming
+general autonomous reprioritization or schedule replanning acceptance.
+
 OSCAR should behave as a continuously available, context-aware personal Chief of Staff, not as a chatbot the user repeatedly opens and prompts.
 
 This document owns the durable product contract for day-to-day context awareness, schedule/task coordination, interruption behavior and proactive assistance. OSCAR Mobile, World Model, Perception Fabric, Communication, Personal Policy and the Executive Planner implement different parts of this contract.

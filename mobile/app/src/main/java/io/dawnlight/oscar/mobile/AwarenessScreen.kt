@@ -100,6 +100,7 @@ import org.json.JSONObject
         state.dayBrief?.takeUnless { state.privateSuppressed }?.let { brief ->
             Text("Observed ${java.time.Instant.ofEpochMilli((brief.observedAt * 1000).toLong()).atZone(java.time.ZoneId.systemDefault()).toLocalTime().withNano(0)} · read-only", style = MaterialTheme.typography.bodySmall)
             if (brief.sources.isEmpty()) Text("No authorized current context is available.")
+            val currentSources = mutableSetOf<String>()
             brief.sources.forEach { source ->
                 val grant = state.snapshot?.management?.source?.let { JSONObject(it).getJSONObject("sentry").objects("sources", 64) }?.find { it.getString("id") == source.id }
                 val account = state.snapshot?.connections?.accounts()?.find { it.getString("id") == source.accountId }
@@ -109,6 +110,7 @@ import org.json.JSONObject
                 Text("${source.id} · ${if (current) source.epistemic.lowercase() else "Needs refresh"}", style = MaterialTheme.typography.titleSmall)
                 val value = source.value?.let { runCatching { JSONObject(it) }.getOrNull() }
                 if (current && value != null) {
+                    currentSources.add(source.id)
                     if (source.adapter == "time") Text(value.optString("datetime", "Time unavailable"))
                     else if (source.adapter == "weather") {
                         Text(value.optString("place", "Selected place"))
@@ -142,7 +144,16 @@ import org.json.JSONObject
                     }
                 }
             }
-            Text("${brief.overlaps} overlapping intervals in this observation${if (brief.incomplete) " · incomplete calendar coverage" else ""}.", style = MaterialTheme.typography.bodySmall)
+            if (brief.sources.all { it.id in currentSources }) {
+                val attention = brief.attentionLines(currentSources, now / 1000.0)
+                if (attention.isNotEmpty()) Text("Reported task attention", style = MaterialTheme.typography.titleSmall)
+                attention.forEach { Text(it, style = MaterialTheme.typography.bodySmall) }
+                if (brief.attentionFreshUntil?.let { now > 0 && now < it * 1000 } == true) {
+                    if (brief.attentionIncomplete) Text("Task attention covers only the selected available tasks.", style = MaterialTheme.typography.bodySmall)
+                    if (brief.unknownDueTimes > 0) Text("Some task due dates or times need clarification.", style = MaterialTheme.typography.bodySmall)
+                } else if (brief.attentionFreshUntil != null) Text("Refresh to reassess task attention.", style = MaterialTheme.typography.bodySmall)
+                Text("${brief.overlaps} overlapping intervals in this observation${if (brief.incomplete) " · incomplete calendar coverage" else ""}.", style = MaterialTheme.typography.bodySmall)
+            } else Text("Refresh to reassess task attention and schedule conflicts.", style = MaterialTheme.typography.bodySmall)
             Text("Refreshing context grants no authority to change your schedule.", style = MaterialTheme.typography.bodySmall)
         }
     }

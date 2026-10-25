@@ -5,6 +5,23 @@ import {assistanceSummary} from './Automations';
 import {Choice,Disclosure} from './UIControls';
 import {SentryNotices} from './SentryNotices';
 function object(value:unknown):Record<string,unknown>|null{return value!==null&&typeof value==='object'&&!Array.isArray(value)?value as Record<string,unknown>:null;}
+function TaskAttentionSummary({value,sources,now}:{value:unknown;sources:Map<string,Record<string,unknown>>;now:number}){
+  const attention=object(value),labels:Record<string,string>={overdue:'Overdue',due_today:'Due today',high_importance:'Reported high importance',upcoming:'Upcoming',no_due_date:'No due date',due_unknown:'Due date or time needs clarification'};
+  if(!attention||!Array.isArray(attention.tasks)||attention.tasks.length>8||typeof attention.incomplete!=='boolean'||typeof attention.truncated!=='boolean'||!Number.isInteger(attention.unknown_due_times)||Number(attention.unknown_due_times)<0||Number(attention.unknown_due_times)>64)return null;
+  if(typeof attention.fresh_until!=='number'||!Number.isFinite(attention.fresh_until))return null;
+  if(attention.fresh_until*1000<=now)return <p>Refresh to reassess task attention.</p>;
+  const seen=new Set<string>(),lines:string[]=[];
+  for(const raw of attention.tasks){
+    const item=object(raw);
+    if(!item||typeof item.source_id!=='string'||typeof item.task_id!=='string'||typeof item.reason!=='string'||!Object.hasOwn(labels,item.reason))return null;
+    const key=JSON.stringify([item.source_id,item.task_id]);if(seen.has(key))return null;seen.add(key);
+    const source=sources.get(item.source_id),tasks=source?.tasks;
+    const task=Array.isArray(tasks)?tasks.slice(0,8).map(object).find(task=>task?.id===item.task_id):null;
+    if(!task)return null;
+    lines.push(`${typeof task.title==='string'?task.title.slice(0,1024):'Untitled task'} · ${labels[item.reason]}`);
+  }
+  return <>{lines.length>0&&<><h4>Reported task attention</h4>{lines.map((line,index)=><p key={index}>{line}</p>)}</>}{(attention.incomplete||attention.truncated)&&<p>Task attention covers only the selected available tasks.</p>}{Number(attention.unknown_due_times)>0&&<p>Some task due dates or times need clarification.</p>}</>;
+}
 export function DayBrief({value,accounts,grants,observation}:{value:unknown;observation?:View['core_clock'];accounts:NonNullable<View['connections']>['accounts'];grants:{id:string;epoch:number;perceive:boolean}[]}){
   const [clock,setClock]=useState<CoreClock|null>(null),[,tick]=useState(0);
   useEffect(()=>{setClock(previous=>observation?CoreClock.observe(observation,Date.now(),()=>performance.now(),previous??undefined):null);},[observation]);
@@ -14,6 +31,7 @@ export function DayBrief({value,accounts,grants,observation}:{value:unknown;obse
   if(!brief||brief.version!==1||typeof brief.observed_at!=='number'||!Array.isArray(brief.sources)||brief.sources.length>8||!schedule)return null;
   let stale=false;
   const sources=brief.sources.map(object).filter((source):source is Record<string,unknown>=>source!==null);
+  const currentSources=new Map<string,Record<string,unknown>>();
   return <section aria-label="Observed day briefing"><h3>Observed briefing</h3><p>Read-only report from {new Date(brief.observed_at*1000).toLocaleString()}. Refresh to check for changes.</p>{sources.map((source,index)=>{
     const evidence=Array.isArray(source.evidence)?source.evidence.map(object):[];
     const expired=source.state!=='current'||!evidence.length||evidence.some(e=>!e||typeof e.fresh_until!=='number'||!Number.isFinite(e.fresh_until)||e.fresh_until*1000<=now);
@@ -21,8 +39,9 @@ export function DayBrief({value,accounts,grants,observation}:{value:unknown;obse
     const revoked=!grants.some(g=>g.id===source.id&&g.epoch===source.epoch&&g.perceive);
     const unavailable=expired||changed||revoked;stale||=unavailable;
     let content:Record<string,unknown>|null=null;try{content=typeof source.value==='string'?object(JSON.parse(source.value)):null;}catch{/* Source reports with invalid data remain unavailable. */}
+    if(!unavailable&&content&&source.adapter==='connected_tasks'&&typeof source.id==='string')currentSources.set(source.id,content);
     return <article key={String(source.id??index)}><h4>{String(source.id??'Context source')}</h4>{unavailable?<p>Stale or unavailable. Refresh before relying on this source.</p>:<><p>{source.epistemic==='REPORTED'?'Connected source report':'Clock or Core observation'}</p>{source.adapter==='time'&&content&&typeof content.datetime==='string'&&<p>{content.datetime} · {String(content.timezone??'Timezone unavailable')}</p>}{source.adapter==='weather'&&content&&<><p>{String(content.place??'Selected place')} · {String(content.temperature_c??'Unavailable')} °C · Wind {String(content.wind_mps??'Unavailable')} m/s · Humidity {String(content.humidity_percent??'Unavailable')}%</p><p>Forecast for {String(content.forecast_time??'time unavailable')}. Model updated {String(content.updated_at??'time unavailable')}.</p><p><a href="https://www.met.no/en" target="_blank" rel="noreferrer">MET Norway</a> · <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer">CC BY 4.0</a> · Selected forecast fields</p></>}{source.adapter==='android'&&content&&<><p>Authenticated phone metadata; playback does not establish attention.</p>{content.notifications_available!==true?<p>Notification context unavailable.</p>:Array.isArray(content.notifications)&&content.notifications.slice(0,8).map((raw,index)=>{const item=object(raw);return item&&typeof item.package==='string'&&typeof item.count==='number'?<p key={index}>{item.package.slice(0,100)} · {item.count} selected notifications</p>:null;})}{content.media_available!==true?<p>Media context unavailable.</p>:Array.isArray(content.media)&&content.media.slice(0,8).map((raw,index)=>{const item=object(raw);return item&&typeof item.package==='string'?<p key={index}>{item.package.slice(0,100)} · {item.state===3?'playing':item.state===2?'paused':item.state===1?'stopped':'other playback state'}</p>:null;})}</>}{source.adapter==='connected_tasks'&&content&&<>{content.complete===false&&<p>Task list coverage is incomplete.</p>}<p>Selected tasks; provider date precision is preserved.</p>{Array.isArray(content.tasks)&&content.tasks.slice(0,8).map((raw,index)=>{const task=object(raw);if(!task)return null;const due=object(task.due_time);return <p key={index}>{String(task.title??'Untitled task')} · {String(task.status??'Status unavailable')}{typeof task.due_date==='string'?` · Due date ${task.due_date} (date only)`:due?` · Due ${String(due.dateTime??'Time unavailable')} · ${String(due.timeZone??'Timezone unavailable')}`:''}{typeof task.importance==='string'?` · ${task.importance}`:''}</p>;})}</>}{source.adapter==='calendar'&&content&&<>{content.complete===false&&<p>Calendar coverage is incomplete.</p>}{Array.isArray(content.events)&&content.events.map((raw,index)=>{const event=object(raw);if(!event)return null;const start=object(event.start),end=object(event.end);return <p key={index}>{String(event.summary??event.subject??'Untitled event')} · {String(start?.dateTime??start?.date??'Time unavailable')} to {String(end?.dateTime??end?.date??'Time unavailable')}</p>;})}</>}</>}</article>;
-  })}{!sources.length&&<p>No configured sources have a report yet.</p>}{stale?<p>Refresh to reassess schedule conflicts.</p>:<>{Array.isArray(schedule.overlaps)&&schedule.overlaps.length>0&&<p>{schedule.overlaps.length} overlapping event pairs were observed.</p>}{schedule.incomplete===true&&<p>Calendar coverage or event times are incomplete; free time cannot be assumed.</p>}</>}{brief.truncated===true&&<p>Additional sources were omitted from this bounded briefing.</p>}</section>;
+  })}{!sources.length&&<p>No configured sources have a report yet.</p>}{stale?<p>Refresh to reassess task attention and schedule conflicts.</p>:<><TaskAttentionSummary value={brief.attention} sources={currentSources} now={now}/>{Array.isArray(schedule.overlaps)&&schedule.overlaps.length>0&&<p>{schedule.overlaps.length} overlapping event pairs were observed.</p>}{schedule.incomplete===true&&<p>Calendar coverage or event times are incomplete; free time cannot be assumed.</p>}</>}{brief.truncated===true&&<p>Additional sources were omitted from this bounded briefing.</p>}</section>;
 }
 export function OperatingSettings({view,busy,run}:{view:View;busy:boolean;run:(command:Command)=>unknown}) {
   const m=view.link==='online'?assistanceSummary(view.executive?.management):null;

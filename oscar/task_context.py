@@ -1,9 +1,11 @@
 """Read-only connected task observations; provider date precision is preserved."""
 
 import json
-from datetime import datetime
+from datetime import UTC, date, datetime, timedelta
 from typing import TYPE_CHECKING, Any
+from zoneinfo import ZoneInfo
 
+from .ambient import qualified_instant
 from .connector_mount import project_accounts
 from .connectors import ConnectionState, endpoint
 from .continuity import ContextObservation
@@ -17,6 +19,109 @@ CAPABILITIES = {
     "microsoft": "microsoft.todo.tasks.list",
 }
 KEY = "connected_tasks.state"
+
+
+def task_attention(sources: list[dict[str, Any]], now: float) -> dict[str, Any]:
+    """Rank only reported open tasks; date-only urgency needs one current selected timezone."""
+    zones = set()
+    for source in sources:
+        if source["adapter"] == "time" and source["state"] == "current":
+            zones.add(json.loads(source["value"])["timezone"])
+    try:
+        zone = ZoneInfo(next(iter(zones))) if len(zones) == 1 else None
+    except (KeyError, ValueError):
+        zone = None
+    today = datetime.fromtimestamp(now, zone).date() if zone else None
+    expires = min(
+        (
+            e["fresh_until"]
+            for s in sources
+            if s["adapter"] in {"time", "connected_tasks"} and s["state"] == "current"
+            for e in s.get("evidence", [])
+        ),
+        default=now,
+    )
+    if today is not None and zone is not None:
+        try:
+            expires = min(
+                expires,
+                qualified_instant(
+                    {
+                        "dateTime": (today + timedelta(days=1)).isoformat() + "T00:00:00",
+                        "timeZone": zone.key,
+                    }
+                ),
+            )
+        except (KeyError, ValueError):
+            expires = now
+    ranked = []
+    incomplete, unknown = False, 0
+    for source in sources:
+        if source["adapter"] != "connected_tasks":
+            continue
+        if source["state"] != "current":
+            incomplete = True
+            continue
+        value = json.loads(source["value"])
+        incomplete |= not value["complete"]
+        for task in value["tasks"]:
+            status = task.get("status")
+            if status == "completed":
+                continue
+            if status not in {
+                "needsAction",
+                "notStarted",
+                "inProgress",
+                "waitingOnOthers",
+                "deferred",
+            }:
+                incomplete = True
+                continue
+            reason, order = "no_due_date", ""
+            try:
+                if "due_date" in task:
+                    due_date = date.fromisoformat(task["due_date"])
+                    if today is None:
+                        raise ValueError("selected timezone required for date-only urgency")
+                    reason = (
+                        "overdue"
+                        if due_date < today
+                        else "due_today"
+                        if due_date == today
+                        else "upcoming"
+                    )
+                    order = due_date.isoformat()
+                elif "due_time" in task:
+                    instant = qualified_instant(task["due_time"])
+                    local_date = datetime.fromtimestamp(instant, zone).date() if zone else None
+                    if instant > now:
+                        expires = min(expires, instant)
+                    reason = (
+                        "overdue"
+                        if instant <= now
+                        else "due_today"
+                        if local_date == today and today is not None
+                        else "upcoming"
+                    )
+                    order = datetime.fromtimestamp(instant, UTC).isoformat()
+            except (KeyError, TypeError, ValueError, OverflowError):
+                unknown += 1
+                reason = "due_unknown"
+            if reason not in {"overdue", "due_today"} and task.get("importance") == "high":
+                reason = "high_importance"
+            rank = {"overdue": 0, "due_today": 1, "high_importance": 2, "upcoming": 3}.get(
+                reason, 4
+            )
+            ranked.append((rank, order, source["id"], task["id"], reason))
+    ranked.sort()
+    return {
+        "tasks": [{"source_id": s, "task_id": t, "reason": r} for _, _, s, t, r in ranked[:8]],
+        "incomplete": incomplete,
+        "unknown_due_times": unknown,
+        "truncated": len(ranked) > 8,
+        "timezone": zone.key if zone else None,
+        "fresh_until": expires,
+    }
 
 
 def binding(world: "WorldRuntime", value: dict[str, Any]) -> tuple[Any, Any, Any]:
@@ -65,7 +170,10 @@ def review(world: "WorldRuntime", value: dict[str, Any]) -> dict[str, Any]:
         "fields": ["id", "title", "status", "due"]
         if account.provider == "google"
         else ["id", "title", "status", "dueDateTime", "importance"],
-        "filter": "first eight tasks; no automatic pagination, prioritization or mutation",
+        "filter": (
+            "first eight tasks; no automatic pagination or mutation; "
+            "attention is read-only and source-bound"
+        ),
         "precision": "Google due is date-only; Microsoft time and timezone are provider-reported",
     }
 
@@ -103,9 +211,13 @@ class ConnectedTaskSource:
         if not isinstance(tasks, list) or len(tasks) > 8:
             raise ValueError("bounded provider task list required")
         selected = []
+        identities = set()
         for task in tasks:
             if not isinstance(task, dict) or not isinstance(task.get("id"), str):
                 raise ValueError("task identity required")
+            if task["id"] in identities:
+                raise ValueError("duplicate provider task identity")
+            identities.add(task["id"])
             item: dict[str, Any] = {}
             for key in ("id", "title", "status", *(("importance",) if not google else ())):
                 if key not in task:

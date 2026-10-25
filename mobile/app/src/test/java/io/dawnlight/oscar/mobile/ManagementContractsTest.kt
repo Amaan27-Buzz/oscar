@@ -159,8 +159,29 @@ class ManagementContractsTest {
                 .put("account_id", "synthetic-owner").put("account_generation", 7).put("value", tasks.toString())
                 .put("evidence", JSONArray().put(JSONObject().put("id", "provider-read").put("fresh_until", 1060)))))
             .put("schedule", JSONObject().put("overlaps", JSONArray()).put("incomplete", false).put("truncated", false))
+        val attention = JSONObject().put("tasks", JSONArray().put(JSONObject()
+            .put("source_id", "tasks").put("task_id", "task").put("reason", "due_today")))
+            .put("incomplete", true).put("truncated", false).put("unknown_due_times", 1).put("fresh_until", 1050)
+        wire.put("attention", attention)
         val brief = parseDayBrief(wire)
         val source = brief.sources.single()
+        assertEquals(listOf("Synthetic task · Due today"), brief.attentionLines(setOf("tasks"), 1000.0))
+        assertTrue(brief.attentionLines(emptySet(), 1000.0).isEmpty())
+        assertTrue(brief.attentionLines(setOf("tasks"), 1050.0).isEmpty())
+        assertTrue(brief.attentionLines(setOf("tasks"), 0.0).isEmpty())
+        assertTrue(brief.attentionIncomplete)
+        assertEquals(1, brief.unknownDueTimes)
+        for (item in listOf(
+            JSONObject().put("source_id", "tasks").put("task_id", "task").put("reason", "invented"),
+            JSONObject().put("source_id", "other").put("task_id", "task").put("reason", "overdue")
+        )) {
+            val bad = JSONObject(wire.toString())
+            bad.getJSONObject("attention").put("tasks", JSONArray().put(item))
+            assertThrows(Exception::class.java) { parseDayBrief(bad) }
+        }
+        val tooMany = JSONObject(wire.toString())
+        tooMany.getJSONObject("attention").put("tasks", JSONArray((0..8).map { attention.getJSONArray("tasks").getJSONObject(0) }))
+        assertThrows(Exception::class.java) { parseDayBrief(tooMany) }
         assertEquals("connected_tasks", source.adapter)
         assertEquals(7, source.accountGeneration)
         assertEquals("synthetic-owner", source.accountId)

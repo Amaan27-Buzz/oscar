@@ -689,6 +689,7 @@ class WorldRuntime:
     def brief(self) -> dict[str, Any]:
         """Caller must hold world:read; metadata snapshots never include private context."""
         from .phone_context import recheck
+        from .task_context import task_attention
 
         with self.store.transaction():
             recheck(self)
@@ -752,6 +753,7 @@ class WorldRuntime:
                 "sources_total": len(rows),
                 "truncated": len(rows) > 8,
                 "schedule": calendar_conflicts(sources),
+                "attention": task_attention(sources, self.world.clock()),
                 "delivery": "passive read-only briefing",
             }
 
