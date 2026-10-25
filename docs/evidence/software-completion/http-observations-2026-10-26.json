@@ -28,7 +28,36 @@
       "Structured decoder keeps the selected dynamic connector identity and requires observation mode",
       "Provider JSON absent from durable result/review records; only content hash and provenance retained"
     ],
-    "development_failures": "Initial cases used Grid low risk instead of native read risk, corrected to the frozen native contract. Drift fixture initially returned the same tampered response twice; corrected to actual between-read mutation. Full fixture initially used a pure read classified outside execution; corrected to a current-information write objective. Earlier logs retained."
+    "development_failures": "Initial cases used Grid low risk instead of native read risk, corrected to the frozen native contract. Drift fixture initially returned the same tampered response twice; corrected to actual between-read mutation. Full fixture initially used a pure read classified outside execution; corrected to a current-information write objective. Earlier logs retained.",
+    "tls_outbound_worker": {
+      "status": "SOFTWARE_VERIFIED",
+      "seconds": 7.725,
+      "tls_mobile_requests": true,
+      "independent_account_gets": 2,
+      "private_model_continuation": true,
+      "separate_outbound_worker_process": true,
+      "canonical_final_task": "verified",
+      "independent_file_readback": true,
+      "provider_json_absent_from_durable_records": true,
+      "limits": [
+        "Core is a thread in the test driver process",
+        "Synthetic model and provider HTTP fixture, synthetic owner",
+        "Protocol acceptance; no rendered native or physical device acceptance"
+      ]
+    },
+    "full_regression": {
+      "base_head": "ce8fadb54e3da1d40a0d567d8f6647ead0170c56",
+      "exit_code": 0,
+      "seconds": 913.331,
+      "source_stable": true,
+      "total": 1277,
+      "passed": 1267,
+      "skipped": 10,
+      "failed": 0,
+      "errors": 0,
+      "test_seconds": 909.754,
+      "independently_checked_hashes": true
+    }
   },
   "sources": {
     "oscar/connectors.py": "cad2c623176ae985e97f4720bb041486999026b7fcaf41df98fa496771a495b6",
@@ -46,14 +75,19 @@
     ".oscar/http-observation-focused-final.log": "b90aa8d33646bdb8030000e9adb1bda9998cdd519d216b16a9a37a0ed2b712f8",
     ".oscar/http-observation-focused-complete.log": "795a4b769c66c2d322e581b2faa24197ee0e52fa6e73d4be6fe2c4a47fe86988",
     ".oscar/http-observation-integration.log": "42ee8b0634fb36e2940cf9c8094e4e1f3c43c5382f0b6e0ba6753f4ee02ff124",
-    ".oscar/http-observation-integration-manifest.json": "0f9d065185fc9c47cc3bd6938e87f032b1447dcefbc4d1fea6245b972cce60a3"
+    ".oscar/http-observation-integration-manifest.json": "0f9d065185fc9c47cc3bd6938e87f032b1447dcefbc4d1fea6245b972cce60a3",
+    ".oscar/http-observation-tls.py": "df897ac5e55b6d6088dd30322c31fa9b6068ecaac40cbb48edf91746dde60468",
+    ".oscar/http-observation-tls.log": "dbc041c8b813f777298ff3710cea7a56e4e54f5295e548a2be33179585e5c61b",
+    ".oscar/http-observation-tls.json": "cca429cb41051bcf2e364e35c0c2ebec0116e9b2a12093c01637990693a53039",
+    ".oscar/http-observation-full-regression.log": "6534ed5675ce0ffd3d4f752a519f96c96187d6ac232b41911205107d6878ecf9",
+    ".oscar/http-observation-full-regression-manifest.json": "4fff01b3f2ff64a0fbb820b31a3e4b9e893f4623d8983fcee19ea6cb077b997c"
   },
   "limits": [
     "Synthetic model/provider HTTP and owners; no actual-model/provider, rendered-native or physical-device acceptance",
     "Only bodyless native account HTTPS GET declared read-only with connectors:read qualifies; MCP tools and writes remain ineligible",
     "At most 4 KiB of source JSON, existing three-stage budget and bounded transient-store capacity; expiry is min(remaining input lifetime, endpoint freshness)",
     "Matching source responses do not prove broader provider semantics, future state, a mutation or the overall objective",
-    "The preceding source-stable 1265-case full PASS at 1996328 predates this change; fresh full regression pending",
-    "No push, Actions, real accounts, production authority, public deployment or cloud provisioning"
+    "No push, Actions, real accounts, production authority, public deployment or cloud provisioning",
+    "Two-account observation continuation reproduced a native signed review size rejection; correction and acceptance remain pending after this full checkpoint"
   ]
 }

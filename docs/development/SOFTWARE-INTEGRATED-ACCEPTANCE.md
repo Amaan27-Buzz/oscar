@@ -92,3 +92,9 @@ Native account HTTPS operations now share the private reviewed model-Worker path
 
 
 Native account bodyless GETs now support independently compared private observation stages and model continuation. Signed Ask and synthetic Full reach verified scoped file output; twelve focused and 243 affected regressions pass. Provider semantics, broad model accuracy and cross-account coordination remain OPEN. [Receipt](../evidence/software-completion/http-observations-2026-10-26.json).
+
+
+**2026-10-26 private account observation over TLS:** a synthetic mobile session signed exact Ask reviews over real TLS sockets. Two independent account GETs matched; private model continuation created a final file task on a separate outbound Worker process. Canonical task verification and independent file readback both passed (7.725 s); provider JSON was absent from durable task/result/review records. Core ran in the driver process, and the model/provider used synthetic HTTP fixtures. This is protocol/process acceptance, not rendered native, real-model/provider or physical acceptance. A fresh full regression on `ce8fadb` is still running; no aggregate PASS is claimed. [Receipt](../evidence/software-completion/http-observations-2026-10-26.json).
+
+
+**2026-10-26 adaptive HTTPS full regression:** `ce8fadb` passed 1,277 tests: 1,267 PASS, ten SKIP, zero failures/errors (909.754 s; 913.331 s wrapper). Sources remained stable and all manifest hashes were independently checked. Both native visual workflows passed this run; historical intermittent focus/stale-frame ambiguity remains unresolved. A separate two-account TLS experiment completed both independent GET comparisons but exposed a native review size rejection before private continuation; this defect remains open at this checkpoint. [Receipt](../evidence/software-completion/http-observations-2026-10-26.json).
