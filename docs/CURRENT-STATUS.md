@@ -512,3 +512,6 @@ Executive readback is now bounded to current work and recent history (64 goals/3
 
 
 **2026-10-25 current integration regression completed:** committed `d58116c` sources passed 1,241 tests: 1,231 PASS, ten SKIP, zero failures/errors (931.956 s). Before/after source hashes stayed stable and were independently checked against the working tree. Both native image and older visual tests passed in this run; earlier foreground failures and stale-frame marker ambiguity retain their unresolved historical qualifications. This supersedes the preceding active-run checkpoint, not the broader incomplete software mandate. [Full receipt](evidence/software-completion/attention-full-2026-10-25.json).
+
+
+**2026-10-26 soak result collected:** the pending `5ccceeb` ten-minute synthetic TLS Core/Worker workload completed in 601.58 s with 96 independently verified effects, separate Worker and Core/Worker restarts, and disposable process/credential cleanup. Recorded runtime hashes still match the checkout. This supersedes the preceding pending soak checkpoint; general model/service/native-product acceptance remains open. [Receipt](evidence/software-completion/soak-5ccceeb-2026-10-25.json).

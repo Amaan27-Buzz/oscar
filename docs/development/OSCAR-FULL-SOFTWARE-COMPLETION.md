@@ -774,3 +774,6 @@ The latest source-stable Core regression at `b3ed1c3` equivalence passed 1,214 t
 
 
 **2026-10-25 stacked conversation courtesy:** fixed shared routing of "could you please write" and equivalent spacing/case variants to the existing signed action review. Questions and recall stay excluded; no new authority is granted. All 76 affected conversation/planner tests pass on stable sources (89.258 s), plus Ruff/mypy. The 1,241-case full PASS predates this parser change. [Receipt](../evidence/software-completion/courtesy-routing-2026-10-25.json).
+
+
+**2026-10-26 soak result collected:** the pending `5ccceeb` ten-minute synthetic TLS Core/Worker workload completed in 601.58 s with 96 independently verified effects, separate Worker and Core/Worker restarts, and disposable process/credential cleanup. Recorded runtime hashes still match the checkout. This supersedes the preceding pending soak checkpoint; general model/service/native-product acceptance remains open. [Receipt](../evidence/software-completion/soak-5ccceeb-2026-10-25.json).

@@ -698,3 +698,6 @@ implemented, not general replanning. Earlier intermittent focus failures and
 stale-frame marker ambiguity remain unresolved despite the latest full PASS.
 No subagents, quota reset, model load, physical device, real account, production
 authority activation, provisioning, push or remote mutation were used.
+
+
+**2026-10-26 soak result collected:** the pending `5ccceeb` ten-minute synthetic TLS Core/Worker workload completed in 601.58 s with 96 independently verified effects, separate Worker and Core/Worker restarts, and disposable process/credential cleanup. Recorded runtime hashes still match the checkout. This supersedes the preceding pending soak checkpoint; general model/service/native-product acceptance remains open. [Receipt](../evidence/software-completion/soak-5ccceeb-2026-10-25.json).
