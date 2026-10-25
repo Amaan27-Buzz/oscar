@@ -315,6 +315,30 @@ class RemoteVerifier(Verifier):
                         content_hash=hashlib.sha256(actual.encode()).hexdigest(),
                     ),
                 )
+            if "focus" in objective.criterion:
+                actual = self.remote.exchange(result.task_id, "readback")["content"]
+                observed = json.loads(actual)
+                matches = (
+                    isinstance(observed, dict)
+                    and observed == objective.criterion["focus"]
+                    and all(type(observed[k]) is int for k in ("handle", "pid"))
+                    and type(observed["foreground"]) is bool
+                )
+                return Verification(
+                    TaskState.VERIFIED if matches else TaskState.FAILED,
+                    Evidence(
+                        new_id(),
+                        result.task_id,
+                        result.correlation_id,
+                        "remote-native-focus-observer",
+                        "separate native foreground window/process identity readback",
+                        time(),
+                        matches,
+                        Epistemic.VERIFIED if matches else Epistemic.KNOWN,
+                        "Focus identity compared; subsequent input must recheck its target",
+                        content_hash=hashlib.sha256(actual.encode()).hexdigest(),
+                    ),
+                )
             if "text" in objective.criterion:
                 actual = self.remote.exchange(result.task_id, "readback")["content"]
                 observed = json.loads(actual)
@@ -1131,6 +1155,15 @@ class RemoteGrid:
             elif capability.id == "machine.screen":
                 criterion["image"] = True
             elif (
+                capability.id == "machine.desktop"
+                and parameters["request"].get("operation") == "focus_window"
+            ):
+                machine_readback(capability.id, parameters)
+                criterion["focus"] = {
+                    **{k: parameters["request"][k] for k in ("handle", "pid")},
+                    "foreground": True,
+                }
+            elif (
                 capability.id
                 in {
                     "machine.apps",
@@ -1869,6 +1902,15 @@ class RemoteGrid:
                     criterion = {"kind": "remote_file", **parameters["verification"]}
                 elif capability["id"] == "machine.screen":
                     criterion["image"] = True
+                elif (
+                    capability["id"] == "machine.desktop"
+                    and parameters["request"].get("operation") == "focus_window"
+                ):
+                    machine_readback(capability["id"], parameters)
+                    criterion["focus"] = {
+                        **{k: parameters["request"][k] for k in ("handle", "pid")},
+                        "foreground": True,
+                    }
                 elif (
                     capability["id"]
                     in {

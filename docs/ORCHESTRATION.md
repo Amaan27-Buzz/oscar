@@ -360,6 +360,15 @@ click. A click report remains PARTIAL until objective-specific independent
 readback establishes the outcome. Synthetic HTTP planning acceptance and installed
 model image accuracy are separate evidence.
 
+When `machine.desktop` is separately selected, a plan may explicitly request
+`focus_window` with the same registered, bound handle/PID before input. This is
+an authorized action, never an implicit side effect of screenshot capture or
+clicking. A separate read-only `focus_check` process returns only the actual
+foreground window/process identity; Core compares it with the selected target.
+Verified focus can release a dependent click, whose native guard still checks
+foreground, obstruction and exact pixels again. Focus is momentary and can be
+withdrawn by user/OS activity. No focus bypass or automatic click retry is added.
+
 Ollama image requests use its documented `/generate` API. A local reproduction
 showed Qwen chat returning fenced Markdown despite `format:json` with thinking
 disabled; `/generate` enforced JSON on the same synthetic image. Strict JSON,

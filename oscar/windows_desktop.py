@@ -204,6 +204,8 @@ class WindowsDesktop:
             "close": {"handle", "pid"},
             "read": {"handle", "pid", "runtime_id"},
             "focus_snapshot": {"handle", "pid", "runtime_id"},
+            "focus_window": {"handle", "pid"},
+            "focus_check": {"handle", "pid"},
             "focus": {"handle", "pid", "runtime_id"},
             "invoke": {"handle", "pid", "runtime_id"},
             "select": {"handle", "pid", "runtime_id"},

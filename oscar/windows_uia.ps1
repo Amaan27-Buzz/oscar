@@ -58,6 +58,25 @@ if ($p.operation -in @('screenshot','visual_click')) {
  & (Join-Path $PSScriptRoot 'windows_visual.ps1') -Request $p
  exit
 }
+if ($p.operation -eq 'focus_window') {
+ $window.SetFocus()
+ @{status='REPORTED';operation='focus_window'}|ConvertTo-Json -Compress;exit
+}
+if ($p.operation -eq 'focus_check') {
+ Add-Type -TypeDefinition @'
+using System;
+using System.Runtime.InteropServices;
+public static class OscarFocus {
+ [DllImport("user32.dll")] public static extern IntPtr GetForegroundWindow();
+}
+'@
+ $handle=[OscarFocus]::GetForegroundWindow()
+ $actual=[Windows.Automation.AutomationElement]::FromHandle($handle)
+ $pidValue=0
+ if ($null -ne $actual) {$pidValue=$actual.Current.ProcessId}
+ @{handle=$handle.ToInt64();pid=$pidValue;foreground=($handle.ToInt64() -eq $p.handle)} |
+  ConvertTo-Json -Compress;exit
+}
 if ($p.operation -eq 'tree') {
  $queue=[Collections.Generic.Queue[object]]::new();$queue.Enqueue(@{e=$window;depth=0});$result=@()
  $walker=[Windows.Automation.TreeWalker]::ControlViewWalker

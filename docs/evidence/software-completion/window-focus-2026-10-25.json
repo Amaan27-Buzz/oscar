@@ -1,0 +1,62 @@
+{
+  "classification": "SELECTED_WINDOW_FOCUS_CONTRACT_VERIFIED_NATIVE_ACCEPTANCE_PARTIAL",
+  "base_head": "eb1f4b23d07ca94de48bc83130148f0ddafe2c1a",
+  "sources": {
+    "oscar/windows_desktop.py": "2d890b48edb70cfdfae9d67311d4df7154af3de58014f49403bf748cb0ce8c43",
+    "oscar/windows_uia.ps1": "6463b89526d84c7125bbbd8e4fdc458f2181bc86daf28b527e64882e1bb868b0",
+    "oscar/remote_machine.py": "248a1a5f9606e6767b2a696f91f0a31afbde09123f4a73e380bd313fca8fc672",
+    "oscar/remote_grid.py": "22326780cf8089d7dc3b444724509e47f876c495bd413ee9a60c44f99a5ad949",
+    "oscar/planner_authoring.py": "cd3a301787bcb794da6e152dc8d77794b32314cc4019a4e132ce6cb48209d889",
+    "tests/test_remote_machine.py": "95425186a7d425b6f8bd1196c272a693a49e4c68feab2f76fde515bc884d1756",
+    "tests/test_screen_observations.py": "e095c008efff211c66a77af4ff62a95f98adc25acec2862534bb31810280f7c5"
+  },
+  "checks": {
+    "portable_contracts": {
+      "passed": 12,
+      "failed": 0
+    },
+    "standalone_native": {
+      "passed": 3,
+      "failed": 0,
+      "seconds": 24.403
+    },
+    "integration": {
+      "total": 152,
+      "passed": 150,
+      "failed": 2,
+      "skipped": 0,
+      "seconds": 145.836,
+      "source_stable": true
+    },
+    "ruff": "PASS",
+    "mypy": {
+      "state": "PASS",
+      "source_files": 106
+    }
+  },
+  "implemented": [
+    "Explicit signed Ask or current synthetic Full focus_window operation over a bound allowlisted HWND/PID",
+    "Independent native foreground identity readback; exact integer handle/process and boolean foreground matching",
+    "Dependent visual input still rechecks foreground, exact frame and obstruction; no automatic input replay",
+    "Nonfocusable native window rejection remains expected; no OS activation bypass"
+  ],
+  "limits": [
+    "Combined integration rejected two native clicks after foreground loss; cause remains unproven. Observed foreground native class changed to WinUIDesktopWin32WindowClass, without reading titles or owner content",
+    "Standalone native positive focus, private image click and retention withdrawal passed; this does not establish reliable combined/native whole-product acceptance",
+    "Earlier UIA integration had 150 PASS and two failures in 144.322 seconds: older visual foreground assertion and an incorrect positive expectation for a deliberately nonfocusable form. Its source manifest was preserved, but its raw log was accidentally overwritten by the final integration; detailed failure summaries remain in task tool output",
+    "A rejected Win32 SetForegroundWindow experiment failed two of three cases and was removed; current implementation uses UI Automation SetFocus",
+    "The previous 1224-case full regression failed two native cases and predates these changes; no new full PASS claimed",
+    "Actual-model coordinate accuracy, historical stale-frame ambiguity, owner applications and whole-product acceptance remain OPEN; no publication, real account, physical device or owner production activation"
+  ],
+  "logs": {
+    ".oscar/window-focus-integration.log": "9cb9065c6680ee9b5a380eafa28257db2e3f14e7b423cc827d120953d3401ca9",
+    ".oscar/window-focus-integration-manifest.json": "4eb07af638c652647114f1e3ae7698891cb476bf143e0bf2ed114eb8e125d2e7",
+    ".oscar/window-focus-before-fixture-correction-manifest.json": "e4ec7dbe2f18792f68ffcef50c7b0f630c046d4e4026dff75937fb6b2a2b8944",
+    ".oscar/window-focus-native-final.log": "aa5eda8db03f7626d84af5de07b0ad95dea9256e5911a5e3fe8804d954c80eb1",
+    ".oscar/window-focus-native-win32.log": "e2039c792409af53b10e93eff5961bdad8a58273ef7c228a887cfbbc7df14bc1",
+    ".oscar/window-focus-win32-sources.json": "ae04c6d6412c484caecd667b7350a0561ceeb0df25cff98c1921e2ae6032cca9",
+    ".oscar/window-focus-diagnostic.log": "36fabf4240ee35eab500ab2b7569d9fc8b11fba8fd921027b9b35b38405f34a6",
+    ".oscar/window-focus-native.log": "d046ec6f5ad119cf84bbcdc90ae8ce6a3d7e7d4dfff3880de49cd1c0be130c23",
+    ".oscar/window-focus-contracts.log": "12924757b22d0d89539777d4e516d3677599873e179ba7597e08eb5c64f0b60f"
+  }
+}

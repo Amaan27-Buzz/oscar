@@ -87,6 +87,14 @@ def machine_readback(capability: str, parameters: dict[str, Any]) -> dict[str, A
     if capability == "machine.desktop" and request.get("operation") == "set_text_checked":
         if set(request) == {"operation", "handle", "pid", "runtime_id", "text", "expected_text"}:
             return {"operation": "read", **{k: request[k] for k in ("handle", "pid", "runtime_id")}}
+    if capability == "machine.desktop" and request.get("operation") == "focus_window":
+        if (
+            set(parameters) != {"request"}
+            or set(request) != {"operation", "handle", "pid"}
+            or any(type(request[k]) is not int or request[k] <= 0 for k in ("handle", "pid"))
+        ):
+            raise ValueError("exact selected-window focus identity required")
+        return {**request, "operation": "focus_check"}
     if capability == "machine.clipboard" and set(request) == {"operation", "text"}:
         if request["operation"] == "clipboard_write":
             return {"operation": "clipboard_read"}
@@ -531,6 +539,9 @@ class RemoteMachine(RemoteWorker):
                 raise ValueError("one browser text observation required")
             return {"content": json.dumps(observations[0], allow_nan=False)}
         observed = self.effects.desktop.observe(delivery["parameters"], timeout=8)
+        self._guard()
+        if delivery["parameters"].get("operation") == "focus_check":
+            return {"content": json.dumps(observed, allow_nan=False)}
         return {"content": json.dumps({"text": observed["text"]}, allow_nan=False)}
 
 

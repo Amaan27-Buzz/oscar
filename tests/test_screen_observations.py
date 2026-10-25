@@ -1,6 +1,7 @@
 """Private image readback and actual run-owned native visual input."""
 
 import base64
+import ctypes
 import hashlib
 import json
 import os
@@ -24,12 +25,13 @@ from oscar.policy import PersonalPolicy
 from oscar.providers import HTTPAdapter
 from oscar.registry import Registry
 from oscar.remote_grid import RemoteVerifier
-from oscar.remote_machine import RemoteMachine
+from oscar.remote_machine import RemoteMachine, machine_readback
 from oscar.router import Router
 from oscar.screen_image import CHUNK_BYTES, ScreenImage
 from oscar.windows_desktop import InstalledApp, WindowsDesktop
 from tests import test_control_observations as control_fixture
 from tests import test_providers as provider_fixture
+from tests import test_remote_machine as machine_fixture
 from tests.support import RouterRig
 from tests.test_directory_observations import step
 from tests.test_remote_grid import signature
@@ -52,6 +54,64 @@ def png(width=64, height=48):
 
 
 class ScreenObservationContractTests(unittest.TestCase):
+    def test_focus_readback_preserves_only_the_exact_selected_window(self):
+        request = {"operation": "focus_window", "handle": 123, "pid": 456}
+        self.assertEqual(
+            {**request, "operation": "focus_check"},
+            machine_readback("machine.desktop", {"request": request}),
+        )
+        for change in ({"handle": True}, {"pid": 0}, {"runtime_id": "other"}):
+            with self.subTest(change=change), self.assertRaises(ValueError):
+                machine_readback("machine.desktop", {"request": {**request, **change}})
+        worker = object.__new__(RemoteMachine)
+        action = SimpleNamespace(capability_id="machine.desktop", parameters={"request": request})
+        delivery = {
+            "kind": "readback",
+            "parameters": {**request, "operation": "focus_check"},
+            "approved": True,
+        }
+        worker.validate_effect(action, delivery)
+        with self.assertRaises(PermissionError):
+            worker.validate_effect(
+                action, {**delivery, "parameters": {**request, "operation": "focus_window"}}
+            )
+        with self.assertRaises(PermissionError):
+            worker.validate_effect(
+                action, {**delivery, "parameters": {**delivery["parameters"], "pid": 789}}
+            )
+
+    def test_focus_verification_uses_independent_typed_foreground_identity(self):
+        expected = {"handle": 123, "pid": 456, "foreground": True}
+        remote = SimpleNamespace(exchange=Mock(return_value={"content": json.dumps(expected)}))
+        verifier = RemoteVerifier(remote, SimpleNamespace(files=None, clock=time))
+        objective = Objective(
+            "objective",
+            "task",
+            "Focus selected window",
+            {"kind": "remote_machine", "focus": expected},
+            time(),
+        )
+        result = Result(
+            "result",
+            "action",
+            "task",
+            "correlation",
+            "machine.desktop",
+            True,
+            value='{"focused":true}',
+        )
+        self.assertEqual("verified", verifier.verify(objective, result).state)
+        for change in (
+            {"handle": 789},
+            {"pid": 789},
+            {"foreground": False},
+            {"foreground": 1},
+            {"extra": True},
+        ):
+            remote.exchange.return_value = {"content": json.dumps({**expected, **change})}
+            with self.subTest(change=change):
+                self.assertEqual("failed", verifier.verify(objective, result).state)
+
     def test_capture_validation_preserves_existing_native_geometry_limit(self):
         width, height = 4096, 2160
 
@@ -410,6 +470,9 @@ class NativeScreenObservationTests(unittest.TestCase):
     enroll = control_fixture.ControlObservationTests.enroll
     start_worker = control_fixture.ControlObservationTests.start_worker
     setUp = control_fixture.ControlObservationTests.setUp
+    submit = machine_fixture.RemoteMachineExecutionTests.submit
+    approve = machine_fixture.RemoteMachineExecutionTests.approve
+    finish = machine_fixture.RemoteMachineExecutionTests.finish
 
     def test_private_verified_image_drives_native_click(self):
         self.workflow()
@@ -446,12 +509,20 @@ class NativeScreenObservationTests(unittest.TestCase):
         while not (self.workspace / "window.txt").exists() and monotonic() < deadline:
             sleep(0.05)
         handle = int((self.workspace / "window.txt").read_text())
-        caps = ("machine.screen", "machine.visual")
+        caps = ("machine.screen", "machine.visual", "machine.desktop")
         self.start_worker(caps, desktop=True)
         native_errors = []
+        foreground = []
         run_command = self.worker.effects.run_command
 
         def inspect_command(*args, **kwargs):
+            user32 = ctypes.WinDLL("user32", use_last_error=True)
+            user32.GetForegroundWindow.restype = ctypes.c_void_p
+            user32.GetClassNameW.argtypes = [ctypes.c_void_p, ctypes.c_wchar_p, ctypes.c_int]
+            current = user32.GetForegroundWindow()
+            window_class = ctypes.create_unicode_buffer(256)
+            user32.GetClassNameW(current, window_class, len(window_class))
+            foreground.append({"selected": current == handle, "window_class": window_class.value})
             result = run_command(*args, **kwargs)
             if result[0]:
                 native_errors.append(result[1])
@@ -485,6 +556,13 @@ class NativeScreenObservationTests(unittest.TestCase):
             }
         )
         self.worker.effects.desktop = adapter
+        if not withdraw:
+            focused = self.submit(
+                "desktop_control",
+                {"request": {"operation": "focus_window", "handle": handle, "pid": process.pid}},
+            )
+            self.approve(focused)
+            self.assertEqual("verified", self.finish(focused)["state"], native_errors)
         marker = self.workspace / "clicks.txt"
         baseline = int(marker.read_text()) if marker.exists() else 0
         p = provider_fixture.ProviderContractTests()
@@ -544,7 +622,14 @@ class NativeScreenObservationTests(unittest.TestCase):
                         "y": int(frame.height * 0.4),
                     },
                 )
-                plan = {"steps": [final]}
+                focus = step(
+                    "machine.desktop",
+                    "desktop_control",
+                    request={"operation": "focus_window", "handle": handle, "pid": process.pid},
+                )
+                focus["id"] = "focus"
+                final["id"], final["depends_on"] = "click", ["focus"]
+                plan = {"steps": [focus, final]}
             p.body = {
                 **(
                     {"response": json.dumps(plan)}
@@ -614,7 +699,7 @@ class NativeScreenObservationTests(unittest.TestCase):
             self.worker.step()
             actions = h.store.all("planned_action")
             visual = [a for a in actions if a["capability_id"] == "machine.visual"]
-            if withdraw and any(t["state"] == "failed" for t in h.store.all("task")):
+            if any(t["state"] == "failed" for t in h.store.all("task")):
                 break
             if visual and h.store.task(visual[0]["task_id"]).state in {
                 "partially_verified",
@@ -641,7 +726,14 @@ class NativeScreenObservationTests(unittest.TestCase):
             self.assertEqual(1, len(p.requests))
             self.assertFalse(visual)
         else:
-            self.assertEqual([], native_errors)
+            focus = [
+                a for a in h.store.all("planned_action") if a["capability_id"] == "machine.desktop"
+            ]
+            self.assertEqual(2, len(focus))
+            self.assertTrue(
+                all(h.store.task(a["task_id"]).state == "verified" for a in focus), native_errors
+            )
+            self.assertEqual([], native_errors, foreground)
             self.assertEqual("partially_verified", h.store.task(visual[0]["task_id"]).state)
             self.assertEqual(3, len(p.requests))
             self.assertEqual("/show", p.requests[1]["path"])

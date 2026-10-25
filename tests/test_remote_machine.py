@@ -911,6 +911,13 @@ class RemoteMachineExecutionTests(unittest.TestCase):
             desktop = self.worker.effects.desktop
             desktop.bind(handle, process.pid, app.id)
             target = {"handle": handle, "pid": process.pid}
+            focused = self.submit(
+                "desktop_control", {"request": {"operation": "focus_window", **target}}
+            )
+            self.assertNotEqual("verified", focused["state"])
+            self.approve(focused)
+            # This fixture deliberately disables keyboard focus; no activation bypass.
+            self.assertEqual("failed", self.finish(focused)["state"])
             tree = desktop.observe({"operation": "tree", **target})
             editor = next(e for e in tree if e["name"] == "Synthetic input")
             button = next(e for e in tree if e["name"] == "Submit synthetic form")

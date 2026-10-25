@@ -85,6 +85,19 @@ class PlannerAuthoring:
                     )
                 )
             )
+            examples.append(
+                asdict(
+                    Intent(
+                        "Focus the owner's selected registered window before native input",
+                        "capability",
+                        capability_kind=kind,
+                        parameters={
+                            "request": {"operation": "focus_window", "handle": 1, "pid": 1}
+                        },
+                        criterion={"kind": "unavailable"},
+                    )
+                )
+            )
         elif kind == "desktop_inspection" and cap["id"] == "machine.controls":
             examples.append(
                 asdict(
@@ -248,6 +261,9 @@ class PlannerAuthoring:
                         "for visual_click and client-pixel x/y inside those bounds. Native input "
                         "recaptures the window and rejects changed pixels/geometry before input. "
                         "Click reports never verify the objective; seek independent readback. "
+                        "If machine.desktop is selected, an explicit focus_window step can focus "
+                        "the same bound handle/pid; make the click depend on its verified focus. "
+                        "Focus can change again, so native input still rechecks it. "
                         "Capture, retention, control and model permissions remain separate."
                     )
                 }
