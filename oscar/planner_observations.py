@@ -55,9 +55,9 @@ def validate_stage(steps: list[dict[str, Any]]) -> None:
             and intent.get("capability_kind") == "browser"
             and isinstance(intent.get("parameters"), dict)
             and static_observation(intent["parameters"])
-            or step["capability_id"] == "machine.controls"
+            or step["capability_id"] in {"machine.controls", "machine.screen"}
             and intent.get("kind") == "capability"
-            and intent.get("capability_kind") == "desktop_inspection"
+            and intent.get("capability_kind") == OBSERVATION_KINDS[step["capability_id"]]
             and isinstance(intent.get("parameters"), dict)
             and machine_readback(step["capability_id"], intent["parameters"]) is not None
         ):
@@ -215,6 +215,20 @@ def context(store: Store, grid: Grid, refs: dict[str, Any], *, task_id: str | No
                 "observed_at": evidence["observed_at"],
                 "expires_at": row["observation_expires"],
                 "value": value,
+                **(
+                    {
+                        "media_type": "image/png",
+                        "target": {
+                            "node_id": step["node_id"],
+                            **{
+                                k: step["intent"]["parameters"]["request"][k]
+                                for k in ("handle", "pid")
+                            },
+                        },
+                    }
+                    if step["capability_id"] == "machine.screen"
+                    else {}
+                ),
             }
         )
     text = json.dumps(values)

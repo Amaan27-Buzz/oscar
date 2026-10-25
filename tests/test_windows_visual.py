@@ -46,9 +46,23 @@ class VisualContractTests(unittest.TestCase):
         self.assertIn("screen:retain", capture[1])
         self.assertNotIn("screen:retain", control[1])
         for kind in (capture[0], control[0]):
-            self.assertEqual({"request": {}}, validate_remote_machine(kind, {"request": {}}))
+            parameters = (
+                {
+                    "request": {
+                        "operation": "screenshot",
+                        "handle": 1,
+                        "pid": 2,
+                        "path": "frame.png",
+                    }
+                }
+                if kind == capture[0]
+                else {"request": {}}
+            )
+            self.assertEqual(parameters, validate_remote_machine(kind, parameters))
             with self.assertRaises(ValueError):
-                validate_remote_machine(kind, {"request": {}, "shell": True})
+                validate_remote_machine(kind, {**parameters, "shell": True})
+        with self.assertRaises(ValueError):
+            validate_remote_machine(capture[0], {"request": {}})
 
     def test_capture_grant_and_exact_visual_material(self):
         adapter = object.__new__(WindowsDesktop)
@@ -143,6 +157,21 @@ class WindowsVisualTests(unittest.TestCase):
                 )
             with closing(worker):
                 worker.advertise()
+                # The remote phase has its own foreground prerequisite after Core startup.
+                tree = adapter.observe({"operation": "tree", **target})
+                adapter.observe(
+                    {"operation": "focus", **target, "runtime_id": tree[0]["runtime_id"]}
+                )
+                native_failures = []
+                run_command = worker.effects.run_command
+
+                def inspect_command(*args, **kwargs):
+                    result = run_command(*args, **kwargs)
+                    if result[0]:
+                        native_failures.append(result[1])
+                    return result
+
+                worker.effects.run_command = inspect_command
 
                 def execute(kind, request):
                     task = owner.request(
@@ -179,7 +208,7 @@ class WindowsVisualTests(unittest.TestCase):
                 captured = execute(
                     "screen_capture", {"operation": "screenshot", **target, "path": "remote.png"}
                 )
-                self.assertEqual("partially_verified", captured["state"])
+                self.assertEqual("verified", captured["state"])
                 result = [
                     r
                     for r in core.harness.store.all("result")
@@ -199,7 +228,8 @@ class WindowsVisualTests(unittest.TestCase):
                     "x": int(frame["width"] * 0.4),
                     "y": int(frame["height"] * 0.4),
                 }
-                self.assertEqual("partially_verified", execute("visual_control", click)["state"])
+                clicked = execute("visual_control", click)
+                self.assertEqual("partially_verified", clicked["state"], native_failures)
                 self.assertEqual("2", (root / "clicks.txt").read_text())
                 worker.step()
                 self.assertEqual("2", (root / "clicks.txt").read_text())

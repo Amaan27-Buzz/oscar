@@ -6,6 +6,7 @@ from enum import StrEnum
 from typing import Any
 
 from .freshness import SourceRef
+from .screen_image import ScreenImage
 
 
 class Mode(StrEnum):
@@ -159,6 +160,7 @@ class ModelRequest:
     ollama_think: bool | None = None
     executive_plan: bool = False
     executive_observation: tuple[str, ...] = ()
+    images: tuple[ScreenImage, ...] = field(default=(), repr=False)
 
     @classmethod
     def from_config(cls, data: Any) -> "ModelRequest":
@@ -202,6 +204,16 @@ class ModelRequest:
         from .planning_contract import OBSERVATION_KINDS
 
         if (
+            not isinstance(self.images, tuple)
+            or len(self.images) > 4
+            or any(not isinstance(image, ScreenImage) for image in self.images)
+            or self.images
+            and (self.mode != Mode.PRIVATE or "vision" not in self.required)
+            or "vision" in self.required
+            and not self.images
+        ):
+            raise ValueError("private bounded vision observations required")
+        if (
             not isinstance(self.executive_observation, tuple)
             or len(self.executive_observation) > 16
             or any(
@@ -209,7 +221,8 @@ class ModelRequest:
                 for c in self.executive_observation
             )
             or len(set(self.executive_observation)) != len(self.executive_observation)
-            or self.executive_observation and not self.executive_plan
+            or self.executive_observation
+            and not self.executive_plan
         ):
             raise ValueError("observation decoding requires an Executive plan")
         if type(self.executive_plan) is not bool or (
@@ -232,7 +245,16 @@ class ModelRequest:
             or not self.required
         ):
             raise ValueError("invalid task requirements")
-        object.__setattr__(self, "input_tokens", max(self.input_tokens, len(self.prompt.encode())))
+        # shortcut: reserve one token per pixel for local vision; add model-specific accounting
+        # before allowing hosted image billing or admitting larger captures.
+        object.__setattr__(
+            self,
+            "input_tokens",
+            max(
+                self.input_tokens,
+                len(self.prompt.encode()) + sum(i.width * i.height for i in self.images),
+            ),
+        )
         if self.mode == Mode.MANUAL and (not self.pinned_provider or not self.pinned_model):
             raise ValueError("manual routing requires provider and model")
 

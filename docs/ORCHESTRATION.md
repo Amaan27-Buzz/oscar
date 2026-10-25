@@ -330,9 +330,39 @@ The initial review discloses the selected private model sources. Raw tool data i
 attached transiently at model execution; canonical planning prompts retain exact
 result/evidence references. The model treats observations as untrusted data and
 returns a new validated plan; data cannot grant authority. New dependencies refer
-only to steps in that response. General image reasoning, arbitrary tool feedback,
-semantic objective verification and unrestricted discovery are not established by
-this bounded text loop.
+only to steps in that response. Arbitrary tool feedback, semantic objective
+verification and unrestricted discovery remain outside this bounded loop.
+
+Selected `machine.screen` captures can now be observation stages. Core separately
+reads the exact retained PNG artifact in 6,000-byte chunks, validates its framing,
+checksums, pixel stream, dimensions and SHA-256, and pins the result/evidence.
+VERIFIED means those captured bytes were inspected, not that depicted text is true.
+The bounded text context carries metadata and target identity; image bytes travel
+as typed private model input, never as instructions or canonical planning text.
+Current capture/retention permissions, owner, executor, policy, delegation and
+provenance are checked again at disclosure. Withdrawal blocks continuation.
+
+Vision currently routes only to configured local Ollama models explicitly
+advertising `vision` with LOCAL funding. Hosted vision is unavailable. Admission
+conservatively reserves one input token per pixel in addition to prompt bytes;
+large screenshots may exceed the selected model's context and fail closed.
+Core accepts non-interlaced 8-bit RGB/RGBA PNGs up to 1 MB and four million pixels.
+At most four images enter a request. The model executor holds at most 16 PNGs,
+usable for 120 seconds; shutdown clears that cache. Core restart or cache loss
+requires a fresh capture, never replay of a prior effect. Worker artifacts and
+authenticated transport receipts remain retained under the capture's retention
+grant; cache expiry is not deletion of those retained records.
+
+The resulting visual plan uses existing exact-frame native input. Target-side
+recapture rejects changed pixels, geometry, identity or foreground before one
+click. A click report remains PARTIAL until objective-specific independent
+readback establishes the outcome. Synthetic HTTP planning acceptance and installed
+model image accuracy are separate evidence.
+
+Ollama image requests use its documented `/generate` API. A local reproduction
+showed Qwen chat returning fenced Markdown despite `format:json` with thinking
+disabled; `/generate` enforced JSON on the same synthetic image. Strict JSON,
+coordinate and target checks remain mandatory; formatted output can still be wrong.
 
 The model may propose a native app launch using a discovered exact target ID and
 an optional existing scoped artifact. Current native allowlists, supported launch

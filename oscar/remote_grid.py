@@ -255,6 +255,48 @@ class RemoteVerifier(Verifier):
 
     def verify(self, objective: Objective, result: Result) -> Verification:
         if objective.criterion["kind"] == "remote_machine":
+            if objective.criterion.get("image"):
+                from .harness import ModelExecutor
+                from .screen_image import CHUNK_BYTES, MAX_IMAGE_BYTES, ScreenImage
+
+                frame = json.loads(result.value or "null")
+                action = self.remote.store.get("planned_action", result.task_id)
+                if (
+                    not isinstance(frame, dict)
+                    or set(frame) != {"width", "height", "sha256", "path", "bytes"}
+                    or frame["path"] != action["parameters"]["request"]["path"]
+                    or type(frame["bytes"]) is not int
+                    or not 45 <= frame["bytes"] <= MAX_IMAGE_BYTES
+                    or result.artifact is None
+                    or result.artifact.content_hash != frame["sha256"]
+                ):
+                    raise ValueError("exact screenshot artifact metadata required")
+                data = bytearray()
+                for offset in range(0, frame["bytes"], CHUNK_BYTES):
+                    response = self.remote.exchange(result.task_id, "readback", offset=offset)
+                    chunk = base64.b64decode(response["content"], validate=True)
+                    if len(chunk) != min(CHUNK_BYTES, frame["bytes"] - offset):
+                        raise ValueError("incomplete screenshot artifact chunk")
+                    data.extend(chunk)
+                image = ScreenImage(bytes(data), frame["width"], frame["height"], frame["sha256"])
+                executor = self.remote.h.dispatcher.executors.get("models.reason")
+                if isinstance(executor, ModelExecutor):
+                    executor.retain_image(result.task_id, image)
+                return Verification(
+                    TaskState.VERIFIED,
+                    Evidence(
+                        new_id(),
+                        result.task_id,
+                        result.correlation_id,
+                        "remote-screenshot-artifact-observer",
+                        "separate exact artifact readback, PNG validation and Core hash comparison",
+                        time(),
+                        True,
+                        Epistemic.VERIFIED,
+                        "Capture bytes verified; image contents remain untrusted observations",
+                        content_hash=image.sha256,
+                    ),
+                )
             if objective.criterion.get("match_report"):
                 actual = self.remote.exchange(result.task_id, "readback")["content"]
                 matches = actual == result.value
@@ -1086,6 +1128,8 @@ class RemoteGrid:
                     raise PermissionError("artifact executor unavailable")
                 self.artifact_permission(session.id, executor, capability, parameters)
                 criterion = {"kind": "remote_file", **parameters["verification"]}
+            elif capability.id == "machine.screen":
+                criterion["image"] = True
             elif (
                 capability.id
                 in {
@@ -1823,6 +1867,8 @@ class RemoteGrid:
                         delegated=bool(owner.get("standing")),
                     )
                     criterion = {"kind": "remote_file", **parameters["verification"]}
+                elif capability["id"] == "machine.screen":
+                    criterion["image"] = True
                 elif (
                     capability["id"]
                     in {
@@ -1878,10 +1924,24 @@ class RemoteGrid:
                 },
             )
 
-    def exchange(self, task_id: str, kind: str) -> dict[str, Any]:
+    def exchange(self, task_id: str, kind: str, *, offset: int | None = None) -> dict[str, Any]:
         with self.lock:
             task = self.store.task(task_id)
             binding = self.store.get("remote_task", task_id)
+            from .screen_image import CHUNK_BYTES, MAX_IMAGE_BYTES
+
+            screenshot = kind == "readback" and binding["capability"]["id"] == "machine.screen"
+            if (
+                screenshot
+                and (
+                    type(offset) is not int
+                    or not 0 <= offset < MAX_IMAGE_BYTES
+                    or offset % CHUNK_BYTES
+                )
+                or not screenshot
+                and offset is not None
+            ):
+                raise ValueError("screenshot-only bounded readback offset required")
             device = self.store.get("remote_device", binding["target"])
             identifier_ = new_id()
             row = {
@@ -1892,6 +1952,7 @@ class RemoteGrid:
                 "task_id": task_id,
                 "lease_id": task.lease_id,
                 "state": "pending",
+                **({"offset": offset} if screenshot else {}),
             }
             self.store.put("remote_delivery", identifier_, row)
         until = monotonic() + 35
@@ -1926,7 +1987,10 @@ class RemoteGrid:
             "parameters": (
                 android_readback(action["parameters"])
                 if binding["capability"]["id"].startswith("android.")
-                else machine_readback(action["capability_id"], action["parameters"])
+                else {
+                    **(machine_readback(action["capability_id"], action["parameters"]) or {}),
+                    **({"offset": row["offset"]} if "offset" in row else {}),
+                }
                 if action["capability_id"] in REMOTE_MACHINE_CAPABILITIES
                 else {"path": action["parameters"]["path"]}
             )

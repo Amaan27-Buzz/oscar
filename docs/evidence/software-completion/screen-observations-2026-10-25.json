@@ -1,0 +1,90 @@
+{
+  "classification": "PRIVATE_VERIFIED_SCREEN_OBSERVATIONS_WITH_GUARDED_NATIVE_INPUT_PARTIAL_ACCEPTANCE",
+  "sources": {
+    "oscar/screen_image.py": "41a80110442513be303d89f0294d3e5e675fc3a4583044685b4b421b6add8782",
+    "oscar/harness.py": "e1df86bca7544e9c1826dcae44d5a2cf5401c051638aa9809bb647871be3c490",
+    "oscar/models.py": "a0fa21851dea8d141e73c7642c9a1b370069ab752b42f6b7f7ec0cfeb367f8f5",
+    "oscar/providers.py": "ac6fa3bd2135c5814bce7ca47baf083825a899f6dcbc013b57d33d4560374100",
+    "oscar/router.py": "0543463ba0e2e1824868960c6fa36660473115a591a333392f85a04b603ade5e",
+    "oscar/remote_grid.py": "e2756ea775f79333d0cd606d0b59926b1c0f5ae862ba62f9a37253113f75a27f",
+    "oscar/remote_machine.py": "cd61c1880cac4861341b9b0e3e76595714972da2e1ede8c352a1aebfc3ccc84c",
+    "oscar/interactive_worker.py": "e548cdb58eee766a93c5544b86dc43999d1d0e845c8932a9e9c339f0742e79bb",
+    "oscar/planning_contract.py": "107ee293a56dac3ffb512dbaec1644b54bc2a7c1bc28bda0f3f201a47ed3a7e0",
+    "oscar/planner_observations.py": "6f51804ab98c6041ec1f7b1d61a6143bcbd6a659bd8b32b898ec99d76f738932",
+    "oscar/planner_authoring.py": "7713dc60879d53146ecb4a8b2a56dd2492ef21bd48b1c243f98636511e4c6718",
+    "tests/test_screen_observations.py": "f9f892b3d83fc525d2323916fc4b1e0af166a6dc7ca3f328575b358164290e7d",
+    "tests/test_windows_visual.py": "fcf86b3706d7e270d9684e6f2a2c2c049dcf97f57fb2af0ec37cfa04e90fd0d8",
+    "scripts/verify_screen_model.py": "cc4252a023375cf84afa7b01f35f97e73e2a6c99d6be234c511b3dece4936728"
+  },
+  "checks": {
+    "portable_screen_contracts": {
+      "passed": 7,
+      "failed": 0
+    },
+    "focused_integration": {
+      "total": 143,
+      "passed": 140,
+      "failed": 2,
+      "errors": 1,
+      "seconds": 141.323,
+      "source_stable": true,
+      "qualification": "Historical pre-contract-test correction; native foreground failures retained"
+    },
+    "native_batch_after_contract_correction": {
+      "total": 16,
+      "passed": 15,
+      "failed": 1,
+      "seconds": 40.805,
+      "qualification": "New image continuation/revocation cases and controls passed; existing visual remote phase failed"
+    },
+    "isolated_existing_visual": {
+      "total": 3,
+      "passed": 2,
+      "failed": 1,
+      "seconds": 8.775,
+      "qualification": "Unexpected marker increment on stale-frame negative; cause unproven; no product guard weakened"
+    },
+    "ruff": "PASS",
+    "mypy": {
+      "state": "PASS",
+      "source_files": 106
+    },
+    "full_regression": {
+      "state": "PENDING"
+    }
+  },
+  "implemented": [
+    "Screenshot-only 6000-byte authenticated readback chunks under current lease and authority; no arbitrary binary path or URL",
+    "Independent exact retained PNG integrity and geometry inspection establishes captured bytes, not depicted facts",
+    "Private provenance-bound model images with current owner/executor/policy/retention/delegation checks",
+    "Local Ollama vision and LOCAL funding only; conservative context admission; hosted image routing unavailable",
+    "Image generation endpoint enforces JSON in reproduced diagnostic; strict parsing remains",
+    "Native exact-frame click guard and at-most-once journal remain authoritative; generic input stays PARTIAL"
+  ],
+  "limits": [
+    "Actual 0.8B/4B Qwen chat attempts rejected structured output before input; source-stable failed receipts retained",
+    "Same synthetic-image generate diagnostic returned valid JSON but incorrect out-of-bounds coordinates; real-model semantic acceptance remains OPEN",
+    "Image cache usable for 120 seconds, at most 16 entries/four per request; restart/cache loss requires fresh capture",
+    "Native artifacts and authenticated transport receipts remain retained under screen retention; cache expiry is not record deletion",
+    "Existing native visual test failures remain unresolved; a complete regression PASS is not yet established",
+    "No owner physical devices, real credentials, hosted commissioning, publication, Actions or subagents used"
+  ],
+  "references": {
+    "ollama_generate": "https://docs.ollama.com/api/generate",
+    "upstream_format_issue": "https://github.com/ollama/ollama/issues/14645"
+  },
+  "log_sha256": {
+    ".oscar/screen-integration-focused.log": "ddb25ec3209b394bcd362fa05e678dd9f382c89bd799a2d16f370fd32d4f3a16",
+    ".oscar/screen-integration-focused-manifest.json": "c607e3c94d627dbcc7f90caa84bbc119540912f0fe82bbd451203bf2a70e838f",
+    ".oscar/screen-native-final.log": "13962310e89fd4c90860c165388167d7c04a0d8a317c5935236ea0b2d3a47022",
+    ".oscar/screen-visual-final.log": "b64258245be761301eda202fd7ce78456c80344e4dc21c5240a54b582b329b4b",
+    ".oscar/screen-model-acceptance.json": "21646aa5fe868c4f7e0f351fbfa5e72e11034c16dce00ef9848fd52b0acb5bc6",
+    ".oscar/screen-model-4b-acceptance.json": "ba54fe386d3d167a6d8ab667708896bcfca5ded0b29ae6c26634d20620443a4d",
+    ".oscar/screen-model-raw-diagnostic.json": "0450df9d17077c2ada16d77fe60a4799770c3e243db859557f38f8aa3c484393",
+    ".oscar/screen-model-generate-diagnostic.json": "6f4a7939bc23fad09fd9c8da92a93d125df7efe8d390e12061e11caef6cdd9df"
+  },
+  "cleanup": {
+    "task_owned_ollama_server_46464": "UNLOADED_AND_STOPPED",
+    "run_owned_fixture_processes": "CLEANED"
+  }
+}

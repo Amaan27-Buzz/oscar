@@ -65,6 +65,8 @@ class Router:
         for provider in self.registry.providers.values():
             if not provider.enabled or not provider.discovery_required:
                 continue
+            if request.images and not (provider.local and provider.adapter == "ollama"):
+                continue
             if request.ollama_think is not None and provider.adapter != "ollama":
                 continue
             if request.pinned_provider and request.pinned_provider != provider.id:
@@ -204,6 +206,10 @@ class Router:
         )
         for model, slot in candidates:
             provider = self.registry.providers[model.provider_id]
+            if request.images and not (
+                provider.local and provider.adapter == "ollama" and model.funding == Funding.LOCAL
+            ):
+                continue
             if (
                 not provider.enabled
                 or request.ollama_think is not None

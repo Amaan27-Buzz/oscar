@@ -26,7 +26,12 @@ Capture is limited to that visible, non-minimized top-level window's client area
 4096×2160 pixels and a 1 MB PNG. It runs in the existing cancellable Windows Job;
 only bounded metadata and the explicitly retained artifact reference enter Core
 results. PNG bytes in the native process pipe remain transient. Screen metadata
-contains `width`, `height`, `sha256` and the relative `path`.
+contains `width`, `height`, `sha256`, byte count `bytes` and the relative `path`.
+Core now independently reads that exact retained destination in authenticated
+6,000-byte chunks under the same current lease, capture/retention grants and
+policy. PNG framing, checksums, pixel stream, dimensions and SHA-256 must agree
+before capture reaches VERIFIED. This verifies captured bytes, not depicted facts.
+Chunks use existing private transport receipts; no arbitrary file or URL is admitted.
 
 Visual input takes exact `handle`, `pid`, `width`, `height`, `sha256`, `x` and `y`
 in physical client pixels. The child re-renders the same window and requires
@@ -35,9 +40,11 @@ point and released mouse/modifier keys. It sends one down/up pair, with no retry
 Core authority, cancellation and the durable execution claim retain their existing
 checks. Pixel equality does not prove semantic correctness or atomicity against
 concurrent UI changes. PrintWindow is app-rendered, and unsupported/protected
-surfaces remain unavailable; OS input restrictions are preserved. Generic capture
-and input results remain PARTIALLY_VERIFIED unless an objective-specific independent
-observer establishes the outcome. This adds no image-model coordinate inference.
+surfaces remain unavailable; OS input restrictions are preserved. Generic input
+results remain PARTIALLY_VERIFIED unless an objective-specific independent observer
+establishes the outcome. Selected captures may feed the bounded private local
+vision continuation in [orchestration](ORCHESTRATION.md); a model proposes input,
+while native authority and exact-frame admission remain decisive.
 
 ## Purpose
 

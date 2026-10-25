@@ -230,6 +230,8 @@ class HTTPAdapter:
     def _request(
         self, provider: ProviderSpec, model: str, secret: str, request: ModelRequest, stream: bool
     ) -> Request:
+        if request.images and not (self.kind == "ollama" and provider.local):
+            raise ProviderError(Failure.CAPABILITY)
         if request.ollama_think is not None and self.kind != "ollama":
             raise ProviderError(Failure.CAPABILITY)
         body: dict[str, Any]
@@ -257,6 +259,16 @@ class HTTPAdapter:
                 "stream": stream,
             }
             if self.kind == "ollama":
+                if request.images:
+                    import base64
+
+                    # Qwen chat can ignore format with thinking disabled; generate enforces it.
+                    url = root + "/generate"
+                    body.pop("messages")
+                    body["prompt"] = request.prompt
+                    body["images"] = [
+                        base64.b64encode(image.data).decode("ascii") for image in request.images
+                    ]
                 body["options"] = {"num_predict": request.max_output_tokens}
                 if request.ollama_think is not None:
                     body["think"] = request.ollama_think
@@ -276,7 +288,7 @@ class HTTPAdapter:
                     body["response_format"] = {"type": "json_object"}
         return Request(url, json.dumps(body).encode(), headers, method="POST")
 
-    def _text(self, data: dict[str, Any], streaming: bool = False) -> str:
+    def _text(self, data: dict[str, Any], streaming: bool = False, *, images: bool = False) -> str:
         if self.kind == "google":
             candidates = data.get("candidates", [])
             if not candidates:
@@ -285,7 +297,9 @@ class HTTPAdapter:
                 part.get("text", "") for part in candidates[0].get("content", {}).get("parts", [])
             )
         if self.kind == "ollama":
-            content = data.get("message", {}).get("content", "")
+            content = (
+                data.get("response", "") if images else data.get("message", {}).get("content", "")
+            )
             if not isinstance(content, str):
                 raise ProviderError(Failure.CAPABILITY)
             return content
@@ -310,7 +324,7 @@ class HTTPAdapter:
         check_cancel: Callable[[], None],
         sink: StreamSink | None = None,
     ) -> ProviderResponse:
-        if request.required - {"text", "structured"}:
+        if request.required - {"text", "structured", "vision"}:
             raise ProviderError(Failure.CAPABILITY)
         if provider.id == "ollama-cloud" and "structured" in request.required:
             raise ProviderError(Failure.CAPABILITY)  # Official cloud docs exclude this feature.
@@ -362,7 +376,7 @@ class HTTPAdapter:
                             or actual_model
                         )
                         actual_provider = safe_identity(last.get("provider")) or actual_provider
-                        text = self._text(last, streaming=True)
+                        text = self._text(last, streaming=True, images=bool(request.images))
                         if text:
                             emitted = True
                             texts.append(text)
@@ -381,7 +395,7 @@ class HTTPAdapter:
                         raise inline_error(last, response.headers, provider.id, False)
                     actual_model = safe_identity(last.get("modelVersion", last.get("model")))
                     actual_provider = safe_identity(last.get("provider"))
-                    text = self._text(last)
+                    text = self._text(last, images=bool(request.images))
                 else:
                     if not complete_stream:
                         raise ProviderError(Failure.NETWORK, emitted=emitted)

@@ -2,6 +2,16 @@
 
 This document is the canonical contract for OSCAR's model/provider routing layer.
 
+Verified selected-window PNG observations can supply typed private `vision`
+input to configured local Ollama models with explicit vision capability and LOCAL
+funding. Hosted image routing is unavailable pending model-specific accounting.
+Request configuration cannot inject images; the Executive continuation obtains
+them from separately verified captures with current disclosure authority. Images
+are omitted from request representations and route history. Context admission
+conservatively reserves prompt bytes plus one token per pixel. Oversized frames,
+missing vision capability or expired image provenance fail closed. See the
+capture and cache limits in [orchestration](ORCHESTRATION.md).
+
 OSCAR does **not** depend on the separate SwitchRoute runtime. SwitchRoute remains reference/prototype material whose useful routing, quota, health and fallback lessons may be reused behind OSCAR-owned contracts.
 
 ## Core principle

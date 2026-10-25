@@ -442,7 +442,7 @@ class InteractiveWorker(MachineWorker):
                         time(),
                         content_hash=frame["sha256"],
                     )
-                    output = json.dumps({**frame, "path": request["path"]})
+                    output = json.dumps({**frame, "path": request["path"], "bytes": len(png)})
                 else:
                     output = captured
             elif cap.id == "machine.apps":

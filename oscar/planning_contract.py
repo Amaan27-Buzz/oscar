@@ -10,6 +10,7 @@ OBSERVATION_KINDS = {
     "machine.apps": "installed_app",
     "machine.controls": "desktop_inspection",
     "machine.browser": "browser",
+    "machine.screen": "screen_capture",
 }
 
 
@@ -112,18 +113,26 @@ def executive_plan_schema(*, observation_only: tuple[str, ...] = ()) -> dict[str
             values["capability_kind"] = {"const": OBSERVATION_KINDS[capability]}
             values["path"] = values["content"] = {"type": "null"}
             properties: dict[str, Any]
-            if capability in {"machine.apps", "machine.controls", "machine.browser"}:
+            if capability in {
+                "machine.apps",
+                "machine.controls",
+                "machine.browser",
+                "machine.screen",
+            }:
                 request: dict[str, Any] = {
                     "operation": {
                         "const": "targets" if capability == "machine.apps" else "inspect_controls"
                     },
                     "query": {"type": "string", "maxLength": 80},
                 }
-                if capability == "machine.controls":
+                if capability in {"machine.controls", "machine.screen"}:
                     request.update(
                         handle={"type": "integer", "minimum": 1},
                         pid={"type": "integer", "minimum": 1},
                     )
+                if capability == "machine.screen":
+                    request.pop("query")
+                    request.update(operation={"const": "screenshot"}, path={"type": "string"})
                 properties = {
                     "request": {
                         "type": "object",

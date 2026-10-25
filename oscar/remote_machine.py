@@ -1,5 +1,6 @@
 """Outbound machine effects under canonical Core delivery authority, never a second Core."""
 
+import base64
 import json
 import math
 from collections.abc import Callable
@@ -61,6 +62,9 @@ REMOTE_MACHINE_CAPABILITIES = {
 def machine_readback(capability: str, parameters: dict[str, Any]) -> dict[str, Any] | None:
     """Derive only a read of the exact reviewed destination, never another effect."""
     spec = REMOTE_MACHINE_CAPABILITIES.get(capability)
+    if capability == "machine.screen":
+        validate_remote_machine("screen_capture", parameters)
+        return {"path": parameters["request"]["path"]}
     if capability == "machine.controls":
         validate_remote_machine("desktop_inspection", parameters)
         return parameters
@@ -171,6 +175,19 @@ def validate_remote_machine(kind: str, parameters: dict[str, Any]) -> dict[str, 
         from .windows_desktop import inspect_request
 
         inspect_request(parameters["request"])
+    if kind == "screen_capture":
+        from .windows_files import WindowsScopedFiles
+
+        request = parameters["request"]
+        if (
+            set(request) != {"operation", "handle", "pid", "path"}
+            or request["operation"] != "screenshot"
+            or any(type(request[k]) is not int or request[k] <= 0 for k in ("handle", "pid"))
+            or not isinstance(request["path"], str)
+            or not 1 <= len(request["path"]) <= 240
+        ):
+            raise ValueError("exact selected-window screenshot required")
+        WindowsScopedFiles.parts(request["path"])
     if kind == "installed_app":
         request = parameters["request"]
         if request.get("operation") == "targets":
@@ -370,6 +387,13 @@ class RemoteMachine(RemoteWorker):
             if delivery["kind"] == "readback"
             else action.parameters
         )
+        if action.capability_id == "machine.screen" and delivery["kind"] == "readback":
+            from .screen_image import CHUNK_BYTES, MAX_IMAGE_BYTES
+
+            offset = delivery["parameters"].get("offset")
+            if type(offset) is not int or not 0 <= offset < MAX_IMAGE_BYTES or offset % CHUNK_BYTES:
+                raise PermissionError("bounded screenshot chunk required")
+            expected = {**(expected or {}), "offset": offset}
         if expected is None or delivery["parameters"] != expected:
             raise PermissionError("only the exact reviewed destination can be read back")
         full = (delivery.get("authority") or {}).get("mode") == "full"
@@ -456,6 +480,19 @@ class RemoteMachine(RemoteWorker):
         if action.capability_id in {"machine.files.read", "machine.files.write"}:
             return super().readback_effect(action, delivery)
         self._guard()
+        if action.capability_id == "machine.screen":
+            from .screen_image import CHUNK_BYTES, MAX_IMAGE_BYTES
+
+            parameters = delivery["parameters"]
+            data = self.files.read(parameters["path"])
+            if len(data) > MAX_IMAGE_BYTES or parameters["offset"] >= len(data):
+                raise ValueError("screenshot artifact exceeds readback boundary")
+            self._guard()
+            return {
+                "content": base64.b64encode(
+                    data[parameters["offset"] : parameters["offset"] + CHUNK_BYTES]
+                ).decode("ascii")
+            }
         if action.capability_id == "machine.controls":
             observed = self.effects.desktop.inspect_controls(delivery["parameters"]["request"])
             self._guard()
