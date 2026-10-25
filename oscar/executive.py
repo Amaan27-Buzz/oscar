@@ -616,6 +616,8 @@ class Executive:
                 "intent has text (string), kind/path/content/capability_kind (string or null), "
                 "parameters/criterion (object or null). For addition use text like 2 + 3; "
                 "intent MUST be an object with all keys from intent_examples, never a string. "
+                "Preserve the chosen example's kind and capability_kind exactly; "
+                "capability_id is a separate field, never an intent kind. "
                 "For file_write, kind MUST be file_write; path and content are REQUIRED strings "
                 "containing the exact filename and literal text requested in the goal. "
                 "Keep unused fields null. Omitting path/content makes the plan invalid. "

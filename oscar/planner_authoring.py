@@ -223,7 +223,9 @@ class PlannerAuthoring:
                 or decision.route
                 in {DecisionRoute.WORLD, DecisionRoute.RECALL, DecisionRoute.VERIFY}
                 or not (
-                    re.match(
+                    delegated
+                    or targets is not None
+                    or re.match(
                         r"(?:plan|create|write|save|make|prepare|build|organize|open|launch|"
                         r"send|schedule|update|edit|fix|debug|implement|download|upload|"
                         r"move|copy|rename|delete|run|install|publish|deploy|"

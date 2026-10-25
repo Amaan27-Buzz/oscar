@@ -111,6 +111,37 @@ class ConversationPlanningTests(unittest.TestCase):
         self.assertEqual([], self.h.store.all("task"))
         self.assertFalse((self.h.files.root / "welcome.txt").exists())
 
+    def test_explicit_worker_or_device_routes_without_a_goal_verb_allowlist(self):
+        for instruction in (
+            "Create worker File preparation: First inspect the input file, then prepare an answer",
+            "On device "
+            + self.h.node_id
+            + ": First inspect the input file, then prepare an answer",
+            "Across devices "
+            + self.h.node_id
+            + ": First inspect the input file, then prepare an answer",
+        ):
+            with self.subTest(instruction=instruction):
+                change = self.proposed(instruction)
+                self.assertEqual("plan_draft", change["operation"])
+                self.assertEqual(
+                    "First inspect the input file, then prepare an answer", change["value"]["goal"]
+                )
+        self.assertEqual([], self.requests)
+        self.assertEqual([], self.h.store.all("task"))
+        self.assertEqual([], self.h.store.all("executive_worker"))
+
+    def test_explicit_worker_keeps_memory_and_current_evidence_preflight(self):
+        for goal in (
+            "Remember what we decided",
+            "Check whether the deployment succeeded",
+            "What is the current weather?",
+        ):
+            with self.subTest(goal=goal):
+                self.assertIsNone(self.conversation("Create worker Evidence: " + goal))
+        self.assertEqual([], self.requests)
+        self.assertEqual([], self.h.store.all("task"))
+
     def test_signed_result_handoff_is_visible_and_uses_actual_output(self):
         self.result_handoff()
 
@@ -341,6 +372,7 @@ class ConversationPlanningTests(unittest.TestCase):
         prompt = self.requests[-1]["body"]["messages"][-1]["content"]
         self.assertIn('"steps" and optional boolean "observe"', prompt)
         self.assertIn('return {"steps":[...],"observe":true}', prompt)
+        self.assertIn("Preserve the chosen example's kind and capability_kind exactly", prompt)
         change = self.proposed("Review the plan")
         path = self.h.files.root / "welcome.txt"
         self.assertFalse(path.exists())

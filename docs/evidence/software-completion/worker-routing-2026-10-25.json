@@ -1,0 +1,58 @@
+{
+  "classification": "LOCAL_ROUTING_VERIFIED_GENERAL_MODEL_ACCEPTANCE_PARTIAL",
+  "sources": {
+    "oscar/executive.py": "5e50a8dc243ca1b6858b61cbd548192aa04098c2ed783832ba65d17cc9eb2c8c",
+    "oscar/planner_authoring.py": "6bc07e1d82d25db67411ef81caf8afaaacd32760fe6fdec98ee114fcc6144d30",
+    "tests/test_conversation_planning.py": "9670fe03f652d323a88e34182cc57ae98aaec2856b42cb6edea71e5cf25545a2"
+  },
+  "checks": {
+    "affected": {
+      "state": "PASS",
+      "tests": 85,
+      "seconds": 79.25
+    },
+    "local_model": {
+      "state": "PASS",
+      "model": "qwen3.5:9b",
+      "seconds": 44.558,
+      "observation_stages": 1,
+      "artifact": "1092",
+      "scope": "Actual installed local model; synthetic owner; arithmetic observation/private continuation/file and independent readback"
+    },
+    "remote_model": {
+      "state": "FAILED",
+      "scope": "Actual installed model with synthetic signed phone/Core/outbound Worker",
+      "detail": "Explicit prefixes now select the planner, but typed and natural read goals returned malformed JSON before effects. Diagnostic schema simplification and JSON mode did not fix it. A diagnostic-only complete observation example yielded valid read/write steps but incorrect transformed bytes: MOOSAIC-7AC1 versus MOSAIC-7AC1. The latter is a failed objective even though the approved literal file-write task verified. No diagnostic adapter or example patch was integrated."
+    },
+    "aggregate": {
+      "state": "PASS",
+      "tests": 1180,
+      "passed": 1170,
+      "skipped": 10,
+      "seconds": 832.767,
+      "source_stable": true,
+      "log_sha256": "de7a1dab4490262e38b75e40214365bd9246c4caa9bfdd3dc0fe53b0d0172255",
+      "manifest_sha256": "06911b4c62155a18349a3254b8d529e27394c334da117fa2012bcee17bccbbb4"
+    },
+    "static": {
+      "ruff": "PASS",
+      "mypy_source_files": 104,
+      "mypy": "PASS",
+      "repository_links_and_secret_scan": "PASS"
+    }
+  },
+  "log_sha256": {
+    "affected": "339e3fbc21bd5248b3954225612a4807aff4b045eb339288163afbc8589b8bf9",
+    "local_model": "c354a8ca12b88c0e0d32f65691c8313afa0be491d197cf8f3e78a16ffa29cbbf",
+    "typed_remote_failure": "dac16d11b73b02996bdc589d2e37f061fbbdc6a1f0bbf5680672da8577271e0e",
+    "natural_remote_failure": "2fe2f3bc9fc96c165018a6b036981e272ba5ec0865be9bc71a8d1286f5b56056",
+    "schema_diagnostic_failure": "816ea3c2bf5a0de45159425d9dfc11864cdb36d52c534e367ddda091f33be3eb",
+    "json_diagnostic_failure": "33c61d233e5e564dfddaa7e5030fbb95f2ccebe7af1dc14fd75f934def58d74d",
+    "example_diagnostic_objective_failure": "7d0810d82e61ce826c0a77f02d100ced56dd803c09279a0f6c588212432756a6"
+  },
+  "limits": [
+    "No broad model reliability or semantic objective completion claim",
+    "No physical phone, real provider account, authenticated coding provider, native UI rebuild, cloud provisioning or publication",
+    "Memory/current-evidence preflight and signed reviews/standing delegation remain authoritative"
+  ]
+}

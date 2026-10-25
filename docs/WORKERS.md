@@ -463,6 +463,13 @@ an uncertain result never authorizes replay of an effect.
 
 ## Installed coding executor planning — 2026-10-25
 
+Explicit `Create worker NAME: objective`, `Delegate worker NAME: objective`,
+`On device ID: objective` and `Across devices ID, ID: objective` requests enter
+reviewed planning without requiring a particular first verb in the objective.
+Memory and live-evidence preflight still apply before planning. These prefixes
+select responsibility or devices; they grant no authority and trigger no model
+call or effect before the required signed review or current standing delegation.
+
 The existing reviewed planner can now select an advertised `machine.agent.codex`
 on an explicitly chosen device. Its descriptor uses the installed CLI's observed
 `exec PROMPT` contract and an exact argument array. Executive validates coding

@@ -12,8 +12,8 @@ software work under the existing authorization; no new agent delegation is neede
 
 ## 2. Current candidate
 
-Latest committed base `b0c074b` on `codex/software-completion`; the Worker
-handoff checkpoint follows it. Use `git rev-parse HEAD` for the exact
+Latest committed base `b2a21e4` on `codex/software-completion`; the explicit Worker
+routing checkpoint follows it. Use `git rev-parse HEAD` for the exact
 checkout, and `git log b700a6c..HEAD --oneline` for all local implementation commits.
 The final owner message must name the actual resulting checkout, not an invented
 self-referential documentation SHA.
@@ -453,3 +453,21 @@ Interrupted revocation recovers through local deletion without remote replay.
 All 63 MCP/AuthBroker/Connections tests passed (75.370 s); mypy and Ruff passed.
 No real provider or native consent acceptance is claimed.
 [Receipt](../evidence/software-completion/mcp-revocation-2026-10-25.json).
+
+**2026-10-25 explicit Worker routing:** named Worker/device prefixes no longer
+fall through merely because their goal starts with “First”. Memory/live preflight,
+signed review and standing authority remain unchanged. All 85 affected planning
+tests passed (79.250 s); installed Qwen 9B repeated the local arithmetic observation
+and exact file proof (44.558 s). Actual remote model requests reached planning but
+failed on malformed JSON. A diagnostic-only complete response example produced
+valid read/write steps but wrote `MOOSAIC-7AC1` instead of `MOSAIC-7AC1`; this is
+a failed objective even though the separately approved literal write verified.
+No diagnostic schema/example modification was integrated. Continue with bounded
+registered-app observations and image-grounded execution; broad accuracy remains
+open. [Receipt](../evidence/software-completion/worker-routing-2026-10-25.json).
+
+The source-stable full Windows Python regression passed 1,180 cases: 1,170 passed,
+ten skipped and zero failures/errors (832.767 s). Native visual cases passed in
+this aggregate without a native guard change. Earlier intermittent foreground
+failures remain unexplained. This is regression acceptance, not full mandate,
+real provider, owner or hosted acceptance.

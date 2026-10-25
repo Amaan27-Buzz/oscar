@@ -4,6 +4,13 @@ Updated 2026-10-24. **IMPLEMENTATION_IN_PROGRESS / SOFTWARE ACCEPTANCE PARTIAL.*
 Material executable work remains. This ledger does not declare
 `SOFTWARE_FEATURE_COMPLETE`, owner acceptance, hosted deployment or Gate E PASS.
 
+**2026-10-25 integrated local regression:** all 1,180 Windows Python cases
+completed on unchanged sources: 1,170 passed, ten skipped, zero failures/errors
+(832.767 s). Explicit Worker/device routing and 85 affected planner checks pass;
+real-model remote accuracy remains partial. Native visual cases passed without
+changing the native guards; earlier foreground failures retain unknown causes.
+[Receipt](../evidence/software-completion/worker-routing-2026-10-25.json).
+
 **2026-10-25 MCP remote disconnect:** validated public-client token revocation,
 qualified acceptance, local deletion and interruption/no-replay checks passed
 63 affected tests in 75.370 s. Real provider commissioning remains separate.

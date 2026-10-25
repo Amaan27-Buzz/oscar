@@ -1,5 +1,18 @@
 # OSCAR — Current Status & Checklist
 
+**2026-10-25 explicit Worker routing:** named Worker and device requests now
+reach reviewed planning even when the goal starts with “First”, while retaining
+memory/live preflight. All 85 affected planning tests passed (79.250 s). Installed
+Qwen 9B repeated the arithmetic/private-continuation/file proof (44.558 s).
+Real-model remote file goals still failed: malformed JSON, or incorrect transformed
+bytes in a diagnostic-only response-example experiment. General model accuracy
+and objective completion remain open. [Receipt](evidence/software-completion/worker-routing-2026-10-25.json).
+
+The matching full Windows Python regression passed 1,180 cases: 1,170 passed
+and ten skipped, zero failures/errors (832.767 s), with unchanged source hashes.
+The native visual tests passed in this aggregate; earlier foreground failures
+remain recorded and their cause is unproven. No native guard was changed.
+
 **2026-10-25 MCP disconnect:** validated authorization-server revocation now
 attempts both stored tokens after local authority withdrawal. Partial acceptance
 and transport failure remain unknown; local deletion and interruption recovery
