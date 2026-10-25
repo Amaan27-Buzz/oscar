@@ -604,3 +604,33 @@ admission rejects it. With a current-information goal, the new preflight blocks
 its initial effect plan before tool execution. Qwen generic JSON also remains
 malformed. No general model objective acceptance is claimed.
 [Receipt](../evidence/software-completion/planning-grammar-2026-10-25.json).
+
+The fresh source-stable full Windows regression at `e1dd12c`, source-equivalent
+to primary `294ec26` after newline normalization, passed 1,214 cases: 1,204 passed,
+ten skipped, no failures/errors (920.260 s). This covers live-information preflight,
+the synthetic cross-account context correction and grammar compatibility. Earlier
+failed browser/control aggregate receipts remain historical evidence. Later
+phase-specific decoding changes have separate verification.
+
+**2026-10-25 phase-specific observation decoding:** current-information planning
+initially exposes selected readers and read examples only. Structured Ollama
+decoding requests one initial observation or clarification, pins its capability
+and kind, and narrows file/app/control parameter shapes. Native validation remains
+decisive, including browser step semantics. Verified data then unlocks a private
+continuation with the original reviewed effect descriptors and normal adaptive
+schema. Later stages preserve the four-read and three-stage bounds.
+
+Actual installed `granite4.1:3b` discovered the synthetic registered app, used its
+independently verified ID to replan and launched a run-owned Pythonw fixture;
+separate marker inspection confirmed its output. Stable-source repeats under
+signed synthetic Ask/Full passed in 51.496/51.017 s. Full required no per-action
+reviews. Native launch remains PARTIAL. Earlier model errors and a diagnostic
+that stopped before its dependent launch are preserved; the corrected harness
+waits for every planned step. Process-only CPU overrides and an isolated task-owned
+server were used; the model was unloaded and that verified server stopped.
+
+All 133 affected integration tests passed on stable sources (215.515 s), plus 38
+contract cases (23.812 s), Ruff/mypy/repository/diff checks. The preceding full
+1,214-case PASS predates this change; fresh full regression remains separate.
+Broader model/image-grounded/native whole-product, service and Chief-of-Staff
+work remains open. [Receipt](../evidence/software-completion/observation-decoding-2026-10-25.json).

@@ -234,6 +234,13 @@ class DirectoryObservationTests(unittest.TestCase):
             self.assertIn(
                 "Controller live preflight", json.dumps(provider_case.requests[0]["body"])
             )
+            prompt = provider_case.requests[0]["body"]["messages"][0]["content"]
+            self.assertNotIn('"capability_id": "machine.files.write"', prompt)
+            self.assertTrue(
+                h.store.all("planner_request")[0]["planning_step"]["intent"]["parameters"][
+                    "observation_only"
+                ]
+            )
         if skip:
             self.assertEqual(1, len(provider_case.requests))
             self.assertFalse((self.workspace / "answer.txt").exists())
@@ -246,6 +253,10 @@ class DirectoryObservationTests(unittest.TestCase):
             return
         self.assertEqual("314", (self.workspace / "answer.txt").read_text())
         self.assertEqual(3, len(provider_case.requests))
+        if current:
+            prompt = provider_case.requests[1]["body"]["messages"][0]["content"]
+            self.assertIn('"capability_id": "machine.files.write"', prompt)
+            self.assertNotIn("Controller live preflight", prompt)
         self.assertIn("source-314.txt", json.dumps(provider_case.requests[1]["body"]))
         self.assertIn("observed_at", json.dumps(provider_case.requests[1]["body"]))
         self.assertIn("expires_at", json.dumps(provider_case.requests[1]["body"]))

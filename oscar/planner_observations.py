@@ -9,19 +9,11 @@ from .credentials import redact_runtime_secrets
 from .executive import digest
 from .executive_inputs import verified_result
 from .grid import Grid
+from .planning_contract import OBSERVATION_KINDS
 from .policy import PersonalPolicy
 from .storage import StateConflict, Store
 
-LIVE_READS = frozenset(
-    {
-        "machine.files.read",
-        "machine.files.list",
-        "machine.files.search",
-        "machine.apps",
-        "machine.controls",
-        "machine.browser",
-    }
-)
+LIVE_READS = frozenset(OBSERVATION_KINDS)
 
 
 def validate_stage(steps: list[dict[str, Any]]) -> None:

@@ -264,7 +264,9 @@ class HTTPAdapter:
                     if request.executive_plan:
                         from .planning_contract import executive_plan_schema
 
-                        body["format"] = executive_plan_schema()
+                        body["format"] = executive_plan_schema(
+                            observation_only=request.executive_observation
+                        )
                         body["options"]["temperature"] = 0
                     else:
                         body["format"] = "json"

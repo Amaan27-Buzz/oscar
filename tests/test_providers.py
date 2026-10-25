@@ -192,6 +192,25 @@ class ProviderContractTests(unittest.TestCase):
         ]["intent"]["properties"]["text"]
         self.assertNotIn("maxLength", text_schema)
         self.assertEqual(0, self.requests[-1]["body"]["options"]["temperature"])
+        self.generate(
+            "ollama",
+            request=replace(request, executive_plan=True, executive_observation=("machine.apps",)),
+        )
+        observation = self.requests[-1]["body"]["format"]["oneOf"][0]
+        self.assertEqual({"const": True}, observation["properties"]["observe"])
+        self.assertIn("observe", observation["required"])
+        self.assertEqual(1, observation["properties"]["steps"]["maxItems"])
+        step = observation["properties"]["steps"]["items"]["oneOf"][0]["properties"]
+        self.assertEqual(
+            {"const": "machine.apps"},
+            step["capability_id"],
+        )
+        self.assertEqual(
+            {"const": "targets"},
+            step["intent"]["properties"]["parameters"]["properties"]["request"]["properties"][
+                "operation"
+            ],
+        )
         self.body["message"]["content"] = 'not JSON: {\\"steps\\":[]}'
         with self.assertRaises(ProviderError) as failure:
             self.generate("ollama", request=replace(request, executive_plan=True))
@@ -199,6 +218,13 @@ class ProviderContractTests(unittest.TestCase):
         for invalid in (0, 1, "true", [], {}):
             with self.assertRaises(ValueError):
                 replace(request, executive_plan=invalid)
+            with self.assertRaises(ValueError):
+                replace(request, executive_observation=invalid)
+        with self.assertRaises(ValueError):
+            replace(request, executive_observation=("machine.apps",))
+        for invalid in (("files.write",), ("machine.apps", "machine.apps"), ({},)):
+            with self.assertRaises(ValueError):
+                replace(request, executive_plan=True, executive_observation=invalid)
         with self.assertRaises(ValueError):
             replace(self.request, executive_plan=True)
         with self.assertRaises(ValueError):

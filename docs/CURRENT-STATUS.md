@@ -1,5 +1,22 @@
 # OSCAR — Current Status & Checklist
 
+**2026-10-25 phase-specific planning:** initial current-information planning now
+shows only selected readers; structured Ollama decoding requests one initial read
+or clarification. Private continuation restores reviewed effect capabilities after
+verified observations. An actual installed Granite model completes registered-app
+discovery → private replan → run-owned fixture launch under signed synthetic Ask
+and Full, with independent marker inspection; canonical launch remains PARTIAL.
+Final stable runs passed in 51.496/51.017 s. All 133 affected integration tests
+passed on stable sources (215.515 s), plus 38 contract cases. General model and
+image-grounded GUI acceptance remain open.
+[Receipt](evidence/software-completion/observation-decoding-2026-10-25.json).
+
+**2026-10-25 full Windows regression:** frozen sources equivalent to `294ec26`
+passed 1,214 cases: 1,204 passed, ten skipped, zero failures (920.260 s), with
+unchanged source hashes. This includes the live-information preflight, browser
+fixture correction and grammar repair. Later phase-specific decoding has separate
+verification. Earlier failed aggregate receipts remain preserved.
+
 **2026-10-25 model grammar compatibility:** the installed Ollama parser rejected
 the schema's 4,096-character grammar repetition. Removing that decoding-only
 limit permits valid structured Granite output; Executive's 4,096-character limit

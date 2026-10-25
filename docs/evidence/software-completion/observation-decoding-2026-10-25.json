@@ -1,0 +1,88 @@
+{
+  "classification": "PHASE_SPECIFIC_OBSERVATION_DECODING_AND_SCOPED_REAL_MODEL_APP_LAUNCH_VERIFIED",
+  "sources": {
+    "oscar/harness.py": "a32a34b5f06d800ca2b66dcded2b6b1bc8fe9427ce274a1a5f788bfa90e66ceb",
+    "oscar/models.py": "27b4a510f9553623235e381d193e2b72a35f65be5ff69d822298fe8722d40e6b",
+    "oscar/planner_authoring.py": "d9fceadefbef4dd7a3c5dce0184e167ae4d48e33674337d77f85974606744e7e",
+    "oscar/planner_observations.py": "b11aff97f3fe47385bd2a791173bf14f4bca0f36014666ea8b2166d370a52723",
+    "oscar/planning_contract.py": "a446417b86024817ad43ab0806cf8b8c126387dfc7ad92f9484719859f6afc40",
+    "oscar/providers.py": "7646dbc0981a77fbd72133543606764b7bf584a7a54aacdff6b13bf13d273154",
+    "tests/test_directory_observations.py": "7359a2d8a072996e2336f698ee39903c2c145294d4a0245cd386c9dc42fc0de4",
+    "tests/test_providers.py": "ab955221c044060b7f6d2cafa96db8e5cbe633e0a4d06e373e89f3303011fef6"
+  },
+  "checks": {
+    "integration": {
+      "state": "PASS",
+      "tests": 133,
+      "seconds": 215.515,
+      "source_stable": true,
+      "manifest_sha256": "0b37eb1c0f51f50fa42e7aeaa268c568048ad216e60c4636b802b550696d408f"
+    },
+    "contracts": {
+      "state": "PASS",
+      "tests": 38,
+      "seconds": 23.812
+    },
+    "static": {
+      "ruff": "PASS",
+      "mypy_sources": 105,
+      "repository": "PASS",
+      "diff_check": "PASS"
+    },
+    "full_regression": {
+      "state": "PENDING",
+      "prior_checkpoint": "294ec26-equivalent full run passed 1214 total, 1204 passed, 10 skipped; predates this change"
+    },
+    "actual_model": {
+      "model": "granite4.1:3b",
+      "installed_digest": "6fd349357287c7ffc9e38189a93b48ea175d24fc566b38f09cfc564fb7f303eb",
+      "source_stable": true,
+      "runs": [
+        {
+          "mode": "ask",
+          "exit_code": 0,
+          "seconds": 51.496,
+          "log": ".oscar/model-app-granite-recheck-ask.log",
+          "sha256": "d85597d9a48afd0db45668431f40a8f01b18e8b3eff9c09247b5f153378eafaf"
+        },
+        {
+          "mode": "full",
+          "exit_code": 0,
+          "seconds": 51.017,
+          "log": ".oscar/model-app-granite-recheck-full.log",
+          "sha256": "5ceb1937e278c8359f30dff338799ff39609877f75078af54d1e24b1caab574b"
+        }
+      ],
+      "manifest_sha256": "b75110347ceda95bb185847c21fd8b7e681866963ccf56682733c2ebbf41a7fd",
+      "qualification": "Actual installed model and native outbound Worker, synthetic signed Ask/Full, process-only CPU request override, scoped run-owned registered app; all planned steps terminal before marker readback; native launch PARTIAL",
+      "server": "Task-owned isolated loopback 11439, unloaded model and stopped verified PID 32500 after acceptance"
+    }
+  },
+  "verified": [
+    "Initial current-information prompt exposes selected read examples only; structured Ollama decoder selects one initial read or clarification, pins source capability/kind and narrows file/app/control argument shapes",
+    "Private continuation restores original reviewed effect descriptors only after independently verified source data; current authority/provenance/private routing and native admission remain decisive",
+    "Actual signed synthetic phone/Core/outbound Windows Worker path used installed Granite to discover registered app, replan with verified identity, launch run-owned Pythonw fixture and read its exact output marker",
+    "Actual Ask and signed synthetic Full repeated successfully on stable implementation/test/helper sources; Full uses no per-action reviews",
+    "Native app-launch result remains PARTIAL; marker inspection is separate acceptance evidence, not silent promotion of canonical task state"
+  ],
+  "limits": [
+    "One model and run-owned registered app subset; not broad GUI/repository/model semantic reliability or physical/native-owner acceptance",
+    "Earlier models emitted effect steps, mismatched kinds and placeholder identities; those failures are preserved and native checks rejected them",
+    "An earlier repeat Ask diagnostic stopped before its dependent launch; corrected harness waits for every planned step, preserving failed diagnostic log",
+    "Initial structured Ollama stage is one read; later adaptive stages retain four-read and three-stage bounds",
+    "Browser step semantics remain enforced by native static-observation validation, not fully constrained by decoding",
+    "No image-grounded model input, wider service workflows, automatic schedule coordination, real-account commissioning or software-completion claim",
+    "Actual model CPU request override was process-only; no persistent model/driver/server configuration changes",
+    "No physical devices, real accounts, production owner activation, provisioning or GitHub publication"
+  ],
+  "log_sha256": {
+    "observation-decoding-final-integration.log": "f23ab1cbb0820199f30fcfb448ad58fe1c9fc9e4eedd38d800bae6015aac5d97",
+    "observation-decoding-final-contracts.log": "820ee2c2f2c7927af1add64b626300f0a997eb052a70c83e24350fb1d0b79219",
+    "model-app-granite-recheck-ask.log": "d85597d9a48afd0db45668431f40a8f01b18e8b3eff9c09247b5f153378eafaf",
+    "model-app-granite-recheck-full.log": "5ceb1937e278c8359f30dff338799ff39609877f75078af54d1e24b1caab574b",
+    "model-app-granite-final-ask.log": "6adc962ba1b3a096da9a8f0370c9ce35af06922a1076714984fa25355ae698bb",
+    "model-app-granite-observe.log": "e6f7a17f1bec7a0f4d14c3679a64f2151151c2a478d3c9161c6b3621aaf6522e",
+    "model-app-granite-scoped.log": "a8d1ded794e7a7f1383413d33552967f35a385a327c2f4a63fb4ccf3c397c8f8",
+    "model-app-granite-read.log": "f015198faf075e0b2ef4b89662dc702c9af1f0a1b6d7e2da1bb56ddc7f39b7dc"
+  }
+}

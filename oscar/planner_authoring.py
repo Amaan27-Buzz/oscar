@@ -671,6 +671,11 @@ class PlannerAuthoring:
                         "Current-information execution requires a scoped live-read capability "
                         "and private observation continuation."
                     )
+                pins = [
+                    {**p, "intent_examples": p["intent_examples"][:1]}
+                    for p in pins
+                    if p["capability_id"] in LIVE_READS
+                ]
             from .memory_fabric import memory_preflight
 
             aliases = tuple(
@@ -708,6 +713,7 @@ class PlannerAuthoring:
             )
             parameters = step["intent"]["parameters"]
             if live_required:
+                parameters["observation_only"] = sorted({p["capability_id"] for p in pins})
                 parameters["prompt"] += (
                     "\nController live preflight: your first response must be an observation "
                     "stage using only the selected current file, directory, app, selected-window "
@@ -740,7 +746,9 @@ class PlannerAuthoring:
                 from .planning_contract import executive_plan_schema
 
                 parameters["prompt"] += "\nResponse JSON schema: " + json.dumps(
-                    executive_plan_schema()
+                    executive_plan_schema(
+                        observation_only=tuple(parameters.get("observation_only", ()))
+                    )
                 )
             request = replace(
                 executor.template,
@@ -865,6 +873,21 @@ class PlannerAuthoring:
 
                 step = deepcopy(step)
                 parameters = step["intent"]["parameters"]
+                if parameters.pop("observation_only", None):
+                    planner = next(c for c in caps if c["id"] == row["planner_id"])
+                    parameters["prompt"] = h.executive.planning_step(
+                        row["goal"],
+                        [self.descriptor(c) for c in caps if c != planner],
+                        {"node_id": planner["node_id"], "capability_id": planner["id"]},
+                        "private",
+                        adaptive=True,
+                    )["intent"]["parameters"]["prompt"]
+                    if "structured" in executor.template.required:
+                        from .planning_contract import executive_plan_schema
+
+                        parameters["prompt"] += "\nResponse JSON schema: " + json.dumps(
+                            executive_plan_schema()
+                        )
                 parameters.update(
                     mode="private", planning_sources=row["observation_sources"], observations=refs
                 )

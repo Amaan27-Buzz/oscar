@@ -158,6 +158,7 @@ class ModelRequest:
     pinned_slot: str | None = None
     ollama_think: bool | None = None
     executive_plan: bool = False
+    executive_observation: tuple[str, ...] = ()
 
     @classmethod
     def from_config(cls, data: Any) -> "ModelRequest":
@@ -198,6 +199,19 @@ class ModelRequest:
         return cls("template", "template", "", **values)
 
     def __post_init__(self) -> None:
+        from .planning_contract import OBSERVATION_KINDS
+
+        if (
+            not isinstance(self.executive_observation, tuple)
+            or len(self.executive_observation) > 16
+            or any(
+                not isinstance(c, str) or c not in OBSERVATION_KINDS
+                for c in self.executive_observation
+            )
+            or len(set(self.executive_observation)) != len(self.executive_observation)
+            or self.executive_observation and not self.executive_plan
+        ):
+            raise ValueError("observation decoding requires an Executive plan")
         if type(self.executive_plan) is not bool or (
             self.executive_plan and "structured" not in self.required
         ):

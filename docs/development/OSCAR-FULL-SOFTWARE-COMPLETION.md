@@ -1,5 +1,20 @@
 # OSCAR full software completion — active local ledger
 
+**2026-10-25 phase-specific decoder:** current goals initially expose only scoped
+read examples; Ollama structured decoding requests one initial read or clarification.
+Verified observations unlock private effect planning. Actual installed Granite
+completed registered-app discovery/private continuation/run-owned fixture launch
+under synthetic signed Ask/Full, with separate marker inspection; canonical launch
+stays PARTIAL. Stable-source 133-case integration and 38 contract regressions pass.
+New full regression is separate; broad model/image-grounded/service acceptance
+remains open. [Receipt](../evidence/software-completion/observation-decoding-2026-10-25.json).
+
+**2026-10-25 full Windows checkpoint:** frozen `294ec26`-equivalent sources passed
+1,214 cases: 1,204 passed, ten skipped, zero failures (920.260 s), with source
+stability verified. This covers live preflight, synthetic browser fixture correction
+and grammar repair. Newer phase-specific decoding is qualified separately; prior
+aggregate failures are preserved.
+
 **2026-10-25 live-information execution:** current action goals require supported
 live readers and private continuation before effects; pure current questions keep
 their retrieval route. Signed synthetic Full completes current-file and bound-WPF

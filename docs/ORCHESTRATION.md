@@ -378,6 +378,16 @@ planning before model I/O. The first accepted response must contain only support
 read observations; a direct effect, arithmetic or recalled history cannot satisfy
 this gate. Pure current-information questions retain the ordinary retrieval route.
 
+Initial current-information planning shows only selected readers and their read
+examples. For structured Ollama planning, phase-specific decoding requests one
+initial read (or clarification), pins its capability/kind and narrows file/app/
+control parameter shapes. Anonymous browser step semantics still require native
+validation. This is an output constraint, never authority or proof of meaning.
+After independent verification, private continuation restores the reviewed effect
+capabilities and normal adaptive schema. Later stages retain the existing one-to-
+four observation and three-stage limits. Other adapters retain their supported
+structured-output contract and deterministic admission checks.
+
 After independent verification, source IDs, observation times and expiry accompany
 the bounded values. Existing provenance, authority, private-routing and 120-second
 stage-expiry checks apply before continuation and effects. These are observations

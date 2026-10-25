@@ -82,6 +82,12 @@ class ModelExecutor:
             executive_plan=(
                 "planning_sources" in action.parameters and "structured" in self.template.required
             ),
+            executive_observation=(
+                tuple(action.parameters.get("observation_only", ()))
+                if "planning_sources" in action.parameters
+                and "structured" in self.template.required
+                else ()
+            ),
         )
         policy = self.policy
         check = cancellation.check

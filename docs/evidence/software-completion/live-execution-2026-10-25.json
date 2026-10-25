@@ -1,5 +1,5 @@
 {
-  "classification": "SYNTHETIC_PRIVATE_LIVE_EXECUTION_PREFLIGHT_VERIFIED_FULL_REGRESSION_PENDING",
+  "classification": "SYNTHETIC_PRIVATE_LIVE_EXECUTION_PREFLIGHT_AND_WINDOWS_REGRESSION_VERIFIED",
   "sources": {
     "oscar/planner_authoring.py": "f584bde924afeaa20f6d6f98cd77ba6b7387a56fc899e3e9ed841d9a435650c0",
     "oscar/planner_observations.py": "b81964822e4c245e1367dc503e9ac89dfda6930dde430e85a0dff0cc6b013006",
@@ -25,7 +25,17 @@
       "diff_check": "PASS"
     },
     "full_regression": {
-      "state": "PENDING"
+      "state": "PASS",
+      "total": 1214,
+      "passed": 1204,
+      "skipped": 10,
+      "failures": 0,
+      "seconds": 920.26,
+      "base_head": "e1dd12c2f3707b0a668cebe6c2367efdaf56a310",
+      "source_stable": true,
+      "source_normalized_matches_primary_294ec26": true,
+      "qualification": "Includes synthetic browser fixture correction and grammar repair; predates later phase-specific observation decoding",
+      "manifest_sha256": "8fe86388a348f65f14872074d268eb88227194bf3efca79c44c892d985d06161"
     }
   },
   "verified": [
@@ -45,6 +55,7 @@
   ],
   "log_sha256": {
     "live-preflight-final-focused.log": "1e5d41e4a0cb5e4da03cedb2fff14ceadbb153ac5c895bcc407f6afe47e8d20c",
-    "live-preflight-planning.log": "a3193fa811fc94bea7d428d3fe8a4a9affeefdc7fa3bea83f77ad95c1e1ed12d"
+    "live-preflight-planning.log": "a3193fa811fc94bea7d428d3fe8a4a9affeefdc7fa3bea83f77ad95c1e1ed12d",
+    "live-aggregate.log": "2939eb0528c8ac06f0c02fa2924ecc2a882879e8b151089a6671ad666223ce5c"
   }
 }
