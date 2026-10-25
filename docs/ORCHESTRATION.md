@@ -346,7 +346,8 @@ Vision currently routes only to configured local Ollama models explicitly
 advertising `vision` with LOCAL funding. Hosted vision is unavailable. Admission
 conservatively reserves one input token per pixel in addition to prompt bytes;
 large screenshots may exceed the selected model's context and fail closed.
-Core accepts non-interlaced 8-bit RGB/RGBA PNGs up to 1 MB and four million pixels.
+Core accepts non-interlaced 8-bit RGB/RGBA PNGs up to 1 MB and 4096 by 2160 pixels,
+matching the existing native capture bounds. Model context admission is separate.
 At most four images enter a request. The model executor holds at most 16 PNGs,
 usable for 120 seconds; shutdown clears that cache. Core restart or cache loss
 requires a fresh capture, never replay of a prior effect. Worker artifacts and

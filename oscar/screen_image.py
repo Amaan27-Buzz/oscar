@@ -24,8 +24,7 @@ class ScreenImage:
             or type(self.width) is not int
             or type(self.height) is not int
             or not 1 <= self.width <= 4096
-            or not 1 <= self.height <= 4096
-            or self.width * self.height > 4_000_000
+            or not 1 <= self.height <= 2160
             or hashlib.sha256(self.data).hexdigest() != self.sha256
         ):
             raise ValueError("bounded exact native PNG required")

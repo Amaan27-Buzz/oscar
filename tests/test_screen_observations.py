@@ -51,6 +51,28 @@ def png(width=64, height=48):
 
 
 class ScreenObservationContractTests(unittest.TestCase):
+    def test_capture_validation_preserves_existing_native_geometry_limit(self):
+        width, height = 4096, 2160
+
+        def chunk(kind, data):
+            return (
+                struct.pack(">I", len(data))
+                + kind
+                + data
+                + struct.pack(">I", zlib.crc32(kind + data))
+            )
+
+        data = (
+            b"\x89PNG\r\n\x1a\n"
+            + chunk(b"IHDR", struct.pack(">IIBBBBB", width, height, 8, 2, 0, 0, 0))
+            + chunk(b"IDAT", zlib.compress((b"\0" * (width * 3 + 1)) * height))
+            + chunk(b"IEND", b"")
+        )
+        image = ScreenImage(data, width, height, hashlib.sha256(data).hexdigest())
+        self.assertEqual((width, height), (image.width, image.height))
+        with self.assertRaises(ValueError):
+            ScreenImage(data, width, height + 1, image.sha256)
+
     def test_private_image_generate_wire_and_strict_structured_output(self):
         fixture = provider_fixture.ProviderContractTests()
         fixture.setUp()
