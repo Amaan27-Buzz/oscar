@@ -50,7 +50,21 @@
       "source_files": 106
     },
     "full_regression": {
-      "state": "PENDING"
+      "state": "FAILED",
+      "head": "8047ed628fd75eb34aacd9fc90dd4f0033928335",
+      "total": 1224,
+      "passed": 1212,
+      "skipped": 10,
+      "failed": 2,
+      "errors": 0,
+      "seconds": 971.41,
+      "wrapper_seconds": 974.763,
+      "source_stable": true,
+      "qualification": "Both native visual tests rejected input because the selected run-owned window was not foreground; original focus-loss cause remains unproven."
+    },
+    "desktop": {
+      "tests_passed": 130,
+      "production_build": "PASS"
     }
   },
   "implemented": [
@@ -67,7 +81,7 @@
     "Same synthetic-image generate diagnostic returned valid JSON but incorrect out-of-bounds coordinates; real-model semantic acceptance remains OPEN",
     "Image cache usable for 120 seconds, at most 16 entries/four per request; restart/cache loss requires fresh capture",
     "Native artifacts and authenticated transport receipts remain retained under screen retention; cache expiry is not record deletion",
-    "Existing native visual test failures remain unresolved; a complete regression PASS is not yet established",
+    "Existing native visual test failures remain unresolved; the 1224-case aggregate failed two foreground-dependent native tests",
     "No owner physical devices, real credentials, hosted commissioning, publication, Actions or subagents used"
   ],
   "references": {
@@ -82,7 +96,9 @@
     ".oscar/screen-model-acceptance.json": "21646aa5fe868c4f7e0f351fbfa5e72e11034c16dce00ef9848fd52b0acb5bc6",
     ".oscar/screen-model-4b-acceptance.json": "ba54fe386d3d167a6d8ab667708896bcfca5ded0b29ae6c26634d20620443a4d",
     ".oscar/screen-model-raw-diagnostic.json": "0450df9d17077c2ada16d77fe60a4799770c3e243db859557f38f8aa3c484393",
-    ".oscar/screen-model-generate-diagnostic.json": "6f4a7939bc23fad09fd9c8da92a93d125df7efe8d390e12061e11caef6cdd9df"
+    ".oscar/screen-model-generate-diagnostic.json": "6f4a7939bc23fad09fd9c8da92a93d125df7efe8d390e12061e11caef6cdd9df",
+    ".oscar/screen-aggregate.log": "e85c0ed3d3770a995c84234817cf45b802f877e0b1471cb3ce9059b2f0476c84",
+    ".oscar/screen-aggregate-manifest.json": "3d705e628f2f2de0e948c9435c4e9e0671db4422b5e6b391418793af8c7bffb5"
   },
   "cleanup": {
     "task_owned_ollama_server_46464": "UNLOADED_AND_STOPPED",
