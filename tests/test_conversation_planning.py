@@ -135,12 +135,15 @@ class ConversationPlanningTests(unittest.TestCase):
         for goal in (
             "Remember what we decided",
             "Check whether the deployment succeeded",
-            "What is the current weather?",
         ):
             with self.subTest(goal=goal):
                 self.assertIsNone(self.conversation("Create worker Evidence: " + goal))
         self.assertEqual([], self.requests)
         self.assertEqual([], self.h.store.all("task"))
+        self.assertIsNone(self.conversation("What is the current weather?"))
+        current = self.conversation("Create worker Evidence: What is the current weather?")
+        self.assertEqual("blocked", current["state"])
+        self.assertIn("scoped live-read", current["message"])
 
     def test_signed_result_handoff_is_visible_and_uses_actual_output(self):
         self.result_handoff()
@@ -485,7 +488,6 @@ class ConversationPlanningTests(unittest.TestCase):
         for text in (
             "2 + 3",
             "What did we decide?",
-            "Prepare a report about the current weather",
             "Explain how a compiler works",
         ):
             with self.subTest(text=text):
@@ -493,6 +495,9 @@ class ConversationPlanningTests(unittest.TestCase):
         recall = self.conversation("Prepare the same report as last time")
         self.assertEqual("blocked", recall["state"])
         self.assertIn("scoped memory recall", recall["message"])
+        current = self.conversation("Prepare a report about the current weather")
+        self.assertEqual("blocked", current["state"])
+        self.assertIn("scoped live-read", current["message"])
         result = self.conversation("Send a message to the university account")
         self.assertEqual("blocked", result["state"])
         self.assertIn("exact available account", result["message"])

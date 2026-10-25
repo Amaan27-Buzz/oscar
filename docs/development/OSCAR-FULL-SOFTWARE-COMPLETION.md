@@ -1,5 +1,13 @@
 # OSCAR full software completion — active local ledger
 
+**2026-10-25 live-information execution:** current action goals require supported
+live readers and private continuation before effects; pure current questions keep
+their retrieval route. Signed synthetic Full completes current-file and bound-WPF
+workflows. Thirty-six focused and 80 planning/memory/freshness cases pass, with
+Ruff/mypy/repository/diff checks. General search/connector observations, semantic
+accuracy and full regression remain separately qualified.
+[Receipt](../evidence/software-completion/live-execution-2026-10-25.json).
+
 **2026-10-25 selected-window control execution:** a signed synthetic Full Worker
 inspects an already bound registered WPF target, privately replans a checked edit
 and independently reads it back. Separate capture/retention authority, password

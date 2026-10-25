@@ -564,5 +564,21 @@ and edits. Four focused checks passed (15.408 s), all 130 Desktop frontend tests
 passed (8.55 s), the production frontend built, and Rust passed 42 cases with one
 explicit synthetic-voice integration fixture ignored (2.07 s). Existing selection
 and binding remain required; no owner windows were inspected. Freshness-classified
-“current” wording still routes to live retrieval and is an open integration gap.
+“current” wording was still routed to live retrieval at that checkpoint; the
+separate live-information execution checkpoint below addresses this boundary.
 [Receipt](../evidence/software-completion/control-observations-2026-10-25.json).
+
+**2026-10-25 live-information execution:** freshness-classified action goals now
+require an adaptive private route and supported scoped current readers. The first
+accepted model stage must read live data; direct effects, arithmetic and recalled
+history cannot satisfy that gate. Manual review includes the adaptive disclosure;
+explicit disabling fails. Pure current-information questions retain retrieval
+routing. Source IDs, observation times and expiry accompany independently verified
+text. Signed synthetic Full completed current-file discovery/read/save and actual
+bound WPF inspection/checked edit; attempted initial writes and withdrawn retention
+remain blocked. All 36 focused tests passed (67.964 s), followed by 80 planning,
+memory and freshness tests (50.698 s); Ruff/mypy/repository/diff checks passed.
+Full regression is separate. This validates source class and authority, not model
+semantic relevance or unchanged real-world state; search/connector observation
+inputs and general model/image-grounded execution remain open.
+[Receipt](../evidence/software-completion/live-execution-2026-10-25.json).

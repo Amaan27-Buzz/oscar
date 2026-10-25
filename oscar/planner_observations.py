@@ -12,6 +12,17 @@ from .grid import Grid
 from .policy import PersonalPolicy
 from .storage import StateConflict, Store
 
+LIVE_READS = frozenset(
+    {
+        "machine.files.read",
+        "machine.files.list",
+        "machine.files.search",
+        "machine.apps",
+        "machine.controls",
+        "machine.browser",
+    }
+)
+
 
 def validate_stage(steps: list[dict[str, Any]]) -> None:
     from .remote_machine import machine_readback
@@ -209,6 +220,8 @@ def context(store: Store, grid: Grid, refs: dict[str, Any], *, task_id: str | No
                 "step_id": step["id"],
                 "task_id": pin["task_id"],
                 "evidence_id": evidence["id"],
+                "observed_at": evidence["observed_at"],
+                "expires_at": row["observation_expires"],
                 "value": value,
             }
         )

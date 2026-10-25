@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Any
 
 from .contracts import TaskState, new_id, record
 from .executive import digest
+from .freshness import Freshness, classify
 from .harness import ModelExecutor
 from .models import Mode
 from .storage import StateConflict
@@ -333,7 +334,7 @@ class PlannerAuthoring:
             )
             decision = decide(Intent(goal), names)
             if (
-                decision.route in {DecisionRoute.WORLD, DecisionRoute.VERIFY}
+                decision.route == DecisionRoute.VERIFY
                 or goal.casefold().startswith(("recall ", "remember "))
                 or not (
                     delegated
@@ -656,6 +657,20 @@ class PlannerAuthoring:
             if mode not in {"auto", "private"}:
                 raise ValueError("choose private or configured routing explicitly")
             pins = [self.descriptor(c) for c in caps if c != planner]
+            live_required = classify(value["goal"]) in {Freshness.CURRENT, Freshness.LIVE}
+            adaptive = value.get("adaptive", live_required)
+            if live_required:
+                from .planner_observations import LIVE_READS
+
+                if (
+                    not adaptive
+                    or executor.grid is not h.grid
+                    or not any(c["id"] in LIVE_READS for c in caps)
+                ):
+                    raise PermissionError(
+                        "Current-information execution requires a scoped live-read capability "
+                        "and private observation continuation."
+                    )
             from .memory_fabric import memory_preflight
 
             aliases = tuple(
@@ -689,12 +704,21 @@ class PlannerAuthoring:
                 mode,
                 [],
                 digest(executor.planning_configuration()),
-                adaptive=value.get("adaptive", False),
+                adaptive=adaptive,
             )
             parameters = step["intent"]["parameters"]
+            if live_required:
+                parameters["prompt"] += (
+                    "\nController live preflight: your first response must be an observation "
+                    "stage using only the selected current file, directory, app, selected-window "
+                    "or anonymous browser readers. Retrieve relevant source data before effects. "
+                    "Arithmetic, memory and model priors cannot establish current state. "
+                    "Use capture times and bounded coverage; never invent missing current facts. "
+                    "If no relevant current source can be read, return clarification."
+                )
             if memory_refs is not None:
                 parameters["memory_refs"] = memory_refs
-            if value.get("adaptive"):
+            if adaptive:
                 parameters["prompt"] += (
                     '\nIf verified tool data is needed, return {"steps":[...],"observe":true}. '
                     "An observation stage permits one to four machine.files.read file_read "
@@ -738,7 +762,12 @@ class PlannerAuthoring:
             observation_sources = [
                 s for s in sources if s["id"] in {r.provider for r in private_routes}
             ]
+            if live_required and not observation_sources:
+                raise PermissionError(
+                    "Current-information execution needs an eligible private source."
+                )
             state = {
+                "adaptive": adaptive,
                 "capabilities": caps,
                 "step": step,
                 "sources": sources,
@@ -757,7 +786,7 @@ class PlannerAuthoring:
                         "Adaptive stages may send up to four verified tool text results "
                         "(16 KiB total) to the selected private model sources. "
                         "No ambient context is attached."
-                        if value.get("adaptive")
+                        if adaptive
                         else "No files or ambient context are attached."
                         if memory_refs is not None
                         else "No files, memories or ambient context are attached."
@@ -874,6 +903,17 @@ class PlannerAuthoring:
 
                 context(h.store, h.grid, row["observation_refs"])
             steps = h.executive.validate_steps(worker, document["steps"])
+            if classify(row["goal"]) in {Freshness.CURRENT, Freshness.LIVE} and not row.get(
+                "observation_refs"
+            ):
+                from .planner_observations import LIVE_READS
+
+                if not document["observe"] or any(
+                    s["capability_id"] not in LIVE_READS for s in steps
+                ):
+                    raise PermissionError(
+                        "Current-information effects require a verified live observation first."
+                    )
             if document["observe"]:
                 from .planner_observations import validate_stage
 
@@ -971,7 +1011,7 @@ class PlannerAuthoring:
                     "planner_id": state["step"]["capability_id"],
                     "sources": state["sources"],
                     "configuration": digest(state["model_configuration"]),
-                    "adaptive": value.get("adaptive", False),
+                    "adaptive": state["adaptive"],
                     "planning_step": state["step"],
                     "observation_sources": state["observation_sources"],
                     "stage": 0,

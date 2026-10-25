@@ -11,6 +11,7 @@ from oscar.credentials import CredentialPool
 from oscar.harness import ModelExecutor
 from oscar.jev import Intent
 from oscar.models import Funding, ModelRequest, ModelSpec, RoutingPolicy
+from oscar.planner_authoring import PlannerAuthoring
 from oscar.planner_observations import validate_stage
 from oscar.policy import PersonalPolicy
 from oscar.providers import HTTPAdapter
@@ -87,6 +88,15 @@ class DirectoryObservationTests(unittest.TestCase):
         self.assertEqual("failed", self.finish(task)["state"])
 
     def test_full_worker_discovers_reads_and_saves_without_action_reviews(self):
+        self.workflow()
+
+    def test_current_information_worker_observes_live_files_before_effects(self):
+        self.workflow(current=True)
+
+    def test_current_information_worker_cannot_skip_observation(self):
+        self.workflow(current=True, skip=True)
+
+    def workflow(self, current=False, skip=False):
         caps = ("machine.files.list", "machine.files.read", "machine.files.write")
         self.start_worker(caps)
         (self.workspace / "notes").mkdir()
@@ -156,19 +166,51 @@ class DirectoryObservationTests(unittest.TestCase):
             "capability_id": "machine.files.write",
             "intent": asdict(Intent("Save discovered source", "file_write", "answer.txt", "314")),
         }
+        responses = (
+            {"steps": [first], "observe": True},
+            {"steps": [second], "observe": True},
+            {"steps": [final]},
+        )
+        if skip:
+            responses = ({"steps": [final]},)
         provider_case.scheduled = [
             (200, {**provider_case.body, "choices": [{"message": {"content": json.dumps(value)}}]})
-            for value in (
-                {"steps": [first], "observe": True},
-                {"steps": [second], "observe": True},
-                {"steps": [final]},
-            )
+            for value in responses
         ]
+        goal = (
+            "Create worker Discover: On device test-machine: First inspect "
+            + ("current files in notes, " if current else "notes, ")
+            + "read its source file, then save its numeric value as answer.txt"
+        )
+        if current:
+            manual = {
+                "name": "Live files",
+                "goal": goal,
+                "mode": "private",
+                "capabilities": [
+                    {"node_id": s.node_id, "capability_id": c}
+                    for s, c in [
+                        *((self.desktop.handle, c) for c in caps),
+                        (h.session, "models.reason"),
+                    ]
+                ],
+            }
+            material = PlannerAuthoring(h).material(
+                "plan_draft", "new", manual, frozenset(self.owner.session["scopes"])
+            )
+            self.assertTrue(material["adaptive"])
+            self.assertIn("Adaptive stages", material["privacy"])
+            with self.assertRaises(PermissionError):
+                PlannerAuthoring(h).material(
+                    "plan_draft",
+                    "new",
+                    {**manual, "adaptive": False},
+                    frozenset(self.owner.session["scopes"]),
+                )
         result = self.owner.request(
             "submit",
             {
-                "text": "Create worker Discover: On device test-machine: First inspect notes, "
-                "read its source file, then save its numeric value as answer.txt",
+                "text": goal,
                 "kind": "text",
                 "target": h.node_id,
                 "parameters": {},
@@ -179,6 +221,8 @@ class DirectoryObservationTests(unittest.TestCase):
         deadline = monotonic() + 20
         while monotonic() < deadline:
             self.worker.step()
+            if skip and h.store.all("planner_request")[0].get("autonomy_blocked"):
+                break
             if (self.workspace / "answer.txt").exists():
                 row = h.store.all("planner_request")[0]
                 if h.store.get("executive_goal", row["accepted_goal"])["state"] == "completed":
@@ -186,9 +230,25 @@ class DirectoryObservationTests(unittest.TestCase):
             sleep(0.02)
         else:
             self.fail("canonical discovery/read/effect workflow did not complete")
+        if current:
+            self.assertIn(
+                "Controller live preflight", json.dumps(provider_case.requests[0]["body"])
+            )
+        if skip:
+            self.assertEqual(1, len(provider_case.requests))
+            self.assertFalse((self.workspace / "answer.txt").exists())
+            self.assertFalse(
+                any(
+                    a["capability_id"] == "machine.files.write"
+                    for a in h.store.all("planned_action")
+                )
+            )
+            return
         self.assertEqual("314", (self.workspace / "answer.txt").read_text())
         self.assertEqual(3, len(provider_case.requests))
         self.assertIn("source-314.txt", json.dumps(provider_case.requests[1]["body"]))
+        self.assertIn("observed_at", json.dumps(provider_case.requests[1]["body"]))
+        self.assertIn("expires_at", json.dumps(provider_case.requests[1]["body"]))
         self.assertIn("Source value 314", json.dumps(provider_case.requests[2]["body"]))
         self.assertEqual(
             ["private", "private"], [r["mode"] for r in h.store.all("route_history")][1:]

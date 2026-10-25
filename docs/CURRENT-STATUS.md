@@ -1,5 +1,14 @@
 # OSCAR — Current Status & Checklist
 
+**2026-10-25 live-information execution:** current-information action goals now
+require supported live reads and private observation continuation before effects.
+Signed synthetic Full verifies current-file discovery/read/write and a bound
+Windows control edit. Direct-effect shortcuts fail; pure current questions retain
+retrieval routing. Observation timestamps and expiry accompany source data.
+Thirty-six focused and 80 planning/memory/freshness tests passed. General search,
+connector context and model semantic accuracy remain separately open.
+[Receipt](evidence/software-completion/live-execution-2026-10-25.json).
+
 **2026-10-25 selected-window inspection:** a separate capture/retention-scoped
 capability supplies bounded controls from an already bound Windows app to private
 Worker replanning. A signed synthetic Full flow edits a real run-owned WPF input

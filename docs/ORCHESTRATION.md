@@ -360,8 +360,27 @@ expected-text check and independent readback; inspection cannot actuate controls
 
 This supports inspection → private replan → checked edit in one Worker. The
 window must already be selected and bound; arbitrary app discovery and visual
-reasoning are separate work. Controller live-retrieval routing still applies to
-freshness-classified wording; no general live-evidence planning bypass is added.
+reasoning are separate work. Current-information action goals use the live-read
+preflight below; pure live-state questions retain Controller retrieval routing.
+
+## Live-information execution preflight
+
+Current/live action goals require adaptive private continuation and at least one
+selected file, directory, app, bound-window or anonymous browser reader. Manual
+planning defaults these goals to adaptive stages and includes that disclosure in
+the signed review. Explicitly disabling stages or lacking a private route blocks
+planning before model I/O. The first accepted response must contain only supported
+read observations; a direct effect, arithmetic or recalled history cannot satisfy
+this gate. Pure current-information questions retain the ordinary retrieval route.
+
+After independent verification, source IDs, observation times and expiry accompany
+the bounded values. Existing provenance, authority, private-routing and 120-second
+stage-expiry checks apply before continuation and effects. These are observations
+as of capture, not a guarantee that the world remains unchanged. The gate verifies
+the source class, not semantic relevance or model accuracy. Checked native edits
+also compare expected text before mutation. Public search and connector context
+are not yet supported observation-stage inputs; an unavailable relevant reader
+must produce clarification rather than invented facts.
 
 ## Scoped file discovery observations
 

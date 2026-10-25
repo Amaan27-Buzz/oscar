@@ -233,7 +233,7 @@ class ControlObservationTests(unittest.TestCase):
                 "text": "Create worker Edit: On device test-machine: "
                 "First inspect Synthetic input "
                 f"in the selected bound window handle {handle} pid {process.pid}, "
-                "then replace its empty text with SCOPED-731",
+                "then replace its current empty text with SCOPED-731",
                 "kind": "text",
                 "target": h.node_id,
                 "parameters": {},

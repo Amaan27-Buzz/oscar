@@ -1,0 +1,50 @@
+{
+  "classification": "SYNTHETIC_PRIVATE_LIVE_EXECUTION_PREFLIGHT_VERIFIED_FULL_REGRESSION_PENDING",
+  "sources": {
+    "oscar/planner_authoring.py": "f584bde924afeaa20f6d6f98cd77ba6b7387a56fc899e3e9ed841d9a435650c0",
+    "oscar/planner_observations.py": "b81964822e4c245e1367dc503e9ac89dfda6930dde430e85a0dff0cc6b013006",
+    "tests/test_control_observations.py": "b51b66139395b2b5e2f3315d5d2d1648de8cd9969faec461ff587d451d9b5475",
+    "tests/test_conversation_planning.py": "449459f80c1f325c13127d7c53a42e6fd4d9b4627e11709cd62a069fa617b403",
+    "tests/test_directory_observations.py": "41f36b45c18f855e3d72c991eef8c7c7cce9073e22e84a6330c9bfbea6073b02"
+  },
+  "checks": {
+    "focused": {
+      "state": "PASS",
+      "tests": 36,
+      "seconds": 67.964
+    },
+    "planning_memory_freshness": {
+      "state": "PASS",
+      "tests": 80,
+      "seconds": 50.698
+    },
+    "static": {
+      "ruff": "PASS",
+      "mypy_sources": 105,
+      "repository": "PASS",
+      "diff_check": "PASS"
+    },
+    "full_regression": {
+      "state": "PENDING"
+    }
+  },
+  "verified": [
+    "Current file discovery/read/private continuation/effect through signed synthetic Full and independent readback",
+    "Current selected-window inspection/private continuation/checked edit on actual run-owned WPF input",
+    "Initial direct effects rejected before execution; arithmetic/history cannot replace live observation",
+    "Manual planning includes adaptive disclosure by default for current goals; explicit disabling denied",
+    "Pure current-information questions retain retrieval routing; actions lacking scoped readers blocked before model I/O",
+    "Canonical observation timestamps and expiry accompany bounded verified text; authority/source/retention withdrawal checks remain active"
+  ],
+  "limits": [
+    "Gate verifies supported source class, not semantic relevance or model accuracy",
+    "Observations are as of capture with existing 120-second stage lease, not continuous world-state proof",
+    "No search/connector observation stage, arbitrary window discovery or model image-grounded reasoning",
+    "Synthetic owners/model HTTP, not general installed-model semantics",
+    "No real accounts, physical devices, owner activation, cloud provisioning or GitHub publication"
+  ],
+  "log_sha256": {
+    "live-preflight-final-focused.log": "1e5d41e4a0cb5e4da03cedb2fff14ceadbb153ac5c895bcc407f6afe47e8d20c",
+    "live-preflight-planning.log": "a3193fa811fc94bea7d428d3fe8a4a9affeefdc7fa3bea83f77ad95c1e1ed12d"
+  }
+}
