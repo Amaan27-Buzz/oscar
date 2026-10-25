@@ -1,0 +1,28 @@
+{
+  "classification": "SHARED_CONVERSATION_ROUTING_SOFTWARE_VERIFIED",
+  "base_head": "8c634b5",
+  "change": "Strip stacked courtesy phrases before existing action/delegation grammar; signed review, memory preflight and standing authority unchanged",
+  "checks": {
+    "affected_total": 76,
+    "passed": 76,
+    "failed": 0,
+    "skipped": 0,
+    "test_seconds": 89.258,
+    "source_stable": true,
+    "ruff": "PASS",
+    "mypy_source_files": 106,
+    "full_regression": "1241-case PASS predates this narrowly scoped parser change"
+  },
+  "sources": {
+    "oscar/planner_authoring.py": "5f5ce2a54c088fe08ee1438185031dd9d4e3f35a58df9fb5d68071846e241904",
+    "tests/test_conversation_planning.py": "f1d589c2bdefcbd65c80d244477695977c039e6244db8574df1272c3649da786"
+  },
+  "logs": {
+    ".oscar/courtesy-routing.log": "b14e88a5ee472d0e37ef3eaa9bfd2e9c6660514ec7c0b4340838eb5286d85a5e",
+    ".oscar/courtesy-routing-manifest.json": "70be13edd74143830432495ec21ff61a672fd3663567ae2cf1e744a7350b67f9"
+  },
+  "limits": [
+    "Existing bounded action grammar remains; this does not establish general natural-language intent understanding",
+    "No model or effect calls before signed Ask review in new routing tests; questions and recall remain excluded"
+  ]
+}

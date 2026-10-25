@@ -69,6 +69,27 @@ class ConversationPlanningTests(unittest.TestCase):
         self.h.executive.tick()
         return self.h.store.all("planner_request")[-1]
 
+    def test_stacked_courtesy_routes_action_to_signed_review_without_effects(self):
+        for prefix in ("Could you please ", "Please can you ", "WOULD  YOU  PLEASE "):
+            with self.subTest(prefix=prefix):
+                result = self.conversation(prefix + "write a welcome note")
+                self.assertIn("assistance_proposal", result)
+                self.assertEqual([], self.requests)
+                self.assertEqual([], self.h.store.all("task"))
+                self.assertEqual([], self.h.store.all("planner_request"))
+
+    def test_stacked_courtesy_does_not_turn_questions_or_recall_into_execution(self):
+        for text in (
+            "Could you please explain how to write a note?",
+            "Please can you recall our previous report?",
+            "Would you please remember my preference?",
+            "Could you please tell me the time?",
+        ):
+            with self.subTest(text=text):
+                self.assertIsNone(self.conversation(text))
+                self.assertEqual([], self.requests)
+                self.assertEqual([], self.h.store.all("task"))
+
     def test_unsigned_input_and_effect_reviews_make_no_calls_or_effects_until_signed(self):
         self.file_result()
         marker = "Unselected synthetic conversation and memory must remain private"

@@ -303,6 +303,14 @@ Workers and Protocols should pass typed Artifact/Result references instead of co
 
 This preserves producer, version/location, provenance, verification and ownership.
 
+### Conversation action routing
+
+Desktop and authenticated Grid conversation use the same planner route. Stacked
+courtesy phrases such as "could you please" are removed before the existing action
+and explicit Worker/device grammar. Questions and recall stay outside this action
+route. Normalization adds no authority: memory preflight, Ask review and exact
+standing delegation still govern every model disclosure and effect.
+
 ### Verified observations and private continuation
 
 Reviewed adaptive conversation planning may request a pure observation stage

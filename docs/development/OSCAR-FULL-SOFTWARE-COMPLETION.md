@@ -771,3 +771,6 @@ The latest source-stable Core regression at `b3ed1c3` equivalence passed 1,214 t
 
 
 **2026-10-25 current integration regression completed:** committed `d58116c` sources passed 1,241 tests: 1,231 PASS, ten SKIP, zero failures/errors (931.956 s). Before/after source hashes stayed stable and were independently checked against the working tree. Both native image and older visual tests passed in this run; earlier foreground failures and stale-frame marker ambiguity retain their unresolved historical qualifications. This supersedes the preceding active-run checkpoint, not the broader incomplete software mandate. [Full receipt](../evidence/software-completion/attention-full-2026-10-25.json).
+
+
+**2026-10-25 stacked conversation courtesy:** fixed shared routing of "could you please write" and equivalent spacing/case variants to the existing signed action review. Questions and recall stay excluded; no new authority is granted. All 76 affected conversation/planner tests pass on stable sources (89.258 s), plus Ruff/mypy. The 1,241-case full PASS predates this parser change. [Receipt](../evidence/software-completion/courtesy-routing-2026-10-25.json).

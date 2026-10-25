@@ -359,7 +359,11 @@ class PlannerAuthoring:
         from .jev import DecisionRoute, Intent, decide
 
         instruction = re.sub(
-            r"^(?:please |(?:can|could|would) you )", "", text.strip(), count=1, flags=re.IGNORECASE
+            r"^(?:(?:please|(?:can|could|would)\s+you)\s+)+",
+            "",
+            text.strip(),
+            count=1,
+            flags=re.IGNORECASE,
         )
         delegated = re.fullmatch(
             r"(?:delegate|create) (?:a )?worker ([A-Za-z0-9 _-]{1,64}):\s*(.+)",
