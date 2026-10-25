@@ -242,6 +242,36 @@ class StandingAuthorityTests(unittest.TestCase):
         with self.assertRaises(PermissionError):
             self.authority.bind(task.id, self.capability, self.h.session)
 
+    def test_connector_objective_account_pin_is_checked_before_binding(self):
+        account = self.h.accounts.add("fixture", "tenant", "subject", "one", verified=True)
+        self.activate(account_ids=[account.id])
+        task = self.task()
+        objective = self.h.store.get("objective", task.objective_id)
+        for pin in (
+            {"id": "another-account", "generation": account.generation},
+            {"id": account.id, "generation": account.generation + 1},
+        ):
+            self.h.store.put(
+                "objective",
+                task.objective_id,
+                {**objective, "criterion": {"kind": "unavailable", "connector_account": pin}},
+            )
+            with self.assertRaises(PermissionError):
+                self.authority.bind(task.id, self.capability, self.h.session)
+            self.assertEqual([], self.h.store.all("task_authority"))
+        self.h.store.put(
+            "objective",
+            task.objective_id,
+            {
+                **objective,
+                "criterion": {
+                    "kind": "unavailable",
+                    "connector_account": {"id": account.id, "generation": account.generation},
+                },
+            },
+        )
+        self.assertIsNotNone(self.authority.bind(task.id, self.capability, self.h.session))
+
     def test_revoke_immediately_before_effect_does_not_write(self):
         self.activate()
         task = self.task()

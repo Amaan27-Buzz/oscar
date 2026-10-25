@@ -1,10 +1,11 @@
-"""Private, expiring MCP arguments behind reviewed Executive plan references."""
+"""Private, expiring connector arguments behind reviewed Executive plan references."""
 
 import json
+import re
 from dataclasses import asdict
 from typing import TYPE_CHECKING, Any
 
-from .connectors import ConnectionState
+from .connectors import AuthType, ConnectionState, ConnectorCapability, endpoint
 from .contracts import Task, TaskState
 from .executive import digest
 from .jev import Intent
@@ -13,7 +14,7 @@ if TYPE_CHECKING:
     from .harness import Harness
 
 
-class MCPPlanning:
+class ConnectorPlanning:
     def __init__(self, harness: "Harness"):
         self.h = harness
         self.inputs: dict[str, dict[str, Any]] = {}
@@ -26,27 +27,70 @@ class MCPPlanning:
         self.inputs.clear()
 
     def contract(self, cap: dict[str, Any]) -> dict[str, Any]:
-        from .connector_providers import mcp_capability_name
-        from .mcp_client import schema_digest
-
         instance_id, name = cap["id"].split(":", 1)
         instance = self.h.connectors.instances[instance_id]
-        client = self.h.plugins.sessions[instance_id]
         spec = next(s for s in instance.manifest.capabilities if s.name == name)
-        tool = next(t for t in client.tools if mcp_capability_name(t["name"]) == name)
         if (
             self.h.connectors.state(instance, spec) != ConnectionState.READY
             or instance.account_id is None
             or instance.account_generation is None
-            or self.h.store.get("mcp_installation", instance_id)["schemas"].get(tool["name"])
-            != schema_digest(tool["inputSchema"])
         ):
-            raise PermissionError("current account-bound MCP tool required")
+            raise PermissionError("current account-bound connector required")
+        if instance.manifest.auth == AuthType.MCP:
+            from .connector_providers import mcp_capability_name
+            from .mcp_client import schema_digest
+
+            client = self.h.plugins.sessions[instance_id]
+            tool = next(t for t in client.tools if mcp_capability_name(t["name"]) == name)
+            if self.h.store.get("mcp_installation", instance_id)["schemas"].get(
+                tool["name"]
+            ) != schema_digest(tool["inputSchema"]):
+                raise PermissionError("MCP schema needs installation review")
+            operation, schema = tool["name"], tool["inputSchema"]
+        else:
+            if instance_id not in self.h._account_instances:
+                raise PermissionError("current native account projection required")
+            operation, schema = spec.name, self.http_schema(spec)
         return {
             "capability": cap,
             "instance": {**asdict(instance), "granted_scopes": sorted(instance.granted_scopes)},
-            "tool": tool["name"],
-            "schema": tool["inputSchema"],
+            "operation": operation,
+            "schema": schema,
+            "transport": "mcp" if instance.manifest.auth == AuthType.MCP else "https",
+            "endpoint": {
+                "method": spec.method,
+                "origin": instance.manifest.base_url,
+                "path": spec.path,
+            },
+        }
+
+    @staticmethod
+    def http_schema(spec: ConnectorCapability) -> dict[str, Any]:
+        paths = re.findall(r"\{([A-Za-z][A-Za-z0-9_]*)\}", spec.path)
+        properties: dict[str, Any] = {
+            "path": {
+                "type": "object",
+                "properties": {
+                    p: {"type": "string", "minLength": 1, "maxLength": 500} for p in paths
+                },
+                "required": paths,
+                "additionalProperties": False,
+            },
+            "query": {
+                "type": "object",
+                "properties": {
+                    q: {"type": ["string", "integer", "boolean"]} for q in spec.query_fields
+                },
+                "additionalProperties": False,
+            },
+        }
+        if spec.body_required:
+            properties["body"] = {"type": "object"}
+        return {
+            "type": "object",
+            "properties": properties,
+            "required": (["path"] if paths else []) + (["body"] if spec.body_required else []),
+            "additionalProperties": False,
         }
 
     def descriptor(self, cap: dict[str, Any]) -> dict[str, Any] | None:
@@ -61,15 +105,17 @@ class MCPPlanning:
             "node_id": cap["node_id"],
             "capability_id": cap["id"],
             "kind": cap["input_kind"],
-            "summary": "Explicitly installed, reviewed MCP tool",
+            "summary": "Current reviewed account-bound connector operation",
             "account_id": instance["account_id"],
             "account_generation": instance["account_generation"],
-            "operation": current["tool"],
+            "operation": current["operation"],
+            "transport": current["transport"],
+            "endpoint": current["endpoint"],
             "argument_schema": current["schema"],
             "intent_examples": [
                 asdict(
                     Intent(
-                        "Invoke selected MCP tool",
+                        "Invoke selected connector operation",
                         "capability",
                         capability_kind=cap["input_kind"],
                         parameters={"arguments": {}},
@@ -79,7 +125,10 @@ class MCPPlanning:
             "intent_rule": (
                 "Supply parameters with exactly arguments, an object matching argument_schema. "
                 "Use the exact selected account/tool; never invent arguments or references. "
-                "No inputs substitutions, verification claims or observation stages for MCP. "
+                "No inputs substitutions, verification claims or connector observation stages. "
+                "For HTTPS, arguments contains only path/query/body; origin, method, headers "
+                "and credentials are fixed by Core. Body fields must come from the owner's "
+                "explicit request; the endpoint shape is not a provider body-field schema. "
                 "Arguments are privately staged for exact review and one immediate execution. "
                 "A tool report does not independently verify the objective."
             ),
@@ -106,7 +155,7 @@ class MCPPlanning:
             c.id == cap["id"] and c.node_id == cap["node_id"]
             for c in self.h.grid.search(cap["input_kind"])
         ):
-            raise PermissionError("MCP planning contract changed")
+            raise PermissionError("connector planning contract changed")
         return self.contract(cap)
 
     def reap(self) -> None:
@@ -136,8 +185,6 @@ class MCPPlanning:
 
     def sanitize(self, text: str, task_id: str, pins: list[dict[str, Any]]) -> str:
         """Run before model Result persistence; no raw tool arguments enter the ledger."""
-        from jsonschema import Draft202012Validator  # type: ignore[import-untyped]
-
         self.reap()
         if len(text.encode()) > 32768:
             raise ValueError("bounded connector plan required")
@@ -192,12 +239,26 @@ class MCPPlanning:
                     or isinstance(document, dict)
                     and document.get("observe")
                 ):
-                    raise ValueError("exact MCP argument plan required")
-                if not Draft202012Validator(current["schema"]).is_valid(params["arguments"]):
-                    raise ValueError("MCP arguments do not match the reviewed schema")
-                ref = self.h.connectors.stage(
-                    {"path": {"name": current["tool"]}, "body": params["arguments"]}
-                )
+                    raise ValueError("exact connector argument plan required")
+                if current["transport"] == "mcp":
+                    from jsonschema import Draft202012Validator  # type: ignore[import-untyped]
+
+                    if not Draft202012Validator(current["schema"]).is_valid(params["arguments"]):
+                        raise ValueError("MCP arguments do not match the reviewed schema")
+                    arguments = {
+                        "path": {"name": current["operation"]},
+                        "body": params["arguments"],
+                    }
+                else:
+                    instance_id, name = step["capability_id"].split(":", 1)
+                    spec = next(
+                        s
+                        for s in self.h.connectors.instances[instance_id].manifest.capabilities
+                        if s.name == name
+                    )
+                    endpoint(spec, params["arguments"])
+                    arguments = params["arguments"]
+                ref = self.h.connectors.stage(arguments)
                 staged.append(ref)
                 self.inputs[ref] = {
                     "planner_task": task_id,
@@ -213,7 +274,7 @@ class MCPPlanning:
                 account = current["instance"]
                 step["intent"] = asdict(
                     Intent(
-                        "Invoke selected MCP tool",
+                        "Invoke selected connector operation",
                         "capability",
                         capability_kind=step["capability_id"],
                         parameters={"request_ref": ref},
@@ -268,10 +329,14 @@ class MCPPlanning:
                     "node_id": step["node_id"],
                     "capability_id": step["capability_id"],
                     "account_id": current["instance"]["account_id"],
-                    "arguments": self.h.connectors.requests[ref]["body"],
+                    "arguments": self.arguments(ref, current),
                 }
             )
         return reviews
+
+    def arguments(self, ref: str, current: dict[str, Any]) -> dict[str, Any]:
+        request = self.h.connectors.requests[ref]
+        return dict(request["body"] if current["transport"] == "mcp" else request)
 
     def task_review(self, task_id: str, grants: frozenset[str]) -> dict[str, Any]:
         """Expose exact private inputs only through the signed native review channel."""
@@ -316,7 +381,7 @@ class MCPPlanning:
                     "node_id": binding["node_id"],
                     "capability_id": binding["capability_id"],
                     "account_id": current["instance"]["account_id"],
-                    "arguments": self.h.connectors.requests[ref]["body"],
+                    "arguments": self.arguments(ref, current),
                 }
             ],
         }

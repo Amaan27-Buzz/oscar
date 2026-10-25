@@ -1,0 +1,68 @@
+{
+  "classification": "MODEL_AUTHORED_NATIVE_HTTPS_LOCAL_INTEGRATION_VERIFIED_OBJECTIVES_PARTIAL",
+  "date": "2026-10-26",
+  "base_head": "8e2c1541ddf95b95734fa9bf707474003af8f46c",
+  "change": "Private model-authored Workers can invoke current native account HTTPS operations through fixed endpoint contracts and existing signed Ask or account-scoped Full authority. Connector account/generation is checked before standing binding and again before effects.",
+  "checks": {
+    "focused": {
+      "total": 7,
+      "passed": 7,
+      "seconds": 8.72
+    },
+    "integration": {
+      "total": 231,
+      "passed": 231,
+      "failed": 0,
+      "errors": 0,
+      "source_stable": true,
+      "test_seconds": 226.313,
+      "wrapper_seconds": 227.56
+    },
+    "static": "Ruff, mypy (107 files), repository/link/secret and diff checks PASS",
+    "covered": [
+      "Exact private signed plan and consequential action reviews before HTTP POST; provider resource inspected independently",
+      "Synthetic signed Full makes one POST without per-action reviews inside account ceiling",
+      "Missing delegated account waits before execution; no request or Ask fallback",
+      "Fixed GET and query without body or consequential action confirmation",
+      "Unknown transport fields, missing resource identifiers and unknown query fields rejected",
+      "Account rotation blocks prior signed review; private arguments absent from durable task/results/reviews",
+      "Shared authority rejects wrong account and generation before binding; current exact pin accepted"
+    ],
+    "development_failures": "Initial test accidentally rediscovered imported MCP TestCase (removed). Missing-account expectation exposed executor-only denial; authorization binding now checks the exact objective account pin. First implementation read the criterion from the wrong record and failed two focused cases; corrected to the canonical/transient Objective. All earlier logs retained.",
+    "second_desktop_protocol": {
+      "status": "SOFTWARE_VERIFIED",
+      "scope": "second synthetic Desktop protocol session approves first owner session native HTTPS Worker via exact signed assistance; real synthetic HTTP POST and independent resource GET",
+      "canonical_task_state": "partially_verified",
+      "private_arguments_absent_from_durable_records": true,
+      "rendered_native_acceptance": false,
+      "real_model_or_provider": false,
+      "seconds": 0.71
+    }
+  },
+  "sources": {
+    "oscar/authority.py": "f1556f80163f194cd233cc14ba589f7ab48cb6b69284643fa03709e0811500c1",
+    "oscar/harness.py": "f6847b06df76a1c7463be4cdcc8a4e42aa50a3bde13c26395c7b4ecf453e6dd0",
+    "oscar/planner_connectors.py": "1f94729efe3c765af2fa234683a1793195c866dc6e78388d6cc3da377e6922f7",
+    "tests/test_authority.py": "5da93840b39691d6f372c2263c84e457d78e763a77519e128eb350c611b493a3",
+    "tests/test_planner_http_connectors.py": "e37100fc9c9a2753030a4284793004b7e249d912e023a71e817341db4ffea615"
+  },
+  "logs": {
+    ".oscar/http-planning-focused.log": "22af461e10b3356c0111ace5642e9939c0de37f367afd13feac56e9e9de76863",
+    ".oscar/http-planning-focused-final.log": "1ee0f1de343644553c64ce23edfff4695fb87bff5fe0a485159b6a6d02347b0f",
+    ".oscar/http-planning-focused-fixed.log": "c901c3726a8e6f1994b8d19ce203eda9de23aa0c796fd58c3a99ca919e6d6a76",
+    ".oscar/http-planning-focused-authority-final.log": "e28850b7598aa488e42f7780ebf1dca9840535d6ae1823ecea882256cf568f45",
+    ".oscar/http-planning-account-diagnostic.log": "b50760f36813eba1b0a1334ea63c4b3cb3b711748acfe6ea13d2b25a4c9b3b19",
+    ".oscar/http-planning-integration.log": "de2424a467240d681b4d4e4abfe72a286d1bcab45336683c9994fd39dded1b60",
+    ".oscar/http-planning-integration-manifest.json": "2a3a5537dcefb6e37c9f1fbbf0d46dea755a219e163d1e03104d8cc204e0c1f0",
+    ".oscar/http-desktop-protocol.py": "5beb60d52af87f5da46833c447f3e54322447310829a1d2feb4249faf31d568d",
+    ".oscar/http-desktop-protocol-final.log": "ec02b6b8a00e884150af1f588cf139c46e96d4f208581fadfaab6574d59b660f",
+    ".oscar/http-desktop-protocol.json": "e1fcf3bbb52e698a79090c16df5e8462fd5c438ce984670be163c898f45b1ed1"
+  },
+  "limits": [
+    "Synthetic model HTTP, provider HTTP and owners; not real provider/OAuth/model commissioning or rendered native acceptance",
+    "Endpoint envelope does not provide provider body-field semantics; exact arguments are reviewed and generic outcomes remain PARTIALLY_VERIFIED",
+    "Immediate literal requests only; adaptive connector observation and result-substitution workflows remain unsupported",
+    "No fresh full regression; preceding 1257-case aggregate has one native focus failure and remains PARTIAL",
+    "No push, Actions, real accounts, physical devices, production activation or cloud provisioning"
+  ]
+}

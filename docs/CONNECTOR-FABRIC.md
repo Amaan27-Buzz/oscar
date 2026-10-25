@@ -281,15 +281,25 @@ federation. Slice 06 COMPLETE; Gate B PASS. Remote revocation remains
 `UNKNOWN_OWNER_ACTION_REQUIRED`. See [final acceptance](GATE-B-COMPLETION.md).
 
 
-## Model-authored MCP execution
+## Model-authored connector execution
 
-Installed, connected, owner-reviewed account-bound MCP tools can participate in
+Installed, connected, owner-reviewed account-bound MCP tools and current native
+account HTTPS operations can participate in
 conversation-created temporary Workers. Planning descriptors expose the exact
 executor/capability/account identity and the reviewed argument schema. Tool names
 and schemas are untrusted metadata, not instructions or additional authority.
 The configured model proposes literal `parameters.arguments` only. Native schema,
 capability, account generation, session, policy and standing-authority checks remain
 authoritative. A changed tool schema needs installation review before new planning.
+
+Native HTTPS descriptors expose the fixed method/origin/path and supported path,
+query and body envelope from the existing endpoint contract. Models cannot supply
+an origin, method, headers or credentials. The existing endpoint validator checks
+resource identifiers, supported fields and payload bounds before private staging.
+This envelope is not a provider body-field schema; body fields must follow the
+explicit owner request and are shown exactly in the signed review. Generic HTTPS
+success does not establish provider semantic correctness or objective verification.
+Only current account projections qualify; arbitrary connector instances do not.
 
 Before the model result is persisted, arguments move into the existing transient
 Connector Fabric. Durable results, goals and actions contain opaque `request_ref`
@@ -308,12 +318,15 @@ the signed completion rechecks input digest, schema/account generation, task/pol
 digest, expiry and current owner scope before recording the existing one-attempt
 Executive confirmation. Pending readback contains IDs only. Standing-delegation
 tasks cannot fall back to this Ask path when their account coverage is missing.
+The exact connector objective account/generation is checked before standing task
+binding as well as at the executor, so missing account authority stays waiting
+instead of entering execution and becoming blocked there.
 Synthetic Full Access uses the existing signed owner/account/capability ceiling
 without per-action prompts. Neither mode adds an account, installs a server,
 refreshes authorization or bypasses external mandatory approval.
 
 Connector plans run once immediately. Recurrence, delayed execution, argument
-substitution from other steps and MCP observation continuation are rejected.
+substitution from other steps and connector observation continuation are rejected.
 Generic tool success is REPORTED/PARTIALLY_VERIFIED, never independent objective
 verification. Core integration, native contract tests and builds do not establish
 rendered native MCP action-confirmation acceptance or general model accuracy.

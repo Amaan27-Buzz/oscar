@@ -25,7 +25,7 @@ from .memory_executor import MemoryExecutor
 from .memory_fabric import MemoryFabric
 from .models import Mode, ModelRequest, ProviderError, RoutingPolicy
 from .oauth_device import Vault, VaultResolver
-from .planner_connectors import MCPPlanning
+from .planner_connectors import ConnectorPlanning
 from .policy import PersonalPolicy
 from .presence import PresenceRuntime
 from .providers import HTTPAdapter
@@ -51,7 +51,7 @@ class ModelExecutor:
         *,
         grid: Grid | None = None,
         memory: MemoryFabric | None = None,
-        connector_plans: MCPPlanning | None = None,
+        connector_plans: ConnectorPlanning | None = None,
     ):
         self.router, self.template, self.policy = router, template, policy
         self.grid = grid
@@ -349,7 +349,7 @@ class Harness:
             self.accounts.check(account_id, generation)
 
         self.plugins = MCPPlugins(self.store, self.connectors, authorize_account=authorize_account)
-        self.connector_plans = MCPPlanning(self)
+        self.connector_plans = ConnectorPlanning(self)
         self.runtime.verifier = ConnectorVerifier(self.runtime.verifier, self.connectors)
         self.runtime.connections = self
         self.registry = Registry.load(manifest, self.store)

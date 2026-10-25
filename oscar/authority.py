@@ -382,8 +382,18 @@ class StandingAuthority:
             if not self.permits(capability, executor):
                 return None
             state, task = self._active(), self.store.task(task_id)
-            parameters = self.store.get("plan", task_id)["parameters"]
+            plan = self.store.get("plan", task_id)
+            parameters = plan["parameters"]
             parameters = self.store.transient.get(task_id, {}).get("parameters", parameters)
+            private_objective = self.store.transient.get(task_id, {}).get("objective")
+            criterion = (
+                private_objective.criterion
+                if private_objective
+                else self.store.get("objective", task.objective_id)["criterion"]
+            )
+            account_pin = criterion.get("connector_account")
+            if account_pin is not None and account_pin not in state["material"]["accounts"]:
+                raise PermissionError("task account is outside signed delegation")
             account_id = parameters.get("account_id")
             try:
                 installation = self.store.get("mcp_installation", capability["id"].split(":", 1)[0])

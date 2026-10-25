@@ -86,3 +86,6 @@ visual reasoning need further implementation or integration acceptance. They are
 not reclassified as owner-only commissioning. API/OAuth consent, actual owner
 activation, hosted Core, physical phone/audio and hardware remain separately
 authorized commissioning. Group 6 and Slice 20 are not passed by this matrix.
+
+
+Native account HTTPS operations now share the private reviewed model-Worker path. Seven focused HTTP cases and 231 affected regressions pass, including signed Ask/Full account ceilings and bodyless reads. Synthetic provider effects are independently inspected; generic task outcomes remain PARTIALLY_VERIFIED. This does not close broader adaptive service/account reasoning or provider commissioning. [Receipt](../evidence/software-completion/http-planning-2026-10-26.json).
