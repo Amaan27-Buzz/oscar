@@ -198,7 +198,7 @@ fun parseSnapshot(json: JSONObject): CoreSnapshot {
     val executive = json.optJSONObject("executive")?.let { root -> require(root.get("version") == 1)
         val goals = root.getJSONArray("goals"); require(goals.length() <= 64)
         (0 until goals.length()).map { index -> val goal = goals.getJSONObject(index)
-            val status = goal.bounded("state", 32); require(status in setOf("proposed", "enabled", "paused", "cancelled", "expired", "completed"))
+            val status = goal.bounded("state", 32); require(status in setOf("proposed", "enabled", "paused", "cancelled", "expired", "completed", "reported"))
             require(goal.get("verified_runs") is Int && goal.get("max_runs") is Int && goal.getInt("max_runs") in 1..100 && goal.getInt("verified_runs") in 0..goal.getInt("max_runs"))
             ExecutiveGoal(goal.bounded("id", 80), goal.bounded("goal", 512), status, goal.getInt("verified_runs"), goal.getInt("max_runs"))
         }

@@ -1,0 +1,121 @@
+{
+  "classification": "NATIVE_EMULATED_CONVERSATION_DESKTOP_HANDOFF_VERIFIED",
+  "serial": "emulator-5582",
+  "avd": "oscar_group05_capability_api35",
+  "task": {
+    "task_id": "61f54c042db34718be7f99ec8c8c08b5",
+    "state": "verified",
+    "retained_available": true,
+    "request_retained": true,
+    "description": "Save native phone handoff 7481",
+    "target": "synthetic-desktop",
+    "capability": "machine.files.write",
+    "approval_required": false,
+    "review_digest": "249df655d3f059d62aa72d9396e5839a5288ba9ee91b393e65d23c9215c5c963",
+    "action_id": "b42e6007bf0e4ddab1c79b3fce25fe6e",
+    "deadline_ms": 1792915562713,
+    "result": {
+      "id": "277b10bc9bde4ae590d33b685210b4c7",
+      "action_id": "b42e6007bf0e4ddab1c79b3fce25fe6e",
+      "task_id": "61f54c042db34718be7f99ec8c8c08b5",
+      "correlation_id": "d111fb31e79d47ebb90ea461629e6203",
+      "executor": "machine.files.write",
+      "success": true,
+      "value": null,
+      "error": null,
+      "status": "REPORTED",
+      "artifact": {
+        "id": "bb323248c04443d1b2733a7760eaa79e",
+        "task_id": "61f54c042db34718be7f99ec8c8c08b5",
+        "producer": "machine.files.write",
+        "kind": "file",
+        "location": "workspace:disposable-workspace/native-phone-handoff.txt",
+        "created_at": 1792915443.9512105,
+        "status": "REPORTED",
+        "content_hash": null,
+        "access_scope": "owner"
+      }
+    },
+    "evidence": [
+      {
+        "id": "af00250ce410485089b8bcf77c996ae2",
+        "task_id": "61f54c042db34718be7f99ec8c8c08b5",
+        "correlation_id": "d111fb31e79d47ebb90ea461629e6203",
+        "source": "remote-scoped-filesystem",
+        "method": "separate readback request and Core exact-byte comparison",
+        "observed_at": 1792915446.1371918,
+        "matches": true,
+        "status": "VERIFIED",
+        "detail": "readback matches",
+        "artifact_id": "bb323248c04443d1b2733a7760eaa79e",
+        "content_hash": "d005d5c2fa7a2c2a0ee049db024124aa347bb0f516937a0e32d221236a5dac63"
+      }
+    ],
+    "blocker": null,
+    "generation": 1,
+    "correlation_id": "d111fb31e79d47ebb90ea461629e6203"
+  },
+  "model_requests": 1,
+  "qualification": "Actual Android Keystore, CoreSession.send, separate TLS Core and outbound Windows Worker. Synthetic fixed model response and host-signed Full authority; no model accuracy, physical phone or owner biometric claim.",
+  "source_sha256": {
+    "mobile/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk": "df4e04de6112ffe58987819080d00fda98fe71835f19812a8232bc8964e41732",
+    "mobile/app/build/outputs/apk/androidTest/review/app-review-androidTest.apk": "a1a35d9a263bc575f2f3eb239e78d2ee11db8ef7b5c41ed3f7248a5edb1772b6",
+    "mobile/app/build/outputs/apk/debug/app-debug.apk": "f8f18cd4d0f7ac8356cbee9e26ed7841c449c8f414e23e7db08730421d558ece",
+    "mobile/app/build/outputs/apk/review/app-review.apk": "7bd4823d57ad689eb46b7a332518a25d7a19a287d9ec4470fd17406fc3eecc58",
+    "mobile/app/src/androidTest/java/io/dawnlight/oscar/mobile/NativeGridExecutionTest.kt": "6e85b700d28c3a9c82f87eecfc13d9f48c18ae2ff6725b831b53d94fa37901d5",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/MobileState.kt": "cf847594dd8ca279f37dab2e65451896555e234be3135f3f994f02a23ff18097",
+    "mobile/app/src/test/java/io/dawnlight/oscar/mobile/ManagementContractsTest.kt": "f5860c833e9eda98ed0a2af8879c0b435b91b8cc0d60633f99fbc646fec7bffb",
+    "scripts/verify_android_conversation.py": "408c14dd68fc70708a53a4798917d47411a906cd6f37d5e70078046810965284",
+    "scripts/verify_connected_grid.py": "3185dfceaed492036b039465d01b60548ae256b8744cdbee435a789a0d54bcae",
+    "desktop/src/Automations.tsx": "e849c0df1fa3fbace622e10ffd68a86331bd031288ad464720df27adf20a0b16",
+    "desktop/src/Automations.test.tsx": "dc3b9468d848a8e1439675332d55eaf487d37fa6331a7cdb2162c5a7fb6b0558"
+  },
+  "cleanup": "Both disposable apps uninstalled; reverse tunnel removed; fixture processes and synthetic data removed",
+  "checks": {
+    "android_unit_tests": {
+      "passed": 87,
+      "failures": 0
+    },
+    "desktop_tests": {
+      "passed": 130,
+      "failures": 0
+    },
+    "desktop_production_build": "PASS, 304 modules",
+    "android_debug_and_instrumentation_builds": "PASS, assembled sequentially",
+    "native_instrumentation": {
+      "passed": 1,
+      "seconds": 17.699
+    },
+    "preceding_core_regression": {
+      "total": 1214,
+      "passed": 1204,
+      "skipped": 10,
+      "failures": 0,
+      "seconds": 892.63,
+      "checkpoint": "b3ed1c3; predates app parser fix; Core runtime unchanged"
+    }
+  },
+  "fix": "Android and Desktop admit the canonical reported Executive draft state without claiming verified completion; unknown states remain rejected.",
+  "prior_failures": [
+    "Host-signed delegation for another owner session correctly required review; test now signs the native session challenge with its synthetic owner.",
+    "Synthetic plan omitted required step id and was rejected before file execution; fixture corrected.",
+    "Actual Desktop effect verified, but Android rejected reported draft state at MobileState.kt:201; both app parsers and negative tests corrected.",
+    "First corrected native instrumentation passed in 20.723 seconds, but host cleanup device query failed. Cause unproven; unchanged-source repeat passed including cleanup."
+  ],
+  "log_sha256": {
+    ".oscar/android-conversation/NativeGridExecutionTest-conversationDelegatesToDesktop.log": "84ed2b8f29163142f3d1167fc0a294418104abf18b81b581f3016fc964228099",
+    ".oscar/android-conversation/passed-native-cleanup-query-failed.log": "e1abb0a58fbef0ceb13e455abfc1e9268c7a16e56d9af94df37a3373716d78c9",
+    ".oscar/native-handoff-fixed-run.log": "c111709d0efead7a57d5d18467a0bd08bebdc75037959baa731e6a9bcb9fb95d",
+    ".oscar/native-handoff-repeat-run.log": "61eac306b64997dcae40fdb41d23e3204805b3c9c845edc646fb43319021dc3a",
+    ".oscar/native-handoff-desktop-suite.log": "c99981ab4f55c21a11c2aa5c2dca99383b1b7a4c1ac4317e5b712331b6cdf464",
+    ".oscar/native-handoff-fix-build.log": "85bbda11091a0d7c7e22078d35a120bdcb90cf53074e0619e8ef4aad57638b75"
+  },
+  "source_manifest_sha256": "e62081aa8f44545f27280b5ed1e48003954b72f35e3c04f907c27a893319b135",
+  "limits": [
+    "Synthetic fixed model response: no model semantic-reliability claim",
+    "Host signs synthetic owner challenge; actual owner biometrics and production authority NOT_RUN",
+    "Native Activity/CoreSession assertions, not a new screenshot/visual acceptance campaign",
+    "No physical devices, real credentials, public deployment or GitHub publication",
+    "No cause claimed for failed cleanup query; failure logs preserved"
+  ]
+}

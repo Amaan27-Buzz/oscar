@@ -124,6 +124,13 @@ class ManagementContractsTest {
             .put("observed_at_ms", 1000).put("tasks", JSONArray()).put("nodes", JSONArray()).put("executive", executive).put("connections", connections())
         assertEquals("ask", parseGridSnapshot(wire, "core", "mobile").management!!.mode)
         assertNotNull(parseGridSnapshot(wire, "core", "mobile").connections)
+        val draft = JSONObject().put("id", "draft").put("goal", "Draft reviewed work").put("state", "reported")
+            .put("verified_runs", 0).put("max_runs", 1)
+        executive.getJSONArray("goals").put(draft)
+        assertEquals("reported", parseGridSnapshot(wire, "core", "mobile").executive!!.single().state)
+        assertEquals(0, parseGridSnapshot(wire, "core", "mobile").executive!!.single().runs)
+        draft.put("state", "invented")
+        assertThrows(Exception::class.java) { parseGridSnapshot(wire, "core", "mobile") }
     }
     @Test fun dayBriefIsBoundedAndWithdrawnOnConnectionLoss() {
         val wire = JSONObject().put("version", 1).put("observed_at", 1000).put("truncated", false)

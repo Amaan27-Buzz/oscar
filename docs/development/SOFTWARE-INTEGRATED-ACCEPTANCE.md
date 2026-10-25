@@ -38,7 +38,7 @@ does not repeat their native UI, model or long-running acceptance.
 | 22 | Native capability admission | LOCAL actual OS-grant/session/source admission and withdrawal; physical OEM commissioning OPEN |
 | 23 | Android UI / gestures | LOCAL actual exact-resource click/text/scroll subset; generic outcome PARTIAL, arbitrary app workflows unaccepted |
 | 24 | Permission withdrawal | LOCAL actual emulator source/capture stop and scoped regression; no physical phone claim |
-| 25 | Android-to-Desktop handoff | PARTIAL authenticated common Grid/remote tasks; current full ordinary native conversation-to-Desktop handoff scenario not freshly accepted |
+| 25 | Android-to-Desktop handoff | LOCAL actual Android Activity/CoreSession conversation creates Worker through separate TLS Core and outbound Windows Worker; exact file independently verified and returned to Android. Synthetic model/native-session owner authority; broader model/native visual acceptance remains PARTIAL. [Receipt](../evidence/software-completion/android-conversation-handoff-2026-10-25.json) |
 | 26 | Process death / restore | LOCAL actual force-stop/relaunch, Keystore session, unchanged claims and fresh work. [Recovery receipt](../evidence/software-completion/android-recovery-2026-10-24.json) |
 | 27 | Grid revocation | LOCAL actual emulator revoked-session notice withdrawal and native/Core tests |
 | 28 | Ask confirmation | LOCAL actual two exact reviews/model/file and native signed effects; no opening/preview grants execution |
@@ -61,7 +61,7 @@ does not repeat their native UI, model or long-running acceptance.
 | 45 | Conditional / schedule triggers | LOCAL Executive event/occurrence tests; richer real daily monitoring acceptance OPEN |
 | 46 | Interrupt / recover / verify | LOCAL actual Core/Worker restart and 98 independently read-back effects; uncertain mutation never replayed. [Soak](../evidence/software-completion/soak-fbe12e3-2026-10-24.json) |
 | 47 | Useful proactive notification | PARTIAL actual transient Sentry notices/quiet/expiry; usefulness and broader Chief-of-Staff follow-up acceptance OPEN |
-| 48 | Same canonical task on Desktop / Android | LOCAL signed synthetic phone → Core arithmetic → outbound Desktop file with exact independent readback and result provenance. Explicit device lists pin each executor. Newest rendered native workflow remains PARTIAL. [Handoffs](../evidence/software-completion/worker-handoffs-2026-10-25.json) |
+| 48 | Same canonical task on Desktop / Android | LOCAL signed synthetic phone → Core arithmetic → outbound Desktop file with exact independent readback and result provenance. Explicit device lists pin each executor. Actual Android conversation/native task readback now passed with synthetic model/authority; newest rendered Desktop workflow remains PARTIAL. [Android receipt](../evidence/software-completion/android-conversation-handoff-2026-10-25.json). [Handoffs](../evidence/software-completion/worker-handoffs-2026-10-25.json) |
 | 49 | Core restart | LOCAL separate TLS Core death/restart, native Worker recovery and fresh clipboard verification |
 | 50 | Worker disconnect | LOCAL actual stop/liveness expiry and cancellation; UI connectivity cannot preserve executor capability |
 | 51 | Browser / MCP interruption | LOCAL actual browser children/profile cleanup, SDK lifecycle and durable uncertain-effect fencing |

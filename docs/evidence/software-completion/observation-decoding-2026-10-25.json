@@ -30,8 +30,20 @@
       "diff_check": "PASS"
     },
     "full_regression": {
-      "state": "PENDING",
-      "prior_checkpoint": "294ec26-equivalent full run passed 1214 total, 1204 passed, 10 skipped; predates this change"
+      "state": "PASS",
+      "total": 1214,
+      "passed": 1204,
+      "skipped": 10,
+      "failures": 0,
+      "errors": 0,
+      "seconds": 892.63,
+      "wrapper_seconds": 895.932,
+      "source_stable": true,
+      "frozen_head": "bf982f4cb53798ed56220c16938d54d24a2b0010",
+      "primary_checkpoint": "b3ed1c3",
+      "source_equivalence": "All manifested source files match git b3ed1c3 after CRLF normalization; raw manifest hashes preserved",
+      "manifest_sha256": "e9184ed769978ac2f407c67c2aed48eab40687563de01a2cb3c9a9b8aa65b374",
+      "log_sha256": "eda553823a2caa7199a304d9eec976a9a6deb23b931b144ff833a3d892a557c4"
     },
     "actual_model": {
       "model": "granite4.1:3b",

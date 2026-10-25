@@ -250,7 +250,7 @@ Ollama configuration but malformed planning output remains a quality bottleneck.
 | --- | --- |
 | P1 product completeness | General image-grounded computer use, broad Chief-of-Staff prioritization/replanning, broader cross-application/cross-account workflows beyond the explicit receipt/file transfer and several requested service-specific integrations lack complete executable/accepted paths. These are not all owner-credential blockers |
 | P2 planning quality | Installed local model can return malformed output despite structured mode. Failure recovery is safe and useful, but successful small examples do not establish broad reliability |
-| P2 unsupported contracts | Blob/cross-origin authenticated downloads; MCP dynamic registration/automatic resource refresh/incremental challenge/remote revoke; arbitrary nested provider mutation verification |
+| P2 unsupported contracts | Blob/cross-origin authenticated downloads; MCP dynamic registration/automatic resource refresh/incremental challenge; arbitrary nested provider mutation verification |
 | P2 verification limits | Generic native click/capture/invoke and Microsoft sendMail 202 remain PARTIAL; recipient delivery unproven |
 | Unassessed | No exhaustive security finding inventory or production incident claim; absence of a confirmed defect in these campaigns is not proof of absence |
 
@@ -634,3 +634,7 @@ contract cases (23.812 s), Ruff/mypy/repository/diff checks. The preceding full
 1,214-case PASS predates this change; fresh full regression remains separate.
 Broader model/image-grounded/native whole-product, service and Chief-of-Staff
 work remains open. [Receipt](../evidence/software-completion/observation-decoding-2026-10-25.json).
+
+**2026-10-25 phase-specific decoding full regression:** source-stable frozen `bf982f4`, equivalent to primary `b3ed1c3` after newline normalization, passed 1,214 cases: 1,204 passed, ten skipped, no failures/errors (892.630 s). The observation-decoding receipt preserves actual manifest/log hashes and earlier failed evidence. This is software regression evidence; broader native/model/service completion remains open.
+
+**2026-10-25 native Android conversation handoff:** fixed both app parsers to admit Core's `reported` draft state without treating it as verified completion; unknown states remain rejected. The actual disposable Android Activity/CoreSession conversation now creates a Worker through a separate TLS Core, delegates to the outbound Windows Worker and receives independently verified exact-file readback. A fixed synthetic model response and native-session challenge signed by the synthetic host owner qualify this as native transport/authority/execution acceptance, not model accuracy or owner biometrics. The complete repeat passed (17.699 s), with both apps uninstalled and the tunnel/process/data cleanup completed. An earlier native pass had a failed cleanup query of unproven cause; preserved failures also include rejected cross-session delegation and an invalid fixture plan. Android 87 unit tests, Desktop 130 tests and both production/debug builds pass. Broader whole-product/model/image/service/Chief-of-Staff work remains open. [Receipt](../evidence/software-completion/android-conversation-handoff-2026-10-25.json).

@@ -489,3 +489,7 @@ Adaptive aggregate: 1,171 tests, 1,159 passed, ten skipped and two failed. The
 stale prompt assertion was corrected and 23 conversation tests passed; unchanged
 native visual/form modules passed four tests in isolation. Foreground failure
 remains unproven; this is not an aggregate PASS. Runtime sources stayed unchanged.
+
+**2026-10-25 phase-specific decoding full regression:** source-stable frozen `bf982f4`, equivalent to primary `b3ed1c3` after newline normalization, passed 1,214 cases: 1,204 passed, ten skipped, no failures/errors (892.630 s). The observation-decoding receipt preserves actual manifest/log hashes and earlier failed evidence. This is software regression evidence; broader native/model/service completion remains open.
+
+Native Android conversation → separate TLS Core → outbound Desktop exact-file execution/readback passed with synthetic model and signed native-session test authority. Android/Desktop now accept the canonical `reported` draft state; 87 Android unit and 130 Desktop tests pass. Physical/biometric/model-semantic acceptance remains separate. [Receipt](evidence/software-completion/android-conversation-handoff-2026-10-25.json).

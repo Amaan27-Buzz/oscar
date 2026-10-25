@@ -27,6 +27,62 @@ class NativeGridExecutionTest {
         while (SystemClock.elapsedRealtime() < until) { if (check()) return; SystemClock.sleep(50) }
         fail(message)
     }
+    @Test fun conversationDelegatesToDesktop() {
+        assumeTrue("Disposable emulator required", android.os.Build.HARDWARE in setOf("ranchu", "goldfish"))
+        val args = InstrumentationRegistry.getArguments()
+        assumeTrue("Actual isolated Core fixture required", args.getString("grid_invitation") != null)
+        val previous = HttpsURLConnection.getDefaultSSLSocketFactory()
+        try {
+            val certificate = CertificateFactory.getInstance("X.509").generateCertificate(Base64.getDecoder().decode(args.getString("grid_ca")).inputStream())
+            val trust = KeyStore.getInstance(KeyStore.getDefaultType()).apply { load(null); setCertificateEntry("disposable-core-ca", certificate) }
+            val managers = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm()).apply { init(trust) }
+            HttpsURLConnection.setDefaultSSLSocketFactory(SSLContext.getInstance("TLS").apply { init(null, managers.trustManagers, null) }.socketFactory)
+            val vault = SessionVault(context)
+            val saved = CoreClient(JSONObject().put("url", args.getString("grid_origin"))).enroll(
+                JSONObject(String(Base64.getDecoder().decode(args.getString("grid_invitation")), Charsets.UTF_8)),
+                vault.deviceIdentity(), vault::signDevice
+            ).put("retain_conversation", true)
+            vault.save(saved)
+            val connection = CoreClient(saved, vault::signDevice)
+            val snapshot = parseGridSnapshot(connection.call("snapshot", JSONObject()), saved.getString("core_id"), saved.getString("node_id"))
+            val management = requireNotNull(snapshot.management)
+            val selected = management.capabilities.filter {
+                (it.node == "synthetic-desktop" && it.id in setOf("machine.files.read", "machine.files.write")) ||
+                    (it.node == saved.getString("core_id") && it.id == "models.reason")
+            }
+            assertEquals(3, selected.size)
+            val proposal = delegationRequest(management.copy(capabilities = selected), requireNotNull(snapshot.connections), "full", 600)
+            val review = connection.call("authority_challenge", proposal)
+            context.openFileOutput("software-handoff-review.json", Context.MODE_PRIVATE).use { it.write(review.toString().toByteArray()) }
+            val signatureFile = context.getFileStreamPath("software-handoff-signature.txt")
+            waitFor("Synthetic host owner did not sign native session delegation") { signatureFile.exists() }
+            connection.call("authority_complete", JSONObject().put("challenge_id", review.getString("challenge_id"))
+                .put("signature", signatureFile.readText().trim()))
+            ActivityScenario.launch(MainActivity::class.java).use { source ->
+                lateinit var product: CoreSession
+                source.onActivity { product = androidx.lifecycle.ViewModelProvider(it)[CoreSession::class.java] }
+                waitFor("Signed synthetic Full authority did not reach native conversation") {
+                    product.state.value.snapshot?.management?.mode == "full" && !product.state.value.busy
+                }
+                source.onActivity { assertTrue(product.send("Create worker Phone handoff: On device synthetic-desktop: Write NATIVE HANDOFF 7481 to native-phone-handoff.txt")) }
+                waitFor("Native conversation did not receive independent Desktop file verification", 90_000) {
+                    assertNull("Standing delegation unexpectedly requested per-action approval", product.state.value.approval)
+                    if (product.state.value.link == Link.DEGRADED) {
+                        parseGridSnapshot(connection.call("snapshot", JSONObject()), saved.getString("core_id"), saved.getString("node_id"))
+                    }
+                    product.state.value.snapshot?.tasks?.any {
+                        it.target == "synthetic-desktop" && it.description == "Save native phone handoff 7481" &&
+                            it.state == "verified" && it.evidence.isNotEmpty()
+                    } == true
+                }
+                assertTrue(product.state.value.snapshot!!.executive.orEmpty().isNotEmpty())
+                stage("Native conversation received verified Desktop handoff")
+            }
+        } finally {
+            HttpsURLConnection.setDefaultSSLSocketFactory(previous)
+            SessionVault(context).forget()
+        }
+    }
     @Test fun actualGridExecutesThenWithdrawsAndRevokes() {
         assumeTrue("Disposable emulator required", android.os.Build.HARDWARE in setOf("ranchu", "goldfish"))
         val args = InstrumentationRegistry.getArguments()
