@@ -39,16 +39,29 @@ class HTTPDiscovery:
         self.clock = clock
 
     def _get(
-        self, provider: ProviderSpec, secret: str, path: str, timeout: float
+        self,
+        provider: ProviderSpec,
+        secret: str,
+        path: str,
+        timeout: float,
+        *,
+        payload: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         headers = {"User-Agent": "OSCAR/0.1", "Accept": "application/json"}
         if secret:
             headers["x-goog-api-key" if provider.adapter == "google" else "Authorization"] = (
                 secret if provider.adapter == "google" else "Bearer " + secret
             )
+        if payload is not None:
+            headers["Content-Type"] = "application/json"
         try:
             with self.opener.open(
-                Request(provider.base_url.rstrip("/") + path, headers=headers), timeout=timeout
+                Request(
+                    provider.base_url.rstrip("/") + path,
+                    data=json.dumps(payload).encode() if payload is not None else None,
+                    headers=headers,
+                ),
+                timeout=timeout,
             ) as response:
                 raw = response.read(2_000_001)
                 if len(raw) > 2_000_000:
@@ -69,6 +82,23 @@ class HTTPDiscovery:
             raise ProviderError(Failure.NETWORK) from None
         except (ValueError, TypeError, AttributeError):
             raise ProviderError(Failure.CAPABILITY) from None
+
+    def local_ollama_capabilities(
+        self, provider: ProviderSpec, model: str, secret: str, timeout: float
+    ) -> frozenset[str]:
+        """A loopback server can proxy cloud models; inspect before private disclosure."""
+        if not provider.local or provider.adapter != "ollama":
+            raise ProviderError(Failure.CAPABILITY)
+        data = self._get(provider, secret, "/show", timeout, payload={"model": model})
+        capabilities = data.get("capabilities")
+        if (
+            any(data.get(key, "") != "" for key in ("remote_host", "remote_model"))
+            or not isinstance(capabilities, list)
+            or len(capabilities) > 32
+            or any(not isinstance(c, str) or not 1 <= len(c) <= 64 for c in capabilities)
+        ):
+            raise ProviderError(Failure.CAPABILITY)
+        return frozenset(capabilities)
 
     @staticmethod
     def _model(item: Any, provider: ProviderSpec) -> DiscoveredModel:

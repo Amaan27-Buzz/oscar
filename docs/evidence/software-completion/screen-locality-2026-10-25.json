@@ -1,0 +1,50 @@
+{
+  "classification": "PRIVATE_IMAGE_OLLAMA_UPSTREAM_PREFLIGHT_SOFTWARE_VERIFIED_NATIVE_FOCUS_PARTIAL",
+  "base_head": "66e64fde060afa816216da73c4041ac68b9b572f",
+  "sources": {
+    "oscar/discovery.py": "83153042422ef9d6b70dd74cf968f17822bdbe1acd7537cae83a4f1c6e8d9cff",
+    "oscar/providers.py": "364412e302d1df066f77da7d0fd0acbd73b2dbb918e4883da215d8114ee8ae6c",
+    "tests/test_screen_observations.py": "5df2f391eb8e6b39122357e10b0ef227c0421f370eb347e9214606a51909c5f1"
+  },
+  "checks": {
+    "integration": {
+      "total": 143,
+      "passed": 142,
+      "failed": 1,
+      "skipped": 0,
+      "seconds": 124.33,
+      "source_stable": true,
+      "qualification": "All portable/provider/router/planning/remote cases passed; native image click rejected a nonforeground fixture. Focus-loss cause remains unproven."
+    },
+    "portable_image_contracts": {
+      "passed": 10,
+      "failed": 0
+    },
+    "ruff": "PASS",
+    "mypy": {
+      "state": "PASS",
+      "source_files": 106
+    },
+    "repository_links_and_secret_safety": "PASS"
+  },
+  "implemented": [
+    "Fresh bounded POST /show for the exact model before each private image generation; metadata carries only model identity, never prompt/image bytes",
+    "Reject nonempty or malformed remote_host/remote_model, missing completion/vision, invalid or oversized metadata and HTTP/redirect failure",
+    "Recheck cancellation/current authority and remaining overall deadline after metadata and before image transmission; no cached preflight acceptance",
+    "Existing strict JSON parsing, native input/frame checks, current authority and local funding admission remain enforced"
+  ],
+  "limits": [
+    "The configured local server is a trusted runtime; metadata is a declaration, not cryptographic proof against a dishonest server or atomic protection against model replacement",
+    "No automatic vision capability enrichment for the general inventory is implemented",
+    "Actual-model coordinate accuracy and native foreground acceptance remain incomplete",
+    "The preceding 1224-case full regression failed two native visual tests and predates this guard; no fresh full PASS is claimed",
+    "No hosted model request, owner-device access, real account, publication or production owner activation performed"
+  ],
+  "references": {
+    "ollama_api": "https://github.com/ollama/ollama/blob/main/api/types.go"
+  },
+  "logs": {
+    ".oscar/screen-locality-integration.log": "900f7e85417d7f17e68345142779b1bf3121ae51932bc6d7dc4e04cccff50f83",
+    ".oscar/screen-locality-integration-manifest.json": "03ad92b76199e594c0701e983e339c2cc2cd2f04723658079486c32451627415"
+  }
+}

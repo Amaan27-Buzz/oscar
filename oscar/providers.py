@@ -332,6 +332,20 @@ class HTTPAdapter:
         emitted = False
         deadline = monotonic() + timeout
         try:
+            if request.images:
+                from .discovery import HTTPDiscovery
+
+                discovery = HTTPDiscovery()
+                discovery.opener = self.opener
+                capabilities = discovery.local_ollama_capabilities(
+                    provider, model, secret, min(10, timeout)
+                )
+                if not {"completion", "vision"} <= capabilities:
+                    raise ProviderError(Failure.CAPABILITY)
+                check_cancel()
+                timeout = deadline - monotonic()
+                if timeout <= 0:
+                    raise ProviderError(Failure.NETWORK)
             with self.opener.open(
                 self._request(provider, model, secret, request, sink is not None), timeout=timeout
             ) as response:

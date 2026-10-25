@@ -4,7 +4,12 @@ This document is the canonical contract for OSCAR's model/provider routing layer
 
 Verified selected-window PNG observations can supply typed private `vision`
 input to configured local Ollama models with explicit vision capability and LOCAL
-funding. Hosted image routing is unavailable pending model-specific accounting.
+funding. Before each image generation, bounded exact-model Ollama `/show`
+metadata must declare completion and vision and no upstream model/host. Failure,
+unknown/malformed metadata or redirects prevent image/prompt disclosure. Authority
+and the remaining request deadline are rechecked after this read. The configured
+server remains trusted; this is not cryptographic proof or an atomic model pin.
+Hosted image routing is unavailable pending model-specific accounting.
 Request configuration cannot inject images; the Executive continuation obtains
 them from separately verified captures with current disclosure authority. Images
 are omitted from request representations and route history. Context admission

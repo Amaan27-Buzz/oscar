@@ -12,8 +12,9 @@ from dataclasses import replace
 from pathlib import Path
 from time import monotonic, sleep, time
 from types import SimpleNamespace
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
+from oscar.capabilities import Cancelled
 from oscar.contracts import ArtifactRef, Objective, Result
 from oscar.credentials import CredentialPool
 from oscar.harness import ModelExecutor
@@ -77,6 +78,7 @@ class ScreenObservationContractTests(unittest.TestCase):
         fixture = provider_fixture.ProviderContractTests()
         fixture.setUp()
         self.addCleanup(fixture.doCleanups)
+        fixture.provider = replace(fixture.provider, adapter="ollama")
         data = png()
         image = ScreenImage(data, 64, 48, hashlib.sha256(data).hexdigest())
         request = replace(
@@ -92,17 +94,99 @@ class ScreenObservationContractTests(unittest.TestCase):
             "prompt_eval_count": 24,
             "eval_count": 10,
         }
+        fixture.scheduled = [(200, {"capabilities": ["completion", "vision"]})]
         result = fixture.generate("ollama", request=request)
         self.assertTrue(result.structured_ok)
         self.assertEqual(24, result.input_tokens)
-        self.assertEqual("/generate", fixture.requests[0]["path"])
-        body = fixture.requests[0]["body"]
+        self.assertEqual({"model": "fixture-model"}, fixture.requests[0]["body"])
+        self.assertEqual("/show", fixture.requests[0]["path"])
+        self.assertEqual("/generate", fixture.requests[1]["path"])
+        body = fixture.requests[1]["body"]
         self.assertNotIn("messages", body)
         self.assertEqual(request.prompt, body["prompt"])
         self.assertEqual(data, base64.b64decode(body["images"][0]))
         fixture.body["response"] = '```json\n{"x":12,"y":24}\n```'
+        fixture.scheduled = [(200, {"capabilities": ["completion", "vision"]})]
         with self.assertRaises(ProviderError):
             fixture.generate("ollama", request=request)
+        self.assertEqual(
+            ["/show", "/generate", "/show", "/generate"],
+            [r["path"] for r in fixture.requests],
+        )
+
+    def test_private_image_rejects_upstream_or_unknown_metadata_without_disclosure(self):
+        fixture = provider_fixture.ProviderContractTests()
+        fixture.setUp()
+        self.addCleanup(fixture.doCleanups)
+        fixture.provider = replace(fixture.provider, adapter="ollama")
+        data = png()
+        request = replace(
+            fixture.request,
+            mode=Mode.PRIVATE,
+            images=(ScreenImage(data, 64, 48, hashlib.sha256(data).hexdigest()),),
+            required=frozenset({"text", "vision"}),
+        )
+        valid = {"capabilities": ["completion", "vision"]}
+        cases = [
+            {**valid, "remote_host": "https://example.invalid"},
+            {**valid, "remote_model": "upstream-model"},
+            {**valid, "remote_host": None},
+            {**valid, "remote_model": False},
+            {},
+            {"capabilities": ["completion"]},
+            {"capabilities": ["vision"]},
+            {"capabilities": "vision"},
+            {"capabilities": [True]},
+            {"capabilities": ["vision"] * 33},
+            {"error": "synthetic-private-error"},
+            b"not JSON",
+            b"x" * 2_000_001,
+        ]
+        for metadata in cases:
+            with self.subTest(case=cases.index(metadata)):
+                fixture.requests.clear()
+                fixture.body = metadata
+                with self.assertRaises(ProviderError):
+                    fixture.generate("ollama", request=request)
+                self.assertEqual(["/show"], [r["path"] for r in fixture.requests])
+                self.assertNotIn(request.prompt, json.dumps(fixture.requests))
+                self.assertNotIn(base64.b64encode(data).decode(), json.dumps(fixture.requests))
+        for status in (302, 401, 503):
+            fixture.requests.clear()
+            fixture.status, fixture.body = status, valid
+            fixture.headers = {"Location": fixture.url + "/unexpected"}
+            with self.subTest(status=status), self.assertRaises(ProviderError):
+                fixture.generate("ollama", request=request)
+            self.assertEqual(["/show"], [r["path"] for r in fixture.requests])
+
+    def test_private_image_rechecks_cancellation_and_deadline_before_disclosure(self):
+        fixture = provider_fixture.ProviderContractTests()
+        fixture.setUp()
+        self.addCleanup(fixture.doCleanups)
+        fixture.provider = replace(fixture.provider, adapter="ollama")
+        fixture.body = {"capabilities": ["completion", "vision"]}
+        data = png()
+        request = replace(
+            fixture.request,
+            mode=Mode.PRIVATE,
+            images=(ScreenImage(data, 64, 48, hashlib.sha256(data).hexdigest()),),
+            required=frozenset({"text", "vision"}),
+        )
+
+        def check():
+            if fixture.requests:
+                raise Cancelled("synthetic authority withdrawal")
+
+        with self.assertRaises(Cancelled):
+            HTTPAdapter("ollama").generate(
+                fixture.provider, "fixture-model", "synthetic-only", request, 2, check
+            )
+        self.assertEqual(["/show"], [r["path"] for r in fixture.requests])
+        fixture.requests.clear()
+        with patch("oscar.providers.monotonic", side_effect=[100, 103]):
+            with self.assertRaises(ProviderError):
+                fixture.generate("ollama", request=request)
+        self.assertEqual(["/show"], [r["path"] for r in fixture.requests])
 
     def test_vision_routes_require_local_ollama_local_funding_and_capability(self):
         rig = RouterRig()
@@ -471,6 +555,8 @@ class NativeScreenObservationTests(unittest.TestCase):
                 "prompt_eval_count": 10,
                 "eval_count": 10,
             }
+            if request.images:
+                p.scheduled = [(200, {"capabilities": ["completion", "vision"]})]
             calls.append(request)
             return generate(provider, model, secret, request, *args, **kwargs)
 
@@ -557,8 +643,9 @@ class NativeScreenObservationTests(unittest.TestCase):
         else:
             self.assertEqual([], native_errors)
             self.assertEqual("partially_verified", h.store.task(visual[0]["task_id"]).state)
-            self.assertEqual(2, len(p.requests))
-            images = p.requests[1]["body"]["images"]
+            self.assertEqual(3, len(p.requests))
+            self.assertEqual("/show", p.requests[1]["path"])
+            images = p.requests[2]["body"]["images"]
             self.assertEqual(
                 (self.workspace / "plan.png").read_bytes(), base64.b64decode(images[0])
             )
