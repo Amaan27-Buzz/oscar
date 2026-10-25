@@ -12,7 +12,7 @@ software work under the existing authorization; no new agent delegation is neede
 
 ## 2. Current candidate
 
-Latest committed runtime base `ea2133c` on `codex/software-completion`; the explicit Worker
+Latest committed runtime base `33f8043` on `codex/software-completion`; the explicit Worker
 routing checkpoint follows it. Use `git rev-parse HEAD` for the exact
 checkout, and `git log b700a6c..HEAD --oneline` for all local implementation commits.
 The final owner message must name the actual resulting checkout, not an invented
@@ -659,3 +659,8 @@ work remains open. [Receipt](../evidence/software-completion/observation-decodin
 
 **2026-10-25 reported task attention:** the read-only briefing now orders selected current task reports by overdue/today, reported high importance and later/undated work. Date-only urgency needs a current selected timezone; ambiguous DST and unknown timezone instants stay unknown. Derived labels expire at evidence/deadline/date boundaries and withdraw in both apps after source/account change. No provider priority, calendar or communication mutation is added. The stable broader integration passed 140 cases; final wording/clock checks passed 14 Core contracts, all 132 Desktop and 87 Android unit tests, both builds and Android lint. Rendered native/accessibility acceptance and general schedule replanning remain OPEN; fresh full regression is pending. [Receipt](../evidence/software-completion/attention-2026-10-25.json).
 
+
+**2026-10-25 active integration run:** current source-equivalent checkpoint is `d58116c` (task attention runtime commit `33f8043`, local discovery `ea2133c`, explicit focus `9112eda`). The full Windows regression is running from `.oscar/run-attention-full.py`, exec session 9998, with `.oscar/attention-full-regression.log` and completion manifest `.oscar/attention-full-regression-manifest.json`. It includes Core/config/tests and both native-client source hashes. Collect completion and confirm `exit_code`, `source_stable` and matching hashes before updating receipts. Do not treat this running checkpoint as PASS. Final native focus acceptance previously remained partial (150/152). Task attention is read-only deadline/importance ordering, not general autonomous schedule replanning. Default Ollama service did not answer the initial metadata-only probe; no service was started and no model loaded. No subagents, remote publication, physical devices or production authority were used.
+
+
+**2026-10-25 current integration regression completed:** committed `d58116c` sources passed 1,241 tests: 1,231 PASS, ten SKIP, zero failures/errors (931.956 s). Before/after source hashes stayed stable and were independently checked against the working tree. Both native image and older visual tests passed in this run; earlier foreground failures and stale-frame marker ambiguity retain their unresolved historical qualifications. This supersedes the preceding active-run checkpoint, not the broader incomplete software mandate. [Full receipt](../evidence/software-completion/attention-full-2026-10-25.json).

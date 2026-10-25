@@ -45,7 +45,16 @@
       "state": "PASS",
       "source_files": 106
     },
-    "full_regression": "PENDING",
+    "full_regression": {
+      "head": "d58116cca35f38c0ae90bd87848f47647537a71f",
+      "total": 1241,
+      "passed": 1231,
+      "skipped": 10,
+      "failed": 0,
+      "errors": 0,
+      "test_seconds": 931.956,
+      "source_stable": true
+    },
     "repository_links_and_secret_safety": "PASS after renaming artifact filenames that matched the existing credential substring pattern; scanner unchanged"
   },
   "implemented": [
@@ -61,7 +70,7 @@
     "Only eight sources and the selected bounded task pages contribute; missing work or free time cannot be inferred",
     "No account mutation, calendar move, message, autonomous reprioritization or retention grant is added",
     "Android unit/build/lint and Desktop component/build evidence do not establish newest-source rendered native or assistive-technology acceptance",
-    "Earlier broader full suite and native focus failures retain their separate source qualifications; fresh aggregate pending",
+    "Earlier broader full suite and native focus failures retain their separate source qualifications; current aggregate passed; broader acceptance remains open",
     "No real account, physical phone, audio/camera capture, model generation, cloud provisioning, publication or production owner activation"
   ],
   "logs": {
