@@ -415,6 +415,8 @@ class InteractiveWorker(MachineWorker):
             elif cap.id == "machine.apps":
                 if request == {"operation": "catalog"}:
                     output = json.dumps(self.desktop.catalog())
+                elif set(request) == {"operation", "query"} and request["operation"] == "targets":
+                    output = json.dumps(self.desktop.app_targets(request["query"]))
                 elif (
                     set(request) in ({"operation", "app_id"}, {"operation", "app_id", "artifact"})
                     and request["operation"] == "launch"

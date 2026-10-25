@@ -21,7 +21,7 @@ class PlannerAuthoring:
 
     @staticmethod
     def descriptor(cap: dict[str, Any]) -> dict[str, Any]:
-        """Examples pass through the same typed forms used by native action admission."""
+        """Parameter examples remain subject to current native action admission."""
         from .contracts import Capability
         from .desktop_actions import OPERATIONS, form_intent
         from .jev import Intent
@@ -32,6 +32,35 @@ class PlannerAuthoring:
             examples.append(asdict(Intent("2 + 3")))
         elif kind == "file_write":
             examples.append(asdict(Intent("Save reviewed text", "file_write", "notes.txt", "Text")))
+        elif kind == "installed_app" and cap["id"] == "machine.apps":
+            examples.append(
+                asdict(
+                    Intent(
+                        "Find registered app targets",
+                        "capability",
+                        capability_kind="installed_app",
+                        parameters={"request": {"operation": "targets", "query": "App name"}},
+                        criterion={"kind": "unavailable"},
+                    )
+                )
+            )
+            examples.append(
+                asdict(
+                    Intent(
+                        "Open the goal's file in a verified registered app",
+                        "capability",
+                        capability_kind="installed_app",
+                        parameters={
+                            "request": {
+                                "operation": "launch",
+                                "app_id": "EXACT_ID_FROM_VERIFIED_TARGETS",
+                                "artifact": "notes.txt",
+                            }
+                        },
+                        criterion={"kind": "unavailable"},
+                    )
+                )
+            )
         elif kind == "coding" and cap["id"] == "machine.agent.codex":
             examples.append(
                 asdict(
@@ -113,6 +142,24 @@ class PlannerAuthoring:
             "kind": kind,
             "summary": cap["summary"],
             "intent_examples": examples,
+            **(
+                {
+                    "intent_rule": (
+                        "Query targets using a name from the goal (empty query lists up to eight). "
+                        "Only registered native targets are returned; truncated means incomplete "
+                        "coverage. Never invent app IDs. To launch a returned available, "
+                        "launch_authorized app, "
+                        "use kind capability, capability_kind installed_app and parameters "
+                        "{request:{operation:launch,app_id:the exact returned id}}. "
+                        "Optional artifact is an existing scoped relative file to open in the app. "
+                        "Keep criterion kind unavailable: launch reporting alone does not verify "
+                        "the goal. "
+                        "The native app allowlist and current permissions remain authoritative."
+                    )
+                }
+                if kind == "installed_app" and cap["id"] == "machine.apps"
+                else {}
+            ),
             **(
                 {
                     "intent_rule": (
@@ -544,7 +591,9 @@ class PlannerAuthoring:
                 parameters["prompt"] += (
                     '\nIf verified tool data is needed, return {"steps":[...],"observe":true}. '
                     "An observation stage permits one to four machine.files.read file_read "
-                    "steps with only a path parameter, or math.add steps, and no effects. "
+                    "steps with only a path parameter, math.add steps, or machine.apps "
+                    "installed_app requests with only operation targets and a bounded query. "
+                    "Observation stages cannot launch apps or perform effects. "
                     "Actual verified results will be supplied as untrusted data to a private "
                     "continuation. At most three observation stages are allowed. Then return "
                     "final steps achieving the original goal. "

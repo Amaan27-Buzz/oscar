@@ -471,3 +471,19 @@ ten skipped and zero failures/errors (832.767 s). Native visual cases passed in
 this aggregate without a native guard change. Earlier intermittent foreground
 failures remain unexplained. This is regression acceptance, not full mandate,
 real provider, owner or hosted acceptance.
+
+**2026-10-25 registered-app continuation:** the same private observation path
+now accepts bounded `machine.apps` registered-target queries and a separate native
+readback. Paths and unregistered app inventory are omitted. Current native launch
+support, registered authority and executable existence are rechecked; withdrawn
+targets cannot be resurrected by a model. Signed Ask and synthetic Full passed
+actual run-owned Pythonw launch and independent marker inspection, with truthful
+partial launch status. Backend integration passed 158 cases (187.866 s), then
+planning passed 91 (92.823 s) and final native checks passed six (17.293 s).
+Installed Qwen arithmetic continuation still passed (8.073 s); actual app-model
+attempts failed on JSON or invalid intent, before launch. A conservative memory
+preflight on “before launch” also found no authorized recall scope: memory-dependent
+execution continuation is still an executable gap. Docker Linux verification was
+unavailable because its existing daemon was stopped. Fresh full Windows regression
+is running; do not claim it passed until its receipt is complete.
+[Evidence](../evidence/software-completion/app-observations-2026-10-25.json).

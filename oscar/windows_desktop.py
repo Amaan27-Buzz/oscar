@@ -117,7 +117,12 @@ class WindowsDesktop:
     def launch(self, app_id: str, *, artifact: str | None = None) -> subprocess.Popen[bytes]:
         self._authorize()
         app = self.apps[app_id]
-        if not app.available or app.launch_type != "native_exe":
+        if (
+            not app.available
+            or app.launch_type != "native_exe"
+            or "launch" not in app.supported_operations
+            or not Path(app.activation).is_file()
+        ):
             raise ValueError("discovered native app required")
         arguments = []
         if artifact is not None:
@@ -296,3 +301,31 @@ class WindowsDesktop:
         return [
             {**asdict(app), "launch_authorized": app.id in self.apps} for app in self.catalog_apps
         ]
+
+    def app_targets(self, query: str) -> dict[str, Any]:
+        """Current registered targets, without executable paths or the owner's app inventory."""
+        self._authorize()
+        if not isinstance(query, str) or len(query) > 80 or "\x00" in query:
+            raise ValueError("bounded registered-app query required")
+        matches = sorted(
+            (app for app in self.apps.values() if query.casefold() in app.name.casefold()),
+            key=lambda app: (app.name.casefold(), app.id),
+        )
+        result = {
+            "applications": [
+                {
+                    "id": app.id,
+                    "name": app.name[:80],
+                    "name_truncated": len(app.name) > 80,
+                    "available": app.available
+                    and app.launch_type == "native_exe"
+                    and Path(app.activation).is_file(),
+                    "launch_authorized": "launch" in app.supported_operations,
+                }
+                for app in matches[:8]
+            ],
+            "truncated": len(matches) > 8,
+        }
+        if len(json.dumps(result).encode()) > 4096:
+            raise ValueError("registered targets exceed observation bound; narrow the query")
+        return result

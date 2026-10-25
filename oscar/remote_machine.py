@@ -62,6 +62,9 @@ def machine_readback(capability: str, parameters: dict[str, Any]) -> dict[str, A
     request = parameters.get("request")
     if not isinstance(request, dict):
         return None
+    if capability == "machine.apps" and set(request) == {"operation", "query"}:
+        if request["operation"] == "targets":
+            return {"request": request}
     if capability == "machine.desktop" and request.get("operation") == "set_text_checked":
         if set(request) == {"operation", "handle", "pid", "runtime_id", "text", "expected_text"}:
             return {"operation": "read", **{k: request[k] for k in ("handle", "pid", "runtime_id")}}
@@ -144,6 +147,16 @@ def validate_remote_machine(kind: str, parameters: dict[str, Any]) -> dict[str, 
             raise ValueError("bounded native argument vector required")
     if "request" in parameters and not isinstance(parameters["request"], dict):
         raise ValueError("structured native request required")
+    if kind == "installed_app":
+        request = parameters["request"]
+        if request.get("operation") == "targets":
+            if (
+                set(request) != {"operation", "query"}
+                or not isinstance(request["query"], str)
+                or len(request["query"]) > 80
+                or "\x00" in request["query"]
+            ):
+                raise ValueError("bounded registered-app query required")
     if kind in {"coding", "terminal_command"} and "verification" in parameters:
         from .windows_files import WindowsScopedFiles
 
@@ -378,6 +391,12 @@ class RemoteMachine(RemoteWorker):
         if action.capability_id in {"machine.files.read", "machine.files.write"}:
             return super().execute_effect(action, cancellation)
         result = self.effects.execute(action, cancellation)
+        if (
+            result.success
+            and action.capability_id == "machine.apps"
+            and action.parameters["request"].get("operation") == "targets"
+        ):
+            result = replace(result, value=self.effects.outputs[action.id])
         if result.artifact:
             result = replace(
                 result,
@@ -392,6 +411,10 @@ class RemoteMachine(RemoteWorker):
         if action.capability_id in {"machine.files.read", "machine.files.write"}:
             return super().readback_effect(action, delivery)
         self._guard()
+        if action.capability_id == "machine.apps":
+            observed = self.effects.desktop.app_targets(delivery["parameters"]["request"]["query"])
+            self._guard()
+            return {"content": json.dumps(observed)}
         if action.capability_id in REMOTE_MACHINE_CAPABILITIES and (
             REMOTE_MACHINE_CAPABILITIES[action.capability_id][0] in {"coding", "terminal_command"}
             and "verification" in action.parameters

@@ -25,6 +25,17 @@ def validate_stage(steps: list[dict[str, Any]]) -> None:
             and set(intent["parameters"]) == {"path"}
             or step["capability_id"] == "math.add"
             and intent.get("kind") is None
+            or step["capability_id"] == "machine.apps"
+            and intent.get("kind") == "capability"
+            and intent.get("capability_kind") == "installed_app"
+            and isinstance(intent.get("parameters"), dict)
+            and set(intent["parameters"]) == {"request"}
+            and isinstance(intent["parameters"]["request"], dict)
+            and set(intent["parameters"]["request"]) == {"operation", "query"}
+            and intent["parameters"]["request"]["operation"] == "targets"
+            and isinstance(intent["parameters"]["request"]["query"], str)
+            and len(intent["parameters"]["request"]["query"]) <= 80
+            and "\x00" not in intent["parameters"]["request"]["query"]
         ):
             raise PermissionError("observation stages cannot contain effects or model calls")
 

@@ -255,6 +255,24 @@ class RemoteVerifier(Verifier):
 
     def verify(self, objective: Objective, result: Result) -> Verification:
         if objective.criterion["kind"] == "remote_machine":
+            if objective.criterion.get("match_report"):
+                actual = self.remote.exchange(result.task_id, "readback")["content"]
+                matches = actual == result.value
+                return Verification(
+                    TaskState.VERIFIED if matches else TaskState.FAILED,
+                    Evidence(
+                        new_id(),
+                        result.task_id,
+                        result.correlation_id,
+                        "remote-registered-app-observer",
+                        "separate current registered-target observation and Core exact comparison",
+                        time(),
+                        matches,
+                        Epistemic.VERIFIED if matches else Epistemic.KNOWN,
+                        "registered targets compared",
+                        content_hash=hashlib.sha256(actual.encode()).hexdigest(),
+                    ),
+                )
             if "text" in objective.criterion:
                 actual = self.remote.exchange(result.task_id, "readback")["content"]
                 observed = json.loads(actual)
@@ -1072,6 +1090,8 @@ class RemoteGrid:
                     raise PermissionError("artifact executor unavailable")
                 self.artifact_permission(session.id, executor, capability, parameters)
                 criterion = {"kind": "remote_file", **parameters["verification"]}
+            elif capability.id == "machine.apps" and machine_readback(capability.id, parameters):
+                criterion["match_report"] = True
             elif machine_readback(capability.id, parameters) is not None:
                 expected = parameters.get("verification", parameters["request"])
                 criterion["text"] = expected["text"]
@@ -1797,6 +1817,10 @@ class RemoteGrid:
                         delegated=bool(owner.get("standing")),
                     )
                     criterion = {"kind": "remote_file", **parameters["verification"]}
+                elif capability["id"] == "machine.apps" and machine_readback(
+                    capability["id"], parameters
+                ):
+                    criterion["match_report"] = True
                 elif machine_readback(capability["id"], parameters) is not None:
                     expected = parameters.get("verification", parameters["request"])
                     criterion["text"] = expected["text"]

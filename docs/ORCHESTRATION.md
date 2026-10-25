@@ -307,8 +307,13 @@ This preserves producer, version/location, provenance, verification and ownershi
 
 Reviewed adaptive conversation planning may request a pure observation stage
 with `{"steps":[...],"observe":true}`. The current text boundary accepts one to
-four scoped `machine.files.read` reads or `math.add` calculations, without effects
-or result substitutions. A single temporary Worker persists through observation,
+four scoped `machine.files.read` reads, `math.add` calculations or `machine.apps`
+registered-target queries, without effects or result substitutions. App queries use
+only `{"request":{"operation":"targets","query":"name"}}`: up to eight
+currently registered targets with bounded names, availability and launch authority,
+explicit truncation, and no executable paths or unregistered app inventory. A
+separate native query must match before Core verifies this observation. A single
+temporary Worker persists through observation,
 private replanning and final action review. Completing an observation does not
 complete the original objective.
 
@@ -328,6 +333,14 @@ returns a new validated plan; data cannot grant authority. New dependencies refe
 only to steps in that response. General image reasoning, arbitrary tool feedback,
 semantic objective verification and unrestricted discovery are not established by
 this bounded text loop.
+
+The model may propose a native app launch using a discovered exact target ID and
+an optional existing scoped artifact. Current native allowlists, supported launch
+operations, executable availability and permissions are rechecked at execution.
+Observation cannot grant launch authority. Launch reporting remains partially
+verified; a broader app objective still needs its own independent resulting-state
+check. Adaptive prompts include a complete read-only response example; examples
+never expand the selected capabilities or authorize their placeholder arguments.
 
 ## Voice-driven orchestration
 

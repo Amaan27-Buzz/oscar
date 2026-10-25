@@ -1,0 +1,63 @@
+{
+  "classification": "SYNTHETIC_MODEL_NATIVE_EXECUTION_VERIFIED_REAL_MODEL_APP_ACCEPTANCE_FAILED",
+  "sources": {
+    "oscar/windows_desktop.py": "79def127e81e99d756be5e4a5370131b3d4cf3b4a9d938f645c869537c9c27b4",
+    "oscar/interactive_worker.py": "2298352c5d9e692ad472bfd7223b59169e654134cadae5e7867e2219ddeb7526",
+    "oscar/remote_machine.py": "0ca1bce71fc35135fe3fa26db8a56f55ae813080971fceb637ec133e729f711e",
+    "oscar/remote_grid.py": "7aa208d0ce29e325ac33f5a8d1d5ce0febc08531dbef57d349febac75ca66953",
+    "oscar/planner_authoring.py": "382fd3ca695daa9078a94a7c37fe2f1121df3b3c59416e5219631b2c2e3069d1",
+    "oscar/planner_observations.py": "17a6d2b2852f2fcb918bba286e82aa307c0dae553d664688b6fb6baf296e0f34",
+    "oscar/executive.py": "29179ea02276c3420909d61dff42bae09d6f43aef0c0cdc816f19f29153e0ad2",
+    "tests/test_app_observations.py": "7fbf196e3e9cf7b484ce2183ec8188703cbac5c3b23a232a30a82870cdd4cdfc",
+    "tests/test_planner_observations.py": "b1eb39438ab7506d67148c4ad9a424e8a94151e3ed2564683f3eddefad47d831"
+  },
+  "checks": {
+    "affected": {
+      "state": "PASS",
+      "tests": 158,
+      "seconds": 187.866,
+      "phase": "Backend/native integration before later adaptive-example and launch-descriptor prompt updates"
+    },
+    "planning": {
+      "state": "PASS",
+      "tests": 91,
+      "seconds": 92.823,
+      "phase": "Adaptive-example prompt update, before final launch-descriptor example"
+    },
+    "native": {
+      "state": "PASS",
+      "tests": 6,
+      "seconds": 17.293,
+      "phase": "Final sources; signed Ask and Full, actual run-owned Pythonw launch, metadata readback, withdrawal and bounds"
+    },
+    "arithmetic": {
+      "state": "PASS",
+      "model": "qwen3.5:9b",
+      "seconds": 8.073,
+      "artifact": "1092",
+      "phase": "Final sources; actual installed local model and independent file readback"
+    },
+    "linux": {
+      "state": "UNAVAILABLE",
+      "reason": "Existing Docker Desktop Linux engine named pipe absent; daemon stopped. No Linux acceptance inferred."
+    }
+  },
+  "log_sha256": {
+    "affected": "2fa91561cf1c7c84920abb778e7b31af54bdec465d4d4297b9bb3163b633b357",
+    "planning": "ba8e05efeb6d2fb257189c9ca3d72bb8f7031b967d378d71f416ec554907ce0d",
+    "native": "c79e4f0300ecccd1d8635be4c65269eb7a5374d976de226b74ab180964a78bb3",
+    "arithmetic": "cb16b8f4f8b647e3c150ead4edd5eea6206239fccb5d3bce7ba5990bc335e655",
+    "preflight_block": "379a8a433a9f99026f66d35eca1fe5983054cc4356b442d4cc1599b5725418bf",
+    "model_baseline_failure": "5875a7816697de1f508ace516ddf0bcae895a4183b88677b5582f5c4cf11fc8f",
+    "model_launch_contract_rejection": "28d647cf9a64941930d8e12e734fe35e38309f138ad4db30637e12a74bac9f97",
+    "model_launch_shape_failure": "5875a7816697de1f508ace516ddf0bcae895a4183b88677b5582f5c4cf11fc8f"
+  },
+  "limits": [
+    "Synthetic registered app identities and signed owners; no owner app inventory or real accounts inspected",
+    "Real installed model did not pass registered-app launch: malformed JSON, or invalid null intent kind after independently verified target discovery. Controller rejected before launch.",
+    "A goal containing before launch hit conservative memory preflight and lacked recall scope; memory-dependent execution continuation remains unfinished",
+    "Native launch alone remains partially verified; synthetic marker readback proves the test process executed, not a general app objective",
+    "No physical phone, microphone/camera, real owner activation, cloud provisioning or GitHub publication",
+    "Fresh full Windows regression pending; prior 1180-case regression qualifies checkpoint 32e7161"
+  ]
+}

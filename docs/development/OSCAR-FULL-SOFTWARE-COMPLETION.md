@@ -4,6 +4,15 @@ Updated 2026-10-24. **IMPLEMENTATION_IN_PROGRESS / SOFTWARE ACCEPTANCE PARTIAL.*
 Material executable work remains. This ledger does not declare
 `SOFTWARE_FEATURE_COMPLETE`, owner acceptance, hosted deployment or Gate E PASS.
 
+**2026-10-25 registered native targets:** private adaptive plans can query and
+independently recheck bounded Windows allowlist metadata, then propose an exact
+registered app launch. Signed Ask/Full synthetic-model tests execute a real
+run-owned Pythonw fixture; launch remains partially verified. Integration passed
+158 backend cases, followed by 91 planning cases and six final native cases.
+Actual Qwen app attempts still failed safely on model contract output; arithmetic
+observation/file acceptance passed again (8.073 s). A fresh full regression is
+pending. [Receipt](../evidence/software-completion/app-observations-2026-10-25.json).
+
 **2026-10-25 integrated local regression:** all 1,180 Windows Python cases
 completed on unchanged sources: 1,170 passed, ten skipped, zero failures/errors
 (832.767 s). Explicit Worker/device routing and 85 affected planner checks pass;

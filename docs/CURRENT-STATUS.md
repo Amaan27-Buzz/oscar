@@ -1,5 +1,16 @@
 # OSCAR — Current Status & Checklist
 
+**2026-10-25 registered-app observations:** scoped private plans can now query
+registered Windows targets, independently recheck the result and propose launch
+using an exact returned app ID. Eight-target/4-KiB bounds, explicit truncation,
+allowlist/operation/availability checks and withdrawal remain enforced. Ask and
+synthetic Full tests launched a real run-owned Pythonw fixture; launch itself
+retains partial status. All 158 affected backend cases, 91 subsequent planning
+cases and six final native cases passed. Real Qwen repeated arithmetic observation
+and exact file proof (8.073 s), but did not pass the app launch objective: malformed
+JSON or an invalid intent was rejected. Broad app/model accuracy remains open.
+[Receipt](evidence/software-completion/app-observations-2026-10-25.json).
+
 **2026-10-25 explicit Worker routing:** named Worker and device requests now
 reach reviewed planning even when the goal starts with “First”, while retaining
 memory/live preflight. All 85 affected planning tests passed (79.250 s). Installed

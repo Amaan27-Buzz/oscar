@@ -65,6 +65,9 @@ class ObservationPlanningTests(unittest.TestCase):
 
     def test_ask_observe_private_continue_review_effect_and_no_replay(self):
         self.begin()
+        prompt = self.requests[0]["body"]["messages"][-1]["content"]
+        self.assertIn("Example read-only observation response structure", prompt)
+        self.assertNotIn('"from_step"', prompt)
         self.observe()
         self.assertEqual(1, len(self.requests))
         self.effects()
