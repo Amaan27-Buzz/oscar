@@ -43,7 +43,38 @@
         "Protocol acceptance; no rendered native or physical device acceptance"
       ]
     },
-    "static": "Ruff and mypy 107 files PASS; repository and diff checks recorded with local commit"
+    "static": "Ruff and mypy 107 files PASS; repository and diff checks recorded with local commit",
+    "cross_account_tls_outbound_worker": {
+      "cross_account_verified_tasks": 2,
+      "credential_isolation": true,
+      "status": "SOFTWARE_VERIFIED",
+      "seconds": 11.332,
+      "tls_mobile_requests": true,
+      "provider_gets": 4,
+      "verified_provider_task": true,
+      "private_model_continuation": true,
+      "separate_outbound_worker_process": true,
+      "canonical_final_task": "verified",
+      "independent_file_readback": true,
+      "provider_json_absent_from_durable_records": true,
+      "limits": [
+        "Core is a thread in the test driver process",
+        "Synthetic model and provider HTTP fixture, synthetic owner",
+        "Protocol acceptance; no rendered native or physical device acceptance"
+      ]
+    },
+    "full_regression": {
+      "source_head": "e5de7fe43bd3e550576e3d3ce0b44c9701b90b37",
+      "total": 1297,
+      "passed": 1287,
+      "skipped": 10,
+      "failed": 0,
+      "errors": 0,
+      "test_seconds": 963.927,
+      "wrapper_seconds": 967.905,
+      "source_stable": true,
+      "current_hashes_independently_matched": true
+    }
   },
   "sources": {
     "oscar/communication.py": "cbe7e3b1255959fd087db124ff3eafc3ac43fe8da07ba9287aa989cced6a222a",
@@ -57,19 +88,23 @@
     "integration-final-manifest.json": "c17b01d4cb9f60e7a211a3d57db0b9d69da0eac630bc1628cf0d7da56bbfffa3",
     "focused-hardened.log": "f4e58410d502e131f715778262aa91e52460cedf8b9aada5d23aed6142d939eb",
     "tls-final.log": "9cafa8ae7a2c4cf9828b849ee628dda800340def0b15d8052f9fa2c146feb604",
-    "read-scope-red.log": "c7d03af1d6a43c96a4e44a63e8fb2041270a8f713805f116337317771a687dda"
+    "read-scope-red.log": "c7d03af1d6a43c96a4e44a63e8fb2041270a8f713805f116337317771a687dda",
+    "cross-account-created-items-tls-final.log": "1cea823fae45b886d43cc2d629aec27157b1aaeb2305aa547d1547bfac43ff54",
+    "planned-items-full-regression.log": "e8b763158f1c248c0bd2a2b623a2a263f492300fa40673f73204099b04bf9eb0",
+    "planned-items-full-regression-manifest.json": "43dfad8ad247273ef43c371195b1be18a970725a69a8189322dcb424173bb326"
   },
   "development_history": [
     "Initial Microsoft fixture used a Google credential reference and was correctly denied; isolated synthetic credential fixed.",
     "Lost private inputs after POST cancel the task through the existing guard; no replay.",
     "Earlier 261-case PASS predates the read-scope hardening. A manual regression reproduced false verification after owner read-scope withdrawal; final 18/263-case runs cover both owner and executor withdrawal.",
     "Initial TLS model fixture context 8192 was insufficient; fixture context increased to 32768 without runtime changes.",
-    "Desktop replay required explicit PYTHONPATH; final hardened replay passed."
+    "Desktop replay required explicit PYTHONPATH; final hardened replay passed.",
+    "Cross-account protocol fixture first selected a nonexistent microsoft.todo manifest; corrected to existing microsoft.graph before the successful run."
   ],
   "limits": [
     "Synthetic provider/model/owner; no real account or rendered native acceptance.",
     "Unsupported task body shapes and generic MCP outcomes remain PARTIALLY_VERIFIED.",
-    "No full regression on this checkpoint yet; preceding 1277-case PASS predates this change.",
-    "General model accuracy, coordination/replanning, native accessibility and sustained product acceptance remain OPEN."
+    "General model accuracy, coordination/replanning, native accessibility and sustained product acceptance remain OPEN.",
+    "Both native visual workflows passed this run; earlier intermittent focus/stale-frame ambiguity remains unresolved."
   ]
 }
