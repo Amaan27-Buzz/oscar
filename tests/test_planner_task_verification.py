@@ -101,7 +101,7 @@ class PlannedTaskVerificationTests(unittest.TestCase):
             "path": {"listId": "selected-list"},
             "body": {
                 "title": self.marker,
-                "body": {"contentType": "text", "content": "Synthetic private notes"},
+                "body": {"contentType": "html", "content": "<div>Synthetic private notes</div>"},
                 "dueDateTime": {"dateTime": "2026-10-28T00:00:00", "timeZone": "UTC"},
                 "status": "notStarted",
             },

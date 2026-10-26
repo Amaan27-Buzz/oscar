@@ -413,7 +413,7 @@ class PlannerAuthoring:
                     or targets is not None
                     or re.match(
                         r"(?:plan|create|write|save|make|prepare|build|organize|open|launch|"
-                        r"send|schedule|update|edit|fix|debug|implement|download|upload|"
+                        r"send|schedule|update|complete|reopen|mark|edit|fix|debug|implement|download|upload|"
                         r"move|copy|rename|delete|run|install|publish|deploy|"
                         r"fill|click|submit|select|navigate)\b",
                         goal,

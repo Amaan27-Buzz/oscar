@@ -1351,6 +1351,9 @@ class RemoteGrid:
             private = self.store.transient[task.id]
             private["review_parameters"] = communication.review
             private["connector_guard"] = lambda: self.authorize_communication(task.id)
+            private["connector_read_guard"] = lambda operation, permissions: (
+                self.authorize_communication(task.id, operation, permissions)
+            )
             plan = self.store.get("plan", task.id)
             executor = self.h.executive.targets[capability.node_id][1]
             authority = StandingAuthority(
@@ -1404,7 +1407,9 @@ class RemoteGrid:
             self.start(task.id)
         return self.inspect(task.id)
 
-    def authorize_communication(self, task_id: str) -> None:
+    def authorize_communication(
+        self, task_id: str, read_operation: str = "", read_permissions: tuple[str, ...] = ()
+    ) -> None:
         row = self.store.get("remote_task", task_id)
         self.h.archive.event(row["event_id"])
         if row["deadline_ms"] <= time() * 1000 or not self.review_matches(row):
@@ -1444,6 +1449,26 @@ class RemoteGrid:
                 .allowed
             ):
                 raise PermissionError("communication requester scope or policy withdrawn")
+        if read_permissions:
+            executor = self.h.executive.targets[capability.node_id][1]
+            for permission in read_permissions:
+                self.grid.authenticate(executor, permission)
+            for operation in (read_operation, *read_permissions):
+                if (
+                    not PersonalPolicy(self.store)
+                    .evaluate(
+                        operation,
+                        read_permissions,
+                        granted,
+                        {
+                            "node": row["requester"],
+                            "target": capability.node_id,
+                            "source": "remote-grid",
+                        },
+                    )
+                    .allowed
+                ):
+                    raise PermissionError("communication readback authority withdrawn")
         if row["approval_required"] and (
             not row["approved"] or row.get("approval_expires_ms", 0) <= time() * 1000
         ):

@@ -208,3 +208,9 @@ class PlannedCalendarVerificationTests(unittest.TestCase):
             self.draft()
         self.assertEqual([], self.api.calls)
         self.assertEqual([], self.h.store.all("executive_goal"))
+
+    def test_consistent_calendar_id_cannot_substitute_for_event_identity(self):
+        self.configure(update=True)
+        self.api.transform = lambda method, data: {**data, "id": "primary"}
+        self.assertEqual("partially_verified", self.run_ask())
+        self.assertEqual(["PATCH"], [call[0] for call in self.api.calls])

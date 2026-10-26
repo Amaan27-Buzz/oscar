@@ -889,6 +889,67 @@ class CommunicationTests(unittest.TestCase):
                 )
                 self.assertNotEqual("verified", result["state"])
 
+    def test_desktop_readback_rechecks_current_owner_and_executor_scopes(self):
+        for principal, identifier in (
+            ("session", self.session.id),
+            ("node", self.session.node_id),
+            ("session", self.mount.session.id),
+            ("node", self.mount.node_id),
+        ):
+            for phase in ("before", "during"):
+                with self.subTest(principal=principal, identifier=identifier, phase=phase):
+                    original = self.h.store.get(principal, identifier)
+
+                    def revoke(principal=principal, identifier=identifier):
+                        row = self.h.store.get(principal, identifier)
+                        self.h.store.put(
+                            principal,
+                            identifier,
+                            {**row, "scopes": [s for s in row["scopes"] if s != "connectors:read"]},
+                        )
+
+                    before = len(self.provider.calls)
+                    try:
+                        self.provider.after_get = revoke if phase == "during" else None
+                        if phase == "before":
+                            revoke()
+                        result = self.execute(
+                            "draft email using Work to friend@example.com "
+                            'subject "Subject" body "Text"'
+                        )
+                        self.assertEqual("partially_verified", result["state"], result)
+                        self.assertEqual(
+                            ["POST", "GET"] if phase == "during" else ["POST"],
+                            [c[0] for c in self.provider.calls[before:]],
+                        )
+                    finally:
+                        self.provider.after_get = None
+                        self.h.store.put(principal, identifier, original)
+
+    def test_desktop_target_scoped_read_policy_withdraws_proof_during_get(self):
+        def revoke():
+            now = self.h.grid.clock()
+            self.h.store.put(
+                "personal_policy",
+                "target-read-denial",
+                {
+                    "id": "target-read-denial",
+                    "capability": "connectors:read",
+                    "effect": "deny",
+                    "source": "owner",
+                    "created_at": now,
+                    "updated_at": now,
+                    "conditions": {"target": self.mount.node_id},
+                },
+            )
+
+        self.provider.after_get = revoke
+        result = self.execute(
+            'draft email using Work to friend@example.com subject "Subject" body "Text"'
+        )
+        self.assertEqual("partially_verified", result["state"], result)
+        self.assertEqual(["POST", "GET"], [c[0] for c in self.provider.calls])
+
     def test_uncertain_mutation_has_no_retry_or_replay(self):
         self.provider.fail = True
         view = self.ask(
@@ -1153,6 +1214,59 @@ class CommunicationTests(unittest.TestCase):
         self.assertEqual(
             session["session_id"], store.get("remote_task", task_id)["requester_session"]
         )
+
+    def test_cloud_readback_rechecks_current_owner_and_executor_scopes(self):
+        core, server = self.cloud()
+        session, call, sign = self.cloud_client(core, server, "readback-phone")
+        mount = core.harness.ensure_connections()
+        store = core.harness.store
+        for principal, identifier in (
+            ("session", session["session_id"]),
+            ("node", session["node_id"]),
+            ("session", mount.session.id),
+            ("node", mount.node_id),
+        ):
+            with self.subTest(principal=principal, identifier=identifier):
+                original = store.get(principal, identifier)
+
+                def revoke(principal=principal, identifier=identifier):
+                    row = store.get(principal, identifier)
+                    store.put(
+                        principal,
+                        identifier,
+                        {**row, "scopes": [s for s in row["scopes"] if s != "connectors:read"]},
+                    )
+
+                before = len(self.provider.calls)
+                try:
+                    self.provider.after_get = revoke
+                    view = call(
+                        "submit",
+                        {
+                            "kind": "text",
+                            "target": core.config.core_id,
+                            "parameters": {},
+                            "retain": True,
+                            "text": "draft email using Work to friend@example.com "
+                            'subject "Subject" body "Text"',
+                        },
+                    )
+                    task_id = view["task_id"]
+                    review = call("challenge", {"operation": "approve", "task_id": task_id})
+                    call(
+                        "complete",
+                        {
+                            "challenge_id": review["challenge_id"],
+                            "signature": sign(base64.b64decode(review["signing_payload"])),
+                        },
+                    )
+                    for thread in core.remote.threads:
+                        thread.join(timeout=10)
+                    self.assertEqual("partially_verified", store.task(task_id).state)
+                    self.assertEqual(["POST", "GET"], [c[0] for c in self.provider.calls[before:]])
+                finally:
+                    self.provider.after_get = None
+                    store.put(principal, identifier, original)
 
     def test_cloud_requester_revoked_after_approval_blocks_actual_provider_io(self):
         core, server = self.cloud()

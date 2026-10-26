@@ -1,0 +1,80 @@
+{
+  "classification": "PROVIDER_STATUS_AND_READBACK_AUTHORITY_SOFTWARE_VERIFIED",
+  "date": "2026-10-26",
+  "base_head": "4e8e80cb7f17a5ee70bf39295488b09f598e1602",
+  "change": "Add native Google Tasks and Microsoft To Do status PATCH; independently verify exact saved resource/status before dependent Workers; encode literal Microsoft notes as HTML; recheck current Desktop and phone/Core owner/executor read authority during GET.",
+  "checks": {
+    "status_calendar_creation_focused_before_direct_authority_fix": {
+      "passed": 46,
+      "seconds": 81.941
+    },
+    "current_read_authority_and_http_catalog_focused": {
+      "passed": 3,
+      "seconds": 8.757,
+      "scope": "Twelve owner/executor scope-withdrawal scenarios across signed Desktop and actual HTTP phone/Core, plus all 44 Google endpoint contracts."
+    },
+    "tls_mobile_outbound_worker": {
+      "independent_completed_task_inspection": true,
+      "status": "SOFTWARE_VERIFIED",
+      "seconds": 11.305,
+      "tls_mobile_requests": true,
+      "provider_gets": 3,
+      "verified_provider_task": true,
+      "private_model_continuation": true,
+      "separate_outbound_worker_process": true,
+      "canonical_final_task": "verified",
+      "independent_file_readback": true,
+      "provider_json_absent_from_durable_records": true,
+      "limits": [
+        "Core is a thread in the test driver process",
+        "Synthetic model and provider HTTP fixture, synthetic owner",
+        "Protocol acceptance; no rendered native or physical device acceptance"
+      ]
+    },
+    "static": {
+      "ruff": "PASS",
+      "mypy": "PASS, 107 files",
+      "repository": "PASS",
+      "diff": "PASS"
+    },
+    "integration_before_target_policy_fix": {
+      "passed": 293,
+      "failed": 0,
+      "errors": 0,
+      "test_seconds": 381.277,
+      "wrapper_seconds": 383.564,
+      "source_stable": true,
+      "current_hashes_independently_matched_before_final_fix": true
+    },
+    "final_current_authority_focused": {
+      "passed": 3,
+      "seconds": 5.514,
+      "scope": "Twelve owner/executor scope withdrawals plus target-scoped policy denial across signed Desktop and HTTP phone/Core."
+    }
+  },
+  "development_history": [
+    "Initial focused run: 30 tests, one failure because Complete was not recognized as an action verb; routing fixed, 32 passed.",
+    "A consistent parent list identifier incorrectly verified as task identity; exact final resource matching added with task and calendar regressions.",
+    "Initial 291-case integration: 290 passed, one stale 43-operation Google HTTP fixture assertion; catalog now has 44. Source hashes were stable.",
+    "Signed Desktop reproduction verified after current owner read scope was withdrawn during GET. Shared readback now invokes current surface owner and executor guards; twelve withdrawal scenarios pass.",
+    "First final integration was interrupted to bind closure variables found by Ruff; its partial run is not acceptance evidence.",
+    "Corrected Unicode encoding damage in CHIEF-OF-STAFF documentation introduced by preceding scheduled-day commit; no runtime data migration.",
+    "Target-specific Desktop read policy denial was reproduced as false verification. Readback now supplies target context and checks both read operation and read permission policy; final focused regressions pass."
+  ],
+  "limits": [
+    "Synthetic owner, credentials, model and provider HTTP fixture; no real account commissioning.",
+    "Protocol acceptance is distinct from rendered native or physical device acceptance.",
+    "Status-only updates and literal task notes have bounded verification contracts; arbitrary rich markup and unsupported mutation bodies remain partial.",
+    "Calendar concurrent-editor/ETag protection, general model reliability, broad coordination and whole-product daily-use acceptance remain open.",
+    "No publication, GitHub mutation or production authority activation.",
+    "Newest full regression is pending; the 293-case affected PASS precedes the final target-policy-context fix, covered by three final focused tests."
+  ],
+  "local_log_sha256": {
+    "provider-status-focused-hardened.log": "441179af41cb24e17827441fb611f69b4bfe86deed86831ada28e2592992b8a7",
+    "provider-read-authority-focused.log": "b3aac5c0181bdcfc53cb426b631e73dbcaa94363e60b637a18759239c8c0f0f1",
+    "provider-status-final-tls.log": "336fd74d77b58d534c10e157eb5c6fb9ed0267ec2af90117e4cb680d8bea64e8",
+    "provider-status-integration.log": "b34629e73fbaa9af76678e420c9cc238cc7f2dc37bbdd85f5dcc6ebed62d7518",
+    "provider-status-final-integration.log": "b97f997db073d44e0881aaeb940c78526daf3403601b82ca1dc9809e02f88655",
+    "provider-read-authority-final-focused.log": "dc8842823502979835c8a319f50fe464121d0a21ddc1cdef8c714a335f573cbd"
+  }
+}

@@ -95,6 +95,16 @@ class ConnectorPlanning:
         }
         if spec.body_required:
             properties["body"] = {"type": "object"}
+            if spec.name == "microsoft.todo.tasks.create":
+                properties["body"]["description"] = (
+                    "Task fields: title, body with contentType html and escaped literal notes, "
+                    "dueDateTime with dateTime at UTC midnight and timeZone UTC, status notStarted."
+                )
+            elif spec.name in {"google.tasks.update", "microsoft.todo.tasks.update"}:
+                properties["body"]["description"] = (
+                    "A status-only body has independent saved-resource verification. "
+                    "Other updates retain generic partial verification."
+                )
         return {
             "type": "object",
             "properties": properties,

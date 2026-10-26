@@ -1,6 +1,7 @@
 """Explicit communication requests compile into the existing account-bound Fabric/runtime."""
 
 import base64
+import html
 import json
 import re
 from dataclasses import dataclass
@@ -9,6 +10,7 @@ from email import policy
 from email.message import EmailMessage
 from email.parser import BytesParser
 from email.utils import getaddresses
+from html.parser import HTMLParser
 from typing import TYPE_CHECKING, Any
 
 from .contracts import Capability
@@ -24,6 +26,83 @@ _CALENDAR_MUTATIONS = {
     "microsoft.calendar.events.create",
     "microsoft.calendar.events.update",
 }
+
+_TASK_UPDATES = {
+    "google.tasks.update": {"needsAction", "completed"},
+    "microsoft.todo.tasks.update": {
+        "notStarted",
+        "inProgress",
+        "completed",
+        "waitingOnOthers",
+        "deferred",
+    },
+}
+
+
+def task_notes(body: dict[str, Any]) -> str:
+    """Read literal notes only; unsupported rich markup cannot become verified text."""
+    content = body["content"]
+    if not isinstance(content, str) or len(content) > 24000:
+        raise ValueError("bounded task notes required")
+    if not isinstance(body["contentType"], str):
+        raise ValueError("task note content type unavailable")
+    if body["contentType"].lower() == "text":
+        return content.replace("\r\n", "\n")
+    if body["contentType"].lower() != "html":
+        raise ValueError("task note content type unavailable")
+
+    class Notes(HTMLParser):
+        def __init__(self) -> None:
+            super().__init__(convert_charrefs=True)
+            self.parts: list[str] = []
+            self.stack: list[str] = []
+            self.block = False
+
+        def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+            if attrs or tag not in {"html", "body", "div", "p", "br"}:
+                raise ValueError("unsupported task note markup")
+            if tag == "br":
+                self.parts.append("\n")
+                return
+            if tag in {"div", "p"}:
+                if self.block:
+                    raise ValueError("multiple task note blocks require separate comparison")
+                self.block = True
+            self.stack.append(tag)
+
+        def handle_endtag(self, tag: str) -> None:
+            if not self.stack or self.stack.pop() != tag:
+                raise ValueError("unbalanced task note markup")
+
+        def handle_startendtag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+            if tag != "br":
+                raise ValueError("unsupported task note markup")
+            self.handle_starttag(tag, attrs)
+
+        def handle_data(self, data: str) -> None:
+            self.parts.append(data)
+
+        def handle_comment(self, data: str) -> None:
+            raise ValueError("unsupported task note markup")
+
+        def handle_decl(self, decl: str) -> None:
+            raise ValueError("unsupported task note markup")
+
+        def handle_pi(self, data: str) -> None:
+            raise ValueError("unsupported task note markup")
+
+        def unknown_decl(self, data: str) -> None:
+            raise ValueError("unsupported task note markup")
+
+    parser = Notes()
+    try:
+        parser.feed(content)
+        parser.close()
+    except AssertionError:
+        raise ValueError("unsupported task note markup") from None
+    if parser.stack:
+        raise ValueError("unbalanced task note markup")
+    return "".join(parser.parts).replace("\r\n", "\n")
 
 
 @dataclass(frozen=True)
@@ -284,7 +363,10 @@ def prepare(harness: "Harness", text: str) -> PreparedCommunication | None:
                 if google
                 else {
                     "title": title,
-                    "body": {"contentType": "text", "content": notes},
+                    "body": {
+                        "contentType": "html",
+                        "content": "<div>" + html.escape(notes).replace("\n", "<br>") + "</div>",
+                    },
                     "dueDateTime": {"dateTime": due + "T00:00:00", "timeZone": "UTC"},
                     "status": "notStarted",
                 }
@@ -417,6 +499,17 @@ def task_expectation(name: str, parameters: dict[str, Any]) -> dict[str, Any] | 
     """Recognize native saved-resource contracts, never model-supplied success criteria."""
     if name in _CALENDAR_MUTATIONS:
         return calendar_expectation(name, parameters)
+    if name in _TASK_UPDATES:
+        body = parameters.get("body")
+        if (
+            set(parameters) == {"path", "body"}
+            and isinstance(body, dict)
+            and set(body) == {"status"}
+            and isinstance(body["status"], str)
+            and body["status"] in _TASK_UPDATES[name]
+        ):
+            return {"status": body["status"]}
+        return None
     if name not in {"google.tasks.create", "microsoft.todo.tasks.create"}:
         return None
     try:
@@ -436,15 +529,14 @@ def task_expectation(name: str, parameters: dict[str, Any]) -> dict[str, Any] | 
                 or body["status"] != "notStarted"
             ):
                 return None
-            if (
-                set(body["body"]) != {"contentType", "content"}
-                or body["body"]["contentType"].lower() != "text"
-            ):
+            if set(body["body"]) != {"contentType", "content"} or body["body"][
+                "contentType"
+            ].lower() not in {"text", "html"}:
                 return None
             point = body["dueDateTime"]
             if set(point) != {"dateTime", "timeZone"} or point["timeZone"] != "UTC":
                 return None
-            notes, due = body["body"]["content"], point["dateTime"] + "Z"
+            notes, due = task_notes(body["body"]), point["dateTime"] + "Z"
         title = body["title"]
         if (
             not isinstance(title, str)
@@ -539,6 +631,13 @@ def calendar_expectation(name: str, parameters: dict[str, Any]) -> dict[str, Any
 
 def matches(name: str, payload: dict[str, Any], expected: dict[str, Any]) -> bool:
     """Prove the saved provider resource, never delivery to another person's inbox."""
+    if name in _TASK_UPDATES:
+        return bool(
+            set(expected) == {"status"}
+            and payload.get("status") == expected["status"]
+            and payload.get("deleted") is not True
+            and payload.get("hidden") is not True
+        )
     if name == "gitlab.issues.create":
         return bool(
             payload.get("title") == expected["title"]
@@ -575,8 +674,7 @@ def matches(name: str, payload: dict[str, Any], expected: dict[str, Any]) -> boo
             instant = instant.replace(tzinfo=UTC)
         return bool(
             payload.get("title") == expected["title"]
-            and payload.get("body", {}).get("contentType", "").lower() == "text"
-            and payload["body"]["content"].replace("\r\n", "\n") == expected["notes"]
+            and task_notes(payload["body"]) == expected["notes"]
             and due.get("timeZone") in {"UTC", "Etc/UTC"}
             and instant == _instant(expected["due"] + "T00:00:00Z")
             and payload.get("status") == "notStarted"

@@ -31,14 +31,14 @@ Normal use should feel like one capable assistant already present across the use
 
 ```text
 observe current context
-â†’ update World Model
-â†’ detect conflicts / opportunities / commitments
-â†’ decide whether to stay quiet, inform, suggest or act
-â†’ apply permission + Personal Policy
-â†’ execute through real capabilities
-â†’ verify consequential changes
-â†’ update schedule/tasks/context
-â†’ report only what matters
+→ update World Model
+→ detect conflicts / opportunities / commitments
+→ decide whether to stay quiet, inform, suggest or act
+→ apply permission + Personal Policy
+→ execute through real capabilities
+→ verify consequential changes
+→ update schedule/tasks/context
+→ report only what matters
 ```
 
 The user should be able to say things like:
@@ -120,13 +120,13 @@ A useful Chief of Staff tracks more than calendar events:
 
 ```text
 commitment
-â”œâ”€ fixed event
-â”œâ”€ flexible block
-â”œâ”€ task/deadline
-â”œâ”€ communication follow-up
-â”œâ”€ Worker/Protocol dependency
-â”œâ”€ travel/preparation buffer
-â””â”€ tentative/awaiting confirmation
+├─ fixed event
+├─ flexible block
+├─ task/deadline
+├─ communication follow-up
+├─ Worker/Protocol dependency
+├─ travel/preparation buffer
+└─ tentative/awaiting confirmation
 ```
 
 Commitments should carry source, owner, deadline/time window, flexibility, priority, confidence, dependencies and mutation authority where known.
@@ -137,19 +137,19 @@ Proactivity is not binary.
 
 ```text
 observe only
-â†’ update context silently
+→ update context silently
 
 inform
-â†’ concise notification/status
+→ concise notification/status
 
 suggest
-â†’ propose a change and wait
+→ propose a change and wait
 
 act within policy
-â†’ make an authorized low-risk change and verify it
+→ make an authorized low-risk change and verify it
 
 interrupt
-â†’ actively surface only when urgency/importance justifies it
+→ actively surface only when urgency/importance justifies it
 ```
 
 Personal Policy can vary these levels by person, app, project, time, place, urgency and activity.
@@ -176,11 +176,11 @@ The output hierarchy is:
 
 ```text
 silent context update
-â†’ passive visual presence
-â†’ notification
-â†’ haptic
-â†’ spoken interruption
-â†’ urgent escalation
+→ passive visual presence
+→ notification
+→ haptic
+→ spoken interruption
+→ urgent escalation
 ```
 
 ## OSCAR Mobile: Android embodiment
@@ -207,16 +207,16 @@ The Orb is not a permanent intrusive bubble. Its presence is attention-aware:
 
 ```text
 normal context
-â†’ visible compact Orb
+→ visible compact Orb
 
 video / reading / presentation / focused content
-â†’ Orb retreats toward an edge anchor or hidden hotspot
+→ Orb retreats toward an edge anchor or hidden hotspot
 
 user invokes by gesture / edge target / assistant invocation / voice
-â†’ Orb returns immediately
+→ Orb returns immediately
 
 context ends
-â†’ Orb may reappear naturally according to policy
+→ Orb may reappear naturally according to policy
 ```
 
 The system may reposition or hide overlay windows, so overlay state is best-effort UI, not a correctness dependency.
@@ -285,25 +285,25 @@ Deep access remains channel-specific. Notification visibility, official API acce
 These are separate grants:
 
 ```text
-CAN PERCEIVE â‰  CAN RETAIN â‰  CAN ACT
+CAN PERCEIVE ≠ CAN RETAIN ≠ CAN ACT
 ```
 
 Examples:
 
 ```text
 notification access
-â‰  permission to save notification content
-â‰  permission to reply
+≠ permission to save notification content
+≠ permission to reply
 
 calendar read
-â‰  permission to modify calendar
+≠ permission to modify calendar
 
 location access
-â‰  permission to retain location history
+≠ permission to retain location history
 
 microphone permission
-â‰  permission to continuously transcribe
-â‰  permission to store raw audio
+≠ permission to continuously transcribe
+≠ permission to store raw audio
 ```
 
 Every implementation should preserve these boundaries in UI, policy and runtime contracts.
@@ -330,20 +330,20 @@ Examples:
 
 ```text
 rain + commute + class start
-â†’ warn earlier / suggest departure buffer
+→ warn earlier / suggest departure buffer
 
 meeting cancelled
-â†’ free block becomes available
-â†’ suggest or schedule high-priority work
+→ free block becomes available
+→ suggest or schedule high-priority work
 
 assignment deadline tonight + unfinished task
-â†’ protect focus time
-â†’ defer low-priority interruptions
+→ protect focus time
+→ defer low-priority interruptions
 
 message changes meeting time
-â†’ verify source
-â†’ update World Model
-â†’ propose/perform calendar change under policy
+→ verify source
+→ update World Model
+→ propose/perform calendar change under policy
 ```
 
 The planner should optimize for user intent, not maximum automation.
@@ -420,3 +420,12 @@ context, with no automatic priority or schedule decision. See the
 
 
 The native model-Worker path can now independently verify explicitly approved timed event creation and time-only Google/Microsoft moves after current account observations. Signed Ask or scoped synthetic standing authority owns the mutation; calendar observations never grant flexibility or action permission. Unsupported event shapes, concurrent-editor/ETag protection, general flexible-versus-fixed commitment reasoning and sustained daily-use acceptance remain open. [Calendar evidence](evidence/software-completion/calendar-verification-2026-10-26.json).
+
+
+Model-created Workers can now complete/reopen exact Google tasks and update
+supported Microsoft task statuses under signed authority, then independently
+read the saved task before unblocking dependent work. Literal Microsoft task
+notes use escaped HTML and independently decoded readback. Provider resource
+identity and current owner/executor read scope are rechecked; neither a matching
+parent list identifier nor withdrawn read authority can establish verification.
+This does not infer personal priorities or automate general replanning.

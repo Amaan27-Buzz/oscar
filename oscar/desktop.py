@@ -383,6 +383,23 @@ class Desktop(Mobile):
                 },
             },
         )
+        if (intent.criterion or {}).get("kind") == "connector_communication":
+
+            def authorize_readback(operation: str, permissions: tuple[str, ...]) -> None:
+                self.permission(session, operation, permissions)
+                executor = self.targets[target][1]
+                for permission in permissions:
+                    self.grid.authenticate(executor, permission)
+                for read_operation in (operation, *permissions):
+                    if not self.policy.evaluate(
+                        read_operation,
+                        permissions,
+                        self.grants(session),
+                        {"node": session.node_id, "source": self.source, "target": target},
+                    ).allowed:
+                        raise PermissionError("connector readback policy withdrawn")
+
+            self.store.transient[task.id]["connector_read_guard"] = authorize_readback
         if self.delegated(session, selected):
             self.runtime.run(task.id, {target: self.targets[target]})
         view = self.inspect(session, task.id)

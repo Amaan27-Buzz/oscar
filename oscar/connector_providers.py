@@ -216,6 +216,15 @@ def microsoft_manifest() -> ConnectorManifest:
                 readback="microsoft.todo.tasks.get",
             ),
             _cap(
+                "microsoft.todo.tasks.update",
+                "/v1.0/me/todo/lists/{listId}/tasks/{id}",
+                ("Tasks.ReadWrite",),
+                method="PATCH",
+                risk=RiskLevel.WRITE,
+                body=True,
+                readback="microsoft.todo.tasks.get",
+            ),
+            _cap(
                 "microsoft.mail.list",
                 "/v1.0/me/messages",
                 ("Mail.Read",),

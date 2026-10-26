@@ -297,3 +297,26 @@ records 120 passing checks with synthetic signed identity and actual loopback HT
 including signed Desktop and phone/Core requests. No real enrollment, GitLab
 mutation, self-hosted instance, pipeline, merge request or general account-agent
 acceptance is claimed.
+
+## Planned task status updates and current readback authority (2026-10-26)
+
+Native account capabilities now include Google Tasks and Microsoft To Do PATCH.
+A model-created Worker can complete or reopen an exact Google task, or select a
+supported Microsoft status. Only a status-only body gains the private task
+verification contract; other PATCH bodies retain generic partial verification.
+A separate GET must return the exact task resource and status, with no deleted
+or hidden resource. A parent task-list or calendar identifier cannot substitute
+for the final resource identifier, even if both mutation and GET agree on it.
+Uncertain mutations are never replayed.
+
+Microsoft To Do creation encodes literal notes into escaped HTML, including
+line breaks. Independent verification decodes a bounded literal HTML subset;
+unknown rich markup remains partially verified. This follows the provider's
+[HTML body contract](https://learn.microsoft.com/en-us/graph/api/todotask-update?view=graph-rest-1.0).
+
+Signed Desktop and remote phone/Core communication readbacks now recheck current
+owner and executor read scope before, during and after the independent GET.
+Removing read authority cannot leave a verified claim. Existing account,
+Personal Policy, exact review, cancellation and signed standing authority checks
+remain separate. Tests use synthetic owners and provider HTTP fixtures; actual
+provider commissioning and rendered native acceptance remain separate.

@@ -972,7 +972,8 @@ class ConnectorVerifier(Verifier):
                     raise ConnectorError("readback_resource_mismatch")
                 response_id = response_identity.removeprefix(mutation.resource_name_prefix)
             expected_path = dict(outcome.resource_path)
-            read_keys = set(re.findall(r"\{(.*?)\}", read.path))
+            read_fields = re.findall(r"\{(.*?)\}", read.path)
+            read_keys = set(read_fields)
             resource_keys = read_keys - expected_path.keys()
             if len(resource_keys) == 1:
                 expected_path[next(iter(resource_keys))] = response_id
@@ -986,7 +987,8 @@ class ConnectorVerifier(Verifier):
                 not response_id
                 or len(resource_keys) > 1
                 or params.get("path") != expected_path
-                or response_id not in expected_path.values()
+                or not read_fields
+                or expected_path.get(read_fields[-1]) != response_id
             ):
                 raise ConnectorError("readback_resource_mismatch")
             endpoint(read, params)
@@ -1009,6 +1011,8 @@ class ConnectorVerifier(Verifier):
                 private = self.fabric.store.transient.get(result.task_id, {})
                 if private.get("connector_guard"):
                     private["connector_guard"]()
+                if private.get("connector_read_guard"):
+                    private["connector_read_guard"](read.name, read.permissions)
                 if (
                     self.fabric.instances.get(instance.id) != instance
                     or self.fabric.state(instance, read) != ConnectionState.READY

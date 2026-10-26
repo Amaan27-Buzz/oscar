@@ -176,7 +176,7 @@ class ConnectorTests(unittest.TestCase):
 
     def test_google_and_non_google_catalog(self):
         google = load_google(ROOT / "config/google-connectors.json")
-        self.assertEqual(43, sum(len(m.capabilities) for m in google))
+        self.assertEqual(44, sum(len(m.capabilities) for m in google))
         for manifest in (
             *google,
             microsoft_manifest(),

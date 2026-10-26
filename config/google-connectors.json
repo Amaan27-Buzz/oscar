@@ -625,6 +625,19 @@
           "body_required": true,
           "response_kind": "json",
           "readback": "google.tasks.get"
+        },
+        {
+          "name": "google.tasks.update",
+          "method": "PATCH",
+          "path": "/tasks/v1/lists/{tasklist}/tasks/{task}",
+          "scopes": [
+            "https://www.googleapis.com/auth/tasks"
+          ],
+          "risk": "write",
+          "query_fields": [],
+          "body_required": true,
+          "response_kind": "json",
+          "readback": "google.tasks.get"
         }
       ]
     },
