@@ -198,6 +198,14 @@ class ManagementContractsTest {
         assertFalse(selected.getBoolean("complete"))
         assertEquals("2027-01-16", selected.getJSONArray("tasks").getJSONObject(0).getString("due_date"))
         assertFalse(selected.getJSONArray("tasks").getJSONObject(0).has("due_time"))
+        for ((reason, label) in mapOf("scheduled_earlier" to "Scheduled earlier", "scheduled_today" to "Scheduled today", "scheduled_later" to "Scheduled later", "scheduled_unknown" to "Scheduled day needs a timezone")) {
+            val scheduled = JSONObject(wire.toString())
+            scheduled.getJSONObject("attention").getJSONArray("tasks").getJSONObject(0).put("reason", reason)
+            val parsed = parseDayBrief(scheduled)
+            assertEquals(listOf("Synthetic task · $label"), parsed.attentionLines(setOf("tasks"), 1000.0))
+            assertTrue(parsed.attentionLines(setOf("tasks"), 1050.0).isEmpty())
+        }
+
         assertNull(MobileState(dayBrief = brief).unavailable("Disconnected").dayBrief)
     }
 

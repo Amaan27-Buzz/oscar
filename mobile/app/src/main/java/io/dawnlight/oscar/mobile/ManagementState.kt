@@ -12,7 +12,7 @@ internal fun parseStartedResponsibility(root: JSONObject): String {
 data class ManagedCapability(val id: String, val node: String, val session: String, val kind: String, val risk: String, val permissions: List<String>)
 data class BriefSource(val id: String, val adapter: String, val state: String, val epistemic: String, val value: String?, val freshUntil: Double?, val epoch: Int, val accountId: String?, val accountGeneration: Int?)
 data class TaskAttention(val sourceId: String, val taskId: String, val reason: String)
-internal val taskAttentionLabels = mapOf("overdue" to "Overdue", "due_today" to "Due today", "high_importance" to "Reported high importance", "upcoming" to "Upcoming", "no_due_date" to "No due date", "due_unknown" to "Due date or time needs clarification")
+internal val taskAttentionLabels = mapOf("scheduled_earlier" to "Scheduled earlier", "scheduled_today" to "Scheduled today", "scheduled_later" to "Scheduled later", "scheduled_unknown" to "Scheduled day needs a timezone", "overdue" to "Overdue", "due_today" to "Due today", "high_importance" to "Reported high importance", "upcoming" to "Upcoming", "no_due_date" to "No date reported", "due_unknown" to "Due date or time needs clarification")
 data class DayBrief(val observedAt: Double, val sources: List<BriefSource>, val overlaps: Int, val incomplete: Boolean,
     val attention: List<TaskAttention> = emptyList(), val attentionIncomplete: Boolean = false, val unknownDueTimes: Int = 0,
     val attentionFreshUntil: Double? = null) {

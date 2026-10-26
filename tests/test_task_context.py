@@ -60,7 +60,7 @@ class ConnectedTaskTests(unittest.TestCase):
         state = self.state()
         self.assertEqual("REPORTED", state.epistemic)
         data = json.loads(state.value)
-        self.assertEqual("2027-01-16", data["tasks"][0]["due_date"])
+        self.assertEqual("2027-01-16", data["tasks"][0]["scheduled_date"])
         self.assertNotIn("due_time", data["tasks"][0])
         self.assertNotIn("unselected private marker", state.value)
         self.assertEqual({"tasklist": "selected-list"}, self.calls[0][1]["path"])
@@ -74,7 +74,7 @@ class ConnectedTaskTests(unittest.TestCase):
         self.assertFalse(self.world.world.source("task-source")["act"])
         brief = self.world.brief()
         self.assertEqual("connected_tasks.state", brief["sources"][0]["key"])
-        self.assertEqual("due_unknown", brief["attention"]["tasks"][0]["reason"])
+        self.assertEqual("scheduled_unknown", brief["attention"]["tasks"][0]["reason"])
         self.now += 61
         self.assertIsNone(self.world.brief()["sources"][0]["value"])
         self.assertEqual([], self.world.brief()["attention"]["tasks"])
@@ -224,7 +224,7 @@ class TaskAttentionTests(unittest.TestCase):
             **changes,
         }
 
-    def test_reported_deadlines_rank_before_importance_without_changing_tasks(self):
+    def test_reported_importance_precedes_scheduled_days_without_changing_tasks(self):
         tasks = [
             {"id": "undated", "status": "needsAction"},
             {"id": "tomorrow", "status": "needsAction", "due_date": "2027-01-17"},
@@ -237,11 +237,17 @@ class TaskAttentionTests(unittest.TestCase):
         before = json.dumps(source)
         result = task_attention([source, self.clock()], self.now)
         self.assertEqual(
-            ["late", "today", "important", "tomorrow", "undated"],
+            ["important", "today", "late", "tomorrow", "undated"],
             [t["task_id"] for t in result["tasks"]],
         )
         self.assertEqual(
-            ["overdue", "due_today", "high_importance", "upcoming", "no_due_date"],
+            [
+                "high_importance",
+                "scheduled_today",
+                "scheduled_earlier",
+                "scheduled_later",
+                "no_due_date",
+            ],
             [t["reason"] for t in result["tasks"]],
         )
         self.assertEqual(before, json.dumps(source))
@@ -257,7 +263,7 @@ class TaskAttentionTests(unittest.TestCase):
         ):
             with self.subTest(clocks=clocks):
                 result = task_attention([source, *clocks], self.now)
-                self.assertEqual("due_unknown", result["tasks"][0]["reason"])
+                self.assertEqual("scheduled_unknown", result["tasks"][0]["reason"])
                 self.assertEqual(1, result["unknown_due_times"])
                 self.assertIsNone(result["timezone"])
 
@@ -334,3 +340,27 @@ class TaskAttentionTests(unittest.TestCase):
         self.assertTrue(result["truncated"])
         self.assertTrue(result["incomplete"])
         self.assertEqual([], task_attention([self.source([], state="stale")], self.now)["tasks"])
+
+    def test_scheduled_google_day_is_not_a_deadline(self):
+        source = self.source(
+            [
+                {"id": "planned", "status": "needsAction", "scheduled_date": "2027-01-15"},
+                {
+                    "id": "deadline",
+                    "status": "notStarted",
+                    "due_time": {"dateTime": "2027-01-15T19:00:00Z", "timeZone": "UTC"},
+                },
+            ]
+        )
+        result = task_attention([source, self.clock()], self.now)
+        self.assertEqual(["deadline", "planned"], [item["task_id"] for item in result["tasks"]])
+        self.assertEqual(
+            ["overdue", "scheduled_earlier"], [item["reason"] for item in result["tasks"]]
+        )
+
+    def test_legacy_google_date_only_report_does_not_become_overdue(self):
+        source = self.source([{"id": "legacy", "status": "needsAction", "due_date": "2027-01-15"}])
+        self.assertEqual(
+            "scheduled_earlier",
+            task_attention([source, self.clock()], self.now)["tasks"][0]["reason"],
+        )

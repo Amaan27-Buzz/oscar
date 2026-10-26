@@ -126,7 +126,7 @@ import org.json.JSONObject
                         runCatching { value.objects("tasks", 8) }.getOrDefault(emptyList()).forEach { task ->
                             Text(task.optString("title", "Untitled task").take(1024), style = MaterialTheme.typography.bodySmall)
                             Text(task.optString("status", "Status unavailable"), style = MaterialTheme.typography.bodySmall)
-                            if (task.has("due_date")) Text("Due date ${task.getString("due_date")} (date only)", style = MaterialTheme.typography.bodySmall)
+                            if (task.has("scheduled_date") || task.has("due_date")) Text("Scheduled day ${task.optString("scheduled_date", task.optString("due_date"))} (date only)", style = MaterialTheme.typography.bodySmall)
                             task.optJSONObject("due_time")?.let { due -> Text("Due ${due.optString("dateTime")} · ${due.optString("timeZone")}", style = MaterialTheme.typography.bodySmall) }
                             if (task.has("importance")) Text(task.getString("importance"), style = MaterialTheme.typography.bodySmall)
                         }
@@ -150,7 +150,7 @@ import org.json.JSONObject
                 attention.forEach { Text(it, style = MaterialTheme.typography.bodySmall) }
                 if (brief.attentionFreshUntil?.let { now > 0 && now < it * 1000 } == true) {
                     if (brief.attentionIncomplete) Text("Task attention covers only the selected available tasks.", style = MaterialTheme.typography.bodySmall)
-                    if (brief.unknownDueTimes > 0) Text("Some task due dates or times need clarification.", style = MaterialTheme.typography.bodySmall)
+                    if (brief.unknownDueTimes > 0) Text("Some task dates or times need clarification.", style = MaterialTheme.typography.bodySmall)
                 } else if (brief.attentionFreshUntil != null) Text("Refresh to reassess task attention.", style = MaterialTheme.typography.bodySmall)
                 Text("${brief.overlaps} overlapping intervals in this observation${if (brief.incomplete) " · incomplete calendar coverage" else ""}.", style = MaterialTheme.typography.bodySmall)
             } else Text("Refresh to reassess task attention and schedule conflicts.", style = MaterialTheme.typography.bodySmall)

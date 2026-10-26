@@ -146,10 +146,10 @@ it('reviews a task list with exact read-only account generation and no implicit 
 it('preserves task date precision and hides reports after account rotation',()=>{
   const now=Date.now(),observation={observed_at_ms:now,received_at_ms:now,transport_ms:0};
   const account={id:'tasks',provider:'google',tenant:'synthetic',subject:'synthetic',alias:'Tasks',identity_class:'owner-delegated',generation:7,status:'connected',remote_revocation:'unknown',services:[]};
-  const source={id:'tasks',epoch:1,adapter:'connected_tasks',state:'current',epistemic:'REPORTED',account_id:'tasks',account_generation:7,value:JSON.stringify({tasks:[{title:'Synthetic task',status:'needsAction',due_date:'2027-01-16'},{title:'Graph task',status:'notStarted',due_time:{dateTime:'2027-01-16T09:30:00',timeZone:'India Standard Time'}}],complete:false}),evidence:[{fresh_until:(now+60000)/1000}]};
+  const source={id:'tasks',epoch:1,adapter:'connected_tasks',state:'current',epistemic:'REPORTED',account_id:'tasks',account_generation:7,value:JSON.stringify({tasks:[{title:'Synthetic task',status:'needsAction',scheduled_date:'2027-01-16'},{title:'Graph task',status:'notStarted',due_time:{dateTime:'2027-01-16T09:30:00',timeZone:'India Standard Time'}}],complete:false}),evidence:[{fresh_until:(now+60000)/1000}]};
   const brief={version:1,observed_at:now/1000,sources:[source],schedule:{}};
   const {rerender}=render(<DayBrief observation={observation} value={brief} accounts={[account]} grants={[{id:'tasks',epoch:1,perceive:true}]}/>);
-  expect(screen.getByText(/Synthetic task.*Due date 2027-01-16 \(date only\)/)).toBeTruthy();
+  expect(screen.getByText(/Synthetic task.*Scheduled day 2027-01-16 \(date only\)/)).toBeTruthy();
   expect(screen.getByText(/Graph task.*India Standard Time/)).toBeTruthy();
   expect(screen.getByText('Task list coverage is incomplete.')).toBeTruthy();
   rerender(<DayBrief observation={observation} value={brief} accounts={[{...account,generation:8}]} grants={[{id:'tasks',epoch:1,perceive:true}]}/>);
@@ -178,9 +178,22 @@ it('bounds task attention and does not render unknown reasons or unselected task
   const brief={version:1,observed_at:now/1000,sources:[source],schedule:{},attention},grants=[{id:'tasks',epoch:1,perceive:true}];
   const {rerender}=render(<DayBrief observation={observation} value={brief} accounts={[]} grants={grants}/>);
   expect(screen.getByText('Synthetic task · Due today')).toBeTruthy();
-  expect(screen.getByText('Some task due dates or times need clarification.')).toBeTruthy();
+  expect(screen.getByText('Some task dates or times need clarification.')).toBeTruthy();
   for(const tasks of [[{source_id:'tasks',task_id:'task',reason:'invented'}],[{source_id:'tasks',task_id:'not-selected',reason:'overdue'}],Array(9).fill(attention.tasks[0])]){
     rerender(<DayBrief observation={observation} value={{...brief,attention:{...attention,tasks}}} accounts={[]} grants={grants}/>);
     expect(screen.queryByText('Reported task attention')).toBeNull();
+  }
+});
+
+it('shows scheduled-day attention separately from deadlines',()=>{
+  const now=Date.now(),observation={observed_at_ms:now,received_at_ms:now,transport_ms:0};
+  const source={id:'tasks',epoch:1,adapter:'connected_tasks',state:'current',epistemic:'REPORTED',value:JSON.stringify({tasks:[{id:'task',title:'Scheduled task',scheduled_date:'2027-01-16'}],complete:true}),evidence:[{fresh_until:(now+60000)/1000}]};
+  const attention={tasks:[{source_id:'tasks',task_id:'task',reason:'scheduled_today'}],incomplete:false,truncated:false,unknown_due_times:0,fresh_until:(now+30000)/1000};
+  const brief={version:1,observed_at:now/1000,sources:[source],schedule:{},attention},grants=[{id:'tasks',epoch:1,perceive:true}];
+  const {rerender}=render(<DayBrief observation={observation} value={brief} accounts={[]} grants={grants}/>);
+  for(const [reason,label] of Object.entries({scheduled_earlier:'Scheduled earlier',scheduled_today:'Scheduled today',scheduled_later:'Scheduled later',scheduled_unknown:'Scheduled day needs a timezone'})){
+    rerender(<DayBrief observation={observation} value={{...brief,attention:{...attention,tasks:[{source_id:'tasks',task_id:'task',reason}]}}} accounts={[]} grants={grants}/>);
+    expect(screen.getByText(`Scheduled task · ${label}`)).toBeTruthy();
+    expect(screen.queryByText(/Scheduled task · (Overdue|Due today)/)).toBeNull();
   }
 });

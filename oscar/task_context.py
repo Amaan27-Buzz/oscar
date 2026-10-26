@@ -79,16 +79,16 @@ def task_attention(sources: list[dict[str, Any]], now: float) -> dict[str, Any]:
                 continue
             reason, order = "no_due_date", ""
             try:
-                if "due_date" in task:
-                    due_date = date.fromisoformat(task["due_date"])
+                if "scheduled_date" in task or "due_date" in task:
+                    due_date = date.fromisoformat(task.get("scheduled_date", task.get("due_date")))
                     if today is None:
                         raise ValueError("selected timezone required for date-only urgency")
                     reason = (
-                        "overdue"
+                        "scheduled_earlier"
                         if due_date < today
-                        else "due_today"
+                        else "scheduled_today"
                         if due_date == today
-                        else "upcoming"
+                        else "scheduled_later"
                     )
                     order = due_date.isoformat()
                 elif "due_time" in task:
@@ -106,12 +106,22 @@ def task_attention(sources: list[dict[str, Any]], now: float) -> dict[str, Any]:
                     order = datetime.fromtimestamp(instant, UTC).isoformat()
             except (KeyError, TypeError, ValueError, OverflowError):
                 unknown += 1
-                reason = "due_unknown"
+                reason = (
+                    "scheduled_unknown"
+                    if "scheduled_date" in task or "due_date" in task
+                    else "due_unknown"
+                )
             if reason not in {"overdue", "due_today"} and task.get("importance") == "high":
                 reason = "high_importance"
-            rank = {"overdue": 0, "due_today": 1, "high_importance": 2, "upcoming": 3}.get(
-                reason, 4
-            )
+            rank = {
+                "overdue": 0,
+                "due_today": 1,
+                "high_importance": 2,
+                "scheduled_today": 3,
+                "scheduled_earlier": 4,
+                "upcoming": 5,
+                "scheduled_later": 5,
+            }.get(reason, 6)
             ranked.append((rank, order, source["id"], task["id"], reason))
     ranked.sort()
     return {
@@ -174,7 +184,10 @@ def review(world: "WorldRuntime", value: dict[str, Any]) -> dict[str, Any]:
             "first eight tasks; no automatic pagination or mutation; "
             "attention is read-only and source-bound"
         ),
-        "precision": "Google due is date-only; Microsoft time and timezone are provider-reported",
+        "precision": (
+            "Google due is a scheduled day, not a deadline; "
+            "Microsoft due time and timezone are provider-reported"
+        ),
     }
 
 
@@ -234,7 +247,7 @@ class ConnectedTaskSource:
                     parsed = datetime.fromisoformat(due.replace("Z", "+00:00"))
                     if parsed.tzinfo is None:
                         raise ValueError("qualified provider date required")
-                    item["due_date"] = parsed.date().isoformat()
+                    item["scheduled_date"] = parsed.date().isoformat()
                 else:
                     if not isinstance(due, dict) or any(
                         not isinstance(due.get(k), str) or not 1 <= len(due[k]) <= 100

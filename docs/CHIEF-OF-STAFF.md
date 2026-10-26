@@ -7,18 +7,9 @@ creation uses signed review; perception, retention and action remain independent
 [Implementation, local checks and remaining live-source gaps](development/SOFTWARE-AMBIENT-CONTEXT.md)
 distinguish this candidate from real-provider, owner and operational acceptance.
 
-The read-only day brief also derives a bounded attention order for the selected
-connected task reports: overdue, due today, provider-reported high importance,
-upcoming, then undated/unclear deadlines. Completed tasks are omitted; unknown
-provider status remains incomplete coverage. This is an explanation of reported
-deadlines and importance, not a claim to know the user's priorities or task effort.
-It does not change provider priorities, schedule blocks or send messages.
+The read-only day brief derives a bounded attention order from selected current task reports: Microsoft overdue/today deadlines, reported high importance, Google scheduled today/earlier, then upcoming and undated/unclear work. Completed tasks are omitted; unknown provider status remains incomplete coverage. This describes reported dates and importance, not the user's personal priorities or task effort. It does not change provider priorities, schedule blocks or send messages.
 
-Date-only deadlines require one unambiguous current selected clock timezone;
-they never become midnight timestamps. Timed deadlines need an explicit offset
-or a recognized timezone; ambiguous/nonexistent local DST times remain unknown.
-Unknown Windows timezone names are preserved as reported rather than guessed.
-Calendar overlap checks use the same qualified-instant rule.
+Google Tasks `due` is a scheduled day rather than a deadline, according to the [official resource contract](https://developers.google.com/workspace/tasks/reference/rest/v1/tasks). Core emits `scheduled_date`; legacy Google-derived `due_date` reports receive the same interpretation. Date-only scheduled days require one unambiguous current selected clock timezone for comparison and never become midnight deadline timestamps. Microsoft timed deadlines need an explicit offset or recognized timezone; ambiguous/nonexistent DST times remain unknown. Unknown Windows timezone names remain reported. Calendar overlap checks use the same qualified-instant rule.
 
 The derived attention list expires at supporting evidence expiry, the next local
 date boundary or the next timed deadline, whichever comes first. Both native
@@ -40,14 +31,14 @@ Normal use should feel like one capable assistant already present across the use
 
 ```text
 observe current context
-→ update World Model
-→ detect conflicts / opportunities / commitments
-→ decide whether to stay quiet, inform, suggest or act
-→ apply permission + Personal Policy
-→ execute through real capabilities
-→ verify consequential changes
-→ update schedule/tasks/context
-→ report only what matters
+â†’ update World Model
+â†’ detect conflicts / opportunities / commitments
+â†’ decide whether to stay quiet, inform, suggest or act
+â†’ apply permission + Personal Policy
+â†’ execute through real capabilities
+â†’ verify consequential changes
+â†’ update schedule/tasks/context
+â†’ report only what matters
 ```
 
 The user should be able to say things like:
@@ -129,13 +120,13 @@ A useful Chief of Staff tracks more than calendar events:
 
 ```text
 commitment
-├─ fixed event
-├─ flexible block
-├─ task/deadline
-├─ communication follow-up
-├─ Worker/Protocol dependency
-├─ travel/preparation buffer
-└─ tentative/awaiting confirmation
+â”œâ”€ fixed event
+â”œâ”€ flexible block
+â”œâ”€ task/deadline
+â”œâ”€ communication follow-up
+â”œâ”€ Worker/Protocol dependency
+â”œâ”€ travel/preparation buffer
+â””â”€ tentative/awaiting confirmation
 ```
 
 Commitments should carry source, owner, deadline/time window, flexibility, priority, confidence, dependencies and mutation authority where known.
@@ -146,19 +137,19 @@ Proactivity is not binary.
 
 ```text
 observe only
-→ update context silently
+â†’ update context silently
 
 inform
-→ concise notification/status
+â†’ concise notification/status
 
 suggest
-→ propose a change and wait
+â†’ propose a change and wait
 
 act within policy
-→ make an authorized low-risk change and verify it
+â†’ make an authorized low-risk change and verify it
 
 interrupt
-→ actively surface only when urgency/importance justifies it
+â†’ actively surface only when urgency/importance justifies it
 ```
 
 Personal Policy can vary these levels by person, app, project, time, place, urgency and activity.
@@ -185,11 +176,11 @@ The output hierarchy is:
 
 ```text
 silent context update
-→ passive visual presence
-→ notification
-→ haptic
-→ spoken interruption
-→ urgent escalation
+â†’ passive visual presence
+â†’ notification
+â†’ haptic
+â†’ spoken interruption
+â†’ urgent escalation
 ```
 
 ## OSCAR Mobile: Android embodiment
@@ -216,16 +207,16 @@ The Orb is not a permanent intrusive bubble. Its presence is attention-aware:
 
 ```text
 normal context
-→ visible compact Orb
+â†’ visible compact Orb
 
 video / reading / presentation / focused content
-→ Orb retreats toward an edge anchor or hidden hotspot
+â†’ Orb retreats toward an edge anchor or hidden hotspot
 
 user invokes by gesture / edge target / assistant invocation / voice
-→ Orb returns immediately
+â†’ Orb returns immediately
 
 context ends
-→ Orb may reappear naturally according to policy
+â†’ Orb may reappear naturally according to policy
 ```
 
 The system may reposition or hide overlay windows, so overlay state is best-effort UI, not a correctness dependency.
@@ -294,25 +285,25 @@ Deep access remains channel-specific. Notification visibility, official API acce
 These are separate grants:
 
 ```text
-CAN PERCEIVE ≠ CAN RETAIN ≠ CAN ACT
+CAN PERCEIVE â‰  CAN RETAIN â‰  CAN ACT
 ```
 
 Examples:
 
 ```text
 notification access
-≠ permission to save notification content
-≠ permission to reply
+â‰  permission to save notification content
+â‰  permission to reply
 
 calendar read
-≠ permission to modify calendar
+â‰  permission to modify calendar
 
 location access
-≠ permission to retain location history
+â‰  permission to retain location history
 
 microphone permission
-≠ permission to continuously transcribe
-≠ permission to store raw audio
+â‰  permission to continuously transcribe
+â‰  permission to store raw audio
 ```
 
 Every implementation should preserve these boundaries in UI, policy and runtime contracts.
@@ -339,20 +330,20 @@ Examples:
 
 ```text
 rain + commute + class start
-→ warn earlier / suggest departure buffer
+â†’ warn earlier / suggest departure buffer
 
 meeting cancelled
-→ free block becomes available
-→ suggest or schedule high-priority work
+â†’ free block becomes available
+â†’ suggest or schedule high-priority work
 
 assignment deadline tonight + unfinished task
-→ protect focus time
-→ defer low-priority interruptions
+â†’ protect focus time
+â†’ defer low-priority interruptions
 
 message changes meeting time
-→ verify source
-→ update World Model
-→ propose/perform calendar change under policy
+â†’ verify source
+â†’ update World Model
+â†’ propose/perform calendar change under policy
 ```
 
 The planner should optimize for user intent, not maximum automation.

@@ -1,0 +1,65 @@
+{
+  "classification": "SCHEDULED_DAY_SEMANTICS_SOFTWARE_VERIFIED",
+  "date": "2026-10-26",
+  "base_head": "5a90efa80b6d97b58e5925f426df48f776b2d891",
+  "change": "Google Tasks due is represented as scheduled_date and scheduled-day attention, never an overdue deadline. Legacy Google-derived due_date reports receive the same treatment. Current Microsoft due_time deadline behavior is preserved. Both apps display scheduled days separately and retain expiry/account/source withdrawal.",
+  "official_contract": "https://developers.google.com/workspace/tasks/reference/rest/v1/tasks",
+  "checks": {
+    "focused_core": {
+      "passed": 16,
+      "seconds": 3.565
+    },
+    "core_integration": {
+      "passed": 120,
+      "failed": 0,
+      "errors": 0,
+      "seconds": 112.676,
+      "wrapper_seconds": 113.915,
+      "source_stable": true,
+      "current_hashes_independently_matched": true
+    },
+    "desktop": {
+      "affected_tests": 15,
+      "passed": 15,
+      "test_seconds": 33.37,
+      "production_build": "PASS"
+    },
+    "android": {
+      "affected_unit_tests": 11,
+      "passed": 11,
+      "assembleDebug": "PASS",
+      "lintDebug": "PASS",
+      "gradle_seconds": 115,
+      "disposable_emulator_or_physical_device_used": false
+    },
+    "static": "Ruff, mypy 107 files and diff PASS; repository scanner recorded at commit"
+  },
+  "sources": {
+    "oscar/task_context.py": "b1b77f871c8aa7a1ac58bbbbd60794b90c5b771731edcc7671eb7ed93ec8aa01",
+    "tests/test_task_context.py": "b4767ae2f092e998c1ba9f87325cb9c201e81e791ce3de93c1f91f2695faed77",
+    "desktop/src/OperatingSettings.tsx": "49e3708eb59033dcbe311f52e0b005711a3f6691f9ab9d27eaa837252ddec4b0",
+    "desktop/src/OperatingSettings.test.tsx": "7c27d40255787d44235684d01fb13d2450de811039ead9b55646502ec39e67c1",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/ManagementState.kt": "ec2f7f13d3c6c1ef677abe4536adbae2c499906e74f7a5ccef313d47ad7af8d4",
+    "mobile/app/src/main/java/io/dawnlight/oscar/mobile/AwarenessScreen.kt": "245b8928badddb9b4ca0bbd1725b7e889e573a0263adaf955836e54f11d519d7",
+    "mobile/app/src/test/java/io/dawnlight/oscar/mobile/ManagementContractsTest.kt": "53b30f13c3c4e066ed3fdb7d18f0b342651f93c46e27dbbfa4a41d9fc013337c"
+  },
+  "local_evidence": {
+    "scheduled-day-red.log": "8f9150abc3cb7dcd3e94c7f2116df93a4697413ab05715f4a2ab124bc8ab833b",
+    "scheduled-day-focused-final.log": "c6c2755e7fae14e8da896206457fdc2375e55d5923bab31ce7ccea0443fa848e",
+    "scheduled-day-integration.log": "273af12a523c73fcd72066bd37e6ef59f69d1813f9b32cf060bb78fec61734ad",
+    "scheduled-day-integration-manifest.json": "72bea7d4219f0ea01a61e58ea458ba6638c5646f98ab6c6b45d1a24672885563",
+    "scheduled-day-desktop-focused.log": "ddb2ab81b33ef99bdcf25233d5a6103142e6ba75f21eb9936fc81dee26520405",
+    "scheduled-day-desktop-build.log": "2d24d64377f69798a2e10674ff68ce5b280c912d72cc90bc6dce3f9898e78382",
+    "scheduled-day-android.log": "c74b5bb9978d1941787f127c2a936c8ddc702d48b1819dc42929e79e719c3f39"
+  },
+  "development_history": [
+    "Two pre-change regressions reproduced overdue promotion of legacy Google day and missing scheduled_date handling.",
+    "Static check found one long precision description; wrapped before final Core integration."
+  ],
+  "limits": [
+    "No newest rendered native or assistive-technology acceptance.",
+    "Older strict clients may hide new attention reasons until updated; no false deadline fallback is introduced.",
+    "This is a read-only reported attention order, not personal priority or task-effort inference.",
+    "Preceding 1297-case full PASS predates calendar and scheduled-day changes; current affected suites are recorded separately."
+  ]
+}
