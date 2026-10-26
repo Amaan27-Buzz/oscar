@@ -268,6 +268,17 @@ def microsoft_manifest() -> ConnectorManifest:
                 readback="microsoft.calendar.events.get",
             ),
             _cap(
+                "microsoft.calendar.events.update",
+                "/v1.0/me/events/{id}",
+                ("Calendars.ReadWrite",),
+                method="PATCH",
+                risk=RiskLevel.WRITE,
+                consequences=(RiskLevel.COMMUNICATION,),
+                communication_trigger="calendar",
+                body=True,
+                readback="microsoft.calendar.events.get",
+            ),
+            _cap(
                 "microsoft.onedrive.list",
                 "/v1.0/me/drive/root/children",
                 ("Files.Read",),

@@ -18,6 +18,14 @@ if TYPE_CHECKING:
     from .harness import Harness
 
 
+_CALENDAR_MUTATIONS = {
+    "google.calendar.events.create",
+    "google.calendar.events.update",
+    "microsoft.calendar.events.create",
+    "microsoft.calendar.events.update",
+}
+
+
 @dataclass(frozen=True)
 class PreparedCommunication:
     capability: Capability
@@ -405,8 +413,10 @@ def prepare(harness: "Harness", text: str) -> PreparedCommunication | None:
     )
 
 
-def task_expectation(name: str, parameters: dict[str, Any]) -> dict[str, str] | None:
-    """Recognize the native date-only task contract, never model-supplied success criteria."""
+def task_expectation(name: str, parameters: dict[str, Any]) -> dict[str, Any] | None:
+    """Recognize native saved-resource contracts, never model-supplied success criteria."""
+    if name in _CALENDAR_MUTATIONS:
+        return calendar_expectation(name, parameters)
     if name not in {"google.tasks.create", "microsoft.todo.tasks.create"}:
         return None
     try:
@@ -449,6 +459,80 @@ def task_expectation(name: str, parameters: dict[str, Any]) -> dict[str, str] | 
         ):
             return None
         return {"title": title, "notes": notes, "due": _instant(due).date().isoformat()}
+    except (KeyError, TypeError, ValueError, AttributeError):
+        return None
+
+
+def calendar_expectation(name: str, parameters: dict[str, Any]) -> dict[str, Any] | None:
+    """Recognize literal timed events or time-only moves; other bodies remain partial."""
+    if name not in _CALENDAR_MUTATIONS:
+        return None
+    try:
+        google = name.startswith("google.")
+        create = name.endswith(".create")
+        if set(parameters) - {"path", "body", "query"}:
+            return None
+        query = parameters.get("query", {})
+        if (
+            not isinstance(query, dict)
+            or query
+            and (
+                not google
+                or set(query) != {"sendUpdates"}
+                or query["sendUpdates"] not in {"all", "none", "externalOnly"}
+            )
+        ):
+            return None
+        body = parameters["body"]
+        title_key = "summary" if google else "subject"
+        allowed = {title_key, "start", "end", "attendees"} if create else {"start", "end"}
+        if set(body) - allowed or not create and set(body) != allowed:
+            return None
+        times = {}
+        for key in ("start", "end"):
+            point = body[key]
+            if set(point) != ({"dateTime"} if google else {"dateTime", "timeZone"}):
+                return None
+            value = point["dateTime"]
+            if not google:
+                if point["timeZone"] != "UTC" or datetime.fromisoformat(value).tzinfo is not None:
+                    return None
+                value += "Z"
+            times[key] = _instant(value)
+        if not 0 < (times["end"] - times["start"]).total_seconds() <= 7 * 86400:
+            return None
+        expected: dict[str, Any] = {key: value.isoformat() for key, value in times.items()}
+        if create:
+            title = body[title_key]
+            if (
+                not isinstance(title, str)
+                or not 1 <= len(title) <= 200
+                or any(ord(c) < 32 for c in title)
+            ):
+                return None
+            if (
+                not isinstance(body.get("attendees", []), list)
+                or len(body.get("attendees", [])) > 16
+            ):
+                return None
+            attendees = []
+            for attendee in body.get("attendees", []):
+                if google:
+                    if set(attendee) != {"email"}:
+                        return None
+                    attendees.append(attendee["email"])
+                else:
+                    if (
+                        set(attendee) != {"emailAddress", "type"}
+                        or attendee["type"] != "required"
+                        or set(attendee["emailAddress"]) != {"address"}
+                    ):
+                        return None
+                    attendees.append(attendee["emailAddress"]["address"])
+            if attendees:
+                _addresses(",".join(attendees))
+            expected.update(title=title, attendees=attendees)
+        return expected
     except (KeyError, TypeError, ValueError, AttributeError):
         return None
 
@@ -531,7 +615,7 @@ def matches(name: str, payload: dict[str, Any], expected: dict[str, Any]) -> boo
             and not payload.get("bccRecipients")
         )
     google = name.startswith("google.")
-    if name.endswith(".events.create"):
+    if name in _CALENDAR_MUTATIONS:
 
         def event_time(key: str) -> datetime:
             point = payload[key]
@@ -542,16 +626,21 @@ def matches(name: str, payload: dict[str, Any], expected: dict[str, Any]) -> boo
                     return parsed.replace(tzinfo=UTC)
             return _instant(value)
 
+        times_match = bool(
+            payload.get("status") != "cancelled"
+            and payload.get("isCancelled") is not True
+            and event_time("start") == _instant(expected["start"])
+            and event_time("end") == _instant(expected["end"])
+        )
+        if name.endswith(".events.update"):
+            return times_match
         attendees = [
             a["email"] if google else a["emailAddress"]["address"]
             for a in payload.get("attendees", [])
         ]
         return bool(
-            payload.get("summary" if google else "subject") == expected["title"]
-            and payload.get("status") != "cancelled"
-            and payload.get("isCancelled") is not True
-            and event_time("start") == _instant(expected["start"])
-            and event_time("end") == _instant(expected["end"])
+            times_match
+            and payload.get("summary" if google else "subject") == expected["title"]
             and sorted(attendees) == sorted(expected["attendees"])
         )
     return False

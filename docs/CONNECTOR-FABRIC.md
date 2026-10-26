@@ -352,3 +352,10 @@ contain explicitly selected source data under the existing file/action contract.
 ### Private planned task mutation readback
 
 Known canonical Google Tasks and Microsoft To Do create bodies derive expected title, notes and explicit date from privately staged arguments. A model cannot supply its own verification criterion. These expectations remain transient and expire with the staged input. Independent saved-resource GET uses the existing communication verifier and must match identity and fields before a dependent Worker proceeds. Current owner and executor read scope, policy, signed authority, account generation and input digest are rechecked before and after readback. Revocation, lost private inputs or uncertain mutation never imply success or authorize replay. Unsupported body shapes retain generic partial verification. This verifies the saved fields, not their real-world completion.
+
+
+### Private calendar verification
+
+The private planned-resource contract also recognizes timed Google/Microsoft event creation and time-only moves. It derives expected times and, for creation, title/attendees from the exact staged body; no model criterion grants verification. Only explicit-offset Google times and UTC Microsoft times qualify. Unknown, recurring, all-day and extra body fields retain partial verification. The saved resource must independently match identity, selected fields and non-cancelled state before dependent Workers proceed. Scope, policy and communication consequences remain independent of calendar read access.
+
+Microsoft event updates use the official [Graph PATCH contract](https://learn.microsoft.com/en-us/graph/api/event-update?view=graph-rest-1.0); Google uses [Events patch](https://developers.google.com/workspace/calendar/api/v3/reference/events/patch). Time-only PATCH omits title, attendees and unrelated fields. Readback does not prove notification delivery or every provider metadata field. Conditional ETag protection is not implemented here: concurrent edits can race, so this is not atomic or conflict-free replanning.

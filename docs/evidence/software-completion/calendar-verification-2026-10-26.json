@@ -1,0 +1,70 @@
+{
+  "classification": "PRIVATE_CALENDAR_MUTATION_READBACK_SOFTWARE_VERIFIED",
+  "date": "2026-10-26",
+  "base_head": "df451f4b8ef90d7c36fe00b0d05d0418d12364b0",
+  "change": "Reuse private server-derived expected fields and current readback authority for timed Google/Microsoft calendar creation and time-only event moves. Add native Microsoft Graph event PATCH with external-communication consequence. Independent saved-resource readback unblocks dependent Workers.",
+  "checks": {
+    "focused": {
+      "passed": 12,
+      "seconds": 17.919
+    },
+    "integration": {
+      "passed": 275,
+      "failed": 0,
+      "errors": 0,
+      "test_seconds": 307.207,
+      "wrapper_seconds": 308.657,
+      "source_stable": true,
+      "current_hashes_independently_matched": true
+    },
+    "tls_mobile_outbound_worker": {
+      "independent_saved_event_inspection": true,
+      "status": "SOFTWARE_VERIFIED",
+      "seconds": 10.655,
+      "tls_mobile_requests": true,
+      "provider_gets": 3,
+      "verified_provider_task": true,
+      "private_model_continuation": true,
+      "separate_outbound_worker_process": true,
+      "canonical_final_task": "verified",
+      "independent_file_readback": true,
+      "provider_json_absent_from_durable_records": true,
+      "limits": [
+        "Core is a thread in the test driver process",
+        "Synthetic model and provider HTTP fixture, synthetic owner",
+        "Protocol acceptance; no rendered native or physical device acceptance"
+      ]
+    },
+    "static": "Ruff, mypy 107 files and diff checks PASS; repository checks recorded at local commit"
+  },
+  "sources": {
+    "oscar/communication.py": "9ac84255e6ae877833a804d3da8389b6fa068170bb3fd3831ef5e25d225b2120",
+    "oscar/connector_providers.py": "36164c2aa8cfd5c2ba86504576dce7aa4a079954f694595c34efcf10015dac94",
+    "tests/test_communication.py": "cd37a76bb4c1440407bfa51a0c07a3ecc6d5c3efb976546cf78b13865802e7a0",
+    "tests/test_connectors.py": "1027e5f38b65b4104dff6eaa7c16d23781af9c49ca04250249f62167694d8a8b",
+    "tests/test_planner_calendar_verification.py": "7e9b9baf92ea844bcf872905c0de8216fb69cae4da6a7a8b74b7d3037b90e4a7"
+  },
+  "local_evidence": {
+    "calendar-verification-red.log": "0aa30e6ca787667d3ad9d729cbb3fc1033f01d2befe32ba007344686f89e06b4",
+    "calendar-verification-focused-complete.log": "2f4ba49d36161c732f19811d33b2e5fc10f96208f3fe5c4a63d49a6b386f3ee2",
+    "calendar-verification-integration.log": "ae2b8adfa7a825f4af31174e0c41506bf9acf367980b4cbf98e912181a466615",
+    "calendar-verification-integration-manifest.json": "26acd19ac79c36f21604bdd09d8d031c0156c3a56a2db11ad73d411f38de0a1a",
+    "calendar-move-tls.log": "1734b8308e055cd61464b006d0e3735c01a1f9ff6f0d55194ef683c1a918e3b2"
+  },
+  "official_contracts": [
+    "https://developers.google.com/workspace/calendar/api/v3/reference/events/patch",
+    "https://learn.microsoft.com/en-us/graph/api/event-update?view=graph-rest-1.0"
+  ],
+  "development_history": [
+    "Pre-change single-case test reproduced generic partial calendar verification.",
+    "Initial eight calendar cases PASS. Expanded missing-communication-scope case was correctly denied at draft review and its test expectation was corrected; final twelve cases PASS."
+  ],
+  "limits": [
+    "Synthetic model/provider/owner; protocol/process acceptance is not rendered native or real-provider acceptance.",
+    "Google explicit-offset timed points and Microsoft UTC points only; recurring/all-day/extra body shapes remain generic partial.",
+    "Time-only move readback verifies resource identity, requested times and non-cancelled state, not delivery of attendee notifications or all provider metadata.",
+    "PATCH has no conditional ETag here: concurrent editors can race. No conflict-free or atomic replanning claim.",
+    "Preceding e5de7fe full regression passed 1297 total, 1287 PASS and ten SKIP; it predates this change.",
+    "General model accuracy, flexible/fixed commitment reasoning and sustained Chief-of-Staff/native acceptance remain OPEN."
+  ]
+}

@@ -52,6 +52,9 @@ class Provider:
             def do_POST(self):
                 self.respond()
 
+            def do_PATCH(self):
+                self.respond()
+
             def do_GET(self):
                 self.respond()
 
@@ -61,7 +64,7 @@ class Provider:
                 path = urlsplit(self.path).path
                 owner.requests.append((self.path, self.headers.get("Authorization")))
                 owner.calls.append((self.command, path, body))
-                if owner.fail and self.command == "POST":
+                if owner.fail and self.command in {"POST", "PATCH"}:
                     self.send_response(503)
                     self.end_headers()
                     return
@@ -97,6 +100,13 @@ class Provider:
                     if path == "/v1.0/me/messages":
                         result["isDraft"] = True
                     owner.resources[read_path] = result
+                elif self.command == "PATCH":
+                    if path not in owner.resources:
+                        self.send_response(404)
+                        self.end_headers()
+                        return
+                    owner.resources[path].update(body)
+                    result = deepcopy(owner.resources[path])
                 elif path in owner.resources:
                     result = deepcopy(owner.resources[path])
                     if owner.tamper:
@@ -115,7 +125,7 @@ class Provider:
                             "@odata.nextLink": "provider-pagination-is-explicit",
                         }
                     )
-                if self.command == "POST" and owner.fail_after_post:
+                if self.command in {"POST", "PATCH"} and owner.fail_after_post:
                     self.send_response(503)
                     self.end_headers()
                     return

@@ -426,3 +426,6 @@ explicit source selection in Sentry (or its selected trigger); stale evidence,
 permission epochs and account drift withdraw visible content. This is read-only
 context, with no automatic priority or schedule decision. See the
 [acceptance receipt](evidence/software-completion/tasks-briefing-2026-10-24.json).
+
+
+The native model-Worker path can now independently verify explicitly approved timed event creation and time-only Google/Microsoft moves after current account observations. Signed Ask or scoped synthetic standing authority owns the mutation; calendar observations never grant flexibility or action permission. Unsupported event shapes, concurrent-editor/ETag protection, general flexible-versus-fixed commitment reasoning and sustained daily-use acceptance remain open. [Calendar evidence](evidence/software-completion/calendar-verification-2026-10-26.json).

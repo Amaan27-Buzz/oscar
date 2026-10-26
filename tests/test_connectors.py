@@ -712,6 +712,7 @@ class ConnectorTests(unittest.TestCase):
             "google.calendar.events.delete",
             "google.gmail.send",
             "microsoft.calendar.events.create",
+            "microsoft.calendar.events.update",
             "microsoft.mail.send",
             "slack.messages.post",
             "github.issues.create",
