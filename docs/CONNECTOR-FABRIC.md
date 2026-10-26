@@ -347,3 +347,8 @@ Expiry, restart, tampering, account rotation or permission withdrawal makes the
 response unavailable. The native model route remains private; provider output is
 untrusted data and cannot grant authority. An owner-approved final artifact may
 contain explicitly selected source data under the existing file/action contract.
+
+
+### Private planned task mutation readback
+
+Known canonical Google Tasks and Microsoft To Do create bodies derive expected title, notes and explicit date from privately staged arguments. A model cannot supply its own verification criterion. These expectations remain transient and expire with the staged input. Independent saved-resource GET uses the existing communication verifier and must match identity and fields before a dependent Worker proceeds. Current owner and executor read scope, policy, signed authority, account generation and input digest are rechecked before and after readback. Revocation, lost private inputs or uncertain mutation never imply success or authorize replay. Unsupported body shapes retain generic partial verification. This verifies the saved fields, not their real-world completion.

@@ -874,10 +874,12 @@ class ConnectorVerifier(Verifier):
         fabric: ConnectorFabric,
         observation_verifier: Callable[[Objective, Result, ConnectorOutcome | None], Verification]
         | None = None,
+        criterion_resolver: Callable[[Objective, Result], dict[str, Any]] | None = None,
     ):
         super().__init__(base.files, base.clock)
         self.base, self.fabric = base, fabric
         self.observation_verifier = observation_verifier
+        self.criterion_resolver = criterion_resolver
 
     def bind_task(self, task_id: str, parameters: dict[str, Any]) -> None:
         self.fabric.bind_task(task_id, parameters)
@@ -892,6 +894,15 @@ class ConnectorVerifier(Verifier):
     def _verify(self, objective: Objective, result: Result) -> Verification:
         if objective.criterion.get("kind") == "connector_observation" and self.observation_verifier:
             return self.observation_verifier(objective, result, self.fabric.outcomes.get(result.id))
+        private_task = objective.criterion.get("kind") == "connector_planned_task"
+        original = objective
+        if private_task:
+            try:
+                if self.criterion_resolver is None:
+                    return self.base.verify(objective, result)
+                objective = replace(objective, criterion=self.criterion_resolver(objective, result))
+            except (KeyError, StopIteration, ValueError, PermissionError):
+                return self.base.verify(objective, result)
         if objective.criterion.get("kind") not in {"connector_fields", "connector_communication"}:
             return self.base.verify(objective, result)
         criterion = objective.criterion
@@ -982,6 +993,12 @@ class ConnectorVerifier(Verifier):
 
             def authorize_readback() -> None:
                 from .authority import check_task_account
+
+                if private_task and (
+                    self.criterion_resolver is None
+                    or self.criterion_resolver(original, result) != criterion
+                ):
+                    raise PermissionError("private task verification changed")
 
                 check_task_account(
                     self.fabric.store,

@@ -535,3 +535,6 @@ Always-on Sentry acoustic awareness can trigger Protocol/Worker evaluation from 
 
 
 Signed plan acceptance displays the current steps, source and authority material without repeating the historical planning prompt or duplicate observation contracts. A digest binds the complete original planner request; acceptance reloads it and rejects any change, including omitted historical fields. Native display/signature size bounds remain enforced.
+
+
+A private model-authored canonical provider task can unblock dependent Workers only after independently verified saved-resource readback. Verification expectations come from the exact staged literal arguments, remain transient and require current owner/executor read authority throughout verification. Tool success alone, unavailable expectations and permission withdrawal cannot promote a mutation to verified.

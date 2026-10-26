@@ -405,6 +405,54 @@ def prepare(harness: "Harness", text: str) -> PreparedCommunication | None:
     )
 
 
+def task_expectation(name: str, parameters: dict[str, Any]) -> dict[str, str] | None:
+    """Recognize the native date-only task contract, never model-supplied success criteria."""
+    if name not in {"google.tasks.create", "microsoft.todo.tasks.create"}:
+        return None
+    try:
+        if set(parameters) != {"path", "body"}:
+            return None
+        body = parameters["body"]
+        if name == "google.tasks.create":
+            if (
+                set(body) - {"title", "notes", "due", "status"}
+                or body.get("status", "needsAction") != "needsAction"
+            ):
+                return None
+            notes, due = body.get("notes", ""), body["due"]
+        else:
+            if (
+                set(body) != {"title", "body", "dueDateTime", "status"}
+                or body["status"] != "notStarted"
+            ):
+                return None
+            if (
+                set(body["body"]) != {"contentType", "content"}
+                or body["body"]["contentType"].lower() != "text"
+            ):
+                return None
+            point = body["dueDateTime"]
+            if set(point) != {"dateTime", "timeZone"} or point["timeZone"] != "UTC":
+                return None
+            notes, due = body["body"]["content"], point["dateTime"] + "Z"
+        title = body["title"]
+        if (
+            not isinstance(title, str)
+            or not 1 <= len(title) <= 200
+            or any(ord(c) < 32 for c in title)
+            or not isinstance(notes, str)
+            or len(notes) > 3000
+            or "\r" in notes
+            or "\x00" in notes
+            or not isinstance(due, str)
+            or not re.fullmatch(r"\d{4}-\d{2}-\d{2}T00:00:00(?:Z|\+00:00)", due)
+        ):
+            return None
+        return {"title": title, "notes": notes, "due": _instant(due).date().isoformat()}
+    except (KeyError, TypeError, ValueError, AttributeError):
+        return None
+
+
 def matches(name: str, payload: dict[str, Any], expected: dict[str, Any]) -> bool:
     """Prove the saved provider resource, never delivery to another person's inbox."""
     if name == "gitlab.issues.create":

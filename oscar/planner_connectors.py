@@ -295,6 +295,12 @@ class ConnectorPlanning:
                     )
                     endpoint(spec, params["arguments"])
                     arguments = params["arguments"]
+                from .communication import task_expectation
+
+                mutation = (
+                    current["transport"] == "https"
+                    and task_expectation(current["operation"], arguments) is not None
+                )
                 ref = self.h.connectors.stage(arguments)
                 staged.append(ref)
                 self.inputs[ref] = {
@@ -303,6 +309,7 @@ class ConnectorPlanning:
                     "expires": self.h.grid.clock() + 120,
                     "input_digest": digest(self.h.connectors.requests[ref]),
                     **({"observation": arguments} if observe else {}),
+                    **({"verification_arguments": arguments} if mutation else {}),
                 }
 
                 def guard(reference: str = ref) -> None:
@@ -317,7 +324,11 @@ class ConnectorPlanning:
                         capability_kind=step["capability_id"],
                         parameters={"request_ref": ref},
                         criterion={
-                            "kind": "connector_observation" if observe else "unavailable",
+                            "kind": "connector_observation"
+                            if observe
+                            else "connector_planned_task"
+                            if mutation
+                            else "unavailable",
                             "connector_account": {
                                 "id": account["account_id"],
                                 "generation": account["account_generation"],
@@ -343,9 +354,60 @@ class ConnectorPlanning:
             and digest(self.h.connectors.requests[ref]) != row["input_digest"]
             or "observation" in row
             and digest(row["observation"]) != row["input_digest"]
+            or "verification_arguments" in row
+            and digest(row["verification_arguments"]) != row["input_digest"]
         ):
             raise PermissionError("private connector arguments changed")
         return self.current(row["pin"])
+
+    def task_criterion(self, objective: Objective, result: Result) -> dict[str, Any]:
+        from .communication import task_expectation
+        from .executive import authorize_step
+
+        ref, row = next(
+            (ref, row)
+            for ref, row in self.inputs.items()
+            if row.get("effect_task") == result.task_id and "verification_arguments" in row
+        )
+        current = self.check(ref)
+        cap, instance = current["capability"], current["instance"]
+        account = {"id": instance["account_id"], "generation": instance["account_generation"]}
+        if (
+            objective.criterion.get("connector_account") != account
+            or objective.correlation_id != result.correlation_id
+            or result.executor != cap["id"]
+            or current["transport"] != "https"
+        ):
+            raise PermissionError("exact private task verification required")
+        authorize_step(
+            self.h.store,
+            self.h.grid,
+            result.task_id,
+            cap,
+            self.h.executive.targets[cap["node_id"]][1],
+            self.h.memory,
+        )
+        binding = self.h.store.get("plan", result.task_id)["executive"]
+        owner = self.h.store.get("executive_owner", binding["goal_id"])
+        target_session = self.h.executive.targets[cap["node_id"]][1]
+        for node_id, session_id in (
+            (owner["node"], owner["session"]),
+            (cap["node_id"], target_session.id),
+        ):
+            session = self.h.store.get("session", session_id)
+            node = self.h.store.get("node", node_id)
+            if "connectors:read" not in set(session["scopes"]) & set(node["scopes"]):
+                raise PermissionError("current owner and executor read scope required")
+        expected = task_expectation(current["operation"], row["verification_arguments"])
+        if expected is None:
+            raise PermissionError("private task verification contract unavailable")
+        return {
+            "kind": "connector_communication",
+            "connector_account": account,
+            "instance_id": instance["id"],
+            "operation": current["operation"],
+            "expected": expected,
+        }
 
     def review(self, steps: list[dict[str, Any]], planner_task: str) -> list[dict[str, Any]]:
         self.reap()

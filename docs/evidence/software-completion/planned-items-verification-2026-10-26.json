@@ -1,0 +1,75 @@
+{
+  "classification": "PRIVATE_PLANNED_TASK_READBACK_SOFTWARE_VERIFIED",
+  "date": "2026-10-26",
+  "base_head": "9ba8f1504854c0e74d5c12caa5db9be87944157a",
+  "change": "Derive private expected fields for canonical Google Tasks and Microsoft To Do creations from staged literal arguments; independently read saved resource before unblocking dependent Workers. Recheck current owner and executor read authority throughout readback.",
+  "checks": {
+    "focused": {
+      "passed": 18,
+      "seconds": 26.357
+    },
+    "integration": {
+      "passed": 263,
+      "failed": 0,
+      "errors": 0,
+      "test_seconds": 261.34,
+      "wrapper_seconds": 262.579,
+      "source_stable": true,
+      "current_hashes_independently_matched": true
+    },
+    "desktop_protocol": {
+      "status": "SOFTWARE_VERIFIED",
+      "scope": "second synthetic Desktop protocol session approves first owner session native HTTPS Worker via exact signed assistance; real synthetic HTTP POST and independent resource GET",
+      "canonical_task_state": "verified",
+      "private_arguments_absent_from_durable_records": true,
+      "rendered_native_acceptance": false,
+      "real_model_or_provider": false,
+      "seconds": 0.711
+    },
+    "tls_outbound_worker": {
+      "status": "SOFTWARE_VERIFIED",
+      "seconds": 10.035,
+      "tls_mobile_requests": true,
+      "provider_gets": 3,
+      "verified_provider_task": true,
+      "private_model_continuation": true,
+      "separate_outbound_worker_process": true,
+      "canonical_final_task": "verified",
+      "independent_file_readback": true,
+      "provider_json_absent_from_durable_records": true,
+      "limits": [
+        "Core is a thread in the test driver process",
+        "Synthetic model and provider HTTP fixture, synthetic owner",
+        "Protocol acceptance; no rendered native or physical device acceptance"
+      ]
+    },
+    "static": "Ruff and mypy 107 files PASS; repository and diff checks recorded with local commit"
+  },
+  "sources": {
+    "oscar/communication.py": "cbe7e3b1255959fd087db124ff3eafc3ac43fe8da07ba9287aa989cced6a222a",
+    "oscar/connectors.py": "54df2796b3eed195e2369ed85bcb010f8fdddc794e051cc0bf7c72e45a217e3b",
+    "oscar/harness.py": "641061200e885d4a18ef03d398e2fc876d5cab69d305a3751f963373eabfad31",
+    "oscar/planner_connectors.py": "e849cdf5569c15bb0f426d391150ea2e14088699af0fffa6d3919a77db435445",
+    "tests/test_planner_task_verification.py": "e2c8557a8086626c4a593590d993e4603d87d6380988e145453618f0fe95f724"
+  },
+  "local_evidence": {
+    "integration-final.log": "0506f800eaa550b75eb6282b32c6e70075c3fce55d1c006beada90d46370b407",
+    "integration-final-manifest.json": "c17b01d4cb9f60e7a211a3d57db0b9d69da0eac630bc1628cf0d7da56bbfffa3",
+    "focused-hardened.log": "f4e58410d502e131f715778262aa91e52460cedf8b9aada5d23aed6142d939eb",
+    "tls-final.log": "9cafa8ae7a2c4cf9828b849ee628dda800340def0b15d8052f9fa2c146feb604",
+    "read-scope-red.log": "c7d03af1d6a43c96a4e44a63e8fb2041270a8f713805f116337317771a687dda"
+  },
+  "development_history": [
+    "Initial Microsoft fixture used a Google credential reference and was correctly denied; isolated synthetic credential fixed.",
+    "Lost private inputs after POST cancel the task through the existing guard; no replay.",
+    "Earlier 261-case PASS predates the read-scope hardening. A manual regression reproduced false verification after owner read-scope withdrawal; final 18/263-case runs cover both owner and executor withdrawal.",
+    "Initial TLS model fixture context 8192 was insufficient; fixture context increased to 32768 without runtime changes.",
+    "Desktop replay required explicit PYTHONPATH; final hardened replay passed."
+  ],
+  "limits": [
+    "Synthetic provider/model/owner; no real account or rendered native acceptance.",
+    "Unsupported task body shapes and generic MCP outcomes remain PARTIALLY_VERIFIED.",
+    "No full regression on this checkpoint yet; preceding 1277-case PASS predates this change.",
+    "General model accuracy, coordination/replanning, native accessibility and sustained product acceptance remain OPEN."
+  ]
+}
