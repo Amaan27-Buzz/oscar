@@ -50,6 +50,67 @@
       "passed": 3,
       "seconds": 5.514,
       "scope": "Twelve owner/executor scope withdrawals plus target-scoped policy denial across signed Desktop and HTTP phone/Core."
+    },
+    "cross_account_status_tls": {
+      "independently_inspected_completed_resources": 2,
+      "cross_account_verified_tasks": 2,
+      "credential_isolation": true,
+      "status": "SOFTWARE_VERIFIED",
+      "seconds": 11.462,
+      "tls_mobile_requests": true,
+      "provider_gets": 6,
+      "verified_provider_task": true,
+      "private_model_continuation": true,
+      "separate_outbound_worker_process": true,
+      "canonical_final_task": "verified",
+      "independent_file_readback": true,
+      "provider_json_absent_from_durable_records": true,
+      "limits": [
+        "Core is a thread in the test driver process",
+        "Synthetic model and provider HTTP fixture, synthetic owner",
+        "Protocol acceptance; no rendered native or physical device acceptance"
+      ]
+    },
+    "full_regression": {
+      "head": "219323b3b85ec1d10500522b91e5e64301b165f3",
+      "total": 1330,
+      "passed": 1316,
+      "failed": 3,
+      "errors": 1,
+      "skipped": 10,
+      "test_seconds": 1385.46,
+      "wrapper_seconds": 1396.67,
+      "source_stable": true,
+      "current_hashes_independently_matched": true,
+      "status": "FAILED_AGGREGATE",
+      "failures": [
+        "control observation independent UIA GET raised OSError",
+        "retention withdrawal fixture saw one rather than two model calls",
+        "private image focus workflow not verified",
+        "native visual click rejected because selected window was not foreground"
+      ]
+    },
+    "native_followup": {
+      "source_head": "219323b3b85ec1d10500522b91e5e64301b165f3",
+      "isolated": {
+        "total": 6,
+        "passed": 5,
+        "failed": 1,
+        "seconds": 26.663
+      },
+      "visual_diagnostic": {
+        "total": 2,
+        "passed": 2,
+        "seconds": 16.814
+      },
+      "uninterrupted_batch": {
+        "total": 6,
+        "passed": 6,
+        "seconds": 34.153
+      },
+      "guards_unchanged": true,
+      "root_cause": "unresolved intermittent foreground/observation failure",
+      "full_aggregate_remains_failed": true
     }
   },
   "development_history": [
@@ -67,7 +128,7 @@
     "Status-only updates and literal task notes have bounded verification contracts; arbitrary rich markup and unsupported mutation bodies remain partial.",
     "Calendar concurrent-editor/ETag protection, general model reliability, broad coordination and whole-product daily-use acceptance remain open.",
     "No publication, GitHub mutation or production authority activation.",
-    "Newest full regression is pending; the 293-case affected PASS precedes the final target-policy-context fix, covered by three final focused tests."
+    "Full aggregate failed four native/control cases; do not claim full software acceptance. Portable and focused evidence remains separately scoped."
   ],
   "local_log_sha256": {
     "provider-status-focused-hardened.log": "441179af41cb24e17827441fb611f69b4bfe86deed86831ada28e2592992b8a7",
@@ -75,6 +136,11 @@
     "provider-status-final-tls.log": "336fd74d77b58d534c10e157eb5c6fb9ed0267ec2af90117e4cb680d8bea64e8",
     "provider-status-integration.log": "b34629e73fbaa9af76678e420c9cc238cc7f2dc37bbdd85f5dcc6ebed62d7518",
     "provider-status-final-integration.log": "b97f997db073d44e0881aaeb940c78526daf3403601b82ca1dc9809e02f88655",
-    "provider-read-authority-final-focused.log": "dc8842823502979835c8a319f50fe464121d0a21ddc1cdef8c714a335f573cbd"
+    "provider-read-authority-final-focused.log": "dc8842823502979835c8a319f50fe464121d0a21ddc1cdef8c714a335f573cbd",
+    "cross-account-status-tls.log": "dfdb037202686aa848a4949da80f8ce1d3fbefdb767f765ca570c290cef214b0",
+    "provider-status-full-regression.log": "716b8166001fe061dd297b37274fdf85a52259d60d505943c52ee065810ef37b",
+    "native-control-isolated-2026-10-27.log": "35945e94bc5548c6fc5bbf3574304c3c92e636f64f47fbe7419281f5a206f9bd",
+    "native-focus-diagnostic-2026-10-27.log": "ebc5b188bdc6617241b196742b2805ca2c3bf2d785f9284c349a9f2cf80d12ce",
+    "native-control-quiescent-2026-10-27.log": "8f07907ac980fd41723bea4ea36b29f5669f504aebbe67e38366500e9c7a44d5"
   }
 }
