@@ -419,7 +419,7 @@ context, with no automatic priority or schedule decision. See the
 [acceptance receipt](evidence/software-completion/tasks-briefing-2026-10-24.json).
 
 
-The native model-Worker path can now independently verify explicitly approved timed event creation and time-only Google/Microsoft moves after current account observations. Signed Ask or scoped synthetic standing authority owns the mutation; calendar observations never grant flexibility or action permission. Unsupported event shapes, concurrent-editor/ETag protection, general flexible-versus-fixed commitment reasoning and sustained daily-use acceptance remain open. [Calendar evidence](evidence/software-completion/calendar-verification-2026-10-26.json).
+The native model-Worker path can now independently verify explicitly approved timed event creation and time-only Google/Microsoft moves after current account observations. Signed Ask or scoped synthetic standing authority owns the mutation; calendar observations never grant flexibility or action permission. Unsupported event shapes, Microsoft concurrent-editor protection, general flexible-versus-fixed commitment reasoning and sustained daily-use acceptance remain open. [Calendar evidence](evidence/software-completion/calendar-verification-2026-10-26.json).
 
 
 Model-created Workers can now complete/reopen exact Google tasks and update
@@ -429,3 +429,5 @@ notes use escaped HTML and independently decoded readback. Provider resource
 identity and current owner/executor read scope are rechecked; neither a matching
 parent list identifier nor withdrawn read authority can establish verification.
 This does not infer personal priorities or automate general replanning.
+
+Google time-only moves require the reviewed event ETag and fail on a changed version without retrying. Independent saved-event readback still gates dependent Workers. This prevents a stale selected Google event from being overwritten; it does not supply flexibility authority or atomic multi-event coordination. See [connector version enforcement](CONNECTOR-FABRIC.md#private-calendar-verification).

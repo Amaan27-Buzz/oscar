@@ -46,6 +46,7 @@ class Provider:
         self.transform = None
         self.response_headers = {}
         self.fail_after_post = False
+        self.require_etag = False
         owner = self
 
         class Handler(BaseHTTPRequestHandler):
@@ -105,7 +106,15 @@ class Provider:
                         self.send_response(404)
                         self.end_headers()
                         return
+                    if owner.require_etag and self.headers.get("If-Match") != owner.resources[
+                        path
+                    ].get("etag"):
+                        self.send_response(412)
+                        self.end_headers()
+                        return
                     owner.resources[path].update(body)
+                    if owner.require_etag:
+                        owner.resources[path]["etag"] = '"saved-version"'
                     result = deepcopy(owner.resources[path])
                 elif path in owner.resources:
                     result = deepcopy(owner.resources[path])

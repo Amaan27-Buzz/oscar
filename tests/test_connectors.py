@@ -224,6 +224,8 @@ class ConnectorTests(unittest.TestCase):
                 params = {"path": path}
                 if spec.body_required:
                     params["body"] = {"synthetic": True}
+                if spec.name == "google.calendar.events.update":
+                    params["if_match"] = '"source-version"'
                 uri, body = endpoint(spec, params)
                 self.assertNotIn("fixture/id", uri)
                 self.assertEqual(spec.body_required, body is not None)
@@ -739,6 +741,8 @@ class ConnectorTests(unittest.TestCase):
                             parameters["body"] = {
                                 "attendees": [{"email": "synthetic@example.invalid"}]
                             }
+                        if spec.name == "google.calendar.events.update":
+                            parameters["if_match"] = '"source-version"'
                         if notifications is not None:
                             parameters["query"] = {"sendUpdates": notifications}
                         action = replace(

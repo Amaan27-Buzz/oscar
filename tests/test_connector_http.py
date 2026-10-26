@@ -106,6 +106,8 @@ class SyntheticHTTPTests(unittest.TestCase):
                     params = {"path": {k: "synthetic" for k in re.findall(r"\{(.*?)\}", spec.path)}}
                     if spec.body_required:
                         params["body"] = {"fixture": True}
+                    if spec.name == "google.calendar.events.update":
+                        params["if_match"] = '"source-version"'
                     if spec.name.endswith("export"):
                         params["query"] = {"mimeType": "text/plain"}
                     payload, _ = HTTPSConnector().request(manifest, spec, params, "synthetic-token")

@@ -93,6 +93,17 @@ class ConnectorPlanning:
                 "additionalProperties": False,
             },
         }
+        conditional = spec.name == "google.calendar.events.update"
+        if conditional:
+            properties["if_match"] = {
+                "type": "string",
+                "minLength": 3,
+                "maxLength": 256,
+                "description": (
+                    "Copy the exact strong etag from the current selected event observation; "
+                    "never guess. A changed version requires a fresh reviewed action."
+                ),
+            }
         if spec.body_required:
             properties["body"] = {"type": "object"}
             if spec.name == "microsoft.todo.tasks.create":
@@ -108,7 +119,9 @@ class ConnectorPlanning:
         return {
             "type": "object",
             "properties": properties,
-            "required": (["path"] if paths else []) + (["body"] if spec.body_required else []),
+            "required": (["path"] if paths else [])
+            + (["body"] if spec.body_required else [])
+            + (["if_match"] if conditional else []),
             "additionalProperties": False,
         }
 
@@ -147,7 +160,8 @@ class ConnectorPlanning:
                 "Use the exact selected account/tool; never invent arguments or references. "
                 "No input substitutions or verification claims. Observation stages may use "
                 "only native HTTPS GET operations marked read, without a body. "
-                "For HTTPS, arguments contains only path/query/body; origin, method, headers "
+                "For HTTPS, use exactly argument_schema fields, including if_match when required; "
+                "origin, method, headers "
                 "and credentials are fixed by Core. Body fields must come from the owner's "
                 "explicit request; the endpoint shape is not a provider body-field schema. "
                 "Arguments are privately staged for exact review and one immediate execution. "

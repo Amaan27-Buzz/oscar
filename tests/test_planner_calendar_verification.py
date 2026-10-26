@@ -71,6 +71,9 @@ class PlannedCalendarVerificationTests(unittest.TestCase):
         if not update:
             body["summary" if provider == "google" else "subject"] = self.marker
         arguments = {"path": path, "body": body}
+        if provider == "google" and update:
+            arguments["if_match"] = '"source-version"'
+            self.api.require_etag = True
         if provider == "google":
             arguments["query"] = {"sendUpdates": "none"}
         self.change["value"]["capabilities"][-1]["capability_id"] = self.cap.id
@@ -86,6 +89,7 @@ class PlannedCalendarVerificationTests(unittest.TestCase):
             )
             self.api.resources[resource_path] = {
                 "id": "selected-event",
+                "etag": '"source-version"',
                 "summary" if provider == "google" else "subject": self.marker,
                 "start": point("10"),
                 "end": point("11"),
@@ -214,3 +218,70 @@ class PlannedCalendarVerificationTests(unittest.TestCase):
         self.api.transform = lambda method, data: {**data, "id": "primary"}
         self.assertEqual("partially_verified", self.run_ask())
         self.assertEqual(["PATCH"], [call[0] for call in self.api.calls])
+
+    def test_changed_version_rejects_once_without_overwriting_or_readback(self):
+        self.configure(update=True)
+        resource = next(iter(self.api.resources.values()))
+        resource.update(etag='"concurrent-version"', summary="Concurrent editor title")
+        before = deepcopy(resource)
+        self.assertEqual("failed", self.run_ask())
+        for _ in range(3):
+            self.h.executive.tick()
+        self.assertEqual(before, resource)
+        self.assertEqual(["PATCH"], [c[0] for c in self.api.calls])
+        self.assertEqual("precondition_failed", self.h.store.all("result")[-1]["error"])
+
+    def test_google_move_requires_one_strong_bounded_version_at_boundary(self):
+        from oscar.connectors import endpoint
+        from oscar.planner_connectors import ConnectorPlanning
+
+        self.configure(update=True)
+        spec = next(c for c in self.manifest.capabilities if c.name.endswith("events.update"))
+        arguments = self.steps[0]["intent"]["parameters"]["arguments"]
+        schema = ConnectorPlanning.http_schema(spec)
+        self.assertIn("if_match", schema["required"])
+        for tag in (
+            None,
+            "",
+            "*",
+            'W/"version"',
+            '"a", "b"',
+            '"a\r\nb"',
+            '"' + "x" * 255 + '"',
+            42,
+        ):
+            with self.subTest(tag=tag), self.assertRaises(ValueError):
+                endpoint(spec, {**arguments, "if_match": tag})
+        with self.assertRaises(ValueError):
+            endpoint(spec, {key: value for key, value in arguments.items() if key != "if_match"})
+        read = next(c for c in self.manifest.capabilities if c.name.endswith("events.get"))
+        with self.assertRaises(ValueError):
+            endpoint(read, {"path": arguments["path"], "if_match": '"version"'})
+        self.assertEqual([], self.api.calls)
+
+    def test_signed_full_conditional_move_verifies_without_action_review(self):
+        from oscar.planner_authoring import PlannerAuthoring
+
+        self.configure(update=True)
+        self.grant_full([self.account.id])
+        result = PlannerAuthoring(self.h).conversation(
+            "Move selected synthetic calendar event",
+            self.owner.node_id,
+            self.owner.id,
+            self.owner_scope,
+            self.grants,
+        )
+        self.assertIn("assistance_started", result)
+        self.assertEqual("verified", self.settle())
+        self.assertEqual([], self.h.store.all("executive_confirmation"))
+        self.assertEqual(["PATCH", "GET"], [c[0] for c in self.api.calls])
+
+    def test_unconditional_google_move_cannot_stage_a_private_action(self):
+        self.configure(update=True)
+        del self.steps[0]["intent"]["parameters"]["arguments"]["if_match"]
+        self.response()
+        self.draft()
+        self.assertEqual("failed", self.h.store.all("task")[-1]["state"])
+        self.assertEqual({}, self.h.connectors.requests)
+        self.assertEqual({}, self.h.connector_plans.inputs)
+        self.assertEqual([], self.api.calls)

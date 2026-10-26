@@ -285,7 +285,14 @@ class ConnectorHTTP(Protocol):
 
 
 def endpoint(spec: ConnectorCapability, parameters: dict[str, Any]) -> tuple[str, bytes | None]:
-    if set(parameters) - {"path", "query", "body"}:
+    conditional = spec.name == "google.calendar.events.update"
+    if conditional:
+        tag = parameters.get("if_match")
+        if not isinstance(tag, str) or not re.fullmatch(r'"[\x21\x23-\x7e]{1,254}"', tag):
+            raise ValueError("calendar update requires the selected event strong ETag")
+    if set(parameters) - (
+        {"path", "query", "body", "if_match"} if conditional else {"path", "query", "body"}
+    ):
         raise ValueError("unsupported connector input fields")
     paths = parameters.get("path", {})
     query = parameters.get("query", {})
@@ -337,6 +344,8 @@ class HTTPSConnector:
         path, body = endpoint(spec, parameters)
         headers = dict(manifest.headers)
         headers.update({"Accept": "application/json", "Content-Type": "application/json"})
+        if spec.name == "google.calendar.events.update":
+            headers["If-Match"] = parameters["if_match"]
         if secret:
             if "\r" in secret or "\n" in secret:
                 raise ConnectorError("invalid_credential")
@@ -372,9 +381,12 @@ class HTTPSConnector:
                 raise ConnectorError("provider_rejected")
             return payload, manifest.base_url.rstrip("/") + path.split("?")[0]
         except HTTPError as error:
-            category = {401: "auth_missing", 403: "access_denied", 429: "rate_limited"}.get(
-                error.code, "http_failure"
-            )
+            category = {
+                401: "auth_missing",
+                403: "access_denied",
+                412: "precondition_failed",
+                429: "rate_limited",
+            }.get(error.code, "http_failure")
             error.close()
             raise ConnectorError(category) from None
         except (URLError, OSError, TimeoutError):
@@ -725,6 +737,7 @@ class ConnectorFabric:
                         "access_denied",
                         "rate_limited",
                         "http_failure",
+                        "precondition_failed",
                         "network_failure",
                         "invalid_contract",
                         "response_bound",

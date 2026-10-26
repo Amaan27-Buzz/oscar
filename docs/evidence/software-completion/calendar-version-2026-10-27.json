@@ -1,0 +1,76 @@
+{
+  "classification": "GOOGLE_CALENDAR_CONDITIONAL_UPDATE_SOFTWARE_VERIFIED",
+  "date": "2026-10-27",
+  "base_head": "a632136bc9d54f7ba801e8baebd911e27845020c",
+  "change": "Require a bounded strong selected-event ETag for Google event PATCH. Exact signed private parameters carry If-Match; stale versions fail once without overwrite, retry or dependent Worker release. Independent saved-resource GET remains mandatory.",
+  "checks": {
+    "initial_focused": {
+      "total": 59,
+      "passed": 59,
+      "seconds": 32.825
+    },
+    "tls_mobile_outbound_worker": {
+      "independent_saved_event_inspection": true,
+      "provider_enforced_if_match": true,
+      "status": "SOFTWARE_VERIFIED",
+      "seconds": 10.003,
+      "tls_mobile_requests": true,
+      "provider_gets": 3,
+      "verified_provider_task": true,
+      "private_model_continuation": true,
+      "separate_outbound_worker_process": true,
+      "canonical_final_task": "verified",
+      "independent_file_readback": true,
+      "provider_json_absent_from_durable_records": true,
+      "limits": [
+        "Core is a thread in the test driver process",
+        "Synthetic model and provider HTTP fixture, synthetic owner",
+        "Protocol acceptance; no rendered native or physical device acceptance"
+      ]
+    },
+    "integration": {
+      "total": 298,
+      "passed": 298,
+      "test_seconds": 341.055,
+      "wrapper_seconds": 342.098,
+      "source_stable": true,
+      "current_hashes_independently_matched_at_collection": true,
+      "qualification": "Precedes the final planner descriptor wording correction for the new if_match input."
+    },
+    "final_contracts": {
+      "total": 24,
+      "passed": 24,
+      "seconds": 35.632,
+      "qualification": "Final planner descriptor explicitly permits the schema-required if_match field."
+    },
+    "static": "Ruff, mypy 107 files, repository and diff checks recorded at commit"
+  },
+  "development_history": [
+    "The final focused draft-rejection test initially expected ValueError; the existing planner correctly records a failed model task and releases inputs instead. The assertion now checks that actual fail-closed contract.",
+    "An affected run was stopped after 32.371 seconds to correct that test assertion; it is not acceptance evidence."
+  ],
+  "sources": {
+    "oscar/connectors.py": "b6eb7e960c7907bedd155b96d942684206060d9c60a444d29bc1e50f85e61025",
+    "oscar/communication.py": "279aa86b3814586fba110a3611f6ba71452b10a0d3dc24755bfefcac077afb44",
+    "oscar/planner_connectors.py": "ee037c34b5b515d7ac2f468ec41f8545ab837ac4a7e959f079daf1a50b711d46",
+    "tests/test_planner_calendar_verification.py": "f11b66f5729059367ed53a9daf70f4cac571d2c658aad0591c1ef27991959d0c",
+    "tests/test_communication.py": "365dd14756a839228427ade97a114e0844b45ec3d523815a8941b2439365fee3",
+    "tests/test_connectors.py": "9f63b0bb0e138d65c0d4a8135f23d580b036848e9d39c3d1077eee55c8ce271e",
+    "tests/test_connector_http.py": "84aad13fe2268388065720b3c48318bda01426e88a035b1e0b81625f65f9bd93"
+  },
+  "limits": [
+    "Synthetic owners, credentials, model and provider HTTP; no real account commissioning.",
+    "Microsoft event conditional writes are not established; those updates retain a concurrent-editor race.",
+    "Google delete is unchanged and does not use this update-only version contract.",
+    "No atomic multi-event replanning, general flexibility reasoning or daily-use acceptance claim.",
+    "The prior full aggregate retains its four native failures; no full-product PASS."
+  ],
+  "local_log_sha256": {
+    "calendar-version-focused.log": "5ae494d3a3b5c32f94d9b1db62fb6075805d1549f27434584f5c7057520bc055",
+    "calendar-version-tls.log": "9a252f91603089197db0633d55c810e45cc94481d351932dcb713917d8ce9c8c",
+    "calendar-version-integration.log": "cd4e940a09bbf442a657ec5573b43430390a6fa9eb838b530658bda9135e9e40",
+    "calendar-version-final-contract.log": "2f355ca6e503f5319e525a11f06f2783866c2b4cc9bb26f2e9d34a266bd93528",
+    "calendar-version-final-tls.log": "7d9204f6762dc406a7af03bc73651755129d87284294055bda5daf087a958111"
+  },
+  "provider_contract": "https://developers.google.com/workspace/calendar/api/guides/version-resources"
+}

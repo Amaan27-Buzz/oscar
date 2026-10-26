@@ -562,7 +562,12 @@ def calendar_expectation(name: str, parameters: dict[str, Any]) -> dict[str, Any
     try:
         google = name.startswith("google.")
         create = name.endswith(".create")
-        if set(parameters) - {"path", "body", "query"}:
+        conditional = google and not create
+        if conditional and not isinstance(parameters.get("if_match"), str):
+            return None
+        if set(parameters) - (
+            {"path", "body", "query", "if_match"} if conditional else {"path", "body", "query"}
+        ):
             return None
         query = parameters.get("query", {})
         if (
