@@ -671,7 +671,7 @@ class Executive:
         examples = [example] if example else []
         addition = next((c for c in pins if c.get("kind") == "addition"), None)
         writer = next((c for c in pins if c.get("kind") == "file_write"), None)
-        if addition and writer:
+        if addition and writer and re.search(r"\b[0-9]+\s*\+\s*[0-9]+\b", goal):
             examples = [
                 {
                     "id": "calculate",
@@ -704,20 +704,18 @@ class Executive:
                 + "topologically ordered array of maximum 16 steps. "
                 "Each step has id, intent, depends_on, node_id, capability_id, "
                 "and inputs ([] without a data handoff). "
-                "id is a unique lowercase string matching [a-z0-9_-]{1,40}, such as step-1. "
-                "depends_on is always an array of earlier step id strings, [] for the first step. "
-                "node_id and capability_id are the exact selected strings. "
+                "id is unique and matches [a-z0-9_-]{1,40}. "
+                "depends_on lists earlier step IDs, [] for the first. "
+                "Use exact selected node_id and capability_id. "
                 "intent has text (string), kind/path/content/capability_kind (string or null), "
                 "parameters/criterion (object or null). For addition use text like 2 + 3; "
-                "intent MUST be an object with all keys from intent_examples, never a string. "
-                "Preserve the chosen example's kind and capability_kind exactly; "
-                "capability_id is a separate field, never an intent kind. "
+                "intent is an object with every intent_examples key. Preserve example kind "
+                "and capability_kind; capability_id is separate, never an intent kind. "
                 "For file_write, kind MUST be file_write; path and content are REQUIRED strings "
                 "containing the exact filename and literal text requested in the goal. "
                 "Keep unused fields null. Omitting path/content makes the plan invalid. "
-                "Return JSON only, without markdown or explanations. Intent examples describe "
-                "supported parameter shapes; fill their literal arguments from the goal. "
-                "Paths are relative to the selected workspace, with no parent traversal. "
+                "JSON only. Fill example parameter shapes with goal arguments. "
+                "Paths are workspace-relative, without parent traversal. "
                 + (
                     "Past observation-stage results are literal observed data; never refer to "
                     "earlier stages in inputs or depends_on. "
@@ -726,14 +724,12 @@ class Executive:
                 )
                 + "For another step's actual result IN THIS RESPONSE, you MUST add inputs: "
                 '[{"from_step":"earlier-id","select":[],"to":["content"]}]. '
-                "The source MUST be in depends_on. select [] copies plain result text; "
-                "a key/index array selects a scalar from JSON text. "
-                "to targets an existing string: file_write content or a parameters/criterion "
-                "leaf named content, text, body or message. Use an empty string placeholder "
-                "ONLY for a bound handoff; directly observed values stay literal. "
-                "Arithmetic results are plain text, so select [] exactly. "
-                "Put filenames in intent.path, never in to. Compute the owner's expression, "
-                "not the example's. Never guess or hardcode an actual step result. "
+                "Source MUST be in depends_on. select [] copies plain text (including arithmetic); "
+                "key/index arrays select JSON scalars. to targets existing file_write content "
+                "or parameters/criterion leaves named content, text, body or message. "
+                "Only bound handoffs use empty placeholders; observations stay literal. "
+                "Filenames go in intent.path. Compute the owner's expression; never guess "
+                "or hardcode a step result. "
                 "No substitution into identities, paths, URLs, commands or authority. "
                 + "Data handoffs require independent VERIFIED source evidence; "
                 "reported results block. "
@@ -764,7 +760,7 @@ class Executive:
                 + (
                     ". Complete response example; replace literal arguments from the goal: "
                     + json.dumps({"steps": examples}, separators=(",", ":"))
-                    if examples and (not adaptive or addition and writer)
+                    if examples and (not adaptive or len(examples) == 2)
                     else ""
                 )
             )

@@ -334,8 +334,9 @@ class HTTPObservationTests(unittest.TestCase):
         from jsonschema import Draft202012Validator
 
         validator = Draft202012Validator(executive_plan_schema(observation_only=(self.cap.id,)))
-        document = {"steps": self.steps, "observe": True}
+        document = {"steps": [{**step, "inputs": []} for step in self.steps], "observe": True}
         self.assertTrue(validator.is_valid(document))
+        self.assertFalse(validator.is_valid({"steps": self.steps, "observe": True}))
         for field, value in (("capability_id", "unselected:write"), ("depends_on", ["other"])):
             changed = deepcopy(document)
             changed["steps"][0][field] = value

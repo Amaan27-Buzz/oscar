@@ -235,7 +235,10 @@ class DirectoryObservationTests(unittest.TestCase):
                 "Controller live preflight", json.dumps(provider_case.requests[0]["body"])
             )
             prompt = provider_case.requests[0]["body"]["messages"][0]["content"]
-            self.assertNotIn('"capability_id": "machine.files.write"', prompt)
+            catalog, _ = json.JSONDecoder().raw_decode(
+                prompt.split("Use only these capabilities: ", 1)[1]
+            )
+            self.assertNotIn("machine.files.write", {p["capability_id"] for p in catalog})
             self.assertTrue(
                 h.store.all("planner_request")[0]["planning_step"]["intent"]["parameters"][
                     "observation_only"
@@ -255,7 +258,10 @@ class DirectoryObservationTests(unittest.TestCase):
         self.assertEqual(3, len(provider_case.requests))
         if current:
             prompt = provider_case.requests[1]["body"]["messages"][0]["content"]
-            self.assertIn('"capability_id": "machine.files.write"', prompt)
+            catalog, _ = json.JSONDecoder().raw_decode(
+                prompt.split("Use only these capabilities: ", 1)[1]
+            )
+            self.assertIn("machine.files.write", {p["capability_id"] for p in catalog})
             self.assertNotIn("Controller live preflight", prompt)
         self.assertIn("source-314.txt", json.dumps(provider_case.requests[1]["body"]))
         self.assertIn("observed_at", json.dumps(provider_case.requests[1]["body"]))

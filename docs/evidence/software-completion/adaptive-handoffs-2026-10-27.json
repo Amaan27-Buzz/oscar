@@ -6,7 +6,8 @@
     "Observation examples and complete effect examples remain distinct. Structured decoded steps require inputs, with [] for no handoff.",
     "Repeated exact node IDs and endpoint origins are shared. Omitted operations are reconstructed only when identical to the capability_id suffix. No catalog truncation, scope change or size-limit expansion.",
     "Owner exact text may be supplied by a verified handoff, but the resolved value is checked before file task creation. Wrong verified result cannot create the file.",
-    "Reference acceptance waits for both dependent task records before testing completion; it no longer races the first task."
+    "Reference acceptance waits for both dependent task records before testing completion; it no longer races the first task.",
+    "Goal-relevant arithmetic examples and concise equivalent instructions leave room for private HTTP/memory continuation on existing 8192-context models; budgets and capability catalogs are unchanged."
   ],
   "checks": {
     "catalog_before_final_required_inputs": {
@@ -278,13 +279,141 @@
       "mypy": "107 source files PASS",
       "repository": "PASS"
     },
-    "full_regression": "Pending on resulting local commit"
+    "full_regression": {
+      "head": "fe230c3550095972848c203a511dcdce5e2879e6",
+      "total": 1350,
+      "passed": 1336,
+      "skipped": 10,
+      "failures": 4,
+      "errors": 0,
+      "seconds": 1089.385,
+      "wrapper_seconds": 1092.089,
+      "source_stable": true,
+      "independently_matched_source_hashes": 298,
+      "failures_detail": [
+        "Directory observation checks obsolete JSON spacing rather than decoded capability selection.",
+        "HTTP observation continuation exceeds8192context (6394input+2048output, zero eligible routes).",
+        "Structured observation fixture omits newly required inputs array.",
+        "Combined memory/observation continuation stops before second model call; context regression under investigation."
+      ],
+      "native_control_image_visual": "PASS in this aggregate; earlier intermittent failures retain unproven cause."
+    },
+    "compact_context_real_model": [
+      {
+        "state": "PASS",
+        "model": "granite4.1:3b",
+        "elapsed_seconds": 9.115,
+        "source_stable": true,
+        "authority_mode": "ask",
+        "local_receipt_sha256": "dc40d91ed28855310136c7fa7738fd57b615bc89b78f05155f0a52d750bbf589"
+      },
+      {
+        "state": "PASS",
+        "model": "granite4.1:3b",
+        "elapsed_seconds": 5.715,
+        "source_stable": true,
+        "authority_mode": "full",
+        "local_receipt_sha256": "7413040a182d32c04508b38bb7d78eb2e847210575805a66a9fa8ad36debcf52"
+      },
+      {
+        "state": "PASS",
+        "model": "granite4.1:3b",
+        "elapsed_seconds": 11.34,
+        "source_stable": true,
+        "authority_mode": "ask",
+        "local_receipt_sha256": "ecc5296374803dcb04d132628ed3ea1805886cf1ac35daa9b0b2d3082be939fd"
+      },
+      {
+        "state": "PASS",
+        "model": "granite4.1:3b",
+        "elapsed_seconds": 7.573,
+        "source_stable": true,
+        "authority_mode": "full",
+        "local_receipt_sha256": "42636980ff69854374cd4eac6ee880fcf2f8e97673f997b019b788fd0ea59eb6"
+      },
+      {
+        "state": "PASS",
+        "model": "granite4.1:3b",
+        "elapsed_seconds": 10.672,
+        "source_stable": true,
+        "authority_mode": "ask",
+        "local_receipt_sha256": "e6e2db9a366edf233314db0f2415fe2a8c0762f3254b31cddd0e4b5e151b7c4b"
+      },
+      {
+        "state": "PASS",
+        "model": "granite4.1:3b",
+        "elapsed_seconds": 9.392,
+        "source_stable": true,
+        "authority_mode": "full",
+        "local_receipt_sha256": "9d693fc668064d242226293ef01589fc9d64b5829ecfd1736386a950c3eb99c1"
+      }
+    ],
+    "compact_context_real_model_qualification": "Precedes final concise handoff wording; six cases passed but HTTP continuation still exceeded context after file-kind instruction restoration.",
+    "final_compact_context": {
+      "passed": 46,
+      "seconds": 73.422,
+      "real_model": [
+        {
+          "state": "PASS",
+          "authority_mode": "ask",
+          "seconds": 9.437,
+          "source_stable": true,
+          "independently_matched_sources": 108,
+          "local_receipt_sha256": "d940962bd20c0ba80651f0fb3464ef325f1880a882a4f5f31ea6cb9cfa2ccbce"
+        },
+        {
+          "state": "PASS",
+          "authority_mode": "full",
+          "seconds": 6.113,
+          "source_stable": true,
+          "independently_matched_sources": 108,
+          "local_receipt_sha256": "963a1ec981154d1caf2562055a5c3f90551b33c750a412d61177cdc106580cf7"
+        },
+        {
+          "state": "PASS",
+          "authority_mode": "ask",
+          "seconds": 11.463,
+          "source_stable": true,
+          "independently_matched_sources": 108,
+          "local_receipt_sha256": "48424ee6f34ad561c0cabbac4b88b4f27dbdcacbe573f3af49a4087192173ece"
+        },
+        {
+          "state": "PASS",
+          "authority_mode": "full",
+          "seconds": 7.919,
+          "source_stable": true,
+          "independently_matched_sources": 108,
+          "local_receipt_sha256": "ee0be4f79707c6d05e475dc855816964a4afafde23055e606a0eb1d33df7674f"
+        },
+        {
+          "state": "PASS",
+          "authority_mode": "ask",
+          "seconds": 10.788,
+          "source_stable": true,
+          "independently_matched_sources": 108,
+          "local_receipt_sha256": "13e3d88f78afd541fd2216da4f28da936a6e172e497413569aa8fddaf0073dec"
+        },
+        {
+          "state": "PASS",
+          "authority_mode": "full",
+          "seconds": 7.637,
+          "source_stable": true,
+          "independently_matched_sources": 108,
+          "local_receipt_sha256": "33d0c40abc0214f05e6c10143e8072b7a06ef9f5c00a8272f2c59dd994dd0c5c"
+        }
+      ],
+      "ruff": "PASS",
+      "mypy": "PASS 107 files",
+      "repository": "PASS",
+      "full_regression": "The 1350-case failed aggregate above is retained. Fresh full aggregate pending."
+    }
   },
   "retained_failures": [
     "Earlier long catalog requests hit the durable limit before final sharing.",
     "Prompt correction alone did not make the model emit optional inputs; a placeholder string was written in synthetic workspaces. The reference correctly failed objective acceptance.",
     "Prior literal protection rejected legitimate bound handoffs; final runtime checks the independently resolved value instead.",
-    "The latest previous whole-suite run failed native foreground/control cases; isolated passes do not supersede the aggregate."
+    "The latest previous whole-suite run failed native foreground/control cases; isolated passes do not supersede the aggregate.",
+    "An intermediate shortened prompt produced a null file intent kind in one Ask model run; validation blocked it. Mandatory file-kind wording was restored before the final six-case pass."
   ],
   "boundaries": [
     "Installed Granite 4.1 3B only; no downloads or cloud/paid inference.",
@@ -305,6 +434,10 @@
     "adaptive-handoff-catalog-final-contracts.log": "733ee4f1bb9c95d32efbd578d81c03bcf1426fd02700d0172c07bb65acaacba1",
     "resolved-literal-handoff-contracts.log": "15729829f98f42e72e94ef14e3331a936c230729dfee91f1e1cf71f3b7a1bab2",
     "handoff-authoring-observation-integration.log": "ebbea3a6e75fa0d0ccfb02dbd998c4ccd73120c3075f43a4747f726a86edb7eb",
-    "local-catalog-resolved-literal-final.log": "1de630caf79b54da6c00f86a1061a17c5c3c7d905682f64192e26ead524f196f"
+    "local-catalog-resolved-literal-final.log": "1de630caf79b54da6c00f86a1061a17c5c3c7d905682f64192e26ead524f196f",
+    "adaptive-handoffs-full-regression.log": "b5c2c7301ab901d5213ea1e3af5ef07e38b1b8902acb26a2532ace70299fae8a",
+    "local-catalog-context-restored.log": "bdea67c460c0dad4d319b2b34080d66bda9334262e2a7d6692fe93a4fd11cc77",
+    "handoff-context-final.log": "f2f2b7ef66331cd51d56120d74bea3a8f1b1f63007eb42221a4f544df22865d3",
+    "local-catalog-context-final.log": "b985c7fbf07e91b4119fb21f6b6b34db1c119b8c0c60a474f67bdb159308b66f"
   }
 }

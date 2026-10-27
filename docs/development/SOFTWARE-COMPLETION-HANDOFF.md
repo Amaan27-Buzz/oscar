@@ -821,3 +821,18 @@ regression is pending on the resulting local commit. Earlier placeholder writes
 and size failures remain failed evidence, not successes. Broader model/native
 reliability and the original full mandate remain OPEN.
 [Receipt](../evidence/software-completion/adaptive-handoffs-2026-10-27.json).
+
+
+**2026-10-27 small-context continuation correction:** the frozen full run at
+`fe230c3` completed 1,350 cases: 1,336 passed, ten skipped, four failed,
+1,089.385 seconds, with 298 source hashes independently matched. Native control,
+image and visual checks passed in that aggregate. Two assertions/fixtures needed
+alignment with compact JSON and required inputs; private HTTP/memory continuation
+needed concise instructions and goal-relevant arithmetic examples to fit existing
+context limits. No context, authority or durable limit was increased. All 46
+final affected tests passed (73.422s); all six installed-Granite Ask/Full file,
+multistep and verified-handoff cases passed with independently matched sources.
+An intermediate null file-kind model response was correctly blocked and retained.
+Ruff, mypy (107 files) and repository checks passed. A fresh whole-suite result
+is still required; the failed aggregate is not relabeled as a pass.
+[Evidence](../evidence/software-completion/adaptive-handoffs-2026-10-27.json).
