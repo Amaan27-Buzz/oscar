@@ -414,7 +414,24 @@ class Assistance:
             state = h.world.source_review(identifier)
         else:
             raise ValueError("unsupported assistance change")
-        review = {"change": change, "current": state}
+        displayed = state
+        if operation in {"plan_draft", "plan_accept"} and len(state["capabilities"]) > 16:
+            # Bind full input/history while showing one catalog and the exact proposed effects.
+            displayed = {k: v for k, v in state.items() if k != "step"}
+            if "step" in state:
+                displayed["model_input_digest"] = fingerprint(state["step"])
+            for key in ("worker", "request"):
+                if key in state:
+                    displayed[key] = {
+                        k: v
+                        for k, v in state[key].items()
+                        if k not in {"capabilities", "contracts"}
+                    }
+                    displayed[key]["full_digest"] = fingerprint(state[key])
+            displayed["executors"] = list(
+                {(e["node_id"], e["session_id"]): e for e in state["executors"]}.values()
+            )
+        review = {"change": change, "current": displayed}
         if proposal is not None:
             review["proposal"] = proposal
         if len(json.dumps(review).encode()) > 24000:
@@ -629,11 +646,15 @@ class Assistance:
             elif operation in {"plan_draft", "plan_accept"}:
                 from .planner_authoring import PlannerAuthoring
 
-                PlannerAuthoring(h).complete(
+                planning = PlannerAuthoring(h)
+                state = planning.material(operation, identifier, value, grants)
+                if fingerprint(state) != material["digest"]:
+                    raise PermissionError("planning changed while restoring exact reviewed input")
+                planning.complete(
                     operation,
                     identifier,
                     value,
-                    material["review"]["current"],
+                    state,
                     {"node": node, "session": session, "scope": scope, "public_key": key},
                 )
             elif operation == "confirm_task":

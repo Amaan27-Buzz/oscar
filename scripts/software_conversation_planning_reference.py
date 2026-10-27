@@ -209,8 +209,8 @@ def run(full=False, multistep=False, handoff=False, model=MODEL):
                     report["provider_decoding"] = {k: body.get(k) for k in ("format", "options")}
                     return request
 
-                def observe_text(data, streaming=False):
-                    value = parse_text(data, streaming)
+                def observe_text(data, streaming=False, *, images=False):
+                    value = parse_text(data, streaming, images=images)
                     report["synthetic_provider_text"] = value
                     return value
 

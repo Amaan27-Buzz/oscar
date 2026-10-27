@@ -1,0 +1,114 @@
+{
+  "classification": "BOUNDED_LARGE_CAPABILITY_CATALOG_SOFTWARE_VERIFIED",
+  "date": "2026-10-27",
+  "base_head": "50622d6",
+  "problem": "Connecting synthetic Google Tasks and Microsoft Graph produced 25 connector operations and blocked an unrelated conversation file objective at the old fifteen-action limit.",
+  "change": "Allow up to 128 exact scoped pins on temporary planning Workers while preserving sixteen ordinary Worker pins and sixteen action steps. Factor identical connector prompt templates, retain all argument schemas, and bind omitted prompt/history with full-state digests in size-bounded signed native reviews. Reconstruct and compare exact reviewed state before execution. Identical argument schemas use lossless shared definitions; structured response schemas use compact JSON. No schema, size bound or action authority is removed.",
+  "checks": {
+    "focused": {
+      "passed": 7,
+      "seconds": 8.635,
+      "qualification": "Precedes additional upper-bound assertions in the existing bounds test; final affected run includes them."
+    },
+    "signed_tls_conversation": {
+      "status": "SOFTWARE_VERIFIED",
+      "seconds": 6.103,
+      "catalog_size": 25,
+      "signed_tls_conversation": true,
+      "separate_outbound_worker_process": true,
+      "canonical_final_task": "verified",
+      "independent_file_readback": true,
+      "unrelated_provider_calls": 0,
+      "model_requests": 1,
+      "limits": [
+        "Core is a thread in the test driver process",
+        "Synthetic model, provider accounts, credentials and owner",
+        "Protocol acceptance; no rendered native or physical device acceptance"
+      ]
+    },
+    "affected_integration": {
+      "passed": 329,
+      "seconds": 300.088,
+      "wrapper_seconds": 301.007,
+      "source_stable": true,
+      "independently_matched_source_hashes": 226,
+      "includes_final_upper_bound_assertions": true,
+      "qualification": "Earlier passing run precedes final shared schemas; final 330-test run has one retained MCP startup error."
+    },
+    "static": {
+      "ruff": "PASS",
+      "mypy": "107 source files PASS",
+      "repository": "PASS after final schema-sharing edit",
+      "diff": "PASS"
+    },
+    "structured_catalog_contracts": {
+      "passed": 8,
+      "seconds": 32.974,
+      "includes_lossless_schema_reconstruction": true,
+      "includes_structured_model_and_upper_bound_assertions": true
+    },
+    "real_local_model": {
+      "status": "FAILED",
+      "model": "granite4.1:3b",
+      "digest": "6fd349357287c7ffc9e38189a93b48ea175d24fc566b38f09cfc564fb7f303eb",
+      "qualification": "Initial real attempt exposed durable proposal overflow, reproduced in a structured regression and corrected. Subsequent normal configured attempts reached real inference but timed out at the existing fifteen-second routing budget, including after explicit preload. No file objective accepted. Synthetic owner/accounts; provider API calls blocked; run-owned loopback model server stopped. A diagnostic ninety-second run produced a plan that omitted the requested final period. A subsequent diagnostic observer crashed on null parameters before effects. Exact-literal preservation and normal configurable timeout remain open; no real-model file success claimed."
+    },
+    "final_affected_integration": {
+      "tests": 330,
+      "passed": 329,
+      "errors": 1,
+      "seconds": 864.996,
+      "source_stable": true,
+      "independently_matched_source_hashes": 226,
+      "error": "MCPPlanningTests.test_account_generation_change_blocks_review: mcp_connection_timeout during fixture setup, before the authority assertion. Isolated reproduction also timed out."
+    },
+    "desktop": {
+      "tests_passed": 134,
+      "files": 24,
+      "single_worker": true,
+      "seconds": 220.01,
+      "build": "PASS",
+      "qualification": "Default parallel run hit worker startup errors; serial run passed."
+    },
+    "final_tls": {
+      "status": "PASS",
+      "seconds": 13.885,
+      "synthetic_accounts": true,
+      "separate_outbound_worker_process": true,
+      "provider_api_calls": 0
+    }
+  },
+  "development_history": [
+    "Reproduced the fifteen-action rejection with actual native account projections before changing code.",
+    "The first test harness setup lacked a borrowed bind method; corrected before recording the failing product assertion.",
+    "After enlarging the catalog, model input and signed/durable size guards correctly rejected repeated descriptors; shared templates and digest-bound review compaction remove duplication without raising those guards.",
+    "The first TLS fixture omitted required explicit remote task retention and was rejected before planning. The corrected synthetic request explicitly permits retention; no runtime retention rule changed.",
+    "Real configured structured-model checks exposed a durable record overflow omitted by the earlier text-only fixture. The regression now requires structured output; repeated exact schemas and compact JSON correct it.",
+    "Installed local Granite inference timed out while processing the catalog under the existing fifteen-second routing policy, including an explicit preload campaign. This is retained as failed model acceptance, not a capability success."
+  ],
+  "sources": {
+    "oscar/assistance.py": "fbf37a126b25fd604dd553c3357861ce6d652ea4d8423c754d5aa606444d2524",
+    "oscar/executive.py": "50ad05dde6b9874c1261f741f834602abdacaaae6cc78ae154274ac3fbd7dabb",
+    "oscar/planner_authoring.py": "56c8efea4214365daa25089a0305c7c4e38e14f11b4792ced30458307271a412",
+    "tests/test_planner_catalog.py": "ca4febb21c9a2f256880de3f5dfcf85e579a67ea9cc7623b94a384b025a280a6",
+    "scripts/software_conversation_planning_reference.py": "4ce88d7dd450ac44ba3c070164182289baa859df209ba09fef0c27aa2566700e"
+  },
+  "limits": [
+    "No catalog truncation or guessed authority; model context, 32 KiB durable goal, 24 KiB display and 32 KiB signing-body bounds still reject oversized inputs.",
+    "A temporary planning Worker may hold 128 scoped capability pins; this is not a guarantee every 128-entry schema catalog fits a configured model or native frame.",
+    "Synthetic model/account/credentials/owner; no real provider or native rendered/physical acceptance.",
+    "One TLS Core runs as a driver thread and its Desktop Worker is a separate process.",
+    "General model planning and visual accuracy, richer Chief-of-Staff coordination and whole-product acceptance remain open."
+  ],
+  "local_log_sha256": {
+    "planning-catalog-final-focused.log": "f704b2d26ac446cab99fbcd4474d3e09210d4c902f69cb9dba6dda19e1d78caa",
+    "planning-catalog-final-tls.log": "2c8e889032c0a192e583f1c15e98d2943c91b5898ff0d4cf3b94bbaad819d801",
+    "planning-catalog-integration.log": "db4efbcacb9ac8977ab09f25ea39117861d1fe66be4f93ab4b3c24f82dcea538",
+    "planning-catalog-integration-manifest.json": "1ba5d2669a38f477f9658d49677c5c35a41a091766824707a71aafa53d5a25be",
+    "planning-catalog-final-contracts.log": "1b8564fc6e1bcfc1e4cb9eda13656772bf75f8fc4269534c9a3a7cec2293b9a8",
+    "planning-catalog-final-integration.log": "394349e6b9fa25aa5cc3a8281ca34997fcba3021cd611ae81d4557ad1105e229",
+    "planning-catalog-schema-tls.log": "95e45379ea537cdec1db7014c1495febc1b9984e9f60eac46ac820ee5084ddaa",
+    "catalog-desktop-single-worker-tests.log": "e4719c26910cc8bab46efcd2a176561ae2d1a0b3941fd882c3742d9ee6adc6e1",
+    "catalog-desktop-build.log": "15658ac150ab70997d94d248c101741ae7329863d2a668633cdf355a721c0230"
+  }
+}

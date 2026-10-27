@@ -546,9 +546,9 @@ class PlannerAuthoring:
                     raise PermissionError(
                         "A configured model and available scoped action device are required."
                     )
-                if len(actions) > 15:
+                if len(actions) + len(recalls) > 127:
                     raise ValueError(
-                        "Choose a device with at most fifteen supported action capabilities."
+                        "Choose a bounded catalog of at most 127 current action capabilities."
                     )
                 change = {
                     "operation": "plan_draft",
@@ -668,8 +668,8 @@ class PlannerAuthoring:
                         h.store.audit("", "delegated_planning_blocked", {"request_id": row["id"]})
 
     def capabilities(self, pins: Any, grants: frozenset[str]) -> list[dict[str, Any]]:
-        if not isinstance(pins, list) or not 2 <= len(pins) <= 16:
-            raise ValueError("select a model and one to fifteen action capabilities")
+        if not isinstance(pins, list) or not 2 <= len(pins) <= 128:
+            raise ValueError("select a model and one to 127 action capabilities")
         result = []
         for pin in pins:
             if (
@@ -828,7 +828,8 @@ class PlannerAuthoring:
                 parameters["prompt"] += "\nResponse JSON schema: " + json.dumps(
                     executive_plan_schema(
                         observation_only=tuple(parameters.get("observation_only", ()))
-                    )
+                    ),
+                    separators=(",", ":"),
                 )
             request = replace(
                 executor.template,
