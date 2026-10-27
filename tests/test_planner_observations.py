@@ -67,7 +67,12 @@ class ObservationPlanningTests(unittest.TestCase):
         self.begin()
         prompt = self.requests[0]["body"]["messages"][-1]["content"]
         self.assertIn("Example read-only observation response structure", prompt)
-        self.assertNotIn('"from_step"', prompt)
+        observation, _ = json.JSONDecoder().raw_decode(
+            prompt.split("return final effect steps instead: ", 1)[1]
+        )
+        self.assertTrue(observation["observe"])
+        self.assertTrue(all(not step.get("inputs") for step in observation["steps"]))
+        self.assertIn("never refer to earlier stages in inputs or depends_on", prompt)
         self.observe()
         self.assertEqual(1, len(self.requests))
         self.effects()

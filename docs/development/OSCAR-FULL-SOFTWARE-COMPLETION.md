@@ -855,3 +855,20 @@ software completion, broader model/native reliability, schedule coordination and
 whole-product acceptance remain OPEN. See the
 [local-model evidence](../evidence/software-completion/local-model-literals-2026-10-27.json)
 and [catalog evidence](../evidence/software-completion/planning-catalog-2026-10-27.json).
+
+
+**2026-10-27 adaptive verified-result handoffs:** the repeated catalog node,
+endpoint origin and derivable operation name are now represented losslessly,
+leaving room for bounded longer objectives without raising any limit. Adaptive
+planning distinguishes prior observation stages from new within-plan handoffs;
+structured decoding requires explicit inputs arrays. On stable final sources the
+installed Granite model passed arithmetic → exact file through Ask (11.673s)
+and synthetic Full (7.991s), and arithmetic → independently verified result
+handoff → file through Ask (11.492s) and Full (7.871s). Both tasks, exact file
+readback and handoff evidence provenance were checked. A verified 42 cannot write
+an owner-required 43. Twenty-five final catalog/dataflow contracts passed; an
+88-case development integration passed with source-change qualification. Full
+regression is pending on the resulting local commit. Earlier placeholder writes
+and size failures remain failed evidence, not successes. Broader model/native
+reliability and the original full mandate remain OPEN.
+[Receipt](../evidence/software-completion/adaptive-handoffs-2026-10-27.json).

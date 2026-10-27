@@ -1,0 +1,310 @@
+{
+  "scope": "Adaptive within-plan verified-result handoffs with a connected account catalog",
+  "status": "SCOPED_SOFTWARE_VERIFIED",
+  "changes": [
+    "Adaptive mode allows observation stages; it no longer omits within-plan input guidance. Prior-stage data stay literal while new-step results require verified handoffs.",
+    "Observation examples and complete effect examples remain distinct. Structured decoded steps require inputs, with [] for no handoff.",
+    "Repeated exact node IDs and endpoint origins are shared. Omitted operations are reconstructed only when identical to the capability_id suffix. No catalog truncation, scope change or size-limit expansion.",
+    "Owner exact text may be supplied by a verified handoff, but the resolved value is checked before file task creation. Wrong verified result cannot create the file.",
+    "Reference acceptance waits for both dependent task records before testing completion; it no longer races the first task."
+  ],
+  "checks": {
+    "catalog_before_final_required_inputs": {
+      "passed": 36,
+      "seconds": 54.978,
+      "qualification": "Includes app observations. Precedes final mandatory inputs schema and resolved-literal check."
+    },
+    "final_catalog_and_executive_inputs": {
+      "passed": 25,
+      "seconds": 21.898
+    },
+    "authoring_observations_providers": {
+      "passed": 88,
+      "seconds": 88.277,
+      "qualification": "Concurrent development run; not a frozen aggregate."
+    },
+    "real_local_inference": [
+      {
+        "state": "PASS",
+        "model": "granite4.1:3b",
+        "installed_model_digest": "6fd349357287c7ffc9e38189a93b48ea175d24fc566b38f09cfc564fb7f303eb",
+        "authority_mode": "ask",
+        "objective": "Calculate 17 + 25 using math.add, then create welcome.txt with exact text \"42\" using files.write. Use two separate steps; the file step must depend on the arithmetic step.",
+        "elapsed_seconds": 11.673,
+        "source_stable": true,
+        "artifact_sha256": "73475cb40a568e8da8a045ced110137e159f890ac4da883b6b17dc651b3a8049",
+        "accepted_plan": [
+          {
+            "id": "addition",
+            "intent": {
+              "text": "17 + 25",
+              "kind": null,
+              "path": null,
+              "content": null,
+              "capability_kind": null,
+              "parameters": null,
+              "criterion": null
+            },
+            "depends_on": [],
+            "node_id": "synthetic-model-core",
+            "capability_id": "math.add",
+            "inputs": []
+          },
+          {
+            "id": "write_file",
+            "intent": {
+              "text": "Save reviewed text",
+              "kind": "file_write",
+              "path": "welcome.txt",
+              "content": "42",
+              "capability_kind": null,
+              "parameters": null,
+              "criterion": null
+            },
+            "depends_on": [
+              "addition"
+            ],
+            "node_id": "synthetic-model-core",
+            "capability_id": "files.write",
+            "inputs": [
+              {
+                "from_step": "addition",
+                "select": [],
+                "to": [
+                  "content"
+                ]
+              }
+            ]
+          }
+        ],
+        "second_review_required": true,
+        "receipt_sha256": "4a64c4a8622646f4aea4999832fd5d72fafc9db8d17644c061a0bd7958eefba2",
+        "handoff_evidence": []
+      },
+      {
+        "state": "PASS",
+        "model": "granite4.1:3b",
+        "installed_model_digest": "6fd349357287c7ffc9e38189a93b48ea175d24fc566b38f09cfc564fb7f303eb",
+        "authority_mode": "full",
+        "objective": "Calculate 17 + 25 using math.add, then create welcome.txt with exact text \"42\" using files.write. Use two separate steps; the file step must depend on the arithmetic step.",
+        "elapsed_seconds": 7.991,
+        "source_stable": true,
+        "artifact_sha256": "73475cb40a568e8da8a045ced110137e159f890ac4da883b6b17dc651b3a8049",
+        "accepted_plan": [
+          {
+            "id": "addition",
+            "intent": {
+              "text": "17 + 25",
+              "kind": null,
+              "path": null,
+              "content": null,
+              "capability_kind": null,
+              "parameters": null,
+              "criterion": null
+            },
+            "depends_on": [],
+            "node_id": "synthetic-model-core",
+            "capability_id": "math.add",
+            "inputs": []
+          },
+          {
+            "id": "write_file",
+            "intent": {
+              "text": "Save reviewed text",
+              "kind": "file_write",
+              "path": "welcome.txt",
+              "content": "42",
+              "capability_kind": null,
+              "parameters": null,
+              "criterion": null
+            },
+            "depends_on": [
+              "addition"
+            ],
+            "node_id": "synthetic-model-core",
+            "capability_id": "files.write",
+            "inputs": [
+              {
+                "from_step": "addition",
+                "select": [],
+                "to": [
+                  "content"
+                ]
+              }
+            ]
+          }
+        ],
+        "second_review_required": false,
+        "receipt_sha256": "d5adf0eae07dabaab018d3b1eab8f4edb3dd496e0cff98f3095a4ee572e23673",
+        "handoff_evidence": []
+      },
+      {
+        "state": "PASS",
+        "model": "granite4.1:3b",
+        "installed_model_digest": "6fd349357287c7ffc9e38189a93b48ea175d24fc566b38f09cfc564fb7f303eb",
+        "authority_mode": "ask",
+        "objective": "Calculate 17 + 25 using math.add, then save the actual result value into welcome.txt using files.write. Use two steps and an inputs handoff from the arithmetic step to file content; do not calculate or hardcode the file content yourself.",
+        "elapsed_seconds": 11.492,
+        "source_stable": true,
+        "artifact_sha256": "73475cb40a568e8da8a045ced110137e159f890ac4da883b6b17dc651b3a8049",
+        "accepted_plan": [
+          {
+            "id": "addition",
+            "intent": {
+              "text": "17 + 25",
+              "kind": null,
+              "path": null,
+              "content": null,
+              "capability_kind": null,
+              "parameters": null,
+              "criterion": null
+            },
+            "depends_on": [],
+            "node_id": "synthetic-model-core",
+            "capability_id": "math.add",
+            "inputs": []
+          },
+          {
+            "id": "write_file",
+            "intent": {
+              "text": "Save reviewed text",
+              "kind": "file_write",
+              "path": "welcome.txt",
+              "content": "<result-from-addition>",
+              "capability_kind": null,
+              "parameters": null,
+              "criterion": null
+            },
+            "depends_on": [
+              "addition"
+            ],
+            "node_id": "synthetic-model-core",
+            "capability_id": "files.write",
+            "inputs": [
+              {
+                "from_step": "addition",
+                "select": [],
+                "to": [
+                  "content"
+                ]
+              }
+            ]
+          }
+        ],
+        "second_review_required": true,
+        "receipt_sha256": "c9616740252147ed0312075f3503734295d6af2b4d3a956d3002ef014840e649",
+        "handoff_evidence": [
+          [
+            {
+              "task_id": "71f416cdffa04cdf85cbf1fc6ad3f2fa",
+              "result_id": "2976462172a84281bc42de08776a38f9",
+              "result_digest": "5b1598d01967798c3f413ef260218523e5f09a4471679a9ffe28600893f75a5f",
+              "evidence_id": "7fa34658adab413bb6caa682aca00150",
+              "evidence_digest": "b0a03485f6d21c0f8c96d94fa94600e76e6a7ec4ff58997090857c8b9f4bb227"
+            }
+          ]
+        ]
+      },
+      {
+        "state": "PASS",
+        "model": "granite4.1:3b",
+        "installed_model_digest": "6fd349357287c7ffc9e38189a93b48ea175d24fc566b38f09cfc564fb7f303eb",
+        "authority_mode": "full",
+        "objective": "Calculate 17 + 25 using math.add, then save the actual result value into welcome.txt using files.write. Use two steps and an inputs handoff from the arithmetic step to file content; do not calculate or hardcode the file content yourself.",
+        "elapsed_seconds": 7.871,
+        "source_stable": true,
+        "artifact_sha256": "73475cb40a568e8da8a045ced110137e159f890ac4da883b6b17dc651b3a8049",
+        "accepted_plan": [
+          {
+            "id": "add",
+            "intent": {
+              "text": "17 + 25",
+              "kind": null,
+              "path": null,
+              "content": null,
+              "capability_kind": null,
+              "parameters": null,
+              "criterion": null
+            },
+            "depends_on": [],
+            "node_id": "synthetic-model-core",
+            "capability_id": "math.add",
+            "inputs": []
+          },
+          {
+            "id": "write",
+            "intent": {
+              "text": "Save reviewed text",
+              "kind": "file_write",
+              "path": "welcome.txt",
+              "content": "<result-from-add>",
+              "capability_kind": null,
+              "parameters": null,
+              "criterion": null
+            },
+            "depends_on": [
+              "add"
+            ],
+            "node_id": "synthetic-model-core",
+            "capability_id": "files.write",
+            "inputs": [
+              {
+                "from_step": "add",
+                "select": [],
+                "to": [
+                  "content"
+                ]
+              }
+            ]
+          }
+        ],
+        "second_review_required": false,
+        "receipt_sha256": "03394c626d13ffb109f3bd5b6dc6ea1f98e74692f27fb79a14c506038b51cd29",
+        "handoff_evidence": [
+          [
+            {
+              "task_id": "bdc68097388b4bbe86456fd8db7e08dd",
+              "result_id": "f8f70c4854b94a07ae50e53f820225cb",
+              "result_digest": "76bb9c203bb3d0245643f2dc6c47d1457a10f8209c68b101e6d09f49c20cf05d",
+              "evidence_id": "10a3f355d3e24306b8bb0574f22f15cf",
+              "evidence_digest": "37333746a5eb0ea72d1d236f93bb4a63737bce8e98340c80afc1e71a11ba761a"
+            }
+          ]
+        ]
+      }
+    ],
+    "static": {
+      "ruff": "PASS",
+      "mypy": "107 source files PASS",
+      "repository": "PASS"
+    },
+    "full_regression": "Pending on resulting local commit"
+  },
+  "retained_failures": [
+    "Earlier long catalog requests hit the durable limit before final sharing.",
+    "Prompt correction alone did not make the model emit optional inputs; a placeholder string was written in synthetic workspaces. The reference correctly failed objective acceptance.",
+    "Prior literal protection rejected legitimate bound handoffs; final runtime checks the independently resolved value instead.",
+    "The latest previous whole-suite run failed native foreground/control cases; isolated passes do not supersede the aggregate."
+  ],
+  "boundaries": [
+    "Installed Granite 4.1 3B only; no downloads or cloud/paid inference.",
+    "Synthetic owners/accounts/credentials and isolated temporary workspaces; provider API calls blocked.",
+    "Only run-owned model server launched and stopped; no physical devices or owner media.",
+    "No push, Actions, cloud provisioning or production authority.",
+    "This is four scoped real-model workflows, not general model reliability or full software completion."
+  ],
+  "sources": {
+    "oscar/executive.py": "cb42cccdac5cfeaed85b8673d249baccd48817e398edd899656d698362780c01",
+    "oscar/planning_contract.py": "3119f172f25d88ac7ffd352868587d85094196d7bcc62096e2ae6376161981b6",
+    "tests/test_planner_catalog.py": "a3ab3d95be5f597b2a3cc7411b1a2dbec0a1481bc93ec0919c2fb1f4aa2d9fe2",
+    "tests/test_planner_observations.py": "b937c856f6c4302e1cbbb87b3e0569407c4f01a1cba2890e86df7489d402a4aa",
+    "scripts/software_conversation_planning_reference.py": "66aa0a6a14a856a4b72856edf7a7793a689da46f1dcfe278919352087cefc37f"
+  },
+  "local_log_sha256": {
+    "catalog-node-sharing-contracts.log": "e58681c87b53d89b7ffa93edd770bb4de6567180446172868400207d78e9ba55",
+    "adaptive-handoff-catalog-final-contracts.log": "733ee4f1bb9c95d32efbd578d81c03bcf1426fd02700d0172c07bb65acaacba1",
+    "resolved-literal-handoff-contracts.log": "15729829f98f42e72e94ef14e3331a936c230729dfee91f1e1cf71f3b7a1bab2",
+    "handoff-authoring-observation-integration.log": "ebbea3a6e75fa0d0ccfb02dbd998c4ccd73120c3075f43a4747f726a86edb7eb",
+    "local-catalog-resolved-literal-final.log": "1de630caf79b54da6c00f86a1061a17c5c3c7d905682f64192e26ead524f196f"
+  }
+}

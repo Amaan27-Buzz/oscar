@@ -295,10 +295,14 @@ def run(full=False, multistep=False, handoff=False, model=MODEL):
                     tasks = (
                         h.executive._tasks(row["accepted_goal"]) if row.get("accepted_goal") else []
                     )
-                    if tasks and all(h.store.task(task).state == "verified" for task in tasks):
+                    if len(tasks) == (2 if multistep else 1) and all(
+                        h.store.task(task).state == "verified" for task in tasks
+                    ):
                         break
                     sleep(0.05)
-                assert tasks and all(h.store.task(task).state == "verified" for task in tasks)
+                assert len(tasks) == (2 if multistep else 1) and all(
+                    h.store.task(task).state == "verified" for task in tasks
+                )
                 assert path.read_text(encoding="utf-8") == expected
                 if multistep:
                     from oscar.capabilities import addition_operands

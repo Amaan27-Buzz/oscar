@@ -41,9 +41,8 @@ def validate_file_literal(goal: str, steps: list[dict[str, Any]]) -> None:
     if len(writes) != 1:
         raise ValueError("one unambiguous exact file literal required")
     step = writes[0]
-    if step["intent"].get("content") != literal or any(
-        b["to"] == ["content"] for b in step.get("inputs", [])
-    ):
+    bound = any(b["to"] == ["content"] for b in step.get("inputs", []))
+    if not bound and step["intent"].get("content") != literal:
         raise ValueError("file plan does not preserve the owner's exact text")
 
 
@@ -590,7 +589,7 @@ class Executive:
             if connectors:
                 shared = {
                     k: connectors[0][k]
-                    for k in ("summary", "intent_rule")
+                    for k in ("summary", "intent_rule", "node_id")
                     if k in connectors[0] and all(p.get(k) == connectors[0][k] for p in connectors)
                 }
                 templates = [
@@ -614,12 +613,27 @@ class Executive:
                         if k not in shared
                         and k != "account_generation"
                         and not (k == "kind" and v == p["capability_id"])
+                        and not (k == "operation" and p["capability_id"].endswith(":" + v))
                     }
                     if p.get("transport") in {"https", "mcp"}
                     else p
                     for p in pins
                 ]
+                origins = list(
+                    dict.fromkeys(
+                        p["endpoint"]["origin"]
+                        for p in pins
+                        if p.get("transport") == "https" and "origin" in p["endpoint"]
+                    )
+                )
+                if origins:
+                    shared["endpoint_origins"] = {"o" + str(i): o for i, o in enumerate(origins)}
                 for pin in pins:
+                    if pin.get("transport") == "https" and "origin" in pin["endpoint"]:
+                        endpoint = dict(pin["endpoint"])
+                        origin = endpoint.pop("origin")
+                        endpoint["origin_ref"] = "o" + str(origins.index(origin))
+                        pin["endpoint"] = endpoint
                     if pin.get("transport") in {"https", "mcp"}:
                         for name, schema in repeated.items():
                             if pin.get("argument_schema") == schema:
@@ -632,7 +646,7 @@ class Executive:
                     "id": "step-1",
                     "intent": c["intent_examples"][0],
                     "depends_on": [],
-                    "node_id": c["node_id"],
+                    "node_id": c.get("node_id", shared.get("node_id")),
                     "capability_id": c["capability_id"],
                     "inputs": [],
                 }
@@ -657,7 +671,7 @@ class Executive:
         examples = [example] if example else []
         addition = next((c for c in pins if c.get("kind") == "addition"), None)
         writer = next((c for c in pins if c.get("kind") == "file_write"), None)
-        if addition and writer and not adaptive:
+        if addition and writer:
             examples = [
                 {
                     "id": "calculate",
@@ -689,7 +703,7 @@ class Executive:
                 )
                 + "topologically ordered array of maximum 16 steps. "
                 "Each step has id, intent, depends_on, node_id, capability_id, "
-                "and optional inputs. "
+                "and inputs ([] without a data handoff). "
                 "id is a unique lowercase string matching [a-z0-9_-]{1,40}, such as step-1. "
                 "depends_on is always an array of earlier step id strings, [] for the first step. "
                 "node_id and capability_id are the exact selected strings. "
@@ -705,32 +719,22 @@ class Executive:
                 "supported parameter shapes; fill their literal arguments from the goal. "
                 "Paths are relative to the selected workspace, with no parent traversal. "
                 + (
-                    "Use literal observed values as intent data. Omit inputs for observations "
-                    "from earlier stages. All depends_on entries must refer to earlier steps "
-                    "IN THIS RESPONSE; use [] for a standalone write of an observed value. "
-                    "Set file_write content to the actual observed text, "
-                    "never an empty placeholder. "
+                    "Past observation-stage results are literal observed data; never refer to "
+                    "earlier stages in inputs or depends_on. "
                     if adaptive
-                    else "To copy an earlier verified result, add inputs: "
-                    '[{"from_step":"earlier-id",'
-                    '"select":[],"to":["content"]}]. The source MUST be in depends_on. '
-                    "select [] copies result text; a key/index array selects a scalar "
-                    "from JSON text. "
-                    "to targets an existing string: file_write content or a "
-                    "parameters/criterion leaf "
-                    "named content, text, body or message. Use an empty string placeholder there. "
-                    'For arithmetic-to-file specifically use select [] and to ["content"] exactly: '
-                    "the arithmetic result is plain text, not an object. "
-                    "to is an intent field path, "
-                    "NEVER a filename. Put the filename only in intent.path. "
-                    "Compute the expression "
-                    "from the owner's goal; 2 + 3 in examples is NOT the requested calculation. "
-                    "No substitution into identities, paths, URLs, commands "
-                    "or authority is supported. "
-                    "When the goal requests an actual earlier result, you MUST include that "
-                    "inputs handoff; a blank or guessed literal content does not accomplish "
-                    "the goal. "
+                    else ""
                 )
+                + "For another step's actual result IN THIS RESPONSE, you MUST add inputs: "
+                '[{"from_step":"earlier-id","select":[],"to":["content"]}]. '
+                "The source MUST be in depends_on. select [] copies plain result text; "
+                "a key/index array selects a scalar from JSON text. "
+                "to targets an existing string: file_write content or a parameters/criterion "
+                "leaf named content, text, body or message. Use an empty string placeholder "
+                "ONLY for a bound handoff; directly observed values stay literal. "
+                "Arithmetic results are plain text, so select [] exactly. "
+                "Put filenames in intent.path, never in to. Compute the owner's expression, "
+                "not the example's. Never guess or hardcode an actual step result. "
+                "No substitution into identities, paths, URLs, commands or authority. "
                 + "Data handoffs require independent VERIFIED source evidence; "
                 "reported results block. "
                 "No unstated account/device binding exists. "
@@ -742,7 +746,9 @@ class Executive:
                 + (
                     "\nShared connector fields (replace <selected kind> with kind, "
                     "or capability_id if kind is omitted; resolve argument_schema_ref in "
-                    "argument_schemas for the exact schema; Core pins account generation): "
+                    "argument_schemas for the exact schema; resolve endpoint.origin_ref in "
+                    "endpoint_origins; omitted operation is the capability_id suffix after its "
+                    "last colon; Core pins account generation): "
                     + json.dumps(shared, separators=(",", ":"))
                     if shared
                     else ""
@@ -751,18 +757,16 @@ class Executive:
                     ". Example read-only observation response structure; replace literals "
                     "from the goal. Only use when tool data is needed. After observations "
                     "arrive, return final effect steps instead: "
-                    + json.dumps({"steps": examples, "observe": True})
+                    + json.dumps({"steps": [example], "observe": True}, separators=(",", ":"))
                     if example and adaptive
                     else ""
                 )
                 + (
                     ". Complete response example; replace literal arguments from the goal: "
-                    + json.dumps({"steps": examples})
-                    if example and not adaptive
+                    + json.dumps({"steps": examples}, separators=(",", ":"))
+                    if examples and (not adaptive or addition and writer)
                     else ""
                 )
-                + ". Goal: "
-                + goal
             )
         )
         return {
@@ -1374,6 +1378,9 @@ class Executive:
 
                     validate_file_literal(goal["goal"], goal["steps"])
                     resolved, inputs = resolve_inputs(self.store, goal, step)
+                    validate_file_literal(
+                        goal["goal"], [{**step, "intent": resolved, "inputs": []}]
+                    )
                     if inputs:
                         binding["inputs"] = inputs
                     task = self.runtime.create(

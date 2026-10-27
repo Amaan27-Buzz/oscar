@@ -545,7 +545,14 @@ For large catalogs, signed review shows one current capability list and exact pr
 
 Explicit `exact text "..."` or `exact content: "..."` file goals bind the
 JSON-decoded owner literal before effect review, Executive proposal and dispatch.
-Changed punctuation, whitespace, ambiguous multiple writes and content handoffs
-are rejected. This bounded guard applies to the scoped `file_write` executor;
+Changed punctuation, whitespace and ambiguous multiple writes are rejected.
+An independently verified content handoff may supply the literal, but the
+resolved value is checked again before task creation or any file effect. This bounded guard applies to the scoped `file_write` executor;
 it is not a general natural-language objective verifier. Other goals still need
 appropriate independent outcome criteria.
+
+Adaptive observation availability does not disable same-plan verified data
+handoffs. Observation examples contain no handoff references; new effect plans
+may bind earlier steps in that response. Structured decoding requires explicit
+`inputs` arrays, empty when unused. Shared connector node IDs, endpoint origins
+and derivable operation names remain fully reconstructable from the catalog.

@@ -105,7 +105,7 @@ def executive_plan_schema(
                         "items": {
                             "type": "object",
                             "properties": step,
-                            "required": [key for key in step if key != "inputs"],
+                            "required": list(step),
                             "additionalProperties": False,
                         },
                     },

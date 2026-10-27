@@ -93,6 +93,76 @@ class PlanningCatalogTests(unittest.TestCase):
         self.assertEqual("Welcome to OSCAR", (self.h.files.root / "catalog-note.txt").read_text())
         self.assertEqual([], self.api.calls)
 
+    def test_adaptive_conversation_can_handoff_a_verified_result_within_its_new_plan(self):
+        self.handoff_literal("42", matches=True)
+
+    def test_wrong_verified_result_cannot_replace_the_owner_literal_or_create_a_file(self):
+        self.handoff_literal("43", matches=False)
+
+    def handoff_literal(self, literal, *, matches):
+        goal = (
+            'Calculate 17 + 25, then save its actual result to catalog-note.txt with exact text "'
+            + literal
+            + '" using inputs.'
+        )
+        written = json.loads(self.body["choices"][0]["message"]["content"])["steps"][0]
+        written["intent"]["content"] = ""
+        written["depends_on"] = ["calculate"]
+        written["inputs"] = [{"from_step": "calculate", "select": [], "to": ["content"]}]
+        calculate = {
+            "id": "calculate",
+            "node_id": self.h.node_id,
+            "capability_id": "math.add",
+            "depends_on": [],
+            "intent": asdict(Intent("17 + 25")),
+        }
+        self.body["choices"][0]["message"]["content"] = json.dumps({"steps": [calculate, written]})
+        proposal = self.conversation(goal)["assistance_proposal"]
+        state = PlannerAuthoring(self.h).material(
+            "plan_draft", "new", proposal["value"], self.grants
+        )
+        prompt = state["step"]["intent"]["parameters"]["prompt"]
+        self.assertIn("IN THIS RESPONSE, you MUST add inputs", prompt)
+        self.assertIn("Past observation-stage results", prompt)
+        from oscar.planning_contract import executive_plan_schema
+
+        self.assertIn(
+            "inputs",
+            executive_plan_schema()["oneOf"][0]["properties"]["steps"]["items"]["required"],
+        )
+        self.complete(self.review(proposal))
+        self.h.executive.tick()
+        self.complete(self.review(self.accept_change(self.h.store.all("planner_request")[-1])))
+        for _ in range(5):
+            self.h.executive.tick()
+        rows = self.h.store.all("task")
+        if not matches:
+            self.assertEqual(2, len(rows))
+            self.assertEqual("verified", rows[-1]["state"])
+            self.assertFalse((self.h.files.root / "catalog-note.txt").exists())
+            self.assertEqual("waiting_for_verified_input", self.h.executive.health)
+            return
+        self.assertEqual(3, len(rows))
+        self.assertTrue(all(t["state"] == "verified" for t in rows[1:]))
+        self.assertEqual("42", (self.h.files.root / "catalog-note.txt").read_text())
+        file_task = next(
+            t
+            for t in self.h.store.all("task")
+            if self.h.store.get("plan", t["id"])["kind"] == "file_write"
+        )
+        self.assertEqual(1, len(self.h.store.get("plan", file_task["id"])["executive"]["inputs"]))
+
+    def test_long_goal_with_connected_catalog_stays_within_durable_frame(self):
+        goal = "Write Welcome to OSCAR to catalog-note.txt. " + "Keep the requested content. " * 14
+        self.assertLessEqual(len(goal), 480)
+        proposal = self.conversation(goal)
+        self.complete(self.review(proposal["assistance_proposal"]))
+        self.h.executive.tick()
+        row = self.h.store.all("planner_request")[-1]
+        self.complete(self.review(self.accept_change(row)))
+        self.assertEqual("verified", self.settle())
+        self.assertEqual("Welcome to OSCAR", (self.h.files.root / "catalog-note.txt").read_text())
+
     def test_changed_exact_literal_never_becomes_a_reviewable_effect(self):
         proposal = self.conversation('Write catalog-note.txt with exact text "Welcome to OSCAR."')
         self.complete(self.review(proposal["assistance_proposal"]))
@@ -147,7 +217,6 @@ class PlanningCatalogTests(unittest.TestCase):
             ('Save exact text "A." and exact content "A."', [step]),
             ("Save exact text A.", [step]),
             ("Save exact text 42", [step]),
-            ('Save exact text "A."', [{**step, "inputs": [{"to": ["content"]}]}]),
         ):
             with self.subTest(goal=goal), self.assertRaises(ValueError):
                 validate_file_literal(goal, steps)
@@ -180,7 +249,15 @@ class PlanningCatalogTests(unittest.TestCase):
                 schema = pin["argument_schema"]
             self.assertEqual(expected["argument_schema"], schema)
             self.assertEqual(expected["account_id"], pin["account_id"])
-            self.assertEqual(expected["endpoint"], pin["endpoint"])
+            self.assertEqual(
+                expected["operation"], pin.get("operation", pin["capability_id"].rsplit(":", 1)[-1])
+            )
+            endpoint = dict(pin["endpoint"])
+            if "origin_ref" in endpoint:
+                endpoint["origin"] = shared["endpoint_origins"][endpoint.pop("origin_ref")]
+            self.assertEqual(expected["endpoint"], endpoint)
+            self.assertNotIn("node_id", pin)
+            self.assertEqual(expected["node_id"], shared["node_id"])
         self.assertGreater(referenced, 1)
 
     def test_omitted_prompt_change_invalidates_signed_catalog_review(self):
