@@ -539,7 +539,7 @@ Signed plan acceptance displays the current steps, source and authority material
 
 A private model-authored canonical provider task can unblock dependent Workers only after independently verified saved-resource readback. Verification expectations come from the exact staged literal arguments, remain transient and require current owner/executor read authority throughout verification. Tool success alone, unavailable expectations and permission withdrawal cannot promote a mutation to verified.
 
-Temporary conversation-planning Workers may pin up to 128 current scoped capabilities, so a connected account catalog is not constrained to sixteen tools. Ordinary Workers and each action plan retain their sixteen-entry bounds. Larger catalogs factor identical connector instructions, examples and exact argument schemas into lossless shared definitions; all endpoint argument schemas stay available. Core still checks every executor, permission, account generation, policy, authority and private input digest. No catalog is silently truncated. Model context and existing native/durable size bounds still apply, so the count ceiling is not a promise that every large schema set fits.
+Temporary conversation-planning Workers may pin up to 128 current scoped capabilities, so a connected account catalog is not constrained to sixteen tools. Ordinary Workers and each action plan retain their sixteen-entry bounds. Larger catalogs factor identical connector instructions and exact argument schemas into lossless shared definitions; all endpoint argument schemas stay available. Core still checks every executor, permission, account generation, policy, authority and private input digest. No catalog is silently truncated. Model context and existing native/durable size bounds still apply, so the count ceiling is not a promise that every large schema set fits.
 
 For large catalogs, signed review shows one current capability list and exact proposed effects. Digests bind the full model input and omitted duplicate Worker/request catalogs. Acceptance reconstructs that complete state and compares its fingerprint before creating work. No display/signing limit or per-effect Ask requirement is relaxed. [Catalog acceptance](evidence/software-completion/planning-catalog-2026-10-27.json).
 
@@ -553,6 +553,24 @@ appropriate independent outcome criteria.
 
 Adaptive observation availability does not disable same-plan verified data
 handoffs. Observation examples contain no handoff references; new effect plans
-may bind earlier steps in that response. Structured decoding requires explicit
+may bind earlier steps in that response. Structured decoding of canonical native steps requires explicit
 `inputs` arrays, empty when unused. Shared connector node IDs, endpoint origins
 and derivable operation names remain fully reconstructable from the catalog.
+
+
+Account connector model steps may use `{id, capability_id, arguments, depends_on}`.
+Core resolves executor and Intent from the exact currently reviewed contract,
+then applies the existing argument validation, private staging, policy and
+execution/readback checks. Connector arguments remain literal; this form cannot
+supply node IDs, headers, credentials, input substitutions or verification claims.
+A forced live observation uses `{id, capability_id, arguments}` with `observe:true`,
+exactly one selected native HTTPS GET and no body. It cannot invoke an available
+write operation. Current alias/provider labels help choose the account; immutable
+IDs and generations bind execution, and labels grant no authority.
+
+The structured decoder obtains native capability IDs from the selected Worker
+and connector argument schemas from its current pinned contracts. These decoder
+hints are not authorization. Large continuation reviews omit duplicate raw model
+input only from display and bind the entire original step with a digest; signed
+acceptance reconstructs and checks the complete input before inference.
+[Scoped acceptance and remaining model limits](evidence/software-completion/compact-connectors-2026-10-27.json).

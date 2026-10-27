@@ -396,7 +396,6 @@ class ConversationPlanningTests(unittest.TestCase):
         prompt = self.requests[-1]["body"]["messages"][-1]["content"]
         self.assertIn('"steps" and optional boolean "observe"', prompt)
         self.assertIn('return {"steps":[...],"observe":true}', prompt)
-        self.assertIn("Preserve the chosen example's kind and capability_kind exactly", prompt)
         change = self.proposed("Review the plan")
         path = self.h.files.root / "welcome.txt"
         self.assertFalse(path.exists())

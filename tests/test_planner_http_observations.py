@@ -333,15 +333,103 @@ class HTTPObservationTests(unittest.TestCase):
     def test_structured_live_decoder_keeps_exact_selected_connector_identity(self):
         from jsonschema import Draft202012Validator
 
-        validator = Draft202012Validator(executive_plan_schema(observation_only=(self.cap.id,)))
-        document = {"steps": [{**step, "inputs": []} for step in self.steps], "observe": True}
+        validator = Draft202012Validator(
+            executive_plan_schema(
+                observation_only=(self.cap.id,),
+                connector_schemas={
+                    self.cap.id: self.h.connector_plans.contract(asdict(self.cap))["schema"]
+                },
+            )
+        )
+        document = {
+            "steps": [
+                {
+                    "id": "read",
+                    "capability_id": self.cap.id,
+                    "arguments": {"path": {"tasklist": "selected-list"}},
+                }
+            ],
+            "observe": True,
+        }
         self.assertTrue(validator.is_valid(document))
-        self.assertFalse(validator.is_valid({"steps": self.steps, "observe": True}))
-        for field, value in (("capability_id", "unselected:write"), ("depends_on", ["other"])):
+        for field, value in (
+            ("capability_id", "unselected:write"),
+            ("depends_on", ["other"]),
+            ("node_id", "guessed-executor"),
+            ("inputs", []),
+        ):
             changed = deepcopy(document)
             changed["steps"][0][field] = value
             self.assertFalse(validator.is_valid(changed))
         self.assertFalse(validator.is_valid({**document, "observe": False}))
+
+    @unittest.skipUnless(importlib.util.find_spec("jsonschema"), "optional schema validator absent")
+    def test_many_reader_schema_uses_one_selector_without_guessed_identities(self):
+        from jsonschema import Draft202012Validator
+
+        capabilities = tuple("native-account-" + "a" * 24 + ":read-" + str(i) for i in range(20))
+        schema = executive_plan_schema(observation_only=capabilities + ("machine.files.read",))
+        self.assertLess(len(json.dumps(schema)), 9000)
+        validator = Draft202012Validator(schema)
+        document = {
+            "steps": [{"id": "read", "capability_id": capabilities[0], "arguments": {}}],
+            "observe": True,
+        }
+        for capability in capabilities:
+            document["steps"][0]["capability_id"] = capability
+            self.assertTrue(validator.is_valid(document))
+        for field, value in (
+            ("intent", {"capability_kind": capabilities[0]}),
+            ("inputs", [{"from_step": "other", "select": [], "to": ["content"]}]),
+        ):
+            changed = deepcopy(document)
+            changed["steps"][0][field] = value
+            self.assertFalse(validator.is_valid(changed))
+
+    def test_compact_reader_restores_current_executor_and_verifies_private_readback(self):
+        self.body["choices"][0]["message"]["content"] = json.dumps(
+            {
+                "steps": [
+                    {
+                        "id": "read",
+                        "capability_id": self.cap.id,
+                        "arguments": {"path": {"tasklist": "selected-list"}},
+                    }
+                ],
+                "observe": True,
+            }
+        )
+        self.observe()
+        goal = self.h.store.get(
+            "executive_goal", self.h.store.all("planner_request")[0]["observation_goal"]
+        )
+        step = goal["steps"][0]
+        self.assertEqual(self.mount.node_id, step["node_id"])
+        self.assertEqual(self.cap.id, step["intent"]["capability_kind"])
+        self.assertEqual([], step["inputs"])
+
+    def test_compact_observation_cannot_invoke_an_available_write_capability(self):
+        cap = self.mount.capability("google.tasks.create", account_id=self.account.id)
+        self.change["value"]["capabilities"][1]["capability_id"] = cap.id
+        self.body["choices"][0]["message"]["content"] = json.dumps(
+            {
+                "steps": [
+                    {
+                        "id": "write",
+                        "capability_id": cap.id,
+                        "arguments": {
+                            "path": {"tasklist": "selected-list"},
+                            "body": {"title": "Must never execute"},
+                        },
+                    }
+                ],
+                "observe": True,
+            }
+        )
+        self.draft()
+        self.assertEqual("failed", self.h.store.all("task")[-1]["state"])
+        self.assertEqual([], self.api.calls)
+        self.assertEqual({}, self.h.connector_plans.inputs)
 
     def test_oversized_response_never_enters_private_replanning(self):
         self.api.resources["/tasks/v1/lists/selected-list/tasks"]["large"] = "x" * 5000

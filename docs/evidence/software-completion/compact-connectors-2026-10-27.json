@@ -1,0 +1,317 @@
+{
+  "status": "PARTIAL",
+  "base_head": "85e6fdc",
+  "qualification": "PARTIAL: real local model inference with synthetic owners/accounts and provider resources. Final generation endpoint file/multistep/handoff campaign: three passed, three failed. All four Ask/Full account trials failed safely. No broad model accuracy or account mutation success claimed.",
+  "implemented": [
+    "Human account alias/provider hints bound to immutable account identity and generation",
+    "Exact-schema compact native connector observation and effect compilation through existing private staging and authority checks",
+    "Worker-selected native capability IDs in structured decoding",
+    "Bounded signed continuation review with full model-input digest",
+    "Remove duplicate response schema from native Ollama live continuation prompt",
+    "Local structured Ollama text with explicitly disabled thinking reuses generation endpoint; response parsing follows actual wire endpoint for streaming and regular calls",
+    "MCP installation IDs supported in structured requests; schemas with local references use generic object decoding hints while exact original MCP validation remains mandatory"
+  ],
+  "model_campaigns": [
+    {
+      "receipt_sha256": "9087acea29ccea82f2c19ebda94e06aef69c694ec5d2c12cc69f1af11cecb18f",
+      "model": "granite4.1:3b",
+      "mode": "ask",
+      "state": "FAILED",
+      "seconds": 126.753,
+      "source_stable_reported": true,
+      "runtime_sources_match": false,
+      "provider_methods": [
+        "GET",
+        "GET"
+      ],
+      "error": "AssertionError"
+    },
+    {
+      "receipt_sha256": "8fd2a92216980251d78f0a7e3a739410a1af1ef65836b8fe138089321d31a214",
+      "model": "granite4.1:3b",
+      "mode": "full",
+      "state": "FAILED",
+      "seconds": 17.4,
+      "source_stable_reported": true,
+      "runtime_sources_match": false,
+      "provider_methods": [
+        "GET",
+        "GET"
+      ],
+      "error": "AssertionError"
+    },
+    {
+      "receipt_sha256": "ab97792198c3a233182eda2acaf9abe48d8bced0acc04554425efa9dd4da42f0",
+      "model": "granite4.1:3b",
+      "mode": "ask",
+      "state": "FAILED",
+      "seconds": 16.987,
+      "source_stable_reported": true,
+      "runtime_sources_match": false,
+      "provider_methods": [
+        "GET",
+        "GET"
+      ],
+      "error": "AssertionError"
+    },
+    {
+      "receipt_sha256": "9d743722a031211197dde2edb5f3ae6158529a0cab9b725e47f82625473ec1a3",
+      "model": "granite4.1:3b",
+      "mode": "full",
+      "state": "FAILED",
+      "seconds": 15.176,
+      "source_stable_reported": true,
+      "runtime_sources_match": false,
+      "provider_methods": [
+        "GET",
+        "GET"
+      ],
+      "error": "AssertionError"
+    },
+    {
+      "receipt_sha256": "f45c49b140215efc0c18be9aed754b232c74527218215e9ff1e6d5078f6cea66",
+      "model": "granite4.1:3b",
+      "mode": "ask",
+      "state": "FAILED",
+      "seconds": 14.525,
+      "source_stable_reported": true,
+      "runtime_sources_match": false,
+      "provider_methods": [
+        "GET",
+        "GET"
+      ],
+      "error": "AssertionError"
+    },
+    {
+      "receipt_sha256": "1ae12a812e1a9442eaee73f9664774d81d960db877b269b923186162b903df0f",
+      "model": "granite4.1:3b",
+      "mode": "full",
+      "state": "FAILED",
+      "seconds": 17.316,
+      "source_stable_reported": true,
+      "runtime_sources_match": false,
+      "provider_methods": [
+        "GET",
+        "GET"
+      ],
+      "error": "AssertionError"
+    },
+    {
+      "receipt_sha256": "366e6e200096c14a66d17a0cf71548643ebe613cacbda40f44fb45d44c250e8f",
+      "model": "granite4.1:3b",
+      "mode": "ask",
+      "state": "FAILED",
+      "seconds": 15.227,
+      "source_stable_reported": true,
+      "runtime_sources_match": false,
+      "provider_methods": [
+        "GET",
+        "GET"
+      ],
+      "error": "AssertionError"
+    },
+    {
+      "receipt_sha256": "a08481b99e91e554bbd0a78d49eb56ddfa0455d24f84b43b186a7e89b2bb197d",
+      "model": "granite4.1:3b",
+      "mode": "full",
+      "state": "FAILED",
+      "seconds": 19.241,
+      "source_stable_reported": true,
+      "runtime_sources_match": false,
+      "provider_methods": [
+        "GET",
+        "GET"
+      ],
+      "error": "AssertionError"
+    },
+    {
+      "receipt_sha256": "b15ab55ac8d80b8292554153eec154610a2686002612a6006bd28abce36ad9c2",
+      "model": "granite4.1:3b",
+      "mode": "ask",
+      "state": "FAILED",
+      "seconds": 16.139,
+      "source_stable_reported": true,
+      "runtime_sources_match": true,
+      "provider_methods": [
+        "GET",
+        "GET"
+      ],
+      "error": "AssertionError"
+    },
+    {
+      "receipt_sha256": "a970894de56fccfd24e555ad4b313eeeabc4bc08bf94e81f3916598cd97c7861",
+      "model": "granite4.1:3b",
+      "mode": "full",
+      "state": "FAILED",
+      "seconds": 16.516,
+      "source_stable_reported": true,
+      "runtime_sources_match": true,
+      "provider_methods": [
+        "GET",
+        "GET"
+      ],
+      "error": "AssertionError"
+    },
+    {
+      "receipt_sha256": "18e02234592e75e40411501877f8d1f1d7ddc3fe472f4b9780af86185531c1a6",
+      "model": "qwen3.5:4b",
+      "mode": "ask",
+      "state": "FAILED",
+      "seconds": 35.363,
+      "source_stable_reported": true,
+      "runtime_sources_match": true,
+      "provider_methods": [],
+      "error": "AssertionError"
+    },
+    {
+      "receipt_sha256": "64901c5ef49066c4fe43589074ebd232af3afd1aeef39b3b17c1a2b7fa4249e1",
+      "model": "qwen3.5:4b",
+      "mode": "full",
+      "state": "FAILED",
+      "seconds": 8.195,
+      "source_stable_reported": true,
+      "runtime_sources_match": true,
+      "provider_methods": [],
+      "error": "AssertionError"
+    }
+  ],
+  "decoder_diagnostic": {
+    "server_version": "0.30.11",
+    "model": "qwen3.5:4b",
+    "chat_json_mode": false,
+    "chat_typed_enum": false,
+    "chat_typed_constant": false,
+    "generate_json_mode": true,
+    "generate_typed_enum": true,
+    "generate_typed_constant": true,
+    "qualification": "Direct generation probes; not OSCAR objective acceptance. Planned correction reuses existing image generation path for structured text with thinking disabled.",
+    "logs": {
+      "local-decoder-typed.log": "af85bcd4ca4314a431fbaa8169174be9543afea8c8d4f3be9e63d2e0b592408e",
+      "local-decoder-generate.log": "6d43aab26c46588b0c5ea5b2ff1a302131c8349583607dc0b9f3afc580c701d9"
+    }
+  },
+  "checks": {
+    "focused_development": {
+      "cases": 109,
+      "passed": 109,
+      "seconds": 132.787,
+      "qualification": "Source changed during this development run; fresh full regression is running on frozen sources."
+    },
+    "mypy_source_files": 107,
+    "repository_checks": "PASS",
+    "ruff": "PASS",
+    "full_regression": {
+      "cases": 1364,
+      "passed": 1352,
+      "failures": 2,
+      "errors": 0,
+      "skipped": 10,
+      "seconds": 1045.463,
+      "source_stable": true,
+      "independently_matched_sources": 298,
+      "manifest_sha256": "e1b9a6463d6fb590c39f62b45a718b90b22f37ef8eb622ee8e4675048a16d8de",
+      "log_sha256": "ed5c9359069a3aed1937d3e08d380415d79df3a614783f35c15d0f84ed3ece7f",
+      "qualification": "FAILED: obsolete prompt wording assertion and native visual foreground rejection. Native cause remains unproven; no guard was relaxed."
+    },
+    "final_new_contracts": {
+      "passed": 4,
+      "cases": 4,
+      "seconds": 7.369
+    },
+    "final_affected": "PENDING session 23095: .oscar/structured-text-final-affected.log",
+    "final_full": "PENDING session 31460: .oscar/structured-text-full-regression.log and matching manifest; sources frozen"
+  },
+  "remaining": [
+    "Collect final frozen full session 31460 and affected session 23095; verify source manifests before edits",
+    "Fix model semantic selection, exact file kind/literal and handoff construction on generation endpoint; account read/replan/create remains incomplete",
+    "Broad model/native/service semantic reliability and general Chief-of-Staff coordination",
+    "Whole-product rendered native/accessibility, latency and operational acceptance"
+  ],
+  "prohibited_actions_performed": [],
+  "official_api_sources": [
+    "https://docs.ollama.com/api/generate",
+    "https://docs.ollama.com/api/chat"
+  ],
+  "final_real_model_trials": [
+    {
+      "receipt_sha256": "7c0511d823f3c7eaf054e6471554da27cf92cf46b5f79da48c15b1e680140d1d",
+      "state": "PASS",
+      "model": "granite4.1:3b",
+      "seconds": 8.393,
+      "source_stable": true,
+      "runtime_sources_match": true
+    },
+    {
+      "receipt_sha256": "7c8cc207eed1eeae0992de35d5f40e44492c2564af37cbf9edf74a67afe00937",
+      "state": "FAILED",
+      "model": "granite4.1:3b",
+      "seconds": 10.147,
+      "source_stable": true,
+      "runtime_sources_match": true
+    },
+    {
+      "receipt_sha256": "9df8b0a6dbc8123d0cfaa96faf92b5d7cee0b926df72a41c1bb394154e7e9769",
+      "state": "PASS",
+      "model": "granite4.1:3b",
+      "seconds": 11.785,
+      "source_stable": true,
+      "runtime_sources_match": true
+    },
+    {
+      "receipt_sha256": "d3a129fc1d5172a706e86fde2ea1011b4bce0a36f45b9efd90d149bab94df022",
+      "state": "PASS",
+      "model": "granite4.1:3b",
+      "seconds": 7.429,
+      "source_stable": true,
+      "runtime_sources_match": true
+    },
+    {
+      "receipt_sha256": "c5836adde48422e81d9819e41e1301e64f986f64735eb3b5c9b79f2f9b7b8980",
+      "state": "FAILED",
+      "model": "granite4.1:3b",
+      "seconds": 9.271,
+      "source_stable": true,
+      "runtime_sources_match": true
+    },
+    {
+      "receipt_sha256": "27826dfee1f4615e89f52e7b11dc2a838b0fe847fca353cfd3c5a0485c3cf9b7",
+      "state": "FAILED",
+      "model": "granite4.1:3b",
+      "seconds": 11.528,
+      "source_stable": true,
+      "runtime_sources_match": true
+    },
+    {
+      "receipt_sha256": "6aa0b6d6918434eb8466611a42fcb2e2c58477d3683a93c5be1a9a4d01a434a3",
+      "state": "FAILED",
+      "model": "granite4.1:3b",
+      "seconds": 17.535,
+      "source_stable": true,
+      "runtime_sources_match": true
+    },
+    {
+      "receipt_sha256": "34d3f55ad5d2e1c8dcd8f797f948f40ac316caec14dae429e410c4bafcbbe1a1",
+      "state": "FAILED",
+      "model": "granite4.1:3b",
+      "seconds": 19.773,
+      "source_stable": true,
+      "runtime_sources_match": true
+    },
+    {
+      "receipt_sha256": "acb3330c9762a7e5593697b7861936298fb932de1c34bb350b7d712e2df5907e",
+      "state": "FAILED",
+      "model": "qwen3.5:4b",
+      "seconds": 8.208,
+      "source_stable": true,
+      "runtime_sources_match": true
+    },
+    {
+      "receipt_sha256": "28d6f38511c6f5d3593c6b09b39a013b7c99e3acf9cfd056a09ae0e0896a65f5",
+      "state": "FAILED",
+      "model": "qwen3.5:4b",
+      "seconds": 4.612,
+      "source_stable": true,
+      "runtime_sources_match": true
+    }
+  ]
+}

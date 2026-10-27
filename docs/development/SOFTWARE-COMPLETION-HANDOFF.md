@@ -836,3 +836,33 @@ An intermediate null file-kind model response was correctly blocked and retained
 Ruff, mypy (107 files) and repository checks passed. A fresh whole-suite result
 is still required; the failed aggregate is not relabeled as a pass.
 [Evidence](../evidence/software-completion/adaptive-handoffs-2026-10-27.json).
+
+
+**2026-10-28 compact connector and local decoder checkpoint (PARTIAL):**
+Current account alias/provider hints, compact exact-contract connector compilation,
+128-reader decoding admission and digest-bound continuation review are implemented.
+Local structured text with explicitly disabled thinking now reuses the existing
+Ollama generation path; direct JSON/enum/constant probes passed there and failed
+on chat in installed 0.30.11. MCP installation IDs remain supported; referenced
+MCP schemas use generic decoder hints and exact original native validation.
+Four final targeted contracts passed (7.369s); Ruff, mypy (107 files) and repository
+checks passed. A 109-case development integration passed with source qualification.
+
+The earlier frozen full run completed 1,364 cases: 1,352 passed, ten skipped and
+two failed (1,045.463s), with all 298 source hashes independently matched. The old
+prompt-wording assertion is corrected; native visual foreground rejection still
+has an unproven cause. No native guard was relaxed. The fresh final full run is
+PENDING in **session 31460**, log/manifest `.oscar/structured-text-full-regression`;
+final 92-case affected run is **session 23095**, log
+`.oscar/structured-text-final-affected.log`. Keep runtime/tests frozen until both
+receipts are collected and the full manifest is independently matched.
+
+Final actual Granite generation tests passed three of six file/multistep/handoff
+cases and failed three; both Granite and both Qwen Ask/Full account workflows
+failed safely. Earlier six-of-six chat acceptance is not current generation-path
+accuracy proof. Run-owned model servers stopped. Model semantic selection, exact
+file kind/literal and handoff reliability, useful account read/replan/create,
+broader model/native/service workflows, general Chief-of-Staff replanning and
+whole-product rendered/accessibility/latency/operational acceptance remain OPEN.
+No publication, real account, physical device or production activation occurred.
+[Qualified receipt](../evidence/software-completion/compact-connectors-2026-10-27.json).

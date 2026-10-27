@@ -133,12 +133,14 @@ class ConnectorPlanning:
         except (KeyError, StopIteration, ValueError, PermissionError):
             return None
         instance = current["instance"]
+        account = self.h.accounts.get(instance["account_id"])
         return {
             "node_id": cap["node_id"],
             "capability_id": cap["id"],
             "kind": cap["input_kind"],
             "summary": "Current reviewed account-bound connector operation",
             "account_id": instance["account_id"],
+            "account": {"alias": account.alias, "provider": account.provider},
             "account_generation": instance["account_generation"],
             "operation": current["operation"],
             "transport": current["transport"],
@@ -156,7 +158,9 @@ class ConnectorPlanning:
                 )
             ],
             "intent_rule": (
-                "Supply parameters with exactly arguments, an object matching argument_schema. "
+                "Return a compact connector step: id, capability_id, arguments matching "
+                "argument_schema, and depends_on ([] when independent). No intent/node_id/inputs. "
+                "For observe:true omit depends_on and use a single read-only GET. "
                 "Use the exact selected account/tool; never invent arguments or references. "
                 "No input substitutions or verification claims. Observation stages may use "
                 "only native HTTPS GET operations marked read, without a body. "
@@ -260,7 +264,40 @@ class ConnectorPlanning:
             raise ValueError("bounded connector plan required")
         staged = []
         try:
-            for step in steps:
+            for index, step in enumerate(steps):
+                if (
+                    isinstance(step, dict)
+                    and isinstance(document, dict)
+                    and set(step) == (
+                        {"id", "capability_id", "arguments"}
+                        if document.get("observe") is True
+                        else {"id", "capability_id", "arguments", "depends_on"}
+                    )
+                ):
+                    selected = next(
+                        (p for p in pins if p["capability_id"] == step["capability_id"]), None
+                    )
+                    if selected is None:
+                        raise PermissionError("unselected compact connector")
+                    current = self.current(selected)
+                    if document.get("observe") is True and not self.is_read(current["capability"]):
+                        raise PermissionError("compact observations require a native read-only GET")
+                    step = {
+                        "id": step["id"],
+                        "node_id": selected["node_id"],
+                        "capability_id": selected["capability_id"],
+                        "intent": asdict(
+                            Intent(
+                                "Invoke selected connector operation",
+                                "capability",
+                                capability_kind=current["capability"]["input_kind"],
+                                parameters={"arguments": step["arguments"]},
+                            )
+                        ),
+                        "depends_on": step.get("depends_on", []),
+                        "inputs": [],
+                    }
+                    steps[index] = step
                 if not isinstance(step, dict) or not isinstance(step.get("intent"), dict):
                     raise ValueError("typed connector step required")
                 if set(step) - {"inputs"} != {

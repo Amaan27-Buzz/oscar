@@ -595,3 +595,12 @@ See [OSCAR Mobile foundation](MOBILE-FOUNDATION.md) for implementation, limits a
 Slice 09 must not merge in this run. Gate C remains PARTIAL. Slice 10, deployment
 and Home Node are not started. Post-alpha Operating Logs, specialist-model training
 and home-server migration remain documented future work, not implemented.
+
+
+For local Ollama structured requests with `ollama_think:false`, the adapter uses
+`/generate` and reads its `response` field, including streamed chunks. Installed
+0.30.11 ignored JSON/enum/constant constraints on `/chat` in direct probes while
+`/generate` enforced them. Native validation and independent outcome verification
+remain mandatory; enforcing output shape does not establish semantic accuracy.
+See [scoped evidence](evidence/software-completion/compact-connectors-2026-10-27.json)
+and the [official generation contract](https://docs.ollama.com/api/generate).

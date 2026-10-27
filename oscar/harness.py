@@ -120,6 +120,20 @@ class ModelExecutor:
         )
 
     def __call__(self, action: Action, cancellation: Cancellation) -> Result:
+        connector_schemas = {
+            pin["capability_id"]: self.connector_plans.current(pin)["schema"]
+            for pin in action.parameters.get("connector_contracts", [])
+            if self.connector_plans is not None and "structured" in self.template.required
+        }
+        native_capabilities = None
+        if connector_schemas and self.grid is not None:
+            binding = self.grid.store.get("plan", action.task_id)["executive"]
+            worker = self.grid.store.get("executive_worker", binding["worker_id"])
+            native_capabilities = tuple(
+                p["capability_id"]
+                for p in worker["capabilities"]
+                if p["capability_id"] not in connector_schemas
+            )
         request = replace(
             self.template,
             task_id=action.task_id,
@@ -135,6 +149,8 @@ class ModelExecutor:
                 and "structured" in self.template.required
                 else ()
             ),
+            executive_connector_schemas=connector_schemas,
+            executive_native_capabilities=native_capabilities,
         )
         policy = self.policy
         check = cancellation.check

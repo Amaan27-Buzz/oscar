@@ -34,7 +34,11 @@ def exact_file_literal(goal: str) -> str | None:
 
 
 def executive_plan_schema(
-    *, observation_only: tuple[str, ...] = (), goal: str = ""
+    *,
+    observation_only: tuple[str, ...] = (),
+    goal: str = "",
+    connector_schemas: dict[str, dict[str, Any]] | None = None,
+    native_capabilities: tuple[str, ...] | None = None,
 ) -> dict[str, Any]:
     intent = {
         # Ollama rejects the 4096-repeat grammar; Executive enforces that text bound.
@@ -130,6 +134,8 @@ def executive_plan_schema(
         plan["properties"]["steps"]["maxItems"] = 1
         variants = []
         for capability in observation_only:
+            if capability not in OBSERVATION_KINDS:
+                continue
             variant = deepcopy(plan["properties"]["steps"]["items"])
             fields = variant["properties"]
             fields["capability_id"] = {"const": capability}
@@ -178,9 +184,6 @@ def executive_plan_schema(
                         }
                     }
                 required = ["request"]
-            elif capability not in OBSERVATION_KINDS:
-                properties = {"arguments": {"type": "object"}}
-                required = ["arguments"]
             else:
                 properties = {
                     key: {"type": "string"}
@@ -200,5 +203,57 @@ def executive_plan_schema(
                 "additionalProperties": False,
             }
             variants.append(variant)
+        plan["properties"]["steps"]["items"] = {"oneOf": variants}
+    connectors = (
+        [c for c in observation_only if c not in OBSERVATION_KINDS]
+        if observation_only
+        else list(connector_schemas or {})
+    )
+    if connectors:
+        plan = schema["oneOf"][0]
+        schemas = list((connector_schemas or {}).values())
+        unique = [s for i, s in enumerate(schemas) if s not in schemas[:i]]
+        if unique:
+            # Nested schema resources vary by decoder; native MCP validation stays exact.
+            schema["$defs"] = {
+                "a" + str(i): (
+                    {"type": "object"}
+                    if any(
+                        key in json.dumps(s)
+                        for key in ('"$ref"', '"$dynamicRef"', '"$recursiveRef"')
+                    )
+                    else s
+                )
+                for i, s in enumerate(unique)
+            }
+        if observation_only:
+            variants = plan["properties"]["steps"]["items"]["oneOf"]
+        else:
+            native = plan["properties"]["steps"]["items"]
+            if native_capabilities is not None:
+                native["properties"]["capability_id"] = {"enum": list(native_capabilities)}
+            variants = []
+        for capability in connectors:
+            fields = {
+                "id": step["id"],
+                "capability_id": {"const": capability},
+                "arguments": (
+                    {"$ref": "#/$defs/a" + str(unique.index(connector_schemas[capability]))}
+                    if connector_schemas and capability in connector_schemas
+                    else {"type": "object"}
+                ),
+            }
+            if not observation_only:
+                fields["depends_on"] = step["depends_on"]
+            variants.append(
+                {
+                    "type": "object",
+                    "properties": fields,
+                    "required": list(fields),
+                    "additionalProperties": False,
+                }
+            )
+        if not observation_only and native_capabilities != ():
+            variants.append(native)
         plan["properties"]["steps"]["items"] = {"oneOf": variants}
     return schema

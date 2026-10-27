@@ -5,7 +5,7 @@ import importlib.util
 import json
 import sys
 import unittest
-from dataclasses import asdict
+from dataclasses import asdict, replace
 from pathlib import Path
 from time import monotonic, sleep
 
@@ -104,6 +104,66 @@ class MCPPlanningTests(unittest.TestCase):
         for row in self.h.store.all("assistance_review"):
             if row.get("payload"):
                 self.assertNotIn(self.marker, base64.b64decode(row["payload"]).decode())
+
+    def test_structured_compact_mcp_keeps_review_and_private_execution(self):
+        self.executor.router.registry.models = {
+            k: replace(m, capabilities=frozenset({"text", "structured"}))
+            for k, m in self.executor.router.registry.models.items()
+        }
+        self.executor.template = replace(
+            self.executor.template, required=frozenset({"text", "structured"})
+        )
+        self.steps = [
+            {
+                "id": "write",
+                "capability_id": self.cap.id,
+                "depends_on": [],
+                "arguments": {"path": "mcp-plan.txt", "content": self.marker},
+            }
+        ]
+        self.set_response()
+        self.test_ask_exact_private_review_real_tool_and_consumed_reference()
+
+    def test_reference_schema_decoder_falls_back_without_relocating_mcp_validation(self):
+        from jsonschema import Draft202012Validator
+
+        from oscar.planning_contract import executive_plan_schema
+
+        original = {
+            "type": "object",
+            "properties": {"count": {"$ref": "#/$defs/count"}},
+            "$defs": {"count": {"type": "integer", "minimum": 1}},
+            "required": ["count"],
+            "additionalProperties": False,
+        }
+        schema = executive_plan_schema(
+            connector_schemas={self.cap.id: original}, native_capabilities=()
+        )
+        self.assertEqual({"a0": {"type": "object"}}, schema["$defs"])
+        self.assertTrue(Draft202012Validator(original).is_valid({"count": 1}))
+        self.assertFalse(Draft202012Validator(original).is_valid({"count": 0}))
+        document = {
+            "steps": [
+                {
+                    "id": "invoke",
+                    "capability_id": self.cap.id,
+                    "depends_on": [],
+                    "arguments": {"count": 0},
+                }
+            ]
+        }
+        self.assertTrue(Draft202012Validator(schema).is_valid(document))
+        from unittest.mock import patch
+
+        pins = self.h.connector_plans.pins([asdict(self.cap)])
+        current = self.h.connector_plans.current(pins[0])
+        with patch.object(
+            self.h.connector_plans, "current", return_value={**current, "schema": original}
+        ):
+            with self.assertRaisesRegex(ValueError, "reviewed schema"):
+                self.h.connector_plans.sanitize(json.dumps(document), "synthetic-plan", pins)
+        self.assertEqual({}, self.h.connector_plans.inputs)
+        self.assertFalse((self.h.files.root / "mcp-plan.txt").exists())
 
     def test_ask_exact_private_review_real_tool_and_consumed_reference(self):
         row = self.draft()

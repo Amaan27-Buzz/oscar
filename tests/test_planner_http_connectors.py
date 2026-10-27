@@ -1,5 +1,6 @@
 """Model-authored private native account requests over real synthetic HTTP."""
 
+import importlib.util
 import json
 import unittest
 from dataclasses import asdict
@@ -156,6 +157,68 @@ class HTTPPlanningTests(unittest.TestCase):
         self.finish()
         self.assertEqual([], self.h.store.all("assistance_review"))
         self.assertEqual([], self.h.store.all("executive_confirmation"))
+
+    @unittest.skipUnless(importlib.util.find_spec("jsonschema"), "optional schema validator absent")
+    def test_compact_decoder_uses_selected_connector_arguments_and_native_ids(self):
+        from jsonschema import Draft202012Validator
+
+        from oscar.planning_contract import executive_plan_schema
+
+        schema = executive_plan_schema(
+            connector_schemas={
+                self.cap.id: self.h.connector_plans.contract(asdict(self.cap))["schema"]
+            },
+            native_capabilities=("files.write",),
+        )
+        validator = Draft202012Validator(schema)
+        self.compact_response()
+        self.assertTrue(validator.is_valid({"steps": self.steps}))
+        self.steps[0]["arguments"]["path"] = {}
+        self.assertFalse(validator.is_valid({"steps": self.steps}))
+        canonical = {
+            "id": "write",
+            "node_id": self.mount.node_id,
+            "capability_id": self.cap.id,
+            "depends_on": [],
+            "inputs": [],
+            "intent": asdict(Intent("Write", "capability", capability_kind=self.cap.id)),
+        }
+        self.assertFalse(validator.is_valid({"steps": [canonical]}))
+        self.assertEqual(
+            ["files.write"],
+            schema["oneOf"][0]["properties"]["steps"]["items"]["oneOf"][-1]["properties"][
+                "capability_id"
+            ]["enum"],
+        )
+
+    def compact_response(self):
+        step = self.steps[0]
+        self.steps = [
+            {
+                "id": step["id"],
+                "capability_id": step["capability_id"],
+                "arguments": step["intent"]["parameters"]["arguments"],
+                "depends_on": [],
+            }
+        ]
+        self.response()
+
+    def test_compact_effect_preserves_ask_review_and_private_arguments(self):
+        self.compact_response()
+        self.test_ask_reviews_exact_endpoint_and_private_body_before_real_http_effect()
+
+    def test_compact_effect_preserves_full_account_delegation(self):
+        self.compact_response()
+        self.test_full_calls_only_the_delegated_account_without_action_reviews()
+
+    def test_compact_effect_cannot_select_an_unreviewed_account(self):
+        self.compact_response()
+        self.steps[0]["capability_id"] = "native-account-" + "f" * 24 + ":google.tasks.create"
+        self.response()
+        self.draft()
+        self.assertEqual("failed", self.h.store.all("task")[-1]["state"])
+        self.assertEqual([], self.api.calls)
+        self.assertEqual({}, self.h.connector_plans.inputs)
 
     def test_full_missing_account_cannot_fall_back_to_native_ask(self):
         self.grant_full([])

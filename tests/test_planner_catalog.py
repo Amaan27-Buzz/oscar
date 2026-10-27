@@ -249,6 +249,8 @@ class PlanningCatalogTests(unittest.TestCase):
                 schema = pin["argument_schema"]
             self.assertEqual(expected["argument_schema"], schema)
             self.assertEqual(expected["account_id"], pin["account_id"])
+            self.assertEqual(expected["account"], shared["accounts"][pin["account_id"]])
+            self.assertNotIn("account", pin)
             self.assertEqual(
                 expected["operation"], pin.get("operation", pin["capability_id"].rsplit(":", 1)[-1])
             )
@@ -259,6 +261,147 @@ class PlanningCatalogTests(unittest.TestCase):
             self.assertNotIn("node_id", pin)
             self.assertEqual(expected["node_id"], shared["node_id"])
         self.assertGreater(referenced, 1)
+
+    def test_account_labels_are_current_without_disclosing_credential_or_subject(self):
+        proposal = self.conversation()["assistance_proposal"]
+        state = PlannerAuthoring(self.h).material(
+            "plan_draft", "new", proposal["value"], self.grants
+        )
+        descriptors = [
+            PlannerAuthoring.descriptor(c, self.h.connector_plans)
+            for c in state["capabilities"]
+            if c["output_kind"] == "connector-reference"
+        ]
+        self.assertGreater(len(descriptors), 1)
+        for descriptor in descriptors:
+            account = self.h.accounts.get(descriptor["account_id"])
+            self.assertEqual(
+                {"alias": account.alias, "provider": account.provider}, descriptor["account"]
+            )
+            self.assertNotIn("subject", descriptor["account"])
+            self.assertNotIn("credential", descriptor["account"])
+
+    def test_account_rename_after_review_blocks_model_disclosure(self):
+        proposal = self.conversation()["assistance_proposal"]
+        reviewed = self.review(proposal)
+        self.h.accounts.rename(self.account.id, "Renamed synthetic account")
+        with self.assertRaises(PermissionError):
+            self.complete(reviewed)
+        self.assertEqual([], self.requests)
+        self.assertEqual([], self.h.store.all("executive_worker"))
+
+    def test_large_live_catalog_continuation_review_binds_the_omitted_model_prompt(self):
+        self.large_live_continuation()
+
+    def test_ollama_live_continuation_uses_its_decoder_without_a_duplicate_schema(self):
+        self.large_live_continuation(ollama=True)
+
+    def large_live_continuation(self, *, ollama=False):
+        from tests.test_planner_http_observations import HTTPObservationTests
+
+        if ollama:
+            from oscar.providers import HTTPAdapter
+
+            self.executor.router.adapters["ollama"] = HTTPAdapter("ollama")
+            registry = self.executor.router.registry
+            registry.providers = {
+                key: replace(provider, adapter="ollama")
+                for key, provider in registry.providers.items()
+            }
+            self.body["message"] = self.body["choices"][0]["message"]
+            self.body["done"] = True
+        reader = self.mount.capability("google.tasks.list", account_id=self.account.id)
+        self.api.resources["/tasks/v1/lists/selected-list/tasks"] = {
+            "items": [{"title": self.marker}]
+        }
+        self.body["choices"][0]["message"]["content"] = json.dumps(
+            {
+                "steps": [
+                    {
+                        "id": "read",
+                        "capability_id": reader.id,
+                        "arguments": {"path": {"tasklist": "selected-list"}},
+                    }
+                ],
+                "observe": True,
+            }
+        )
+        proposal = self.conversation("Create catalog-note.txt using current selected task data")[
+            "assistance_proposal"
+        ]
+        self.complete(self.review(proposal))
+        self.h.executive.tick()
+        row = self.h.store.all("planner_request")[0]
+        self.complete(self.review(self.accept_change(row)))
+        self.assertEqual("verified", HTTPObservationTests.settle(self, 2)["state"])
+        continuation = self.review(self.accept_change(row))
+        self.assertLess(len(continuation["review"].encode()), 24000)
+        self.assertIn("model_input_digest", continuation["review"])
+        if ollama:
+            material = PlannerAuthoring(self.h).material(
+                "plan_accept", row["id"], self.accept_change(row)["value"], self.grants
+            )
+            self.assertNotIn(
+                "Response JSON schema:", material["steps"][0]["intent"]["parameters"]["prompt"]
+            )
+            self.assertIn("$defs", self.requests[0]["body"]["format"])
+        original = self.h.store.get("planner_request", row["id"])
+        from copy import deepcopy
+
+        changed = deepcopy(original)
+        changed["planning_step"]["intent"]["parameters"]["prompt"] += " Unreviewed change"
+        self.h.store.put("planner_request", row["id"], changed)
+        with self.assertRaises(PermissionError):
+            self.complete(continuation)
+        self.assertEqual(1, len(self.requests))
+        self.h.store.put("planner_request", row["id"], original)
+        self.body["choices"][0]["message"]["content"] = json.dumps(
+            {
+                "steps": [
+                    {
+                        "id": "save",
+                        "node_id": self.h.node_id,
+                        "capability_id": "files.write",
+                        "depends_on": [],
+                        "inputs": [],
+                        "intent": asdict(
+                            Intent(
+                                "Save observed task", "file_write", "catalog-note.txt", self.marker
+                            )
+                        ),
+                    }
+                ],
+            }
+        )
+        self.complete(self.review(self.accept_change(row)))
+        self.assertEqual("partially_verified", HTTPObservationTests.settle(self, 3)["state"])
+        self.complete(self.review(self.accept_change(row)))
+        self.assertEqual("verified", HTTPObservationTests.settle(self, 4)["state"])
+        self.assertEqual(self.marker, (self.h.files.root / "catalog-note.txt").read_text())
+
+    def test_duplicate_account_labels_preserve_distinct_ids_and_ambiguity(self):
+        other = self.h.accounts.add(
+            "google", "synthetic-other", "tasks-other", self.account.alias, verified=True
+        )
+        self.vault.put("synthetic-other-token", reference="planning-other")
+        self.h.accounts.bind(
+            other.id,
+            self.manifest.id,
+            CredentialRef("planning-other"),
+            self.scopes,
+            self.manifest.base_url,
+        )
+        self.mount.refresh()
+        proposal = self.conversation()["assistance_proposal"]
+        state = PlannerAuthoring(self.h).material(
+            "plan_draft", "new", proposal["value"], self.grants
+        )
+        prompt = state["step"]["intent"]["parameters"]["prompt"]
+        shared_text = prompt.split("Shared connector fields (", 1)[1].split("): ", 1)[1]
+        shared, _ = json.JSONDecoder().raw_decode(shared_text)
+        self.assertEqual(shared["accounts"][self.account.id], shared["accounts"][other.id])
+        with self.assertRaisesRegex(PermissionError, "ambiguous"):
+            self.h.accounts.select("google", self.manifest.id, alias=self.account.alias)
 
     def test_omitted_prompt_change_invalidates_signed_catalog_review(self):
         from unittest.mock import patch

@@ -1,5 +1,6 @@
 """Router contracts. Model metadata is replaceable data with explicit provenance."""
 
+import re
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from enum import StrEnum
@@ -160,6 +161,8 @@ class ModelRequest:
     ollama_think: bool | None = None
     executive_plan: bool = False
     executive_observation: tuple[str, ...] = ()
+    executive_native_capabilities: tuple[str, ...] | None = None
+    executive_connector_schemas: dict[str, dict[str, Any]] = field(default_factory=dict)
     images: tuple[ScreenImage, ...] = field(default=(), repr=False)
 
     @classmethod
@@ -215,9 +218,11 @@ class ModelRequest:
             raise ValueError("private bounded vision observations required")
         if (
             not isinstance(self.executive_observation, tuple)
-            or len(self.executive_observation) > 16
+            or len(self.executive_observation) > 128
             or any(
-                not isinstance(c, str) or c not in OBSERVATION_KINDS
+                not isinstance(c, str)
+                or c not in OBSERVATION_KINDS
+                and not re.fullmatch(r"native-account-[0-9a-f]{24}:[a-z0-9_.-]{1,160}", c)
                 for c in self.executive_observation
             )
             or len(set(self.executive_observation)) != len(self.executive_observation)
@@ -229,6 +234,35 @@ class ModelRequest:
             self.executive_plan and "structured" not in self.required
         ):
             raise ValueError("Executive decoding requires explicit structured model output")
+        if (
+            not isinstance(self.executive_connector_schemas, dict)
+            or len(self.executive_connector_schemas) > 128
+            or not {c for c in self.executive_observation if c not in OBSERVATION_KINDS}.issubset(
+                self.executive_connector_schemas
+            )
+            or self.executive_connector_schemas
+            and not self.executive_plan
+            or any(
+                not isinstance(c, str)
+                or not re.fullmatch(r"[a-zA-Z0-9_.-]{1,128}:[a-zA-Z0-9_.-]{1,160}", c)
+                for c in self.executive_connector_schemas
+            )
+            or any(not isinstance(s, dict) for s in self.executive_connector_schemas.values())
+        ):
+            raise ValueError("exact native connector argument schemas required")
+        if self.executive_native_capabilities is not None and (
+            not self.executive_plan
+            or not isinstance(self.executive_native_capabilities, tuple)
+            or len(self.executive_native_capabilities) > 128
+            or any(
+                not isinstance(c, str) or not 1 <= len(c) <= 256
+                for c in self.executive_native_capabilities
+            )
+            or len(set(self.executive_native_capabilities))
+            != len(self.executive_native_capabilities)
+            or set(self.executive_native_capabilities) & set(self.executive_connector_schemas)
+        ):
+            raise ValueError("distinct selected native Executive capabilities required")
         if self.ollama_think is not None and type(self.ollama_think) is not bool:
             raise ValueError("Ollama thinking preference must be an explicit boolean")
         if (

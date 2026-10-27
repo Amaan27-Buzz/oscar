@@ -230,6 +230,79 @@ class ProviderContractTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             ModelRequest.from_config({"executive_plan": True})
 
+    def test_local_structured_thinking_disabled_uses_generate_for_regular_and_stream(self):
+        request = replace(
+            self.request,
+            required=frozenset({"text", "structured"}),
+            executive_plan=True,
+            ollama_think=False,
+        )
+        text = '{"clarification":"Which file?"}'
+        self.body = {"response": text, "done": True, "model": "fixture-model"}
+        result = self.generate("ollama", request=request)
+        self.assertEqual(text, result.text)
+        self.assertTrue(result.structured_ok)
+        wire = self.requests[-1]
+        self.assertEqual("/generate", wire["path"])
+        self.assertEqual(request.prompt, wire["body"]["prompt"])
+        self.assertNotIn("messages", wire["body"])
+        self.assertNotIn("images", wire["body"])
+        self.body = (
+            b"\n".join(
+                json.dumps(row).encode()
+                for row in (
+                    {"response": text[:10], "done": False},
+                    {"response": text[10:], "done": True, "model": "fixture-model"},
+                )
+            )
+            + b"\n"
+        )
+        pieces = []
+        result = self.generate("ollama", sink=pieces.append, request=request)
+        self.assertEqual(text, result.text)
+        self.assertEqual(text, "".join(pieces))
+        self.assertEqual("/generate", self.requests[-1]["path"])
+        self.body = {"message": {"content": text}, "done": True}
+        adapter = HTTPAdapter("ollama")
+        adapter.generate(
+            replace(self.provider, local=False), "fixture-model", "", request, 2, lambda: None
+        )
+        self.assertEqual("/chat", self.requests[-1]["path"])
+
+    def test_observation_decoding_accepts_bounded_native_account_catalogs(self):
+        request = replace(self.request, required=frozenset({"text", "structured"}))
+        readers = tuple("native-account-" + "a" * 24 + ":read-" + str(i) for i in range(128))
+        self.assertEqual(
+            readers,
+            replace(
+                request,
+                executive_plan=True,
+                executive_observation=readers,
+                executive_connector_schemas={c: {"type": "object"} for c in readers},
+            ).executive_observation,
+        )
+        for invalid in (readers + ("machine.apps",), ("native-account-invalid:read",)):
+            with self.assertRaises(ValueError):
+                replace(request, executive_plan=True, executive_observation=invalid)
+        with self.assertRaises(ValueError):
+            replace(request, executive_plan=True, executive_observation=(readers[0],))
+
+    def test_native_decoder_scope_cannot_overlap_connector_scope_or_escape_configuration(self):
+        request = replace(
+            self.request, required=frozenset({"text", "structured"}), executive_plan=True
+        )
+        capability = "native-account-" + "a" * 24 + ":write"
+        with self.assertRaises(ValueError):
+            replace(
+                request,
+                executive_connector_schemas={capability: {}},
+                executive_native_capabilities=(capability,),
+            )
+        with self.assertRaises(ValueError):
+            ModelRequest.from_config({"executive_native_capabilities": ["files.write"]})
+        with self.assertRaises(ValueError):
+            replace(request, executive_native_capabilities=("files.write",) * 2)
+
     def test_invalid_structured_output_is_failure(self):
         with self.assertRaises(ProviderError) as caught:
             self.generate(request=replace(self.request, required=frozenset({"text", "structured"})))

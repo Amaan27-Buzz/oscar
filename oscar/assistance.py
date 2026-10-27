@@ -420,6 +420,15 @@ class Assistance:
             displayed = {k: v for k, v in state.items() if k != "step"}
             if "step" in state:
                 displayed["model_input_digest"] = fingerprint(state["step"])
+            if state.get("continuation"):
+                from copy import deepcopy
+
+                displayed["steps"] = deepcopy(state["steps"])
+                for step in displayed["steps"]:
+                    parameters = step["intent"]["parameters"]
+                    parameters.pop("prompt", None)
+                    parameters.pop("connector_contracts", None)
+                displayed["model_input_digest"] = fingerprint(state["steps"])
             for key in ("worker", "request"):
                 if key in state:
                     displayed[key] = {

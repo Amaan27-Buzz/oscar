@@ -259,13 +259,18 @@ class HTTPAdapter:
                 "stream": stream,
             }
             if self.kind == "ollama":
-                if request.images:
-                    import base64
-
-                    # Qwen chat can ignore format with thinking disabled; generate enforces it.
+                if request.images or (
+                    provider.local
+                    and "structured" in request.required
+                    and request.ollama_think is False
+                ):
+                    # Local chat can ignore format with thinking disabled; generate enforces it.
                     url = root + "/generate"
                     body.pop("messages")
                     body["prompt"] = request.prompt
+                if request.images:
+                    import base64
+
                     body["images"] = [
                         base64.b64encode(image.data).decode("ascii") for image in request.images
                     ]
@@ -279,7 +284,9 @@ class HTTPAdapter:
                         from .planning_contract import executive_plan_schema
 
                         body["format"] = executive_plan_schema(
-                            observation_only=request.executive_observation
+                            observation_only=request.executive_observation,
+                            connector_schemas=request.executive_connector_schemas,
+                            native_capabilities=request.executive_native_capabilities,
                         )
                         body["options"]["temperature"] = 0
                     else:
@@ -348,9 +355,9 @@ class HTTPAdapter:
                 timeout = deadline - monotonic()
                 if timeout <= 0:
                     raise ProviderError(Failure.NETWORK)
-            with self.opener.open(
-                self._request(provider, model, secret, request, sink is not None), timeout=timeout
-            ) as response:
+            wire = self._request(provider, model, secret, request, sink is not None)
+            generated = self.kind == "ollama" and wire.full_url.endswith("/generate")
+            with self.opener.open(wire, timeout=timeout) as response:
                 raw, pending, texts = bytearray(), bytearray(), []
                 last: dict[str, Any] = {}
                 actual_model: str | None = None
@@ -392,7 +399,7 @@ class HTTPAdapter:
                             or actual_model
                         )
                         actual_provider = safe_identity(last.get("provider")) or actual_provider
-                        text = self._text(last, streaming=True, images=bool(request.images))
+                        text = self._text(last, streaming=True, images=generated)
                         if text:
                             emitted = True
                             texts.append(text)
@@ -411,7 +418,7 @@ class HTTPAdapter:
                         raise inline_error(last, response.headers, provider.id, False)
                     actual_model = safe_identity(last.get("modelVersion", last.get("model")))
                     actual_provider = safe_identity(last.get("provider"))
-                    text = self._text(last, images=bool(request.images))
+                    text = self._text(last, images=generated)
                 else:
                     if not complete_stream:
                         raise ProviderError(Failure.NETWORK, emitted=emitted)
