@@ -71,9 +71,9 @@ class PlanningCatalogTests(unittest.TestCase):
             }
         )
 
-    def conversation(self):
+    def conversation(self, goal="Write Welcome to OSCAR to catalog-note.txt"):
         return PlannerAuthoring(self.h).conversation(
-            "Write Welcome to OSCAR to catalog-note.txt",
+            goal,
             self.owner.node_id,
             self.owner.id,
             self.owner_scope,
@@ -92,6 +92,71 @@ class PlanningCatalogTests(unittest.TestCase):
         self.assertEqual("verified", self.settle())
         self.assertEqual("Welcome to OSCAR", (self.h.files.root / "catalog-note.txt").read_text())
         self.assertEqual([], self.api.calls)
+
+    def test_changed_exact_literal_never_becomes_a_reviewable_effect(self):
+        proposal = self.conversation('Write catalog-note.txt with exact text "Welcome to OSCAR."')
+        self.complete(self.review(proposal["assistance_proposal"]))
+        self.h.executive.tick()
+        row = self.h.store.all("planner_request")[-1]
+        with self.assertRaisesRegex(ValueError, "owner's exact text"):
+            self.review(self.accept_change(row))
+        self.assertFalse((self.h.files.root / "catalog-note.txt").exists())
+        self.assertEqual([], self.api.calls)
+
+    def test_signed_full_blocks_changed_exact_literal_without_any_file_effect(self):
+        self.delegate_catalog()
+        result = self.conversation('Write catalog-note.txt with exact text "Welcome to OSCAR."')
+        self.assertIn("assistance_started", result)
+        for _ in range(5):
+            self.h.executive.tick()
+        row = self.h.store.all("planner_request")[-1]
+        self.assertTrue(row.get("autonomy_blocked"))
+        self.assertFalse((self.h.files.root / "catalog-note.txt").exists())
+        self.assertEqual([], self.api.calls)
+        self.assertEqual([], self.h.store.all("executive_confirmation"))
+
+    def test_matching_escaped_literal_is_written_and_independently_verified(self):
+        literal = 'Welcome to OSCAR.\n"Café" '
+        response = json.loads(self.body["choices"][0]["message"]["content"])
+        response["steps"][0]["intent"]["content"] = literal
+        self.body["choices"][0]["message"]["content"] = json.dumps(response)
+        proposal = self.conversation(
+            "Write catalog-note.txt with exact content: " + json.dumps(literal)
+        )
+        from oscar.planning_contract import executive_plan_schema
+
+        schema = executive_plan_schema(goal="Write exact text " + json.dumps(literal))
+        content = schema["oneOf"][0]["properties"]["steps"]["items"]["properties"]["intent"][
+            "properties"
+        ]["content"]
+        self.assertEqual([None, literal], content["enum"])
+        self.complete(self.review(proposal["assistance_proposal"]))
+        self.h.executive.tick()
+        self.complete(self.review(self.accept_change(self.h.store.all("planner_request")[-1])))
+        self.assertEqual("verified", self.settle())
+        self.assertEqual(
+            literal, (self.h.files.root / "catalog-note.txt").read_text(encoding="utf-8")
+        )
+
+    def test_explicit_literal_rejects_ambiguous_targets_and_content_handoffs(self):
+        from oscar.executive import validate_file_literal
+
+        step = {"intent": {"kind": "file_write", "content": "A."}}
+        for goal, steps in (
+            ('Save exact text "A."', [step, step]),
+            ('Save exact text "A." and exact content "A."', [step]),
+            ("Save exact text A.", [step]),
+            ("Save exact text 42", [step]),
+            ('Save exact text "A."', [{**step, "inputs": [{"to": ["content"]}]}]),
+        ):
+            with self.subTest(goal=goal), self.assertRaises(ValueError):
+                validate_file_literal(goal, steps)
+        from oscar.planning_contract import exact_file_literal
+
+        for text in ("", 'Describe exact text "quoted" with exact content', "\nA. "):
+            self.assertEqual(text, exact_file_literal("Save exact text " + json.dumps(text)))
+        validate_file_literal("Save the computed result", [step])
+        validate_file_literal('Observe exact text "A."', [{"intent": {"kind": "file_read"}}])
 
     def test_shared_model_schemas_reconstruct_every_exact_connector_contract(self):
         planning = PlannerAuthoring(self.h)

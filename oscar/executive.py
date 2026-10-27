@@ -29,6 +29,24 @@ def digest(value: Any) -> str:
     return hashlib.sha256(json.dumps(value, sort_keys=True, allow_nan=False).encode()).hexdigest()
 
 
+def validate_file_literal(goal: str, steps: list[dict[str, Any]]) -> None:
+    writes = [s for s in steps if s["intent"].get("kind") == "file_write"]
+    if not writes:
+        return
+    from .planning_contract import exact_file_literal
+
+    literal = exact_file_literal(goal)
+    if literal is None:
+        return
+    if len(writes) != 1:
+        raise ValueError("one unambiguous exact file literal required")
+    step = writes[0]
+    if step["intent"].get("content") != literal or any(
+        b["to"] == ["content"] for b in step.get("inputs", [])
+    ):
+        raise ValueError("file plan does not preserve the owner's exact text")
+
+
 def confirmation_digest(store: Store, task_id: str) -> str:
     task = store.task(task_id)
     return digest(
@@ -347,6 +365,7 @@ class Executive:
         ):
             raise ValueError("bounded goal, schedule and deadline required")
         normalized = self.validate_steps(worker, steps)
+        validate_file_literal(goal, normalized)
         proposal = {
             "id": new_id(),
             "relationship": self.runtime.relationship_id,
@@ -1353,6 +1372,7 @@ class Executive:
                 try:
                     from .executive_inputs import resolve_inputs
 
+                    validate_file_literal(goal["goal"], goal["steps"])
                     resolved, inputs = resolve_inputs(self.store, goal, step)
                     if inputs:
                         binding["inputs"] = inputs

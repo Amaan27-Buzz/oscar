@@ -826,3 +826,32 @@ The latest source-stable Core regression at `b3ed1c3` equivalence passed 1,214 t
 2026-10-27 native follow-up on unchanged `219323b`: the first isolated six-case batch passed five and lost foreground in the visual case. Two diagnostic visual runs passed (16.814s), followed by all six control/image/visual cases passing together without concurrent tool activity (34.153s). Foreground/frame guards remain intact. Desktop interference is a hypothesis, not a proven cause or fix; the 1330-case full aggregate remains FAILED.
 
 **2026-10-27 conditional Google calendar moves:** Google event PATCH requires the exact strong selected-event ETag in private signed arguments. The adapter sends `If-Match`; a stale version returns `precondition_failed` without overwrite, retry or dependent work. Missing/wildcard/weak/malformed versions fail before dispatch. Independent event GET still gates completion. All 298 affected integration cases pass on stable sources (341.055 s); after correcting a planner field-description inconsistency, all 24 final contract cases pass (35.632 s) and actual TLS mobile protocol → conditional move/readback → separate outbound Worker file output passes (10.003 s). The broad run precedes that final wording-only correction. Microsoft concurrency, Google delete protection, general flexible commitment reasoning and product acceptance remain OPEN. [Receipt](../evidence/software-completion/calendar-version-2026-10-27.json).
+
+
+**2026-10-27 connected-catalog and real-model continuation:** local `cd75463`
+allows a temporary scoped planning Worker to pin up to 128 current capabilities,
+while ordinary Workers remain limited to sixteen and a plan to sixteen actions.
+Repeated connector examples and exact argument schemas are shared losslessly;
+compact signed reviews still bind the complete private material. Eight catalog
+contracts and the signed TLS Core/separate outbound Worker check passed; 329 of
+330 broader tests passed, with one MCP startup timeout during fixture setup.
+The same authority test subsequently passed at both the unchanged default and a
+diagnostic thirty-second startup budget. Root cause remains unproven.
+Desktop serial acceptance passed all 134 tests and its production build; the
+default parallel attempt had worker startup errors.
+
+The following working change exposes the existing bounded model timeout through
+normal Cloud and local serve configuration and binds explicitly quoted file
+literals before review/proposal/dispatch. Actual installed Granite 4.1 3B passed
+signed Ask (8.938 s) and synthetic signed Full Access (6.164 s) with a 28-capability
+two-account catalog, exact punctuation and independently verified file readback.
+No provider API operations were allowed. Earlier unconstrained output omitted the
+period and was blocked; constrained decoding now preserves the owner literal.
+The final frozen affected integration passed all 431 tests (393.850 s), with 226
+source hashes independently checked. Longer two-step and arithmetic
+result handoffs with this catalog still exceed the unchanged durable goal limit
+before inference; this is an active executable gap, not model success. Full
+software completion, broader model/native reliability, schedule coordination and
+whole-product acceptance remain OPEN. See the
+[local-model evidence](../evidence/software-completion/local-model-literals-2026-10-27.json)
+and [catalog evidence](../evidence/software-completion/planning-catalog-2026-10-27.json).

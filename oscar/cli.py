@@ -238,6 +238,7 @@ def parser() -> argparse.ArgumentParser:
     serve.add_argument("--seconds", type=int, default=3600)
     serve.add_argument("--voice-config", type=Path)
     serve.add_argument("--model-config", type=Path)
+    serve.add_argument("--model-timeout-seconds", type=float, default=15)
     serve.add_argument(
         "--continuous-voice",
         metavar="SESSION_ID",
@@ -308,6 +309,7 @@ def main() -> int:
             args.manifest,
             template,
             execution_enrollment_authorized=getattr(args, "reenroll_execution", False),
+            model_timeout_seconds=getattr(args, "model_timeout_seconds", 15),
             auth_config=args.auth_config,
             memory_config=LocalMemoryConfig.load(args.memory_config)
             if args.memory_config

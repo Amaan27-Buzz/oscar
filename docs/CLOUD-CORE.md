@@ -122,6 +122,13 @@ matching provider/model entry in the selected manifest:
 }
 ```
 
+For local models with slower loading or large catalogs, `model_timeout_seconds`
+in `cloud.json`, or `serve --model-timeout-seconds 90`, sets the per-attempt routing
+timeout. The default is 15 seconds; only finite numbers greater than zero and at
+most 120 are accepted. This does not extend task leases or change fallback,
+authority, cost or verification policy. A longer timeout does not guarantee a
+correct model plan.
+
 An explicit thinking preference selects only the native Ollama adapter; it cannot
 silently fall back to an adapter that ignores the preference. Omit it for other
 providers. This follows [Ollama's native thinking contract](https://github.com/ollama/ollama/blob/main/docs/capabilities/thinking.mdx).

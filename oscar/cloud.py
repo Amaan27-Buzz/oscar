@@ -23,7 +23,7 @@ from .grid import Node, NodeRole, SessionHandle
 from .harness import Harness
 from .jev import Intent
 from .local_memory import LocalMemory, LocalMemoryConfig
-from .models import ModelRequest
+from .models import ModelRequest, RoutingPolicy
 from .policy import PersonalPolicy
 from .registry import Registry
 from .secure_credentials import InjectedCredentialStore
@@ -59,6 +59,7 @@ class CloudConfig:
     credential_key_ref: str | None = None
     local_memory: LocalMemoryConfig | None = None
     model_request: ModelRequest | None = None
+    model_timeout_seconds: float = 15
 
     @classmethod
     def load(cls, path: Path) -> "CloudConfig":
@@ -88,6 +89,7 @@ class CloudConfig:
                 "credential_key_ref",
                 "local_memory",
                 "model_request",
+                "model_timeout_seconds",
             }
         ):
             raise ValueError("explicit versioned production configuration required")
@@ -180,6 +182,7 @@ class CloudConfig:
             if not isinstance(key_ref, str) or not re.fullmatch(r"[A-Za-z0-9_-]{1,128}", key_ref):
                 raise ValueError("opaque credential key mount required")
             load_providers(Path(auth_config))
+        model_policy = RoutingPolicy(timeout_seconds=data.get("model_timeout_seconds", 15))
         return cls(
             data["core_id"],
             root,
@@ -194,6 +197,7 @@ class CloudConfig:
             key_ref,
             LocalMemoryConfig.parse(data["local_memory"]) if "local_memory" in data else None,
             ModelRequest.from_config(data["model_request"]) if "model_request" in data else None,
+            model_policy.timeout_seconds,
         )
 
 
@@ -246,6 +250,7 @@ class CloudCore:
                 start_services=False,
                 memory_config=config.local_memory,
                 model_request=config.model_request,
+                model_timeout_seconds=config.model_timeout_seconds,
             )
             pools = (
                 (self.core.pool, list(self.core.registry.providers.values())),

@@ -271,7 +271,11 @@ class RoutingPolicy:
     allow_unknown_limits: bool = False
 
     def __post_init__(self) -> None:
-        if not 1 <= self.max_attempts <= 10 or not 0 < self.timeout_seconds <= 120:
+        if (
+            not 1 <= self.max_attempts <= 10
+            or type(self.timeout_seconds) not in {int, float}
+            or not 0 < self.timeout_seconds <= 120
+        ):
             raise ValueError("invalid retry/time budget")
         if self.max_paid_cost < 0:
             raise ValueError("invalid monetary budget")

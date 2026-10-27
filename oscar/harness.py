@@ -282,7 +282,9 @@ class Harness:
         start_services: bool = True,
         auth_config: Path | None = None,
         memory_config: LocalMemoryConfig | None = None,
+        model_timeout_seconds: float = 15,
     ):
+        model_policy = RoutingPolicy(timeout_seconds=model_timeout_seconds)
         providers = load_providers(auth_config) if auth_config is not None else []
         self.store = Store(state)
         self.grid = Grid(self.store, clock)
@@ -471,7 +473,7 @@ class Harness:
                 "models.reason": ModelExecutor(
                     self.router,
                     template,
-                    RoutingPolicy(),
+                    model_policy,
                     grid=self.grid,
                     connector_plans=self.connector_plans,
                 ),

@@ -1,0 +1,133 @@
+{
+  "scope": "Bounded configurable model timeout and owner-literal file-plan preservation",
+  "status": "PARTIAL_PRODUCT_ACCEPTANCE",
+  "changes": [
+    "Cloud model_timeout_seconds and serve --model-timeout-seconds reach the existing executor before state initialization; default15, finite0<timeout<=120; no lease, authority or spend expansion.",
+    "Explicit JSON-quoted exact text/content file goals constrain structured content decoding. Independent checks reject mismatched punctuation, whitespace, ambiguous writes or content handoffs before review, proposal and dispatch.",
+    "A literal may contain an exact text marker without creating a second constraint."
+  ],
+  "checks": {
+    "timeout_and_router": {
+      "passed": 52,
+      "seconds": 7.713
+    },
+    "combined_before_final_decoding": {
+      "passed": 109,
+      "seconds": 53.437
+    },
+    "schema_and_authoring": {
+      "passed": 33,
+      "seconds": 38.973,
+      "qualification": "Precedes final parser handling of markers inside quoted literal; targeted final parser check passed."
+    },
+    "final_integration": {
+      "passed": 431,
+      "seconds": 393.85,
+      "wrapper_seconds": 395.042,
+      "source_stable": true,
+      "independently_matched_sources": 226
+    },
+    "real_local_inference": [
+      {
+        "state": "PASS",
+        "model": "granite4.1:3b",
+        "installed_model_digest": "6fd349357287c7ffc9e38189a93b48ea175d24fc566b38f09cfc564fb7f303eb",
+        "authority_mode": "ask",
+        "normal_cloud_configuration": true,
+        "objective": "Create welcome.txt as a note with exact text \"Hello from local OSCAR.\"",
+        "artifact_sha256": "9bad2fbb2292513ce3e6a8b93399af3a1c217d8d25a80d6f939b9c0572c43dc7",
+        "verified_tasks": [
+          {
+            "id": "7dac1077c2614e9fbba126dfff49aa3e",
+            "objective_id": "16410e6b502e49c1bf336bbe110d7331",
+            "correlation_id": "8f63a14dbabd4c959a37515b4b3d4c44",
+            "state": "verified",
+            "attempts": 1,
+            "retry_budget": 2,
+            "cancelled": false,
+            "blocker": null,
+            "lease_id": "caf223662d9a4fda9d16348432094734",
+            "decision": "deterministic_capability"
+          }
+        ],
+        "second_review_required": true,
+        "elapsed_seconds": 8.938,
+        "source_stable": true,
+        "local_receipt_sha256": "f512f769754b553c633dd6c5a8488feed3cc72adf714b74911eb609c8dd3aa3c"
+      },
+      {
+        "state": "PASS",
+        "model": "granite4.1:3b",
+        "installed_model_digest": "6fd349357287c7ffc9e38189a93b48ea175d24fc566b38f09cfc564fb7f303eb",
+        "authority_mode": "full",
+        "normal_cloud_configuration": true,
+        "objective": "Create welcome.txt as a note with exact text \"Hello from local OSCAR.\"",
+        "artifact_sha256": "9bad2fbb2292513ce3e6a8b93399af3a1c217d8d25a80d6f939b9c0572c43dc7",
+        "verified_tasks": [
+          {
+            "id": "09c96bd02b834b5c8ac3111c2974fe10",
+            "objective_id": "84c55ccc46894e3196cb192992774d66",
+            "correlation_id": "e12dcd9bbc8e41038e5717db4f3eaad3",
+            "state": "verified",
+            "attempts": 1,
+            "retry_budget": 2,
+            "cancelled": false,
+            "blocker": null,
+            "lease_id": "6254216bab1745a298eeece05887c7ad",
+            "decision": "deterministic_capability"
+          }
+        ],
+        "second_review_required": false,
+        "elapsed_seconds": 6.164,
+        "source_stable": true,
+        "local_receipt_sha256": "4ae8818e3a7bdff168ca6bf71da0e796072806a742966addad069d602304f266"
+      }
+    ],
+    "static": {
+      "ruff": "PASS",
+      "mypy": "107 files PASS",
+      "repository": "PASS",
+      "qualification": "Final Ruff, strict mypy and repository checks pass, including final quoted-marker handling."
+    },
+    "mcp_startup_comparison": {
+      "default_15_seconds": "PASS 3.825s",
+      "diagnostic_30_seconds": "PASS 2.478s",
+      "qualification": "Earlier broad setup timeout retained. Cold-start variability remains unexplained; no production timeout or fixture changed."
+    }
+  },
+  "retained_failures": [
+    "Default 15s real inference timed out under earlier load.",
+    "An earlier diagnostic observer lacked an images keyword and later probe mishandled null parameters; corrected harness failures are separate from product failures.",
+    "Without constrained decoding the actual model dropped the final period; deterministic guard rejected it without a file effect.",
+    "Longer two-step and arithmetic-result-handoff requests with the connected catalog still exceed the unchanged durable proposal limit before inference.",
+    "The last whole-suite native run had three failures and one error; isolated subsequent passes do not make it a full pass."
+  ],
+  "boundaries": [
+    "Synthetic owners, credentials and account projections only; provider API operations blocked.",
+    "Installed local Granite only; no downloads or paid/cloud inference.",
+    "Independent file readback; no physical Android, personal media, real provider account or production delegation.",
+    "Run-owned model server stopped; no GitHub publication.",
+    "The guard is for scoped file_write with explicit JSON-quoted literals, not arbitrary natural-language goal verification."
+  ],
+  "sources": {
+    "oscar/models.py": "33a2c7fad63fdc41ceaac6346eef4f57e01fe025983e0687af069e52dd95f36b",
+    "oscar/cloud.py": "cc8ceb33556b2175eb380ed0d99b013ece766b0a4dbf7d0bc4d4e8e6c6ed0bd0",
+    "oscar/cli.py": "0ea54a570e6ad666e7a62aa256590e679294296a38634d305f745dbabd1b2d8d",
+    "oscar/harness.py": "94d8ac9b9ac12b351721217efa1a1526cb5eeb2aaab5d3f5671a0808d1430b09",
+    "oscar/executive.py": "61241d6eb8cb2e9377e41d1da40e946dc588ad08f5aba65f12d58934cdb3640e",
+    "oscar/planner_authoring.py": "462f737c729580eefe27ab1403fcbf566e74962b3a539a6e7d8f52617d5a4a53",
+    "oscar/planning_contract.py": "bc6b9ccb4a100666599e5addd3d30beeffc10fb67d6a3f8325285055f5f0ffa6",
+    "tests/test_cloud.py": "d517a142b614df143f4b3f5440d6fad1f00730fc4a4a5ee21cb77a30c8ebcef9",
+    "tests/test_planner_catalog.py": "b953ebb849d9709ce1c70fa94d0a14a06dfecd4e94b29e97810e592a32588179"
+  },
+  "local_log_sha256": {
+    "model-timeout-contracts.log": "d7f984163b325caa4a788f81ae8312d14f244dd8f86a1cd7d47b5fc75e156257",
+    "catalog-timeout-literal-integrated.log": "fcd2889908ec22e7abc7b2767b98eb53cc022b1909e6f42751ef04620109c2cf",
+    "literal-schema-contracts.log": "507fa13d4c6af2f3a10f5b4a143c308c3ccfa450ff7cb7acfc9a8f00e067d2d0",
+    "catalog-mcp-startup-budget-comparison.log": "6468a35cbbec10302327736124c2bc409aac7a4b33d51e90aec1ece6d6c5872f",
+    "local-catalog-configured-guard-final.log": "3b5a8d92c856c4b870b495603db8760300f68740bbbbb7d280648c060e0d310a",
+    "local-catalog-final-parser.log": "5107b5dfca9d2ff2cb5706db8e946e7a1ea3e434cc086d72804dec765a3ed469",
+    "local-catalog-dependent.log": "c8baa45959f82439012677b76f017f367ebe7a46725c4bc3e38e5222a47cafe7",
+    "literal-model-final-integration.log": "b33a69c03d1f7146596033045aac37402ca8a0da6d92e506ef76b0809155aedd"
+  }
+}

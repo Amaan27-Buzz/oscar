@@ -1,5 +1,7 @@
 """Decoding shape only; Executive validation and native authority remain mandatory."""
 
+import json
+import re
 from copy import deepcopy
 from typing import Any
 
@@ -14,7 +16,26 @@ OBSERVATION_KINDS = {
 }
 
 
-def executive_plan_schema(*, observation_only: tuple[str, ...] = ()) -> dict[str, Any]:
+def exact_file_literal(goal: str) -> str | None:
+    pattern = r"\bexact\s+(?:text|content)\s*(?::|=)?\s*"
+    marker = re.search(pattern, goal, re.I)
+    if marker is None:
+        return None
+    # shortcut: explicit JSON-quoted literals only, extend with typed owner objectives.
+    try:
+        literal, consumed = json.JSONDecoder().raw_decode(goal[marker.end() :])
+    except ValueError as exc:
+        raise ValueError("exact file text requires a JSON-quoted literal") from exc
+    if not isinstance(literal, str):
+        raise ValueError("exact file text requires a JSON-quoted literal")
+    if re.search(pattern, goal[marker.end() + consumed :], re.I):
+        raise ValueError("one unambiguous exact file literal required")
+    return literal
+
+
+def executive_plan_schema(
+    *, observation_only: tuple[str, ...] = (), goal: str = ""
+) -> dict[str, Any]:
     intent = {
         # Ollama rejects the 4096-repeat grammar; Executive enforces that text bound.
         "text": {"type": "string", "minLength": 1},
@@ -24,6 +45,12 @@ def executive_plan_schema(*, observation_only: tuple[str, ...] = ()) -> dict[str
         },
         **{key: {"type": ["object", "null"]} for key in ("parameters", "criterion")},
     }
+    try:
+        literal = exact_file_literal(goal)
+    except ValueError:
+        literal = None
+    if literal is not None:
+        intent["content"] = {"enum": [None, literal]}
     step = {
         "id": {"type": "string", "pattern": "^[a-z0-9_-]{1,40}$"},
         "intent": {

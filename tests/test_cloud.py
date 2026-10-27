@@ -135,9 +135,12 @@ class CloudTests(unittest.TestCase):
             "ollama_think": False,
             "required": ["text", "structured"],
         }
-        config = CloudConfig.load(configuration(self.root, model_request=options))
+        config = CloudConfig.load(
+            configuration(self.root, model_request=options, model_timeout_seconds=90)
+        )
         with closing(CloudCore(config, initialize=True, start_services=False)) as core:
             executor = core.harness.dispatcher.executors["models.reason"]
+            self.assertEqual(executor.policy.timeout_seconds, 90)
             self.assertEqual(executor.template.mode, Mode.PRIVATE)
             self.assertEqual(executor.template.max_output_tokens, 8192)
             self.assertIs(executor.template.ollama_think, False)
@@ -145,6 +148,13 @@ class CloudTests(unittest.TestCase):
             self.assertEqual(executor.template.pinned_model, "qwen3.5:4b")
             self.assertEqual(core.harness.store.all("standing_grant"), [])
             self.assertEqual(core.harness.store.all("task"), [])
+
+    def test_model_timeout_validation_precedes_state_creation(self):
+        self.assertEqual(self.config.model_timeout_seconds, 15)
+        for timeout in (True, None, "90", 0, -1, float("nan"), float("inf"), 121):
+            with self.subTest(timeout=timeout), self.assertRaises(ValueError):
+                CloudConfig.load(configuration(self.root, model_timeout_seconds=timeout))
+        self.assertFalse(self.config.data_dir.exists())
 
     def test_model_configuration_rejects_invalid_options_before_state_initialization(self):
         invalid = [
@@ -183,11 +193,15 @@ class CloudTests(unittest.TestCase):
         path = self.root / "model-request.json"
         path.write_text('{"max_output_tokens":8192,"ollama_think":false}')
         with (
-            patch("sys.argv", ["oscar", "serve", "--model-config", str(path)]),
+            patch(
+                "sys.argv",
+                ["oscar", "serve", "--model-config", str(path), "--model-timeout-seconds", "90"],
+            ),
             patch("oscar.cli.Harness", side_effect=RuntimeError("configured boundary")) as ctor,
         ):
             with self.assertRaisesRegex(RuntimeError, "configured boundary"):
                 main()
+        self.assertEqual(ctor.call_args.kwargs["model_timeout_seconds"], 90)
         template = ctor.call_args.args[3]
         self.assertEqual(template.max_output_tokens, 8192)
         self.assertIs(template.ollama_think, False)

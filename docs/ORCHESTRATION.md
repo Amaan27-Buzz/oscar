@@ -542,3 +542,10 @@ A private model-authored canonical provider task can unblock dependent Workers o
 Temporary conversation-planning Workers may pin up to 128 current scoped capabilities, so a connected account catalog is not constrained to sixteen tools. Ordinary Workers and each action plan retain their sixteen-entry bounds. Larger catalogs factor identical connector instructions, examples and exact argument schemas into lossless shared definitions; all endpoint argument schemas stay available. Core still checks every executor, permission, account generation, policy, authority and private input digest. No catalog is silently truncated. Model context and existing native/durable size bounds still apply, so the count ceiling is not a promise that every large schema set fits.
 
 For large catalogs, signed review shows one current capability list and exact proposed effects. Digests bind the full model input and omitted duplicate Worker/request catalogs. Acceptance reconstructs that complete state and compares its fingerprint before creating work. No display/signing limit or per-effect Ask requirement is relaxed. [Catalog acceptance](evidence/software-completion/planning-catalog-2026-10-27.json).
+
+Explicit `exact text "..."` or `exact content: "..."` file goals bind the
+JSON-decoded owner literal before effect review, Executive proposal and dispatch.
+Changed punctuation, whitespace, ambiguous multiple writes and content handoffs
+are rejected. This bounded guard applies to the scoped `file_write` executor;
+it is not a general natural-language objective verifier. Other goals still need
+appropriate independent outcome criteria.

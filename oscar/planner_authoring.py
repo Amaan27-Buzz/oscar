@@ -6,7 +6,7 @@ from dataclasses import asdict, replace
 from typing import TYPE_CHECKING, Any
 
 from .contracts import TaskState, new_id, record
-from .executive import digest
+from .executive import digest, validate_file_literal
 from .freshness import Freshness, classify
 from .harness import ModelExecutor
 from .models import Mode
@@ -827,7 +827,8 @@ class PlannerAuthoring:
 
                 parameters["prompt"] += "\nResponse JSON schema: " + json.dumps(
                     executive_plan_schema(
-                        observation_only=tuple(parameters.get("observation_only", ()))
+                        observation_only=tuple(parameters.get("observation_only", ())),
+                        goal=value["goal"],
                     ),
                     separators=(",", ":"),
                 )
@@ -967,7 +968,7 @@ class PlannerAuthoring:
                         from .planning_contract import executive_plan_schema
 
                         parameters["prompt"] += "\nResponse JSON schema: " + json.dumps(
-                            executive_plan_schema()
+                            executive_plan_schema(goal=row["goal"]), separators=(",", ":")
                         )
                 parameters.update(
                     mode="private", planning_sources=row["observation_sources"], observations=refs
@@ -1007,6 +1008,7 @@ class PlannerAuthoring:
 
                 context(h.store, h.grid, row["observation_refs"])
             steps = h.executive.validate_steps(worker, document["steps"])
+            validate_file_literal(row["goal"], steps)
             connector_inputs = h.connector_plans.review(steps, tasks[0])
             if connector_inputs and value != {
                 "start_at": None,
