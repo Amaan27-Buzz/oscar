@@ -407,6 +407,12 @@ class ConnectorPlanning:
                 self.inputs.pop(ref, None)
             raise
 
+    def discard_draft(self, task_id: str) -> None:
+        for ref, row in list(self.inputs.items()):
+            if row["planner_task"] == task_id and not row.get("effect_task"):
+                self.h.connectors.release_request(ref)
+                self.inputs.pop(ref, None)
+
     def check(self, ref: str) -> dict[str, Any]:
         row = self.inputs.get(ref)
         if row is None or row["expires"] <= self.h.grid.clock():

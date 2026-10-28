@@ -159,3 +159,29 @@ checks passed (52.335 s). The initial routing failure and rejected prose
 arithmetic output remain recorded. These are literal steps with no output
 substitution or broad model-reliability claim.
 [Receipt](../evidence/software-completion/multistep-model-2026-10-24.json).
+
+**2026-10-28 bounded native draft correction:** reviewed structured planning can
+correct one native-invalid draft on known free/subscription/local-funded routes,
+within the existing total route-attempt ceiling. The correction pins the original
+provider/model, prohibits paid/unknown-cost fallback and repeats provider-contract,
+context, cancellation, observation/memory and account checks. Rejected staged
+connector inputs are discarded; raw rejected output is not appended to the prompt.
+The same graph parser and local file-path validator are reused without executing
+proposed steps. Clarification stays a question; another invalid draft fails.
+
+All 38 final catalog cases pass (50.593s), including synthetic signed Ask/Full,
+free OpenAI-format HTTP, path-alias rejection without normalization, private-input
+cleanup, cancellation, source withdrawal, changed provider origin and route/context
+budget denial. A preceding 180-case integration passed before the final funding
+eligibility/provider-guard follow-up. A command typo produced a retained loader
+error; it is not represented as a passing aggregate.
+
+The current actual-model campaign passes six of eight cases. Granite passes five
+file/arithmetic/handoff cases but Ask loses exact text and stops at effect review.
+Qwen 9B Full corrects its native-invalid draft and independently verifies the task
+in the requested synthetic Google account; Ask chooses the wrong account and
+fails external acceptance. This is mixed model reliability, not general semantic
+verification. A separate installed-runtime native Worker run passes signed TLS
+file execution/readback/stop/withdrawal (9.711s). Recorded model/native source hashes
+were independently matched. Whole-suite regression is RUNNING on frozen sources.
+[Correction evidence](../evidence/software-completion/draft-correction-2026-10-28.json).

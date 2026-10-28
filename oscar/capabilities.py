@@ -81,8 +81,10 @@ class ScopedFiles:
                     names.append(entry.name)
             return sorted(names)
 
-    @contextmanager
-    def parent(self, relative: str, create: bool = False) -> Iterator[tuple[int, str]]:
+    @staticmethod
+    def parts(relative: str) -> list[str]:
+        if not isinstance(relative, str):
+            raise ValueError("text workspace path required")
         parts = relative.split("/")
         if (
             not relative
@@ -92,6 +94,11 @@ class ScopedFiles:
             or "\\" in relative
         ):
             raise ValueError("path outside authorized workspace")
+        return parts
+
+    @contextmanager
+    def parent(self, relative: str, create: bool = False) -> Iterator[tuple[int, str]]:
+        parts = self.parts(relative)
         descriptor = os.open(self.root, os.O_RDONLY | _posix_os.O_DIRECTORY | _posix_os.O_NOFOLLOW)
         try:
             for part in parts[:-1]:

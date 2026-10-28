@@ -606,3 +606,21 @@ Decoder input-kind hints require agreement across every selected device advertis
 the same capability ID. Conflicting kinds retain the generic intent shape instead
 of adopting the last device's contract. Exact device pins and native argument
 validation remain authoritative.
+
+Reviewed structured drafts have at most one native-validation correction on known
+free, subscription or local-funded routes. The initial review binds this behavior
+in the model configuration. Correction stays within the existing total route-attempt
+ceiling, pins the same provider/model, prohibits paid or unknown-cost fallback,
+and repeats context, provider-contract, cancellation, memory/observation and account
+checks. Paid and unknown-funded drafts retain their existing single-draft behavior.
+
+Core parses the same bounded graph before persistence and before effect review.
+Invalid shapes, dependencies, capability bindings, observation/effect mixtures and
+known local file-path forms trigger correction without executing the proposed
+steps. Private staged connector inputs from rejected drafts are discarded; neither
+the rejected response nor raw validation details are inserted into the correction
+prompt. Route history links the correction and records native draft validity.
+Clarification remains a question, and a second invalid draft stops with failure.
+These checks establish plan admission, never that a model chose the right account,
+resource or operation for the owner's objective. Signed effect review/current
+delegation and independent outcome verification remain mandatory.

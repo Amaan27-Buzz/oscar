@@ -23,7 +23,7 @@ from .local_memory import LocalMemory, LocalMemoryConfig
 from .mcp_client import MCPPlugins
 from .memory_executor import MemoryExecutor
 from .memory_fabric import MemoryFabric
-from .models import Mode, ModelRequest, ProviderError, RoutingPolicy
+from .models import Funding, Mode, ModelRequest, ProviderError, RoutingPolicy
 from .oauth_device import Vault, VaultResolver
 from .planner_connectors import ConnectorPlanning
 from .policy import PersonalPolicy
@@ -113,6 +113,7 @@ class ModelExecutor:
                         "policy": asdict(self.policy),
                         "observations": self.grid is not None,
                         "connector_plans": self.connector_plans is not None,
+                        "draft_attempts": 2,
                     },
                     default=sorted,
                 )
@@ -269,16 +270,109 @@ class ModelExecutor:
             if policy.allowed_providers is not None:
                 allowed &= policy.allowed_providers
             policy = replace(policy, allowed_providers=frozenset(allowed))
+            source_check = check
+
+            def check() -> None:
+                source_check()
+                if action.parameters.get("planning_configuration") != digest(
+                    self.planning_configuration()
+                ) or any(
+                    source["id"] not in self.router.registry.providers
+                    or digest(record(self.router.registry.providers[source["id"]]))
+                    != source["contract"]
+                    for source in sources
+                ):
+                    raise PermissionError("reviewed model routing configuration changed")
+
         try:
             routed = self.router.execute(request, policy, check)
-            value = routed.response.text
-            if action.parameters.get("connector_contracts"):
-                if self.connector_plans is None:
-                    raise PermissionError("private connector planning unavailable")
-                check()
-                value = self.connector_plans.sanitize(
-                    value, action.task_id, action.parameters["connector_contracts"]
-                )
+            repairable = (
+                request.executive_plan
+                and self.grid is not None
+                and self.connector_plans is not None
+                and self.router.registry.model_for_slot(
+                    routed.route.provider, routed.route.model, routed.route.slot, self.grid.clock()
+                ).funding
+                in {Funding.FREE, Funding.SUBSCRIPTION, Funding.LOCAL}
+            )
+            remaining = policy.max_attempts - routed.attempts
+            for attempt in range(2):
+                try:
+                    value = routed.response.text
+                    if action.parameters.get("connector_contracts"):
+                        if self.connector_plans is None:
+                            raise PermissionError("private connector planning unavailable")
+                        check()
+                        value = self.connector_plans.sanitize(
+                            value, action.task_id, action.parameters["connector_contracts"]
+                        )
+                    if repairable:
+                        self.validate_draft(value, action)
+                        history = self.router.store.get("route_history", routed.history_id)
+                        self.router.store.put(
+                            "route_history",
+                            routed.history_id,
+                            {**history, "planning_draft_valid": True},
+                        )
+                    break
+                except (ValueError, KeyError, TypeError, PermissionError, StopIteration):
+                    if not repairable:
+                        raise
+                    assert self.connector_plans is not None
+                    self.connector_plans.discard_draft(action.task_id)
+                    history = self.router.store.get("route_history", routed.history_id)
+                    self.router.store.put(
+                        "route_history",
+                        routed.history_id,
+                        {**history, "planning_draft_valid": False},
+                    )
+                    if attempt or remaining < 1:
+                        return Result(
+                            new_id(),
+                            action.id,
+                            action.task_id,
+                            action.correlation_id,
+                            action.capability_id,
+                            False,
+                            error="invalid_model_plan",
+                        )
+                    check()
+                    assert self.connector_plans is not None
+                    for pin in action.parameters.get("connector_contracts", []):
+                        self.connector_plans.current(pin)
+                    request = replace(
+                        request,
+                        pinned_provider=routed.route.provider,
+                        pinned_model=routed.route.model,
+                        prompt=request.prompt
+                        + (
+                            "\nThe previous draft failed native plan validation; no proposed "
+                            "action ran. Return a corrected complete plan for the same goal and "
+                            "selected capabilities. Use observe:true only for independent "
+                            "read-only observations; effects require observe:false. Preserve "
+                            "exact owner literals, typed arguments and a valid dependency graph. "
+                            "Workspace paths must be relative without '.' or '..' components. "
+                            "If required information is missing, return clarification."
+                        ),
+                    )
+                    previous = routed.history_id
+                    routed = self.router.execute(
+                        request,
+                        replace(
+                            policy,
+                            max_attempts=remaining,
+                            allow_paid=False,
+                            allow_unknown_cost=False,
+                            max_paid_cost=0,
+                        ),
+                        check,
+                    )
+                    history = self.router.store.get("route_history", routed.history_id)
+                    self.router.store.put(
+                        "route_history",
+                        routed.history_id,
+                        {**history, "planning_repair_of": previous},
+                    )
             return Result(
                 new_id(),
                 action.id,
@@ -305,6 +399,30 @@ class ModelExecutor:
             False,
             error=error,
         )
+
+    def validate_draft(self, text: str, action: Action) -> None:
+        assert self.grid is not None and self.connector_plans is not None
+        document = json.loads(text)
+        if isinstance(document, dict) and set(document) == {"clarification"}:
+            if (
+                isinstance(document["clarification"], str)
+                and 1 <= len(document["clarification"]) <= 480
+            ):
+                return
+        plan = Executive.parse_plan(text)
+        binding = self.grid.store.get("plan", action.task_id)["executive"]
+        worker = self.grid.store.get("executive_worker", binding["worker_id"])
+        h = self.connector_plans.h
+        steps = h.executive.validate_steps(worker, plan["steps"])
+        for step in steps:
+            if step["node_id"] == h.node_id:
+                executor = h.dispatcher.executors.get(step["capability_id"])
+                if isinstance(executor, FileExecutor):
+                    executor.files.parts(step["intent"].get("path"))
+        if plan["observe"]:
+            from .planner_observations import validate_stage
+
+            validate_stage(plan["steps"])
 
 
 class Harness:

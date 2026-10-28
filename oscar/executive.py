@@ -861,8 +861,15 @@ class Executive:
             or len(results[-1]["value"]) > 32768
         ):
             raise StateConflict("bounded model result required")
+        return self.parse_plan(results[-1]["value"])
+
+    @staticmethod
+    def parse_plan(text: str) -> dict[str, Any]:
+        """Parse untrusted drafts before persistence or signed effect review."""
+        if not isinstance(text, str) or len(text.encode()) > 32768:
+            raise ValueError("bounded model result required")
         try:
-            steps = json.loads(results[-1]["value"])
+            steps = json.loads(text)
         except json.JSONDecodeError:
             raise ValueError(
                 "The model returned an unusable plan. Request a new draft; "

@@ -420,6 +420,202 @@ class PlanningCatalogTests(unittest.TestCase):
         self.h.executive.tick()
         self.assertIn("$defs", self.requests[0]["body"]["format"])
 
+    def repair_fixture(self, *, second_valid=True, attempts=4, full=False, adapter="ollama"):
+        from copy import deepcopy
+
+        from oscar.models import Funding
+
+        self.use_ollama()
+        registry = self.executor.router.registry
+        registry.providers = {
+            key: replace(provider, private=True, adapter=adapter)
+            for key, provider in registry.providers.items()
+        }
+        registry.models = {
+            key: replace(model, funding=Funding.LOCAL if adapter == "ollama" else Funding.FREE)
+            for key, model in registry.models.items()
+        }
+        self.executor.policy = replace(self.executor.policy, max_attempts=attempts)
+        good = deepcopy(self.body)
+        bad = deepcopy(good)
+        document = json.loads(bad["message"]["content"])
+        document["observe"] = True
+        bad["message"]["content"] = json.dumps(document)
+        self.scheduled.extend([(200, bad), (200, good if second_valid else bad)])
+        self.assertEqual(2, self.executor.planning_configuration()["draft_attempts"])
+        if full:
+            self.delegate_catalog()
+            self.assertIn("assistance_started", self.conversation())
+        else:
+            proposal = self.conversation()["assistance_proposal"]
+            self.complete(self.review(proposal))
+
+    def test_local_draft_corrects_observation_effect_mix_before_signed_effect_review(self):
+        self.repair_fixture()
+        self.h.executive.tick()
+        self.assertEqual(2, len(self.requests))
+        self.assertEqual([], self.api.calls)
+        self.assertFalse((self.h.files.root / "catalog-note.txt").exists())
+        histories = self.h.store.all("route_history")
+        self.assertFalse(histories[0]["planning_draft_valid"])
+        self.assertEqual(histories[0]["id"], histories[1]["planning_repair_of"])
+        self.assertTrue(histories[1]["planning_draft_valid"])
+        prompts = [request["body"]["messages"][0]["content"] for request in self.requests]
+        self.assertIn("previous draft failed native plan validation", prompts[1])
+        self.assertTrue(prompts[1].startswith(prompts[0]))
+        row = self.h.store.all("planner_request")[-1]
+        self.complete(self.review(self.accept_change(row)))
+        self.assertEqual("verified", self.settle())
+        self.assertEqual("Welcome to OSCAR", (self.h.files.root / "catalog-note.txt").read_text())
+
+    def test_local_draft_correction_stops_after_one_rejected_repair(self):
+        self.repair_fixture(second_valid=False)
+        for _ in range(4):
+            self.h.executive.tick()
+        self.assertEqual(2, len(self.requests))
+        self.assertEqual("invalid_model_plan", self.h.store.all("result")[-1]["error"])
+        self.assertFalse((self.h.files.root / "catalog-note.txt").exists())
+        self.assertEqual({}, self.h.connector_plans.inputs)
+
+    def test_local_draft_correction_respects_total_route_attempt_limit(self):
+        self.repair_fixture(attempts=1)
+        self.h.executive.tick()
+        self.assertEqual(1, len(self.requests))
+        self.assertEqual("invalid_model_plan", self.h.store.all("result")[-1]["error"])
+
+    def test_local_draft_correction_rechecks_account_withdrawal_before_inference(self):
+        from unittest.mock import patch
+
+        self.repair_fixture()
+        adapter = self.executor.router.adapters["ollama"]
+        generate = adapter.generate
+
+        def withdraw(*args, **kwargs):
+            response = generate(*args, **kwargs)
+            self.h.accounts.disconnect(self.account.id)
+            return response
+
+        with patch.object(adapter, "generate", side_effect=withdraw):
+            self.h.executive.tick()
+        self.assertEqual(1, len(self.requests))
+        self.assertFalse((self.h.files.root / "catalog-note.txt").exists())
+
+    def test_local_draft_correction_does_not_repeat_a_clarification(self):
+        self.repair_fixture()
+        self.scheduled[0][1]["message"]["content"] = json.dumps({"clarification": "Which file?"})
+        self.h.executive.tick()
+        self.assertEqual(1, len(self.requests))
+        self.assertTrue(self.h.store.all("route_history")[-1]["planning_draft_valid"])
+
+    def test_local_draft_correction_progresses_under_signed_full_without_action_prompts(self):
+        self.repair_fixture(full=True)
+        for _ in range(5):
+            self.h.executive.tick()
+        self.assertEqual(2, len(self.requests))
+        self.assertEqual("Welcome to OSCAR", (self.h.files.root / "catalog-note.txt").read_text())
+        self.assertEqual("verified", self.h.store.all("task")[-1]["state"])
+        self.assertEqual([], self.h.store.all("executive_confirmation"))
+
+    def test_local_draft_correction_repeats_model_context_admission(self):
+        from unittest.mock import patch
+
+        self.repair_fixture()
+        adapter = self.executor.router.adapters["ollama"]
+        generate = adapter.generate
+
+        def shrink_context(*args, **kwargs):
+            response = generate(*args, **kwargs)
+            request = args[3]
+            registry = self.executor.router.registry
+            registry.models = {
+                key: replace(model, context_limit=request.input_tokens + request.max_output_tokens)
+                for key, model in registry.models.items()
+            }
+            return response
+
+        with patch.object(adapter, "generate", side_effect=shrink_context):
+            self.h.executive.tick()
+        self.assertEqual(1, len(self.requests))
+        self.assertEqual("route_unavailable", self.h.store.all("result")[-1]["error"])
+
+    def test_local_draft_correction_rejects_alias_path_without_normalizing_it(self):
+        self.repair_fixture()
+        document = json.loads(self.scheduled[0][1]["message"]["content"])
+        document["observe"] = False
+        document["steps"][0]["intent"]["path"] = "./catalog-note.txt"
+        self.scheduled[0][1]["message"]["content"] = json.dumps(document)
+        self.h.executive.tick()
+        self.assertEqual(2, len(self.requests))
+        self.assertFalse((self.h.files.root / "catalog-note.txt").exists())
+        row = self.h.store.all("planner_request")[-1]
+        review = self.review(self.accept_change(row))
+        self.assertIn("catalog-note.txt", review["review"])
+        self.complete(review)
+        self.assertEqual("verified", self.settle())
+
+    def test_local_draft_correction_discards_private_inputs_from_invalid_graph(self):
+        from copy import deepcopy
+
+        self.repair_fixture()
+        private_step = deepcopy(self.steps[0])
+        self.scheduled[0][1]["message"]["content"] = json.dumps(
+            {"steps": [private_step, private_step]}
+        )
+        self.h.executive.tick()
+        self.assertEqual(2, len(self.requests))
+        self.assertEqual({}, self.h.connector_plans.inputs)
+        self.assertEqual({}, self.h.connectors.requests)
+        self.assertEqual([], self.api.calls)
+        self.assert_private()
+
+    def test_local_draft_correction_stops_on_task_cancellation(self):
+        from unittest.mock import patch
+
+        self.repair_fixture()
+        adapter = self.executor.router.adapters["ollama"]
+        generate = adapter.generate
+
+        def cancel(*args, **kwargs):
+            response = generate(*args, **kwargs)
+            self.h.runtime.cancel(args[3].task_id)
+            return response
+
+        with patch.object(adapter, "generate", side_effect=cancel):
+            self.h.executive.tick()
+        self.assertEqual(1, len(self.requests))
+        self.assertEqual("cancelled", self.h.store.all("task")[-1]["state"])
+        self.assertFalse((self.h.files.root / "catalog-note.txt").exists())
+
+    def test_free_openai_draft_uses_same_bounded_correction_without_paid_fallback(self):
+        self.repair_fixture(adapter="openai")
+        self.h.executive.tick()
+        self.assertEqual(2, len(self.requests))
+        self.assertEqual(
+            1, sum(bool(h.get("planning_repair_of")) for h in self.h.store.all("route_history"))
+        )
+        self.assertFalse((self.h.files.root / "catalog-note.txt").exists())
+
+    def test_draft_correction_cannot_follow_a_changed_provider_origin(self):
+        from unittest.mock import patch
+
+        self.repair_fixture()
+        adapter = self.executor.router.adapters["ollama"]
+        generate = adapter.generate
+
+        def change_origin(*args, **kwargs):
+            response = generate(*args, **kwargs)
+            registry = self.executor.router.registry
+            registry.providers = {
+                key: replace(provider, base_url=provider.base_url + "/changed")
+                for key, provider in registry.providers.items()
+            }
+            return response
+
+        with patch.object(adapter, "generate", side_effect=change_origin):
+            self.h.executive.tick()
+        self.assertEqual(1, len(self.requests))
+        self.assertFalse((self.h.files.root / "catalog-note.txt").exists())
+
     def test_large_live_catalog_continuation_review_binds_the_omitted_model_prompt(self):
         self.large_live_continuation()
 
