@@ -11,7 +11,7 @@ receipts below; none has been promoted to a new PASS.
   Draft PR: https://github.com/Amaan27-Buzz/oscar/pull/10
   Base: `codex/software-completion`, unchanged.
 - Last implementation/test commit while writing this checkpoint:
-  `ff61196a99224448bce9e457f0ef3cf6245d0377`.
+  `22e66a4ceca64637da73b379ec5d318135fa8b3d`.
   The ledger and this handoff were committed afterward. Resolve the final exact
   branch HEAD via GitHub; the committed file cannot reference its own SHA.
 - `planning_contract.py`: added verified, service-bound account registry
@@ -30,6 +30,8 @@ receipts below; none has been promoted to a new PASS.
   transfer completed. Such goals now settle at `partially_verified` with
   `objective_verification.state=not_verified`, rather than fabricating a
   whole-objective success. This is a fail-closed interim state, not goal proof.
+- The typed contract is normalized to JSON-stable arrays for durable Store
+  round-trips and signed revalidation; test asserts JSON shape stability.
 - Added adversarial tests for ordinary service names, multiple usable accounts,
   wrong destination operation, source-read dependencies, stale/unrelated
   observation references, original fields, and step-verified/goal-unverified
@@ -43,7 +45,7 @@ receipts below; none has been promoted to a new PASS.
 | --- | --- |
 | Remote PR at start | HEAD `58fb1e21c6f9743dd98cac4f50754c870632cf80`, open draft, correct base |
 | Actions at initial exact HEAD | Nine pull_request workflow runs all `startup_failure`; verified Voice run `40713570211` has zero jobs. No job or test executed |
-| Actions cause | **UNRESOLVED.** All workflows fail before job creation; YAML triggers exist. Connector denies Actions settings/permissions and workflow configuration API endpoints. Billing/usage and repository policy are plausible, not confirmed |
+| Actions cause | **UNRESOLVED.** All workflows fail before job creation; YAML triggers exist. Connector denies Actions settings/permissions and workflow configuration API endpoints. Billing/usage, policy and platform scheduling are plausible, not confirmed. Standard hosted runners in public repos are generally free, so quota history is not a diagnosis |
 | Local clone | **BLOCKED.** Current execution container cannot resolve `github.com`; GitHub plugin is not a native shell |
 | Focused unit tests / Ruff / format / mypy / repository checks | **NOT_RUN** for continuation-02 changes |
 | Installed-Qwen Ask/Full synthetic-provider campaign | **NOT_RUN** after changes. Historical owner objectives FAILED 0/2 |
