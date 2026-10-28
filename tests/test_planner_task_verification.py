@@ -564,7 +564,7 @@ class PlannedTaskVerificationTests(unittest.TestCase):
         self.assertEqual("verified", goal["objective_verification"]["state"])
         self.assertEqual(1, goal["objective_verification"]["count"])
         self.assertEqual(1, sum(method == "POST" for method, *_ in self.api.calls))
-        self.assertEqual({}, self.h.connector_plans.inputs)
+        self.assert_private()
 
     def test_source_change_before_copy_blocks_destination_post(self):
         goal_id, task_id = self.prepare_cross_account_copy()
