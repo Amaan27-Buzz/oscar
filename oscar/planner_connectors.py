@@ -246,8 +246,31 @@ class ConnectorPlanning:
             raise PermissionError("plan does not preserve the owner's selected account")
         bindings = owner_account_bindings(goal)
         if not bindings:
+            # Do not let an alias-free cross-service goal silently collapse to
+            # whichever provider's mutation the model happened to select.
+            mentioned = {
+                account.provider
+                for account in self.h.accounts.list_accounts()
+                if re.search(r"\\b" + re.escape(account.provider) + r"\\b", goal, re.I)
+            }
+            routed = {
+                descriptor["account"]["provider"]
+                for cap in caps
+                if (descriptor := self.descriptor(cap)) is not None
+            }
+            if (
+                (len(mentioned) > 1 or mentioned - routed)
+                and any(
+                    not self.is_read(cap) for cap in caps if self.descriptor(cap) is not None
+                )
+            ):
+                raise ValueError(
+                    "Clarify exact source and destination account aliases before effects."
+                )
             return
         roles = {(b["provider"], b["alias"]): b for b in bindings}
+        if len(roles) != len(bindings):
+            raise ValueError("Clarify repeated or conflicting account roles.")
         selected: list[tuple[dict[str, Any], dict[str, Any], dict[str, Any]]] = []
         for step, cap in zip(steps, caps):
             descriptor = self.descriptor(cap)
@@ -284,8 +307,9 @@ class ConnectorPlanning:
                         raise PermissionError("private resource binding unavailable")
                     arguments = self.arguments(ref, self.check(ref))
                 paths = arguments.get("path", {}) if isinstance(arguments, dict) else {}
-                if not isinstance(paths, dict) or not all(
-                    resource in paths.values() for resource in binding["resources"]
+                if not isinstance(paths, dict) or (
+                    (method != "GET" or paths)
+                    and not all(resource in paths.values() for resource in binding["resources"])
                 ):
                     raise PermissionError("plan does not preserve the owner's resource ID")
 
