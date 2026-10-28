@@ -223,7 +223,17 @@ class ConnectorPlanning:
             selected.append(cap)
         return selected
 
-    def check_goal_accounts(self, goal: str, steps: list[dict[str, Any]]) -> None:
+    def check_goal_accounts(
+        self, goal: str, steps: list[dict[str, Any]], *, observe: bool = False
+    ) -> None:
+        """Admit actual account effects against owner roles, not an account union.
+
+        The model can choose its plan, but it cannot turn a named source into a
+        destination, change an explicit resource ID, or supply its own objective.
+        A role that owner text does not establish must remain unresolved.
+        """
+        from .planning_contract import owner_account_bindings
+
         caps = [
             next(
                 c
@@ -234,6 +244,61 @@ class ConnectorPlanning:
         ]
         if len(self.goal_accounts(goal, caps)) != len(caps):
             raise PermissionError("plan does not preserve the owner's selected account")
+        bindings = owner_account_bindings(goal)
+        if not bindings:
+            return
+        roles = {(b["provider"], b["alias"]): b for b in bindings}
+        selected: list[tuple[dict[str, Any], dict[str, Any], dict[str, Any]]] = []
+        for step, cap in zip(steps, caps):
+            descriptor = self.descriptor(cap)
+            if descriptor is None:
+                continue
+            binding = roles.get(
+                (descriptor["account"]["provider"], descriptor["account"]["alias"])
+            )
+            if binding is None:
+                raise PermissionError("plan selects an account absent from the owner goal")
+            selected.append((step, cap, binding))
+
+        if len(roles) > 1 and any(b["role"] is None for b in bindings):
+            if any(not self.is_read(cap) for _, cap, _ in selected):
+                raise ValueError(
+                    "Clarify each source and destination account before authorizing effects."
+                )
+        destination_effects: set[tuple[str, str]] = set()
+        for step, cap, binding in selected:
+            current = self.contract(cap)
+            method = current["endpoint"]["method"].upper()
+            if current["transport"] != "https" and binding["role"] is not None:
+                raise PermissionError("typed source/destination roles require a reviewed endpoint")
+            if binding["role"] == "source" and method != "GET":
+                raise PermissionError("owner source account cannot receive a proposed effect")
+            if binding["role"] == "destination" and method != "GET":
+                destination_effects.add((binding["provider"], binding["alias"]))
+            if binding["resources"]:
+                parameters = step["intent"].get("parameters") or {}
+                arguments = parameters.get("arguments")
+                if arguments is None and "request_ref" in parameters:
+                    ref = parameters["request_ref"]
+                    if ref not in self.inputs:
+                        raise PermissionError("private resource binding unavailable")
+                    arguments = self.arguments(ref, self.check(ref))
+                paths = arguments.get("path", {}) if isinstance(arguments, dict) else {}
+                if not isinstance(paths, dict) or not all(
+                    resource in paths.values() for resource in binding["resources"]
+                ):
+                    raise PermissionError("plan does not preserve the owner's resource ID")
+
+        if not observe and selected:
+            expected = {
+                (b["provider"], b["alias"])
+                for b in bindings
+                if b["role"] == "destination"
+            }
+            if expected - destination_effects:
+                raise PermissionError(
+                    "plan does not perform the owner's destination operation"
+                )
 
     def is_read(self, cap: dict[str, Any]) -> bool:
         if self.descriptor(cap) is None:
