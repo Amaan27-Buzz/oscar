@@ -1028,7 +1028,12 @@ class PlannerAuthoring:
                 context(h.store, h.grid, row["observation_refs"])
             steps = h.executive.validate_steps(worker, document["steps"])
             validate_file_literal(row["goal"], steps)
-            h.connector_plans.check_goal_accounts(row["goal"], steps, observe=document["observe"])
+            h.connector_plans.check_goal_accounts(
+                row["goal"],
+                steps,
+                observe=document["observe"],
+                source_observations=row.get("observation_refs"),
+            )
             connector_inputs = h.connector_plans.review(steps, tasks[0])
             if connector_inputs and value != {
                 "start_at": None,
