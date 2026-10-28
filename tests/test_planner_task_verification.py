@@ -366,6 +366,29 @@ class PlannedTaskVerificationTests(unittest.TestCase):
             self.h.connector_plans.check_goal_accounts(goal, [source, changed])
         self.assertEqual([], self.api.calls)
 
+    def test_copy_rejects_unobserved_source_and_unordered_destination(self):
+        goal, source, destination, _ = self.cross_service_role_steps()
+        with self.assertRaisesRegex(PermissionError, "source observation"):
+            self.h.connector_plans.check_goal_accounts(goal, [destination])
+        destination["depends_on"] = []
+        with self.assertRaisesRegex(PermissionError, "depend on verified source read"):
+            self.h.connector_plans.check_goal_accounts(goal, [source, destination])
+        self.assertEqual([], self.api.calls)
+
+    def test_unrelated_observation_cannot_authorize_source_transfer(self):
+        goal, _, destination, _ = self.cross_service_role_steps()
+        with self.assertRaises(PermissionError):
+            self.h.connector_plans.check_goal_accounts(
+                goal,
+                [destination],
+                source_observations={
+                    "request_id": "unrelated",
+                    "goal_id": "unrelated",
+                    "pins": [],
+                },
+            )
+        self.assertEqual([], self.api.calls)
+
     def test_owner_objective_contract_retains_owner_fields_not_model_fields(self):
         from oscar.planning_contract import owner_objective_contract
 
@@ -428,6 +451,9 @@ class PlannedTaskVerificationTests(unittest.TestCase):
         source["intent"]["parameters"] = {
             "arguments": {"path": {"tasklist": "source-list"}}
         }
+        source["id"] = "read-source"
+        destination["id"] = "copy-target"
+        destination["depends_on"] = ["read-source"]
         goal = (
             'Copy from Google account alias "Tasks" list ID "source-list" '
             'to Google account alias "Secondary" list ID "target-list".'
