@@ -3,7 +3,7 @@
 import json
 import unittest
 
-from oscar.owner_transfer import source_task_records, source_transfer_proof
+from oscar.owner_transfer import source_task_digest, source_task_records, source_transfer_proof
 
 
 class OwnerTransferEquivalenceTests(unittest.TestCase):
@@ -115,6 +115,24 @@ class OwnerTransferEquivalenceTests(unittest.TestCase):
             source_transfer_proof(
                 json.dumps(other), "source-account", [self.microsoft_effect()]
             )
+
+    def test_fresh_source_digest_detects_field_mutation_but_not_response_order(self):
+        first = self.task()
+        second = {**self.task(), "title": "Second task"}
+        baseline = source_task_digest(
+            "google.tasks.list", {"items": [first, second]}
+        )
+        self.assertEqual(
+            baseline,
+            source_task_digest("google.tasks.list", {"items": [second, first]}),
+        )
+        self.assertNotEqual(
+            baseline,
+            source_task_digest(
+                "google.tasks.list",
+                {"items": [first, {**second, "due": "2026-10-29T00:00:00Z"}]},
+            ),
+        )
 
     def test_microsoft_to_google_task_transfer_uses_same_canonical_fields(self):
         source = json.dumps(
