@@ -263,7 +263,8 @@ class PlannedTaskVerificationTests(unittest.TestCase):
             ),
         }
         destination = deepcopy(self.steps[0])
-        destination["intent"]["parameters"]["arguments"]["path"]["listId"] = "target-list"
+        destination_args = destination["intent"]["parameters"]["arguments"]
+        destination_args["path"]["listId"] = "target-list"
         destination["depends_on"] = ["source"]
         goal = (
             'Copy records from Google account alias "Tasks" list ID "source-list" '
@@ -278,14 +279,15 @@ class PlannedTaskVerificationTests(unittest.TestCase):
         self.assertEqual([], self.api.calls)
 
     def test_owner_goal_rejects_provider_swap_before_effects(self):
-        goal, source, destination, google_create = self.cross_service_role_steps()
+        goal, source, _, google_create = self.cross_service_role_steps()
         with self.assertRaisesRegex(PermissionError, "source account"):
             self.h.connector_plans.check_goal_accounts(goal, [source, google_create])
         self.assertEqual([], self.api.calls)
 
     def test_owner_goal_rejects_wrong_destination_resource(self):
         goal, source, destination, _ = self.cross_service_role_steps()
-        destination["intent"]["parameters"]["arguments"]["path"]["listId"] = "other-list"
+        destination_args = destination["intent"]["parameters"]["arguments"]
+        destination_args["path"]["listId"] = "other-list"
         with self.assertRaisesRegex(PermissionError, "resource ID"):
             self.h.connector_plans.check_goal_accounts(goal, [source, destination])
         self.assertEqual([], self.api.calls)
@@ -296,7 +298,9 @@ class PlannedTaskVerificationTests(unittest.TestCase):
             self.h.connector_plans.check_goal_accounts(goal, [source])
         from oscar.jev import Intent
 
-        reader = self.mount.capability("microsoft.todo.tasks.list", account_id=self.account.id)
+        reader = self.mount.capability(
+            "microsoft.todo.tasks.list", account_id=self.account.id
+        )
         destination_read = {
             "id": "target-read",
             "node_id": reader.node_id,
@@ -317,7 +321,10 @@ class PlannedTaskVerificationTests(unittest.TestCase):
 
     def test_owner_goal_ambiguous_accounts_require_clarification(self):
         _, source, destination, _ = self.cross_service_role_steps()
-        goal = 'Copy tasks using Google account alias "Tasks" and Microsoft account alias "MS Tasks".'
+        goal = (
+            'Copy tasks using Google account alias "Tasks" '
+            'and Microsoft account alias "MS Tasks".'
+        )
         with self.assertRaisesRegex(ValueError, "Clarify"):
             self.h.connector_plans.check_goal_accounts(goal, [source, destination])
         self.assertEqual([], self.api.calls)
@@ -346,12 +353,15 @@ class PlannedTaskVerificationTests(unittest.TestCase):
         destination["node_id"] = target.node_id
         destination["capability_id"] = target.id
         destination["intent"]["capability_kind"] = target.id
-        destination["intent"]["parameters"]["arguments"]["path"]["tasklist"] = "target-list"
+        destination_args = destination["intent"]["parameters"]["arguments"]
+        destination_args["path"]["tasklist"] = "target-list"
         source_reader = self.mount.capability("google.tasks.list", account_id=google.id)
         source["node_id"] = source_reader.node_id
         source["capability_id"] = source_reader.id
         source["intent"]["capability_kind"] = source_reader.id
-        source["intent"]["parameters"]["arguments"] = {"path": {"tasklist": "source-list"}}
+        source["intent"]["parameters"] = {
+            "arguments": {"path": {"tasklist": "source-list"}}
+        }
         goal = (
             'Copy from Google account alias "Tasks" list ID "source-list" '
             'to Google account alias "Secondary" list ID "target-list".'
