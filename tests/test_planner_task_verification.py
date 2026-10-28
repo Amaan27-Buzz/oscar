@@ -340,9 +340,20 @@ class PlannedTaskVerificationTests(unittest.TestCase):
     def test_ambiguous_ordinary_service_name_requires_account_clarification(self):
         from oscar.planning_contract import resolved_owner_account_bindings
 
+        from oscar.connectors import CredentialRef
+
+        google_manifest = self.manifest
         self.cross_service_role_steps()
-        self.h.accounts.add(
+        secondary = self.h.accounts.add(
             "google", "synthetic-other", "secondary", "Other Tasks", verified=True
+        )
+        self.vault.put("synthetic-other-token", reference="planning-other")
+        self.h.accounts.bind(
+            secondary.id,
+            google_manifest.id,
+            CredentialRef("planning-other"),
+            {scope for cap in google_manifest.capabilities for scope in cap.scopes},
+            google_manifest.base_url,
         )
         with self.assertRaisesRegex(ValueError, "Clarify"):
             resolved_owner_account_bindings(
