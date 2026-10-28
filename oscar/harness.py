@@ -142,15 +142,21 @@ class ModelExecutor:
                     and p["capability_id"] != action.capability_id
                 )
             )
+            kinds_by_capability: dict[str, set[str]] = {}
+            for node in self.grid.nodes():
+                for capability in node["capabilities"]:
+                    if capability["id"] in native_capabilities and any(
+                        pin["node_id"] == capability["node_id"]
+                        and pin["capability_id"] == capability["id"]
+                        for pin in worker["capabilities"]
+                    ):
+                        kinds_by_capability.setdefault(capability["id"], set()).add(
+                            capability["input_kind"]
+                        )
             native_kinds = {
-                c["id"]: c["input_kind"]
-                for node in self.grid.nodes()
-                for c in node["capabilities"]
-                if any(
-                    p["node_id"] == c["node_id"] and p["capability_id"] == c["id"]
-                    for p in worker["capabilities"]
-                )
-                and c["id"] in native_capabilities
+                capability: next(iter(kinds))
+                for capability, kinds in kinds_by_capability.items()
+                if len(kinds) == 1
             }
         request = replace(
             self.template,

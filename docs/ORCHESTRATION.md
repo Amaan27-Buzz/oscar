@@ -601,3 +601,8 @@ For eligible Ollama-only routes, initial planning also omits the textual respons
 schema because the adapter transmits the selected schema to native decoding.
 Other eligible adapters retain the textual schema and repeat context admission.
 This avoids duplicated durable payload without increasing any model or goal bound.
+
+Decoder input-kind hints require agreement across every selected device advertising
+the same capability ID. Conflicting kinds retain the generic intent shape instead
+of adopting the last device's contract. Exact device pins and native argument
+validation remain authoritative.

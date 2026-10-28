@@ -137,6 +137,12 @@ class PlanningCatalogTests(unittest.TestCase):
         )
 
     def test_shared_capability_id_keeps_both_device_pins_but_one_decoder_hint(self):
+        self.shared_capability("file_write")
+
+    def test_shared_id_with_different_contracts_does_not_choose_one_device_kind(self):
+        self.shared_capability("addition")
+
+    def shared_capability(self, input_kind):
         from unittest.mock import patch
 
         from oscar.contracts import Capability
@@ -152,7 +158,10 @@ class PlanningCatalogTests(unittest.TestCase):
             for c in node["capabilities"]
             if c["id"] == "files.write"
         )
-        self.h.grid.advertise(session, [Capability(**{**cap, "node_id": session.node_id})])
+        self.h.grid.advertise(
+            session,
+            [Capability(**{**cap, "node_id": session.node_id, "input_kind": input_kind})],
+        )
         self.h.executive.targets[session.node_id] = (self.h.dispatcher, session)
         proposal = self.conversation(
             "Across devices " + self.h.node_id + ", second-device: Prepare a welcome file"
@@ -164,6 +173,10 @@ class PlanningCatalogTests(unittest.TestCase):
             self.h.executive.tick()
         request = execute.call_args.args[0]
         self.assertEqual(1, request.executive_native_capabilities.count("files.write"))
+        if input_kind == "file_write":
+            self.assertEqual("file_write", request.executive_native_kinds["files.write"])
+        else:
+            self.assertNotIn("files.write", request.executive_native_kinds)
         self.assertEqual("partially_verified", self.h.store.all("task")[-1]["state"])
         worker = self.h.store.all("executive_worker")[-1]
         self.assertEqual(

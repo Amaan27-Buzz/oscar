@@ -974,8 +974,11 @@ The final catalog suite passed 25 cases (33.497s). Ruff/format (289 files), mypy
 with a loader ERROR because the command named nonexistent `tests.test_planner_mcp`.
 The intended `tests.test_planner_connectors` passed all sixteen cases separately
 (38.526s); these suites do not overlap. The aggregate
-runner error is retained. The whole-suite discovery run is RUNNING on unchanged
-runtime/test sources at `.oscar/native-graph-final-full.log`; no PASS is claimed.
+runner error is retained. The source-stable whole-suite discovery run finished with 1,383 cases: 1,372
+passed, ten skipped and one native visual failure (1,065.244s). The selected-window
+click was rejected because its target was not foreground. Focus-loss cause remains
+unproven; no guard was relaxed. MCP admission passed. All manifest hashes were
+independently matched to the committed runtime; this aggregate remains FAILED.
 
 Actual installed Granite passed five of six file/arithmetic/handoff cases; Full
 file acceptance failed after a `./welcome.txt` plan. The earlier six-of-six receipt
@@ -992,3 +995,61 @@ used the wrong task-list resource and Full failed its accepted workflow. These
 failures remain recorded rather than replacing the earlier scenarios. The full
 original mandate remains incomplete.
 [Follow-up receipt](../evidence/software-completion/native-planning-followup-2026-10-28.json).
+
+
+**2026-10-28 current native Desktop checkpoint:** rebuilt the actual current
+Tauri/WebView2 executable; expression/frontend production builds passed, along
+with all 134 Desktop tests and 42 Rust tests (one ignored). Seven native sharing
+form checks passed; a first PrintWindow image showed older paint despite current
+DOM state. A separate eight-check crosscheck captured WebView pixels first, then
+Windows pixels; both showed withdrawn host opt-in and disabled host executors/start.
+This does not establish a general capture-freshness fix, owner visual approval or
+full assistive-technology acceptance. [Native images and qualified receipt](../evidence/software-completion/native-sharing-2026-10-28/receipt.json).
+
+The rebuilt native Worker supervisor also passed actual synthetic CNG/DPAPI and
+TLS enrollment, workspace binding, signed Ask file write, independent Core readback,
+separate file bytes, cooperative stop and capability withdrawal (8.065s), with all
+recorded source hashes matched. Disposable runtime/credentials were cleaned up.
+No real account, owner activation, physical device or hosted deployment was used.
+[Native Worker receipt](../evidence/software-completion/native-worker-current-2026-10-28.json).
+
+
+**2026-10-28 sustained current-source acceptance:** the ten-minute actual TLS
+Core/Worker workload completed 98 effects and 98 independent file readbacks over
+601.33 seconds, including Worker restart and combined Core/Worker restart.
+Every recorded source hash matched; fixture processes, synthetic credentials and
+disposable files were cleaned up. This ran alongside regression/build/model work,
+so its timing/resource samples are not an isolated performance baseline, leak-free,
+multi-day, hosted or daily-use acceptance claim.
+[Soak receipt](../evidence/software-completion/soak-native-planning-2026-10-28.json).
+
+Four real Qwen 9B image-adapter diagnostics retained three failures and one hit
+across two synthetic images and pixel/normalized coordinate prompts. Two outputs
+lacked the requested x/y shape, and one pixel prediction missed. This does not
+justify adopting a generic coordinate conversion or claiming visual reasoning fixed.
+No GUI input was sent by the diagnostic. [Qualified results](../evidence/software-completion/native-planning-followup-2026-10-28.json).
+
+**2026-10-28 reproducible native checks and device-kind follow-up:** the checked-in
+`scripts/desktop_sharing_acceptance.py` passes ten assertions on the rebuilt native
+app. It refuses an existing output directory, records source/binary hashes, checks
+form authority withdrawal and captures only the owned Workspace. Both resulting
+images were inspected and agree. This preserves the earlier stale capture rather
+than claiming a general freshness fix. The isolated original Windows visual test
+also passed with boolean foreground instrumentation; the 1,383-case aggregate
+remains FAILED and its focus-loss cause remains unproven.
+[Sharing receipt](../evidence/software-completion/native-sharing-2026-10-28/receipt.json),
+[foreground diagnostic](../evidence/software-completion/native-foreground-diagnostic-2026-10-28.json).
+
+The subsequent decoder change omits an input-kind hint when selected devices
+advertise different contracts under the same capability ID. Exact device pins and
+native argument validation remain required. Earlier full/native/soak/model receipts
+qualify `1d717e5` runtime sources and precede this change; they are not refreshed
+whole-product acceptance for the follow-up.
+
+The device-kind follow-up passes all 75 catalog/provider cases (64.893s), including
+conflicting supported device contracts and preserved signed file execution. The
+control/image/visual affected run executes 21 cases with exit code
+1 (28.643s); its recorded source hashes are
+stable and independently matched. The original development fixture error remains
+qualified in the receipt. Static and repository checks pass.
+[Follow-up evidence](../evidence/software-completion/device-kind-followup-2026-10-28.json).

@@ -1283,9 +1283,21 @@
     "qualification": "All 300 loaded tests passed; the nonexistent MCP module name produced one loader error. The intended connector suite separately passed all 16 cases. These suites do not overlap."
   },
   "full_regression": {
-    "state": "RUNNING",
+    "state": "FAILED",
+    "tests": 1383,
+    "passed": 1372,
+    "skipped": 10,
+    "failures": 1,
+    "unittest_seconds": 1065.244,
+    "wrapper_seconds": 1068.163,
+    "base_head_at_start": "cb92c175a77d629966a2604336b625e704e4329a",
+    "runtime_matches_commit": "1d717e5",
+    "source_stable": true,
+    "all_recorded_source_hashes_match": true,
     "log": ".oscar/native-graph-final-full.log",
-    "manifest": ".oscar/native-graph-final-full-manifest.json"
+    "log_sha256": "304f1fb73606fa297d2a9a2ec4fa757f6495c016591a89943f9f680f0cc8d13d",
+    "manifest_sha256": "ef4f2da31ff0dc919340dc22ce4a0a880433ee6879d07c68d730aea41e0da778",
+    "failure": "WindowsVisualTests.test_actual_capture_visual_fallback_and_no_replay: valid selected click rejected because selected window was not foreground. Focus-loss cause remains unproven; no guard relaxed. MCP planning case passed."
   },
   "static_checks": {
     "ruff": "PASS",
@@ -1304,5 +1316,91 @@
     "passed": 16,
     "seconds": 38.526,
     "log_sha256": "7822c09e21fd7837f02e4ee02be5efe7ea880f0d3f3cbaf8596cc7a68c7bc55b"
+  },
+  "restart_soak": {
+    "receipt": "docs/evidence/software-completion/soak-native-planning-2026-10-28.json",
+    "receipt_sha256": "a970cae5f356c5363d5423fab9648c57e89a4d64ffd79baf27f6adbdf1708b3d",
+    "status": "SOFTWARE_VERIFIED",
+    "seconds": 601.33,
+    "verified_effects": 98,
+    "independent_file_readbacks": 98,
+    "source_hashes_independently_matched": true,
+    "restarts": [
+      "worker",
+      "core-and-worker"
+    ],
+    "qualification": "Synthetic TLS/file workload concurrent with regression, builds and local-model diagnostics; latency/RSS are not an isolated performance or leak-free claim."
+  },
+  "visual_coordinate_diagnostic": {
+    "cases": [
+      {
+        "image_sha256": "26a98f92734e91db21f3a96695e09520e0f4f24b15131a8c5ce6516f5aa334c5",
+        "rectangle": [
+          80,
+          50,
+          180,
+          120
+        ],
+        "coordinate_space": "pixels",
+        "hit": false,
+        "error": "KeyError: 'x'",
+        "seconds": 15.133
+      },
+      {
+        "image_sha256": "26a98f92734e91db21f3a96695e09520e0f4f24b15131a8c5ce6516f5aa334c5",
+        "rectangle": [
+          80,
+          50,
+          180,
+          120
+        ],
+        "coordinate_space": "normalized_1000",
+        "hit": false,
+        "error": "KeyError: 'x'",
+        "seconds": 12.787
+      },
+      {
+        "image_sha256": "0a13655e1d30d1f1f64b3d35aec07e0b185ef0be9b05f094a9ed340c80c103ba",
+        "rectangle": [
+          210,
+          130,
+          290,
+          190
+        ],
+        "coordinate_space": "pixels",
+        "response": {
+          "x": 167,
+          "y": 84
+        },
+        "pixel_point": [
+          167,
+          84
+        ],
+        "hit": false,
+        "seconds": 12.064
+      },
+      {
+        "image_sha256": "0a13655e1d30d1f1f64b3d35aec07e0b185ef0be9b05f094a9ed340c80c103ba",
+        "rectangle": [
+          210,
+          130,
+          290,
+          190
+        ],
+        "coordinate_space": "normalized_1000",
+        "response": {
+          "x": 746,
+          "y": 825
+        },
+        "pixel_point": [
+          238.72,
+          165.0
+        ],
+        "hit": true,
+        "seconds": 11.797
+      }
+    ],
+    "raw_receipt_sha256": "7a271b0ed966aef367a87623dd4dc476ddbbfb692939d2a47e69e036870b0304",
+    "qualification": "Four actual Qwen 9B image-adapter diagnostics on two synthetic PNGs. One normalized point hits the rectangle; two outputs lack requested x/y and one pixel point misses. No GUI input, generic coordinate conversion implementation or general vision acceptance."
   }
 }

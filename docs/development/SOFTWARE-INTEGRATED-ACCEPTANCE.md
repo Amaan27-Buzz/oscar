@@ -69,7 +69,7 @@ does not repeat their native UI, model or long-running acceptance.
 | 53 | Backup / independent restore | LOCAL D1 offline backup/restore tests; hosted storage/keys/disaster acceptance OPEN |
 | 54 | Uncertain mutation not duplicated | LOCAL actual after-effect Worker death/restart, provider mutation failures and claim journal tests |
 | 55 | Revoked device cannot regain access | LOCAL signed session, enrollment/revocation and target pre-effect regressions; real owner commissioning separate |
-| 56 | Desktop functional inspection | PARTIAL earlier actual native reviews/workflows plus current compiled/unit-tested controls; newest sharing controls lack rendered owner acceptance |
+| 56 | Desktop functional inspection | PARTIAL earlier actual native reviews/workflows plus current compiled/unit-tested controls; current rebuilt sharing controls pass scoped native focus/opt-in/withdrawal checks with inspected WebView/Windows captures; owner visual and broad current-surface acceptance remain OPEN |
 | 57 | Android functional inspection | LOCAL disposable native production navigation/reviews/recall and 11 captures; owner visual/physical acceptance OPEN |
 | 58 | Accessibility / large text | PARTIAL prior API35 large-text/landscape/IME reference and native semantic tests; current full assistive-technology campaign OPEN |
 | 59 | Workflow latency | LOCAL 80 samples/operation and raw plots; source checkpoint explicitly predates later changes. [Performance](../evidence/software-completion/performance-2026-10-24/performance.md) |

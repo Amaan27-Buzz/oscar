@@ -1,0 +1,162 @@
+{
+  "qualification": "Diagnostic original test with foreground boolean traces; no product/source change, no foreign app identities or content collected. Original failed 1383-case aggregate remains FAILED; isolated PASS is not a root-cause fix.",
+  "passed": true,
+  "trace": [
+    {
+      "seconds": 0.654,
+      "stage": "before-input",
+      "operation": "focus_window",
+      "selected_is_foreground": false
+    },
+    {
+      "seconds": 1.086,
+      "stage": "before-input",
+      "operation": "focus_check",
+      "selected_is_foreground": true
+    },
+    {
+      "seconds": 1.532,
+      "stage": "before-input",
+      "operation": "tree",
+      "selected_is_foreground": true
+    },
+    {
+      "seconds": 1.92,
+      "stage": "before-input",
+      "operation": "screenshot",
+      "selected_is_foreground": true
+    },
+    {
+      "seconds": 1.92,
+      "stage": "before-child",
+      "operation": "screenshot",
+      "selected_is_foreground": true
+    },
+    {
+      "seconds": 2.46,
+      "stage": "after-child",
+      "operation": "screenshot",
+      "selected_is_foreground": true
+    },
+    {
+      "seconds": 2.751,
+      "stage": "before-input",
+      "operation": "visual_click",
+      "selected_is_foreground": true
+    },
+    {
+      "seconds": 2.751,
+      "stage": "before-child",
+      "operation": "visual_click",
+      "selected_is_foreground": true
+    },
+    {
+      "seconds": 3.349,
+      "stage": "after-child",
+      "operation": "visual_click",
+      "selected_is_foreground": true
+    },
+    {
+      "seconds": 3.374,
+      "stage": "before-input",
+      "operation": "visual_click",
+      "selected_is_foreground": true
+    },
+    {
+      "seconds": 3.374,
+      "stage": "before-child",
+      "operation": "visual_click",
+      "selected_is_foreground": true
+    },
+    {
+      "seconds": 3.94,
+      "stage": "after-child",
+      "operation": "visual_click",
+      "selected_is_foreground": true
+    },
+    {
+      "seconds": 3.961,
+      "stage": "before-input",
+      "operation": "visual_click",
+      "selected_is_foreground": true
+    },
+    {
+      "seconds": 3.961,
+      "stage": "before-child",
+      "operation": "visual_click",
+      "selected_is_foreground": true
+    },
+    {
+      "seconds": 4.539,
+      "stage": "after-child",
+      "operation": "visual_click",
+      "selected_is_foreground": true
+    },
+    {
+      "seconds": 4.57,
+      "stage": "before-input",
+      "operation": "visual_click",
+      "selected_is_foreground": true
+    },
+    {
+      "seconds": 4.57,
+      "stage": "before-child",
+      "operation": "visual_click",
+      "selected_is_foreground": true
+    },
+    {
+      "seconds": 5.126,
+      "stage": "after-child",
+      "operation": "visual_click",
+      "selected_is_foreground": true
+    },
+    {
+      "seconds": 6.073,
+      "stage": "before-input",
+      "operation": "focus_window",
+      "selected_is_foreground": true
+    },
+    {
+      "seconds": 6.462,
+      "stage": "before-input",
+      "operation": "focus_check",
+      "selected_is_foreground": true
+    },
+    {
+      "seconds": 6.894,
+      "stage": "before-input",
+      "operation": "screenshot",
+      "selected_is_foreground": true
+    },
+    {
+      "seconds": 6.894,
+      "stage": "before-child",
+      "operation": "screenshot",
+      "selected_is_foreground": true
+    },
+    {
+      "seconds": 7.429,
+      "stage": "after-child",
+      "operation": "screenshot",
+      "selected_is_foreground": true
+    },
+    {
+      "seconds": 7.59,
+      "stage": "before-input",
+      "operation": "visual_click",
+      "selected_is_foreground": true
+    },
+    {
+      "seconds": 7.59,
+      "stage": "before-child",
+      "operation": "visual_click",
+      "selected_is_foreground": true
+    },
+    {
+      "seconds": 8.115,
+      "stage": "after-child",
+      "operation": "visual_click",
+      "selected_is_foreground": true
+    }
+  ]
+}

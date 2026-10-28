@@ -1,5 +1,20 @@
 # OSCAR — Current Status & Checklist
 
+**2026-10-28 native planning checkpoint:** local `1d717e5` includes bounded native
+graph decoding, dependency ordering, verified HTTPS prerequisites and undated task
+creation. Actual model results remain mixed: five of six file/arithmetic/handoff
+cases pass; only one of four ordinary multi-account task cases passes. The latest
+full regression is **FAILED: 1,372 PASS, ten SKIP, one native foreground FAIL**
+(1,383 total). Rebuilt Desktop/Rust tests pass, actual enrolled native Worker
+execution passes, and the ten-minute restart soak verifies 98 effects/readbacks.
+Sharing controls now have a reproducible scoped native check. A later conflicting
+device-kind decoder fix passes 75 catalog/provider cases; its 21-case native batch
+passes 19 and fails two foreground checks. General model semantics,
+native focus/capture reliability, broader integrations and full software/product
+acceptance remain OPEN. No publication or real-owner commissioning occurred.
+[Current handoff](development/SOFTWARE-COMPLETION-HANDOFF.md),
+[qualified regression and model results](evidence/software-completion/native-planning-followup-2026-10-28.json).
+
 **2026-10-27 conditional Google calendar moves:** Google event PATCH requires the exact strong selected-event ETag in private signed arguments. The adapter sends `If-Match`; a stale version returns `precondition_failed` without overwrite, retry or dependent work. Missing/wildcard/weak/malformed versions fail before dispatch. Independent event GET still gates completion. All 298 affected integration cases pass on stable sources (341.055 s); after correcting a planner field-description inconsistency, all 24 final contract cases pass (35.632 s) and actual TLS mobile protocol → conditional move/readback → separate outbound Worker file output passes (10.003 s). The broad run precedes that final wording-only correction. Microsoft concurrency, Google delete protection, general flexible commitment reasoning and product acceptance remain OPEN. [Receipt](evidence/software-completion/calendar-version-2026-10-27.json).
 
 **2026-10-26 scheduled task days:** Google Tasks dates now remain scheduled days rather than overdue deadlines in Core attention and both apps. Legacy Google date-only reports receive the same semantics; Microsoft due times retain deadline handling. All sixteen Core cases and 120 source-stable integration tests PASS (112.676 s), with fifteen affected Desktop tests/build and eleven affected Android tests/APK/lint. Report expiry and source/account withdrawal remain enforced. No schedule mutation, personal-priority inference or rendered native acceptance is added. The prior 1,297-case full PASS predates calendar and this change. [Receipt](evidence/software-completion/scheduled-day-2026-10-26.json).
