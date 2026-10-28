@@ -338,9 +338,8 @@ class PlannedTaskVerificationTests(unittest.TestCase):
         self.assertEqual([], self.api.calls)
 
     def test_ambiguous_ordinary_service_name_requires_account_clarification(self):
-        from oscar.planning_contract import resolved_owner_account_bindings
-
         from oscar.connectors import CredentialRef
+        from oscar.planning_contract import resolved_owner_account_bindings
 
         google_manifest = self.manifest
         self.cross_service_role_steps()
