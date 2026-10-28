@@ -1139,6 +1139,11 @@ class PlannerAuthoring:
         h = self.h
         if operation == "plan_draft":
             caps = state["capabilities"]
+            from .planning_contract import owner_objective_contract
+
+            owner_objective = owner_objective_contract(
+                value["goal"], h.accounts.list_accounts()
+            )
             worker = h.executive.worker(
                 value["name"],
                 [(c["node_id"], c["id"]) for c in caps],
@@ -1155,6 +1160,7 @@ class PlannerAuthoring:
                     "id": request_id,
                     "relationship": h.runtime.relationship_id,
                     "goal": value["goal"],
+                    **({"owner_objective": owner_objective} if owner_objective else {}),
                     "goal_id": proposal["id"],
                     "worker_id": worker,
                     "capabilities": value["capabilities"],
@@ -1190,6 +1196,16 @@ class PlannerAuthoring:
             )
             if state.get("continuation") or row.get("observation_refs"):
                 proposal["observations"] = state.get("observations", row.get("observation_refs"))
+                proposal["review_digest"] = h.executive._review(proposal)
+                h.store.put("executive_goal", proposal["id"], proposal)
+            if (
+                row.get("owner_objective")
+                and not state.get("observe")
+                and not state.get("continuation")
+            ):
+                # Executive must not equate individually verified model steps with
+                # completion of an independently observed cross-account owner goal.
+                proposal["owner_objective"] = row["owner_objective"]
                 proposal["review_digest"] = h.executive._review(proposal)
                 h.store.put("executive_goal", proposal["id"], proposal)
             if state.get("continuation"):
