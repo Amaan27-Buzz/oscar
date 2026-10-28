@@ -170,7 +170,7 @@ def prepare(harness: "Harness", text: str) -> PreparedCommunication | None:
         + identifier
         + " titled "
         + quoted
-        + r" due (\d{4}-\d{2}-\d{2}) notes "
+        + r"(?: due (\d{4}-\d{2}-\d{2}))? notes "
         + quoted,
         request,
         re.IGNORECASE,
@@ -356,10 +356,15 @@ def prepare(harness: "Harness", text: str) -> PreparedCommunication | None:
                 raise ValueError("single-line bounded task title required")
             if len(notes) > 3000 or "\x00" in notes or "\r" in notes:
                 raise ValueError("bounded task notes with LF line endings required")
-            due = date.fromisoformat(task[4]).isoformat()
+            due = date.fromisoformat(task[4]).isoformat() if task[4] else None
             expected = {"title": title, "notes": notes, "due": due}
             parameters["body"] = (
-                {"title": title, "notes": notes, "due": due + "T00:00:00Z", "status": "needsAction"}
+                {
+                    "title": title,
+                    "notes": notes,
+                    **({"due": due + "T00:00:00Z"} if due else {}),
+                    "status": "needsAction",
+                }
                 if google
                 else {
                     "title": title,
@@ -367,7 +372,11 @@ def prepare(harness: "Harness", text: str) -> PreparedCommunication | None:
                         "contentType": "html",
                         "content": "<div>" + html.escape(notes).replace("\n", "<br>") + "</div>",
                     },
-                    "dueDateTime": {"dateTime": due + "T00:00:00", "timeZone": "UTC"},
+                    **(
+                        {"dueDateTime": {"dateTime": due + "T00:00:00", "timeZone": "UTC"}}
+                        if due
+                        else {}
+                    ),
                     "status": "notStarted",
                 }
             )

@@ -1,0 +1,29 @@
+{
+  "status": "SOFTWARE_VERIFIED_BOUNDED",
+  "base_head": "f4d76d8",
+  "scope": "Optional explicit task due clause using existing native Google/Microsoft task authoring; synthetic provider HTTP and signed owner protocol. No real account or general model acceptance.",
+  "checks": [
+    {
+      "log": ".oscar/undated-communication-focused.log",
+      "tests": 51,
+      "seconds": 77.278,
+      "result": "PASS",
+      "sha256": "567e26f89889258c73865962dddfdd3739d43024ee042f7a95404211a163783a"
+    },
+    {
+      "log": ".oscar/undated-planner-integration.log",
+      "tests": 76,
+      "seconds": 112.243,
+      "result": "PASS",
+      "sha256": "3e20397d9ed4988da8ce97772b5609d245a88af9a120cfd3574d8acc96126193"
+    }
+  ],
+  "source_hashes": {
+    "oscar/communication.py": "0318c6c6d84a17b6ae5fb194fd1886f5986f02392b9b7a0265a55278c6f8d66e",
+    "tests/test_communication.py": "90280391e299e25aa8f446d17b3d27cb9bf30277b03cae087bfaaaf6564d28cb"
+  },
+  "source_qualification": "Hashes captured after communication run and during planning run, independently matched after both; no canonical edits during either run.",
+  "static_checks": "Ruff oscar/tests/scripts, 291 formatted files, mypy 107 source files PASS",
+  "full_regression": "Precedes this small parser follow-up: 1400 PASS, 10 SKIP, 1 native foreground FAIL; cause unresolved.",
+  "remaining": "General cross-service model goal semantics remain failed; this explicit command parser does not resolve them."
+}

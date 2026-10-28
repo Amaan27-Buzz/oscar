@@ -21,8 +21,11 @@ create calendar event using Work titled "Title" from 2026-10-23T09:00:00+05:30 t
 list task lists using Work
 list tasks using Work in list LIST_ID
 create task using Work in list LIST_ID titled "Prepare meeting" due 2026-10-25 notes "Read the agenda"
+create task using Work in list LIST_ID titled "Prepare meeting" notes "Read the agenda"
 ```
 
+Task due dates are optional: omit the entire due clause for an undated task.
+Independent saved-resource readback must confirm that no date was added.
 Event attendees are optional. Times require an explicit offset; event duration is
 bounded to seven days. Requests are bounded to 4096 characters, recipients to 16,
 subject/title to 200 and plain text body to 3000. Header injection, ambiguous
@@ -42,8 +45,8 @@ REPORTED, and reading does not create mutation or retention authority.
 
 Task titles are bounded to 200 single-line characters, notes to 3000 characters
 with LF line endings, and the request to the existing 4096-character limit. A
-literal `YYYY-MM-DD` date is required; relative dates, times, implicit lists and
-compound instructions are rejected. This is a due **date**, not a timed reminder
+due date, when supplied, must be a literal `YYYY-MM-DD`; relative dates, times,
+implicit lists and compound instructions are rejected. This is a due **date**, not a timed reminder
 or a promise of provider notification. Google Tasks stores a date; the Microsoft
 request uses explicit midnight UTC. Saved-resource readback checks account/list
 and returned resource identity, exact title/notes/date, and an uncompleted state.

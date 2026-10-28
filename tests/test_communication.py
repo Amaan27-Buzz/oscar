@@ -751,6 +751,35 @@ class CommunicationTests(unittest.TestCase):
             0, self.h.archive.db.execute("SELECT count(*) FROM archive_events").fetchone()[0]
         )
 
+    def test_undated_task_creation_omits_dates_and_independently_reads_both_providers(self):
+        for alias in ("Google", "Work"):
+            with self.subTest(alias=alias):
+                result = self.execute(
+                    f'create task using {alias} in list selected-list titled "Prepare meeting" '
+                    'notes "Private marker"'
+                )
+                self.assertEqual("verified", result["state"], result)
+                post, get = self.provider.calls[-2:]
+                self.assertEqual(["POST", "GET"], [post[0], get[0]])
+                self.assertNotIn("due", post[2])
+                self.assertNotIn("dueDateTime", post[2])
+                self.assertEqual(post[1] + "/synthetic-resource", get[1])
+                self.assertEqual({}, self.h.connectors.requests)
+
+    def test_undated_task_readback_rejects_unrequested_due_dates(self):
+        self.provider.transform = lambda method, data: {
+            **data,
+            "due": "2026-10-28T00:00:00Z",
+            "dueDateTime": {"dateTime": "2026-10-28T00:00:00", "timeZone": "UTC"},
+        }
+        for alias in ("Google", "Work"):
+            with self.subTest(alias=alias):
+                result = self.execute(
+                    f'create task using {alias} in list selected-list titled "Prepare meeting" '
+                    'notes "Private marker"'
+                )
+                self.assertEqual("failed", result["state"], result)
+
     def test_task_list_discovery_is_bounded_read_only_and_transient(self):
         for alias in ("Google", "Work"):
             for instruction in (
@@ -1155,6 +1184,12 @@ class CommunicationTests(unittest.TestCase):
         self.check_cloud_native_request(
             'create task using Work in list selected-list titled "Prepare meeting" '
             'due 2026-10-25 notes "Private marker"'
+        )
+
+    def test_cloud_undated_task_creation_uses_signed_review_and_independent_get(self):
+        self.check_cloud_native_request(
+            'create task using Work in list selected-list titled "Prepare meeting" '
+            'notes "Private marker"'
         )
 
     def test_cloud_meet_creation_actual_http_signature_resource_name_and_private_output(self):

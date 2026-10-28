@@ -142,3 +142,6 @@ success and every failed trial remain recorded. Broader account/operation/resour
 roles and field semantics remain active software gaps. No real account or owner
 activation occurred. Frozen full Python regression has 1,400 PASS, ten SKIP and one native foreground FAIL (1,411 total, 1,080.220s); all source hashes independently match. The fixture expected PID 12804 but observed foreground PID 10072; cause remains unresolved and the guard stays enforced. The newest-source restart soak passes 98 signed effects and independent readbacks in 603.74s. Neither closes the failed general cross-service owner objective.
 [Evidence](../evidence/software-completion/cross-service-preflight-2026-10-28.json).
+
+
+**2026-10-28 explicit undated tasks:** native Google/Microsoft task requests can omit the entire due clause. Existing account/list/signature guards and independent saved-resource readback remain enforced; a provider-added date fails verification. All 127 focused communication/planning cases pass, including actual authenticated Cloud HTTP. Ruff, formatting and mypy pass. This follows the full regression with 1,400 PASS, ten SKIP and one unresolved native foreground FAIL; no newer full PASS or general cross-service model reliability is claimed. [Evidence](../evidence/software-completion/undated-native-task-2026-10-28.json).
