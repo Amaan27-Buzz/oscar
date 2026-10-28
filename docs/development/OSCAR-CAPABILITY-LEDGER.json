@@ -30,7 +30,7 @@
       "severity": "P1",
       "capability": "CAP-PLANNING",
       "evidence": "docs/evidence/software-completion/cross-service-preflight-2026-10-28.json",
-      "description": "Source/destination account/provider/resource/operation roles are not bound to original owner objective; final real local-model synthetic-provider campaign 0/2."
+      "description": "Source/destination account/provider/resource/operation roles are not bound to original owner objective; final real local-model synthetic-provider campaign 0/2. As of continuation-01 PR #10, exact quoted alias direction and path-ID admission defenses have been committed but NOT_RUN; original-goal field/data dependency verification remains absent and bug OPEN."
     },
     {
       "id": "BUG-FOCUS-001",
@@ -1638,7 +1638,8 @@
         "oscar/planning_contract.py",
         "oscar/planner_authoring.py",
         "oscar/planner_connectors.py",
-        "oscar/executive.py"
+        "oscar/executive.py",
+        "oscar/harness.py"
       ],
       "implementation_status": "PARTIAL",
       "integration_status": "PARTIAL",
@@ -1676,6 +1677,10 @@
         {
           "path": "docs/evidence/software-completion/cross-service-preflight-2026-10-28.json",
           "scope": "Historical source-qualified evidence; read receipt for exact native/synthetic/live boundary. No blanket capability acceptance."
+        },
+        {
+          "path": "docs/development/OSCAR-SESSION-STATE.md",
+          "scope": "Continuation-01 feature branch PR #10; owner alias direction and path-ID admission guards added, tests committed but NOT_RUN. Action startup failures (zero jobs) are not test evidence; installed-model Ask/Full 0/2 historical failure unresolved."
         }
       ],
       "test_commands": [
@@ -1690,10 +1695,11 @@
       ],
       "bugs_and_blockers": [
         "BUG-PLAN-001: final installed Qwen Ask/Full cross-service goal campaign 0/2; wrong service/resource can have verified substeps without completing owner goal.",
-        "General natural objective and image reasoning accuracy is not established."
+        "General natural objective and image reasoning accuracy is not established.",
+        "BUG-PLAN-001 remains OPEN: role-bound exact alias/path admission is a partial defensive guard only. Natural intent outside the explicit-account grammar, source data dependencies, requested fields, operation semantics and independent original-owner-goal completion are not yet implemented or tested."
       ],
       "required_owner_action": [],
-      "next_implementation_action": "Bind source/destination provider account operation resource and field roles to owner objectives; reject role swaps before effects.",
+      "next_implementation_action": "Add typed owner-goal contract and evidence-linked source/destination field and operation readback in existing Controller/Planner/Executive; run role-swap focused tests and real installed-Qwen Ask/Full synthetic-provider campaign.",
       "deferred": false,
       "owner_action_status": "NOT_RUN"
     },
@@ -4024,10 +4030,11 @@
       ],
       "dependencies": [],
       "bugs_and_blockers": [
-        "Bind verification to requested owner goal as well as model-selected steps; preserve partial generic outcomes."
+        "Bind verification to requested owner goal as well as model-selected steps; preserve partial generic outcomes.",
+        "Owner-objective evidence remains missing: individually verified connector writes may not satisfy a cross-service source-content/destination-field goal. PR #10 adds partial pre-effect safeguards, not end-goal proof."
       ],
       "required_owner_action": [],
-      "next_implementation_action": "Bind verification to requested owner goal as well as model-selected steps; preserve partial generic outcomes.",
+      "next_implementation_action": "Require independent end-goal readback against owner-origin expectation and observed source field provenance; preserve partial/unknown states without claiming success from model-chosen substep verification.",
       "deferred": false,
       "owner_action_status": "NOT_RUN"
     },
