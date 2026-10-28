@@ -442,6 +442,7 @@ class ConnectorPlanning:
         from .capabilities import Cancellation
         from .owner_transfer import source_task_digest
         from .planner_observations import context
+        from .storage import StateConflict
 
         refs = goal.get("observations")
         if not isinstance(refs, dict):
@@ -494,7 +495,15 @@ class ConnectorPlanning:
             cancellation.check()
             if source_task_digest(current["operation"], payload) != proof["source_digest"]:
                 raise PermissionError("source records changed before destination effect")
-        except (KeyError, StopIteration, ValueError, Cancelled, ConnectorError) as exc:
+        except (
+            KeyError,
+            StopIteration,
+            ValueError,
+            Cancelled,
+            ConnectorError,
+            StateConflict,
+            TypeError,
+        ) as exc:
             raise PermissionError("verified source pre-effect check unavailable") from exc
 
     def is_read(self, cap: dict[str, Any]) -> bool:
