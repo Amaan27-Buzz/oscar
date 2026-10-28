@@ -26,7 +26,27 @@
     "format": "PASS 291 files",
     "mypy": "PASS 107 source files",
     "repository_secret_scan": "PASS",
-    "full_regression": "RUNNING; no new aggregate result yet"
+    "full_regression": {
+      "exit_code": 1,
+      "tests": 1411,
+      "seconds": 1080.22,
+      "wrapper_seconds": 1084.04,
+      "source_stable": true,
+      "sources_match_checkpoint": true,
+      "qualification": "Frozen Python sources now at 5827ffa; prior native foreground failure remains unexplained even if this run passes.",
+      "log_sha256": "fe20fab6c5b6080baa2c3acff1b7cac0ad03d9ba38d3691c346f9532045f9b9e",
+      "manifest_sha256": "c6a08eb701c0e5bf7280b50a5cd5aefee9751a1d24039fd25aa130bc617472a4",
+      "summary": "Ran 1411 tests in 1080.220s\n\nFAILED (failures=1, skipped=10)",
+      "passed": 1400,
+      "skipped": 10,
+      "failures": 1,
+      "status": "FAILED",
+      "failure": "tests.test_windows_visual.WindowsVisualTests.test_actual_capture_visual_fallback_and_no_replay:312 expected fixture PID 12804, observed foreground PID 10072; cause unresolved"
+    },
+    "linux": {
+      "status": "UNAVAILABLE",
+      "reason": "Local Docker Linux engine named pipe is absent; read-only image inventory failed before build or container creation. No engine start, image pull or installation attempted."
+    }
   },
   "final_installed_model_cases": [
     {
@@ -435,7 +455,21 @@
     "receipt_sha256": "f92859a01c8830e1ddfe7e6c4d9056dd593ca2cebd7a569c047e377d1a382b36",
     "qualification": "Precedes typed-body and read-review follow-ups. Source pins retained in raw receipt."
   },
-  "current_soak": "RUNNING",
+  "current_soak": {
+    "status": "SOFTWARE_VERIFIED",
+    "candidate": "5827ffa",
+    "seconds": 603.74,
+    "effects": 98,
+    "independent_readbacks": 98,
+    "restarts": [
+      "worker",
+      "core-and-worker"
+    ],
+    "source_hashes_independently_matched": true,
+    "receipt": "docs/evidence/software-completion/cross-service-soak-2026-10-28.json",
+    "sha256": "5020ceabf9e233fd2f9da1cec873b73599468ec008c887b371f9ade7f2e11db2",
+    "qualification": "Synthetic loopback TLS and scoped filesystem workload only; retained task history intentionally grows. No leak-free, multi-day, hosted, browser, audio, battery, physical-device or owner-activation claim."
+  },
   "api_contract_sources": [
     "https://learn.microsoft.com/en-us/graph/api/todotasklist-post-tasks?view=graph-rest-1.0",
     "https://learn.microsoft.com/en-us/graph/api/resources/itembody?view=graph-rest-1.0"

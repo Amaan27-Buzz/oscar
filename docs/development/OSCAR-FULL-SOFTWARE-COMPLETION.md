@@ -1157,5 +1157,5 @@ creation instead of the requested Microsoft destination. Independent substep
 verification does not establish owner-goal correctness. Earlier intermediate Ask
 success and every failed trial remain recorded. Broader account/operation/resource
 roles and field semantics remain active software gaps. No real account or owner
-activation occurred. Full regression and newest-source soak are running.
+activation occurred. Frozen full Python regression has 1,400 PASS, ten SKIP and one native foreground FAIL (1,411 total, 1,080.220s); all source hashes independently match. The fixture expected PID 12804 but observed foreground PID 10072; cause remains unresolved and the guard stays enforced. The newest-source restart soak passes 98 signed effects and independent readbacks in 603.74s. Neither closes the failed general cross-service owner objective.
 [Evidence](../evidence/software-completion/cross-service-preflight-2026-10-28.json).
