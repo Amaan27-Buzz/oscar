@@ -216,14 +216,28 @@ def owner_objective_contract(goal: str, accounts: list[Any]) -> dict[str, Any] |
     Unknown field/resource semantics must not be reported as verified.
     """
     roles = resolved_owner_account_bindings(goal, accounts)
-    if not roles:
-        return None
     transfer = re.search(
-        r"\b(copy|duplicate|replicate|transfer|migrate|sync)\b|"
+        r"\b(copy|duplicate|replicate|transfer|migrate|move|sync|synchronize)\b|"
         r"\bcreate\s+equivalent\b",
         goal,
         re.I,
     )
+    if transfer and re.search(r"\b(move|migrate|sync|synchronize)\b", goal, re.I):
+        raise ValueError(
+            "Clarify the move or synchronization semantics; copying alone is insufficient."
+        )
+    if transfer and re.search(r"\btransfer\b", goal, re.I) and not re.search(
+        r"\b(copy|duplicate|replicate)\b|\bcreate\s+equivalent\b",
+        goal,
+        re.I,
+    ):
+        raise ValueError(
+            "Clarify whether transfer means copy or move; source deletion is not inferred."
+        )
+    if not roles:
+        if transfer and re.search(r"\b(tasks?|records?|events?|messages?)\b", goal, re.I):
+            raise ValueError("Clarify the source and destination account identities.")
+        return None
     if not transfer:
         return None
     sources = [r for r in roles if r["role"] == "source"]
