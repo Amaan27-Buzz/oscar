@@ -1111,3 +1111,57 @@ activation occurred. Frozen full Python regression has 1,400 PASS, ten SKIP and 
 
 
 **2026-10-28 explicit undated tasks:** native Google/Microsoft task requests can omit the entire due clause. Existing account/list/signature guards and independent saved-resource readback remain enforced; a provider-added date fails verification. All 127 focused communication/planning cases pass, including actual authenticated Cloud HTTP. Ruff, formatting and mypy pass. This follows the full regression with 1,400 PASS, ten SKIP and one unresolved native foreground FAIL; no newer full PASS or general cross-service model reliability is claimed. [Evidence](../evidence/software-completion/undated-native-task-2026-10-28.json).
+
+
+## 2026-10-28 end-of-allowance continuation checkpoint
+
+Primary checkout `D:\TheDawnlightGroup\DawnlightLabs\oscar`, branch
+`codex/software-completion`; runtime HEAD `608dcdf`. Source clean before this
+receipt-only update. No push, remote mutation, subagent or quota reset. All owned
+model servers and test fixtures are stopped; no regression process remains.
+
+Frozen full regression: 1,400 PASS, ten SKIP, one native foreground FAIL in
+1,080.220s. All 300 recorded source pins independently matched at sealing. Expected fixture PID 12804,
+observed PID 10072, subsequently identified as Explorer. Cause is unproven.
+The unchanged original native test passes once in isolated observe-boundary
+HWND/PID tracing (8.910s); selected focus stays intact during that isolated run.
+This does not supersede or fix the aggregate failure. The trace collects no app
+content. [Trace](../evidence/software-completion/cross-service-foreground-diagnostic-2026-10-28.json).
+
+Latest explicit undated native-task parser change passes 51 communication and
+76 planning tests; full regression predates that small follow-up. Newest-source
+pre-parser restart soak passes 98 signed effects/readbacks in 603.74s. Installed
+cross-service model acceptance remains 0/2: wrong provider/resource selected.
+Do not repeat completed foundations, replay uncertain effects or chase model PASS
+without fixing semantic objective binding.
+
+Next engineering priority: `planning_contract.exact_account_aliases` currently
+only constrains the union of named accounts; `PlannerConnectors.goal_accounts`
+and `check_goal_accounts` cannot bind each account to source/destination or
+operation/resource roles. Admission is called in `Harness` and
+`PlanningAuthoring` before persistence/effects. Reuse those shared checks and
+existing private expectations/readback; add a coherent owner-objective contract
+and adversarial role-swap coverage. Ambiguous meaning must retain uncertainty;
+model-chosen verified substeps cannot themselves establish owner-goal completion.
+
+Remaining nondeferred software: reliable general model/provider/account/resource
+and field semantics; image-grounded general computer use and broader cross-app
+workflows; richer Chief-of-Staff prioritization/flexibility/calendar coordination;
+service gaps including MCP registration/refresh/challenges, authenticated
+cross-origin/Blob downloads, nested mutation verification, Microsoft sent-copy
+verification and calendar concurrency; foreground root cause, broader native
+accessibility/text scaling/screen reader and sustained operational acceptance.
+This is several substantial workstreams, not one final test run. No defensible
+single completion percentage exists because acceptance cases are unequal.
+
+Provisional planning estimate, low confidence: 8-16 additional five-hour allowance
+windows, about 20-40 active engineering hours. If allowance resets are the pacing
+constraint and work resumes continuously, approximately 40-80 elapsed hours
+(2-4 days); this is not a promise, and quota windows are not five hours of actual
+coding. Basis: this allowance closed several bounded guards/integration fixes,
+but the cross-service end-goal campaign still fails; a full regression costs
+about 18 minutes, a restart soak ten minutes, focused campaigns 1-4 minutes plus
+implementation/diagnosis. Revise after semantic binding passes actual-model
+acceptance. Real credentials, provisioning/hosted Core, physical devices/audio,
+owner activation and deferred hardware are excluded from this estimate and
+remain separately authorized. No full Group6/Slice20/GateE PASS is claimed.

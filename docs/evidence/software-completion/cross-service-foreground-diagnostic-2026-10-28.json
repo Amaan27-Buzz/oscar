@@ -1,0 +1,104 @@
+{
+  "qualification": "Original native test with observe-boundary HWND/PID tracing only; no app content or product modification. Isolated success does not explain or close aggregate failure.",
+  "passed": true,
+  "seconds": 8.91,
+  "trace": [
+    {
+      "seconds": 1.082,
+      "stage": "before",
+      "operation": "focus_window",
+      "selected_handle": 4786574,
+      "selected_pid": 35068,
+      "foreground_handle": 526626,
+      "foreground_pid": 2440
+    },
+    {
+      "seconds": 1.571,
+      "stage": "after",
+      "operation": "focus_window",
+      "selected_handle": 4786574,
+      "selected_pid": 35068,
+      "foreground_handle": 4786574,
+      "foreground_pid": 35068
+    },
+    {
+      "seconds": 1.571,
+      "stage": "before",
+      "operation": "focus_check",
+      "selected_handle": 4786574,
+      "selected_pid": 35068,
+      "foreground_handle": 4786574,
+      "foreground_pid": 35068
+    },
+    {
+      "seconds": 1.976,
+      "stage": "after",
+      "operation": "focus_check",
+      "selected_handle": 4786574,
+      "selected_pid": 35068,
+      "foreground_handle": 4786574,
+      "foreground_pid": 35068
+    },
+    {
+      "seconds": 1.976,
+      "stage": "before",
+      "operation": "tree",
+      "selected_handle": 4786574,
+      "selected_pid": 35068,
+      "foreground_handle": 4786574,
+      "foreground_pid": 35068
+    },
+    {
+      "seconds": 2.356,
+      "stage": "after",
+      "operation": "tree",
+      "selected_handle": 4786574,
+      "selected_pid": 35068,
+      "foreground_handle": 4786574,
+      "foreground_pid": 35068
+    },
+    {
+      "seconds": 6.803,
+      "stage": "before",
+      "operation": "focus_window",
+      "selected_handle": 4786574,
+      "selected_pid": 35068,
+      "foreground_handle": 4786574,
+      "foreground_pid": 35068
+    },
+    {
+      "seconds": 7.185,
+      "stage": "after",
+      "operation": "focus_window",
+      "selected_handle": 4786574,
+      "selected_pid": 35068,
+      "foreground_handle": 4786574,
+      "foreground_pid": 35068
+    },
+    {
+      "seconds": 7.185,
+      "stage": "before",
+      "operation": "focus_check",
+      "selected_handle": 4786574,
+      "selected_pid": 35068,
+      "foreground_handle": 4786574,
+      "foreground_pid": 35068
+    },
+    {
+      "seconds": 7.573,
+      "stage": "after",
+      "operation": "focus_check",
+      "selected_handle": 4786574,
+      "selected_pid": 35068,
+      "foreground_handle": 4786574,
+      "foreground_pid": 35068
+    }
+  ],
+  "unchanged_native_sources": {
+    "oscar/windows_desktop.py": "2d890b48edb70cfdfae9d67311d4df7154af3de58014f49403bf748cb0ce8c43",
+    "oscar/windows_uia.ps1": "5fa3c275833c2140892b9852f13657c087b00a4f872a3f77292255b4f963254b",
+    "oscar/windows_visual.ps1": "a12281ede97cca9635b3ce579f9fc448fdbe62bfe3d8752d2e4017e837ce9278",
+    "tests/test_windows_visual.py": "b40f6ef9edc866ff1a9ec3cd2caf52ff409ed1d48463c6b1ca586f173191509e"
+  },
+  "log_sha256": "0e23ca6db1c248f5af9dc8a0929ca33bfcb3f0975ba09fbe7fb1b42276ad6747"
+}
