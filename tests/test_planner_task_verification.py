@@ -410,6 +410,7 @@ class PlannedTaskVerificationTests(unittest.TestCase):
         contract = owner_objective_contract(goal, self.h.accounts.list_accounts())
         self.assertIsNotNone(contract)
         self.assertEqual(goal, contract["objective"])
+        self.assertEqual(contract, json.loads(json.dumps(contract)))
         self.assertEqual("copy", contract["operation"])
         self.assertEqual(("due", "title", "notes"), tuple(contract["required_fields"]))
         self.assertEqual(
