@@ -361,10 +361,15 @@ class ConnectorPlanning:
                 raise PermissionError("source observation required before transfer effects")
             from .planner_observations import context
 
-            context(self.h.store, self.h.grid, source_observations)
-            observed_goal = self.h.store.get(
-                "executive_goal", source_observations["goal_id"]
-            )
+            try:
+                context(self.h.store, self.h.grid, source_observations)
+                observed_goal = self.h.store.get(
+                    "executive_goal", source_observations["goal_id"]
+                )
+            except (KeyError, ValueError) as exc:
+                raise PermissionError(
+                    "verified source observation unavailable"
+                ) from exc
             expected_sources = {
                 binding["account_id"]
                 for binding in bindings
