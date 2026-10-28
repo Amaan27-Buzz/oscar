@@ -829,6 +829,43 @@ class ConnectorPlanning:
         expected = task_expectation(current["operation"], row["verification_arguments"])
         if expected is None:
             raise PermissionError("private task verification contract unavailable")
+        goal = self.h.store.get("executive_goal", binding["goal_id"])
+        proof = goal.get("owner_transfer_proof")
+        if proof and binding["step_id"] in proof["destination_step_ids"]:
+            index = proof["destination_step_ids"].index(binding["step_id"])
+            if (
+                digest(expected) != proof["expected_field_digests"][index]
+                or account["id"] != next(
+                    entry["account_id"]
+                    for entry in goal["owner_objective"]["accounts"]
+                    if entry["role"] == "destination"
+                )
+            ):
+                raise PermissionError("destination field proof or account changed")
+            receipt = self.h.store.get(
+                "owner_transfer_source_preflight", result.task_id
+            )
+            if receipt != {
+                "goal_id": goal["id"],
+                "step_id": binding["step_id"],
+                "proof_digest": digest(proof),
+                "source_digest": proof["source_digest"],
+                "checked_at": receipt["checked_at"],
+            }:
+                raise PermissionError("fresh source pre-effect proof missing")
+            with self.h.store.transaction():
+                self.h.store.put(
+                    "owner_transfer_expected_effect",
+                    result.task_id,
+                    {
+                        "goal_id": goal["id"],
+                        "step_id": binding["step_id"],
+                        "account_id": account["id"],
+                        "generation": account["generation"],
+                        "expected_digest": digest(expected),
+                        "proof_digest": digest(proof),
+                    },
+                )
         return {
             "kind": "connector_communication",
             "connector_account": account,
