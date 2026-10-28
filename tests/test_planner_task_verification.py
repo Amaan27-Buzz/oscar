@@ -238,6 +238,129 @@ class PlannedTaskVerificationTests(unittest.TestCase):
         self.assertEqual("partially_verified", self.run_ask())
         self.assertEqual(["POST"], [c[0] for c in self.api.calls])
 
+    def cross_service_role_steps(self):
+        """Synthetic source/destination accounts; no provider request is sent."""
+        from copy import deepcopy
+
+        from oscar.jev import Intent
+
+        google = self.account
+        google_create = deepcopy(self.steps[0])
+        self.microsoft_task()
+        reader = self.mount.capability("google.tasks.list", account_id=google.id)
+        source = {
+            "id": "source",
+            "node_id": reader.node_id,
+            "capability_id": reader.id,
+            "depends_on": [],
+            "intent": asdict(
+                Intent(
+                    "Read source records",
+                    "capability",
+                    capability_kind=reader.id,
+                    parameters={"arguments": {"path": {"tasklist": "source-list"}}},
+                )
+            ),
+        }
+        destination = deepcopy(self.steps[0])
+        destination["intent"]["parameters"]["arguments"]["path"]["listId"] = "target-list"
+        destination["depends_on"] = ["source"]
+        goal = (
+            'Copy records from Google account alias "Tasks" list ID "source-list" '
+            'to Microsoft account alias "MS Tasks" list ID "target-list".'
+        )
+        return goal, source, destination, google_create
+
+    def test_owner_goal_roles_admit_correct_cross_service_plan_without_executing(self):
+        goal, source, destination, _ = self.cross_service_role_steps()
+        self.h.connector_plans.check_goal_accounts(goal, [source], observe=True)
+        self.h.connector_plans.check_goal_accounts(goal, [source, destination])
+        self.assertEqual([], self.api.calls)
+
+    def test_owner_goal_rejects_provider_swap_before_effects(self):
+        goal, source, destination, google_create = self.cross_service_role_steps()
+        with self.assertRaisesRegex(PermissionError, "source account"):
+            self.h.connector_plans.check_goal_accounts(goal, [source, google_create])
+        self.assertEqual([], self.api.calls)
+
+    def test_owner_goal_rejects_wrong_destination_resource(self):
+        goal, source, destination, _ = self.cross_service_role_steps()
+        destination["intent"]["parameters"]["arguments"]["path"]["listId"] = "other-list"
+        with self.assertRaisesRegex(PermissionError, "resource ID"):
+            self.h.connector_plans.check_goal_accounts(goal, [source, destination])
+        self.assertEqual([], self.api.calls)
+
+    def test_owner_goal_rejects_source_only_and_partial_read_plan(self):
+        goal, source, destination, _ = self.cross_service_role_steps()
+        with self.assertRaisesRegex(PermissionError, "destination operation"):
+            self.h.connector_plans.check_goal_accounts(goal, [source])
+        reader = self.mount.capability("microsoft.todo.lists.list", account_id=self.account.id)
+        destination_read = {
+            "id": "target-read",
+            "node_id": reader.node_id,
+            "capability_id": reader.id,
+            "depends_on": [],
+            "intent": asdict(
+                __import__("oscar.jev", fromlist=["Intent"]).Intent(
+                    "Inspect target", "capability", capability_kind=reader.id,
+                    parameters={"arguments": {}},
+                )
+            ),
+        }
+        with self.assertRaisesRegex(PermissionError, "destination operation"):
+            self.h.connector_plans.check_goal_accounts(goal, [source, destination_read])
+        self.assertEqual([], self.api.calls)
+
+    def test_owner_goal_ambiguous_accounts_require_clarification(self):
+        _, source, destination, _ = self.cross_service_role_steps()
+        goal = 'Copy tasks using Google account alias "Tasks" and Microsoft account alias "MS Tasks".'
+        with self.assertRaisesRegex(ValueError, "Clarify"):
+            self.h.connector_plans.check_goal_accounts(goal, [source, destination])
+        self.assertEqual([], self.api.calls)
+
+    def test_owner_goal_same_provider_multi_account_routing(self):
+        from copy import deepcopy
+
+        from oscar.connectors import CredentialRef
+
+        google = self.account
+        source = deepcopy(self.steps[0])
+        secondary = self.h.accounts.add(
+            "google", "synthetic-secondary", "other", "Secondary", verified=True
+        )
+        self.vault.put("synthetic-secondary-token", reference="planning-secondary")
+        self.h.accounts.bind(
+            secondary.id,
+            self.manifest.id,
+            CredentialRef("planning-secondary"),
+            self.scopes,
+            self.manifest.base_url,
+        )
+        self.mount.refresh()
+        target = self.mount.capability("google.tasks.create", account_id=secondary.id)
+        destination = deepcopy(source)
+        destination["node_id"] = target.node_id
+        destination["capability_id"] = target.id
+        destination["intent"]["capability_kind"] = target.id
+        destination["intent"]["parameters"]["arguments"]["path"]["tasklist"] = "target-list"
+        source_reader = self.mount.capability("google.tasks.list", account_id=google.id)
+        source["node_id"] = source_reader.node_id
+        source["capability_id"] = source_reader.id
+        source["intent"]["capability_kind"] = source_reader.id
+        source["intent"]["parameters"]["arguments"] = {"path": {"tasklist": "source-list"}}
+        goal = (
+            'Copy from Google account alias "Tasks" list ID "source-list" '
+            'to Google account alias "Secondary" list ID "target-list".'
+        )
+        self.h.connector_plans.check_goal_accounts(goal, [source, destination])
+        swapped = deepcopy(destination)
+        swapped["node_id"] = self.cap.node_id
+        swapped["capability_id"] = self.cap.id
+        swapped["intent"]["capability_kind"] = self.cap.id
+        with self.assertRaisesRegex(PermissionError, "source account"):
+            self.h.connector_plans.check_goal_accounts(goal, [source, swapped])
+        self.assertEqual([], self.api.calls)
+
     def microsoft_task(self):
         self.account = self.h.accounts.add(
             "microsoft", "synthetic-ms", "tasks", "MS Tasks", verified=True
