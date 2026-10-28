@@ -1,0 +1,53 @@
+{
+  "status": "SCOPED_NATIVE_VERIFIED",
+  "base_head": "37d34b3",
+  "change": "A failed explicit Refresh updates connection state through Bridge.fail rather than manufacturing Unknown action feedback. Existing action feedback is preserved. Successful fresh snapshots clear the transport message.",
+  "native": {
+    "receipt": "desktop-accessibility-final-2026-10-28/receipt.json",
+    "sha256": "fd4eab2d8c093c901c2cde8bb89aee8fb4cfd72b08535a45bfdcf722d1211635",
+    "seconds": 13.465,
+    "checks": 20,
+    "all_sources_and_binary_independently_matched": true,
+    "webview_image_inspected": true,
+    "image_sha256": "dcd19c5d19981090c4510dbaedb4585193e8ebf70cf1a05dce7286ee8fb7fa7d"
+  },
+  "rust": {
+    "passed": 42,
+    "ignored": 1,
+    "seconds": 2.08,
+    "log_sha256": "691080b3c6707a715e34bab05b6c48525875c1ed64b389e8d95c866108089e86",
+    "qualification": "Includes direct guard that connection failure preserves existing Unknown action feedback; ordinary suite ignores its existing synthetic voice integration fixture."
+  },
+  "native_build": {
+    "status": "PASS",
+    "seconds": 8.83,
+    "binary_sha256": "24a299af71651454f31bf42f53600cd4c95647bce54f377dd2f5948f616d60f2",
+    "log_sha256": "b002ab38ba5360f7899a76aeb39e63a6c843bc9c32555dc5f7c2c71a43306854"
+  },
+  "development": [
+    {
+      "receipt": "desktop-accessibility-2026-10-28/receipt.json",
+      "qualification": "Incorrect six-page harness assertion; corrected to the exact five current Workspace destinations."
+    },
+    {
+      "receipt": "desktop-accessibility-corrected-2026-10-28/receipt.json",
+      "qualification": "Earlier semantics/draft recovery checks passed, but inspected recovered image revealed a stale generic request notice; this scope did not test notice clearing."
+    },
+    {
+      "receipt": "desktop-recovery-reproduction-2026-10-28/receipt.json",
+      "qualification": "New notice-clearing assertion reproduces the product defect on the old binary before the Rust fix."
+    }
+  ],
+  "native_visual": {
+    "diagnostic": ".oscar/visual-focus-diagnostic.json",
+    "sha256": "811bdc36983c4638a44f9de4fa04a9da2e6464102851ee2c8d2bc89bef328dd0",
+    "isolated_pass": true,
+    "seconds": 8.322,
+    "qualification": "Unchanged visual test passed under HWND/PID-only tracing. This does not explain or fix the earlier full-suite foreground failure. No owner window capture or focus guard relaxation."
+  },
+  "remaining": [
+    "Actual screen-reader, Windows text scaling, owner visual and broad native daily-use acceptance remain unverified.",
+    "The latest full Python regression predates this Rust-only change and remains failed at a native foreground assertion. No whole-product completion or new full PASS.",
+    "No real account, microphone, physical phone or privileged owner activation was used."
+  ]
+}

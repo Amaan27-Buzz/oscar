@@ -1726,9 +1726,16 @@ mod tests {
         ));
         assert!(unknown.expression.generation > revision);
         assert!(unknown.current.is_none());
+        let disconnected = bridge.fail("Core unavailable; connection check failed".into());
+        assert!(matches!(
+            disconnected.feedback.unwrap().kind,
+            FeedbackKind::Unknown
+        ));
         let resolved = bridge.response(json!({"task_id":"exact","state":"planned","target":"fixture","actions":["approve"]})).unwrap();
         assert!(resolved.feedback.is_none());
         assert_eq!(resolved.current.unwrap().state, "planned");
+        let disconnected = bridge.fail("Core unavailable; connection check failed".into());
+        assert!(disconnected.feedback.is_none());
     }
     #[test]
     fn http_permission_rejection_and_uncertain_server_failure_remain_distinct() {

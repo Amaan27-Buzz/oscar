@@ -888,6 +888,7 @@ async fn desktop_command(
     }
     let bridge = state.bridge.clone();
     let handle = app.clone();
+    let connection_check = matches!(request, Command::Refresh);
     let view = tauri::async_runtime::spawn_blocking(move || {
         bridge.execute(request, |review| owner_review(&handle, review))
     })
@@ -895,6 +896,7 @@ async fn desktop_command(
     .map_err(|_| "native request failed; inspect before retry")?;
     let view = match view {
         Ok(v) => v,
+        Err(error) if connection_check => state.bridge.fail(error),
         Err(error) => state.bridge.fail_request(error),
     };
     if view.review.is_some() {

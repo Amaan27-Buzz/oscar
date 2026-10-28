@@ -71,11 +71,11 @@ does not repeat their native UI, model or long-running acceptance.
 | 55 | Revoked device cannot regain access | LOCAL signed session, enrollment/revocation and target pre-effect regressions; real owner commissioning separate |
 | 56 | Desktop functional inspection | PARTIAL earlier actual native reviews/workflows plus current compiled/unit-tested controls; current rebuilt sharing controls pass scoped native focus/opt-in/withdrawal checks with inspected WebView/Windows captures; owner visual and broad current-surface acceptance remain OPEN |
 | 57 | Android functional inspection | LOCAL disposable native production navigation/reviews/recall and 11 captures; owner visual/physical acceptance OPEN |
-| 58 | Accessibility / large text | PARTIAL prior API35 large-text/landscape/IME reference and native semantic tests; current full assistive-technology campaign OPEN |
+| 58 | Accessibility / large text | PARTIAL current rebuilt native WebView accessibility names across all five pages/expanded settings and keyboard choice/composer navigation pass. Actual screen-reader and Windows text-scale campaign remain OPEN. [Current evidence](../evidence/software-completion/desktop-recovery-accessibility-2026-10-28.json). Prior API35 large-text/landscape/IME reference and native semantic tests; current full assistive-technology campaign OPEN |
 | 59 | Workflow latency | LOCAL 80 samples/operation and raw plots; source checkpoint explicitly predates later changes. [Performance](../evidence/software-completion/performance-2026-10-24/performance.md) |
 | 60 | Sustained operation soak | LOCAL ten-minute frozen restart soak, separate 65-second eight-source phone campaign; no newest-source or multi-day acceptance |
 | 61 | Resource / memory reporting | LOCAL CPU/RSS/SQL and Core/Worker soak measurements; storage grows with retained tasks; no leak-free/battery claim |
-| 62 | Visible error / recovery | LOCAL actual native revoked/offline/expired-source behavior; newest all-feature native error inspection PARTIAL |
+| 62 | Visible error / recovery | LOCAL current rebuilt Desktop offline/reconnect preserves unsent text and clears a read-only connection failure notice; uncertain action feedback stays preserved. [Recovery evidence](../evidence/software-completion/desktop-recovery-accessibility-2026-10-28.json). Actual native revoked/offline/expired-source behavior; newest all-feature native error inspection PARTIAL |
 
 ## Active executable gaps
 

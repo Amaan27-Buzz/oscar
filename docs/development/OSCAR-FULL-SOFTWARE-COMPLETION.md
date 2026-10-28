@@ -1115,3 +1115,20 @@ one native foreground failure); no new full PASS or general model reliability
 is claimed. Resource/field/operation semantics, arbitrary account wording and
 multi-account step roles remain partial. No real account or activation occurred.
 [Evidence](../evidence/software-completion/explicit-goals-2026-10-28.json).
+
+
+**2026-10-28 native recovery and accessibility:** actual Tauri/WebView2 acceptance
+passes 20 checks across the five Workspace pages, expanded settings, named
+interactive accessibility nodes, keyboard choice dismissal/focus return, composer
+navigation and offline unsent-draft recovery (13.465s). Inspecting an earlier
+recovered image revealed a stale unknown-request notice; a new native assertion
+reproduced it. Explicit Refresh errors now update connection state without creating
+unknown-action feedback. Existing uncertain action feedback remains preserved.
+The rebuilt native executable passes the stronger check; the final recovered
+WebView image was inspected and all recorded source/binary hashes independently
+match. All 42 Rust tests pass, one existing integration fixture ignored (2.08s).
+The unchanged native visual test also passed once in isolation under PID/HWND-only
+tracing (8.322s); this does not fix or explain the failed full-suite foreground
+assertion. Screen-reader, Windows text-scale, owner visual and broader operational
+acceptance remain OPEN. No owner activation or real provider was used.
+[Evidence](../evidence/software-completion/desktop-recovery-accessibility-2026-10-28.json).
