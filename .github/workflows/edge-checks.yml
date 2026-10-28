@@ -9,7 +9,9 @@ jobs:
   pico:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
       - run: sudo apt-get update && sudo apt-get install -y gcc-arm-none-eabi libnewlib-arm-none-eabi
       - run: git clone --depth 1 --branch 2.3.1 --recurse-submodules https://github.com/raspberrypi/pico-sdk.git "$RUNNER_TEMP/pico-sdk"
       - name: Build exact RP2040 reference board
@@ -19,7 +21,7 @@ jobs:
           cmake --build .tmp/pico --parallel 2
           cmake -S edge/pico -B .tmp/pico-watchdog -DPICO_BOARD=pico -DEDGE_WATCHDOG_TEST=ON
           cmake --build .tmp/pico-watchdog --parallel 2
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: pico-reference-firmware
           path: .tmp/pico/*.uf2
@@ -27,7 +29,9 @@ jobs:
     runs-on: ubuntu-latest
     container: espressif/idf:v6.1
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
       - name: Build ESP32 reference gateway
         shell: bash
         run: |
@@ -35,7 +39,7 @@ jobs:
           cd edge/esp32
           idf.py set-target esp32
           idf.py build
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: esp32-reference-firmware
           path: |
