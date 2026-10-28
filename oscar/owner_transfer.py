@@ -13,6 +13,8 @@ from .executive import digest
 
 
 def _canonical(name: str, item: dict[str, Any]) -> dict[str, Any]:
+    if "status" not in item:
+        raise PermissionError("source task status was not independently observed")
     if item.get("deleted") is True or item.get("hidden") is True:
         raise PermissionError("deleted or hidden source task cannot be copied")
     if name == "google.tasks.list":
