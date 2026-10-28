@@ -272,10 +272,11 @@ class PlannedTaskVerificationTests(unittest.TestCase):
         )
         return goal, source, destination, google_create
 
-    def test_owner_goal_roles_admit_correct_cross_service_plan_without_executing(self):
+    def test_source_observation_stage_admitted_but_unbound_copy_requires_replan(self):
         goal, source, destination, _ = self.cross_service_role_steps()
         self.h.connector_plans.check_goal_accounts(goal, [source], observe=True)
-        self.h.connector_plans.check_goal_accounts(goal, [source, destination])
+        with self.assertRaisesRegex(PermissionError, "verified source observation stage"):
+            self.h.connector_plans.check_goal_accounts(goal, [source, destination])
         self.assertEqual([], self.api.calls)
 
     def test_owner_goal_rejects_provider_swap_before_effects(self):
@@ -332,7 +333,8 @@ class PlannedTaskVerificationTests(unittest.TestCase):
     def test_ordinary_service_names_route_only_to_verified_accounts(self):
         _, source, destination, google_create = self.cross_service_role_steps()
         goal = "Please copy these tasks from Google Tasks into my Microsoft To Do work list."
-        self.h.connector_plans.check_goal_accounts(goal, [source, destination])
+        with self.assertRaisesRegex(PermissionError, "verified source observation stage"):
+            self.h.connector_plans.check_goal_accounts(goal, [source, destination])
         with self.assertRaises(PermissionError):
             self.h.connector_plans.check_goal_accounts(goal, [source, google_create])
         self.assertEqual([], self.api.calls)
@@ -381,7 +383,7 @@ class PlannedTaskVerificationTests(unittest.TestCase):
         with self.assertRaisesRegex(PermissionError, "source observation"):
             self.h.connector_plans.check_goal_accounts(goal, [destination])
         destination["depends_on"] = []
-        with self.assertRaisesRegex(PermissionError, "depend on verified source read"):
+        with self.assertRaisesRegex(PermissionError, "verified source observation stage"):
             self.h.connector_plans.check_goal_accounts(goal, [source, destination])
         self.assertEqual([], self.api.calls)
 
@@ -469,7 +471,8 @@ class PlannedTaskVerificationTests(unittest.TestCase):
             'Copy from Google account alias "Tasks" list ID "source-list" '
             'to Google account alias "Secondary" list ID "target-list".'
         )
-        self.h.connector_plans.check_goal_accounts(goal, [source, destination])
+        with self.assertRaisesRegex(PermissionError, "verified source observation stage"):
+            self.h.connector_plans.check_goal_accounts(goal, [source, destination])
         swapped = deepcopy(destination)
         swapped["node_id"] = self.cap.node_id
         swapped["capability_id"] = self.cap.id
