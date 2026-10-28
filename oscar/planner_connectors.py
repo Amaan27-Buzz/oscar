@@ -229,7 +229,7 @@ class ConnectorPlanning:
         *,
         observe: bool = False,
         source_observations: dict[str, Any] | None = None,
-    ) -> None:
+    ) -> dict[str, Any] | None:
         """Admit actual account effects against owner roles, not an account union.
 
         The model can choose its plan, but it cannot turn a named source into a
@@ -335,26 +335,17 @@ class ConnectorPlanning:
                 ):
                     raise PermissionError("plan does not preserve the owner's resource ID")
 
+        proof: dict[str, Any] | None = None
         if not observe and destination_steps and source_reads:
-            graph = {step["id"]: set(step["depends_on"]) for step in steps}
-
-            def ancestors(step_id: str) -> set[str]:
-                visited: set[str] = set()
-                pending = list(graph[step_id])
-                while pending:
-                    key = pending.pop()
-                    if key in visited:
-                        continue
-                    visited.add(key)
-                    pending.extend(graph.get(key, ()))
-                return visited
-
-            for step in destination_steps:
-                if not ancestors(step["id"]) & source_reads:
-                    raise PermissionError(
-                        "destination effect must depend on verified source read"
-                    )
-        elif not observe and destination_steps and any(
+            # A dependency edge alone only orders two calls: connector plan
+            # bodies are literal and cannot use result handoffs. Require a
+            # separate verified observation stage so source fields are known
+            # before the destination intent is accepted.
+            raise PermissionError(
+                "task copy requires a verified source observation stage; "
+                "an in-plan GET does not bind copied fields"
+            )
+        if not observe and destination_steps and any(
             binding["role"] == "source" for binding in bindings
         ):
             if source_observations is None:
@@ -385,6 +376,44 @@ class ConnectorPlanning:
             }
             if not expected_sources <= read_accounts:
                 raise PermissionError("no verified observation of owner's source account")
+            from .owner_transfer import source_transfer_proof
+
+            source_account_id = next(iter(expected_sources))
+            effects = []
+            for step in destination_steps:
+                cap = next(
+                    c for c in caps
+                    if c["id"] == step["capability_id"]
+                    and c["node_id"] == step["node_id"]
+                )
+                contract = self.contract(cap)
+                parameters = step["intent"].get("parameters") or {}
+                arguments = parameters.get("arguments")
+                if arguments is None and "request_ref" in parameters:
+                    ref = parameters["request_ref"]
+                    arguments = self.arguments(ref, self.check(ref))
+                if not isinstance(arguments, dict):
+                    raise PermissionError("private destination arguments required")
+                effects.append(
+                    {
+                        "step_id": step["id"],
+                        "operation": contract["operation"],
+                        "arguments": arguments,
+                    }
+                )
+            from .planning_contract import owner_objective_contract
+
+            owner_contract = owner_objective_contract(
+                goal, self.h.accounts.list_accounts()
+            )
+            proof = source_transfer_proof(
+                context(self.h.store, self.h.grid, source_observations),
+                source_account_id,
+                effects,
+                required_fields=tuple(
+                    owner_contract["required_fields"] if owner_contract else ()
+                ),
+            )
 
         if not observe:
             expected = {
@@ -396,6 +425,7 @@ class ConnectorPlanning:
                 raise PermissionError(
                     "plan does not perform the owner's destination operation"
                 )
+        return proof
 
     def is_read(self, cap: dict[str, Any]) -> bool:
         if self.descriptor(cap) is None:
