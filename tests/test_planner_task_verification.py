@@ -505,6 +505,78 @@ class PlannedTaskVerificationTests(unittest.TestCase):
             self.h.connector_plans.check_goal_accounts(goal, [source, swapped])
         self.assertEqual([], self.api.calls)
 
+    def prepare_cross_account_copy(self):
+        from tests.test_planner_http_observations import HTTPObservationTests
+
+        goal, source, destination, _ = self.cross_service_role_steps()
+        goal += " Preserve the task titles, notes and due dates."
+        destination["depends_on"] = []
+        self.api.resources["/tasks/v1/lists/source-list/tasks"] = {
+            "items": [
+                {
+                    "title": self.marker,
+                    "notes": "Synthetic private notes",
+                    "due": "2026-10-28T00:00:00Z",
+                    "status": "needsAction",
+                }
+            ]
+        }
+        self.change["value"].update(
+            goal=goal,
+            adaptive=True,
+            capabilities=[
+                {"node_id": self.h.node_id, "capability_id": "models.reason"},
+                {"node_id": source["node_id"], "capability_id": source["capability_id"]},
+                {"node_id": destination["node_id"], "capability_id": destination["capability_id"]},
+            ],
+        )
+        self.body["choices"][0]["message"]["content"] = json.dumps(
+            {"steps": [source], "observe": True}
+        )
+        row = self.draft()
+        self.complete(self.review(self.accept_change(row)))
+        self.assertEqual("verified", HTTPObservationTests.settle(self, 2)["state"])
+        self.body["choices"][0]["message"]["content"] = json.dumps(
+            {"steps": [destination]}
+        )
+        self.complete(self.review(self.accept_change(row)))
+        self.assertEqual("partially_verified", HTTPObservationTests.settle(self, 3)["state"])
+        self.complete(self.review(self.accept_change(row)))
+        owner_row = self.h.store.get("planner_request", row["id"])
+        owner_goal = owner_row["accepted_goal"]
+        self.assertEqual(
+            "source_task_field_equivalence",
+            self.h.store.get("executive_goal", owner_goal)["owner_transfer_proof"]["kind"],
+        )
+        self.h.executive.tick()
+        task = self.h.store.all("task")[-1]
+        self.assertEqual("planned", task["state"])
+        return owner_goal, task["id"]
+
+    def test_cross_account_owner_copy_completes_only_after_independent_field_proof(self):
+        from tests.test_planner_http_observations import HTTPObservationTests
+
+        goal_id, task_id = self.prepare_cross_account_copy()
+        self.complete(self.review({"operation": "confirm_task", "id": task_id, "value": {}}))
+        self.assertEqual("verified", HTTPObservationTests.settle(self, 4)["state"])
+        goal = self.h.store.get("executive_goal", goal_id)
+        self.assertEqual("completed", goal["state"])
+        self.assertEqual("verified", goal["objective_verification"]["state"])
+        self.assertEqual(1, goal["objective_verification"]["count"])
+        self.assertEqual(1, sum(method == "POST" for method, *_ in self.api.calls))
+        self.assertEqual({}, self.h.connector_plans.inputs)
+
+    def test_source_change_before_copy_blocks_destination_post(self):
+        goal_id, task_id = self.prepare_cross_account_copy()
+        self.api.resources["/tasks/v1/lists/source-list/tasks"]["items"][0]["due"] = (
+            "2026-10-29T00:00:00Z"
+        )
+        self.complete(self.review({"operation": "confirm_task", "id": task_id, "value": {}}))
+        self.h.executive.tick()
+        self.assertFalse(any(method == "POST" for method, *_ in self.api.calls))
+        self.assertEqual("planned", self.h.store.task(task_id).state)
+        self.assertNotEqual("completed", self.h.store.get("executive_goal", goal_id)["state"])
+
     def microsoft_task(self):
         self.account = self.h.accounts.add(
             "microsoft", "synthetic-ms", "tasks", "MS Tasks", verified=True
