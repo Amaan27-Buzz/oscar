@@ -108,6 +108,44 @@ class ExecutiveTests(unittest.TestCase):
         self.assertEqual(0, saved["run_index"])
         self.assertEqual(0, self.e.tick())
 
+    def test_fresh_source_guard_blocks_effect_until_source_is_still_verified(self):
+        proposal = self.e.propose(
+            self.worker, "Copy source record", [self.step()]
+        )
+        proposal["owner_objective"] = {
+            "objective": "Copy source record into the destination",
+            "operation": "copy",
+            "required_fields": ["title"],
+            "accounts": [],
+        }
+        proposal["owner_transfer_proof"] = {
+            "kind": "source_task_field_equivalence",
+            "destination_step_ids": ["sum"],
+        }
+        proposal["review_digest"] = self.e._review(proposal)
+        with self.r.store.transaction():
+            self.r.store.put("executive_goal", proposal["id"], proposal)
+        self.e.accept(proposal["id"], proposal["review_digest"], owner_authorized=True)
+        checked = []
+
+        def changed(goal, step, task_id):
+            checked.append((goal["id"], step["id"], task_id))
+            raise PermissionError("independent source changed")
+
+        self.e.owner_transfer_guard = changed
+        self.assertEqual(0, self.e.tick())
+        self.assertEqual(1, len(checked))
+        self.assertEqual("planned", self.r.store.all("task")[-1]["state"])
+        self.assertEqual("waiting_for_verified_source", self.e.health)
+        self.assertEqual(0, self.r.store.get("executive_goal", proposal["id"])["run_index"])
+        self.e.owner_transfer_guard = lambda goal, step, task_id: None
+        self.assertEqual(1, self.e.tick())
+        self.assertEqual("verified", self.r.store.all("task")[-1]["state"])
+        self.assertEqual(
+            "partially_verified",
+            self.r.store.get("executive_goal", proposal["id"])["state"],
+        )
+
     def test_connector_mount_during_heartbeat_does_not_stop_executive_tick(self):
         heartbeat = self.e.grid.heartbeat
         called = []
