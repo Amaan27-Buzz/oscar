@@ -176,6 +176,42 @@ class ConnectorPlanning:
             ),
         }
 
+    def goal_accounts(self, goal: str, caps: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        from .planning_contract import exact_account_aliases
+
+        aliases = exact_account_aliases(goal)
+        if not aliases:
+            return caps
+        selected = []
+        for cap in caps:
+            descriptor = self.descriptor(cap)
+            if descriptor is not None and aliases:
+                account = descriptor["account"]
+                if account["provider"] not in aliases:
+                    continue
+                if account["alias"] not in aliases[account["provider"]]:
+                    continue
+                instance = self.h.connectors.instances[cap["id"].split(":", 1)[0]]
+                current = self.h.accounts.select(
+                    account["provider"], instance.manifest.id, alias=account["alias"]
+                )
+                if current.id != descriptor["account_id"]:
+                    raise PermissionError("selected account changed")
+            selected.append(cap)
+        return selected
+
+    def check_goal_accounts(self, goal: str, steps: list[dict[str, Any]]) -> None:
+        caps = [
+            next(
+                c
+                for c in self.h.store.get("node", step["node_id"])["capabilities"]
+                if c["id"] == step["capability_id"]
+            )
+            for step in steps
+        ]
+        if len(self.goal_accounts(goal, caps)) != len(caps):
+            raise PermissionError("plan does not preserve the owner's selected account")
+
     def is_read(self, cap: dict[str, Any]) -> bool:
         if self.descriptor(cap) is None:
             return False

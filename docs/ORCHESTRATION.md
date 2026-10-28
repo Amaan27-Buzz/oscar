@@ -624,3 +624,13 @@ Clarification remains a question, and a second invalid draft stops with failure.
 These checks establish plan admission, never that a model chose the right account,
 resource or operation for the owner's objective. Signed effect review/current
 delegation and independent outcome verification remain mandatory.
+
+
+Explicit `Google account alias "Work"` / `Microsoft account alias "Team"`
+clauses narrow the model's connector catalog to those named providers and aliases.
+Quoted data is skipped, aliases remain case-sensitive and the existing registry
+rejects service-specific ambiguity. Native capabilities remain available. The same
+constraint is checked against proposed steps before draft persistence and effect
+review. Multiple named accounts do not establish which semantic role each step
+should perform. Other natural-language account references retain existing behavior.
+Exact file literals use the existing execution guard during draft admission too.

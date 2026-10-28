@@ -524,6 +524,7 @@ class PlannerAuthoring:
                     raise PermissionError(
                         "Current scoped memory recall is required for this objective."
                     )
+                actions = self.h.connector_plans.goal_accounts(goal, actions)
                 duplicates = {
                     c["input_kind"]
                     for c in actions
@@ -1012,6 +1013,7 @@ class PlannerAuthoring:
                 context(h.store, h.grid, row["observation_refs"])
             steps = h.executive.validate_steps(worker, document["steps"])
             validate_file_literal(row["goal"], steps)
+            h.connector_plans.check_goal_accounts(row["goal"], steps)
             connector_inputs = h.connector_plans.review(steps, tasks[0])
             if connector_inputs and value != {
                 "start_at": None,

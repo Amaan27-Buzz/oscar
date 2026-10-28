@@ -16,6 +16,24 @@ OBSERVATION_KINDS = {
 }
 
 
+def exact_account_aliases(goal: str) -> dict[str, set[str]]:
+    aliases: dict[str, set[str]] = {}
+    # shortcut: explicit provider/account-alias clauses only, extend with typed objectives.
+    pattern = r'"(?:\\.|[^"\\])*"|\b(?P<provider>google|microsoft)\s+account\s+alias\s*'
+    for match in re.finditer(pattern, goal, re.I):
+        provider = match.group("provider")
+        if provider is None:
+            continue
+        try:
+            alias, _ = json.JSONDecoder().raw_decode(goal[match.end() :])
+        except ValueError as exc:
+            raise ValueError("account alias requires a JSON-quoted literal") from exc
+        if not isinstance(alias, str) or not alias.strip() or len(alias) > 500:
+            raise ValueError("bounded account alias required")
+        aliases.setdefault(provider.casefold(), set()).add(alias)
+    return aliases
+
+
 def exact_file_literal(goal: str) -> str | None:
     pattern = r"\bexact\s+(?:text|content)\s*(?::|=)?\s*"
     marker = re.search(pattern, goal, re.I)

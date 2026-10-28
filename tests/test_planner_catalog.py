@@ -275,7 +275,10 @@ class PlanningCatalogTests(unittest.TestCase):
         self.complete(self.review(proposal["assistance_proposal"]))
         self.h.executive.tick()
         row = self.h.store.all("planner_request")[-1]
-        with self.assertRaisesRegex(ValueError, "owner's exact text"):
+        from oscar.storage import StateConflict
+
+        self.assertEqual("invalid_model_plan", self.h.store.all("result")[-1]["error"])
+        with self.assertRaisesRegex(StateConflict, "Planning stopped"):
             self.review(self.accept_change(row))
         self.assertFalse((self.h.files.root / "catalog-note.txt").exists())
         self.assertEqual([], self.api.calls)
@@ -419,6 +422,171 @@ class PlanningCatalogTests(unittest.TestCase):
         self.complete(self.review(proposal))
         self.h.executive.tick()
         self.assertIn("$defs", self.requests[0]["body"]["format"])
+
+    def test_explicit_account_aliases_ignore_quoted_data_and_preserve_case(self):
+        from oscar.planning_contract import exact_account_aliases
+
+        self.assertEqual(
+            {"google": {"Work"}, "microsoft": {"Team"}},
+            exact_account_aliases(
+                'Use Google account alias "Work" and Microsoft account alias "Team".'
+            ),
+        )
+        self.assertEqual(
+            {}, exact_account_aliases(r'Write exact text "Google account alias \"Work\""')
+        )
+        self.assertEqual(
+            {"google": {'A"B'}}, exact_account_aliases(r'using Google account alias "A\"B"')
+        )
+        for text in (
+            "Google account alias Work",
+            "Google account alias 42",
+            'Google account alias ""',
+        ):
+            with self.subTest(text=text), self.assertRaises(ValueError):
+                exact_account_aliases(text)
+
+    def test_explicit_account_alias_narrows_the_conversation_catalog(self):
+        self.h.accounts.rename(self.account.id, "Personal")
+        other = self.h.accounts.add("google", "synthetic-other", "other", "Work", verified=True)
+        self.vault.put("synthetic-other-token", reference="planning-other")
+        self.h.accounts.bind(
+            other.id,
+            self.manifest.id,
+            CredentialRef("planning-other"),
+            self.scopes,
+            self.manifest.base_url,
+        )
+        self.mount.refresh()
+        proposal = self.conversation('Create a task using Google account alias "Work".')[
+            "assistance_proposal"
+        ]
+        caps = PlannerAuthoring(self.h).capabilities(proposal["value"]["capabilities"], self.grants)
+        google = [
+            d
+            for c in caps
+            if (d := self.h.connector_plans.descriptor(c)) and d["account"]["provider"] == "google"
+        ]
+        self.assertTrue(google)
+        self.assertEqual({other.id}, {d["account_id"] for d in google})
+        self.assertTrue(any(c["id"] == "files.write" for c in caps))
+
+    def test_explicit_account_alias_cannot_choose_between_duplicate_accounts(self):
+        other = self.h.accounts.add("google", "synthetic-other", "other", "Tasks", verified=True)
+        self.vault.put("synthetic-other-token", reference="planning-other")
+        self.h.accounts.bind(
+            other.id,
+            self.manifest.id,
+            CredentialRef("planning-other"),
+            self.scopes,
+            self.manifest.base_url,
+        )
+        self.mount.refresh()
+        result = self.conversation('Create a task using Google account alias "Tasks".')
+        self.assertNotIn("assistance_proposal", result)
+        self.assertEqual([], self.requests)
+        self.assertEqual([], self.api.calls)
+
+    def test_account_goal_guard_rejects_a_different_alias_without_effects(self):
+        with self.assertRaisesRegex(PermissionError, "selected account"):
+            self.h.connector_plans.check_goal_accounts('Google account alias "Work"', self.steps)
+        self.assertEqual([], self.api.calls)
+        self.h.connector_plans.check_goal_accounts('Google account alias "Tasks"', self.steps)
+
+    def test_two_explicit_aliases_preserve_both_accounts_without_inventing_step_roles(self):
+        other = self.h.accounts.add("google", "synthetic-other", "other", "Work", verified=True)
+        self.vault.put("synthetic-other-token", reference="planning-other")
+        self.h.accounts.bind(
+            other.id,
+            self.manifest.id,
+            CredentialRef("planning-other"),
+            self.scopes,
+            self.manifest.base_url,
+        )
+        self.mount.refresh()
+        result = self.conversation(
+            'Create tasks using Google account alias "Tasks" and Google account alias "Work".'
+        )
+        caps = PlannerAuthoring(self.h).capabilities(
+            result["assistance_proposal"]["value"]["capabilities"], self.grants
+        )
+        ids = {
+            d["account_id"]
+            for c in caps
+            if (d := self.h.connector_plans.descriptor(c)) and d["account"]["provider"] == "google"
+        }
+        self.assertEqual({self.account.id, other.id}, ids)
+
+    def test_exact_file_literal_is_corrected_before_effect_review(self):
+        from copy import deepcopy
+
+        self.use_ollama()
+        good = deepcopy(self.body)
+        bad = deepcopy(good)
+        plan = json.loads(bad["message"]["content"])
+        plan["steps"][0]["intent"]["content"] = "Unrequested text"
+        bad["message"]["content"] = json.dumps(plan)
+        self.scheduled.extend([(200, bad), (200, good)])
+        proposal = self.conversation('Write catalog-note.txt with exact text "Welcome to OSCAR".')[
+            "assistance_proposal"
+        ]
+        self.complete(self.review(proposal))
+        self.h.executive.tick()
+        self.assertEqual(2, len(self.requests))
+        self.assertFalse((self.h.files.root / "catalog-note.txt").exists())
+        row = self.h.store.all("planner_request")[-1]
+        self.complete(self.review(self.accept_change(row)))
+        self.assertEqual("verified", self.settle())
+        self.assertEqual("Welcome to OSCAR", (self.h.files.root / "catalog-note.txt").read_text())
+
+    def test_unselected_account_draft_is_corrected_before_any_provider_effect(self):
+        from copy import deepcopy
+
+        other = self.h.accounts.add("google", "synthetic-other", "other", "Personal", verified=True)
+        self.vault.put("synthetic-other-token", reference="planning-other")
+        self.h.accounts.bind(
+            other.id,
+            self.manifest.id,
+            CredentialRef("planning-other"),
+            self.scopes,
+            self.manifest.base_url,
+        )
+        self.mount.refresh()
+        wrong_cap = self.mount.capability("google.tasks.create", account_id=other.id)
+        self.response()
+        self.use_ollama()
+        good = deepcopy(self.body)
+        bad = deepcopy(good)
+        plan = json.loads(bad["message"]["content"])
+        step = plan["steps"][0]
+        step["capability_id"] = wrong_cap.id
+        step["intent"]["capability_kind"] = wrong_cap.id
+        bad["message"]["content"] = json.dumps(plan)
+        self.scheduled.extend([(200, bad), (200, good)])
+        proposal = self.conversation(
+            'Create the requested task using Google account alias "Tasks".'
+        )["assistance_proposal"]
+        self.complete(self.review(proposal))
+        self.h.executive.tick()
+        self.assertEqual(2, len(self.requests))
+        self.assertEqual([], self.api.calls)
+        row = self.h.store.all("planner_request")[-1]
+        self.complete(self.review(self.accept_change(row)))
+        self.h.executive.tick()
+        task = self.h.store.all("task")[-1]
+        self.complete(self.review({"operation": "confirm_task", "id": task["id"], "value": {}}))
+        self.assertEqual("verified", self.settle())
+        self.assertEqual(["POST", "GET"], [c[0] for c in self.api.calls])
+        objective = self.h.store.get("objective", task["objective_id"])
+        self.assertEqual(self.account.id, objective["criterion"]["connector_account"]["id"])
+
+    def test_explicit_provider_selection_rejects_another_provider(self):
+        microsoft = next(a for a in self.h.accounts.list_accounts() if a.provider == "microsoft")
+        cap = self.mount.capability("microsoft.todo.tasks.create", account_id=microsoft.id)
+        steps = [{**self.steps[0], "capability_id": cap.id, "node_id": cap.node_id}]
+        with self.assertRaisesRegex(PermissionError, "selected account"):
+            self.h.connector_plans.check_goal_accounts('Google account alias "Tasks"', steps)
+        self.assertEqual([], self.api.calls)
 
     def repair_fixture(self, *, second_valid=True, attempts=4, full=False, adapter="ollama"):
         from copy import deepcopy

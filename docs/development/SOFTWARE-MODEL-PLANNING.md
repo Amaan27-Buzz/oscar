@@ -185,3 +185,30 @@ verification. A separate installed-runtime native Worker run passes signed TLS
 file execution/readback/stop/withdrawal (9.711s). Recorded model/native source hashes
 were independently matched. Whole-suite regression completed on frozen sources: 1,397 total, 1,386 passed, ten skipped and one native foreground failure (1,116.212s). All manifest source hashes independently match. The older visual fixture HWND was not foreground at its assertion; cause remains unproven. No guard was relaxed.
 [Correction evidence](../evidence/software-completion/draft-correction-2026-10-28.json).
+
+
+**2026-10-28 explicit planning constraints:** conversation catalogs now honor
+JSON-quoted Google/Microsoft account-alias clauses through the existing account
+registry. Only named providers/aliases are offered for connector work; native
+capabilities remain available. Exact alias case, service availability and duplicate
+alias ambiguity remain enforced. Effect admission rechecks the account choice.
+Multiple named accounts are supported without assigning semantic roles to steps.
+Quoted goal data does not become an account selector. Existing exact-file-text
+validation also runs before draft persistence so altered text can trigger the
+bounded correction path.
+
+All 179 affected integration cases pass (234.420s), including wrong-account draft
+correction before provider effects and canonical selected-account verification.
+Final installed-model acceptance passes 8/8: Qwen 9B Ask/Full selected synthetic
+Google task creation plus independent saved-resource GET, and Granite Ask/Full
+file, arithmetic and value-handoff workflows. Qwen Ask rejects an initial draft
+and corrects it within the route budget. The Ask harness was updated to assert
+that the narrowed catalog contains exactly the selected account; its obsolete
+large-catalog assertion failure is retained. A fresh installed-runtime TLS native
+Worker check passes (8.979s). All model/native source hashes independently match.
+Ruff, 290-file formatting and 107-file mypy pass. The preceding full regression
+predates this follow-up and remains a failed aggregate (1,386 pass, ten skip,
+one native foreground failure); no new full PASS or general model reliability
+is claimed. Resource/field/operation semantics, arbitrary account wording and
+multi-account step roles remain partial. No real account or activation occurred.
+[Evidence](../evidence/software-completion/explicit-goals-2026-10-28.json).

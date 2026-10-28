@@ -17,7 +17,7 @@ from .contracts import Action, Capability, Result, new_id, record
 from .credentials import CredentialPool
 from .discovery import HTTPDiscovery
 from .event_archive import EventArchive
-from .executive import Executive
+from .executive import Executive, validate_file_literal
 from .grid import Grid, InternalSessionRuntime, Node, NodeRole
 from .local_memory import LocalMemory, LocalMemoryConfig
 from .mcp_client import MCPPlugins
@@ -414,6 +414,9 @@ class ModelExecutor:
         worker = self.grid.store.get("executive_worker", binding["worker_id"])
         h = self.connector_plans.h
         steps = h.executive.validate_steps(worker, plan["steps"])
+        goal = self.grid.store.get("executive_goal", binding["goal_id"])["goal"]
+        validate_file_literal(goal, steps)
+        self.connector_plans.check_goal_accounts(goal, steps)
         for step in steps:
             if step["node_id"] == h.node_id:
                 executor = h.dispatcher.executors.get(step["capability_id"])
