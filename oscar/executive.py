@@ -228,6 +228,9 @@ class Executive:
         self.owner_transfer_guard: (
             Callable[[dict[str, Any], dict[str, Any], str], None] | None
         ) = None
+        self.owner_transfer_verifier: (
+            Callable[[dict[str, Any]], dict[str, Any]] | None
+        ) = None
 
     def _owner(self, authorized: bool) -> None:
         if authorized is not True:
@@ -1561,15 +1564,19 @@ class Executive:
             if len(results) == len(goal["steps"]) and all(
                 s == TaskState.VERIFIED for s in results.values()
             ):
+                owner_receipt = None
+                if goal.get("owner_objective") and self.owner_transfer_verifier is not None:
+                    try:
+                        owner_receipt = self.owner_transfer_verifier(goal)
+                    except (KeyError, ValueError, PermissionError, StateConflict):
+                        self.health = "waiting_for_owner_objective_verification"
                 with self.store.transaction():
                     current = self._row("executive_goal", goal["id"])
                     if current["state"] != "enabled" or current["run_index"] != goal["run_index"]:
                         continue
-                    if current.get("owner_objective"):
-                        # Verified individual steps are insufficient for a cross-account
-                        # copy. No current whole-objective comparator has proved that
-                        # source records, required fields and destination resources
-                        # correspond; never promote the goal to completed on API success.
+                    if current.get("owner_objective") and owner_receipt is None:
+                        # Individual verified steps are insufficient without a
+                        # fresh original-objective source/destination proof.
                         self.store.put(
                             "executive_goal",
                             goal["id"],
@@ -1605,6 +1612,11 @@ class Executive:
                             "run_index": index,
                             "next_at": next_at,
                             "state": "completed" if index >= goal["max_runs"] else "enabled",
+                            **(
+                                {"objective_verification": owner_receipt}
+                                if owner_receipt is not None
+                                else {}
+                            ),
                         },
                     )
                     self.store.audit(
