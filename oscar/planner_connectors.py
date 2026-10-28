@@ -310,10 +310,12 @@ class ConnectorPlanning:
                 source_reads.add(step["id"])
             if binding["role"] == "destination" and method != "GET":
                 destination_steps.append(step)
-                if re.search(r"\b(copy|duplicate|replicate|transfer|migrate|sync)\b|\bcreate\s+equivalent\b", goal, re.I) and (
-                    method != "POST"
-                    or current["operation"].rsplit(".", 1)[-1] != "create"
-                ):
+                if re.search(
+                    r"\b(copy|duplicate|replicate|transfer|migrate|sync)\b|"
+                    r"\bcreate\s+equivalent\b",
+                    goal,
+                    re.I,
+                ) and (method != "POST" or current["operation"].rsplit(".", 1)[-1] != "create"):
                     raise PermissionError(
                         "owner requested a copy; destination operation must create"
                     )
@@ -360,7 +362,9 @@ class ConnectorPlanning:
             from .planner_observations import context
 
             context(self.h.store, self.h.grid, source_observations)
-            observed_goal = self.h.store.get("executive_goal", source_observations["goal_id"])
+            observed_goal = self.h.store.get(
+                "executive_goal", source_observations["goal_id"]
+            )
             expected_sources = {
                 binding["account_id"]
                 for binding in bindings
