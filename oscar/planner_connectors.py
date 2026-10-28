@@ -200,25 +200,24 @@ class ConnectorPlanning:
         }
 
     def goal_accounts(self, goal: str, caps: list[dict[str, Any]]) -> list[dict[str, Any]]:
-        from .planning_contract import exact_account_aliases
+        from .planning_contract import resolved_owner_account_bindings
 
-        aliases = exact_account_aliases(goal)
-        if not aliases:
+        bindings = resolved_owner_account_bindings(goal, self.h.accounts.list_accounts())
+        if not bindings:
             return caps
+        allowed = {binding["account_id"] for binding in bindings}
         selected = []
         for cap in caps:
             descriptor = self.descriptor(cap)
-            if descriptor is not None and aliases:
-                account = descriptor["account"]
-                if account["provider"] not in aliases:
-                    continue
-                if account["alias"] not in aliases[account["provider"]]:
+            if descriptor is not None:
+                if descriptor["account_id"] not in allowed:
                     continue
                 instance = self.h.connectors.instances[cap["id"].split(":", 1)[0]]
+                account = self.h.accounts.get(descriptor["account_id"])
                 current = self.h.accounts.select(
-                    account["provider"], instance.manifest.id, alias=account["alias"]
+                    account.provider, instance.manifest.id, alias=account.alias
                 )
-                if current.id != descriptor["account_id"]:
+                if current.id != account.id or current.generation != account.generation:
                     raise PermissionError("selected account changed")
             selected.append(cap)
         return selected
@@ -232,7 +231,7 @@ class ConnectorPlanning:
         destination, change an explicit resource ID, or supply its own objective.
         A role that owner text does not establish must remain unresolved.
         """
-        from .planning_contract import owner_account_bindings
+        from .planning_contract import resolved_owner_account_bindings
 
         caps = [
             next(
@@ -244,7 +243,7 @@ class ConnectorPlanning:
         ]
         if len(self.goal_accounts(goal, caps)) != len(caps):
             raise PermissionError("plan does not preserve the owner's selected account")
-        bindings = owner_account_bindings(goal)
+        bindings = resolved_owner_account_bindings(goal, self.h.accounts.list_accounts())
         if not bindings:
             # Do not let an alias-free cross-service goal silently collapse to
             # whichever provider's mutation the model happened to select.
@@ -279,7 +278,11 @@ class ConnectorPlanning:
             binding = roles.get(
                 (descriptor["account"]["provider"], descriptor["account"]["alias"])
             )
-            if binding is None:
+            if (
+                binding is None
+                or descriptor["account_id"] != binding["account_id"]
+                or descriptor["account_generation"] != binding["generation"]
+            ):
                 raise PermissionError("plan selects an account absent from the owner goal")
             selected.append((step, cap, binding))
 
@@ -297,6 +300,13 @@ class ConnectorPlanning:
             if binding["role"] == "source" and method != "GET":
                 raise PermissionError("owner source account cannot receive a proposed effect")
             if binding["role"] == "destination" and method != "GET":
+                if re.search(r"\b(copy|duplicate|replicate|transfer)\b", goal, re.I) and (
+                    method != "POST"
+                    or current["operation"].rsplit(".", 1)[-1] != "create"
+                ):
+                    raise PermissionError(
+                        "owner requested a copy; destination operation must create"
+                    )
                 destination_effects.add((binding["provider"], binding["alias"]))
             if binding["resources"]:
                 parameters = step["intent"].get("parameters") or {}
