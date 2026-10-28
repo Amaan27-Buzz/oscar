@@ -18,9 +18,27 @@ def _canonical(name: str, item: dict[str, Any]) -> dict[str, Any]:
     if item.get("deleted") is True or item.get("hidden") is True:
         raise PermissionError("deleted or hidden source task cannot be copied")
     if name == "google.tasks.list":
+        if any(item.get(key) for key in ("parent", "completed", "links")):
+            raise PermissionError("source task contains unsupported semantic fields")
         keys = ("title", "notes", "due", "status")
         operation = "google.tasks.create"
     elif name == "microsoft.todo.tasks.list":
+        if (
+            any(
+                item.get(key)
+                for key in (
+                    "recurrence",
+                    "reminderDateTime",
+                    "checklistItems",
+                    "linkedResources",
+                    "categories",
+                    "completedDateTime",
+                )
+            )
+            or item.get("isReminderOn") is True
+            or item.get("importance", "normal") not in {"normal", None}
+        ):
+            raise PermissionError("source task contains unsupported semantic fields")
         keys = ("title", "body", "dueDateTime", "status")
         operation = "microsoft.todo.tasks.create"
     else:
