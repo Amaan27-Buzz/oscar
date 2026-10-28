@@ -224,7 +224,7 @@ class ConnectorTests(unittest.TestCase):
                 params = {"path": path}
                 if spec.body_required:
                     params["body"] = {"synthetic": True}
-                if spec.name == "google.calendar.events.update":
+                if spec.name in {"google.calendar.events.update", "google.calendar.events.delete"}:
                     params["if_match"] = '"source-version"'
                 uri, body = endpoint(spec, params)
                 self.assertNotIn("fixture/id", uri)
@@ -634,7 +634,10 @@ class ConnectorTests(unittest.TestCase):
                     action = replace(
                         action,
                         capability_id="calendar:" + name,
-                        parameters={"path": {"calendarId": "primary", "eventId": "event-1"}},
+                        parameters={
+                            "path": {"calendarId": "primary", "eventId": "event-1"},
+                            "if_match": '"source-version"',
+                        },
                     )
                     criterion["read_capability"] = "google.calendar.events.get"
                 outcome = self.fabric.execute(
@@ -741,7 +744,10 @@ class ConnectorTests(unittest.TestCase):
                             parameters["body"] = {
                                 "attendees": [{"email": "synthetic@example.invalid"}]
                             }
-                        if spec.name == "google.calendar.events.update":
+                        if spec.name in {
+                            "google.calendar.events.update",
+                            "google.calendar.events.delete",
+                        }:
                             parameters["if_match"] = '"source-version"'
                         if notifications is not None:
                             parameters["query"] = {"sendUpdates": notifications}

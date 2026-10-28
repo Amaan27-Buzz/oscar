@@ -285,11 +285,11 @@ class ConnectorHTTP(Protocol):
 
 
 def endpoint(spec: ConnectorCapability, parameters: dict[str, Any]) -> tuple[str, bytes | None]:
-    conditional = spec.name == "google.calendar.events.update"
+    conditional = spec.name in {"google.calendar.events.update", "google.calendar.events.delete"}
     if conditional:
         tag = parameters.get("if_match")
         if not isinstance(tag, str) or not re.fullmatch(r'"[\x21\x23-\x7e]{1,254}"', tag):
-            raise ValueError("calendar update requires the selected event strong ETag")
+            raise ValueError("calendar modification requires the selected event strong ETag")
     if set(parameters) - (
         {"path", "query", "body", "if_match"} if conditional else {"path", "query", "body"}
     ):
@@ -344,7 +344,7 @@ class HTTPSConnector:
         path, body = endpoint(spec, parameters)
         headers = dict(manifest.headers)
         headers.update({"Accept": "application/json", "Content-Type": "application/json"})
-        if spec.name == "google.calendar.events.update":
+        if spec.name in {"google.calendar.events.update", "google.calendar.events.delete"}:
             headers["If-Match"] = parameters["if_match"]
         if secret:
             if "\r" in secret or "\n" in secret:

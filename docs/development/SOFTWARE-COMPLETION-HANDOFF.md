@@ -1002,3 +1002,12 @@ control/image/visual affected run executes 21 cases with exit code
 stable and independently matched. The original development fixture error remains
 qualified in the receipt. Static and repository checks pass.
 [Follow-up evidence](../evidence/software-completion/device-kind-followup-2026-10-28.json).
+
+**2026-10-28 conditional Google event deletion:** DELETE now uses the same exact
+strong ETag boundary and private planner field as PATCH. Missing/invalid versions
+fail before dispatch; the adapter transmits If-Match and never retries a 412
+conflict. All 61 connector/HTTP/calendar cases pass (31.728s), including
+actual synthetic HTTP header/conflict checks. Ruff/mypy pass. Deletion still has
+generic partial verification; independent absence/objective verification and
+Microsoft concurrency remain OPEN. No real account or deletion was used.
+[Receipt](../evidence/software-completion/calendar-delete-version-2026-10-28.json).

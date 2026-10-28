@@ -93,7 +93,10 @@ class ConnectorPlanning:
                 "additionalProperties": False,
             },
         }
-        conditional = spec.name == "google.calendar.events.update"
+        conditional = spec.name in {
+            "google.calendar.events.update",
+            "google.calendar.events.delete",
+        }
         if conditional:
             properties["if_match"] = {
                 "type": "string",

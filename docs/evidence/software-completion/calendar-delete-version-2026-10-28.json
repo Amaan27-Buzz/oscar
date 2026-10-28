@@ -1,0 +1,28 @@
+{
+  "base_head": "3b9081d",
+  "qualification": "Synthetic loopback HTTP through production adapter; no real Google account, deletion or model acceptance. Earlier full regression precedes this change and remains failed.",
+  "changes": [
+    "Google Calendar DELETE requires the selected event strong ETag in signed arguments and planner schema.",
+    "If-Match is transmitted; 412 is precondition_failed with one DELETE and no retry.",
+    "Missing, weak, wildcard, multiple, malformed and non-string versions are rejected before dispatch."
+  ],
+  "focused": {
+    "passed": 61,
+    "seconds": 31.728,
+    "log_sha256": "0949e69a9140ec32dcc36d1d60ae72d4897547b7aa838b76598cdc11487812d4"
+  },
+  "sources": {
+    "oscar/connectors.py": "419facdfdb582c89f74859a1f9e73d08264e7e608257e1adaa4284010b6573b6",
+    "oscar/planner_connectors.py": "45210cdf7f58fbc33217606db72005c0e154eaadba94238fd9094872fd74ca1c",
+    "tests/test_connector_http.py": "fc20620fa4ee314e34b23f85f40485404a63625b20d3e6afdc4b44559860bed1",
+    "tests/test_connectors.py": "d237145a0d442fb96e1f95ee18357e515de766c366961e392f1aa0109dbfb2f2"
+  },
+  "checks": [
+    "Ruff PASS",
+    "mypy 107 source files PASS"
+  ],
+  "limits": [
+    "Delete retains generic partial verification; resource absence and full objective completion are not newly verified.",
+    "Microsoft calendar concurrency and broader calendar replanning remain open."
+  ]
+}
