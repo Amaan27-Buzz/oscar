@@ -225,6 +225,9 @@ class Executive:
         self.health = "idle"
         self.active: set[str] = set()
         self.advance_plans: Callable[[], None] | None = None
+        self.owner_transfer_guard: (
+            Callable[[dict[str, Any], dict[str, Any], str], None] | None
+        ) = None
 
     def _owner(self, authorized: bool) -> None:
         if authorized is not True:
@@ -1498,6 +1501,12 @@ class Executive:
                         self.targets[step["node_id"]][1],
                         self.runtime.memory,
                     )
+                    if goal.get("owner_transfer_proof"):
+                        if self.owner_transfer_guard is None:
+                            raise PermissionError(
+                                "fresh owner transfer verification unavailable"
+                            )
+                        self.owner_transfer_guard(goal, step, task.id)
                     if self.stop.is_set():
                         break
                     token = new_id()
@@ -1544,7 +1553,11 @@ class Executive:
                             if current_slot.get("token") == token:
                                 self.store.delete("executive_slot", goal["worker_id"])
                 except PermissionError:
-                    self.health = "waiting_for_authority"
+                    self.health = (
+                        "waiting_for_verified_source"
+                        if goal.get("owner_transfer_proof")
+                        else "waiting_for_authority"
+                    )
             if len(results) == len(goal["steps"]) and all(
                 s == TaskState.VERIFIED for s in results.values()
             ):
