@@ -1034,7 +1034,7 @@ class PlannerAuthoring:
                 context(h.store, h.grid, row["observation_refs"])
             steps = h.executive.validate_steps(worker, document["steps"])
             validate_file_literal(row["goal"], steps)
-            h.connector_plans.check_goal_accounts(
+            owner_transfer_proof = h.connector_plans.check_goal_accounts(
                 row["goal"],
                 steps,
                 observe=document["observe"],
@@ -1094,6 +1094,11 @@ class PlannerAuthoring:
                 "steps": steps,
                 **({"connector_inputs": connector_inputs} if connector_inputs else {}),
                 "observe": document["observe"],
+                **(
+                    {"owner_transfer_proof": owner_transfer_proof}
+                    if owner_transfer_proof is not None
+                    else {}
+                ),
                 "planner_task_id": tasks[0],
                 "routing_evidence": [
                     {
@@ -1216,7 +1221,12 @@ class PlannerAuthoring:
             ):
                 # Executive must not equate individually verified model steps with
                 # completion of an independently observed cross-account owner goal.
+                if state.get("owner_transfer_proof") is None:
+                    raise PermissionError(
+                        "verified source-to-destination owner field proof required"
+                    )
                 proposal["owner_objective"] = row["owner_objective"]
+                proposal["owner_transfer_proof"] = state["owner_transfer_proof"]
                 proposal["review_digest"] = h.executive._review(proposal)
                 h.store.put("executive_goal", proposal["id"], proposal)
             if state.get("continuation"):
