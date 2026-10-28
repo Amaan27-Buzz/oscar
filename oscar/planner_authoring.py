@@ -917,6 +917,12 @@ class PlannerAuthoring:
             }:
                 raise ValueError("exact suggested-plan schedule required")
             row = h.store.get("planner_request", identifier)
+            from .planning_contract import owner_objective_contract
+
+            if row.get("owner_objective") != owner_objective_contract(
+                row["goal"], h.accounts.list_accounts()
+            ):
+                raise PermissionError("owner objective account bindings changed")
             if row["relationship"] != h.runtime.relationship_id or row.get("accepted_goal"):
                 raise PermissionError("planning request unavailable or already accepted")
             owner = h.store.get("executive_owner", row["goal_id"])
