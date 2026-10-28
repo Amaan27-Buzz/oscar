@@ -1,3 +1,90 @@
+# OSCAR continuation 02 — bounded owner-copy integration (2026-10-28)
+
+**Engineering status: PARTIAL / UNVERIFIED. BUG-PLAN-001 OPEN. PR #10 DRAFT.**
+This is an in-thread development checkpoint, **not** an instruction to start another chat.
+It supersedes the narrower continuation-02 checkpoint preserved below.
+
+## Current branch
+
+- Repository `Amaan27-Buzz/oscar`, feature `codex/bug-plan-001-owner-intent`;
+  PR https://github.com/Amaan27-Buzz/oscar/pull/10 remains draft/unmerged.
+- Last implementation/test commit observed while writing:
+  `868e8463a93a0c824337f8890c466c748bc3f6d4`. Resolve final documentation
+  commit HEAD from GitHub; commits cannot embed their own SHA.
+- Base `codex/software-completion` at
+  `bf691635970dceddab8b03a4bd8ae030e8ca2e96` at start of this work.
+  Main and PR #9 were not edited.
+
+## Implemented on PR #10 (not executable-test qualified)
+
+- Registry-grounded owner account identity and source/destination role contracts.
+  Move/sync and ambiguous transfer are rejected rather than silently copied.
+- `oscar/owner_transfer.py`: canonical task source-to-destination comparison
+  for bounded Google Tasks and Microsoft To Do lists. Verifies title, notes,
+  due-date equivalence, whole observed page/count and provenance; rejects
+  unknown status, hidden/deleted tasks, pagination, semantic fields the
+  adapter cannot faithfully preserve and unsupported owner-required fields.
+- `planner_connectors.py`: final effects need a separately VERIFIED private
+  source observation stage. A mere source GET dependency is not a data handoff.
+  Verifies destination arguments against the independent source snapshot
+  and binds that proof to the accepted Executive goal; denies ungrounded
+  source/destination resource IDs before consequential copy effects.
+- `planner_connectors.py` + `executive.py`: re-read source with current
+  account/Policy/evidence permission immediately before each mutation.
+  Persist hashed (not plaintext) pre-effect receipts and expected destination
+  field hashes. Independent provider saved-resource GETs must verify each
+  target action; a final current source re-read and explicit owner resource
+  IDs are required before goal `completed`.
+- Fail-closed recovery: changed source blocks unexecuted writes; partial
+  mutations, failed readbacks and uncertain provider responses keep explicit
+  `partially_verified`/`unknown` states and do not blindly replay the POST.
+  This is not an atomic cross-provider transaction.
+- Tests added/changed: `tests.test_owner_transfer`,
+  `tests.test_planner_task_verification`, `tests.test_executive` including
+  synthetic Ask full objective acceptance, source changed before POST,
+  wrong saved destination fields and response-lost-after-POST cases.
+  **NONE were executed here.**
+
+## Verification receipts and blockers
+
+| Item | Result |
+| --- | --- |
+| GitHub remote feature HEAD | Source and tests committed via connector; final remote HEAD must be resolved |
+| Initial PR #10 CI | Nine `startup_failure` runs on `58fb1e21...`; confirmed zero jobs on run `40713570211` |
+| Current Actions diagnostic | Root cause UNRESOLVED. Actions configuration, restriction and account billing settings inaccessible through GitHub connector; no new CI PASS claimed |
+| Local source checkout | UNAVAILABLE: this conversation container cannot resolve `github.com` for git clone |
+| New unit/integration tests | **NOT_RUN**, including the positive owner-copy path |
+| Ruff / format / mypy / repository scan | **NOT_RUN** after this implementation |
+| Installed local Qwen Ask + synthetic Full | **NOT_RUN** after this implementation; historical owner-goal campaign FAILED 0/2 |
+| Natural named-list metadata resolution | **NOT_IMPLEMENTED**. No model-invented list ID may authorize a copy |
+| Other providers/operations, MCP, multi-page records, nontrivial fields, broad general planning | **PARTIAL/OPEN** |
+| Cross-provider atomicity and provider-side concurrent changes | Not guaranteed; pre-effect and final GET narrow, not eliminate, TOCTOU |
+| Public release, real accounts or physical devices | NOT_AUTHORIZED / publication clearance outstanding |
+
+## Minimum runnable Windows checkout validation
+
+```powershell
+git fetch origin
+git switch codex/bug-plan-001-owner-intent
+git pull --ff-only origin codex/bug-plan-001-owner-intent
+python -m unittest tests.test_owner_transfer tests.test_planner_task_verification tests.test_planner_http_observations tests.test_planner_catalog tests.test_executive -v
+python -m ruff check oscar tests scripts
+python -m ruff format --check oscar tests scripts
+python -m mypy oscar
+python -m scripts.check_repository
+```
+
+If these tests fail, fix on **this same feature branch** before expanding
+behavior or claiming verified completion. Inspect repo Settings → Actions →
+General and owner Billing & licensing → Usage/Budgets, or GitHub run
+https://github.com/Amaan27-Buzz/oscar/actions/runs/40713570211 for startup
+error text. Do not launch nine redundant failing workflows. After focused
+checks: add source/destination named list discovery via authoritative provider
+catalogs, broaden operation/provider semantic contracts, and rerun actual
+installed-Qwen synthetic Ask/Full campaign. **Do not merge PR #10.**
+
+---
+
 # OSCAR development continuation 02 — 2026-10-28
 
 **Checkpoint: PARTIAL implementation. BUG-PLAN-001 OPEN. PR #10 DRAFT; DO NOT MERGE.**
