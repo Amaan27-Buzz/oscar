@@ -1505,11 +1505,59 @@ class Executive:
                         self.runtime.memory,
                     )
                     if goal.get("owner_transfer_proof"):
-                        if self.owner_transfer_guard is None:
-                            raise PermissionError(
-                                "fresh owner transfer verification unavailable"
-                            )
-                        self.owner_transfer_guard(goal, step, task.id)
+                        try:
+                            if self.owner_transfer_guard is None:
+                                raise PermissionError(
+                                    "fresh owner transfer verification unavailable"
+                                )
+                            self.owner_transfer_guard(goal, step, task.id)
+                        except PermissionError:
+                            # This is a verified source-preflight failure, distinct
+                            # from Ask awaiting owner confirmation. Stop this
+                            # occurrence instead of repeatedly reconsidering an
+                            # unsafe consequential effect.
+                            previous = [
+                                row
+                                for row in self.store.all("executive_task")
+                                if row["goal_id"] == goal["id"]
+                                and row["occurrence"] == goal["run_index"]
+                                and row["step_id"] in goal["owner_transfer_proof"][
+                                    "destination_step_ids"
+                                ]
+                                and self.store.task(row["task_id"]).state
+                                in {
+                                    TaskState.VERIFIED,
+                                    TaskState.PARTIALLY_VERIFIED,
+                                    TaskState.FAILED,
+                                    TaskState.UNKNOWN,
+                                }
+                            ]
+                            status = "partially_verified" if previous else "blocked"
+                            with self.store.transaction():
+                                current = self._row("executive_goal", goal["id"])
+                                if current["state"] == "enabled":
+                                    self.store.put(
+                                        "executive_goal",
+                                        goal["id"],
+                                        {
+                                            **current,
+                                            "state": status,
+                                            "objective_verification": {
+                                                "state": "not_verified",
+                                                "reason": "fresh_source_preflight_denied",
+                                                "step_id": step["id"],
+                                            },
+                                        },
+                                    )
+                                    self.store.audit(
+                                        "", "executive_owner_source_changed", {
+                                            "goal_id": goal["id"],
+                                            "step_id": step["id"],
+                                            "state": status,
+                                        },
+                                    )
+                            self.health = "waiting_for_verified_source"
+                            break
                     if self.stop.is_set():
                         break
                     token = new_id()
@@ -1556,11 +1604,7 @@ class Executive:
                             if current_slot.get("token") == token:
                                 self.store.delete("executive_slot", goal["worker_id"])
                 except PermissionError:
-                    self.health = (
-                        "waiting_for_verified_source"
-                        if goal.get("owner_transfer_proof")
-                        else "waiting_for_authority"
-                    )
+                    self.health = "waiting_for_authority"
             if len(results) == len(goal["steps"]) and all(
                 s == TaskState.VERIFIED for s in results.values()
             ):
