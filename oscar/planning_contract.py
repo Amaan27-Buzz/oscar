@@ -135,7 +135,9 @@ def resolved_owner_account_bindings(
     for provider in sorted({a.provider for a in connected}, key=len, reverse=True):
         if provider == "mcp-resource":
             continue
-        for mention in re.finditer(r"(?<!\w)" + re.escape(provider) + r"(?!\w)", goal, re.I):
+        for mention in re.finditer(
+            r"(?<!\w)" + re.escape(provider) + r"(?!\w)", goal, re.I
+        ):
             if any(mention.start() < end and mention.end() > start for start, end, _ in references):
                 continue
             references.append((mention.start(), mention.end(), provider))
@@ -143,10 +145,13 @@ def resolved_owner_account_bindings(
     bindings: list[dict[str, Any]] = []
     for index, (start, end, provider) in enumerate(references):
         previous = references[index - 1][1] if index else 0
-        cues = list(re.finditer(
-            r"\b(from|source|origin|to|into|destination|target)\b",
-            goal[previous:start], re.I,
-        ))
+        cues = list(
+            re.finditer(
+                r"\b(from|source|origin|to|into|destination|target)\b",
+                goal[previous:start],
+                re.I,
+            )
+        )
         role = None
         if cues and start - previous - cues[-1].end() <= 100:
             role = (
@@ -161,14 +166,16 @@ def resolved_owner_account_bindings(
                 "multiple verified accounts match."
             )
         account = matches[0]
-        bindings.append({
-            "provider": provider,
-            "alias": account.alias,
-            "account_id": account.id,
-            "generation": account.generation,
-            "role": role,
-            "resources": (),
-        })
+        bindings.append(
+            {
+                "provider": provider,
+                "alias": account.alias,
+                "account_id": account.id,
+                "generation": account.generation,
+                "role": role,
+                "resources": (),
+            }
+        )
     if len(bindings) > 1 and (
         any(b["role"] is None for b in bindings)
         or len({b["role"] for b in bindings}) == 1
@@ -222,29 +229,33 @@ def owner_objective_contract(goal: str, accounts: list[Any]) -> dict[str, Any] |
     if sources[0]["account_id"] == destinations[0]["account_id"]:
         raise ValueError("Clarify distinct source and destination accounts.")
     fields = tuple(
-        field for field, pattern in (
+        field
+        for field, pattern in (
             ("due", r"\b(due\s+dates?|deadlines?)\b"),
             ("title", r"\b(titles?|names?)\b"),
             ("notes", r"\b(notes?|descriptions?)\b"),
             ("status", r"\b(status|completion\s+state)\b"),
-        ) if re.search(pattern, goal, re.I)
+        )
+        if re.search(pattern, goal, re.I)
     )
-    return asdict(OwnerObjectiveContract(
-        objective=goal,
-        accounts=tuple(
-            OwnerAccountRole(
-                account_id=role["account_id"],
-                generation=role["generation"],
-                provider=role["provider"],
-                alias=role["alias"],
-                role=role["role"],
-                resource_ids=tuple(role["resources"]),
-            )
-            for role in (sources[0], destinations[0])
-        ),
-        operation="copy",
-        required_fields=fields,
-    ))
+    return asdict(
+        OwnerObjectiveContract(
+            objective=goal,
+            accounts=tuple(
+                OwnerAccountRole(
+                    account_id=role["account_id"],
+                    generation=role["generation"],
+                    provider=role["provider"],
+                    alias=role["alias"],
+                    role=role["role"],
+                    resource_ids=tuple(role["resources"]),
+                )
+                for role in (sources[0], destinations[0])
+            ),
+            operation="copy",
+            required_fields=fields,
+        )
+    )
 
 
 def exact_file_literal(goal: str) -> str | None:
