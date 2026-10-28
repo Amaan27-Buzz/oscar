@@ -100,10 +100,7 @@ def owner_account_bindings(goal: str) -> list[dict[str, Any]]:
     return bindings
 
 
-
-def resolved_owner_account_bindings(
-    goal: str, accounts: list[Any]
-) -> list[dict[str, Any]]:
+def resolved_owner_account_bindings(goal: str, accounts: list[Any]) -> list[dict[str, Any]]:
     """Resolve owner-named service roles against verified registry identities.
 
     Service names identify a provider, never a credential. An alias-free service
@@ -116,7 +113,8 @@ def resolved_owner_account_bindings(
     if explicit:
         for binding in explicit:
             candidates = [
-                a for a in accounts
+                a
+                for a in accounts
                 if a.status == "connected"
                 and a.services
                 and a.provider == binding["provider"]
@@ -129,7 +127,8 @@ def resolved_owner_account_bindings(
         return explicit
 
     connected = [
-        a for a in accounts
+        a
+        for a in accounts
         if a.status == "connected"
         and a.services
         and a.identity_class == "owner-delegated"
@@ -221,7 +220,9 @@ def owner_objective_contract(goal: str, accounts: list[Any]) -> dict[str, Any] |
         return None
     transfer = re.search(
         r"\b(copy|duplicate|replicate|transfer|migrate|sync)\b|"
-        r"\bcreate\s+equivalent\b", goal, re.I,
+        r"\bcreate\s+equivalent\b",
+        goal,
+        re.I,
     )
     if not transfer:
         return None
