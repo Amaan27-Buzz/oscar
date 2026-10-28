@@ -223,7 +223,12 @@ class ConnectorPlanning:
         return selected
 
     def check_goal_accounts(
-        self, goal: str, steps: list[dict[str, Any]], *, observe: bool = False
+        self,
+        goal: str,
+        steps: list[dict[str, Any]],
+        *,
+        observe: bool = False,
+        source_observations: dict[str, Any] | None = None,
     ) -> None:
         """Admit actual account effects against owner roles, not an account union.
 
@@ -292,6 +297,8 @@ class ConnectorPlanning:
                     "Clarify each source and destination account before authorizing effects."
                 )
         destination_effects: set[tuple[str, str]] = set()
+        source_reads: set[str] = set()
+        destination_steps: list[dict[str, Any]] = []
         for step, cap, binding in selected:
             current = self.contract(cap)
             method = current["endpoint"]["method"].upper()
@@ -299,8 +306,11 @@ class ConnectorPlanning:
                 raise PermissionError("typed source/destination roles require a reviewed endpoint")
             if binding["role"] == "source" and method != "GET":
                 raise PermissionError("owner source account cannot receive a proposed effect")
+            if binding["role"] == "source" and method == "GET":
+                source_reads.add(step["id"])
             if binding["role"] == "destination" and method != "GET":
-                if re.search(r"\b(copy|duplicate|replicate|transfer)\b", goal, re.I) and (
+                destination_steps.append(step)
+                if re.search(r"\b(copy|duplicate|replicate|transfer|migrate|sync)\b|\bcreate\s+equivalent\b", goal, re.I) and (
                     method != "POST"
                     or current["operation"].rsplit(".", 1)[-1] != "create"
                 ):
@@ -322,6 +332,50 @@ class ConnectorPlanning:
                     and not all(resource in paths.values() for resource in binding["resources"])
                 ):
                     raise PermissionError("plan does not preserve the owner's resource ID")
+
+        if not observe and destination_steps and source_reads:
+            graph = {step["id"]: set(step["depends_on"]) for step in steps}
+
+            def ancestors(step_id: str) -> set[str]:
+                visited: set[str] = set()
+                pending = list(graph[step_id])
+                while pending:
+                    key = pending.pop()
+                    if key in visited:
+                        continue
+                    visited.add(key)
+                    pending.extend(graph.get(key, ()))
+                return visited
+
+            for step in destination_steps:
+                if not ancestors(step["id"]) & source_reads:
+                    raise PermissionError(
+                        "destination effect must depend on verified source read"
+                    )
+        elif not observe and destination_steps and any(
+            binding["role"] == "source" for binding in bindings
+        ):
+            if source_observations is None:
+                raise PermissionError("source observation required before transfer effects")
+            from .planner_observations import context
+
+            context(self.h.store, self.h.grid, source_observations)
+            observed_goal = self.h.store.get("executive_goal", source_observations["goal_id"])
+            expected_sources = {
+                binding["account_id"]
+                for binding in bindings
+                if binding["role"] == "source"
+            }
+            read_accounts = {
+                criterion["connector_account"]["id"]
+                for step in observed_goal["steps"]
+                if (criterion := (step["intent"].get("criterion") or {})).get("kind")
+                == "connector_observation"
+                and isinstance(criterion.get("connector_account"), dict)
+                and "id" in criterion["connector_account"]
+            }
+            if not expected_sources <= read_accounts:
+                raise PermissionError("no verified observation of owner's source account")
 
         if not observe:
             expected = {
