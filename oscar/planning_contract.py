@@ -34,7 +34,6 @@ def exact_account_aliases(goal: str) -> dict[str, set[str]]:
     return aliases
 
 
-
 def owner_account_bindings(goal: str) -> list[dict[str, Any]]:
     """Ground explicitly named account roles in owner text, never in a model draft.
 
@@ -54,7 +53,12 @@ def owner_account_bindings(goal: str) -> list[dict[str, Any]]:
         if not isinstance(alias, str) or not alias.strip() or len(alias) > 500:
             raise ValueError("bounded account alias required")
         mentions.append(
-            (match.start(), match.end() + consumed, match.group("provider").casefold(), alias)
+            (
+                match.start(),
+                match.end() + consumed,
+                match.group("provider").casefold(),
+                alias,
+            )
         )
     bindings: list[dict[str, Any]] = []
     for index, (start, end, provider, alias) in enumerate(mentions):
@@ -93,7 +97,6 @@ def owner_account_bindings(goal: str) -> list[dict[str, Any]]:
             }
         )
     return bindings
-
 
 
 def exact_file_literal(goal: str) -> str | None:
