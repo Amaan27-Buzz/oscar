@@ -99,6 +99,85 @@ def owner_account_bindings(goal: str) -> list[dict[str, Any]]:
     return bindings
 
 
+
+def resolved_owner_account_bindings(
+    goal: str, accounts: list[Any]
+) -> list[dict[str, Any]]:
+    """Resolve owner-named service roles against verified registry identities.
+
+    Service names identify a provider, never a credential. An alias-free service
+    reference is admissible only when exactly one connected owner account has
+    that provider. Multiple accounts require clarification; the model's selected
+    capability cannot break the tie. Explicit quoted roles keep their existing
+    strict syntax and resource-ID constraints.
+    """
+    explicit = owner_account_bindings(goal)
+    if explicit:
+        for binding in explicit:
+            candidates = [
+                a for a in accounts
+                if a.status == "connected"
+                and a.provider == binding["provider"]
+                and a.alias == binding["alias"]
+            ]
+            if len(candidates) != 1:
+                raise ValueError("Clarify an unavailable or ambiguous account alias.")
+            binding["account_id"] = candidates[0].id
+            binding["generation"] = candidates[0].generation
+        return explicit
+
+    connected = [
+        a for a in accounts
+        if a.status == "connected" and a.identity_class == "owner-delegated"
+    ]
+    references: list[tuple[int, int, str]] = []
+    for provider in sorted({a.provider for a in connected}, key=len, reverse=True):
+        if provider == "mcp-resource":
+            continue
+        for mention in re.finditer(r"(?<!\\w)" + re.escape(provider) + r"(?!\\w)", goal, re.I):
+            if any(mention.start() < end and mention.end() > start for start, end, _ in references):
+                continue
+            references.append((mention.start(), mention.end(), provider))
+    references.sort()
+    bindings: list[dict[str, Any]] = []
+    for index, (start, end, provider) in enumerate(references):
+        previous = references[index - 1][1] if index else 0
+        cues = list(re.finditer(
+            r"\\b(from|source|origin|to|into|destination|target)\\b",
+            goal[previous:start], re.I,
+        ))
+        role = None
+        if cues and start - previous - cues[-1].end() <= 100:
+            role = (
+                "source"
+                if cues[-1].group(1).casefold() in {"from", "source", "origin"}
+                else "destination"
+            )
+        matches = [a for a in connected if a.provider == provider]
+        if len(matches) != 1:
+            raise ValueError(
+                "Clarify the exact account alias for each named service; "
+                "multiple verified accounts match."
+            )
+        account = matches[0]
+        bindings.append({
+            "provider": provider,
+            "alias": account.alias,
+            "account_id": account.id,
+            "generation": account.generation,
+            "role": role,
+            "resources": (),
+        })
+    if len(bindings) > 1 and (
+        any(b["role"] is None for b in bindings)
+        or len({b["role"] for b in bindings}) == 1
+    ):
+        raise ValueError("Clarify source and destination account roles.")
+    if len({b["account_id"] for b in bindings}) != len(bindings):
+        raise ValueError("Clarify repeated account references.")
+    return bindings
+
+
 def exact_file_literal(goal: str) -> str | None:
     pattern = r"\bexact\s+(?:text|content)\s*(?::|=)?\s*"
     marker = re.search(pattern, goal, re.I)
