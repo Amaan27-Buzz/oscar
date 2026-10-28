@@ -308,6 +308,28 @@ class ProviderContractTests(unittest.TestCase):
             self.generate(request=replace(self.request, required=frozenset({"text", "structured"})))
         self.assertEqual(caught.exception.category, Failure.STRUCTURED)
 
+    def test_native_input_kinds_are_internal_and_bound_to_selected_capabilities(self):
+        request = replace(
+            self.request,
+            required=frozenset({"text", "structured"}),
+            executive_plan=True,
+            executive_native_capabilities=("files.write",),
+        )
+        for kinds in ({"other": "file_write"}, {"files.write": ""}, {"files.write": None}):
+            with self.assertRaises(ValueError):
+                replace(request, executive_native_kinds=kinds)
+        with self.assertRaises(ValueError):
+            ModelRequest.from_config({"executive_native_kinds": {"files.write": "file_write"}})
+        self.body = {"message": {"content": '{"clarification":"Which file?"}'}, "done": True}
+        self.generate(
+            "ollama", request=replace(request, executive_native_kinds={"files.write": "file_write"})
+        )
+        variant = self.requests[-1]["body"]["format"]["oneOf"][0]["properties"]["steps"]["items"][
+            "oneOf"
+        ][0]["properties"]
+        self.assertEqual({"const": "files.write"}, variant["capability_id"])
+        self.assertEqual({"type": "string"}, variant["intent"]["properties"]["content"])
+
     def test_empty_or_malformed_200_is_not_provider_success(self):
         for body in ({}, b"not-json", {"choices": []}):
             self.body = body

@@ -2,6 +2,7 @@
 
 import json
 import unittest
+from dataclasses import asdict
 from time import monotonic, sleep
 
 from tests import test_planner_http_connectors as fixture
@@ -62,6 +63,83 @@ class PlannedTaskVerificationTests(unittest.TestCase):
         self.assertIsNone(self.h.store.all("result")[-1]["value"])
         self.assertEqual({}, self.h.connector_plans.inputs)
 
+    def test_google_undated_task_verifies_notes_and_absent_due_date(self):
+        arguments = self.steps[0]["intent"]["parameters"]["arguments"]
+        arguments["body"].pop("due")
+        arguments["query"] = {}
+        self.response()
+        self.assertEqual("verified", self.run_ask())
+        self.assertNotIn("due", self.api.calls[0][2])
+        self.assertEqual(["POST", "GET"], [c[0] for c in self.api.calls])
+
+    def test_unrequested_due_date_in_saved_task_fails_verification(self):
+        self.steps[0]["intent"]["parameters"]["arguments"]["body"].pop("due")
+        self.api.transform = lambda method, data: {**data, "due": "2026-10-28T00:00:00Z"}
+        self.response()
+        self.assertEqual("failed", self.run_ask())
+
+    def test_verified_read_in_an_effect_graph_unblocks_only_the_reviewed_task_mutation(self):
+        self.read_then_create(changed=False)
+
+    def test_changed_independent_read_blocks_the_dependent_task_mutation(self):
+        self.read_then_create(changed=True)
+
+    def read_then_create(self, *, changed):
+        from oscar.jev import Intent
+        from tests.test_planner_http_observations import HTTPObservationTests
+
+        reader = self.mount.capability("google.tasks.list", account_id=self.account.id)
+        path = "/tasks/v1/lists/selected-list/tasks"
+        self.api.resources[path] = {"items": [{"title": "Selected synthetic task"}]}
+        if changed:
+            self.api.after_get = lambda: self.api.resources.update({path: {"items": []}})
+        create = self.steps[0]
+        create["depends_on"] = ["read"]
+        read = {
+            "id": "read",
+            "node_id": reader.node_id,
+            "capability_id": reader.id,
+            "depends_on": [],
+            "intent": asdict(
+                Intent(
+                    "Read selected tasks",
+                    "capability",
+                    capability_kind=reader.id,
+                    parameters={"arguments": {"path": {"tasklist": "selected-list"}}},
+                )
+            ),
+        }
+        self.steps = [create, read]
+        self.change["value"]["capabilities"].append(
+            {"node_id": reader.node_id, "capability_id": reader.id}
+        )
+        self.response()
+        row = self.draft()
+        self.complete(self.review(self.accept_change(row)))
+        deadline = monotonic() + 10
+        while monotonic() < deadline:
+            self.h.executive.tick()
+            tasks = self.h.store.all("task")
+            if len(tasks) >= 2 and tasks[1]["state"] in {"verified", "failed"}:
+                observed = tasks[1]
+                break
+            sleep(0.02)
+        else:
+            self.fail("read prerequisite did not settle")
+        self.assertEqual("failed" if changed else "verified", observed["state"])
+        self.assertEqual(["GET", "GET"], [c[0] for c in self.api.calls])
+        if changed:
+            for _ in range(3):
+                self.h.executive.tick()
+            self.assertEqual(2, len(self.h.store.all("task")))
+            return
+        self.h.executive.tick()
+        task = self.h.store.all("task")[-1]
+        self.assertEqual("planned", task["state"])
+        self.complete(self.review({"operation": "confirm_task", "id": task["id"], "value": {}}))
+        self.assertEqual("verified", HTTPObservationTests.settle(self, 3)["state"])
+        self.assertEqual(["GET", "GET", "POST", "GET"], [c[0] for c in self.api.calls])
+
     def test_signed_full_creates_and_verifies_without_per_action_reviews(self):
         from oscar.planner_authoring import PlannerAuthoring
 
@@ -80,6 +158,26 @@ class PlannedTaskVerificationTests(unittest.TestCase):
         self.assertEqual(["POST", "GET"], [c[0] for c in self.api.calls])
 
     def test_microsoft_task_uses_its_account_and_exact_saved_plain_text(self):
+        self.microsoft_task()
+        self.assertEqual("verified", self.run_ask())
+        self.assertEqual(
+            "/v1.0/me/todo/lists/selected-list/tasks/synthetic-resource", self.api.calls[-1][1]
+        )
+
+    def test_microsoft_undated_task_verifies_notes_without_inventing_a_date(self):
+        self.microsoft_task()
+        self.steps[0]["intent"]["parameters"]["arguments"]["body"].pop("dueDateTime")
+        self.response()
+        self.assertEqual("verified", self.run_ask())
+        self.assertNotIn("dueDateTime", self.api.calls[0][2])
+
+    def test_microsoft_title_only_task_verifies_empty_notes_and_absent_due_date(self):
+        self.microsoft_task()
+        self.steps[0]["intent"]["parameters"]["arguments"]["body"] = {"title": self.marker}
+        self.response()
+        self.assertEqual("verified", self.run_ask())
+
+    def microsoft_task(self):
         self.account = self.h.accounts.add(
             "microsoft", "synthetic-ms", "tasks", "MS Tasks", verified=True
         )
@@ -107,10 +205,6 @@ class PlannedTaskVerificationTests(unittest.TestCase):
             },
         }
         self.response()
-        self.assertEqual("verified", self.run_ask())
-        self.assertEqual(
-            "/v1.0/me/todo/lists/selected-list/tasks/synthetic-resource", self.api.calls[-1][1]
-        )
 
     def test_changed_saved_fields_fail_verification(self):
         self.api.tamper = True

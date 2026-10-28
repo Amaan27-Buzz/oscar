@@ -7,6 +7,7 @@ import re
 import sqlite3
 from collections.abc import Callable, Mapping
 from dataclasses import asdict
+from graphlib import CycleError, TopologicalSorter
 from threading import Event, Thread
 from typing import TYPE_CHECKING, Any
 
@@ -586,7 +587,8 @@ class Executive:
             raise ValueError("explicit configured or private model routing required")
         pins = [
             {k: v for k, v in p.items() if k != "intent_examples"}
-            if p.get("transport") in {"https", "mcp"} else p
+            if p.get("transport") in {"https", "mcp"}
+            else p
             for p in pins
         ]
         shared = {}
@@ -885,7 +887,34 @@ class Executive:
             steps = steps["steps"]
         if not isinstance(steps, list) or any(not isinstance(step, dict) for step in steps):
             raise ValueError("model result must contain a typed step array")
-        return {"steps": steps, "observe": observe}
+        if not 1 <= len(steps) <= 16:
+            raise ValueError("bounded model task graph required")
+        indexed = {}
+        for step in steps:
+            name, dependencies = step.get("id"), step.get("depends_on")
+            if (
+                not isinstance(name, str)
+                or not re.fullmatch(r"[a-z0-9_-]{1,40}", name)
+                or name in indexed
+                or not isinstance(dependencies, list)
+                or any(not isinstance(d, str) for d in dependencies)
+                or len(set(dependencies)) != len(dependencies)
+            ):
+                raise ValueError("unique model step IDs and explicit dependencies required")
+            indexed[name] = step
+        if any(set(s["depends_on"]) - indexed.keys() for s in steps):
+            raise ValueError("model dependency must name a step in this response")
+        try:
+            # Only array order changes; the declared edges and reviewed intents stay exact.
+            ordered = [
+                indexed[k]
+                for k in TopologicalSorter(
+                    {k: s["depends_on"] for k, s in indexed.items()}
+                ).static_order()
+            ]
+        except CycleError:
+            raise ValueError("model task graph contains a dependency cycle") from None
+        return {"steps": ordered, "observe": observe}
 
     @staticmethod
     def _review(row: dict[str, Any]) -> str:

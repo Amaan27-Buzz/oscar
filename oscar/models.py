@@ -162,6 +162,7 @@ class ModelRequest:
     executive_plan: bool = False
     executive_observation: tuple[str, ...] = ()
     executive_native_capabilities: tuple[str, ...] | None = None
+    executive_native_kinds: dict[str, str] = field(default_factory=dict)
     executive_connector_schemas: dict[str, dict[str, Any]] = field(default_factory=dict)
     images: tuple[ScreenImage, ...] = field(default=(), repr=False)
 
@@ -263,6 +264,20 @@ class ModelRequest:
             or set(self.executive_native_capabilities) & set(self.executive_connector_schemas)
         ):
             raise ValueError("distinct selected native Executive capabilities required")
+        if (
+            not isinstance(self.executive_native_kinds, dict)
+            or len(self.executive_native_kinds) > 128
+            or self.executive_native_kinds
+            and (
+                self.executive_native_capabilities is None
+                or not set(self.executive_native_kinds) <= set(self.executive_native_capabilities)
+            )
+            or any(
+                not isinstance(kind, str) or not re.fullmatch(r"[a-z0-9_]{1,80}", kind)
+                for kind in self.executive_native_kinds.values()
+            )
+        ):
+            raise ValueError("selected native Executive input kinds required")
         if self.ollama_think is not None and type(self.ollama_think) is not bool:
             raise ValueError("Ollama thinking preference must be an explicit boolean")
         if (

@@ -93,13 +93,98 @@ class PlanningCatalogTests(unittest.TestCase):
         self.assertEqual("Welcome to OSCAR", (self.h.files.root / "catalog-note.txt").read_text())
         self.assertEqual([], self.api.calls)
 
+    def test_effect_review_shows_used_capabilities_but_binds_the_full_catalog(self):
+        from oscar.assistance import Assistance
+        from oscar.mobile import fingerprint
+
+        proposal = self.conversation()["assistance_proposal"]
+        self.complete(self.review(proposal))
+        self.h.executive.tick()
+        row = self.h.store.all("planner_request")[-1]
+        change = self.accept_change(row)
+        state = PlannerAuthoring(self.h).material(
+            "plan_accept", row["id"], change["value"], self.grants
+        )
+        material = Assistance(self.h).material(change, self.grants, self.owner.node_id)
+        displayed = material["review"]["current"]
+        self.assertEqual(["files.write"], [c["id"] for c in displayed["capabilities"]])
+        self.assertEqual(
+            fingerprint(state["capabilities"]), displayed["capability_catalog"]["digest"]
+        )
+        self.assertEqual(len(state["capabilities"]), displayed["capability_catalog"]["count"])
+        review = self.review(change)
+        other = next(a for a in self.h.store.all("connected_account") if a["id"] != self.account.id)
+        self.h.accounts.disconnect(other["id"])
+        with self.assertRaises(PermissionError):
+            self.complete(review)
+        self.assertFalse((self.h.files.root / "catalog-note.txt").exists())
+
+    def test_decoder_kinds_follow_reviewed_catalog_without_exposing_the_planner_as_an_action(self):
+        from unittest.mock import patch
+
+        proposal = self.conversation()["assistance_proposal"]
+        self.complete(self.review(proposal))
+        with patch.object(
+            self.executor.router, "execute", wraps=self.executor.router.execute
+        ) as execute:
+            self.h.executive.tick()
+        request = execute.call_args.args[0]
+        self.assertNotIn("models.reason", request.executive_native_capabilities)
+        self.assertEqual("file_write", request.executive_native_kinds["files.write"])
+        self.assertEqual("addition", request.executive_native_kinds["math.add"])
+        self.assertFalse(
+            set(request.executive_native_kinds) & set(request.executive_connector_schemas)
+        )
+
+    def test_shared_capability_id_keeps_both_device_pins_but_one_decoder_hint(self):
+        from unittest.mock import patch
+
+        from oscar.contracts import Capability
+        from oscar.grid import Node, NodeRole
+
+        scopes = ("heartbeat", "advertise", "execute", "files:write")
+        self.h.grid.register(Node("second-device", NodeRole.DESKTOP, scopes))
+        session = self.h.grid.pair("second-device", scopes)
+        cap = next(
+            c
+            for node in self.h.grid.nodes()
+            if node["id"] == self.h.node_id
+            for c in node["capabilities"]
+            if c["id"] == "files.write"
+        )
+        self.h.grid.advertise(session, [Capability(**{**cap, "node_id": session.node_id})])
+        self.h.executive.targets[session.node_id] = (self.h.dispatcher, session)
+        proposal = self.conversation(
+            "Across devices " + self.h.node_id + ", second-device: Prepare a welcome file"
+        )["assistance_proposal"]
+        self.complete(self.review(proposal))
+        with patch.object(
+            self.executor.router, "execute", wraps=self.executor.router.execute
+        ) as execute:
+            self.h.executive.tick()
+        request = execute.call_args.args[0]
+        self.assertEqual(1, request.executive_native_capabilities.count("files.write"))
+        self.assertEqual("partially_verified", self.h.store.all("task")[-1]["state"])
+        worker = self.h.store.all("executive_worker")[-1]
+        self.assertEqual(
+            {self.h.node_id, "second-device"},
+            {p["node_id"] for p in worker["capabilities"] if p["capability_id"] == "files.write"},
+        )
+        row = self.h.store.all("planner_request")[-1]
+        self.complete(self.review(self.accept_change(row)))
+        self.assertEqual("verified", self.settle())
+        self.assertEqual("Welcome to OSCAR", (self.h.files.root / "catalog-note.txt").read_text())
+
     def test_adaptive_conversation_can_handoff_a_verified_result_within_its_new_plan(self):
         self.handoff_literal("42", matches=True)
+
+    def test_unordered_model_graph_is_reviewed_and_executes_its_exact_verified_handoff(self):
+        self.handoff_literal("42", matches=True, reverse=True)
 
     def test_wrong_verified_result_cannot_replace_the_owner_literal_or_create_a_file(self):
         self.handoff_literal("43", matches=False)
 
-    def handoff_literal(self, literal, *, matches):
+    def handoff_literal(self, literal, *, matches, reverse=False):
         goal = (
             'Calculate 17 + 25, then save its actual result to catalog-note.txt with exact text "'
             + literal
@@ -116,7 +201,9 @@ class PlanningCatalogTests(unittest.TestCase):
             "depends_on": [],
             "intent": asdict(Intent("17 + 25")),
         }
-        self.body["choices"][0]["message"]["content"] = json.dumps({"steps": [calculate, written]})
+        self.body["choices"][0]["message"]["content"] = json.dumps(
+            {"steps": [written, calculate] if reverse else [calculate, written]}
+        )
         proposal = self.conversation(goal)["assistance_proposal"]
         state = PlannerAuthoring(self.h).material(
             "plan_draft", "new", proposal["value"], self.grants
@@ -132,7 +219,14 @@ class PlanningCatalogTests(unittest.TestCase):
         )
         self.complete(self.review(proposal))
         self.h.executive.tick()
-        self.complete(self.review(self.accept_change(self.h.store.all("planner_request")[-1])))
+        change = self.accept_change(self.h.store.all("planner_request")[-1])
+        if reverse:
+            state = PlannerAuthoring(self.h).material(
+                "plan_accept", change["id"], change["value"], self.grants
+            )
+            self.assertEqual(["calculate", "save"], [s["id"] for s in state["steps"]])
+            self.assertFalse((self.h.files.root / "catalog-note.txt").exists())
+        self.complete(self.review(change))
         for _ in range(5):
             self.h.executive.tick()
         rows = self.h.store.all("task")
@@ -290,6 +384,29 @@ class PlanningCatalogTests(unittest.TestCase):
         self.assertEqual([], self.requests)
         self.assertEqual([], self.h.store.all("executive_worker"))
 
+    def use_ollama(self):
+        from oscar.providers import HTTPAdapter
+
+        self.executor.router.adapters["ollama"] = HTTPAdapter("ollama")
+        registry = self.executor.router.registry
+        registry.providers = {
+            key: replace(provider, adapter="ollama") for key, provider in registry.providers.items()
+        }
+        self.body["message"] = self.body["choices"][0]["message"]
+        self.body["done"] = True
+
+    def test_ollama_root_plan_uses_decoder_without_duplicate_schema(self):
+        self.use_ollama()
+        proposal = self.conversation()["assistance_proposal"]
+        state = PlannerAuthoring(self.h).material(
+            "plan_draft", "new", proposal["value"], self.grants
+        )
+        self.assertNotIn("Response JSON schema:", state["step"]["intent"]["parameters"]["prompt"])
+        self.assertLess(len(json.dumps([state["step"]], separators=(",", ":"))), 32768)
+        self.complete(self.review(proposal))
+        self.h.executive.tick()
+        self.assertIn("$defs", self.requests[0]["body"]["format"])
+
     def test_large_live_catalog_continuation_review_binds_the_omitted_model_prompt(self):
         self.large_live_continuation()
 
@@ -300,16 +417,7 @@ class PlanningCatalogTests(unittest.TestCase):
         from tests.test_planner_http_observations import HTTPObservationTests
 
         if ollama:
-            from oscar.providers import HTTPAdapter
-
-            self.executor.router.adapters["ollama"] = HTTPAdapter("ollama")
-            registry = self.executor.router.registry
-            registry.providers = {
-                key: replace(provider, adapter="ollama")
-                for key, provider in registry.providers.items()
-            }
-            self.body["message"] = self.body["choices"][0]["message"]
-            self.body["done"] = True
+            self.use_ollama()
         reader = self.mount.capability("google.tasks.list", account_id=self.account.id)
         self.api.resources["/tasks/v1/lists/selected-list/tasks"] = {
             "items": [{"title": self.marker}]

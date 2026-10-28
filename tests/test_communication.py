@@ -75,6 +75,10 @@ class Provider:
                         self.end_headers()
                         return
                     result = {"id": "synthetic-resource", **body}
+                    if path.startswith("/tasks/v1/lists/") and path.endswith("/tasks"):
+                        result.setdefault("status", "needsAction")
+                    if path.startswith("/v1.0/me/todo/lists/") and path.endswith("/tasks"):
+                        result.setdefault("status", "notStarted")
                     if path == "/v2/spaces":
                         result = {
                             "name": "spaces/SyntheticSpace",

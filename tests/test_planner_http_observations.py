@@ -386,7 +386,16 @@ class HTTPObservationTests(unittest.TestCase):
             changed["steps"][0][field] = value
             self.assertFalse(validator.is_valid(changed))
 
+    def test_compact_reader_with_explicit_empty_dependencies_verifies_readback(self):
+        self.compact_reader(dependencies=[])
+
+    def test_compact_reader_rejects_nonempty_dependencies_before_io(self):
+        self.compact_reader(dependencies=["unbound"])
+
     def test_compact_reader_restores_current_executor_and_verifies_private_readback(self):
+        self.compact_reader()
+
+    def compact_reader(self, dependencies=None):
         self.body["choices"][0]["message"]["content"] = json.dumps(
             {
                 "steps": [
@@ -399,6 +408,16 @@ class HTTPObservationTests(unittest.TestCase):
                 "observe": True,
             }
         )
+        if dependencies is not None:
+            document = json.loads(self.body["choices"][0]["message"]["content"])
+            document["steps"][0]["depends_on"] = dependencies
+            self.body["choices"][0]["message"]["content"] = json.dumps(document)
+        if dependencies:
+            self.draft()
+            self.assertEqual("failed", self.h.store.all("task")[-1]["state"])
+            self.assertEqual([], self.api.calls)
+            self.assertEqual({}, self.h.connector_plans.inputs)
+            return
         self.observe()
         goal = self.h.store.get(
             "executive_goal", self.h.store.all("planner_request")[0]["observation_goal"]

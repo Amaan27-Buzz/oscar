@@ -917,3 +917,78 @@ broader model/native/service workflows, general Chief-of-Staff replanning and
 whole-product rendered/accessibility/latency/operational acceptance remain OPEN.
 No publication, real account, physical device or production activation occurred.
 [Qualified receipt](../evidence/software-completion/compact-connectors-2026-10-27.json).
+
+
+**2026-10-28 native graph compilation checkpoint (in verification):**
+The former pending 92-case affected run completed: 92 passed (104.303s).
+The former full run has no completion manifest and is INTERRUPTED/INCOMPLETE,
+not a pass. A later native-kinds full attempt was explicitly stopped after a
+cross-device decoder admission defect was found; that receipt is also incomplete.
+
+Current changes derive native decoder input kinds from reviewed live Worker pins,
+exclude the planner from effect capabilities, deduplicate cross-device capability
+IDs, and select capability names before decoding their arguments. Model DAGs are
+topologically ordered before signed review; duplicate/missing/cyclic dependencies
+are rejected. Large effect reviews display only used executors and bind the full
+catalog digest. Read-only HTTPS prerequisites reuse independent bounded readback;
+changed results block dependent writes. Signed review, exact executor/account
+bindings, current authority and saved-effect verification remain mandatory.
+
+All 213 affected cases passed (203.412s); the three targeted read/dependency cases
+passed (4.456s). Ruff, formatting (289 files), mypy (107 files), repository links
+and value-silent credential checks passed. The source-stable whole-suite run
+finished with 1,376 cases: 1,365 passed, ten skipped and one MCP planning error
+(1,059.919s). Its source hashes were independently matched at sealing. The redundant
+first-step decoder shape exhausted that fixture model budget; the follow-up below
+removes it and passes the targeted MCP case. This aggregate remains FAILED; account selection, all requested fields and independent saved-resource
+readback must pass together. No broader model reliability or product completion
+is implied. No publication, real account, physical device or activation occurred.
+
+
+The frozen installed-Granite file/arithmetic/handoff campaign passed all six cases
+in Ask/synthetic Full Access (5.813–10.476s), with every recorded runtime/driver
+hash independently matched. Both Granite account cases and both Qwen 9B account
+cases failed acceptance. The Ask driver originally handled only a single effect
+confirmation; its corrected multi-step version preserves exact account, all fields,
+exactly one POST and independent saved GET checks. Qwen still clarified concrete
+IDs or mistook the read-preflight catalog for missing final write capabilities.
+Granite chose an incorrect account/omitted fields or an unnecessary update with
+an invented reference. These outcomes are retained; no account automation PASS
+is claimed. Experimental prompt changes are diagnostic, not product evidence.
+[Source-qualified receipt](../evidence/software-completion/native-graph-compilation-2026-10-28.json).
+
+
+**2026-10-28 native planning follow-up (verification running):**
+Compact read observations now accept the general decoder's explicit empty
+`depends_on` list; nonempty dependencies and extra fields still fail. Removing
+the redundant first-step schema restores MCP model-budget admission; native graph
+validation remains authoritative. Known Google Tasks/Microsoft To Do creates
+without dates now receive independent saved-title/notes/initial-status verification,
+including an empty query object. Unexpected saved dates fail verification.
+Ollama root planning omits its duplicate textual response schema because the
+adapter supplies the native decoder separately. Other eligible adapters retain
+textual schema and repeat context admission. No bounds were increased.
+
+The final catalog suite passed 25 cases (33.497s). Ruff/format (289 files), mypy
+(107 files), links and value-silent secrets checks pass. The affected integration batch passed all 300 loaded tests (330.801s), but ended
+with a loader ERROR because the command named nonexistent `tests.test_planner_mcp`.
+The intended `tests.test_planner_connectors` passed all sixteen cases separately
+(38.526s); these suites do not overlap. The aggregate
+runner error is retained. The whole-suite discovery run is RUNNING on unchanged
+runtime/test sources at `.oscar/native-graph-final-full.log`; no PASS is claimed.
+
+Actual installed Granite passed five of six file/arithmetic/handoff cases; Full
+file acceptance failed after a `./welcome.txt` plan. The earlier six-of-six receipt
+remains a different source checkpoint. Actual Qwen 9B passed ordinary undated task
+creation in Ask: exact synthetic Google Work credential, requested title/notes,
+one POST and independent GET, canonical task VERIFIED. Synthetic Full returned
+wrong-provider writes in an observation-only plan and was rejected before provider
+I/O. This is narrow actual-model/synthetic-provider evidence, not broad reliability
+or real-provider acceptance. All recorded runtime/driver hashes matched current
+sources when this receipt was sealed. Run-owned model servers stopped. Explicit
+status/live-preflight account cases remain failures; no experimental prompt is
+adopted. Both additional Granite ordinary task-create cases also failed acceptance: Ask
+used the wrong task-list resource and Full failed its accepted workflow. These
+failures remain recorded rather than replacing the earlier scenarios. The full
+original mandate remains incomplete.
+[Follow-up receipt](../evidence/software-completion/native-planning-followup-2026-10-28.json).

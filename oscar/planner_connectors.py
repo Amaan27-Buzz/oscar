@@ -268,10 +268,11 @@ class ConnectorPlanning:
                 if (
                     isinstance(step, dict)
                     and isinstance(document, dict)
-                    and set(step) == (
-                        {"id", "capability_id", "arguments"}
-                        if document.get("observe") is True
-                        else {"id", "capability_id", "arguments", "depends_on"}
+                    and (
+                        set(step) == {"id", "capability_id", "arguments", "depends_on"}
+                        and (document.get("observe") is not True or step["depends_on"] == [])
+                        or document.get("observe") is True
+                        and set(step) == {"id", "capability_id", "arguments"}
                     )
                 ):
                     selected = next(
@@ -334,9 +335,8 @@ class ConnectorPlanning:
                 ):
                     raise ValueError("exact connector argument plan required")
                 observe = isinstance(document, dict) and document.get("observe") is True
-                if observe and (
-                    not self.is_read(current["capability"]) or "body" in params["arguments"]
-                ):
+                read = self.is_read(current["capability"]) and "body" not in params["arguments"]
+                if observe and not read:
                     raise PermissionError("connector observations require a native read-only GET")
                 if current["transport"] == "mcp":
                     from jsonschema import Draft202012Validator  # type: ignore[import-untyped]
@@ -369,7 +369,7 @@ class ConnectorPlanning:
                     "pin": selected,
                     "expires": self.h.grid.clock() + 120,
                     "input_digest": digest(self.h.connectors.requests[ref]),
-                    **({"observation": arguments} if observe else {}),
+                    **({"observation": arguments} if read else {}),
                     **({"verification_arguments": arguments} if mutation else {}),
                 }
 
@@ -386,7 +386,7 @@ class ConnectorPlanning:
                         parameters={"request_ref": ref},
                         criterion={
                             "kind": "connector_observation"
-                            if observe
+                            if read
                             else "connector_planned_task"
                             if mutation
                             else "unavailable",

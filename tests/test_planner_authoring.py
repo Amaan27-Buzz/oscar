@@ -269,6 +269,25 @@ class PlannerAuthoringTests(unittest.TestCase):
         with self.assertRaises(PermissionError):
             self.complete(review)
 
+    def test_model_graph_rejects_duplicate_missing_self_and_cyclic_dependencies(self):
+        from copy import deepcopy
+
+        first = self.steps[0]
+        second = {**first, "id": "second"}
+        for graph in (
+            [first, first],
+            [{**first, "depends_on": ["absent"]}],
+            [{**first, "depends_on": [first["id"]]}],
+            [{**first, "depends_on": ["second"]}, {**second, "depends_on": [first["id"]]}],
+        ):
+            with self.subTest(graph=graph):
+                self.body["choices"][0]["message"]["content"] = json.dumps(deepcopy(graph))
+                self.complete(self.review(self.change))
+                self.h.executive.tick()
+                with self.assertRaises(ValueError):
+                    self.h.executive.result_plan(self.h.store.all("task")[-1]["id"])
+        self.assertTrue(all(t["state"] == "partially_verified" for t in self.h.store.all("task")))
+
     def test_structured_ollama_plan_constrains_decoding_and_keeps_both_reviews(self):
         from oscar.planning_contract import executive_plan_schema
 

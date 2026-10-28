@@ -39,8 +39,9 @@ def executive_plan_schema(
     goal: str = "",
     connector_schemas: dict[str, dict[str, Any]] | None = None,
     native_capabilities: tuple[str, ...] | None = None,
+    native_kinds: dict[str, str] | None = None,
 ) -> dict[str, Any]:
-    intent = {
+    intent: dict[str, Any] = {
         # Ollama rejects the 4096-repeat grammar; Executive enforces that text bound.
         "text": {"type": "string", "minLength": 1},
         **{
@@ -96,6 +97,10 @@ def executive_plan_schema(
             },
         },
     }
+    # Select the executor before decoding its intent, as with a tool name before arguments.
+    step = {
+        k: step[k] for k in ("id", "capability_id", "node_id", "intent", "depends_on", "inputs")
+    }
     schema: dict[str, Any] = {
         "oneOf": [
             {
@@ -141,7 +146,7 @@ def executive_plan_schema(
             fields["capability_id"] = {"const": capability}
             fields["depends_on"] = {"type": "array", "maxItems": 0}
             fields["inputs"] = {"type": "array", "maxItems": 0}
-            values = fields["intent"]["properties"]
+            values: dict[str, Any] = fields["intent"]["properties"]
             values["kind"] = {"const": "capability"}
             values["capability_kind"] = {"const": OBSERVATION_KINDS.get(capability, capability)}
             values["path"] = values["content"] = {"type": "null"}
@@ -204,6 +209,28 @@ def executive_plan_schema(
             }
             variants.append(variant)
         plan["properties"]["steps"]["items"] = {"oneOf": variants}
+    if not observation_only and native_kinds:
+        variants = []
+        for capability in native_capabilities or ():
+            variant = deepcopy(schema["oneOf"][0]["properties"]["steps"]["items"])
+            fields = variant["properties"]
+            fields["capability_id"] = {"const": capability}
+            values = fields["intent"]["properties"]
+            kind = native_kinds.get(capability)
+            if kind == "file_write":
+                values["kind"] = {"const": "file_write"}
+                values["path"] = {"type": "string", "minLength": 1}
+                values["content"] = (
+                    {"enum": ["", literal]} if literal is not None else {"type": "string"}
+                )
+                for key in ("capability_kind", "parameters", "criterion"):
+                    values[key] = {"type": "null"}
+            elif kind == "addition":
+                values["text"] = {"type": "string", "pattern": r"^[0-9]{1,12} *\+ *[0-9]{1,12}$"}
+                for key in values.keys() - {"text"}:
+                    values[key] = {"type": "null"}
+            variants.append(variant)
+        schema["oneOf"][0]["properties"]["steps"]["items"] = {"oneOf": variants}
     connectors = (
         [c for c in observation_only if c not in OBSERVATION_KINDS]
         if observation_only
@@ -230,7 +257,7 @@ def executive_plan_schema(
             variants = plan["properties"]["steps"]["items"]["oneOf"]
         else:
             native = plan["properties"]["steps"]["items"]
-            if native_capabilities is not None:
+            if native_capabilities is not None and not native_kinds:
                 native["properties"]["capability_id"] = {"enum": list(native_capabilities)}
             variants = []
         for capability in connectors:
@@ -254,6 +281,6 @@ def executive_plan_schema(
                 }
             )
         if not observation_only and native_capabilities != ():
-            variants.append(native)
+            variants.extend(native.get("oneOf", [native]))
         plan["properties"]["steps"]["items"] = {"oneOf": variants}
     return schema

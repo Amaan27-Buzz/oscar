@@ -499,6 +499,10 @@ def task_expectation(name: str, parameters: dict[str, Any]) -> dict[str, Any] | 
     """Recognize native saved-resource contracts, never model-supplied success criteria."""
     if name in _CALENDAR_MUTATIONS:
         return calendar_expectation(name, parameters)
+    if "query" in parameters:
+        if parameters["query"] != {}:
+            return None
+        parameters = {k: v for k, v in parameters.items() if k != "query"}
     if name in _TASK_UPDATES:
         body = parameters.get("body")
         if (
@@ -522,21 +526,27 @@ def task_expectation(name: str, parameters: dict[str, Any]) -> dict[str, Any] | 
                 or body.get("status", "needsAction") != "needsAction"
             ):
                 return None
-            notes, due = body.get("notes", ""), body["due"]
+            notes, due = body.get("notes", ""), body.get("due")
+            if "due" in body and due is None:
+                return None
         else:
             if (
-                set(body) != {"title", "body", "dueDateTime", "status"}
-                or body["status"] != "notStarted"
+                set(body) - {"title", "body", "dueDateTime", "status"}
+                or body.get("status", "notStarted") != "notStarted"
             ):
                 return None
-            if set(body["body"]) != {"contentType", "content"} or body["body"][
-                "contentType"
-            ].lower() not in {"text", "html"}:
-                return None
-            point = body["dueDateTime"]
-            if set(point) != {"dateTime", "timeZone"} or point["timeZone"] != "UTC":
-                return None
-            notes, due = task_notes(body["body"]), point["dateTime"] + "Z"
+            notes, due = "", None
+            if "body" in body:
+                if set(body["body"]) != {"contentType", "content"} or body["body"][
+                    "contentType"
+                ].lower() not in {"text", "html"}:
+                    return None
+                notes = task_notes(body["body"])
+            if "dueDateTime" in body:
+                point = body["dueDateTime"]
+                if set(point) != {"dateTime", "timeZone"} or point["timeZone"] != "UTC":
+                    return None
+                due = point["dateTime"] + "Z"
         title = body["title"]
         if (
             not isinstance(title, str)
@@ -546,11 +556,18 @@ def task_expectation(name: str, parameters: dict[str, Any]) -> dict[str, Any] | 
             or len(notes) > 3000
             or "\r" in notes
             or "\x00" in notes
-            or not isinstance(due, str)
-            or not re.fullmatch(r"\d{4}-\d{2}-\d{2}T00:00:00(?:Z|\+00:00)", due)
+            or due is not None
+            and (
+                not isinstance(due, str)
+                or not re.fullmatch(r"\d{4}-\d{2}-\d{2}T00:00:00(?:Z|\+00:00)", due)
+            )
         ):
             return None
-        return {"title": title, "notes": notes, "due": _instant(due).date().isoformat()}
+        return {
+            "title": title,
+            "notes": notes,
+            "due": _instant(due).date().isoformat() if due is not None else None,
+        }
     except (KeyError, TypeError, ValueError, AttributeError):
         return None
 
@@ -667,21 +684,32 @@ def matches(name: str, payload: dict[str, Any], expected: dict[str, Any]) -> boo
         return bool(
             payload.get("title") == expected["title"]
             and payload.get("notes", "") == expected["notes"]
-            and _instant(payload["due"]).date().isoformat() == expected["due"]
+            and (
+                payload.get("due") is None
+                if expected["due"] is None
+                else _instant(payload["due"]).date().isoformat() == expected["due"]
+            )
             and payload.get("status") == "needsAction"
             and payload.get("deleted") is not True
             and payload.get("hidden") is not True
         )
     if name == "microsoft.todo.tasks.create":
-        due = payload["dueDateTime"]
-        instant = datetime.fromisoformat(due["dateTime"].replace("Z", "+00:00"))
-        if instant.tzinfo is None:
-            instant = instant.replace(tzinfo=UTC)
+        due = payload.get("dueDateTime")
+        due_matches = due is None
+        if expected["due"] is not None:
+            if not isinstance(due, dict):
+                return False
+            instant = datetime.fromisoformat(due["dateTime"].replace("Z", "+00:00"))
+            if instant.tzinfo is None:
+                instant = instant.replace(tzinfo=UTC)
+            due_matches = due.get("timeZone") in {"UTC", "Etc/UTC"} and instant == _instant(
+                expected["due"] + "T00:00:00Z"
+            )
         return bool(
             payload.get("title") == expected["title"]
-            and task_notes(payload["body"]) == expected["notes"]
-            and due.get("timeZone") in {"UTC", "Etc/UTC"}
-            and instant == _instant(expected["due"] + "T00:00:00Z")
+            and (task_notes(payload["body"]) if payload.get("body") is not None else "")
+            == expected["notes"]
+            and due_matches
             and payload.get("status") == "notStarted"
         )
     if name.startswith("google.gmail."):

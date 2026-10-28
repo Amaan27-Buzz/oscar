@@ -106,14 +106,15 @@ class HTTPPlanningTests(unittest.TestCase):
             self.h.executive.tick()
             if len(self.h.store.all("task")) == 2 and self.h.store.all("task")[-1]["state"] in {
                 "partially_verified",
+                "verified",
                 "failed",
                 "blocked",
                 "unknown",
             }:
                 break
             sleep(0.02)
-        self.assertEqual("partially_verified", self.h.store.all("task")[-1]["state"])
-        self.assertEqual(1, len(self.api.calls))
+        self.assertEqual("verified", self.h.store.all("task")[-1]["state"])
+        self.assertEqual(2, len(self.api.calls))
         self.assert_private()
 
     def test_ask_reviews_exact_endpoint_and_private_body_before_real_http_effect(self):
@@ -191,6 +192,60 @@ class HTTPPlanningTests(unittest.TestCase):
             ]["enum"],
         )
 
+    @unittest.skipUnless(importlib.util.find_spec("jsonschema"), "optional schema validator absent")
+    def test_native_decoder_rejects_null_file_fields_and_preserves_typed_handoff(self):
+        from copy import deepcopy
+
+        from jsonschema import Draft202012Validator
+
+        from oscar.planning_contract import executive_plan_schema
+
+        for connectors in ({}, {self.cap.id: {"type": "object"}}):
+            validator = Draft202012Validator(
+                executive_plan_schema(
+                    connector_schemas=connectors,
+                    native_capabilities=("files.write", "math.add"),
+                    native_kinds={"files.write": "file_write", "math.add": "addition"},
+                )
+            )
+            source = {
+                "id": "calculate",
+                "node_id": "selected",
+                "capability_id": "math.add",
+                "depends_on": [],
+                "inputs": [],
+                "intent": asdict(Intent("17 + 25")),
+            }
+            writer = {
+                "id": "write",
+                "node_id": "selected",
+                "capability_id": "files.write",
+                "depends_on": ["calculate"],
+                "inputs": [{"from_step": "calculate", "select": [], "to": ["content"]}],
+                "intent": asdict(Intent("Save result", "file_write", "answer.txt", "")),
+            }
+            self.assertTrue(validator.is_valid({"steps": [source, writer]}))
+            variants = validator.schema["oneOf"][0]["properties"]["steps"]["items"]["oneOf"]
+            native = next(
+                v for v in variants if v["properties"]["capability_id"] == {"const": "files.write"}
+            )
+            self.assertLess(
+                list(native["properties"]).index("capability_id"),
+                list(native["properties"]).index("intent"),
+            )
+            invalid_source = deepcopy(source)
+            invalid_source["intent"]["text"] = "Write the requested file"
+            self.assertFalse(validator.is_valid({"steps": [invalid_source]}))
+            for key in ("kind", "path", "content"):
+                invalid = deepcopy(writer)
+                invalid["intent"][key] = None
+                self.assertFalse(validator.is_valid({"steps": [source, invalid]}))
+            invalid = deepcopy(writer)
+            invalid["capability_id"] = "unselected"
+            self.assertFalse(validator.is_valid({"steps": [invalid]}))
+            # Graph references are checked by Core, rather than duplicating the decoder schema.
+            self.assertTrue(validator.is_valid({"steps": [writer]}))
+
     def compact_response(self):
         step = self.steps[0]
         self.steps = [
@@ -246,6 +301,8 @@ class HTTPPlanningTests(unittest.TestCase):
             )
 
     def test_read_only_endpoint_uses_fixed_get_without_body_or_action_confirmation(self):
+        from tests.test_planner_http_observations import HTTPObservationTests
+
         self.cap = self.mount.capability("google.tasks.list", account_id=self.account.id)
         self.steps[0]["capability_id"] = self.cap.id
         self.steps[0]["intent"]["capability_kind"] = self.cap.id
@@ -257,7 +314,8 @@ class HTTPPlanningTests(unittest.TestCase):
         self.response()
         row = self.draft()
         self.complete(self.review(self.accept_change(row)))
-        self.finish()
+        self.assertEqual("verified", HTTPObservationTests.settle(self, 2)["state"])
+        self.assertEqual(2, len(self.api.calls))
         self.assertEqual(("GET", "/tasks/v1/lists/selected-list/tasks", None), self.api.calls[0])
         self.assertEqual(
             "/tasks/v1/lists/selected-list/tasks?maxResults=10", self.api.requests[0][0]

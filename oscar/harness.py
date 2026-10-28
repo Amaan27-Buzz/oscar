@@ -126,14 +126,32 @@ class ModelExecutor:
             if self.connector_plans is not None and "structured" in self.template.required
         }
         native_capabilities = None
-        if connector_schemas and self.grid is not None:
+        native_kinds = {}
+        if (
+            "planning_sources" in action.parameters
+            and "structured" in self.template.required
+            and self.grid is not None
+        ):
             binding = self.grid.store.get("plan", action.task_id)["executive"]
             worker = self.grid.store.get("executive_worker", binding["worker_id"])
             native_capabilities = tuple(
-                p["capability_id"]
-                for p in worker["capabilities"]
-                if p["capability_id"] not in connector_schemas
+                dict.fromkeys(
+                    p["capability_id"]
+                    for p in worker["capabilities"]
+                    if p["capability_id"] not in connector_schemas
+                    and p["capability_id"] != action.capability_id
+                )
             )
+            native_kinds = {
+                c["id"]: c["input_kind"]
+                for node in self.grid.nodes()
+                for c in node["capabilities"]
+                if any(
+                    p["node_id"] == c["node_id"] and p["capability_id"] == c["id"]
+                    for p in worker["capabilities"]
+                )
+                and c["id"] in native_capabilities
+            }
         request = replace(
             self.template,
             task_id=action.task_id,
@@ -151,6 +169,7 @@ class ModelExecutor:
             ),
             executive_connector_schemas=connector_schemas,
             executive_native_capabilities=native_capabilities,
+            executive_native_kinds=native_kinds,
         )
         policy = self.policy
         check = cancellation.check

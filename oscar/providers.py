@@ -287,6 +287,7 @@ class HTTPAdapter:
                             observation_only=request.executive_observation,
                             connector_schemas=request.executive_connector_schemas,
                             native_capabilities=request.executive_native_capabilities,
+                            native_kinds=request.executive_native_kinds,
                         )
                         body["options"]["temperature"] = 0
                     else:

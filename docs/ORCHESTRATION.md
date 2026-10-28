@@ -574,3 +574,30 @@ hints are not authorization. Large continuation reviews omit duplicate raw model
 input only from display and bind the entire original step with a digest; signed
 acceptance reconstructs and checks the complete input before inference.
 [Scoped acceptance and remaining model limits](evidence/software-completion/compact-connectors-2026-10-27.json).
+
+Native decoder variants also carry the selected capability's current input kind.
+File writes require `kind:file_write` and string path/content fields, including
+an empty string for a reviewed handoff destination. Addition requires the native
+bounded integer expression. The planning executor itself is excluded from the
+action catalog. Native graph validation owns dependency and handoff ordering. These
+shape constraints supplement native validation; they do not verify that a model
+selected the operation that fulfills the owner's objective.
+
+Before signed review, Core topologically orders the model's declared graph without
+changing its edges or intents. Duplicate IDs, missing dependencies and cycles are
+rejected. Final effect reviews show the used executors and a digest of the complete
+catalog; acceptance still rechecks the complete catalog and account generations.
+A selected read-only HTTPS GET inside an effect graph reuses independent bounded
+readback verification. Only a verified prerequisite releases its dependent step;
+the write retains its own permission and saved-resource verification requirements.
+Verifying that read does not establish completion of the owner's overall objective.
+Compact observation steps may omit dependencies or supply an explicit empty list,
+as required by the general decoder contract. Nonempty observation dependencies and
+extra fields remain invalid. The schema does not duplicate its entire step shape
+to constrain the first item; native graph admission owns that check within the
+existing model context budget.
+
+For eligible Ollama-only routes, initial planning also omits the textual response
+schema because the adapter transmits the selected schema to native decoding.
+Other eligible adapters retain the textual schema and repeat context admission.
+This avoids duplicated durable payload without increasing any model or goal bound.

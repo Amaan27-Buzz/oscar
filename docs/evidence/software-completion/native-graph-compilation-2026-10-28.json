@@ -1,0 +1,244 @@
+{
+  "status": "PARTIAL",
+  "base_head": "cb92c17",
+  "qualification": "Local software and installed-model inference; synthetic owners/accounts and loopback provider resources only. General account/model/product acceptance remains incomplete.",
+  "implemented": [
+    "Reviewed current native decoder kinds, capability-before-intent decoding and cross-device ID deduplication",
+    "Normalize declared model DAG order before signed review; reject duplicate/missing/cyclic dependencies",
+    "Bound final effect review display to used executors while retaining full catalog digest and current-state recheck",
+    "Independent bounded GET prerequisite verification inside effect graphs; changed reads block dependent mutations"
+  ],
+  "affected": {
+    "cases": 213,
+    "passed": 213,
+    "seconds": 203.412,
+    "log_sha256": "694830ea19f5b03c8d3d4f8e28d0500c0ca790287a89cdd10d8fd63bcd09955a"
+  },
+  "targeted": {
+    "cases": 3,
+    "passed": 3,
+    "seconds": 4.456,
+    "log_sha256": "58ac92940b923840ff295722e3dc7bfd750d5be845bf7abc1798e28f5599ed04"
+  },
+  "static_checks": [
+    "Ruff check PASS",
+    "Ruff format check PASS: 289 files",
+    "mypy PASS: 107 files",
+    "repository links and value-silent credential scan PASS"
+  ],
+  "model_campaigns": [
+    {
+      "receipt_sha256": "0e94a6a01e18321c7a3b9664d279927d6d21bdd5755bda5047cf3533fd689bcb",
+      "model": "granite4.1:3b",
+      "mode": "ask",
+      "state": "PASS",
+      "seconds": 8.593,
+      "source_stable_reported": true,
+      "sources_independently_match": true,
+      "verified_effect_tasks": 1,
+      "provider_methods": [],
+      "correct_account_credential_verified": false,
+      "error": null
+    },
+    {
+      "receipt_sha256": "bbda6a13ee9b7daf9dc939897705c2061d0f32b3020a1fd96e377a90240d7406",
+      "model": "granite4.1:3b",
+      "mode": "full",
+      "state": "PASS",
+      "seconds": 5.813,
+      "source_stable_reported": true,
+      "sources_independently_match": true,
+      "verified_effect_tasks": 1,
+      "provider_methods": [],
+      "correct_account_credential_verified": false,
+      "error": null
+    },
+    {
+      "receipt_sha256": "e94f9ea76fa87a30b97c9af37680b14d7996a4178c777ad9d57c9b60db4dbc5f",
+      "model": "granite4.1:3b",
+      "mode": "ask",
+      "state": "PASS",
+      "seconds": 10.312,
+      "source_stable_reported": true,
+      "sources_independently_match": true,
+      "verified_effect_tasks": 2,
+      "provider_methods": [],
+      "correct_account_credential_verified": false,
+      "error": null
+    },
+    {
+      "receipt_sha256": "b854d42db4230e78afa4675ce807fdc729f376f12f1baec3d46fbad87c83e32d",
+      "model": "granite4.1:3b",
+      "mode": "full",
+      "state": "PASS",
+      "seconds": 7.51,
+      "source_stable_reported": true,
+      "sources_independently_match": true,
+      "verified_effect_tasks": 2,
+      "provider_methods": [],
+      "correct_account_credential_verified": false,
+      "error": null
+    },
+    {
+      "receipt_sha256": "a35c763607a9ed41f5098c574b18fc766a94313cdcc5dee1109b18d733083e2a",
+      "model": "granite4.1:3b",
+      "mode": "ask",
+      "state": "PASS",
+      "seconds": 10.476,
+      "source_stable_reported": true,
+      "sources_independently_match": true,
+      "verified_effect_tasks": 2,
+      "provider_methods": [],
+      "correct_account_credential_verified": false,
+      "error": null
+    },
+    {
+      "receipt_sha256": "fab3d0fbb12f683b252e79ff56308c81e2e4cc377e2d360373a44e4f36f51caa",
+      "model": "granite4.1:3b",
+      "mode": "full",
+      "state": "PASS",
+      "seconds": 7.649,
+      "source_stable_reported": true,
+      "sources_independently_match": true,
+      "verified_effect_tasks": 2,
+      "provider_methods": [],
+      "correct_account_credential_verified": false,
+      "error": null
+    },
+    {
+      "receipt_sha256": "9664a5dd89c3617d5b72eb56d3d6c616bb523fc058c8c0f3b941956bc1b6193e",
+      "model": "granite4.1:3b",
+      "mode": "ask",
+      "state": "FAILED",
+      "seconds": 126.519,
+      "source_stable_reported": true,
+      "sources_independently_match": true,
+      "verified_effect_tasks": 0,
+      "provider_methods": [
+        "GET",
+        "GET",
+        "GET",
+        "GET"
+      ],
+      "correct_account_credential_verified": false,
+      "error": "AssertionError: "
+    },
+    {
+      "receipt_sha256": "61d9ec5280b21b99eb8fb420cf0a30e5ac13a0e0fb54329813d4f91e48f83b3a",
+      "model": "granite4.1:3b",
+      "mode": "full",
+      "state": "FAILED",
+      "seconds": 126.787,
+      "source_stable_reported": true,
+      "sources_independently_match": true,
+      "verified_effect_tasks": 0,
+      "provider_methods": [
+        "GET",
+        "GET",
+        "GET",
+        "GET",
+        "POST"
+      ],
+      "correct_account_credential_verified": false,
+      "error": "AssertionError: "
+    },
+    {
+      "receipt_sha256": "aa633467076fcabe0db2460e17f09c1128c0ef5ea74ef9d2fd23055a32d73d7f",
+      "model": "qwen3.5:9b",
+      "mode": "ask",
+      "state": "FAILED",
+      "seconds": 13.316,
+      "source_stable_reported": true,
+      "sources_independently_match": true,
+      "verified_effect_tasks": 0,
+      "provider_methods": [],
+      "correct_account_credential_verified": false,
+      "error": "AssertionError: {'state': 'blocked', 'epistemic': 'UNKNOWN', 'message': \"Plan needs clarification: Which specific task list ID corresponds to 'selected-list' in the Google Tasks API for account alias 'Work'? The objective requires a literal string value for the path.tasklist argument.\"}"
+    },
+    {
+      "receipt_sha256": "9fe9b897c2327d8e2314a6f98434ce3a0348ca3d0ced06a1c32e3593f016cd0f",
+      "model": "qwen3.5:9b",
+      "mode": "full",
+      "state": "FAILED",
+      "seconds": 6.15,
+      "source_stable_reported": true,
+      "sources_independently_match": true,
+      "verified_effect_tasks": 0,
+      "provider_methods": [],
+      "correct_account_credential_verified": false,
+      "error": "AssertionError: {'autonomy_blocked': True, 'durable_probe': {'steps_json_chars': 24714, 'secrets_changed': False, 'parameters': {'prompt': 16389, 'mode': 6, 'planning_sources': 108, 'planning_configuration': 66, 'connector_contracts': 6399, 'observation_only': 1316}}}"
+    },
+    {
+      "receipt_sha256": "d473ea9fbc4ef2dd2a234a192c503ae93d9b09ae1309f5d8eb65134a091fe1ab",
+      "model": "nemotron-3-nano:4b",
+      "mode": "ask",
+      "state": "FAILED",
+      "seconds": 30.78,
+      "source_stable_reported": true,
+      "sources_independently_match": true,
+      "verified_effect_tasks": 0,
+      "provider_methods": [
+        "GET",
+        "GET"
+      ],
+      "correct_account_credential_verified": false,
+      "error": "AssertionError: planning failed; no repeated model or effect attempt"
+    },
+    {
+      "receipt_sha256": "8dab8771626720869b4c69bd85d86f662ec5fe7deb51fec3f7c3687ad2c46786",
+      "model": "nemotron-3-nano:4b",
+      "mode": "full",
+      "state": "FAILED",
+      "seconds": 18.486,
+      "source_stable_reported": true,
+      "sources_independently_match": true,
+      "verified_effect_tasks": 0,
+      "provider_methods": [
+        "GET",
+        "GET"
+      ],
+      "correct_account_credential_verified": false,
+      "error": "AssertionError: planning failed; no repeated model or effect attempt"
+    }
+  ],
+  "full_regression": {
+    "state": "FAILED",
+    "errors": 1,
+    "skipped": 10,
+    "cases": 1376,
+    "passed": 1365,
+    "base_head": "cb92c175a77d629966a2604336b625e704e4329a",
+    "exit_code": 1,
+    "seconds": 1062.647,
+    "source_stable": true,
+    "manifest_sha256": "4de22e8b4ae5f40d8191dbf2740d9b9b9e9967586b84a38a9da561151a48a92a",
+    "log_sha256": "7b0c869f050c1e13872e30bf026674fbe79fecb3c73a5c765dc9f727c53cddbd",
+    "sources_independently_match": true
+  },
+  "prior_runs": [
+    {
+      "state": "PASS",
+      "cases": 92,
+      "seconds": 104.303,
+      "log_sha256": "e4ed70b7e06d2528bdd9b1af102d6fb702d11e29329ee72c7aa7bb4b6c07fd61"
+    },
+    {
+      "state": "INTERRUPTED_INCOMPLETE",
+      "log_sha256": "d15bb616e2035622960fcf1d7a7b7fee0b16d6a4ad35cb2d190827b70fbea072"
+    },
+    {
+      "state": "INTENTIONALLY_STOPPED_SUPERSEDED",
+      "log_sha256": "c94d0cd684be65906d6e5d0426d35b3c13ea25211068d24ff7239bf669eae311"
+    }
+  ],
+  "remaining": [
+    "General model/account/field/reference correctness beyond explicit successful cases",
+    "Broader model/native/service workflows and general Chief-of-Staff replanning",
+    "Whole-product rendered/accessibility/latency/sustained-operation acceptance"
+  ],
+  "boundaries": [
+    "No publication, push, Actions or remote mutation",
+    "No real accounts, personal data, physical device or live microphone/camera",
+    "No cloud provisioning, spending, deployment or production authority activation"
+  ]
+}

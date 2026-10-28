@@ -351,7 +351,20 @@ contain explicitly selected source data under the existing file/action contract.
 
 ### Private planned task mutation readback
 
-Known canonical Google Tasks and Microsoft To Do create bodies derive expected title, notes and explicit date from privately staged arguments. A model cannot supply its own verification criterion. These expectations remain transient and expire with the staged input. Independent saved-resource GET uses the existing communication verifier and must match identity and fields before a dependent Worker proceeds. Current owner and executor read scope, policy, signed authority, account generation and input digest are rechecked before and after readback. Revocation, lost private inputs or uncertain mutation never imply success or authorize replay. Unsupported body shapes retain generic partial verification. This verifies the saved fields, not their real-world completion.
+Known canonical Google Tasks and Microsoft To Do create bodies derive expected title,
+notes and optional date from privately staged arguments. Undated tasks require an
+independently saved resource with no due date; an unexpected date fails verification.
+Title-only creation can verify empty notes and the saved initial task status. Empty
+query objects are equivalent to omitted query arguments; nonempty unsupported queries
+cannot acquire this verification contract. See the official [Google task resource](https://developers.google.com/workspace/tasks/reference/rest/v1/tasks)
+and [Microsoft task creation](https://learn.microsoft.com/en-us/graph/api/todotasklist-post-tasks?view=graph-rest-1.0)
+contracts. A model cannot supply its own verification criterion. Expectations remain
+transient and expire with staged input. Independent saved-resource GET must match
+identity and fields before a dependent Worker proceeds. Owner/executor read scope,
+policy, signed authority, account generation and input digest are rechecked before
+and after readback. Revocation, lost private inputs or uncertain mutation never
+imply success or authorize replay. Unsupported body shapes retain partial
+verification. This verifies saved fields, not their real-world completion.
 
 
 ### Private calendar verification

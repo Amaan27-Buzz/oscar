@@ -429,6 +429,15 @@ class Assistance:
                     parameters.pop("prompt", None)
                     parameters.pop("connector_contracts", None)
                 displayed["model_input_digest"] = fingerprint(state["steps"])
+            elif operation == "plan_accept":
+                used = {(s["node_id"], s["capability_id"]) for s in state["steps"]}
+                displayed["capabilities"] = [
+                    c for c in state["capabilities"] if (c["node_id"], c["id"]) in used
+                ]
+                displayed["capability_catalog"] = {
+                    "count": len(state["capabilities"]),
+                    "digest": fingerprint(state["capabilities"]),
+                }
             for key in ("worker", "request"):
                 if key in state:
                     displayed[key] = {
