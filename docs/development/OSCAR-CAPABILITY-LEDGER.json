@@ -30,7 +30,7 @@
       "severity": "P1",
       "capability": "CAP-PLANNING",
       "evidence": "docs/evidence/software-completion/cross-service-preflight-2026-10-28.json",
-      "description": "Installed-Qwen source/destination campaign remains FAILED 0/2 (historical). PR #10 now includes registry-grounded ordinary provider names (only unambiguous current owner accounts), typed transfer role/field contract, source-read or verified-source-observation dependency, operation-class admission and an Executive fail-closed partially_verified state. No independently verified whole-objective destination/source field comparator exists. All new tests NOT_RUN; BUG OPEN."
+      "description": "P1 OPEN. Historical installed-Qwen cross-service owner-objective campaign FAILED 0/2. PR #10 now commits typed owner roles, verified-account routing, source observation and freshness preflight, bounded Google Tasks↔Microsoft To Do canonical field equivalence, independent destination task GET linkage and explicit-resource whole-objective terminal proof, including unknown/partial/no-replay states. Implementation and new adversarial/synthetic end-to-end tests are NOT_RUN. Ordinary named-resource resolution, other services/operations, wider field fidelity and real-model acceptance remain open; no merge or PASS."
     },
     {
       "id": "BUG-FOCUS-001",
@@ -1639,7 +1639,8 @@
         "oscar/planner_authoring.py",
         "oscar/planner_connectors.py",
         "oscar/executive.py",
-        "oscar/harness.py"
+        "oscar/harness.py",
+        "oscar/owner_transfer.py"
       ],
       "implementation_status": "PARTIAL",
       "integration_status": "PARTIAL",
@@ -1684,7 +1685,8 @@
         }
       ],
       "test_commands": [
-        "python -m unittest tests.test_planner_catalog tests.test_planner_task_verification -v"
+        "python -m unittest tests.test_planner_catalog tests.test_planner_task_verification -v",
+        "python -m unittest tests.test_owner_transfer tests.test_planner_task_verification tests.test_planner_http_observations tests.test_executive -v"
       ],
       "dependencies": [
         "CAP-CONTROLLER",
@@ -1694,13 +1696,13 @@
         "CAP-VERIFICATION"
       ],
       "bugs_and_blockers": [
-        "BUG-PLAN-001 OPEN: historical installed Qwen Ask/Full cross-service campaign FAILED 0/2; wrong-service or incomplete fields can have verified substeps.",
-        "PR #10 partial implementation: owner-sourced contract preserves exact text, account identity/generation and named fields; admission enforces account roles, create operation for transfers, source-read dependency or verified source observation. No general semantic resolution of named destination lists or guaranteed field-value provenance.",
-        "Executive fails closed to partially_verified on typed transfer objectives. Whole-objective result matching, source freshness at effect boundary and independently verified end-goal completion remain NOT_IMPLEMENTED; new tests NOT_RUN, no CI jobs.",
-        "General natural objective, non-HTTPS MCP semantic contracts and image reasoning accuracy remain unestablished."
+        "BUG-PLAN-001 OPEN: installed-Qwen synthetic cross-provider Ask/Full owner-goal campaign historical FAILED 0/2; continuation-02 changes have NOT_RUN tests.",
+        "PR #10 now has a bounded typed source/destination copy contract and independently verified source snapshot + fresh pre-effect GET + destination field-equivalence admission + independent destination saved-resource GET + final original-owner-goal proof when both resource IDs are explicit. All runtime paths and new behavioral tests remain NOT_RUN.",
+        "Ordinary language account/provider roles are resolved only when one bound account/provider is unambiguous. Named resource/list strings are not yet independently resolved through provider metadata; avoid claiming or enacting owner-specific list goals from guessed resource IDs.",
+        "Non-task transfers, MCP operation semantics, unsupported semantic fields, multi-page source inventories, move/sync, broad field/capability coverage, and concurrent cross-provider source changes require further implementation and adversarial acceptance. No atomic cross-provider transaction is claimed."
       ],
       "required_owner_action": [],
-      "next_implementation_action": "Build independent, provider-neutral source-record-to-destination-field/resource comparator and currentness recheck on the typed owner contract; then execute focused unittest/Ruff/mypy, broaden adversarial tests and repeat synthetic installed-Qwen Ask/Full acceptance.",
+      "next_implementation_action": "Run focused unittest suite, Ruff format/check, mypy, repository checks on PR #10; fix any failures, then connect provider-native named-list metadata to owner resource bindings and repeat real installed-Qwen Ask/Full synthetic goal campaign.",
       "deferred": false,
       "owner_action_status": "NOT_RUN"
     },
@@ -4009,7 +4011,8 @@
         "oscar/communication.py",
         "oscar/planning_contract.py",
         "oscar/planner_connectors.py",
-        "oscar/executive.py"
+        "oscar/executive.py",
+        "oscar/owner_transfer.py"
       ],
       "implementation_status": "PARTIAL",
       "integration_status": "INTEGRATED",
@@ -4034,16 +4037,17 @@
         }
       ],
       "test_commands": [
-        "python -m unittest tests.test_planner_task_verification tests.test_planner_calendar_verification -v"
+        "python -m unittest tests.test_planner_task_verification tests.test_planner_calendar_verification -v",
+        "python -m unittest tests.test_owner_transfer tests.test_planner_task_verification tests.test_executive -v"
       ],
       "dependencies": [],
       "bugs_and_blockers": [
-        "BUG-PLAN-001 OPEN: provider task saved-resource GET verifies an individual model-selected operation, not equivalence to the original owner objective.",
-        "PR #10 adds a fail-closed Executive partially_verified state for owner transfer contracts with verified steps, but has no independent complete owner-goal comparator or field-level source-to-destination result proof; tests NOT_RUN.",
-        "Missing/expired source observations, uncertain effects and source mutations require explicit recovery and fresh authority; no blind consequential replay."
+        "BUG-PLAN-001 OPEN. PR #10 implements bounded task-copy whole-objective comparator (source/destination equality, provenance, explicit resource IDs, pre-effect GET, saved-resource readbacks, final source refresh), but all new code and tests are NOT_RUN due zero-job Actions and no checkout.",
+        "Goal-level unknown/partial/blocked states avoid blind replay; handling of some uncertain provider effects, interleaving and recovery needs executed adversarial verification.",
+        "Named resource resolution and generalized non-task/MCP effect evidence remain NOT_IMPLEMENTED. Currentness checks narrow the race but cannot make cross-provider writes atomic."
       ],
       "required_owner_action": [],
-      "next_implementation_action": "Attach source observation field provenance and destination independent readback to the original owner objective with currentness and resource identity checks; only then allow goal completed, preserving partial/unknown states.",
+      "next_implementation_action": "Execute and correct PR #10 synthetic task-copy end-to-end tests including Ask, Full, changed source, wrong destination field, partial mutation and lost post response; extend typed verified metadata for named resources and other provider operations.",
       "deferred": false,
       "owner_action_status": "NOT_RUN"
     },
