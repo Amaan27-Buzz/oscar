@@ -251,7 +251,7 @@ class ConnectorPlanning:
             mentioned = {
                 account.provider
                 for account in self.h.accounts.list_accounts()
-                if re.search(r"\\b" + re.escape(account.provider) + r"\\b", goal, re.I)
+                if re.search(r"\b" + re.escape(account.provider) + r"\b", goal, re.I)
             }
             routed = {
                 descriptor["account"]["provider"]
