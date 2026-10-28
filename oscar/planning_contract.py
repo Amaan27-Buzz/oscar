@@ -240,6 +240,16 @@ def owner_objective_contract(goal: str, accounts: list[Any]) -> dict[str, Any] |
         return None
     if not transfer:
         return None
+    if re.search(
+        r"\b(reminders?|attachments?|subtasks?|priorit(?:y|ies)|categories|"
+        r"recurren(?:t|ce)|checklists?|ordering|positions?)\b",
+        goal,
+        re.I,
+    ):
+        raise ValueError(
+            "Clarify requested task fields; no independently verified transfer adapter "
+            "preserves those semantics."
+        )
     sources = [r for r in roles if r["role"] == "source"]
     destinations = [r for r in roles if r["role"] == "destination"]
     if len(sources) != 1 or len(destinations) != 1:
