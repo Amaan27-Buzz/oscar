@@ -495,6 +495,18 @@ class ConnectorPlanning:
             cancellation.check()
             if source_task_digest(current["operation"], payload) != proof["source_digest"]:
                 raise PermissionError("source records changed before destination effect")
+            with self.h.store.transaction():
+                self.h.store.put(
+                    "owner_transfer_source_preflight",
+                    task_id,
+                    {
+                        "goal_id": goal["id"],
+                        "step_id": step["id"],
+                        "proof_digest": digest(proof),
+                        "source_digest": proof["source_digest"],
+                        "checked_at": self.h.grid.clock(),
+                    },
+                )
         except (
             KeyError,
             StopIteration,
