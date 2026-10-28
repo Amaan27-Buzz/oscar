@@ -82,6 +82,32 @@ class ExecutiveTests(unittest.TestCase):
         self.assertEqual(0, self.e.tick())
         self.assertEqual(2, len(self.r.store.all("task")))
 
+    def test_individual_verified_steps_do_not_complete_unproven_owner_objective(self):
+        proposal = self.e.propose(
+            self.worker, "Copy owner records between accounts", [self.step()]
+        )
+        proposal["owner_objective"] = {
+            "objective": "Copy source records to the destination and preserve due dates",
+            "operation": "copy",
+            "required_fields": ["due"],
+            "accounts": [
+                {"account_id": "source", "role": "source", "generation": 1},
+                {"account_id": "destination", "role": "destination", "generation": 1},
+            ],
+            "completion_rule": "independent_source_and_destination_evidence",
+        }
+        proposal["review_digest"] = self.e._review(proposal)
+        with self.r.store.transaction():
+            self.r.store.put("executive_goal", proposal["id"], proposal)
+        self.e.accept(proposal["id"], proposal["review_digest"], owner_authorized=True)
+        self.assertEqual(1, self.e.tick())
+        self.assertEqual("verified", self.r.store.all("task")[-1]["state"])
+        saved = self.r.store.get("executive_goal", proposal["id"])
+        self.assertEqual("partially_verified", saved["state"])
+        self.assertEqual("not_verified", saved["objective_verification"]["state"])
+        self.assertEqual(0, saved["run_index"])
+        self.assertEqual(0, self.e.tick())
+
     def test_connector_mount_during_heartbeat_does_not_stop_executive_tick(self):
         heartbeat = self.e.grid.heartbeat
         called = []
