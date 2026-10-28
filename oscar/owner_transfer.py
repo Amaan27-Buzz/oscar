@@ -50,6 +50,16 @@ def source_task_records(operation: str, payload: dict[str, Any]) -> list[dict[st
     return [_canonical(operation, item) for item in items]
 
 
+def source_task_digest(operation: str, payload: dict[str, Any]) -> str:
+    """Canonical bounded source snapshot, excluding provider metadata."""
+    records = source_task_records(operation, payload)
+    serialized = [
+        json.dumps(record, sort_keys=True, separators=(",", ":"))
+        for record in records
+    ]
+    return digest(sorted(serialized))
+
+
 def source_transfer_proof(
     observations_text: str,
     source_account_id: str,
@@ -85,15 +95,20 @@ def source_transfer_proof(
             if expected is None or not effect["operation"].endswith(".create"):
                 raise PermissionError("destination task effect cannot preserve source fields")
             normalized_effects.append(expected)
-        serial = lambda value: json.dumps(value, sort_keys=True, separators=(",", ":"))
-        if Counter(map(serial, source_records)) != Counter(map(serial, normalized_effects)):
+        def serialize(value: dict[str, Any]) -> str:
+            return json.dumps(value, sort_keys=True, separators=(",", ":"))
+
+        if Counter(map(serialize, source_records)) != Counter(
+            map(serialize, normalized_effects)
+        ):
             raise PermissionError("destination task fields differ from source observations")
         return {
             "kind": "source_task_field_equivalence",
             "source_account_id": source_account_id,
             "source_task_id": observed["task_id"],
             "source_evidence_id": observed["evidence_id"],
-            "source_digest": digest(sorted(map(serial, source_records))),
+            "source_operation": operation,
+            "source_digest": digest(sorted(map(serialize, source_records))),
             "destination_step_ids": [effect["step_id"] for effect in destination_effects],
             "expected_field_digests": [digest(row) for row in normalized_effects],
             "count": len(source_records),
