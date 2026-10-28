@@ -314,6 +314,27 @@ class HTTPPlanningTests(unittest.TestCase):
         self.response()
         row = self.draft()
         self.complete(self.review(self.accept_change(row)))
+        from dataclasses import replace
+
+        from oscar.policy import PersonalPolicy, PolicyEffect, PolicyRule
+
+        now = self.h.grid.clock()
+        policy = PersonalPolicy(self.h.store)
+        rule = PolicyRule(
+            "ask-reader", self.cap.id, PolicyEffect.ASK, "synthetic-owner", now, now, {}
+        )
+        policy.save(rule, owner_authorized=True)
+        self.h.executive.tick()
+        task_id = self.h.executive._tasks(
+            self.h.store.get("planner_request", row["id"])["accepted_goal"]
+        )[0]
+        self.assertEqual(
+            [task_id], [v["task_id"] for v in self.h.connector_plans.pending(self.grants)]
+        )
+        policy.save(replace(rule, enabled=False), owner_authorized=True)
+        self.assertEqual([], self.h.connector_plans.pending(self.grants))
+        with self.assertRaisesRegex(PermissionError, "no additional confirmation"):
+            self.h.connector_plans.task_review(task_id, self.grants)
         self.assertEqual("verified", HTTPObservationTests.settle(self, 2)["state"])
         self.assertEqual(2, len(self.api.calls))
         self.assertEqual(("GET", "/tasks/v1/lists/selected-list/tasks", None), self.api.calls[0])

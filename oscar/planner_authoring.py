@@ -799,7 +799,22 @@ class PlannerAuthoring:
                     "before effects. Arithmetic, memory and priors cannot establish current state. "
                     "Respect capture times and coverage; clarify if no relevant source is readable."
                     " Native account GET steps have only id, capability_id and literal arguments; "
-                    "Core restores their exact executor and intent."
+                    "Core restores their exact executor and intent. "
+                    "This response is only the read-only preflight, not the final effect plan. "
+                    "Selected non-reader operations are deliberately withheld until verified "
+                    "observations return; their absence here is not an overall capability loss. "
+                    "Later operation names (informational only; exact bindings and authority "
+                    "are rechecked in continuation): "
+                    + json.dumps(
+                        sorted(
+                            {
+                                c["id"].rsplit(":", 1)[-1]
+                                for c in caps
+                                if c != planner and c["id"] not in live_reads
+                            }
+                        ),
+                        separators=(",", ":"),
+                    )
                 )
             if memory_refs is not None:
                 parameters["memory_refs"] = memory_refs

@@ -517,6 +517,51 @@ class PlanningCatalogTests(unittest.TestCase):
         }
         self.assertEqual({self.account.id, other.id}, ids)
 
+    def test_malformed_microsoft_task_draft_is_corrected_before_any_provider_effect(self):
+        from copy import deepcopy
+
+        account = self.h.accounts.select("microsoft", "microsoft.graph", alias="Work")
+        cap = self.mount.capability("microsoft.todo.tasks.create", account_id=account.id)
+        self.steps[0].update(capability_id=cap.id, node_id=cap.node_id)
+        self.steps[0]["intent"] = asdict(
+            Intent(
+                "Create selected Microsoft task",
+                "capability",
+                capability_kind=cap.id,
+                parameters={
+                    "arguments": {
+                        "path": {"listId": "selected-list"},
+                        "body": {
+                            "title": "Synthetic title",
+                            "body": {"contentType": "text", "content": "Synthetic notes"},
+                        },
+                    }
+                },
+            )
+        )
+        self.response()
+        self.use_ollama()
+        good = deepcopy(self.body)
+        bad = deepcopy(good)
+        plan = json.loads(bad["message"]["content"])
+        plan["steps"][0]["intent"]["parameters"]["arguments"]["body"]["body"] = "Synthetic notes"
+        bad["message"]["content"] = json.dumps(plan)
+        self.scheduled.extend([(200, bad), (200, good)])
+        proposal = self.conversation(
+            'Create the requested task using Microsoft account alias "Work".'
+        )["assistance_proposal"]
+        self.complete(self.review(proposal))
+        self.h.executive.tick()
+        self.assertEqual(2, len(self.requests))
+        self.assertEqual([], self.api.calls)
+        row = self.h.store.all("planner_request")[-1]
+        self.complete(self.review(self.accept_change(row)))
+        self.h.executive.tick()
+        task = self.h.store.all("task")[-1]
+        self.complete(self.review({"operation": "confirm_task", "id": task["id"], "value": {}}))
+        self.assertEqual("verified", self.settle())
+        self.assertEqual(["POST", "GET"], [c[0] for c in self.api.calls])
+
     def test_exact_file_literal_is_corrected_before_effect_review(self):
         from copy import deepcopy
 
@@ -783,6 +828,33 @@ class PlanningCatalogTests(unittest.TestCase):
             self.h.executive.tick()
         self.assertEqual(1, len(self.requests))
         self.assertFalse((self.h.files.root / "catalog-note.txt").exists())
+
+    def test_live_preflight_names_later_effects_without_admitting_them(self):
+        self.use_ollama()
+        proposal = self.conversation("Create catalog-note.txt using current selected task data")[
+            "assistance_proposal"
+        ]
+        material = PlannerAuthoring(self.h).material(
+            "plan_draft", proposal["id"], proposal["value"], self.grants
+        )
+        parameters = material["step"]["intent"]["parameters"]
+        prompt = parameters["prompt"]
+        self.assertTrue(
+            prompt.startswith("Current stage: select one relevant read-only observation")
+        )
+        self.assertIn("required reader argument", prompt)
+        self.assertIn("only the read-only preflight", prompt)
+        later = json.loads(prompt.split("are rechecked in continuation): ", 1)[1].split("\n", 1)[0])
+        self.assertIn("files.write", later)
+        self.assertIn("microsoft.todo.tasks.create", later)
+        self.assertNotIn("google.tasks.list", later)
+        self.assertNotIn("models.reason", later)
+        self.assertNotIn("files.write", parameters["observation_only"])
+        self.assertFalse(
+            any(c.endswith(":microsoft.todo.tasks.create") for c in parameters["observation_only"])
+        )
+        self.assertEqual([], self.requests)
+        self.assertEqual([], self.api.calls)
 
     def test_large_live_catalog_continuation_review_binds_the_omitted_model_prompt(self):
         self.large_live_continuation()

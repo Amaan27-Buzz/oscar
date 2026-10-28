@@ -1081,3 +1081,30 @@ tracing (8.322s); this does not fix or explain the failed full-suite foreground
 assertion. Screen-reader, Windows text-scale, owner visual and broader operational
 acceptance remain OPEN. No owner activation or real provider was used.
 [Evidence](../evidence/software-completion/desktop-recovery-accessibility-2026-10-28.json).
+
+
+## 2026-10-28 cross-service preflight and native input checks
+
+Initial live-read planning now explains its current stage before the larger goal;
+clarification concerns missing reader inputs rather than future effects or facts
+that can be retrieved. Deferred operation names remain informational; the decoder
+and native admission still accept only selected readers in preflight.
+
+Microsoft task creation advertises nested `body.contentType` / `body.content`
+and `dueDateTime.dateTime` / `dueDateTime.timeZone` fields. Malformed objects,
+unsupported note types and empty date values are rejected before staging/effects;
+no date means omit the field. Additional provider fields keep generic partial
+verification. Action-review discovery excludes automatically allowed readers but
+still exposes a reader when explicit Personal Policy requires confirmation.
+
+All 88 final focused tests pass (133.902s), including same-route malformed-body
+correction before any provider effect, extended-field partial outcomes and
+policy-aware read review. The earlier 185-case pass predates the final two guards.
+Final installed Qwen Ask/Full cross-service trials both fail the owner objective:
+Ask selected Google creation with an unsupported status; Full verified a Google
+creation instead of the requested Microsoft destination. Independent substep
+verification does not establish owner-goal correctness. Earlier intermediate Ask
+success and every failed trial remain recorded. Broader account/operation/resource
+roles and field semantics remain active software gaps. No real account or owner
+activation occurred. Full regression and newest-source soak are running.
+[Evidence](../evidence/software-completion/cross-service-preflight-2026-10-28.json).

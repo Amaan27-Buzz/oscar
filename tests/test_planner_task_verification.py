@@ -177,6 +177,67 @@ class PlannedTaskVerificationTests(unittest.TestCase):
         self.response()
         self.assertEqual("verified", self.run_ask())
 
+    def test_microsoft_task_decoder_exposes_nested_note_and_date_fields(self):
+        self.microsoft_task()
+        cap = self.mount.capability("microsoft.todo.tasks.create", account_id=self.account.id)
+        schema = self.h.connector_plans.contract(asdict(cap))["schema"]["properties"]["body"]
+        fields = schema["properties"]
+        self.assertEqual(["contentType", "content"], fields["body"]["required"])
+        self.assertEqual(["text", "html"], fields["body"]["properties"]["contentType"]["enum"])
+        self.assertEqual("string", fields["body"]["properties"]["content"]["type"])
+        self.assertEqual(["dateTime", "timeZone"], fields["dueDateTime"]["required"])
+        self.assertIn("Omit dueDateTime", schema["description"])
+
+    def test_malformed_microsoft_task_notes_are_rejected_before_provider_effects(self):
+        self.microsoft_task()
+        for value in (
+            "<div>notes</div>",
+            None,
+            {},
+            {"contentType": "text", "content": 7},
+            {"contentType": "markdown", "content": "notes"},
+        ):
+            with self.subTest(value=value):
+                self.steps[0]["intent"]["parameters"]["arguments"]["body"]["body"] = value
+                cap = self.mount.capability(
+                    "microsoft.todo.tasks.create", account_id=self.account.id
+                )
+                pins = self.h.connector_plans.pins([asdict(cap)])
+                with self.assertRaises(ValueError):
+                    self.h.connector_plans.sanitize(
+                        json.dumps({"steps": self.steps}), "invalid-draft", pins
+                    )
+                self.assertEqual([], self.api.calls)
+                self.assertEqual({}, self.h.connector_plans.inputs)
+
+    def test_malformed_microsoft_task_due_date_is_rejected_before_provider_effects(self):
+        self.microsoft_task()
+        for value in (
+            None,
+            "tomorrow",
+            {},
+            {"dateTime": 7, "timeZone": "UTC"},
+            {"dateTime": "", "timeZone": "UTC"},
+        ):
+            with self.subTest(value=value):
+                self.steps[0]["intent"]["parameters"]["arguments"]["body"]["dueDateTime"] = value
+                cap = self.mount.capability(
+                    "microsoft.todo.tasks.create", account_id=self.account.id
+                )
+                pins = self.h.connector_plans.pins([asdict(cap)])
+                with self.assertRaises(ValueError):
+                    self.h.connector_plans.sanitize(
+                        json.dumps({"steps": self.steps}), "invalid-draft", pins
+                    )
+                self.assertEqual([], self.api.calls)
+
+    def test_microsoft_extra_fields_keep_generic_partial_contract(self):
+        self.microsoft_task()
+        self.steps[0]["intent"]["parameters"]["arguments"]["body"]["categories"] = ["Synthetic"]
+        self.response()
+        self.assertEqual("partially_verified", self.run_ask())
+        self.assertEqual(["POST"], [c[0] for c in self.api.calls])
+
     def microsoft_task(self):
         self.account = self.h.accounts.add(
             "microsoft", "synthetic-ms", "tasks", "MS Tasks", verified=True

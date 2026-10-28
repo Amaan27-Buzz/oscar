@@ -111,9 +111,32 @@ class ConnectorPlanning:
             properties["body"] = {"type": "object"}
             if spec.name == "microsoft.todo.tasks.create":
                 properties["body"]["description"] = (
-                    "Task fields: title, body with contentType html and escaped literal notes, "
-                    "dueDateTime with dateTime at UTC midnight and timeZone UTC, status notStarted."
+                    "Task fields: title, body object with contentType and content for "
+                    "literal notes, "
+                    "dueDateTime object with dateTime at UTC midnight and timeZone UTC, "
+                    "status notStarted. Omit dueDateTime when no date was requested; "
+                    "do not use null."
                 )
+                properties["body"]["properties"] = {
+                    "title": {"type": "string"},
+                    "status": {"type": "string"},
+                    "body": {
+                        "type": "object",
+                        "properties": {
+                            "contentType": {"enum": ["text", "html"]},
+                            "content": {"type": "string"},
+                        },
+                        "required": ["contentType", "content"],
+                    },
+                    "dueDateTime": {
+                        "type": "object",
+                        "properties": {
+                            "dateTime": {"type": "string", "minLength": 1},
+                            "timeZone": {"type": "string", "minLength": 1},
+                        },
+                        "required": ["dateTime", "timeZone"],
+                    },
+                }
             elif spec.name in {"google.tasks.update", "microsoft.todo.tasks.update"}:
                 properties["body"]["description"] = (
                     "A status-only body has independent saved-resource verification. "
@@ -395,6 +418,22 @@ class ConnectorPlanning:
                     )
                     endpoint(spec, params["arguments"])
                     arguments = params["arguments"]
+                    if name == "microsoft.todo.tasks.create":
+                        fields = current["schema"]["properties"]["body"]["properties"]
+                        for field in ("body", "dueDateTime"):
+                            if field not in arguments["body"]:
+                                continue
+                            value, shape = arguments["body"][field], fields[field]
+                            if not isinstance(value, dict) or any(
+                                not isinstance(value.get(key), str)
+                                or len(value[key]) < shape["properties"][key].get("minLength", 0)
+                                for key in shape["required"]
+                            ):
+                                raise ValueError(
+                                    "Microsoft task notes and dates require typed objects"
+                                )
+                            if field == "body" and value["contentType"] not in ("text", "html"):
+                                raise ValueError("Microsoft task note type must be text or html")
                 from .communication import task_expectation
 
                 mutation = (
@@ -672,6 +711,20 @@ class ConnectorPlanning:
             or not set(current["capability"]["permissions"]) <= grants
         ):
             raise PermissionError("current private action and owner scope required")
+        if "observation" in self.inputs[ref]:
+            from .policy import PersonalPolicy
+
+            cap = current["capability"]
+            worker = self.h.store.get("executive_worker", binding["worker_id"])
+            decision = PersonalPolicy(self.h.store).evaluate(
+                cap["id"],
+                tuple(cap["permissions"]),
+                frozenset(worker["grants"]),
+                {"source": "executive", "node": cap["node_id"]},
+                now=self.h.grid.clock(),
+            )
+            if decision.allowed:
+                raise PermissionError("read-only action requires no additional confirmation")
         review = self.h.executive.review_task(task_id)
         try:
             confirmation = self.h.store.get("executive_confirmation", task_id)

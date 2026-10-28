@@ -634,3 +634,10 @@ constraint is checked against proposed steps before draft persistence and effect
 review. Multiple named accounts do not establish which semantic role each step
 should perform. Other natural-language account references retain existing behavior.
 Exact file literals use the existing execution guard during draft admission too.
+
+
+Initial live planning is a read-only preflight: clarify missing reader arguments,
+not values a selected reader can retrieve or effects deferred to continuation.
+Automatic account reads are absent from action-review discovery when current
+Personal Policy permits them; explicit Ask policy remains effective. Verified
+model-chosen substeps do not by themselves establish owner-goal correctness.
