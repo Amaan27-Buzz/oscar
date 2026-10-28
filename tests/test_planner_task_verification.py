@@ -329,13 +329,63 @@ class PlannedTaskVerificationTests(unittest.TestCase):
             self.h.connector_plans.check_goal_accounts(goal, [source, destination])
         self.assertEqual([], self.api.calls)
 
-    def test_alias_free_cross_provider_objective_requires_clarification(self):
+    def test_ordinary_service_names_route_only_to_verified_accounts(self):
         _, source, destination, google_create = self.cross_service_role_steps()
-        goal = "Copy task records from Google Tasks to Microsoft To Do."
-        for plan in ([source, google_create], [source, destination]):
-            with self.subTest(plan=plan[-1]["capability_id"]):
-                with self.assertRaisesRegex(ValueError, "Clarify"):
-                    self.h.connector_plans.check_goal_accounts(goal, plan)
+        goal = "Please copy these tasks from Google Tasks into my Microsoft To Do work list."
+        self.h.connector_plans.check_goal_accounts(goal, [source, destination])
+        with self.assertRaises(PermissionError):
+            self.h.connector_plans.check_goal_accounts(goal, [source, google_create])
+        self.assertEqual([], self.api.calls)
+
+    def test_ambiguous_ordinary_service_name_requires_account_clarification(self):
+        from oscar.planning_contract import resolved_owner_account_bindings
+
+        self.cross_service_role_steps()
+        self.h.accounts.add(
+            "google", "synthetic-other", "secondary", "Other Tasks", verified=True
+        )
+        with self.assertRaisesRegex(ValueError, "Clarify"):
+            resolved_owner_account_bindings(
+                "Copy the tasks from Google Tasks to Microsoft To Do.",
+                self.h.accounts.list_accounts(),
+            )
+        self.assertEqual([], self.api.calls)
+
+    def test_copy_does_not_accept_wrong_operation_on_correct_destination(self):
+        from copy import deepcopy
+
+        goal, source, destination, _ = self.cross_service_role_steps()
+        wrong = self.mount.capability(
+            "microsoft.todo.tasks.update", account_id=self.account.id
+        )
+        changed = deepcopy(destination)
+        changed["capability_id"] = wrong.id
+        changed["node_id"] = wrong.node_id
+        changed["intent"]["capability_kind"] = wrong.id
+        with self.assertRaisesRegex(PermissionError, "destination operation must create"):
+            self.h.connector_plans.check_goal_accounts(goal, [source, changed])
+        self.assertEqual([], self.api.calls)
+
+    def test_owner_objective_contract_retains_owner_fields_not_model_fields(self):
+        from oscar.planning_contract import owner_objective_contract
+
+        self.cross_service_role_steps()
+        goal = (
+            "Transfer tasks from Google Tasks to Microsoft To Do and preserve "
+            "their titles, notes and due dates."
+        )
+        contract = owner_objective_contract(goal, self.h.accounts.list_accounts())
+        self.assertIsNotNone(contract)
+        self.assertEqual(goal, contract["objective"])
+        self.assertEqual("copy", contract["operation"])
+        self.assertEqual(("due", "title", "notes"), tuple(contract["required_fields"]))
+        self.assertEqual(
+            ("source", "destination"),
+            tuple(account["role"] for account in contract["accounts"]),
+        )
+        self.assertNotEqual(
+            contract["accounts"][0]["account_id"], contract["accounts"][1]["account_id"]
+        )
         self.assertEqual([], self.api.calls)
 
     def test_repeated_conflicting_owner_roles_are_not_silently_merged(self):
