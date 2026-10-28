@@ -1,3 +1,96 @@
+# OSCAR development continuation 02 — 2026-10-28
+
+**Checkpoint: PARTIAL implementation. BUG-PLAN-001 OPEN. PR #10 DRAFT; DO NOT MERGE.**
+The whole-objective field comparator, executable verification and installed-model acceptance
+are still missing. This record preserves old continuation-01 and software-completion
+receipts below; none has been promoted to a new PASS.
+
+## Feature branch and source changes
+
+- Repository: `Amaan27-Buzz/oscar`. Branch: `codex/bug-plan-001-owner-intent`.
+  Draft PR: https://github.com/Amaan27-Buzz/oscar/pull/10
+  Base: `codex/software-completion`, unchanged.
+- Last implementation/test commit while writing this checkpoint:
+  `ff61196a99224448bce9e457f0ef3cf6245d0377`.
+  The ledger and this handoff were committed afterward. Resolve the final exact
+  branch HEAD via GitHub; the committed file cannot reference its own SHA.
+- `planning_contract.py`: added verified, service-bound account registry
+  resolution for ordinary provider names (only one usable owner account per
+  provider), conservative immutable OwnerObjectiveContract retaining original
+  owner text, account identity/generation, explicit resource IDs, operation and
+  named fields. Ambiguous routing needs clarification.
+- `planner_connectors.py`: rejects wrong account/provider, incorrect destination
+  operation class for copies, missing source-read graph edges and missing/invalid
+  verified source observation provenance. No invented account/list IDs.
+- `planner_authoring.py` and `harness.py`: enforce checks on both model-draft
+  validation and acceptance; carry verified observation references; persist
+  original owner objective through signed Executive review and reject changed
+  account binding at acceptance.
+- `executive.py`: step-level VERIFIED does **not** mean owner cross-account
+  transfer completed. Such goals now settle at `partially_verified` with
+  `objective_verification.state=not_verified`, rather than fabricating a
+  whole-objective success. This is a fail-closed interim state, not goal proof.
+- Added adversarial tests for ordinary service names, multiple usable accounts,
+  wrong destination operation, source-read dependencies, stale/unrelated
+  observation references, original fields, and step-verified/goal-unverified
+  Executive integration.
+- Updated `BUG-PLAN-001`, `CAP-PLANNING` and `CAP-VERIFICATION` ledger
+  records without changing PARTIAL/OPEN statuses.
+
+## Exact evidence and blockers
+
+| Check | Status |
+| --- | --- |
+| Remote PR at start | HEAD `58fb1e21c6f9743dd98cac4f50754c870632cf80`, open draft, correct base |
+| Actions at initial exact HEAD | Nine pull_request workflow runs all `startup_failure`; verified Voice run `40713570211` has zero jobs. No job or test executed |
+| Actions cause | **UNRESOLVED.** All workflows fail before job creation; YAML triggers exist. Connector denies Actions settings/permissions and workflow configuration API endpoints. Billing/usage and repository policy are plausible, not confirmed |
+| Local clone | **BLOCKED.** Current execution container cannot resolve `github.com`; GitHub plugin is not a native shell |
+| Focused unit tests / Ruff / format / mypy / repository checks | **NOT_RUN** for continuation-02 changes |
+| Installed-Qwen Ask/Full synthetic-provider campaign | **NOT_RUN** after changes. Historical owner objectives FAILED 0/2 |
+| Source observation → every destination field comparison | **NOT_IMPLEMENTED**. Task-level independent saved-resource verification still compares model-selected fields, not owner/source fields |
+| Changed source immediately before mutation / uncertain partially committed writes | **NOT_VERIFIED**. No automatic replay should be inferred |
+| Public release / real accounts / owner Full activation | **NOT_AUTHORIZED**. Publication clearance still blocked |
+
+**Do not treat the new `partially_verified` barrier as an implemented goal
+comparator.** The work list named in natural prose has not been authoritatively
+resolved to a destination resource ID. Native HTTPS account routing is narrower
+than a provider-neutral MCP objective contract. General goal completion is open.
+
+## Owner-only GitHub Actions diagnosis
+
+1. Inspect run https://github.com/Amaan27-Buzz/oscar/actions/runs/40713570211
+   for a pre-job error banner.
+2. Inspect repository **Settings → Actions → General** for enabled Actions
+   and allowed action policies; no need to retry nine workflows.
+3. Inspect personal **Settings → Billing & licensing → Budgets and alerts** and
+   **Usage** for Actions limit, budget or payment hold. Historical notes say
+   Actions was paused after quota exhaustion; the current account-side cause
+   is **not** independently confirmed. If all checks permit runs and failure
+   persists, provide this exact run ID to GitHub Support.
+
+## Exact next validation in an existing safe checkout
+
+```powershell
+git fetch origin
+git switch codex/bug-plan-001-owner-intent
+git pull --ff-only origin codex/bug-plan-001-owner-intent
+python -m unittest tests.test_planner_task_verification tests.test_executive tests.test_planner_catalog tests.test_planner_http_observations -v
+python -m ruff check oscar tests scripts
+python -m ruff format --check oscar tests scripts
+python -m mypy oscar
+python -m scripts.check_repository
+```
+
+Only after checks pass: add independent field-by-field source/destination
+canonicalization and a current-source pre-effect recheck, then final
+destination resource readback tied to the original typed objective. Cover
+partial mutations, wrong named list, source-change and replay prevention.
+Repeat the installed local-Qwen synthetic campaign with the owner-local
+ignored driver/config and record receipts. Do not merge PR #10 or touch main
+or PR #9 meanwhile.
+
+---
+
 # OSCAR development continuation 01 — 2026-10-28
 
 **Checkpoint status: PARTIAL implementation; BUG-PLAN-001 remains OPEN.**
