@@ -601,6 +601,27 @@ class PlannedTaskVerificationTests(unittest.TestCase):
             posted, sum(method == "POST" for method, *_ in self.api.calls)
         )
 
+    def test_post_committed_but_provider_reply_lost_is_unknown_without_replay(self):
+        from tests.test_planner_http_observations import HTTPObservationTests
+
+        goal_id, task_id = self.prepare_cross_account_copy()
+        self.api.fail_after_post = True
+        self.complete(self.review({"operation": "confirm_task", "id": task_id, "value": {}}))
+        self.assertEqual("blocked", HTTPObservationTests.settle(self, 4)["state"])
+        goal = self.h.store.get("executive_goal", goal_id)
+        self.assertEqual("unknown", goal["state"])
+        self.assertEqual(
+            "incomplete_or_uncertain_destination_effects",
+            goal["objective_verification"]["reason"],
+        )
+        posted = sum(method == "POST" for method, *_ in self.api.calls)
+        self.assertEqual(1, posted)
+        for _ in range(3):
+            self.h.executive.tick()
+        self.assertEqual(
+            posted, sum(method == "POST" for method, *_ in self.api.calls)
+        )
+
     def test_source_change_before_copy_blocks_destination_post(self):
         goal_id, task_id = self.prepare_cross_account_copy()
         self.api.resources["/tasks/v1/lists/source-list/tasks"]["items"][0]["due"] = (
