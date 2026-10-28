@@ -242,7 +242,7 @@ def owner_objective_contract(goal: str, accounts: list[Any]) -> dict[str, Any] |
         )
         if re.search(pattern, goal, re.I)
     )
-    return asdict(
+    contract = asdict(
         OwnerObjectiveContract(
             objective=goal,
             accounts=tuple(
@@ -260,6 +260,14 @@ def owner_objective_contract(goal: str, accounts: list[Any]) -> dict[str, Any] |
             required_fields=fields,
         )
     )
+    # Store uses JSON; normalize tuple-backed dataclass fields before the first
+    # signed review so persisted contracts compare byte-for-byte on revalidation.
+    contract["accounts"] = [
+        {**role, "resource_ids": list(role["resource_ids"])}
+        for role in contract["accounts"]
+    ]
+    contract["required_fields"] = list(contract["required_fields"])
+    return contract
 
 
 def exact_file_literal(goal: str) -> str | None:
