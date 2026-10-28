@@ -518,6 +518,100 @@ class ConnectorPlanning:
         ) as exc:
             raise PermissionError("verified source pre-effect check unavailable") from exc
 
+    def verify_transfer_completion(self, goal: dict[str, Any]) -> dict[str, Any]:
+        """Prove bounded copy completion using reviewed source and saved-resource GETs.
+
+        The owner must identify both source and destination resource IDs.
+        Without those bindings, model-selected lists cannot certify the
+        original owner's resource-specific objective.
+        """
+        from .executive_inputs import verified_result
+
+        proof = goal.get("owner_transfer_proof")
+        contract = goal.get("owner_objective")
+        if (
+            not isinstance(proof, dict)
+            or proof.get("kind") != "source_task_field_equivalence"
+            or not isinstance(contract, dict)
+            or contract.get("operation") != "copy"
+            or len(proof.get("destination_step_ids", [])) != proof.get("count")
+            or len(proof.get("expected_field_digests", [])) != proof.get("count")
+        ):
+            raise PermissionError("whole-objective task proof unavailable")
+        roles = contract.get("accounts", [])
+        if (
+            len(roles) != 2
+            or {role["role"] for role in roles} != {"source", "destination"}
+            or any(not role.get("resource_ids") for role in roles)
+        ):
+            raise PermissionError("owner resource identities require clarification")
+        source = next(role for role in roles if role["role"] == "source")
+        destination = next(role for role in roles if role["role"] == "destination")
+        if proof["source_account_id"] != source["account_id"]:
+            raise PermissionError("source account proof changed")
+        for role in roles:
+            self.h.accounts.check(role["account_id"], role["generation"])
+        if len(set(proof["destination_step_ids"])) != proof["count"]:
+            raise PermissionError("duplicate destination proof steps")
+        result_evidence: list[str] = []
+        last_step: dict[str, Any] | None = None
+        last_task_id: str | None = None
+        for step_id, expected_digest in zip(
+            proof["destination_step_ids"],
+            proof["expected_field_digests"],
+            strict=True,
+        ):
+            found = [
+                row
+                for row in self.h.store.all("executive_task")
+                if row["goal_id"] == goal["id"]
+                and row["relationship"] == goal["relationship"]
+                and row["occurrence"] == goal["run_index"]
+                and row["step_id"] == step_id
+            ]
+            steps = [step for step in goal["steps"] if step["id"] == step_id]
+            if len(found) != 1 or len(steps) != 1:
+                raise PermissionError("destination task or step proof missing")
+            task_id = found[0]["task_id"]
+            _, evidence = verified_result(self.h.store, task_id)
+            if evidence["source"] != "connector-independent-readback":
+                raise PermissionError("independent destination saved-resource GET required")
+            expected = self.h.store.get("owner_transfer_expected_effect", task_id)
+            preflight = self.h.store.get("owner_transfer_source_preflight", task_id)
+            if expected != {
+                "goal_id": goal["id"],
+                "step_id": step_id,
+                "account_id": destination["account_id"],
+                "generation": destination["generation"],
+                "expected_digest": expected_digest,
+                "proof_digest": digest(proof),
+            } or any(
+                preflight.get(key) != value
+                for key, value in {
+                    "goal_id": goal["id"],
+                    "step_id": step_id,
+                    "source_digest": proof["source_digest"],
+                    "proof_digest": digest(proof),
+                }.items()
+            ):
+                raise PermissionError("reviewed destination or pre-effect proof changed")
+            result_evidence.append(evidence["id"])
+            last_step, last_task_id = steps[0], task_id
+        if last_step is None or last_task_id is None:
+            raise PermissionError("no destination proof")
+        # This also validates source observation provenance, authority and
+        # latest canonical source fields. No consequential effect is replayed.
+        self.verify_transfer_source(goal, last_step, last_task_id)
+        return {
+            "state": "verified",
+            "kind": proof["kind"],
+            "source_evidence_id": proof["source_evidence_id"],
+            "destination_evidence_ids": result_evidence,
+            "source_digest": proof["source_digest"],
+            "count": proof["count"],
+            "verified_at": self.h.grid.clock(),
+        }
+
     def is_read(self, cap: dict[str, Any]) -> bool:
         if self.descriptor(cap) is None:
             return False
