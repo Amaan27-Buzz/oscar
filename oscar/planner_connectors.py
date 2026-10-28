@@ -289,7 +289,7 @@ class ConnectorPlanning:
                 ):
                     raise PermissionError("plan does not preserve the owner's resource ID")
 
-        if not observe and selected:
+        if not observe:
             expected = {
                 (b["provider"], b["alias"])
                 for b in bindings
