@@ -329,6 +329,22 @@ class PlannedTaskVerificationTests(unittest.TestCase):
             self.h.connector_plans.check_goal_accounts(goal, [source, destination])
         self.assertEqual([], self.api.calls)
 
+    def test_alias_free_cross_provider_objective_requires_clarification(self):
+        _, source, destination, google_create = self.cross_service_role_steps()
+        goal = "Copy task records from Google Tasks to Microsoft To Do."
+        for plan in ([source, google_create], [source, destination]):
+            with self.subTest(plan=plan[-1]["capability_id"]):
+                with self.assertRaisesRegex(ValueError, "Clarify"):
+                    self.h.connector_plans.check_goal_accounts(goal, plan)
+        self.assertEqual([], self.api.calls)
+
+    def test_repeated_conflicting_owner_roles_are_not_silently_merged(self):
+        goal, source, destination, _ = self.cross_service_role_steps()
+        goal += ' Also copy back to Google account alias "Tasks".'
+        with self.assertRaisesRegex(ValueError, "conflicting account roles"):
+            self.h.connector_plans.check_goal_accounts(goal, [source, destination])
+        self.assertEqual([], self.api.calls)
+
     def test_owner_goal_same_provider_multi_account_routing(self):
         from copy import deepcopy
 
