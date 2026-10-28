@@ -3,6 +3,7 @@
 import json
 import re
 from copy import deepcopy
+from dataclasses import asdict, dataclass
 from typing import Any
 
 OBSERVATION_KINDS = {
@@ -176,6 +177,74 @@ def resolved_owner_account_bindings(
     if len({b["account_id"] for b in bindings}) != len(bindings):
         raise ValueError("Clarify repeated account references.")
     return bindings
+
+
+@dataclass(frozen=True)
+class OwnerAccountRole:
+    account_id: str
+    generation: int
+    provider: str
+    alias: str
+    role: str
+    resource_ids: tuple[str, ...]
+
+
+@dataclass(frozen=True)
+class OwnerObjectiveContract:
+    """Owner-sourced objective; never replaced by model-generated plan text."""
+
+    objective: str
+    accounts: tuple[OwnerAccountRole, ...]
+    operation: str
+    required_fields: tuple[str, ...]
+    completion_rule: str = "independent_source_and_destination_evidence"
+
+
+def owner_objective_contract(goal: str, accounts: list[Any]) -> dict[str, Any] | None:
+    """Capture actionable cross-account invariants before the model drafts effects.
+
+    This is a conservative contract, not a claim of natural-language completeness.
+    Unknown field/resource semantics must not be reported as verified.
+    """
+    roles = resolved_owner_account_bindings(goal, accounts)
+    if not roles:
+        return None
+    transfer = re.search(
+        r"\b(copy|duplicate|replicate|transfer|migrate|sync)\b|"
+        r"\bcreate\s+equivalent\b", goal, re.I,
+    )
+    if not transfer:
+        return None
+    sources = [r for r in roles if r["role"] == "source"]
+    destinations = [r for r in roles if r["role"] == "destination"]
+    if len(sources) != 1 or len(destinations) != 1:
+        raise ValueError("Clarify one source and one destination account for transfer.")
+    if sources[0]["account_id"] == destinations[0]["account_id"]:
+        raise ValueError("Clarify distinct source and destination accounts.")
+    fields = tuple(
+        field for field, pattern in (
+            ("due", r"\b(due\s+dates?|deadlines?)\b"),
+            ("title", r"\b(titles?|names?)\b"),
+            ("notes", r"\b(notes?|descriptions?)\b"),
+            ("status", r"\b(status|completion\s+state)\b"),
+        ) if re.search(pattern, goal, re.I)
+    )
+    return asdict(OwnerObjectiveContract(
+        objective=goal,
+        accounts=tuple(
+            OwnerAccountRole(
+                account_id=role["account_id"],
+                generation=role["generation"],
+                provider=role["provider"],
+                alias=role["alias"],
+                role=role["role"],
+                resource_ids=tuple(role["resources"]),
+            )
+            for role in (sources[0], destinations[0])
+        ),
+        operation="copy",
+        required_fields=fields,
+    ))
 
 
 def exact_file_literal(goal: str) -> str | None:
