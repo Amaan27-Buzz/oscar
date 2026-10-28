@@ -1552,6 +1552,29 @@ class Executive:
                     current = self._row("executive_goal", goal["id"])
                     if current["state"] != "enabled" or current["run_index"] != goal["run_index"]:
                         continue
+                    if current.get("owner_objective"):
+                        # Verified individual steps are insufficient for a cross-account
+                        # copy. No current whole-objective comparator has proved that
+                        # source records, required fields and destination resources
+                        # correspond; never promote the goal to completed on API success.
+                        self.store.put(
+                            "executive_goal",
+                            goal["id"],
+                            {
+                                **current,
+                                "state": "partially_verified",
+                                "objective_verification": {
+                                    "state": "not_verified",
+                                    "reason": "independent whole-objective comparison unavailable",
+                                },
+                            },
+                        )
+                        self.store.audit(
+                            "",
+                            "executive_owner_objective_unverified",
+                            {"goal_id": goal["id"], "occurrence": goal["run_index"]},
+                        )
+                        continue
                     index = goal["run_index"] + 1
                     interval = goal["interval_seconds"]
                     next_at = (
