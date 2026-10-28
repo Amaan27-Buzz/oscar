@@ -406,6 +406,13 @@ class ConnectorPlanning:
             owner_contract = owner_objective_contract(
                 goal, self.h.accounts.list_accounts()
             )
+            if owner_contract is None or any(
+                not role["resource_ids"] for role in owner_contract["accounts"]
+            ):
+                raise ValueError(
+                    "Clarify source and destination list identities using verified "
+                    "resource metadata; model-chosen list IDs are not owner approval."
+                )
             proof = source_transfer_proof(
                 context(self.h.store, self.h.grid, source_observations),
                 source_account_id,
