@@ -676,6 +676,9 @@ class Harness:
         self.executive = Executive(self.runtime, {self.node_id: (self.dispatcher, self.session)})
         self.runtime.executive = self.executive
         self.executive.owner_transfer_guard = self.connector_plans.verify_transfer_source
+        self.executive.owner_transfer_verifier = (
+            self.connector_plans.verify_transfer_completion
+        )
         from .planner_authoring import PlannerAuthoring
 
         self.executive.advance_plans = PlannerAuthoring(self).advance_delegated
