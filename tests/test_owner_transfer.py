@@ -108,6 +108,28 @@ class OwnerTransferEquivalenceTests(unittest.TestCase):
         with self.assertRaisesRegex(PermissionError, "cannot be preserved"):
             source_task_records("google.tasks.list", {"items": [modified]})
 
+    def test_nontrivial_source_fields_do_not_disappear_in_equivalence_proof(self):
+        for changes in (
+            {"parent": "task-parent"},
+            {"links": [{"type": "email", "link": "https://example.invalid"}]},
+        ):
+            with self.subTest(changes=changes):
+                with self.assertRaisesRegex(PermissionError, "unsupported semantic fields"):
+                    source_task_records(
+                        "google.tasks.list", {"items": [{**self.task(), **changes}]}
+                    )
+        with self.assertRaisesRegex(PermissionError, "unsupported semantic fields"):
+            source_task_records(
+                "microsoft.todo.tasks.list",
+                {
+                    "value": [{
+                        "title": "Source title",
+                        "status": "notStarted",
+                        "importance": "high",
+                    }],
+                },
+            )
+
     def test_missing_source_status_is_not_assumed_uncompleted(self):
         item = self.task()
         item.pop("status")
