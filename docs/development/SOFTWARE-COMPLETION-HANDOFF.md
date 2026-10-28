@@ -1035,5 +1035,5 @@ in the requested synthetic Google account; Ask chooses the wrong account and
 fails external acceptance. This is mixed model reliability, not general semantic
 verification. A separate installed-runtime native Worker run passes signed TLS
 file execution/readback/stop/withdrawal (9.711s). Recorded model/native source hashes
-were independently matched. Whole-suite regression is RUNNING on frozen sources.
+were independently matched. Whole-suite regression completed on frozen sources: 1,397 total, 1,386 passed, ten skipped and one native foreground failure (1,116.212s). All manifest source hashes independently match. The older visual fixture HWND was not foreground at its assertion; cause remains unproven. No guard was relaxed.
 [Correction evidence](../evidence/software-completion/draft-correction-2026-10-28.json).

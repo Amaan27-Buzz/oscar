@@ -313,9 +313,23 @@
     "source_hashes_independently_matched": true
   },
   "full_regression": {
-    "status": "RUNNING",
+    "status": "FAIL",
+    "total": 1397,
+    "passed": 1386,
+    "skipped": 10,
+    "failures": 1,
+    "test_seconds": 1116.212,
+    "wrapper_seconds": 1120.336,
+    "source_stable": true,
+    "all_sources_independently_matched": true,
+    "source_count": 299,
+    "runtime_commit": "e746705",
+    "base_head": "0834a2e2f1e655ebc77493a3a9863bd3b6bc1aa0",
     "log": ".oscar/draft-correction-full.log",
-    "qualification": "No final aggregate claimed until manifest and final log are collected."
+    "log_sha256": "41eed4fdaa55f20073b26365617cde02f11b296e634ca7bed508a71ce76be702",
+    "manifest": ".oscar/draft-correction-full-manifest.json",
+    "manifest_sha256": "7c23fc9bd4bddc17ecf6dd84981c3a2423e0d6d4040af6e2976445e29d19c66f",
+    "failure": "tests.test_windows_visual.WindowsVisualTests.test_actual_capture_visual_fallback_and_no_replay: selected fixture HWND was not foreground at line 376; cause remains unproven, guard unchanged."
   },
   "checks": [
     "Ruff all source/tests/scripts PASS",

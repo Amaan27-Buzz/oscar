@@ -1,5 +1,7 @@
 # OSCAR — Current Status & Checklist
 
+**2026-10-28 bounded draft correction:** one native-invalid structured draft can be corrected within the reviewed route budget on free/subscription/local funding. Final focused checks pass 38 cases; the current installed-model campaign passes 6/8, with wrong-account selection and exact-file-text loss retained as failures. Fresh separate installed-runtime TLS Worker acceptance passes. The frozen full regression ran 1,397 cases: 1,386 passed, ten skipped and one native foreground failure (1,116.212s). Manifest hashes independently match; the foreground-loss cause remains unproven. [Evidence](evidence/software-completion/draft-correction-2026-10-28.json).
+
 **2026-10-28 native planning checkpoint:** local `1d717e5` includes bounded native
 graph decoding, dependency ordering, verified HTTPS prerequisites and undated task
 creation. Actual model results remain mixed: five of six file/arithmetic/handoff
