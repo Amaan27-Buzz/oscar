@@ -1605,6 +1605,61 @@ class Executive:
                                 self.store.delete("executive_slot", goal["worker_id"])
                 except PermissionError:
                     self.health = "waiting_for_authority"
+            if goal.get("owner_objective") and any(
+                state in {
+                    TaskState.FAILED,
+                    TaskState.PARTIALLY_VERIFIED,
+                    TaskState.UNKNOWN,
+                    TaskState.CANCELLED,
+                    TaskState.BLOCKED,
+                }
+                for state in results.values()
+            ):
+                # A provider mutation may have taken effect even when its GET
+                # failed. Never automatically retry a partially proven owner
+                # transfer or leave it looking like active verified work.
+                uncertain = any(
+                    state in {
+                        TaskState.FAILED,
+                        TaskState.PARTIALLY_VERIFIED,
+                        TaskState.CANCELLED,
+                    }
+                    for state in results.values()
+                )
+                if any(state == TaskState.UNKNOWN for state in results.values()):
+                    status = "unknown"
+                elif uncertain or any(
+                    state == TaskState.VERIFIED for state in results.values()
+                ):
+                    status = "partially_verified"
+                else:
+                    status = "blocked"
+                with self.store.transaction():
+                    current = self._row("executive_goal", goal["id"])
+                    if current["state"] == "enabled":
+                        self.store.put(
+                            "executive_goal",
+                            goal["id"],
+                            {
+                                **current,
+                                "state": status,
+                                "objective_verification": {
+                                    "state": "not_verified",
+                                    "reason": "incomplete_or_uncertain_destination_effects",
+                                    "step_states": {
+                                        step_id: state.value
+                                        for step_id, state in results.items()
+                                    },
+                                },
+                            },
+                        )
+                        self.store.audit(
+                            "", "executive_owner_effect_uncertain", {
+                                "goal_id": goal["id"],
+                                "state": status,
+                            },
+                        )
+                continue
             if len(results) == len(goal["steps"]) and all(
                 s == TaskState.VERIFIED for s in results.values()
             ):
