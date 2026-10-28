@@ -294,6 +294,8 @@ class PlannedTaskVerificationTests(unittest.TestCase):
         goal, source, destination, _ = self.cross_service_role_steps()
         with self.assertRaisesRegex(PermissionError, "destination operation"):
             self.h.connector_plans.check_goal_accounts(goal, [source])
+        from oscar.jev import Intent
+
         reader = self.mount.capability("microsoft.todo.tasks.list", account_id=self.account.id)
         destination_read = {
             "id": "target-read",
@@ -301,8 +303,10 @@ class PlannedTaskVerificationTests(unittest.TestCase):
             "capability_id": reader.id,
             "depends_on": [],
             "intent": asdict(
-                __import__("oscar.jev", fromlist=["Intent"]).Intent(
-                    "Inspect target", "capability", capability_kind=reader.id,
+                Intent(
+                    "Inspect target",
+                    "capability",
+                    capability_kind=reader.id,
                     parameters={"arguments": {"path": {"listId": "target-list"}}},
                 )
             ),
