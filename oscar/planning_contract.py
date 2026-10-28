@@ -134,7 +134,7 @@ def resolved_owner_account_bindings(
     for provider in sorted({a.provider for a in connected}, key=len, reverse=True):
         if provider == "mcp-resource":
             continue
-        for mention in re.finditer(r"(?<!\\w)" + re.escape(provider) + r"(?!\\w)", goal, re.I):
+        for mention in re.finditer(r"(?<!\w)" + re.escape(provider) + r"(?!\w)", goal, re.I):
             if any(mention.start() < end and mention.end() > start for start, end, _ in references):
                 continue
             references.append((mention.start(), mention.end(), provider))
@@ -143,7 +143,7 @@ def resolved_owner_account_bindings(
     for index, (start, end, provider) in enumerate(references):
         previous = references[index - 1][1] if index else 0
         cues = list(re.finditer(
-            r"\\b(from|source|origin|to|into|destination|target)\\b",
+            r"\b(from|source|origin|to|into|destination|target)\b",
             goal[previous:start], re.I,
         ))
         role = None
