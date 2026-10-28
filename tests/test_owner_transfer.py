@@ -108,6 +108,12 @@ class OwnerTransferEquivalenceTests(unittest.TestCase):
         with self.assertRaisesRegex(PermissionError, "cannot be preserved"):
             source_task_records("google.tasks.list", {"items": [modified]})
 
+    def test_missing_source_status_is_not_assumed_uncompleted(self):
+        item = self.task()
+        item.pop("status")
+        with self.assertRaisesRegex(PermissionError, "status was not independently observed"):
+            source_task_records("google.tasks.list", {"items": [item]})
+
     def test_unmatched_task_service_cannot_be_used_as_source(self):
         other = json.loads(self.google_source([self.task()]))
         other[0]["capability_id"] = "synthetic:google.calendar.events.list"
