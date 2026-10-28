@@ -34,6 +34,60 @@ def exact_account_aliases(goal: str) -> dict[str, set[str]]:
     return aliases
 
 
+
+def owner_account_bindings(goal: str) -> list[dict[str, Any]]:
+    """Ground explicitly named account roles in owner text, never in a model draft.
+
+    Directional clauses are unambiguous only when attached to an exact quoted
+    account alias. Other natural-language roles need owner clarification, not a
+    guess from whichever capability the model selected.
+    """
+    pattern = r'"(?:\\\\.|[^"\\\\])*"|\\b(?P<provider>google|microsoft)\\s+account\\s+alias\\s*'
+    mentions = []
+    for match in re.finditer(pattern, goal, re.I):
+        if match.group("provider") is None:
+            continue
+        try:
+            alias, consumed = json.JSONDecoder().raw_decode(goal[match.end() :])
+        except ValueError as exc:
+            raise ValueError("account alias requires a JSON-quoted literal") from exc
+        if not isinstance(alias, str) or not alias.strip() or len(alias) > 500:
+            raise ValueError("bounded account alias required")
+        mentions.append((match.start(), match.end() + consumed, match.group("provider").casefold(), alias))
+    bindings: list[dict[str, Any]] = []
+    for index, (start, end, provider, alias) in enumerate(mentions):
+        previous = mentions[index - 1][1] if index else 0
+        following = mentions[index + 1][0] if index + 1 < len(mentions) else len(goal)
+        # A cue must occur after the preceding account reference. Do not
+        # classify a second account from a verb attached to the first one.
+        cues = list(re.finditer(r"\\b(from|source|origin|to|into|destination|target)\\b", goal[previous:start], re.I))
+        role = None
+        if cues and len(goal[previous:start]) - cues[-1].end() <= 100:
+            role = (
+                "source"
+                if cues[-1].group(1).casefold() in {"from", "source", "origin"}
+                else "destination"
+            )
+        # Only explicit identifiers are constraints; free prose cannot be
+        # silently turned into a provider-specific list or folder identifier.
+        resources = re.findall(
+            r"\\b(?:list|folder|calendar|board|resource|project|tasklist)\\s+"
+            r"(?:id|identifier)\\s*(?::|=)?\\s*(?:\\\"([^\\\"]+)\\\"|'([^']+)'|([A-Za-z0-9_-]+))",
+            goal[end:following],
+            re.I,
+        )
+        bindings.append(
+            {
+                "provider": provider,
+                "alias": alias,
+                "role": role,
+                "resources": tuple(next(v for v in match if v) for match in resources),
+            }
+        )
+    return bindings
+
+
+
 def exact_file_literal(goal: str) -> str | None:
     pattern = r"\bexact\s+(?:text|content)\s*(?::|=)?\s*"
     marker = re.search(pattern, goal, re.I)
