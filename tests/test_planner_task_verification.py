@@ -439,6 +439,16 @@ class PlannedTaskVerificationTests(unittest.TestCase):
                     owner_objective_contract(goal, self.h.accounts.list_accounts())
         self.assertEqual([], self.api.calls)
 
+    def test_owner_required_reminders_are_not_silently_dropped(self):
+        from oscar.planning_contract import owner_objective_contract
+
+        self.cross_service_role_steps()
+        with self.assertRaisesRegex(ValueError, "task fields"):
+            owner_objective_contract(
+                "Copy tasks from Google Tasks to Microsoft To Do and preserve reminders.",
+                self.h.accounts.list_accounts(),
+            )
+
     def test_unknown_accounts_cannot_silently_satisfy_task_transfer(self):
         from oscar.planning_contract import owner_objective_contract
 
