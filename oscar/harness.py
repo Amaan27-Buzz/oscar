@@ -416,7 +416,22 @@ class ModelExecutor:
         steps = h.executive.validate_steps(worker, plan["steps"])
         goal = self.grid.store.get("executive_goal", binding["goal_id"])["goal"]
         validate_file_literal(goal, steps)
-        self.connector_plans.check_goal_accounts(goal, steps, observe=plan["observe"])
+        planner_request = next(
+            (
+                row
+                for row in self.grid.store.all("planner_request")
+                if row.get("goal_id") == binding["goal_id"]
+            ),
+            None,
+        )
+        self.connector_plans.check_goal_accounts(
+            goal,
+            steps,
+            observe=plan["observe"],
+            source_observations=(
+                planner_request.get("observation_refs") if planner_request else None
+            ),
+        )
         for step in steps:
             if step["node_id"] == h.node_id:
                 executor = h.dispatcher.executors.get(step["capability_id"])
