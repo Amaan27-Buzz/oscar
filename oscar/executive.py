@@ -1626,7 +1626,10 @@ class Executive:
                     }
                     for state in results.values()
                 )
-                if any(state == TaskState.UNKNOWN for state in results.values()):
+                if any(
+                    state in {TaskState.UNKNOWN, TaskState.BLOCKED}
+                    for state in results.values()
+                ):
                     status = "unknown"
                 elif uncertain or any(
                     state == TaskState.VERIFIED for state in results.values()
