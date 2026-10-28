@@ -54,8 +54,7 @@ def source_task_digest(operation: str, payload: dict[str, Any]) -> str:
     """Canonical bounded source snapshot, excluding provider metadata."""
     records = source_task_records(operation, payload)
     serialized = [
-        json.dumps(record, sort_keys=True, separators=(",", ":"))
-        for record in records
+        json.dumps(record, sort_keys=True, separators=(",", ":")) for record in records
     ]
     return digest(sorted(serialized))
 
@@ -95,6 +94,7 @@ def source_transfer_proof(
             if expected is None or not effect["operation"].endswith(".create"):
                 raise PermissionError("destination task effect cannot preserve source fields")
             normalized_effects.append(expected)
+
         def serialize(value: dict[str, Any]) -> str:
             return json.dumps(value, sort_keys=True, separators=(",", ":"))
 
