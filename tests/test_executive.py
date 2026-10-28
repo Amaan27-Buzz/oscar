@@ -138,13 +138,10 @@ class ExecutiveTests(unittest.TestCase):
         self.assertEqual("planned", self.r.store.all("task")[-1]["state"])
         self.assertEqual("waiting_for_verified_source", self.e.health)
         self.assertEqual(0, self.r.store.get("executive_goal", proposal["id"])["run_index"])
+        self.assertEqual("blocked", self.r.store.get("executive_goal", proposal["id"])["state"])
         self.e.owner_transfer_guard = lambda goal, step, task_id: None
-        self.assertEqual(1, self.e.tick())
-        self.assertEqual("verified", self.r.store.all("task")[-1]["state"])
-        self.assertEqual(
-            "partially_verified",
-            self.r.store.get("executive_goal", proposal["id"])["state"],
-        )
+        self.assertEqual(0, self.e.tick())
+        self.assertEqual("planned", self.r.store.all("task")[-1]["state"])
 
     def test_connector_mount_during_heartbeat_does_not_stop_executive_tick(self):
         heartbeat = self.e.grid.heartbeat
