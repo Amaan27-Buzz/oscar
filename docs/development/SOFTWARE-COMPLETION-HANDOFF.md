@@ -1165,3 +1165,26 @@ implementation/diagnosis. Revise after semantic binding passes actual-model
 acceptance. Real credentials, provisioning/hosted Core, physical devices/audio,
 owner activation and deferred hardware are excluded from this estimate and
 remain separately authorized. No full Group6/Slice20/GateE PASS is claimed.
+
+
+## 2026-10-28 final conversation closeout
+
+The owner ended this oversized Codex development session, authorized checked
+private publication of the existing software branch and requested fresh GitHub
+conversation continuity. No further feature work was performed for closeout.
+Use [session state](OSCAR-SESSION-STATE.md), [continuation](OSCAR-CONTINUATION.md),
+[capability ledger](OSCAR-CAPABILITY-LEDGER.json) and
+[publication readiness](../../PUBLICATION-READINESS.md). Existing source and
+failure evidence is preserved. The ledger records 21 slices, Groups4-6,
+78 subsystem/service capabilities and1,044 criteria including62 minimum scenarios.
+Only explicitly approved physical hardware is deferred. The final full regression
+is FAILED with one foreground assertion; the subsequent parser has127 focused
+passes. The installed-model cross-service campaign remains0/2. Earlier text that
+says full/soak still running is superseded by the completed final receipts, not
+deleted. This checkpoint is not full product completion, public release approval,
+CI acceptance, real account/device/host commissioning or a PR merge.
+
+The owner subsequently confirmed changing the repository to PUBLIC and requested
+the checked branch push. No visibility mutation was performed by Codex. The
+readiness report preserves incomplete rights/privacy clearance; no actual
+credential or sensitive research exposure was confirmed in the scoped audit.

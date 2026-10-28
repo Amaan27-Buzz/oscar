@@ -1,5 +1,22 @@
 # AGENTS.md — active development instructions (2026-10-19)
 
+## 2026-10-28 session closeout and continuation
+
+The owner ended this software-development session and requested a GitHub handoff.
+Read [current session state](docs/development/OSCAR-SESSION-STATE.md),
+[continuation guide](docs/development/OSCAR-CONTINUATION.md),
+[machine-readable capability ledger](docs/development/OSCAR-CAPABILITY-LEDGER.json)
+and [publication readiness](PUBLICATION-READINESS.md) before new work.
+The owner changed the repository to PUBLIC and subsequently explicitly requested
+a checked normal push of `codex/software-completion`, superseding older local-only
+and private-only push restrictions for this handoff only. No main merge, PR #9 change, force-push,
+history rewrite, visibility change or Actions dispatch is authorized. No new
+feature development belongs to this closeout. The full software objective remains
+PARTIAL; future development follows a fresh owner task and the preserved ledger.
+Physical device/audio, real credentials, spending, hosting and owner activation
+restrictions remain active. Publication rights/privacy clearance remains BLOCKED per the readiness report.
+
+
 **Read before any OSCAR work:** [Current status](docs/CURRENT-STATUS.md), [new delivery groups](docs/DELIVERY-PLAN.md), [canonical slices](docs/SLICE-NUMBERING.md), [roadmap](docs/ROADMAP.md), [build gates](docs/BUILD-GATES.md) and [deployment](docs/DEPLOYMENT.md).
 
 ## Current owner sequencing and authorization

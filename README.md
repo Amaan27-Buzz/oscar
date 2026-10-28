@@ -1,5 +1,14 @@
 # OSCAR
 
+**2026-10-28 conversation closeout:** development continues from the preserved
+`codex/software-completion` branch in fresh conversations. Start with
+[session state](docs/development/OSCAR-SESSION-STATE.md),
+[continuation guide](docs/development/OSCAR-CONTINUATION.md) and
+[capability ledger](docs/development/OSCAR-CAPABILITY-LEDGER.json).
+Software completion remains PARTIAL. [Public release is not yet cleared](PUBLICATION-READINESS.md);
+D2 PR #9 and main remain unmerged/unchanged by this closeout.
+
+
 **Active local software candidate, 2026-10-22:**
 [full software completion](docs/development/OSCAR-FULL-SOFTWARE-COMPLETION.md)
 extends the unmerged D2/C1/C2 foundation with signed standing delegation,
