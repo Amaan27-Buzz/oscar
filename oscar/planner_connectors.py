@@ -427,6 +427,76 @@ class ConnectorPlanning:
                 )
         return proof
 
+    def verify_transfer_source(
+        self, goal: dict[str, Any], step: dict[str, Any], task_id: str
+    ) -> None:
+        """Re-read the exact verified source before a consequential destination copy.
+
+        A stale observation, changed source fields, revoked identity or lost
+        private source input blocks the destination mutation. This is a fresh
+        pre-effect check, not an atomic cross-provider transaction.
+        """
+        proof = goal.get("owner_transfer_proof")
+        if not proof or step["id"] not in proof["destination_step_ids"]:
+            return
+        from .capabilities import Cancellation
+        from .owner_transfer import source_task_digest
+        from .planner_observations import context
+
+        refs = goal.get("observations")
+        if not isinstance(refs, dict):
+            raise PermissionError("original source observation references required")
+
+        def authorize_source() -> None:
+            observed = json.loads(
+                context(self.h.store, self.h.grid, refs, task_id=task_id)
+            )
+            matches = [
+                entry
+                for entry in observed
+                if entry.get("account_id") == proof["source_account_id"]
+                and entry.get("task_id") == proof["source_task_id"]
+                and entry.get("evidence_id") == proof["source_evidence_id"]
+                and entry.get("capability_id", "").split(":", 1)[-1]
+                == proof["source_operation"]
+            ]
+            if len(matches) != 1:
+                raise PermissionError("verified source provenance changed")
+
+        try:
+            source = [
+                (ref, row)
+                for ref, row in self.inputs.items()
+                if row.get("effect_task") == proof["source_task_id"]
+                and "observation" in row
+            ]
+            if len(source) != 1:
+                raise PermissionError("private source request no longer available")
+            ref, row = source[0]
+            current = self.check(ref)
+            if (
+                current["operation"] != proof["source_operation"]
+                or current["instance"]["account_id"] != proof["source_account_id"]
+                or not self.is_read(current["capability"])
+            ):
+                raise PermissionError("source operation or account changed")
+            instance = self.h.connectors.instances[current["instance"]["id"]]
+            spec = next(
+                capability
+                for capability in instance.manifest.capabilities
+                if capability.name == current["operation"]
+            )
+            cancellation = Cancellation(self.h.store, task_id, authorize_source)
+            cancellation.check()
+            payload, _ = self.h.connectors._request(
+                instance, spec, row["observation"], cancellation
+            )
+            cancellation.check()
+            if source_task_digest(current["operation"], payload) != proof["source_digest"]:
+                raise PermissionError("source records changed before destination effect")
+        except (KeyError, StopIteration, ValueError, Cancelled, ConnectorError) as exc:
+            raise PermissionError("verified source pre-effect check unavailable") from exc
+
     def is_read(self, cap: dict[str, Any]) -> bool:
         if self.descriptor(cap) is None:
             return False
