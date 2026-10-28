@@ -118,6 +118,7 @@ def resolved_owner_account_bindings(
             candidates = [
                 a for a in accounts
                 if a.status == "connected"
+                and a.services
                 and a.provider == binding["provider"]
                 and a.alias == binding["alias"]
             ]
@@ -129,7 +130,9 @@ def resolved_owner_account_bindings(
 
     connected = [
         a for a in accounts
-        if a.status == "connected" and a.identity_class == "owner-delegated"
+        if a.status == "connected"
+        and a.services
+        and a.identity_class == "owner-delegated"
     ]
     references: list[tuple[int, int, str]] = []
     for provider in sorted({a.provider for a in connected}, key=len, reverse=True):
