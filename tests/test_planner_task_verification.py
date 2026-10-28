@@ -406,7 +406,7 @@ class PlannedTaskVerificationTests(unittest.TestCase):
 
         self.cross_service_role_steps()
         goal = (
-            "Transfer tasks from Google Tasks to Microsoft To Do and preserve "
+            "Copy tasks from Google Tasks to Microsoft To Do and preserve "
             "their titles, notes and due dates."
         )
         contract = owner_objective_contract(goal, self.h.accounts.list_accounts())
@@ -423,6 +423,30 @@ class PlannedTaskVerificationTests(unittest.TestCase):
             contract["accounts"][0]["account_id"], contract["accounts"][1]["account_id"]
         )
         self.assertEqual([], self.api.calls)
+
+    def test_move_sync_and_ambiguous_transfer_are_not_silent_copies(self):
+        from oscar.planning_contract import owner_objective_contract
+
+        self.cross_service_role_steps()
+        for goal in (
+            "Move tasks from Google Tasks to Microsoft To Do.",
+            "Sync tasks from Google Tasks to Microsoft To Do.",
+            "Migrate tasks from Google Tasks to Microsoft To Do.",
+            "Transfer tasks from Google Tasks to Microsoft To Do.",
+        ):
+            with self.subTest(goal=goal):
+                with self.assertRaisesRegex(ValueError, "Clarify"):
+                    owner_objective_contract(goal, self.h.accounts.list_accounts())
+        self.assertEqual([], self.api.calls)
+
+    def test_unknown_accounts_cannot_silently_satisfy_task_transfer(self):
+        from oscar.planning_contract import owner_objective_contract
+
+        with self.assertRaisesRegex(ValueError, "source and destination"):
+            owner_objective_contract(
+                "Copy these tasks from my personal account into my work account.",
+                self.h.accounts.list_accounts(),
+            )
 
     def test_repeated_conflicting_owner_roles_are_not_silently_merged(self):
         goal, source, destination, _ = self.cross_service_role_steps()
