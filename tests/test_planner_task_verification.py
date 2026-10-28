@@ -566,6 +566,31 @@ class PlannedTaskVerificationTests(unittest.TestCase):
         self.assertEqual(1, sum(method == "POST" for method, *_ in self.api.calls))
         self.assert_private()
 
+    def test_partial_destination_readback_never_completes_or_replays_copy(self):
+        from tests.test_planner_http_observations import HTTPObservationTests
+
+        goal_id, task_id = self.prepare_cross_account_copy()
+        self.api.transform = (
+            lambda method, data: {**data, "title": "Wrong saved task"}
+            if method == "GET" and "title" in data
+            else data
+        )
+        self.complete(self.review({"operation": "confirm_task", "id": task_id, "value": {}}))
+        self.assertEqual("failed", HTTPObservationTests.settle(self, 4)["state"])
+        goal = self.h.store.get("executive_goal", goal_id)
+        self.assertEqual("partially_verified", goal["state"])
+        self.assertEqual(
+            "incomplete_or_uncertain_destination_effects",
+            goal["objective_verification"]["reason"],
+        )
+        posted = sum(method == "POST" for method, *_ in self.api.calls)
+        self.assertEqual(1, posted)
+        for _ in range(3):
+            self.h.executive.tick()
+        self.assertEqual(
+            posted, sum(method == "POST" for method, *_ in self.api.calls)
+        )
+
     def test_source_change_before_copy_blocks_destination_post(self):
         goal_id, task_id = self.prepare_cross_account_copy()
         self.api.resources["/tasks/v1/lists/source-list/tasks"]["items"][0]["due"] = (
@@ -575,7 +600,7 @@ class PlannedTaskVerificationTests(unittest.TestCase):
         self.h.executive.tick()
         self.assertFalse(any(method == "POST" for method, *_ in self.api.calls))
         self.assertEqual("planned", self.h.store.task(task_id).state)
-        self.assertNotEqual("completed", self.h.store.get("executive_goal", goal_id)["state"])
+        self.assertEqual("blocked", self.h.store.get("executive_goal", goal_id)["state"])
 
     def microsoft_task(self):
         self.account = self.h.accounts.add(
