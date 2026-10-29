@@ -1,3 +1,45 @@
+# OSCAR local owner-copy regression — 2026-10-29
+
+**User's Windows acceptance receipt at `2f0d17f0a97e4d8c0972f3d4836c98aebc022b86`:**
+`python -m unittest tests.test_owner_transfer tests.test_planner_task_verification tests.test_planner_http_observations tests.test_planner_catalog tests.test_executive -v`
+executed **161 tests: 160 PASS, 1 FAIL**. The new duplicate-resource
+identity test PASSED. Ruff lint PASS, mypy PASS (108 source files),
+`python -m scripts.check_repository` PASS. The lone failure was
+`test_post_committed_but_provider_reply_lost_is_unknown_without_replay`,
+which received task state `failed` rather than its expected `blocked`
+when a synthetic provider saved the POST and then returned HTTP 503.
+
+**Fix committed (NOT_YET_TESTED):**
+- `oscar/executive.py`: distinguish terminal `FAILED` result records
+  with `success=False` (provider may have committed before replying)
+  from `FAILED` independent destination verification with a successful
+  mutation result. Set the OWNER GOAL to `unknown` for an unsuccessful
+  write response; preserve `partially_verified` for a saved-resource GET
+  mismatch. Neither branch auto-replays effects.
+- `tests/test_planner_task_verification.py`: expect the task state
+  `failed` for a post-commit HTTP 503 and assert the persisted result is
+  unsuccessful, owner goal `unknown`, and no duplicate POST.
+- The patch at `61821e9611fbc1e11a1a930d741613b714dda095` is
+  **not** a PASS receipt. Rerun the one failing test, then full 161.
+
+**Next local commands:**
+```powershell
+git pull --ff-only
+python -m unittest tests.test_planner_task_verification.PlannedTaskVerificationTests.test_post_committed_but_provider_reply_lost_is_unknown_without_replay -v
+python -m unittest tests.test_owner_transfer tests.test_planner_task_verification tests.test_planner_http_observations tests.test_planner_catalog tests.test_executive -v
+python -m ruff check oscar tests scripts
+python -m mypy oscar
+python -m scripts.check_repository
+python -m ruff format --check oscar tests scripts
+```
+
+PR #10 remains draft/unmerged. BUG-PLAN-001 is still OPEN until
+unambiguous owner-goal Ask/Full and original installed-Qwen acceptance
+plus complete formatter/test receipts. GitHub Actions startup_failure
+with no jobs remains an independent CI blocker.
+
+---
+
 # OSCAR owner-copy identity hardening — 2026-10-29
 
 **Actual Windows targeted acceptance receipt at `fe4a96d9e4c49d674c9e53693886c9108d18527f`:**
