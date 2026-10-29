@@ -139,6 +139,46 @@ class OwnerTransferEquivalenceTests(unittest.TestCase):
                 },
             )
 
+    def test_microsoft_utc_zero_fraction_due_date_has_equal_semantics(self):
+        payload = {
+            "value": [{
+                "title": "Source title",
+                "status": "notStarted",
+                "body": {
+                    "contentType": "text",
+                    "content": "Private source notes",
+                },
+                "dueDateTime": {
+                    "dateTime": "2026-10-28T00:00:00.0000000",
+                    "timeZone": "UTC",
+                },
+            }]
+        }
+        records = source_task_records("microsoft.todo.tasks.list", payload)
+        self.assertEqual("2026-10-28", records[0]["due"])
+        payload["value"][0]["dueDateTime"]["dateTime"] = (
+            "2026-10-28T00:00:00.0000001"
+        )
+        with self.assertRaisesRegex(PermissionError, "cannot be preserved"):
+            source_task_records("microsoft.todo.tasks.list", payload)
+
+    def test_microsoft_rich_notes_are_not_silently_downgraded(self):
+        for notes in (
+            {"contentType": "html", "content": "<b>Important</b>"},
+            {"contentType": None, "content": "invalid"},
+            "not a typed notes body",
+        ):
+            with self.subTest(notes=notes):
+                with self.assertRaisesRegex(PermissionError, "without loss"):
+                    source_task_records(
+                        "microsoft.todo.tasks.list",
+                        {"value": [{
+                            "title": "Source title",
+                            "status": "notStarted",
+                            "body": notes,
+                        }]},
+                    )
+
     def test_missing_source_status_is_not_assumed_uncompleted(self):
         item = self.task()
         item.pop("status")
