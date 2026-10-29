@@ -919,6 +919,12 @@ class PlannerAuthoring:
             row = h.store.get("planner_request", identifier)
             if row["relationship"] != h.runtime.relationship_id or row.get("accepted_goal"):
                 raise PermissionError("planning request unavailable or already accepted")
+            from .planning_contract import owner_objective_contract
+
+            if row.get("owner_objective") != owner_objective_contract(
+                row["goal"], h.accounts.list_accounts()
+            ):
+                raise PermissionError("owner objective account bindings changed")
             owner = h.store.get("executive_owner", row["goal_id"])
             from .authority import StandingAuthority
 
@@ -1028,7 +1034,12 @@ class PlannerAuthoring:
                 context(h.store, h.grid, row["observation_refs"])
             steps = h.executive.validate_steps(worker, document["steps"])
             validate_file_literal(row["goal"], steps)
-            h.connector_plans.check_goal_accounts(row["goal"], steps)
+            owner_transfer_proof = h.connector_plans.check_goal_accounts(
+                row["goal"],
+                steps,
+                observe=document["observe"],
+                source_observations=row.get("observation_refs"),
+            )
             connector_inputs = h.connector_plans.review(steps, tasks[0])
             if connector_inputs and value != {
                 "start_at": None,
@@ -1083,6 +1094,11 @@ class PlannerAuthoring:
                 "steps": steps,
                 **({"connector_inputs": connector_inputs} if connector_inputs else {}),
                 "observe": document["observe"],
+                **(
+                    {"owner_transfer_proof": owner_transfer_proof}
+                    if owner_transfer_proof is not None
+                    else {}
+                ),
                 "planner_task_id": tasks[0],
                 "routing_evidence": [
                     {
@@ -1139,6 +1155,9 @@ class PlannerAuthoring:
         h = self.h
         if operation == "plan_draft":
             caps = state["capabilities"]
+            from .planning_contract import owner_objective_contract
+
+            owner_objective = owner_objective_contract(value["goal"], h.accounts.list_accounts())
             worker = h.executive.worker(
                 value["name"],
                 [(c["node_id"], c["id"]) for c in caps],
@@ -1155,6 +1174,7 @@ class PlannerAuthoring:
                     "id": request_id,
                     "relationship": h.runtime.relationship_id,
                     "goal": value["goal"],
+                    **({"owner_objective": owner_objective} if owner_objective else {}),
                     "goal_id": proposal["id"],
                     "worker_id": worker,
                     "capabilities": value["capabilities"],
@@ -1190,6 +1210,21 @@ class PlannerAuthoring:
             )
             if state.get("continuation") or row.get("observation_refs"):
                 proposal["observations"] = state.get("observations", row.get("observation_refs"))
+                proposal["review_digest"] = h.executive._review(proposal)
+                h.store.put("executive_goal", proposal["id"], proposal)
+            if (
+                row.get("owner_objective")
+                and not state.get("observe")
+                and not state.get("continuation")
+            ):
+                # Executive must not equate individually verified model steps with
+                # completion of an independently observed cross-account owner goal.
+                if state.get("owner_transfer_proof") is None:
+                    raise PermissionError(
+                        "verified source-to-destination owner field proof required"
+                    )
+                proposal["owner_objective"] = row["owner_objective"]
+                proposal["owner_transfer_proof"] = state["owner_transfer_proof"]
                 proposal["review_digest"] = h.executive._review(proposal)
                 h.store.put("executive_goal", proposal["id"], proposal)
             if state.get("continuation"):

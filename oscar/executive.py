@@ -225,6 +225,10 @@ class Executive:
         self.health = "idle"
         self.active: set[str] = set()
         self.advance_plans: Callable[[], None] | None = None
+        self.owner_transfer_guard: Callable[[dict[str, Any], dict[str, Any], str], None] | None = (
+            None
+        )
+        self.owner_transfer_verifier: Callable[[dict[str, Any]], dict[str, Any]] | None = None
 
     def _owner(self, authorized: bool) -> None:
         if authorized is not True:
@@ -1498,6 +1502,61 @@ class Executive:
                         self.targets[step["node_id"]][1],
                         self.runtime.memory,
                     )
+                    if goal.get("owner_transfer_proof"):
+                        try:
+                            if self.owner_transfer_guard is None:
+                                raise PermissionError(
+                                    "fresh owner transfer verification unavailable"
+                                )
+                            self.owner_transfer_guard(goal, step, task.id)
+                        except PermissionError:
+                            # This is a verified source-preflight failure, distinct
+                            # from Ask awaiting owner confirmation. Stop this
+                            # occurrence instead of repeatedly reconsidering an
+                            # unsafe consequential effect.
+                            previous = [
+                                row
+                                for row in self.store.all("executive_task")
+                                if row["goal_id"] == goal["id"]
+                                and row["occurrence"] == goal["run_index"]
+                                and row["step_id"]
+                                in goal["owner_transfer_proof"]["destination_step_ids"]
+                                and self.store.task(row["task_id"]).state
+                                in {
+                                    TaskState.VERIFIED,
+                                    TaskState.PARTIALLY_VERIFIED,
+                                    TaskState.FAILED,
+                                    TaskState.UNKNOWN,
+                                }
+                            ]
+                            status = "partially_verified" if previous else "blocked"
+                            with self.store.transaction():
+                                current = self._row("executive_goal", goal["id"])
+                                if current["state"] == "enabled":
+                                    self.store.put(
+                                        "executive_goal",
+                                        goal["id"],
+                                        {
+                                            **current,
+                                            "state": status,
+                                            "objective_verification": {
+                                                "state": "not_verified",
+                                                "reason": "fresh_source_preflight_denied",
+                                                "step_id": step["id"],
+                                            },
+                                        },
+                                    )
+                                    self.store.audit(
+                                        "",
+                                        "executive_owner_source_changed",
+                                        {
+                                            "goal_id": goal["id"],
+                                            "step_id": step["id"],
+                                            "state": status,
+                                        },
+                                    )
+                            self.health = "waiting_for_verified_source"
+                            break
                     if self.stop.is_set():
                         break
                     token = new_id()
@@ -1545,12 +1604,123 @@ class Executive:
                                 self.store.delete("executive_slot", goal["worker_id"])
                 except PermissionError:
                     self.health = "waiting_for_authority"
+            if goal.get("owner_objective") and any(
+                state
+                in {
+                    TaskState.FAILED,
+                    TaskState.PARTIALLY_VERIFIED,
+                    TaskState.UNKNOWN,
+                    TaskState.CANCELLED,
+                    TaskState.BLOCKED,
+                }
+                for state in results.values()
+            ):
+                # A provider mutation may have taken effect even when its GET
+                # failed. Never automatically retry a partially proven owner
+                # transfer or leave it looking like active verified work.
+                uncertain = any(
+                    state
+                    in {
+                        TaskState.FAILED,
+                        TaskState.PARTIALLY_VERIFIED,
+                        TaskState.CANCELLED,
+                    }
+                    for state in results.values()
+                )
+                # A failed *mutation response* is not proof that the provider
+                # rejected the write. It may have committed the POST and then
+                # lost the reply (or returned a 5xx). The native task remains
+                # FAILED, but the owner's cross-provider objective is UNKNOWN.
+                # A successful mutation with a mismatching independent GET is
+                # instead partially verified, since its outcome was observed.
+                failed_tasks = {
+                    row["task_id"]
+                    for row in self.store.all("executive_task")
+                    if row["goal_id"] == goal["id"]
+                    and row["occurrence"] == goal["run_index"]
+                    and row["relationship"] == goal["relationship"]
+                    and results.get(row["step_id"]) == TaskState.FAILED
+                }
+                failed_mutation_responses = any(
+                    r["task_id"] in failed_tasks and r["success"] is False
+                    for r in self.store.all("result")
+                )
+                if failed_mutation_responses or any(
+                    state in {TaskState.UNKNOWN, TaskState.BLOCKED} for state in results.values()
+                ):
+                    status = "unknown"
+                elif uncertain or any(state == TaskState.VERIFIED for state in results.values()):
+                    status = "partially_verified"
+                else:
+                    status = "blocked"
+                with self.store.transaction():
+                    current = self._row("executive_goal", goal["id"])
+                    if current["state"] == "enabled":
+                        self.store.put(
+                            "executive_goal",
+                            goal["id"],
+                            {
+                                **current,
+                                "state": status,
+                                "objective_verification": {
+                                    "state": "not_verified",
+                                    "reason": "incomplete_or_uncertain_destination_effects",
+                                    "step_states": {
+                                        step_id: state.value for step_id, state in results.items()
+                                    },
+                                },
+                            },
+                        )
+                        self.store.audit(
+                            "",
+                            "executive_owner_effect_uncertain",
+                            {
+                                "goal_id": goal["id"],
+                                "state": status,
+                            },
+                        )
+                continue
             if len(results) == len(goal["steps"]) and all(
                 s == TaskState.VERIFIED for s in results.values()
             ):
+                owner_receipt = None
+                if goal.get("owner_objective") and self.owner_transfer_verifier is not None:
+                    try:
+                        owner_receipt = self.owner_transfer_verifier(goal)
+                    except (KeyError, ValueError, PermissionError, StateConflict):
+                        self.health = "waiting_for_owner_objective_verification"
                 with self.store.transaction():
                     current = self._row("executive_goal", goal["id"])
-                    if current["state"] != "enabled" or current["run_index"] != goal["run_index"]:
+                    if (
+                        current["state"] != "enabled"
+                        or current["run_index"] != goal["run_index"]
+                        or current["review_digest"] != goal["review_digest"]
+                        or self._review(current) != current["review_digest"]
+                    ):
+                        # No task result, even an independently verified saved
+                        # resource, can satisfy an altered owner commitment.
+                        self.health = "waiting_for_owner_review"
+                        continue
+                    if current.get("owner_objective") and owner_receipt is None:
+                        # Individual verified steps are insufficient without a
+                        # fresh original-objective source/destination proof.
+                        self.store.put(
+                            "executive_goal",
+                            goal["id"],
+                            {
+                                **current,
+                                "state": "partially_verified",
+                                "objective_verification": {
+                                    "state": "not_verified",
+                                    "reason": "independent whole-objective comparison unavailable",
+                                },
+                            },
+                        )
+                        self.store.audit(
+                            "",
+                            "executive_owner_objective_unverified",
+                            {"goal_id": goal["id"], "occurrence": goal["run_index"]},
+                        )
                         continue
                     index = goal["run_index"] + 1
                     interval = goal["interval_seconds"]
@@ -1569,6 +1739,11 @@ class Executive:
                             "run_index": index,
                             "next_at": next_at,
                             "state": "completed" if index >= goal["max_runs"] else "enabled",
+                            **(
+                                {"objective_verification": owner_receipt}
+                                if owner_receipt is not None
+                                else {}
+                            ),
                         },
                     )
                     self.store.audit(

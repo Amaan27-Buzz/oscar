@@ -488,7 +488,10 @@ class PlanningCatalogTests(unittest.TestCase):
         self.assertEqual([], self.api.calls)
 
     def test_account_goal_guard_rejects_a_different_alias_without_effects(self):
-        with self.assertRaisesRegex(PermissionError, "selected account"):
+        # "Work" is a Microsoft alias in this fixture, not a connected
+        # Google alias. The owner must clarify an unavailable account rather
+        # than implicitly map the request to the Google "Tasks" account.
+        with self.assertRaisesRegex(ValueError, "unavailable or ambiguous account alias"):
             self.h.connector_plans.check_goal_accounts('Google account alias "Work"', self.steps)
         self.assertEqual([], self.api.calls)
         self.h.connector_plans.check_goal_accounts('Google account alias "Tasks"', self.steps)

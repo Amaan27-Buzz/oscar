@@ -82,6 +82,95 @@ class ExecutiveTests(unittest.TestCase):
         self.assertEqual(0, self.e.tick())
         self.assertEqual(2, len(self.r.store.all("task")))
 
+    def test_individual_verified_steps_do_not_complete_unproven_owner_objective(self):
+        proposal = self.e.propose(self.worker, "Copy owner records between accounts", [self.step()])
+        proposal["owner_objective"] = {
+            "objective": "Copy source records to the destination and preserve due dates",
+            "operation": "copy",
+            "required_fields": ["due"],
+            "accounts": [
+                {"account_id": "source", "role": "source", "generation": 1},
+                {"account_id": "destination", "role": "destination", "generation": 1},
+            ],
+            "completion_rule": "independent_source_and_destination_evidence",
+        }
+        proposal["review_digest"] = self.e._review(proposal)
+        with self.r.store.transaction():
+            self.r.store.put("executive_goal", proposal["id"], proposal)
+        self.e.accept(proposal["id"], proposal["review_digest"], owner_authorized=True)
+        self.assertEqual(1, self.e.tick())
+        self.assertEqual("verified", self.r.store.all("task")[-1]["state"])
+        saved = self.r.store.get("executive_goal", proposal["id"])
+        self.assertEqual("partially_verified", saved["state"])
+        self.assertEqual("not_verified", saved["objective_verification"]["state"])
+        self.assertEqual(0, saved["run_index"])
+        self.assertEqual(0, self.e.tick())
+
+    def test_owner_commitment_changed_during_final_proof_never_completes(self):
+        proposal = self.e.propose(self.worker, "Copy source record", [self.step()])
+        proposal["owner_objective"] = {
+            "objective": "Copy source record",
+            "operation": "copy",
+            "required_fields": [],
+            "accounts": [],
+        }
+        proposal["owner_transfer_proof"] = {
+            "kind": "source_task_field_equivalence",
+            "destination_step_ids": ["sum"],
+        }
+        proposal["review_digest"] = self.e._review(proposal)
+        self.r.store.put("executive_goal", proposal["id"], proposal)
+        self.e.accept(proposal["id"], proposal["review_digest"], owner_authorized=True)
+        self.e.owner_transfer_guard = lambda goal, step, task_id: None
+
+        def stale_confirmation(goal):
+            current = self.r.store.get("executive_goal", goal["id"])
+            self.r.store.put(
+                "executive_goal",
+                goal["id"],
+                {**current, "goal": "Silently changed original objective"},
+            )
+            return {"state": "verified", "kind": "synthetic"}
+
+        self.e.owner_transfer_verifier = stale_confirmation
+        self.assertEqual(1, self.e.tick())
+        current = self.r.store.get("executive_goal", proposal["id"])
+        self.assertNotEqual("completed", current["state"])
+        self.assertEqual("waiting_for_owner_review", self.e.health)
+
+    def test_fresh_source_guard_blocks_effect_until_source_is_still_verified(self):
+        proposal = self.e.propose(self.worker, "Copy source record", [self.step()])
+        proposal["owner_objective"] = {
+            "objective": "Copy source record into the destination",
+            "operation": "copy",
+            "required_fields": ["title"],
+            "accounts": [],
+        }
+        proposal["owner_transfer_proof"] = {
+            "kind": "source_task_field_equivalence",
+            "destination_step_ids": ["sum"],
+        }
+        proposal["review_digest"] = self.e._review(proposal)
+        with self.r.store.transaction():
+            self.r.store.put("executive_goal", proposal["id"], proposal)
+        self.e.accept(proposal["id"], proposal["review_digest"], owner_authorized=True)
+        checked = []
+
+        def changed(goal, step, task_id):
+            checked.append((goal["id"], step["id"], task_id))
+            raise PermissionError("independent source changed")
+
+        self.e.owner_transfer_guard = changed
+        self.assertEqual(0, self.e.tick())
+        self.assertEqual(1, len(checked))
+        self.assertEqual("planned", self.r.store.all("task")[-1]["state"])
+        self.assertEqual("waiting_for_verified_source", self.e.health)
+        self.assertEqual(0, self.r.store.get("executive_goal", proposal["id"])["run_index"])
+        self.assertEqual("blocked", self.r.store.get("executive_goal", proposal["id"])["state"])
+        self.e.owner_transfer_guard = lambda goal, step, task_id: None
+        self.assertEqual(0, self.e.tick())
+        self.assertEqual("planned", self.r.store.all("task")[-1]["state"])
+
     def test_connector_mount_during_heartbeat_does_not_stop_executive_tick(self):
         heartbeat = self.e.grid.heartbeat
         called = []

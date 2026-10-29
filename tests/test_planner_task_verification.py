@@ -2,7 +2,7 @@
 
 import json
 import unittest
-from dataclasses import asdict
+from dataclasses import asdict, replace
 from time import monotonic, sleep
 
 from tests import test_planner_http_connectors as fixture
@@ -237,6 +237,516 @@ class PlannedTaskVerificationTests(unittest.TestCase):
         self.response()
         self.assertEqual("partially_verified", self.run_ask())
         self.assertEqual(["POST"], [c[0] for c in self.api.calls])
+
+    def cross_service_role_steps(self):
+        """Synthetic source/destination accounts; no provider request is sent."""
+        from copy import deepcopy
+
+        from oscar.jev import Intent
+
+        google = self.account
+        google_create = deepcopy(self.steps[0])
+        self.microsoft_task()
+        reader = self.mount.capability("google.tasks.list", account_id=google.id)
+        source = {
+            "id": "source",
+            "node_id": reader.node_id,
+            "capability_id": reader.id,
+            "depends_on": [],
+            "intent": asdict(
+                Intent(
+                    "Read source records",
+                    "capability",
+                    capability_kind=reader.id,
+                    parameters={"arguments": {"path": {"tasklist": "source-list"}}},
+                )
+            ),
+        }
+        destination = deepcopy(self.steps[0])
+        destination_args = destination["intent"]["parameters"]["arguments"]
+        destination_args["path"]["listId"] = "target-list"
+        destination["depends_on"] = ["source"]
+        goal = (
+            'Copy records from Google account alias "Tasks" list ID "source-list" '
+            'to Microsoft account alias "MS Tasks" list ID "target-list".'
+        )
+        return goal, source, destination, google_create
+
+    def test_source_observation_stage_admitted_but_unbound_copy_requires_replan(self):
+        goal, source, destination, _ = self.cross_service_role_steps()
+        self.h.connector_plans.check_goal_accounts(goal, [source], observe=True)
+        with self.assertRaisesRegex(PermissionError, "verified source observation stage"):
+            self.h.connector_plans.check_goal_accounts(goal, [source, destination])
+        self.assertEqual([], self.api.calls)
+
+    def test_owner_goal_rejects_provider_swap_before_effects(self):
+        goal, source, _, google_create = self.cross_service_role_steps()
+        with self.assertRaisesRegex(PermissionError, "source account"):
+            self.h.connector_plans.check_goal_accounts(goal, [source, google_create])
+        self.assertEqual([], self.api.calls)
+
+    def test_copy_contract_rejects_unrelated_native_file_effect(self):
+        from oscar.jev import Intent
+
+        goal, source, destination, _ = self.cross_service_role_steps()
+        destination["depends_on"] = []
+        extra = {
+            "id": "unrequested-local-write",
+            "node_id": self.h.node_id,
+            "capability_id": "files.write",
+            "depends_on": [],
+            "intent": asdict(
+                Intent(
+                    "Save an unrelated local artifact",
+                    "file_write",
+                    "unrequested.txt",
+                    "not part of the owner's copy",
+                )
+            ),
+        }
+        with self.assertRaisesRegex(PermissionError, "unrelated plan steps"):
+            self.h.connector_plans.check_goal_accounts(goal, [destination, extra])
+        with self.assertRaisesRegex(PermissionError, "exact source-account read stage"):
+            self.h.connector_plans.check_goal_accounts(goal, [source, extra], observe=True)
+        self.assertEqual([], self.api.calls)
+
+    def test_owner_goal_rejects_wrong_destination_resource(self):
+        goal, source, destination, _ = self.cross_service_role_steps()
+        destination_args = destination["intent"]["parameters"]["arguments"]
+        destination_args["path"]["listId"] = "other-list"
+        with self.assertRaisesRegex(PermissionError, "resource ID"):
+            self.h.connector_plans.check_goal_accounts(goal, [source, destination])
+        self.assertEqual([], self.api.calls)
+
+    def test_owner_goal_rejects_source_only_and_partial_read_plan(self):
+        goal, source, destination, _ = self.cross_service_role_steps()
+        with self.assertRaisesRegex(PermissionError, "destination operation"):
+            self.h.connector_plans.check_goal_accounts(goal, [source])
+        from oscar.jev import Intent
+
+        reader = self.mount.capability("microsoft.todo.tasks.list", account_id=self.account.id)
+        destination_read = {
+            "id": "target-read",
+            "node_id": reader.node_id,
+            "capability_id": reader.id,
+            "depends_on": [],
+            "intent": asdict(
+                Intent(
+                    "Inspect target",
+                    "capability",
+                    capability_kind=reader.id,
+                    parameters={"arguments": {"path": {"listId": "target-list"}}},
+                )
+            ),
+        }
+        with self.assertRaisesRegex(PermissionError, "destination operation"):
+            self.h.connector_plans.check_goal_accounts(goal, [source, destination_read])
+        self.assertEqual([], self.api.calls)
+
+    def test_owner_goal_ambiguous_accounts_require_clarification(self):
+        _, source, destination, _ = self.cross_service_role_steps()
+        goal = (
+            'Copy tasks using Google account alias "Tasks" and Microsoft account alias "MS Tasks".'
+        )
+        with self.assertRaisesRegex(ValueError, "Clarify"):
+            self.h.connector_plans.check_goal_accounts(goal, [source, destination])
+        self.assertEqual([], self.api.calls)
+
+    def test_ordinary_service_names_route_only_to_verified_accounts(self):
+        _, source, destination, google_create = self.cross_service_role_steps()
+        goal = "Please copy these tasks from Google Tasks into my Microsoft To Do work list."
+        with self.assertRaisesRegex(PermissionError, "verified source observation stage"):
+            self.h.connector_plans.check_goal_accounts(goal, [source, destination])
+        with self.assertRaises(PermissionError):
+            self.h.connector_plans.check_goal_accounts(goal, [source, google_create])
+        self.assertEqual([], self.api.calls)
+
+    def test_ambiguous_ordinary_service_name_requires_account_clarification(self):
+        from oscar.connectors import CredentialRef
+        from oscar.planning_contract import resolved_owner_account_bindings
+
+        google_manifest = self.manifest
+        self.cross_service_role_steps()
+        secondary = self.h.accounts.add(
+            "google", "synthetic-other", "secondary", "Other Tasks", verified=True
+        )
+        self.vault.put("synthetic-other-token", reference="planning-other")
+        self.h.accounts.bind(
+            secondary.id,
+            google_manifest.id,
+            CredentialRef("planning-other"),
+            {scope for cap in google_manifest.capabilities for scope in cap.scopes},
+            google_manifest.base_url,
+        )
+        with self.assertRaisesRegex(ValueError, "Clarify"):
+            resolved_owner_account_bindings(
+                "Copy the tasks from Google Tasks to Microsoft To Do.",
+                self.h.accounts.list_accounts(),
+            )
+        self.assertEqual([], self.api.calls)
+
+    def test_copy_does_not_accept_wrong_operation_on_correct_destination(self):
+        from copy import deepcopy
+
+        goal, source, destination, _ = self.cross_service_role_steps()
+        wrong = self.mount.capability("microsoft.todo.tasks.update", account_id=self.account.id)
+        changed = deepcopy(destination)
+        changed["capability_id"] = wrong.id
+        changed["node_id"] = wrong.node_id
+        changed["intent"]["capability_kind"] = wrong.id
+        with self.assertRaisesRegex(PermissionError, "destination operation must create"):
+            self.h.connector_plans.check_goal_accounts(goal, [source, changed])
+        self.assertEqual([], self.api.calls)
+
+    def test_copy_rejects_unobserved_source_and_unordered_destination(self):
+        goal, source, destination, _ = self.cross_service_role_steps()
+        with self.assertRaisesRegex(PermissionError, "source observation"):
+            self.h.connector_plans.check_goal_accounts(goal, [destination])
+        destination["depends_on"] = []
+        with self.assertRaisesRegex(PermissionError, "verified source observation stage"):
+            self.h.connector_plans.check_goal_accounts(goal, [source, destination])
+        self.assertEqual([], self.api.calls)
+
+    def test_unrelated_observation_cannot_authorize_source_transfer(self):
+        goal, _, destination, _ = self.cross_service_role_steps()
+        with self.assertRaises(PermissionError):
+            self.h.connector_plans.check_goal_accounts(
+                goal,
+                [destination],
+                source_observations={
+                    "request_id": "unrelated",
+                    "goal_id": "unrelated",
+                    "pins": [],
+                },
+            )
+        self.assertEqual([], self.api.calls)
+
+    def test_owner_objective_contract_retains_owner_fields_not_model_fields(self):
+        from oscar.planning_contract import owner_objective_contract
+
+        self.cross_service_role_steps()
+        goal = (
+            "Copy tasks from Google Tasks to Microsoft To Do and preserve "
+            "their titles, notes and due dates."
+        )
+        contract = owner_objective_contract(goal, self.h.accounts.list_accounts())
+        self.assertIsNotNone(contract)
+        self.assertEqual(goal, contract["objective"])
+        self.assertEqual(contract, json.loads(json.dumps(contract)))
+        self.assertEqual("copy", contract["operation"])
+        self.assertEqual(("due", "title", "notes"), tuple(contract["required_fields"]))
+        self.assertEqual(
+            ("source", "destination"),
+            tuple(account["role"] for account in contract["accounts"]),
+        )
+        self.assertNotEqual(
+            contract["accounts"][0]["account_id"], contract["accounts"][1]["account_id"]
+        )
+        self.assertEqual([], self.api.calls)
+
+    def test_move_sync_and_ambiguous_transfer_are_not_silent_copies(self):
+        from oscar.planning_contract import owner_objective_contract
+
+        self.cross_service_role_steps()
+        for goal in (
+            "Move tasks from Google Tasks to Microsoft To Do.",
+            "Sync tasks from Google Tasks to Microsoft To Do.",
+            "Migrate tasks from Google Tasks to Microsoft To Do.",
+            "Transfer tasks from Google Tasks to Microsoft To Do.",
+        ):
+            with self.subTest(goal=goal):
+                with self.assertRaisesRegex(ValueError, "Clarify"):
+                    owner_objective_contract(goal, self.h.accounts.list_accounts())
+        self.assertEqual([], self.api.calls)
+
+    def test_filtered_subset_is_not_misreported_as_complete_list_copy(self):
+        from oscar.planning_contract import owner_objective_contract
+
+        self.cross_service_role_steps()
+        for goal in (
+            "Copy only 3 tasks from Google Tasks to Microsoft To Do.",
+            "Copy overdue tasks from Google Tasks to Microsoft To Do.",
+            "Copy selected tasks from Google Tasks to Microsoft To Do.",
+            "Copy tasks matching a label from Google Tasks to Microsoft To Do.",
+        ):
+            with self.subTest(goal=goal):
+                with self.assertRaisesRegex(ValueError, "selection and filtering"):
+                    owner_objective_contract(goal, self.h.accounts.list_accounts())
+
+    def test_owner_required_reminders_are_not_silently_dropped(self):
+        from oscar.planning_contract import owner_objective_contract
+
+        self.cross_service_role_steps()
+        with self.assertRaisesRegex(ValueError, "task fields"):
+            owner_objective_contract(
+                "Copy tasks from Google Tasks to Microsoft To Do and preserve reminders.",
+                self.h.accounts.list_accounts(),
+            )
+
+    def test_unknown_accounts_cannot_silently_satisfy_task_transfer(self):
+        from oscar.planning_contract import owner_objective_contract
+
+        with self.assertRaisesRegex(ValueError, "source and destination"):
+            owner_objective_contract(
+                "Copy these tasks from my personal account into my work account.",
+                self.h.accounts.list_accounts(),
+            )
+
+    def test_repeated_conflicting_owner_roles_are_not_silently_merged(self):
+        goal, source, destination, _ = self.cross_service_role_steps()
+        goal += ' Also copy back to Google account alias "Tasks".'
+        with self.assertRaisesRegex(ValueError, "conflicting account roles"):
+            self.h.connector_plans.check_goal_accounts(goal, [source, destination])
+        self.assertEqual([], self.api.calls)
+
+    def test_owner_goal_same_provider_multi_account_routing(self):
+        from copy import deepcopy
+
+        from oscar.connectors import CredentialRef
+
+        google = self.account
+        source = deepcopy(self.steps[0])
+        secondary = self.h.accounts.add(
+            "google", "synthetic-secondary", "other", "Secondary", verified=True
+        )
+        self.vault.put("synthetic-secondary-token", reference="planning-secondary")
+        self.h.accounts.bind(
+            secondary.id,
+            self.manifest.id,
+            CredentialRef("planning-secondary"),
+            self.scopes,
+            self.manifest.base_url,
+        )
+        self.mount.refresh()
+        target = self.mount.capability("google.tasks.create", account_id=secondary.id)
+        destination = deepcopy(source)
+        destination["node_id"] = target.node_id
+        destination["capability_id"] = target.id
+        destination["intent"]["capability_kind"] = target.id
+        destination_args = destination["intent"]["parameters"]["arguments"]
+        destination_args["path"]["tasklist"] = "target-list"
+        source_reader = self.mount.capability("google.tasks.list", account_id=google.id)
+        source["node_id"] = source_reader.node_id
+        source["capability_id"] = source_reader.id
+        source["intent"]["capability_kind"] = source_reader.id
+        source["intent"]["parameters"] = {"arguments": {"path": {"tasklist": "source-list"}}}
+        source["id"] = "read-source"
+        destination["id"] = "copy-target"
+        destination["depends_on"] = ["read-source"]
+        goal = (
+            'Copy from Google account alias "Tasks" list ID "source-list" '
+            'to Google account alias "Secondary" list ID "target-list".'
+        )
+        with self.assertRaisesRegex(PermissionError, "verified source observation stage"):
+            self.h.connector_plans.check_goal_accounts(goal, [source, destination])
+        swapped = deepcopy(destination)
+        swapped["node_id"] = self.cap.node_id
+        swapped["capability_id"] = self.cap.id
+        swapped["intent"]["capability_kind"] = self.cap.id
+        with self.assertRaisesRegex(PermissionError, "source account"):
+            self.h.connector_plans.check_goal_accounts(goal, [source, swapped])
+        self.assertEqual([], self.api.calls)
+
+    def prepare_cross_account_copy(self, *, duplicated=False):
+        from copy import deepcopy
+
+        from tests.test_planner_http_observations import HTTPObservationTests
+
+        goal, source, destination, _ = self.cross_service_role_steps()
+        goal += " Preserve the task titles, notes and due dates."
+        destination["depends_on"] = []
+        self.api.resources["/tasks/v1/lists/source-list/tasks"] = {
+            "items": [
+                {
+                    "title": self.marker,
+                    "notes": "Synthetic private notes",
+                    "due": "2026-10-28T00:00:00Z",
+                    "status": "needsAction",
+                }
+            ]
+        }
+        if duplicated:
+            self.api.resources["/tasks/v1/lists/source-list/tasks"]["items"].append(
+                deepcopy(self.api.resources["/tasks/v1/lists/source-list/tasks"]["items"][0])
+            )
+        # This multi-provider adaptive prompt includes two typed endpoint
+        # contracts and a source observation schema. The default 8K fixture
+        # model is too small, so synthetic admission cannot reach the copy
+        # verification under test. This does not relax production routing.
+        self.executor.router.registry.models = {
+            key: replace(model, context_limit=65536)
+            for key, model in self.executor.router.registry.models.items()
+        }
+        self.change["value"].update(
+            goal=goal,
+            adaptive=True,
+            capabilities=[
+                {"node_id": self.h.node_id, "capability_id": "models.reason"},
+                {"node_id": source["node_id"], "capability_id": source["capability_id"]},
+                {"node_id": destination["node_id"], "capability_id": destination["capability_id"]},
+            ],
+        )
+        self.body["choices"][0]["message"]["content"] = json.dumps(
+            {"steps": [source], "observe": True}
+        )
+        row = self.draft()
+        self.complete(self.review(self.accept_change(row)))
+        self.assertEqual("verified", HTTPObservationTests.settle(self, 2)["state"])
+        # Fabric owns action/outcome disposal; only Planner's bounded private
+        # snapshot may survive to authorize a new independent source GET.
+        source_ref, source_row = next(
+            (ref, item)
+            for ref, item in self.h.connector_plans.inputs.items()
+            if "observation" in item
+        )
+        self.assertNotIn(source_ref, self.h.connectors.requests)
+        self.assertEqual("verified", self.h.store.task(source_row["effect_task"]).state)
+        destination_steps = [destination]
+        if duplicated:
+            second = deepcopy(destination)
+            second["id"] = "destination-second"
+            destination_steps.append(second)
+        self.body["choices"][0]["message"]["content"] = json.dumps({"steps": destination_steps})
+        self.complete(self.review(self.accept_change(row)))
+        self.assertEqual("partially_verified", HTTPObservationTests.settle(self, 3)["state"])
+        self.complete(self.review(self.accept_change(row)))
+        owner_row = self.h.store.get("planner_request", row["id"])
+        owner_goal = owner_row["accepted_goal"]
+        self.assertEqual(
+            "source_task_field_equivalence",
+            self.h.store.get("executive_goal", owner_goal)["owner_transfer_proof"]["kind"],
+        )
+        self.h.executive.tick()
+        task = self.h.store.all("task")[-1]
+        self.assertEqual("planned", task["state"])
+        if duplicated:
+            ids = [
+                record["task_id"]
+                for record in self.h.store.all("executive_task")
+                if record["goal_id"] == owner_goal
+            ]
+            self.assertEqual(2, len(ids))
+            return owner_goal, ids
+        return owner_goal, task["id"]
+
+    def test_cross_account_owner_copy_completes_only_after_independent_field_proof(self):
+        from tests.test_planner_http_observations import HTTPObservationTests
+
+        goal_id, task_id = self.prepare_cross_account_copy()
+        self.complete(self.review({"operation": "confirm_task", "id": task_id, "value": {}}))
+        self.assertEqual("verified", HTTPObservationTests.settle(self, 4)["state"])
+        goal = self.h.store.get("executive_goal", goal_id)
+        self.assertEqual("completed", goal["state"])
+        self.assertEqual("verified", goal["objective_verification"]["state"])
+        self.assertEqual(1, goal["objective_verification"]["count"])
+        self.assertEqual(1, sum(method == "POST" for method, *_ in self.api.calls))
+        self.assert_private()
+
+    def test_two_verified_creates_with_one_provider_id_do_not_satisfy_two_task_copy(self):
+        goal_id, tasks = self.prepare_cross_account_copy(duplicated=True)
+        for task_id in tasks:
+            self.complete(self.review({"operation": "confirm_task", "id": task_id, "value": {}}))
+        deadline = monotonic() + 10
+        while monotonic() < deadline:
+            self.h.executive.tick()
+            statuses = [self.h.store.task(task_id).state for task_id in tasks]
+            goal = self.h.store.get("executive_goal", goal_id)
+            if all(status == "verified" for status in statuses) and goal["state"] != "enabled":
+                break
+            sleep(0.02)
+        else:
+            self.fail("two synthetic provider creates did not reach objective comparison")
+        self.assertEqual("partially_verified", goal["state"])
+        self.assertEqual("not_verified", goal["objective_verification"]["state"])
+        self.assertEqual(2, sum(method == "POST" for method, *_ in self.api.calls))
+        for _ in range(3):
+            self.h.executive.tick()
+        self.assertEqual(2, sum(method == "POST" for method, *_ in self.api.calls))
+        self.assert_private()
+
+    def test_partial_destination_readback_never_completes_or_replays_copy(self):
+        from tests.test_planner_http_observations import HTTPObservationTests
+
+        goal_id, task_id = self.prepare_cross_account_copy()
+        self.api.transform = (
+            lambda method, data: {**data, "title": "Wrong saved task"}
+            if method == "GET" and "title" in data
+            else data
+        )
+        self.complete(self.review({"operation": "confirm_task", "id": task_id, "value": {}}))
+        self.assertEqual("failed", HTTPObservationTests.settle(self, 4)["state"])
+        goal = self.h.store.get("executive_goal", goal_id)
+        self.assertEqual("partially_verified", goal["state"])
+        self.assertEqual(
+            "incomplete_or_uncertain_destination_effects",
+            goal["objective_verification"]["reason"],
+        )
+        posted = sum(method == "POST" for method, *_ in self.api.calls)
+        self.assertEqual(1, posted)
+        for _ in range(3):
+            self.h.executive.tick()
+        self.assertEqual(posted, sum(method == "POST" for method, *_ in self.api.calls))
+
+    def test_post_committed_but_provider_reply_lost_is_unknown_without_replay(self):
+        from tests.test_planner_http_observations import HTTPObservationTests
+
+        goal_id, task_id = self.prepare_cross_account_copy()
+        self.api.fail_after_post = True
+        self.complete(self.review({"operation": "confirm_task", "id": task_id, "value": {}}))
+        # HTTP 503 after the synthetic provider has persisted the POST is
+        # a FAILED task transport receipt, not evidence of a rejected write.
+        # Executive must record the *owner effect* as UNKNOWN and never retry.
+        self.assertEqual("failed", HTTPObservationTests.settle(self, 4)["state"])
+        self.assertTrue(
+            any(
+                result["task_id"] == task_id and result["success"] is False
+                for result in self.h.store.all("result")
+            )
+        )
+        goal = self.h.store.get("executive_goal", goal_id)
+        self.assertEqual("unknown", goal["state"])
+        self.assertEqual(
+            "incomplete_or_uncertain_destination_effects",
+            goal["objective_verification"]["reason"],
+        )
+        posted = sum(method == "POST" for method, *_ in self.api.calls)
+        self.assertEqual(1, posted)
+        for _ in range(3):
+            self.h.executive.tick()
+        self.assertEqual(posted, sum(method == "POST" for method, *_ in self.api.calls))
+
+    def test_expired_private_source_snapshot_blocks_mutation_without_replay(self):
+        goal_id, task_id = self.prepare_cross_account_copy()
+        source_row = next(
+            item for item in self.h.connector_plans.inputs.values() if "observation" in item
+        )
+        source_row["expires"] = self.h.grid.clock() - 1
+        self.complete(self.review({"operation": "confirm_task", "id": task_id, "value": {}}))
+        self.h.executive.tick()
+        self.assertFalse(any(method == "POST" for method, *_ in self.api.calls))
+        self.assertEqual("blocked", self.h.store.get("executive_goal", goal_id)["state"])
+
+    def test_tampered_private_source_read_arguments_block_mutation(self):
+        goal_id, task_id = self.prepare_cross_account_copy()
+        source_row = next(
+            item for item in self.h.connector_plans.inputs.values() if "observation" in item
+        )
+        source_row["observation"]["path"]["tasklist"] = "other-list"
+        self.complete(self.review({"operation": "confirm_task", "id": task_id, "value": {}}))
+        self.h.executive.tick()
+        self.assertFalse(any(method == "POST" for method, *_ in self.api.calls))
+        self.assertEqual("blocked", self.h.store.get("executive_goal", goal_id)["state"])
+
+    def test_source_change_before_copy_blocks_destination_post(self):
+        goal_id, task_id = self.prepare_cross_account_copy()
+        self.api.resources["/tasks/v1/lists/source-list/tasks"]["items"][0]["due"] = (
+            "2026-10-29T00:00:00Z"
+        )
+        self.complete(self.review({"operation": "confirm_task", "id": task_id, "value": {}}))
+        self.h.executive.tick()
+        self.assertFalse(any(method == "POST" for method, *_ in self.api.calls))
+        self.assertEqual("planned", self.h.store.task(task_id).state)
+        self.assertEqual("blocked", self.h.store.get("executive_goal", goal_id)["state"])
 
     def microsoft_task(self):
         self.account = self.h.accounts.add(

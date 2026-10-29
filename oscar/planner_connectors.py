@@ -200,30 +200,44 @@ class ConnectorPlanning:
         }
 
     def goal_accounts(self, goal: str, caps: list[dict[str, Any]]) -> list[dict[str, Any]]:
-        from .planning_contract import exact_account_aliases
+        from .planning_contract import resolved_owner_account_bindings
 
-        aliases = exact_account_aliases(goal)
-        if not aliases:
+        bindings = resolved_owner_account_bindings(goal, self.h.accounts.list_accounts())
+        if not bindings:
             return caps
+        allowed = {binding["account_id"] for binding in bindings}
         selected = []
         for cap in caps:
             descriptor = self.descriptor(cap)
-            if descriptor is not None and aliases:
-                account = descriptor["account"]
-                if account["provider"] not in aliases:
-                    continue
-                if account["alias"] not in aliases[account["provider"]]:
+            if descriptor is not None:
+                if descriptor["account_id"] not in allowed:
                     continue
                 instance = self.h.connectors.instances[cap["id"].split(":", 1)[0]]
+                account = self.h.accounts.get(descriptor["account_id"])
                 current = self.h.accounts.select(
-                    account["provider"], instance.manifest.id, alias=account["alias"]
+                    account.provider, instance.manifest.id, alias=account.alias
                 )
-                if current.id != descriptor["account_id"]:
+                if current.id != account.id or current.generation != account.generation:
                     raise PermissionError("selected account changed")
             selected.append(cap)
         return selected
 
-    def check_goal_accounts(self, goal: str, steps: list[dict[str, Any]]) -> None:
+    def check_goal_accounts(
+        self,
+        goal: str,
+        steps: list[dict[str, Any]],
+        *,
+        observe: bool = False,
+        source_observations: dict[str, Any] | None = None,
+    ) -> dict[str, Any] | None:
+        """Admit actual account effects against owner roles, not an account union.
+
+        The model can choose its plan, but it cannot turn a named source into a
+        destination, change an explicit resource ID, or supply its own objective.
+        A role that owner text does not establish must remain unresolved.
+        """
+        from .planning_contract import resolved_owner_account_bindings
+
         caps = [
             next(
                 c
@@ -234,6 +248,411 @@ class ConnectorPlanning:
         ]
         if len(self.goal_accounts(goal, caps)) != len(caps):
             raise PermissionError("plan does not preserve the owner's selected account")
+        bindings = resolved_owner_account_bindings(goal, self.h.accounts.list_accounts())
+        if not bindings:
+            # Do not let an alias-free cross-service goal silently collapse to
+            # whichever provider's mutation the model happened to select.
+            mentioned = {
+                account.provider
+                for account in self.h.accounts.list_accounts()
+                if re.search(r"\b" + re.escape(account.provider) + r"\b", goal, re.I)
+            }
+            routed = {
+                descriptor["account"]["provider"]
+                for cap in caps
+                if (descriptor := self.descriptor(cap)) is not None
+            }
+            if (len(mentioned) > 1 or mentioned - routed) and any(
+                not self.is_read(cap) for cap in caps if self.descriptor(cap) is not None
+            ):
+                raise ValueError(
+                    "Clarify exact source and destination account aliases before effects."
+                )
+            return None
+        roles = {(b["provider"], b["alias"]): b for b in bindings}
+        if len(roles) != len(bindings):
+            raise ValueError("Clarify repeated or conflicting account roles.")
+        selected: list[tuple[dict[str, Any], dict[str, Any], dict[str, Any]]] = []
+        for step, cap in zip(steps, caps, strict=True):
+            descriptor = self.descriptor(cap)
+            if descriptor is None:
+                continue
+            binding = roles.get((descriptor["account"]["provider"], descriptor["account"]["alias"]))
+            if (
+                binding is None
+                or descriptor["account_id"] != binding["account_id"]
+                or descriptor["account_generation"] != binding["generation"]
+            ):
+                raise PermissionError("plan selects an account absent from the owner goal")
+            selected.append((step, cap, binding))
+
+        if len(roles) > 1 and any(b["role"] is None for b in bindings):
+            if any(not self.is_read(cap) for _, cap, _ in selected):
+                raise ValueError(
+                    "Clarify each source and destination account before authorizing effects."
+                )
+        destination_effects: set[tuple[str, str]] = set()
+        source_reads: set[str] = set()
+        destination_steps: list[dict[str, Any]] = []
+        for step, cap, binding in selected:
+            current = self.contract(cap)
+            method = current["endpoint"]["method"].upper()
+            if current["transport"] != "https" and binding["role"] is not None:
+                raise PermissionError("typed source/destination roles require a reviewed endpoint")
+            if binding["role"] == "source" and method != "GET":
+                raise PermissionError("owner source account cannot receive a proposed effect")
+            if binding["role"] == "source" and method == "GET":
+                source_reads.add(step["id"])
+            if binding["role"] == "destination" and method != "GET":
+                destination_steps.append(step)
+                if re.search(
+                    r"\b(copy|duplicate|replicate|transfer|migrate|sync)\b|"
+                    r"\bcreate\s+equivalent\b",
+                    goal,
+                    re.I,
+                ) and (method != "POST" or current["operation"].rsplit(".", 1)[-1] != "create"):
+                    raise PermissionError(
+                        "owner requested a copy; destination operation must create"
+                    )
+                destination_effects.add((binding["provider"], binding["alias"]))
+            if binding["resources"]:
+                parameters = step["intent"].get("parameters") or {}
+                arguments = parameters.get("arguments")
+                if arguments is None and "request_ref" in parameters:
+                    ref = parameters["request_ref"]
+                    if ref not in self.inputs:
+                        raise PermissionError("private resource binding unavailable")
+                    arguments = self.arguments(ref, self.check(ref))
+                paths = arguments.get("path", {}) if isinstance(arguments, dict) else {}
+                if not isinstance(paths, dict) or (
+                    (method != "GET" or paths)
+                    and not all(resource in paths.values() for resource in binding["resources"])
+                ):
+                    raise PermissionError("plan does not preserve the owner's resource ID")
+
+        proof: dict[str, Any] | None = None
+        if not observe and destination_steps and source_reads:
+            # A dependency edge alone only orders two calls: connector plan
+            # bodies are literal and cannot use result handoffs. Require a
+            # separate verified observation stage so source fields are known
+            # before the destination intent is accepted.
+            raise PermissionError(
+                "task copy requires a verified source observation stage; "
+                "an in-plan GET does not bind copied fields"
+            )
+        # A source-to-destination owner copy is not blanket authorization to
+        # perform extra native file writes, model calls or unrelated account
+        # reads during the effect stage. Every accepted effect must be one of
+        # the independently compared destination task creations.
+        copying = bool(
+            re.search(
+                r"\b(copy|duplicate|replicate|transfer|migrate|sync)\b|"
+                r"\bcreate\s+equivalent\b",
+                goal,
+                re.I,
+            )
+            and any(binding["role"] == "source" for binding in bindings)
+            and any(binding["role"] == "destination" for binding in bindings)
+        )
+        if (
+            copying
+            and not observe
+            and destination_steps
+            and (
+                len(destination_steps) != len(steps)
+                or len({step["id"] for step in destination_steps}) != len(steps)
+            )
+        ):
+            raise PermissionError(
+                "owner task copy does not authorize unrelated plan steps or side effects"
+            )
+        if (
+            copying
+            and observe
+            and (
+                len(source_reads) != len(steps)
+                or any(
+                    binding["role"] != "source" or not self.is_read(cap)
+                    for _, cap, binding in selected
+                )
+            )
+        ):
+            raise PermissionError(
+                "owner source observation must be an exact source-account read stage"
+            )
+
+        if (
+            not observe
+            and destination_steps
+            and any(binding["role"] == "source" for binding in bindings)
+        ):
+            if source_observations is None:
+                raise PermissionError("source observation required before transfer effects")
+            from .planner_observations import context
+
+            try:
+                context(self.h.store, self.h.grid, source_observations)
+                observed_goal = self.h.store.get("executive_goal", source_observations["goal_id"])
+            except (KeyError, ValueError) as exc:
+                raise PermissionError("verified source observation unavailable") from exc
+            expected_sources = {
+                binding["account_id"] for binding in bindings if binding["role"] == "source"
+            }
+            read_accounts = {
+                criterion["connector_account"]["id"]
+                for step in observed_goal["steps"]
+                if (criterion := (step["intent"].get("criterion") or {})).get("kind")
+                == "connector_observation"
+                and isinstance(criterion.get("connector_account"), dict)
+                and "id" in criterion["connector_account"]
+            }
+            if not expected_sources <= read_accounts:
+                raise PermissionError("no verified observation of owner's source account")
+            from .owner_transfer import source_transfer_proof
+
+            source_account_id = next(iter(expected_sources))
+            effects = []
+            for step in destination_steps:
+                cap = next(
+                    c
+                    for c in caps
+                    if c["id"] == step["capability_id"] and c["node_id"] == step["node_id"]
+                )
+                contract = self.contract(cap)
+                parameters = step["intent"].get("parameters") or {}
+                arguments = parameters.get("arguments")
+                if arguments is None and "request_ref" in parameters:
+                    ref = parameters["request_ref"]
+                    arguments = self.arguments(ref, self.check(ref))
+                if not isinstance(arguments, dict):
+                    raise PermissionError("private destination arguments required")
+                effects.append(
+                    {
+                        "step_id": step["id"],
+                        "operation": contract["operation"],
+                        "arguments": arguments,
+                    }
+                )
+            from .planning_contract import owner_objective_contract
+
+            owner_contract = owner_objective_contract(goal, self.h.accounts.list_accounts())
+            if owner_contract is None or any(
+                not role["resource_ids"] for role in owner_contract["accounts"]
+            ):
+                raise ValueError(
+                    "Clarify source and destination list identities using verified "
+                    "resource metadata; model-chosen list IDs are not owner approval."
+                )
+            proof = source_transfer_proof(
+                context(self.h.store, self.h.grid, source_observations),
+                source_account_id,
+                effects,
+                required_fields=tuple(owner_contract["required_fields"] if owner_contract else ()),
+            )
+
+        if not observe:
+            expected = {(b["provider"], b["alias"]) for b in bindings if b["role"] == "destination"}
+            if expected - destination_effects:
+                raise PermissionError("plan does not perform the owner's destination operation")
+        return proof
+
+    def verify_transfer_source(
+        self, goal: dict[str, Any], step: dict[str, Any], task_id: str
+    ) -> None:
+        """Re-read the exact verified source before a consequential destination copy.
+
+        A stale observation, changed source fields, revoked identity or lost
+        private source input blocks the destination mutation. This is a fresh
+        pre-effect check, not an atomic cross-provider transaction.
+        """
+        proof = goal.get("owner_transfer_proof")
+        if not proof or step["id"] not in proof["destination_step_ids"]:
+            return
+        from .capabilities import Cancellation
+        from .owner_transfer import source_task_digest
+        from .planner_observations import context
+        from .storage import StateConflict
+
+        refs = goal.get("observations")
+        if not isinstance(refs, dict):
+            raise PermissionError("original source observation references required")
+
+        def authorize_source() -> None:
+            observed = json.loads(context(self.h.store, self.h.grid, refs, task_id=task_id))
+            matches = [
+                entry
+                for entry in observed
+                if entry.get("account_id") == proof["source_account_id"]
+                and entry.get("task_id") == proof["source_task_id"]
+                and entry.get("evidence_id") == proof["source_evidence_id"]
+                and entry.get("capability_id", "").split(":", 1)[-1] == proof["source_operation"]
+            ]
+            if len(matches) != 1:
+                raise PermissionError("verified source provenance changed")
+
+        try:
+            source = [
+                (ref, row)
+                for ref, row in self.inputs.items()
+                if row.get("effect_task") == proof["source_task_id"] and "observation" in row
+            ]
+            if len(source) != 1:
+                raise PermissionError("private source request no longer available")
+            _, row = source[0]
+            # ConnectorFabric intentionally destroys its executable request on
+            # terminal verification. Keep only the original short-lived,
+            # planner-private observation arguments for authorized fresh GETs;
+            # never rebind them as a new executable mutation.
+            if (
+                row["expires"] <= self.h.grid.clock()
+                or digest(row["observation"]) != row["input_digest"]
+                or self.h.store.task(proof["source_task_id"]).state != TaskState.VERIFIED
+            ):
+                raise PermissionError("verified source observation input expired or changed")
+            current = self.current(row["pin"])
+            if (
+                current["operation"] != proof["source_operation"]
+                or current["instance"]["account_id"] != proof["source_account_id"]
+                or not self.is_read(current["capability"])
+            ):
+                raise PermissionError("source operation or account changed")
+            instance = self.h.connectors.instances[current["instance"]["id"]]
+            spec = next(
+                capability
+                for capability in instance.manifest.capabilities
+                if capability.name == current["operation"]
+            )
+            cancellation = Cancellation(self.h.store, task_id, authorize_source)
+            cancellation.check()
+            payload, _ = self.h.connectors._request(
+                instance, spec, row["observation"], cancellation
+            )
+            cancellation.check()
+            if source_task_digest(current["operation"], payload) != proof["source_digest"]:
+                raise PermissionError("source records changed before destination effect")
+            with self.h.store.transaction():
+                self.h.store.put(
+                    "owner_transfer_source_preflight",
+                    task_id,
+                    {
+                        "goal_id": goal["id"],
+                        "step_id": step["id"],
+                        "proof_digest": digest(proof),
+                        "source_digest": proof["source_digest"],
+                        "checked_at": self.h.grid.clock(),
+                    },
+                )
+        except (
+            KeyError,
+            StopIteration,
+            ValueError,
+            Cancelled,
+            ConnectorError,
+            StateConflict,
+            TypeError,
+        ) as exc:
+            raise PermissionError("verified source pre-effect check unavailable") from exc
+
+    def verify_transfer_completion(self, goal: dict[str, Any]) -> dict[str, Any]:
+        """Prove bounded copy completion using reviewed source and saved-resource GETs.
+
+        The owner must identify both source and destination resource IDs.
+        Without those bindings, model-selected lists cannot certify the
+        original owner's resource-specific objective.
+        """
+        from .executive_inputs import verified_result
+
+        proof = goal.get("owner_transfer_proof")
+        contract = goal.get("owner_objective")
+        if (
+            not isinstance(proof, dict)
+            or proof.get("kind") != "source_task_field_equivalence"
+            or not isinstance(contract, dict)
+            or contract.get("operation") != "copy"
+            or len(proof.get("destination_step_ids", [])) != proof.get("count")
+            or len(proof.get("expected_field_digests", [])) != proof.get("count")
+        ):
+            raise PermissionError("whole-objective task proof unavailable")
+        roles = contract.get("accounts", [])
+        if (
+            len(roles) != 2
+            or {role["role"] for role in roles} != {"source", "destination"}
+            or any(not role.get("resource_ids") for role in roles)
+        ):
+            raise PermissionError("owner resource identities require clarification")
+        source = next(role for role in roles if role["role"] == "source")
+        destination = next(role for role in roles if role["role"] == "destination")
+        if proof["source_account_id"] != source["account_id"]:
+            raise PermissionError("source account proof changed")
+        for role in roles:
+            self.h.accounts.check(role["account_id"], role["generation"])
+        if len(set(proof["destination_step_ids"])) != proof["count"]:
+            raise PermissionError("duplicate destination proof steps")
+        result_evidence: list[str] = []
+        destination_identities: set[str] = set()
+        last_step: dict[str, Any] | None = None
+        last_task_id: str | None = None
+        for step_id, expected_digest in zip(
+            proof["destination_step_ids"],
+            proof["expected_field_digests"],
+            strict=True,
+        ):
+            found = [
+                row
+                for row in self.h.store.all("executive_task")
+                if row["goal_id"] == goal["id"]
+                and row["relationship"] == goal["relationship"]
+                and row["occurrence"] == goal["run_index"]
+                and row["step_id"] == step_id
+            ]
+            steps = [step for step in goal["steps"] if step["id"] == step_id]
+            if len(found) != 1 or len(steps) != 1:
+                raise PermissionError("destination task or step proof missing")
+            task_id = found[0]["task_id"]
+            _, evidence = verified_result(self.h.store, task_id)
+            if evidence["source"] != "connector-independent-readback":
+                raise PermissionError("independent destination saved-resource GET required")
+            identity = evidence.get("content_hash")
+            if not isinstance(identity, str) or not identity or identity in destination_identities:
+                raise PermissionError(
+                    "destination creates did not prove distinct persisted resources"
+                )
+            destination_identities.add(identity)
+            expected = self.h.store.get("owner_transfer_expected_effect", task_id)
+            preflight = self.h.store.get("owner_transfer_source_preflight", task_id)
+            if expected != {
+                "goal_id": goal["id"],
+                "step_id": step_id,
+                "account_id": destination["account_id"],
+                "generation": destination["generation"],
+                "expected_digest": expected_digest,
+                "proof_digest": digest(proof),
+            } or any(
+                preflight.get(key) != value
+                for key, value in {
+                    "goal_id": goal["id"],
+                    "step_id": step_id,
+                    "source_digest": proof["source_digest"],
+                    "proof_digest": digest(proof),
+                }.items()
+            ):
+                raise PermissionError("reviewed destination or pre-effect proof changed")
+            result_evidence.append(evidence["id"])
+            last_step, last_task_id = steps[0], task_id
+        if last_step is None or last_task_id is None:
+            raise PermissionError("no destination proof")
+        # This also validates source observation provenance, authority and
+        # latest canonical source fields. No consequential effect is replayed.
+        self.verify_transfer_source(goal, last_step, last_task_id)
+        return {
+            "state": "verified",
+            "kind": proof["kind"],
+            "source_evidence_id": proof["source_evidence_id"],
+            "destination_evidence_ids": result_evidence,
+            "source_digest": proof["source_digest"],
+            "count": proof["count"],
+            "verified_at": self.h.grid.clock(),
+        }
 
     def is_read(self, cap: dict[str, Any]) -> bool:
         if self.descriptor(cap) is None:
@@ -303,9 +722,16 @@ class ConnectorPlanning:
         }:
             return
         for ref, row in list(self.inputs.items()):
-            if row.get("effect_task") == task.id:
-                self.h.connectors.release_request(ref)
-                self.inputs.pop(ref, None)
+            if row.get("effect_task") != task.id:
+                continue
+            if task.state == TaskState.VERIFIED and "observation" in row:
+                # The provider read may be needed for a *fresh*, independently
+                # authorized transfer-source comparison after model replanning.
+                # Its private read arguments expire in <=120s; Fabric separately
+                # releases the executed request and outcome immediately.
+                continue
+            self.h.connectors.release_request(ref)
+            self.inputs.pop(ref, None)
 
     def sanitize(self, text: str, task_id: str, pins: list[dict[str, Any]]) -> str:
         """Run before model Result persistence; no raw tool arguments enter the ledger."""
@@ -546,6 +972,38 @@ class ConnectorPlanning:
         expected = task_expectation(current["operation"], row["verification_arguments"])
         if expected is None:
             raise PermissionError("private task verification contract unavailable")
+        goal = self.h.store.get("executive_goal", binding["goal_id"])
+        proof = goal.get("owner_transfer_proof")
+        if proof and binding["step_id"] in proof["destination_step_ids"]:
+            index = proof["destination_step_ids"].index(binding["step_id"])
+            if digest(expected) != proof["expected_field_digests"][index] or account["id"] != next(
+                entry["account_id"]
+                for entry in goal["owner_objective"]["accounts"]
+                if entry["role"] == "destination"
+            ):
+                raise PermissionError("destination field proof or account changed")
+            receipt = self.h.store.get("owner_transfer_source_preflight", result.task_id)
+            if receipt != {
+                "goal_id": goal["id"],
+                "step_id": binding["step_id"],
+                "proof_digest": digest(proof),
+                "source_digest": proof["source_digest"],
+                "checked_at": receipt["checked_at"],
+            }:
+                raise PermissionError("fresh source pre-effect proof missing")
+            with self.h.store.transaction():
+                self.h.store.put(
+                    "owner_transfer_expected_effect",
+                    result.task_id,
+                    {
+                        "goal_id": goal["id"],
+                        "step_id": binding["step_id"],
+                        "account_id": account["id"],
+                        "generation": account["generation"],
+                        "expected_digest": digest(expected),
+                        "proof_digest": digest(proof),
+                    },
+                )
         return {
             "kind": "connector_communication",
             "connector_account": account,

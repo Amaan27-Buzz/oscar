@@ -30,7 +30,7 @@
       "severity": "P1",
       "capability": "CAP-PLANNING",
       "evidence": "docs/evidence/software-completion/cross-service-preflight-2026-10-28.json",
-      "description": "Source/destination account/provider/resource/operation roles are not bound to original owner objective; final real local-model synthetic-provider campaign 0/2."
+      "description": "P1 OPEN; source-level targeted owner-copy verification is GREEN on Windows after formatting at 001549a: all 161 targeted unittest cases PASS (168.517s), Ruff lint PASS, Ruff formatting PASS (293 files), mypy PASS on 108 source files, repository checks PASS. Owner pushed local feature formatting commit to remote PR #10, still draft/unmerged. This is not a full-repository unittest run or installed-model acceptance. Historical qwen3.5:9b synthetic-account cross-service Ask/Full objective acceptance FAILED 0/2 at 2026-10-28; must rerun signed Ask/Full through real installed Ollama model against synthetic Google/Microsoft endpoints, verify original whole owner objective and no provider/task hallucinations, publish reproducible receipt. Existing committed script software_conversation_planning_reference covers file/arithmetic, not this owner-copy campaign; prior local acceptance harness is not tracked. GitHub Actions zero-job startup_failure remains unverified. No real-account actions, cloud commissioning, PR merge or production activation authorized. BUG-PLAN-001 remains OPEN."
     },
     {
       "id": "BUG-FOCUS-001",
@@ -1638,7 +1638,9 @@
         "oscar/planning_contract.py",
         "oscar/planner_authoring.py",
         "oscar/planner_connectors.py",
-        "oscar/executive.py"
+        "oscar/executive.py",
+        "oscar/harness.py",
+        "oscar/owner_transfer.py"
       ],
       "implementation_status": "PARTIAL",
       "integration_status": "PARTIAL",
@@ -1676,10 +1678,15 @@
         {
           "path": "docs/evidence/software-completion/cross-service-preflight-2026-10-28.json",
           "scope": "Historical source-qualified evidence; read receipt for exact native/synthetic/live boundary. No blanket capability acceptance."
+        },
+        {
+          "path": "docs/development/OSCAR-SESSION-STATE.md",
+          "scope": "Continuation-02 PR #10: registry-resolved owner roles, immutable transfer contract, verified source-read lineage and false-completion barrier are committed but NOT_RUN. Whole-objective comparator remains absent; Actions startup_failure produced zero jobs."
         }
       ],
       "test_commands": [
-        "python -m unittest tests.test_planner_catalog tests.test_planner_task_verification -v"
+        "python -m unittest tests.test_planner_catalog tests.test_planner_task_verification -v",
+        "python -m unittest tests.test_owner_transfer tests.test_planner_task_verification tests.test_planner_http_observations tests.test_executive -v"
       ],
       "dependencies": [
         "CAP-CONTROLLER",
@@ -1689,11 +1696,14 @@
         "CAP-VERIFICATION"
       ],
       "bugs_and_blockers": [
-        "BUG-PLAN-001: final installed Qwen Ask/Full cross-service goal campaign 0/2; wrong service/resource can have verified substeps without completing owner goal.",
-        "General natural objective and image reasoning accuracy is not established."
+        "BUG-PLAN-001 OPEN: installed-Qwen synthetic cross-provider Ask/Full owner-goal campaign historical FAILED 0/2; continuation-02 changes have NOT_RUN tests.",
+        "Ordinary language account/provider roles are resolved only when one bound account/provider is unambiguous. Named resource/list strings are not yet independently resolved through provider metadata; avoid claiming or enacting owner-specific list goals from guessed resource IDs.",
+        "Non-task transfers, MCP operation semantics, unsupported semantic fields, multi-page source inventories, move/sync, broad field/capability coverage, and concurrent cross-provider source changes require further implementation and adversarial acceptance. No atomic cross-provider transaction is claimed.",
+        "PR #10 bounded copy extension: retained expiring private source observation only after ConnectorFabric releases its executed request; fresh GET guards transfer mutation and final whole-objective comparison. Supported zero-fraction UTC due dates and uncompleted task status; denied lossy HTML notes, filtered task selection and unreviewed extra steps. Source-level and integration tests remain NOT_RUN.",
+        "Actions still startup_failure on current HEAD (nine runs, sample run 40839501047 zero jobs); no executable CI receipt, no verified whole-objective PASS. Root cause needs owner Actions/Billing UI inspection. Ordinary named-list resolution and non-task/MCP operation generality remain OPEN."
       ],
       "required_owner_action": [],
-      "next_implementation_action": "Bind source/destination provider account operation resource and field roles to owner objectives; reject role swaps before effects.",
+      "next_implementation_action": "Execute focused owner_transfer/planner_task_verification/planner_http_observations/executive regression tests, Ruff/format/mypy and repository validation on PR #10 locally; fix failures before further provider expansion. Then add independently verified named-list catalog resolution.",
       "deferred": false,
       "owner_action_status": "NOT_RUN"
     },
@@ -3999,7 +4009,11 @@
       "source_files": [
         "oscar/runtime.py",
         "oscar/desktop_verify.py",
-        "oscar/communication.py"
+        "oscar/communication.py",
+        "oscar/planning_contract.py",
+        "oscar/planner_connectors.py",
+        "oscar/executive.py",
+        "oscar/owner_transfer.py"
       ],
       "implementation_status": "PARTIAL",
       "integration_status": "INTEGRATED",
@@ -4017,17 +4031,26 @@
         {
           "path": "docs/evidence/software-completion/cross-service-preflight-2026-10-28.json",
           "scope": "Historical source-qualified evidence; read receipt for exact native/synthetic/live boundary. No blanket capability acceptance."
+        },
+        {
+          "path": "docs/development/OSCAR-SESSION-STATE.md",
+          "scope": "Continuation-02: verified substeps no longer automatically complete a typed cross-account owner transfer; comparator and runnable tests remain outstanding."
         }
       ],
       "test_commands": [
-        "python -m unittest tests.test_planner_task_verification tests.test_planner_calendar_verification -v"
+        "python -m unittest tests.test_planner_task_verification tests.test_planner_calendar_verification -v",
+        "python -m unittest tests.test_owner_transfer tests.test_planner_task_verification tests.test_executive -v",
+        "python -m unittest tests.test_owner_transfer tests.test_planner_task_verification tests.test_planner_http_observations tests.test_executive -v"
       ],
       "dependencies": [],
       "bugs_and_blockers": [
-        "Bind verification to requested owner goal as well as model-selected steps; preserve partial generic outcomes."
+        "Goal-level unknown/partial/blocked states avoid blind replay; handling of some uncertain provider effects, interleaving and recovery needs executed adversarial verification.",
+        "Named resource resolution and generalized non-task/MCP effect evidence remain NOT_IMPLEMENTED. Currentness checks narrow the race but cannot make cross-provider writes atomic.",
+        "PR #10 bounded copy extension: retained expiring private source observation only after ConnectorFabric releases its executed request; fresh GET guards transfer mutation and final whole-objective comparison. Supported zero-fraction UTC due dates and uncompleted task status; denied lossy HTML notes, filtered task selection and unreviewed extra steps. Source-level and integration tests remain NOT_RUN.",
+        "Actions still startup_failure on current HEAD (nine runs, sample run 40839501047 zero jobs); no executable CI receipt, no verified whole-objective PASS. Root cause needs owner Actions/Billing UI inspection. Ordinary named-list resolution and non-task/MCP operation generality remain OPEN."
       ],
       "required_owner_action": [],
-      "next_implementation_action": "Bind verification to requested owner goal as well as model-selected steps; preserve partial generic outcomes.",
+      "next_implementation_action": "Execute focused owner_transfer/planner_task_verification/planner_http_observations/executive regression tests, Ruff/format/mypy and repository validation on PR #10 locally; fix failures before further provider expansion. Then add independently verified named-list catalog resolution.",
       "deferred": false,
       "owner_action_status": "NOT_RUN"
     },

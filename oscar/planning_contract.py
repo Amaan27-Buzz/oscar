@@ -3,6 +3,7 @@
 import json
 import re
 from copy import deepcopy
+from dataclasses import asdict, dataclass
 from typing import Any
 
 OBSERVATION_KINDS = {
@@ -32,6 +33,278 @@ def exact_account_aliases(goal: str) -> dict[str, set[str]]:
             raise ValueError("bounded account alias required")
         aliases.setdefault(provider.casefold(), set()).add(alias)
     return aliases
+
+
+def owner_account_bindings(goal: str) -> list[dict[str, Any]]:
+    """Ground explicitly named account roles in owner text, never in a model draft.
+
+    Directional clauses are unambiguous only when attached to an exact quoted
+    account alias. Other natural-language roles need owner clarification, not a
+    guess from whichever capability the model selected.
+    """
+    pattern = r'"(?:\\.|[^"\\])*"|\b(?P<provider>google|microsoft)\s+account\s+alias\s*'
+    mentions = []
+    for match in re.finditer(pattern, goal, re.I):
+        if match.group("provider") is None:
+            continue
+        try:
+            alias, consumed = json.JSONDecoder().raw_decode(goal[match.end() :])
+        except ValueError as exc:
+            raise ValueError("account alias requires a JSON-quoted literal") from exc
+        if not isinstance(alias, str) or not alias.strip() or len(alias) > 500:
+            raise ValueError("bounded account alias required")
+        mentions.append(
+            (
+                match.start(),
+                match.end() + consumed,
+                match.group("provider").casefold(),
+                alias,
+            )
+        )
+    bindings: list[dict[str, Any]] = []
+    for index, (start, end, provider, alias) in enumerate(mentions):
+        previous = mentions[index - 1][1] if index else 0
+        following = mentions[index + 1][0] if index + 1 < len(mentions) else len(goal)
+        # A cue must occur after the preceding account reference. Do not
+        # classify a second account from a verb attached to the first one.
+        cues = list(
+            re.finditer(
+                r"\b(from|source|origin|to|into|destination|target)\b",
+                goal[previous:start],
+                re.I,
+            )
+        )
+        role = None
+        if cues and len(goal[previous:start]) - cues[-1].end() <= 100:
+            role = (
+                "source"
+                if cues[-1].group(1).casefold() in {"from", "source", "origin"}
+                else "destination"
+            )
+        # Only explicit identifiers are constraints; free prose cannot be
+        # silently turned into a provider-specific list or folder identifier.
+        resources = re.findall(
+            r"\b(?:list|folder|calendar|board|resource|project|tasklist)\s+"
+            r"(?:id|identifier)\s*(?::|=)?\s*(?:\"([^\"]+)\"|'([^']+)'|([A-Za-z0-9_-]+))",
+            goal[end:following],
+            re.I,
+        )
+        bindings.append(
+            {
+                "provider": provider,
+                "alias": alias,
+                "role": role,
+                "resources": tuple(next(v for v in match if v) for match in resources),
+            }
+        )
+    return bindings
+
+
+def resolved_owner_account_bindings(goal: str, accounts: list[Any]) -> list[dict[str, Any]]:
+    """Resolve owner-named service roles against verified registry identities.
+
+    Service names identify a provider, never a credential. An alias-free service
+    reference is admissible only when exactly one connected owner account has
+    that provider. Multiple accounts require clarification; the model's selected
+    capability cannot break the tie. Explicit quoted roles keep their existing
+    strict syntax and resource-ID constraints.
+    """
+    explicit = owner_account_bindings(goal)
+    if explicit:
+        for binding in explicit:
+            candidates = [
+                a
+                for a in accounts
+                if a.status == "connected"
+                and a.services
+                and a.provider == binding["provider"]
+                and a.alias == binding["alias"]
+            ]
+            if len(candidates) != 1:
+                raise ValueError("Clarify an unavailable or ambiguous account alias.")
+            binding["account_id"] = candidates[0].id
+            binding["generation"] = candidates[0].generation
+        return explicit
+
+    connected = [
+        a
+        for a in accounts
+        if a.status == "connected" and a.services and a.identity_class == "owner-delegated"
+    ]
+    references: list[tuple[int, int, str]] = []
+    for provider in sorted({a.provider for a in connected}, key=len, reverse=True):
+        if provider == "mcp-resource":
+            continue
+        for mention in re.finditer(r"(?<!\w)" + re.escape(provider) + r"(?!\w)", goal, re.I):
+            if any(mention.start() < end and mention.end() > start for start, end, _ in references):
+                continue
+            references.append((mention.start(), mention.end(), provider))
+    references.sort()
+    bindings: list[dict[str, Any]] = []
+    for index, (start, _end, provider) in enumerate(references):
+        previous = references[index - 1][1] if index else 0
+        cues = list(
+            re.finditer(
+                r"\b(from|source|origin|to|into|destination|target)\b",
+                goal[previous:start],
+                re.I,
+            )
+        )
+        role = None
+        if cues and start - previous - cues[-1].end() <= 100:
+            role = (
+                "source"
+                if cues[-1].group(1).casefold() in {"from", "source", "origin"}
+                else "destination"
+            )
+        matches = [a for a in connected if a.provider == provider]
+        if len(matches) != 1:
+            raise ValueError(
+                "Clarify the exact account alias for each named service; "
+                "multiple verified accounts match."
+            )
+        account = matches[0]
+        bindings.append(
+            {
+                "provider": provider,
+                "alias": account.alias,
+                "account_id": account.id,
+                "generation": account.generation,
+                "role": role,
+                "resources": (),
+            }
+        )
+    if len(bindings) > 1 and (
+        any(b["role"] is None for b in bindings) or len({b["role"] for b in bindings}) == 1
+    ):
+        raise ValueError("Clarify source and destination account roles.")
+    if len({b["account_id"] for b in bindings}) != len(bindings):
+        raise ValueError("Clarify repeated account references.")
+    return bindings
+
+
+@dataclass(frozen=True)
+class OwnerAccountRole:
+    account_id: str
+    generation: int
+    provider: str
+    alias: str
+    role: str
+    resource_ids: tuple[str, ...]
+
+
+@dataclass(frozen=True)
+class OwnerObjectiveContract:
+    """Owner-sourced objective; never replaced by model-generated plan text."""
+
+    objective: str
+    accounts: tuple[OwnerAccountRole, ...]
+    operation: str
+    required_fields: tuple[str, ...]
+    completion_rule: str = "independent_source_and_destination_evidence"
+
+
+def owner_objective_contract(goal: str, accounts: list[Any]) -> dict[str, Any] | None:
+    """Capture actionable cross-account invariants before the model drafts effects.
+
+    This is a conservative contract, not a claim of natural-language completeness.
+    Unknown field/resource semantics must not be reported as verified.
+    """
+    roles = resolved_owner_account_bindings(goal, accounts)
+    transfer = re.search(
+        r"\b(copy|duplicate|replicate|transfer|migrate|move|sync|synchronize)\b|"
+        r"\bcreate\s+equivalent\b",
+        goal,
+        re.I,
+    )
+    if transfer and re.search(r"\b(move|migrate|sync|synchronize)\b", goal, re.I):
+        raise ValueError(
+            "Clarify the move or synchronization semantics; copying alone is insufficient."
+        )
+    if (
+        transfer
+        and re.search(r"\btransfer\b", goal, re.I)
+        and not re.search(
+            r"\b(copy|duplicate|replicate)\b|\bcreate\s+equivalent\b",
+            goal,
+            re.I,
+        )
+    ):
+        raise ValueError(
+            "Clarify whether transfer means copy or move; source deletion is not inferred."
+        )
+    if not roles:
+        if transfer and re.search(r"\b(tasks?|records?|events?|messages?)\b", goal, re.I):
+            raise ValueError("Clarify the source and destination account identities.")
+        return None
+    if not transfer:
+        return None
+    if re.search(
+        r"\b(reminders?|attachments?|subtasks?|priorit(?:y|ies)|categories|"
+        r"recurren(?:t|ce)|checklists?|ordering|positions?)\b",
+        goal,
+        re.I,
+    ):
+        raise ValueError(
+            "Clarify requested task fields; no independently verified transfer adapter "
+            "preserves those semantics."
+        )
+    # The bounded copy verifier proves equality of one complete list and its
+    # destination creations. It cannot prove an arbitrary task subset, order,
+    # search criterion or relative-time filter merely from the model's chosen
+    # query. Never silently turn a filtered owner request into 'copy all'.
+    if re.search(
+        r"\b(only|except|first|last|latest|oldest|recent|matching|tagged|"
+        r"selected|specific|overdue|unfinished|incomplete|completed|"
+        r"before|after|between)\b|\b\d+\s+tasks?\b",
+        goal,
+        re.I,
+    ):
+        raise ValueError(
+            "Clarify task selection and filtering; this copy proof supports "
+            "one complete unfiltered source list only."
+        )
+    sources = [r for r in roles if r["role"] == "source"]
+    destinations = [r for r in roles if r["role"] == "destination"]
+    if len(sources) != 1 or len(destinations) != 1:
+        raise ValueError("Clarify one source and one destination account for transfer.")
+    if sources[0]["account_id"] == destinations[0]["account_id"]:
+        raise ValueError("Clarify distinct source and destination accounts.")
+    fields = tuple(
+        field
+        for field, pattern in (
+            ("due", r"\b(due\s+dates?|deadlines?)\b"),
+            ("title", r"\b(titles?|names?)\b"),
+            ("notes", r"\b(notes?|descriptions?)\b"),
+            ("status", r"\b(status|completion\s+state)\b"),
+        )
+        if re.search(pattern, goal, re.I)
+    )
+    contract = asdict(
+        OwnerObjectiveContract(
+            objective=goal,
+            accounts=tuple(
+                OwnerAccountRole(
+                    account_id=role["account_id"],
+                    generation=role["generation"],
+                    provider=role["provider"],
+                    alias=role["alias"],
+                    role=role["role"],
+                    resource_ids=tuple(role["resources"]),
+                )
+                for role in (sources[0], destinations[0])
+            ),
+            operation="copy",
+            required_fields=fields,
+        )
+    )
+    # Store uses JSON; normalize tuple-backed dataclass fields before the first
+    # signed review so persisted contracts compare byte-for-byte on revalidation.
+    contract["accounts"] = [
+        {**role, "resource_ids": list(role["resource_ids"])} for role in contract["accounts"]
+    ]
+    contract["required_fields"] = list(contract["required_fields"])
+    return contract
 
 
 def exact_file_literal(goal: str) -> str | None:
