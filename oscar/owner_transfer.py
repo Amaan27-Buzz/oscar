@@ -92,7 +92,10 @@ def source_transfer_proof(
     revalidates evidence pins, account permissions, session and provenance.
     No private titles, notes or due dates are persisted in the returned proof.
     """
-    if set(required_fields) - {"title", "notes", "due"}:
+    # Only the provider's default uncompleted status is currently copyable.
+    # task_expectation rejects completed source tasks, and the independent
+    # destination saved-resource GET explicitly verifies its default status.
+    if set(required_fields) - {"title", "notes", "due", "status"}:
         raise PermissionError("requested task fields need an explicit preserving adapter")
     try:
         observations = json.loads(observations_text)
