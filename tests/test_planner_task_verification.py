@@ -468,6 +468,20 @@ class PlannedTaskVerificationTests(unittest.TestCase):
                     owner_objective_contract(goal, self.h.accounts.list_accounts())
         self.assertEqual([], self.api.calls)
 
+    def test_filtered_subset_is_not_misreported_as_complete_list_copy(self):
+        from oscar.planning_contract import owner_objective_contract
+
+        self.cross_service_role_steps()
+        for goal in (
+            "Copy only 3 tasks from Google Tasks to Microsoft To Do.",
+            "Copy overdue tasks from Google Tasks to Microsoft To Do.",
+            "Copy selected tasks from Google Tasks to Microsoft To Do.",
+            "Copy tasks matching a label from Google Tasks to Microsoft To Do.",
+        ):
+            with self.subTest(goal=goal):
+                with self.assertRaisesRegex(ValueError, "selection and filtering"):
+                    owner_objective_contract(goal, self.h.accounts.list_accounts())
+
     def test_owner_required_reminders_are_not_silently_dropped(self):
         from oscar.planning_contract import owner_objective_contract
 
