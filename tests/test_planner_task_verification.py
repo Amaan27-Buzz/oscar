@@ -2,7 +2,7 @@
 
 import json
 import unittest
-from dataclasses import asdict
+from dataclasses import asdict, replace
 from time import monotonic, sleep
 
 from tests import test_planner_http_connectors as fixture
@@ -573,6 +573,14 @@ class PlannedTaskVerificationTests(unittest.TestCase):
                     "status": "needsAction",
                 }
             ]
+        }
+        # This multi-provider adaptive prompt includes two typed endpoint
+        # contracts and a source observation schema. The default 8K fixture
+        # model is too small, so synthetic admission cannot reach the copy
+        # verification under test. This does not relax production routing.
+        self.executor.router.registry.models = {
+            key: replace(model, context_limit=65536)
+            for key, model in self.executor.router.registry.models.items()
         }
         self.change["value"].update(
             goal=goal,
