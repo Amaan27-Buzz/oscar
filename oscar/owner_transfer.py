@@ -5,6 +5,7 @@ authority, signed reviews or final independent destination readback.
 """
 
 import json
+import re
 from collections import Counter
 from typing import Any
 
@@ -23,6 +24,11 @@ def _canonical(name: str, item: dict[str, Any]) -> dict[str, Any]:
         keys = ("title", "notes", "due", "status")
         operation = "google.tasks.create"
     elif name == "microsoft.todo.tasks.list":
+        # Plain text is the only note representation that both task APIs can
+        # preserve without an unrequested rich-text downgrade.
+        note = item.get("body")
+        if isinstance(note, dict) and note.get("contentType", "").lower() != "text":
+            raise PermissionError("rich source task notes cannot be copied without loss")
         if (
             any(
                 item.get(key)
@@ -44,6 +50,22 @@ def _canonical(name: str, item: dict[str, Any]) -> dict[str, Any]:
     else:
         raise PermissionError("no reviewed source-to-destination task adapter")
     body = {key: item[key] for key in keys if key in item}
+    if name == "microsoft.todo.tasks.list" and isinstance(
+        body.get("dueDateTime"), dict
+    ):
+        point = dict(body["dueDateTime"])
+        # Microsoft may return a zero-fraction UTC-midnight timestamp (e.g.
+        # .0000000); it denotes the same date as a strict midnight request.
+        # Nonzero fractions and non-UTC timezone remain unsupported.
+        date_time = point.get("dateTime")
+        if isinstance(date_time, str):
+            match = re.fullmatch(
+                r"(\d{4}-\d{2}-\d{2}T00:00:00)(?:\.0{1,7})?",
+                date_time,
+            )
+            if match:
+                point["dateTime"] = match.group(1)
+                body["dueDateTime"] = point
     expected = task_expectation(operation, {"path": {}, "body": body})
     if expected is None:
         raise PermissionError("source fields cannot be preserved by task adapter")
