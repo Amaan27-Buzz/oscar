@@ -57,6 +57,15 @@ class OwnerTransferEquivalenceTests(unittest.TestCase):
         self.assertNotIn("Source title", json.dumps(proof))
         self.assertNotIn("Private source notes", json.dumps(proof))
 
+    def test_uncompleted_status_semantics_are_preserved_across_providers(self):
+        proof = source_transfer_proof(
+            self.google_source([self.task()]),
+            "source-account",
+            [self.microsoft_effect()],
+            required_fields=("title", "notes", "due", "status"),
+        )
+        self.assertEqual(1, proof["count"])
+
     def test_missing_due_date_is_not_an_equivalent_copy(self):
         with self.assertRaisesRegex(PermissionError, "fields differ"):
             source_transfer_proof(
@@ -102,7 +111,7 @@ class OwnerTransferEquivalenceTests(unittest.TestCase):
                 self.google_source([self.task()]),
                 "source-account",
                 [self.microsoft_effect()],
-                required_fields=("status",),
+                required_fields=("recurrence",),
             )
         modified = {**self.task(), "status": "completed"}
         with self.assertRaisesRegex(PermissionError, "cannot be preserved"):
