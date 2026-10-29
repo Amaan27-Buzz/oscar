@@ -1674,7 +1674,15 @@ class Executive:
                         self.health = "waiting_for_owner_objective_verification"
                 with self.store.transaction():
                     current = self._row("executive_goal", goal["id"])
-                    if current["state"] != "enabled" or current["run_index"] != goal["run_index"]:
+                    if (
+                        current["state"] != "enabled"
+                        or current["run_index"] != goal["run_index"]
+                        or current["review_digest"] != goal["review_digest"]
+                        or self._review(current) != current["review_digest"]
+                    ):
+                        # No task result, even an independently verified saved
+                        # resource, can satisfy an altered owner commitment.
+                        self.health = "waiting_for_owner_review"
                         continue
                     if current.get("owner_objective") and owner_receipt is None:
                         # Individual verified steps are insufficient without a
