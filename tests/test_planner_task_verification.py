@@ -558,7 +558,9 @@ class PlannedTaskVerificationTests(unittest.TestCase):
             self.h.connector_plans.check_goal_accounts(goal, [source, swapped])
         self.assertEqual([], self.api.calls)
 
-    def prepare_cross_account_copy(self):
+    def prepare_cross_account_copy(self, *, duplicated=False):
+        from copy import deepcopy
+
         from tests.test_planner_http_observations import HTTPObservationTests
 
         goal, source, destination, _ = self.cross_service_role_steps()
@@ -574,6 +576,10 @@ class PlannedTaskVerificationTests(unittest.TestCase):
                 }
             ]
         }
+        if duplicated:
+            self.api.resources["/tasks/v1/lists/source-list/tasks"]["items"].append(
+                deepcopy(self.api.resources["/tasks/v1/lists/source-list/tasks"]["items"][0])
+            )
         # This multi-provider adaptive prompt includes two typed endpoint
         # contracts and a source observation schema. The default 8K fixture
         # model is too small, so synthetic admission cannot reach the copy
@@ -607,8 +613,13 @@ class PlannedTaskVerificationTests(unittest.TestCase):
         self.assertEqual(
             "verified", self.h.store.task(source_row["effect_task"]).state
         )
+        destination_steps = [destination]
+        if duplicated:
+            second = deepcopy(destination)
+            second["id"] = "destination-second"
+            destination_steps.append(second)
         self.body["choices"][0]["message"]["content"] = json.dumps(
-            {"steps": [destination]}
+            {"steps": destination_steps}
         )
         self.complete(self.review(self.accept_change(row)))
         self.assertEqual("partially_verified", HTTPObservationTests.settle(self, 3)["state"])
@@ -622,6 +633,14 @@ class PlannedTaskVerificationTests(unittest.TestCase):
         self.h.executive.tick()
         task = self.h.store.all("task")[-1]
         self.assertEqual("planned", task["state"])
+        if duplicated:
+            ids = [
+                record["task_id"]
+                for record in self.h.store.all("executive_task")
+                if record["goal_id"] == owner_goal
+            ]
+            self.assertEqual(2, len(ids))
+            return owner_goal, ids
         return owner_goal, task["id"]
 
     def test_cross_account_owner_copy_completes_only_after_independent_field_proof(self):
@@ -635,6 +654,30 @@ class PlannedTaskVerificationTests(unittest.TestCase):
         self.assertEqual("verified", goal["objective_verification"]["state"])
         self.assertEqual(1, goal["objective_verification"]["count"])
         self.assertEqual(1, sum(method == "POST" for method, *_ in self.api.calls))
+        self.assert_private()
+
+    def test_two_verified_creates_with_one_provider_id_do_not_satisfy_two_task_copy(self):
+        goal_id, tasks = self.prepare_cross_account_copy(duplicated=True)
+        for task_id in tasks:
+            self.complete(
+                self.review({"operation": "confirm_task", "id": task_id, "value": {}})
+            )
+        deadline = monotonic() + 10
+        while monotonic() < deadline:
+            self.h.executive.tick()
+            statuses = [self.h.store.task(task_id).state for task_id in tasks]
+            goal = self.h.store.get("executive_goal", goal_id)
+            if all(status == "verified" for status in statuses) and goal["state"] != "enabled":
+                break
+            sleep(0.02)
+        else:
+            self.fail("two synthetic provider creates did not reach objective comparison")
+        self.assertEqual("partially_verified", goal["state"])
+        self.assertEqual("not_verified", goal["objective_verification"]["state"])
+        self.assertEqual(2, sum(method == "POST" for method, *_ in self.api.calls))
+        for _ in range(3):
+            self.h.executive.tick()
+        self.assertEqual(2, sum(method == "POST" for method, *_ in self.api.calls))
         self.assert_private()
 
     def test_partial_destination_readback_never_completes_or_replays_copy(self):
