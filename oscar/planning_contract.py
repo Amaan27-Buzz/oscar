@@ -250,6 +250,21 @@ def owner_objective_contract(goal: str, accounts: list[Any]) -> dict[str, Any] |
             "Clarify requested task fields; no independently verified transfer adapter "
             "preserves those semantics."
         )
+    # The bounded copy verifier proves equality of one complete list and its
+    # destination creations. It cannot prove an arbitrary task subset, order,
+    # search criterion or relative-time filter merely from the model's chosen
+    # query. Never silently turn a filtered owner request into 'copy all'.
+    if re.search(
+        r"\b(only|except|first|last|latest|oldest|recent|matching|tagged|"
+        r"selected|specific|overdue|unfinished|incomplete|completed|"
+        r"before|after|between)\b|\b\d+\s+tasks?\b",
+        goal,
+        re.I,
+    ):
+        raise ValueError(
+            "Clarify task selection and filtering; this copy proof supports "
+            "one complete unfiltered source list only."
+        )
     sources = [r for r in roles if r["role"] == "source"]
     destinations = [r for r in roles if r["role"] == "destination"]
     if len(sources) != 1 or len(destinations) != 1:
