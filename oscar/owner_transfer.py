@@ -27,7 +27,11 @@ def _canonical(name: str, item: dict[str, Any]) -> dict[str, Any]:
         # Plain text is the only note representation that both task APIs can
         # preserve without an unrequested rich-text downgrade.
         note = item.get("body")
-        if isinstance(note, dict) and note.get("contentType", "").lower() != "text":
+        if note is not None and (
+            not isinstance(note, dict)
+            or not isinstance(note.get("contentType"), str)
+            or note["contentType"].lower() != "text"
+        ):
             raise PermissionError("rich source task notes cannot be copied without loss")
         if (
             any(
