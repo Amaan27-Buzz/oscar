@@ -30,7 +30,7 @@
       "severity": "P1",
       "capability": "CAP-PLANNING",
       "evidence": "docs/evidence/software-completion/cross-service-preflight-2026-10-28.json",
-      "description": "P1 OPEN. Historical installed-Qwen cross-service owner-objective campaign FAILED 0/2. PR #10 now commits typed owner roles, verified-account routing, source observation and freshness preflight, bounded Google Tasks↔Microsoft To Do canonical field equivalence, independent destination task GET linkage and explicit-resource whole-objective terminal proof, including unknown/partial/no-replay states. Implementation and new adversarial/synthetic end-to-end tests are NOT_RUN. Ordinary named-resource resolution, other services/operations, wider field fidelity and real-model acceptance remain open; no merge or PASS."
+      "description": "P1 OPEN; historical installed-Qwen Ask/Full owner-objective acceptance FAILED 0/2. PR #10 implements bounded Google Tasks↔Microsoft To Do whole-list copy source/destination field equivalence, explicit-owner resource IDs, short-lived retained source GET inputs, fresh pre-effect/final source GET, independent destination GET receipts and objective-level signed-commitment proof. Guards now deny unsupported semantic fields, filtered owner selections, unrelated plan effects, stale or tampered source reads and uncertain replay. New unit/synthetic end-to-end/adversarial checks NOT_RUN. GitHub Actions still startup_failure zero jobs on latest branch (40839501047); root cause UNRESOLVED. No merge/PASS."
     },
     {
       "id": "BUG-FOCUS-001",
@@ -1697,12 +1697,13 @@
       ],
       "bugs_and_blockers": [
         "BUG-PLAN-001 OPEN: installed-Qwen synthetic cross-provider Ask/Full owner-goal campaign historical FAILED 0/2; continuation-02 changes have NOT_RUN tests.",
-        "PR #10 now has a bounded typed source/destination copy contract and independently verified source snapshot + fresh pre-effect GET + destination field-equivalence admission + independent destination saved-resource GET + final original-owner-goal proof when both resource IDs are explicit. All runtime paths and new behavioral tests remain NOT_RUN.",
         "Ordinary language account/provider roles are resolved only when one bound account/provider is unambiguous. Named resource/list strings are not yet independently resolved through provider metadata; avoid claiming or enacting owner-specific list goals from guessed resource IDs.",
-        "Non-task transfers, MCP operation semantics, unsupported semantic fields, multi-page source inventories, move/sync, broad field/capability coverage, and concurrent cross-provider source changes require further implementation and adversarial acceptance. No atomic cross-provider transaction is claimed."
+        "Non-task transfers, MCP operation semantics, unsupported semantic fields, multi-page source inventories, move/sync, broad field/capability coverage, and concurrent cross-provider source changes require further implementation and adversarial acceptance. No atomic cross-provider transaction is claimed.",
+        "PR #10 bounded copy extension: retained expiring private source observation only after ConnectorFabric releases its executed request; fresh GET guards transfer mutation and final whole-objective comparison. Supported zero-fraction UTC due dates and uncompleted task status; denied lossy HTML notes, filtered task selection and unreviewed extra steps. Source-level and integration tests remain NOT_RUN.",
+        "Actions still startup_failure on current HEAD (nine runs, sample run 40839501047 zero jobs); no executable CI receipt, no verified whole-objective PASS. Root cause needs owner Actions/Billing UI inspection. Ordinary named-list resolution and non-task/MCP operation generality remain OPEN."
       ],
       "required_owner_action": [],
-      "next_implementation_action": "Run focused unittest suite, Ruff format/check, mypy, repository checks on PR #10; fix any failures, then connect provider-native named-list metadata to owner resource bindings and repeat real installed-Qwen Ask/Full synthetic goal campaign.",
+      "next_implementation_action": "Execute focused owner_transfer/planner_task_verification/planner_http_observations/executive regression tests, Ruff/format/mypy and repository validation on PR #10 locally; fix failures before further provider expansion. Then add independently verified named-list catalog resolution.",
       "deferred": false,
       "owner_action_status": "NOT_RUN"
     },
@@ -4038,16 +4039,18 @@
       ],
       "test_commands": [
         "python -m unittest tests.test_planner_task_verification tests.test_planner_calendar_verification -v",
-        "python -m unittest tests.test_owner_transfer tests.test_planner_task_verification tests.test_executive -v"
+        "python -m unittest tests.test_owner_transfer tests.test_planner_task_verification tests.test_executive -v",
+        "python -m unittest tests.test_owner_transfer tests.test_planner_task_verification tests.test_planner_http_observations tests.test_executive -v"
       ],
       "dependencies": [],
       "bugs_and_blockers": [
-        "BUG-PLAN-001 OPEN. PR #10 implements bounded task-copy whole-objective comparator (source/destination equality, provenance, explicit resource IDs, pre-effect GET, saved-resource readbacks, final source refresh), but all new code and tests are NOT_RUN due zero-job Actions and no checkout.",
         "Goal-level unknown/partial/blocked states avoid blind replay; handling of some uncertain provider effects, interleaving and recovery needs executed adversarial verification.",
-        "Named resource resolution and generalized non-task/MCP effect evidence remain NOT_IMPLEMENTED. Currentness checks narrow the race but cannot make cross-provider writes atomic."
+        "Named resource resolution and generalized non-task/MCP effect evidence remain NOT_IMPLEMENTED. Currentness checks narrow the race but cannot make cross-provider writes atomic.",
+        "PR #10 bounded copy extension: retained expiring private source observation only after ConnectorFabric releases its executed request; fresh GET guards transfer mutation and final whole-objective comparison. Supported zero-fraction UTC due dates and uncompleted task status; denied lossy HTML notes, filtered task selection and unreviewed extra steps. Source-level and integration tests remain NOT_RUN.",
+        "Actions still startup_failure on current HEAD (nine runs, sample run 40839501047 zero jobs); no executable CI receipt, no verified whole-objective PASS. Root cause needs owner Actions/Billing UI inspection. Ordinary named-list resolution and non-task/MCP operation generality remain OPEN."
       ],
       "required_owner_action": [],
-      "next_implementation_action": "Execute and correct PR #10 synthetic task-copy end-to-end tests including Ask, Full, changed source, wrong destination field, partial mutation and lost post response; extend typed verified metadata for named resources and other provider operations.",
+      "next_implementation_action": "Execute focused owner_transfer/planner_task_verification/planner_http_observations/executive regression tests, Ruff/format/mypy and repository validation on PR #10 locally; fix failures before further provider expansion. Then add independently verified named-list catalog resolution.",
       "deferred": false,
       "owner_action_status": "NOT_RUN"
     },
