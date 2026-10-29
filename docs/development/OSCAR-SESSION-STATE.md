@@ -1,3 +1,33 @@
+# OSCAR owner-copy identity hardening — 2026-10-29
+
+**Actual Windows targeted acceptance receipt at `fe4a96d9e4c49d674c9e53693886c9108d18527f`:**
+2/2 focused unit/integration regressions PASS (including single-task
+Google Tasks → Microsoft To Do full objective); `ruff check oscar tests scripts`
+PASS; `mypy oscar` PASS (108 modules). User ran each twice. These are
+user-provided local test outputs, not GitHub Actions CI; **full original
+160-case batch was not rerun yet**.
+
+**New unexecuted change since local receipt:** The independent connector
+mutation GET now commits a private SHA-256 digest of the verified destination
+resource identity into its evidence's `content_hash`. Whole-objective
+multi-task copy must prove a *distinct saved identity for each copied task*;
+two POSTs resolving to the same provider object cannot count as two tasks.
+Added synthetic end-to-end adversarial test
+`test_two_verified_creates_with_one_provider_id_do_not_satisfy_two_task_copy`
+using two equal source items and provider responses intentionally returning
+one identical ID. **New regression NOT_RUN.** Source snapshot and field
+proofs are unchanged. Formatting and full-suite verification still required
+before clearing BUG-PLAN-001.
+
+**User local branch caution:** checkout is now confirmed to be on
+`codex/bug-plan-001-owner-intent`, tracking `origin/codex/bug-plan-001-owner-intent`,
+with no local changes before last pull. The older local
+`codex/software-completion` was accidentally fast-forwarded via explicit
+`git pull origin ...` before tracking branch existed; do not push that
+base branch.
+
+---
+
 # OSCAR local test triage — 2026-10-29
 
 **User-provided executable Windows test receipt:** 160 tests / 153 passed / 7 errors
