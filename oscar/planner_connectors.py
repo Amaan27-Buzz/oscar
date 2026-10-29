@@ -335,6 +335,38 @@ class ConnectorPlanning:
                 ):
                     raise PermissionError("plan does not preserve the owner's resource ID")
 
+        # A source-to-destination owner copy is not blanket authorization to
+        # perform extra native file writes, model calls or unrelated account
+        # reads during the effect stage. Every accepted effect must be one of
+        # the independently compared destination task creations.
+        copying = bool(
+            re.search(
+                r"\b(copy|duplicate|replicate|transfer|migrate|sync)\b|"
+                r"\bcreate\s+equivalent\b",
+                goal,
+                re.I,
+            )
+            and any(binding["role"] == "source" for binding in bindings)
+            and any(binding["role"] == "destination" for binding in bindings)
+        )
+        if copying and not observe and destination_steps and (
+            len(destination_steps) != len(steps)
+            or len({step["id"] for step in destination_steps}) != len(steps)
+        ):
+            raise PermissionError(
+                "owner task copy does not authorize unrelated plan steps or side effects"
+            )
+        if copying and observe and (
+            len(source_reads) != len(steps)
+            or any(
+                binding["role"] != "source" or not self.is_read(cap)
+                for _, cap, binding in selected
+            )
+        ):
+            raise PermissionError(
+                "owner source observation must be an exact source-account read stage"
+            )
+
         proof: dict[str, Any] | None = None
         if not observe and destination_steps and source_reads:
             # A dependency edge alone only orders two calls: connector plan
