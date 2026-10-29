@@ -603,6 +603,7 @@ class ConnectorPlanning:
         if len(set(proof["destination_step_ids"])) != proof["count"]:
             raise PermissionError("duplicate destination proof steps")
         result_evidence: list[str] = []
+        destination_identities: set[str] = set()
         last_step: dict[str, Any] | None = None
         last_task_id: str | None = None
         for step_id, expected_digest in zip(
@@ -625,6 +626,12 @@ class ConnectorPlanning:
             _, evidence = verified_result(self.h.store, task_id)
             if evidence["source"] != "connector-independent-readback":
                 raise PermissionError("independent destination saved-resource GET required")
+            identity = evidence.get("content_hash")
+            if not isinstance(identity, str) or not identity or identity in destination_identities:
+                raise PermissionError(
+                    "destination creates did not prove distinct persisted resources"
+                )
+            destination_identities.add(identity)
             expected = self.h.store.get("owner_transfer_expected_effect", task_id)
             preflight = self.h.store.get("owner_transfer_source_preflight", task_id)
             if expected != {
