@@ -546,6 +546,16 @@ class PlannedTaskVerificationTests(unittest.TestCase):
         row = self.draft()
         self.complete(self.review(self.accept_change(row)))
         self.assertEqual("verified", HTTPObservationTests.settle(self, 2)["state"])
+        # Fabric owns action/outcome disposal; only Planner's bounded private
+        # snapshot may survive to authorize a new independent source GET.
+        source_ref, source_row = next(
+            (ref, item) for ref, item in self.h.connector_plans.inputs.items()
+            if "observation" in item
+        )
+        self.assertNotIn(source_ref, self.h.connectors.requests)
+        self.assertEqual(
+            "verified", self.h.store.task(source_row["effect_task"]).state
+        )
         self.body["choices"][0]["message"]["content"] = json.dumps(
             {"steps": [destination]}
         )
@@ -621,6 +631,30 @@ class PlannedTaskVerificationTests(unittest.TestCase):
         self.assertEqual(
             posted, sum(method == "POST" for method, *_ in self.api.calls)
         )
+
+    def test_expired_private_source_snapshot_blocks_mutation_without_replay(self):
+        goal_id, task_id = self.prepare_cross_account_copy()
+        source_row = next(
+            item for item in self.h.connector_plans.inputs.values()
+            if "observation" in item
+        )
+        source_row["expires"] = self.h.grid.clock() - 1
+        self.complete(self.review({"operation": "confirm_task", "id": task_id, "value": {}}))
+        self.h.executive.tick()
+        self.assertFalse(any(method == "POST" for method, *_ in self.api.calls))
+        self.assertEqual("blocked", self.h.store.get("executive_goal", goal_id)["state"])
+
+    def test_tampered_private_source_read_arguments_block_mutation(self):
+        goal_id, task_id = self.prepare_cross_account_copy()
+        source_row = next(
+            item for item in self.h.connector_plans.inputs.values()
+            if "observation" in item
+        )
+        source_row["observation"]["path"]["tasklist"] = "other-list"
+        self.complete(self.review({"operation": "confirm_task", "id": task_id, "value": {}}))
+        self.h.executive.tick()
+        self.assertFalse(any(method == "POST" for method, *_ in self.api.calls))
+        self.assertEqual("blocked", self.h.store.get("executive_goal", goal_id)["state"])
 
     def test_source_change_before_copy_blocks_destination_post(self):
         goal_id, task_id = self.prepare_cross_account_copy()
