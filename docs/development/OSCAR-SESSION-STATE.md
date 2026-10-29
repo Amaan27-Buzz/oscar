@@ -1,3 +1,46 @@
+# OSCAR BUG-PLAN-001 — green Windows source-level checkpoint, 2026-10-29
+
+**Confirmed local checkout and remote after owner's push:** branch
+`codex/bug-plan-001-owner-intent`, formatting commit
+`001549a3980085b3eeb5c3edc9db71f29370b284`, PR #10 OPEN/DRAFT.
+Owner ran commands locally on Windows using actual repository sources,
+then pushed the nine-file Ruff formatting-only commit. Results:
+
+- Focused `unittest` modules
+  `tests.test_owner_transfer tests.test_planner_task_verification
+  tests.test_planner_http_observations tests.test_planner_catalog
+  tests.test_executive`: **161/161 PASS in 168.517s**.
+- `python -m ruff check oscar tests scripts`: **PASS**.
+- `python -m ruff format --check oscar tests scripts`:
+  **PASS, 293 files already formatted**.
+- `python -m mypy oscar`: **PASS, 108 source files**.
+- `python -m scripts.check_repository`: **PASS** for required files,
+  Markdown links, removed references and scoped secret-safety scan.
+- `git diff --check`: **PASS** prior to formatting commit.
+- This is not a full-repo unittest suite, nor installed-model, hosted,
+  Windows native/Android physical, real-account or GitHub Actions proof.
+  Earlier GitHub Actions startup_failure/zero-job remains unverified.
+
+**Next mandatory BUG-PLAN-001 acceptance:**
+Recreate and run the original real installed `qwen3.5:9b` **signed Ask and
+synthetic Full** cross-account campaign using local Ollama and disposable
+synthetic Google Tasks/Microsoft To Do endpoints. The historical
+`docs/evidence/software-completion/cross-service-preflight-2026-10-28.json`
+records final 0/2 owner-objective failures. The old implementation's
+`.oscar/` local raw campaign output is ignored and its executable harness
+is **not** present as a committed standalone script; do not confuse
+`scripts/software_conversation_planning_reference.py` (file/arithmetic
+planning) with actual owner-list-copy acceptance. A reusable,
+source-controlled synthetic account acceptance harness is still needed
+before independently reproducible real-model PASS claims.
+Do not change real provider accounts or commission owner Full; no effects
+outside disposable fixtures. Retain exact owner/source/destination
+intent, provenance and independently verified destination resource fields.
+Keep PR draft and BUG-PLAN-001 OPEN until evidence meets this scope.
+Additional product mandates remain OPEN after this bug.
+
+---
+
 # OSCAR owner-copy Windows verification update — 2026-10-29
 
 **Owner-provided Windows receipt at HEAD `1c6c67b4a23d2f20d11868e0c7c296c88958e30f`:**
