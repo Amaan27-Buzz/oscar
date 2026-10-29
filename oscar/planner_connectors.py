@@ -480,8 +480,18 @@ class ConnectorPlanning:
             ]
             if len(source) != 1:
                 raise PermissionError("private source request no longer available")
-            ref, row = source[0]
-            current = self.check(ref)
+            _, row = source[0]
+            # ConnectorFabric intentionally destroys its executable request on
+            # terminal verification. Keep only the original short-lived,
+            # planner-private observation arguments for authorized fresh GETs;
+            # never rebind them as a new executable mutation.
+            if (
+                row["expires"] <= self.h.grid.clock()
+                or digest(row["observation"]) != row["input_digest"]
+                or self.h.store.task(proof["source_task_id"]).state != TaskState.VERIFIED
+            ):
+                raise PermissionError("verified source observation input expired or changed")
+            current = self.current(row["pin"])
             if (
                 current["operation"] != proof["source_operation"]
                 or current["instance"]["account_id"] != proof["source_account_id"]
@@ -687,9 +697,16 @@ class ConnectorPlanning:
         }:
             return
         for ref, row in list(self.inputs.items()):
-            if row.get("effect_task") == task.id:
-                self.h.connectors.release_request(ref)
-                self.inputs.pop(ref, None)
+            if row.get("effect_task") != task.id:
+                continue
+            if task.state == TaskState.VERIFIED and "observation" in row:
+                # The provider read may be needed for a *fresh*, independently
+                # authorized transfer-source comparison after model replanning.
+                # Its private read arguments expire in <=120s; Fabric separately
+                # releases the executed request and outcome immediately.
+                continue
+            self.h.connectors.release_request(ref)
+            self.inputs.pop(ref, None)
 
     def sanitize(self, text: str, task_id: str, pins: list[dict[str, Any]]) -> str:
         """Run before model Result persistence; no raw tool arguments enter the ledger."""
