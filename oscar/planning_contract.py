@@ -145,7 +145,7 @@ def resolved_owner_account_bindings(goal: str, accounts: list[Any]) -> list[dict
             references.append((mention.start(), mention.end(), provider))
     references.sort()
     bindings: list[dict[str, Any]] = []
-    for index, (start, end, provider) in enumerate(references):
+    for index, (start, _end, provider) in enumerate(references):
         previous = references[index - 1][1] if index else 0
         cues = list(
             re.finditer(
