@@ -305,13 +305,9 @@ class PlannedTaskVerificationTests(unittest.TestCase):
             ),
         }
         with self.assertRaisesRegex(PermissionError, "unrelated plan steps"):
-            self.h.connector_plans.check_goal_accounts(
-                goal, [destination, extra]
-            )
+            self.h.connector_plans.check_goal_accounts(goal, [destination, extra])
         with self.assertRaisesRegex(PermissionError, "exact source-account read stage"):
-            self.h.connector_plans.check_goal_accounts(
-                goal, [source, extra], observe=True
-            )
+            self.h.connector_plans.check_goal_accounts(goal, [source, extra], observe=True)
         self.assertEqual([], self.api.calls)
 
     def test_owner_goal_rejects_wrong_destination_resource(self):
@@ -328,9 +324,7 @@ class PlannedTaskVerificationTests(unittest.TestCase):
             self.h.connector_plans.check_goal_accounts(goal, [source])
         from oscar.jev import Intent
 
-        reader = self.mount.capability(
-            "microsoft.todo.tasks.list", account_id=self.account.id
-        )
+        reader = self.mount.capability("microsoft.todo.tasks.list", account_id=self.account.id)
         destination_read = {
             "id": "target-read",
             "node_id": reader.node_id,
@@ -352,8 +346,7 @@ class PlannedTaskVerificationTests(unittest.TestCase):
     def test_owner_goal_ambiguous_accounts_require_clarification(self):
         _, source, destination, _ = self.cross_service_role_steps()
         goal = (
-            'Copy tasks using Google account alias "Tasks" '
-            'and Microsoft account alias "MS Tasks".'
+            'Copy tasks using Google account alias "Tasks" and Microsoft account alias "MS Tasks".'
         )
         with self.assertRaisesRegex(ValueError, "Clarify"):
             self.h.connector_plans.check_goal_accounts(goal, [source, destination])
@@ -396,9 +389,7 @@ class PlannedTaskVerificationTests(unittest.TestCase):
         from copy import deepcopy
 
         goal, source, destination, _ = self.cross_service_role_steps()
-        wrong = self.mount.capability(
-            "microsoft.todo.tasks.update", account_id=self.account.id
-        )
+        wrong = self.mount.capability("microsoft.todo.tasks.update", account_id=self.account.id)
         changed = deepcopy(destination)
         changed["capability_id"] = wrong.id
         changed["node_id"] = wrong.node_id
@@ -538,9 +529,7 @@ class PlannedTaskVerificationTests(unittest.TestCase):
         source["node_id"] = source_reader.node_id
         source["capability_id"] = source_reader.id
         source["intent"]["capability_kind"] = source_reader.id
-        source["intent"]["parameters"] = {
-            "arguments": {"path": {"tasklist": "source-list"}}
-        }
+        source["intent"]["parameters"] = {"arguments": {"path": {"tasklist": "source-list"}}}
         source["id"] = "read-source"
         destination["id"] = "copy-target"
         destination["depends_on"] = ["read-source"]
@@ -606,21 +595,18 @@ class PlannedTaskVerificationTests(unittest.TestCase):
         # Fabric owns action/outcome disposal; only Planner's bounded private
         # snapshot may survive to authorize a new independent source GET.
         source_ref, source_row = next(
-            (ref, item) for ref, item in self.h.connector_plans.inputs.items()
+            (ref, item)
+            for ref, item in self.h.connector_plans.inputs.items()
             if "observation" in item
         )
         self.assertNotIn(source_ref, self.h.connectors.requests)
-        self.assertEqual(
-            "verified", self.h.store.task(source_row["effect_task"]).state
-        )
+        self.assertEqual("verified", self.h.store.task(source_row["effect_task"]).state)
         destination_steps = [destination]
         if duplicated:
             second = deepcopy(destination)
             second["id"] = "destination-second"
             destination_steps.append(second)
-        self.body["choices"][0]["message"]["content"] = json.dumps(
-            {"steps": destination_steps}
-        )
+        self.body["choices"][0]["message"]["content"] = json.dumps({"steps": destination_steps})
         self.complete(self.review(self.accept_change(row)))
         self.assertEqual("partially_verified", HTTPObservationTests.settle(self, 3)["state"])
         self.complete(self.review(self.accept_change(row)))
@@ -659,9 +645,7 @@ class PlannedTaskVerificationTests(unittest.TestCase):
     def test_two_verified_creates_with_one_provider_id_do_not_satisfy_two_task_copy(self):
         goal_id, tasks = self.prepare_cross_account_copy(duplicated=True)
         for task_id in tasks:
-            self.complete(
-                self.review({"operation": "confirm_task", "id": task_id, "value": {}})
-            )
+            self.complete(self.review({"operation": "confirm_task", "id": task_id, "value": {}}))
         deadline = monotonic() + 10
         while monotonic() < deadline:
             self.h.executive.tick()
@@ -701,9 +685,7 @@ class PlannedTaskVerificationTests(unittest.TestCase):
         self.assertEqual(1, posted)
         for _ in range(3):
             self.h.executive.tick()
-        self.assertEqual(
-            posted, sum(method == "POST" for method, *_ in self.api.calls)
-        )
+        self.assertEqual(posted, sum(method == "POST" for method, *_ in self.api.calls))
 
     def test_post_committed_but_provider_reply_lost_is_unknown_without_replay(self):
         from tests.test_planner_http_observations import HTTPObservationTests
@@ -715,10 +697,12 @@ class PlannedTaskVerificationTests(unittest.TestCase):
         # a FAILED task transport receipt, not evidence of a rejected write.
         # Executive must record the *owner effect* as UNKNOWN and never retry.
         self.assertEqual("failed", HTTPObservationTests.settle(self, 4)["state"])
-        self.assertTrue(any(
-            result["task_id"] == task_id and result["success"] is False
-            for result in self.h.store.all("result")
-        ))
+        self.assertTrue(
+            any(
+                result["task_id"] == task_id and result["success"] is False
+                for result in self.h.store.all("result")
+            )
+        )
         goal = self.h.store.get("executive_goal", goal_id)
         self.assertEqual("unknown", goal["state"])
         self.assertEqual(
@@ -729,15 +713,12 @@ class PlannedTaskVerificationTests(unittest.TestCase):
         self.assertEqual(1, posted)
         for _ in range(3):
             self.h.executive.tick()
-        self.assertEqual(
-            posted, sum(method == "POST" for method, *_ in self.api.calls)
-        )
+        self.assertEqual(posted, sum(method == "POST" for method, *_ in self.api.calls))
 
     def test_expired_private_source_snapshot_blocks_mutation_without_replay(self):
         goal_id, task_id = self.prepare_cross_account_copy()
         source_row = next(
-            item for item in self.h.connector_plans.inputs.values()
-            if "observation" in item
+            item for item in self.h.connector_plans.inputs.values() if "observation" in item
         )
         source_row["expires"] = self.h.grid.clock() - 1
         self.complete(self.review({"operation": "confirm_task", "id": task_id, "value": {}}))
@@ -748,8 +729,7 @@ class PlannedTaskVerificationTests(unittest.TestCase):
     def test_tampered_private_source_read_arguments_block_mutation(self):
         goal_id, task_id = self.prepare_cross_account_copy()
         source_row = next(
-            item for item in self.h.connector_plans.inputs.values()
-            if "observation" in item
+            item for item in self.h.connector_plans.inputs.values() if "observation" in item
         )
         source_row["observation"]["path"]["tasklist"] = "other-list"
         self.complete(self.review({"operation": "confirm_task", "id": task_id, "value": {}}))

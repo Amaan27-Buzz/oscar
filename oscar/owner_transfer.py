@@ -54,9 +54,7 @@ def _canonical(name: str, item: dict[str, Any]) -> dict[str, Any]:
     else:
         raise PermissionError("no reviewed source-to-destination task adapter")
     body = {key: item[key] for key in keys if key in item}
-    if name == "microsoft.todo.tasks.list" and isinstance(
-        body.get("dueDateTime"), dict
-    ):
+    if name == "microsoft.todo.tasks.list" and isinstance(body.get("dueDateTime"), dict):
         point = dict(body["dueDateTime"])
         # Microsoft may return a zero-fraction UTC-midnight timestamp (e.g.
         # .0000000); it denotes the same date as a strict midnight request.
@@ -78,8 +76,10 @@ def _canonical(name: str, item: dict[str, Any]) -> dict[str, Any]:
 
 def source_task_records(operation: str, payload: dict[str, Any]) -> list[dict[str, Any]]:
     """Reject pagination/truncation and unknown task shapes rather than guess coverage."""
-    if not isinstance(payload, dict) or payload.get("nextPageToken") or payload.get(
-        "@odata.nextLink"
+    if (
+        not isinstance(payload, dict)
+        or payload.get("nextPageToken")
+        or payload.get("@odata.nextLink")
     ):
         raise PermissionError("complete source task page required")
     key = {
@@ -89,8 +89,10 @@ def source_task_records(operation: str, payload: dict[str, Any]) -> list[dict[st
     if key is None:
         raise PermissionError("unsupported task source operation")
     items = payload.get(key)
-    if not isinstance(items, list) or not 1 <= len(items) <= 16 or any(
-        not isinstance(item, dict) for item in items
+    if (
+        not isinstance(items, list)
+        or not 1 <= len(items) <= 16
+        or any(not isinstance(item, dict) for item in items)
     ):
         raise PermissionError("one to sixteen complete typed source tasks required")
     return [_canonical(operation, item) for item in items]
@@ -99,9 +101,7 @@ def source_task_records(operation: str, payload: dict[str, Any]) -> list[dict[st
 def source_task_digest(operation: str, payload: dict[str, Any]) -> str:
     """Canonical bounded source snapshot, excluding provider metadata."""
     records = source_task_records(operation, payload)
-    serialized = [
-        json.dumps(record, sort_keys=True, separators=(",", ":")) for record in records
-    ]
+    serialized = [json.dumps(record, sort_keys=True, separators=(",", ":")) for record in records]
     return digest(sorted(serialized))
 
 
@@ -147,9 +147,7 @@ def source_transfer_proof(
         def serialize(value: dict[str, Any]) -> str:
             return json.dumps(value, sort_keys=True, separators=(",", ":"))
 
-        if Counter(map(serialize, source_records)) != Counter(
-            map(serialize, normalized_effects)
-        ):
+        if Counter(map(serialize, source_records)) != Counter(map(serialize, normalized_effects)):
             raise PermissionError("destination task fields differ from source observations")
         return {
             "kind": "source_task_field_equivalence",

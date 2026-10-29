@@ -129,17 +129,13 @@ def resolved_owner_account_bindings(goal: str, accounts: list[Any]) -> list[dict
     connected = [
         a
         for a in accounts
-        if a.status == "connected"
-        and a.services
-        and a.identity_class == "owner-delegated"
+        if a.status == "connected" and a.services and a.identity_class == "owner-delegated"
     ]
     references: list[tuple[int, int, str]] = []
     for provider in sorted({a.provider for a in connected}, key=len, reverse=True):
         if provider == "mcp-resource":
             continue
-        for mention in re.finditer(
-            r"(?<!\w)" + re.escape(provider) + r"(?!\w)", goal, re.I
-        ):
+        for mention in re.finditer(r"(?<!\w)" + re.escape(provider) + r"(?!\w)", goal, re.I):
             if any(mention.start() < end and mention.end() > start for start, end, _ in references):
                 continue
             references.append((mention.start(), mention.end(), provider))
@@ -179,8 +175,7 @@ def resolved_owner_account_bindings(goal: str, accounts: list[Any]) -> list[dict
             }
         )
     if len(bindings) > 1 and (
-        any(b["role"] is None for b in bindings)
-        or len({b["role"] for b in bindings}) == 1
+        any(b["role"] is None for b in bindings) or len({b["role"] for b in bindings}) == 1
     ):
         raise ValueError("Clarify source and destination account roles.")
     if len({b["account_id"] for b in bindings}) != len(bindings):
@@ -226,10 +221,14 @@ def owner_objective_contract(goal: str, accounts: list[Any]) -> dict[str, Any] |
         raise ValueError(
             "Clarify the move or synchronization semantics; copying alone is insufficient."
         )
-    if transfer and re.search(r"\btransfer\b", goal, re.I) and not re.search(
-        r"\b(copy|duplicate|replicate)\b|\bcreate\s+equivalent\b",
-        goal,
-        re.I,
+    if (
+        transfer
+        and re.search(r"\btransfer\b", goal, re.I)
+        and not re.search(
+            r"\b(copy|duplicate|replicate)\b|\bcreate\s+equivalent\b",
+            goal,
+            re.I,
+        )
     ):
         raise ValueError(
             "Clarify whether transfer means copy or move; source deletion is not inferred."
@@ -302,8 +301,7 @@ def owner_objective_contract(goal: str, accounts: list[Any]) -> dict[str, Any] |
     # Store uses JSON; normalize tuple-backed dataclass fields before the first
     # signed review so persisted contracts compare byte-for-byte on revalidation.
     contract["accounts"] = [
-        {**role, "resource_ids": list(role["resource_ids"])}
-        for role in contract["accounts"]
+        {**role, "resource_ids": list(role["resource_ids"])} for role in contract["accounts"]
     ]
     contract["required_fields"] = list(contract["required_fields"])
     return contract

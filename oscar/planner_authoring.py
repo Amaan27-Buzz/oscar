@@ -1157,9 +1157,7 @@ class PlannerAuthoring:
             caps = state["capabilities"]
             from .planning_contract import owner_objective_contract
 
-            owner_objective = owner_objective_contract(
-                value["goal"], h.accounts.list_accounts()
-            )
+            owner_objective = owner_objective_contract(value["goal"], h.accounts.list_accounts())
             worker = h.executive.worker(
                 value["name"],
                 [(c["node_id"], c["id"]) for c in caps],

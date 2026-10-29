@@ -262,11 +262,8 @@ class ConnectorPlanning:
                 for cap in caps
                 if (descriptor := self.descriptor(cap)) is not None
             }
-            if (
-                (len(mentioned) > 1 or mentioned - routed)
-                and any(
-                    not self.is_read(cap) for cap in caps if self.descriptor(cap) is not None
-                )
+            if (len(mentioned) > 1 or mentioned - routed) and any(
+                not self.is_read(cap) for cap in caps if self.descriptor(cap) is not None
             ):
                 raise ValueError(
                     "Clarify exact source and destination account aliases before effects."
@@ -280,9 +277,7 @@ class ConnectorPlanning:
             descriptor = self.descriptor(cap)
             if descriptor is None:
                 continue
-            binding = roles.get(
-                (descriptor["account"]["provider"], descriptor["account"]["alias"])
-            )
+            binding = roles.get((descriptor["account"]["provider"], descriptor["account"]["alias"]))
             if (
                 binding is None
                 or descriptor["account_id"] != binding["account_id"]
@@ -359,26 +354,37 @@ class ConnectorPlanning:
             and any(binding["role"] == "source" for binding in bindings)
             and any(binding["role"] == "destination" for binding in bindings)
         )
-        if copying and not observe and destination_steps and (
-            len(destination_steps) != len(steps)
-            or len({step["id"] for step in destination_steps}) != len(steps)
+        if (
+            copying
+            and not observe
+            and destination_steps
+            and (
+                len(destination_steps) != len(steps)
+                or len({step["id"] for step in destination_steps}) != len(steps)
+            )
         ):
             raise PermissionError(
                 "owner task copy does not authorize unrelated plan steps or side effects"
             )
-        if copying and observe and (
-            len(source_reads) != len(steps)
-            or any(
-                binding["role"] != "source" or not self.is_read(cap)
-                for _, cap, binding in selected
+        if (
+            copying
+            and observe
+            and (
+                len(source_reads) != len(steps)
+                or any(
+                    binding["role"] != "source" or not self.is_read(cap)
+                    for _, cap, binding in selected
+                )
             )
         ):
             raise PermissionError(
                 "owner source observation must be an exact source-account read stage"
             )
 
-        if not observe and destination_steps and any(
-            binding["role"] == "source" for binding in bindings
+        if (
+            not observe
+            and destination_steps
+            and any(binding["role"] == "source" for binding in bindings)
         ):
             if source_observations is None:
                 raise PermissionError("source observation required before transfer effects")
@@ -386,17 +392,11 @@ class ConnectorPlanning:
 
             try:
                 context(self.h.store, self.h.grid, source_observations)
-                observed_goal = self.h.store.get(
-                    "executive_goal", source_observations["goal_id"]
-                )
+                observed_goal = self.h.store.get("executive_goal", source_observations["goal_id"])
             except (KeyError, ValueError) as exc:
-                raise PermissionError(
-                    "verified source observation unavailable"
-                ) from exc
+                raise PermissionError("verified source observation unavailable") from exc
             expected_sources = {
-                binding["account_id"]
-                for binding in bindings
-                if binding["role"] == "source"
+                binding["account_id"] for binding in bindings if binding["role"] == "source"
             }
             read_accounts = {
                 criterion["connector_account"]["id"]
@@ -414,9 +414,9 @@ class ConnectorPlanning:
             effects = []
             for step in destination_steps:
                 cap = next(
-                    c for c in caps
-                    if c["id"] == step["capability_id"]
-                    and c["node_id"] == step["node_id"]
+                    c
+                    for c in caps
+                    if c["id"] == step["capability_id"] and c["node_id"] == step["node_id"]
                 )
                 contract = self.contract(cap)
                 parameters = step["intent"].get("parameters") or {}
@@ -435,9 +435,7 @@ class ConnectorPlanning:
                 )
             from .planning_contract import owner_objective_contract
 
-            owner_contract = owner_objective_contract(
-                goal, self.h.accounts.list_accounts()
-            )
+            owner_contract = owner_objective_contract(goal, self.h.accounts.list_accounts())
             if owner_contract is None or any(
                 not role["resource_ids"] for role in owner_contract["accounts"]
             ):
@@ -449,21 +447,13 @@ class ConnectorPlanning:
                 context(self.h.store, self.h.grid, source_observations),
                 source_account_id,
                 effects,
-                required_fields=tuple(
-                    owner_contract["required_fields"] if owner_contract else ()
-                ),
+                required_fields=tuple(owner_contract["required_fields"] if owner_contract else ()),
             )
 
         if not observe:
-            expected = {
-                (b["provider"], b["alias"])
-                for b in bindings
-                if b["role"] == "destination"
-            }
+            expected = {(b["provider"], b["alias"]) for b in bindings if b["role"] == "destination"}
             if expected - destination_effects:
-                raise PermissionError(
-                    "plan does not perform the owner's destination operation"
-                )
+                raise PermissionError("plan does not perform the owner's destination operation")
         return proof
 
     def verify_transfer_source(
@@ -488,17 +478,14 @@ class ConnectorPlanning:
             raise PermissionError("original source observation references required")
 
         def authorize_source() -> None:
-            observed = json.loads(
-                context(self.h.store, self.h.grid, refs, task_id=task_id)
-            )
+            observed = json.loads(context(self.h.store, self.h.grid, refs, task_id=task_id))
             matches = [
                 entry
                 for entry in observed
                 if entry.get("account_id") == proof["source_account_id"]
                 and entry.get("task_id") == proof["source_task_id"]
                 and entry.get("evidence_id") == proof["source_evidence_id"]
-                and entry.get("capability_id", "").split(":", 1)[-1]
-                == proof["source_operation"]
+                and entry.get("capability_id", "").split(":", 1)[-1] == proof["source_operation"]
             ]
             if len(matches) != 1:
                 raise PermissionError("verified source provenance changed")
@@ -507,8 +494,7 @@ class ConnectorPlanning:
             source = [
                 (ref, row)
                 for ref, row in self.inputs.items()
-                if row.get("effect_task") == proof["source_task_id"]
-                and "observation" in row
+                if row.get("effect_task") == proof["source_task_id"] and "observation" in row
             ]
             if len(source) != 1:
                 raise PermissionError("private source request no longer available")
@@ -990,18 +976,13 @@ class ConnectorPlanning:
         proof = goal.get("owner_transfer_proof")
         if proof and binding["step_id"] in proof["destination_step_ids"]:
             index = proof["destination_step_ids"].index(binding["step_id"])
-            if (
-                digest(expected) != proof["expected_field_digests"][index]
-                or account["id"] != next(
-                    entry["account_id"]
-                    for entry in goal["owner_objective"]["accounts"]
-                    if entry["role"] == "destination"
-                )
+            if digest(expected) != proof["expected_field_digests"][index] or account["id"] != next(
+                entry["account_id"]
+                for entry in goal["owner_objective"]["accounts"]
+                if entry["role"] == "destination"
             ):
                 raise PermissionError("destination field proof or account changed")
-            receipt = self.h.store.get(
-                "owner_transfer_source_preflight", result.task_id
-            )
+            receipt = self.h.store.get("owner_transfer_source_preflight", result.task_id)
             if receipt != {
                 "goal_id": goal["id"],
                 "step_id": binding["step_id"],

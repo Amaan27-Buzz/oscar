@@ -83,9 +83,7 @@ class ExecutiveTests(unittest.TestCase):
         self.assertEqual(2, len(self.r.store.all("task")))
 
     def test_individual_verified_steps_do_not_complete_unproven_owner_objective(self):
-        proposal = self.e.propose(
-            self.worker, "Copy owner records between accounts", [self.step()]
-        )
+        proposal = self.e.propose(self.worker, "Copy owner records between accounts", [self.step()])
         proposal["owner_objective"] = {
             "objective": "Copy source records to the destination and preserve due dates",
             "operation": "copy",
@@ -109,9 +107,7 @@ class ExecutiveTests(unittest.TestCase):
         self.assertEqual(0, self.e.tick())
 
     def test_owner_commitment_changed_during_final_proof_never_completes(self):
-        proposal = self.e.propose(
-            self.worker, "Copy source record", [self.step()]
-        )
+        proposal = self.e.propose(self.worker, "Copy source record", [self.step()])
         proposal["owner_objective"] = {
             "objective": "Copy source record",
             "operation": "copy",
@@ -143,9 +139,7 @@ class ExecutiveTests(unittest.TestCase):
         self.assertEqual("waiting_for_owner_review", self.e.health)
 
     def test_fresh_source_guard_blocks_effect_until_source_is_still_verified(self):
-        proposal = self.e.propose(
-            self.worker, "Copy source record", [self.step()]
-        )
+        proposal = self.e.propose(self.worker, "Copy source record", [self.step()])
         proposal["owner_objective"] = {
             "objective": "Copy source record into the destination",
             "operation": "copy",

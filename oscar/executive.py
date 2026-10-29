@@ -225,12 +225,10 @@ class Executive:
         self.health = "idle"
         self.active: set[str] = set()
         self.advance_plans: Callable[[], None] | None = None
-        self.owner_transfer_guard: (
-            Callable[[dict[str, Any], dict[str, Any], str], None] | None
-        ) = None
-        self.owner_transfer_verifier: (
-            Callable[[dict[str, Any]], dict[str, Any]] | None
-        ) = None
+        self.owner_transfer_guard: Callable[[dict[str, Any], dict[str, Any], str], None] | None = (
+            None
+        )
+        self.owner_transfer_verifier: Callable[[dict[str, Any]], dict[str, Any]] | None = None
 
     def _owner(self, authorized: bool) -> None:
         if authorized is not True:
@@ -1521,9 +1519,8 @@ class Executive:
                                 for row in self.store.all("executive_task")
                                 if row["goal_id"] == goal["id"]
                                 and row["occurrence"] == goal["run_index"]
-                                and row["step_id"] in goal["owner_transfer_proof"][
-                                    "destination_step_ids"
-                                ]
+                                and row["step_id"]
+                                in goal["owner_transfer_proof"]["destination_step_ids"]
                                 and self.store.task(row["task_id"]).state
                                 in {
                                     TaskState.VERIFIED,
@@ -1550,7 +1547,9 @@ class Executive:
                                         },
                                     )
                                     self.store.audit(
-                                        "", "executive_owner_source_changed", {
+                                        "",
+                                        "executive_owner_source_changed",
+                                        {
                                             "goal_id": goal["id"],
                                             "step_id": step["id"],
                                             "state": status,
@@ -1606,7 +1605,8 @@ class Executive:
                 except PermissionError:
                     self.health = "waiting_for_authority"
             if goal.get("owner_objective") and any(
-                state in {
+                state
+                in {
                     TaskState.FAILED,
                     TaskState.PARTIALLY_VERIFIED,
                     TaskState.UNKNOWN,
@@ -1619,7 +1619,8 @@ class Executive:
                 # failed. Never automatically retry a partially proven owner
                 # transfer or leave it looking like active verified work.
                 uncertain = any(
-                    state in {
+                    state
+                    in {
                         TaskState.FAILED,
                         TaskState.PARTIALLY_VERIFIED,
                         TaskState.CANCELLED,
@@ -1645,13 +1646,10 @@ class Executive:
                     for r in self.store.all("result")
                 )
                 if failed_mutation_responses or any(
-                    state in {TaskState.UNKNOWN, TaskState.BLOCKED}
-                    for state in results.values()
+                    state in {TaskState.UNKNOWN, TaskState.BLOCKED} for state in results.values()
                 ):
                     status = "unknown"
-                elif uncertain or any(
-                    state == TaskState.VERIFIED for state in results.values()
-                ):
+                elif uncertain or any(state == TaskState.VERIFIED for state in results.values()):
                     status = "partially_verified"
                 else:
                     status = "blocked"
@@ -1668,14 +1666,15 @@ class Executive:
                                     "state": "not_verified",
                                     "reason": "incomplete_or_uncertain_destination_effects",
                                     "step_states": {
-                                        step_id: state.value
-                                        for step_id, state in results.items()
+                                        step_id: state.value for step_id, state in results.items()
                                     },
                                 },
                             },
                         )
                         self.store.audit(
-                            "", "executive_owner_effect_uncertain", {
+                            "",
+                            "executive_owner_effect_uncertain",
+                            {
                                 "goal_id": goal["id"],
                                 "state": status,
                             },

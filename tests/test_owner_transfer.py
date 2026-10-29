@@ -131,34 +131,36 @@ class OwnerTransferEquivalenceTests(unittest.TestCase):
             source_task_records(
                 "microsoft.todo.tasks.list",
                 {
-                    "value": [{
-                        "title": "Source title",
-                        "status": "notStarted",
-                        "importance": "high",
-                    }],
+                    "value": [
+                        {
+                            "title": "Source title",
+                            "status": "notStarted",
+                            "importance": "high",
+                        }
+                    ],
                 },
             )
 
     def test_microsoft_utc_zero_fraction_due_date_has_equal_semantics(self):
         payload = {
-            "value": [{
-                "title": "Source title",
-                "status": "notStarted",
-                "body": {
-                    "contentType": "text",
-                    "content": "Private source notes",
-                },
-                "dueDateTime": {
-                    "dateTime": "2026-10-28T00:00:00.0000000",
-                    "timeZone": "UTC",
-                },
-            }]
+            "value": [
+                {
+                    "title": "Source title",
+                    "status": "notStarted",
+                    "body": {
+                        "contentType": "text",
+                        "content": "Private source notes",
+                    },
+                    "dueDateTime": {
+                        "dateTime": "2026-10-28T00:00:00.0000000",
+                        "timeZone": "UTC",
+                    },
+                }
+            ]
         }
         records = source_task_records("microsoft.todo.tasks.list", payload)
         self.assertEqual("2026-10-28", records[0]["due"])
-        payload["value"][0]["dueDateTime"]["dateTime"] = (
-            "2026-10-28T00:00:00.0000001"
-        )
+        payload["value"][0]["dueDateTime"]["dateTime"] = "2026-10-28T00:00:00.0000001"
         with self.assertRaisesRegex(PermissionError, "cannot be preserved"):
             source_task_records("microsoft.todo.tasks.list", payload)
 
@@ -172,11 +174,15 @@ class OwnerTransferEquivalenceTests(unittest.TestCase):
                 with self.assertRaisesRegex(PermissionError, "without loss"):
                     source_task_records(
                         "microsoft.todo.tasks.list",
-                        {"value": [{
-                            "title": "Source title",
-                            "status": "notStarted",
-                            "body": notes,
-                        }]},
+                        {
+                            "value": [
+                                {
+                                    "title": "Source title",
+                                    "status": "notStarted",
+                                    "body": notes,
+                                }
+                            ]
+                        },
                     )
 
     def test_missing_source_status_is_not_assumed_uncompleted(self):
@@ -189,16 +195,12 @@ class OwnerTransferEquivalenceTests(unittest.TestCase):
         other = json.loads(self.google_source([self.task()]))
         other[0]["capability_id"] = "synthetic:google.calendar.events.list"
         with self.assertRaisesRegex(PermissionError, "unambiguous"):
-            source_transfer_proof(
-                json.dumps(other), "source-account", [self.microsoft_effect()]
-            )
+            source_transfer_proof(json.dumps(other), "source-account", [self.microsoft_effect()])
 
     def test_fresh_source_digest_detects_field_mutation_but_not_response_order(self):
         first = self.task()
         second = {**self.task(), "title": "Second task"}
-        baseline = source_task_digest(
-            "google.tasks.list", {"items": [first, second]}
-        )
+        baseline = source_task_digest("google.tasks.list", {"items": [first, second]})
         self.assertEqual(
             baseline,
             source_task_digest("google.tasks.list", {"items": [second, first]}),
@@ -213,23 +215,32 @@ class OwnerTransferEquivalenceTests(unittest.TestCase):
 
     def test_microsoft_to_google_task_transfer_uses_same_canonical_fields(self):
         source = json.dumps(
-            [{
-                "account_id": "source-account",
-                "capability_id": "synthetic:microsoft.todo.tasks.list",
-                "task_id": "verified-read",
-                "evidence_id": "independent-evidence",
-                "value": json.dumps({
-                    "value": [{
-                        "title": "Source title",
-                        "body": {"contentType": "text", "content": "Private source notes"},
-                        "dueDateTime": {
-                            "dateTime": "2026-10-28T00:00:00",
-                            "timeZone": "UTC",
-                        },
-                        "status": "notStarted",
-                    }],
-                }),
-            }]
+            [
+                {
+                    "account_id": "source-account",
+                    "capability_id": "synthetic:microsoft.todo.tasks.list",
+                    "task_id": "verified-read",
+                    "evidence_id": "independent-evidence",
+                    "value": json.dumps(
+                        {
+                            "value": [
+                                {
+                                    "title": "Source title",
+                                    "body": {
+                                        "contentType": "text",
+                                        "content": "Private source notes",
+                                    },
+                                    "dueDateTime": {
+                                        "dateTime": "2026-10-28T00:00:00",
+                                        "timeZone": "UTC",
+                                    },
+                                    "status": "notStarted",
+                                }
+                            ],
+                        }
+                    ),
+                }
+            ]
         )
         destination = {
             "step_id": "google-copy",
