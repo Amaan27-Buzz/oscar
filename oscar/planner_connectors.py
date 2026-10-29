@@ -271,12 +271,12 @@ class ConnectorPlanning:
                 raise ValueError(
                     "Clarify exact source and destination account aliases before effects."
                 )
-            return
+            return None
         roles = {(b["provider"], b["alias"]): b for b in bindings}
         if len(roles) != len(bindings):
             raise ValueError("Clarify repeated or conflicting account roles.")
         selected: list[tuple[dict[str, Any], dict[str, Any], dict[str, Any]]] = []
-        for step, cap in zip(steps, caps):
+        for step, cap in zip(steps, caps, strict=True):
             descriptor = self.descriptor(cap)
             if descriptor is None:
                 continue
