@@ -1626,7 +1626,25 @@ class Executive:
                     }
                     for state in results.values()
                 )
-                if any(
+                # A failed *mutation response* is not proof that the provider
+                # rejected the write. It may have committed the POST and then
+                # lost the reply (or returned a 5xx). The native task remains
+                # FAILED, but the owner's cross-provider objective is UNKNOWN.
+                # A successful mutation with a mismatching independent GET is
+                # instead partially verified, since its outcome was observed.
+                failed_tasks = {
+                    row["task_id"]
+                    for row in self.store.all("executive_task")
+                    if row["goal_id"] == goal["id"]
+                    and row["occurrence"] == goal["run_index"]
+                    and row["relationship"] == goal["relationship"]
+                    and results.get(row["step_id"]) == TaskState.FAILED
+                }
+                failed_mutation_responses = any(
+                    r["task_id"] in failed_tasks and r["success"] is False
+                    for r in self.store.all("result")
+                )
+                if failed_mutation_responses or any(
                     state in {TaskState.UNKNOWN, TaskState.BLOCKED}
                     for state in results.values()
                 ):
