@@ -1,3 +1,72 @@
+# OSCAR active same-chat checkpoint — 2026-10-29
+
+**Status: BUG-PLAN-001 OPEN, partial source implementation, NOT_RUN tests. PR #10 draft/unmerged.**
+This is the live same-chat development checkpoint, not a rollover or new-chat request.
+
+## Branch and CI truth
+
+- Repository: `Amaan27-Buzz/oscar`; feature:
+  `codex/bug-plan-001-owner-intent`; draft PR #10.
+- Last reviewed source/test commit: `87cbacf6fb225937c3c9625f41e64d606579c4c9`;
+  subsequent capability-ledger edit: `b2398111137c95ea64bfc3ef4ee6288c3b64ae4b`.
+  Resolve final checkpoint HEAD through GitHub; documentation cannot embed its own SHA.
+- Latest inspected branch Actions: nine **startup_failure** workflows;
+  run `40839501047` returned **zero jobs**. Root cause unresolved,
+  not evidence that Ruff, mypy, Python tests or code executed.
+- Container clone failed with DNS `Could not resolve host: github.com`;
+  no equivalent local source-qualified checkout was available.
+- Historical installed-Qwen owner-goal synthetic Ask/Full campaign **FAILED 0/2**;
+  all new regression and acceptance tests **NOT_RUN**.
+
+## Implementation added in this conversation
+
+- Found and corrected a critical lifecycle flaw: `ConnectorFabric` releases
+  its runnable provider request on terminal verification; `ConnectorPlanning`
+  must retain only the bounded, expiring original **read-only observation
+  arguments**, validated against their input digest and verified source task,
+  to perform final independently authorized source GET. These are never
+  reattached as executable connector requests.
+- Added regression assertions that Fabric request was actually discarded;
+  changed/expired/tampered read arguments block destination POST rather than
+  silently accepting saved source data.
+- Denied unrelated native/file side effects in copy effect plans and
+  non-source observations in copy observation plans. Denied owner-selected
+  subsets/filters not representable by the current complete-list comparator.
+- Task adapter supports verified uncompleted status and semantically
+  identical UTC-midnight Microsoft dates with zero fractional seconds.
+  Rejects rich HTML source notes and unsupported task metadata that would
+  be silently lost in a cross-provider copy.
+- Added terminal Executive recheck of the signed owner goal review digest;
+  a changed commitment during independently verified result comparison
+  cannot become `completed`.
+- Added tests to `tests/test_owner_transfer.py`,
+  `tests/test_planner_task_verification.py` and
+  `tests/test_executive.py`. All remain NOT_RUN; no success claim.
+
+## Immediate next verification checkpoint
+
+```powershell
+git fetch origin
+git switch codex/bug-plan-001-owner-intent
+git pull --ff-only origin codex/bug-plan-001-owner-intent
+python -m unittest tests.test_owner_transfer tests.test_planner_task_verification tests.test_planner_http_observations tests.test_planner_catalog tests.test_executive -v
+python -m ruff check oscar tests scripts
+python -m ruff format --check oscar tests scripts
+python -m mypy oscar
+python -m scripts.check_repository
+```
+
+Resolve failures in the **same feature branch**. Do not merge PR #10
+until original owner-goal installed-Qwen Ask/Full synthetic tests pass.
+Remaining: first-party verified named-list metadata resolution,
+cross-provider and MCP operation/field generalization, user-device/
+real-account controlled testing, and the broader non-deferred
+software-completion backlog. Local checkout access and owner Action/Billing
+settings are the current verification blockers. Prior checkpoints below
+remain historical; do not treat their commits as current HEAD.
+
+---
+
 # OSCAR continuation 02 — bounded owner-copy integration (2026-10-28)
 
 **Engineering status: PARTIAL / UNVERIFIED. BUG-PLAN-001 OPEN. PR #10 DRAFT.**
