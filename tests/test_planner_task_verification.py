@@ -711,7 +711,14 @@ class PlannedTaskVerificationTests(unittest.TestCase):
         goal_id, task_id = self.prepare_cross_account_copy()
         self.api.fail_after_post = True
         self.complete(self.review({"operation": "confirm_task", "id": task_id, "value": {}}))
-        self.assertEqual("blocked", HTTPObservationTests.settle(self, 4)["state"])
+        # HTTP 503 after the synthetic provider has persisted the POST is
+        # a FAILED task transport receipt, not evidence of a rejected write.
+        # Executive must record the *owner effect* as UNKNOWN and never retry.
+        self.assertEqual("failed", HTTPObservationTests.settle(self, 4)["state"])
+        self.assertTrue(any(
+            result["task_id"] == task_id and result["success"] is False
+            for result in self.h.store.all("result")
+        ))
         goal = self.h.store.get("executive_goal", goal_id)
         self.assertEqual("unknown", goal["state"])
         self.assertEqual(
