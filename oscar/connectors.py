@@ -920,6 +920,7 @@ class ConnectorVerifier(Verifier):
             return self.base.verify(objective, result)
         criterion = objective.criterion
         matches: bool | None = None
+        identity_hash: str | None = None
         detail = "authoritative read-back unavailable"
         try:
             outcome = self.fabric.outcomes[result.id]
@@ -1063,6 +1064,23 @@ class ConnectorVerifier(Verifier):
                 matches = identity_matches and all(
                     payload.get(k) == v for k, v in criterion["expected"].items()
                 )
+            if matches:
+                # Commit only a digest of the independently read resource
+                # identity. Two separately verified creates may otherwise be
+                # accidentally counted as two distinct persisted resources
+                # even if a provider returned the same ID for both.
+                identity_hash = hashlib.sha256(
+                    json.dumps(
+                        {
+                            "instance_id": instance.id,
+                            "read_operation": read.name,
+                            "resource_path": expected_path,
+                        },
+                        sort_keys=True,
+                        separators=(",", ":"),
+                        allow_nan=False,
+                    ).encode()
+                ).hexdigest()
             detail = "expected fields match" if matches else "read-back fields differ"
         except (
             KeyError,
@@ -1089,5 +1107,6 @@ class ConnectorVerifier(Verifier):
             matches,
             Epistemic.VERIFIED if matches else Epistemic.REPORTED,
             detail,
+            content_hash=identity_hash,
         )
         return Verification(state, evidence)
