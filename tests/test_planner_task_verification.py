@@ -285,6 +285,35 @@ class PlannedTaskVerificationTests(unittest.TestCase):
             self.h.connector_plans.check_goal_accounts(goal, [source, google_create])
         self.assertEqual([], self.api.calls)
 
+    def test_copy_contract_rejects_unrelated_native_file_effect(self):
+        from oscar.jev import Intent
+
+        goal, source, destination, _ = self.cross_service_role_steps()
+        destination["depends_on"] = []
+        extra = {
+            "id": "unrequested-local-write",
+            "node_id": self.h.node_id,
+            "capability_id": "files.write",
+            "depends_on": [],
+            "intent": asdict(
+                Intent(
+                    "Save an unrelated local artifact",
+                    "file_write",
+                    "unrequested.txt",
+                    "not part of the owner's copy",
+                )
+            ),
+        }
+        with self.assertRaisesRegex(PermissionError, "unrelated plan steps"):
+            self.h.connector_plans.check_goal_accounts(
+                goal, [destination, extra]
+            )
+        with self.assertRaisesRegex(PermissionError, "exact source-account read stage"):
+            self.h.connector_plans.check_goal_accounts(
+                goal, [source, extra], observe=True
+            )
+        self.assertEqual([], self.api.calls)
+
     def test_owner_goal_rejects_wrong_destination_resource(self):
         goal, source, destination, _ = self.cross_service_role_steps()
         destination_args = destination["intent"]["parameters"]["arguments"]
