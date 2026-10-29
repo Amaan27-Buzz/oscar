@@ -1,3 +1,43 @@
+# OSCAR local test triage — 2026-10-29
+
+**User-provided executable Windows test receipt:** 160 tests / 153 passed / 7 errors
+at earlier feature HEAD `fbaf3a2fbb1b35874db4cfffe5f11b97d9937d37`.
+Six owner-copy errors all stopped during the synthetic planner draft with
+`PermissionError: no currently eligible configured model source`, consistent
+with a too-small 8192-token fixture window for an adaptive multi-provider
+prompt. The other error is a legacy test expecting `PermissionError` for an
+unavailable account alias, now surfaced as a clarification `ValueError`.
+Ruff reported B905/B007; mypy reported one missing None return; nine
+recently touched files failed `ruff format --check`.
+
+**Fixes published:** Increase the *test-only* cross-provider model context to
+65536 tokens, preserve account-name clarification error semantics in the
+catalog assertion, add `strict=True` to paired connector steps, change
+no-binding return to explicit None, and rename unused tuple variable `end`.
+These changes are **NOT YET RETESTED**. All original 153 successful tests
+remain a user-provided receipt from *before* these patches. Formatting
+cleanup is still open. Do not report the 7 errors resolved until rerun.
+
+**Important local checkout hazard:** User's first `git fetch` failed DNS,
+then `git switch codex/bug-plan-001-owner-intent` failed (no local tracking
+branch); `git pull --ff-only origin codex/bug-plan-001-owner-intent`
+fast-forwarded the previously checked-out local branch from `bf69163` to
+`fbaf3a2`. Before any local edits/push, inspect
+`git branch --show-current` and `git status --short`, then use
+`git fetch origin` and
+`git switch --track origin/codex/bug-plan-001-owner-intent`
+to create/switch to the correct tracking branch. **Do not push the
+incorrectly fast-forwarded local base branch.** No force/reset/merge
+without explicit user confirmation.
+
+**Next owner action:** On the correct feature branch, rerun the focused
+cross-account synthetic integration test first, then all 160,
+Ruff, formatter and mypy. If fresh integration errors emerge, fix them
+instead of broadening owner intent capabilities. Github Actions remain
+startup_failure/zero jobs on the previous observed branch head.
+
+---
+
 # OSCAR active same-chat checkpoint — 2026-10-29
 
 **Status: BUG-PLAN-001 OPEN, partial source implementation, NOT_RUN tests. PR #10 draft/unmerged.**
