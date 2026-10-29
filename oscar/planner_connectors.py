@@ -335,6 +335,16 @@ class ConnectorPlanning:
                 ):
                     raise PermissionError("plan does not preserve the owner's resource ID")
 
+        proof: dict[str, Any] | None = None
+        if not observe and destination_steps and source_reads:
+            # A dependency edge alone only orders two calls: connector plan
+            # bodies are literal and cannot use result handoffs. Require a
+            # separate verified observation stage so source fields are known
+            # before the destination intent is accepted.
+            raise PermissionError(
+                "task copy requires a verified source observation stage; "
+                "an in-plan GET does not bind copied fields"
+            )
         # A source-to-destination owner copy is not blanket authorization to
         # perform extra native file writes, model calls or unrelated account
         # reads during the effect stage. Every accepted effect must be one of
@@ -367,16 +377,6 @@ class ConnectorPlanning:
                 "owner source observation must be an exact source-account read stage"
             )
 
-        proof: dict[str, Any] | None = None
-        if not observe and destination_steps and source_reads:
-            # A dependency edge alone only orders two calls: connector plan
-            # bodies are literal and cannot use result handoffs. Require a
-            # separate verified observation stage so source fields are known
-            # before the destination intent is accepted.
-            raise PermissionError(
-                "task copy requires a verified source observation stage; "
-                "an in-plan GET does not bind copied fields"
-            )
         if not observe and destination_steps and any(
             binding["role"] == "source" for binding in bindings
         ):
