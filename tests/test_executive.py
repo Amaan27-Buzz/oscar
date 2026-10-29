@@ -108,6 +108,40 @@ class ExecutiveTests(unittest.TestCase):
         self.assertEqual(0, saved["run_index"])
         self.assertEqual(0, self.e.tick())
 
+    def test_owner_commitment_changed_during_final_proof_never_completes(self):
+        proposal = self.e.propose(
+            self.worker, "Copy source record", [self.step()]
+        )
+        proposal["owner_objective"] = {
+            "objective": "Copy source record",
+            "operation": "copy",
+            "required_fields": [],
+            "accounts": [],
+        }
+        proposal["owner_transfer_proof"] = {
+            "kind": "source_task_field_equivalence",
+            "destination_step_ids": ["sum"],
+        }
+        proposal["review_digest"] = self.e._review(proposal)
+        self.r.store.put("executive_goal", proposal["id"], proposal)
+        self.e.accept(proposal["id"], proposal["review_digest"], owner_authorized=True)
+        self.e.owner_transfer_guard = lambda goal, step, task_id: None
+
+        def stale_confirmation(goal):
+            current = self.r.store.get("executive_goal", goal["id"])
+            self.r.store.put(
+                "executive_goal",
+                goal["id"],
+                {**current, "goal": "Silently changed original objective"},
+            )
+            return {"state": "verified", "kind": "synthetic"}
+
+        self.e.owner_transfer_verifier = stale_confirmation
+        self.assertEqual(1, self.e.tick())
+        current = self.r.store.get("executive_goal", proposal["id"])
+        self.assertNotEqual("completed", current["state"])
+        self.assertEqual("waiting_for_owner_review", self.e.health)
+
     def test_fresh_source_guard_blocks_effect_until_source_is_still_verified(self):
         proposal = self.e.propose(
             self.worker, "Copy source record", [self.step()]
