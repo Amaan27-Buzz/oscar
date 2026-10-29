@@ -1,3 +1,31 @@
+# OSCAR owner-copy Windows verification update — 2026-10-29
+
+**Owner-provided Windows receipt at HEAD `1c6c67b4a23d2f20d11868e0c7c296c88958e30f`:**
+- `test_post_committed_but_provider_reply_lost_is_unknown_without_replay`: **PASS**
+- `test_partial_destination_readback_never_completes_or_replays_copy`: **PASS**
+- These two focused cases ran in 3.381 seconds. The entire **161-case** batch
+  **has NOT been rerun since the provider-503 fix**; the immediately preceding
+  batch was 160 PASS / 1 FAIL.
+- `python -m ruff format --check oscar tests scripts`: **FAIL**, nine files
+  require formatting: `oscar/executive.py`, `oscar/harness.py`,
+  `oscar/owner_transfer.py`, `oscar/planner_authoring.py`,
+  `oscar/planner_connectors.py`, `oscar/planning_contract.py`,
+  `tests/test_executive.py`, `tests/test_owner_transfer.py`, and
+  `tests/test_planner_task_verification.py`. 284 others already formatted.
+- Prior full-batch Ruff lint, mypy (108 modules), and repository checks PASS.
+  Those checks preceded the latest provider-503 fix.
+- GitHub Actions previously showed startup_failure/zero-job runs. No
+  verified CI receipt exists for this feature branch.
+- **Next step:** On the local feature branch, run Ruff formatting on exactly
+  the nine listed files, inspect diff and commit/push only the formatted
+  changes to the same PR #10 branch. Then rerun the full 161-case integration
+  suite, Ruff lint, mypy, format --check, and repository integrity.
+- **Do not close BUG-PLAN-001 merely on these receipts:** installed-model
+  owner-objective Ask/Full remains to be rerun and verified, and the draft PR
+  is unmerged.
+
+---
+
 # OSCAR local owner-copy regression — 2026-10-29
 
 **User's Windows acceptance receipt at `2f0d17f0a97e4d8c0972f3d4836c98aebc022b86`:**
