@@ -89,6 +89,29 @@ Runtime state, secrets, memory exports, recordings and device credentials must r
 
 ## Build commands
 
+### Windows local Core and Desktop
+
+Use `main` for the current owner-directed soft restart. Keep unpublished studies
+on their existing branches. From the repository root, with Python 3.12+,
+`cryptography`, npm, Rust 1.99 and the Windows native build tools available:
+
+```powershell
+python -m pip install --no-deps -e .
+python -m scripts.build_desktop
+python -m scripts.desktop_tauri
+```
+
+The build script installs the locked Expression/Desktop dependencies and builds
+the native debug executable. Subsequent launches need only the last command.
+The launcher runs the actual Core and native Desktop against a disposable WPF
+fixture, with synthetic authority and simulated reasoning; this is a development
+reference, not an owner-configured functional alpha. Closing Desktop stops the
+fixture and removes its run-owned state through `TemporaryDirectory` under the
+Windows temporary directory. Add `--self-check` for automated native acceptance.
+No separate copied checkout, `.tmp` convention or new orchestration is needed.
+Keep existing `.oscar` state, voice assets and installed-model drivers separately;
+this launcher does not migrate, activate or delete them.
+
 The Group 4/D1 persistent service and its exact Linux/TLS, restart, authentication
 and backup verification commands are documented in [Cloud Core operations](docs/CLOUD-CORE.md).
 It composes the existing runtime; the diagnostic API is deliberately narrower than
