@@ -1,5 +1,13 @@
 # AGENTS.md — active development instructions (2026-10-19)
 
+## Owner development reset — 2026-11-02
+
+Use this original checkout and `main` for ordinary development. Do not create
+Git worktrees, duplicate checkouts or per-task clones. Use a normal branch only
+for genuinely risky or isolated experiments, and integrate accepted work promptly.
+Concurrent agents coordinate file ownership within this checkout.
+This owner instruction supersedes older instructions proposing extra checkouts.
+
 ## 2026-10-28 session closeout and continuation
 
 The owner ended this software-development session and requested a GitHub handoff.
