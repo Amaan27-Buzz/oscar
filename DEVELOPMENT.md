@@ -89,6 +89,12 @@ Runtime state, secrets, memory exports, recordings and device credentials must r
 
 ## Build commands
 
+## Owner-directed alpha, packaging and later repository consolidation (2026-11-02)
+
+Prioritize a real usable OSCAR in the **approved Desktop and Android applications**, with the actual Core, model inference, memory and capabilities. The [cinematic first-run experience and reopenable Setup Studio](docs/FIRST-RUN-EXPERIENCE.md) are part of the non-deferred user-facing software scope; avoid replacing them with a demo or blocking settings wizard. Use existing commissioning and Grid contracts.
+
+**After** a packaged Windows/Android alpha has been made available for owner manual testing, follow [Alpha Packaging, Manual Acceptance and Final Main-Only Consolidation](docs/development/ALPHA-RELEASE-CONSOLIDATION.md). Consolidation to only active `main` locally and on GitHub requires verified preservation of unpublished work, recovery backups, fresh-clone/package checks, and the owner's **separate approval to delete branches**. Do not prune Git refs during feature development.
+
 ### Windows local Core and Desktop
 
 Use `main` for the current owner-directed soft restart. Keep unpublished studies

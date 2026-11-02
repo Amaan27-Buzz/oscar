@@ -1,5 +1,9 @@
 # First-Time Setup / Commissioning
 
+## Active owner direction — cinematic first run and progressive commissioning (2026-11-02)
+
+The user-facing first-run story, short live hands-on introduction, optional **OSCAR Setup Studio**, model/API-key onboarding, dedicated OSCAR accounts where authorized, device pairing, spare-laptop/cloud setup, replayability and authentic readiness checks are specified in [Cinematic First Run and Progressive Setup](FIRST-RUN-EXPERIENCE.md). It supplements the detailed commissioning requirements below and does **not** claim those flows are already implemented. Preserve approved native Desktop/Android designs, the original mascot and Orb, and real Core-driven behavior. The [packaging, owner acceptance and later main-only branch cleanup](development/ALPHA-RELEASE-CONSOLIDATION.md) is a separate end-of-alpha step; do not delete branches or unique local state prematurely.
+
 ## Group 3 backend candidate — 2026-10-16
 
 `oscar.commissioning.Commissioning` now supplies trusted-local Core instance
