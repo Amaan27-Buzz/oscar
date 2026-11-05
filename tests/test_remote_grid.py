@@ -66,6 +66,98 @@ class DirectClient:
 
 
 class RemoteGridTests(unittest.TestCase):
+    def test_model_followup_receives_canonical_cross_device_context_without_durable_copy(self):
+        from oscar.models import Mode, ProviderResponse, Route, RoutedResult
+
+        h = self.core.harness
+        event = SourceEvent(
+            "owner",
+            "Synthetic previous Desktop observation",
+            "desktop/conversation",
+            time(),
+            kind="conversation_owner",
+        )
+        h.archive.append(event, retain_authorized=True)
+        captured = []
+        completed = Event()
+
+        def generate(request, policy, check):
+            check()
+            captured.append(request)
+            completed.set()
+            return RoutedResult(
+                Route("fixture", "fixture", "fixture", Mode.PRIVATE, 0, (), None),
+                ProviderResponse("Synthetic response"),
+                1,
+                "synthetic-route",
+            )
+
+        with patch.object(h.router, "execute", side_effect=generate):
+            task = self.mobile.request(
+                "submit",
+                {
+                    "text": "Explain how that observation could help",
+                    "kind": "text",
+                    "target": h.node_id,
+                    "parameters": {},
+                    "retain": True,
+                },
+            )
+            if task["approval_required"]:
+                self.approve(task)
+            self.assertTrue(completed.wait(4))
+        self.assertIn(event.content, captured[0].prompt)
+        self.assertIn(event.id, captured[0].prompt)
+        self.assertEqual(Mode.PRIVATE, captured[0].mode)
+        self.assertNotIn(event.content, "\n".join(h.store.db.iterdump()))
+
+    def test_context_permission_is_rechecked_after_admission(self):
+        h = self.core.harness
+        event = SourceEvent(
+            "owner",
+            "Synthetic bounded history",
+            "desktop/conversation",
+            time(),
+            kind="conversation_owner",
+        )
+        h.archive.append(event, retain_authorized=True)
+        executor = h.dispatcher.executors["models.reason"]
+        executor.retain_conversation(
+            "synthetic-context",
+            (event.id,),
+            lambda: self.core.remote.require(self.mobile.handle, "archive:read"),
+        )
+        self.assertIn(event.content, executor.conversation_context("synthetic-context"))
+        row = h.store.get("session", self.mobile.handle.id)
+        h.store.put(
+            "session",
+            row["id"],
+            {**row, "scopes": [s for s in row["scopes"] if s != "archive:read"]},
+        )
+        with self.assertRaises(PermissionError):
+            executor.conversation_context("synthetic-context")
+
+    def test_forgotten_source_is_not_uploaded_as_recent_context(self):
+        from oscar.event_archive import MemoryWriter
+
+        h = self.core.harness
+        event = SourceEvent(
+            "owner",
+            "Synthetic forget marker",
+            "desktop/conversation",
+            time(),
+            kind="conversation_owner",
+        )
+        h.archive.append(event, retain_authorized=True)
+        memory = MemoryWriter(h.archive).retain(
+            (event.id,), event.content, "episodic", retain_authorized=True, inferred=False
+        )
+        executor = h.dispatcher.executors["models.reason"]
+        executor.retain_conversation("forget-context", (event.id,), lambda: None)
+        self.assertIn(event.content, executor.conversation_context("forget-context"))
+        h.archive.forget(memory.id, owner_authorized=True, forget_sources=True)
+        self.assertEqual("", executor.conversation_context("forget-context"))
+
     def test_owner_model_selection_is_shared_persisted_and_keeps_routing_policy(self):
         from oscar.models import RoutingPolicy
 

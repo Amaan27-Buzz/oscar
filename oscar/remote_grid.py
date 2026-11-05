@@ -1268,6 +1268,21 @@ class RemoteGrid:
         if ephemeral_recall:
             self.store.transient[task.id]["remote_query"] = payload["text"]
         plan = self.store.get("plan", task.id)
+        if kind == "text" and plan["kind"] == "model_reasoning" and self.can_read(session):
+            from .harness import ModelExecutor
+
+            executor_model = self.h.dispatcher.executors.get("models.reason")
+            events = self.h.archive.conversation(self.h.runtime.relationship_id)["events"]
+            if isinstance(executor_model, ModelExecutor) and events:
+
+                def authorize_context() -> None:
+                    self.require(session, "grid:submit")
+                    if not self.can_read(session):
+                        raise PermissionError("Conversation read authority withdrawn")
+
+                executor_model.retain_conversation(
+                    task.id, tuple(e.id for e in events), authorize_context
+                )
         if kind == "text":
             choices = [c for c in self.grid.search(plan["kind"]) if c.node_id == target]
             if choices:

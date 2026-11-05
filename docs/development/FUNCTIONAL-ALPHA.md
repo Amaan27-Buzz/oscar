@@ -372,3 +372,32 @@ The Windows ZIP was refreshed from clean `23d84c6`. Its frozen executable passed
 real local Qwen3.5 4B inference outside the repository. The restored configuration
 remains present, ignored and untracked. Rendered local/cloud switching and broader
 cross-device continuity remain additional acceptance work.
+
+## Recent conversation context across Grid — active continuation
+
+Remote model requests previously displayed canonical history without supplying it
+to inference. Grid now binds at most 40 recent canonical event IDs to a model
+request. The executor reads a bounded evidence excerpt immediately before
+inference; source IDs, epistemic status and the data-not-authority boundary remain
+visible in its prompt. Prior text is not copied into durable task/action records.
+Context handoffs expire after 120 seconds and are cleared after execution.
+
+Admission requires archive-read authority. Execution and each provider attempt
+recheck that authority and source visibility; changed/forgotten context cannot be
+uploaded from an earlier cached excerpt. Source and parent-event relationships
+are checked, including remote answers whose source request was forgotten. This
+does not replace Controller Memory Preflight or grant memory access implicitly.
+
+`python -m scripts.alpha_grid_conversation_acceptance` passed real installed
+Qwen3.5 4B inference through signed synthetic Grid admission: the follow-up recovered
+a synthetic Desktop observation, used its codename, and retained its response in
+canonical shared history. Database inspection confirmed that the prior observation
+was not duplicated into task state. A differently worded initial prompt required
+an ungranted capability and was denied; the successful bounded model-reasoning
+check does not generalize to all contextual objectives. This script uses the
+actual Core/Grid request protocol directly, not Android rendering or HTTPS.
+
+All 74 affected Desktop/Grid/conversation-planning regressions passed. New checks
+cover source-ID prompt composition, private routing, read-scope withdrawal and
+forgetting after admission. Typechecking and lint passed. Native Android follow-up
+acceptance and a rebuilt Windows package remain outstanding for this change.
