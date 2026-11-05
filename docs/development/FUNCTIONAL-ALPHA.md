@@ -213,4 +213,7 @@ passed (111 modules). Android unit tests cover bounded/malformed model projectio
 and preservation of an unavailable choice. Android unit tests, debug APK,
 instrumentation APK and lint passed after the final privacy guard. The debug APK
 SHA-256 is `2c19226fb7a66e1962fda3bd220058e30d04802dd4214c046d2e8096b865dd04`.
-The Windows ZIP is being refreshed separately; no device acceptance is implied.
+The Windows ZIP was rebuilt from clean `614e47a` and its actual frozen executable
+passed real Gemini Flash-Lite inference outside the checkout using Windows Vault.
+No device acceptance is implied. Guided provider-key entry inside the app remains
+missing; existing restored configuration and secure Vault bindings are supported.

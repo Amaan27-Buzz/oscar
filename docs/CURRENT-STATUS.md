@@ -1,5 +1,15 @@
 # OSCAR — Current Status & Checklist
 
+**2026-11-06 Functional Alpha continuation:** development is active on the original
+`main` checkout. [Current implementation and acceptance](development/FUNCTIONAL-ALPHA.md)
+supersede the dated closeout as the live continuation record. Persistent Desktop,
+verified-free cloud inference, scoped Windows execution, first-run introduction,
+shared Grid history and Android model-selection integration are implemented within
+the boundaries recorded there. Windows and Android alpha artifacts are built;
+native Android runtime acceptance is blocked by an emulator graphics failure.
+The full mandate remains PARTIAL; no production, physical-device or full gate
+acceptance is claimed. Earlier receipts below remain historical evidence.
+
 **2026-10-28 session closeout:** this Codex development session ended with the
 software objective still PARTIAL. The [session state](development/OSCAR-SESSION-STATE.md),
 [continuation guide](development/OSCAR-CONTINUATION.md) and

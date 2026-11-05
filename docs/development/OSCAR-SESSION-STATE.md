@@ -1,5 +1,11 @@
 # OSCAR BUG-PLAN-001 — green Windows source-level checkpoint, 2026-10-29
 
+> **Active continuation, 2026-11-06:** the owner resumed the Functional Alpha
+> mandate on the consolidated original `main`. See [current implementation](FUNCTIONAL-ALPHA.md)
+> and [current status](../CURRENT-STATUS.md). The dated checkpoint below remains
+> provenance, not the active branch or an instruction to stop new development.
+> Overall alpha acceptance remains PARTIAL.
+
 **Confirmed local checkout and remote after owner's push:** branch
 `codex/bug-plan-001-owner-intent`, formatting commit
 `001549a3980085b3eeb5c3edc9db71f29370b284`, PR #10 OPEN/DRAFT.
