@@ -419,4 +419,7 @@ synthetic owner and isolated Core, not an injected transcript or canned model
 response. It does not commission the owner's physical phone or establish every
 native permission/OEM behavior. Both APK builds, unit tests and lint passed;
 the application APK is unchanged by the test-only addition. The Windows package
-is being refreshed to include the latest Core context handoff.
+was rebuilt from clean `645fc08`, includes the latest Core context handoff, and
+passed real local Qwen3.5 4B inference outside the checkout. Package inspection
+confirmed exclusion of configuration secrets and user databases. The restored
+`.env.local` remains present, ignored and untracked.
