@@ -97,6 +97,9 @@ impl ActForm {
 #[derive(Deserialize)]
 #[serde(tag = "kind", rename_all = "snake_case", deny_unknown_fields)]
 pub enum Command {
+    SelectModel {
+        model: String,
+    },
     ManageAssistance {
         operation: String,
         id: String,
@@ -425,6 +428,7 @@ pub enum ThemeChoice {
 }
 #[derive(Clone, Serialize, Default, PartialEq)]
 pub struct View {
+    pub models: Option<Value>,
     pub worker_sharing: Option<crate::worker_sharing::WorkerView>,
     pub connections: Option<Value>,
     pub connection: Option<ConnectionView>,

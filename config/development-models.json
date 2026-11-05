@@ -107,6 +107,15 @@
       ],
       "provenance": "Official Coding Plan usage policy restricts to supported tools/products. Disabled: no coding credentials/legitimate OSCAR workload entitlement established.",
       "quota_pool_provenance": "Separate subscription pool; never general/prepaid API balance."
+    },
+    {
+      "id": "ollama-local",
+      "adapter": "ollama",
+      "base_url": "http://127.0.0.1:11434/api",
+      "credential_envs": {},
+      "local": true,
+      "discovery_required": true,
+      "inventory_ttl_seconds": 300
     }
   ],
   "models": [

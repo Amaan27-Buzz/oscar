@@ -20,6 +20,7 @@ pub fn now_ms() -> u64 {
         .as_millis() as u64
 }
 struct CoreSnapshot {
+    models: Option<Value>,
     connections: Option<Value>,
     nodes: Vec<Value>,
     presence: Option<Value>,
@@ -233,6 +234,7 @@ impl CoreClient {
             presence: value.get("presence").cloned(),
             core_clock: value.get("core_clock").cloned(),
             setup: value.get("setup").cloned(),
+            models: value.get("models").cloned(),
             executive: value.get("executive").cloned(),
             adaptive_views: value["adaptive_views"]
                 .as_array()
@@ -518,6 +520,7 @@ impl Bridge {
             self.voice_request(json!({"operation":"inspect"}))?;
         }
         let CoreSnapshot {
+            models,
             connections,
             nodes,
             presence,
@@ -621,6 +624,7 @@ impl Bridge {
         view.presence = presence;
         view.core_clock = core_clock;
         view.setup = setup;
+        view.models = models;
         view.executive = if self.hide_private.load(Ordering::Acquire) {
             None
         } else {
@@ -696,6 +700,7 @@ impl Bridge {
             view.voice_devices.clear();
             view.voice_support = VoiceSupport::default();
             view.setup = None;
+            view.models = None;
             view.connections = None;
             view.capabilities.clear();
             view.nodes.clear();
@@ -1008,6 +1013,11 @@ impl Bridge {
                 crate::remote::task(&value)?
             }
             Command::Refresh => return self.refresh(),
+            Command::SelectModel { model } => {
+                bound(&model, 200)?;
+                client.request("select_model", json!({"model":model}))?;
+                return self.refresh();
+            }
             Command::DayBrief => {
                 self.hide_private.store(false, Ordering::Release);
                 self.view

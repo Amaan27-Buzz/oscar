@@ -40,8 +40,8 @@ export interface ConnectionsView {
   access:string;enrollment:string;observed_at_ms:number;
   credential_deletion?:'available'|'unavailable';accounts_total?:number;plugins_total?:number;truncated?:boolean;
 }
-export interface View {voice_settings?:VoiceSettings|null;voice_devices?:AudioDevice[];connections?:ConnectionsView|null;day_brief?:Record<string,unknown>|null;worker_sharing?:WorkerSharingView|null}
-export interface View {connection?:ConnectionView|null;nodes?:GridNode[];core_clock?:CoreClockObservation|null;executive?:ExecutiveSummary|null;presence?:{version:1;visible:boolean;expression:unknown}|null;setup?:Record<string,{configured?:boolean;operational?:boolean}>|null;adaptive_views?:unknown[];access_mode?:string|null;voice_available?:boolean;conversation?:ConversationHistory;operating?:Operating|null;theme?:'light'|'dark';expression:ExpressionReadback|null;link:string;orb:string;window:WindowMode;tasks:Task[];capabilities:Capability[];
+export interface View {models?:{selected:string|null;available:string[]}|null;voice_settings?:VoiceSettings|null;voice_devices?:AudioDevice[];connections?:ConnectionsView|null;day_brief?:Record<string,unknown>|null;worker_sharing?:WorkerSharingView|null}
+export interface View {models?:{selected:string|null;available:string[]}|null;connection?:ConnectionView|null;nodes?:GridNode[];core_clock?:CoreClockObservation|null;executive?:ExecutiveSummary|null;presence?:{version:1;visible:boolean;expression:unknown}|null;setup?:Record<string,{configured?:boolean;operational?:boolean}>|null;adaptive_views?:unknown[];access_mode?:string|null;voice_available?:boolean;conversation?:ConversationHistory;operating?:Operating|null;theme?:'light'|'dark';expression:ExpressionReadback|null;link:string;orb:string;window:WindowMode;tasks:Task[];capabilities:Capability[];
   context:Context|null;preview:Preview|null;review:Review|null;current:Task|null;message:string|null;started_goal?:string|null;
   voice:string;voice_support?:VoiceSupport;shortcut:string;shortcut_enabled?:boolean;capture_choice?:ContextChoice;observed_at_ms:number;reference:boolean;window_revision?:number;feedback?:RequestFeedback|null}
 export const initialView:View={expression:null,link:'unconfigured',orb:'unavailable',window:'compact',tasks:[],capabilities:[],
@@ -54,6 +54,7 @@ export type ActForm=
   |{operation:'launch_app';app_id:string}
   |{operation:'list_files'|'git_status'|'git_diff'|'git_log'|'git_branches'|'ps_environment'|'list_apps'|'worker_tools'};
 export type Command=
+  |{kind:'select_model';model:string}
   |{kind:'voice_settings'|'voice_devices'|'voice_listen'|'voice_mute'}
   |{kind:'voice_configure';muted:boolean;input_device:number;output_device:number|null}
   |{kind:'worker_start';config:WorkerConfig}|{kind:'worker_stop'}

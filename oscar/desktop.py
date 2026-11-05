@@ -567,10 +567,66 @@ class Desktop(Mobile):
             if type(payload["before"]) is not int or payload["before"] < 0:
                 raise ValueError("bounded conversation cursor required")
             return self.conversation(session, payload["before"])
+        if op == "select_model" and set(payload) == {"model"}:
+            from dataclasses import replace
+
+            from .harness import ModelExecutor
+            from .models import Mode
+
+            self.permission(session, "desktop.models", ("desktop:text", "models"))
+            h = self.runtime.connections
+            executor = h.dispatcher.executors["models.reason"] if h else None
+            if h is None or not isinstance(executor, ModelExecutor):
+                raise PermissionError("Model selection unavailable")
+            if not isinstance(payload["model"], str) or len(payload["model"]) > 200:
+                raise ValueError("Choose an available local model")
+            candidate = replace(
+                executor.template,
+                mode=Mode.LOCAL,
+                pinned_provider="ollama-local",
+                pinned_model=payload["model"],
+                pinned_slot=None,
+            )
+            h.router.refresh(candidate, executor.policy)
+            if not h.router.rank(candidate, executor.policy):
+                raise ValueError("Selected local model is unavailable")
+            with self.store.transaction():
+                self.store.put(
+                    "desktop_model",
+                    "selection",
+                    {
+                        "configuration": {
+                            "mode": "local",
+                            "pinned_provider": "ollama-local",
+                            "pinned_model": candidate.pinned_model,
+                            "max_output_tokens": candidate.max_output_tokens,
+                            "ollama_think": candidate.ollama_think,
+                        }
+                    },
+                )
+                executor.template = candidate
+            return {"selected": candidate.pinned_model}
         if op == "snapshot" and payload == {}:
             from .assistance import Assistance
 
             view = super().request(session, data)
+            h = self.runtime.connections
+            if h:
+                executor = h.dispatcher.executors.get("models.reason")
+                template = getattr(executor, "template", None)
+                view["models"] = {
+                    "selected": template.pinned_model if template else None,
+                    "available": sorted(
+                        {
+                            m.id
+                            for (provider, _), inventory in h.registry.inventories.items()
+                            if provider == "ollama-local"
+                            and inventory.source.current(h.grid.clock())
+                            for m in inventory.models
+                            if m.active and "text" in m.capabilities
+                        }
+                    ),
+                }
             if self.runtime.connections is not None:
                 from .connections import snapshot
 
