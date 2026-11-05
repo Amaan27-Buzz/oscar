@@ -248,3 +248,38 @@ bundle was rebuilt from clean `e3f0da7`; its frozen executable passed Gemini
 Flash-Lite inference outside the repository using the existing Vault. Package
 checks confirmed the matching native binary and exclusion of configuration and
 user databases. The restored `.env.local` remains present, ignored and untracked.
+
+## Opt-in cloud voice — active continuation
+
+The everyday Desktop prepares the existing voice runtime with Groq
+`whisper-large-v3-turbo` transcription and optional installed Windows speech
+output. No local reasoning/STT model is loaded or downloaded. Preferences → Voice
+offers explicit cloud audio consent before microphone controls become available.
+The owner then selects devices and unmutes separately; preparation and settings
+never start capture. Continuous/wake listening remains unavailable in cloud mode.
+
+Cloud turns are bounded to 15 seconds. WAV upload is constructed in memory;
+requests use current Vault bindings and a fresh confirmed Groq Free-plan assertion,
+the shared conservative credential-capacity pool, bounded responses/timeouts and
+no redirects or automatic mutation retry. Billing/local fallback remains disabled.
+Cancellation suppresses a late transcript. Withdrawing cloud-audio consent cancels
+the turn and removes its microphone/cloud scopes without changing other grants.
+No real owner microphone or audio consent was activated during development.
+
+`python -m scripts.alpha_voice_acceptance` passed generated Windows speech → actual
+Groq transcription → canonical Ask → synthetic signed review → independently
+verified arithmetic result `15` and retained voice/text history. Generated PCM was
+not played. The initial HTTP 403 was resolved by using OSCAR's standard User-Agent;
+the next observed planned state correctly required Ask approval. Both boundaries
+were preserved rather than bypassed. Two final generated-audio acceptances passed.
+
+Focused voice/launcher regressions passed (44), additional cloud admission/consent
+tests passed (7), UI voice tests passed (5), and native tests passed (42 with one
+existing fixture-only skip). Typechecking and native build passed. Hardware audio,
+speech quality, barge-in during actual playback and rendered control acceptance
+remain NOT RUN. Installed Windows speech is a fallback voice binding, not owner
+acceptance of OSCAR's final voice identity. Packaging is being refreshed.
+
+Current provider contracts: [Groq transcription](https://console.groq.com/docs/speech-to-text)
+and [Free-plan limits](https://console.groq.com/docs/rate-limits). Account confirmation,
+provider availability and actual remaining quotas remain separate observations.

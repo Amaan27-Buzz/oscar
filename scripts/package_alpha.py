@@ -66,8 +66,9 @@ def main() -> int:
         "sentence_transformers",
     ]
     # The cloud alpha does not ship optional local inference/plotting UI engines.
-    for module in ("matplotlib", "PyQt6", "PySide6", "numpy", "scipy", "pandas"):
+    for module in ("matplotlib", "PyQt6", "PySide6", "scipy", "pandas"):
         command += ["--exclude-module", module]
+    command += ["--collect-all", "sounddevice", "--hidden-import", "numpy"]
     for path in (ROOT / "oscar").glob("*.ps1"):
         command += ["--add-data", str(path) + os.pathsep + "oscar"]
     command += [str(ROOT / "scripts/start_oscar.py")]
@@ -76,6 +77,8 @@ def main() -> int:
     destination = package / "desktop/src-tauri/target/debug/oscar-desktop.exe"
     destination.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy2(desktop, destination)
+    (package / "scripts").mkdir(exist_ok=True)
+    shutil.copy2(ROOT / "scripts/voice_sapi.ps1", package / "scripts/voice_sapi.ps1")
     (package / "config").mkdir(exist_ok=True)
     shutil.copy2(
         ROOT / "config/development-models.json", package / "config/development-models.json"

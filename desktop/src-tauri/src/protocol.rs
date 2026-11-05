@@ -97,6 +97,9 @@ impl ActForm {
 #[derive(Deserialize)]
 #[serde(tag = "kind", rename_all = "snake_case", deny_unknown_fields)]
 pub enum Command {
+    EnableVoice {
+        enabled: bool,
+    },
     SetupProvider {
         slot: String,
         secret: String,

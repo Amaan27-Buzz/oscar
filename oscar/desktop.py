@@ -581,6 +581,36 @@ class Desktop(Mobile):
             if type(payload["before"]) is not int or payload["before"] < 0:
                 raise ValueError("bounded conversation cursor required")
             return self.conversation(session, payload["before"])
+        if op == "enable_voice" and set(payload) == {"enabled"}:
+            h = self.runtime.connections
+            if h is None or self.voice is None or type(payload["enabled"]) is not bool:
+                raise ValueError("Prepared voice and explicit audio consent required")
+            self.permission(
+                session, "desktop.voice.enroll", ("desktop:connect", "control:approve:" + h.node_id)
+            )
+            self.voice.cancel(session)
+            added = {"desktop:microphone", "desktop:voice:cloud"}
+            with self.store.transaction():
+                for kind, identifier in (("node", session.node_id), ("session", session.id)):
+                    row = self.store.get(kind, identifier)
+                    scopes = set(row["scopes"])
+                    scopes = scopes | added if payload["enabled"] else scopes - added
+                    self.store.put(kind, identifier, {**row, "scopes": sorted(scopes)})
+                self.store.put(
+                    "voice_consent",
+                    session.node_id,
+                    {
+                        "enabled": payload["enabled"],
+                        "node": session.node_id,
+                        "observed_at": self.grid.clock(),
+                    },
+                )
+                self.store.audit(
+                    "",
+                    "desktop_voice_consent",
+                    {"node": session.node_id, "enabled": payload["enabled"]},
+                )
+            return {"enabled": payload["enabled"]}
         if op == "setup_provider" and set(payload) == {"slot", "secret"}:
             from .harness import ModelExecutor
 
@@ -662,6 +692,8 @@ class Desktop(Mobile):
                         self.grants(session), session.node_id
                     )
             view["conversation"] = self.conversation(session)
+            if view.get("setup"):
+                view["setup"]["voice"]["available"] = self.voice is not None
             view["voice_available"] = (
                 self.voice is not None
                 and self.policy.evaluate(

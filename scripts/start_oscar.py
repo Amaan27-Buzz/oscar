@@ -79,6 +79,11 @@ def desktop_session(h: Harness, worker_node: str | None = None) -> SessionHandle
         *(f"control:{op}:{h.node_id}" for op in ("inspect", "approve", "cancel")),
     )
     node = "oscar-local-desktop"
+    try:
+        if h.store.get("voice_consent", node).get("enabled") is True:
+            scopes += ("desktop:microphone", "desktop:voice:cloud")
+    except KeyError:
+        pass
     base_scopes = scopes
     if worker_node:
         scopes += (
@@ -373,6 +378,9 @@ def main() -> int:
             },
             worker_outputs={worker.session.node_id: worker.outputs},
         )
+        from oscar.cloud_speech import mount_cloud_voice
+
+        mount_cloud_voice(core, h, data)
         grid_server = CloudHTTPServer(coordinator)
         grid_server.start()
         try:

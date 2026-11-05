@@ -4,6 +4,7 @@ import json
 import os
 import tempfile
 from collections.abc import Callable, Iterable
+from dataclasses import replace
 from pathlib import Path
 from threading import Thread
 from time import monotonic
@@ -85,8 +86,7 @@ class DesktopVoice:
         validate_device = getattr(self.capture, "validate_device", None)
         if validate_device is not None:
             validate_device()
-        if not self.recognizer.local:
-            raise PermissionError("Desktop voice requires explicit local recognizer")
+        self.authorize_recognition(session)
         with self.core.lock:
             if self.thread and self.thread.is_alive():
                 raise VoiceError("voice interaction already owned")
@@ -137,6 +137,9 @@ class DesktopVoice:
                     self.core.permission(session, "desktop.voice", ("desktop:microphone",))
                     if frame.origin == Origin.PLAYBACK:
                         continue
+                    remaining = 15 * 16000 - samples
+                    if len(frame.samples) > remaining:
+                        frame = replace(frame, samples=frame.samples[:remaining])
                     frames.append(frame)
                     samples += len(frame.samples)
                     if samples >= 15 * 16000:
@@ -151,6 +154,7 @@ class DesktopVoice:
                 if generation != self.generation:
                     return
                 self.view = {"state": "processing", "orb": "thinking"}
+            self.authorize_recognition(session)
             transcript = self.recognizer.transcribe(tuple(frames), True, recognition)
             recognition.check()
             if supplied is not None:
@@ -209,6 +213,21 @@ class DesktopVoice:
                     if self.acoustic.state in {"processing", "speaking"}:
                         self.acoustic.cancel()
 
+    def authorize_recognition(self, session: SessionHandle) -> None:
+        if self.recognizer.local:
+            return
+        self.core.permission(session, "desktop.voice.cloud", ("desktop:voice:cloud",))
+        try:
+            consent = self.core.store.get("voice_consent", session.node_id)
+        except KeyError:
+            raise PermissionError("Explicit cloud audio consent required") from None
+        if consent.get("enabled") is not True:
+            raise PermissionError("Cloud audio consent withdrawn")
+        ready = getattr(self.recognizer, "ready", None)
+        if ready is None:
+            raise PermissionError("Prepared cloud recognizer required")
+        ready()
+
     def settings(self, session: SessionHandle) -> dict[str, Any]:
         self.core.permission(session, "desktop.voice", ("desktop:microphone",))
         return {
@@ -221,6 +240,7 @@ class DesktopVoice:
             and self.listener_thread.is_alive(),
             "continuous_granted": "desktop:voice:continuous" in self.core.grants(session),
             "persisted": self.config_path is not None,
+            "recognition": "local" if self.recognizer.local else "groq",
         }
 
     def devices(self, session: SessionHandle) -> dict[str, Any]:

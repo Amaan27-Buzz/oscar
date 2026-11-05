@@ -24,6 +24,21 @@ from oscar.voice_contracts import StopToken, Transcript
 
 @unittest.skipUnless(importlib.util.find_spec("cryptography"), "optional owner signing executor")
 class DesktopTests(unittest.TestCase):
+    def test_cloud_voice_consent_is_explicit_revocable_and_keeps_other_scopes(self):
+        from unittest.mock import MagicMock
+
+        self.core.voice = MagicMock()
+        original = self.core.grants(self.session)
+        self.call("enable_voice", {"enabled": True})
+        self.assertTrue(
+            {"desktop:microphone", "desktop:voice:cloud"} <= self.core.grants(self.session)
+        )
+        self.call("enable_voice", {"enabled": False})
+        self.assertNotIn("desktop:voice:cloud", self.core.grants(self.session))
+        self.assertTrue((original - {"desktop:microphone"}) <= self.core.grants(self.session))
+        self.assertFalse(self.h.store.get("voice_consent", self.session.node_id)["enabled"])
+        self.assertEqual(2, self.core.voice.cancel.call_count)
+
     def test_provider_entry_uses_vault_without_history_or_plaintext_database_copy(self):
         from unittest.mock import patch
 

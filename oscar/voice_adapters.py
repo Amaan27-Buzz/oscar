@@ -4,6 +4,7 @@ import io
 import json
 import re
 import subprocess
+import sys
 import tempfile
 import wave
 from collections.abc import Iterable
@@ -189,7 +190,12 @@ class WindowsSpeech:
         self, text: str, profile: VoiceProfile, utterance_id: str, stop: StopToken
     ) -> Iterable[AudioChunk]:
         stop.check()
-        script = Path(__file__).resolve().parents[1] / "scripts/voice_sapi.ps1"
+        root = (
+            Path(sys.executable).resolve().parent
+            if getattr(sys, "frozen", False)
+            else Path(__file__).resolve().parents[1]
+        )
+        script = root / "scripts/voice_sapi.ps1"
         with tempfile.TemporaryDirectory(prefix="oscar-tts-") as directory:
             path = Path(directory) / "output.wav"
             payload = json.dumps(

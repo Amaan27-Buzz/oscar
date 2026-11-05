@@ -21,7 +21,7 @@ export interface Review {review_id:string;task_id?:string;operation:string;descr
   consequence:string;policy_reason:string;evidence_state:string;review:string;expires_at_ms:number}
 export interface ExpressionReadback {epoch:string;generation:number;observed_at_ms:number;voice_observed_at_ms:number;tasks_observed_at_ms:number;current_observed_at_ms:number}
 export interface RequestFeedback {kind:'blocked'|'denied'|'unknown'|'rejected';message:string;observed_at_ms:number}
-export interface VoiceSettings {muted:boolean;input_device:number|null;output_device:number|null;continuous_available:boolean;continuous_active:boolean;continuous_granted:boolean;persisted:boolean}
+export interface VoiceSettings {muted:boolean;input_device:number|null;output_device:number|null;continuous_available:boolean;continuous_active:boolean;continuous_granted:boolean;persisted:boolean;recognition?:string}
 export interface AudioDevice {id:number;name:string;input:boolean;output:boolean}
 export interface VoiceSupport {persistent_mute:'unavailable'|'available';sentry:'unavailable';acoustic_awareness:'unavailable';wake_word:'unavailable'|'available'}
 export interface ConversationTurn {id:string;task_id:string;role:'owner'|'oscar';text:string;status:string;occurred_at:number;retained:boolean}
@@ -41,7 +41,7 @@ export interface ConnectionsView {
   credential_deletion?:'available'|'unavailable';accounts_total?:number;plugins_total?:number;truncated?:boolean;
 }
 export interface View {models?:{selected:string|null;available:string[];free_only?:boolean;credential_slots?:{id:string;provider:string;configured:boolean}[];provider_plans?:{id:string;confirmed:boolean}[]}|null;voice_settings?:VoiceSettings|null;voice_devices?:AudioDevice[];connections?:ConnectionsView|null;day_brief?:Record<string,unknown>|null;worker_sharing?:WorkerSharingView|null}
-export interface View {models?:{selected:string|null;available:string[];free_only?:boolean;credential_slots?:{id:string;provider:string;configured:boolean}[];provider_plans?:{id:string;confirmed:boolean}[]}|null;connection?:ConnectionView|null;nodes?:GridNode[];core_clock?:CoreClockObservation|null;executive?:ExecutiveSummary|null;presence?:{version:1;visible:boolean;expression:unknown}|null;setup?:Record<string,{configured?:boolean;operational?:boolean;completed?:boolean;step?:number;preferred_name?:string;tone?:string;muted?:boolean;reduced_motion?:boolean}>|null;adaptive_views?:unknown[];access_mode?:string|null;voice_available?:boolean;conversation?:ConversationHistory;operating?:Operating|null;theme?:'light'|'dark';expression:ExpressionReadback|null;link:string;orb:string;window:WindowMode;tasks:Task[];capabilities:Capability[];
+export interface View {models?:{selected:string|null;available:string[];free_only?:boolean;credential_slots?:{id:string;provider:string;configured:boolean}[];provider_plans?:{id:string;confirmed:boolean}[]}|null;connection?:ConnectionView|null;nodes?:GridNode[];core_clock?:CoreClockObservation|null;executive?:ExecutiveSummary|null;presence?:{version:1;visible:boolean;expression:unknown}|null;setup?:Record<string,{available?:boolean;configured?:boolean;operational?:boolean;completed?:boolean;step?:number;preferred_name?:string;tone?:string;muted?:boolean;reduced_motion?:boolean}>|null;adaptive_views?:unknown[];access_mode?:string|null;voice_available?:boolean;conversation?:ConversationHistory;operating?:Operating|null;theme?:'light'|'dark';expression:ExpressionReadback|null;link:string;orb:string;window:WindowMode;tasks:Task[];capabilities:Capability[];
   context:Context|null;preview:Preview|null;review:Review|null;current:Task|null;message:string|null;started_goal?:string|null;
   voice:string;voice_support?:VoiceSupport;shortcut:string;shortcut_enabled?:boolean;capture_choice?:ContextChoice;observed_at_ms:number;reference:boolean;window_revision?:number;feedback?:RequestFeedback|null}
 export const initialView:View={expression:null,link:'unconfigured',orb:'unavailable',window:'compact',tasks:[],capabilities:[],
@@ -54,6 +54,7 @@ export type ActForm=
   |{operation:'launch_app';app_id:string}
   |{operation:'list_files'|'git_status'|'git_diff'|'git_log'|'git_branches'|'ps_environment'|'list_apps'|'worker_tools'};
 export type Command=
+  |{kind:'enable_voice';enabled:boolean}
   |{kind:'configure_setup';section:'onboarding'|'persona'|'preferences'|'voice'|'provider_plan';value:Record<string,unknown>}
   |{kind:'select_model';model:string}
   |{kind:'setup_provider';slot:string;secret:string}

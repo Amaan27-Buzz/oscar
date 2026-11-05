@@ -1269,6 +1269,10 @@ impl Bridge {
                 }
                 result
             }
+            Command::EnableVoice { enabled } => {
+                client.request("enable_voice", json!({"enabled":enabled}))?;
+                return self.refresh();
+            }
             Command::VoiceStart { context_id, mode } => {
                 bound(&context_id, 80)?;
                 return self.voice_request(
