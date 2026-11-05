@@ -449,6 +449,7 @@ impl RemoteClient {
                     json!({"tasks":tasks,"nodes":projection.nodes,"conversation":conversation,
                     "presence":snapshot["presence"],
                     "connections":snapshot["connections"],
+                    "models":snapshot["models"],
                     "core_clock":clock,"observed_at_ms":received_at,"voice_available":false,
                     "executive":snapshot["executive"],"operating":snapshot["operating"]}),
                 )
@@ -461,6 +462,7 @@ impl RemoteClient {
             | "authority_challenge"
             | "authority_complete"
             | "authority_revoke"
+            | "select_model"
             | "day_brief" => self.request(operation, payload),
             "catalog" => Ok(
                 json!({"capabilities":self.projection.lock().map_err(|_| "native synchronization unavailable")?.capabilities}),

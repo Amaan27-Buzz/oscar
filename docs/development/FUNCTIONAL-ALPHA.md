@@ -215,5 +215,33 @@ instrumentation APK and lint passed after the final privacy guard. The debug APK
 SHA-256 is `2c19226fb7a66e1962fda3bd220058e30d04802dd4214c046d2e8096b865dd04`.
 The Windows ZIP was rebuilt from clean `614e47a` and its actual frozen executable
 passed real Gemini Flash-Lite inference outside the checkout using Windows Vault.
-No device acceptance is implied. Guided provider-key entry inside the app remains
-missing; existing restored configuration and secure Vault bindings are supported.
+No device acceptance is implied. At this checkpoint provider-key entry still used
+the restored configuration and secure Vault bindings; the integration below adds
+application entry without replacing existing credentials.
+
+## Secure provider entry in the application — active continuation
+
+First run and Preferences → Intelligence now offer Add provider key for an
+unconfigured cloud credential slot. The password field sends through the existing
+authenticated native/Core path into SetupRuntime and Windows Credential Manager.
+No plaintext credential file, conversation event or raw-key database record is
+created. Entry requires current owner control scope and Personal Policy approval.
+Present credentials cannot be overwritten by this operation. No restored
+configuration values were edited or existing real Vault bindings replaced during
+development or testing.
+
+The field clears before awaiting admission, on cancellation and on connection
+changes. Saving is described as configuration, not verified inference; Gemini/Groq
+free-plan confirmation remains separate. The existing Router policy continues to
+exclude paid/local inference in the everyday profile. Remote devices select the
+shared model; provider-key setup is performed on the Core host. The remote Desktop
+adapter now forwards shared model snapshots and selection requests too.
+
+Synthetic acceptance verified Vault admission, refusal to overwrite, owner-scope
+denial and absence of the key from state/archive databases and public snapshots.
+The focused Python batch passed 50 tests, UI/setup regressions passed 26 tests,
+native Rust tests passed 42 with one existing fixture-only skip, and Python
+typechecking passed (111 modules). The production frontend and debug native app
+build passed. Full rendered key-entry/first-run flow and real owner key entry have
+not been exercised, in accordance with background-only verification. Packaging is
+being refreshed from the committed source before further owner testing.

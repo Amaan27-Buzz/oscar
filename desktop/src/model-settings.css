@@ -2,3 +2,5 @@
 .workspace .model-plan-review label{display:flex;align-items:flex-start;gap:10px;font-weight:400}
 .workspace .model-plan-review input{width:16px;height:16px;min-height:0;flex:none;margin:3px 0 0;padding:0}
 .workspace .model-plan-review .actions{display:flex;gap:10px;margin-top:16px}
+.workspace .provider-setup .model-plan-review label{display:block;margin-top:12px}
+.workspace .provider-setup .model-plan-review input[type="password"]{width:100%;height:auto;min-height:44px;margin:8px 0 16px;padding:10px 12px}

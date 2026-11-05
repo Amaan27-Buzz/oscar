@@ -1013,6 +1013,12 @@ impl Bridge {
                 crate::remote::task(&value)?
             }
             Command::Refresh => return self.refresh(),
+            Command::SetupProvider { slot, secret } => {
+                bound(&slot, 200)?;
+                bound(&secret, 2000)?;
+                client.request("setup_provider", json!({"slot":slot,"secret":secret}))?;
+                return self.refresh();
+            }
             Command::SelectModel { model } => {
                 bound(&model, 300)?;
                 client.request("select_model", json!({"model":model}))?;

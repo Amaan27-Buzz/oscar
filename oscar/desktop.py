@@ -581,6 +581,28 @@ class Desktop(Mobile):
             if type(payload["before"]) is not int or payload["before"] < 0:
                 raise ValueError("bounded conversation cursor required")
             return self.conversation(session, payload["before"])
+        if op == "setup_provider" and set(payload) == {"slot", "secret"}:
+            from .harness import ModelExecutor
+
+            h = self.runtime.connections
+            if h is None or self.runtime.setup is None:
+                raise PermissionError("Secure provider setup unavailable")
+            self.permission(
+                session,
+                "desktop.provider.setup",
+                ("desktop:connect", "control:approve:" + h.node_id),
+            )
+            slot, secret = payload["slot"], payload["secret"]
+            if not isinstance(slot, str) or not isinstance(secret, str) or slot not in h.pool.slots:
+                raise ValueError("Known cloud credential slot required")
+            provider = h.registry.providers[h.pool.slots[slot].provider]
+            if provider.local or not provider.enabled or h.pool.slots[slot].present:
+                raise PermissionError("Choose an unconfigured cloud credential slot")
+            self.runtime.setup.provider(slot, secret, owner_authorized=True)
+            executor = h.dispatcher.executors.get("models.reason")
+            if isinstance(executor, ModelExecutor):
+                h.router.refresh(executor.template, executor.policy)
+            return {"state": "configured", "verification": "generation_required"}
         if op == "configure_setup" and set(payload) == {"section", "value"}:
             h = self.runtime.connections
             if h is None or self.runtime.setup is None:
@@ -624,6 +646,12 @@ class Desktop(Mobile):
                 from .model_preferences import model_snapshot
 
                 view["models"] = model_snapshot(h)
+                view["models"]["credential_slots"] = [
+                    {"id": slot.id, "provider": slot.provider, "configured": slot.present}
+                    for slot in h.pool.slots.values()
+                    if h.registry.providers[slot.provider].enabled
+                    and not h.registry.providers[slot.provider].local
+                ][:100]
             if self.runtime.connections is not None:
                 from .connections import snapshot
 

@@ -40,8 +40,8 @@ export interface ConnectionsView {
   access:string;enrollment:string;observed_at_ms:number;
   credential_deletion?:'available'|'unavailable';accounts_total?:number;plugins_total?:number;truncated?:boolean;
 }
-export interface View {models?:{selected:string|null;available:string[];free_only?:boolean;provider_plans?:{id:string;confirmed:boolean}[]}|null;voice_settings?:VoiceSettings|null;voice_devices?:AudioDevice[];connections?:ConnectionsView|null;day_brief?:Record<string,unknown>|null;worker_sharing?:WorkerSharingView|null}
-export interface View {models?:{selected:string|null;available:string[];free_only?:boolean;provider_plans?:{id:string;confirmed:boolean}[]}|null;connection?:ConnectionView|null;nodes?:GridNode[];core_clock?:CoreClockObservation|null;executive?:ExecutiveSummary|null;presence?:{version:1;visible:boolean;expression:unknown}|null;setup?:Record<string,{configured?:boolean;operational?:boolean;completed?:boolean;step?:number;preferred_name?:string;tone?:string;muted?:boolean;reduced_motion?:boolean}>|null;adaptive_views?:unknown[];access_mode?:string|null;voice_available?:boolean;conversation?:ConversationHistory;operating?:Operating|null;theme?:'light'|'dark';expression:ExpressionReadback|null;link:string;orb:string;window:WindowMode;tasks:Task[];capabilities:Capability[];
+export interface View {models?:{selected:string|null;available:string[];free_only?:boolean;credential_slots?:{id:string;provider:string;configured:boolean}[];provider_plans?:{id:string;confirmed:boolean}[]}|null;voice_settings?:VoiceSettings|null;voice_devices?:AudioDevice[];connections?:ConnectionsView|null;day_brief?:Record<string,unknown>|null;worker_sharing?:WorkerSharingView|null}
+export interface View {models?:{selected:string|null;available:string[];free_only?:boolean;credential_slots?:{id:string;provider:string;configured:boolean}[];provider_plans?:{id:string;confirmed:boolean}[]}|null;connection?:ConnectionView|null;nodes?:GridNode[];core_clock?:CoreClockObservation|null;executive?:ExecutiveSummary|null;presence?:{version:1;visible:boolean;expression:unknown}|null;setup?:Record<string,{configured?:boolean;operational?:boolean;completed?:boolean;step?:number;preferred_name?:string;tone?:string;muted?:boolean;reduced_motion?:boolean}>|null;adaptive_views?:unknown[];access_mode?:string|null;voice_available?:boolean;conversation?:ConversationHistory;operating?:Operating|null;theme?:'light'|'dark';expression:ExpressionReadback|null;link:string;orb:string;window:WindowMode;tasks:Task[];capabilities:Capability[];
   context:Context|null;preview:Preview|null;review:Review|null;current:Task|null;message:string|null;started_goal?:string|null;
   voice:string;voice_support?:VoiceSupport;shortcut:string;shortcut_enabled?:boolean;capture_choice?:ContextChoice;observed_at_ms:number;reference:boolean;window_revision?:number;feedback?:RequestFeedback|null}
 export const initialView:View={expression:null,link:'unconfigured',orb:'unavailable',window:'compact',tasks:[],capabilities:[],
@@ -56,6 +56,7 @@ export type ActForm=
 export type Command=
   |{kind:'configure_setup';section:'onboarding'|'persona'|'preferences'|'voice'|'provider_plan';value:Record<string,unknown>}
   |{kind:'select_model';model:string}
+  |{kind:'setup_provider';slot:string;secret:string}
   |{kind:'voice_settings'|'voice_devices'|'voice_listen'|'voice_mute'}
   |{kind:'voice_configure';muted:boolean;input_device:number;output_device:number|null}
   |{kind:'worker_start';config:WorkerConfig}|{kind:'worker_stop'}

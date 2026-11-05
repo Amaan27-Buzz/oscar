@@ -24,6 +24,43 @@ from oscar.voice_contracts import StopToken, Transcript
 
 @unittest.skipUnless(importlib.util.find_spec("cryptography"), "optional owner signing executor")
 class DesktopTests(unittest.TestCase):
+    def test_provider_entry_uses_vault_without_history_or_plaintext_database_copy(self):
+        from unittest.mock import patch
+
+        from oscar.credentials import Slot
+        from oscar.models import ProviderSpec
+        from tests.test_oauth_device import TestVault
+
+        self.h.registry.providers["setup-fixture"] = ProviderSpec(
+            "setup-fixture", "openai", "https://example.invalid", {"setup-slot": "SYNTHETIC_KEY"}
+        )
+        self.h.pool.slots["setup-slot"] = Slot("setup-slot", "setup-fixture", False)
+        vault = TestVault()
+        self.h.runtime.setup.vault = vault
+        secret = "synthetic-provider-entry-only"
+        with patch.object(self.h.router, "refresh"):
+            result = self.call("setup_provider", {"slot": "setup-slot", "secret": secret})
+            self.assertEqual("generation_required", result["verification"])
+            with self.assertRaises(PermissionError):
+                self.call("setup_provider", {"slot": "setup-slot", "secret": "replacement"})
+        self.assertEqual([secret], list(vault.values.values()))
+        snapshot = self.call("snapshot", {})
+        self.assertNotIn(secret, json.dumps(snapshot))
+        self.assertNotIn(secret, "\n".join(self.h.store.db.iterdump()))
+        self.assertNotIn(secret, "\n".join(self.h.archive.db.iterdump()))
+        self.assertTrue(
+            next(s for s in snapshot["models"]["credential_slots"] if s["id"] == "setup-slot")[
+                "configured"
+            ]
+        )
+
+    def test_provider_entry_requires_owner_control_scope(self):
+        scopes = tuple(s for s in self.scopes if not s.startswith("control:approve:"))
+        self.h.grid.register(Node("setup-observer", NodeRole.DESKTOP, scopes))
+        self.session = self.h.grid.pair("setup-observer", scopes)
+        with self.assertRaises(PermissionError):
+            self.call("setup_provider", {"slot": "unknown", "secret": "synthetic-unused"})
+
     def setUp(self) -> None:
         from cryptography.hazmat.primitives import serialization
         from cryptography.hazmat.primitives.asymmetric import rsa
