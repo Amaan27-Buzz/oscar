@@ -567,6 +567,32 @@ class Desktop(Mobile):
             if type(payload["before"]) is not int or payload["before"] < 0:
                 raise ValueError("bounded conversation cursor required")
             return self.conversation(session, payload["before"])
+        if op == "configure_setup" and set(payload) == {"section", "value"}:
+            h = self.runtime.connections
+            if h is None or self.runtime.setup is None:
+                raise PermissionError("Core setup unavailable")
+            self.permission(
+                session,
+                "desktop.setup",
+                (
+                    "desktop:connect",
+                    "control:approve:" + h.node_id,
+                ),
+            )
+            if not isinstance(payload["section"], str) or payload["section"] not in {
+                "onboarding",
+                "persona",
+                "preferences",
+                "voice",
+                "provider_plan",
+            }:
+                raise ValueError("Supported non-secret preferences required")
+            if not isinstance(payload["value"], dict):
+                raise ValueError("Bounded setup preferences required")
+            self.runtime.setup.configure(
+                payload["section"], payload["value"], owner_authorized=True
+            )
+            return self.runtime.setup.snapshot()
         if op == "select_model" and set(payload) == {"model"}:
             from dataclasses import replace
 
@@ -660,6 +686,20 @@ class Desktop(Mobile):
                             }
                         ),
                         "free_only": True,
+                        "provider_plans": [
+                            {
+                                "id": provider,
+                                "confirmed": any(
+                                    h.router._confirmed_free_plan(s.id)
+                                    for s in h.pool.slots.values()
+                                    if s.provider == provider
+                                ),
+                            }
+                            for provider in ("google", "groq")
+                            if any(
+                                s.provider == provider and s.present for s in h.pool.slots.values()
+                            )
+                        ],
                     }
             if self.runtime.connections is not None:
                 from .connections import snapshot

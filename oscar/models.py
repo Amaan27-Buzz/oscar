@@ -107,6 +107,7 @@ class ModelSpec:
     funding_source: SourceRef | None = None
     retired: bool = False
     retirement_source: SourceRef | None = None
+    requires_free_plan: bool = False
 
 
 @dataclass(frozen=True)

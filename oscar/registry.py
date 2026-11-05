@@ -353,6 +353,8 @@ class Registry:
             model = ModelSpec(**converted)
             if type(model.retired) is not bool:
                 raise ValueError("retirement flag must be boolean")
+            if type(model.requires_free_plan) is not bool:
+                raise ValueError("free-plan requirement must be boolean")
             if (
                 not isinstance(model.id, str)
                 or not model.id

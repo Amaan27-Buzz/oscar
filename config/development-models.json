@@ -123,53 +123,73 @@
       "provider_id": "groq",
       "id": "openai/gpt-oss-20b",
       "capabilities": [
-        "text"
+        "text",
+        "structured"
       ],
       "quality": 2,
       "affinities": {
-        "reasoning": 0.65,
-        "extraction": 0.9
+        "reasoning": 0.7,
+        "extraction": 0.85
       },
       "context_limit": 131072,
       "output_limit": 65536,
-      "funding": "unknown",
-      "provenance": "Current official catalog candidate retrieved 2026-10-02; quality/affinity are declared routing tiers, not benchmarks. Account funding/entitlement UNKNOWN. Live inventory required.",
+      "funding": "free",
+      "provenance": "Free-plan candidate only: requires current owner-confirmed Vault binding plus fresh official pricing and live availability. Quality is a declared routing tier, not a benchmark.",
       "last_verified": null,
       "metadata_source": {
-        "identity": "https://console.groq.com/docs/models",
+        "identity": "https://console.groq.com/docs/structured-outputs",
         "authority": "official_docs",
         "scope": "provider",
-        "observed_at": 1790944089.8160906,
+        "observed_at": 1793908530.81787,
         "ttl_seconds": 86400,
         "refreshable": true
       },
-      "funding_source": null
+      "funding_source": {
+        "identity": "https://console.groq.com/docs/billing-faqs",
+        "authority": "official_docs",
+        "scope": "provider",
+        "observed_at": 1793908530.81787,
+        "ttl_seconds": 86400,
+        "refreshable": true
+      },
+      "retired": false,
+      "requires_free_plan": true
     },
     {
       "provider_id": "groq",
       "id": "openai/gpt-oss-120b",
       "capabilities": [
-        "text"
+        "text",
+        "structured"
       ],
       "quality": 4,
       "affinities": {
-        "reasoning": 0.9,
-        "extraction": 0.75
+        "reasoning": 0.85,
+        "extraction": 0.85
       },
       "context_limit": 131072,
       "output_limit": 65536,
-      "funding": "unknown",
-      "provenance": "Current official catalog candidate retrieved 2026-10-02; quality/affinity are declared routing tiers, not benchmarks. Account funding/entitlement UNKNOWN. Live inventory required.",
+      "funding": "free",
+      "provenance": "Free-plan candidate only: requires current owner-confirmed Vault binding plus fresh official pricing and live availability. Quality is a declared routing tier, not a benchmark.",
       "last_verified": null,
       "metadata_source": {
-        "identity": "https://console.groq.com/docs/models",
+        "identity": "https://console.groq.com/docs/structured-outputs",
         "authority": "official_docs",
         "scope": "provider",
-        "observed_at": 1790944089.8160906,
+        "observed_at": 1793908530.81787,
         "ttl_seconds": 86400,
         "refreshable": true
       },
-      "funding_source": null
+      "funding_source": {
+        "identity": "https://console.groq.com/docs/billing-faqs",
+        "authority": "official_docs",
+        "scope": "provider",
+        "observed_at": 1793908530.81787,
+        "ttl_seconds": 86400,
+        "refreshable": true
+      },
+      "retired": false,
+      "requires_free_plan": true
     },
     {
       "provider_id": "groq",
@@ -308,53 +328,73 @@
       "provider_id": "google",
       "id": "gemini-3.5-flash-lite",
       "capabilities": [
-        "text"
+        "text",
+        "structured"
       ],
-      "quality": 2,
+      "quality": 3,
       "affinities": {
-        "reasoning": 0.65,
-        "extraction": 0.9
+        "reasoning": 0.8,
+        "extraction": 0.85
       },
-      "funding": "unknown",
-      "provenance": "Current official catalog candidate retrieved 2026-10-02; quality/affinity are declared routing tiers, not benchmarks. Account funding/entitlement UNKNOWN. Live inventory required.",
+      "funding": "free",
+      "provenance": "Free-plan candidate only: requires current owner-confirmed Vault binding plus fresh official pricing and live availability. Quality is a declared routing tier, not a benchmark.",
       "last_verified": null,
       "metadata_source": {
-        "identity": "https://ai.google.dev/gemini-api/docs/models",
+        "identity": "https://ai.google.dev/gemini-api/docs/models/gemini-3.5-flash-lite",
         "authority": "official_docs",
         "scope": "provider",
-        "observed_at": 1790944089.8160906,
+        "observed_at": 1793908530.81787,
         "ttl_seconds": 86400,
         "refreshable": true
       },
-      "funding_source": null,
+      "funding_source": {
+        "identity": "https://ai.google.dev/gemini-api/docs/pricing",
+        "authority": "official_docs",
+        "scope": "provider",
+        "observed_at": 1793908530.81787,
+        "ttl_seconds": 86400,
+        "refreshable": true
+      },
       "context_limit": 1048576,
-      "output_limit": 65536
+      "output_limit": 65536,
+      "retired": false,
+      "requires_free_plan": true
     },
     {
       "provider_id": "google",
       "id": "gemini-3.8-flash",
       "capabilities": [
-        "text"
+        "text",
+        "structured"
       ],
       "quality": 4,
       "affinities": {
         "reasoning": 0.9,
         "extraction": 0.85
       },
-      "funding": "unknown",
-      "provenance": "Current official catalog candidate retrieved 2026-10-02; quality/affinity are declared routing tiers, not benchmarks. Account funding/entitlement UNKNOWN. Live inventory required.",
+      "funding": "free",
+      "provenance": "Free-plan candidate only: requires current owner-confirmed Vault binding plus fresh official pricing and live availability. Quality is a declared routing tier, not a benchmark.",
       "last_verified": null,
       "metadata_source": {
-        "identity": "https://ai.google.dev/gemini-api/docs/models",
+        "identity": "https://ai.google.dev/gemini-api/docs/models/gemini-3.8-flash",
         "authority": "official_docs",
         "scope": "provider",
-        "observed_at": 1790944089.8160906,
+        "observed_at": 1793908530.81787,
         "ttl_seconds": 86400,
         "refreshable": true
       },
-      "funding_source": null,
+      "funding_source": {
+        "identity": "https://ai.google.dev/gemini-api/docs/pricing",
+        "authority": "official_docs",
+        "scope": "provider",
+        "observed_at": 1793908530.81787,
+        "ttl_seconds": 86400,
+        "refreshable": true
+      },
       "context_limit": 1048576,
-      "output_limit": 65536
+      "output_limit": 65536,
+      "retired": false,
+      "requires_free_plan": true
     },
     {
       "provider_id": "zai",

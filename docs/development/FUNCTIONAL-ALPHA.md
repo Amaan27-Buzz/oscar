@@ -104,3 +104,35 @@ separate; their results do not commission real providers or physical devices.
 During this development run, check Codex's five-hour allowance and issue a
 consolidated owner progress report when it reaches 50% remaining. This is a
 reporting checkpoint, not a change to alpha completion criteria.
+
+## First run, additional free providers and packaging — active continuation
+
+- The first-run introduction is integrated with Core preferences, current model
+  selection and the actual Workspace request path. Skip/replay, resume, reduced
+  motion and optional muted-by-default introduction audio are implemented. Name
+  and tone affect conversational expression, never authority or verification.
+- Core and UI tests cover preference persistence, real request handoff and offline
+  skip. The native first frame was inspected; a layout collision was corrected.
+  Later verification runs in the background at the owner's request. Full rendered
+  flow, motion and owner approval remain unverified.
+- The owner confirmed all configured keys use Free plans with billing disabled.
+  Plan confirmations are tied to current Vault bindings, expire after 24 hours,
+  and do not survive credential replacement or revocation. Preferences and first
+  run expose explicit renewal. Official free pricing and live model availability
+  remain separate requirements. Pricing evidence expiry can temporarily exclude
+  a provider until refreshed; OpenRouter's live zero-price inventory remains a
+  fallback, subject to its actual account limits.
+- Gemini `gemini-3.5-flash-lite` and Groq `openai/gpt-oss-120b` completed real
+  inference. Both also passed the signed two-step Worker/result-handoff check.
+  Gemini's first planning attempt failed safely, then the repeat passed; broad
+  planning reliability is not established. `gemini-3.8-flash` is listed by the
+  current API but this account's generation check returned HTTP 403; it is not
+  claimed operational.
+- A Windows bundle with the frozen Core, Desktop and Companion has been produced.
+  It is being rebuilt against these changes and still needs isolated packaged
+  startup/Vault verification before owner testing. No secrets or user databases
+  belong in it. Packaging script: `python -m scripts.package_alpha`.
+
+No computer-use interactions are to be performed during the current background
+continuation. No physical phone, real capture, paid inference or local reasoning
+model is authorized by this continuation.

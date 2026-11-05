@@ -143,6 +143,25 @@ class Router:
                 pass
         return False
 
+    def _confirmed_free_plan(self, slot: str) -> bool:
+        try:
+            plan = self.store.get("provider_plan", slot)
+        except KeyError:
+            return False
+        return bool(
+            plan.get("plan") == "free"
+            and plan.get("billing_enabled") is False
+            and plan.get("confirmed_at", float("inf")) <= self.clock() < plan.get("expires_at", 0)
+            and plan.get("provider") == self.pool.slots[slot].provider
+            and any(
+                row["slot"] == slot
+                and row["state"] == "configured"
+                and row["reference"] == plan.get("credential_reference")
+                and row["relationship"] == plan.get("relationship")
+                for row in self.store.all("setup_provider")
+            )
+        )
+
     def _observed(self, model: ModelSpec, task_class: str) -> tuple[float, float]:
         reliability = model.reliability if model.reliability is not None else 0.5
         latency = model.latency_ms if model.latency_ms is not None else 3000.0
@@ -255,11 +274,19 @@ class Router:
             ):
                 continue
             free = model.funding in {Funding.FREE, Funding.SUBSCRIPTION, Funding.LOCAL}
+            account_free = bool(
+                model.funding_source
+                and model.funding_source.authority == Authority.OFFICIAL_DOCS
+                and model.funding_source.current(self.clock())
+                and self._confirmed_free_plan(slot.id)
+            )
+            if model.requires_free_plan and not account_free:
+                continue
             if policy.require_free and (
                 model.funding != Funding.FREE
                 or provider.local
                 or model.funding_source is None
-                or model.funding_source.authority != Authority.LIVE_API
+                or not (model.funding_source.authority == Authority.LIVE_API or account_free)
                 or not model.funding_source.current(self.clock())
             ):
                 continue

@@ -97,6 +97,10 @@ impl ActForm {
 #[derive(Deserialize)]
 #[serde(tag = "kind", rename_all = "snake_case", deny_unknown_fields)]
 pub enum Command {
+    ConfigureSetup {
+        section: String,
+        value: Value,
+    },
     SelectModel {
         model: String,
     },

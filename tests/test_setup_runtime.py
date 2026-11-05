@@ -13,6 +13,33 @@ from tests.test_oauth_device import TestVault
 
 
 class SetupTests(unittest.TestCase):
+    def test_free_plan_confirmation_does_not_replace_or_reactivate_credentials(self):
+        self.setup.provider("fixture-slot", "synthetic-current-key", owner_authorized=True)
+        with self.assertRaises(PermissionError):
+            self.setup.confirm_free_plan("fixture-slot", owner_authorized=False)
+        self.setup.confirm_free_plan("fixture-slot", owner_authorized=True)
+        self.assertEqual(self.pool.secret_for_adapter("fixture-slot"), "synthetic-current-key")
+        self.setup.revoke_provider("fixture-slot", owner_authorized=True)
+        with self.assertRaises(PermissionError):
+            self.setup.confirm_free_plan("fixture-slot", owner_authorized=True)
+
+    def test_first_run_resumes_preferences_without_granting_authority(self):
+        data = {
+            "completed": False,
+            "step": 2,
+            "preferred_name": "Synthetic owner",
+            "tone": "spark",
+            "muted": True,
+            "reduced_motion": True,
+        }
+        self.setup.configure("onboarding", data, owner_authorized=True)
+        restarted = SetupRuntime(self.r.runtime, self.pool, self.vault)
+        self.assertEqual(restarted.profile("onboarding"), data)
+        self.assertFalse(restarted.snapshot()["onboarding"]["completed"])
+        self.assertEqual(self.r.store.all("perception_source"), [])
+        with self.assertRaises(ValueError):
+            restarted.configure("onboarding", {**data, "full_access": True}, owner_authorized=True)
+
     def setUp(self):
         self.r = Rig()
         self.addCleanup(self.r.close)

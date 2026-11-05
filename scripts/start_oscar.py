@@ -30,7 +30,11 @@ from oscar.registry import Registry
 from oscar.storage import Store
 from oscar.transport import Dispatcher
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = (
+    Path(sys.executable).resolve().parent
+    if getattr(sys, "frozen", False)
+    else Path(__file__).resolve().parents[1]
+)
 
 
 def renew_local_execution(state: Path, node_id: str = "oscar-local-core") -> bool:
@@ -125,7 +129,8 @@ def mount_windows_worker(h: Harness, state: Path):
         internal=True,
         reenroll=renew_local_execution(state, node_id),
     )
-    executables = [sys.executable]
+    python = shutil.which("python.exe") if getattr(sys, "frozen", False) else sys.executable
+    executables = [python] if python else []
     for command in ("git.exe", "pwsh.exe", "powershell.exe"):
         executable = shutil.which(command)
         if executable:
@@ -215,6 +220,13 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--data-dir", type=Path)
     parser.add_argument("--provider", help="Optional cloud provider pin")
+    parser.add_argument(
+        "--confirm-free-plan",
+        action="append",
+        choices=("google", "groq"),
+        default=[],
+        help="Confirm this account has billing disabled and uses its Free plan (24 hours)",
+    )
     parser.add_argument("--model", help="Cloud model ID; use with --provider")
     parser.add_argument(
         "--check",
@@ -264,6 +276,9 @@ def main() -> int:
     ):
         assert h.runtime.setup is not None
         import_missing_vault_bindings(h.runtime.setup, h.registry.providers.values(), credentials)
+        for slot in h.pool.slots.values():
+            if slot.provider in args.confirm_free_plan and slot.present:
+                h.runtime.setup.confirm_free_plan(slot.id, owner_authorized=True)
         executor = h.dispatcher.executors["models.reason"]
         executor.policy = policy
         try:

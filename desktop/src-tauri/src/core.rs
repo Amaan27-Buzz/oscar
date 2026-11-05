@@ -1018,6 +1018,12 @@ impl Bridge {
                 client.request("select_model", json!({"model":model}))?;
                 return self.refresh();
             }
+            Command::ConfigureSetup { section, value } => {
+                bound(&section, 24)?;
+                bound(&value.to_string(), 4096)?;
+                client.request("configure_setup", json!({"section":section,"value":value}))?;
+                return self.refresh();
+            }
             Command::DayBrief => {
                 self.hide_private.store(false, Ordering::Release);
                 self.view

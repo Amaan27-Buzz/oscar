@@ -7,6 +7,24 @@ from tests.test_desktop_conversation import ConversationTests
 
 
 class EverydayDesktopTests(ConversationTests):
+    def test_surface_first_run_saves_only_nonsecret_preferences(self):
+        data = {
+            "completed": False,
+            "step": 1,
+            "preferred_name": "Synthetic owner",
+            "tone": "steady",
+            "muted": True,
+            "reduced_motion": True,
+        }
+        self.call("configure_setup", {"section": "onboarding", "value": data})
+        self.assertEqual(self.h.runtime.setup.profile("onboarding"), data)
+        with self.assertRaises(ValueError):
+            self.call("configure_setup", {"section": "provider", "value": {"key": "synthetic"}})
+        with self.assertRaises(ValueError):
+            self.call(
+                "configure_setup", {"section": "onboarding", "value": {**data, "full_access": True}}
+            )
+
     def test_windows_worker_executes_signed_scoped_file_write_with_readback(self):
         worker = mount_windows_worker(self.h, self.root / "core.db")
         self.session = desktop_session(self.h, worker.session.node_id)

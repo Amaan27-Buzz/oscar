@@ -44,7 +44,50 @@ class SetupRuntime:
         encoded = json.dumps(data, allow_nan=False)
         if len(encoded) > 4096 or redact_runtime_secrets(encoded) != encoded:
             raise ValueError("bounded non-secret configuration required")
-        if section == "persona":
+        if section == "provider_plan":
+            if (
+                set(data) != {"provider", "plan", "billing_enabled"}
+                or not isinstance(data["provider"], str)
+                or data["provider"] not in {"google", "groq"}
+                or data["plan"] != "free"
+                or data["billing_enabled"] is not False
+            ):
+                raise ValueError("Explicit free-plan confirmation with billing disabled required")
+            slots = [
+                row["slot"]
+                for row in self.store.all("setup_provider")
+                if row["relationship"] == self.relationship
+                and row["state"] == "configured"
+                and row["slot"] in self.pool.slots
+                and self.pool.slots[row["slot"]].provider == data["provider"]
+            ]
+            if not slots:
+                raise ValueError("Configure a secure provider credential first")
+            for slot in slots:
+                self.confirm_free_plan(slot, owner_authorized=True)
+            return
+        if section == "onboarding":
+            if set(data) != {
+                "completed",
+                "step",
+                "preferred_name",
+                "tone",
+                "muted",
+                "reduced_motion",
+            }:
+                raise ValueError("explicit first-run preferences required")
+            if (
+                type(data["step"]) is not int
+                or not 0 <= data["step"] <= 3
+                or any(type(data[k]) is not bool for k in ("completed", "muted", "reduced_motion"))
+                or not isinstance(data["preferred_name"], str)
+                or len(data["preferred_name"]) > 80
+                or any(ord(c) < 32 for c in data["preferred_name"])
+                or not isinstance(data["tone"], str)
+                or data["tone"] not in {"steady", "spark", "wry"}
+            ):
+                raise ValueError("bounded first-run preferences required")
+        elif section == "persona":
             if set(data) - {"name", "warmth", "formality", "brevity", "style"}:
                 raise ValueError("unsupported Persona setting")
             for key in ("name", "style"):
@@ -149,6 +192,29 @@ class SetupRuntime:
             if self.store.get("setup_provider", key) == {**row, "state": "revoking"}:
                 self.store.put("setup_provider", key, {**row, "state": "revoked"})
 
+    def confirm_free_plan(self, slot: str, *, owner_authorized: bool) -> None:
+        """Record an explicit owner's current plan assertion, tied to this Vault binding."""
+        self._owner(owner_authorized)
+        binding = self.store.get("setup_provider", self._key(slot))
+        if binding["state"] != "configured" or slot not in self.pool.slots:
+            raise PermissionError("A current secure provider binding is required")
+        now = self.runtime.grid.clock()
+        self.store.put(
+            "provider_plan",
+            slot,
+            {
+                "provider": self.pool.slots[slot].provider,
+                "slot": slot,
+                "credential_reference": binding["reference"],
+                "plan": "free",
+                "billing_enabled": False,
+                "confirmed_at": now,
+                "expires_at": now + 86400,
+                "source": "explicit-owner-confirmation",
+                "relationship": self.relationship,
+            },
+        )
+
     def recover(self) -> int:
         count = self.commissioning.recover()
         for row in self.store.all("setup_provider"):
@@ -173,6 +239,18 @@ class SetupRuntime:
         sections = {
             r["section"] for r in self.store.all("setup") if r["relationship"] == self.relationship
         }
+        onboarding = (
+            self.profile("onboarding")
+            if "onboarding" in sections
+            else {
+                "completed": False,
+                "step": 0,
+                "preferred_name": "",
+                "tone": "steady",
+                "muted": True,
+                "reduced_motion": False,
+            }
+        )
         bindings = [
             r for r in self.store.all("setup_provider") if r["relationship"] == self.relationship
         ]
@@ -224,6 +302,7 @@ class SetupRuntime:
                 if operational
                 else "live_provider_probe_required",
             },
+            "onboarding": {"configured": "onboarding" in sections, **onboarding},
             "persona": {"configured": "persona" in sections, "operational": "persona" in sections},
             "preferences": {"configured": "preferences" in sections},
             "policy": {

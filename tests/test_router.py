@@ -22,6 +22,48 @@ from .support import RouterRig
 
 
 class RouterTests(unittest.TestCase):
+    def test_provider_free_plan_requires_current_confirmation_for_the_same_vault_binding(self):
+        from oscar.freshness import Authority, SourceRef
+
+        slot = next(s for s in self.r.pool.slots.values() if s.provider == "plentiful")
+        source = SourceRef(
+            "https://example.test/pricing", Authority.OFFICIAL_DOCS, "provider", self.r.clock()
+        )
+        for key, model in list(self.r.registry.models.items()):
+            self.r.registry.models[key] = replace(
+                model, requires_free_plan=True, funding_source=source
+            )
+        policy = RoutingPolicy(require_free=True)
+        self.assertEqual(self.r.router.rank(self.r.request, policy), [])
+        binding = {
+            "slot": slot.id,
+            "state": "configured",
+            "reference": "synthetic-binding",
+            "relationship": "owner",
+        }
+        self.r.store.put("setup_provider", "fixture", binding)
+        self.r.store.put(
+            "provider_plan",
+            slot.id,
+            {
+                "provider": slot.provider,
+                "plan": "free",
+                "billing_enabled": False,
+                "credential_reference": "synthetic-binding",
+                "relationship": "owner",
+                "confirmed_at": self.r.clock(),
+                "expires_at": self.r.clock() + 60,
+            },
+        )
+        routes = self.r.router.rank(self.r.request, policy)
+        self.assertTrue(routes)
+        self.assertTrue(all(r.slot == slot.id for r in routes))
+        self.r.store.put("setup_provider", "fixture", {**binding, "reference": "changed-binding"})
+        self.assertEqual(self.r.router.rank(self.r.request, policy), [])
+        self.r.store.put("setup_provider", "fixture", binding)
+        self.r.clock.now += 61
+        self.assertEqual(self.r.router.rank(self.r.request, policy), [])
+
     def test_free_only_requires_fresh_zero_price_evidence_and_never_local_or_subscription(self):
         from oscar.freshness import Authority, SourceRef
 

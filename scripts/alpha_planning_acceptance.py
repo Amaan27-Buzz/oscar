@@ -14,33 +14,42 @@ from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding, rsa
 
 from oscar.contracts import new_id
-from oscar.credential_loading import existing_provider_environment
+from oscar.credential_loading import existing_provider_environment, import_missing_vault_bindings
 from oscar.desktop import Desktop
 from oscar.harness import Harness
 from oscar.models import ModelRequest, RoutingPolicy
 from oscar.policy import PersonalPolicy
 from oscar.registry import Registry
 from scripts.start_oscar import ROOT, desktop_session
+from tests.test_oauth_device import TestVault
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--model")
+    parser.add_argument(
+        "--provider", choices=("openrouter", "google", "groq"), default="openrouter"
+    )
+    parser.add_argument("--confirm-free-plan", action="store_true")
     args = parser.parse_args()
+    if args.provider != "openrouter" and not args.confirm_free_plan:
+        parser.error("Confirm that this provider account uses its Free plan with billing disabled")
     registry = Registry.load(ROOT / "config/development-models.json")
-    credentials = existing_provider_environment(ROOT / ".env.local", registry.providers.values())
+    credentials = existing_provider_environment(
+        ROOT / ".env.local", [registry.providers[args.provider]]
+    )
     template = ModelRequest.from_config(
         {
             "mode": "free_first",
-            "pinned_provider": "openrouter",
+            "pinned_provider": args.provider,
             "pinned_model": args.model,
             "max_output_tokens": 4096,
         }
     )
     policy = RoutingPolicy(
         require_free=True,
-        allowed_providers=frozenset({"openrouter"}),
-        private_providers=frozenset({"openrouter"}),
+        allowed_providers=frozenset({args.provider}),
+        private_providers=frozenset({args.provider}),
         timeout_seconds=120,
         max_paid_cost=0,
     )
@@ -54,7 +63,15 @@ def main() -> int:
             node_id="oscar-local-core",
             credential_environ=credentials,
             model_timeout_seconds=120,
+            vault=TestVault(),
         ) as h:
+            import_missing_vault_bindings(
+                h.runtime.setup, [registry.providers[args.provider]], credentials
+            )
+            if args.confirm_free_plan:
+                for slot in h.pool.slots.values():
+                    if slot.provider == args.provider and slot.present:
+                        h.runtime.setup.confirm_free_plan(slot.id, owner_authorized=True)
             h.dispatcher.executors["models.reason"].policy = policy
             h.router.refresh(template, policy)
             assert h.router.rank(template, policy), "No verified-free cloud model available"
@@ -120,6 +137,23 @@ def main() -> int:
                 sleep(0.05)
             assert not path.exists(), "Draft inference must not execute the proposed effects"
             second = ask("Review the plan")
+            if second.get("assistance_proposal", {}).get("operation") != "plan_accept":
+                print(
+                    "Planning task states:",
+                    [(t["state"], t.get("blocker")) for t in h.store.all("task")],
+                )
+                print(
+                    "Routing outcomes:",
+                    [(r.get("model"), r.get("error")) for r in h.store.all("route_history")],
+                )
+                for private in h.store.transient.values():
+                    result = private.get("result")
+                    if result:
+                        print(
+                            "Synthetic planning result:",
+                            result.error,
+                            h.pool.redact(str(result.value or ""))[:1500],
+                        )
             assert second.get("assistance_proposal", {}).get("operation") == "plan_accept", (
                 second.get("message")
             )

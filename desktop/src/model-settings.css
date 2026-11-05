@@ -1,0 +1,4 @@
+.workspace .model-plan-review{margin:20px 0;padding:16px;border:1px solid var(--line);border-radius:6px}
+.workspace .model-plan-review label{display:flex;align-items:flex-start;gap:10px;font-weight:400}
+.workspace .model-plan-review input{width:16px;height:16px;min-height:0;flex:none;margin:3px 0 0;padding:0}
+.workspace .model-plan-review .actions{display:flex;gap:10px;margin-top:16px}

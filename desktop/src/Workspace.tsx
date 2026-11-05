@@ -18,6 +18,7 @@ import {ConnectionSettings} from './ConnectionSettings';
 import {WorkerSharing} from './WorkerSharing';
 import {VoiceSettings} from './VoiceSettings';
 import {Connections} from './Connections';
+import {FirstRun} from './FirstRun';
 import {ModelSettings} from './ModelSettings';
 import {MemorySettings} from './MemorySettings';
 import type {CSSProperties} from 'react';
@@ -38,10 +39,14 @@ export function Workspace({port=send,events=subscribe}:{port?:Send;events?:typeo
   async function local(request:Parameters<typeof surface>[0]) {try{accept(await surface(request));setError('');}catch(e){setError(typeof e==='string'?e:'Native control unavailable.');}}
   async function run(command:Command){if(command.kind==='window'&&command.mode==='activity')setPage('Activity');if(command.kind==='discard'){setDraft('');setToolDrafts({Dictate:'',Edit:''});setActionDraft(emptyActionDraft);setSubmitted(null);}if(view.connection&&command.kind==='review'&&command.operation==='cancel')return bridgeRun({kind:'cancel_remote',task_id:command.task_id});return bridgeRun(command);}
   function discard(){void run({kind:'discard'});}
+  const [intro,setIntro]=useState(false),[introDismissed,setIntroDismissed]=useState(false);
+  useEffect(()=>{if(view.setup?.onboarding?.completed===false&&!view.reference&&!introDismissed)setIntro(true);},[view.setup?.onboarding?.completed,view.reference,introDismissed]);
+  async function closeIntro(prompt?:string){setIntroDismissed(true);setIntro(false);setPage('Conversation');if(prompt)await run({kind:'interact',mode:'Ask',text:prompt,context_id:''});}
   const task=view.current;
   const history=view.conversation?.turns??[];
   const hasCurrentReply=history.some(t=>t.task_id===task?.task_id&&t.role==='oscar');
   async function ask(){if(!available||busy||!draft.trim())return;const text=draft;const prior=latest.current.current?.task_id;const priorGoal=latest.current.started_goal;const ok=await run({kind:'interact',mode:'Ask',text,context_id:view.context?.id??''});const id=latest.current.current?.task_id;if(ok&&latest.current.started_goal&&latest.current.started_goal!==priorGoal){setDraft(current=>current===text?'':current);}else if(ok&&id&&id!==prior){setSubmitted({id,text});setDraft(current=>current===text?'':current);}}
+  if(intro)return <Theme asChild appearance={view.theme??'light'} accentColor="blue" grayColor="sand" radius="small"><FirstRun view={view} busy={busy} error={error} available={available} run={run} onClose={prompt=>void closeIntro(prompt)}/></Theme>;
   return <Theme asChild appearance={view.theme??'light'} accentColor="blue" grayColor="sand" radius="small"><main className="workspace">
     <aside className="workspace-rail"><div className="workspace-brand"><strong>OSCAR</strong></div>
       <nav aria-label="Workspace" style={{'--nav-index':pages.indexOf(page)} as CSSProperties}>{pages.map(item=><button key={item} aria-current={page===item?'page':undefined} onClick={()=>{setPage(item);setReading(false);document.querySelector('.workspace-content')?.scrollTo({top:0,behavior:'instant'});}}><WorkspaceMark name={item}/><span>{item}</span></button>)}</nav>
@@ -68,6 +73,7 @@ export function Workspace({port=send,events=subscribe}:{port?:Send;events?:typeo
         {page==='Devices'&&<Devices view={view} available={available} busy={busy} refresh={()=>void run({kind:'refresh'})} prepare={capability=>{setPage('Conversation');setDraft(`Help me ${capability.label.toLowerCase()}. `);requestAnimationFrame(()=>document.getElementById('workspace-ask')?.focus());}}/>}
         {page==='Preferences'&&<section className="preferences-page" aria-label="Preferences">
           <div className="section-heading"><h1>Preferences</h1><p className="leaf-secondary">Make OSCAR feel at home on your desktop.</p></div>
+          <section className="settings-group"><h2>Meet OSCAR</h2><p>Replay the introduction or revisit your starting preferences. Your identity, connections and permissions stay in place.</p><button onClick={()=>setIntro(true)}>Replay introduction</button></section>
           <ConnectionSettings view={view} busy={busy} run={run}/>
           <WorkerSharing view={view} busy={busy} run={run}/>
           <Connections view={view} busy={busy} run={run}/>
