@@ -423,3 +423,33 @@ was rebuilt from clean `645fc08`, includes the latest Core context handoff, and
 passed real local Qwen3.5 4B inference outside the checkout. Package inspection
 confirmed exclusion of configuration secrets and user databases. The restored
 `.env.local` remains present, ignored and untracked.
+
+## Device invitation from the actual application — active continuation
+
+Desktop Devices now exposes Pair a phone using the existing signed connection
+management review and native confirmation. The owner supplies the phone's public
+registration and a new device identity, with separate default-off history and
+phone-review authority choices. Phone review uses its separate device-lock-backed
+owner public key. The Core issues the existing five-minute, device-key-bound Grid
+invitation only after signature verification and current owner/policy checks.
+No key, shell command, new credential file or replacement Core is introduced.
+
+Pending unexpired invitations are projected from canonical enrollment state and
+disappear after consumption/expiry. A valid device signature is still required
+to enroll. Existing identities are refused here rather than silently recovered.
+This operation does not grant Android actions, microphone/camera/notifications,
+continuous perception, Secure or Full Access. Those remain separately scoped.
+
+The form explicitly explains the connectivity boundary: the everyday launcher is
+loopback-only, and physical phones still need a reachable trusted HTTPS Core.
+Issuing an invitation does not provision hosting, expose a port or open a firewall.
+Public registration/invitation exchange is currently manual; QR/discovery and
+production Cloud provisioning are not claimed by this integration.
+
+Synthetic acceptance passed signed issuance, exact requested scopes, device proof,
+consumed-invitation disappearance and signed-review replay rejection. The broader
+Core/connection/Grid/launcher batch passed 85 cases; 21 UI/Workspace cases and
+typechecking passed. The actual source-built Devices screen and default-off form
+were inspected; checkbox sizing was then corrected and native build passed.
+No new real owner device was enrolled during the inspection. Final packaged
+pairing and physical-phone onboarding acceptance remain outstanding.

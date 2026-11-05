@@ -59,6 +59,27 @@ def snapshot(h: "Harness") -> dict[str, Any]:
         "plugins_total": len(plugins),
         "truncated": False,
         "providers": h.auth.catalog() if h.auth else [],
+        "device_pairing": h.device_invitation is not None,
+        "device_invitations": [
+            {
+                k: claim[k]
+                for k in (
+                    "version",
+                    "core_id",
+                    "node_id",
+                    "role",
+                    "installation_id",
+                    "workspace",
+                    "public_key",
+                    "challenge_id",
+                    "expires_at_ms",
+                )
+            }
+            | {"signing_payload": row["signing_payload"]}
+            for row in reversed(h.store.all("remote_invitation"))
+            if row["expires_at_ms"] > h.grid.clock() * 1000
+            and (claim := json.loads(base64.b64decode(row["signing_payload"])))
+        ][:10],
     }
     # Management replies share the native 64 KB response boundary with review metadata.
     while len(json.dumps(result).encode()) > 40_000 and (accounts or plugins):
@@ -157,7 +178,36 @@ class Connections:
             raise ValueError("bounded connection identifier required")
         if not isinstance(value, str) or len(value.encode()) > 20_000:
             raise ValueError("bounded management value required")
-        if operation == "begin_account":
+        state: dict[str, Any]
+        if operation == "pair_device":
+            from .mobile import public_key as load_public_key
+            from .remote_grid import identifier as device_identifier
+
+            device_identifier(identifier, node=True)
+            options = json.loads(value)
+            if (
+                not isinstance(options, dict)
+                or set(options)
+                != {"installation_id", "public_key", "owner_public_key", "retain", "approve"}
+                or type(options["retain"]) is not bool
+                or type(options["approve"]) is not bool
+            ):
+                raise ValueError("Exact device registration and permission choices required")
+            device_identifier(options["installation_id"])
+            load_public_key(options["public_key"])
+            if not isinstance(options["owner_public_key"], str):
+                raise ValueError("Optional public owner key required")
+            if options["approve"] or options["owner_public_key"]:
+                load_public_key(options["owner_public_key"])
+            if self.h.device_invitation is None:
+                raise PermissionError("Authenticated Grid pairing is unavailable on this Core")
+            if any(row["id"] == identifier for row in self.h.store.all("node")):
+                raise ValueError(
+                    "Existing devices require explicit recovery; choose a new device identity"
+                )
+            state = {"node": identifier, "options": options}
+            revision, target = 1, "New phone: " + identifier
+        elif operation == "begin_account":
             if self.h.auth is None:
                 raise PermissionError("configured Auth Broker required")
             provider = self.h.auth.providers[identifier]
@@ -379,7 +429,12 @@ class Connections:
                 self.h.accounts.set_default(identifier, value)
             elif operation == "disconnect_account":
                 disconnected = self.h.accounts.disconnect(identifier)
-            elif operation in {"begin_account", "refresh_account", "register_plugin"}:
+            elif operation in {
+                "begin_account",
+                "refresh_account",
+                "register_plugin",
+                "pair_device",
+            }:
                 deferred = change
             else:
                 plugin_config = self.h.plugins._config(store.get("mcp_installation", identifier))
@@ -426,7 +481,16 @@ class Connections:
             else:
                 self.h.plugins.disconnect(identifier, expected_config=plugin_config)
         elif deferred is not None:
-            if operation == "register_plugin":
+            if operation == "pair_device":
+                self._authority(node, session, scope)
+                if self.h.device_invitation is None:
+                    raise PermissionError("Device pairing unavailable")
+                self.h.device_invitation(identifier, json.loads(value))
+                message = (
+                    "Device-bound invitation issued for five minutes. "
+                    "Device proof and a reachable trusted Core are still required."
+                )
+            elif operation == "register_plugin":
                 config, reviewed = self._registration(value)
                 self.h.plugins.register(config, reviewed, owner_reviewed=True)
                 message = "Server registered. Review connect to discover its permitted tools."

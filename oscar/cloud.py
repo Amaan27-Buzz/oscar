@@ -281,6 +281,17 @@ class CloudCore:
             from .remote_grid import RemoteGrid
 
             self.remote = RemoteGrid(self)
+            from .remote_grid import create_invitation
+
+            self.core.device_invitation = lambda node, options: create_invitation(
+                self,
+                node,
+                "mobile",
+                options["installation_id"],
+                options["public_key"],
+                retain=options["retain"],
+                owner_public_key=options["owner_public_key"] if options["approve"] else None,
+            )
             if start_services:
                 self.core.start()
                 if not self.ready():

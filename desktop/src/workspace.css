@@ -277,3 +277,7 @@
 .connection-setting form{display:grid;gap:12px;margin:16px 0}.connection-setting input,.connection-setting textarea{width:100%;box-sizing:border-box}.connection-setting textarea{resize:none}.connection-setting dl{overflow-wrap:anywhere}.connection-setting button{justify-self:start}
 
 .responsibility-form{display:grid;gap:16px;max-width:560px;margin:20px 0}.responsibility-form label{display:grid;gap:8px}.responsibility-form input,.responsibility-form textarea{width:100%;box-sizing:border-box}.responsibility-form textarea{min-height:120px;resize:none}.automation-availability article{padding:24px 0;border-bottom:1px solid var(--border)}
+
+.workspace .pair-device form{display:grid;gap:12px}
+.workspace .pair-device .pair-choice{display:flex;align-items:center;gap:12px;min-height:44px}
+.workspace .pair-device .pair-choice input[type="checkbox"]{width:18px;height:18px;min-height:0;padding:0;margin:0;flex:none}

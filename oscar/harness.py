@@ -552,6 +552,7 @@ class Harness:
         model_policy = RoutingPolicy(timeout_seconds=model_timeout_seconds)
         providers = load_providers(auth_config) if auth_config is not None else []
         self.store = Store(state)
+        self.device_invitation: Callable[[str, dict[str, Any]], dict[str, Any]] | None = None
         self.grid = Grid(self.store, clock)
         self.files = ScopedFiles(workspace)
         self.archive = EventArchive(state.with_suffix(".archive.sqlite"))

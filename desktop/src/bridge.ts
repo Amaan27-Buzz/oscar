@@ -38,6 +38,7 @@ export interface ConnectionsView {
   plugins:{id:string;name:string;account_id:string;enabled:boolean;health:string;transport:string;permissions:Record<string,string[]>;tools:{name:string}[];activity:{event?:string;observed_at?:number}[]}[];
   providers?:{id:string;provider:string;service:string;scopes:string[];redirect_uri:string;configured:boolean;resource?:string;issuer?:string}[];
   access:string;enrollment:string;observed_at_ms:number;
+  device_pairing?:boolean;device_invitations?:{node_id:string;expires_at_ms:number;[key:string]:unknown}[];
   credential_deletion?:'available'|'unavailable';accounts_total?:number;plugins_total?:number;truncated?:boolean;
 }
 export interface View {models?:{selected:string|null;available:string[];free_only?:boolean;local_available?:boolean;credential_slots?:{id:string;provider:string;configured:boolean}[];provider_plans?:{id:string;confirmed:boolean}[]}|null;voice_settings?:VoiceSettings|null;voice_devices?:AudioDevice[];connections?:ConnectionsView|null;day_brief?:Record<string,unknown>|null;worker_sharing?:WorkerSharingView|null}
@@ -64,7 +65,7 @@ export type Command=
   |{kind:'manage_assistance';operation:string;id:string;value:Record<string,unknown>}
   |{kind:'set_access';relationship_id:string;value:Record<string,unknown>}
   |{kind:'revoke_access'}
-  |{kind:'manage_connection';operation:'begin_account'|'refresh_account'|'register_plugin'|'rename_account'|'default_account'|'disconnect_account'|'connect_plugin'|'disable_plugin'|'enable_plugin'|'remove_plugin';id:string;value:string}
+  |{kind:'manage_connection';operation:'pair_device'|'begin_account'|'refresh_account'|'register_plugin'|'rename_account'|'default_account'|'disconnect_account'|'connect_plugin'|'disable_plugin'|'enable_plugin'|'remove_plugin';id:string;value:string}
   |{kind:'connection_prepare';url:string}|{kind:'connection_enroll';invitation:string}|{kind:'connection_logout'}|{kind:'cancel_remote';task_id:string}
   |{kind:'history';before:number}
   |{kind:'ready'|'refresh'|'day_brief'|'discard'|'voice_stop'|'voice_cancel'}|{kind:'window';mode:WindowMode}

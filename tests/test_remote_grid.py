@@ -66,6 +66,51 @@ class DirectClient:
 
 
 class RemoteGridTests(unittest.TestCase):
+    def test_signed_device_pairing_issues_only_reviewed_bound_connection_scopes(self):
+        options = {
+            "installation_id": "new-phone-install",
+            "public_key": self.public,
+            "owner_public_key": "",
+            "retain": True,
+            "approve": False,
+        }
+        change = {"operation": "pair_device", "id": "new-alpha-phone", "value": json.dumps(options)}
+        review = self.mobile.request("management_challenge", change)
+        self.assertFalse(self.core.harness.store.all("remote_invitation"))
+        result = self.mobile.request(
+            "management_complete",
+            {
+                "challenge_id": review["challenge_id"],
+                "signature": signature(self.owner_key, base64.b64decode(review["signing_payload"])),
+            },
+        )
+        invitation = result["connections"]["device_invitations"][0]
+        self.assertEqual("new-alpha-phone", invitation["node_id"])
+        claim = json.loads(base64.b64decode(invitation["signing_payload"]))
+        self.assertIn("archive:read", claim["scopes"])
+        self.assertNotIn("grid:approve", claim["scopes"])
+        self.assertNotIn("android:act", claim["scopes"])
+        self.assertNotIn("desktop:microphone", claim["scopes"])
+        enrolled = self.core.remote.enroll(
+            {
+                "version": 2,
+                "challenge_id": invitation["challenge_id"],
+                "signature": signature(self.key, base64.b64decode(invitation["signing_payload"])),
+            }
+        )
+        self.assertEqual("new-alpha-phone", enrolled["node_id"])
+        self.assertFalse(self.mobile.request("snapshot", {})["connections"]["device_invitations"])
+        with self.assertRaises(PermissionError):
+            self.mobile.request(
+                "management_complete",
+                {
+                    "challenge_id": review["challenge_id"],
+                    "signature": signature(
+                        self.owner_key, base64.b64decode(review["signing_payload"])
+                    ),
+                },
+            )
+
     def test_model_followup_receives_canonical_cross_device_context_without_durable_copy(self):
         from oscar.models import Mode, ProviderResponse, Route, RoutedResult
 
