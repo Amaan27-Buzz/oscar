@@ -22,6 +22,22 @@ from .support import RouterRig
 
 
 class RouterTests(unittest.TestCase):
+    def test_free_only_requires_fresh_zero_price_evidence_and_never_local_or_subscription(self):
+        from oscar.freshness import Authority, SourceRef
+
+        policy = RoutingPolicy(require_free=True)
+        self.assertEqual(self.r.router.rank(self.r.request, policy), [])
+        source = SourceRef(
+            "https://example.test/models", Authority.LIVE_API, "account", self.r.clock()
+        )
+        for key, model in list(self.r.registry.models.items()):
+            self.r.registry.models[key] = replace(model, funding_source=source)
+        self.assertTrue(self.r.router.rank(self.r.request, policy))
+        for funding in (Funding.SUBSCRIPTION, Funding.LOCAL, Funding.PAID, Funding.UNKNOWN):
+            for key, model in list(self.r.registry.models.items()):
+                self.r.registry.models[key] = replace(model, funding=funding)
+            self.assertEqual(self.r.router.rank(self.r.request, policy), [])
+
     def setUp(self):
         self.r = RouterRig()
         self.addCleanup(self.r.close)
@@ -449,5 +465,6 @@ class CredentialTests(unittest.TestCase):
     def test_all_seventeen_real_slot_names_are_metadata_only(self):
         registry = Registry.load(Path("config/development-models.json"))
         pool = CredentialPool(list(registry.providers.values()), {})
-        self.assertEqual(len(pool.slots), 17)
-        self.assertTrue(all(not s.present for s in pool.slots.values()))
+        cloud_slots = [s for s in pool.slots.values() if not registry.providers[s.provider].local]
+        self.assertEqual(len(cloud_slots), 17)
+        self.assertTrue(all(not s.present for s in cloud_slots))

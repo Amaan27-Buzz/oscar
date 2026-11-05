@@ -9,6 +9,7 @@ from .capabilities import Cancelled
 from .contracts import Evidence, new_id
 from .credentials import CredentialPool, Slot
 from .discovery import HTTPDiscovery
+from .freshness import Authority
 from .models import (
     Failure,
     Funding,
@@ -254,6 +255,14 @@ class Router:
             ):
                 continue
             free = model.funding in {Funding.FREE, Funding.SUBSCRIPTION, Funding.LOCAL}
+            if policy.require_free and (
+                model.funding != Funding.FREE
+                or provider.local
+                or model.funding_source is None
+                or model.funding_source.authority != Authority.LIVE_API
+                or not model.funding_source.current(self.clock())
+            ):
+                continue
             if not free and not policy.allow_paid:
                 continue
             if model.funding == Funding.UNKNOWN and not policy.allow_unknown_cost:

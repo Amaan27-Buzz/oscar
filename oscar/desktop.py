@@ -578,8 +578,8 @@ class Desktop(Mobile):
             executor = h.dispatcher.executors["models.reason"] if h else None
             if h is None or not isinstance(executor, ModelExecutor):
                 raise PermissionError("Model selection unavailable")
-            if not isinstance(payload["model"], str) or len(payload["model"]) > 200:
-                raise ValueError("Choose an available local model")
+            if not isinstance(payload["model"], str) or len(payload["model"]) > 300:
+                raise ValueError("Choose an available model")
             candidate = replace(
                 executor.template,
                 mode=Mode.LOCAL,
@@ -587,17 +587,28 @@ class Desktop(Mobile):
                 pinned_model=payload["model"],
                 pinned_slot=None,
             )
+            if executor.policy.require_free:
+                provider, separator, model = payload["model"].partition("::")
+                if payload["model"] and (not separator or not provider or not model):
+                    raise ValueError("Choose an available cloud model")
+                candidate = replace(
+                    candidate,
+                    mode=Mode.FREE_FIRST,
+                    pinned_provider=provider or None,
+                    pinned_model=model or None,
+                    ollama_think=None,
+                )
             h.router.refresh(candidate, executor.policy)
-            if not h.router.rank(candidate, executor.policy):
-                raise ValueError("Selected local model is unavailable")
+            if payload["model"] and not h.router.rank(candidate, executor.policy):
+                raise ValueError("Selected model is unavailable under the current routing policy")
             with self.store.transaction():
                 self.store.put(
                     "desktop_model",
                     "selection",
                     {
                         "configuration": {
-                            "mode": "local",
-                            "pinned_provider": "ollama-local",
+                            "mode": candidate.mode.value,
+                            "pinned_provider": candidate.pinned_provider,
                             "pinned_model": candidate.pinned_model,
                             "max_output_tokens": candidate.max_output_tokens,
                             "ollama_think": candidate.ollama_think,
@@ -608,6 +619,7 @@ class Desktop(Mobile):
             return {"selected": candidate.pinned_model}
         if op == "snapshot" and payload == {}:
             from .assistance import Assistance
+            from .harness import ModelExecutor
 
             view = super().request(session, data)
             h = self.runtime.connections
@@ -627,6 +639,28 @@ class Desktop(Mobile):
                         }
                     ),
                 }
+                if (
+                    isinstance(executor, ModelExecutor)
+                    and template
+                    and executor.policy.require_free
+                ):
+                    from dataclasses import replace
+
+                    unpinned = replace(template, pinned_provider=None, pinned_model=None)
+                    view["models"] = {
+                        "selected": (
+                            template.pinned_provider + "::" + template.pinned_model
+                            if template.pinned_provider and template.pinned_model
+                            else ""
+                        ),
+                        "available": sorted(
+                            {
+                                route.provider + "::" + route.model
+                                for route in h.router.rank(unpinned, executor.policy)
+                            }
+                        ),
+                        "free_only": True,
+                    }
             if self.runtime.connections is not None:
                 from .connections import snapshot
 

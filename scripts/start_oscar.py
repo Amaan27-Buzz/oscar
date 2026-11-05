@@ -1,6 +1,6 @@
 """Start the everyday Desktop with OSCAR's persistent, authenticated local Core.
 
-Never reads project credential files. Provider setup uses the existing OS Vault.
+Cloud inference is restricted to verified-free routes; local fallback is disabled.
 """
 
 import argparse
@@ -16,6 +16,7 @@ from threading import Thread
 
 from oscar.cloud_state import DataDirectoryLock
 from oscar.connectors import ConnectorVerifier
+from oscar.credential_loading import existing_provider_environment, import_missing_vault_bindings
 from oscar.desktop import Desktop
 from oscar.desktop_verify import DesktopVerifier
 from oscar.grid import InternalSessionRuntime, Node, NodeRole
@@ -25,6 +26,7 @@ from oscar.machine import MachineScope, MachineVerifier
 from oscar.mobile import MobileServer
 from oscar.models import ModelRequest, RoutingPolicy
 from oscar.policy import PersonalPolicy
+from oscar.registry import Registry
 from oscar.storage import Store
 from oscar.transport import Dispatcher
 
@@ -212,11 +214,12 @@ def run_desktop(core: Desktop, session, executable: Path) -> None:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--data-dir", type=Path)
-    parser.add_argument("--model", help="Override the saved local model for this launch")
+    parser.add_argument("--provider", help="Optional cloud provider pin")
+    parser.add_argument("--model", help="Cloud model ID; use with --provider")
     parser.add_argument(
         "--check",
         action="store_true",
-        help="Check live local model routing without opening Desktop",
+        help="Check verified-free cloud inference without opening Desktop",
     )
     args = parser.parse_args()
     data = args.data_dir or Path(os.environ["LOCALAPPDATA"]) / "DawnlightLabs/OSCAR"
@@ -224,14 +227,27 @@ def main() -> int:
     if not args.check and not executable.is_file():
         parser.error("Build Desktop first: python -m scripts.build_desktop")
     data.mkdir(parents=True, exist_ok=True)
+    registry = Registry.load(ROOT / "config/development-models.json")
+    credentials = existing_provider_environment(ROOT / ".env.local", registry.providers.values())
+    cloud_providers = frozenset(
+        p.id for p in registry.providers.values() if not p.local and p.enabled
+    )
+    if args.provider and args.provider not in cloud_providers:
+        parser.error("Choose a configured cloud provider; local inference is disabled")
     template = ModelRequest.from_config(
         {
-            "mode": "local",
-            "pinned_provider": "ollama-local",
-            "pinned_model": args.model or "qwen3.5:9b",
-            "max_output_tokens": 1024,
-            "ollama_think": False,
+            "mode": "free_first",
+            "pinned_provider": args.provider,
+            "pinned_model": args.model,
+            "max_output_tokens": 2048,
         }
+    )
+    policy = RoutingPolicy(
+        require_free=True,
+        allowed_providers=cloud_providers,
+        private_providers=cloud_providers,
+        timeout_seconds=120,
+        max_paid_cost=0,
     )
     with (
         DataDirectoryLock(data),
@@ -242,36 +258,42 @@ def main() -> int:
             template,
             node_id="oscar-local-core",
             model_timeout_seconds=120,
-            credential_environ={},
+            credential_environ=credentials,
             execution_enrollment_authorized=renew_local_execution(data / "core.sqlite"),
         ) as h,
     ):
+        assert h.runtime.setup is not None
+        import_missing_vault_bindings(h.runtime.setup, h.registry.providers.values(), credentials)
+        executor = h.dispatcher.executors["models.reason"]
+        executor.policy = policy
         try:
-            saved = h.store.get("desktop_model", "selection")
+            saved = h.store.get("desktop_model", "selection")["configuration"]
         except KeyError:
-            pass
-        else:
-            if args.model:
-                saved = {
-                    "configuration": {
-                        **saved["configuration"],
-                        "pinned_model": args.model,
-                    }
-                }
-            template = ModelRequest.from_config(saved["configuration"])
-            h.dispatcher.executors["models.reason"].template = template
-        h.router.refresh(template, RoutingPolicy(timeout_seconds=120))
-        if not h.router.rank(template):
-            raise RuntimeError("Selected local model unavailable. Start Ollama or choose --model.")
+            saved = None
+        if saved and not args.provider and not args.model:
+            if saved.get("mode") != "local" and saved.get("pinned_provider") in cloud_providers | {
+                None
+            }:
+                template = ModelRequest.from_config(saved)
+        executor.template = template
+        h.router.refresh(template, policy)
+        routes = h.router.rank(template, policy)
         if args.check:
+            if not routes:
+                raise RuntimeError(
+                    "No verified-free cloud model available; no paid/local fallback used"
+                )
             result = h.router.execute(
                 replace(template, prompt="Reply with a short greeting.", max_output_tokens=64),
-                RoutingPolicy(timeout_seconds=120),
+                policy,
             )
             if not result.response.text.strip():
-                raise RuntimeError("Local model returned no answer")
-            print("Real local inference completed through OSCAR Model Router.")
+                raise RuntimeError("Cloud model returned no answer")
+            print("Verified-free cloud inference completed through OSCAR Model Router.")
+            print("Provider:", result.route.provider, "Model:", result.route.model)
             return 0
+        if not routes:
+            print("Core ready; no verified-free model is currently available. Check model setup.")
         worker = mount_windows_worker(h, data / "core.sqlite")
         session = desktop_session(h, worker.session.node_id)
         core = Desktop(

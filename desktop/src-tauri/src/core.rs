@@ -1014,7 +1014,7 @@ impl Bridge {
             }
             Command::Refresh => return self.refresh(),
             Command::SelectModel { model } => {
-                bound(&model, 200)?;
+                bound(&model, 300)?;
                 client.request("select_model", json!({"model":model}))?;
                 return self.refresh();
             }
