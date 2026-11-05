@@ -243,5 +243,8 @@ The focused Python batch passed 50 tests, UI/setup regressions passed 26 tests,
 native Rust tests passed 42 with one existing fixture-only skip, and Python
 typechecking passed (111 modules). The production frontend and debug native app
 build passed. Full rendered key-entry/first-run flow and real owner key entry have
-not been exercised, in accordance with background-only verification. Packaging is
-being refreshed from the committed source before further owner testing.
+not been exercised, in accordance with background-only verification. The Windows
+bundle was rebuilt from clean `e3f0da7`; its frozen executable passed Gemini
+Flash-Lite inference outside the repository using the existing Vault. Package
+checks confirmed the matching native binary and exclusion of configuration and
+user databases. The restored `.env.local` remains present, ignored and untracked.
