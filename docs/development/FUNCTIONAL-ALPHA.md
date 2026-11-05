@@ -169,3 +169,24 @@ an installed API 35 image. No physical Android device has been accessed.
 The requested quota report was delivered at the next observed checkpoint: 38%
 five-hour allowance remaining (previous observation 60%). The exact 50% crossing
 was not observed. This checkpoint does not imply alpha completion.
+
+### Packaged background verification and emulator boundary
+
+The shared-Core Windows bundle passed real Gemini Flash-Lite inference from outside
+the checkout. Its frozen headless Core/Grid passed loopback health and closed its
+owned services with exit code 0 on stdin-pipe closure. The runtime comes from
+`7a26f5a`; a concurrent test-runner-only edit means this build's manifest honestly
+records a dirty working tree. Full native UI/owner acceptance remains outstanding.
+
+Created one disposable `oscar_functional_alpha_api36_1` AVD from the already
+installed API 36.1 image, with no window, audio or cameras. It booted and accepted
+both APKs, but instrumentation was aborted by Android's SurfaceFlinger graphics
+crash (`GoldfishMapper`, `hasReadColorBufferDma`). Reusing the same AVD with
+SwiftShader still produced that system crash. The owned emulator was stopped;
+native Keystore/Grid runtime acceptance is BLOCKED for this image/emulator
+combination, not passed. No physical serial was queried or operated.
+
+The existing Grid acceptance runner now permits an exact `--avd` guard, checks
+boot completion, and addresses only the explicit emulator serial. It no longer
+enumerates unrelated ADB devices. No OSCAR permission or transport security was
+weakened to accommodate this environment failure.

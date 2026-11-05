@@ -37,6 +37,7 @@ def private_log(operation: str, output: str, secrets: tuple[str, ...] = ()) -> P
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--serial", required=True)
+    parser.add_argument("--avd", help="Require this exact disposable AVD name")
     parser.add_argument("--adb", type=Path)
     arguments = parser.parse_args()
     # Deliberately refuse every physical serial before invoking device commands.
@@ -48,17 +49,6 @@ def main() -> int:
         adb = Path(sdk) / "platform-tools" / ("adb.exe" if os.name == "nt" else "adb")
     if adb is None:
         parser.error("ADB must be available through --adb, PATH or ANDROID_HOME")
-    inventory = subprocess.run(
-        [str(adb), "devices", "-l"],
-        capture_output=True,
-        encoding="utf-8",
-        errors="replace",
-        check=True,
-        timeout=20,
-    ).stdout
-    if not re.search(r"^" + re.escape(arguments.serial) + r"\s+device\b", inventory, re.MULTILINE):
-        raise RuntimeError("explicit emulator is absent from the ADB device inventory")
-
     def invoke(
         *command: str,
         timeout: int = 30,
@@ -110,6 +100,10 @@ def main() -> int:
     avd = names[0] if names else ""
     if not avd or avd == "OK":
         raise RuntimeError("selected emulator has no identifiable AVD")
+    if arguments.avd and avd != arguments.avd:
+        raise RuntimeError("selected emulator does not match the explicitly named AVD")
+    if invoke("shell", "getprop", "sys.boot_completed").strip() != "1":
+        raise RuntimeError("selected emulator has not completed boot")
 
     # connectedDebugAndroidTest removes its test APKs during teardown. Reinstall
     # both exact build outputs after the emulator guard and before direct am instrument.
