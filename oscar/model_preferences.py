@@ -30,10 +30,14 @@ def select_model(h: "Harness", value: Any) -> dict[str, Any]:
             raise ValueError("Choose an available cloud model")
         candidate = replace(
             candidate,
-            mode=Mode.FREE_FIRST,
+            mode=Mode.LOCAL
+            if provider in h.registry.providers and h.registry.providers[provider].local
+            else Mode.FREE_FIRST,
             pinned_provider=provider or None,
             pinned_model=model or None,
-            ollama_think=None,
+            ollama_think=False
+            if provider in h.registry.providers and h.registry.providers[provider].local
+            else None,
         )
     h.router.refresh(candidate, executor.policy)
     if value and not h.router.rank(candidate, executor.policy):
@@ -76,7 +80,13 @@ def model_snapshot(h: "Harness") -> dict[str, Any]:
     if isinstance(executor, ModelExecutor) and template and executor.policy.require_free:
         from dataclasses import replace
 
-        unpinned = replace(template, pinned_provider=None, pinned_model=None)
+        unpinned = replace(
+            template,
+            mode=Mode.FREE_FIRST,
+            pinned_provider=None,
+            pinned_model=None,
+            ollama_think=None,
+        )
         view = {
             "selected": (
                 template.pinned_provider + "::" + template.pinned_model
@@ -90,6 +100,7 @@ def model_snapshot(h: "Harness") -> dict[str, Any]:
                 }
             ),
             "free_only": True,
+            "local_available": executor.policy.allow_local,
             "provider_plans": [
                 {
                     "id": provider,

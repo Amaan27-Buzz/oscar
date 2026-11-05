@@ -1,6 +1,6 @@
 """Start the everyday Desktop with OSCAR's persistent, authenticated local Core.
 
-Cloud inference is restricted to verified-free routes; local fallback is disabled.
+Cloud inference is restricted to verified-free routes; installed local models are allowed.
 """
 
 import argparse
@@ -233,7 +233,9 @@ def main() -> int:
     parser.add_argument(
         "--grid-port", type=int, default=8765, help="Authenticated loopback Grid port"
     )
-    parser.add_argument("--provider", help="Optional cloud provider pin")
+    parser.add_argument(
+        "--provider", help="Optional provider pin; ollama-local uses installed models"
+    )
     parser.add_argument(
         "--headless", action="store_true", help="Run Core and authenticated Grid without Desktop"
     )
@@ -249,11 +251,11 @@ def main() -> int:
         default=[],
         help="Confirm this account has billing disabled and uses its Free plan (24 hours)",
     )
-    parser.add_argument("--model", help="Cloud model ID; use with --provider")
+    parser.add_argument("--model", help="Model ID; use with --provider")
     parser.add_argument(
         "--check",
         action="store_true",
-        help="Check verified-free cloud inference without opening Desktop",
+        help="Check zero-cost inference without opening Desktop",
     )
     args = parser.parse_args()
     if args.stop_on_stdin_close and not args.headless:
@@ -267,21 +269,21 @@ def main() -> int:
     data.mkdir(parents=True, exist_ok=True)
     registry = Registry.load(ROOT / "config/development-models.json")
     credentials = existing_provider_environment(ROOT / ".env.local", registry.providers.values())
-    cloud_providers = frozenset(
-        p.id for p in registry.providers.values() if not p.local and p.enabled
-    )
+    cloud_providers = frozenset(p.id for p in registry.providers.values() if p.enabled)
     if args.provider and args.provider not in cloud_providers:
-        parser.error("Choose a configured cloud provider; local inference is disabled")
+        parser.error("Choose a configured provider")
     template = ModelRequest.from_config(
         {
-            "mode": "free_first",
+            "mode": "local" if args.provider == "ollama-local" else "free_first",
             "pinned_provider": args.provider,
             "pinned_model": args.model,
             "max_output_tokens": 2048,
+            "ollama_think": False if args.provider == "ollama-local" else None,
         }
     )
     policy = RoutingPolicy(
         require_free=True,
+        allow_local=True,
         allowed_providers=cloud_providers,
         private_providers=cloud_providers,
         timeout_seconds=120,
@@ -324,9 +326,7 @@ def main() -> int:
         except KeyError:
             saved = None
         if saved and not args.provider and not args.model:
-            if saved.get("mode") != "local" and saved.get("pinned_provider") in cloud_providers | {
-                None
-            }:
+            if saved.get("pinned_provider") in cloud_providers | {None}:
                 template = ModelRequest.from_config(saved)
         executor.template = template
         h.router.refresh(template, policy)
@@ -335,19 +335,19 @@ def main() -> int:
             h.start()
             if not routes:
                 raise RuntimeError(
-                    "No verified-free cloud model available; no paid/local fallback used"
+                    "No eligible zero-cost model available; no paid fallback used"
                 )
             result = h.router.execute(
                 replace(template, prompt="Reply with a short greeting.", max_output_tokens=64),
                 policy,
             )
             if not result.response.text.strip():
-                raise RuntimeError("Cloud model returned no answer")
-            print("Verified-free cloud inference completed through OSCAR Model Router.")
+                raise RuntimeError("Model returned no answer")
+            print("Zero-cost inference completed through OSCAR Model Router.")
             print("Provider:", result.route.provider, "Model:", result.route.model)
             return 0
         if not routes:
-            print("Core ready; no verified-free model is currently available. Check model setup.")
+            print("Core ready; no eligible zero-cost model is available. Check model setup.")
         worker = mount_windows_worker(h, data / "core.sqlite")
         h.start()
         if args.headless:

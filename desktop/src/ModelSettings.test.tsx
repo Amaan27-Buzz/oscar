@@ -3,6 +3,11 @@ import {cleanup,fireEvent,render,screen} from '@testing-library/react';
 import {ModelSettings} from './ModelSettings';
 import {initialView} from './bridge';
 afterEach(cleanup);
+it('distinguishes installed Core-host models from cloud-only routing',()=>{
+ render(<ModelSettings view={{...initialView,link:'online',models:{selected:'ollama-local::fixture',available:['ollama-local::fixture'],free_only:true,local_available:true}}} busy={false} run={vi.fn()}/>);
+ expect(screen.getByText(/Verified free cloud and installed local models/)).toBeTruthy();
+ expect(screen.queryByText(/local fallback are disabled/)).toBeNull();
+});
 it('requires an explicit free-plan assertion before saving account status',async()=>{
   const run=vi.fn(async()=>true);
   render(<ModelSettings view={{...initialView,link:'online',models:{selected:'',available:[],free_only:true,provider_plans:[{id:'google',confirmed:false}]}}} busy={false} run={run}/>);

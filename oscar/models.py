@@ -320,6 +320,7 @@ class RoutingPolicy:
     max_paid_cost: float = 0.01
     allow_unknown_limits: bool = False
     require_free: bool = False
+    allow_local: bool = False
 
     def __post_init__(self) -> None:
         if (

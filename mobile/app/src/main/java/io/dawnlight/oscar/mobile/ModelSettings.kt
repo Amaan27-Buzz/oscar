@@ -17,7 +17,7 @@ import androidx.compose.runtime.*
         PreferenceValue("Current", models.selected.ifEmpty { "Automatic" }.replace("::", " · "))
         if (models.selected.isNotEmpty() && models.selected !in models.available)
             Text("The selected model is unavailable. Choose another model or Automatic.", style = MaterialTheme.typography.bodySmall)
-        if (models.freeOnly) Text("Verified free cloud routes only.", style = MaterialTheme.typography.bodySmall)
+        if (models.freeOnly) Text(if (models.localAvailable) "Verified free cloud and installed Core-host models. Paid calls disabled." else "Verified free cloud routes only.", style = MaterialTheme.typography.bodySmall)
         Box {
             OutlinedButton(onClick = { expanded = true }, enabled = !state.busy) { Text("Choose model") }
             DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {

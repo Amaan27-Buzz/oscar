@@ -22,6 +22,22 @@ from .support import RouterRig
 
 
 class RouterTests(unittest.TestCase):
+    def test_zero_cost_local_exception_requires_explicit_policy_and_local_provider(self):
+        provider = self.r.registry.providers["plentiful"]
+        self.r.registry.providers["plentiful"] = replace(provider, local=True)
+        for key, model in list(self.r.registry.models.items()):
+            self.r.registry.models[key] = replace(model, funding=Funding.LOCAL)
+        request = replace(self.r.request, mode=Mode.LOCAL, pinned_provider="plentiful")
+        self.assertFalse(self.r.router.rank(request, RoutingPolicy(require_free=True)))
+        policy = RoutingPolicy(require_free=True, allow_local=True)
+        self.assertTrue(self.r.router.rank(request, policy))
+        self.r.registry.providers["plentiful"] = provider
+        self.assertFalse(self.r.router.rank(request, policy))
+        self.r.registry.providers["plentiful"] = replace(provider, local=True)
+        for key, model in list(self.r.registry.models.items()):
+            self.r.registry.models[key] = replace(model, funding=Funding.PAID)
+        self.assertFalse(self.r.router.rank(request, policy))
+
     def test_provider_free_plan_requires_current_confirmation_for_the_same_vault_binding(self):
         from oscar.freshness import Authority, SourceRef
 

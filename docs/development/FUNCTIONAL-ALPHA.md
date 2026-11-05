@@ -312,3 +312,34 @@ now passes with warnings denied. The package still records its exact `90d6fd3`
 source; subsequent documentation/style changes are not mislabeled as that binary.
 Installed Ollama inventory includes Qwen3.5 9B/4B/0.8B; availability is not model
 quality or integrated local-mode acceptance. No new weights were downloaded.
+
+## Installed local model selection — active continuation
+
+Following the expanded authorization, everyday Core now allows installed local
+models alongside verified-free cloud routes. The Router's zero-cost policy has an
+explicit `allow_local` exception that defaults off for existing cloud-only callers.
+It accepts only a genuinely local provider with LOCAL funding; subscription, paid
+and unknown cloud funding do not qualify. Existing live Ollama metadata checks
+continue to reject cloud-proxy model claims.
+
+Desktop and Android shared model selectors identify this expanded policy. Selecting
+an installed model uses LOCAL mode and persists the selection; Automatic resets
+the pin and can choose eligible zero-cost routes. Switching lists include cloud
+routes even after a local model is selected. Explicit local selection disables
+optional Ollama thinking so short output budgets yield final answers. The first
+short check exhausted its final-text budget; the corrected real Qwen3.5 4B
+Router check passed with `python -m scripts.start_oscar --check --provider
+ollama-local --model qwen3.5:4b`. No new model download or secret change occurred.
+
+Focused routing/Grid/launcher regressions passed (98); model UI tests and
+TypeScript checking passed. Android unit tests, debug/instrumentation APK builds
+and lint passed; debug APK SHA-256:
+`2eb516c88c3384ae73147f1c932893d9f8aadab384eb026fa28fac1204ce6454`.
+Python typechecking and repository checks passed. Desktop debug build passed.
+The Windows ZIP still predates this integration and must be refreshed.
+
+The existing disposable API 36.1 AVD was retried with GPU emulation enabled,
+supported software rendering, 3 GB RAM and four cores. The same SurfaceFlinger
+buffer-mapping assertion persisted; the owned emulator was stopped. This concrete
+configuration change did not establish Android runtime acceptance. Device/image
+compatibility remains the next runtime investigation, not an application PASS.

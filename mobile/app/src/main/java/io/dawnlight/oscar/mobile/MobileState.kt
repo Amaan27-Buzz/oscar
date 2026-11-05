@@ -44,7 +44,7 @@ data class CoreSnapshot(val tasks: List<CoreTask>, val nodes: List<CoreNode>, va
     val management: ManagementView? = null, val connections: ConnectionView? = null, val executiveTruncated: Boolean = false,
     val models: ModelChoices? = null)
 
-data class ModelChoices(val selected: String, val available: List<String>, val freeOnly: Boolean)
+data class ModelChoices(val selected: String, val available: List<String>, val freeOnly: Boolean, val localAvailable: Boolean = false)
 
 internal fun parseModels(json: JSONObject): ModelChoices {
     val selected = if (json.isNull("selected")) "" else json.boundedText("selected", 300)
@@ -54,7 +54,8 @@ internal fun parseModels(json: JSONObject): ModelChoices {
     }
     require(available.distinct().size == available.size)
     require(!json.has("free_only") || json.get("free_only") is Boolean)
-    return ModelChoices(selected, available, json.optBoolean("free_only", false))
+    require(!json.has("local_available") || json.get("local_available") is Boolean)
+    return ModelChoices(selected, available, json.optBoolean("free_only", false), json.optBoolean("local_available", false))
 }
 data class ExecutiveGoal(val id: String, val goal: String, val state: String, val runs: Int, val maxRuns: Int)
 data class Interaction(val text: String, val response: String, val taskId: String? = null)

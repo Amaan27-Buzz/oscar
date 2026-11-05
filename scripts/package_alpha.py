@@ -94,8 +94,8 @@ Quit through Workspace Preferences or the tray to stop the owned runtime.
 
 Windows 10/11 and Microsoft Edge WebView2 Runtime are required.
 Python and Ollama are not required for conversation in this bundle.
-Cloud inference is restricted to verified-free routes; paid/local fallback is disabled.
-Messages and relevant context are sent to your selected cloud provider.
+Verified-free cloud and installed Core-host models are supported; paid calls are disabled.
+Cloud choices send messages and relevant context to that provider. Local models require Ollama.
 
 State and history: %LOCALAPPDATA%\\DawnlightLabs\\OSCAR
 Provider credentials: Windows Credential Manager via OSCAR's Vault.

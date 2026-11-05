@@ -282,12 +282,16 @@ class Router:
             )
             if model.requires_free_plan and not account_free:
                 continue
-            if policy.require_free and (
-                model.funding != Funding.FREE
-                or provider.local
-                or model.funding_source is None
-                or not (model.funding_source.authority == Authority.LIVE_API or account_free)
-                or not model.funding_source.current(self.clock())
+            if (
+                policy.require_free
+                and not (policy.allow_local and provider.local and model.funding == Funding.LOCAL)
+                and (
+                    model.funding != Funding.FREE
+                    or provider.local
+                    or model.funding_source is None
+                    or not (model.funding_source.authority == Authority.LIVE_API or account_free)
+                    or not model.funding_source.current(self.clock())
+                )
             ):
                 continue
             if not free and not policy.allow_paid:
