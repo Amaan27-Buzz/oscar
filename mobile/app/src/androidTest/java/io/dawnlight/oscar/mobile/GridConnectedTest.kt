@@ -87,6 +87,31 @@ class GridConnectedTest {
             compose.onNodeWithText(before!!).assertExists()
         }
     }
+    @Test fun realModelFollowsDesktopContext() {
+        emulator()
+        assumeTrue("Explicit isolated local-model fixture required", args.getString("grid_model_check") == "true")
+        trustedFixture {
+            val invitation = JSONObject(String(Base64.getDecoder().decode(args.getString("grid_invitation")), Charsets.UTF_8))
+            val model = session()
+            compose.runOnIdle { model.enroll(args.getString("grid_origin")!!, invitation, true) }
+            compose.waitUntil(25_000) { model.state.value.link == Link.CONNECTED }
+            compose.waitUntil(10_000) { model.state.value.interactions.any { it.text.contains("Cedar Otter") } }
+            val prompt = "Explain how that observation could help."
+            compose.onNodeWithTag("interactionInput").performTextInput(prompt)
+            compose.onNodeWithText("Send").performClick()
+            compose.waitUntil(125_000) {
+                model.state.value.interactions.any { it.text == prompt && it.response.contains("cedar", true) && it.response.contains("otter", true) }
+            }
+            assertNull(model.state.value.approval)
+            assertTrue(model.state.value.snapshot!!.tasks.any { it.description == prompt && it.state == "partially_verified" })
+            val saved = SessionVault(compose.activity).load()!!
+            val history = SessionVault(compose.activity).loadHistory(CoreClient(saved).binding())!!
+            assertTrue(history.toString().contains("Cedar"))
+            compose.activityRule.scenario.recreate()
+            compose.waitUntil(20_000) { model.state.value.link == Link.CONNECTED }
+            compose.waitUntil(10_000) { model.state.value.interactions.any { it.text == prompt && it.response.contains("otter", true) } }
+        }
+    }
     @Test fun processRestored() {
         emulator()
         assumeTrue("Previously enrolled isolated fixture required", args.getString("grid_origin") != null)

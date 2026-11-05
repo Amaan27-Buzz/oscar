@@ -38,6 +38,11 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--serial", required=True)
     parser.add_argument("--avd", help="Require this exact disposable AVD name")
+    parser.add_argument(
+        "--real-model",
+        action="store_true",
+        help="Verify native conversation with installed Qwen3.5 4B",
+    )
     parser.add_argument("--adb", type=Path)
     arguments = parser.parse_args()
     # Deliberately refuse every physical serial before invoking device commands.
@@ -49,6 +54,7 @@ def main() -> int:
         adb = Path(sdk) / "platform-tools" / ("adb.exe" if os.name == "nt" else "adb")
     if adb is None:
         parser.error("ADB must be available through --adb, PATH or ANDROID_HOME")
+
     def invoke(
         *command: str,
         timeout: int = 30,
@@ -153,11 +159,79 @@ def main() -> int:
         invoke("exec-out", "run-as", PACKAGE, "cat", "files/d2-device-identity.json")
     )
     with android_core_fixture(identity) as (fixture, core_process, details):
+        if arguments.real_model:
+            from time import time
+
+            from oscar.cloud import CloudCore
+            from oscar.event_archive import SourceEvent
+
+            fixture.stop_all()
+            (fixture.root / "models.json").write_bytes(
+                (ROOT / "config/development-models.json").read_bytes()
+            )
+            configuration = json.loads(fixture.path.read_text(encoding="utf-8"))
+            configuration.update(
+                model_request={
+                    "mode": "local",
+                    "pinned_provider": "ollama-local",
+                    "pinned_model": "qwen3.5:4b",
+                    "ollama_think": False,
+                    "max_output_tokens": 256,
+                },
+                model_timeout_seconds=120,
+            )
+            fixture.path.write_text(json.dumps(configuration), encoding="utf-8")
+            # The same initialized identity/archive, updated only with synthetic context.
+            with_core = CloudCore(fixture.config, start_services=False)
+            try:
+                with_core.harness.archive.append(
+                    SourceEvent(
+                        "owner",
+                        "The project codename is Cedar Otter, "
+                        "chosen for a calm and resourceful personality.",
+                        "desktop/conversation",
+                        time(),
+                        kind="conversation_owner",
+                    ),
+                    retain_authorized=True,
+                )
+            finally:
+                with_core.close()
+            core_process = fixture.start_core()
+            fixture.start_worker()
         port = str(details["grid_port"])
         invoke("reverse", "tcp:" + port, "tcp:" + port)
         try:
             connection = {k: str(v) for k, v in details.items() if k.startswith("grid_")}
             connection.pop("grid_port")
+            if arguments.real_model:
+                instrument(
+                    "GridConnectedTest",
+                    "realModelFollowsDesktopContext",
+                    **connection,
+                    grid_model_check="true",
+                )
+                snapshot = fixture.mobile.request("snapshot", {})
+                if not any(
+                    e["speaker"] == "oscar" and "otter" in e["text"].lower()
+                    for e in snapshot["events"]
+                ):
+                    raise RuntimeError(
+                        "Independent Core history did not confirm contextual native response"
+                    )
+                print(
+                    json.dumps(
+                        {
+                            "status": "EMULATED_REAL_MODEL",
+                            "model": "ollama-local/qwen3.5:4b",
+                            "native_composer": True,
+                            "context": "synthetic Desktop observation",
+                            "owner_phone": "NOT_RUN",
+                        }
+                    ),
+                    flush=True,
+                )
+                return 0
             instrument("GridConnectedTest", "connectedGrid", **connection)
             invoke("shell", "am", "force-stop", PACKAGE)
             instrument(

@@ -401,3 +401,22 @@ All 74 affected Desktop/Grid/conversation-planning regressions passed. New check
 cover source-ID prompt composition, private routing, read-scope withdrawal and
 forgetting after admission. Typechecking and lint passed. Native Android follow-up
 acceptance and a rebuilt Windows package remain outstanding for this change.
+
+### Actual Android composer follow-up acceptance
+
+`python -m scripts.verify_android_grid --serial emulator-5582 --avd
+oscar_functional_alpha_api36_1 --real-model` passed native
+`GridConnectedTest.realModelFollowsDesktopContext`. It enrolled the disposable
+Android app over actual trusted-CA HTTPS, loaded the canonical synthetic Desktop
+observation, typed into `interactionInput`, pressed Send, and received a real
+installed Qwen3.5 4B response using its Cedar Otter codename. The test verified
+Partially verified status rather than fabricating independent verification of
+model prose, encrypted history persistence, and continuity after activity
+recreation. Independent Core snapshot readback also confirmed the answer.
+
+This uses the production CoreSession/composer/transport/history paths with a
+synthetic owner and isolated Core, not an injected transcript or canned model
+response. It does not commission the owner's physical phone or establish every
+native permission/OEM behavior. Both APK builds, unit tests and lint passed;
+the application APK is unchanged by the test-only addition. The Windows package
+is being refreshed to include the latest Core context handoff.
