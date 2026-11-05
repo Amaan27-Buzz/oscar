@@ -610,10 +610,10 @@ impl Bridge {
             view.review = None;
         }
         view.capabilities = caps;
-        if let Ok(mut notice) = client.oauth_notice.lock() {
-            if let Some(message) = notice.take() {
-                view.message = Some(message);
-            }
+        if let Ok(mut notice) = client.oauth_notice.lock()
+            && let Some(message) = notice.take()
+        {
+            view.message = Some(message);
         }
         view.nodes = nodes;
         if let Some(connection) = &mut view.connection {
@@ -826,10 +826,10 @@ impl Bridge {
             if let Some(executive) = value.get("executive") {
                 view.executive = Some(executive.clone());
             }
-            if let Some(assistance) = value.get("assistance") {
-                if let Some(executive) = &mut view.executive {
-                    executive["management"] = assistance.clone();
-                }
+            if let Some(assistance) = value.get("assistance")
+                && let Some(executive) = &mut view.executive
+            {
+                executive["management"] = assistance.clone();
             }
         }
         if let Some(authority) = value.get("authority") {

@@ -190,12 +190,11 @@ impl Enrollment {
             return Err("callback path rejected".into());
         }
         let query = pairs(&callback)?;
-        if let Some(expected) = &self.issuer {
-            if query.get("iss").is_some_and(|actual| actual != expected)
-                || self.issuer_required && !query.contains_key("iss")
-            {
-                return Err("MCP callback issuer rejected".into());
-            }
+        if let Some(expected) = &self.issuer
+            && (query.get("iss").is_some_and(|actual| actual != expected)
+                || self.issuer_required && !query.contains_key("iss"))
+        {
+            return Err("MCP callback issuer rejected".into());
         }
         if query.get("state") != Some(&self.state) {
             return Err("callback state rejected".into());

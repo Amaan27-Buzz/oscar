@@ -278,8 +278,37 @@ tests passed (7), UI voice tests passed (5), and native tests passed (42 with on
 existing fixture-only skip). Typechecking and native build passed. Hardware audio,
 speech quality, barge-in during actual playback and rendered control acceptance
 remain NOT RUN. Installed Windows speech is a fallback voice binding, not owner
-acceptance of OSCAR's final voice identity. Packaging is being refreshed.
+acceptance of OSCAR's final voice identity. The roughly 72 MB Windows bundle was
+rebuilt from clean `90d6fd3`. PortAudio, NumPy audio support and the Windows speech
+helper are present; no credential files or user databases are bundled. Its frozen
+executable passed actual Gemini Flash-Lite inference outside the repository.
+Packaged hardware voice acceptance remains NOT RUN.
 
 Current provider contracts: [Groq transcription](https://console.groq.com/docs/speech-to-text)
 and [Free-plan limits](https://console.groq.com/docs/rate-limits). Account confirmation,
 provider availability and actual remaining quotas remain separate observations.
+
+## Owner expanded authorization and rendered acceptance — 2026-11-06
+
+The owner explicitly lifted prior execution restrictions and made local compute
+available for the full product mandate. Local-model and GUI/device verification
+may now proceed. This supersedes the earlier background-only/local-model
+prohibitions in this dated record. Configuration preservation remains the working
+practice; no cleanup, credential replacement or paid inference is needed here.
+The packaged everyday profile still enforces verified-free cloud routing until
+an explicit local-mode implementation is integrated and verified.
+
+The actual frozen Windows app rendered all four introduction steps, saved/resumed
+their progression, and submitted its first request into Workspace. Its native Ask
+review was inspected and confirmed for the bounded explanatory prompt. The actual
+model response rendered with the honest Partially verified / Not independently
+checked status. This establishes packaged onboarding-to-response behavior, not
+general native computer control, audio hardware quality or owner acceptance.
+
+Broader background checks passed: 130 focused Python cases, 31 UI cases, full
+Python typechecking and repository secret-safety checks. Three pre-existing Clippy
+collapsible-if warnings were corrected without changing their predicates; Clippy
+now passes with warnings denied. The package still records its exact `90d6fd3`
+source; subsequent documentation/style changes are not mislabeled as that binary.
+Installed Ollama inventory includes Qwen3.5 9B/4B/0.8B; availability is not model
+quality or integrated local-mode acceptance. No new weights were downloaded.
