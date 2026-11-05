@@ -29,6 +29,71 @@ from oscar.storage import StateConflict, Store
 
 
 class CloudStateTests(unittest.TestCase):
+    def test_local_core_adoption_preserves_identity_history_and_vault_references(self):
+        local = self.root / "everyday"
+        with Harness(
+            local / STATE_NAME,
+            local / "workspace",
+            Path("config/development-models.json"),
+            node_id="oscar-local-core",
+            start_services=False,
+        ) as h:
+            h.runtime.setup.configure(
+                "preferences",
+                {
+                    "reduced_motion": True,
+                    "show_presence": True,
+                },
+                owner_authorized=True,
+            )
+            owner = h.store.get("core_identity", "core")
+            binding = {
+                "reference": "synthetic-vault-reference",
+                "relationship": "owner",
+                "slot": "fixture",
+                "state": "configured",
+            }
+            h.store.put("setup_provider", "synthetic", binding)
+            event = SourceEvent("owner", "Preserve this canonical conversation", "test", time())
+            h.archive.append(event, retain_authorized=True)
+        with DataDirectoryLock(local):
+            initialize_identity(local, "oscar-local-core", initialize=True, adopt_existing=True)
+            self.assertEqual(validate_state(local), "oscar-local-core")
+        with closing(Store(local / STATE_NAME)) as store:
+            self.assertEqual(store.get("core_identity", "core"), owner)
+            self.assertEqual(store.get("setup_provider", "synthetic"), binding)
+        with closing(EventArchive(local / ARCHIVE_NAME)) as archive:
+            self.assertEqual(archive.event(event.id).content, event.content)
+
+    def test_local_adoption_rejects_another_archives_identity_before_writing(self):
+        local = self.root / "mismatched-local"
+        with Harness(
+            local / STATE_NAME,
+            local / "workspace",
+            Path("config/development-models.json"),
+            node_id="oscar-local-core",
+            start_services=False,
+        ) as h:
+            h.runtime.setup.configure(
+                "preferences",
+                {
+                    "reduced_motion": True,
+                    "show_presence": True,
+                },
+                owner_authorized=True,
+            )
+            with h.archive.db:
+                h.archive.db.execute(
+                    "INSERT INTO archive_metadata(key,value) VALUES('cloud_core_id','other-core')"
+                )
+        with DataDirectoryLock(local):
+            with self.assertRaises(StateConflict):
+                initialize_identity(local, "oscar-local-core", initialize=True, adopt_existing=True)
+        self.assertFalse((local / IDENTITY_NAME).exists())
+        with closing(Store(local / STATE_NAME)) as store:
+            with self.assertRaises(KeyError):
+                store.get("cloud_identity", "core")
+
     def setUp(self):
         self.temp = TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)

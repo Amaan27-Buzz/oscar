@@ -2322,7 +2322,9 @@ class RemoteGrid:
                 {
                     "event_id": event["id"],
                     "sequence": sequence,
-                    "turn_id": event["turn_id"],
+                    "turn_id": (event["task_id"] or event["turn_id"])
+                    if event["kind"] in {"conversation_owner", "conversation_oscar"}
+                    else event["turn_id"],
                     "task_id": event["task_id"],
                     "speaker": "oscar"
                     if event["kind"] in {"remote_result", "conversation_oscar"}

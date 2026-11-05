@@ -14,12 +14,14 @@ import re
 import shutil
 import sqlite3
 import tempfile
+from contextlib import closing
 from importlib import import_module
 from pathlib import Path, PurePosixPath
 from types import TracebackType
 from typing import BinaryIO
 
 from .event_archive import EventArchive
+from .grid import NodeRole
 from .storage import StateConflict, Store
 
 STATE_NAME = "core.sqlite"
@@ -101,7 +103,11 @@ def _read_identity(data_dir: Path) -> str:
 
 
 def initialize_identity(
-    data_dir: Path, configured_core_id: str, *, initialize: bool = False
+    data_dir: Path,
+    configured_core_id: str,
+    *,
+    initialize: bool = False,
+    adopt_existing: bool = False,
 ) -> str:
     """Call under DataDirectoryLock; never manufacture an owner or enroll authority.
 
@@ -117,6 +123,8 @@ def initialize_identity(
     if not initialize:
         raise StateConflict("Core is not initialized; explicit initialization required")
     if any(path.name != LOCK_NAME for path in data_dir.iterdir()):
+        if adopt_existing:
+            return adopt_local_state(data_dir, identifier)
         raise StateConflict("initialization requires an empty data directory")
     store = Store(data_dir / STATE_NAME)
     try:
@@ -141,6 +149,73 @@ def initialize_identity(
     _sync_directory(data_dir)
     validate_state(data_dir)
     return identifier
+
+
+def adopt_local_state(data_dir: Path, configured_core_id: str) -> str:
+    """Under the single-writer lock, add deployment identity to an existing local Core.
+
+    This preserves both databases and their owner identity, policies and Vault refs.
+    It never imports another checkout, repairs mismatched identities or re-enrolls authority.
+    """
+    identifier = _core_id(configured_core_id)
+    path = data_dir / IDENTITY_NAME
+    if path.exists() or path.is_symlink():
+        return initialize_identity(data_dir, identifier)
+    for filename in (STATE_NAME, ARCHIVE_NAME):
+        with closing(_database(data_dir / filename)) as connection:
+            if connection.execute("PRAGMA user_version").fetchone()[0] != 1 or (
+                connection.execute("PRAGMA integrity_check").fetchall() != [("ok",)]
+                or connection.execute("PRAGMA foreign_key_check").fetchone()
+            ):
+                raise StateConflict("Existing local Core requires integrity review")
+            if filename == STATE_NAME:
+                node = connection.execute(
+                    "SELECT data FROM records WHERE kind='node' AND id=?", (identifier,)
+                ).fetchone()
+                owner = connection.execute(
+                    "SELECT data FROM records WHERE kind='core_identity' AND id='core'"
+                ).fetchone()
+                marker = connection.execute(
+                    "SELECT data FROM records WHERE kind='cloud_identity' AND id='core'"
+                ).fetchone()
+                if not node or not owner:
+                    raise StateConflict("Only an identified existing local Core can be adopted")
+                node_data, owner_data = json.loads(node[0]), json.loads(owner[0])
+                if (
+                    node_data.get("role") != NodeRole.CLOUD
+                    or node_data.get("revoked")
+                    or (owner_data.get("relationship") != "owner" or not owner_data.get("id"))
+                ):
+                    raise StateConflict("Existing local Core identity or revocation does not match")
+                existing = json.loads(marker[0]).get("id") if marker else identifier
+            else:
+                marker = connection.execute(
+                    "SELECT value FROM archive_metadata WHERE key='cloud_core_id'"
+                ).fetchone()
+                existing = marker[0] if marker else identifier
+            if existing != identifier:
+                raise StateConflict("Existing canonical databases belong to a different Core")
+    store = Store(data_dir / STATE_NAME)
+    try:
+        store.put("cloud_identity", "core", {"id": identifier, "version": 1})
+    finally:
+        store.close()
+    archive = EventArchive(data_dir / ARCHIVE_NAME)
+    try:
+        with archive.db:
+            archive.db.execute(
+                "INSERT OR IGNORE INTO archive_metadata(key,value) VALUES('cloud_core_id',?)",
+                (identifier,),
+            )
+    finally:
+        archive.close()
+    with path.open("x", encoding="utf-8") as handle:
+        path.chmod(0o600)
+        json.dump({"version": 1, "core_id": identifier}, handle)
+        handle.flush()
+        os.fsync(handle.fileno())
+    _sync_directory(data_dir)
+    return validate_state(data_dir)
 
 
 def _database(path: Path) -> sqlite3.Connection:

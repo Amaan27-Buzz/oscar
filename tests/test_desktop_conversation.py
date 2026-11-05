@@ -1,12 +1,13 @@
 """Canonical history composition; synthetic executors, no owner data or live inference."""
 
+import json
 import unittest
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 from oscar.contracts import Epistemic
 from oscar.desktop import Desktop
-from oscar.event_archive import SourceEvent
+from oscar.event_archive import MemoryWriter, SourceEvent
 from oscar.grid import Node, NodeRole
 from oscar.harness import Harness
 from oscar.memory_fabric import MemoryFabric
@@ -33,6 +34,38 @@ class ConversationTests(unittest.TestCase):
 
     def tearDown(self):
         test_desktop.DesktopTests.tearDown(self)
+
+    def test_remote_history_shares_archive_and_hides_results_after_source_forget(self):
+        owner = SourceEvent(
+            "owner",
+            "Phone request",
+            "remote-grid:owner",
+            1,
+            kind="owner_turn",
+            id="phone-owner",
+            task_id="phone-task",
+        )
+        reply = SourceEvent(
+            "owner",
+            json.dumps({"state": "verified", "result": {"value": "Phone answer"}}),
+            "remote-grid:oscar",
+            2,
+            kind="remote_result",
+            id="phone-answer",
+            turn_id=owner.id,
+            task_id="phone-task",
+            status=Epistemic.VERIFIED,
+        )
+        for event in (owner, reply):
+            self.archive.append(event, retain_authorized=True)
+        history = self.call("conversation", {"before": 0})
+        self.assertEqual(["Phone request", "Phone answer"], [t["text"] for t in history["turns"]])
+        self.assertEqual(Epistemic.VERIFIED, history["turns"][1]["status"])
+        memory = MemoryWriter(self.archive).retain(
+            (owner.id,), owner.content, "episodic", retain_authorized=True, inferred=False
+        )
+        self.archive.forget(memory.id, owner_authorized=True, forget_sources=True)
+        self.assertEqual([], self.call("conversation", {"before": 0})["turns"])
 
     def test_retained_turns_reopen_from_canonical_archive_without_private_replay(self):
         task = self.ask("2 + 3")

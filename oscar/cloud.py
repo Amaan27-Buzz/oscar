@@ -8,7 +8,7 @@ import signal
 import sqlite3
 import stat
 import sys
-from collections.abc import Iterator
+from collections.abc import Iterator, Mapping
 from contextlib import contextmanager
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -24,6 +24,7 @@ from .harness import Harness
 from .jev import Intent
 from .local_memory import LocalMemory, LocalMemoryConfig
 from .models import ModelRequest, RoutingPolicy
+from .oauth_device import Vault
 from .policy import PersonalPolicy
 from .registry import Registry
 from .secure_credentials import InjectedCredentialStore
@@ -209,6 +210,9 @@ class CloudCore:
         initialize: bool = False,
         renew_execution: bool = False,
         start_services: bool = True,
+        vault: Vault | None = None,
+        credential_environ: Mapping[str, str] | None = None,
+        adopt_existing: bool = False,
     ):
         self.config, self.lock = config, RLock()
         self.directory_lock = DataDirectoryLock(config.data_dir)
@@ -217,8 +221,14 @@ class CloudCore:
         self.remote: Any = None
         self.closed = False
         try:
-            initialize_identity(config.data_dir, config.core_id, initialize=initialize)
-            vault = InjectedCredentialStore(config.secret_dir)
+            initialize_identity(
+                config.data_dir,
+                config.core_id,
+                initialize=initialize,
+                adopt_existing=adopt_existing,
+            )
+            if vault is None:
+                vault = InjectedCredentialStore(config.secret_dir)
             account_vault: Any = vault
             if config.auth_config is not None:
                 import base64
@@ -231,7 +241,7 @@ class CloudCore:
                 account_vault = EncryptedCredentialStore(
                     config.data_dir / "account-credentials", key, vault
                 )
-            credentials: dict[str, str] = {}
+            credentials: dict[str, str] = dict(credential_environ or {})
             for name, reference in config.provider_secrets.items():
                 try:
                     credentials[name] = vault.read(reference).value

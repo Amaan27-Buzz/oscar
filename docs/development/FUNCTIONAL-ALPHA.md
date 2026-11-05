@@ -128,11 +128,44 @@ reporting checkpoint, not a change to alpha completion criteria.
   planning reliability is not established. `gemini-3.8-flash` is listed by the
   current API but this account's generation check returned HTTP 403; it is not
   claimed operational.
-- A Windows bundle with the frozen Core, Desktop and Companion has been produced.
-  It is being rebuilt against these changes and still needs isolated packaged
-  startup/Vault verification before owner testing. No secrets or user databases
-  belong in it. Packaging script: `python -m scripts.package_alpha`.
+- A roughly 61 MB Windows bundle from clean commit `aef309f` contains the frozen
+  Core, Desktop and Companion. The actual frozen executable passed Gemini
+  Flash-Lite inference outside the checkout using existing Windows Vault bindings.
+  No configuration secrets or user databases are bundled. Full packaged GUI and
+  owner acceptance remain outstanding. Packaging: `python -m scripts.package_alpha`.
 
 No computer-use interactions are to be performed during the current background
 continuation. No physical phone, real capture, paid inference or local reasoning
 model is authorized by this continuation.
+
+## Shared everyday Core — 2026-11-06
+
+The everyday launcher now composes the existing CloudCore and authenticated v2
+Grid listener with the same Harness, canonical databases and local Windows Vault.
+The listener binds only to `127.0.0.1:8765`; this does not deploy a Cloud Core or
+enable a production phone's HTTPS connection. Existing Desktop v1 admission remains.
+Explicit local-state adoption validates both databases and the existing owner/Core
+identity before adding deployment identity metadata. It never resets enrollment.
+
+Desktop projects retained phone turns from the same Event Archive. Android Grid
+history pairs retained Desktop requests and answers by task ID, including older
+events whose independently generated turn IDs differed. Canonical events are not
+rewritten. Forgotten source requests suppress dependent answer projection.
+
+Background service mode is available with `python -m scripts.start_oscar --headless`.
+For a supervising process, add `--stop-on-stdin-close` and provide an anonymous stdin
+pipe; closing that pipe shuts down the owned listener, services and state lock.
+The actual persistent Core passed loopback health and clean exit (code 0), without
+opening Desktop. Real Gemini inference passed after adoption; comparisons confirmed
+unchanged owner identity, Vault bindings, pre-existing archive events and ignored
+`.env.local`. Focused Cloud/state/launcher tests (45) and Desktop/Grid history tests
+(42) passed; full Python typechecking passed (110 modules including the launcher).
+These changes still need a rebuilt bundle and integrated Android acceptance.
+
+The installed API 35 system-image directory is empty; the API 36.1 Play Store image
+is present. No AVD is configured. Earlier directory-only inspection did not establish
+an installed API 35 image. No physical Android device has been accessed.
+
+The requested quota report was delivered at the next observed checkpoint: 38%
+five-hour allowance remaining (previous observation 60%). The exact 50% crossing
+was not observed. This checkpoint does not imply alpha completion.

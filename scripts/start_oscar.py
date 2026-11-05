@@ -9,24 +9,28 @@ import os
 import shutil
 import subprocess
 import sys
+from contextlib import closing
 from dataclasses import replace
 from pathlib import Path
 from queue import Queue
-from threading import Thread
+from threading import Event, Thread
 
-from oscar.cloud_state import DataDirectoryLock
+from oscar.cloud import CloudConfig, CloudCore
+from oscar.cloud_http import CloudHTTPServer
 from oscar.connectors import ConnectorVerifier
 from oscar.credential_loading import existing_provider_environment, import_missing_vault_bindings
 from oscar.desktop import Desktop
 from oscar.desktop_verify import DesktopVerifier
-from oscar.grid import InternalSessionRuntime, Node, NodeRole
-from oscar.harness import Harness
+from oscar.grid import InternalSessionRuntime, Node, NodeRole, SessionHandle
+from oscar.harness import Harness, ModelExecutor
 from oscar.interactive_worker import InteractiveWorker
 from oscar.machine import MachineScope, MachineVerifier
 from oscar.mobile import MobileServer
 from oscar.models import ModelRequest, RoutingPolicy
 from oscar.policy import PersonalPolicy
 from oscar.registry import Registry
+from oscar.remote_grid import RemoteVerifier
+from oscar.secure_credentials import WindowsCredentialStore
 from oscar.storage import Store
 from oscar.transport import Dispatcher
 
@@ -59,7 +63,7 @@ def renew_local_execution(state: Path, node_id: str = "oscar-local-core") -> boo
         store.close()
 
 
-def desktop_session(h: Harness, worker_node: str | None = None):
+def desktop_session(h: Harness, worker_node: str | None = None) -> SessionHandle:
     """Local trusted enrollment; each launch replaces the old surface session."""
     scopes = (
         "heartbeat",
@@ -102,7 +106,7 @@ def desktop_session(h: Harness, worker_node: str | None = None):
         return h.grid.pair(node, scopes, ttl=86400)
 
 
-def mount_windows_worker(h: Harness, state: Path):
+def mount_windows_worker(h: Harness, state: Path) -> InteractiveWorker:
     """Mount installed executors under Ask; no capture, clipboard or microphone grant."""
     node_id = "oscar-local-windows"
     scopes = (
@@ -146,8 +150,10 @@ def mount_windows_worker(h: Harness, state: Path):
     capabilities = worker.capabilities()
     h.grid.advertise(session, capabilities)
     dispatcher = Dispatcher(h.store, h.grid, node_id, worker.executors())
-    h.executive.targets[node_id] = (dispatcher, session)
+    h.executive.targets = {**h.executive.targets, node_id: (dispatcher, session)}
     verifier = h.runtime.verifier
+    if isinstance(verifier, RemoteVerifier):
+        verifier = verifier.original
     if not isinstance(verifier, ConnectorVerifier):
         raise RuntimeError("Canonical connector verifier composition changed")
     verifier.base = MachineVerifier(worker.files)
@@ -159,7 +165,7 @@ def mount_windows_worker(h: Harness, state: Path):
     return worker
 
 
-def run_desktop(core: Desktop, session, executable: Path) -> None:
+def run_desktop(core: Desktop, session: SessionHandle, executable: Path) -> None:
     # Credentials travel only over the anonymous stdin pipe, never arguments/files.
     with MobileServer(core) as server:
         process = subprocess.Popen(
@@ -219,7 +225,18 @@ def run_desktop(core: Desktop, session, executable: Path) -> None:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--data-dir", type=Path)
+    parser.add_argument(
+        "--grid-port", type=int, default=8765, help="Authenticated loopback Grid port"
+    )
     parser.add_argument("--provider", help="Optional cloud provider pin")
+    parser.add_argument(
+        "--headless", action="store_true", help="Run Core and authenticated Grid without Desktop"
+    )
+    parser.add_argument(
+        "--stop-on-stdin-close",
+        action="store_true",
+        help="With --headless, stop cleanly when the parent closes its stdin pipe",
+    )
     parser.add_argument(
         "--confirm-free-plan",
         action="append",
@@ -234,9 +251,13 @@ def main() -> int:
         help="Check verified-free cloud inference without opening Desktop",
     )
     args = parser.parse_args()
+    if args.stop_on_stdin_close and not args.headless:
+        parser.error("--stop-on-stdin-close requires --headless")
+    if not 1 <= args.grid_port <= 65535:
+        parser.error("Grid port must be between 1 and 65535")
     data = args.data_dir or Path(os.environ["LOCALAPPDATA"]) / "DawnlightLabs/OSCAR"
     executable = ROOT / "desktop/src-tauri/target/debug/oscar-desktop.exe"
-    if not args.check and not executable.is_file():
+    if not args.check and not args.headless and not executable.is_file():
         parser.error("Build Desktop first: python -m scripts.build_desktop")
     data.mkdir(parents=True, exist_ok=True)
     registry = Registry.load(ROOT / "config/development-models.json")
@@ -261,25 +282,37 @@ def main() -> int:
         timeout_seconds=120,
         max_paid_cost=0,
     )
-    with (
-        DataDirectoryLock(data),
-        Harness(
-            data / "core.sqlite",
-            data / "workspace",
-            ROOT / "config/development-models.json",
-            template,
-            node_id="oscar-local-core",
-            model_timeout_seconds=120,
+    configuration = CloudConfig(
+        core_id="oscar-local-core",
+        data_dir=data,
+        manifest=ROOT / "config/development-models.json",
+        secret_dir=data.parent / "OSCAR-vault",
+        listen_host="127.0.0.1",
+        listen_port=args.grid_port,
+        ingress="loopback",
+        allowed_hosts=("127.0.0.1",),
+        model_request=template,
+        model_timeout_seconds=120,
+    )
+    with closing(
+        CloudCore(
+            configuration,
+            initialize=True,
+            adopt_existing=True,
+            renew_execution=renew_local_execution(data / "core.sqlite"),
+            start_services=False,
+            vault=WindowsCredentialStore(),
             credential_environ=credentials,
-            execution_enrollment_authorized=renew_local_execution(data / "core.sqlite"),
-        ) as h,
-    ):
+        )
+    ) as coordinator:
+        h = coordinator.harness
         assert h.runtime.setup is not None
         import_missing_vault_bindings(h.runtime.setup, h.registry.providers.values(), credentials)
         for slot in h.pool.slots.values():
             if slot.provider in args.confirm_free_plan and slot.present:
                 h.runtime.setup.confirm_free_plan(slot.id, owner_authorized=True)
         executor = h.dispatcher.executors["models.reason"]
+        assert isinstance(executor, ModelExecutor)
         executor.policy = policy
         try:
             saved = h.store.get("desktop_model", "selection")["configuration"]
@@ -294,6 +327,7 @@ def main() -> int:
         h.router.refresh(template, policy)
         routes = h.router.rank(template, policy)
         if args.check:
+            h.start()
             if not routes:
                 raise RuntimeError(
                     "No verified-free cloud model available; no paid/local fallback used"
@@ -310,6 +344,22 @@ def main() -> int:
         if not routes:
             print("Core ready; no verified-free model is currently available. Check model setup.")
         worker = mount_windows_worker(h, data / "core.sqlite")
+        h.start()
+        if args.headless:
+            grid_server = CloudHTTPServer(coordinator)
+            grid_server.start()
+            try:
+                print("OSCAR Core and authenticated loopback Grid ready.", flush=True)
+                if args.stop_on_stdin_close:
+                    while sys.stdin.buffer.read(1):
+                        pass
+                else:
+                    Event().wait()
+            except KeyboardInterrupt:
+                pass
+            finally:
+                grid_server.close()
+            return 0
         session = desktop_session(h, worker.session.node_id)
         core = Desktop(
             h.runtime,
@@ -323,7 +373,12 @@ def main() -> int:
             },
             worker_outputs={worker.session.node_id: worker.outputs},
         )
-        run_desktop(core, session, executable)
+        grid_server = CloudHTTPServer(coordinator)
+        grid_server.start()
+        try:
+            run_desktop(core, session, executable)
+        finally:
+            grid_server.close()
     return 0
 
 

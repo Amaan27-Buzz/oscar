@@ -3,6 +3,7 @@
 Presentation never executes apps. Private payloads expire on restart, not into memory.
 """
 
+import json
 import re
 import sqlite3
 from typing import Any
@@ -148,18 +149,31 @@ class Desktop(Mobile):
         if retained and archive is not None:
             page = archive.conversation(self.runtime.relationship_id, before=before)
             cursor = page["before"]
-            turns = [
-                {
-                    "id": e.id,
-                    "task_id": e.task_id or "",
-                    "role": "owner" if e.kind == "conversation_owner" else "oscar",
-                    "text": e.content,
-                    "status": e.status,
-                    "occurred_at": e.occurred_at,
-                    "retained": True,
-                }
-                for e in page["events"]
-            ]
+            for e in page["events"]:
+                text = e.content
+                if e.kind == "remote_result":
+                    try:
+                        parent = archive.event(e.turn_id)
+                    except KeyError:
+                        continue
+                    if parent.relationship_id != self.runtime.relationship_id:
+                        continue
+                    projection = json.loads(text)
+                    value = (projection.get("result") or {}).get("value")
+                    text = str(value) if value is not None else "Task " + projection["state"]
+                turns.append(
+                    {
+                        "id": e.id,
+                        "task_id": e.task_id or "",
+                        "role": "owner"
+                        if e.kind in {"conversation_owner", "owner_turn"}
+                        else "oscar",
+                        "text": text,
+                        "status": e.status,
+                        "occurred_at": e.occurred_at,
+                        "retained": True,
+                    }
+                )
         elif before:
             raise PermissionError("retained conversation read unavailable")
         if not before:

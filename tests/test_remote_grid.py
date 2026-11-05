@@ -578,6 +578,23 @@ class RemoteGridTests(unittest.TestCase):
         self.assertEqual(resumed["events"], [])
         self.assertEqual(first["events"], sorted(first["events"], key=lambda e: e["sequence"]))
 
+    def test_desktop_retained_turns_pair_on_mobile_by_task_without_rewriting_events(self):
+        for role in ("owner", "oscar"):
+            self.core.harness.archive.append(
+                SourceEvent(
+                    "owner",
+                    "Desktop " + role,
+                    "desktop/conversation",
+                    1,
+                    kind="conversation_" + role,
+                    task_id="desktop-turn",
+                ),
+                retain_authorized=True,
+            )
+        events = self.mobile.request("snapshot", {"cursor": 0})["events"]
+        self.assertEqual(["owner", "oscar"], [e["speaker"] for e in events])
+        self.assertEqual(["desktop-turn"] * 2, [e["turn_id"] for e in events])
+
     def test_completion_and_snapshot_repair_retain_one_result_memory(self):
         archive = self.core.harness.archive
         append = archive.append

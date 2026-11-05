@@ -294,7 +294,11 @@ class EventArchive:
             raise ValueError("bounded conversation page required")
         rows = self.db.execute(
             "SELECT rowid,id FROM archive_events WHERE relationship=? AND forgotten=0 "
-            "AND json_extract(payload,'$.kind') IN ('conversation_owner','conversation_oscar') "
+            "AND (json_extract(payload,'$.kind') IN ('conversation_owner','conversation_oscar') "
+            "OR (json_extract(payload,'$.kind')='owner_turn' "
+            "AND json_extract(payload,'$.source')='remote-grid:owner') "
+            "OR (json_extract(payload,'$.kind')='remote_result' "
+            "AND json_extract(payload,'$.source')='remote-grid:oscar')) "
             "AND (json_extract(payload,'$.expires_at') IS NULL "
             "OR json_extract(payload,'$.expires_at')>?) "
             "AND (?=0 OR rowid<?) ORDER BY rowid DESC LIMIT ?",
