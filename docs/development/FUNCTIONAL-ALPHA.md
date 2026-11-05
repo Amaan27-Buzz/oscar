@@ -190,3 +190,27 @@ The existing Grid acceptance runner now permits an exact `--avd` guard, checks
 boot completion, and addresses only the explicit emulator serial. It no longer
 enumerates unrelated ADB devices. No OSCAR permission or transport security was
 weakened to accommodate this environment failure.
+
+## Shared model preferences — active continuation
+
+Android Preferences now includes Models. It reads the same Core selection and
+eligible routes as Desktop, supports Automatic for free-only routing, preserves an
+unavailable selection visibly, and refreshes authoritative state after a change.
+Model selection is implemented once in `oscar/model_preferences.py` and reused by
+both surface adapters; it never changes the executor's routing policy. The everyday
+launcher's existing persistence restores the shared selection on restart.
+
+Remote selection requires a current enrolled owner binding, `grid:approve` and
+`models` scopes, and Personal Policy approval. Ordinary paired observers cannot
+change it. Android clears model controls with private-state suppression, and
+does not optimistically announce a mutation as confirmed. No provider secrets or
+local-model fallback were added. The native page extends the existing Preferences
+component system; rendered/device acceptance remains unverified.
+
+Focused Desktop/Grid/launcher regressions passed (62 tests); the added owner,
+policy-denial and unavailable-selection check also passed. Python typechecking
+passed (111 modules). Android unit tests cover bounded/malformed model projections
+and preservation of an unavailable choice. Android unit tests, debug APK,
+instrumentation APK and lint passed after the final privacy guard. The debug APK
+SHA-256 is `2c19226fb7a66e1962fda3bd220058e30d04802dd4214c046d2e8096b865dd04`.
+The Windows ZIP is being refreshed separately; no device acceptance is implied.

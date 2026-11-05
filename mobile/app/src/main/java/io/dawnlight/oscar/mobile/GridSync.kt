@@ -123,7 +123,8 @@ internal fun parseGridSnapshot(json: JSONObject, expectedCore: String, expectedN
     json.bounded("relationship_id", 128)
     val basic = parseSnapshot(JSONObject().put("tasks", JSONArray()).put("nodes", json.getJSONArray("nodes"))
         .put("observed_at_ms", json.get("observed_at_ms")).put("presence", json.optJSONObject("presence") ?: JSONObject.NULL)
-        .put("executive", json.optJSONObject("executive") ?: JSONObject.NULL).put("connections", json.optJSONObject("connections") ?: JSONObject.NULL))
+        .put("executive", json.optJSONObject("executive") ?: JSONObject.NULL).put("connections", json.optJSONObject("connections") ?: JSONObject.NULL)
+        .put("models", json.optJSONObject("models") ?: JSONObject.NULL))
     basic.presence?.let { require(io.dawnlight.oscar.expression.Contract.validate(it, basic.observedAt) != null) { "Stale canonical presence" } }
     val tasks = json.getJSONArray("tasks"); require(tasks.length() <= 100)
     val parsed = (0 until tasks.length()).map { parseGridTask(tasks.getJSONObject(it), basic.nodes) }

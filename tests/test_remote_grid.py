@@ -66,6 +66,46 @@ class DirectClient:
 
 
 class RemoteGridTests(unittest.TestCase):
+    def test_owner_model_selection_is_shared_persisted_and_keeps_routing_policy(self):
+        from oscar.models import RoutingPolicy
+
+        h = self.core.harness
+        executor = h.dispatcher.executors["models.reason"]
+        policy = RoutingPolicy(require_free=True, max_paid_cost=0)
+        executor.policy = policy
+        with patch.object(h.router, "refresh"), patch.object(h.router, "rank", return_value=[]):
+            self.mobile.request("select_model", {"model": ""})
+            self.assertIs(policy, executor.policy)
+            self.assertEqual(
+                "free_first", h.store.get("desktop_model", "selection")["configuration"]["mode"]
+            )
+            self.assertEqual("", self.desktop.request("snapshot", {})["models"]["selected"])
+            self.assertTrue(self.mobile.request("snapshot", {})["models"]["free_only"])
+            with self.assertRaises(ValueError):
+                self.mobile.request("select_model", {"model": "paid::unavailable"})
+            self.assertIsNone(
+                h.store.get("desktop_model", "selection")["configuration"]["pinned_provider"]
+            )
+            PersonalPolicy(h.store).save(
+                PolicyRule(
+                    "deny-model-change",
+                    "core.models.select",
+                    PolicyEffect.DENY,
+                    "synthetic-owner",
+                    time(),
+                    time(),
+                    {},
+                    user_authoritative=True,
+                ),
+                owner_authorized=True,
+            )
+            with self.assertRaises(PermissionError):
+                self.mobile.request("select_model", {"model": ""})
+        observer = self.enroll("model-observer", "mobile")
+        with self.assertRaises(PermissionError):
+            observer.request("select_model", {"model": ""})
+        self.assertNotIn("models", observer.request("snapshot", {}))
+
     def test_memory_control_invitation_is_explicit_and_separate_from_retention(self):
         ordinary = self.invitation("ordinary-memory", retain=False)
         granted = self.invitation("granted-memory", retain=False, memory_control=True)

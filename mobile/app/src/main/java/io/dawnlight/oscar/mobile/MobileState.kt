@@ -41,7 +41,21 @@ data class CoreArtifact(val id: String, val kind: String, val status: String, va
 data class CoreNode(val id: String, val role: String, val status: String, val paired: Boolean, val capabilities: List<String>, val inputKinds: Set<String> = emptySet())
 data class CoreSnapshot(val tasks: List<CoreTask>, val nodes: List<CoreNode>, val observedAt: Long,
     val presence: String? = null, val setup: Map<String, String> = emptyMap(), val adaptive: List<AdaptiveDescriptor> = emptyList(), val executive: List<ExecutiveGoal>? = null,
-    val management: ManagementView? = null, val connections: ConnectionView? = null, val executiveTruncated: Boolean = false)
+    val management: ManagementView? = null, val connections: ConnectionView? = null, val executiveTruncated: Boolean = false,
+    val models: ModelChoices? = null)
+
+data class ModelChoices(val selected: String, val available: List<String>, val freeOnly: Boolean)
+
+internal fun parseModels(json: JSONObject): ModelChoices {
+    val selected = if (json.isNull("selected")) "" else json.boundedText("selected", 300)
+    val choices = json.getJSONArray("available"); require(choices.length() <= 100)
+    val available = (0 until choices.length()).map { index ->
+        val value = choices.get(index); require(value is String && value.length in 1..300 && value.none { it.isISOControl() }); value
+    }
+    require(available.distinct().size == available.size)
+    require(!json.has("free_only") || json.get("free_only") is Boolean)
+    return ModelChoices(selected, available, json.optBoolean("free_only", false))
+}
 data class ExecutiveGoal(val id: String, val goal: String, val state: String, val runs: Int, val maxRuns: Int)
 data class Interaction(val text: String, val response: String, val taskId: String? = null)
 /** An authenticated observation advances only with this process's monotonic clock. */
@@ -155,7 +169,7 @@ fun parseTask(json: JSONObject): CoreTask {
         evidence, value, blocker, response, json.optBoolean("response_truncated", false), progress, artifacts, ownership, origin, originNode,
         responseStatus = responseStatus, sourceEventIds = sources)
 }
-fun CoreSnapshot.withoutPrivate() = copy(adaptive = emptyList(), executive = null, executiveTruncated = false, management = null, connections = null, tasks = tasks.map { it.copy(description = "Private request hidden", response = null, value = null,
+fun CoreSnapshot.withoutPrivate() = copy(adaptive = emptyList(), executive = null, executiveTruncated = false, management = null, connections = null, models = null, tasks = tasks.map { it.copy(description = "Private request hidden", response = null, value = null,
     responseStatus = null, sourceEventIds = emptyList(),
     artifacts = emptyList(), progress = it.progress?.copy(step = "Worker checkpoint available"),
     blocker = it.blocker?.let { "Inspect Core before continuing" }, actions = it.actions.filter { action -> action in setOf("deny", "cancel") }) })
@@ -209,5 +223,6 @@ fun parseSnapshot(json: JSONObject): CoreSnapshot {
     } ?: false
     return CoreSnapshot(parsedTasks, parsedNodes, observed.toLong(), presence, setup, adaptive, executive,
         json.optJSONObject("executive")?.optJSONObject("management")?.let(::parseManagement),
-        json.optJSONObject("connections")?.let(::parseConnections), executiveTruncated)
+        json.optJSONObject("connections")?.let(::parseConnections), executiveTruncated,
+        json.optJSONObject("models")?.let(::parseModels))
 }

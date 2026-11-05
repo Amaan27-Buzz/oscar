@@ -761,6 +761,23 @@ class RemoteGrid:
         with self.lock:
             self.require(session, "grid:connect")
             self.grid.heartbeat(session)
+            if operation == "select_model" and set(payload) == {"model"}:
+                from .model_preferences import select_model
+
+                binding = self.require(session, "grid:approve")
+                self.require(session, "models")
+                if not binding["owner_public_key"]:
+                    raise PermissionError("Enrolled owner model selection required")
+                grants = frozenset(self.store.get("session", session.id)["scopes"])
+                decision = PersonalPolicy(self.store).evaluate(
+                    "core.models.select",
+                    ("grid:approve", "models"),
+                    grants,
+                    {"node": session.node_id, "source": "remote-grid"},
+                )
+                if not decision.allowed:
+                    raise PermissionError(decision.reason)
+                return select_model(self.h, payload["model"])
             if operation in {"snapshot", "conversation"}:
                 return self.snapshot(session, payload)
             if operation == "presence" and not payload:
@@ -2356,7 +2373,9 @@ class RemoteGrid:
         if "grid:approve" in self.store.get("session", session.id)["scopes"]:
             from .assistance import Assistance
             from .connections import snapshot as connections_snapshot
+            from .model_preferences import model_snapshot
 
+            snapshot["models"] = model_snapshot(self.h)
             snapshot["connections"] = connections_snapshot(self.h)
             snapshot["executive"] = {
                 **self.h.executive.snapshot(),

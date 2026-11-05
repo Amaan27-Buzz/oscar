@@ -608,113 +608,22 @@ class Desktop(Mobile):
             )
             return self.runtime.setup.snapshot()
         if op == "select_model" and set(payload) == {"model"}:
-            from dataclasses import replace
-
-            from .harness import ModelExecutor
-            from .models import Mode
+            from .model_preferences import select_model
 
             self.permission(session, "desktop.models", ("desktop:text", "models"))
             h = self.runtime.connections
-            executor = h.dispatcher.executors["models.reason"] if h else None
-            if h is None or not isinstance(executor, ModelExecutor):
+            if h is None:
                 raise PermissionError("Model selection unavailable")
-            if not isinstance(payload["model"], str) or len(payload["model"]) > 300:
-                raise ValueError("Choose an available model")
-            candidate = replace(
-                executor.template,
-                mode=Mode.LOCAL,
-                pinned_provider="ollama-local",
-                pinned_model=payload["model"],
-                pinned_slot=None,
-            )
-            if executor.policy.require_free:
-                provider, separator, model = payload["model"].partition("::")
-                if payload["model"] and (not separator or not provider or not model):
-                    raise ValueError("Choose an available cloud model")
-                candidate = replace(
-                    candidate,
-                    mode=Mode.FREE_FIRST,
-                    pinned_provider=provider or None,
-                    pinned_model=model or None,
-                    ollama_think=None,
-                )
-            h.router.refresh(candidate, executor.policy)
-            if payload["model"] and not h.router.rank(candidate, executor.policy):
-                raise ValueError("Selected model is unavailable under the current routing policy")
-            with self.store.transaction():
-                self.store.put(
-                    "desktop_model",
-                    "selection",
-                    {
-                        "configuration": {
-                            "mode": candidate.mode.value,
-                            "pinned_provider": candidate.pinned_provider,
-                            "pinned_model": candidate.pinned_model,
-                            "max_output_tokens": candidate.max_output_tokens,
-                            "ollama_think": candidate.ollama_think,
-                        }
-                    },
-                )
-                executor.template = candidate
-            return {"selected": candidate.pinned_model}
+            return select_model(h, payload["model"])
         if op == "snapshot" and payload == {}:
             from .assistance import Assistance
-            from .harness import ModelExecutor
 
             view = super().request(session, data)
             h = self.runtime.connections
             if h:
-                executor = h.dispatcher.executors.get("models.reason")
-                template = getattr(executor, "template", None)
-                view["models"] = {
-                    "selected": template.pinned_model if template else None,
-                    "available": sorted(
-                        {
-                            m.id
-                            for (provider, _), inventory in h.registry.inventories.items()
-                            if provider == "ollama-local"
-                            and inventory.source.current(h.grid.clock())
-                            for m in inventory.models
-                            if m.active and "text" in m.capabilities
-                        }
-                    ),
-                }
-                if (
-                    isinstance(executor, ModelExecutor)
-                    and template
-                    and executor.policy.require_free
-                ):
-                    from dataclasses import replace
+                from .model_preferences import model_snapshot
 
-                    unpinned = replace(template, pinned_provider=None, pinned_model=None)
-                    view["models"] = {
-                        "selected": (
-                            template.pinned_provider + "::" + template.pinned_model
-                            if template.pinned_provider and template.pinned_model
-                            else ""
-                        ),
-                        "available": sorted(
-                            {
-                                route.provider + "::" + route.model
-                                for route in h.router.rank(unpinned, executor.policy)
-                            }
-                        ),
-                        "free_only": True,
-                        "provider_plans": [
-                            {
-                                "id": provider,
-                                "confirmed": any(
-                                    h.router._confirmed_free_plan(s.id)
-                                    for s in h.pool.slots.values()
-                                    if s.provider == provider
-                                ),
-                            }
-                            for provider in ("google", "groq")
-                            if any(
-                                s.provider == provider and s.present for s in h.pool.slots.values()
-                            )
-                        ],
-                    }
+                view["models"] = model_snapshot(h)
             if self.runtime.connections is not None:
                 from .connections import snapshot
 

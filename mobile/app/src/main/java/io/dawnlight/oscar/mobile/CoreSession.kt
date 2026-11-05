@@ -192,6 +192,13 @@ class CoreSession(application: Application) : AndroidViewModel(application) {
             }
         }
     }
+    fun selectModel(model: String): Boolean {
+        if (mutable.value.privateSuppressed || mutable.value.link != Link.CONNECTED || mutable.value.snapshot?.models == null || model.length > 300) return false
+        return request { epoch ->
+            call("select_model", JSONObject().put("model", model), epoch)
+            if (mutable.value.epoch == epoch) refresh()
+        }
+    }
     fun send(text: String): Boolean {
         if (text.isBlank() || text.length > 1000 || mutable.value.privateSuppressed) return false
         if (client?.remote() == true) return submitRemote(text, "text", client!!.coreId(), JSONObject())
