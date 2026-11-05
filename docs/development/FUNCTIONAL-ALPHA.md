@@ -35,6 +35,14 @@ functional-alpha mandate. Quit OSCAR through Preferences or the tray to stop the
 Desktop and its launcher-owned Core. Closing Workspace alone leaves the tray active.
 Keep the data directory to preserve history across source rebuilds and upgrades.
 
+The everyday launcher also mounts the existing local Windows Worker into this Core.
+Preferences → Advanced controls → Direct device operations exposes its supported
+file, Git, installed-program version and typed PowerShell operations. Files are
+scoped to OSCAR's data workspace. Each consequential action still goes through
+signed Ask review; this does not activate owner Full Access. Installed application
+launches require separately allowed app IDs. No microphone, clipboard, screenshot
+or retained-screen grant is automatically enrolled.
+
 ## Evidence on 2026-11-05
 
 - Windows debug executable built; actual Workspace accessibility state showed Connected.
@@ -49,6 +57,9 @@ Keep the data directory to preserve history across source rebuilds and upgrades.
   regression batch passed. Android debug APK, unit tests and lint built successfully
   at `mobile/app/build/outputs/apk/debug/app-debug.apk`; emulator shared-Core
   acceptance has not yet run.
+- The actual local Worker performed a signed, disposable file write and a typed
+  PowerShell UTF-8 write with independent byte readback. Neither mutation ran
+  before approval. This does not establish broad visual computer-use acceptance.
 
 Full GUI message/selection acceptance remains unverified. This is a development
 executable, not a self-contained installer. Broader native execution, Workers,

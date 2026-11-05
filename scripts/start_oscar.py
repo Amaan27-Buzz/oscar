@@ -6,33 +6,40 @@ Never reads project credential files. Provider setup uses the existing OS Vault.
 import argparse
 import json
 import os
+import shutil
 import subprocess
+import sys
 from dataclasses import replace
 from pathlib import Path
 from queue import Queue
 from threading import Thread
 
 from oscar.cloud_state import DataDirectoryLock
+from oscar.connectors import ConnectorVerifier
 from oscar.desktop import Desktop
-from oscar.grid import Node, NodeRole
+from oscar.desktop_verify import DesktopVerifier
+from oscar.grid import InternalSessionRuntime, Node, NodeRole
 from oscar.harness import Harness
+from oscar.interactive_worker import InteractiveWorker
+from oscar.machine import MachineScope, MachineVerifier
 from oscar.mobile import MobileServer
 from oscar.models import ModelRequest, RoutingPolicy
 from oscar.policy import PersonalPolicy
 from oscar.storage import Store
+from oscar.transport import Dispatcher
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def renew_local_execution(state: Path) -> bool:
+def renew_local_execution(state: Path, node_id: str = "oscar-local-core") -> bool:
     """A trusted local restart may renew expiry, but never undo revocation."""
     if not state.is_file():
         return False
     store = Store(state)
     try:
         try:
-            node = store.get("node", "oscar-local-core")
-            binding = store.get("core_execution", "oscar-local-core")
+            node = store.get("node", node_id)
+            binding = store.get("core_execution", node_id)
             session = store.get("session", binding["session_id"])
         except KeyError:
             return False
@@ -40,13 +47,13 @@ def renew_local_execution(state: Path) -> bool:
             not node["revoked"]
             and not session["revoked"]
             and session.get("internal")
-            and session["node_id"] == "oscar-local-core"
+            and session["node_id"] == node_id
         )
     finally:
         store.close()
 
 
-def desktop_session(h: Harness):
+def desktop_session(h: Harness, worker_node: str | None = None):
     """Local trusted enrollment; each launch replaces the old surface session."""
     scopes = (
         "heartbeat",
@@ -62,11 +69,24 @@ def desktop_session(h: Harness):
         *(f"control:{op}:{h.node_id}" for op in ("inspect", "approve", "cancel")),
     )
     node = "oscar-local-desktop"
+    base_scopes = scopes
+    if worker_node:
+        scopes += (
+            "files:read",
+            "machine:host",
+            "desktop:control",
+            *(f"control:{op}:{worker_node}" for op in ("inspect", "approve", "cancel")),
+        )
     try:
         existing = h.store.get("node", node)
     except KeyError:
         h.grid.register(Node(node, NodeRole.DESKTOP, scopes))
     else:
+        # Migrate only the exact first everyday-launcher enrollment, never an
+        # enrollment whose owner has narrowed or revoked its grants.
+        if not existing["revoked"] and set(existing["scopes"]) == set(base_scopes) and worker_node:
+            h.store.put("node", node, {**existing, "scopes": list(scopes)})
+            existing = h.store.get("node", node)
         if existing["revoked"] or set(existing["scopes"]) != set(scopes):
             raise PermissionError("Desktop enrollment changed; inspect before restarting")
     with h.store.transaction():
@@ -74,6 +94,62 @@ def desktop_session(h: Harness):
             if previous["node_id"] == node and not previous["revoked"]:
                 h.store.put("session", previous["id"], {**previous, "revoked": True})
         return h.grid.pair(node, scopes, ttl=86400)
+
+
+def mount_windows_worker(h: Harness, state: Path):
+    """Mount installed executors under Ask; no capture, clipboard or microphone grant."""
+    node_id = "oscar-local-windows"
+    scopes = (
+        "heartbeat",
+        "advertise",
+        "execute",
+        "cancel",
+        "pause",
+        "files:read",
+        "files:write",
+        "machine:host",
+        "desktop:control",
+    )
+    try:
+        existing = h.store.get("node", node_id)
+    except KeyError:
+        h.grid.register(Node(node_id, NodeRole.DESKTOP, scopes))
+    else:
+        if existing["revoked"] or set(existing["scopes"]) != set(scopes):
+            raise PermissionError("Windows Worker enrollment changed; inspect before restarting")
+    session = h.grid.pair(
+        node_id,
+        scopes,
+        internal=True,
+        reenroll=renew_local_execution(state, node_id),
+    )
+    executables = [sys.executable]
+    for command in ("git.exe", "pwsh.exe", "powershell.exe"):
+        executable = shutil.which(command)
+        if executable:
+            executables.append(executable)
+    worker = InteractiveWorker(
+        h.store,
+        h.grid,
+        session,
+        MachineScope(h.files.root, True, tuple(dict.fromkeys(executables))),
+        PersonalPolicy(h.store),
+        desktop=True,
+    )
+    capabilities = worker.capabilities()
+    h.grid.advertise(session, capabilities)
+    dispatcher = Dispatcher(h.store, h.grid, node_id, worker.executors())
+    h.executive.targets[node_id] = (dispatcher, session)
+    verifier = h.runtime.verifier
+    if not isinstance(verifier, ConnectorVerifier):
+        raise RuntimeError("Canonical connector verifier composition changed")
+    verifier.base = MachineVerifier(worker.files)
+    if worker.desktop:
+        verifier.base = DesktopVerifier(verifier.base, worker.desktop)
+    maintenance = InternalSessionRuntime(h.grid, session)
+    maintenance.thread.start()
+    h.store.close_callbacks.insert(0, maintenance.close)
+    return worker
 
 
 def run_desktop(core: Desktop, session, executable: Path) -> None:
@@ -196,8 +272,20 @@ def main() -> int:
                 raise RuntimeError("Local model returned no answer")
             print("Real local inference completed through OSCAR Model Router.")
             return 0
-        session = desktop_session(h)
-        core = Desktop(h.runtime, PersonalPolicy(h.store), {h.node_id: (h.dispatcher, h.session)})
+        worker = mount_windows_worker(h, data / "core.sqlite")
+        session = desktop_session(h, worker.session.node_id)
+        core = Desktop(
+            h.runtime,
+            PersonalPolicy(h.store),
+            h.executive.targets,
+            native_catalogs={
+                worker.session.node_id: {
+                    "executables": worker.scope.allowed_executables,
+                    "applications": worker.desktop.catalog() if worker.desktop else [],
+                }
+            },
+            worker_outputs={worker.session.node_id: worker.outputs},
+        )
         run_desktop(core, session, executable)
     return 0
 
