@@ -114,6 +114,7 @@ class ModelExecutor:
                         "observations": self.grid is not None,
                         "connector_plans": self.connector_plans is not None,
                         "draft_attempts": 2,
+                        "structured_planning": "when_eligible",
                     },
                     default=sorted,
                 )
@@ -121,18 +122,24 @@ class ModelExecutor:
         )
 
     def __call__(self, action: Action, cancellation: Cancellation) -> Result:
+        planning = "planning_sources" in action.parameters and (
+            "structured" in self.template.required
+            or bool(
+                self.router.rank(
+                    replace(self.template, required=self.template.required | {"structured"}),
+                    self.policy,
+                )
+            )
+        )
+        required = self.template.required | ({"structured"} if planning else set())
         connector_schemas = {
             pin["capability_id"]: self.connector_plans.current(pin)["schema"]
             for pin in action.parameters.get("connector_contracts", [])
-            if self.connector_plans is not None and "structured" in self.template.required
+            if self.connector_plans is not None and "structured" in required
         }
         native_capabilities = None
         native_kinds = {}
-        if (
-            "planning_sources" in action.parameters
-            and "structured" in self.template.required
-            and self.grid is not None
-        ):
+        if planning and self.grid is not None:
             binding = self.grid.store.get("plan", action.task_id)["executive"]
             worker = self.grid.store.get("executive_worker", binding["worker_id"])
             native_capabilities = tuple(
@@ -164,15 +171,11 @@ class ModelExecutor:
             task_id=action.task_id,
             correlation_id=action.correlation_id,
             prompt=action.parameters["prompt"],
+            required=frozenset(required),
             mode=Mode.PRIVATE if action.parameters.get("mode") == "private" else self.template.mode,
-            executive_plan=(
-                "planning_sources" in action.parameters and "structured" in self.template.required
-            ),
+            executive_plan=planning,
             executive_observation=(
-                tuple(action.parameters.get("observation_only", ()))
-                if "planning_sources" in action.parameters
-                and "structured" in self.template.required
-                else ()
+                tuple(action.parameters.get("observation_only", ())) if planning else ()
             ),
             executive_connector_schemas=connector_schemas,
             executive_native_capabilities=native_capabilities,
