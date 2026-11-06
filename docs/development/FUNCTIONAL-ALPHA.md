@@ -13,17 +13,20 @@ python -m scripts.build_desktop
 python -m scripts.start_oscar
 ```
 
-The owner requested cloud inference only on 2026-11-06. Local models and paid
-fallbacks are disabled in the everyday launcher. To check live inference:
+The owner initially requested cloud inference only, then explicitly authorized
+installed local inference and full local compute. The everyday launcher supports
+available local models alongside verified-free cloud routes; paid fallback remains
+disabled. To check live cloud inference:
 
 ```powershell
 python -m scripts.start_oscar --check --provider openrouter
 ```
 
 Preferences → Intelligence offers automatic verified-free routing and available
-cloud models. Selection is persisted. Optional `--provider` and `--model` pins
+cloud and installed local models. Selection is persisted. Optional `--provider` and `--model` pins
 override it for a launch. Eligibility requires current live zero-price evidence;
-cached free labels, subscriptions, local models and unknown pricing cannot qualify.
+cached free labels, subscriptions and unknown cloud pricing cannot qualify.
+Explicitly permitted local inference is a separate routing class.
 No provider quotas are invented or multiplied by the number of keys. Groq/Gemini
 free plans require account-specific evidence; a general free-tier advertisement
 does not prove that a particular key cannot incur charges.
