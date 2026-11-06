@@ -46,3 +46,11 @@ it('only displays measured progress within the supported range',()=>{
  rerender(<Activity {...props} view={{...initialView,current:{...task,progress:{fraction:.5,step:'Writing',status:'working'}}}}/>);
  expect(screen.getByRole('progressbar').getAttribute('value')).toBe('0.5');
 });
+
+it('management reviews need no existing task but still expire',()=>{
+ vi.useFakeTimers();const run=vi.fn();
+ render(<Activity view={{...initialView,review:{...review,requires_task:false,task_id:'new',expires_at_ms:Date.now()+1000}}} available busy={false} run={run} back={vi.fn()}/>);
+ const button=screen.getByRole('button',{name:'Continue to confirmation'}) as HTMLButtonElement;
+ expect(button.disabled).toBe(false);fireEvent.click(button);expect(run).toHaveBeenCalledWith({kind:'confirm',review_id:'exact',accept:true});
+ act(()=>vi.advanceTimersByTime(1001));expect(button.disabled).toBe(true);
+});

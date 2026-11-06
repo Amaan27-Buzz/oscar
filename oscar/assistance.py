@@ -4,6 +4,7 @@ import base64
 import json
 import re
 from dataclasses import asdict
+from time import time
 from typing import TYPE_CHECKING, Any
 
 from .contracts import Epistemic, new_id, record
@@ -22,19 +23,39 @@ class Assistance:
         self.h = harness
 
     @staticmethod
-    def conversation_change(text: str) -> dict[str, Any] | None:
+    def conversation_change(text: str, *, now: float | None = None) -> dict[str, Any] | None:
         instruction = text.strip()
         if re.match(r"every\b", instruction, re.IGNORECASE):
-            return Assistance.natural_change(instruction)
+            return Assistance.natural_change(instruction, now=now)
+        if re.match(r"in [0-9]+ (?:seconds?|minutes?|hours?)\b", instruction, re.IGNORECASE):
+            return Assistance.natural_change(instruction, now=now)
         match = re.fullmatch(r"create automation: ?(.+)", instruction, re.IGNORECASE | re.DOTALL)
-        return Assistance.natural_change(match[1]) if match else None
+        return Assistance.natural_change(match[1], now=now) if match else None
 
     @staticmethod
-    def natural_change(text: str, name: str = "OSCAR responsibility") -> dict[str, Any]:
+    def natural_change(
+        text: str, name: str = "OSCAR responsibility", *, now: float | None = None
+    ) -> dict[str, Any]:
         """Explicit bounded schedules; missing run counts never imply standing authority."""
         if not isinstance(text, str) or not 1 <= len(text) <= 512:
             raise ValueError("bounded responsibility instruction required")
         interval, runs = None, 1
+        start_at = None
+        delayed = re.fullmatch(
+            r"in ([0-9]{1,6}) (seconds?|minutes?|hours?)[:,] ?(.+)",
+            text.strip(),
+            re.IGNORECASE | re.DOTALL,
+        )
+        if delayed:
+            delay = (
+                int(delayed[1])
+                * {"second": 1, "minute": 60, "hour": 3600}[delayed[2].lower().rstrip("s")]
+            )
+            if not 1 <= delay <= 604800:
+                raise ValueError("one-off delay must be between one second and seven days")
+            start_at, text = (time() if now is None else now) + delay, delayed[3]
+        elif re.match(r"in [0-9]+ (?:seconds?|minutes?|hours?)\b", text, re.IGNORECASE):
+            raise ValueError("Use an explicit delay followed by a comma or colon and the action")
         scheduled = re.fullmatch(
             r"every (hour|day|week) for ([0-9]{1,3}) (?:runs|times)[:,] ?(.+)",
             text.strip(),
@@ -54,7 +75,7 @@ class Assistance:
                 "name": name,
                 "instruction": text,
                 "node_id": "",
-                "start_at": None,
+                "start_at": start_at,
                 "interval_seconds": interval,
                 "max_runs": runs,
                 "priority": 0,

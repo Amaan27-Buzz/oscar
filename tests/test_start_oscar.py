@@ -104,3 +104,19 @@ class EverydayDesktopTests(ConversationTests):
         self.h.store.put("node", self.session.node_id, {**node, "revoked": True})
         with self.assertRaises(PermissionError):
             desktop_session(self.h)
+
+    def test_exact_legacy_enrollment_adds_automation_readback_but_narrowed_scope_does_not(self):
+        self.session = desktop_session(self.h)
+        node = self.h.store.get("node", self.session.node_id)
+        legacy = [scope for scope in node["scopes"] if scope != "executive:read"]
+        self.h.store.put("node", self.session.node_id, {**node, "scopes": legacy})
+        self.session = desktop_session(self.h)
+        self.assertIn("executive", self.call("snapshot", {}))
+        node = self.h.store.get("node", self.session.node_id)
+        self.h.store.put(
+            "node",
+            self.session.node_id,
+            {**node, "scopes": [s for s in node["scopes"] if s != "files:write"]},
+        )
+        with self.assertRaises(PermissionError):
+            desktop_session(self.h)

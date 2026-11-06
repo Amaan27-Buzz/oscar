@@ -73,6 +73,7 @@ def desktop_session(h: Harness, worker_node: str | None = None) -> SessionHandle
         "desktop:conversation:read",
         "desktop:conversation:retain",
         "models",
+        "executive:read",
         "math",
         "memory:read",
         "files:write",
@@ -99,7 +100,11 @@ def desktop_session(h: Harness, worker_node: str | None = None) -> SessionHandle
     else:
         # Migrate only the exact first everyday-launcher enrollment, never an
         # enrollment whose owner has narrowed or revoked its grants.
-        if not existing["revoked"] and set(existing["scopes"]) == set(base_scopes) and worker_node:
+        if not existing["revoked"] and set(existing["scopes"]) in (
+            set(base_scopes),
+            set(base_scopes) - {"executive:read"},
+            set(scopes) - {"executive:read"},
+        ):
             h.store.put("node", node, {**existing, "scopes": list(scopes)})
             existing = h.store.get("node", node)
         if existing["revoked"] or set(existing["scopes"]) != set(scopes):
@@ -334,9 +339,7 @@ def main() -> int:
         if args.check:
             h.start()
             if not routes:
-                raise RuntimeError(
-                    "No eligible zero-cost model available; no paid fallback used"
-                )
+                raise RuntimeError("No eligible zero-cost model available; no paid fallback used")
             result = h.router.execute(
                 replace(template, prompt="Reply with a short greeting.", max_output_tokens=64),
                 policy,

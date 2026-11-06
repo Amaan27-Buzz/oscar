@@ -17,7 +17,7 @@ export interface Capability {id:string;node:string;kind:string;label:string;summ
   operations:string[];programs:Choice[];applications:Choice[];permissions?:string[]}
 export interface Preview {preview_id:string;before:string|null;after:string;epistemic:string;expires:number;destinations:string[];
   focused_before?:string|null;focused_after?:string|null;mode?:string}
-export interface Review {review_id:string;task_id?:string;operation:string;description:string;target:string;capability:string;reason:string;
+export interface Review {requires_task?:boolean;review_id:string;task_id?:string;operation:string;description:string;target:string;capability:string;reason:string;
   consequence:string;policy_reason:string;evidence_state:string;review:string;expires_at_ms:number}
 export interface ExpressionReadback {epoch:string;generation:number;observed_at_ms:number;voice_observed_at_ms:number;tasks_observed_at_ms:number;current_observed_at_ms:number}
 export interface RequestFeedback {kind:'blocked'|'denied'|'unknown'|'rejected';message:string;observed_at_ms:number}

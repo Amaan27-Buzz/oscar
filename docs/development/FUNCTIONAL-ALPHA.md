@@ -453,3 +453,29 @@ typechecking passed. The actual source-built Devices screen and default-off form
 were inspected; checkbox sizing was then corrected and native build passed.
 No new real owner device was enrolled during the inspection. Final packaged
 pairing and physical-phone onboarding acceptance remain outstanding.
+
+
+## Bounded delayed requests and native review repair
+
+Conversation recognizes explicit delays such as `In 90 seconds, 19 + 23`,
+bounded to one second through seven days and one run. Desktop and remote Grid
+compute absolute due time from the Core clock before exact signed review.
+Malformed delays fail rather than silently becoming immediate work.
+
+Live native acceptance exposed management reviews incorrectly requiring an
+existing task. The native bridge now explicitly projects whether a task is
+required. Expiry, signed material and current-policy checks remain enforced.
+Actual Workspace submission and Windows confirmation created one scheduled
+addition. Independent Core readback confirmed completed/run_index=1 and the
+bound task verified. The launcher now includes executive:read for automation
+readback, migrating only exact legacy scope sets. Narrowed or revoked
+enrollments still refuse startup.
+
+Checks passed: 135 assistance/Executive/cloud/Desktop/Grid Python cases,
+20 launcher cases, 28 Activity/Workspace cases, 42 Rust tests (one optional
+synthetic voice fixture ignored), UI/native builds, Ruff and mypy.
+
+The preceding pairing package from clean 6fbd996 passed real local Qwen3.5 4B
+inference outside the checkout; it predates this delay/review repair.
+Physical-phone onboarding and production HTTPS hosting remain unverified.
+The restored .env.local was not edited and remains ignored/untracked.

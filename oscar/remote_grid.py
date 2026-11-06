@@ -1028,7 +1028,7 @@ class RemoteGrid:
             from .communication import prepare
 
             try:
-                proposal = Assistance.conversation_change(payload["text"])
+                proposal = Assistance.conversation_change(payload["text"], now=self.grid.clock())
             except ValueError:
                 return {
                     "state": "blocked",

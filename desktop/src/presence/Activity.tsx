@@ -13,7 +13,7 @@ export function Activity({view,available,busy,run,back,human=false}:{human?:bool
   const [now,setNow]=useState(Date.now());
   const review=view.review;
   const task=review?(view.current?.task_id===review.task_id?view.current:view.tasks.find(t=>t.task_id===review.task_id)):view.current;
-  const decisionCurrent=!!review&&!!task&&task.actions.includes(review.operation)&&now<review.expires_at_ms;
+  const decisionCurrent=!!review&&(review.requires_task===false||(!!task&&task.actions.includes(review.operation)))&&now<review.expires_at_ms;
   useEffect(()=>{title.current?.focus({preventScroll:true});},[]);
   useEffect(()=>{
     if(!review)return;

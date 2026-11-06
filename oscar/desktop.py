@@ -982,7 +982,7 @@ class Desktop(Mobile):
                         from .communication import prepare
 
                         try:
-                            proposal = Assistance.conversation_change(text)
+                            proposal = Assistance.conversation_change(text, now=self.grid.clock())
                             if proposal is not None:
                                 return {"assistance_proposal": proposal}
                             communication = prepare(self.runtime.connections, text)

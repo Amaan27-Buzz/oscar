@@ -736,7 +736,7 @@ async fn desktop_command(
                 let path = directory.join("connection.dat");
                 let connection = remote::Connection::load(&path)?.ok_or("Connect this Desktop first")?;
                 let scope = config.scope(&connection, &directory)?;
-                let review = ReviewView {review_id:"desktop-sharing".into(),task_id:"desktop-sharing".into(),operation:"share".into(),
+                let review = ReviewView { requires_task: true,review_id:"desktop-sharing".into(),task_id:"desktop-sharing".into(),operation:"share".into(),
                     description:"Share this Desktop's execution capabilities".into(),target:connection.url.clone(),capability:"Local Desktop execution".into(),
                     reason:"Explicit local workspace and capability selection".into(),consequence:"The enrolled Core may request these capabilities while sharing is running. Host commands use your Windows account's OS permissions.".into(),
                     policy_reason:"This grant does not activate Secure or Full Access. Existing Core approval, policy and revocation remain authoritative.".into(),evidence_state:"Installed capability availability is checked by the runtime".into(),
@@ -789,7 +789,7 @@ async fn desktop_command(
             let handle = app.clone();
             let (client, connection) = tauri::async_runtime::spawn_blocking(move || -> Result<_, String> {
                 let mut connection = remote::Connection::load(&path)?.ok_or("Prepare this device first")?;
-                let review = ReviewView { review_id: "enrollment".into(), task_id: "enrollment".into(), operation: "enroll".into(),
+                let review = ReviewView { requires_task: true, review_id: "enrollment".into(), task_id: "enrollment".into(), operation: "enroll".into(),
                     description: "Connect this Desktop to your OSCAR Core".into(), target: connection.url.clone(), capability: "Grid connection".into(),
                     reason: "Trusted operator invitation".into(), consequence: "Share authorized conversation and device state with this Core".into(),
                     policy_reason: "Only enrolled scopes apply; changes still need exact review".into(), evidence_state: "Owner enrollment required".into(),
@@ -1201,7 +1201,7 @@ fn main() {
                     if baseline=="--baseline-menu" {
                         if let Some(window)=handle.get_webview_window("main"){let _=window.popup_menu_at(&menu,tauri::LogicalPosition::new(30.,30.));}
                     }else if baseline=="--baseline-dialog" {
-                        owner_review(&handle,&ReviewView {review_id:"synthetic-unusable".into(),task_id:"synthetic-unusable".into(),operation:"approve".into(),description:"Synthetic capture only".into(),target:"fixture-worker".into(),capability:"machine.files.write".into(),reason:"Development baseline capture".into(),consequence:"No action or signature is possible in this capture mode".into(),policy_reason:"Native presentation only; no Core or credentials".into(),evidence_state:"SIMULATED / unexecuted".into(),review:"notes/reference.txt\nSynthetic content only. This dialog cannot authorize work.".into(),expires_at_ms:0});
+                        owner_review(&handle,&ReviewView { requires_task: true,review_id:"synthetic-unusable".into(),task_id:"synthetic-unusable".into(),operation:"approve".into(),description:"Synthetic capture only".into(),target:"fixture-worker".into(),capability:"machine.files.write".into(),reason:"Development baseline capture".into(),consequence:"No action or signature is possible in this capture mode".into(),policy_reason:"Native presentation only; no Core or credentials".into(),evidence_state:"SIMULATED / unexecuted".into(),review:"notes/reference.txt\nSynthetic content only. This dialog cannot authorize work.".into(),expires_at_ms:0});
                     }else {
                         let window=handle.get_webview_window("main").expect("owned lifecycle window");
                         window.close().expect("close request");thread::sleep(Duration::from_millis(700));

@@ -9,6 +9,16 @@ from tests import test_authority as fixture
 
 
 class AssistanceTests(unittest.TestCase):
+    def test_one_off_relative_time_uses_core_clock_and_never_creates_recurrence(self):
+        change = Assistance.conversation_change("In 1 minute, 2 + 3", now=1000)
+        self.assertEqual(1060, change["value"]["start_at"])
+        self.assertEqual("2 + 3", change["value"]["instruction"])
+        self.assertEqual(1, change["value"]["max_runs"])
+        self.assertIsNone(change["value"]["interval_seconds"])
+        for text in ("In 0 seconds: 2 + 3", "In 999999 hours: 2 + 3", "In 1 minute do that"):
+            with self.assertRaises(ValueError):
+                Assistance.conversation_change(text, now=1000)
+
     setUp = fixture.StandingAuthorityTests.setUp
     signature = fixture.StandingAuthorityTests.signature
 

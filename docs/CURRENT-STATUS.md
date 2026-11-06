@@ -6,7 +6,8 @@ supersede the dated closeout as the live continuation record. Persistent Desktop
 verified-free cloud inference, scoped Windows execution, first-run introduction,
 shared Grid history and Android model-selection integration are implemented within
 the boundaries recorded there. Windows and Android alpha artifacts are built;
-native Android runtime acceptance is blocked by an emulator graphics failure.
+native Android Grid and real-model conversation acceptance passed on the disposable
+API 36.1 emulator after repairing its target metadata.
 The full mandate remains PARTIAL; no production, physical-device or full gate
 acceptance is claimed. Earlier receipts below remain historical evidence.
 

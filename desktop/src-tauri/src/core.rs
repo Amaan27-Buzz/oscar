@@ -316,6 +316,7 @@ impl CoreClient {
         };
         let id = uuid::Uuid::new_v4().simple().to_string();
         let view = ReviewView {
+            requires_task: complete_operation == "complete",
             review_id: id.clone(),
             task_id: task_id.into(),
             operation: text("operation")?,
@@ -1595,6 +1596,7 @@ mod tests {
         )
         .expect("client");
         let view = ReviewView {
+            requires_task: true,
             review_id: "stale".into(),
             task_id: "fixture".into(),
             operation: "approve".into(),
@@ -1626,6 +1628,7 @@ mod tests {
         );
         assert!(client.confirm("stale", true, |_| true).is_err());
         let fresh = ReviewView {
+            requires_task: true,
             expires_at_ms: now_ms() + 30000,
             ..view
         };
@@ -1858,6 +1861,7 @@ mod tests {
                 ..Default::default()
             });
             view.review = Some(ReviewView {
+                requires_task: true,
                 review_id: "review".into(),
                 task_id: "new".into(),
                 operation: "approve".into(),

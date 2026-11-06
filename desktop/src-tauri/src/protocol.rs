@@ -361,6 +361,7 @@ pub struct PreviewView {
 }
 #[derive(Clone, Serialize, PartialEq)]
 pub struct ReviewView {
+    pub requires_task: bool,
     pub review_id: String,
     pub task_id: String,
     pub operation: String,
